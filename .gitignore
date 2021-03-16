@@ -1,0 +1,4 @@
+.pylint.d
+.pylint.d/*
+__pycache__
+*.pyc

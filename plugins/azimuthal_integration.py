@@ -14,3 +14,9 @@ class AzimuthalIntegration(ProcPlugin):
 
     def __init__(self):
         pass
+
+
+    def execute(self, *data, **kwargs):
+        import numpy as np
+        print(f'Execute plugin {self.name} with arguments: {data}, {kwargs}')
+        return np.array(np.sum(data)), kwargs

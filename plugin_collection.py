@@ -8,9 +8,28 @@ import importlib
 import os
 import inspect
 import sys
-import plugins.base_plugins as base_plugins
 
-class PluginCollection:
+INPUT_PLUGIN = 0
+PROC_PLUGIN = 1
+OUTPUT_PLUGIN = 2
+
+class _PluginCollectionFactory:
+    """
+    Singleton factory to make sure that only one PluginCollection exists
+    at runtime.
+    """
+    def __init__(self):
+        self._instance = None
+
+    def __call__(self, plugin_path=None):
+        if not self._instance:
+            self._instance = _PluginCollection(plugin_path)
+        return self._instance
+
+PluginCollection = _PluginCollectionFactory()
+
+
+class _PluginCollection:
     """
     Class to hold references of all plugins
     """
@@ -33,11 +52,13 @@ class PluginCollection:
             plugin_path = os.path.join(os.path.dirname(__file__), 'plugins')
         if plugin_path not in sys.path:
             sys.path.insert(0, plugin_path)
-        self.plugins = {}
-        self.plugins['base'] = {}
-        self.plugins['proc'] = {}
-        self.plugins['input'] = {}
-        self.plugins['output'] = {}
+        self.plugins = dict(base={}, proc={}, input={}, output={})
+        # self.plugins['base'] = {}
+        # self.plugins['proc'] = {}
+        # self.plugins['input'] = {}
+        # self.plugins['output'] = {}
+        self.plugin_names = []
+        self.plugin_classnames = []
         self.find_plugins(plugin_path)
 
     def find_files(self, path):
@@ -74,20 +95,10 @@ class PluginCollection:
 
     def find_plugins(self, path, reload=True):
         """
-        Find plugins in the specified path.
-
-        Parameters
-        ----------
-        path : str
-            The file system search path.
-        reload : bool
-            Keyword to toggle reloading of plugins. Default is True.
-
-        Returns
-        -------
-        None.
-
+        TO DO
         """
+
+        path = path if not os.path.isfile(path) else os.path.dirname(path)
         _modules = [item[len(path)+len(os.sep):-3].replace(os.sep, '.')
                   for item in self.find_files(path)]
         if len(_modules) == 0:
@@ -99,17 +110,35 @@ class PluginCollection:
             for _name, _cls in clsmembers:
                 if not self.plugin_consistency_check(_cls):
                     continue
-                if (_cls.basic_plugin and
-                    (_name not in self.plugins['base'] or reload)):
-                    self.plugins['base'][_name] = _cls
-                for ptype, key in [[base_plugins.INPUT_PLUGIN, 'input'],
-                                   [base_plugins.PROC_PLUGIN, 'proc'],
-                                   [base_plugins.OUTPUT_PLUGIN, 'output']]:
-                    if (not _cls.basic_plugin and
-                        _cls.plugin_type == ptype and
-                        (_name not in self.plugins[key] or reload)):
-                        self.plugins[key][_name] = _cls
+                if (_name in self.plugin_names or
+                    _cls.__name__ in self.plugin_classnames) and not reload:
+                    raise NameError(f'Plugin with name "{_name}" and '
+                                    f'class name {_cls.__name__} already'
+                                    'exists in plugin catalogue.')
+                ptype = self.plugin_type_check(_cls)
+                if (_name not in self.plugins[ptype] or reload):
+                    self.plugins[ptype][_name] = _cls
+                    if _name not in self.plugin_names:
+                        self.plugin_names.append(_name)
+                    if _cls.__name__ not in self.plugin_classnames:
+                        self.plugin_names.append(_cls.__name__)
             del _m
+
+    @staticmethod
+    def plugin_type_check(cls_item):
+        """
+        TO DO
+        """
+        if cls_item.basic_plugin:
+            return 'base'
+        if cls_item.plugin_type == INPUT_PLUGIN:
+            return 'input'
+        if cls_item.plugin_type == PROC_PLUGIN:
+            return 'proc'
+        if cls_item.plugin_type == OUTPUT_PLUGIN:
+            return 'output'
+        raise ValueError('Could not determine the plugin type for'
+                         'class "{cls_item.__name__}"')
 
     @staticmethod
     def plugin_consistency_check(cls_item):
@@ -131,3 +160,47 @@ class PluginCollection:
             hasattr(cls_item, 'execute')):
             return True
         return False
+
+    def get_all_plugins(self):
+        """
+        TO DO
+        """
+        _d = {**self.plugins['input'], **self.plugins['proc'],
+              **self.plugins['output']}
+        _res = []
+        for key, item in _d.items():
+            _res.append(item)
+        del _d
+        return _res
+
+    def get_all_plugin_names(self):
+        """
+        TO DO
+        """
+        _d = {**self.plugins['input'], **self.plugins['proc'],
+              **self.plugins['output']}
+        _res = []
+        for key, item in _d.items():
+            _res.append(item.name)
+        del _d
+        return _res
+
+
+    def get_plugin_by_name(self, name):
+        """
+        TO DO
+        """
+        for _plugin in self.get_all_plugins():
+            if name == _plugin.name:
+                return _plugin
+        raise KeyError(f'No plugin with name "{name}" has been registered!')
+
+    def get_plugin_by_class_name(self, name):
+        """
+        TO DO
+        """
+        for _plugin in self.get_all_plugins():
+            if name == _plugin.__name__:
+                return _plugin
+        raise KeyError(f'No plugin with claass name "{name}" has been '
+                       'registered!')

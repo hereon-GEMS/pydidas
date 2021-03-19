@@ -11,3 +11,7 @@ class PeakFitting(ProcPlugin):
 
     def __init__(self):
         pass
+
+    def execute(self, *data, **kwargs):
+        print(f'Execute plugin {self.name} with arguments: {data}, {kwargs}')
+        return data, kwargs

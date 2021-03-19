@@ -11,3 +11,10 @@ class BackgroundCorrection(ProcPlugin):
 
     def __init__(self):
         pass
+
+    def execute(self, *data, **kwargs):
+        print(f'Execute plugin {self.name} with arguments: {data}, {kwargs}')
+        for _data in data:
+            _data -= 1
+        return data, kwargs
+

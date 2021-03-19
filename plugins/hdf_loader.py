@@ -12,3 +12,8 @@ class HdfLoader(InputPlugin):
 
     def __init__(self):
         pass
+
+    def execute(self, i, **kwargs):
+        import numpy as np
+        print(f'Execute plugin {self.name} with arguments: {i}, {kwargs}')
+        return np.arange((i)), {}

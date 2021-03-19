@@ -4,13 +4,15 @@ Created on Tue Mar 16 10:39:19 2021
 
 @author: ogurreck
 """
-from PyQt5 import QtWidgets, Qt, QtGui
+from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
 from plugin_workflow_gui.plugin_collection import PluginCollection
 
 PLUGIN_COLLECTION = PluginCollection()
 
 class PluginTreeView(QtWidgets.QTreeView):
+    name_selected_signal = QtCore.pyqtSlot(str)
+
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
@@ -41,6 +43,17 @@ class PluginTreeView(QtWidgets.QTreeView):
         self.setModel(treeModel)
         self.expandAll()
         self.setItemDelegate(PluginCollectionTreeDelegate(rootNode))
+
+        # self.doubleClicked.connect(self.parent.tree_changed)#doubleClicked)
+
+    # @QtCore.pyqtSlot(str)
+    # def name_selected_signal(self, value):
+
+
+    def _doubleClicked(self, index):
+        item = self.selectedIndexes()[0]
+        print(item.model().itemFromIndex(index).text())
+
         # self.setDragEnabled(True)
 
     # def edit(self, index, trigger, event):

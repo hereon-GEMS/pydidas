@@ -5,7 +5,7 @@ Created on Tue Mar 16 11:39:13 2021
 @author: ogurreck
 """
 from copy import copy
-from plugin_workflow_gui.generic_tree import GenericNode
+from plugin_workflow_gui.generic_tree import GenericNode, GenericTree
 
 class WorkflowNode(GenericNode):
     def __init__(self, **kwargs):
@@ -52,23 +52,11 @@ class WorkflowNode(GenericNode):
         for _child in self._children:
             _child.execute_plugin_chain(res, **reskws)
 
-    def delete_node(self, recursive=True):
-        if self.is_leaf():
-            self.plugin = None
-            return
-        if not self.is_leaf() and not recursive:
-            raise RecursionError('Node children detected but deletion'
-                                 'is not recursive.')
-        for child in self.get_children():
-            child.delete_node(recursive)
-        self._children = []
-        self._parent.remove_child_reference(self)
 
 
-class _WorkflowTree:
+class _WorkflowTree(GenericTree):
     def __init__(self):
-        self.nodes = {}
-        self.node_ids = []
+        super().__init__()
 
     def clear(self):
         self.nodes = {}
@@ -95,37 +83,6 @@ class _WorkflowTree:
             if hasattr(_plugin, key) and getattr(_plugin, key) == value:
                 res.append(node_id)
         return res
-
-    def get_new_nodeid(self):
-        if not self.node_ids:
-            self.node_ids = [0]
-            return 0
-        else:
-            i = self.node_ids[-1]
-            self.node_ids.append(i+1)
-            return i+1
-
-    def register_node(self, node, node_id=None):
-        if node_id in self.node_ids:
-            raise ValueError('Duplicate node ID detected. Tree node has not'
-                             'been registered!')
-        if not node_id:
-            node.node_id = self.get_new_nodeid()
-        self.node_ids.append(node.node_id)
-        self.nodes[node.node_id] = node
-
-    def find_node_by_id(self, node_id):
-        if not self.nodes:
-            raise TypeError('No nodes detected in Tree')
-        return self.nodes[node_id]
-
-    def delete_node(self, node_id, recursive=True):
-        if node_id not in self.node_ids:
-            raise KeyError('Selected node not found.')
-        ids = self.nodes[node_id].get_recursive_ids()
-        self.nodes[node_id].delete_node(node_id)
-        for _id in ids:
-            del self.nodes[_id]
 
     def execute_process(self, data, **kwargs):
         self.nodes[0].execute_plugin_chain(data, **kwargs)

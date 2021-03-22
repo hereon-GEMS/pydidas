@@ -35,6 +35,8 @@ class _GuiWorkflowTreeNode(pwg.generic_tree.GenericNode):
         self.parent = parent
         self.node_id = node_id
         self._children = []
+        if parent:
+            parent.add_child(self)
 
     def get_width(self):
         if len(self._children) == 0:
@@ -54,24 +56,21 @@ class _GuiWorkflowTreeNode(pwg.generic_tree.GenericNode):
 
     def get_relative_positions(self):
         pos = {self.node_id: [0, 0]}
-
         if not self.is_leaf():
             child_w = {}
-
             for child in self._children:
                 child_w[child.node_id] = child.get_width()
 
             w = (np.sum([_w[1] for _w in child_w.items()])
-                 + (len(self._children) - 1) * self.child_spacing)
+                  + (len(self._children) - 1) * self.child_spacing)
             dx = w // (len(self._children) - 1)
             x0 = - w // 2
-
             for i, child in enumerate(self._children):
                 _p = child.get_relative_positions()
                 for key in _p:
                     pos.update([_p[key][0] - x0 + i * dx,
                                 _p[key][1] + self.height + self.child_spacing])
-            return pos
+        return pos
 
 
 class _GuiWorkflowTreeManager:
@@ -85,6 +84,7 @@ class _GuiWorkflowTreeManager:
         self.nodes = {}
         self.node_ids = []
         self.active_node = None
+        self.active_node_id = None
 
 
     def add_plugin_node(self, name, title=None):
@@ -122,6 +122,18 @@ class _GuiWorkflowTreeManager:
         print(pos_ids, pos_vals)
 
 
+    def set_active_node(self, node_id):
+        for nid in self.widgets:
+            if node_id == nid:
+                self.widgets[nid].widget_select()
+            else:
+                self.widgets[nid].widget_deselect()
+        self.active_node = self.nodes[node_id]
+        self.active_node_id = node_id
+
+
+
+
 
 class WorkflowPluginWidget(QtWidgets.QFrame):
     def __init__(self, qt_parent=None, qt_main=None, title='No title',
@@ -130,6 +142,7 @@ class WorkflowPluginWidget(QtWidgets.QFrame):
         self.qt_parent = qt_parent
         self.qt_main = qt_main
         self.position = position
+        self.active = False
         if not name:
             raise ValueError('No plugin name given.')
         if widget_id is None:
@@ -137,6 +150,7 @@ class WorkflowPluginWidget(QtWidgets.QFrame):
 
         self.widget_id = widget_id
         self.plugin = PLUGIN_COLLECTION.get_plugin_by_name(name)()
+        self.installEventFilter(self)
 
         self.setFixedSize(250, 55)
         self.setFrameStyle(QtWidgets.QFrame.StyledPanel)
@@ -158,17 +172,28 @@ class WorkflowPluginWidget(QtWidgets.QFrame):
         self.qtw_del_button.clicked.connect(partial(self.msg, 'Clicked del button'))
         self.qtw_cfg_button.clicked.connect(partial(self.msg, 'Clicked cfg button'))
 
+        # for child in [self]
+
     def mousePressEvent(self, event):
-        print('Clicked widget')
+        if not self.active:
+            self.qt_main.workflow_edit_manager.set_active_node(self.widget_id)
+
+        print('Clicked widget', self.widget_id)
 
     def msg(self, msg):
         print(msg)
 
     def widget_select(self):
-        self.setLineWidth(4)
+        self.setLineWidth(5)
+        self.qtw_title.setText('widget selected')
+        self.update()
+        self.active = True
 
     def widget_deselect(self):
+        self.qtw_title.setText('widget deselected')
         self.setLineWidth(2)
+        self.update()
+        self.active = False
 
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
@@ -185,10 +210,10 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self._layout = QtWidgets.QVBoxLayout()
         self._layout.setContentsMargins(0, 0, 0, 0)
         # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
+        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
+        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
+        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
+        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
         # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
         # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
         # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
@@ -282,7 +307,6 @@ class LayoutTest(QtWidgets.QMainWindow):
         self.workflow_canvas = WorkflowTreeCanvas(self)
         self.treeView = pwg.widgets.PluginTreeView(self)
         self.workflow_edit_manager = _GuiWorkflowTreeManager(self.workflow_canvas, self)
-
         self.workflow_area = _WorkflowScrollArea(self, self.workflow_canvas)
 
         self.button1 = QtWidgets.QPushButton('Test button')
@@ -297,6 +321,12 @@ class LayoutTest(QtWidgets.QMainWindow):
         self.main_frame.setLayout(_layout)
 
         self.treeView.doubleClicked.connect(self.tree_changed)
+
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
+
 
     def button_clicked(self, i_button):
         print(f'clicked button {i_button}')

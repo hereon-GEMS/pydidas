@@ -37,19 +37,24 @@ class GenericNode:
     def get_children(self):
         return self._children
 
+    @property
+    def n_child(self):
+        return len(self._children)
+
     def set_parent(self, parent):
         self._parent = parent
 
     def delete_node(self, recursive=True):
-        if self.is_leaf():
-            return
         if not self.is_leaf() and not recursive:
             raise RecursionError('Node children detected but deletion'
                                  'is not recursive.')
+        if self._parent is not None:
+            self._parent.remove_child_reference(self)
+        if self.is_leaf():
+            return
         for child in self.get_children():
             child.delete_node(recursive)
         self._children = []
-        self._parent.remove_child_reference(self)
 
 
 class GenericTree:

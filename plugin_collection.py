@@ -157,6 +157,7 @@ class _PluginCollection:
         """
         if (hasattr(cls_item, 'basic_plugin') and
             hasattr(cls_item, 'plugin_type') and
+            hasattr(cls_item, 'plugin_name') and
             hasattr(cls_item, 'execute')):
             return True
         return False
@@ -168,7 +169,7 @@ class _PluginCollection:
         _d = {**self.plugins['input'], **self.plugins['proc'],
               **self.plugins['output']}
         _res = []
-        for key, item in _d.items():
+        for item in _d.values():
             _res.append(item)
         del _d
         return _res
@@ -180,8 +181,8 @@ class _PluginCollection:
         _d = {**self.plugins['input'], **self.plugins['proc'],
               **self.plugins['output']}
         _res = []
-        for key, item in _d.items():
-            _res.append(item.name)
+        for item in _d.values():
+            _res.append(item.plugin_name)
         del _d
         return _res
 
@@ -191,7 +192,7 @@ class _PluginCollection:
         TO DO
         """
         for _plugin in self.get_all_plugins():
-            if name == _plugin.name:
+            if name == _plugin.plugin_name:
                 return _plugin
         raise KeyError(f'No plugin with name "{name}" has been registered!')
 

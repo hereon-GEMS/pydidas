@@ -3,8 +3,7 @@ from base_plugins import ProcPlugin, PROC_PLUGIN
 class PeakFitting(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    name = 'Peak fitting'
-    ptype = 'Processing plugin'
+    plugin_name = 'Peak fitting'
     params = {'function': None,
               'bg_correction': None,
               }

@@ -3,8 +3,7 @@ from base_plugins import ProcPlugin, PROC_PLUGIN
 class AzimuthalIntegration(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    name = 'Azimuthal integration'
-    ptype = 'Processing plugin'
+    plugin_name = 'Azimuthal integration'
     params = {'beam_cente_x': None,
               'beam_cente_y': None,
               'bins': None,

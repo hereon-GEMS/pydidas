@@ -10,6 +10,7 @@ import inspect
 import os
 import numpy as np
 from functools import partial
+from copy import copy
 #from qtpy import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
@@ -21,271 +22,148 @@ import plugin_workflow_gui as pwg
 
 
 PLUGIN_COLLECTION = pwg.PluginCollection()
-WorkflowTree = pwg.WorkflowTree()
-PALETTES = pwg.PALETTES
-STYLES = pwg.STYLES
-
-class _GuiWorkflowTreeNode(pwg.generic_tree.GenericNode):
-    width = 250
-    height = 55
-    child_spacing = 20
-    border_spacing = 10
-
-    def __init__(self, parent=None, node_id=None):
-        self.parent = parent
-        self.node_id = node_id
-        self._children = []
-        if parent:
-            parent.add_child(self)
-
-    def get_width(self):
-        if len(self._children) == 0:
-            return self.width
-        w = (len(self._children) - 1) * self.child_spacing
-        for child in self._children:
-            w += child.get_width()
-        return w
-
-    def get_height(self):
-        if len(self._children) == 0:
-            return self.height
-        h = []
-        for child in self._children:
-            h.append(child.get_height())
-        return max(h) + self.child_spacing + self.height
-
-    def get_relative_positions(self):
-        pos = {self.node_id: [0, 0]}
-        if not self.is_leaf():
-            child_w = {}
-            for child in self._children:
-                child_w[child.node_id] = child.get_width()
-
-            w = (np.sum([_w[1] for _w in child_w.items()])
-                  + (len(self._children) - 1) * self.child_spacing)
-            dx = w // (len(self._children) - 1)
-            x0 = - w // 2
-            for i, child in enumerate(self._children):
-                _p = child.get_relative_positions()
-                for key in _p:
-                    pos.update([_p[key][0] - x0 + i * dx,
-                                _p[key][1] + self.height + self.child_spacing])
-        return pos
-
-
-class _GuiWorkflowTreeManager:
-    def __init__(self, qt_canvas=None, qt_main=None):
-        self.root = None
-        self.qt_canvas= qt_canvas
-        self.qt_main = qt_main
-
-        self.node_pos = {}
-        self.widgets = {}
-        self.nodes = {}
-        self.node_ids = []
-        self.active_node = None
-        self.active_node_id = None
-
-
-    def add_plugin_node(self, name, title=None):
-        if not self.root:
-            _newid = 0
-        else:
-            _newid = self.node_ids[-1] + 1
-
-        title = title if title else name
-        widget = WorkflowPluginWidget(self.qt_canvas, self.qt_main, title, name, _newid)
-        node = _GuiWorkflowTreeNode(self.active_node, _newid)
-        if not self.root:
-            self.root = node
-
-        self.nodes[_newid] = node
-        self.widgets[_newid] = widget
-
-        self.node_ids.append(_newid)
-        self.active_node = node
-        self.qt_canvas._layout.addWidget(widget)
-
-    def get_node_positions(self):
-        if not self.root:
-            raise KeyError('No root node specified')
-        _pos = self.root.get_relative_positions()
-        _n = len(_pos)
-
-        pos_ids = []
-        pos_vals = []
-        for key, pos in _pos.items():
-            pos_ids.append(key)
-            pos_vals.append(pos)
-        pos_ids = np.asarray(pos_ids)
-        pos_vals = np.asaray(pos_vals)
-        print(pos_ids, pos_vals)
-
-
-    def set_active_node(self, node_id):
-        for nid in self.widgets:
-            if node_id == nid:
-                self.widgets[nid].widget_select()
-            else:
-                self.widgets[nid].widget_deselect()
-        self.active_node = self.nodes[node_id]
-        self.active_node_id = node_id
-
-
-
-
-
-class WorkflowPluginWidget(QtWidgets.QFrame):
-    def __init__(self, qt_parent=None, qt_main=None, title='No title',
-                 name=None, widget_id=None, position=None):
-        super().__init__(qt_parent)
-        self.qt_parent = qt_parent
-        self.qt_main = qt_main
-        self.position = position
-        self.active = False
-        if not name:
-            raise ValueError('No plugin name given.')
-        if widget_id is None:
-            raise ValueError('No plugin node id given.')
-
-        self.widget_id = widget_id
-        self.plugin = PLUGIN_COLLECTION.get_plugin_by_name(name)()
-        self.installEventFilter(self)
-
-        self.setFixedSize(250, 55)
-        self.setFrameStyle(QtWidgets.QFrame.StyledPanel)
-        self.setLineWidth(2)
-        self.setAutoFillBackground(True)
-        self.setPalette(PALETTES['workflow_plugin_widget'])
-
-        self.qtw_title = QtWidgets.QLabel(title, self)
-        self.qtw_title.setStyleSheet(STYLES['plugin_title'])
-        self.qtw_title.setGeometry(4, 2, 224, 22)
-
-        self.qtw_del_button = QtWidgets.QPushButton('delete plugin', self)
-        self.qtw_del_button.setStyleSheet(STYLES['plugin_del_button'])
-        self.qtw_del_button.setGeometry(178, 2, 70, 22)
-
-        self.qtw_cfg_button = QtWidgets.QPushButton('Configure plugin', self)
-        self.qtw_cfg_button.setGeometry(2, 28, 246, 25)
-
-        self.qtw_del_button.clicked.connect(partial(self.msg, 'Clicked del button'))
-        self.qtw_cfg_button.clicked.connect(partial(self.msg, 'Clicked cfg button'))
-
-        # for child in [self]
-
-    def mousePressEvent(self, event):
-        if not self.active:
-            self.qt_main.workflow_edit_manager.set_active_node(self.widget_id)
-
-        print('Clicked widget', self.widget_id)
-
-    def msg(self, msg):
-        print(msg)
-
-    def widget_select(self):
-        self.setLineWidth(5)
-        self.qtw_title.setText('widget selected')
-        self.update()
-        self.active = True
-
-    def widget_deselect(self):
-        self.qtw_title.setText('widget deselected')
-        self.setLineWidth(2)
-        self.update()
-        self.active = False
-
+STYLES = pwg.config.STYLES
+#WorkflowTree = pwg.WorkflowTree()
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent = parent
-
-        #self.setFixedSize(800, 600)
-
-
+        self.title = QtWidgets.QLabel(self)
+        self.title.setStyleSheet(STYLES['title'])
+        self.title.setText('Workflow tree')
+        self.title.move(10, 10)
+        self.painter =  QtGui.QPainter()
         self.setAutoFillBackground(True)
-        self.setPalette(PALETTES['workflow_widget'])
 
-        self._layout = QtWidgets.QVBoxLayout()
-        self._layout.setContentsMargins(0, 0, 0, 0)
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, self.parent, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
-        # self._layout.addWidget(WorkflowPluginWidget(self, 'Test', 'HDF loader', 1))
+        self.setLineWidth(2)
+        self.setFrameStyle(QtWidgets.QFrame.Raised)
+        self.widget_connections = []
 
-        self.setLayout(self._layout)
 
-        self.buttons = []
-        #grid in 30 x 120 pixel steps from (15, 585) x (5, 795)
-        self.grid = np.zeros((59, 79))
+    def paintEvent(self, event):
+        self.painter.begin(self)
+        self.painter.setPen(QtGui.QPen(QtGui.QColor(120, 120, 120), 2))
+        self.draw_connections()
+        self.painter.end()
 
-    def find_empty_spot(self, x, y):
-        return
+    def draw_connections(self):
+        for x0, y0, x1, y1 in self.widget_connections:
+            self.painter.drawLine(x0, y0, x1, y1)
 
-    def dragEnterEvent(self, e):
-        e.accept()
 
-    def DragMoveEvent (self, e):
-        # if
-        pos_x = e.pos().x()
-        pos_y = e.pos().y()
-        print(pos_x, pos_y)
-        if not self.grid[pos_y, pos_x]:
-            print(pos_x, pos_y)
-            e.accept()
-        else:
-            print('no good')
-        e.ignore()
+    def update_widget_connections(self, widget_conns):
+        self.widget_connections = widget_conns
+        self.update()
 
-    def dropEvent(self, e):
-        index = self.parent.treeView.selectedIndexes()[0]
-        model = index.model()
-        #filter headings:
-        if model.itemFromIndex(index).parent() is None:
-            e.ignore()
-            return
+class PluginEditCanvas(QtWidgets.QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
 
-        self.buttons.append(QtWidgets.QPushButton('test button'))
-        i_button = len(self.buttons)
-        #self.buttons[i_button].clicked.connect(partial(self.parent.button_clicked, i_button))
-        # self.
+        self.painter =  QtGui.QPainter()
+        self.setAutoFillBackground(True)
 
-        index = self.parent.treeView.selectedIndexes()[0]
-        name = index.model().itemFromIndex(index).text()
-        if self.parent.process == None:
-            pass
-        pos_x = (e.pos().x() - 5) // 10
-        pos_y = (e.pos().y() - 5) // 10
-        if self.grid[pos_y, pos_x]:
-            pos_x, pos_y = self.find_empty_spot(pos_x, pos_y)
+        self.setLineWidth(2)
+        self.setFrameStyle(QtWidgets.QFrame.Raised)
 
-        index = self.parent.treeView.selectedIndexes()[0]
-        name = index.model().itemFromIndex(index).text()
-        print(name, pos_x, pos_y)
-        if not self.grid[pos_y, pos_x]:
-            pass
-        # print(e.mimeData().parent(), e.mimeData().__str__())
-        # for item in inspect.getmembers(e.mimeData()):
-        #     print(item)
+    # def paint_connections(self, *points):
 
-class _WorkflowScrollArea(QtWidgets.QScrollArea):
-    def __init__(self, parent=None, widget=None):
+
+class _ScrollArea(QtWidgets.QScrollArea):
+    def __init__(self, parent=None, widget=None, width=None, height=None):
         super().__init__(parent)
         self.parent = parent
         self.setWidget(widget)
         self.setWidgetResizable(True)
-        self.setFixedHeight(600)
-        self.setFixedWidth(800)
+        if width:
+            self.setFixedWidth(width)
+        if height:
+            self.setFixedHeight(height)
+
+
+class WorkflowEditTab(QtWidgets.QWidget):
+    def __init__(self, parent=None, qt_main=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.qt_main = qt_main
+        self.workflow_canvas = WorkflowTreeCanvas(self)
+        self.plugin_edit_canvas = PluginEditCanvas(self)
+        self.treeView = pwg.widgets.WidgetTreeviewForPlugins(self.qt_main)
+        self.workflow_area = _ScrollArea(
+            self, self.workflow_canvas,
+            self.qt_main.params['workflow_edit_canvas_x'],
+            self.qt_main.params['workflow_edit_canvas_y']
+        )
+        self.plugin_edit_area = _ScrollArea(self, self.plugin_edit_canvas, 400, None)
+        self.plugin_text_hint = PluginTextHint(self)
+
+        self.treeView.doubleClicked.connect(self.treeview_add_plugin)
+        self.treeView.selection_changed_signal.connect(self.treeview_clicked_plugin)
+
+        _layout0 = QtWidgets.QHBoxLayout()
+        _layout0.setContentsMargins(5, 5, 5, 5)
+
+        _layout1 = QtWidgets.QVBoxLayout()
+        _layout1.addWidget(self.workflow_area)
+
+        _layout2 = QtWidgets.QHBoxLayout()
+        _layout2.addWidget(self.treeView)
+        _layout2.addWidget(self.plugin_text_hint)
+        _layout1.addLayout(_layout2)
+
+        _layout0.addLayout(_layout1)
+        _layout0.addWidget(self.plugin_edit_area)
+        self.setLayout(_layout0)
+
+
+    def treeview_add_plugin(self, index):
+        item = self.treeView.selectedIndexes()[0]
+        name = item.model().itemFromIndex(index).text()
+        self.qt_main.workflow_edit_manager.add_plugin_node(name)
+
+    @QtCore.pyqtSlot(str)
+    def treeview_clicked_plugin(self, name):
+        if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
+            return
+        p = PLUGIN_COLLECTION.get_plugin_by_name(name)()
+        self.plugin_text_hint.setText(p.get_hint_text(), p.plugin_name)
+        del p
+
+
+class PluginTextHint(QtWidgets.QTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.setAcceptRichText(True)
+        self.setReadOnly(True)
+
+    def setText(self, text, title=None):
+        super().setText('')
+        if title:
+            self.setFontPointSize(14)
+            self.setFontWeight(75)
+            self.append(f'Plugin description: {title}')
+        self.setFontPointSize(10)
+        self.append('')
+        for key, item in text:
+            self.setFontWeight(75)
+            self.append(key + ':')
+            self.setFontWeight(50)
+            item = '    ' + item if key != 'Parameters' else  item
+            self.append('    ' + item if key != 'Parameters' else  item)
+
+
+class ExperimentEditTab(QtWidgets.QWidget):
+    def __init__(self, parent=None, qt_main=None):
+        super().__init__(parent)
+        self.parent = parent
+        self.qt_main = qt_main
+
+
+class MainTabWidget(QtWidgets.QTabWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
 
 
 class LayoutTest(QtWidgets.QMainWindow):
@@ -296,50 +174,48 @@ class LayoutTest(QtWidgets.QMainWindow):
 
         self.process = None
         self.setGeometry(20, 40, 1400, 1000)
+        self.params = {'workflow_edit_canvas_x': 1000,
+                       'workflow_edit_canvas_y': 600}
         self.status = self.statusBar()
 
-        self.main_frame = QtWidgets.QWidget()
+        self.workflow_edit_manager = pwg.gui.GuiWorkflowEditTreeManager()
+
+
+        self.main_frame = QtWidgets.QTabWidget()
         self.setCentralWidget(self.main_frame)
         self.status.showMessage('Test status')
-        _layout = QtWidgets.QVBoxLayout()
-        _layout.setContentsMargins(5, 10, 10, 10)
-
-        self.workflow_canvas = WorkflowTreeCanvas(self)
-        self.treeView = pwg.widgets.PluginTreeView(self)
-        self.workflow_edit_manager = _GuiWorkflowTreeManager(self.workflow_canvas, self)
-        self.workflow_area = _WorkflowScrollArea(self, self.workflow_canvas)
-
-        self.button1 = QtWidgets.QPushButton('Test button')
-        self.label1 = QtWidgets.QLabel('test label 1')
-        _layout.addWidget(self.label1)
-        _layout.addWidget(self.button1)
-        _layout.addWidget(self.workflow_area)
-        _layout.addWidget(QtWidgets.QLabel('Available'))
-        _layout.addWidget(self.treeView)
-
-        self.setWindowTitle('Layout test')
-        self.main_frame.setLayout(_layout)
-
-        self.treeView.doubleClicked.connect(self.tree_changed)
-
-        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
-        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
-        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
-        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title')
 
 
-    def button_clicked(self, i_button):
-        print(f'clicked button {i_button}')
+        self.experiment_edit_tab = ExperimentEditTab(self.main_frame, self)
+        self.workflow_edit_tab = WorkflowEditTab(self.main_frame, self)
+        self.main_frame.addTab(self.experiment_edit_tab, 'Experiment editor')
+        self.main_frame.addTab(self.workflow_edit_tab, 'Workflow editor')
+        self.workflow_edit_manager.update_qt_items(
+            self.workflow_edit_tab.workflow_canvas, self
+        )
 
-    def tree_changed(self, index):
-        item = self.treeView.selectedIndexes()[0]
-        name = item.model().itemFromIndex(index).text()
-        self.workflow_edit_manager.add_plugin_node(name)
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 0')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 1')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 2')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 3')
+        self.workflow_edit_manager.set_active_node(2)
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 4')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 5')
+        self.workflow_edit_manager.set_active_node(2)
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 6')
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 7')
+        self.workflow_edit_manager.set_active_node(6)
+        self.workflow_edit_manager.add_plugin_node('HDF loader', 'Test title 8')
 
+        self.setWindowTitle('Plugin edit test')
+        self._createMenu()
 
-    @QtCore.pyqtSlot(str)
-    def name_selected_signal(self, s):
-        print(s)
+    def _createMenu(self):
+        self._menu = self.menuBar()
+        fileMenu = QtWidgets.QMenu('&File')
+        self._menu.addMenu(fileMenu)
+        self._menu.addMenu("&Edit")
+        self._menu.addMenu("&Help")
 
 
 if __name__ == '__main__':

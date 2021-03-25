@@ -23,6 +23,7 @@ import plugin_workflow_gui as pwg
 
 PLUGIN_COLLECTION = pwg.PluginCollection()
 STYLES = pwg.config.STYLES
+PALETTES = pwg.config.PALETTES
 #WorkflowTree = pwg.WorkflowTree()
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
@@ -35,6 +36,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.title.move(10, 10)
         self.painter =  QtGui.QPainter()
         self.setAutoFillBackground(True)
+        # self.setPalette(PALETTES['clean_bg'])
 
         self.setLineWidth(2)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
@@ -76,6 +78,8 @@ class _ScrollArea(QtWidgets.QScrollArea):
         self.parent = parent
         self.setWidget(widget)
         self.setWidgetResizable(True)
+        self.setAutoFillBackground(True)
+        #self.setPalette(PALETTES['clean_bg'])
         if width:
             self.setFixedWidth(width)
         if height:
@@ -98,32 +102,40 @@ class WorkflowEditTab(QtWidgets.QWidget):
         self.plugin_edit_area = _ScrollArea(self, self.plugin_edit_canvas, 400, None)
         self.plugin_text_hint = PluginTextHint(self)
 
-        self.treeView.doubleClicked.connect(self.treeview_add_plugin)
-        self.treeView.selection_changed_signal.connect(self.treeview_clicked_plugin)
+        self.treeView.selection_confirmed.connect(self.workflow_add_plugin)
+        self.treeView.selection_changed.connect(self.update_plugin_description)
+
+
 
         _layout0 = QtWidgets.QHBoxLayout()
+        # _layout0.setAutoFillBackground(True)
         _layout0.setContentsMargins(5, 5, 5, 5)
 
         _layout1 = QtWidgets.QVBoxLayout()
+        _layout1.setContentsMargins(0, 0, 0, 0)
         _layout1.addWidget(self.workflow_area)
 
         _layout2 = QtWidgets.QHBoxLayout()
+        _layout2.setContentsMargins(0, 0, 0, 0)
         _layout2.addWidget(self.treeView)
         _layout2.addWidget(self.plugin_text_hint)
         _layout1.addLayout(_layout2)
 
         _layout0.addLayout(_layout1)
         _layout0.addWidget(self.plugin_edit_area)
+
+        _layout = QtWidgets.QVBoxLayout(self)
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.addLayout(_layout0)
+        _layout.addWidget(pwg.widgets.ConfirmationBar())
         self.setLayout(_layout0)
 
 
-    def treeview_add_plugin(self, index):
-        item = self.treeView.selectedIndexes()[0]
-        name = item.model().itemFromIndex(index).text()
+    def workflow_add_plugin(self, name):
         self.qt_main.workflow_edit_manager.add_plugin_node(name)
 
     @QtCore.pyqtSlot(str)
-    def treeview_clicked_plugin(self, name):
+    def update_plugin_description(self, name):
         if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
             return
         p = PLUGIN_COLLECTION.get_plugin_by_name(name)()
@@ -137,6 +149,7 @@ class PluginTextHint(QtWidgets.QTextEdit):
         self.parent = parent
         self.setAcceptRichText(True)
         self.setReadOnly(True)
+        self.setFixedWidth(500)
 
     def setText(self, text, title=None):
         super().setText('')
@@ -152,18 +165,25 @@ class PluginTextHint(QtWidgets.QTextEdit):
             self.setFontWeight(50)
             item = '    ' + item if key != 'Parameters' else  item
             self.append('    ' + item if key != 'Parameters' else  item)
+        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
 
 class ExperimentEditTab(QtWidgets.QWidget):
-    def __init__(self, parent=None, qt_main=None):
+    def __init__(self, parent=None, qt_main=None, master=None):
         super().__init__(parent)
         self.parent = parent
         self.qt_main = qt_main
+        self._layout = QtWidgets.QVBoxLayout()
+        _label = QtWidgets.QLabel('Test 123')
+        self._layout.addWidget(_label)
+        self._layout.addWidget(pwg.widgets.ConfirmationBar())
+        self.setLayout(self._layout)
 
 
 class MainTabWidget(QtWidgets.QTabWidget):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super().__init__(parent)
+
 
 
 class LayoutTest(QtWidgets.QMainWindow):
@@ -184,7 +204,6 @@ class LayoutTest(QtWidgets.QMainWindow):
         self.main_frame = QtWidgets.QTabWidget()
         self.setCentralWidget(self.main_frame)
         self.status.showMessage('Test status')
-
 
         self.experiment_edit_tab = ExperimentEditTab(self.main_frame, self)
         self.workflow_edit_tab = WorkflowEditTab(self.main_frame, self)
@@ -213,13 +232,21 @@ class LayoutTest(QtWidgets.QMainWindow):
     def _createMenu(self):
         self._menu = self.menuBar()
         fileMenu = QtWidgets.QMenu('&File')
-        self._menu.addMenu(fileMenu)
+        self._menu.addMenu('&File')
         self._menu.addMenu("&Edit")
         self._menu.addMenu("&Help")
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
+    app.setStyle('Fusion')
+    _font = app.font()
+    _font.setPointSize(11)
+    app.setFont(_font)
+# new_font.setPointSize( int ** ); //your option
+# new_font.setWeight( int ** ); //your option
+# app.setFont( new_font );
+    # app.setFont(QtGui.Font('{font-size: 11px;}'))
     gui = LayoutTest()
     gui.show()
     sys.exit(app.exec_())

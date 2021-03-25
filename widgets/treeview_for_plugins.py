@@ -5,6 +5,7 @@ Created on Tue Mar 16 10:39:19 2021
 @author: ogurreck
 """
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
+from functools import partial
 
 from plugin_workflow_gui.plugin_collection import PluginCollection
 from plugin_workflow_gui.config import STYLES
@@ -12,14 +13,16 @@ from plugin_workflow_gui.config import STYLES
 PLUGIN_COLLECTION = PluginCollection()
 
 class WidgetTreeviewForPlugins(QtWidgets.QTreeView):
-    selection_changed_signal = QtCore.pyqtSignal(str)
+    selection_changed = QtCore.pyqtSignal(str)
+    selection_confirmed = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
         self.setEditTriggers(Qt.QAbstractItemView.NoEditTriggers)
 
-        self.setFixedWidth(400)
+        self.setFixedWidth(493)
+        self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
         self.setSelectionMode(Qt.QAbstractItemView.SingleSelection)
         self.header().setStyleSheet(STYLES['title'])
@@ -47,12 +50,13 @@ class WidgetTreeviewForPlugins(QtWidgets.QTreeView):
         self.setModel(tree_model)
         self.expandAll()
         self.setItemDelegate(PluginCollectionTreeDelegate(root_node))
-        self.clicked.connect(self.selection_changed)
+        self.clicked.connect(partial(self.update_selection, self.selection_changed))
+        self.doubleClicked.connect(partial(self.update_selection, self.selection_confirmed))
 
-    def selection_changed(self):
+    def update_selection(self, signal):
         index = self.selectedIndexes()[0]
         name = self.model().itemFromIndex(index).text()
-        self.selection_changed_signal.emit(name)
+        signal.emit(name)
 
 
 class PluginCollectionTreeDelegate(QtWidgets.QStyledItemDelegate):

@@ -20,29 +20,9 @@ class WorkflowNode(GenericNode):
 
     def get_recursive_ids(self):
         res = [self.node_id]
-        if not self.is_leaf():
-            for child in self._children:
-                res += child.get_recursive_ids()
+        for child in self._children:
+            res += child.get_recursive_ids()
         return res
-
-    # def get_parent(self):
-    #     return self._parent
-
-    # def find_attribute_match(self, attr, val):
-    #     res = []
-    #     if hasattr(self, attr) and self.__dict__[attr] == val:
-    #         res += [self.plugin]
-    #     for _child in self._children:
-    #         res += _child.find_attribute_match(attr, val)
-    #     return res
-
-    # def find_plugin_match(self, plugin_cls):
-    #     res = []
-    #     if self.plugin.__class__  == plugin_cls:
-    #         res += [self.plugin]
-    #     for _child in self._children:
-    #         res += _child.find_plugin_match(plugin_cls)
-    #     return res
 
     def execute_plugin(self, data, **kwargs):
         return self.plugin.execute(data, **kwargs)

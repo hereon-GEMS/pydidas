@@ -1,4 +1,5 @@
 from base_plugins import ProcPlugin, PROC_PLUGIN
+from plugin_workflow_gui.parameter import Parameter
 
 class BackgroundCorrection(ProcPlugin):
     basic_plugin = False

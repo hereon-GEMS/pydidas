@@ -110,7 +110,7 @@ class _GuiWorkflowEditTreeManager:
             _newid = self.node_ids[-1] + 1
 
         title = title if title else name
-        widget = WorkflowPluginWidget(self.qt_canvas, self.qt_main, title, name, _newid)
+        widget = WorkflowPluginWidget(self.qt_canvas, self.qt_main, title, _newid)
         widget.setVisible(True)
         node = _GuiWorkflowTreeNode(self.active_node, _newid)
         if not self.root:

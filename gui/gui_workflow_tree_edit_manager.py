@@ -184,6 +184,7 @@ class _GuiWorkflowEditTreeManager:
         self.set_active_node(self.node_ids[-1])
         self.update_node_positions()
 
+
 class _GuiWorkflowEditTreeManagerFactory:
     def __init__(self):
         self._instance = None
@@ -192,5 +193,6 @@ class _GuiWorkflowEditTreeManagerFactory:
         if not self._instance:
             self._instance = _GuiWorkflowEditTreeManager(**kwargs)
         return self._instance
+
 
 GuiWorkflowEditTreeManager = _GuiWorkflowEditTreeManagerFactory()

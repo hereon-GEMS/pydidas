@@ -33,7 +33,6 @@ class WorkflowNode(GenericNode):
             _child.execute_plugin_chain(res, **reskws)
 
 
-
 class _WorkflowTree(GenericTree):
     def __init__(self):
         super().__init__()

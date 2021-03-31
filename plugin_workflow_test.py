@@ -69,6 +69,9 @@ class PluginEditCanvas(QtWidgets.QFrame):
         self.setLineWidth(2)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
 
+    def select_plugin(self, plugin):
+        pass
+
     # def paint_connections(self, *points):
 
 
@@ -93,17 +96,15 @@ class WorkflowEditTab(QtWidgets.QWidget):
         self.qt_main = qt_main
         self.workflow_canvas = WorkflowTreeCanvas(self)
         self.plugin_edit_canvas = PluginEditCanvas(self)
-        self.treeView = pwg.widgets.WidgetTreeviewForPlugins(self.qt_main)
+        self.w_plugin_collection = pwg.widgets.PluginCollectionPresenter(self, self.qt_main, self.qt_main)
         self.workflow_area = _ScrollArea(
             self, self.workflow_canvas,
             self.qt_main.params['workflow_edit_canvas_x'],
             self.qt_main.params['workflow_edit_canvas_y']
         )
         self.plugin_edit_area = _ScrollArea(self, self.plugin_edit_canvas, 400, None)
-        self.plugin_text_hint = PluginTextHint(self)
 
-        self.treeView.selection_confirmed.connect(self.workflow_add_plugin)
-        self.treeView.selection_changed.connect(self.update_plugin_description)
+        self.w_plugin_collection.selection_confirmed.connect(self.workflow_add_plugin)
 
 
 
@@ -115,11 +116,11 @@ class WorkflowEditTab(QtWidgets.QWidget):
         _layout1.setContentsMargins(0, 0, 0, 0)
         _layout1.addWidget(self.workflow_area)
 
-        _layout2 = QtWidgets.QHBoxLayout()
-        _layout2.setContentsMargins(0, 0, 0, 0)
-        _layout2.addWidget(self.treeView)
-        _layout2.addWidget(self.plugin_text_hint)
-        _layout1.addLayout(_layout2)
+        # _layout2 = QtWidgets.QHBoxLayout()
+        # _layout2.setContentsMargins(0, 0, 0, 0)
+        # _layout2.addWidget(self.treeView)
+        # _layout2.addWidget(self.plugin_text_hint)
+        _layout1.addWidget(self.w_plugin_collection)
 
         _layout0.addLayout(_layout1)
         _layout0.addWidget(self.plugin_edit_area)
@@ -133,39 +134,6 @@ class WorkflowEditTab(QtWidgets.QWidget):
 
     def workflow_add_plugin(self, name):
         self.qt_main.workflow_edit_manager.add_plugin_node(name)
-
-    @QtCore.pyqtSlot(str)
-    def update_plugin_description(self, name):
-        if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
-            return
-        p = PLUGIN_COLLECTION.get_plugin_by_name(name)()
-        self.plugin_text_hint.setText(p.get_hint_text(), p.plugin_name)
-        del p
-
-
-class PluginTextHint(QtWidgets.QTextEdit):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.setAcceptRichText(True)
-        self.setReadOnly(True)
-        self.setFixedWidth(500)
-
-    def setText(self, text, title=None):
-        super().setText('')
-        if title:
-            self.setFontPointSize(14)
-            self.setFontWeight(75)
-            self.append(f'Plugin description: {title}')
-        self.setFontPointSize(10)
-        self.append('')
-        for key, item in text:
-            self.setFontWeight(75)
-            self.append(key + ':')
-            self.setFontWeight(50)
-            item = '    ' + item if key != 'Parameters' else  item
-            self.append('    ' + item if key != 'Parameters' else  item)
-        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
 
 class ExperimentEditTab(QtWidgets.QWidget):
@@ -236,6 +204,10 @@ class LayoutTest(QtWidgets.QMainWindow):
         self._menu.addMenu("&Edit")
         self._menu.addMenu("&Help")
 
+
+# class MasterApplication:
+#     def __init__(self):
+#         self.
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

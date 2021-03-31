@@ -53,7 +53,7 @@ class ParameterCollection:
 class Parameter:
     """An object to hold all information needed for parameters."""
 
-    def __init__(self, name=None, param_type=None, def_val=None,
+    def __init__(self, name=None, param_type=None, default=None,
                  optional=False, desc=None):
         """
         Setup method.
@@ -65,7 +65,7 @@ class Parameter:
         param_type : type, optional
             The type of the parameter. If None, no type-checking will be
             performed. The default is None.
-        def_val : TYPE, optional
+        default : TYPE, optional
             The default value. The default is None.
         optional : bool, optional
             Keyword to toggle optional parameters. The default is False.
@@ -78,10 +78,13 @@ class Parameter:
         """
         self.name = name
         self._type = param_type
-        self.value = copy(def_val)
+        if not self.typecheck(default):
+            raise TypeError(f'Default value "{default}" does not have data'
+                            f'type {param_type}!')
+        self.value = copy(default)
         self.optional = optional
         self.description = desc
-        self.default = def_val
+        self.default = default
 
     def typecheck(self, val):
         """

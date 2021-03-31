@@ -1,4 +1,4 @@
-from .treeview_for_plugins import WidgetTreeviewForPlugins
+from .plugin_collection_presenter import PluginCollectionPresenter
 
 from .warning_box import WarningBox
 

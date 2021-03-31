@@ -14,8 +14,8 @@ class BasePlugin:
     """
     basic_plugin = True
     plugin_type = BASE_PLUGIN
-    plugin_name = ''
-    params = {}
+    plugin_name = 'Base plugin'
+    params = []
 
     def __init__(self):
         pass
@@ -25,28 +25,44 @@ class BasePlugin:
         Execute the processing step."""
         raise NotImplementedError('Execute method has not been implemented.')
 
-    def get_hint_text(self):
+    def get_class_description(self, return_list=False):
         try:
             _name = self.__name__
         except:
             _name = self.__class__.__name__
-        rvals = []
-        rvals = [['Name', f'{self.plugin_name}\n']]
-        rvals.append(['Class name', f'{_name}\n'])
-        rvals.append(['Plugin type', f'{ptype[self.plugin_type]}\n'])
-        rvals.append(['Plugin description', f'{self.__doc__}\n'])
-        pstr = ''
-        for param in self.params:
-            pstr += f'\n{param}: {self.params[param]}'
-        rvals.append(['Parameters', pstr[1:]])
-        # rstr = (f'Name: {self.plugin_name}\n'
-        #         f'Class name: {_name}\n'
-        #         f'Plugin type: {ptype[self.plugin_type]}\n\n'
-        #         f'Plugin description:\n{self.__doc__}\n\n'
-        #         'Parameters:')
-        # for param in self.params:
-        #     rstr += f'\n{param}: {self.params[param]}'
+        if return_list:
+            rvals = []
+            rvals = [['Name', f'{self.plugin_name}\n']]
+            rvals.append(['Class name', f'{_name}\n'])
+            rvals.append(['Plugin type', f'{ptype[self.plugin_type]}\n'])
+            rvals.append(['Plugin description', f'{self.__doc__}\n'])
+            pstr = ''
+            for param in self.params:
+                pstr += f'\n{param}: {self.params[param]}'
+            rvals.append(['Parameters', pstr[1:]])
+        else:
+            rvals = (f'Name: {self.plugin_name}\n'
+                     f'Class name: {_name}\n'
+                     f'Plugin type: {ptype[self.plugin_type]}\n\n'
+                     f'Plugin description:\n{self.__doc__}\n\n'
+                     'Parameters:')
+            for param in self.params:
+                rvals += f'\n{param}: {self.params[param]}'
         return rvals
+
+    def set_param(self, param_name, value):
+        for param in self.params:
+            if param.name == param_name:
+                param.set(value)
+
+    def add_param(self, param):
+        if param.name in [p.name for p in self.params]:
+            raise KeyError(f'A parameter with the name {param.name} already'
+                           'exists.')
+        self.params.append(param)
+
+    def get_param_names(self):
+        return [p.name for p in self.params]
 
 
 class InputPlugin(BasePlugin):

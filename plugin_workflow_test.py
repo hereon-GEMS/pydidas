@@ -14,21 +14,22 @@ from copy import copy
 #from qtpy import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
-p = 'h:/myPython'
-if not p in sys.path:
-    sys.path.insert(0, p)
+# p = 'h:/myPython'
+# if not p in sys.path:
+#     sys.path.insert(0, p)
 
 import plugin_workflow_gui as pwg
 
-
+WORKFLOW_EDIT_MANAGER = pwg.gui.GuiWorkflowEditTreeManager()
 PLUGIN_COLLECTION = pwg.PluginCollection()
 STYLES = pwg.config.STYLES
 PALETTES = pwg.config.PALETTES
+STANDARD_FONT_SIZE = 10
 #WorkflowTree = pwg.WorkflowTree()
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__(parent=parent)
         self.parent = parent
         self.title = QtWidgets.QLabel(self)
         self.title.setStyleSheet(STYLES['title'])
@@ -65,15 +66,62 @@ class PluginEditCanvas(QtWidgets.QFrame):
 
         self.painter =  QtGui.QPainter()
         self.setAutoFillBackground(True)
-
         self.setLineWidth(2)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
+        self._layout = QtWidgets.QVBoxLayout()
+        self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.setLayout(self._layout)
 
-    def select_plugin(self, plugin):
-        pass
+    def configure_plugin(self, node_id):
+        self.plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
+        #delete current widgets
+        for i in reversed(range(self._layout.count())):
+            widgetToRemove = self._layout.itemAt(i).widget()
+            self._layout.removeWidget(widgetToRemove)
+            widgetToRemove.setParent(None)
+            widgetToRemove.deleteLater()
+        #setup new widgets:
 
-    # def paint_connections(self, *points):
+        self.add_label(f'Plugin: {self.plugin.plugin_name}', fontsize=12, width=385)
+        self.add_label(f'Node id: {node_id}', fontsize=12)
+        self.add_label('\nParameters:', fontsize=12)
+        self.setup_restore_default_button()
+        for param in self.plugin.params:
+            print(param)
 
+
+    def setup_restore_default_button(self):
+        but = QtWidgets.QPushButton(self.style().standardIcon(59),
+                                    'Restore default parameters')
+        self._layout.addWidget(but, 0, QtCore.Qt.AlignRight)
+        but.clicked.connect(partial(self.plugin.restore_defaults, force=True))
+        # self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+
+    def restore_plugin_defaults(self):
+        ...
+
+    def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None):
+        w = QtWidgets.QLabel(text)
+        if fontsize != STANDARD_FONT_SIZE:
+            _font = app.font()
+            _font.setPointSize(fontsize)
+            w.setFont(_font)
+        if width:
+            w.setFixedWidth(width)
+        # self.widgets.append(w)
+        self._layout.addWidget(w, 0, QtCore.Qt.AlignLeft)
+
+    def add_param(self, param):
+        _l = QtWidgets.QHBoxLayout()
+        _txt = QtWidgets.QLabel(f'{param}:')
+        _txt.setFixedWidth(180)
+        _io = QtWidgets.QTextEdit()
+
+        _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
+
+
+    def set_plugin_param(self, param, value):
+        self.plugin.set_param(param, value)
 
 class _ScrollArea(QtWidgets.QScrollArea):
     def __init__(self, parent=None, widget=None, width=None, height=None):
@@ -103,23 +151,16 @@ class WorkflowEditTab(QtWidgets.QWidget):
             self.qt_main.params['workflow_edit_canvas_y']
         )
         self.plugin_edit_area = _ScrollArea(self, self.plugin_edit_canvas, 400, None)
+        self.plugin_edit_area.setMinimumHeight(500)
 
         self.w_plugin_collection.selection_confirmed.connect(self.workflow_add_plugin)
 
-
-
         _layout0 = QtWidgets.QHBoxLayout()
-        # _layout0.setAutoFillBackground(True)
         _layout0.setContentsMargins(5, 5, 5, 5)
 
         _layout1 = QtWidgets.QVBoxLayout()
         _layout1.setContentsMargins(0, 0, 0, 0)
         _layout1.addWidget(self.workflow_area)
-
-        # _layout2 = QtWidgets.QHBoxLayout()
-        # _layout2.setContentsMargins(0, 0, 0, 0)
-        # _layout2.addWidget(self.treeView)
-        # _layout2.addWidget(self.plugin_text_hint)
         _layout1.addWidget(self.w_plugin_collection)
 
         _layout0.addLayout(_layout1)
@@ -129,11 +170,16 @@ class WorkflowEditTab(QtWidgets.QWidget):
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.addLayout(_layout0)
         _layout.addWidget(pwg.widgets.ConfirmationBar())
-        self.setLayout(_layout0)
-
+        self.setLayout(_layout)
+        self.qt_main.workflow_edit_manager.plugin_to_edit.connect(self.configure_plugin)
 
     def workflow_add_plugin(self, name):
         self.qt_main.workflow_edit_manager.add_plugin_node(name)
+
+    @QtCore.pyqtSlot(int)
+    def configure_plugin(self, node_id):
+        # print(f'configure plugin {node_id}')
+        self.plugin_edit_canvas.configure_plugin(node_id)
 
 
 class ExperimentEditTab(QtWidgets.QWidget):
@@ -197,10 +243,38 @@ class LayoutTest(QtWidgets.QMainWindow):
         self.setWindowTitle('Plugin edit test')
         self._createMenu()
 
+    def action_new(self):
+        print('new')
+
+    def action_open(self):
+        print('open')
+
     def _createMenu(self):
         self._menu = self.menuBar()
+
+        newAction = QtWidgets.QAction(QtGui.QIcon('new.png'), '&New', self)
+        newAction.setShortcut('Ctrl+N')
+        newAction.setStatusTip('New document')
+        newAction.triggered.connect(self.action_new)
+
+        # Create new action
+        openAction = QtWidgets.QAction(QtGui.QIcon('open.png'), '&Open', self)
+        openAction.setShortcut('Ctrl+O')
+        openAction.setStatusTip('Open document')
+        openAction.triggered.connect(self.action_open)
+
+        # Create exit action
+        exitAction = QtWidgets.QAction(QtGui.QIcon('exit.png'), '&Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.closeEvent)
+
         fileMenu = QtWidgets.QMenu('&File')
-        self._menu.addMenu('&File')
+        fileMenu.addAction(newAction)
+        fileMenu.addAction(openAction)
+        fileMenu.addAction(exitAction)
+
+        self._menu.addMenu(fileMenu)
         self._menu.addMenu("&Edit")
         self._menu.addMenu("&Help")
 
@@ -213,7 +287,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
     _font = app.font()
-    _font.setPointSize(11)
+    _font.setPointSize(STANDARD_FONT_SIZE)
     app.setFont(_font)
 # new_font.setPointSize( int ** ); //your option
 # new_font.setWeight( int ** ); //your option

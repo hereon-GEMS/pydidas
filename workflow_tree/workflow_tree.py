@@ -5,7 +5,7 @@ Created on Tue Mar 16 11:39:13 2021
 @author: ogurreck
 """
 from copy import copy
-from plugin_workflow_gui.workflow_tree.generic_tree import GenericNode, GenericTree
+from .generic_tree import GenericNode, GenericTree
 
 class WorkflowNode(GenericNode):
     def __init__(self, **kwargs):

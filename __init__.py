@@ -1,4 +1,3 @@
-
 from . import plugin_collection
 from .plugin_collection import PluginCollection
 

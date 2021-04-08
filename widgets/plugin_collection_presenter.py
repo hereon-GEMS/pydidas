@@ -23,6 +23,7 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
         self.master = master
 
         self.w_treeview_plugins = PluginCollectionTreeWidget(self)
+        self.setMinimumHeight(300)
         self.w_plugin_description = TextDescriptionForPlugins(self)
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
@@ -40,6 +41,8 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
     def update_selection(self, signal):
         index = self.w_treeview_plugins.selectedIndexes()[0]
         name = self.w_treeview_plugins.model().itemFromIndex(index).text()
+        if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
+            return
         self.selection_confirmed.emit(name)
 
     @QtCore.pyqtSlot(str)

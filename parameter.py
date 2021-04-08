@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Malte Storm, HZG
+# Copyright (c) 2021 Malte Storm, Hereon
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,69 @@
 """Base class for parameter handling."""
 
 from copy import copy
+import numbers
 
 
-class ParameterCollection:
-    def __init__(self):
-        self._params = []
-        self._param_names = []
 
-    def add_parameter(self, param):
-        if param.name in self._param_names:
-            raise KeyError(f'A parameter with the name "{param.name}" already exists.')
-        self._params.append(param)
-        self._param_names.append(param.name)
+# class ParameterCollection(OrderedDict):
+#     def __init__(self, params=None):
+#         self._params = []
+#         self._param_names = []
+#         for p in params:
+#             self.add_parameter(p)
 
-    def remove_parameter_by_name(self, param_name):
-        if param_name not in self._param_names:
-            raise KeyError(f'No parameter with the name "{param_name}" has been registered.')
-        self._param_names.remove(param_name)
+#     def add_parameter(self, param):
+#         if param.name in self._param_names:
+#             raise KeyError(f'A parameter with the name "{param.name}" already exists.')
+#         self._params.append(param)
+#         self._param_names.append(param.name)
 
-        for param in self._params:
-            if param.name == param_name:
-                self._params.remove(param)
+#     def remove_parameter_by_name(self, param_name):
+#         if param_name not in self._param_names:
+#             raise KeyError(f'No parameter with the name "{param_name}" has been registered.')
+#         self._param_names.remove(param_name)
 
-    @property
-    def parameters(self):
-        return self._params
+#         for param in self._params:
+#             if param.name == param_name:
+#                 self._params.remove(param)
+#     @property
+#     def parameters(self):
+#         return self._params
+
+
+def _get_base_cls(cls):
+    """
+    Filter numerical and sequence classes and return the corresponding
+    abstract base class.
+
+    This function checks whether cls is a numerical class and returns the
+    numerical abstract base class from the numbers module for type-checking.
+    Any other class will be returned.
+
+    Parameters
+    ----------
+    cls : object
+        The concrete class.
+
+    Returns
+    -------
+    object
+        The base class of the input class if the inpu.
+    """
+    if cls is None:
+        return None
+    if numbers.Integral.__subclasscheck__(cls):
+        return numbers.Integral
+    if numbers.Real.__subclasscheck__(cls):
+        return numbers.Real
+    return cls
 
 
 class Parameter:
     """An object to hold all information needed for parameters."""
 
     def __init__(self, name=None, param_type=None, default=None,
-                 optional=False, desc=None):
+                 optional=False, desc=None, unit=None):
         """
         Setup method.
 
@@ -63,8 +94,10 @@ class Parameter:
         name : str, optional
             The name of the parameter. The default is None.
         param_type : type, optional
-            The type of the parameter. If None, no type-checking will be
-            performed. The default is None.
+            The datatype of the parameter. If None, no type-checking will be
+            performed. If any integer or float value is used, this will be
+            changed to the abstract base class of numbers.Integral or
+            numbers.Real. The default is None.
         default : TYPE, optional
             The default value. The default is None.
         optional : bool, optional
@@ -77,14 +110,15 @@ class Parameter:
 
         """
         self.name = name
-        self._type = param_type
+        self._type = _get_base_cls(param_type)
         if not self.typecheck(default):
             raise TypeError(f'Default value "{default}" does not have data'
                             f'type {param_type}!')
-        self.value = copy(default)
+        self.__value = default
         self.optional = optional
         self.description = desc
         self.default = default
+        self.unit = unit if unit else ''
 
     def typecheck(self, val):
         """
@@ -102,12 +136,26 @@ class Parameter:
             or if type is None.
 
         """
-        if (type(val) is self._type) or not self._type:
+        if not self._type:
             return True
-        else:
-            return False
+        if isinstance(val, self._type):
+            return True
+        return False
 
-    def set(self, val):
+    @property
+    def value(self):
+        """
+        Get the parameter value.
+
+        Returns
+        -------
+        value
+            The value of the parameter.
+        """
+        return self.__value
+
+    @value.setter
+    def value(self, val):
         """
         Set a new value for the parameter.
 
@@ -128,7 +176,7 @@ class Parameter:
 
         """
         if self.typecheck(val):
-            self.value = val
+            self.__value = val
         else:
             if self.optional and (val is None):
                 return
@@ -136,16 +184,16 @@ class Parameter:
                 raise ValueError(f'Cannot set parameter "{str(self.name)}" '
                                  'because it is of the wrong data type.')
 
-    def get(self):
+
+    def restore_default(self):
         """
-        Get the parameter value.
+        Restore the parameter to its default value.
 
         Returns
         -------
-        value
-            The value of the parameter.
+        None.
         """
-        return self.value
+        self.value = self.default
 
     def isOptional(self):
         """
@@ -155,7 +203,6 @@ class Parameter:
         -------
         bool
             The boolean flag whether the paramter is optional.
-
         """
         return self.optional
 
@@ -177,8 +224,8 @@ class Parameter:
         str
             The description of the parameter.
         """
-        return (self.name, self._type, self.value, self.optional,
-                self.description)
+        return (self.name, self._type, self.__value, self.optional,
+                self.description, self.unit)
 
     def __repr__(self):
         _type =( f'{self._type.__name__}' if self._type is not None else
@@ -186,5 +233,5 @@ class Parameter:
         s = f'Parameter {self.name} (type: {_type}'
         if self.optional:
             s += ', optional'
-        s += f'): {self.value} (default: {self.default})'
+        s += f'): {self.__value} {self.unit} (default: {self.default})'
         return s

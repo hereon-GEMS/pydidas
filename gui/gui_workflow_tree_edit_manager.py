@@ -5,6 +5,7 @@ from plugin_workflow_gui.config import gui_constants, qt_presets
 
 from plugin_workflow_gui.workflow_tree.generic_tree import GenericNode
 from plugin_workflow_gui.widgets import WorkflowPluginWidget
+from PyQt5 import QtCore
 PLUGIN_COLLECTION = PluginCollection()
 #WorkflowTree = pwg.WorkflowTree()
 PALETTES = qt_presets.PALETTES
@@ -18,7 +19,7 @@ class _GuiWorkflowTreeNode(GenericNode):
     border_spacing = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
 
     def __init__(self, parent=None, node_id=None):
-        self._parent = parent
+        super().__init__(parent=parent)
         self.node_id = node_id
         self._children = []
         if parent:
@@ -81,10 +82,13 @@ class _GuiWorkflowTreeNode(GenericNode):
                              pos_dict[key][1] - yoffset]
 
 
-class _GuiWorkflowEditTreeManager:
+class _GuiWorkflowEditTreeManager(QtCore.QObject):
+    plugin_to_edit = QtCore.pyqtSignal(int)
     pos_x_min = 5
     pos_y_min = 5
+
     def __init__(self, qt_canvas=None, qt_main=None):
+        super().__init__()
         self.root = None
         self.qt_canvas= qt_canvas
         self.qt_main = qt_main
@@ -164,6 +168,8 @@ class _GuiWorkflowEditTreeManager:
                 self.widgets[nid].widget_deselect()
         self.active_node = self.nodes[node_id]
         self.active_node_id = node_id
+        self.plugin_to_edit.emit(node_id)
+
 
     def delete_node(self, node_id):
         _all_ids = self.nodes[node_id].get_recursive_ids()

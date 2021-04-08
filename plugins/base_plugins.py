@@ -1,3 +1,5 @@
+import abc
+
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
 PROC_PLUGIN = 1
@@ -16,11 +18,13 @@ class BasePlugin:
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     params = []
+    input_data = []
+    output_data = []
 
     def __init__(self):
         pass
 
-    def execute(self):
+    def execute(self, *data, **kwargs):
         """
         Execute the processing step."""
         raise NotImplementedError('Execute method has not been implemented.')
@@ -64,6 +68,13 @@ class BasePlugin:
     def get_param_names(self):
         return [p.name for p in self.params]
 
+    def restore_defaults(self, force=False):
+        if not force:
+            raise NotImplementedError('Confirmation of restoring plugin defaults not yet implemented.')
+        print('restore defaults')
+        for p in self.params:
+            p.restore_default()
+
 
 class InputPlugin(BasePlugin):
     """
@@ -100,3 +111,10 @@ class OutputPlugin(BasePlugin):
 
 class NoPlugin:
     basic_plugin = False
+
+class PluginMeta(metaclass=abc.ABCMeta):
+    ...
+
+PluginMeta.register(InputPlugin)
+PluginMeta.register(OutputPlugin)
+PluginMeta.register(ProcPlugin)

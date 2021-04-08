@@ -18,7 +18,7 @@ PALETTES['workflow_plugin_widget_active'] = pal
 
 STYLES['workflow_plugin_active'] = """
     QLabel{
-        font-size: 13px;
+        font-size: 12px;
         font: bold;
         color: rgb(0, 0, 0);
         border: 0px;
@@ -33,13 +33,13 @@ STYLES['workflow_plugin_active'] = """
 
 STYLES['workflow_plugin_inactive'] = """
     QPushButton{
-        font-size: 12px;
+        font-size: 11px;
         color: rgb(65, 65, 65);
         align: center;
         border: 1px solid rgb(205, 205, 205);
     }
     QLabel{
-        font-size: 12px;
+        font-size: 11px;
         font: bold;
         color: rgb(60, 60, 60);
         border: 0px;

@@ -1,15 +1,16 @@
 from base_plugins import ProcPlugin, PROC_PLUGIN
+from plugin_workflow_gui.parameter import Parameter
 
 class AzimuthalIntegration(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_name = 'Azimuthal integration'
-    params = {'beam_cente_x': None,
-              'beam_cente_y': None,
-              'bins': None,
-              'theta_min': None,
-              'theta_max': None,
-              }
+    params = [Parameter('beam_cente_x', param_type=float, default=-1, desc='The beam-center x coordinate.'),
+              Parameter('beam_cente_y', param_type=float, default=-1, desc='The beam-center y coordinate.'),
+              Parameter('bins', param_type=int, default=100, desc='The number of bins'),
+              Parameter('theta_min', param_type=float, default=0, desc='The lower theta limit'),
+              Parameter('theta_max', param_type=float, default=10, desc='The upper theta limit')
+              ]
 
     def __init__(self):
         pass

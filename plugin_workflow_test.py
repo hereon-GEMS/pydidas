@@ -11,6 +11,7 @@ import os
 import numpy as np
 from functools import partial
 from copy import copy
+import numbers
 #from qtpy import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
@@ -26,6 +27,17 @@ STYLES = pwg.config.STYLES
 PALETTES = pwg.config.PALETTES
 STANDARD_FONT_SIZE = 10
 #WorkflowTree = pwg.WorkflowTree()
+
+def deleteItemsOfLayout(layout):
+     if layout is not None:
+         while layout.count():
+             item = layout.takeAt(0)
+             widget = item.widget()
+             if widget is not None:
+                 widget.setParent(None)
+                 widget.deleteLater()
+             else:
+                 deleteItemsOfLayout(item.layout())
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
@@ -59,11 +71,73 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.widget_connections = widget_conns
         self.update()
 
+
+class IOwidget(QtWidgets.QWidget):
+    """Widgets for I/O during plugin parameter editing."""
+    def __init__(self, parent, param):
+        super().__init__(parent)
+        self.setFixedWidth(175)
+        self.setFixedHeight(25)
+        self.__ptype = param.type
+        self.setToolTip(f'{param.tooltip}')
+
+    def get_value_from_text(self, text):
+        if self.__ptype == numbers.Integral:
+            return int(text)
+        elif self.__ptype == numbers.Real:
+            return float(text)
+        return text
+
+
+class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
+    """Widgets for I/O during plugin parameter editing with predefined choices."""
+    #for some reason, inhering the signal does not work
+    io_edited = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent, param):
+        super().__init__(parent, param)
+        for choice in param.choices:
+            self.addItem(f'{choice}')
+        self.currentIndexChanged.connect(self.emit_signal)
+
+    def emit_signal(self):
+        self.io_edited.emit(self.currentText())
+
+    def get_value(self):
+        text = self.currentText()
+        return self.get_value_from_text(text)
+
+    def set_value(self, value):
+        self.setCurrentIndex(self.findText(f'{value}'))
+
+class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
+    """Widgets for I/O during plugin parameter editing without choices."""
+    #for some reason, inhering the signal does not work
+    io_edited = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent, param):
+        super().__init__(parent, param)
+        self.editingFinished.connect(self.emit_signal)
+        if param.type == numbers.Integral:
+            self.setValidator(QtGui.QIntValidator())
+        elif param.type == numbers.Real:
+            self.setValidator(QtGui.QDoubleValidator())
+
+    def emit_signal(self):
+        self.io_edited.emit(self.text())
+
+    def get_value(self):
+        text = self.text()
+        return self.get_value_from_text(text)
+
+    def set_value(self, value):
+        self.setText(f'{value}')
+
+
 class PluginEditCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.parent = parent
-
         self.painter =  QtGui.QPainter()
         self.setAutoFillBackground(True)
         self.setLineWidth(2)
@@ -74,31 +148,42 @@ class PluginEditCanvas(QtWidgets.QFrame):
 
     def configure_plugin(self, node_id):
         self.plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
+        self.param_links = {}
         #delete current widgets
         for i in reversed(range(self._layout.count())):
-            widgetToRemove = self._layout.itemAt(i).widget()
-            self._layout.removeWidget(widgetToRemove)
-            widgetToRemove.setParent(None)
-            widgetToRemove.deleteLater()
-        #setup new widgets:
+            item = self._layout.itemAt(i)
+            if isinstance(item, QtWidgets.QLayout):
+                deleteItemsOfLayout(item)
+                self._layout.removeItem(item)
+                item.deleteLater()
+            elif isinstance(item.widget(), QtWidgets.QWidget):
+                widgetToRemove = item.widget()
+                self._layout.removeWidget(widgetToRemove)
+                widgetToRemove.setParent(None)
+                widgetToRemove.deleteLater()
 
+        #setup new widgets:
         self.add_label(f'Plugin: {self.plugin.plugin_name}', fontsize=12, width=385)
         self.add_label(f'Node id: {node_id}', fontsize=12)
         self.add_label('\nParameters:', fontsize=12)
         self.setup_restore_default_button()
         for param in self.plugin.params:
-            print(param)
-
+            self.add_param(param)
 
     def setup_restore_default_button(self):
         but = QtWidgets.QPushButton(self.style().standardIcon(59),
                                     'Restore default parameters')
-        self._layout.addWidget(but, 0, QtCore.Qt.AlignRight)
         but.clicked.connect(partial(self.plugin.restore_defaults, force=True))
-        # self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        but.clicked.connect(self.update_edits)
+        but.setFixedHeight(25)
+        self._layout.addWidget(but, 0, QtCore.Qt.AlignRight)
 
-    def restore_plugin_defaults(self):
-        ...
+    # def restore_plugin_defaults(self):
+    #     ...
+
+    def update_edits(self):
+        for param in self.plugin.params:
+            self.param_links[param.name].setText(param.value)
 
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None):
         w = QtWidgets.QLabel(text)
@@ -108,20 +193,45 @@ class PluginEditCanvas(QtWidgets.QFrame):
             w.setFont(_font)
         if width:
             w.setFixedWidth(width)
-        # self.widgets.append(w)
+        w.setFixedHeight(fontsize * (1 + text.count('\n')) + 8)
         self._layout.addWidget(w, 0, QtCore.Qt.AlignLeft)
 
     def add_param(self, param):
         _l = QtWidgets.QHBoxLayout()
-        _txt = QtWidgets.QLabel(f'{param}:')
-        _txt.setFixedWidth(180)
-        _io = QtWidgets.QTextEdit()
-
+        _txt = QtWidgets.QLabel(f'{param.name}:')
+        _txt.setFixedWidth(120)
+        _txt.setFixedHeight(25)
+        _txt.setToolTip(param.tooltip)
         _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
 
+        if param.choices:
+            _io = IOwidget_combo(None, param)
+        else:
+            _io= IOwidget_line(None, param)
+        _io.io_edited.connect(partial(self.set_plugin_param, param, _io))
+        _io.set_value(param.value)
+        _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
+        self.param_links[param.name] = _io
+        self._layout.addLayout(_l)
 
-    def set_plugin_param(self, param, value):
-        self.plugin.set_param(param, value)
+    def update_param_value(self, param):
+        ...
+
+    # def set_plugin_param(self, param, widget):
+    #     if isinstance(widget, QtWidgets.QComboBox):
+    #         value = widget.currentText()
+    #     if isinstance(widget, QtWidgets.QLineEdit):
+    #         value = widget.text()
+    #     self.plugin.set_param(param.name, value)
+
+    def set_plugin_param(self, param, widget):
+        param.value = widget.get_value()
+        print(param.value)
+        # if isinstance(widget, QtWidgets.QComboBox):
+        #     value = widget.currentText()
+        # if isinstance(widget, QtWidgets.QLineEdit):
+        #     value = widget.text()
+        # self.plugin.set_param(param.name, value)
 
 class _ScrollArea(QtWidgets.QScrollArea):
     def __init__(self, parent=None, widget=None, width=None, height=None):

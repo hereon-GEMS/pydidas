@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Malte Storm, Hereon
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,40 +22,70 @@
 
 """Base class for parameter handling."""
 
-from copy import copy
+from collections import OrderedDict
 import numbers
 
 
 
-# class ParameterCollection(OrderedDict):
-#     def __init__(self, params=None):
-#         self._params = []
-#         self._param_names = []
-#         for p in params:
-#             self.add_parameter(p)
+class ParameterCollection(OrderedDict):
+    """Collection of parameters for plugins.
+    """
+    def __init__(self, params=None):
+        """Setup method."""
+        super().__init__()
+        for _p in params:
+            self.add_parameter(_p)
 
-#     def add_parameter(self, param):
-#         if param.name in self._param_names:
-#             raise KeyError(f'A parameter with the name "{param.name}" already exists.')
-#         self._params.append(param)
-#         self._param_names.append(param.name)
+    def add_parameter(self, param):
+        """Method to add a parameter.
 
-#     def remove_parameter_by_name(self, param_name):
-#         if param_name not in self._param_names:
-#             raise KeyError(f'No parameter with the name "{param_name}" has been registered.')
-#         self._param_names.remove(param_name)
+        Parameters
+        ----------
+        param : Parameter object
+            An instance of a Parameter object.
 
-#         for param in self._params:
-#             if param.name == param_name:
-#                 self._params.remove(param)
-#     @property
-#     def parameters(self):
-#         return self._params
+        Raises
+        ------
+        KeyError
+            If an entry with param.name already exists.
+
+        Returns
+        -------
+        None.
+        """
+        if param.name in self.keys():
+            raise KeyError(f'A parameter with the name "{param.name}" '
+                           'already exists.')
+        self.__setitem__(param.name, param)
+
+    def remove_parameter_by_name(self, param_name):
+        """
+        Removoe a parameter from the collection.
+
+        Parameters
+        ----------
+        param_name : str
+            The key name of the parameter.
+
+        Raises
+        ------
+        KeyError
+            If no parameter with param_name has been registered.
+
+        Returns
+        -------
+        None.
+        """
+        if param_name not in self.keys():
+            raise KeyError(f'No parameter with the name "{param_name}" '
+                           'has been registered.')
+        self.__delitem__(param_name)
+
 
 
 def _get_base_cls(cls):
     """
-    Filter numerical and sequence classes and return the corresponding
+    Filter numerical classes and return the corresponding
     abstract base class.
 
     This function checks whether cls is a numerical class and returns the
@@ -82,12 +112,39 @@ def _get_base_cls(cls):
 
 
 class Parameter:
-    """An object to hold all information needed for parameters."""
+    """A class used for storing parameters and associated metadata.
+
+    The parameter has the following properties which can be accessed.
+    Only the value property can be edited at runtime, all other properties
+    are fixed at instanciation.
+
+    +-----------+-----------+-------------------------------------------+
+    | property  | editable  | description                               |
+    +===========+===========+===========================================+
+    | name      | False     | A readable name as description.           |
+    +-----------+-----------+-------------------------------------------+
+    | value     | True      | The current value.                        |
+    +-----------+-----------+-------------------------------------------+
+    | optional  | False     | A flag whether the parameter is required  |
+    |           |           |  or optional.                             |
+    +-----------+-----------+-------------------------------------------+
+    | choices   | False     | A list with choices if the value of the   |
+    |           |           | parameter is limited to specific values.  |
+    +-----------+-----------+-------------------------------------------+
+    | tooltip   | False     | A readable tooltip.                       |
+    +-----------+-----------+-------------------------------------------+
+    | default   | False     | The default value                         |
+    +-----------+-----------+-------------------------------------------+
+    """
 
     def __init__(self, name=None, param_type=None, default=None,
-                 optional=False, desc=None, unit=None):
+                 optional=False, tooltip='', unit='', choices=None,
+                 meta_dict=None):
         """
         Setup method.
+
+        Parameters can be passed either as a complete meta_dict or as
+        indicidual keyword arguments. The meta_dict will take precend
 
         Parameters
         ----------
@@ -98,29 +155,54 @@ class Parameter:
             performed. If any integer or float value is used, this will be
             changed to the abstract base class of numbers.Integral or
             numbers.Real. The default is None.
-        default : TYPE, optional
+        default : type, optional
             The default value. The default is None.
-        optional : bool, optional
+        optional : bool
             Keyword to toggle optional parameters. The default is False.
-        desc : None or str
-            A description of the parameter.
+        tooltip : str
+            A description of the parameter. It will be automatically extended
+            to include certain type and unit information.
+        unit : str
+            The unit of the parameter.
+        choices : list
+            A list of allowed choices.
+        meta_dict : dict
+            A dictionary with the metadata. Warning: Using this will disable
+            the use of the direct parameter
         Returns
         -------
         None.
 
         """
-        self.name = name
-        self._type = _get_base_cls(param_type)
-        if not self.typecheck(default):
+        self.__name = name
+        self.__type = _get_base_cls(param_type)
+        choices = (choices if (isinstance(choices, list) or choices is None)
+                   else list(choices))
+        if not self.__typecheck(default):
             raise TypeError(f'Default value "{default}" does not have data'
                             f'type {param_type}!')
         self.__value = default
-        self.optional = optional
-        self.description = desc
-        self.default = default
-        self.unit = unit if unit else ''
+        self.__meta = meta_dict if meta_dict is not None else {}
 
-    def typecheck(self, val):
+        for key, item in [['optional', optional], ['tooltip', tooltip],
+                          ['unit', unit], ['default', default],
+                          ['choices', choices]]:
+            if key not in self.__meta.keys():
+                self.__meta[key] = item
+
+    def __call__(self):
+        """
+        Calling method to get the value.
+
+        Returns
+        -------
+        value
+            The stored parameter value-
+
+        """
+        return self.__value
+
+    def __typecheck(self, val):
         """
         Check type of
 
@@ -136,11 +218,104 @@ class Parameter:
             or if type is None.
 
         """
-        if not self._type:
+        if not self.__type:
             return True
-        if isinstance(val, self._type):
+        if isinstance(val, self.__type):
             return True
         return False
+
+    @property
+    def name(self):
+        """
+        Return the paramter name.
+
+        Returns
+        -------
+        str
+            The parameter name.
+        """
+        return self.__name
+
+    @property
+    def default(self):
+        """
+        Return the default value.
+
+        Returns
+        -------
+        default
+            The default value.
+        """
+        return self.__meta['default']
+
+    @property
+    def unit(self):
+        """
+        Get the Parameter unit.
+
+        Returns
+        -------
+        str
+            The unit of the Parameter.
+        """
+        return self.__meta['unit']
+
+    @property
+    def tooltip(self):
+        """
+        Get the Parameter tooltip.
+
+        Returns
+        -------
+        str
+            The tooltip for the Parameter.
+        """
+        _t = self.__meta['tooltip']
+        if self.unit:
+            _t += f' (unit: {self.unit})'
+        if self.type == numbers.Integral:
+            _t += ' (type: integer)'
+        elif self.type == numbers.Real:
+            _t += ' (type: float)'
+        elif self.type == str:
+            _t += ' (type: str)'
+        return _t.replace(') (', ', ')
+
+    @property
+    def choices(self):
+        """
+        Get the allowed choices for the Parameter value.
+
+        Returns
+        -------
+        list or None
+            The allowed choices for the Parameter.
+        """
+        return self.__meta['choices']
+
+    @property
+    def optional(self):
+        """
+        Get the flag whether the parameter is optional or not.
+
+        Returns
+        -------
+        bool
+            The unit of the Parameter.
+        """
+        return self.__meta['optional']
+
+    @property
+    def type(self):
+        """
+        Get the type of the Parameter value.
+
+        Returns
+        -------
+        object
+            The class of the parameter value type.
+        """
+        return self.__type
 
     @property
     def value(self):
@@ -175,15 +350,17 @@ class Parameter:
         None.
 
         """
-        if self.typecheck(val):
+        if self.__meta['choices'] and val not in self.__meta['choices']:
+            raise ValueError(f'The selected value "{val}" does not correspond'
+                             'to any of the allowed choices: '
+                             f'{self.__meta["choices"]}')
+        if self.__typecheck(val):
             self.__value = val
-        else:
-            if self.optional and (val is None):
-                return
-            else:
-                raise ValueError(f'Cannot set parameter "{str(self.name)}" '
-                                 'because it is of the wrong data type.')
-
+            return
+        if self.__meta['optional'] and (val is None):
+            return
+        raise ValueError(f'Cannot set parameter "{str(self.__name)}" '
+                         'because it is of the wrong data type.')
 
     def restore_default(self):
         """
@@ -193,9 +370,9 @@ class Parameter:
         -------
         None.
         """
-        self.value = self.default
+        self.value = self.__meta['default']
 
-    def isOptional(self):
+    def is_optional(self):
         """
         Check whether the parameter is optional.
 
@@ -204,11 +381,23 @@ class Parameter:
         bool
             The boolean flag whether the paramter is optional.
         """
-        return self.optional
+        return self.__meta['optional']
+
+
+    def get_type(self):
+        """
+        A method to get the parameter data type.
+
+        Returns
+        -------
+        object
+            The class of the data type.
+        """
+        return self.__type
 
     def dump(self):
         """
-        A function to get the full class information for saving.
+        A method to get the full class information for saving.
 
         Returns
         -------
@@ -224,14 +413,40 @@ class Parameter:
         str
             The description of the parameter.
         """
-        return (self.name, self._type, self.__value, self.optional,
-                self.description, self.unit)
+        return (self.__name, self.__type, self.__value, self.__meta)
+
+    def __str__(self):
+        """
+        Get a short string representation of the parameter.
+
+        This method will return a short description of the Parameter in the
+        format
+        <Name> - type: <type>, default: <default> <unit>.
+
+        Returns
+        -------
+        str
+            The string of the short description.
+        """
+
+        _type =( f'{self.__type.__name__}' if self.__type is not None else
+                'None')
+        _def = (f'{self.__meta["default"]}'
+                if self.__meta['default'] not in (None, '') else 'None')
+        _unit = f' {self.unit}' if self.unit else ''
+        return (f'{self.name}: {self.value}{_unit} (type: {_type}, '
+                f'default: {_def} {self.__meta["unit"]})')
 
     def __repr__(self):
-        _type =( f'{self._type.__name__}' if self._type is not None else
-                'no type specified')
-        s = f'Parameter {self.name} (type: {_type}'
-        if self.optional:
-            s += ', optional'
-        s += f'): {self.__value} {self.unit} (default: {self.default})'
-        return s
+        _type =( f'{self.__type.__name__}' if self.__type is not None else
+                'None')
+        _unit= (f'{self.__meta["unit"]} ' if self.__meta['unit'] !=''
+                else self.__meta['unit'])
+        _val = f'{self.value}' if self.value not in (None, '') else '""'
+        _def = (f'{self.__meta["default"]}'
+                if self.__meta['default'] not in (None, '') else 'None')
+        _s = f'Parameter {self.__name} (type: {_type}'
+        if self.__meta['optional']:
+            _s += ', optional'
+        _s += f'): {_val} {_unit}(default: {_def})'
+        return _s

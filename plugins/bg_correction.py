@@ -5,12 +5,9 @@ class BackgroundCorrection(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     plugin_name = 'Background correction'
-    params = [Parameter('function', param_type=None, default=None, desc='The background correction function'),
-              Parameter('function params', param_type=None, default=None, desc='Calling parameters for the fit function')
-              ]
-
-    def __init__(self):
-        pass
+    parameters = [Parameter('function', param_type=None, default=None, tooltip='The background correction function'),
+                  Parameter('function params', param_type=None, default=None, tooltip='Calling parameters for the fit function')
+                  ]
 
     def execute(self, *data, **kwargs):
         print(f'Execute plugin {self.name} with arguments: {data}, {kwargs}')

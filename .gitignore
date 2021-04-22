@@ -2,3 +2,4 @@
 .pylint.d/*
 __pycache__
 *.pyc
+*.log

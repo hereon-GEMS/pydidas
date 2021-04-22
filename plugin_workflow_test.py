@@ -8,13 +8,16 @@ Created on Thu Mar 11 10:24:52 2021
 import sys
 import inspect
 import os
+import time
+import traceback
 import numpy as np
 from functools import partial
 from copy import copy
 import numbers
+import pathlib
 #from qtpy import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
-
+from io import StringIO
 # p = 'h:/myPython'
 # if not p in sys.path:
 #     sys.path.insert(0, p)
@@ -39,6 +42,71 @@ def deleteItemsOfLayout(layout):
              else:
                  deleteItemsOfLayout(item.layout())
 
+class ErrorMessageBox(QtWidgets.QDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setWindowTitle("An exception has occured")
+
+        _label = QtWidgets.QLabel()
+        _label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        _scroll_area = QtWidgets.QScrollArea()
+
+        _scroll_area.setWidget(_label)
+        _scroll_area.setWidgetResizable(True)
+        _ok_button = QtWidgets.QPushButton('OK')
+
+        _layout = QtWidgets.QVBoxLayout()
+        _layout.addWidget(_scroll_area, 1, QtCore.Qt.AlignLeft)
+        _layout.addWidget(_ok_button, 1, QtCore.Qt.AlignRight)
+
+        self.setLayout(_layout)
+        _ok_button.clicked.connect(self.close)
+        self.setText = _label.setText
+
+
+def excepthook(exc_type, exception, trace):
+    """
+    Catch global exceptions.
+
+    This global function is used to replace the generic sys.excepthook
+    to handle exceptions. It will open a popup window with the exception
+    text.
+
+    Parameters
+    ----------
+    exc_type : type
+        The exception type
+    exception : Exception
+        The exception itself.
+    trace : traceback object
+        The trace of where the exception occured.
+
+    Returns
+    -------
+    None
+    """
+    _sep = '\n' + '-' * 80 + '\n'
+    _traceback_info = StringIO()
+    traceback.print_tb(trace, None, _traceback_info)
+    _traceback_info.seek(0)
+    _trace = _traceback_info.read()
+    _logfile = os.path.join(os.path.dirname(__file__), 'error.log')
+    _note = ('"An unhandled exception occurred. Please report the bug to:'
+             '\n\tmalte.storm@hereon.de\nor'
+             '\n\thttps://github.com/malte-storm/plugin_workflow_gui/issues .'
+             f'\n\A log has been written to:\n\t{_logfile}.'
+             '\n\nError information:\n')
+    _time = time.strftime('%Y-%m-%d %H:%M:%S')
+    _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace ])
+    try:
+        with open(_logfile, 'w') as f:
+            f.write(_msg)
+    except IOError:
+        pass
+    errorbox = ErrorMessageBox()
+    errorbox.setText(_note + _msg)
+    errorbox.exec_()
+
 class WorkflowTreeCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -54,7 +122,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.setLineWidth(2)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
-
 
     def paintEvent(self, event):
         self.painter.begin(self)
@@ -86,7 +153,18 @@ class IOwidget(QtWidgets.QWidget):
             return int(text)
         elif self.__ptype == numbers.Real:
             return float(text)
+        elif self.__ptype == pathlib.Path:
+            return pathlib.Path(text)
         return text
+
+    def emit_signal(self):
+        raise NotImplementedError
+
+    def get_value(self):
+        raise NotImplementedError
+
+    def set_value(self, value):
+        raise NotImplementedError
 
 
 class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
@@ -117,11 +195,11 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
 
     def __init__(self, parent, param):
         super().__init__(parent, param)
-        self.editingFinished.connect(self.emit_signal)
         if param.type == numbers.Integral:
             self.setValidator(QtGui.QIntValidator())
         elif param.type == numbers.Real:
             self.setValidator(QtGui.QDoubleValidator())
+        self.editingFinished.connect(self.emit_signal)
 
     def emit_signal(self):
         self.io_edited.emit(self.text())
@@ -132,6 +210,56 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
 
     def set_value(self, value):
         self.setText(f'{value}')
+
+class IOwidget_file(IOwidget):
+    """
+    Widgets for I/O during plugin parameter for filepaths.
+    (Includes a small button to select a filepath from a dialogue.)
+     """
+    #for some reason, inhering the signal from the base class does not work
+    io_edited = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent, param):
+        super().__init__(parent, param)
+        self.ledit = QtWidgets.QLineEdit()
+        self.ledit.setFixedWidth(150)
+        self.ledit.setFixedHeight(25)
+        self.lastDir = None
+
+        fbutton = QtWidgets.QPushButton(self.style().standardIcon(42), '')
+        fbutton.setFixedWidth(25)
+        self.ledit.setFixedHeight(25)
+        _layout = QtWidgets.QHBoxLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.addWidget(self.ledit)
+        _layout.addWidget(fbutton)
+        self.setLayout(_layout)
+
+        self.ledit.editingFinished.connect(self.emit_signal)
+        fbutton.clicked.connect(self.button)
+
+    def button(self):
+        fname = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Name of file', None,
+            ('All files (*.*);;HDF5 files (*.nxs *.hdf *.h5)'
+             ';;TIFF files (*.tif, *.tiff)')
+        )[0]
+        self.setText(fname)
+        self.emit_signal()
+
+    def emit_signal(self):
+        self.io_edited.emit(self.ledit.text())
+
+    def get_value(self):
+        text = self.ledit.text()
+        return pathlib.Path(self.get_value_from_text(text))
+
+    def set_value(self, value):
+        self.ledit.setText(f'{value}')
+
+    def setText(self, text):
+        self.ledit.setText(str(text))
+
 
 
 class PluginEditCanvas(QtWidgets.QFrame):
@@ -166,6 +294,8 @@ class PluginEditCanvas(QtWidgets.QFrame):
         self.add_label(f'Plugin: {self.plugin.plugin_name}', fontsize=12, width=385)
         self.add_label(f'Node id: {node_id}', fontsize=12)
         self.add_label('\nParameters:', fontsize=12)
+        if self.plugin.has_unique_param_config_widget():
+            self._layout.add(self.plugin.param_config_widget())
         self.setup_restore_default_button()
         for param in self.plugin.params:
             self.add_param(param)
@@ -177,9 +307,6 @@ class PluginEditCanvas(QtWidgets.QFrame):
         but.clicked.connect(self.update_edits)
         but.setFixedHeight(25)
         self._layout.addWidget(but, 0, QtCore.Qt.AlignRight)
-
-    # def restore_plugin_defaults(self):
-    #     ...
 
     def update_edits(self):
         for param in self.plugin.params:
@@ -207,7 +334,10 @@ class PluginEditCanvas(QtWidgets.QFrame):
         if param.choices:
             _io = IOwidget_combo(None, param)
         else:
-            _io= IOwidget_line(None, param)
+            if param.type == pathlib.Path:
+                _io = IOwidget_file(None, param)
+            else:
+                _io= IOwidget_line(None, param)
         _io.io_edited.connect(partial(self.set_plugin_param, param, _io))
         _io.set_value(param.value)
         _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
@@ -225,8 +355,14 @@ class PluginEditCanvas(QtWidgets.QFrame):
     #     self.plugin.set_param(param.name, value)
 
     def set_plugin_param(self, param, widget):
-        param.value = widget.get_value()
-        print(param.value)
+        try:
+            param.value = widget.get_value()
+        except:
+            widget.set_value(param.value)
+            excepthook(*sys.exc_info())
+
+
+
         # if isinstance(widget, QtWidgets.QComboBox):
         #     value = widget.currentText()
         # if isinstance(widget, QtWidgets.QLineEdit):
@@ -394,6 +530,7 @@ class LayoutTest(QtWidgets.QMainWindow):
 #         self.
 
 if __name__ == '__main__':
+    sys.excepthook = excepthook
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('Fusion')
     _font = app.font()

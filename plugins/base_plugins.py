@@ -138,10 +138,20 @@ class BasePlugin:
 
     def restore_defaults(self, force=False):
         if not force:
-            raise NotImplementedError('Confirmation of restoring plugin defaults not yet implemented.')
-        print('restore defaults')
+            raise NotImplementedError('Confirmation of restoring plugin '
+                                      'defaults not yet implemented.')
         for p in self.params:
             p.restore_default()
+
+    def check_if_plugin(self):
+        return True
+
+    def has_unique_param_config_widget(self):
+        return False
+
+    def param_config_widget(self):
+        raise NotImplementedError('Generic plugins do not have a unique'
+                                  'parameter config widget.')
 
 
 class InputPlugin(BasePlugin):

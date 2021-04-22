@@ -20,66 +20,68 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Base class for parameter handling."""
+"""
+The parameter module includes the Parameter class which is used to store
+processing parameters.
+"""
 
-from collections import OrderedDict
+# from collections import OrderedDict
 import numbers
+import pathlib
 
+# class ParameterCollection(OrderedDict):
+#     """Collection of parameters for plugins.
+#     """
+#     def __init__(self, params=None):
+#         """Setup method."""
+#         super().__init__()
+#         for _p in params:
+#             self.add_parameter(_p)
 
+#     def add_parameter(self, param):
+#         """Method to add a parameter.
 
-class ParameterCollection(OrderedDict):
-    """Collection of parameters for plugins.
-    """
-    def __init__(self, params=None):
-        """Setup method."""
-        super().__init__()
-        for _p in params:
-            self.add_parameter(_p)
+#         Parameters
+#         ----------
+#         param : Parameter object
+#             An instance of a Parameter object.
 
-    def add_parameter(self, param):
-        """Method to add a parameter.
+#         Raises
+#         ------
+#         KeyError
+#             If an entry with param.name already exists.
 
-        Parameters
-        ----------
-        param : Parameter object
-            An instance of a Parameter object.
+#         Returns
+#         -------
+#         None.
+#         """
+#         if param.name in self.keys():
+#             raise KeyError(f'A parameter with the name "{param.name}" '
+#                            'already exists.')
+#         self.__setitem__(param.name, param)
 
-        Raises
-        ------
-        KeyError
-            If an entry with param.name already exists.
+#     def remove_parameter_by_name(self, param_name):
+#         """
+#         Removoe a parameter from the collection.
 
-        Returns
-        -------
-        None.
-        """
-        if param.name in self.keys():
-            raise KeyError(f'A parameter with the name "{param.name}" '
-                           'already exists.')
-        self.__setitem__(param.name, param)
+#         Parameters
+#         ----------
+#         param_name : str
+#             The key name of the parameter.
 
-    def remove_parameter_by_name(self, param_name):
-        """
-        Removoe a parameter from the collection.
+#         Raises
+#         ------
+#         KeyError
+#             If no parameter with param_name has been registered.
 
-        Parameters
-        ----------
-        param_name : str
-            The key name of the parameter.
-
-        Raises
-        ------
-        KeyError
-            If no parameter with param_name has been registered.
-
-        Returns
-        -------
-        None.
-        """
-        if param_name not in self.keys():
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                           'has been registered.')
-        self.__delitem__(param_name)
+#         Returns
+#         -------
+#         None.
+#         """
+#         if param_name not in self.keys():
+#             raise KeyError(f'No parameter with the name "{param_name}" '
+#                            'has been registered.')
+#         self.__delitem__(param_name)
 
 
 
@@ -137,8 +139,8 @@ class Parameter:
     +-----------+-----------+-------------------------------------------+
     """
 
-    def __init__(self, name=None, param_type=None, default=None,
-                 optional=False, tooltip='', unit='', choices=None,
+    def __init__(self, name, param_type, default=None,
+                 tooltip='', unit='', choices=None, optional=False,
                  meta_dict=None):
         """
         Setup method.

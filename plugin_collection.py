@@ -5,6 +5,7 @@ Created on Fri Mar 12 11:13:34 2021
 @author: ogurreck
 """
 import importlib
+import itertools
 import os
 import inspect
 import sys
@@ -12,6 +13,24 @@ import sys
 INPUT_PLUGIN = 0
 PROC_PLUGIN = 1
 OUTPUT_PLUGIN = 2
+
+def flatten(_list):
+    """
+    Flatten a nested list.
+
+    This function will flatten any nested list.
+
+    Parameters
+    ----------
+    _list : list
+        A list with arbitrary nesting.
+
+    Returns
+    -------
+    list
+        The flattened list.
+    """
+    return list(itertools.chain.from_iterable(_list))
 
 class _PluginCollectionFactory:
     """
@@ -27,7 +46,6 @@ class _PluginCollectionFactory:
         return self._instance
 
 PluginCollection = _PluginCollectionFactory()
-
 
 class _PluginCollection:
     """
@@ -46,19 +64,14 @@ class _PluginCollection:
         Returns
         -------
         None.
-
         """
         if not plugin_path:
             plugin_path = os.path.join(os.path.dirname(__file__), 'plugins')
         if plugin_path not in sys.path:
             sys.path.insert(0, plugin_path)
         self.plugins = dict(base={}, proc={}, input={}, output={})
-        # self.plugins['base'] = {}
-        # self.plugins['proc'] = {}
-        # self.plugins['input'] = {}
-        # self.plugins['output'] = {}
-        self.plugin_names = []
-        self.plugin_classnames = []
+        self.__plugin_names = []
+        self.__plugin_classnames = []
         self.find_plugins(plugin_path)
 
     def find_files(self, path):
@@ -66,7 +79,8 @@ class _PluginCollection:
         Search for all python files in path.
 
         This method will search the specified path recursicely for all
-        python files.
+        python files. It will ignore protected files (starting with "__")
+        and hidden files (starting with "."). The
 
         Parameters
         ----------
@@ -77,30 +91,28 @@ class _PluginCollection:
 
         Returns
         -------
-        None.
-
+        list
+            A list with the full filesystem path of python files in the
+            directory and its subdirectories.
         """
         path = path if not os.path.isfile(path) else os.path.dirname(path)
-        _results = []
         _entries = [os.path.join(path, item) for item in os.listdir(path)
-                   if (item[:2] != '__' and item[0] != '.')]
+                    if (item[:2] != '__' and item[0] != '.')]
         _dirs = [item for item in _entries if os.path.isdir(item)]
         _files = [item for item in _entries if os.path.isfile(item)]
-        for entry in _dirs:
-            _results += self.find_files(os.path.join(path, entry))
-        _results += [item for item in _files
-                     if (item[:2] != '__' and item[0] != '.' and
-                         item[-3:] == '.py')]
+        _results = flatten(
+            [self.find_files(os.path.join(path, entry)) for entry in _dirs]
+        )
+        _results += [f for f in _files if f[-3:] == '.py']
         return _results
 
     def find_plugins(self, path, reload=True):
         """
         TO DO
         """
-
         path = path if not os.path.isfile(path) else os.path.dirname(path)
         _modules = [item[len(path)+len(os.sep):-3].replace(os.sep, '.')
-                  for item in self.find_files(path)]
+                    for item in self.find_files(path)]
         if len(_modules) == 0:
             return
         for _mod in _modules:
@@ -110,18 +122,18 @@ class _PluginCollection:
             for _name, _cls in clsmembers:
                 if not self.plugin_consistency_check(_cls):
                     continue
-                if (_name in self.plugin_names or
-                    _cls.__name__ in self.plugin_classnames) and not reload:
+                if (_name in self.__plugin_names or
+                    _cls.__name__ in self.__plugin_classnames) and not reload:
                     raise NameError(f'Plugin with name "{_name}" and '
                                     f'class name {_cls.__name__} already'
                                     'exists in plugin catalogue.')
                 ptype = self.plugin_type_check(_cls)
                 if (_name not in self.plugins[ptype] or reload):
                     self.plugins[ptype][_name] = _cls
-                    if _name not in self.plugin_names:
-                        self.plugin_names.append(_name)
-                    if _cls.__name__ not in self.plugin_classnames:
-                        self.plugin_names.append(_cls.__name__)
+                    if _name not in self.__plugin_names:
+                        self.__plugin_names.append(_name)
+                    if _cls.__name__ not in self.__plugin_classnames:
+                        self.__plugin_classnames.append(_cls.__name__)
             del _m
 
     @staticmethod
@@ -148,18 +160,17 @@ class _PluginCollection:
         Parameters
         ----------
         cls_item : plugin object
-            A plugin object.
+            A plugin class.
 
         Returns
         -------
         bool.
             Returns True if consistency check succeeded and False otherwise.
         """
-        if (hasattr(cls_item, 'basic_plugin') and
-            hasattr(cls_item, 'plugin_type') and
-            hasattr(cls_item, 'plugin_name') and
-            hasattr(cls_item, 'execute')):
-            return True
+        print(cls_item, hasattr(cls_item, 'check_if_plugin'))
+        if hasattr(cls_item, 'check_if_plugin'):
+            if cls_item.check_if_plugin(cls_item):
+                return True
         return False
 
     def get_all_plugins(self):

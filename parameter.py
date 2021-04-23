@@ -183,6 +183,10 @@ class Parameter:
         if not self.__typecheck(default):
             raise TypeError(f'Default value "{default}" does not have data'
                             f'type {param_type}!')
+        if choices and default not in choices:
+            raise ValueError(f'The default value "{default}" does not '
+                             'correspond to any of the defined choices: '
+                             f'{choices}.')
         self.__value = default
         self.__meta = meta_dict if meta_dict is not None else {}
 
@@ -354,7 +358,7 @@ class Parameter:
         """
         if self.__meta['choices'] and val not in self.__meta['choices']:
             raise ValueError(f'The selected value "{val}" does not correspond'
-                             'to any of the allowed choices: '
+                             ' to any of the allowed choices: '
                              f'{self.__meta["choices"]}')
         if self.__typecheck(val):
             self.__value = val

@@ -75,9 +75,9 @@ class BasePlugin:
         _desc : str or list
             The descripion of the plugin.
         """
-        try:
+        if self.__class__ == type:
             _name = self.__name__
-        except:
+        else:
             _name = self.__class__.__name__
         if return_list:
             _desc = [['Name', f'{self.plugin_name}\n']]
@@ -123,7 +123,7 @@ class BasePlugin:
     def add_param(self, param):
         if param.name in [p.name for p in self.params]:
             raise KeyError(f'A parameter with the name {param.name} already'
-                           'exists.')
+                           ' exists.')
         self.params.append(param)
 
     def get_param_value(self, param_name):
@@ -138,20 +138,23 @@ class BasePlugin:
 
     def restore_defaults(self, force=False):
         if not force:
-            raise NotImplementedError('Confirmation of restoring plugin '
-                                      'defaults not yet implemented.')
-        for p in self.params:
-            p.restore_default()
+            raise NotImplementedError('Confirmation of restoring plugin'
+                                      ' defaults not yet implemented.')
+        for param in self.params:
+            param.restore_default()
 
-    def check_if_plugin(self):
+    @staticmethod
+    def check_if_plugin():
         return True
 
-    def has_unique_param_config_widget(self):
+    @staticmethod
+    def has_unique_param_config_widget():
         return False
+
 
     def param_config_widget(self):
         raise NotImplementedError('Generic plugins do not have a unique'
-                                  'parameter config widget.')
+                                  ' parameter config widget.')
 
 
 class InputPlugin(BasePlugin):
@@ -161,9 +164,6 @@ class InputPlugin(BasePlugin):
     basic_plugin = True
     plugin_type = INPUT_PLUGIN
 
-    def __init__(self):
-        super().__init__()
-
 
 class ProcPlugin(BasePlugin):
     """
@@ -171,9 +171,6 @@ class ProcPlugin(BasePlugin):
     """
     basic_plugin = True
     plugin_type = PROC_PLUGIN
-
-    def __init__(self):
-        super().__init__()
 
 
 class OutputPlugin(BasePlugin):
@@ -183,12 +180,7 @@ class OutputPlugin(BasePlugin):
     basic_plugin = True
     plugin_type = OUTPUT_PLUGIN
 
-    def __init__(self):
-        super().__init__()
 
-
-class NoPlugin:
-    basic_plugin = False
 
 class PluginMeta(metaclass=abc.ABCMeta):
     ...

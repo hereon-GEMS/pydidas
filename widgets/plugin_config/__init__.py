@@ -22,8 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Package with individual QtWidgets used for the plugin parameter settings."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -33,6 +32,26 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from PyQt5 import QtWidgets, QtCore
-from plugin_workflow_gui.config import gui_constants, qt_presets
+# from . import io_widget_combo
+# from .io_widget_combo import *
 
+# from . import io_widget_line
+# from .io_widget_line import *
+
+# from . import io_widget_file
+# from .io_widget_file import *
+
+from . import plugin_param_config
+from .plugin_param_config import *
+
+__all__ += plugin_param_config.__all__
+# __all__ += io_widget_combo.__all__
+# __all__ += io_widget_line.__all__
+# __all__ += io_widget_file.__all__
+
+
+#unclutter the namespace:
+del plugin_param_config
+# del io_widget_combo
+# del io_widget_line
+# del io_widget_file

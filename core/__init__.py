@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -22,8 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Subpackage with GUI elements."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -33,6 +30,22 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from PyQt5 import QtWidgets, QtCore
-from plugin_workflow_gui.config import gui_constants, qt_presets
+from . import composites
+from .composites import *
 
+from . import parameter
+from .parameter import *
+
+from . import dataset
+from .dataset import *
+
+__all__ += composites.__all__
+__all__ += parameter.__all__
+__all__ += dataset.__all__
+
+
+
+# Unclutter namespace: remove modules from namespace
+del composites
+del parameter
+del dataset

@@ -1,5 +1,5 @@
 from base_plugins import InputPlugin, INPUT_PLUGIN
-from plugin_workflow_gui.parameter import Parameter
+from plugin_workflow_gui.core import Parameter
 
 class EigerLoader(InputPlugin):
     basic_plugin = False

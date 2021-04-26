@@ -22,8 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Module with Warning class for showing notifications."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -31,8 +30,41 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['ScrollArea']
 
-from PyQt5 import QtWidgets, QtCore
-from plugin_workflow_gui.config import gui_constants, qt_presets
+from PyQt5 import QtWidgets
 
+class ScrollArea(QtWidgets.QScrollArea):
+    """
+    Convenience class to simplify the setup of a QScrollArea.
+    """
+    def __init__(self, parent=None, widget=None, width=None, height=None):
+        """
+        Create a QScrollArea with defined widgets, width and height.
+
+        Parameters
+        ----------
+        parent : QWidget, optional
+            The parent widget. The default is None.
+        widget : QWidget, optional
+            The scroll area's own widget which is displayed.
+            The default is None.
+        width : int, optional
+            The width in pixel. The default is None.
+        height : int, optional
+            The height in pixel. The default is None.
+
+        Returns
+        -------
+        None.
+
+        """
+        super().__init__(parent)
+        self.parent = parent
+        self.setWidget(widget)
+        self.setWidgetResizable(True)
+        self.setAutoFillBackground(True)
+        if width:
+            self.setFixedWidth(width)
+        if height:
+            self.setFixedHeight(height)

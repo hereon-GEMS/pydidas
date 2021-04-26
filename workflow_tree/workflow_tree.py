@@ -5,7 +5,10 @@ Created on Tue Mar 16 11:39:13 2021
 @author: ogurreck
 """
 from copy import copy
-from .generic_tree import GenericNode, GenericTree
+from .generic_tree import GenericTree
+from .generic_node import GenericNode
+
+__all__ = ['WorkflowNode', 'WorkflowTree']
 
 class WorkflowNode(GenericNode):
     def __init__(self, **kwargs):

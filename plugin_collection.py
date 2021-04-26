@@ -1,9 +1,35 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Mar 12 11:13:34 2021
+# MIT License
+#
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 
-@author: ogurreck
-"""
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""Module with the plugin collection class."""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "MIT"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = []
+
 import importlib
 import itertools
 import os
@@ -32,6 +58,7 @@ def flatten(_list):
     """
     return list(itertools.chain.from_iterable(_list))
 
+
 class _PluginCollectionFactory:
     """
     Singleton factory to make sure that only one PluginCollection exists
@@ -45,7 +72,9 @@ class _PluginCollectionFactory:
             self._instance = _PluginCollection(plugin_path)
         return self._instance
 
+
 PluginCollection = _PluginCollectionFactory()
+
 
 class _PluginCollection:
     """
@@ -167,9 +196,8 @@ class _PluginCollection:
         bool.
             Returns True if consistency check succeeded and False otherwise.
         """
-        print(cls_item, hasattr(cls_item, 'check_if_plugin'))
         if hasattr(cls_item, 'check_if_plugin'):
-            if cls_item.check_if_plugin(cls_item):
+            if cls_item.check_if_plugin():
                 return True
         return False
 

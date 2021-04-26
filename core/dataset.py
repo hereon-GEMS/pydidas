@@ -20,11 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""
-Created on Thu Apr  1 13:49:10 2021
+""" The dataset module includes subclasses of numpy.ndarray with additional
+embedded metadata."""
 
-@author: ogurreck
-"""
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "MIT"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['Dataset']
+
 from numbers import Integral
 
 import numpy as np

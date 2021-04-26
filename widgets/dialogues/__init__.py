@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -22,17 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Subpackage with PyQt dialogues."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
-__version__ = "0.0.0"
-__maintainer__ = "Malte Storm"
-__status__ = "Development"
+
+from . import warning_box
+from .warning_box import *
+
+from . import error_message_box
+from .error_message_box import *
+
 __all__ = []
+__all__ += warning_box.__all__
+__all__ += error_message_box.__all__
 
-from PyQt5 import QtWidgets, QtCore
-from plugin_workflow_gui.config import gui_constants, qt_presets
-
+# remove modules from namespace after importing their content
+del warning_box
+del error_message_box

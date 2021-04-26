@@ -1,1 +1,56 @@
-from .workflow_tree import WorkflowTree, WorkflowNode
+# MIT License
+#
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""Subpackage with workflow tree ."""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "MIT"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = []
+
+from . import generic_node
+from .generic_node import *
+
+from . import generic_tree
+from .generic_tree import *
+
+from . import workflow_tree
+from .workflow_tree import *
+
+from . import plugin_position_node
+from .plugin_position_node import *
+
+
+__all__ += generic_node.__all__
+__all__ += generic_tree.__all__
+__all__ += workflow_tree.__all__
+__all__ += plugin_position_node.__all__
+
+
+# Unclutter namespace: remove modules from namespace
+del generic_node
+del generic_tree
+del workflow_tree
+del plugin_position_node

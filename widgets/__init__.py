@@ -56,12 +56,16 @@ from .workflow_plugin import *
 from . import workflow_tree_canvas
 from .workflow_tree_canvas import *
 
+from . import central_widget_proxy
+from .central_widget_proxy import *
+
 __all__ += confirmation_bar.__all__
 __all__ += plugin_collection_presenter.__all__
 __all__ += scroll_area.__all__
 __all__ += utilities.__all__
 __all__ += workflow_plugin.__all__
 __all__ += workflow_tree_canvas.__all__
+__all__ += central_widget_proxy.__all__
 
 # unclutter namespace and remove modules:
 del confirmation_bar
@@ -70,3 +74,4 @@ del scroll_area
 del utilities
 del workflow_plugin
 del workflow_tree_canvas
+del central_widget_proxy

@@ -91,10 +91,10 @@ def excepthook(exc_type, exception, trace):
     _traceback_info.seek(0)
     _trace = _traceback_info.read()
     _logfile = os.path.join(os.path.dirname(__file__), 'error.log')
-    _note = ('"An unhandled exception occurred. Please report the bug to:'
+    _note = ('An unhandled exception occurred. Please report the bug to:'
              '\n\tmalte.storm@hereon.de\nor'
-             '\n\thttps://github.com/malte-storm/plugin_workflow_gui/issues .'
-             f'\n\A log has been written to:\n\t{_logfile}.'
+             '\n\thttps://github.com/malte-storm/plugin_workflow_gui/issues'
+             f'\n\nA log has been written to:\n\t{_logfile}.'
              '\n\nError information:\n')
     _time = time.strftime('%Y-%m-%d %H:%M:%S')
     _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace ])
@@ -104,5 +104,5 @@ def excepthook(exc_type, exception, trace):
     except IOError:
         pass
     errorbox = ErrorMessageBox()
-    errorbox.setText(_note + _msg)
+    errorbox.set_text(_note + _msg)
     errorbox.exec_()

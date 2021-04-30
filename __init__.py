@@ -11,4 +11,3 @@ from . import gui
 from . import core
 
 del plugin_collection
-del workflow_tree

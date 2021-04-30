@@ -85,21 +85,24 @@ class MainTabWidget(QtWidgets.QTabWidget):
 class _ToplevelFrame(QtWidgets.QFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent)
-        self.parent = parent
-        self.menu_bar = None
-        self.active = False
+        self.font = QtWidgets.QApplication.font()
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.initialized = False
         self._actions = []
         self.name = name if name else ''
         if name:
             CENTRAL_WIDGET_PROXY.register_widget(self.name, self)
-        if self.parent:
+        if self.parent():
             self._initialize()
 
     def set_parent(self, parent):
-        self.parent = parent
-        if self.parent and not self.initialized:
+        self.setParent(parent)
+        if self.parent() and not self.initialized:
             self._initialize()
+
+    def _initialize(self):
+        ...
 
     def set_name(self, name):
         self.name = name
@@ -108,54 +111,11 @@ class _ToplevelFrame(QtWidgets.QFrame):
         else:
             CENTRAL_WIDGET_PROXY.change_reference_name(name, self)
 
-
     def _initialize(self):
-        self.menu_bar = QtWidgets.QToolBar(self)
-
-        for icon, name in self._actions:
-            _action = QtWidgets.QAction(icon, name.replace(' ', '\n'), self)
-            _action.setStatusTip(name)
-            _action.triggered.connect(partial(self.select_item, name))
-            self.menu_bar.addAction(_action)
-
-        self.menu_bar.setStyleSheet("QToolBar{spacing:20px;}");
-        self.menu_bar.setIconSize(QtCore.QSize(40, 40))
-        self.menu_bar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        self.menu_bar.setFixedWidth(80)
-        self.menu_bar.setMovable(False)
-        self.menu_bar.toggleViewAction().setChecked(False)
-        self.menu_bar.toggleViewAction().trigger()
         self.initialized = True
-
-    def toggle(self, value=None):
-        if value is not None:
-            self.active = value
-        else:
-            self.active = not self.active
-        if self.menu_bar:
-            self.menu_bar.toggleViewAction().trigger()
 
     def select_item(self, name):
         raise NotImplementedError
-
-class HomeFrame(_ToplevelFrame):
-    def __init__(self, parent=None, name=None):
-        super().__init__(parent, name)
-        self._initialize()
-
-    def _initialize(self):
-        self.initialized = True
-        self.font = QtWidgets.QApplication.font()
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-
-        self.add_label('Welcome to pySALADD', 14, bold=True)
-        self.add_label('\nQuickstart:', 12, bold=True)
-        self.add_label('\nMenu: ', 11, underline=True, bold=True)
-        self.add_label('Use the menu toolbar on the left to switch between'
-                       ' different views. Some menu toolbars will open a'
-                       'further submenu on the left.\nAll functions can'
-                       'also be accessed through the regular menu on top.')
 
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, underline=False,
                   bold=False):
@@ -167,6 +127,21 @@ class HomeFrame(_ToplevelFrame):
         _l.setFixedWidth(400)
         _l.setWordWrap(True)
         self.layout.addWidget(_l)
+
+
+class HomeFrame(_ToplevelFrame):
+    def __init__(self, parent=None, name=None):
+        super().__init__(parent, name)
+        self.add_label('Welcome to pySALADD', 14, bold=True)
+        self.add_label('\nQuickstart:', 12, bold=True)
+        self.add_label('\nMenu: ', 11, underline=True, bold=True)
+        self.add_label('Use the menu toolbar on the left to switch between'
+                       ' different views. Some menu toolbars will open a'
+                       'further submenu on the left.\nAll functions can'
+                       ' also be accessed through the regular menu on top.')
+
+
+
 
 
 class ProcessingSetupFrame(_ToplevelFrame):
@@ -254,12 +229,9 @@ class LayoutTest2(QtWidgets.QMainWindow):
         self.params = {'workflow_edit_canvas_x': 1000,
                        'workflow_edit_canvas_y': 600}
         self.status = self.statusBar()
-        self._refs = {}
 
         self.frame_menuentries = []
-        self.frame_names= {}
-        self.frame_refs= {}
-        self.frame_icons = {}
+        self.frame_meta = {}
 
         # self.params = {'active_frame': 'Home'}
         # self.main_frames = {'Home': HomeFrame(),
@@ -351,13 +323,27 @@ class LayoutTest2(QtWidgets.QMainWindow):
         # self.initialized = True
 
 
-    def __find_toolbar_bases(self):
+    @staticmethod
+    def __find_toolbar_bases(items):
         _menu = []
-        for item in self.frame_menuentries:
-            itembase = os.path.dirname(item)
-            if itembase not in _menu:
-                _menu.append(itembase)
+        for _item in items:
+            _itembase = os.path.dirname(_item)
+            if _itembase not in _menu:
+                _menu.append(_itembase)
+            _item = _itembase
+        _menu.sort()
         return _menu
+
+    @staticmethod
+    def __find_all_own_bases(item):
+        _r = []
+        while len(item) > 0:
+            _base = os.path.dirname(item)
+            _r.append(_base)
+            item = _base
+        return _r[::-1]
+
+
 
     @staticmethod
     def __format_str_for_toolbar(input_str):
@@ -385,19 +371,17 @@ class LayoutTest2(QtWidgets.QMainWindow):
 
     def create_toolbars(self):
         self._toolbars = {}
-        for tb in self.__find_toolbar_bases():
+        for tb in self.__find_toolbar_bases(self.frame_menuentries):
             self._toolbars[tb] = QtWidgets.QToolBar(self)
-            self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}");
+            self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}")
             self._toolbars[tb].setIconSize(QtCore.QSize(40, 40))
             self._toolbars[tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
             self._toolbars[tb].setFixedWidth(80)
             self._toolbars[tb].setMovable(False)
-            self._toolbars[tb].toggleViewAction().setChecked(False)
-            self._toolbars[tb].toggleViewAction().trigger()
 
         for item in self.frame_menuentries:
-            _icon = self.frame_icons[item]
-            _name = self.frame_names[item]
+            _icon = self.frame_meta[item]['icon']
+            _name = self.frame_meta[item]['name']
             _action = QtWidgets.QAction(_icon, _name, self)
             _action.setStatusTip(_name)
             _action.triggered.connect(partial(self.select_item, item))
@@ -406,7 +390,6 @@ class LayoutTest2(QtWidgets.QMainWindow):
 
         for tb in self._toolbars:
             if tb == '':
-                self._toolbars[tb].toggleViewAction().setChecked(True)
                 self.addToolBar(QtCore.Qt.LeftToolBarArea, self._toolbars[tb])
             else:
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
@@ -415,8 +398,21 @@ class LayoutTest2(QtWidgets.QMainWindow):
         self.select_item(self.frame_menuentries[0])
         CENTRAL_WIDGET_PROXY.setCurrentIndex(0)
 
+        _toolbar = QtWidgets.QToolBar(self)
+        _toolbar.setStyleSheet("QToolBar{spacing:20px;}")
+        _toolbar.setIconSize(QtCore.QSize(40, 40))
+        _toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        _toolbar.setFixedHeight(30)
+        _toolbar.setMovable(False)
+        self.top_toolbar_label = QtWidgets.QLabel(_toolbar)
 
-
+    @staticmethod
+    def __get_active_toolbars(name):
+        _r = [name]
+        while len(name):
+            name = os.path.dirname(name)
+            _r.append(name)
+        return _r[::-1]
 
     def register_frame(self, name, menu_name, menuicon, frame):
         if menu_name in self.frame_menuentries:
@@ -429,33 +425,23 @@ class LayoutTest2(QtWidgets.QMainWindow):
         else:
             CENTRAL_WIDGET_PROXY.register_widget(menu_name, frame)
         self.frame_menuentries.append(menu_name)
-        self.frame_names[menu_name] = self.__format_str_for_toolbar(name)
-        self.frame_icons[menu_name] = menuicon
-        self.frame_refs[menu_name] = frame.frame_index
+        _meta = dict(name=self.__format_str_for_toolbar(name),
+                     icon=menuicon,
+                     index=frame.frame_index,
+                     menus=self.__get_active_toolbars(menu_name))
+        self.frame_meta[menu_name] = _meta
 
 
     def select_item(self, name):
-        print(name)
-        CENTRAL_WIDGET_PROXY.setCurrentIndex(self.frame_refs[name])
-        print(CENTRAL_WIDGET_PROXY.currentWidget())
+        for _tb in self._toolbars:
+            if _tb in self.frame_meta[name]['menus']:
+                if not self._toolbars[_tb].toggleViewAction().isChecked():
+                    self._toolbars[_tb].toggleViewAction().trigger()
+            else:
+                if self._toolbars[_tb].toggleViewAction().isChecked():
+                    self._toolbars[_tb].toggleViewAction().trigger()
 
-        # if name != self.params['active_frame']:
-        #     current_frame = self.main_frames[self.params['active_frame']]
-        #     print(name, current_frame, current_frame.menu_bar)
-        #     if current_frame.menu_bar:
-        #         self.removeToolBar(current_frame.menu_bar)
-        # CENTRAL_WIDGET_PROXY.activate_widget_by_name(name)
-        # for key in self.main_frames:
-        #     item = self.main_frames[key]
-        #     if item.name == name:
-
-        #         item.toggle(True)
-        #         self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
-        #         self.addToolBar(QtCore.Qt.LeftToolBarArea, item.menu_bar)
-        #     else:
-        #         item.toggle(False)
-        # self.params['active_frame'] = name
-
+        CENTRAL_WIDGET_PROXY.setCurrentIndex(self.frame_meta[name]['index'])
 
 
     def action_new(self):
@@ -540,8 +526,9 @@ if __name__ == '__main__':
     gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame())
     gui.register_frame('Home 2', 'Processing/Home', qta.icon('mdi.home'), HomeFrame())
     gui.register_frame('Help', 'Processing/Home2', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Tools/Help', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Tools/Help 2', qta.icon('mdi.home'), HomeFrame())
+    gui.register_frame('Help', 'Tools/help/Help', qta.icon('mdi.home'), HomeFrame())
+    gui.register_frame('Help', 'Tools/help/Help 2', qta.icon('mdi.home'), HomeFrame())
+    gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), HomeFrame())
     gui.create_toolbars()
 
     gui.show()

@@ -131,8 +131,6 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
                            ' registered with the CENTRAL_WIDGET_PROXY.'
                            ' New widget has not been registered.')
         index = super().addWidget(widget)
-        #self.addWidget(widget, name)
-        print(name, widget, index)
         widget.frame_index = index
         self.widgets.append(widget)
         self.widget_indices[name] = index

@@ -38,7 +38,7 @@ class ScrollArea(QtWidgets.QScrollArea):
     """
     Convenience class to simplify the setup of a QScrollArea.
     """
-    def __init__(self, parent=None, widget=None, width=None, height=None):
+    def __init__(self, parent=None, **kwargs):
         """
         Create a QScrollArea with defined widgets, width and height.
 
@@ -46,13 +46,19 @@ class ScrollArea(QtWidgets.QScrollArea):
         ----------
         parent : QWidget, optional
             The parent widget. The default is None.
+        **kwargs : keyword arguments
+
+        Supported keywords
+        ------------------
         widget : QWidget, optional
             The scroll area's own widget which is displayed.
             The default is None.
-        width : int, optional
-            The width in pixel. The default is None.
-        height : int, optional
-            The height in pixel. The default is None.
+        fixedWidth : int, optional
+            If the scroll area shall have a fixed width, this value can be
+            defined in pixel. The default is None.
+        fixedHeight : int, optional
+            If the scroll area shall have a fixed height, this value can be
+            defined in pixel. The default is None.
 
         Returns
         -------
@@ -60,11 +66,31 @@ class ScrollArea(QtWidgets.QScrollArea):
 
         """
         super().__init__(parent)
-        self.parent = parent
-        self.setWidget(widget)
+        self._parent = parent
+        params = dict(widget=kwargs.get('widget', None),
+                      width=kwargs.get('width', None),
+                      height=kwargs.get('height', None),
+                      fixedHeight=kwargs.get('fixedHeight', None),
+                      minHeight=kwargs.get('minHeight', None),
+                      maxHeight=kwargs.get('maxHeight', None),
+                      fixedWidth=kwargs.get('fixedWidth', None),
+                      minWidth=kwargs.get('minWidth', None),
+                      maxWidth=kwargs.get('maxWidth', None),
+                      )
+        if params['widget']:
+            self.setWidget(params['widget'])
         self.setWidgetResizable(True)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.setAutoFillBackground(True)
-        if width:
-            self.setFixedWidth(width)
-        if height:
-            self.setFixedHeight(height)
+        if params['fixedWidth']:
+            self.setFixedWidth(params['fixedWidth'])
+        if params['minWidth']:
+            self.setMinimumWidth(params['minWidth'])
+        if params['maxWidth']:
+            self.setMinimumWidth(params['maxWidth'])
+        if params['fixedHeight']:
+            self.setFixedHeight(params['fixedHeight'])
+        if params['minHeight']:
+            self.setMinimumHeight(params['minHeight'])
+        if params['maxHeight']:
+            self.setMinimumHeight(params['maxHeight'])

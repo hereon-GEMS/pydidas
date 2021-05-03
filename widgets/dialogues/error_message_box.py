@@ -67,18 +67,21 @@ class ErrorMessageBox(QtWidgets.QDialog):
 
         self._label = QtWidgets.QLabel()
         self._label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        self._label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         _scroll_area = QtWidgets.QScrollArea()
 
         _scroll_area.setWidget(self._label)
         _scroll_area.setWidgetResizable(True)
+        _scroll_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         _ok_button = QtWidgets.QPushButton('OK')
 
         _layout = QtWidgets.QVBoxLayout()
-        _layout.addWidget(_scroll_area, 1, QtCore.Qt.AlignLeft)
+        _layout.addWidget(_scroll_area)
         _layout.addWidget(_ok_button, 1, QtCore.Qt.AlignRight)
 
         self.setLayout(_layout)
         _ok_button.clicked.connect(self.close)
+        self.resize(800, self.height())
         if _text:
             self.set_text(_text)
 

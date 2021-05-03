@@ -8,9 +8,13 @@ Created on Thu Mar 11 10:24:52 2021
 import sys
 import os
 import re
+
+from functools import partial
+
 #from qtpy import QtWidgets, QtGui, QtCore
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
-from functools import partial
+
+import qtawesome as qta
 
 import plugin_workflow_gui as pwg
 
@@ -22,9 +26,9 @@ PALETTES = pwg.config.PALETTES
 from plugin_workflow_gui.widgets import WorkflowTreeCanvas, PluginCollectionPresenter, ScrollArea
 from plugin_workflow_gui.widgets.plugin_config import PluginParamConfig
 from plugin_workflow_gui.config import STANDARD_FONT_SIZE
+import plugin_workflow_gui.config.gui_constants as gui_const
 #WorkflowTree = pwg.WorkflowTree()
 
-import qtawesome as qta
 
 class FrameConfigError(Exception):
     ...
@@ -32,20 +36,25 @@ class FrameConfigError(Exception):
 
 
 
-class WorkflowEditTab(QtWidgets.QWidget):
+class WorkflowEditFrame(QtWidgets.QFrame):
     def __init__(self, parent=None, params=None):
         super().__init__(parent)
         self.parent = parent
         self.workflow_canvas = WorkflowTreeCanvas(self)
         self.plugin_edit_canvas = PluginParamConfig(self)
         self.w_plugin_collection = PluginCollectionPresenter(self)
+        params = params if params else {}
+        self.params = {}
+        self.params['workflow_edit_canvas_x'] = params.get('workflow_edit_canvas_x', gui_const.WORKFLOW_EDIT_CANVAS_X)
+        self.params['workflow_edit_canvas_y'] = params.get('workflow_edit_canvas_y', gui_const.WORKFLOW_EDIT_CANVAS_Y)
         self.workflow_area = ScrollArea(
-            self, self.workflow_canvas,
-            params['workflow_edit_canvas_x'],
-            params['workflow_edit_canvas_y']
-        )
-        self.plugin_edit_area = ScrollArea(self, self.plugin_edit_canvas, 400, None)
-        self.plugin_edit_area.setMinimumHeight(500)
+            self, widget=self.workflow_canvas, minHeight=500)
+        #     self.params['workflow_edit_canvas_x'],
+        #     self.params['workflow_edit_canvas_y']
+        # )
+        self.plugin_edit_area = ScrollArea(self, widget=self.plugin_edit_canvas, fixedWidth=400, minHeight=500)
+        #self.plugin_edit_area.setMinimumHeight(500)
+        self.plugin_edit_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         self.w_plugin_collection.selection_confirmed.connect(self.workflow_add_plugin)
 
@@ -63,8 +72,9 @@ class WorkflowEditTab(QtWidgets.QWidget):
         _layout = QtWidgets.QVBoxLayout(self)
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.addLayout(_layout0)
-        _layout.addWidget(pwg.widgets.ConfirmationBar())
+        # _layout.addWidget(pwg.widgets.ConfirmationBar())
         self.setLayout(_layout)
+        WORKFLOW_EDIT_MANAGER.update_qt_items(qt_canvas=self.workflow_canvas)
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
 
     def workflow_add_plugin(self, name):
@@ -72,34 +82,32 @@ class WorkflowEditTab(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot(int)
     def configure_plugin(self, node_id):
-        # print(f'configure plugin {node_id}')
         self.plugin_edit_canvas.configure_plugin(node_id)
 
 
 
 
-class MainTabWidget(QtWidgets.QTabWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
 
 class _ToplevelFrame(QtWidgets.QFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent)
         self.font = QtWidgets.QApplication.font()
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self._layout = QtWidgets.QVBoxLayout(self)
+        self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.initialized = False
-        self._actions = []
         self.name = name if name else ''
+        # self.empty_frame
         if name:
             CENTRAL_WIDGET_PROXY.register_widget(self.name, self)
         if self.parent():
             self._initialize()
+            self.initialized = True
 
     def set_parent(self, parent):
         self.setParent(parent)
         if self.parent() and not self.initialized:
             self._initialize()
+            self.initialized = True
 
     def _initialize(self):
         ...
@@ -114,9 +122,6 @@ class _ToplevelFrame(QtWidgets.QFrame):
     def _initialize(self):
         self.initialized = True
 
-    def select_item(self, name):
-        raise NotImplementedError
-
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, underline=False,
                   bold=False):
         _l = QtWidgets.QLabel(text)
@@ -126,7 +131,7 @@ class _ToplevelFrame(QtWidgets.QFrame):
         _l.setFont(self.font)
         _l.setFixedWidth(400)
         _l.setWordWrap(True)
-        self.layout.addWidget(_l)
+        self._layout.addWidget(_l)
 
 
 class HomeFrame(_ToplevelFrame):
@@ -142,59 +147,26 @@ class HomeFrame(_ToplevelFrame):
 
 
 
-
-
 class ProcessingSetupFrame(_ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
-        self._actions = [[qta.icon('mdi.flask', color='blue'), 'Experiment'],
-                         [qta.icon('mdi.axis-arrow'), 'Scan'],
-                         [qta.icon('mdi.clipboard-flow-outline'), 'Workflow']
-                         ]
-
-    def select_item(self, name):
-        print(name)
 
 class DataBrowsingFrame(_ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
 
-    def select_item(self, name):
-        print(name)
 
 class ToolsFrame(_ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
-        self._actions = [[qta.icon('mdi.flask', color='blue'), 'Experiment'],
-                         [qta.icon('mdi.axis-arrow'), 'Scan'],
-                         [qta.icon('mdi.clipboard-flow-outline'), 'Workflow']
-                         ]
-
-    def select_item(self, name):
-        print(name)
 
 class ProcessingFrame(_ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
-        self._actions = [[qta.icon('mdi.flask', color='blue'), 'Experiment'],
-                         [qta.icon('mdi.axis-arrow'), 'Scan'],
-                         [qta.icon('mdi.clipboard-flow-outline'), 'Workflow']
-                         ]
-
-    def select_item(self, name):
-        print(name)
 
 class ResultVisualizationFrame(_ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
-        self._actions = [[qta.icon('mdi.flask', color='blue'), 'Experiment'],
-                         [qta.icon('mdi.axis-arrow'), 'Scan'],
-                         [qta.icon('mdi.clipboard-flow-outline'), 'Workflow']
-                         ]
-
-    def select_item(self, name):
-        print(name)
-
 
 
 class _InfoWidget(QtWidgets.QTextEdit):
@@ -221,13 +193,14 @@ InfoWidget = _InfoWidgetFactory()
 class LayoutTest2(QtWidgets.QMainWindow):
     name_selected_signal = QtCore.pyqtSlot(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
 
         self.process = None
-        self.setGeometry(20, 40, 1400, 1000)
-        self.params = {'workflow_edit_canvas_x': 1000,
-                       'workflow_edit_canvas_y': 600}
+        if geometry and len(geometry) == 4:
+            self.setGeometry(*geometry)
+        else:
+            self.setGeometry(40, 60, 1400, 1000)
         self.status = self.statusBar()
 
         self.frame_menuentries = []
@@ -271,56 +244,6 @@ class LayoutTest2(QtWidgets.QMainWindow):
         self.setWindowTitle('Plugin edit test')
         self.__createMenu()
         self.__create_info_box()
-
-    def __update_toolbar(self):
-
-        menu = ['Home', 'Tools', 'Proc setup', 'Proc setup/Workflow', 'Proc setup/Exp', 'Proc setup/Scan', 'Proc setup/Exp/Generic']
-        menuitems = [item.split('/') for item in menu]
-
-        # _menu = QtWidgets.QToolBar(self)
-        # _action = None
-
-        # _groups = [[[qta.icon('mdi.home'), 'Home']],
-        #            [[qta.icon('mdi.image-search-outline'), 'Data browsing']],
-        #            [[qta.icon('mdi.tools'), 'Tools']],
-        #            [[qta.icon('mdi.cogs'), 'Processing setup'],
-        #             [qta.icon('fa5s.sync'), 'Processing'],
-        #             [qta.icon('mdi.monitor-eye'), 'Result visualization']]
-        #            ]
-
-        # for i, group in enumerate(_groups):
-        #     _newgroup = True
-        #     for icon, name in group:
-        #         _action = QtWidgets.QAction(icon, name.replace(' ', '\n'), self)
-        #         _action.setStatusTip(name)
-        #         _action.triggered.connect(partial(self.select_item, name))
-        #         _menu.addAction(_action)
-        #         if _newgroup and i > 0:
-        #             _menu.insertSeparator(_action)
-        #         _newgroup = False
-
-        # _menu.setStyleSheet("QToolBar{spacing:20px;}");
-        # _menu.setIconSize(QtCore.QSize(40, 40))
-        # _menu.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        # _menu.setFixedWidth(80)
-        # _menu.setMovable(False)
-        # self._refs['main_toolbar'] = _menu
-        # self.addToolBar(QtCore.Qt.LeftToolBarArea, _menu)
-
-        # for icon, name in self._actions:
-        #     _action = QtWidgets.QAction(icon, name.replace(' ', '\n'), self)
-        #     _action.setStatusTip(name)
-        #     _action.triggered.connect(partial(self.select_item, name))
-        #     self.menu_bar.addAction(_action)
-
-        # self.menu_bar.setStyleSheet("QToolBar{spacing:20px;}");
-        # self.menu_bar.setIconSize(QtCore.QSize(40, 40))
-        # self.menu_bar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        # self.menu_bar.setFixedWidth(80)
-        # self.menu_bar.setMovable(False)
-        # self.menu_bar.toggleViewAction().setChecked(False)
-        # self.menu_bar.toggleViewAction().trigger()
-        # self.initialized = True
 
 
     @staticmethod
@@ -372,12 +295,14 @@ class LayoutTest2(QtWidgets.QMainWindow):
     def create_toolbars(self):
         self._toolbars = {}
         for tb in self.__find_toolbar_bases(self.frame_menuentries):
-            self._toolbars[tb] = QtWidgets.QToolBar(self)
+            tb_title = tb if tb else 'Main toolbar'
+            self._toolbars[tb] = QtWidgets.QToolBar(tb_title, self)
             self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}")
             self._toolbars[tb].setIconSize(QtCore.QSize(40, 40))
             self._toolbars[tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-            self._toolbars[tb].setFixedWidth(80)
+            self._toolbars[tb].setFixedWidth(85)
             self._toolbars[tb].setMovable(False)
+            self._toolbars[tb].toggleViewAction().setEnabled(False)
 
         for item in self.frame_menuentries:
             _icon = self.frame_meta[item]['icon']
@@ -394,17 +319,19 @@ class LayoutTest2(QtWidgets.QMainWindow):
             else:
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
                 self.addToolBar(QtCore.Qt.LeftToolBarArea, self._toolbars[tb])
-                self._toolbars[tb].toggleViewAction().trigger()
+                self._toolbars[tb].setVisible(False)
         self.select_item(self.frame_menuentries[0])
         CENTRAL_WIDGET_PROXY.setCurrentIndex(0)
 
-        _toolbar = QtWidgets.QToolBar(self)
-        _toolbar.setStyleSheet("QToolBar{spacing:20px;}")
-        _toolbar.setIconSize(QtCore.QSize(40, 40))
-        _toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        _toolbar.setFixedHeight(30)
-        _toolbar.setMovable(False)
-        self.top_toolbar_label = QtWidgets.QLabel(_toolbar)
+        # _toolbar = QtWidgets.QToolBar('Top toolbar')
+        # _toolbar.setStyleSheet("QToolBar{spacing:20px;}")
+        # _toolbar.setIconSize(QtCore.QSize(40, 40))
+        # _toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        # _toolbar.setFixedHeight(30)
+        # _toolbar.setMovable(False)
+        # self.addToolBar(QtCore.Qt.TopToolBarArea, _toolbar)
+        # self.top_toolbar_label = QtWidgets.QLabel(_toolbar)
+        # self.top_toolbar_label
 
     @staticmethod
     def __get_active_toolbars(name):
@@ -434,14 +361,12 @@ class LayoutTest2(QtWidgets.QMainWindow):
 
     def select_item(self, name):
         for _tb in self._toolbars:
-            if _tb in self.frame_meta[name]['menus']:
-                if not self._toolbars[_tb].toggleViewAction().isChecked():
-                    self._toolbars[_tb].toggleViewAction().trigger()
-            else:
-                if self._toolbars[_tb].toggleViewAction().isChecked():
-                    self._toolbars[_tb].toggleViewAction().trigger()
+            self._toolbars[_tb].setVisible(_tb in self.frame_meta[name]['menus'])
 
-        CENTRAL_WIDGET_PROXY.setCurrentIndex(self.frame_meta[name]['index'])
+
+        w = CENTRAL_WIDGET_PROXY.get_widget_by_name(name)
+        if w.layout() and w.layout().count() > 0:
+            CENTRAL_WIDGET_PROXY.setCurrentIndex(self.frame_meta[name]['index'])
 
 
     def action_new(self):
@@ -518,7 +443,6 @@ if __name__ == '__main__':
     gui = LayoutTest2()
 
     gui.register_frame('Home', 'Home', qta.icon('mdi.home'), HomeFrame())
-    print(CENTRAL_WIDGET_PROXY.get_all_widget_names())
     gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame())
     gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame())
     gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame())
@@ -527,8 +451,9 @@ if __name__ == '__main__':
     gui.register_frame('Home 2', 'Processing/Home', qta.icon('mdi.home'), HomeFrame())
     gui.register_frame('Help', 'Processing/Home2', qta.icon('mdi.home'), HomeFrame())
     gui.register_frame('Help', 'Tools/help/Help', qta.icon('mdi.home'), HomeFrame())
+    gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame())
     gui.register_frame('Help', 'Tools/help/Help 2', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), HomeFrame())
+    gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), QtWidgets.QFrame())
     gui.create_toolbars()
 
     gui.show()

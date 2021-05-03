@@ -80,7 +80,6 @@ class _WorkflowPluginWidget(QtWidgets.QLabel):
         Returns
         -------
         None.
-
         """
         super().__init__(parent)
         self.qt_parent = parent

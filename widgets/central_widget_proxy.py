@@ -91,6 +91,32 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
         val_list = list(self.widget_indices.values())
         return key_list[val_list.index(index)]
 
+    def get_widget_by_name(self, name):
+        """
+        Get a widget from its reference name.
+
+        This method will return the widget registered with the reference
+        name, if it exists.
+
+        Parameters
+        ----------
+        name : str
+            The reference name of the widget.
+
+        Raises
+        ------
+        KeyError
+            If no widget with the reference name has been registered.
+
+        Returns
+        -------
+        None.
+        """
+        if name not in self.widget_indices:
+            raise KeyError(f'No widget with the name "{name}" has been'
+                           ' registered.')
+        return self.widget(self.widget_indices[name])
+
     def get_all_widget_names(self):
         """
         Get the names of all registered widgets.

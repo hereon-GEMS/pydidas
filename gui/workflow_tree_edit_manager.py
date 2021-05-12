@@ -45,7 +45,7 @@ PALETTES = qt_presets.PALETTES
 STYLES = qt_presets.STYLES
 
 
-class _WorkflowPluginWidget(QtWidgets.QLabel):
+class WorkflowPluginWidget(QtWidgets.QLabel):
     """Widget with title and delete button for every selected plugin
     in the processing chain.
 
@@ -149,7 +149,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         super().__init__()
         self.root = None
         self.qt_canvas= qt_canvas
-        self.qt_main = qt_main
 
         self.node_pos = {}
         self.widgets = {}
@@ -159,7 +158,7 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         self.active_node = None
         self.active_node_id = None
 
-    def update_qt_items(self, qt_canvas=None, qt_main=None):
+    def update_qt_canvas(self, qt_canvas):
         """
         Store references to the QT items.
 
@@ -170,11 +169,9 @@ class _WorkflowEditTreeManager(QtCore.QObject):
 
         Parameters
         ----------
-        qt_canvas : QtWidget, optional
+        qt_canvas : QtWidget
             The QtWidget which acts as canvas for the plugin workflow tree.
             The default is None.
-        qt_main : QtMainWindow, optional
-            Reference to the main application. The default is None.
 
         Returns
         -------
@@ -182,8 +179,7 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         """
         if qt_canvas:
             self.qt_canvas = qt_canvas
-        if qt_main:
-            self.qt_main = qt_main
+
 
     def add_plugin_node(self, name, title=None):
         """
@@ -205,10 +201,18 @@ class _WorkflowEditTreeManager(QtCore.QObject):
             The title of the plugin widget. If None, this will default to the
             widget name. The default is None.
 
+        Raises
+        ------
+        AttributeError
+            AttributeError is raised if the Qt drawing Canvas for the plugins
+            has not been defined yet.
+
         Returns
         -------
         None.
         """
+        if not self.qt_canvas:
+            raise AttributeError('No QtCanvas defined. Cannot add plugins.')
         if not self.root:
             _newid = 0
         else:
@@ -226,7 +230,7 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         self.node_ids.append(_newid)
         self.set_active_node(_newid)
         self.update_node_positions()
-        self.qt_main.update()
+        # self.qt_canvas.update()
 
     def update_node_positions(self):
         """
@@ -249,8 +253,8 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         _pos = self.root.get_relative_positions()
         _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
         _offset = 0
-        if _width < self.qt_main.params['workflow_edit_canvas_x']:
-            _offset = (self.qt_main.params['workflow_edit_canvas_x'] - _width) // 2
+        if _width < self.qt_canvas.parent().width():
+            _offset = (self.qt_canvas.parent().width() - _width) // 2
         pos_vals = np.asarray(list(_pos.values()))
         pos_vals[:, 0] += - np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
         pos_vals[:, 1] += - np.amin(pos_vals[:, 1]) + self.pos_y_min

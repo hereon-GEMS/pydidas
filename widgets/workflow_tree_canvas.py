@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -55,7 +53,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         None.
         """
         super().__init__(parent=parent)
-        self.parent = parent
         self.title = QtWidgets.QLabel(self)
         self.title.setStyleSheet(STYLES['title'])
         self.title.setText('Workflow tree')

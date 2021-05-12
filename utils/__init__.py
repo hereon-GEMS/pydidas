@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -22,8 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Package with utility functions."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -33,6 +30,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from PyQt5 import QtWidgets, QtCore
-from plugin_workflow_gui.config import gui_constants, qt_presets
 
+from . import hdf_dataset_filter
+from .hdf_dataset_filter import *
+
+__all__ += hdf_dataset_filter.__all__
+
+
+# unclutter namespace and delete the references to the modules itself
+# as all functions are imported directly
+del hdf_dataset_filter

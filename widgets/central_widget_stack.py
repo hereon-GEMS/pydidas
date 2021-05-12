@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -23,7 +21,7 @@
 # SOFTWARE.
 
 """
-Module with the CENTRAL_WIDGET_PROXY used for managing the central window.
+Module with the CENTRAL_WIDGET_STACK used for managing the central window.
 """
 
 __author__      = "Malte Storm"
@@ -32,12 +30,12 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CENTRAL_WIDGET_PROXY']
+__all__ = ['CENTRAL_WIDGET_STACK']
 
 from PyQt5 import QtWidgets
 
-class _CentralWidgetProxy(QtWidgets.QStackedWidget):
-    """The _CentralWidgetProxy is a QStackedWidget with references to all
+class _CentralWidgetStack(QtWidgets.QStackedWidget):
+    """The _CentralWidgetStack is a QStackedWidget with references to all
     the possible top level widgets.
     Widgets are responsible for registering themself with this class to
     allow a later reference.
@@ -68,6 +66,19 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
         super().__init__(parent)
         self.widget_indices = {}
         self.widgets = []
+    #     self.delayTimeout = 100
+
+    #     self._resizeTimer = QtCore.QTimer(self)
+    #     self._resizeTimer.timeout.connect(self._delayedUpdate)
+
+    # def resizeEvent(self, event):
+    #     self._resizeTimer.start(self.delayTimeout)
+    #     self.setUpdatesEnabled(False)
+    #     super().resizeEvent(event)
+
+    # def _delayedUpdate(self):
+    #     self._resizeTimer.stop()
+    #     self.setUpdatesEnabled(True)
 
     def get_name_from_index(self, index):
         """
@@ -154,7 +165,7 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
         """
         if name in self.widget_indices:
             raise KeyError(f'A widget with the name "{name}" has already been'
-                           ' registered with the CENTRAL_WIDGET_PROXY.'
+                           ' registered with the CENTRAL_WIDGET_STACK.'
                            ' New widget has not been registered.')
         index = super().addWidget(widget)
         widget.frame_index = index
@@ -181,7 +192,7 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
         """
         if name not in self.widget_indices:
             raise KeyError(f'No widget with the name "{name}" has been'
-                           ' registered with the CENTRAL_WIDGET_PROXY.')
+                           ' registered with the CENTRAL_WIDGET_STACK.')
         index = self.widget_indices[name]
         self.setCurrentIndex(index)
 
@@ -275,7 +286,7 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
 
     def reset(self):
         """
-        Reset the CentralWidgetProxy and delete all widgets from itself.
+        Reset the CentralWidgetStack and delete all widgets from itself.
 
         Returns
         -------
@@ -337,10 +348,10 @@ class _CentralWidgetProxy(QtWidgets.QStackedWidget):
             self.widget_indices[new_name] = index
 
 
-class _CentralWidgetProxyFactory:
+class _CentralWidgetStackFactory:
     """
     Factory class which returns always the same instance of the
-    CentralWidgetProxy.
+    CentralWidgetStack.
     """
     def __init__(self):
         """Setup method."""
@@ -348,16 +359,16 @@ class _CentralWidgetProxyFactory:
 
     def __call__(self):
         """
-        Get the instance of the _CentralWidgetProxy
+        Get the instance of the _CentralWidgetStack
 
         Returns
         -------
-        _CentralWidgetProxy
-            The instance of the _CentralWidgetProxy.
+        _CentralWidgetStack
+            The instance of the _CentralWidgetStack.
         """
         if not self._instance:
-            self._instance = _CentralWidgetProxy()
+            self._instance = _CentralWidgetStack()
         return self._instance
 
-CENTRAL_WIDGET_PROXY = _CentralWidgetProxyFactory()
+CENTRAL_WIDGET_STACK = _CentralWidgetStackFactory()
 

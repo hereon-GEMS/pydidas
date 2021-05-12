@@ -30,41 +30,10 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['deleteItemsOfLayout', 'excepthook', 'QtaIconButton']
-
-from io import StringIO
-import os
-import time
-import traceback
+__all__ = ['QtaIconButton']
 
 from PyQt5 import QtWidgets, QtCore
 import qtawesome
-
-from .dialogues import ErrorMessageBox
-
-
-def deleteItemsOfLayout(layout):
-    """
-    Function to recursively delete items in a QLayout.
-
-    Parameters
-    ----------
-    layout : QLayout
-        The layout to be cleard.
-
-    Returns
-    -------
-    None.
-    """
-    if layout is not None:
-        while layout.count():
-            item = layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.setParent(None)
-                widget.deleteLater()
-            else:
-                deleteItemsOfLayout(item.layout())
 
 
 class QtaIconButton(QtWidgets.QPushButton):
@@ -120,48 +89,3 @@ class QtaIconButton(QtWidgets.QPushButton):
                 raise ValueError(f'Cannot interprete size "{size}".')
             self.setIconSize(QtCore.QSize(*size))
             self.setFixedSize(*size)
-
-
-
-def excepthook(exc_type, exception, trace):
-    """
-    Catch global exceptions.
-
-    This global function is used to replace the generic sys.excepthook
-    to handle exceptions. It will open a popup window with the exception
-    text.
-
-    Parameters
-    ----------
-    exc_type : type
-        The exception type
-    exception : Exception
-        The exception itself.
-    trace : traceback object
-        The trace of where the exception occured.
-
-    Returns
-    -------
-    None
-    """
-    _sep = '\n' + '-' * 80 + '\n'
-    _traceback_info = StringIO()
-    traceback.print_tb(trace, None, _traceback_info)
-    _traceback_info.seek(0)
-    _trace = _traceback_info.read()
-    _logfile = os.path.join(os.path.dirname(__file__), 'error.log')
-    _note = ('An unhandled exception occurred. Please report the bug to:'
-             '\n\tmalte.storm@hereon.de\nor'
-             '\n\thttps://github.com/malte-storm/plugin_workflow_gui/issues'
-             f'\n\nA log has been written to:\n\t{_logfile}.'
-             '\n\nError information:\n')
-    _time = time.strftime('%Y-%m-%d %H:%M:%S')
-    _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace ])
-    try:
-        with open(_logfile, 'w') as f:
-            f.write(_msg)
-    except IOError:
-        pass
-    errorbox = ErrorMessageBox()
-    errorbox.set_text(_note + _msg)
-    errorbox.exec_()

@@ -155,7 +155,7 @@ class PluginParamConfig(QtWidgets.QFrame):
         None.
         """
         for param in self.plugin.params:
-            self.param_links[param.name].setText(param.value)
+            self.param_links[param.name].setText(str(param.value))
 
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None):
         """

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Subpackage with GUI elements."""
+"""Module with Warning class for showing notifications."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -28,24 +28,13 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['FrameConfigError']
 
-from . import workflow_tree_edit_manager
-from .workflow_tree_edit_manager import *
+import numpy as np
 
-from . import _exceptions
-
-from . import data_browsing_frame
-from .data_browsing_frame import *
-
-from . import workflow_edit_frame
-from .workflow_edit_frame import *
-
-__all__ += workflow_tree_edit_manager.__all__
-__all__ += data_browsing_frame.__all__
-__all__ += workflow_edit_frame.__all__
-
-# Unclutter namespace: remove modules from namespace
-del workflow_tree_edit_manager
-del data_browsing_frame
-del workflow_edit_frame
+class FrameConfigError(Exception):
+    """
+    FrameConfigError is used if any required Qt references are missing or
+    any other specific issues are raised in the configuration of Frames.
+    """
+    ...

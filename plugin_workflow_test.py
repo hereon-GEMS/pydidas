@@ -8,6 +8,7 @@ Created on Thu Mar 11 10:24:52 2021
 import sys
 import os
 import re
+import time
 
 from functools import partial
 
@@ -15,6 +16,10 @@ from functools import partial
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
 import qtawesome as qta
+import h5py
+import hdf5plugin
+import silx
+import numpy as np
 
 import plugin_workflow_gui as pwg
 
@@ -23,118 +28,14 @@ PLUGIN_COLLECTION = pwg.PluginCollection()
 STYLES = pwg.config.STYLES
 PALETTES = pwg.config.PALETTES
 
-from plugin_workflow_gui.widgets import WorkflowTreeCanvas, PluginCollectionPresenter, ScrollArea
-from plugin_workflow_gui.widgets.plugin_config import PluginParamConfig
+from plugin_workflow_gui.widgets import ToplevelFrame
+from plugin_workflow_gui.gui import DataBrowsingFrame,  WorkflowEditFrame
 from plugin_workflow_gui.config import STANDARD_FONT_SIZE
-import plugin_workflow_gui.config.gui_constants as gui_const
-#WorkflowTree = pwg.WorkflowTree()
-
-
-class FrameConfigError(Exception):
-    ...
+from plugin_workflow_gui.gui._exceptions import FrameConfigError
 
 
 
-
-class WorkflowEditFrame(QtWidgets.QFrame):
-    def __init__(self, parent=None, params=None):
-        super().__init__(parent)
-        self.parent = parent
-        self.workflow_canvas = WorkflowTreeCanvas(self)
-        self.plugin_edit_canvas = PluginParamConfig(self)
-        self.w_plugin_collection = PluginCollectionPresenter(self)
-        params = params if params else {}
-        self.params = {}
-        self.params['workflow_edit_canvas_x'] = params.get('workflow_edit_canvas_x', gui_const.WORKFLOW_EDIT_CANVAS_X)
-        self.params['workflow_edit_canvas_y'] = params.get('workflow_edit_canvas_y', gui_const.WORKFLOW_EDIT_CANVAS_Y)
-        self.workflow_area = ScrollArea(
-            self, widget=self.workflow_canvas, minHeight=500)
-        #     self.params['workflow_edit_canvas_x'],
-        #     self.params['workflow_edit_canvas_y']
-        # )
-        self.plugin_edit_area = ScrollArea(self, widget=self.plugin_edit_canvas, fixedWidth=400, minHeight=500)
-        #self.plugin_edit_area.setMinimumHeight(500)
-        self.plugin_edit_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-
-        self.w_plugin_collection.selection_confirmed.connect(self.workflow_add_plugin)
-
-        _layout0 = QtWidgets.QHBoxLayout()
-        _layout0.setContentsMargins(5, 5, 5, 5)
-
-        _layout1 = QtWidgets.QVBoxLayout()
-        _layout1.setContentsMargins(0, 0, 0, 0)
-        _layout1.addWidget(self.workflow_area)
-        _layout1.addWidget(self.w_plugin_collection)
-
-        _layout0.addLayout(_layout1)
-        _layout0.addWidget(self.plugin_edit_area)
-
-        _layout = QtWidgets.QVBoxLayout(self)
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addLayout(_layout0)
-        # _layout.addWidget(pwg.widgets.ConfirmationBar())
-        self.setLayout(_layout)
-        WORKFLOW_EDIT_MANAGER.update_qt_items(qt_canvas=self.workflow_canvas)
-        WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
-
-    def workflow_add_plugin(self, name):
-        WORKFLOW_EDIT_MANAGER.add_plugin_node(name)
-
-    @QtCore.pyqtSlot(int)
-    def configure_plugin(self, node_id):
-        self.plugin_edit_canvas.configure_plugin(node_id)
-
-
-
-
-
-class _ToplevelFrame(QtWidgets.QFrame):
-    def __init__(self, parent=None, name=None):
-        super().__init__(parent)
-        self.font = QtWidgets.QApplication.font()
-        self._layout = QtWidgets.QVBoxLayout(self)
-        self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.initialized = False
-        self.name = name if name else ''
-        # self.empty_frame
-        if name:
-            CENTRAL_WIDGET_PROXY.register_widget(self.name, self)
-        if self.parent():
-            self._initialize()
-            self.initialized = True
-
-    def set_parent(self, parent):
-        self.setParent(parent)
-        if self.parent() and not self.initialized:
-            self._initialize()
-            self.initialized = True
-
-    def _initialize(self):
-        ...
-
-    def set_name(self, name):
-        self.name = name
-        if not CENTRAL_WIDGET_PROXY.is_registered(self.name, self):
-            CENTRAL_WIDGET_PROXY.register_widget(name, self)
-        else:
-            CENTRAL_WIDGET_PROXY.change_reference_name(name, self)
-
-    def _initialize(self):
-        self.initialized = True
-
-    def add_label(self, text, fontsize=STANDARD_FONT_SIZE, underline=False,
-                  bold=False):
-        _l = QtWidgets.QLabel(text)
-        self.font.setPointSize(fontsize)
-        self.font.setBold(bold)
-        self.font.setUnderline(underline)
-        _l.setFont(self.font)
-        _l.setFixedWidth(400)
-        _l.setWordWrap(True)
-        self._layout.addWidget(_l)
-
-
-class HomeFrame(_ToplevelFrame):
+class HomeFrame(ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
         self.add_label('Welcome to pySALADD', 14, bold=True)
@@ -147,24 +48,21 @@ class HomeFrame(_ToplevelFrame):
 
 
 
-class ProcessingSetupFrame(_ToplevelFrame):
-    def __init__(self, parent=None, name=None):
-        super().__init__(parent, name)
-
-class DataBrowsingFrame(_ToplevelFrame):
+class ProcessingSetupFrame(ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
 
 
-class ToolsFrame(_ToplevelFrame):
+
+class ToolsFrame(ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
 
-class ProcessingFrame(_ToplevelFrame):
+class ProcessingFrame(ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
 
-class ResultVisualizationFrame(_ToplevelFrame):
+class ResultVisualizationFrame(ToplevelFrame):
     def __init__(self, parent=None, name=None):
         super().__init__(parent, name)
 
@@ -213,7 +111,7 @@ class LayoutTest2(QtWidgets.QMainWindow):
         #                     'Processing setup': ProcessingSetupFrame(),
         #                     'Processing': ProcessingFrame(),
         #                     'Result visualization': ResultVisualizationFrame()}
-        self.setCentralWidget(CENTRAL_WIDGET_PROXY)
+        self.setCentralWidget(CENTRAL_WIDGET_STACK)
         self.status.showMessage('Test status')
         #self.__create_main_toolbar()
 
@@ -244,6 +142,7 @@ class LayoutTest2(QtWidgets.QMainWindow):
         self.setWindowTitle('Plugin edit test')
         self.__createMenu()
         self.__create_info_box()
+        self.setFocus(QtCore.Qt.OtherFocusReason)
 
 
     @staticmethod
@@ -321,7 +220,7 @@ class LayoutTest2(QtWidgets.QMainWindow):
                 self.addToolBar(QtCore.Qt.LeftToolBarArea, self._toolbars[tb])
                 self._toolbars[tb].setVisible(False)
         self.select_item(self.frame_menuentries[0])
-        CENTRAL_WIDGET_PROXY.setCurrentIndex(0)
+        CENTRAL_WIDGET_STACK.setCurrentIndex(0)
 
         # _toolbar = QtWidgets.QToolBar('Top toolbar')
         # _toolbar.setStyleSheet("QToolBar{spacing:20px;}")
@@ -347,10 +246,10 @@ class LayoutTest2(QtWidgets.QMainWindow):
                                    ' already exists.')
         frame.name = menu_name
         frame.setParent(self)
-        if CENTRAL_WIDGET_PROXY.is_registed(frame):
-            CENTRAL_WIDGET_PROXY.change_reference_name(menu_name, frame)
+        if CENTRAL_WIDGET_STACK.is_registed(frame):
+            CENTRAL_WIDGET_STACK.change_reference_name(menu_name, frame)
         else:
-            CENTRAL_WIDGET_PROXY.register_widget(menu_name, frame)
+            CENTRAL_WIDGET_STACK.register_widget(menu_name, frame)
         self.frame_menuentries.append(menu_name)
         _meta = dict(name=self.__format_str_for_toolbar(name),
                      icon=menuicon,
@@ -358,16 +257,23 @@ class LayoutTest2(QtWidgets.QMainWindow):
                      menus=self.__get_active_toolbars(menu_name))
         self.frame_meta[menu_name] = _meta
 
-
     def select_item(self, name):
-        for _tb in self._toolbars:
-            self._toolbars[_tb].setVisible(_tb in self.frame_meta[name]['menus'])
+        self.setUpdatesEnabled(False)
+        CENTRAL_WIDGET_STACK.setUpdatesEnabled(False)
+        _no_show_toolbars = (set(self._toolbars)
+                             - set(self.frame_meta[name]['menus']))
+        _show_toolbars = [_tb for _tb in self._toolbars
+                          if _tb in self.frame_meta[name]['menus']]
+        for _tb in _no_show_toolbars:
+            self._toolbars[_tb].setVisible(False)
+        for _tb in _show_toolbars:
+            self._toolbars[_tb].setVisible(True)
 
-
-        w = CENTRAL_WIDGET_PROXY.get_widget_by_name(name)
+        w = CENTRAL_WIDGET_STACK.get_widget_by_name(name)
         if w.layout() and w.layout().count() > 0:
-            CENTRAL_WIDGET_PROXY.setCurrentIndex(self.frame_meta[name]['index'])
-
+            CENTRAL_WIDGET_STACK.setCurrentIndex(self.frame_meta[name]['index'])
+        self.setUpdatesEnabled(True)
+        CENTRAL_WIDGET_STACK.setUpdatesEnabled(True)
 
     def action_new(self):
         print('new')
@@ -434,7 +340,7 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    CENTRAL_WIDGET_PROXY = pwg.widgets.CENTRAL_WIDGET_PROXY()
+    CENTRAL_WIDGET_STACK = pwg.widgets.CENTRAL_WIDGET_STACK()
 
 
     _font = app.font()

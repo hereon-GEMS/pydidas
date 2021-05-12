@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.

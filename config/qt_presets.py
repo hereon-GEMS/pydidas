@@ -32,14 +32,12 @@ STYLES['workflow_plugin_active'] = """
         background: rgb(225, 225, 255);
         margin-left: 2px;
         margin-bottom: 2px;
-        align: bottom;
     }
     """
 STYLES['workflow_plugin_inactive'] = """
     QPushButton{
         font-size: 11px;
         color: rgb(65, 65, 65);
-        align: center;
         border: 1px solid rgb(205, 205, 205);
     }
     QLabel{
@@ -49,7 +47,6 @@ STYLES['workflow_plugin_inactive'] = """
         border: 0px;
         margin-left: 2px;
         margin-bottom: 2px;
-        align: bottom;
         border: 1px solid rgb(60, 60, 60);
         border-radius: 3px;
         background: rgb(225, 225, 225);

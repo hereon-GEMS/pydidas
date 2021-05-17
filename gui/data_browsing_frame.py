@@ -28,7 +28,7 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['DataBrowsingFrame']
 
 import os
 from functools import partial
@@ -94,7 +94,7 @@ class DataBrowsingFrame(ToplevelFrame):
         self.main_splitter.addWidget(self._selection)
         self.main_splitter.addWidget(self._imview)
 
-        self._layout.addWidget(self.main_splitter)
+        self.layout().addWidget(self.main_splitter)
 
         button_min.clicked.connect(partial(self.change_min_widths, False))
         button_max.clicked.connect(partial(self.change_min_widths, True))

@@ -43,10 +43,8 @@ from .io_widget_file import IOwidget_file
 from .io_widget_line import IOwidget_line
 
 from ..utilities import deleteItemsOfLayout, excepthook
-from ...gui import WorkflowEditTreeManager
 from ...config import STANDARD_FONT_SIZE
 
-WORKFLOW_EDIT_MANAGER = WorkflowEditTreeManager()
 
 class PluginParamConfig(QtWidgets.QFrame):
     """
@@ -83,7 +81,7 @@ class PluginParamConfig(QtWidgets.QFrame):
         self.param_links = {}
         self.setLayout(self._layout)
 
-    def configure_plugin(self, node_id):
+    def configure_plugin(self, node_id, plugin):
         """
         Update the panel to show the parameters of a different plugin.
 
@@ -94,12 +92,14 @@ class PluginParamConfig(QtWidgets.QFrame):
         ----------
         node_id : int
             The node_id in the workflow edit tree.
+        plugin : object
+            The instance of the Plugin to be edited.
 
         Returns
         -------
         None.
         """
-        self.plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
+        self.plugin = plugin
         self.param_links = {}
         #delete current widgets
         for i in reversed(range(self._layout.count())):

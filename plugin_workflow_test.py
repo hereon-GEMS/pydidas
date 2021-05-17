@@ -28,10 +28,9 @@ PLUGIN_COLLECTION = pwg.PluginCollection()
 STYLES = pwg.config.STYLES
 PALETTES = pwg.config.PALETTES
 
-from plugin_workflow_gui.widgets import ToplevelFrame
-from plugin_workflow_gui.gui import DataBrowsingFrame,  WorkflowEditFrame
+from plugin_workflow_gui.gui import DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame
 from plugin_workflow_gui.config import STANDARD_FONT_SIZE
-from plugin_workflow_gui.gui._exceptions import FrameConfigError
+from plugin_workflow_gui._exceptions import FrameConfigError
 
 
 

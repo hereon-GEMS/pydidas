@@ -43,6 +43,8 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
     """
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
+    widget_activated = QtCore.pyqtSignal(int)
+    widget_delete_request = QtCore.pyqtSignal(int)
 
     def __init__(self, parent=None, title='No title', widget_id=None):
         """
@@ -93,10 +95,10 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
     def mousePressEvent(self, event):
         event.accept()
         if not self.active:
-            WORKFLOW_EDIT_MANAGER.set_active_node(self.widget_id)
+            self.widget_activated.emit(self.widget_id)
 
     def delete(self):
-        WORKFLOW_EDIT_MANAGER.delete_node(self.widget_id)
+        self.widget_delete_request.emit(self.widget_id)
 
     def widget_select(self):
         self.setStyleSheet(qt_presets.STYLES['workflow_plugin_active'])

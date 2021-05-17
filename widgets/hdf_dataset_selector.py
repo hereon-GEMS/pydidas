@@ -39,7 +39,7 @@ import hdf5plugin
 from PyQt5 import QtWidgets, QtCore
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
-from ..gui._exceptions import FrameConfigError
+from .._exceptions import FrameConfigError
 from ..utils import get_hdf5_populated_dataset_keys
 
 DEFAULT_FILTERS = {'/entry/instrument/detector/detectorSpecific/':

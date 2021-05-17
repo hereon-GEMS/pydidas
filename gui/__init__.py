@@ -33,19 +33,22 @@ __all__ = []
 from . import workflow_tree_edit_manager
 from .workflow_tree_edit_manager import *
 
-from . import _exceptions
-
 from . import data_browsing_frame
 from .data_browsing_frame import *
 
 from . import workflow_edit_frame
 from .workflow_edit_frame import *
 
+from . import toplevel_frame
+from .toplevel_frame import *
+
 __all__ += workflow_tree_edit_manager.__all__
 __all__ += data_browsing_frame.__all__
 __all__ += workflow_edit_frame.__all__
+__all__ += toplevel_frame.__all__
 
 # Unclutter namespace: remove modules from namespace
 del workflow_tree_edit_manager
 del data_browsing_frame
 del workflow_edit_frame
+del toplevel_frame

@@ -33,7 +33,7 @@ __all__ = ['ToplevelFrame']
 
 from PyQt5 import QtWidgets, QtCore
 
-from .central_widget_stack import CENTRAL_WIDGET_STACK
+from ..widgets import CENTRAL_WIDGET_STACK
 from ..config import STANDARD_FONT_SIZE
 
 class ToplevelFrame(QtWidgets.QFrame):
@@ -45,7 +45,7 @@ class ToplevelFrame(QtWidgets.QFrame):
 
     By default, a QVBoxLayout is applied with an alignment
     """
-    def __init__(self, parent=None, name=None):
+    def __init__(self, parent=None, name=None, initLayout=True):
         """
         Initialize the ToplevelFrame instance.
 
@@ -56,6 +56,10 @@ class ToplevelFrame(QtWidgets.QFrame):
         name : Union[str, None], optional
             The reference name of the widget for the CENTRAL_WIDGET_STACK.
             The default is None.
+        initLayout : bool
+            Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
+            If False, no layout will be initialized and the subclass is
+            responsible for setting up the layout. The default is True.
 
         Returns
         -------
@@ -63,9 +67,10 @@ class ToplevelFrame(QtWidgets.QFrame):
         """
         super().__init__(parent)
         self.font = QtWidgets.QApplication.font()
-        _layout = QtWidgets.QVBoxLayout(self)
-        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.setLayout(_layout)
+        if initLayout:
+            _layout = QtWidgets.QVBoxLayout(self)
+            _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+            self.setLayout(_layout)
         self.initialized = False
         self.name = name if name else ''
         if name:
@@ -156,4 +161,4 @@ class ToplevelFrame(QtWidgets.QFrame):
         _l.setFont(self.font)
         _l.setFixedWidth(400)
         _l.setWordWrap(True)
-        self._layout.addWidget(_l)
+        self.layout().addWidget(_l)

@@ -33,8 +33,9 @@ __all__ = ['WorkflowEditFrame']
 
 from PyQt5 import QtWidgets, QtCore
 
-from ..widgets import (WorkflowTreeCanvas, PluginParamConfig,
-                       PluginCollectionPresenter, ScrollArea)
+from ..widgets import (WorkflowTreeCanvas, PluginCollectionPresenter,
+                       ScrollArea)
+from ..widgets.plugin_config import PluginParamConfig
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
@@ -42,7 +43,7 @@ from .toplevel_frame import ToplevelFrame
 
 class WorkflowEditFrame(ToplevelFrame):
     def __init__(self, parent=None, params=None):
-        super().__init__(parent)
+        super().__init__(parent, initLayout=False)
         params = params if params else {}
         self.params = {
             'workflow_edit_canvas_x': params.get('workflow_edit_canvas_x',
@@ -79,4 +80,5 @@ class WorkflowEditFrame(ToplevelFrame):
 
     @QtCore.pyqtSlot(int)
     def configure_plugin(self, node_id):
-        self.w_plugin_edit_canvas.configure_plugin(node_id)
+        plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
+        self.w_plugin_edit_canvas.configure_plugin(node_id, plugin)

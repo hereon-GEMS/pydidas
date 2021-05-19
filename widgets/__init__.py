@@ -34,7 +34,7 @@ __all__ = []
 
 from . import dialogues
 
-from . import plugin_config
+from . import param_config
 
 from . import workflow_edit
 

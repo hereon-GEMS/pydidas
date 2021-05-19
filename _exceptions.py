@@ -38,3 +38,9 @@ class FrameConfigError(Exception):
     any other specific issues are raised in the configuration of Frames.
     """
     ...
+
+class WidgetLayoutError(Exception):
+    """
+    WidgetLayoutError is used if a widget attempts to add items to a layout
+    without having a layout.
+    """

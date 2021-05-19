@@ -138,11 +138,7 @@ class _WorkflowEditTreeManager(QtCore.QObject):
 
         title = title if title else name
         self.plugins[_newid] = PLUGIN_COLLECTION.get_plugin_by_name(name)()
-
-        print('new id: ', _newid)
-        print('start canvas_manager add plugin')
         self.canvas_manager.add_plugin_node(name, _newid, title)
-        print('returned from canvas_manager add plugin')
         if not self.root:
             self.root = True
         self.set_active_node(_newid)

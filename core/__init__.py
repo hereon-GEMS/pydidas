@@ -39,13 +39,26 @@ from .parameter import *
 from . import dataset
 from .dataset import *
 
+from . import global_settings
+from .global_settings import *
+
+from . import experimental_settings
+from .experimental_settings import *
+
+from . import scan_settings
+from .scan_settings import *
+
 __all__ += composites.__all__
 __all__ += parameter.__all__
 __all__ += dataset.__all__
-
-
+__all__ += global_settings.__all__
+__all__ += experimental_settings.__all__
+__all__ += scan_settings.__all__
 
 # Unclutter namespace: remove modules from namespace
 del composites
 del parameter
 del dataset
+del global_settings
+del experimental_settings
+del scan_settings

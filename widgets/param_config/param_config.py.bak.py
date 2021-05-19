@@ -30,30 +30,31 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginParamConfig']
+__all__ = ['ParamConfig']
 
 import sys
 import pathlib
 
 from functools import partial
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore
 from .io_widget_combo import IOwidget_combo
 from .io_widget_file import IOwidget_file
 from .io_widget_line import IOwidget_line
 
-from ..utilities import deleteItemsOfLayout, excepthook
+from ..utilities import excepthook
 from ...config import STANDARD_FONT_SIZE
+from ..._exceptions import WidgetLayoutError
 
 
-class PluginParamConfig(QtWidgets.QFrame):
+class ParamConfig(QtWidgets.QFrame):
     """
     The PluginParamConfig widget creates the composite widget for updating
     parameters and changing default values.
 
     Depending on the parameter types, automatic typechecks are implemented.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         """
         Setup method.
 
@@ -63,101 +64,33 @@ class PluginParamConfig(QtWidgets.QFrame):
         ----------
         parent : QtWidget, optional
             The parent widget. The default is None.
+        initLayout : bool, optional
+            Flag to toggle layout creation (with a VBoxLayout). The default
+            is True.
 
         Returns
         -------
         None.
         """
+        # parent = kwargs.get('parent', None)
+        initLayout = kwargs.get('initLayout', True)
+        print('Param config initLayout: ', initLayout)
+        print(kwargs)
         super().__init__(parent)
-        self.parent = parent
-        self.painter =  QtGui.QPainter()
         self.setAutoFillBackground(True)
         self.setLineWidth(2)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
-        self._layout = QtWidgets.QVBoxLayout()
-        self._layout.setContentsMargins(5, 5, 0, 0)
-        self._layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.plugin = None
         self.param_links = {}
-        self.setLayout(self._layout)
+        if initLayout:
+            _layout = QtWidgets.QVBoxLayout()
+            _layout.setContentsMargins(5, 5, 0, 0)
+            _layout.setAlignment(QtCore.Qt.AlignLeft
+                                      | QtCore.Qt.AlignTop)
+            self.setLayout(_layout)
+        self.layout_meta = dict(set=initLayout, grid=False, row=0)
 
-    def configure_plugin(self, node_id, plugin):
-        """
-        Update the panel to show the parameters of a different plugin.
-
-        This method clears the widget and populates it again with the
-        parameters of the new plugin, defined by the plugin node_id
-
-        Parameters
-        ----------
-        node_id : int
-            The node_id in the workflow edit tree.
-        plugin : object
-            The instance of the Plugin to be edited.
-
-        Returns
-        -------
-        None.
-        """
-        self.plugin = plugin
-        self.param_links = {}
-        #delete current widgets
-        for i in reversed(range(self._layout.count())):
-            item = self._layout.itemAt(i)
-            if isinstance(item, QtWidgets.QLayout):
-                deleteItemsOfLayout(item)
-                self._layout.removeItem(item)
-                item.deleteLater()
-            elif isinstance(item.widget(), QtWidgets.QWidget):
-                widgetToRemove = item.widget()
-                self._layout.removeWidget(widgetToRemove)
-                widgetToRemove.setParent(None)
-                widgetToRemove.deleteLater()
-
-        #setup new widgets:
-        self.add_label(f'Plugin: {self.plugin.plugin_name}', fontsize=12,
-                       width=385)
-        self.add_label(f'Node id: {node_id}', fontsize=12)
-        self.add_label('\nParameters:', fontsize=12)
-        if self.plugin.has_unique_param_config_widget():
-            self._layout.add(self.plugin.param_config_widget())
-        self.restore_default_button()
-        for param in self.plugin.params:
-            self.add_param(param)
-
-    def restore_default_button(self):
-        """
-        Restore default values for all parameters.
-
-        This method is called on clicks on the "Restore defaults" button and
-        will reset all parameter to their default values.
-
-        Returns
-        -------
-        None.
-        """
-        but = QtWidgets.QPushButton(self.style().standardIcon(59),
-                                    'Restore default parameters')
-        but.clicked.connect(partial(self.plugin.restore_defaults, force=True))
-        but.clicked.connect(self.update_edits)
-        but.setFixedHeight(25)
-        self._layout.addWidget(but, 0, QtCore.Qt.AlignRight)
-
-    def update_edits(self):
-        """
-        Update the input fields with the stored parameter values.
-
-        This method will go through all plugin parameters and populates
-        the input fields with the stores parameter values.
-
-        Returns
-        -------
-        None.
-        """
-        for param in self.plugin.params:
-            self.param_links[param.name].setText(str(param.value))
-
-    def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None):
+    def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None,
+                  gridPos=None):
         """
         Add a label to the widget.
 
@@ -173,6 +106,8 @@ class PluginParamConfig(QtWidgets.QFrame):
         width : int, optional
             The width of the QLabel. If None, no width will be speciied.
             The default is None.
+        gridPos : Union[list, tuple, None], optional
+            The
 
         Returns
         -------
@@ -186,9 +121,15 @@ class PluginParamConfig(QtWidgets.QFrame):
         if width:
             w.setFixedWidth(width)
         w.setFixedHeight(fontsize * (1 + text.count('\n')) + 8)
-        self._layout.addWidget(w, 0, QtCore.Qt.AlignLeft)
+        if self.layout_meta['set']:
+            if self.layout_meta['grid']:
+                self.layout().addWidget(w, *gridPos, QtCore.Qt.AlignLeft)
+            else:
+                self.layout().addWidget(w, 0, QtCore.Qt.AlignLeft)
+        else:
+            raise WidgetLayoutError('No layout set.')
 
-    def add_param(self, param):
+    def add_param(self, param, row=None):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
@@ -197,17 +138,17 @@ class PluginParamConfig(QtWidgets.QFrame):
         ----------
         param : Parameter
             A Parameter class instance from the plugin.
+        row : int, optional
+            The row in case a grid layout is used.
 
         Returns
         -------
         None.
         """
-        _l = QtWidgets.QHBoxLayout()
         _txt = QtWidgets.QLabel(f'{param.name}:')
         _txt.setFixedWidth(120)
         _txt.setFixedHeight(25)
         _txt.setToolTip(param.tooltip)
-        _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
 
         if param.choices:
             _io = IOwidget_combo(None, param)
@@ -218,10 +159,20 @@ class PluginParamConfig(QtWidgets.QFrame):
                 _io= IOwidget_line(None, param)
         _io.io_edited.connect(partial(self.set_plugin_param, param, _io))
         _io.set_value(param.value)
-        _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
         self.param_links[param.name] = _io
-        self._layout.addLayout(_l)
-
+        if self.layout_meta['set']:
+            if self.layout_meta['grid']:
+                self.layout().addWidget(_txt, row, 0, 1, 1,
+                                        QtCore.Qt.AlignRight)
+                self.layout().addWidget(_io, row, 1, 1, 1,
+                                        QtCore.Qt.AlignRight)
+            else:
+                _l = QtWidgets.QHBoxLayout()
+                _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
+                _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
+                self.layout().addLayout(_l)
+        else:
+            raise WidgetLayoutError('No layout set.')
 
     @staticmethod
     def set_plugin_param(param, widget):
@@ -245,6 +196,6 @@ class PluginParamConfig(QtWidgets.QFrame):
         """
         try:
             param.value = widget.get_value()
-        except:
+        except Exception:
             widget.set_value(param.value)
             excepthook(*sys.exc_info())

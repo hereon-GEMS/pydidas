@@ -35,16 +35,17 @@ from PyQt5 import QtWidgets, QtCore
 
 from ..widgets import (WorkflowTreeCanvas, PluginCollectionPresenter,
                        ScrollArea)
-from ..widgets.plugin_config import PluginParamConfig
+from ..widgets.param_config import PluginParamConfig
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
 from .toplevel_frame import ToplevelFrame
 
 class WorkflowEditFrame(ToplevelFrame):
-    def __init__(self, parent=None, params=None):
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
         super().__init__(parent, initLayout=False)
-        params = params if params else {}
+        params = kwargs.get('params', {})
         self.params = {
             'workflow_edit_canvas_x': params.get('workflow_edit_canvas_x',
                                                  WORKFLOW_EDIT_CANVAS_X),
@@ -66,10 +67,13 @@ class WorkflowEditFrame(ToplevelFrame):
         self.w_plugin_collection.selection_confirmed.connect(
             self.workflow_add_plugin)
 
+        self.w_save_button= QtWidgets.QPushButton('save workflow')
         _layout = QtWidgets.QGridLayout(self)
         _layout.addWidget(self.w_workflow_area, 0, 0, 1, 1)
-        _layout.addWidget(self.w_plugin_collection, 1, 0, 1, 1)
-        _layout.addWidget(self.w_plugin_edit_area, 0, 1, 1, 2)
+        _layout.addWidget(self.w_plugin_collection, 1, 0, 2, 1)
+        _layout.addWidget(self.w_plugin_edit_area, 0, 1, 2, 1)
+        _layout.addWidget(self.w_save_button, 2, 1, 1, 1)
+        # _layout.addWidget()
         self.setLayout(_layout)
 
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(self.w_workflow_canvas)

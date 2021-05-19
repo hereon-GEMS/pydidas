@@ -33,4 +33,5 @@ __all__ = []
 
 from PyQt5 import QtWidgets, QtCore
 from plugin_workflow_gui.config import gui_constants, qt_presets
+from plugin_workflow_gui import
 

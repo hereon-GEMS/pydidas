@@ -146,7 +146,7 @@ class _PluginDescriptionField(QtWidgets.QTextEdit):
         self.parent = parent
         self.setAcceptRichText(True)
         self.setReadOnly(True)
-        self.setFixedWidth(500)
+        self.setMinimumWidth(500)
 
     def setText(self, text, title=None):
         """

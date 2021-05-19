@@ -35,7 +35,6 @@ __all__ = ['Parameter']
 
 # from collections import OrderedDict
 import numbers
-import pathlib
 
 # class ParameterCollection(OrderedDict):
 #     """Collection of parameters for plugins.
@@ -128,23 +127,23 @@ class Parameter:
     Only the value property can be edited at runtime, all other properties
     are fixed at instanciation.
 
-    +-----------+-----------+-------------------------------------------+
-    | property  | editable  | description                               |
-    +===========+===========+===========================================+
-    | name      | False     | A readable name as description.           |
-    +-----------+-----------+-------------------------------------------+
-    | value     | True      | The current value.                        |
-    +-----------+-----------+-------------------------------------------+
-    | optional  | False     | A flag whether the parameter is required  |
-    |           |           |  or optional.                             |
-    +-----------+-----------+-------------------------------------------+
-    | choices   | False     | A list with choices if the value of the   |
-    |           |           | parameter is limited to specific values.  |
-    +-----------+-----------+-------------------------------------------+
-    | tooltip   | False     | A readable tooltip.                       |
-    +-----------+-----------+-------------------------------------------+
-    | default   | False     | The default value                         |
-    +-----------+-----------+-------------------------------------------+
+    +------------+-----------+-------------------------------------------+
+    | property   | editable  | description                               |
+    +============+===========+===========================================+
+    | name       | False     | A readable name as description.           |
+    +------------+-----------+-------------------------------------------+
+    | value      | True      | The current value.                        |
+    +------------+-----------+-------------------------------------------+
+    | optional   | False     | A flag whether the parameter is required  |
+    |            |           |  or optional.                             |
+    +------------+-----------+-------------------------------------------+
+    | choices    | False     | A list with choices if the value of the   |
+    |            |           | parameter is limited to specific values.  |
+    +------------+-----------+-------------------------------------------+
+    | tooltip    | False     | A readable tooltip.                       |
+    +------------+-----------+-------------------------------------------+
+    | default    | False     | The default value                         |
+    +------------+-----------+-------------------------------------------+
     """
 
     def __init__(self, name, param_type, default=None,
@@ -184,6 +183,7 @@ class Parameter:
         None.
 
         """
+        super().__init__()
         self.__name = name
         self.__type = _get_base_cls(param_type)
         choices = (choices if (isinstance(choices, list) or choices is None)
@@ -362,19 +362,16 @@ class Parameter:
         Returns
         -------
         None.
-
         """
         if self.__meta['choices'] and val not in self.__meta['choices']:
             raise ValueError(f'The selected value "{val}" does not correspond'
                              ' to any of the allowed choices: '
                              f'{self.__meta["choices"]}')
-        if self.__typecheck(val):
-            self.__value = val
-            return
-        if self.__meta['optional'] and (val is None):
-            return
-        raise ValueError(f'Cannot set parameter "{str(self.__name)}" '
-                         'because it is of the wrong data type.')
+        if not (self.__typecheck(val)
+                or self.__meta['optional'] and (val is None)):
+            raise ValueError(f'Cannot set parameter "{str(self.__name)}" '
+                             'because it is of the wrong data type.')
+        self.__value = val
 
     def restore_default(self):
         """

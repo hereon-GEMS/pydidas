@@ -32,26 +32,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-# from . import io_widget_combo
-# from .io_widget_combo import *
-
-# from . import io_widget_line
-# from .io_widget_line import *
-
-# from . import io_widget_file
-# from .io_widget_file import *
-
 from . import plugin_param_config
 from .plugin_param_config import *
 
-__all__ += plugin_param_config.__all__
-# __all__ += io_widget_combo.__all__
-# __all__ += io_widget_line.__all__
-# __all__ += io_widget_file.__all__
+from . import param_config
+from .param_config import *
 
+__all__ += plugin_param_config.__all__
+__all__ += param_config.__all__
 
 #unclutter the namespace:
 del plugin_param_config
-# del io_widget_combo
-# del io_widget_line
-# del io_widget_file
+del param_config

@@ -43,9 +43,11 @@ class ToplevelFrame(QtWidgets.QFrame):
     It adds a name attribute and registration routines with the
     CENTRAL_WIDGET_STACK.
 
-    By default, a QVBoxLayout is applied with an alignment
+    By default, a QGridLayout is applied with an alignment
     """
-    def __init__(self, parent=None, name=None, initLayout=True):
+    status_msg = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent=None, name=None, **kwargs):
         """
         Initialize the ToplevelFrame instance.
 
@@ -60,15 +62,19 @@ class ToplevelFrame(QtWidgets.QFrame):
             Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
             If False, no layout will be initialized and the subclass is
             responsible for setting up the layout. The default is True.
+        **kwargs : object
+            Any additional keyword arguments.
 
         Returns
         -------
         None.
         """
-        super().__init__(parent)
+        initLayout = kwargs.get('initLayout', True)
+        super().__init__(parent=parent)
+        # self.
         self.font = QtWidgets.QApplication.font()
         if initLayout:
-            _layout = QtWidgets.QVBoxLayout(self)
+            _layout = QtWidgets.QGridLayout(self)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.initialized = False
@@ -133,8 +139,23 @@ class ToplevelFrame(QtWidgets.QFrame):
         """
         self.initialized = True
 
+    def set_status(self, text):
+        """
+        Emit a status message to the main window.
+
+        Parameters
+        ----------
+        text : str
+            The status message to be emitted.
+
+        Returns
+        -------
+        None.
+        """
+        self.status_msg.emit(text)
+
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, underline=False,
-                  bold=False):
+                  bold=False, gridPos=None, width=400):
         """
 
 
@@ -159,6 +180,9 @@ class ToplevelFrame(QtWidgets.QFrame):
         self.font.setBold(bold)
         self.font.setUnderline(underline)
         _l.setFont(self.font)
-        _l.setFixedWidth(400)
+        _l.setFixedWidth(width)
         _l.setWordWrap(True)
-        self.layout().addWidget(_l)
+        if gridPos:
+            self.layout().addWidget(_l, *gridPos)
+        else:
+            self.layout().addWidget(_l)

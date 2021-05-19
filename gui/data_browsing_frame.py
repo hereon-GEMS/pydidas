@@ -48,8 +48,10 @@ class DataBrowsingFrame(ToplevelFrame):
     data preview window and a main data visualization window. Its main
     purpose is to browse through datasets.
     """
-    def __init__(self, parent=None, name=None):
-        super().__init__(parent, name)
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('name', None)
+        super().__init__(parent=parent, name=name)
         self.add_label('Data exploration view', fontsize=14)
 
         self.initUI()
@@ -64,7 +66,7 @@ class DataBrowsingFrame(ToplevelFrame):
         self._tree = DirectoryExplorer()
         self.hdf_dset_w = Hdf5DatasetSelector()
 
-        button_min = QtaIconButton('fa.chevron-left', text='test', size=25)
+        button_min = QtaIconButton('fa.chevron-left', size=25)
         button_max = QtaIconButton('fa.chevron-right', size=25)
 
         self._preview = _ImagePreview()
@@ -111,6 +113,7 @@ class DataBrowsingFrame(ToplevelFrame):
     def __fileSelected(self, widget):
         index = self._tree.selectedIndexes()[0]
         name = self._tree._filemodel.filePath(index)
+        self.set_status(f'New file: {name}')
         if not os.path.isfile(name):
             return
         self._preview.setData(None)

@@ -16,9 +16,6 @@ from functools import partial
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
 import qtawesome as qta
-import h5py
-import hdf5plugin
-import silx
 import numpy as np
 
 import plugin_workflow_gui as pwg
@@ -28,41 +25,51 @@ PLUGIN_COLLECTION = pwg.PluginCollection()
 STYLES = pwg.config.STYLES
 PALETTES = pwg.config.PALETTES
 
-from plugin_workflow_gui.gui import DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame
+from plugin_workflow_gui.gui import DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame, ExperimentSettingsFrame, ScanSettingsFrame
 from plugin_workflow_gui.config import STANDARD_FONT_SIZE
 from plugin_workflow_gui._exceptions import FrameConfigError
 
 
 
 class HomeFrame(ToplevelFrame):
-    def __init__(self, parent=None, name=None):
-        super().__init__(parent, name)
-        self.add_label('Welcome to pySALADD', 14, bold=True)
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('Name', None)
+        super().__init__(parent=parent, name=name)
+        self.add_label('Welcome to pyDIDAS', 14, bold=True)
+        self.add_label('the python Diffraction Data Analysis Suite.\n', 13,
+                       bold=True)
         self.add_label('\nQuickstart:', 12, bold=True)
-        self.add_label('\nMenu: ', 11, underline=True, bold=True)
+        self.add_label('\nMenu toolbar: ', 11, underline=True, bold=True)
         self.add_label('Use the menu toolbar on the left to switch between'
-                       ' different views. Some menu toolbars will open a'
-                       'further submenu on the left.\nAll functions can'
-                       ' also be accessed through the regular menu on top.')
-
+                       ' different Frames. Some menu toolbars will open an '
+                       'additional submenu on the left.')
 
 
 class ProcessingSetupFrame(ToplevelFrame):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('Name', None)
         super().__init__(parent, name)
-
 
 
 class ToolsFrame(ToplevelFrame):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
+
 class ProcessingFrame(ToplevelFrame):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
 class ResultVisualizationFrame(ToplevelFrame):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, **kwargs):
+        parent = kwargs.get('parent', None)
+        name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
 
@@ -87,10 +94,9 @@ class _InfoWidgetFactory:
 
 InfoWidget = _InfoWidgetFactory()
 
-class LayoutTest2(QtWidgets.QMainWindow):
-    name_selected_signal = QtCore.pyqtSlot(str)
-
+class LayoutTest(QtWidgets.QMainWindow):
     def __init__(self, parent=None, geometry=None):
+        from plugin_workflow_gui.gui.pyfai_calib_frame import pyfaiRingIcon
         super().__init__(parent)
 
         self.process = None
@@ -103,46 +109,14 @@ class LayoutTest2(QtWidgets.QMainWindow):
         self.frame_menuentries = []
         self.frame_meta = {}
 
-        # self.params = {'active_frame': 'Home'}
-        # self.main_frames = {'Home': HomeFrame(),
-        #                     'Data browsing': DataBrowsingFrame(),
-        #                     'Tools': ToolsFrame(),
-        #                     'Processing setup': ProcessingSetupFrame(),
-        #                     'Processing': ProcessingFrame(),
-        #                     'Result visualization': ResultVisualizationFrame()}
         self.setCentralWidget(CENTRAL_WIDGET_STACK)
         self.status.showMessage('Test status')
-        #self.__create_main_toolbar()
 
-        # for key in self.main_frames:
-        #     self.main_frames[key].toggle(False)
-        #     self.main_frames[key].set_parent(self)
-        # self.experiment_edit_tab = ExperimentEditTab(self.main_frame)
-        # self.workflow_edit_tab = WorkflowEditTab(self.main_frame, self.params)
-        # self.main_frame.addTab(self.experiment_edit_tab, 'Experiment editor')
-        # self.main_frame.addTab(self.workflow_edit_tab, 'Workflow editor')
-
-        # WORKFLOW_EDIT_MANAGER.update_qt_items(
-        #     self.workflow_edit_tab.workflow_canvas, self
-        # )
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 0')
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 1')
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 2')
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 3')
-        # WORKFLOW_EDIT_MANAGER.set_active_node(2)
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 4')
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 5')
-        # WORKFLOW_EDIT_MANAGER.set_active_node(2)
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 6')
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 7')
-        # WORKFLOW_EDIT_MANAGER.set_active_node(6)
-        # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 8')
-
-        self.setWindowTitle('Plugin edit test')
+        self.setWindowTitle('pyDIDAS layout prototype')
+        self.setWindowIcon(pyfaiRingIcon())
         self.__createMenu()
         self.__create_info_box()
         self.setFocus(QtCore.Qt.OtherFocusReason)
-
 
     @staticmethod
     def __find_toolbar_bases(items):
@@ -243,16 +217,18 @@ class LayoutTest2(QtWidgets.QMainWindow):
         if menu_name in self.frame_menuentries:
             raise FrameConfigError(f'The selected menu entry "{menu_name}"'
                                    ' already exists.')
-        frame.name = menu_name
-        frame.setParent(self)
-        if CENTRAL_WIDGET_STACK.is_registed(frame):
-            CENTRAL_WIDGET_STACK.change_reference_name(menu_name, frame)
+        _frame = frame(mainWindow=self)
+        _frame.name = menu_name
+        _frame.setParent(self)
+        _frame.status_msg.connect(self.update_status)
+        if CENTRAL_WIDGET_STACK.is_registed(_frame):
+            CENTRAL_WIDGET_STACK.change_reference_name(menu_name, _frame)
         else:
-            CENTRAL_WIDGET_STACK.register_widget(menu_name, frame)
+            CENTRAL_WIDGET_STACK.register_widget(menu_name, _frame)
         self.frame_menuentries.append(menu_name)
         _meta = dict(name=self.__format_str_for_toolbar(name),
                      icon=menuicon,
-                     index=frame.frame_index,
+                     index=_frame.frame_index,
                      menus=self.__get_active_toolbars(menu_name))
         self.frame_meta[menu_name] = _meta
 
@@ -279,6 +255,10 @@ class LayoutTest2(QtWidgets.QMainWindow):
 
     def action_open(self):
         print('open')
+
+    @QtCore.pyqtSlot(str)
+    def update_status(self, text):
+        self.status.showMessage(text)
 
     def __createMenu(self):
         self._menu = self.menuBar()
@@ -342,24 +322,45 @@ if __name__ == '__main__':
     CENTRAL_WIDGET_STACK = pwg.widgets.CENTRAL_WIDGET_STACK()
 
 
+
     _font = app.font()
     _font.setPointSize(STANDARD_FONT_SIZE)
     app.setFont(_font)
-    gui = LayoutTest2()
+    gui = LayoutTest()
 
-    gui.register_frame('Home', 'Home', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame())
-    gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame())
-    gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame())
-    gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame())
-    gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame())
-    gui.register_frame('Home 2', 'Processing/Home', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Processing/Home2', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Tools/help/Help', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame())
-    gui.register_frame('Help', 'Tools/help/Help 2', qta.icon('mdi.home'), HomeFrame())
-    gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), QtWidgets.QFrame())
+    from plugin_workflow_gui.gui.pyfai_calib_frame import PyfaiCalibFrame, pyfaiCalibIcon
+    gui.register_frame('Home', 'Home', qta.icon('mdi.home'), HomeFrame)
+    gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
+    gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
+    gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
+    gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame)
+    gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame)
+    gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)
+    gui.register_frame('Home 2', 'Processing/Home', qta.icon('mdi.home'), HomeFrame)
+    gui.register_frame('Help', 'Processing/Home2', qta.icon('mdi.home'), HomeFrame)
+    gui.register_frame('Help', 'Tools/help/Help/help', qta.icon('mdi.home'), HomeFrame)
+    gui.register_frame('Experimental settings', 'Processing setup/Experimental settings', qta.icon('mdi.card-bulleted-settings-outline'), ExperimentSettingsFrame)
+    gui.register_frame('Scan settings', 'Processing setup/Scan settings', qta.icon('ei.move'), ScanSettingsFrame)
+    gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame)
+    gui.register_frame('Help', 'Tools/help/Help 2', qta.icon('mdi.home'), HomeFrame)
+    # gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), QtWidgets.QFrame())
     gui.create_toolbars()
+
+
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 0')
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 1')
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 2')
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 3')
+    # WORKFLOW_EDIT_MANAGER.set_active_node(2)
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 4')
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 5')
+    # WORKFLOW_EDIT_MANAGER.set_active_node(2)
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 6')
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 7')
+    # WORKFLOW_EDIT_MANAGER.set_active_node(6)
+    # WORKFLOW_EDIT_MANAGER.add_plugin_node('HDF loader', 'Test title 8')
 
     gui.show()
     sys.exit(app.exec_())
+
+    app.deleteLater()

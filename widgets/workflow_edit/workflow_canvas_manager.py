@@ -143,8 +143,6 @@ class WorkflowCanvasManager(QtCore.QObject):
         -------
         None.
         """
-        if not self.qt_canvas:
-            raise AttributeError('No QtCanvas defined. Cannot add plugins.')
         if node_id in self.node_ids:
             raise ValueError('Specified node_id not found.')
 
@@ -160,6 +158,11 @@ class WorkflowCanvasManager(QtCore.QObject):
         self.widgets[node_id] = widget
         self.node_ids.append(node_id)
         self.set_active_node(node_id)
+
+        if not self.qt_canvas:
+            # raise Warning('No QtCanvas defined. Nodes added but cannot be '
+            #               'displayed')
+            return
         self.update_node_positions()
 
     def update_node_positions(self):

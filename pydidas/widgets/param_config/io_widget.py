@@ -37,6 +37,7 @@ import numbers
 import pathlib
 from PyQt5 import QtWidgets
 
+from ...core import HdfKey
 
 class IOwidget(QtWidgets.QWidget):
     """Base class of widgets for I/O during plugin parameter editing."""
@@ -64,6 +65,7 @@ class IOwidget(QtWidgets.QWidget):
         self.setFixedWidth(width)
         self.setFixedHeight(25)
         self.__ptype = param.type
+        self._oldValue = None
         self.setToolTip(f'{param.tooltip}')
 
     def get_value_from_text(self, text):
@@ -87,6 +89,8 @@ class IOwidget(QtWidgets.QWidget):
             return float(text)
         if self.__ptype == pathlib.Path:
             return pathlib.Path(text)
+        if self.__ptype == HdfKey:
+            return HdfKey(text)
         return text
 
     def emit_signal(self):

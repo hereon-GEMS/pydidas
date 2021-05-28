@@ -68,11 +68,11 @@ class IOwidget_file(IOwidget):
         super().__init__(parent, param, width)
         self.ledit = QtWidgets.QLineEdit()
         self.ledit.setFixedWidth(width - 25)
-        self.ledit.setFixedHeight(25)
+        self.ledit.setFixedHeight(23)
 
         fbutton = QtWidgets.QPushButton(self.style().standardIcon(42), '')
         fbutton.setFixedWidth(25)
-        self.ledit.setFixedHeight(25)
+        fbutton.setFixedHeight(25)
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.addWidget(self.ledit)
@@ -113,7 +113,10 @@ class IOwidget_file(IOwidget):
         -------
         None.
         """
-        self.io_edited.emit(self.ledit.text())
+        _curValue = self.ledit.text()
+        if _curValue != self._oldValue:
+            self._oldValue = _curValue
+            self.io_edited.emit(_curValue)
 
     def get_value(self):
         """

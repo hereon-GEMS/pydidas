@@ -119,7 +119,7 @@ class ScanSettingsFrame(ToplevelFrame, ParamConfigMixIn):
             self.param_titlewidgets[i].setVisible(_toggle)
             for _pre in _prefixes:
                 self.param_widgets[_pre.format(n=i)].setVisible(_toggle)
-                self.param_txtwidgets[_pre.format(n=i)].setVisible(_toggle)
+                self.param_textwidgets[_pre.format(n=i)].setVisible(_toggle)
 
     def update_param(self, pname, widget):
         try:

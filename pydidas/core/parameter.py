@@ -33,8 +33,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Parameter']
 
-# from collections import OrderedDict
 import numbers
+from PyQt5 import QtCore
 
 # class ParameterCollection(OrderedDict):
 #     """Collection of parameters for plugins.
@@ -149,8 +149,7 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     """
 
-    def __init__(self, name, param_type, **kwargs
-                 ):
+    def __init__(self, name, param_type, **kwargs):
         """
         Setup method.
 
@@ -179,6 +178,9 @@ class Parameter:
         choices : Union[list, tuple, None]
             A list of allowed choices. If None, no checking will be enforced.
             The default is None.
+        value : object
+            The value of the parameter. This parameter should only be used
+            to restore saved parameters.
         **kwargs : dict
             All optional parameters can also be passed as a keyword argument
             dictionary.
@@ -209,7 +211,7 @@ class Parameter:
             raise ValueError(f'The default value "{_def}" does not '
                              'correspond to any of the defined choices: '
                              f'{self.__meta["choices"]}.')
-        self.__value = _def
+        self.__value = _def if not 'value' in kwargs else kwargs['value']
 
     def __call__(self):
         """
@@ -427,7 +429,7 @@ class Parameter:
                              ' to any of the allowed choices: '
                              f'{self.__meta["choices"]}')
         if not (self.__typecheck(val)
-                or self.__meta['optional'] and (val is None)):
+                or self.__mexta['optional'] and (val is None)):
             raise ValueError(f'Cannot set parameter "{str(self.__name)}" '
                              'because it is of the wrong data type.')
         self.__value = val
@@ -483,7 +485,9 @@ class Parameter:
         str
             The description of the parameter.
         """
-        return (self.__name, self.__type, self.__value, self.__meta)
+        _meta = self.__meta
+        _meta.update({'value': self.__value})
+        return (self.__name, self.__type, _meta)
 
     def __str__(self):
         """

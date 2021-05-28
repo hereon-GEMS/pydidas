@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Subpackage with GUI elements."""
+"""Module with the rebin2d function to rebin images."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -28,47 +28,38 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['rebin2d']
 
-from . import workflow_tree_edit_manager
-from .workflow_tree_edit_manager import *
 
-from . import data_browsing_frame
-from .data_browsing_frame import *
+def rebin2d(image, binning):
+    """
+    Rebin an 2-d numpy.ndarray.
 
-from . import workflow_edit_frame
-from .workflow_edit_frame import *
+    This function rebins a 2d image in the form of a numpy.ndarray with a
+    factor by calculating the corresponding mean values.
 
-from . import toplevel_frame
-from .toplevel_frame import *
+    Parameters
+    ----------
+    image : np.ndarray
+        The 2d image to be re-binned.
+    binning : int
+        The re-binning factor.
 
-from . import experiment_settings_frame
-from .experiment_settings_frame import *
-
-from . import scan_settings_frame
-from .scan_settings_frame import *
-
-from . import processing_single_plugin_frame
-from .processing_single_plugin_frame import *
-
-from . import processing_full_workflow
-from .processing_full_workflow import *
-
-__all__ += workflow_tree_edit_manager.__all__
-__all__ += data_browsing_frame.__all__
-__all__ += workflow_edit_frame.__all__
-__all__ += toplevel_frame.__all__
-__all__ += experiment_settings_frame.__all__
-__all__ += scan_settings_frame.__all__
-__all__ += processing_single_plugin_frame.__all__
-__all__ += processing_full_workflow.__all__
-
-# Unclutter namespace: remove modules from namespace
-del workflow_tree_edit_manager
-del data_browsing_frame
-del workflow_edit_frame
-del toplevel_frame
-del experiment_settings_frame
-del scan_settings_frame
-del processing_single_plugin_frame
-del processing_full_workflow
+    Returns
+    -------
+    image : np.ndarray
+        The re-binned image.
+    """
+    if binning == 1:
+        return image
+    _shape = image.shape
+    if _shape[0] % binning != 0:
+        _r0 = _shape[0] % binning
+        image = image[:-_r0]
+    if _shape[1] % binning != 0:
+        _r1 = _shape[1] % binning
+        image = image[:, :-_r1]
+    _s0 = _shape[0] // binning
+    _s1 = _shape[1] // binning
+    _sh = _s0, image.shape[0] // _s0, _s1, image.shape[1] // _s1
+    return image.reshape(_sh).mean(-1).mean(1)

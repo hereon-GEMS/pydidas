@@ -29,9 +29,11 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys']
+__all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys',
+           'get_hdf5_dataset_shape']
 
 import os
+import pathlib
 import h5py
 import hdf5plugin
 
@@ -73,6 +75,56 @@ def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
             and not item.name.startswith(tuple(ignoreList))):
         return True
     return False
+
+
+def get_hdf5_dataset_shape(fname, dset=None):
+    """
+    Get the shape of an hdf5 dataset.
+
+    This function will return the shape of an hdf5 dataset. Input can be given
+    either with file name and dataset parameters or using the hdf5
+    nomenclature with <filename>://</dataset> (note the total of 3 slashes).
+
+    Parameters
+    ----------
+    fname : Union[str, pathlib.Path]
+        The filepath or path to filename and dataset.
+    dset : str, optional
+        The optional dataset key, if not specified in the fname.
+        The default is None.
+
+    Raises
+    ------
+    KeyError
+        If the dataset has not been specified.
+    TypeError
+        If fname is not of type str or pathlib.Path.
+
+    Returns
+    -------
+    shape : tuple
+        The shape of the dataset.
+
+    """
+    if dset is not None:
+        _dset = dset
+    if not isinstance(fname, (str, pathlib.Path)):
+        raise TypeError('The path must be specified as string or pathlib.Path')
+
+    if isinstance(fname, pathlib.Path):
+        fname = str(fname)
+
+    if fname.find('://') > 0:
+        _fname, _dset = fname.split('://')
+    else:
+        _fname = fname
+
+    if _dset is None:
+        raise KeyError('No dataset specified. Cannot determine shape.')
+
+    with h5py.File(_fname, 'r') as f:
+        shape = f[_dset].shape
+    return shape
 
 
 def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
@@ -125,7 +177,7 @@ def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
     _ignore = ignoreKeys if ignoreKeys is not None else []
     _datasets = []
 
-    if isinstance(item, str):
+    if isinstance(item, (str, pathlib.Path)):
         if os.path.exists(item):
             item = h5py.File(item, 'r')
             _close_on_exit = True

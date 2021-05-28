@@ -29,10 +29,15 @@ from .warning_box import *
 from . import error_message_box
 from .error_message_box import *
 
+from . import hdf5_dataset_selection
+from .hdf5_dataset_selection import *
 __all__ = []
 __all__ += warning_box.__all__
 __all__ += error_message_box.__all__
+__all__ += hdf5_dataset_selection.__all__
+
 
 # remove modules from namespace after importing their content
 del warning_box
 del error_message_box
+del hdf5_dataset_selection

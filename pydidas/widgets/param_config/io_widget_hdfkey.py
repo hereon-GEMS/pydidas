@@ -30,16 +30,23 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IOwidget_line']
+__all__ = ['IOwidget_hdfkey']
 
-import numbers
+import qtawesome as qta
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from .io_widget import IOwidget
+from pydidas.widgets.param_config.io_widget import IOwidget
+from pydidas.widgets.dialogues import Hdf5DatasetSelection
+from pydidas.utils import get_hdf5_populated_dataset_keys
+from pydidas.core import HdfKey
+from pydidas.config import HDF5_EXTENSIONS
 
-class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
-    """Widgets for I/O during plugin parameter editing without choices."""
-    #for some reason, inhering the signal does not work
+class IOwidget_hdfkey(IOwidget):
+    """
+    Widgets for I/O during plugin parameter for filepaths.
+    (Includes a small button to select a filepath from a dialogue.)
+     """
+    #for some reason, inhering the signal from the base class does not work
     io_edited = QtCore.pyqtSignal(str)
 
     def __init__(self, parent, param, width=255):
@@ -63,12 +70,44 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
         None.
         """
         super().__init__(parent, param, width)
-        if param.type == numbers.Integral:
-            self.setValidator(QtGui.QIntValidator())
-        elif param.type == numbers.Real:
-            self.setValidator(QtGui.QDoubleValidator())
-        self.editingFinished.connect(self.emit_signal)
-        self.setFixedHeight(23)
+        self.ledit = QtWidgets.QLineEdit()
+        self.ledit.setFixedWidth(width - 25)
+        self.ledit.setFixedHeight(23)
+
+        fbutton = QtWidgets.QPushButton(qta.icon('mdi.text-box-search-outline'), '')
+        fbutton.setToolTip('Select a dataset from all dataset keys in a file.')
+        fbutton.setFixedWidth(25)
+        fbutton.setFixedHeight(25)
+        _layout = QtWidgets.QHBoxLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.addWidget(self.ledit)
+        _layout.addWidget(fbutton)
+        self.setLayout(_layout)
+
+        self.ledit.editingFinished.connect(self.emit_signal)
+        fbutton.clicked.connect(self.button_select)
+
+    def button_select(self):
+        """
+        Open a dialogue to select a file.
+
+        This method is called upon clicking the "open file" button
+        and opens a QFileDialog widget to select a filename.
+
+        Returns
+        -------
+        None.
+        """
+        _fnames = ' '.join(HDF5_EXTENSIONS)
+        fname = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Name of file', None,
+            ('HDF5 files (*.nxs *.hdf *.h5);; All files (*.*)')
+        )[0]
+        if fname:
+            dset = Hdf5DatasetSelection(self, fname).get_dset()
+            if dset is not None:
+                self.setText(str(dset))
+                self.emit_signal()
 
     def emit_signal(self):
         """
@@ -81,7 +120,7 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
         -------
         None.
         """
-        _curValue = self.text()
+        _curValue = self.ledit.text()
         if _curValue != self._oldValue:
             self._oldValue = _curValue
             self.io_edited.emit(_curValue)
@@ -92,11 +131,10 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
 
         Returns
         -------
-        type
-            The text converted to the required datatype (int, float, path)
-            to update the Parameter value.
+        Path
+            The text converted to a pathlib.Path to update the Parameter value.
         """
-        text = self.text()
+        text = self.ledit.text()
         return self.get_value_from_text(text)
 
     def set_value(self, value):
@@ -110,4 +148,22 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
         -------
         None.
         """
-        self.setText(f'{value}')
+        self.ledit.setText(f'{value}')
+
+    def setText(self, text):
+        """
+        Set the line edit text to the input.
+
+        This method will call the line edit setText method to update the
+        displayed text.
+
+        Parameters
+        ----------
+        text : object
+            Any object, the object's str representation will be used.
+
+        Returns
+        -------
+        None.
+        """
+        self.ledit.setText(str(text))

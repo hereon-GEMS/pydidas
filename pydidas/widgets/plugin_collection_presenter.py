@@ -37,7 +37,7 @@ from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
 from ..plugin_collection import PluginCollection
 from ..config import STYLES
-
+from .read_only_text_widget import ReadOnlyTextWidget
 PLUGIN_COLLECTION = PluginCollection()
 
 
@@ -118,50 +118,26 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
             return
         p = PLUGIN_COLLECTION.get_plugin_by_name(name)()
         self.w_plugin_description.setText(
-            p.get_class_description(return_list=True), p.plugin_name
-        )
+            p.get_class_description(return_list=True), p.plugin_name)
         del p
 
-
-class _PluginDescriptionField(QtWidgets.QTextEdit):
-    """
-    Text edit to show the description of the plugin and its parameters.
-    """
-
-    def __init__(self, parent=None):
-        """
-        Create the _PluginDescriptionField.
-
-        Parameters
-        ----------
-        parent : QWidget, optional
-            The Qt parent widget. The default is None.
-
-        Returns
-        -------
-        None.
-
-        """
-        super().__init__(parent)
-        self.parent = parent
-        self.setAcceptRichText(True)
-        self.setReadOnly(True)
-        self.setMinimumWidth(500)
-
+class _PluginDescriptionField(ReadOnlyTextWidget):
     def setText(self, text, title=None):
         """
-        Display information about a plugin.
+        Print information.
 
         This widget accepts both a single text entry and a list of entries
         for the text. A list of entries will be converted to a single text
-        according to
+        according to a <key: entry> scheme.
 
         Parameters
         ----------
-        text : str or list of str.
-            The text to be displayed.
+        text : Union[str, list]
+            The text to be displayed. A string will be processed directly
+            whereas a list will be processed with the first entries of every
+            list entry being interpreted as key, entry.
         title : str, optional
-            The title. The default is None.
+            The title. If None, no title will be printed. The default is None.
 
         Returns
         -------
@@ -184,8 +160,7 @@ class _PluginDescriptionField(QtWidgets.QTextEdit):
                 self.setFontWeight(50)
                 self.append(' ' * 4 + item if key != 'Parameters' else item)
         self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum
-        )
+            QtWidgets.QScrollBar.SliderToMinimum)
 
 
 class _PluginCollectionTreeWidget(QtWidgets.QTreeView):

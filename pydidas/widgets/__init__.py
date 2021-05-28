@@ -68,6 +68,9 @@ from .directory_explorer import *
 from . import info_widget
 from .info_widget import *
 
+from . import read_only_text_widget
+from .read_only_text_widget import *
+
 __all__ += confirmation_bar.__all__
 __all__ += plugin_collection_presenter.__all__
 __all__ += scroll_area.__all__
@@ -78,6 +81,7 @@ __all__ += hdf_dataset_selector.__all__
 __all__ += qta_button.__all__
 __all__ += directory_explorer.__all__
 __all__ += info_widget.__all__
+__all__ += read_only_text_widget.__all__
 
 # unclutter namespace and remove modules:
 del confirmation_bar
@@ -90,3 +94,4 @@ del hdf_dataset_selector
 del qta_button
 del directory_explorer
 del info_widget
+del read_only_text_widget

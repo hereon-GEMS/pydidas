@@ -16,17 +16,17 @@ from functools import partial
 from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
 import qtawesome as qta
-import numpy as np
 
-import pydidas as pwg
+import pydidas
+WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowEditTreeManager()
+PLUGIN_COLLECTION = pydidas.PluginCollection()
+STYLES = pydidas.config.STYLES
+PALETTES = pydidas.config.PALETTES
+STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 
-WORKFLOW_EDIT_MANAGER = pwg.gui.WorkflowEditTreeManager()
-PLUGIN_COLLECTION = pwg.PluginCollection()
-STYLES = pwg.config.STYLES
-PALETTES = pwg.config.PALETTES
-STANDARD_FONT_SIZE = pwg.config.STANDARD_FONT_SIZE
-
-from pydidas.gui import DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame, ExperimentSettingsFrame, ScanSettingsFrame
+from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame,
+    ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
+    ProcessingFullWorkflowFrame)
 
 
 class HomeFrame(ToplevelFrame):
@@ -78,8 +78,8 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    sys.excepthook = pwg.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pwg.widgets.CentralWidgetStack()
+    sys.excepthook = pydidas.widgets.excepthook
+    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
 
 
 
@@ -96,13 +96,11 @@ if __name__ == '__main__':
     gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame)
     gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame)
     gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)
-    gui.register_frame('Home 2', 'Processing/Home', qta.icon('mdi.home'), HomeFrame)
-    gui.register_frame('Help', 'Processing/Home2', qta.icon('mdi.home'), HomeFrame)
-    gui.register_frame('Help', 'Tools/help/Help/help', qta.icon('mdi.home'), HomeFrame)
+    gui.register_frame('Run single plugins', 'Processing/Run single plugins', qta.icon('mdi.debug-step-over'), ProcessingSinglePluginFrame)
+    gui.register_frame('Run full processing', 'Processing/Run full procesing', qta.icon('mdi.play-circle-outline'), ProcessingFullWorkflowFrame)
     gui.register_frame('Experimental settings', 'Processing setup/Experimental settings', qta.icon('mdi.card-bulleted-settings-outline'), ExperimentSettingsFrame)
     gui.register_frame('Scan settings', 'Processing setup/Scan settings', qta.icon('ei.move'), ScanSettingsFrame)
     gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame)
-    gui.register_frame('Help', 'Tools/help/Help 2', qta.icon('mdi.home'), HomeFrame)
     # gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), QtWidgets.QFrame())
     gui.create_toolbars()
 

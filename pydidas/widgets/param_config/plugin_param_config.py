@@ -32,19 +32,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PluginParamConfig']
 
-import sys
-import pathlib
-
 from functools import partial
 
-from PyQt5 import QtWidgets, QtGui, QtCore
-from .io_widget_combo import IOwidget_combo
-from .io_widget_file import IOwidget_file
-from .io_widget_line import IOwidget_line
+from PyQt5 import QtWidgets, QtCore
 from .param_config import ParamConfig
 
-from ..utilities import deleteItemsOfLayout, excepthook
-from ...config import STANDARD_FONT_SIZE
+from ..utilities import deleteItemsOfLayout
 
 
 class PluginParamConfig(ParamConfig):
@@ -114,9 +107,10 @@ class PluginParamConfig(ParamConfig):
         self.add_label('\nParameters:', fontsize=12)
         if self.plugin.has_unique_param_config_widget():
             _layout.add(self.plugin.param_config_widget())
-        self.restore_default_button()
-        for param in self.plugin.params:
-            self.add_param(param)
+        else:
+            self.restore_default_button()
+            for param in self.plugin.params:
+                self.add_param(param)
 
     def restore_default_button(self):
         """
@@ -148,5 +142,4 @@ class PluginParamConfig(ParamConfig):
         None.
         """
         for param in self.plugin.params:
-            #self.param_widgets[param.name].setText(str(param.value))
             self.param_widgets[param.name].set_value(param.value)

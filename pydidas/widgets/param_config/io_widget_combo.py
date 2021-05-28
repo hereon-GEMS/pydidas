@@ -82,7 +82,10 @@ class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
         -------
         None.
         """
-        self.io_edited.emit(self.currentText())
+        _curValue = self.currentText()
+        if _curValue != self._oldValue:
+            self._oldValue = _curValue
+            self.io_edited.emit(_curValue)
 
     def get_value(self):
         """

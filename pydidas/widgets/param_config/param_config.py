@@ -41,9 +41,11 @@ from PyQt5 import QtWidgets, QtCore
 from .io_widget_combo import IOwidget_combo
 from .io_widget_file import IOwidget_file
 from .io_widget_line import IOwidget_line
+from .io_widget_hdfkey import IOwidget_hdfkey
 
 from ..utilities import excepthook
 from ...config import STANDARD_FONT_SIZE
+from ...core import HdfKey
 from ..._exceptions import WidgetLayoutError
 
 
@@ -55,7 +57,66 @@ class ParamConfigMixIn:
     """
     def __init__(self, *args, **kwargs):
         self.param_widgets = {}
-        self.param_txtwidgets = {}
+        self.params = {}
+        self.param_textwidgets = {}
+
+    def update_param_value(self, key, value):
+        """
+        Update a parameter value both in the Parameter and the widget.
+
+        This method will update the parameter referenced by <key> and
+        update both the Parameter.value as well as the displayed widget
+        entry.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter.
+        value : object
+            The new parameter value. This must be of the same type as the
+            Parameter datatype.
+
+        Raises
+        ------
+        KeyError
+            If no parameter or widget has been registered with this key.
+
+        Returns
+        -------
+        None.
+        """
+        if key not in self.params or key not in self.param_widgets:
+            raise KeyError(f'No parameter with key "{key}" found.')
+        self.params[key].value = value
+        self.param_widgets[key].set_value(value)
+
+    def toggle_widget_visibility(self, key, visible):
+        """
+        Toggle the visibility of widgets referenced with key.
+
+        This method allows to show/hide the label and input widget for a
+        parameter referenced with <key>.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter..
+        visible : bool
+            The boolean setting for the visibility.
+
+        Raises
+        ------
+        KeyError
+            If no widget has been registered with this key.
+
+        Returns
+        -------
+        None.
+        """
+        if key not in self.param_textwidgets or key not in self.param_widgets:
+            raise KeyError(f'No parameter with key "{key}" found.')
+        self.param_widgets[key].setVisible(visible)
+        self.param_textwidgets[key].setVisible(visible)
 
     def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None,
                   gridPos=None):
@@ -91,9 +152,13 @@ class ParamConfigMixIn:
         w.setFixedHeight(fontsize * (1 + text.count('\n')) + 10)
         if self.layout_meta['set']:
             if self.layout_meta['grid']:
-                self.layout().addWidget(w, *gridPos, QtCore.Qt.AlignLeft)
+                self.layout().addWidget(
+                    w, *gridPos, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+                )
             else:
-                self.layout().addWidget(w, 0, QtCore.Qt.AlignLeft)
+                self.layout().addWidget(
+                    w, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+                )
         else:
             raise WidgetLayoutError('No layout set.')
 
@@ -122,26 +187,36 @@ class ParamConfigMixIn:
         linebreak : bool, optional
             Keyword to toggle a line break between the text label and the
             input widget. The default is False.
-        align_io : QtCore.Qt.Alignment, optional
-            The alignment for the input widget. The default is
+        halign_io : QtCore.Qt.Alignment, optional
+            The horizontal alignment for the input widget. The default is
             QtCore.Qt.AlignRight.
-        align_text : QtCore.Qt.Alignment, optional
-            The alignment for the text (label) widget. The default is
-            QtCore.Qt.AlignRight.
+        halign_text : QtCore.Qt.Alignment, optional
+            The horizontal alignment for the text (label) widget. The default
+            is QtCore.Qt.AlignRight.
+        valign_io : QtCore.Qt.Alignment, optional
+            The vertical alignment for the input widget. The default is
+            QtCore.Qt.AlignTop.
+        valign_text : QtCore.Qt.Alignment, optional
+            The vertical alignment for the text (label) widget. The default
+            is QtCore.Qt.AlignTop.
 
         Returns
         -------
         None.
         """
-        self._cfg = {'row': kwargs.get('row', self.layout().rowCount() + 1),
+        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
+                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
+        self._cfg = {'row': _row,
                      'column': kwargs.get('column', 0),
-                     'width_text': kwargs.get('textwidth', 120),
+                     'width_text': kwargs.get('width_text', 120),
                      'width': kwargs.get('width', 255),
                      'n_columns_text': kwargs.get('n_columns_text', 1),
                      'n_columns': kwargs.get('n_columns', 1),
                      'linebreak': kwargs.get('linebreak', False),
-                     'align_io': kwargs.get('align', QtCore.Qt.AlignRight),
-                     'align_text': kwargs.get('align', QtCore.Qt.AlignRight)
+                     'halign_io': kwargs.get('halign_io', QtCore.Qt.AlignRight),
+                     'halign_text': kwargs.get('halign_text', QtCore.Qt.AlignRight),
+                     'valign_io': kwargs.get('valign_io', QtCore.Qt.AlignTop),
+                     'valign_text': kwargs.get('valign_text', QtCore.Qt.AlignTop)
             }
 
         _txt = QtWidgets.QLabel(f'{param.name}:')
@@ -155,15 +230,17 @@ class ParamConfigMixIn:
         else:
             if param.type == pathlib.Path:
                 _io = IOwidget_file(None, param, self._cfg['width'])
+            elif param.type == HdfKey:
+                _io = IOwidget_hdfkey(None, param, self._cfg['width'])
             else:
                 _io = IOwidget_line(None, param, self._cfg['width'])
 
-        _io.io_edited.connect(partial(self.set_plugin_param, param, _io))
+        _io.io_edited.connect(partial(self.set_param_value, param, _io))
         _io.set_value(param.value)
 
         # store references to the widgets:
         self.param_widgets[param.refkey] = _io
-        self.param_txtwidgets[param.refkey] = _txt
+        self.param_textwidgets[param.refkey] = _txt
 
         # add widgets to layout:
         if self.layout() is None:
@@ -171,20 +248,44 @@ class ParamConfigMixIn:
         if isinstance(self.layout(), QtWidgets.QGridLayout):
             self.layout().addWidget(
                 _txt, self._cfg['row'], self._cfg['column'], 1,
-                self._cfg['n_columns_text'], )
+                self._cfg['n_columns_text'],
+                self._cfg['valign_text'] | self._cfg['halign_text'])
             self.layout().addWidget(
                 _io, self._cfg['row'] + self._cfg['linebreak'],
                 self._cfg['column'] + 1 - self._cfg['linebreak'], 1,
-                self._cfg['n_columns'], self._cfg['align_io'])
+                self._cfg['n_columns'],
+                self._cfg['valign_io'] | self._cfg['halign_io'])
         else:
             _l = QtWidgets.QHBoxLayout()
             _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
             _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
             self.layout().addLayout(_l)
 
+    def get_param_value(self, key):
+        """
+        Get the value of the Parameter referencey by key.
+
+        Parameters
+        ----------
+        key : str
+            The parameter reference key.
+
+        Raises
+        ------
+        KeyError
+            If no parameter has been registered with key.
+
+        Returns
+        -------
+        object
+            The Parameter value (in the datatype determined by Parameter).
+        """
+        if key not in self.params:
+            raise KeyError(f'No parameter with key "{key}" found.')
+        return self.params[key].value
 
     @staticmethod
-    def set_plugin_param(param, widget):
+    def set_param_value(param, widget):
         """
         Update the Parameter value with the entry from the widget.
 

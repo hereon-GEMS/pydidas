@@ -30,45 +30,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import workflow_tree_edit_manager
-from .workflow_tree_edit_manager import *
+from . import hdf_reader
 
-from . import data_browsing_frame
-from .data_browsing_frame import *
+from . import tiff_reader
 
-from . import workflow_edit_frame
-from .workflow_edit_frame import *
+from . import raw_reader
 
-from . import toplevel_frame
-from .toplevel_frame import *
-
-from . import experiment_settings_frame
-from .experiment_settings_frame import *
-
-from . import scan_settings_frame
-from .scan_settings_frame import *
-
-from . import processing_single_plugin_frame
-from .processing_single_plugin_frame import *
-
-from . import processing_full_workflow
-from .processing_full_workflow import *
-
-__all__ += workflow_tree_edit_manager.__all__
-__all__ += data_browsing_frame.__all__
-__all__ += workflow_edit_frame.__all__
-__all__ += toplevel_frame.__all__
-__all__ += experiment_settings_frame.__all__
-__all__ += scan_settings_frame.__all__
-__all__ += processing_single_plugin_frame.__all__
-__all__ += processing_full_workflow.__all__
-
-# Unclutter namespace: remove modules from namespace
-del workflow_tree_edit_manager
-del data_browsing_frame
-del workflow_edit_frame
-del toplevel_frame
-del experiment_settings_frame
-del scan_settings_frame
-del processing_single_plugin_frame
-del processing_full_workflow
+from . import numpy_reader

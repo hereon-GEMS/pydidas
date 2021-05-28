@@ -29,15 +29,15 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['ReadOnlyTextWidget']
 
-from PyQt5 import QtWidgets, QtCore
-from pydidas.config import gui_constants, qt_presets
+from PyQt5 import QtWidgets
 
 
-class _PluginDescriptionField(QtWidgets.QTextEdit):
+class ReadOnlyTextWidget(QtWidgets.QTextEdit):
     """
-    Text edit to show the description of the plugin and its parameters.
+    A read only QTextEdit widget with some layout settings in setup and a
+    more advanced setText method.
     """
 
     def __init__(self, parent=None, **params):
@@ -62,19 +62,29 @@ class _PluginDescriptionField(QtWidgets.QTextEdit):
         fixedHeight : Union[int, None], optional
             A fixed height for the widget. If None, no fixedHeight will be set.
             The default is None.
-
+        visible : bool, optional
+            Flag to set widget visibility at startup.
 
         Returns
         -------
         None.
-
         """
         super().__init__(parent)
         _params = {'readOnly': params.get('readOnly', True),
                    'fixedWidth': params.get('fixedWidth', None),
                    'minimumWidth': params.get('minimumWidth', 500),
                    'fixedHeight': params.get('fixedHeight', None),
-                   'minimumHeight': params.get('minimumHeight', None)}
+                   'minimumHeight': params.get('minimumHeight', None),
+                   'visible': params.get('visible', True),
+                   }
+        # if fixed settings are given, overwrite the minimum size settings
+        # because these take precedence in Qt:
+        if _params['fixedWidth'] is not None:
+            _params['minimumWidth'] = None
+        if _params['fixedHeight'] is not None:
+            _params['minimumHeight'] = None
+
+        self.setVisible(_params['visible'])
         self.setAcceptRichText(True)
         self.setReadOnly(_params['readOnly'])
         for _param, _func  in zip(
@@ -83,43 +93,51 @@ class _PluginDescriptionField(QtWidgets.QTextEdit):
                  self.setFixedHeight, self.setMinimumHeight]):
             if _params[_param] is not None:
                 _func(_params[_param])
-        self.setMinimumWidth(500)
+        self._params = _params
 
-    def setText(self, text, title=None):
+    def setText(self, text, title=None, oneLineKeys=False, indent=4):
         """
-        Display information about a plugin.
+        Print information.
 
         This widget accepts both a single text entry and a list of entries
         for the text. A list of entries will be converted to a single text
-        according to
+        according to a <key: entry> scheme.
 
         Parameters
         ----------
-        text : str or list of str.
-            The text to be displayed.
+        text : Union[str, list]
+            The text to be displayed. A string will be processed directly
+            whereas a list will be processed with the first entries of every
+            list entry being interpreted as key, entry.
         title : str, optional
-            The title. The default is None.
+            The title. If None, no title will be printed. The default is None.
+        oneLineKeys : bool, optional
+            Used for text lists only. Flag to force printing of keys and
+            entries in one line instead of two lines with an indent.
+            The default is False.
+        indent : int, optional
+            The indent depth for list entries. The default is 4.
 
         Returns
         -------
         None.
         """
-        if isinstance(text, str):
-            super().setText(text)
-        elif isinstance(text, list):
-            super().setText('')
-            if title:
-                self.setFontPointSize(14)
-                self.setFontWeight(75)
-                self.append(f'Plugin description: {title}')
+        super().setText('')
+        if title is not None:
+            self.setFontPointSize(14)
+            self.setFontWeight(75)
+            self.append(f'{title}')
             self.setFontPointSize(10)
-            self.append('')
-
+        if isinstance(text, str):
+            self.append(text)
+        elif isinstance(text, list):
             for key, item in text:
-                self.setFontWeight(75)
-                self.append(key + ':')
-                self.setFontWeight(50)
-                self.append(' ' * 4 + item if key != 'Parameters' else item)
+                if oneLineKeys:
+                    self.append(f'{key}: {item}')
+                else:
+                    self.setFontWeight(75)
+                    self.append(key + ':')
+                    self.setFontWeight(50)
+                    self.append(' ' * indent + item)
         self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum
-        )
+            QtWidgets.QScrollBar.SliderToMinimum)

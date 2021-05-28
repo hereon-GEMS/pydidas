@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Subpackage with GUI elements."""
+"""
+The parameter module includes the Parameter class which is used to store
+processing parameters.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -28,42 +31,28 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['HdfKey']
 
-from . import composites
-from .composites import *
 
-from . import parameter
-from .parameter import *
+class HdfKey(str):
+    """A class used for referencing hdf keys."""
+    def __new__(cls, text):
+        _instance = super().__new__(cls, text)
+        _instance.__hdf_fname = None
+        return _instance
 
-from . import dataset
-from .dataset import *
+    @property
+    def hdf_filename(self):
+        """
+        Get the filename of the associated hdf5 file.
 
-from . import global_settings
-from .global_settings import *
+        Returns
+        -------
+        str
+            The filename of the associated hdf5 file.
+        """
+        return self.__hdf_fname
 
-from . import experimental_settings
-from .experimental_settings import *
-
-from . import scan_settings
-from .scan_settings import *
-
-from . import hdf_key
-from .hdf_key import *
-
-__all__ += composites.__all__
-__all__ += parameter.__all__
-__all__ += dataset.__all__
-__all__ += global_settings.__all__
-__all__ += experimental_settings.__all__
-__all__ += scan_settings.__all__
-__all__ += hdf_key.__all__
-
-# Unclutter namespace: remove modules from namespace
-del composites
-del parameter
-del dataset
-del global_settings
-del experimental_settings
-del scan_settings
-del hdf_key
+    @hdf_filename.setter
+    def hdf_filename(self, txt):
+        self.__hdf_fname = txt

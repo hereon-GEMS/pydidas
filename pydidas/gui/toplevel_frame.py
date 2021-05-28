@@ -211,7 +211,8 @@ class ToplevelFrame(QtWidgets.QFrame):
             If not None, the fixed height of the button. The default is None.
         enabled : bool, optional
             Flag to create the button enabled or disabled. The default is True.
-
+        visible : bool, optional
+            Flag to toggle button visibility at creation.
         Returns
         -------
         _button : QtWidgets.QPushButton
@@ -222,23 +223,26 @@ class ToplevelFrame(QtWidgets.QFrame):
                 'width': kwargs.get('width', None),
                 'height': kwargs.get('height', None),
                 'enabled': kwargs.get('enabled', True),
+                'visible': kwargs.get('visible', True),
                 }
         if _cfg['icon'] is not None:
-            _button = QtWidgets.QPushButton(text, _cfg['icon'])
+            _button = QtWidgets.QPushButton(_cfg['icon'], text)
         else:
             _button = QtWidgets.QPushButton(text)
         _button.setEnabled(_cfg['enabled'])
+        _button.setVisible(_cfg['visible'])
         if _cfg['width'] is not None:
             _button.setFixedWidth(_cfg['width'])
         if _cfg['height'] is not None:
             _button.setFixedHeight(_cfg['height'])
         if _cfg['gridPos']:
-            self.layout().addWidget(_button, *_cfg['gridPos'])
+            self.layout().addWidget(_button, *_cfg['gridPos'], QtCore.Qt.AlignTop)
         else:
             self.layout().addWidget(_button)
         return _button
 
-    def add_spacer(self, height=20, width=20, gridPos=None):
+    def add_spacer(self, height=20, width=20, gridPos=None,
+                   policy=QtWidgets.QSizePolicy.Minimum):
         """
         Add a spacer to the Frame layout.
 
@@ -251,19 +255,21 @@ class ToplevelFrame(QtWidgets.QFrame):
             The height of the spacer in pixel. The default is 20.
         width : int, optional
             The width of the spacer in pixel. The default is 20.
-        gridPos : TYPE, optional
-            DESCRIPTION. The default is None.
+        gridPos : Union[tuple, list, None], optional
+            A list or tuple of length 4 can be supplied as theg . The default
+            is None.
+        policy : QtWidgets.QSizePolicy, optional
+            The size policy for the spacer (applied both horizontally and
+            vertically). The default is QtWidgets.QSizePolicy.Minimum.
 
         Returns
         -------
         None.
 
         """
-        _spacer = QtWidgets.QSpacerItem(width, height,
-                                        QtWidgets.QSizePolicy.Minimum,
-                                        QtWidgets.QSizePolicy.Minimum)
+        _spacer = QtWidgets.QSpacerItem(width, height, policy, policy)
         if gridPos:
-            self.layout().addItem(_spacer, *gridPos)
+            self.layout().addItem(_spacer, *gridPos, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         else:
             self.layout().addItem(_spacer)
 

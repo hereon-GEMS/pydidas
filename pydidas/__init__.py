@@ -10,4 +10,6 @@ from . import gui
 
 from . import core
 
+from . import image_reader
+
 del plugin_collection

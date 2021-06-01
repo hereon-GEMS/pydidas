@@ -1,4 +1,4 @@
-HDF5_EXTENSIONS = ['.h5', '.hdf', 'nxs']
+HDF5_EXTENSIONS = ['.h5', '.hdf', '.nxs']
 
 NUMPY_EXTENSIONS = ['.npy', '.np', '.npz']
 

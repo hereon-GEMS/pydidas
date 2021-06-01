@@ -83,6 +83,12 @@ class IOwidget(QtWidgets.QWidget):
             The text converted to the required datatype (int, float, path)
             to update the Parameter value.
         """
+        # need to process True and False explicitly because bool is a subtype
+        # of int but the strings 'True' and 'False' cannot be converted to int
+        if text == 'True':
+            text = True
+        if text == 'False':
+            text = False
         if self.__ptype == numbers.Integral:
             return int(text)
         if self.__ptype == numbers.Real:

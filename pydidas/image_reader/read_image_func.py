@@ -47,6 +47,15 @@ def read_image(filename, **kwargs):
     specified file format and read and return the file. The required
     keyword arguments vary, depending on file type.
 
+    Parameters
+    ----------
+    filename : str
+        The full filename and path to the file.
+    *args : any
+        further arguments (currently not used)
+    **kwargs : dict
+        keyword arguments
+
     Supported keyword arguments:
 
     for all images:
@@ -80,14 +89,6 @@ def read_image(filename, **kwargs):
             The number of the image in the dataset. The default is 0.
         axisNo : int
             The number of the axis with the image. The default is 0.
-
-
-    Parameters
-    ----------
-    filename : str
-        The full filename and path to the file.
-    *args : further arguments (currently not used)
-    **kwargs: keyword arguments
 
     Returns
     -------

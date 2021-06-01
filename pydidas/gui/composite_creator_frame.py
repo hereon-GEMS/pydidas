@@ -50,6 +50,7 @@ from pydidas.widgets.param_config import ParamConfigMixIn
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_dataset_shape)
 
+
 _params = {
     'first_file': Parameter('First file name', Path, default=Path(), refkey='first_file'),
     'last_file': Parameter('Last file name', Path, default=Path(), refkey='last_file'),
@@ -60,7 +61,8 @@ _params = {
     'n_image': Parameter('Total number of images', int, default=-1, refkey='n_image'),
     'composite_nx': Parameter('Number of images in x', int, default=1, refkey='composite_nx'),
     'composite_ny': Parameter('Number of images in y', int, default=-1, refkey='composite_ny'),
-    'flag_roi': Parameter('Use ROI', str, default='False', refkey='flag_roi', choices=['True', 'False']),
+    #'flag_roi': Parameter('Use ROI', str, default='False', refkey='flag_roi', choices=['True', 'False']),
+    'flag_roi': Parameter('Use ROI', int, default=False, refkey='flag_roi', choices=[True, False]),
     'roi_xlow': Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow'),
     'roi_xhigh': Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh'),
     'roi_ylow': Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow'),
@@ -250,7 +252,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
             i2 = self.get_param_value('hdf_last_no')
             if i2 == -1:
                 i2 = self.__select_info['hdf_n_image']
-            _n = (i2 - i1 + 1) // step
+            _n = (i2 - i1) // step
         elif self.__select_info['hdf_images'] == False:
             _n = self.__select_info['file_n_image'] // step
         if self.__select_info['hdf_images'] is not None:

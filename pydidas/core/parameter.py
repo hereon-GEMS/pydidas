@@ -34,62 +34,6 @@ __status__ = "Development"
 __all__ = ['Parameter']
 
 import numbers
-from PyQt5 import QtCore
-
-# class ParameterCollection(OrderedDict):
-#     """Collection of parameters for plugins.
-#     """
-#     def __init__(self, params=None):
-#         """Setup method."""
-#         super().__init__()
-#         for _p in params:
-#             self._eter(_p)
-
-#     def add_parameter(self, param):
-#         """Method to add a parameter.
-
-#         Parameters
-#         ----------
-#         param : Parameter object
-#             An instance of a Parameter object.
-
-#         Raises
-#         ------
-#         KeyError
-#             If an entry with param.name already exists.
-
-#         Returns
-#         -------
-#         None.
-#         """
-#         if param.name in self.keys():
-#             raise KeyError(f'A parameter with the name "{param.name}" '
-#                            'already exists.')
-#         self.__setitem__(param.name, param)
-
-#     def remove_parameter_by_name(self, param_name):
-#         """
-#         Removoe a parameter from the collection.
-
-#         Parameters
-#         ----------
-#         param_name : str
-#             The key name of the parameter.
-
-#         Raises
-#         ------
-#         KeyError
-#             If no parameter with param_name has been registered.
-
-#         Returns
-#         -------
-#         None.
-#         """
-#         if param_name not in self.keys():
-#             raise KeyError(f'No parameter with the name "{param_name}" '
-#                            'has been registered.')
-#         self.__delitem__(param_name)
-
 
 
 def _get_base_cls(cls):
@@ -134,6 +78,10 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | value      | True      | The current value.                        |
     +------------+-----------+-------------------------------------------+
+    | refkey     | False     | A reference key for the parameter.        |
+    |            |           | This key is used for accessing the        |
+    |            |           | Parameter in the ParameterCollection      |
+    +------------+-----------+-------------------------------------------+
     | choices    | True      | A list with choices if the value of the   |
     |            |           | parameter is limited to specific values.  |
     +------------+-----------+-------------------------------------------+
@@ -143,9 +91,6 @@ class Parameter:
     | tooltip    | False     | A readable tooltip.                       |
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value                         |
-    +------------+-----------+-------------------------------------------+
-    | refkey     | False     | A reference key for the parameter.        |
-    |            |           | This key is only used internally.         |
     +------------+-----------+-------------------------------------------+
     """
 
@@ -165,6 +110,9 @@ class Parameter:
             performed. If any integer or float value is used, this will be
             changed to the abstract base class of numbers.Integral or
             numbers.Real. The default is None.
+        refkey : str, optional
+            The reference key for the Parameter in the Parameter collection.
+            If not specified, this will default to the name.
         default : type, optional
             The default value. The data type must be of the same type as
             param_type. The default is None.
@@ -429,9 +377,11 @@ class Parameter:
                              ' to any of the allowed choices: '
                              f'{self.__meta["choices"]}')
         if not (self.__typecheck(val)
-                or self.__mexta['optional'] and (val is None)):
-            raise ValueError(f'Cannot set parameter "{str(self.__name)}" '
-                             'because it is of the wrong data type.')
+                or self.__meta['optional'] and (val is None)):
+            raise ValueError(
+                f'Cannot set Parameter (object ID:{id(self)}, name: '
+                f'"{self.__name}", reference: "{self.__meta["refkey"]}")'
+                ' because it is of the wrong data type.')
         self.__value = val
 
     def restore_default(self):
@@ -519,8 +469,8 @@ class Parameter:
         _val = f'{self.value}' if self.value not in (None, '') else '""'
         _def = (f'{self.__meta["default"]}'
                 if self.__meta['default'] not in (None, '') else 'None')
-        _s = f'Parameter {self.__name} (type: {_type}'
+        _s = f'Parameter <{self.__name} (type: {_type}'
         if self.__meta['optional']:
             _s += ', optional'
-        _s += f'): {_val} {_unit}(default: {_def})'
+        _s += f'): {_val} {_unit}(default: {_def})>'
         return _s

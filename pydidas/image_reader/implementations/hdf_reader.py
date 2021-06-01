@@ -30,6 +30,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+from numpy import squeeze
+
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
 from ..low_level_readers.read_hdf_slice import read_hdf_slice
@@ -92,8 +94,9 @@ class Hdf5Reader(ImageReader):
         kwargs.update(self._image_metadata)
         if dataset is None:
             raise KeyError('The hdf dataset has not been specified.')
-        self._image = read_hdf_slice(
-            filename, dataset, [None] * axisNo + [imageNo])
+        self._image = squeeze(
+            read_hdf_slice(filename, dataset, [None] * axisNo + [imageNo])
+        )
         return self.return_image(**kwargs)
 
 

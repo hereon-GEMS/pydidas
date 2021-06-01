@@ -44,3 +44,9 @@ class WidgetLayoutError(Exception):
     WidgetLayoutError is used if a widget attempts to add items to a layout
     without having a layout.
     """
+
+class AppConfigError(Exception):
+    """
+    AppConfigError is used when app parameters are not consistent and cannot
+    be processed.
+    """

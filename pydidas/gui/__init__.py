@@ -54,6 +54,9 @@ from .processing_single_plugin_frame import *
 from . import processing_full_workflow
 from .processing_full_workflow import *
 
+from . import composite_creator_frame
+from .composite_creator_frame import *
+
 __all__ += workflow_tree_edit_manager.__all__
 __all__ += data_browsing_frame.__all__
 __all__ += workflow_edit_frame.__all__
@@ -62,6 +65,7 @@ __all__ += experiment_settings_frame.__all__
 __all__ += scan_settings_frame.__all__
 __all__ += processing_single_plugin_frame.__all__
 __all__ += processing_full_workflow.__all__
+__all__ += composite_creator_frame.__all__
 
 # Unclutter namespace: remove modules from namespace
 del workflow_tree_edit_manager
@@ -72,3 +76,4 @@ del experiment_settings_frame
 del scan_settings_frame
 del processing_single_plugin_frame
 del processing_full_workflow
+del composite_creator_frame

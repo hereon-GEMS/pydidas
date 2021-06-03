@@ -32,6 +32,7 @@ __all__ = []
 
 import numpy as np
 
+from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
 from ...config import NUMPY_EXTENSIONS
@@ -82,7 +83,7 @@ class NumpyReader(ImageReader):
         """
         _data = np.load(filename)
         assert len(_data.shape)==2
-        self._image = _data
+        self._image = Dataset(_data)
         return self.return_image(**kwargs)
 
 

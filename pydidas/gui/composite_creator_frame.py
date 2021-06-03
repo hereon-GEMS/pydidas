@@ -41,28 +41,27 @@ from PyQt5 import QtWidgets, QtCore
 
 # from silx.gui.plot.ImageView import ImageView
 
+from pydidas.apps import CompositeCreatorApp
 from pydidas.gui.toplevel_frame import ToplevelFrame
-from pydidas.core import Parameter, HdfKey
+from pydidas.core import Parameter, HdfKey, ParameterCollectionMixIn
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.widgets import ReadOnlyTextWidget
 from pydidas.widgets.dialogues import Hdf5DatasetSelection
 from pydidas.widgets.param_config import ParamConfigMixIn
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
-                           get_hdf5_dataset_shape)
+                           get_hdf5_metadata)
 
 
 _params = {
     'first_file': Parameter('First file name', Path, default=Path(), refkey='first_file'),
     'last_file': Parameter('Last file name', Path, default=Path(), refkey='last_file'),
     'hdf_key': Parameter('Hdf image key (dataset)', HdfKey, default=HdfKey(''), refkey='hdf_key'),
-    'hdf_first_no': Parameter('First image number', int, default=0, refkey='hdf_first_no'),
-    'hdf_last_no': Parameter('Last image number', int, default=-1, refkey='hdf_last_no'),
+    'hdf_first_num': Parameter('First image number', int, default=0, refkey='hdf_first_num'),
+    'hdf_last_num': Parameter('Last image number', int, default=-1, refkey='hdf_last_num'),
     'stepping': Parameter('Stepping', int, default=1, refkey='stepping'),
     'n_image': Parameter('Total number of images', int, default=-1, refkey='n_image'),
     'composite_nx': Parameter('Number of images in x', int, default=1, refkey='composite_nx'),
     'composite_ny': Parameter('Number of images in y', int, default=-1, refkey='composite_ny'),
-    #'flag_roi': Parameter('Use ROI', str, default='False', refkey='flag_roi', choices=['True', 'False']),
-    'flag_roi': Parameter('Use ROI', int, default=False, refkey='flag_roi', choices=[True, False]),
     'roi_xlow': Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow'),
     'roi_xhigh': Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh'),
     'roi_ylow': Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow'),
@@ -71,13 +70,15 @@ _params = {
     }
 
 
-class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
+class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollectionMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
-        self.params = _params
+        self.params = CompositeCreatorApp.get_default_params_copy()
+        self.add_param(Parameter('Total number of images', int, default=-1,
+                                 refkey='n_image'))
         self.__select_info = {'hdf_images': None}
-
+        print('starting widget setup')
         self.init_widgets()
         self.connect_signals()
 
@@ -86,7 +87,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
 
-        self.add_label('Composite image creator', fontsize=14,
+        self.add_label_widget('Composite image creator', fontsize=14,
                        gridPos=(0, 0, 1, 5))
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         self.b_clear = self.add_button('Clear all entries',
@@ -94,7 +95,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
 
         # special formatting for first_file, last_file and hdf_key:
         for _key in ['first_file', 'last_file', 'hdf_key']:
-            self.add_param(self.params[_key], linebreak=True,
+            self.add_param_widget(self.params[_key], linebreak=True,
                            halign_text=QtCore.Qt.AlignLeft, n_columns_text=2,
                            n_columns=2, width= 250, width_text=200)
 
@@ -104,11 +105,11 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
 
         for _key in [key for key in self.params
                      if key not in self.param_widgets.keys()]:
-            self.add_param(self.params[_key], width=100, width_text=140)
+            self.add_param_widget(self.params[_key], width=100, width_text=140)
         self.param_widgets['n_image'].setEnabled(False)
 
-        for _key in ['hdf_key', 'hdf_first_no', 'hdf_last_no', 'last_file',
-                     'hdf_first_no', 'hdf_last_no', 'stepping']:
+        for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file',
+                     'hdf_first_num', 'hdf_last_num', 'stepping']:
             self.toggle_widget_visibility(_key, False)
 
         self.b_exec = self.add_button('Generate composite',
@@ -124,7 +125,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
     def connect_signals(self):
         self.b_clear.clicked.connect(partial(self.__clear_entries, 'all'))
 
-        self.param_widgets['flag_roi'].currentTextChanged.connect(
+        self.param_widgets['use_roi'].currentTextChanged.connect(
             self.toggle_roi_selection )
         self.param_widgets['first_file'].io_edited.connect(
             self.__selected_fist_file)
@@ -132,7 +133,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
             self.__selected_last_file)
         self.param_widgets['hdf_key'].io_edited.connect(
             self.__selected_hdf_key)
-        for _key in ['hdf_first_no', 'hdf_last_no', 'stepping']:
+        for _key in ['hdf_first_num', 'hdf_last_num', 'stepping']:
             self.param_widgets[_key].io_edited.connect(
                 self.update_n_image)
 
@@ -147,14 +148,14 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
 
     def __selected_fist_file(self, fname):
         # reset all follow-up settings upon selecting a new
-        self.__clear_entries(['hdf_key', 'hdf_first_no', 'hdf_last_no',
+        self.__clear_entries(['hdf_key', 'hdf_first_num', 'hdf_last_num',
                             'last_file', 'stepping', 'n_image',
                             'composite_nx', 'composite_ny'])
         # depending on whether a hdf5 file has been selected, show and hide
         # different widgets:
         hdf_flag = (True if os.path.splitext(fname)[1] in HDF5_EXTENSIONS
                     else False)
-        for _key in ['hdf_key', 'hdf_first_no', 'hdf_last_no']:
+        for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num']:
             self.toggle_widget_visibility(_key, hdf_flag)
             self.toggle_widget_visibility('last_file', not hdf_flag)
         self.param_widgets['last_file'].setVisible(not hdf_flag)
@@ -178,7 +179,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
             self.__clear_entries(['hdf_key'])
             self.toggle_widget_visibility('hdf_key', True)
             return
-        _shape = get_hdf5_dataset_shape(_fname, _dset)
+        _shape = get_hdf5_metadata(_fname, 'shape', _dset)
         self.w_selection_info.setText(
             (f'Number of images in dataset:\n  {_shape[0]}\n\nImage size:\n  '
              f'{_shape[1]} x {_shape[2]}'))
@@ -239,8 +240,8 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
         self.w_selection_info.setVisible(False)
-        for _key in ['hdf_key', 'hdf_first_no', 'hdf_last_no', 'last_file',
-                     'hdf_first_no', 'hdf_last_no']:
+        for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file',
+                     'hdf_first_num', 'hdf_last_num']:
             self.toggle_widget_visibility(_key, False)
         self.__select_info['hdf_images'] = None
         self.b_exec.setEnabled(False)
@@ -248,8 +249,8 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn):
     def update_n_image(self):
         step = self.get_param_value('stepping')
         if self.__select_info['hdf_images']:
-            i1 = self.get_param_value('hdf_first_no')
-            i2 = self.get_param_value('hdf_last_no')
+            i1 = self.get_param_value('hdf_first_num')
+            i2 = self.get_param_value('hdf_last_num')
             if i2 == -1:
                 i2 = self.__select_info['hdf_n_image']
             _n = (i2 - i1) // step
@@ -285,7 +286,7 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    sys.excepthook = pydidas.widgets.excepthook
+    # sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
     STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 

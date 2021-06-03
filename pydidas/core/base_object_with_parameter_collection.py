@@ -1,0 +1,222 @@
+# MIT License
+#
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+"""Module with the BaseApp from which all apps should inherit.."""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "MIT"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['ParameterCollectionMixIn', 'BaseObjectWithParameterCollection']
+
+from PyQt5 import QtCore
+
+from .parameter import Parameter
+from .parameter_collection import ParameterCollection
+
+
+class ParameterCollectionMixIn:
+    """
+    MixIn class with ParameterCollection convenience methods.
+    If the MixIn is used, the subclass is responsible for creating a
+    ParameterCollection instance as self.params attribute.
+    """
+
+    default_params = ParameterCollection()
+
+    @classmethod
+    def get_default_params_copy(cls):
+        """
+        Get a copy of the default ParameterCollection.
+
+        Returns
+        -------
+        ParameterCollection
+            A copy of the default ParameterCollection.
+
+        """
+        return cls.default_params.get_copy()
+
+    def add_param(self, param):
+        """
+        Add a parameter to the ParameterCollection.
+
+        This is a wrapper for the ParameterCollection.add_parameter method.
+
+        Parameters
+        ----------
+        param : Parameter
+            An instance of a Parameter object.
+
+        Returns
+        -------
+        None.
+        """
+        self.params.add_param(param)
+
+    def add_params(self, *params):
+        """
+        Add parameters to the object.
+
+        This method adds Parameters to the ParameterCollection of the object.
+        Parameters can be either supplies as args or a ParameterCollection
+        or dictionary in the form of <ref_key>: <Parameter>.
+        This method is explicitly separate from the __init__ method to allow
+        subclasses full control over args and kwargs.
+
+        Parameters
+        ----------
+        *params : Union[Parameter, dict, ParameterCollection]
+            Any Parameter or ParameterCollection
+
+        Returns
+        -------
+        None.
+        """
+        for _param in params:
+            if isinstance(_param, Parameter):
+                self.add_param(_param)
+            elif isinstance(_param, (ParameterCollection, dict)):
+                self.params.update(_param)
+            else:
+                raise TypeError(
+                    f'Cannot add object of type "{_param.__class__}" '
+                    'to ParameterCollection.')
+
+    def set_default_params(self, defaults):
+        """
+        Set default entries.
+
+        This method will go through the supplied defaults iterable
+        if there are no entries for the default re
+
+        Parameters
+        ----------
+        defaults : Union[dict, ParameterCollection, list, tuple, set]
+            An iterable with default Parameters.
+
+        Returns
+        -------
+        None.
+        """
+        if isinstance(defaults, (dict, ParameterCollection)):
+            defaults = defaults.values()
+        for _param in defaults:
+            if _param.refkey not in self.params:
+                self.params.add_param(Parameter(*_param.dump()))
+
+    def get_param_value(self, param_name):
+        """
+        Get a parameter value.
+
+        Parameters
+        ----------
+        param_name : str
+            The key name of the Parameter.
+
+        Returns
+        -------
+        object
+            The value of the Parameter.
+        """
+        if not param_name in self.params:
+            raise KeyError(f'No parameter with the name "{param_name}" '
+                           'has been registered.')
+        return self.params.get_value(param_name)
+
+    def set_param_value(self, param_name, value):
+        """
+        Set a parameter value.
+
+        Parameters
+        ----------
+        param_name : str
+            The key name of the Parameter.
+        value : *
+            The value to be set. This has to be the datatype associated with
+            the Parameter.
+
+        Returns
+        -------
+        None
+        """
+        if not param_name in self.params:
+            raise KeyError(f'No parameter with the name "{param_name}" '
+                           'has been registered.')
+        self.params.set_value(param_name, value)
+
+    def get_param_values_as_dict(self):
+        """
+        Get a dictionary with Parameter names and values only.
+
+        Returns
+        -------
+        name_val_pairs : dict
+            The dictionary with Parameter <name>: <value> pairs.
+        """
+        name_val_pairs = {}
+        for _key in self.params:
+            name_val_pairs[self.params[_key].name] = self.params[_key].value
+        return name_val_pairs
+
+
+    def print_param_values(self):
+        """
+        Print the name and value of all Parameters.
+
+        Returns
+        -------
+        None.
+        """
+        _config = self.get_param_values_as_dict()
+        for _key in _config:
+            print(f'{_key}: {_config[_key]}')
+
+
+class BaseObjectWithParameterCollection(QtCore.QObject,
+                                        ParameterCollectionMixIn):
+    """
+    An object with a ParameterCollection.
+
+    This class can be inherited by any class which requires a
+    ParameterCollection and access methods for it.
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Create a Base instance.
+
+        Parameters
+        ----------
+        *args : list
+            Any arguments. Defined by the concrete
+            subclass..
+        **kwargs : dict
+            A dictionary of keyword arguments. Defined by the concrete
+            subclass.
+
+        Returns
+        -------
+        None.
+        """
+        self.params = ParameterCollection()

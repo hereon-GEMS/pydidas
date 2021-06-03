@@ -30,12 +30,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseApp']
 
-from PyQt5 import QtCore
-
-from pydidas.core import Parameter, ParameterCollection
+from pydidas.core import BaseObjectWithParameterCollection
 
 
-class BaseApp(QtCore.QObject):
+class BaseApp(BaseObjectWithParameterCollection):
     """
     The BaseApp.
 
@@ -58,73 +56,11 @@ class BaseApp(QtCore.QObject):
         -------
         None.
         """
-        self.params = ParameterCollection(*args, **kwargs)
-
-    def set_default_params(self, defaults):
-        """
-        Set default entries.
-
-        This method will go through the supplied defaults iterable
-        if there are no entries for the default re
-
-        Parameters
-        ----------
-        defaults : Union[dict, ParameterCollection, list, tuple, set]
-            An iterable with default Parameters.
-
-        Returns
-        -------
-        None.
-        """
-        if isinstance(defaults, (dict, ParameterCollection)):
-            defaults = defaults.values()
-        for param in defaults:
-            if param.refkey not in self.params:
-                self.params.add_parameter(param)
-
+        super().__init__()
+        self.add_params(*args, **kwargs)
 
     def run(self, *args, **kwargs):
         """
         Run the app.
         """
         raise NotImplementedError
-
-    def get_param_value(self, param_name):
-        """
-        Get a parameter value.
-
-        Parameters
-        ----------
-        param_name : str
-            The key name of the Parameter.
-
-        Returns
-        -------
-        object
-            The value of the Parameter.
-        """
-        if not param_name in self.params:
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                           'has been registered.')
-        return self.params.get_value(param_name)
-
-    def set_param_value(self, param_name, value):
-        """
-        Set a parameter value.
-
-        Parameters
-        ----------
-        param_name : str
-            The key name of the Parameter.
-        value : *
-            The value to be set. This has to be the datatype associated with
-            the Parameter.
-
-        Returns
-        -------
-        None
-        """
-        if not param_name in self.params:
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                           'has been registered.')
-        self.params.set_value(param_name, value)

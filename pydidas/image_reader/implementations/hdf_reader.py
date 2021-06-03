@@ -32,6 +32,7 @@ __all__ = []
 
 from numpy import squeeze
 
+from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
 from ..low_level_readers.read_hdf_slice import read_hdf_slice
@@ -94,8 +95,12 @@ class Hdf5Reader(ImageReader):
         kwargs.update(self._image_metadata)
         if dataset is None:
             raise KeyError('The hdf dataset has not been specified.')
-        self._image = squeeze(
+        _img = squeeze(
             read_hdf_slice(filename, dataset, [None] * axisNo + [imageNo])
+        )
+        self._image = Dataset(_img, metadata={'axisNo': axisNo,
+                                              'imageNo': imageNo,
+                                              'dataset': dataset}
         )
         return self.return_image(**kwargs)
 

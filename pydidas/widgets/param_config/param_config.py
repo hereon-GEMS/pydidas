@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # MIT License
 #
 # Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
@@ -118,8 +116,8 @@ class ParamConfigMixIn:
         self.param_widgets[key].setVisible(visible)
         self.param_textwidgets[key].setVisible(visible)
 
-    def add_label(self, text, fontsize=STANDARD_FONT_SIZE, width=None,
-                  gridPos=None):
+    def add_label_widget(self, text, fontsize=STANDARD_FONT_SIZE, width=None,
+                         gridPos=None):
         """
         Add a label to the widget.
 
@@ -150,19 +148,16 @@ class ParamConfigMixIn:
         if width:
             w.setFixedWidth(width)
         w.setFixedHeight(fontsize * (1 + text.count('\n')) + 10)
-        if self.layout_meta['set']:
-            if self.layout_meta['grid']:
-                self.layout().addWidget(
-                    w, *gridPos, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-                )
-            else:
-                self.layout().addWidget(
-                    w, 0, QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
-                )
-        else:
+        if self.layout() is None:
             raise WidgetLayoutError('No layout set.')
+        if isinstance(self.layout(), QtWidgets.QGridLayout):
+            self.layout().addWidget(w, *gridPos,
+                                    QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        else:
+            self.layout().addWidget(w, 0,
+                                    QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
 
-    def add_param(self, param, **kwargs):
+    def add_param_widget(self, param, **kwargs):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
@@ -213,10 +208,14 @@ class ParamConfigMixIn:
                      'n_columns_text': kwargs.get('n_columns_text', 1),
                      'n_columns': kwargs.get('n_columns', 1),
                      'linebreak': kwargs.get('linebreak', False),
-                     'halign_io': kwargs.get('halign_io', QtCore.Qt.AlignRight),
-                     'halign_text': kwargs.get('halign_text', QtCore.Qt.AlignRight),
-                     'valign_io': kwargs.get('valign_io', QtCore.Qt.AlignTop),
-                     'valign_text': kwargs.get('valign_text', QtCore.Qt.AlignTop)
+                     'halign_io': kwargs.get('halign_io',
+                                             QtCore.Qt.AlignRight),
+                     'halign_text': kwargs.get('halign_text',
+                                               QtCore.Qt.AlignRight),
+                     'valign_io': kwargs.get('valign_io',
+                                             QtCore.Qt.AlignTop),
+                     'valign_text': kwargs.get('valign_text',
+                                               QtCore.Qt.AlignTop)
             }
 
         _txt = QtWidgets.QLabel(f'{param.name}:')
@@ -246,6 +245,8 @@ class ParamConfigMixIn:
         if self.layout() is None:
             raise WidgetLayoutError('No layout set.')
         if isinstance(self.layout(), QtWidgets.QGridLayout):
+            _vs = self.layout().verticalSpacing()
+            self.layout().setVerticalSpacing(0)
             self.layout().addWidget(
                 _txt, self._cfg['row'], self._cfg['column'], 1,
                 self._cfg['n_columns_text'],
@@ -255,6 +256,7 @@ class ParamConfigMixIn:
                 self._cfg['column'] + 1 - self._cfg['linebreak'], 1,
                 self._cfg['n_columns'],
                 self._cfg['valign_io'] | self._cfg['halign_io'])
+            self.layout().setVerticalSpacing(_vs)
         else:
             _l = QtWidgets.QHBoxLayout()
             _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)

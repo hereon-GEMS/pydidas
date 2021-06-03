@@ -35,11 +35,15 @@ from numbers import Integral
 
 import numpy as np
 
+
+def _default_vals(ndim):
+    return {i: None for i in range(ndim)}
+
 class DatasetConfigException(Exception):
     """
     Exception class for Dataset class configuration of metadata.
     """
-    ...
+
 
 class EmptyDataset(np.ndarray):
     """
@@ -50,26 +54,31 @@ class EmptyDataset(np.ndarray):
         __new__ method for creation of new numpy.ndarray object.
         """
         local_kws = kwargs.copy()
-        for item in ['axis_labels', 'axis_scales', 'axis_units', 'image_id']:
-            if item in kwargs.keys():
+        for item in ['axis_labels', 'axis_scales', 'axis_units', 'metadata']:
+            if item in kwargs:
                 del kwargs[item]
         obj = super().__new__(cls, *args, **kwargs)
-        obj.axis_labels = local_kws.get('axis_labels', [None] * obj.ndim)
-        obj.axis_scales = local_kws.get('axis_scales', [None] * obj.ndim)
-        obj.axis_units = local_kws.get('axis_units', [None] * obj.ndim)
-        obj.image_id = local_kws.get('image_id', None)
+        obj.axis_labels = local_kws.get('axis_labels', _default_vals(obj.ndim))
+        obj.axis_scales = local_kws.get('axis_scales', _default_vals(obj.ndim))
+        obj.axis_units = local_kws.get('axis_units', _default_vals(obj.ndim))
+        obj.metadata = local_kws.get('metadata', None)
         return obj
 
     def __array_finalize__(self, obj):
         """
         Finalizazion of numpy.ndarray object creation.
+
+        This method will delete or append dimensions to the associated
+        axis_labels/_scales/_units attributes, depending on the object
+        dimensionality.
         """
         if obj is None:
             return
-        self.axis_labels = getattr(obj, 'axis_labels', [None] * obj.ndim)
-        self.axis_scales = getattr(obj, 'axis_scales', [None] * obj.ndim)
-        self.axis_units = getattr(obj, 'axis_units', [None] * obj.ndim)
-        self.image_id = getattr(obj, 'image_id', None)
+        for key in ['axis_labels', 'axis_scales', 'axis_units']:
+            _item = getattr(obj, key, _default_vals(self.ndim))
+            setattr(self, key,
+                    {i: _item.get(i, None) for i in range(self.ndim)})
+        self.metadata = getattr(obj, 'metadata', None)
 
     def __get_dict(self, _data, _text):
         """
@@ -106,9 +115,9 @@ class EmptyDataset(np.ndarray):
                 raise DatasetConfigException(
                     f'The keys for "{_text}" do not match the axis dimensions'
                 )
-            return  {i: _data[i] for i in range(self.ndim)}
+            return  _data #{i: _data[i] for i in range(self.ndim)}
         if isinstance(_data, (list, tuple)):
-            _data = {zip(np.arange(self.ndim), _data)}
+            _data = dict(zip(np.arange(self.ndim), _data))
             return _data
         raise DatasetConfigException(
             f'Input {_data} cannot be converted to dictionary'
@@ -124,7 +133,6 @@ class EmptyDataset(np.ndarray):
         dict
             The axis labels: A dictionary with keys corresponding to the
             dimension in the array and respective values.
-
         """
         return self.__axis_labels
 
@@ -157,7 +165,6 @@ class EmptyDataset(np.ndarray):
         dict
             The axis scales: A dictionary with keys corresponding to the
             dimension in the array and respective values.
-
         """
         return self.__axis_scales
 
@@ -189,7 +196,6 @@ class EmptyDataset(np.ndarray):
         dict
             The axis units: A dictionary with keys corresponding to the
             dimension in the array and respective values.
-
         """
         return self.__axis_units
 
@@ -209,11 +215,10 @@ class EmptyDataset(np.ndarray):
         -------
         None
         """
-
         self.__axis_units = self.__get_dict(units, 'axis_units')
 
     @property
-    def image_id(self):
+    def metadata(self):
         """
         Get the image ID.
 
@@ -223,30 +228,30 @@ class EmptyDataset(np.ndarray):
             The image ID.
 
         """
-        return self.__image_id
+        return self.__metadata
 
-    @image_id.setter
-    def image_id(self, image_id):
+    @metadata.setter
+    def metadata(self, metadata):
         """
-        Set the image id metadata.
+        Set the image metadata.
 
         Parameters
         ----------
-        image_id : integer or None
-            The image number metadata.
+        metadata : Union[dict, None]
+            The image metadata.
 
         Raises
         ------
         ValueError
-            If image_is is not None and no integer datatype.
+            If metadata is not None or dict
 
         Returns
         -------
         None.
         """
-        if not (isinstance(image_id, Integral) or image_id is None):
+        if not (isinstance(metadata, dict) or metadata is None):
             raise ValueError('Image id variable is not an integer.')
-        self.__image_id = image_id
+        self.__metadata = metadata
 
     def __repr__(self):
         """
@@ -261,7 +266,7 @@ class EmptyDataset(np.ndarray):
         _info = {'axis_labels': self.axis_labels,
                  'axis_scales': self.axis_scales,
                  'axis_units': self.axis_units,
-                 'image_id': self.image_id,
+                 'metadata': self.metadata,
                  'array': self.__array__()}
         return (self.__class__.__name__
                 + '('
@@ -297,8 +302,8 @@ class Dataset(EmptyDataset):
     axis_units : dict, list or tuple, optional
         The units for the axes. The length must correspond to the array
         dimensions. The default is None.
-    image_id : integer, optional
-        DESCRIPTION. The default is None.
+    metadata : Union[dict, None], optional
+        A dictionary with metadata. The default is None.
     """
     def __new__(cls, array, *args, **kwargs):
         """
@@ -325,6 +330,6 @@ class Dataset(EmptyDataset):
             obj.axis_scales = kwargs.get('axis_scales')
         if 'axis_units' in kwargs:
             obj.axis_units = kwargs.get('axis_units')
-        if 'image_id' in kwargs:
-            obj.image_id = kwargs.get('image_id')
+        if 'metadata' in kwargs:
+            obj.metadata = kwargs.get('metadata')
         return obj

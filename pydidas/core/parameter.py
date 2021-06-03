@@ -34,9 +34,12 @@ __status__ = "Development"
 __all__ = ['Parameter']
 
 import numbers
+from pathlib import Path
+
+from pydidas.core.hdf_key import HdfKey
 
 
-def _get_base_cls(cls):
+def _get_base_class(cls):
     """
     Filter numerical classes and return the corresponding
     abstract base class.
@@ -94,7 +97,7 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     """
 
-    def __init__(self, name, param_type, **kwargs):
+    def __init__(self, name, param_type, meta=None, **kwargs):
         """
         Setup method.
 
@@ -110,6 +113,11 @@ class Parameter:
             performed. If any integer or float value is used, this will be
             changed to the abstract base class of numbers.Integral or
             numbers.Real. The default is None.
+        meta : Union[dict, None], optional
+            A dictionary with meta data. Any keys specified as meta will
+            overwrite the kwargs dictionary. This is added merely as
+            convenience to facility copying Parameter instances. If None,
+            this entry will be ignored. The default is None.
         refkey : str, optional
             The reference key for the Parameter in the Parameter collection.
             If not specified, this will default to the name.
@@ -139,7 +147,9 @@ class Parameter:
         """
         super().__init__()
         self.__name = name
-        self.__type = _get_base_cls(param_type)
+        self.__type = _get_base_class(param_type)
+        if isinstance(meta, dict):
+            kwargs.update(meta)
         self.__meta = dict(default = kwargs.get('default', None),
                            tooltip = kwargs.get('tooltip', ''),
                            unit = kwargs.get('unit', ''),
@@ -159,7 +169,7 @@ class Parameter:
             raise ValueError(f'The default value "{_def}" does not '
                              'correspond to any of the defined choices: '
                              f'{self.__meta["choices"]}.')
-        self.__value = _def if not 'value' in kwargs else kwargs['value']
+        self.__value = _def if 'value' not in kwargs else kwargs['value']
 
     def __call__(self):
         """
@@ -169,7 +179,6 @@ class Parameter:
         -------
         value
             The stored parameter value-
-
         """
         return self.__value
 
@@ -194,6 +203,35 @@ class Parameter:
         if isinstance(val, self.__type):
             return True
         return False
+
+    def __convenience_type_conversion(self, value):
+        """
+        Convert the value to the defined type.
+
+        This method will take the input value and do some type checking and
+        conversion.
+
+        The following conversions are supported:
+
+            - str input and Path type
+            - str input and HdfKey type
+
+        Parameters
+        ----------
+        value : any
+            The input value. This can be any datatype entered by the user.
+
+        Returns
+        -------
+        value : any
+            The value with the above mentioned type conversions applied.
+        """
+        if isinstance(value, str):
+            if self.__type == Path:
+                value = Path(value)
+            elif self.__type == HdfKey:
+                value = HdfKey(value)
+        return value
 
     @property
     def name(self):
@@ -372,6 +410,7 @@ class Parameter:
         -------
         None.
         """
+        val = self.__convenience_type_conversion(val)
         if self.__meta['choices'] and val not in self.__meta['choices']:
             raise ValueError(f'The selected value "{val}" does not correspond'
                              ' to any of the allowed choices: '

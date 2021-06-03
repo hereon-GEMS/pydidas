@@ -32,6 +32,7 @@ __all__ = []
 
 from skimage.io import imread
 
+from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
 from ...config import TIFF_EXTENSIONS
@@ -77,7 +78,7 @@ class TiffReader(ImageReader):
         """
         _data = imread(filename)
         assert len(_data.shape) == 2
-        self._image = _data
+        self._image = Dataset(_data)
         return self.return_image(**kwargs)
 
 

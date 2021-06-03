@@ -22,7 +22,7 @@
 
 """
 The parameter_collection module includes the ParameterCollection class which
-is an OrderedDict implementation with additional methods to get and set
+is an dict implementation with additional methods to get and set
 values of Parameters..
 """
 
@@ -34,16 +34,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterCollection']
 
-import collections
-
 from .parameter import Parameter
 
-
-class ParameterCollection(collections.OrderedDict):
+class ParameterCollection(dict):
     """
-    Ordered collection of parameters.
+    Ordered collection of parameters, implemented as subclass of dict.
 
-    The ParameterCollection is an ordered dictionary for Parameter instances
+    The ParameterCollection is a dictionary for Parameter instances
     with additional convenience rountines to easily get and set Parameter
     values.
     Items can be added at instantiation either as a dictionary or as keyword
@@ -55,20 +52,37 @@ class ParameterCollection(collections.OrderedDict):
     def __init__(self, *args, **kwargs):
         """Setup method."""
         super().__init__()
-        for param in args:
-            self.add_parameter(param)
-        for _key in kwargs:
-            if not isinstance(kwargs[_key], Parameter):
-                raise TypeError(('ParameterCollection only supports '
-                                 'Parameter objects as values.'))
-            self.__setitem__(_key, kwargs[_key])
+        self.add_params(*args, **kwargs)
 
-    def add_parameter(self, param):
-        """Method to add a parameter.
+    @staticmethod
+    def __raise_type_error(item):
+        """
+        Raise a TypeError that item is of wrong type.
 
         Parameters
         ----------
-        param : Parameter object
+        item : object
+            Any item.
+
+        Raises
+        ------
+        TypeError
+            Error message that object cannot be added to ParameterCollection.
+
+        Returns
+        -------
+        None.
+        """
+        raise TypeError(f'Cannot add object of type "{item.__class__}" '
+                        'to ParameterCollection.')
+
+    def add_param(self, param):
+        """
+        Add a parameter to the ParameterCollection.
+
+        Parameters
+        ----------
+        param : Parameter
             An instance of a Parameter object.
 
         Raises
@@ -83,35 +97,74 @@ class ParameterCollection(collections.OrderedDict):
         None.
         """
         if not isinstance(param, Parameter):
-            raise TypeError(('ParameterCollection only supports '
-                             'Parameter objects as values.'))
+            self.__raise_type_error(param)
         if param.name in self.keys():
             raise KeyError(f'A parameter with the name "{param.name}" '
                             'already exists.')
         self.__setitem__(param.refkey, param)
 
-    def remove_parameter_by_refkey(self, param_refkey):
+    def add_params(self, *params, **kwparams):
         """
-        Removoe a parameter from the collection.
+        Add parameters to the ParameterCollection.
+
+        This method adds Parameters to the ParameterCollection
+        Parameters can be either supplies individually as arguments or as
+        ParameterCollections or dictionaries.
 
         Parameters
         ----------
-        param_refkey : str
-            The reference key name of the parameter.
+        *params : Union[Parameter, dict, ParameterCollection]
+            Any Parameter or ParameterCollection
+        **kwparams : dict
+            A dictionary with Parameter values.
 
         Raises
         ------
-        KeyError
-            If no parameter with param_name has been registered.
+        TypeError
+
 
         Returns
         -------
         None.
         """
-        if param_refkey not in self.keys():
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                            'has been registered.')
-        self.__delitem__(param_refkey)
+        # perform all type checks before adding any items:
+        for _param in params:
+            if not isinstance(_param, (Parameter, ParameterCollection, dict)):
+                self.__raise_type_error(_param)
+        for _key in kwparams:
+            if not isinstance(kwparams[_key], Parameter):
+                self.__raise_type_error(kwparams[_key])
+
+        if isinstance(params, (ParameterCollection, dict)):
+            self.update(params)
+        else:
+            for _param in params:
+                if isinstance(_param, Parameter):
+                    self.add_param(_param)
+                elif isinstance(_param, (ParameterCollection, dict)):
+                    self.update(_param)
+        for _key in kwparams:
+            self.__setitem__(_key, kwparams[_key])
+
+    def get_copy(self):
+        """
+        Get a copy of the ParameterCollection.
+
+        This method will return a copy of the ParameterCollection with
+        a copy of each Parameter object.
+
+        Returns
+        -------
+        _copy : ParameterCollection
+            The copy of ParameterCollection with no shared objects.
+
+        """
+        _copy = ParameterCollection()
+        for _param in self.values():
+            _new_param = Parameter(*_param.dump())
+            _copy.add_param(_new_param)
+        return _copy
+
 
     def get_value(self, param_name):
         """

@@ -40,7 +40,6 @@ class ImageReader:
     def __init__(self, *args, **kwargs):
         """Initialization"""
         self._image = None
-        self._image_metadata = None
 
     def read_image(self, filename, **kwargs):
         """
@@ -98,7 +97,7 @@ class ImageReader:
             _image = rebin2d(_image, int(_binning))
         if _return_type not in ('auto', _image.dtype):
             _image = _image.astype(_return_type)
-        return _image, self._image_metadata
+        return _image
 
     @staticmethod
     def check_ROI(**kwargs):

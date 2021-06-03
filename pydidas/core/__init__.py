@@ -30,17 +30,26 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import composites
-from .composites import *
-
 from . import parameter
 from .parameter import *
+
+from . import dataset
+from .dataset import *
 
 from . import parameter_collection
 from .parameter_collection import *
 
-from . import dataset
-from .dataset import *
+from . import base_object_with_parameter_collection
+from .base_object_with_parameter_collection import *
+
+from . import composites
+from .composites import *
+
+from . import composite_image
+from .composite_image import *
+
+from . import generic_parameters
+from .generic_parameters import *
 
 from . import global_settings
 from .global_settings import *
@@ -57,11 +66,14 @@ from .hdf_key import *
 __all__ += composites.__all__
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
+__all__ += base_object_with_parameter_collection.__all__
 __all__ += dataset.__all__
 __all__ += global_settings.__all__
 __all__ += experimental_settings.__all__
 __all__ += scan_settings.__all__
 __all__ += hdf_key.__all__
+__all__ += composite_image.__all__
+__all__ += generic_parameters.__all__
 
 # Unclutter namespace: remove modules from namespace
 del composites
@@ -72,3 +84,6 @@ del experimental_settings
 del scan_settings
 del hdf_key
 del parameter_collection
+del base_object_with_parameter_collection
+del composite_image
+del generic_parameters

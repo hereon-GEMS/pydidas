@@ -26,8 +26,8 @@ STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 
 from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
-    ProcessingFullWorkflowFrame)
-
+    ProcessingFullWorkflowFrame, CompositeCreatorFrame)
+from pydidas.widgets.param_config import ParamConfigMixIn
 
 class HomeFrame(ToplevelFrame):
     def __init__(self, **kwargs):
@@ -64,11 +64,13 @@ class ProcessingFrame(ToplevelFrame):
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
-class ResultVisualizationFrame(ToplevelFrame):
+class ResultVisualizationFrame(ToplevelFrame, ParamConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
+        self.add_label('Result visualization', fontsize=14,
+                       gridPos=(0, 0, 1, 5))
 
 
 if __name__ == '__main__':
@@ -93,6 +95,7 @@ if __name__ == '__main__':
     gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
     gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
     gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
+    gui.register_frame('Composite image creator', 'Tools/Composite image creator', qta.icon('mdi.view-comfy'), CompositeCreatorFrame)
     gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame)
     gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame)
     gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)

@@ -69,7 +69,32 @@ class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
         super().__init__(parent, param, width)
         for choice in param.choices:
             self.addItem(f'{choice}')
+        self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
+
+    def __convert_bool(self, value):
+        """
+        Convert boolean integers to string.
+
+        This conversion is necessary because boolean "0" and "1" cannot be
+        interpreted as "True" and "False" straight away.
+
+        Parameters
+        ----------
+        value : any
+            The input value from the field. This could be any object.
+
+        Returns
+        -------
+        value : any
+            The input value, with 0/1 converted it True or False are
+            widget choices.
+        """
+        if value == 0 and 'False' in self.__items:
+            value = 'False'
+        elif value == 1 and 'True' in self.__items:
+            value = 'True'
+        return value
 
     def emit_signal(self):
         """
@@ -110,4 +135,6 @@ class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
         -------
         None.
         """
+        print(value, self.__items)
+        value = self.__convert_bool(value)
         self.setCurrentIndex(self.findText(f'{value}'))

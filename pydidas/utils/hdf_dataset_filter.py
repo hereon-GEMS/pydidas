@@ -30,7 +30,7 @@ __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys',
-           'get_hdf5_dataset_shape']
+           'get_hdf5_metadata']
 
 import os
 import pathlib
@@ -76,13 +76,12 @@ def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
         return True
     return False
 
-
-def get_hdf5_dataset_shape(fname, dset=None):
+def _get_hdf5_file_and_dataset_names(fname, dset=None):
     """
-    Get the shape of an hdf5 dataset.
+    Get the name of the file and an hdf5 dataset.
 
-    This function will return the shape of an hdf5 dataset. Input can be given
-    either with file name and dataset parameters or using the hdf5
+    This function will return the file name and dataset name. Input can be
+    given either with file name and dataset parameters or using the hdf5
     nomenclature with <filename>://</dataset> (note the total of 3 slashes).
 
     Parameters
@@ -102,8 +101,10 @@ def get_hdf5_dataset_shape(fname, dset=None):
 
     Returns
     -------
-    shape : tuple
-        The shape of the dataset.
+    fname : str
+        The filename (without and possible reference to the dataset).
+    dset : str
+        The internal path to the dataset.
 
     """
     if dset is not None:
@@ -120,11 +121,59 @@ def get_hdf5_dataset_shape(fname, dset=None):
         _fname = fname
 
     if _dset is None:
-        raise KeyError('No dataset specified. Cannot determine shape.')
+        raise KeyError('No dataset specified. Cannot access information.')
 
+    return _fname, _dset
+
+
+def get_hdf5_metadata(fname, meta, dset=None):
+    """
+    Get metadata about an hdf5 dataset.
+
+    This function will return the requested metadata of an hdf5 dataset.
+    Input can be given either with file name and dataset parameters or using
+    the hdf5 nomenclature with <filename>://</dataset> (note the total of
+    3 slashes). Dataset metadata include the following: dtype, shape, size,
+    ndim, nbytes
+
+    Parameters
+    ----------
+    fname : Union[str, pathlib.Path]
+        The filepath or path to filename and dataset.
+    meta : Union[str, iterable]
+        The metadata item(s). Accepted values are either an iterable (list or
+        tuple) of entries or a single string of the following: "dtype",
+        "shape", "size", "ndim" or "nbytes".
+    dset : str, optional
+        The optional dataset key, if not specified in the fname.
+        The default is None.
+
+    Returns
+    -------
+    meta : object
+        The return value. If exactly one metadata information has been
+        requested, this information is return is returned directly. If more
+        than one piece of information has been requested, a dictionary with
+        the information will be returned.
+    """
+    _fname, _dset = _get_hdf5_file_and_dataset_names(fname, dset)
+    if isinstance(meta, str):
+        meta = [meta]
+    _results = {}
     with h5py.File(_fname, 'r') as f:
-        shape = f[_dset].shape
-    return shape
+        if 'dtype' in meta:
+            _results['dtype'] = f[_dset].dtype
+        if 'shape' in meta:
+            _results['shape'] = f[_dset].shape
+        if 'size' in meta:
+            _results['size'] = f[_dset].size
+        if 'ndim' in meta:
+            _results['ndim'] = f[_dset].ndim
+        if 'nbytes' in meta:
+            _results['nbytes'] = f[_dset].nbytes
+    if len(_results) == 1:
+        _results = list(_results.values())[0]
+    return _results
 
 
 def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,

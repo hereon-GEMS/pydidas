@@ -34,15 +34,16 @@ __all__ = ['CompositeCreatorApp']
 import os
 import argparse
 from pathlib import Path
+from numbers import Integral
 
 import numpy as np
 
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
-from pydidas.core import Parameter, HdfKey, ParameterCollection
+from pydidas.core import Parameter, HdfKey, ParameterCollection, CompositeImage, get_generic_parameter
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
-                           get_hdf5_dataset_shape)
+                           get_hdf5_metadata)
 from pydidas.image_reader import read_image
 
 PARAM_TOOLTIPS = {
@@ -94,16 +95,16 @@ PARAM_TOOLTIPS = {
                   ' use_roi is enabled. Negative values will be modulated '
                   'with the image height, i.e. -1 is equivalent with the '
                   'full image size. The default is -1'),
-    'threshold_low': ('The lower threshold of the composite image. If a value'
-                      ' other than -1 is used, any pixels with a value below '
-                      'the threshold will be replaced by the threshold. A '
-                      'value of -1 will ignore the threshold. The default is '
-                      '0.'),
-    'threshold_high': ('The upper threshold of the composite image. If a value'
-                      ' other than -1 is used, any pixels with a value above '
-                      'the threshold will be replaced by the threshold. A '
-                      'value of -1 will ignore the threshold. The default is '
-                      '-1.'),
+    'threshold_low': ('The lower threshold of the composite image. If any '
+                      ' finite value (i.e. not np.nan) is used, any pixels '
+                      'with a value below the threshold will be replaced by '
+                      'the threshold. A value of np.nan will ignore the '
+                      'threshold. The default is np.nan.'),
+    'threshold_high': ('The upper threshold of the composite image. If any '
+                       ' finite value (i.e. not np.nan) is used, any pixels '
+                       'with a value above the threshold will be replaced by '
+                       'the threshold. A value of np.nan will ignore the '
+                       'threshold. The default is np.nan.'),
     'binning': ('The re-binning factor for the images in the composite. The '
                 'binning will be applied to the cropped images. The default '
                 'is 1.'),
@@ -112,16 +113,21 @@ PARAM_TOOLTIPS = {
 }
 
 DEFAULT_PARAMS = ParameterCollection(
-    Parameter('First file name', Path, default=Path(), refkey='first_file',
-              tooltip=PARAM_TOOLTIPS['first_file']),
+    get_generic_parameter('first_file'),
+    # Parameter('First file name', Path, default=Path(), refkey='first_file',
+    #           tooltip=PARAM_TOOLTIPS['first_file']),
     Parameter('Last file name', Path, default=Path(), refkey='last_file',
               tooltip=PARAM_TOOLTIPS['last_file']),
-    Parameter('Hdf dataset key', HdfKey, default=HdfKey(''), refkey='hdf_key',
-              tooltip=PARAM_TOOLTIPS['hdf_key']),
-    Parameter('First image number', int, default=0, refkey='hdf_first_num',
-              tooltip=PARAM_TOOLTIPS['hdf_first_num']),
-    Parameter('Last image number', int, default=-1, refkey='hdf_last_num',
-              tooltip=PARAM_TOOLTIPS['hdf_last_num']),
+
+    get_generic_parameter('hdf_key'),
+    get_generic_parameter('hdf_first_num'),
+    get_generic_parameter('hdf_last_num'),
+    # Parameter('Hdf dataset key', HdfKey, default=HdfKey(''), refkey='hdf_key',
+    #           tooltip=PARAM_TOOLTIPS['hdf_key']),
+    # Parameter('First image number', int, default=0, refkey='hdf_first_num',
+    #           tooltip=PARAM_TOOLTIPS['hdf_first_num']),
+    # Parameter('Last image number', int, default=-1, refkey='hdf_last_num',
+    #           tooltip=PARAM_TOOLTIPS['hdf_last_num']),
     Parameter('Subtract background image', int, default=0,
               refkey='use_bg_file', choices=[True, False],
               tooltip=PARAM_TOOLTIPS['use_bg_file']),
@@ -133,29 +139,44 @@ DEFAULT_PARAMS = ParameterCollection(
               tooltip=PARAM_TOOLTIPS['bg_hdf_num']),
     Parameter('Stepping', int, default=1, refkey='stepping',
               tooltip=PARAM_TOOLTIPS['stepping']),
-    Parameter('Number of images in x', int, default=1, refkey='composite_nx',
-              tooltip=PARAM_TOOLTIPS['composite_nx']),
-    Parameter('Number of images in y', int, default=-1, refkey='composite_ny',
-              tooltip=PARAM_TOOLTIPS['composite_ny']),
-    Parameter('Preferred composite direction', str, default='x',
-              refkey='composite_dir', choices=['x', 'y'],
-              tooltip=PARAM_TOOLTIPS['composite_dir']),
-    Parameter('Use ROI', int, default=0, refkey='use_roi',
-              choices=[True, False], tooltip=PARAM_TOOLTIPS['use_roi']),
-    Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow',
-              tooltip=PARAM_TOOLTIPS['roi_xlow']),
-    Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh',
-              tooltip=PARAM_TOOLTIPS['roi_xhigh']),
-    Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow',
-              tooltip=PARAM_TOOLTIPS['roi_ylow']),
-    Parameter('ROI upper y limit', int, default=-1, refkey='roi_yhigh',
-              tooltip=PARAM_TOOLTIPS['roi_yhigh']),
-    Parameter('Lower threshold', int, default=0, refkey='threshold_low',
-              tooltip=PARAM_TOOLTIPS['threshold_low']),
-    Parameter('Upper threshold', int, default=-1, refkey='threshold_high',
-              tooltip=PARAM_TOOLTIPS['threshold_high']),
-    Parameter('Binning factor', int, default=1, refkey='binning',
-              tooltip=PARAM_TOOLTIPS['binning']),
+    Parameter('Total number of images', int, default=-1, refkey='n_image',
+              tooltip=PARAM_TOOLTIPS['n_image']),
+    get_generic_parameter('composite_nx'),
+    get_generic_parameter('composite_ny'),
+    get_generic_parameter('composite_dir'),
+    get_generic_parameter('use_roi'),
+    get_generic_parameter('roi_xlow'),
+    get_generic_parameter('roi_xhigh'),
+    get_generic_parameter('roi_ylow'),
+    get_generic_parameter('roi_yhigh'),
+    get_generic_parameter('threshold_low'),
+    get_generic_parameter('threshold_high'),
+    get_generic_parameter('binning'),
+    # Parameter('Number of images in x', int, default=1, refkey='composite_nx',
+    #           tooltip=PARAM_TOOLTIPS['composite_nx']),
+    # Parameter('Number of images in y', int, default=-1, refkey='composite_ny',
+    #           tooltip=PARAM_TOOLTIPS['composite_ny']),
+    # Parameter('Preferred composite direction', str, default='x',
+    #           refkey='composite_dir', choices=['x', 'y'],
+    #           tooltip=PARAM_TOOLTIPS['composite_dir']),
+    # Parameter('Use ROI', int, default=0, refkey='use_roi',
+    #           choices=[True, False], tooltip=PARAM_TOOLTIPS['use_roi']),
+    # Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow',
+    #           tooltip=PARAM_TOOLTIPS['roi_xlow']),
+    # Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh',
+    #           tooltip=PARAM_TOOLTIPS['roi_xhigh']),
+    # Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow',
+    #           tooltip=PARAM_TOOLTIPS['roi_ylow']),
+    # Parameter('ROI upper y limit', int, default=-1, refkey='roi_yhigh',
+    #           tooltip=PARAM_TOOLTIPS['roi_yhigh']),
+    # Parameter('Lower threshold', float, default=np.nan,
+    #           refkey='threshold_low',
+    #           tooltip=PARAM_TOOLTIPS['threshold_low']),
+    # Parameter('Upper threshold', float, default=np.nan,
+    #           refkey='threshold_high',
+    #           tooltip=PARAM_TOOLTIPS['threshold_high']),
+    # Parameter('Binning factor', int, default=1, refkey='binning',
+    #           tooltip=PARAM_TOOLTIPS['binning']),
     Parameter('Composite image filename', Path, default=Path(),
               refkey='save_name', tooltip=PARAM_TOOLTIPS['save_name'])
 )
@@ -240,6 +261,8 @@ class CompositeCreatorApp(BaseApp):
         The name used for saving the composite image. None will default to
         no image saving. The default is None.
     """
+    default_params = DEFAULT_PARAMS
+
     def __init__(self, *args, **kwargs):
         """
         Create a CompositeCreatorApp instance.
@@ -257,20 +280,23 @@ class CompositeCreatorApp(BaseApp):
         """
         super().__init__(*args, **kwargs)
 
-        # update DEFAULT_PARAMS with command line entries:
         _cmdline_args = self.__parse_arguments()
-        for _key in DEFAULT_PARAMS:
+        self.set_default_params(self.default_params)
+        # update default_params with command line entries:
+        for _key in self.params:
             if _key in _cmdline_args:
-                DEFAULT_PARAMS.set_value(_key, _cmdline_args[_key])
+                self.params.set_value(_key, _cmdline_args[_key])
 
-        self.set_default_params(DEFAULT_PARAMS)
         self.__composite = None
         self.__file_list = None
         self.__hdffile = None
-        self.__img_shape = None
+        self.__raw_img_shape = None
         self.__n_image = None
         self.__file_path = None
         self.__bg_image = None
+        self.__roi = None
+        self.__final_image_size = None
+        self.__datatype = None
 
     @staticmethod
     def __parse_arguments():
@@ -328,9 +354,9 @@ class CompositeCreatorApp(BaseApp):
                             help=DEFAULT_PARAMS['save_name'].tooltip)
         return dict(vars(parser.parse_args()))
 
-    def __get_filelist(self):
+    def __create_filelist(self):
         """
-        Get the list of all files to be processed.
+        Create the list of all files to be processed.
 
         The list of files to be processed is created based on the filenames
         of the first and last files. The directory content will be sorted
@@ -381,6 +407,93 @@ class CompositeCreatorApp(BaseApp):
         self.__check_roi()
         self.__check_composite_dims()
         self.__check_and_set_bg_file()
+        self.__process_roi()
+
+    def __check_hdf_key(self, fname, key):
+        """
+        Veriy that the selected file has a dataset with key.
+
+        Parameters
+        ----------
+        fname : str
+            The filename and path.
+        key : str
+            The dataset key.
+
+        Raises
+        ------
+        AppConfigError
+            If the dataset key is not found in the hdf5 file.
+        Returns
+        -------
+        None.
+        """
+        dsets = get_hdf5_populated_dataset_keys(fname)
+        if key not in dsets:
+            raise AppConfigError(f'hdf_key "{key}" is not a valid key '
+                                 f'for the file "{fname}."')
+
+    def __check_file_exists(self, fname):
+        """
+        Check that a file exists and raise an Exception if not.
+
+        Parameters
+        ----------
+        fname : str
+            The filename and path.
+
+        Raises
+        ------
+        AppConfigError
+            If the selected filename does not exist.
+
+        Returns
+        -------
+        None.
+        """
+        if not os.path.isfile(fname):
+            raise AppConfigError(f'The selected filename "{fname}" does not '
+                                 ' point to a valid file.')
+
+    def __store_image_data_from_hdf_file(self):
+        _first_file = self.get_param_value('first_file')
+        _key = self.get_param_value('hdf_key')
+        self.__check_hdf_key(_first_file, _key)
+
+        _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
+        _n_image = _meta['shape'][0]
+        self.__raw_img_shape = _meta['shape'][1:3]
+        self.__datatype = _meta['dtype']
+        _n0 = self.__apply_param_modulo('hdf_first_image_num', _n_image)
+        _n1 = self.__apply_param_modulo('hdf_last_image_num', _n_image)
+        # correct total number of images for stepping *after* the
+        # numbers have been modulated to be in the image range.
+        self.__n_image = _n_image // self.get_param_value('stepping')
+        if not _n0 < _n1:
+            raise AppConfigError(
+                f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
+                'not describe a correct range.')
+
+    def __store_image_data_from_file_range(self):
+        _first_file = self.get_param_value('first_file')
+        _last_file = self.get_param_value('last_file')
+        _path1, _name1 = os.path.split(self.get_param_value('first_file'))
+        _path2, _name2 = os.path.split(self.get_param_value('last_file'))
+        if _path1 != _path2:
+            raise AppConfigError(
+                'The selected files are not in the same directory:\n'
+                f'{_first_file}\nand\n{_last_file}')
+        self.__create_filelist()
+        # check that all selected files are of the same size:
+        _fsizes = np.r_[[os.stat(f'{_path1}/{f}').st_size
+                         for f in self.__file_list]]
+        if _fsizes.std() > 0.:
+            raise AppConfigError('The selected files are not all of the '
+                                 'same size.')
+        _test_image = read_image(_first_file)
+        self.__datatype = _test_image.dtype
+        self.__raw_img_shape = _test_image.shape
+        self.__n_image = _fsizes.size // self.get_param_value('stepping')
 
     def __check_files(self):
         """
@@ -397,50 +510,47 @@ class CompositeCreatorApp(BaseApp):
         None
         """
         _first_file = self.get_param_value('first_file')
-        if not os.path.isfile(_first_file):
-            raise AppConfigError(f'first_file "{_first_file}" is not a valid '
-                                 'file!')
-        # check hdf5 key and dataset dimensions
+        self.__check_file_exists(_first_file)
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
             self.__hdffile = True
-            _key = self.get_param_value('hdf_key')
-            dsets = get_hdf5_populated_dataset_keys(_first_file)
-            if _key not in dsets:
-                raise AppConfigError(f'hdf_key "{_key}" is not a valid key '
-                                     f'for the file "{_first_file}."')
-            _shape = get_hdf5_dataset_shape(_first_file, _key)
-            _n_image = _shape[0]
-            self.__img_shape = _shape[1:3]
-            _n0 = self.__get_param_in_range('hdf_first_image_num', 0,
-                                            _n_image, _n_image)
-            _n1 = self.__get_param_in_range('hdf_last_image_num', 0,
-                                            _n_image, _n_image)
-            # correct total number of images for stepping *after* the
-            # numbers have been modulated to be in the image range.
-            self.__n_image = _n_image // self.get_param_value('stepping')
-            if not _n0 < _n1:
-                raise AppConfigError(
-                    f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
-                    'not describe a correct range.')
-        # case of non-hdf5 files: Check 2nd file and file range
+            self.__store_image_data_from_hdf_file()
         else:
             self.__hdffile = False
-            _last_file = self.get_param_value('last_file')
-            _path1, _name1 = os.path.split(self.get_param_value('first_file'))
-            _path2, _name2 = os.path.split(self.get_param_value('last_file'))
-            if _path1 != _path2:
-                raise AppConfigError(
-                    'The selected files are not in the same directory:\n'
-                    f'{_first_file}\nand\n{_last_file}')
-            self.__get_filelist()
-            # check that all selected files are of the same size:
-            _fsizes = np.r_[[os.stat(f'{_path1}/{f}').st_size
-                             for f in self.__file_list]]
-            if _fsizes.std() > 0.:
-                raise AppConfigError('The selected files are not all of the '
-                                     'same size.')
-            self.__img_shape = read_image(_first_file)[0].shape
-            self.__n_image = _fsizes.size // self.get_param_value('stepping')
+            self.__store_image_data_from_file_range()
+
+
+    def __apply_param_modulo(self, param_refkey, modulo):
+        """
+        Apply a modulo to a Parameter.
+
+        This method applies a modulo to a Parameter, referenced by its
+        refkey, for example for converting image sizes of -1 to the actual
+        detector dimensions.
+
+        Parameters
+        ----------
+        param_refkey : str
+            The reference key for the selected Parameter.
+        modulo : int
+            The mathematical modulo to be applied.
+
+        Raises
+        ------
+        ValueError
+            If the datatype of the selected Parameter is not integer.
+
+        Returns
+        -------
+        _val : int
+            The modulated Parameter value
+        """
+        _param = self.params[param_refkey]
+        if _param.type is not Integral:
+            raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
+                             ' is not integer.')
+        _val = np.mod(_param.value, modulo)
+        _param.value = _val
+        return _val
 
     def __check_and_set_bg_file(self):
         """
@@ -467,26 +577,20 @@ class CompositeCreatorApp(BaseApp):
         if not self.get_param_value('use_bg_file'):
             return
         _bg_file = self.get_param_value('bg_file')
-        if not os.path.isfile(_bg_file):
-            raise AppConfigError(f'bg_file "{_bg_file}" is not a valid '
-                                 'file!')
-        _roi, _img_pix_y, _img_pix_x = self.__get_roi_and_img_size()
+        self.__check_file_exists(_bg_file)
+        self.__process_roi()
         # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
-            _key = self.get_param_value('bg_hdf_key')
-            dsets = get_hdf5_populated_dataset_keys(_bg_file)
-            if _key not in dsets:
-                raise AppConfigError(f'bg_hdf_key "{_key}" is not a valid key '
-                                     f'for the file "{_bg_file}."')
-            _bg_image = read_image(self.get_param_value('bg_file'),
-                                   dataset=self.get_param_value('bg_hdf_key'),
-                                   binning=self.get_param_value('binning'),
-                                   imageNo=self.get_param_value('bg_hdf_num'),
-                                   ROI=_roi)[0]
+            self.__check_hdf_key(_bg_file, self.get_param_value('bg_hdf_key'))
+            _params = dict(dataset=self.get_param_value('bg_hdf_key'),
+                           binning=self.get_param_value('binning'),
+                           imageNo=self.get_param_value('bg_hdf_num'),
+                           ROI=self.__roi)
         else:
-            _bg_image = read_image(_bg_file, ROI=_roi,
-                                   binning=self.get_param_value('binning'))[0]
-        if not _bg_image.shape == (_img_pix_y, _img_pix_x):
+            _params = dict(binning=self.get_param_value('binning'),
+                           ROI=self.__roi)
+        _bg_image = read_image(_bg_file, **_params)
+        if not _bg_image.shape == self.__final_image_size:
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not the same image dimensions as the'
                                  'selected files.')
@@ -507,18 +611,14 @@ class CompositeCreatorApp(BaseApp):
         """
         if self.get_param_value('use_roi'):
             _warning = ''
-            _x0 = self.__get_param_in_range(
-                'roi_xlow', 0, self.__img_shape[1], self.__img_shape[1]
-                )
-            _x1 = self.__get_param_in_range(
-                'roi_xhigh', 0, self.__img_shape[1], self.__img_shape[1]
-                )
-            _y0 = self.__get_param_in_range(
-                'roi_ylow', 0, self.__img_shape[0], self.__img_shape[0]
-                )
-            _y1 = self.__get_param_in_range(
-                'roi_yhigh', 0, self.__img_shape[0], self.__img_shape[0]
-                )
+            _x0 = self.__apply_param_modulo('roi_xlow',
+                                            self.__raw_img_shape[1])
+            _x1 = self.__apply_param_modulo('roi_xhigh',
+                                            self.__raw_img_shape[1])
+            _y0 = self.__apply_param_modulo('roi_ylow',
+                                            self.__raw_img_shape[0])
+            _y1 = self.__apply_param_modulo('roi_yhigh',
+                                            self.__raw_img_shape[0])
             if _x1 < _x0:
                 _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]'
             if _y1 < _y0:
@@ -558,22 +658,14 @@ class CompositeCreatorApp(BaseApp):
                 'The selected composite dimensions are too large for all'
                 f'images. (nx={_nx}, ny={_ny}, n={self.__n_image})')
 
-    def __get_roi_and_img_size(self):
-        """
-        Get the ROI and image size.
 
-        This method calculates the ROI and image size based on the ROI flag
-        and boundaries.
+    def __process_roi(self):
+        """
+        Process and ROI inputs and store the ROI.
 
         Returns
         -------
-        roi : Union[tuple, None]
-            If the use_roi flag is set, a tuple of 2 slice objects for y and x
-            is returned. If not, the return value is None.
-        img_pix_y : int
-            The number of pixels in the image in y direction.
-        img_pix_x : int
-            The number of pixels in the image in x direction.
+        None
         """
         _binning = self.get_param_value('binning')
         if self.get_param_value('use_roi'):
@@ -581,14 +673,13 @@ class CompositeCreatorApp(BaseApp):
             _y1 = self.get_param_value('roi_yhigh')
             _x0 = self.get_param_value('roi_xlow')
             _x1 = self.get_param_value('roi_xhigh')
-            img_pix_x = (_x1 - _x0) // _binning
-            img_pix_y = (_y1 - _y0) // _binning
-            roi = (slice(_y0, _y1 + 1), slice(_x0, _x1 + 1))
+            self.__final_image_size = ((_y1 - _y0) // _binning,
+                                         (_x1 - _x0) // _binning)
+            self.__roi = (slice(_y0, _y1 + 1), slice(_x0, _x1 + 1))
         else:
-            img_pix_x = self.__img_shape[1] // _binning
-            img_pix_y = self.__img_shape[0] // _binning
-            roi = None
-        return roi, img_pix_y, img_pix_x
+            self.__final_image_size = (self.__raw_img_shape[0] // _binning,
+                                       self.__raw_img_shape[1] // _binning)
+            self.__roi = None
 
     def __put_image_in_composite(self, image, index):
         """
@@ -609,34 +700,72 @@ class CompositeCreatorApp(BaseApp):
         -------
         None.
         """
-        _roi, _img_pix_y, _img_pix_x = self.__get_roi_and_img_size()
         if self.get_param_value('composite_dir') == 'x':
             _iy = index // self.get_param_value('composite_nx')
             _ix = index % self.get_param_value('composite_nx')
         else:
             _iy = index % self.get_param_value('composite_ny')
             _ix = index // self.get_param_value('composite_ny')
-        del _roi
-        yslice = slice(_iy * _img_pix_y, (_iy + 1) * _img_pix_y)
-        xslice = slice(_ix * _img_pix_x, (_ix + 1) * _img_pix_x)
+        yslice = slice(_iy * self.__final_image_size[0],
+                       (_iy + 1) * self.__final_image_size[0])
+        xslice = slice(_ix * self.__final_image_size[1],
+                       (_ix + 1) * self.__final_image_size[1])
         if self.__bg_image is not None:
             image -= self.__bg_image
         self.__composite[yslice, xslice] = image
 
-    def __apply_thresholds(self):
+    def apply_thresholds(self, low=None, high=None):
         """
         Apply thresholds to the composite image.
+
+        This method is a wrapper for the apply_thresholds method of the
+        CompositeImage object.
+
+        Parameters
+        ----------
+        low : Union[float, None], optional
+            The lower threshold. If None, the stored lower thresholds from
+            the ParameterCollection will be used. The default is None.
+        high : Union[float, None], optional
+            The upper threshold. If None, the stored upper thresholds from
+            the ParameterCollection will be used. The default is None.
 
         Returns
         -------
         None.
         """
-        _thresh_low= self.get_param_value('threshold_low')
-        if _thresh_low != -1:
-            self.__composite[self.__composite < _thresh_low] = _thresh_low
-        _thresh_high = self.get_param_value('threshold_high')
-        if _thresh_high != -1:
-            self.__composite[self.__composite > _thresh_high] = _thresh_high
+        self.__composite.apply_thresholds(low, high)
+
+
+    def __get_args_for_read_image(self, index):
+        if self.__hdffile:
+            _params = dict(dataset=self.get_param_value('hdf_key'),
+                           binning=self.get_param_value('binning'),
+                           ROI=self.__roi, imageNo=index)
+            _fname = self.get_param_value('first_file')
+        else:
+            _fname = os.path.join(self.__file_path, self.__file_list[index])
+            _params = dict(binning=self.get_param_value('binning'),
+                           ROI=self.__roi)
+        return _fname, _params
+
+    def prepare_run(self):
+        """
+        Prepare running the composite creation.
+
+        This method will check all settings and create the composite image.
+
+        Returns
+        -------
+        None.
+        """
+        self.check_entries()
+        self.__composite = CompositeImage(
+            image_shape=self.__final_image_size,
+            composite_nx=self.get_param_value('composite_nx'),
+            composite_ny=self.get_param_value('composite_ny'),
+            composite_dir=self.get_param_value('composite_dir'),
+            datatype=self.__datatype)
 
     def run(self, *args, **kwargs):
         """
@@ -656,32 +785,25 @@ class CompositeCreatorApp(BaseApp):
         None.
 
         """
-        save_name = kwargs.get('save_name', None)
         self.check_entries()
-        _roi, _img_pix_y, _img_pix_x = self.__get_roi_and_img_size()
-        self.__composite = np.zeros(
-            (self.get_param_value('composite_ny') * _img_pix_y,
-             self.get_param_value('composite_nx') * _img_pix_x)
-        )
-        if self.__hdffile:
-            for i in range(self.get_param_value('hdf_first_num'),
-                           self.get_param_value('hdf_last_num') + 1,
-                           self.get_param_value('stepping')):
-                _image = read_image(self.get_param_value('first_file'),
-                                    dataset=self.get_param_value('hdf_key'),
-                                    binning=self.get_param_value('binning'),
-                                    ROI=_roi, imageNo=i)[0]
-                self.__put_image_in_composite(
-                    _image, i - self.get_param_value('hdf_first_num')
-                )
-        else:
-            for i, fname in enumerate(self.__file_list):
-                _path = os.path.join(self.__file_path, fname)
-                _image = read_image(_path, ROI=_roi,
-                                    binning=self.get_param_value('binning'))[0]
-                self.__put_image_in_composite(_image, i)
+        save_name = kwargs.get('save_name', None)
+        if self.__composite is None:
+            self.prepare_run()
 
-        self.__apply_thresholds()
+        self.__composite.print_param_values()
+        if self.__hdffile:
+            _range = range(self.get_param_value('hdf_first_num'),
+                           self.get_param_value('hdf_last_num') + 1,
+                           self.get_param_value('stepping'))
+        else:
+            _range = range(len(self.__file_list))
+
+        for compindex, imgindex in enumerate(_range):
+            _fname, _kwargs = self.__get_args_for_read_image(imgindex)
+            self.__composite.insert_image(read_image(_fname, **_kwargs),
+                                          compindex)
+
+        self.apply_thresholds()
         save_name = (save_name if save_name is not None
                      else self.get_param_value('save_name'))
         if (save_name is not None
@@ -699,4 +821,4 @@ class CompositeCreatorApp(BaseApp):
             The composite image in np.ndarray format.
 
         """
-        return self.__composite
+        return self.__composite.image

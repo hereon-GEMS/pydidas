@@ -32,6 +32,7 @@ __all__ = []
 
 import numpy as np
 
+from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
 from ...config import BINARY_EXTENSIONS
@@ -94,7 +95,8 @@ class RawReader(ImageReader):
             raise KeyError('The number of pixels in x has not been specified.')
         if ny is None:
             raise KeyError('The number of pixels in y has not been specified.')
-        self._image = np.fromfile(filename, dtype=datatype).reshape(ny, nx)
+        self._image = Dataset(
+            np.fromfile(filename, dtype=datatype).reshape(ny, nx))
         return self.return_image(**kwargs)
 
 

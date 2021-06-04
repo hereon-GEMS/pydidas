@@ -43,16 +43,24 @@ class ParameterCollection(dict):
     The ParameterCollection is a dictionary for Parameter instances
     with additional convenience rountines to easily get and set Parameter
     values.
-    Items can be added at instantiation either as a dictionary or as keyword
-    arguments. Keywords will be converted to keys for the
+    Items can be added at instantiation either as single Parameters,
+    ParameterCollections or as keyword arguments. Keywords will be converted
+    to keys for the associated Parameters.
 
     Parameters
     ----------
+    *args : Union[Parameter, ParameterCollection]
+        Any number of Parameter or ParameterCollection instances
+    **kwargs : dict
+        Any number of Parameters
     """
     def __init__(self, *args, **kwargs):
         """Setup method."""
         super().__init__()
         self.add_params(*args, **kwargs)
+
+    def __copy__(self):
+        return self.get_copy()
 
     @staticmethod
     def __raise_type_error(item):
@@ -68,13 +76,74 @@ class ParameterCollection(dict):
         ------
         TypeError
             Error message that object cannot be added to ParameterCollection.
-
-        Returns
-        -------
-        None.
         """
-        raise TypeError(f'Cannot add object of type "{item.__class__}" '
-                        'to ParameterCollection.')
+        raise TypeError(f'Cannot add object "{item}" of type '
+                        '"{item.__class__}" to ParameterCollection.')
+
+    def __add_arg_params(self, *params):
+        """
+        Add the passed parameters to the ParameterCollection.
+
+        Parameters
+        ----------
+        *params : Union[Parameter, ParameterCollection]
+            Single Parameters or ParameterCollections.
+        """
+        if isinstance(params, (ParameterCollection)):
+            self.update(params)
+        else:
+            for _param in params:
+                if isinstance(_param, Parameter):
+                    self.add_param(_param)
+                elif isinstance(_param, (ParameterCollection, dict)):
+                    self.update(_param)
+
+    def __add_kwarg_params(self, **kwparams):
+        """
+        Add the passed keyword parameters to the ParameterCollection.
+
+        Parameters
+        ----------
+        **kwparams : dict
+            A dictionary of keyword arguments.
+        """
+        for _key in kwparams:
+            assert _key == kwparams[_key].refkey
+            self.__setitem__(_key, kwparams[_key])
+
+    def __check_arg_types(self, *args):
+        """
+        Check the types of input arguments.
+
+        This method verifies that all passed arguments are either Parameters
+        or ParameterCollections.
+
+        This method
+        Parameters
+        ----------
+        *params : any
+            Any arguments.
+        """
+        for _param in args:
+            if not isinstance(_param, (Parameter, ParameterCollection)):
+                self.__raise_type_error(_param)
+
+    def __check_kwarg_types(self, **kwargs):
+        """
+        Check the types of input keyword arguments.
+
+        This method verifies that all passed arguments are either Parameters
+        or ParameterCollections.
+
+        This method
+        Parameters
+        ----------
+        *kwargs : any
+            Any keyword arguments.
+        """
+        for _key in kwargs:
+            if not isinstance(kwargs[_key], Parameter):
+                self.__raise_type_error(kwargs[_key])
 
     def add_param(self, param):
         """
@@ -91,13 +160,8 @@ class ParameterCollection(dict):
             If the passed param argument is not a Parameter instance.
         KeyError
             If an entry with param.name already exists.
-
-        Returns
-        -------
-        None.
         """
-        if not isinstance(param, Parameter):
-            self.__raise_type_error(param)
+        self.__check_arg_types(param)
         if param.name in self.keys():
             raise KeyError(f'A parameter with the name "{param.name}" '
                             'already exists.')
@@ -117,34 +181,12 @@ class ParameterCollection(dict):
             Any Parameter or ParameterCollection
         **kwparams : dict
             A dictionary with Parameter values.
-
-        Raises
-        ------
-        TypeError
-
-
-        Returns
-        -------
-        None.
         """
         # perform all type checks before adding any items:
-        for _param in params:
-            if not isinstance(_param, (Parameter, ParameterCollection, dict)):
-                self.__raise_type_error(_param)
-        for _key in kwparams:
-            if not isinstance(kwparams[_key], Parameter):
-                self.__raise_type_error(kwparams[_key])
-
-        if isinstance(params, (ParameterCollection, dict)):
-            self.update(params)
-        else:
-            for _param in params:
-                if isinstance(_param, Parameter):
-                    self.add_param(_param)
-                elif isinstance(_param, (ParameterCollection, dict)):
-                    self.update(_param)
-        for _key in kwparams:
-            self.__setitem__(_key, kwparams[_key])
+        self.__check_arg_types(*params)
+        self.__check_kwarg_types(*kwparams)
+        self.__add_arg_params(*params)
+        self.__add_kwarg_params(**kwparams)
 
     def get_copy(self):
         """
@@ -157,7 +199,6 @@ class ParameterCollection(dict):
         -------
         _copy : ParameterCollection
             The copy of ParameterCollection with no shared objects.
-
         """
         _copy = ParameterCollection()
         for _param in self.values():
@@ -219,10 +260,6 @@ class ParameterCollection(dict):
         ------
         KeyError
             If the key <param_name> is not registered.
-
-        Returns
-        -------
-        None
         """
         if param_name not in self.keys():
             raise KeyError(f'No parameter with the name "{param_name}" '

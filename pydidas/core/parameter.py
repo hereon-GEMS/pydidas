@@ -301,7 +301,7 @@ class Parameter:
         elif self.type == str:
             _t += ' (type: str)'
         else:
-            _t += f' (type: {str(self.type)}'
+            _t += f' (type: {str(self.type)})'
         return _t.replace(') (', ', ')
 
     @property
@@ -445,16 +445,16 @@ class Parameter:
         return self.__meta['optional']
 
 
-    def get_type(self):
+    def get_copy(self):
         """
-        A method to get the parameter data type.
+        A method to get the a copy of the Parameter object.
 
         Returns
         -------
-        object
-            The class of the data type.
+        Parameter
+            A full copy of the object.
         """
-        return self.__type
+        return Parameter(*self.dump())
 
     def dump(self):
         """
@@ -513,3 +513,6 @@ class Parameter:
             _s += ', optional'
         _s += f'): {_val} {_unit}(default: {_def})>'
         return _s
+
+    def __copy__(self):
+        return self.get_copy()

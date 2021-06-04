@@ -75,7 +75,6 @@ class ToplevelFrame(QtWidgets.QFrame):
             _layout = QtWidgets.QGridLayout(self)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
-            self.layout_meta = dict(set=True, grid=True, row=0)
         self.initialized = False
         self.name = name if name else ''
 
@@ -117,7 +116,6 @@ class ToplevelFrame(QtWidgets.QFrame):
         -------
         None.
         """
-        pass
 
     def _initialize(self):
         """
@@ -147,12 +145,10 @@ class ToplevelFrame(QtWidgets.QFrame):
         """
         self.status_msg.emit(text)
 
-    def add_textbox(self, text, fontsize=STANDARD_FONT_SIZE, underline=False,
-                    bold=False, gridPos=None, width=400):
+    def add_text_widget(self, text, fontsize=STANDARD_FONT_SIZE,
+                        underline=False, bold=False, gridPos=None, width=400):
         """
         Add a label textbox to the frame.
-
-
 
         Parameters
         ----------
@@ -184,7 +180,7 @@ class ToplevelFrame(QtWidgets.QFrame):
         _l.setFont(self.font)
         _l.setFixedWidth(width)
         _l.setWordWrap(True)
-        if gridPos:
+        if gridPos is not None:
             self.layout().addWidget(_l, *gridPos)
         else:
             self.layout().addWidget(_l)

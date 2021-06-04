@@ -75,14 +75,14 @@ class ProcessingFullWorkflowFrame(ToplevelFrame, ParamConfigMixIn):
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
 
-        self.add_label('Full processing workflow', fontsize=14,
-                       gridPos=(0, 0, 1, 5))
+        self.add_label_widget('Full processing workflow', fontsize=14,
+                              gridPos=(0, 0, 1, 5))
 
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         self.w_verify_cfg = self.add_button('Verify all settings', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('mdi.text-search'))
 
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.add_param(self.params['run_type'])
+        self.add_param_widget(self.params['run_type'])
 
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         self.w_run = self.add_button('Run', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('fa5s.play'))
@@ -91,60 +91,6 @@ class ProcessingFullWorkflowFrame(ToplevelFrame, ParamConfigMixIn):
         self.w_run = self.add_button('Processing feedback', gridPos=(self.next_row(), 0, 2, 4))
         self.w_run.setFixedHeight(200)
         self.w_run.setFixedWidth(600)
-
-        # self.add_label('Select image', fontsize=12,
-        #                gridPos=(self.next_row(), 0, 1, 2))
-        # self.add_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
-
-        # # create button group for switching between
-        # _frame = QtWidgets.QFrame()
-        # _radio1 = QtWidgets.QRadioButton('Using image number', _frame)
-        # _radio2 = QtWidgets.QRadioButton('Using scan position', _frame)
-        # _radio1.setChecked(True)
-        # _layout.addWidget(_radio1, self.next_row(), 0, 1, 2)
-        # _layout.addWidget(_radio2, self.next_row(), 0, 1, 2)
-        # _radio1.toggled.connect(self.select_image_nr)
-        # _row = self.next_row()
-        # _iow = 40
-        # _txtw = 120
-        # self.add_param(self.params['image_nr'], row=_row, width=_iow,
-        #                textwidth = _txtw)
-        # self.add_param(self.params['scan_index1'], row=_row, width=_iow,
-        #                textwidth = _txtw)
-        # self.add_param(self.params['scan_index2'], width=_iow,
-        #                textwidth = _txtw)
-        # self.add_param(self.params['scan_index3'], width=_iow,
-        #                textwidth = _txtw)
-        # self.add_param(self.params['scan_index4'], width=_iow,
-        #                textwidth = _txtw)
-        # self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        # for i in range(1, 5):
-        #     self.param_widgets[f'scan_index{i}'].setVisible(False)
-        #     self.param_textwidgets[f'scan_index{i}'].setVisible(False)
-        # self.add_label('Select plugin', fontsize=12, width=250,
-        #                gridPos=(self.next_row(), 0, 1, 2))
-
-        # self.add_param(self.params['plugins'], n_columns=2, width=250,
-        #                n_columns_text=2, linebreak=True,
-        #                halign_text=QtCore.Qt.AlignLeft)
-
-        # self.w_plugin_info = ReadOnlyTextWidget(None, fixedWidth=250,
-        #                                         fixedHeight=250)
-        # _layout.addWidget(self.w_plugin_info, self.next_row(), 0, 1, 2,
-        #                   QtCore.Qt.AlignTop)
-
-        # self.button_plugin_input = self.add_button(
-        #     'Show plugin input data', enabled=False,
-        #     gridPos=(self.next_row(), 0, 1, 2))
-        # self.button_plugin_exec = self.add_button(
-        #     'Execute plugin && show ouput data', enabled=False,
-        #     gridPos=(self.next_row(), 0, 1, 2))
-        # self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
-        #                 policy=QtWidgets.QSizePolicy.Expanding)
-        # self.w_output_data = QtWidgets.QStackedWidget(self)
-        # self.w_output_data.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-        #                                  QtWidgets.QSizePolicy.Expanding)
-
 
 
     def select_image_nr(self, active):

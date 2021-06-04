@@ -36,15 +36,40 @@ import pathlib
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
-from .io_widget_combo import IOwidget_combo
-from .io_widget_file import IOwidget_file
-from .io_widget_line import IOwidget_line
-from .io_widget_hdfkey import IOwidget_hdfkey
+from .input_widget_combo import InputWidgetCombo
+from .input_widget_file import InputWidgetFile
+from .input_widget_line import InputWidgetLine
+from .input_widget_hdfkey import InputWidgetHdfKey
 
 from ..utilities import excepthook
 from ...config import STANDARD_FONT_SIZE
 from ...core import HdfKey
 from ..._exceptions import WidgetLayoutError
+
+
+def param_widget_factory(param, widget_width):
+    if param.choices:
+        _widget = InputWidgetCombo(None, param, widget_width)
+    else:
+        if param.type == pathlib.Path:
+            _widget =  InputWidgetFile(None, param, widget_width)
+        elif param.type == HdfKey:
+            _widget =  InputWidgetHdfKey(None, param, widget_width)
+        else:
+            _widget =  InputWidgetLine(None, param, widget_width)
+    _widget.set_value(param.value)
+    return _widget
+
+
+def text_widget_factory(param, width, alignment=None):
+    _txt = QtWidgets.QLabel(f'{param.name}:')
+    _txt.setFixedWidth(width)
+    _txt.setFixedHeight(20)
+    _txt.setToolTip(param.tooltip)
+    _txt.setMargin(0)
+    if alignment is not None:
+        _txt.setAlignment(alignment)
+    return _txt
 
 
 class ParamConfigMixIn:
@@ -57,6 +82,68 @@ class ParamConfigMixIn:
         self.param_widgets = {}
         self.params = {}
         self.param_textwidgets = {}
+
+    def __get_layout_args(self, config):
+        """
+        Get the layout insertion arguments based on config.
+
+        Parameters
+        ----------
+        config : dict
+            The dictionary with the layout formatting arguments.
+
+        Returns
+        -------
+        _txt_args : tuple
+            The tuple with the layout formatting args for the text widget.
+        _io_args : tuple
+            The tuple with the layout formatting args for the input widget.
+        """
+        if isinstance(self.layout(), QtWidgets.QGridLayout):
+            _txt_args = (config['row'], config['column'], 1,
+                         config['n_columns_text'],
+                         config['valign_text'] | config['halign_text'])
+            _io_args = (config['row'] + config['linebreak'],
+                        config['column'] + 1 - config['linebreak'], 1,
+                        config['n_columns'],
+                        config['valign_io'] | config['halign_io'])
+        else:
+            _txt_args = (0, QtCore.Qt.AlignRight)
+            _io_args = (0, QtCore.Qt.AlignRight)
+        return _txt_args, _io_args
+
+    def __get_config(self, **kwargs):
+        """
+        Get the config with kwargs formatting options.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            All possible formatting options.
+
+        Returns
+        -------
+        config : dict
+            The full formatting options, updated with the default values.
+        """
+        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
+                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
+        config = {'row': _row,
+                  'column': kwargs.get('column', 0),
+                  'width_text': kwargs.get('width_text', 120),
+                  'width': kwargs.get('width', 255),
+                  'n_columns_text': kwargs.get('n_columns_text', 1),
+                  'n_columns': kwargs.get('n_columns', 1),
+                  'linebreak': kwargs.get('linebreak', False),
+                  'halign_io': kwargs.get('halign_io',
+                                          QtCore.Qt.AlignRight),
+                  'halign_text': kwargs.get('halign_text',
+                                            QtCore.Qt.AlignRight),
+                  'valign_io': kwargs.get('valign_io',
+                                          QtCore.Qt.AlignVCenter),
+                  'valign_text': kwargs.get('valign_text',
+                                            QtCore.Qt.AlignVCenter)}
+        return config
 
     def update_param_value(self, key, value):
         """
@@ -78,10 +165,6 @@ class ParamConfigMixIn:
         ------
         KeyError
             If no parameter or widget has been registered with this key.
-
-        Returns
-        -------
-        None.
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
@@ -106,10 +189,6 @@ class ParamConfigMixIn:
         ------
         KeyError
             If no widget has been registered with this key.
-
-        Returns
-        -------
-        None.
         """
         if key not in self.param_textwidgets or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
@@ -135,10 +214,6 @@ class ParamConfigMixIn:
             The default is None.
         gridPos : Union[list, tuple, None], optional
             The
-
-        Returns
-        -------
-        None.
         """
         w = QtWidgets.QLabel(text)
         if fontsize != STANDARD_FONT_SIZE:
@@ -194,74 +269,25 @@ class ParamConfigMixIn:
         valign_text : QtCore.Qt.Alignment, optional
             The vertical alignment for the text (label) widget. The default
             is QtCore.Qt.AlignTop.
-
-        Returns
-        -------
-        None.
         """
-        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
-                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
-        self._cfg = {'row': _row,
-                     'column': kwargs.get('column', 0),
-                     'width_text': kwargs.get('width_text', 120),
-                     'width': kwargs.get('width', 255),
-                     'n_columns_text': kwargs.get('n_columns_text', 1),
-                     'n_columns': kwargs.get('n_columns', 1),
-                     'linebreak': kwargs.get('linebreak', False),
-                     'halign_io': kwargs.get('halign_io',
-                                             QtCore.Qt.AlignRight),
-                     'halign_text': kwargs.get('halign_text',
-                                               QtCore.Qt.AlignRight),
-                     'valign_io': kwargs.get('valign_io',
-                                             QtCore.Qt.AlignTop),
-                     'valign_text': kwargs.get('valign_text',
-                                               QtCore.Qt.AlignTop)
-            }
-
-        _txt = QtWidgets.QLabel(f'{param.name}:')
-        _txt.setFixedWidth(self._cfg['width_text'])
-        _txt.setFixedHeight(25)
-        _txt.setToolTip(param.tooltip)
-
-        # create an io widget depending on the Parameter.
-        if param.choices:
-            _io = IOwidget_combo(None, param, self._cfg['width'])
-        else:
-            if param.type == pathlib.Path:
-                _io = IOwidget_file(None, param, self._cfg['width'])
-            elif param.type == HdfKey:
-                _io = IOwidget_hdfkey(None, param, self._cfg['width'])
-            else:
-                _io = IOwidget_line(None, param, self._cfg['width'])
-
-        _io.io_edited.connect(partial(self.set_param_value, param, _io))
-        _io.set_value(param.value)
+        _config = self.__get_config(**kwargs)
+        _text_widget = text_widget_factory(param, _config['width_text'],
+                                           _config['valign_text'])
+        _input_widget = param_widget_factory(param, _config['width'])
+        _input_widget.io_edited.connect(
+            partial(self.set_param_value, param, _input_widget)
+            )
 
         # store references to the widgets:
-        self.param_widgets[param.refkey] = _io
-        self.param_textwidgets[param.refkey] = _txt
+        self.param_widgets[param.refkey] = _input_widget
+        self.param_textwidgets[param.refkey] = _text_widget
 
         # add widgets to layout:
         if self.layout() is None:
             raise WidgetLayoutError('No layout set.')
-        if isinstance(self.layout(), QtWidgets.QGridLayout):
-            _vs = self.layout().verticalSpacing()
-            self.layout().setVerticalSpacing(0)
-            self.layout().addWidget(
-                _txt, self._cfg['row'], self._cfg['column'], 1,
-                self._cfg['n_columns_text'],
-                self._cfg['valign_text'] | self._cfg['halign_text'])
-            self.layout().addWidget(
-                _io, self._cfg['row'] + self._cfg['linebreak'],
-                self._cfg['column'] + 1 - self._cfg['linebreak'], 1,
-                self._cfg['n_columns'],
-                self._cfg['valign_io'] | self._cfg['halign_io'])
-            self.layout().setVerticalSpacing(_vs)
-        else:
-            _l = QtWidgets.QHBoxLayout()
-            _l.addWidget(_txt, 0, QtCore.Qt.AlignRight)
-            _l.addWidget(_io, 0, QtCore.Qt.AlignRight)
-            self.layout().addLayout(_l)
+        _text_widget_args, _input_widget_args = self.__get_layout_args(_config)
+        self.layout().addWidget(_text_widget, *_text_widget_args)
+        self.layout().addWidget(_input_widget, *_input_widget_args)
 
     def get_param_value(self, key):
         """

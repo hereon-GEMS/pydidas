@@ -43,7 +43,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from pydidas.apps import CompositeCreatorApp
 from pydidas.gui.toplevel_frame import ToplevelFrame
-from pydidas.core import Parameter, HdfKey, ParameterCollectionMixIn
+from pydidas.core import Parameter, HdfKey, ParameterCollectionMixIn, get_generic_parameter
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.widgets import ReadOnlyTextWidget
 from pydidas.widgets.dialogues import Hdf5DatasetSelection
@@ -52,25 +52,10 @@ from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_metadata)
 
 
-_params = {
-    'first_file': Parameter('First file name', Path, default=Path(), refkey='first_file'),
-    'last_file': Parameter('Last file name', Path, default=Path(), refkey='last_file'),
-    'hdf_key': Parameter('Hdf image key (dataset)', HdfKey, default=HdfKey(''), refkey='hdf_key'),
-    'hdf_first_num': Parameter('First image number', int, default=0, refkey='hdf_first_num'),
-    'hdf_last_num': Parameter('Last image number', int, default=-1, refkey='hdf_last_num'),
-    'stepping': Parameter('Stepping', int, default=1, refkey='stepping'),
-    'n_image': Parameter('Total number of images', int, default=-1, refkey='n_image'),
-    'composite_nx': Parameter('Number of images in x', int, default=1, refkey='composite_nx'),
-    'composite_ny': Parameter('Number of images in y', int, default=-1, refkey='composite_ny'),
-    'roi_xlow': Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow'),
-    'roi_xhigh': Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh'),
-    'roi_ylow': Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow'),
-    'roi_yhigh': Parameter('ROI upper y limit', int, default=-1, refkey='roi_yhigh'),
-    'rebin': Parameter('Rebinning factor', int, default=1, refkey='rebin'),
-    }
-
 
 class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollectionMixIn):
+    CONFIG_WIDGET_WIDTH = 300
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
@@ -78,14 +63,13 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         self.add_param(Parameter('Total number of images', int, default=-1,
                                  refkey='n_image'))
         self.__select_info = {'hdf_images': None}
-        print('starting widget setup')
         self.init_widgets()
         self.connect_signals()
 
     def init_widgets(self):
         _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+        _layout.setHorizontalSpacing(5)
+        _layout.setVerticalSpacing(8)
 
         self.add_label_widget('Composite image creator', fontsize=14,
                        gridPos=(0, 0, 1, 5))
@@ -93,19 +77,28 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         self.b_clear = self.add_button('Clear all entries',
                                        gridPos=(self.next_row(), 0, 1, 2))
 
-        # special formatting for first_file, last_file and hdf_key:
-        for _key in ['first_file', 'last_file', 'hdf_key']:
-            self.add_param_widget(self.params[_key], linebreak=True,
-                           halign_text=QtCore.Qt.AlignLeft, n_columns_text=2,
-                           n_columns=2, width= 250, width_text=200)
-
         self.w_selection_info = ReadOnlyTextWidget(
-            fixedWidth=250, fixedHeight=90, visible=False)
-        _layout.addWidget(self.w_selection_info, self.next_row(), 0, 1, 2)
+            fixedWidth=self.CONFIG_WIDGET_WIDTH, fixedHeight=60, visible=False
+            )
 
-        for _key in [key for key in self.params
-                     if key not in self.param_widgets.keys()]:
-            self.add_param_widget(self.params[_key], width=100, width_text=140)
+        # special formatting for first_file, last_file and hdf_key:
+        for _key in self.params:
+            if _key in ['first_file', 'last_file', 'hdf_key', 'bg_file',
+                        'bg_hdf_key']:
+                _options = dict(linebreak=True, n_columns=2, n_columns_text=2,
+                                halign_text=QtCore.Qt.AlignLeft,
+                                valign_text=QtCore.Qt.AlignBottom,
+                                width=self.CONFIG_WIDGET_WIDTH,
+                                width_text=self.CONFIG_WIDGET_WIDTH - 50)
+            else:
+                _options = dict(width=100,
+                                width_text=self.CONFIG_WIDGET_WIDTH - 110)
+            self.add_param_widget(self.params[_key], **_options)
+            # add selection info box after hdf_key widgets:
+            if _key == 'hdf_key':
+                _layout.addWidget(self.w_selection_info, self.next_row(),
+                                  0, 1, 2)
+
         self.param_widgets['n_image'].setEnabled(False)
 
         for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file',
@@ -118,17 +111,17 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         self.b_save = self.add_button('Save composite image as tif',
                                       gridPos=(self.next_row(), 0, 1, 2),
                                       enabled=False)
-        self.toggle_roi_selection(False)
+        self.__toggle_roi_selection(False)
+        self.__toggle_bg_file_selection(False)
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
                         policy = QtWidgets.QSizePolicy.Expanding)
 
     def connect_signals(self):
         self.b_clear.clicked.connect(partial(self.__clear_entries, 'all'))
-
         self.param_widgets['use_roi'].currentTextChanged.connect(
-            self.toggle_roi_selection )
+            self.__toggle_roi_selection )
         self.param_widgets['first_file'].io_edited.connect(
-            self.__selected_fist_file)
+            self.__selected_first_file)
         self.param_widgets['last_file'].io_edited.connect(
             self.__selected_last_file)
         self.param_widgets['hdf_key'].io_edited.connect(
@@ -145,8 +138,27 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         self.param_widgets['composite_ny'].io_edited.disconnect()
         self.param_widgets['composite_ny'].io_edited.connect(
             partial(self.update_composite_dim, 'y'))
+        self.param_widgets['use_bg_file'].io_edited.connect(
+            self.__toggle_bg_file_selection)
+        self.param_widgets['bg_file'].io_edited.connect(
+            self.__selected_bg_file)
 
-    def __selected_fist_file(self, fname):
+    def __selected_bg_file(self, fname):
+        # reset all follow-up settings upon selecting a new
+        self.__clear_entries(['bg_hdf_key', 'bg_hdf_num'])
+        # depending on whether a hdf5 file has been selected, show and hide
+        # different widgets:
+        hdf_flag = (True if os.path.splitext(fname)[1] in HDF5_EXTENSIONS
+                    else False)
+        for _key in ['bg_hdf_key', 'bg_hdf_num']:
+            self.toggle_widget_visibility(_key, hdf_flag)
+        self.__select_info['bg_hdf_images'] = hdf_flag
+        # open a pop-up to select the dataset from the hdf5 file
+        if hdf_flag:
+            dset = Hdf5DatasetSelection(self, fname).get_dset()
+            self.update_param_value('bg_hdf_key', dset)
+
+    def __selected_first_file(self, fname):
         # reset all follow-up settings upon selecting a new
         self.__clear_entries(['hdf_key', 'hdf_first_num', 'hdf_last_num',
                             'last_file', 'stepping', 'n_image',
@@ -157,8 +169,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
                     else False)
         for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num']:
             self.toggle_widget_visibility(_key, hdf_flag)
-            self.toggle_widget_visibility('last_file', not hdf_flag)
-        self.param_widgets['last_file'].setVisible(not hdf_flag)
+        self.toggle_widget_visibility('last_file', not hdf_flag)
         self.__select_info['hdf_images'] = hdf_flag
         # open a pop-up to select the dataset from the hdf5 file
         if hdf_flag:
@@ -166,26 +177,42 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
             self.update_param_value('hdf_key', dset)
             self.__selected_hdf_key()
 
-    def __selected_hdf_key(self):
-        _fname = self.params['first_file'].value
-        _dset = self.params['hdf_key'].value
-        dsets = get_hdf5_populated_dataset_keys(_fname)
-        if _dset not in dsets:
+    def __verify_hdf_key(self, filename, dset, param_key):
+        """
+        Verify that the hdf5 file has the selected dataset.
+
+        Parameters
+        ----------
+        filename : str
+            The filename to the hdf5 file.
+        dset : str
+            The dateset.
+        """
+        dsets = get_hdf5_populated_dataset_keys(filename)
+        if dset not in dsets:
             QtWidgets.QMessageBox(
                 QtWidgets.QMessageBox.Critical, 'Dataset key error',
-                (f'The selected file\n\n\t{_fname}\n\ndoes not have the '
-                 f'selected dataset\n\n{_dset}')
+                (f'The selected file\n\n\t{filename}\n\ndoes not have the '
+                 f'selected dataset\n\n{dset}')
             ).exec_()
-            self.__clear_entries(['hdf_key'])
-            self.toggle_widget_visibility('hdf_key', True)
-            return
+            self.__clear_entries([param_key], hide=False)
+
+    def __selected_hdf_key(self):
+        _fname = self.get_param_value('first_file')
+        _dset = self.get_param_value('hdf_key')
+        self.__verify_hdf_key(_fname, _dset, 'hdf_key')
         _shape = get_hdf5_metadata(_fname, 'shape', _dset)
         self.w_selection_info.setText(
-            (f'Number of images in dataset:\n  {_shape[0]}\n\nImage size:\n  '
+            (f'Number of images in dataset: {_shape[0]}\n\nImage size: '
              f'{_shape[1]} x {_shape[2]}'))
         self.update_param_value('n_image', _shape[0])
         self.__select_info['hdf_n_image'] = _shape[0]
         self.__show_selection_choices()
+
+    def __selected_bg_hdf_key(self):
+        _fname = self.get_param_value('bg_file')
+        _dset = self.get_param_value('bg_hdf_key')
+        self.__verify_hdf_key(_fname, _dset, 'bg_hdf_key', hide=False,)
 
     def __selected_last_file(self):
         _path1, _fname1 = os.path.split(self.params['first_file'].value)
@@ -220,11 +247,20 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         # finally, give information about number of selected files
         self.w_selection_info.setText(
             (f'Selected directory:\n  [...]/{os.path.basename(_path1)}\n'
-             f'\nTotal number of selected files:\n  {i2 - i1 + 1}'))
+             f'Total number of selected files: {i2 - i1 + 1}'))
         self.update_param_value('n_image', i2 - i1 + 1)
         self.__select_info['file_n_image'] = i2 - i1 + 1
         self.__select_info['file_list'] = _flist
         self.__show_selection_choices()
+
+
+    def __toggle_bg_file_selection(self, flag):
+        flag = True if flag == 'True' else False
+        self.toggle_widget_visibility('bg_file', flag)
+        if not self._get_filename_param_ext('bg_file') in HDF5_EXTENSIONS:
+            flag = False
+        self.toggle_widget_visibility('bg_hdf_key', flag)
+        self.toggle_widget_visibility('bg_hdf_num', flag)
 
     def __show_selection_choices(self):
         self.w_selection_info.setVisible(True)
@@ -232,39 +268,41 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
             self.toggle_widget_visibility(_key, True)
         self.b_exec.setEnabled(True)
 
-    def __clear_entries(self, keys='all'):
+    def __clear_entries(self, keys='all', hide=True):
         if keys == 'all':
             keys = list(self.params.keys())
         for _key in keys:
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
-        self.w_selection_info.setVisible(False)
+        self.w_selection_info.setVisible(not hide)
         for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file',
                      'hdf_first_num', 'hdf_last_num']:
-            self.toggle_widget_visibility(_key, False)
-        self.__select_info['hdf_images'] = None
+            self.toggle_widget_visibility(_key, not hide)
+        if 'hdf_images' in keys:
+            self.__select_info['hdf_images'] = None
         self.b_exec.setEnabled(False)
 
     def update_n_image(self):
+        print('update n image')
         step = self.get_param_value('stepping')
         if self.__select_info['hdf_images']:
             i1 = self.get_param_value('hdf_first_num')
             i2 = self.get_param_value('hdf_last_num')
             if i2 == -1:
                 i2 = self.__select_info['hdf_n_image']
-            _n = (i2 - i1) // step
+            _n = (i2 - i1 + 1) // step
         elif self.__select_info['hdf_images'] == False:
             _n = self.__select_info['file_n_image'] // step
         if self.__select_info['hdf_images'] is not None:
             self.update_param_value('n_image', _n)
 
 
-    def toggle_roi_selection(self, toggle):
-        if isinstance(toggle, str):
-            toggle = True if toggle == 'True' else False
+    def __toggle_roi_selection(self, flag):
+        if isinstance(flag, str):
+            flag = True if flag == 'True' else False
         for _key in ['roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh']:
-            self.param_widgets[_key].setEnabled(toggle)
+            self.param_widgets[_key].setEnabled(flag)
 
     def frame_activated(self, index):
         ...

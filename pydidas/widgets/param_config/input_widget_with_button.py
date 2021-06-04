@@ -30,19 +30,22 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IOwidget_line']
-
-import numbers
+__all__ = ['InputWidgetWithButton']
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from .io_widget import IOwidget
+from .input_widget import InputWidget
+from ...config import PARAM_INPUT_WIDGET_HEIGHT
 
-class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
-    """Widgets for I/O during plugin parameter editing without choices."""
-    #for some reason, inhering the signal does not work
+
+class InputWidgetWithButton(InputWidget):
+    """
+    Widgets for I/O during plugin parameter for filepaths.
+    (Includes a small button to select a filepath from a dialogue.)
+     """
+    #for some reason, inhering the signal from the base class does not work
     io_edited = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent, param, width=255):
+    def __init__(self, parent, param, width=255, button_icon=None):
         """
         Setup the widget.
 
@@ -57,18 +60,40 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
             A Parameter instance.
         width : int, optional
             The width of the IOwidget.
+        button_icon : Union[QIcon, None], optional
+            The icon for the button. If None, the standard "file open" icon
+            will be used.
 
         Returns
         -------
         None.
         """
         super().__init__(parent, param, width)
-        if param.type == numbers.Integral:
-            self.setValidator(QtGui.QIntValidator())
-        elif param.type == numbers.Real:
-            self.setValidator(QtGui.QDoubleValidator())
-        self.editingFinished.connect(self.emit_signal)
-        self.setFixedHeight(23)
+        self.ledit = QtWidgets.QLineEdit()
+        self.ledit.setFixedWidth(width - PARAM_INPUT_WIDGET_HEIGHT - 2)
+        self.ledit.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
+
+        if not isinstance(button_icon, QtGui.QIcon):
+            button_icon = self.style().standardIcon(42)
+
+        self._button = QtWidgets.QPushButton(button_icon, '')
+        self._button.setFixedWidth(PARAM_INPUT_WIDGET_HEIGHT)
+        self._button.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
+        _layout = QtWidgets.QHBoxLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.addWidget(self.ledit)
+        _layout.addWidget(self._button)
+        self.setLayout(_layout)
+
+        self.ledit.editingFinished.connect(self.emit_signal)
+        self._button.clicked.connect(self.button_function)
+        self.set_value(param.value)
+
+    def button_function(self):
+        """
+        Needs to be implemented by the subclass.
+        """
+        raise NotImplementedError
 
     def emit_signal(self):
         """
@@ -76,27 +101,22 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
 
         This method emits a signal that the combobox selection has been
         changed and the Parameter value needs to be updated.
-
-        Returns
-        -------
-        None.
         """
-        _curValue = self.text()
-        if _curValue != self._oldValue:
-            self._oldValue = _curValue
-            self.io_edited.emit(_curValue)
+        _curr_value = self.ledit.text()
+        if _curr_value != self._oldValue:
+            self._oldValue = _curr_value
+            self.io_edited.emit(_curr_value)
 
     def get_value(self):
         """
-        Get the current value from the combobox to update the Parameter value.
+        Get the current value from the QLineEdit to update the Parameter value.
 
         Returns
         -------
-        type
-            The text converted to the required datatype (int, float, path)
-            to update the Parameter value.
+        str
+            The input text.
         """
-        text = self.text()
+        text = self.ledit.text()
         return self.get_value_from_text(text)
 
     def set_value(self, value):
@@ -104,10 +124,19 @@ class IOwidget_line(QtWidgets.QLineEdit, IOwidget):
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
-        Warning: This method will *not* update the connected parameter value.
-
-        Returns
-        -------
-        None.
         """
-        self.setText(f'{value}')
+        self.ledit.setText(f'{value}')
+
+    def setText(self, text):
+        """
+        Set the line edit text to the input.
+
+        This method will call the line edit setText method to update the
+        displayed text.
+
+        Parameters
+        ----------
+        text : object
+            Any object, the object's str representation will be used.
+        """
+        self.ledit.setText(str(text))

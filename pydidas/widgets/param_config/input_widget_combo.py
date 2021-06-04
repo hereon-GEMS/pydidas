@@ -30,15 +30,15 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IOwidget_combo']
+__all__ = ['InputWidget']
 
 
 
 from PyQt5 import QtWidgets, QtCore
-from .io_widget import IOwidget
+from .input_widget import InputWidget
 
 
-class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
+class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
     """
     Widgets for I/O during plugin parameter editing with predefined
     choices.
@@ -71,6 +71,7 @@ class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
             self.addItem(f'{choice}')
         self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
+        self.set_value(param.value)
 
     def __convert_bool(self, value):
         """
@@ -135,6 +136,5 @@ class IOwidget_combo(QtWidgets.QComboBox, IOwidget):
         -------
         None.
         """
-        print(value, self.__items)
         value = self.__convert_bool(value)
         self.setCurrentIndex(self.findText(f'{value}'))

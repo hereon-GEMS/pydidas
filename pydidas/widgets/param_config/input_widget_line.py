@@ -30,19 +30,17 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IOwidget_file']
+__all__ = ['InputWidgetLine']
 
-import pathlib
+import numbers
 
-from PyQt5 import QtWidgets, QtCore
-from .io_widget import IOwidget
+from PyQt5 import QtWidgets, QtCore, QtGui
+from .input_widget import InputWidget
+from ...config import PARAM_INPUT_WIDGET_HEIGHT
 
-class IOwidget_file(IOwidget):
-    """
-    Widgets for I/O during plugin parameter for filepaths.
-    (Includes a small button to select a filepath from a dialogue.)
-     """
-    #for some reason, inhering the signal from the base class does not work
+class InputWidgetLine(QtWidgets.QLineEdit, InputWidget):
+    """Widgets for I/O during plugin parameter editing without choices."""
+    #for some reason, inhering the signal does not work
     io_edited = QtCore.pyqtSignal(str)
 
     def __init__(self, parent, param, width=255):
@@ -60,47 +58,18 @@ class IOwidget_file(IOwidget):
             A Parameter instance.
         width : int, optional
             The width of the IOwidget.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(parent, param, width)
-        self.ledit = QtWidgets.QLineEdit()
-        self.ledit.setFixedWidth(width - 25)
-        self.ledit.setFixedHeight(23)
+        if param.type == numbers.Integral:
+            self.setValidator(QtGui.QIntValidator())
+        elif param.type == numbers.Real:
+            _validator = QtGui.QDoubleValidator()
+            _validator.setNotation(QtGui.QDoubleValidator.ScientificNotation)
+            self.setValidator(_validator)
 
-        fbutton = QtWidgets.QPushButton(self.style().standardIcon(42), '')
-        fbutton.setFixedWidth(25)
-        fbutton.setFixedHeight(25)
-        _layout = QtWidgets.QHBoxLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self.ledit)
-        _layout.addWidget(fbutton)
-        self.setLayout(_layout)
-
-        self.ledit.editingFinished.connect(self.emit_signal)
-        fbutton.clicked.connect(self.button)
-
-    def button(self):
-        """
-        Open a dialogue to select a file.
-
-        This method is called upon clicking the "open file" button
-        and opens a QFileDialog widget to select a filename.
-
-        Returns
-        -------
-        None.
-        """
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Name of file', None,
-            ('All files (*.*);;HDF5 files (*.nxs *.hdf *.h5)'
-             ';;TIFF files (*.tif, *.tiff)')
-        )[0]
-        if fname:
-            self.setText(fname)
-            self.emit_signal()
+        self.editingFinished.connect(self.emit_signal)
+        self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
+        self.set_value(param.value)
 
     def emit_signal(self):
         """
@@ -113,7 +82,7 @@ class IOwidget_file(IOwidget):
         -------
         None.
         """
-        _curValue = self.ledit.text()
+        _curValue = self.text()
         if _curValue != self._oldValue:
             self._oldValue = _curValue
             self.io_edited.emit(_curValue)
@@ -124,38 +93,22 @@ class IOwidget_file(IOwidget):
 
         Returns
         -------
-        Path
-            The text converted to a pathlib.Path to update the Parameter value.
+        type
+            The text converted to the required datatype (int, float, path)
+            to update the Parameter value.
         """
-        text = self.ledit.text()
-        return pathlib.Path(self.get_value_from_text(text))
+        text = self.text()
+        return self.get_value_from_text(text)
 
     def set_value(self, value):
         """
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
+        Warning: This method will *not* update the connected parameter value.
 
         Returns
         -------
         None.
         """
-        self.ledit.setText(f'{value}')
-
-    def setText(self, text):
-        """
-        Set the line edit text to the input.
-
-        This method will call the line edit setText method to update the
-        displayed text.
-
-        Parameters
-        ----------
-        text : object
-            Any object, the object's str representation will be used.
-
-        Returns
-        -------
-        None.
-        """
-        self.ledit.setText(str(text))
+        self.setText(f'{value}')

@@ -52,7 +52,7 @@ class DataBrowsingFrame(ToplevelFrame):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         super().__init__(parent=parent, name=name)
-        self.add_textbox('Data exploration view', fontsize=14)
+        self.add_text_widget('Data exploration view', fontsize=14)
 
         self.initUI()
         self._tree.clicked.connect(partial(self.__fileSelected, self._preview))

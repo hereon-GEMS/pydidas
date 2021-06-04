@@ -31,95 +31,83 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from PyQt5 import QtWidgets, QtCore
-from pydidas.config import gui_constants, qt_presets
+def read_hdf(h5file, location, axes):
+    """Function to read unchunked/chunked data from an hdf file.
+    
+    Warning: Reading data from an unchunked file requires loading the full
+    file with all the resulting memory and performance implications.
 
+    :param h5file: file name of the hdf5 file
+    :type h5file: str
 
-class _PluginDescriptionField(QtWidgets.QTextEdit):
+    :param location: The path to the dataset in the hdf5 structure
+    :type location: str
+
+    :param axes: The indices for the individual axes (order as in the file).
+                 The input needs to be in form of a list of entries for each
+                 axis. Any missing axes will take the full data indices.
+
+                 The following input formats are supported:
+
+                 - None will take the full axis
+                 - <value> will select only the slice of <value> from this axis
+                 - [ax_low, ax_high] will take the range of ax_low to ax_high
+                 - (ax_low, ax_high) will take the range of ax_low to ax_high
+
+    :type axes: list of 2-tuple, 2-list, None, or integer
+
+    :return: The dataset as a numpy array.
+    :rtype: :py:class:`np.ndarray`
     """
-    Text edit to show the description of the plugin and its parameters.
-    """
+    with h5py.File(h5file, 'r') as f:
+        ds = f[location]
+        limits = np.r_[[(0, ds.shape[i1]) for i1 in range(len(ds.shape))]]
+        for i1 in range(len(axes)):
+            if axes[i1] is None:
+                limits[i1] = (0, ds.shape[i1])
+            elif isinstance(axes[i1], (list, tuple)) and not axes[i1]:
+                limits[i1] = (0, ds.shape[i1])
+            elif isinstance(axes[i1], (list, tuple)) and len(axes[i1]) == 1:
+                limits[i1] = (axes[i1][0], axes[i1][0]+1)
+            elif isinstance(axes[i1], (list, tuple)) and len(axes[i1]) == 2:
+                if axes[i1][0] is None:
+                    axes[i1][0] = 0
+                if axes[i1][1] in [-1, None]:
+                    axes[i1][1] = ds.shape[i1]
+                limits[i1] = (axes[i1][0], axes[i1][1])
+            elif isinstance(axes[i1], (int, np.int16, np.int32)):
+                limits[i1] = (axes[i1], axes[i1]+1)
+            else:
+                raise Exception('Slicing "{}" not supported.'.format(axes[i1]))
 
-    def __init__(self, parent=None, **params):
-        """
-        Create the _PluginDescriptionField.
-
-        Parameters
-        ----------
-        parent : QWidget, optional
-            The Qt parent widget. The default is None.
-        readOnly : bool, optional
-            Flag to set the field to read only. The default is True.
-        minimumWidth : Union[int, None], optional
-            The minimum width of the widget. If None, no minimum width will be
-            set for the widget. The default is 500.
-        fixedWidth : Union[int, None], optional
-            A fixed width for the widget. If None, no fixedWidth will be set.
-            The default is None.
-        minimumHeight : Union[int, None], optional
-            The minimum Height of the widget. If None, no minimum height will
-            be set for the widget. The default is None.
-        fixedHeight : Union[int, None], optional
-            A fixed height for the widget. If None, no fixedHeight will be set.
-            The default is None.
-
-
-        Returns
-        -------
-        None.
-
-        """
-        super().__init__(parent)
-        _params = {'readOnly': params.get('readOnly', True),
-                   'fixedWidth': params.get('fixedWidth', None),
-                   'minimumWidth': params.get('minimumWidth', 500),
-                   'fixedHeight': params.get('fixedHeight', None),
-                   'minimumHeight': params.get('minimumHeight', None)}
-        self.setAcceptRichText(True)
-        self.setReadOnly(_params['readOnly'])
-        for _param, _func  in zip(
-                ['fixedWidth', 'minimumWidth', 'fixedHeight', 'minimumHeight'],
-                [self.setFixedWidth, self.setMinimumWidth,
-                 self.setFixedHeight, self.setMinimumHeight]):
-            if _params[_param] is not None:
-                _func(_params[_param])
-        self.setMinimumWidth(500)
-
-    def setText(self, text, title=None):
-        """
-        Display information about a plugin.
-
-        This widget accepts both a single text entry and a list of entries
-        for the text. A list of entries will be converted to a single text
-        according to
-
-        Parameters
-        ----------
-        text : str or list of str.
-            The text to be displayed.
-        title : str, optional
-            The title. The default is None.
-
-        Returns
-        -------
-        None.
-        """
-        if isinstance(text, str):
-            super().setText(text)
-        elif isinstance(text, list):
-            super().setText('')
-            if title:
-                self.setFontPointSize(14)
-                self.setFontWeight(75)
-                self.append(f'Plugin description: {title}')
-            self.setFontPointSize(10)
-            self.append('')
-
-            for key, item in text:
-                self.setFontWeight(75)
-                self.append(key + ':')
-                self.setFontWeight(50)
-                self.append(' ' * 4 + item if key != 'Parameters' else item)
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum
-        )
+        if ds.chunks is None:
+            roi = tuple(slice(limits[i1,0], limits[i1,1]) for i1 in 
+                        range(limits.shape[0]))
+            data = ds[roi]
+        else:
+            data = np.empty((limits[:, 1] - limits[:, 0]).astype(np.int16),
+                            dtype=ds.dtype)
+    
+            numSlices = (np.ceil(limits[:, 1] / ds.chunks) \
+                -np.floor(limits[:, 0] / ds.chunks)).astype(np.int16)
+    
+            slicesData = [None] * numSlices.size
+            slicesTarget = [None] * numSlices.size
+            for i0 in range(numSlices.size):
+                s0, s1 = limits[i0, 0], limits[i0, 1]
+                chk = ds.chunks[i0]
+                ioff = int(s0 // ds.chunks[i0])
+                slicesData[i0] = [slice(max((i1 + ioff) * chk, s0),
+                                        min((i1 + 1 + ioff) * chk, s1))
+                                  for i1 in range(numSlices[i0])]
+                slicesTarget[i0] = [slice(max((i1 + ioff) * chk -s0, 0),
+                                          min((i1 + 1 + ioff) * chk, s1) - s0)
+                                    for i1 in range(numSlices[i0])]
+    
+            sliceFrom = itertools.product(*slicesData)
+            sliceTo = itertools.product(*slicesTarget)
+    
+            for sF, sT in zip(sliceFrom, sliceTo):
+                data[sT] = ds[sF]
+    return data
+#read_hdf

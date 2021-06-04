@@ -47,16 +47,8 @@ from pydidas.utils import (get_hdf5_populated_dataset_keys,
 from pydidas.image_reader import read_image
 
 PARAM_TOOLTIPS = {
-    'first_file': ('The name of the first file for a file series or of the '
-                   'hdf5 file in case of hdf5 file input.'),
     'last_file': ('Used only for file series: The name of the last file to be'
                   ' added to the composite image.'),
-    'hdf_key': ('Used only for hdf5 files: The dataset key.'),
-    'hdf_first_num': ('The first image in the hdf5-dataset to be used. The '
-                      'default is 0.'),
-    'hdf_last_num': ('The last image in the hdf5-dataset to be used. The '
-                     'value -1 will default to the last image. The default '
-                     'is -1.'),
     'use_bg_file' : ('Keyword to toggle usage of background subtraction.'),
     'bg_file': ('The name of the file used for background correction.'),
     'bg_hdf_key': ('For hdf5 background image files: The dataset key.'),
@@ -65,69 +57,17 @@ PARAM_TOOLTIPS = {
     'stepping': ('The step width (in images). A value n > 1 will only add '
                  'every n-th image to the composite.'),
     'n_image': ('The toal number of images in the composite images.'),
-    'composite_nx': ('The number of original images combined in the composite'
-                     ' image in x direction. A value of -1 will determine the'
-                     ' number of images in x direction automatically based on'
-                     ' the number of images in y direction. The default is '
-                     '1.'),
-    'composite_ny': ('The number of original images combined in the composite'
-                     ' image in y direction. A value of -1 will determine the'
-                     ' number of images in y direction automatically based on'
-                     ' the number of images in x direction. The default is '
-                     '-1.'),
-    'composite_dir': ('The "fast" direction of the composite image. This '
-                      'dimension will be filled first before going to the'
-                      ' next row/column.'),
-       'use_roi': ('Keyword to toggle use of the ROI for cropping the '
-                   'original images before combining them. The default is '
-                   'False.'),
-    'roi_xlow': ('The lower boundary (in pixel) for cropping images in x, if'
-                 ' use_roi is enabled. Negative values will be modulated with'
-                 ' the image width. The default is 0.'),
-    'roi_xhigh': ('The upper boundary (in pixel) for cropping images in x, if'
-                  ' use_roi is enabled. Negative values will be modulated '
-                  'with the image width, i.e. -1 is equivalent with the full '
-                  'image size. The default is -1'),
-    'roi_ylow': ('The lower boundary (in pixel) for cropping images in y, if'
-                 ' use_roi is enabled. Negative values will be modulated with'
-                 ' the image width. The default is 0.'),
-    'roi_yhigh': ('The upper boundary (in pixel) for cropping images in y, if'
-                  ' use_roi is enabled. Negative values will be modulated '
-                  'with the image height, i.e. -1 is equivalent with the '
-                  'full image size. The default is -1'),
-    'threshold_low': ('The lower threshold of the composite image. If any '
-                      ' finite value (i.e. not np.nan) is used, any pixels '
-                      'with a value below the threshold will be replaced by '
-                      'the threshold. A value of np.nan will ignore the '
-                      'threshold. The default is np.nan.'),
-    'threshold_high': ('The upper threshold of the composite image. If any '
-                       ' finite value (i.e. not np.nan) is used, any pixels '
-                       'with a value above the threshold will be replaced by '
-                       'the threshold. A value of np.nan will ignore the '
-                       'threshold. The default is np.nan.'),
-    'binning': ('The re-binning factor for the images in the composite. The '
-                'binning will be applied to the cropped images. The default '
-                'is 1.'),
     'save_name': ('The name used for saving the composite image. None will '
                   'default to no image saving. The default is None.')
 }
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('first_file'),
-    # Parameter('First file name', Path, default=Path(), refkey='first_file',
-    #           tooltip=PARAM_TOOLTIPS['first_file']),
     Parameter('Last file name', Path, default=Path(), refkey='last_file',
               tooltip=PARAM_TOOLTIPS['last_file']),
-
     get_generic_parameter('hdf_key'),
     get_generic_parameter('hdf_first_num'),
     get_generic_parameter('hdf_last_num'),
-    # Parameter('Hdf dataset key', HdfKey, default=HdfKey(''), refkey='hdf_key',
-    #           tooltip=PARAM_TOOLTIPS['hdf_key']),
-    # Parameter('First image number', int, default=0, refkey='hdf_first_num',
-    #           tooltip=PARAM_TOOLTIPS['hdf_first_num']),
-    # Parameter('Last image number', int, default=-1, refkey='hdf_last_num',
-    #           tooltip=PARAM_TOOLTIPS['hdf_last_num']),
     Parameter('Subtract background image', int, default=0,
               refkey='use_bg_file', choices=[True, False],
               tooltip=PARAM_TOOLTIPS['use_bg_file']),
@@ -152,31 +92,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('threshold_low'),
     get_generic_parameter('threshold_high'),
     get_generic_parameter('binning'),
-    # Parameter('Number of images in x', int, default=1, refkey='composite_nx',
-    #           tooltip=PARAM_TOOLTIPS['composite_nx']),
-    # Parameter('Number of images in y', int, default=-1, refkey='composite_ny',
-    #           tooltip=PARAM_TOOLTIPS['composite_ny']),
-    # Parameter('Preferred composite direction', str, default='x',
-    #           refkey='composite_dir', choices=['x', 'y'],
-    #           tooltip=PARAM_TOOLTIPS['composite_dir']),
-    # Parameter('Use ROI', int, default=0, refkey='use_roi',
-    #           choices=[True, False], tooltip=PARAM_TOOLTIPS['use_roi']),
-    # Parameter('ROI lower x limit', int, default=0, refkey='roi_xlow',
-    #           tooltip=PARAM_TOOLTIPS['roi_xlow']),
-    # Parameter('ROI upper x limit', int, default=-1, refkey='roi_xhigh',
-    #           tooltip=PARAM_TOOLTIPS['roi_xhigh']),
-    # Parameter('ROI lower y limit', int, default=0, refkey='roi_ylow',
-    #           tooltip=PARAM_TOOLTIPS['roi_ylow']),
-    # Parameter('ROI upper y limit', int, default=-1, refkey='roi_yhigh',
-    #           tooltip=PARAM_TOOLTIPS['roi_yhigh']),
-    # Parameter('Lower threshold', float, default=np.nan,
-    #           refkey='threshold_low',
-    #           tooltip=PARAM_TOOLTIPS['threshold_low']),
-    # Parameter('Upper threshold', float, default=np.nan,
-    #           refkey='threshold_high',
-    #           tooltip=PARAM_TOOLTIPS['threshold_high']),
-    # Parameter('Binning factor', int, default=1, refkey='binning',
-    #           tooltip=PARAM_TOOLTIPS['binning']),
     Parameter('Composite image filename', Path, default=Path(),
               refkey='save_name', tooltip=PARAM_TOOLTIPS['save_name'])
 )
@@ -212,6 +127,17 @@ class CompositeCreatorApp(BaseApp):
     hdf_last_num : int, optional
         The last image in the hdf5-dataset to be used. The value -1 will
         default to the last image. The default is -1.
+    use_bg_file : bool, optional
+        Keyword to toggle usage of background subtraction. The default is
+        False.
+    bg_file : pathlib.Path
+        The name of the file used for background correction.
+    bg_hdf_key : HdfKey, optional
+        Required for hdf5 background image files: The dataset key with the
+        image for the background file.
+    bg_hdf_num : int, optional
+        Required for hdf5 background image files: The image number of the
+        background image in the  dataset. The default is 0.
     stepping : int, optional
         The step width (in images). A value n > 1 will only add every n-th
         image to the composite.

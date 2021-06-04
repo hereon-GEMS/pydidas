@@ -30,10 +30,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseApp']
 
-from pydidas.core import BaseObjectWithParameterCollection
 
+from pydidas.core import ObjectWithParameterCollection, ParameterCollection
 
-class BaseApp(BaseObjectWithParameterCollection):
+class BaseApp(ObjectWithParameterCollection):
     """
     The BaseApp.
 
@@ -64,3 +64,10 @@ class BaseApp(BaseObjectWithParameterCollection):
         Run the app.
         """
         raise NotImplementedError
+
+    def __copy__(self):
+        import copy
+        _obj_copy = type(self)()
+        for _key in self.__dict__:
+            _obj_copy.__dict__[_key] = copy.copy(self.__dict__[_key])
+        return _obj_copy

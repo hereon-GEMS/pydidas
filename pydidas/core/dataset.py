@@ -31,13 +31,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Dataset']
 
-from numbers import Integral
-
 import numpy as np
 
 
 def _default_vals(ndim):
     return {i: None for i in range(ndim)}
+
 
 class DatasetConfigException(Exception):
     """

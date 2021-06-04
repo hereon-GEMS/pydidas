@@ -30,7 +30,7 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IOwidget']
+__all__ = ['InputWidget']
 
 
 import numbers
@@ -38,8 +38,9 @@ import pathlib
 from PyQt5 import QtWidgets
 
 from ...core import HdfKey
+from ...config import PARAM_INPUT_WIDGET_HEIGHT
 
-class IOwidget(QtWidgets.QWidget):
+class InputWidget(QtWidgets.QWidget):
     """Base class of widgets for I/O during plugin parameter editing."""
     def __init__(self, parent, param, width=255):
         """
@@ -63,7 +64,7 @@ class IOwidget(QtWidgets.QWidget):
         """
         super().__init__(parent)
         self.setFixedWidth(width)
-        self.setFixedHeight(25)
+        self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self.__ptype = param.type
         self._oldValue = None
         self.setToolTip(f'{param.tooltip}')

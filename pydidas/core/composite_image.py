@@ -32,7 +32,7 @@ __all__ = ['CompositeImage']
 
 import numpy as np
 from pydidas.core.parameter_collection import ParameterCollection
-from pydidas.core.base_object_with_parameter_collection import ParameterCollectionMixIn
+from pydidas.core.object_with_parameter_collection import ParameterCollectionMixIn
 from pydidas.core.generic_parameters import get_generic_parameter
 
 _composite_image_params = ParameterCollection(

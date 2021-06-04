@@ -28,7 +28,10 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterCollectionMixIn', 'BaseObjectWithParameterCollection']
+__all__ = ['ParameterCollectionMixIn', 'ObjectWithParameterCollection']
+
+import os
+from pathlib import Path
 
 from PyQt5 import QtCore
 
@@ -54,7 +57,6 @@ class ParameterCollectionMixIn:
         -------
         ParameterCollection
             A copy of the default ParameterCollection.
-
         """
         return cls.default_params.get_copy()
 
@@ -68,10 +70,6 @@ class ParameterCollectionMixIn:
         ----------
         param : Parameter
             An instance of a Parameter object.
-
-        Returns
-        -------
-        None.
         """
         self.params.add_param(param)
 
@@ -89,10 +87,6 @@ class ParameterCollectionMixIn:
         ----------
         *params : Union[Parameter, dict, ParameterCollection]
             Any Parameter or ParameterCollection
-
-        Returns
-        -------
-        None.
         """
         for _param in params:
             if isinstance(_param, Parameter):
@@ -115,10 +109,6 @@ class ParameterCollectionMixIn:
         ----------
         defaults : Union[dict, ParameterCollection, list, tuple, set]
             An iterable with default Parameters.
-
-        Returns
-        -------
-        None.
         """
         if isinstance(defaults, (dict, ParameterCollection)):
             defaults = defaults.values()
@@ -126,13 +116,13 @@ class ParameterCollectionMixIn:
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
 
-    def get_param_value(self, param_name):
+    def get_param_value(self, param_key):
         """
         Get a parameter value.
 
         Parameters
         ----------
-        param_name : str
+        param_key : str
             The key name of the Parameter.
 
         Returns
@@ -140,31 +130,27 @@ class ParameterCollectionMixIn:
         object
             The value of the Parameter.
         """
-        if not param_name in self.params:
-            raise KeyError(f'No parameter with the name "{param_name}" '
+        if not param_key in self.params:
+            raise KeyError(f'No parameter with the name "{param_key}" '
                            'has been registered.')
-        return self.params.get_value(param_name)
+        return self.params.get_value(param_key)
 
-    def set_param_value(self, param_name, value):
+    def set_param_value(self, param_key, value):
         """
         Set a parameter value.
 
         Parameters
         ----------
-        param_name : str
+        param_key : str
             The key name of the Parameter.
         value : *
             The value to be set. This has to be the datatype associated with
             the Parameter.
-
-        Returns
-        -------
-        None
         """
-        if not param_name in self.params:
-            raise KeyError(f'No parameter with the name "{param_name}" '
+        if not param_key in self.params:
+            raise KeyError(f'No parameter with the name "{param_key}" '
                            'has been registered.')
-        self.params.set_value(param_name, value)
+        self.params.set_value(param_key, value)
 
     def get_param_values_as_dict(self):
         """
@@ -180,13 +166,32 @@ class ParameterCollectionMixIn:
             name_val_pairs[self.params[_key].name] = self.params[_key].value
         return name_val_pairs
 
+    def _get_filename_param_ext(self, param_key):
+        """
+        Get the extension of a
+
+        Parameters
+        ----------
+        param_key : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        _fname = self.get_param_value(param_key)
+        if not isinstance(_fname, Path):
+            raise TypeError(
+                'Cannot determine file extension of non-Path objects '
+                '(requested for {self.params[param_key]}).'
+                )
+        return os.path.splitext(self.get_param_value(param_key))[1]
 
     def print_param_values(self):
         """
         Print the name and value of all Parameters.
-
-        Returns
-        -------
         None.
         """
         _config = self.get_param_values_as_dict()
@@ -194,8 +199,7 @@ class ParameterCollectionMixIn:
             print(f'{_key}: {_config[_key]}')
 
 
-class BaseObjectWithParameterCollection(QtCore.QObject,
-                                        ParameterCollectionMixIn):
+class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn):
     """
     An object with a ParameterCollection.
 
@@ -214,9 +218,6 @@ class BaseObjectWithParameterCollection(QtCore.QObject,
         **kwargs : dict
             A dictionary of keyword arguments. Defined by the concrete
             subclass.
-
-        Returns
-        -------
-        None.
         """
+        super().__init__()
         self.params = ParameterCollection()

@@ -104,14 +104,14 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter(
         'Lower threshold', float, default=np.nan, refkey='threshold_low',
         tooltip=('The lower threshold of the composite image. If any '
-                 ' finite value (i.e. not np.nan) is used, any pixels '
+                 'finite value (i.e. not np.nan) is used, any pixels '
                  'with a value below the threshold will be replaced by '
                  'the threshold. A value of np.nan will ignore the '
                  'threshold. The default is np.nan.')),
     Parameter(
         'Upper threshold', float, default=np.nan, refkey='threshold_high',
         tooltip=('The upper threshold of the composite image. If any '
-                 ' finite value (i.e. not np.nan) is used, any pixels '
+                 'finite value (i.e. not np.nan) is used, any pixels '
                  'with a value above the threshold will be replaced by '
                  'the threshold. A value of np.nan will ignore the '
                  'threshold. The default is np.nan.')),

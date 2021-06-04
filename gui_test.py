@@ -34,12 +34,12 @@ class HomeFrame(ToplevelFrame):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent=parent, name=name)
-        self.add_textbox('Welcome to pyDIDAS', 14, bold=True)
-        self.add_textbox('the python Diffraction Data Analysis Suite.\n', 13,
+        self.add_text_widget('Welcome to pyDIDAS', 14, bold=True)
+        self.add_text_widget('the python Diffraction Data Analysis Suite.\n', 13,
                          bold=True)
-        self.add_textbox('\nQuickstart:', 12, bold=True)
-        self.add_textbox('\nMenu toolbar: ', 11, underline=True, bold=True)
-        self.add_textbox('Use the menu toolbar on the left to switch between'
+        self.add_text_widget('\nQuickstart:', 12, bold=True)
+        self.add_text_widget('\nMenu toolbar: ', 11, underline=True, bold=True)
+        self.add_text_widget('Use the menu toolbar on the left to switch between'
                          ' different Frames. Some menu toolbars will open an '
                          'additional submenu on the left.')
 
@@ -69,8 +69,8 @@ class ResultVisualizationFrame(ToplevelFrame, ParamConfigMixIn):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
-        self.add_label('Result visualization', fontsize=14,
-                       gridPos=(0, 0, 1, 5))
+        self.add_label_widget('Result visualization', fontsize=14,
+                              gridPos=(0, 0, 1, 5))
 
 
 if __name__ == '__main__':

@@ -86,11 +86,11 @@ class ProcessingSinglePluginFrame(ToplevelFrame, ParamConfigMixIn):
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
 
-        self.add_label('Test of processing workflow', fontsize=14,
-                       gridPos=(0, 0, 1, 5))
+        self.add_label_widget('Test of processing workflow', fontsize=14,
+                              gridPos=(0, 0, 1, 5))
         self.add_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
-        self.add_label('Select image', fontsize=12,
-                       gridPos=(self.next_row(), 0, 1, 2))
+        self.add_label_widget('Select image', fontsize=12,
+                              gridPos=(self.next_row(), 0, 1, 2))
         self.add_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
 
         # create button group for switching between
@@ -104,26 +104,26 @@ class ProcessingSinglePluginFrame(ToplevelFrame, ParamConfigMixIn):
         _row = self.next_row()
         _iow = 40
         _txtw = 120
-        self.add_param(self.params['image_nr'], row=_row, width=_iow,
-                       textwidth = _txtw)
-        self.add_param(self.params['scan_index1'], row=_row, width=_iow,
-                       textwidth = _txtw)
-        self.add_param(self.params['scan_index2'], width=_iow,
-                       textwidth = _txtw)
-        self.add_param(self.params['scan_index3'], width=_iow,
-                       textwidth = _txtw)
-        self.add_param(self.params['scan_index4'], width=_iow,
-                       textwidth = _txtw)
+        self.add_param_widget(self.params['image_nr'], row=_row, width=_iow,
+                              textwidth = _txtw)
+        self.add_param_widget(self.params['scan_index1'], row=_row,
+                              width=_iow, textwidth = _txtw)
+        self.add_param_widget(self.params['scan_index2'], width=_iow,
+                              textwidth = _txtw)
+        self.add_param_widget(self.params['scan_index3'], width=_iow,
+                              textwidth = _txtw)
+        self.add_param_widget(self.params['scan_index4'], width=_iow,
+                              textwidth = _txtw)
         self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         for i in range(1, 5):
             self.param_widgets[f'scan_index{i}'].setVisible(False)
             self.param_textwidgets[f'scan_index{i}'].setVisible(False)
-        self.add_label('Select plugin', fontsize=12, width=250,
-                       gridPos=(self.next_row(), 0, 1, 2))
+        self.add_label_widget('Select plugin', fontsize=12, width=250,
+                              gridPos=(self.next_row(), 0, 1, 2))
 
-        self.add_param(self.params['plugins'], n_columns=2, width=250,
-                       n_columns_text=2, linebreak=True,
-                       halign_text=QtCore.Qt.AlignLeft)
+        self.add_param_widget(self.params['plugins'], n_columns=2, width=250,
+                              n_columns_text=2, linebreak=True,
+                              halign_text=QtCore.Qt.AlignLeft)
 
         self.w_plugin_info = ReadOnlyTextWidget(None, fixedWidth=250,
                                                 fixedHeight=250)

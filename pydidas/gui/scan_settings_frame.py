@@ -65,7 +65,7 @@ class ScanSettingsFrame(ToplevelFrame, ParamConfigMixIn):
         self.toggle_dims()
 
     def initWidgets(self):
-        self.add_textbox('Scan settings\n', fontsize=14, bold=True,
+        self.add_text_widget('Scan settings\n', fontsize=14, bold=True,
                          underline=True, gridPos=(0, 0, 1, 0))
         _but = QtWidgets.QPushButton('Load scan parameters from file')
         _but.setIcon(self.style().standardIcon(42))
@@ -74,41 +74,31 @@ class ScanSettingsFrame(ToplevelFrame, ParamConfigMixIn):
         _but.setIcon(self.style().standardIcon(42))
         self.layout().addWidget(_but, self.next_row(), 0, 1, 2)
 
-        self.add_textbox('\nScan dimensionality:', fontsize=11,
+        self.add_text_widget('\nScan dimensionality:', fontsize=11,
                          bold=True, gridPos=(self.next_row(), 0, 1, 2))
 
         param = SCAN_SETTINGS.get_param('scan_dim')
-        self.add_param(param, textwidth = 180)
+        self.add_param_widget(param, textwidth = 180)
         self.param_widgets['scan_dim'].currentTextChanged.connect(
             self.toggle_dims)
         _rowoffset = self.next_row()
         _prefixes = ['scan_dir_', 'n_points_', 'delta_', 'unit_', 'offset_']
-        for i in range(4):
-            _gridPos = (_rowoffset + 6 * (i % 2), 3 * (i // 2), 1, 2)
-            _box = self.add_textbox(f'\nScan dimension {i+1}:', fontsize=11,
-                                    bold=True, gridPos= _gridPos)
-            self.param_titlewidgets[i + 1] = _box
-            for iitem, basename in enumerate(_prefixes):
-                _row = iitem + _rowoffset + 1 + 6 * (i % 2)
-                _column = 3 * (i // 2)
-                pname = f'{basename}{i+1}'
+        for i_dim in range(4):
+            _gridPos = (_rowoffset + 6 * (i_dim % 2), 3 * (i_dim // 2), 1, 2)
+            _box = self.add_text_widget(f'\nScan dimension {i_dim+1}:',
+                                    fontsize=11, bold=True, gridPos= _gridPos)
+            self.param_titlewidgets[i_dim + 1] = _box
+            for i_item, basename in enumerate(_prefixes):
+                _row = i_item + _rowoffset + 1 + 6 * (i_dim % 2)
+                _column = 3 * (i_dim // 2)
+                pname = f'{basename}{i_dim+1}'
                 param = SCAN_SETTINGS.get_param(pname)
-                self.add_param(param, row=_row, textwidth = 180, column=_column)
+                self.add_param_widget(param, row=_row, textwidth = 180, column=_column)
 
         _spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
                                         QtWidgets.QSizePolicy.Minimum)
         self.layout().addItem(_spacer, _rowoffset + 1, 2, 1, 1)
 
-
-        #     _w.setFixedWidth(150)
-        #     self.add_label(param.unit, gridPos=(row + _rowoffset, 2, 1, 1), width=24)
-        # _row = self.layout().getItemPosition(self.layout().indexOf(_w))[0] + 2
-        # _spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
-        #                                 QtWidgets.QSizePolicy.Expanding)
-        # self.layout().addItem(_spacer, _row, 0, 1, 3)
-        # _but = QtWidgets.QPushButton('Save experimental parameters to file')
-        # _but.setIcon(self.style().standardIcon(43))
-        # self.layout().addWidget(_but, _row + 1, 0, 1, 3)
 
     def toggle_dims(self):
         _prefixes = ['scan_dir_{n}', 'n_points_{n}', 'delta_{n}',

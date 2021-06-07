@@ -137,4 +137,5 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         None.
         """
         value = self.__convert_bool(value)
+        self._oldValue = value
         self.setCurrentIndex(self.findText(f'{value}'))

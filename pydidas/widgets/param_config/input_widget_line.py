@@ -111,4 +111,5 @@ class InputWidgetLine(QtWidgets.QLineEdit, InputWidget):
         -------
         None.
         """
+        self._oldValue = value
         self.setText(f'{value}')

@@ -45,9 +45,9 @@ from pydidas.apps import CompositeCreatorApp
 from pydidas.gui.toplevel_frame import ToplevelFrame
 from pydidas.core import Parameter, HdfKey, ParameterCollectionMixIn, get_generic_parameter
 from pydidas.config import HDF5_EXTENSIONS
-from pydidas.widgets import ReadOnlyTextWidget
+from pydidas.widgets import ReadOnlyTextWidget, ScrollArea
 from pydidas.widgets.dialogues import Hdf5DatasetSelection
-from pydidas.widgets.param_config import ParamConfigMixIn
+from pydidas.widgets.param_config import ParamConfigMixIn, ParamConfig
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_metadata)
 
@@ -70,6 +70,9 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         _layout = self.layout()
         _layout.setHorizontalSpacing(5)
         _layout.setVerticalSpacing(8)
+
+        self.w_config = ParamConfig(self)
+        self.w_config_scroll_area = ScrollArea(self, widget=self.w_config, )
 
         self.add_label_widget('Composite image creator', fontsize=14,
                        gridPos=(0, 0, 1, 5))
@@ -117,7 +120,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
                         policy = QtWidgets.QSizePolicy.Expanding)
 
     def connect_signals(self):
-        self.b_clear.clicked.connect(partial(self.__clear_entries, 'all'))
+        self.b_clear.clicked.connect(partial(self.__clear_entries, 'all', True))
         self.param_widgets['use_roi'].currentTextChanged.connect(
             self.__toggle_roi_selection )
         self.param_widgets['first_file'].io_edited.connect(
@@ -142,6 +145,9 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
             self.__toggle_bg_file_selection)
         self.param_widgets['bg_file'].io_edited.connect(
             self.__selected_bg_file)
+        self.param_widgets['bg_hdf_key'].io_edited.connect(
+            self.__selected_bg_hdf_key)
+
 
     def __selected_bg_file(self, fname):
         # reset all follow-up settings upon selecting a new
@@ -153,8 +159,8 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         for _key in ['bg_hdf_key', 'bg_hdf_num']:
             self.toggle_widget_visibility(_key, hdf_flag)
         self.__select_info['bg_hdf_images'] = hdf_flag
-        # open a pop-up to select the dataset from the hdf5 file
         if hdf_flag:
+            # open a pop-up to select the dataset from the hdf5 file
             dset = Hdf5DatasetSelection(self, fname).get_dset()
             self.update_param_value('bg_hdf_key', dset)
 
@@ -174,6 +180,7 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
         # open a pop-up to select the dataset from the hdf5 file
         if hdf_flag:
             dset = Hdf5DatasetSelection(self, fname).get_dset()
+            print(dset, type(dset))
             self.update_param_value('hdf_key', dset)
             self.__selected_hdf_key()
 
@@ -187,32 +194,44 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
             The filename to the hdf5 file.
         dset : str
             The dateset.
+        param_key : str
+            The reference key for the hdf dataset Parameter to be reset if
+            the selection is invalid.
+
+        Returns
+        -------
+        bool
+            The result of the hdf key check. True if the dataset exists in the
+            file and False if not.
         """
         dsets = get_hdf5_populated_dataset_keys(filename)
         if dset not in dsets:
+            self.__clear_entries([param_key], hide=False)
             QtWidgets.QMessageBox(
                 QtWidgets.QMessageBox.Critical, 'Dataset key error',
-                (f'The selected file\n\n\t{filename}\n\ndoes not have the '
-                 f'selected dataset\n\n{dset}')
+                (f'The selected file\n\n"{filename}"\n\ndoes not have the '
+                 f'selected dataset\n\n"{dset}"')
             ).exec_()
-            self.__clear_entries([param_key], hide=False)
+            return False
+        return True
 
     def __selected_hdf_key(self):
         _fname = self.get_param_value('first_file')
         _dset = self.get_param_value('hdf_key')
-        self.__verify_hdf_key(_fname, _dset, 'hdf_key')
-        _shape = get_hdf5_metadata(_fname, 'shape', _dset)
-        self.w_selection_info.setText(
-            (f'Number of images in dataset: {_shape[0]}\n\nImage size: '
-             f'{_shape[1]} x {_shape[2]}'))
-        self.update_param_value('n_image', _shape[0])
-        self.__select_info['hdf_n_image'] = _shape[0]
-        self.__show_selection_choices()
+        if self.__verify_hdf_key(_fname, _dset, 'hdf_key'):
+            _shape = get_hdf5_metadata(_fname, 'shape', _dset)
+            self.w_selection_info.setText(
+                (f'Number of images in dataset: {_shape[0]}\n\nImage size: '
+                 f'{_shape[1]} x {_shape[2]}'))
+            self.update_param_value('n_image', _shape[0])
+            self.__select_info['hdf_n_image'] = _shape[0]
+            self.__show_selection_choices()
 
     def __selected_bg_hdf_key(self):
+        print('select bg hdf key')
         _fname = self.get_param_value('bg_file')
         _dset = self.get_param_value('bg_hdf_key')
-        self.__verify_hdf_key(_fname, _dset, 'bg_hdf_key', hide=False,)
+        self.__verify_hdf_key(_fname, _dset, 'bg_hdf_key')#, hide=False,)
 
     def __selected_last_file(self):
         _path1, _fname1 = os.path.split(self.params['first_file'].value)
@@ -268,23 +287,36 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
             self.toggle_widget_visibility(_key, True)
         self.b_exec.setEnabled(True)
 
-    def __clear_entries(self, keys='all', hide=True):
-        if keys == 'all':
-            keys = list(self.params.keys())
+    def __reset_params(self, keys='all'):
         for _key in keys:
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
-        self.w_selection_info.setVisible(not hide)
+
+
+    def __clear_entries(self, keys='all', hide=True):
+        if keys == 'all':
+            keys = list(self.params.keys())
+        self.__reset_params(keys)
+        print(hide, keys)
+        _hide_selection = any(
+            [_key in keys for _key in
+             ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file']]
+            )
+        self.w_selection_info.setVisible(not _hide_selection)
         for _key in ['hdf_key', 'hdf_first_num', 'hdf_last_num', 'last_file',
-                     'hdf_first_num', 'hdf_last_num']:
-            self.toggle_widget_visibility(_key, not hide)
+                     'hdf_first_num', 'hdf_last_num', 'bg_hdf_key',
+                     'bg_hdf_num', 'bg_file']:
+            if _key in keys:
+                print(_key, hide, (not hide))
+                self.toggle_widget_visibility(_key, not hide)
         if 'hdf_images' in keys:
             self.__select_info['hdf_images'] = None
         self.b_exec.setEnabled(False)
 
+    # def __reset
+
     def update_n_image(self):
-        print('update n image')
         step = self.get_param_value('stepping')
         if self.__select_info['hdf_images']:
             i1 = self.get_param_value('hdf_first_num')
@@ -309,10 +341,11 @@ class CompositeCreatorFrame(ToplevelFrame, ParamConfigMixIn, ParameterCollection
 
     def update_composite_dim(self, dim):
         n1 = self.param_widgets[f'composite_n{dim}'].get_value()
-        n2 = int(np.ceil(self.get_param_value('n_image') / n1))
+        n2 = int(np.ceil(self.get_param_value('n_image') / abs(n1)))
         dim2 = 'y' if dim == 'x' else 'x'
-        self.params[f'composite_n{dim}'].value = n1
+        #self.params[f'composite_n{dim}'].value = n1
         self.update_param_value(f'composite_n{dim2}', n2)
+        self.update_param_value(f'composite_n{dim}', abs(n1))
 
 
 if __name__ == '__main__':
@@ -324,7 +357,7 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
+    sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
     STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 

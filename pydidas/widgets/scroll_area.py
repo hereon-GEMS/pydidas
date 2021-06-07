@@ -20,7 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with Warning class for showing notifications."""
+"""
+Module with ScrollArea, a QScrollArea implementation with convenience
+features for formatting.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -57,11 +60,6 @@ class ScrollArea(QtWidgets.QScrollArea):
         fixedHeight : int, optional
             If the scroll area shall have a fixed height, this value can be
             defined in pixel. The default is None.
-
-        Returns
-        -------
-        None.
-
         """
         super().__init__(parent)
         self._parent = parent
@@ -78,7 +76,8 @@ class ScrollArea(QtWidgets.QScrollArea):
         if params['widget']:
             self.setWidget(params['widget'])
         self.setWidgetResizable(True)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                           QtWidgets.QSizePolicy.Expanding)
         self.setAutoFillBackground(True)
         if params['fixedWidth']:
             self.setFixedWidth(params['fixedWidth'])

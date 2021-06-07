@@ -36,6 +36,7 @@ import os
 import pathlib
 import h5py
 import hdf5plugin
+from ..config import HDF5_EXTENSIONS
 
 
 def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
@@ -227,6 +228,7 @@ def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
     _datasets = []
 
     if isinstance(item, (str, pathlib.Path)):
+        assert os.path.splitext(item)[1] in HDF5_EXTENSIONS
         if os.path.exists(item):
             item = h5py.File(item, 'r')
             _close_on_exit = True

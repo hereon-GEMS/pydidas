@@ -102,8 +102,9 @@ class ParameterCollectionMixIn:
         """
         Set default entries.
 
-        This method will go through the supplied defaults iterable
-        if there are no entries for the default re
+        This method will go through the supplied defaults iterable.
+        If there are no entries for the Parameter keys, it will add a
+        Parameter with default value.
 
         Parameters
         ----------

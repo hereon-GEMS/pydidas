@@ -35,11 +35,11 @@ from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot.StackView import StackView
 
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 from ..core import ScanSettings, Parameter
 from ..workflow_tree import WorkflowTree
 from ..widgets import ReadOnlyTextWidget
-from ..widgets.param_config import ParamConfigMixIn
+from ..widgets.param_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
@@ -68,7 +68,7 @@ class LargeStackView(StackView):
     def sizeHint(self):
         return QtCore.QSize(500, 1000)
 
-class ProcessingSinglePluginFrame(ToplevelFrame, ParamConfigMixIn):
+class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)

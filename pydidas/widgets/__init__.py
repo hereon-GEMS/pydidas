@@ -71,6 +71,12 @@ from .info_widget import *
 from . import read_only_text_widget
 from .read_only_text_widget import *
 
+from . import create_widgets_mixin
+from .create_widgets_mixin import *
+
+from . import base_frame
+from .base_frame import *
+
 __all__ += confirmation_bar.__all__
 __all__ += plugin_collection_presenter.__all__
 __all__ += scroll_area.__all__
@@ -82,6 +88,9 @@ __all__ += qta_button.__all__
 __all__ += directory_explorer.__all__
 __all__ += info_widget.__all__
 __all__ += read_only_text_widget.__all__
+__all__ += create_widgets_mixin.__all__
+__all__ += base_frame.__all__
+
 
 # unclutter namespace and remove modules:
 del confirmation_bar
@@ -95,3 +104,5 @@ del qta_button
 del directory_explorer
 del info_widget
 del read_only_text_widget
+del create_widgets_mixin
+del base_frame

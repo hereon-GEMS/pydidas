@@ -39,9 +39,9 @@ from ..widgets.param_config import PluginParamConfig
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 
-class WorkflowEditFrame(ToplevelFrame):
+class WorkflowEditFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
@@ -57,10 +57,10 @@ class WorkflowEditFrame(ToplevelFrame):
         self.w_plugin_edit_canvas = PluginParamConfig(self)
         self.w_plugin_collection = PluginCollectionPresenter(self)
         self.w_workflow_area = ScrollArea(
-            self, widget=self.w_workflow_canvas, minHeight=500)
+            self, widget=self.w_workflow_canvas, minimumHeight=500)
         self.w_plugin_edit_area = ScrollArea(
             self, widget=self.w_plugin_edit_canvas, fixedWidth=400,
-            minHeight=500)
+            minimumHeight=500)
         self.w_plugin_edit_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                               QtWidgets.QSizePolicy.Expanding)
 

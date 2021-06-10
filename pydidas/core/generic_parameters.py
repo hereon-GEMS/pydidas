@@ -102,6 +102,12 @@ GENERIC_PARAMS = ParameterCollection(
                  'with the image height, i.e. -1 is equivalent with the '
                  'full image size. The default is -1')),
     Parameter(
+        'Use Thresholds', int, default=0, refkey='use_thresholds',
+        choices=[True, False],
+        tooltip=('Keyword to toggle use of the thresholds for clipping the '
+                 'data range in the original images before combining them. '
+                 'The default is False.')),
+    Parameter(
         'Lower threshold', float, default=np.nan, refkey='threshold_low',
         tooltip=('The lower threshold of the composite image. If any '
                  'finite value (i.e. not np.nan) is used, any pixels '

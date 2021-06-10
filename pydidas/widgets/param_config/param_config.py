@@ -28,7 +28,7 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamConfig', 'ParamConfigMixIn']
+__all__ = ['ParamConfig', 'ParameterConfigMixIn']
 
 import sys
 import pathlib
@@ -41,7 +41,7 @@ from .input_widget_file import InputWidgetFile
 from .input_widget_line import InputWidgetLine
 from .input_widget_hdfkey import InputWidgetHdfKey
 
-from ..utilities import excepthook
+from ..utilities import excepthook, apply_widget_properties
 from ...config import STANDARD_FONT_SIZE
 from ...core import HdfKey
 from ..._exceptions import WidgetLayoutError
@@ -72,9 +72,9 @@ def text_widget_factory(param, width, alignment=None):
     return _txt
 
 
-class ParamConfigMixIn:
+class ParameterConfigMixIn:
     """
-    The ParamConfigMixIn class includes methods which can be added to other
+    The ParameterConfigMixIn class includes methods which can be added to other
     classes without having to inherit from ParamConfig to avoid multiple
     inheritance from QtWidgets.QFrame.
     """
@@ -83,7 +83,7 @@ class ParamConfigMixIn:
         self.params = {}
         self.param_textwidgets = {}
 
-    def __get_layout_args(self, config):
+    def __get_create_params_layout_args(self, config):
         """
         Get the layout insertion arguments based on config.
 
@@ -112,7 +112,7 @@ class ParamConfigMixIn:
             _io_args = (0, QtCore.Qt.AlignRight)
         return _txt_args, _io_args
 
-    def __get_config(self, **kwargs):
+    def __get_create_param_config(self, **kwargs):
         """
         Get the config with kwargs formatting options.
 
@@ -144,6 +144,7 @@ class ParamConfigMixIn:
                   'valign_text': kwargs.get('valign_text',
                                             QtCore.Qt.AlignVCenter)}
         return config
+
 
     def update_param_value(self, key, value):
         """
@@ -195,44 +196,7 @@ class ParamConfigMixIn:
         self.param_widgets[key].setVisible(visible)
         self.param_textwidgets[key].setVisible(visible)
 
-    def add_label_widget(self, text, fontsize=STANDARD_FONT_SIZE, width=None,
-                         gridPos=None):
-        """
-        Add a label to the widget.
-
-        This method will add a label with "text" to the widget. Useful for
-        defining item groups etc.
-
-        Parameters
-        ----------
-        text : str
-            The label text to be printed.
-        fontsize : int, optional
-            The font size in pixels. The default is STANDARD_FONT_SIZE.
-        width : int, optional
-            The width of the QLabel. If None, no width will be speciied.
-            The default is None.
-        gridPos : Union[list, tuple, None], optional
-            The
-        """
-        w = QtWidgets.QLabel(text)
-        if fontsize != STANDARD_FONT_SIZE:
-            _font = QtWidgets.QApplication.font()
-            _font.setPointSize(fontsize)
-            w.setFont(_font)
-        if width:
-            w.setFixedWidth(width)
-        w.setFixedHeight(fontsize * (1 + text.count('\n')) + 10)
-        if self.layout() is None:
-            raise WidgetLayoutError('No layout set.')
-        if isinstance(self.layout(), QtWidgets.QGridLayout):
-            self.layout().addWidget(w, *gridPos,
-                                    QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        else:
-            self.layout().addWidget(w, 0,
-                                    QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-
-    def add_param_widget(self, param, **kwargs):
+    def create_param_widget(self, param, **kwargs):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
@@ -269,25 +233,34 @@ class ParamConfigMixIn:
         valign_text : QtCore.Qt.Alignment, optional
             The vertical alignment for the text (label) widget. The default
             is QtCore.Qt.AlignTop.
+        parent_widget : Union[QWidget, None], optional
+            The widget to which the label is added. If None, this defaults
+            to the calling widget, ie. "self". The default is None.
+
+        Returns
+        -------
+        QLabel, InputWidget
+            The formatted QLabel and Input widgets.
         """
-        _config = self.__get_config(**kwargs)
+        _widget = kwargs.get('parent_widget', self)
+        _config = self.__get_create_param_config(**kwargs)
         _text_widget = text_widget_factory(param, _config['width_text'],
                                            _config['valign_text'])
         _input_widget = param_widget_factory(param, _config['width'])
         _input_widget.io_edited.connect(
             partial(self.set_param_value, param, _input_widget)
             )
-
         # store references to the widgets:
         self.param_widgets[param.refkey] = _input_widget
         self.param_textwidgets[param.refkey] = _text_widget
-
         # add widgets to layout:
-        if self.layout() is None:
+        if _widget.layout() is None:
             raise WidgetLayoutError('No layout set.')
-        _text_widget_args, _input_widget_args = self.__get_layout_args(_config)
-        self.layout().addWidget(_text_widget, *_text_widget_args)
-        self.layout().addWidget(_input_widget, *_input_widget_args)
+        _text_widget_args, _input_widget_args = \
+            self.__get_create_params_layout_args(_config)
+        _widget.layout().addWidget(_text_widget, *_text_widget_args)
+        _widget.layout().addWidget(_input_widget, *_input_widget_args)
+        return _text_widget, _input_widget
 
     def get_param_value(self, key):
         """
@@ -339,7 +312,7 @@ class ParamConfigMixIn:
             excepthook(*sys.exc_info())
 
 
-class ParamConfig(QtWidgets.QFrame, ParamConfigMixIn):
+class ParamConfig(QtWidgets.QFrame, ParameterConfigMixIn):
     """
     The ParamConfig widget can be used to create a composite widget for
     updating parameter values.
@@ -366,15 +339,27 @@ class ParamConfig(QtWidgets.QFrame, ParamConfigMixIn):
         -------
         None.
         """
-        initLayout = kwargs.get('initLayout', True)
         super().__init__(parent)
-        self.setAutoFillBackground(True)
-        self.setLineWidth(2)
-        self.setFrameStyle(QtWidgets.QFrame.Raised)
+        initLayout = kwargs.get('initLayout', True)
+        kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
+        kwargs['frameStyle'] = kwargs.get('frameStyle',
+                                          QtWidgets.QFrame.Raised)
+        kwargs['autoFillBackground'] = kwargs.get('autoFillBackground', True)
+        apply_widget_properties(self, **kwargs)
         if initLayout:
             _layout = QtWidgets.QVBoxLayout()
             _layout.setContentsMargins(5, 5, 0, 0)
             _layout.setAlignment(QtCore.Qt.AlignLeft
                                       | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
-        self.layout_meta = dict(set=initLayout, grid=False, row=0)
+
+    def next_row(self):
+        """
+        Get the next empty row in the layout.
+
+        Returns
+        -------
+        int
+            The next empty row.
+        """
+        return self.layout().rowCount() + 1

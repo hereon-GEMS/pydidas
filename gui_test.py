@@ -24,12 +24,12 @@ STYLES = pydidas.config.STYLES
 PALETTES = pydidas.config.PALETTES
 STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 
-from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, ToplevelFrame,
+from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, BaseFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
     ProcessingFullWorkflowFrame, CompositeCreatorFrame)
-from pydidas.widgets.param_config import ParamConfigMixIn
+from pydidas.widgets.param_config import ParameterConfigMixIn
 
-class HomeFrame(ToplevelFrame):
+class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
@@ -44,27 +44,27 @@ class HomeFrame(ToplevelFrame):
                          'additional submenu on the left.')
 
 
-class ProcessingSetupFrame(ToplevelFrame):
+class ProcessingSetupFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
 
-class ToolsFrame(ToplevelFrame):
+class ToolsFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
 
-class ProcessingFrame(ToplevelFrame):
+class ProcessingFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
-class ResultVisualizationFrame(ToplevelFrame, ParamConfigMixIn):
+class ResultVisualizationFrame(BaseFrame, ParameterConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)

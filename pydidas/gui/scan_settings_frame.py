@@ -36,17 +36,17 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore
 
 
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 from ..core import ScanSettings
 from ..widgets.utilities import excepthook
-from ..widgets.param_config import ParamConfigMixIn
+from ..widgets.param_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 
 
 
 
-class ScanSettingsFrame(ToplevelFrame, ParamConfigMixIn):
+class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn):
 
     # need to redefine the signal because of the multiple inheritance
     # status_msg = QtCore.pyqtSignal(str)

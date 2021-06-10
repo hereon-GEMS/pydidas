@@ -43,7 +43,7 @@ from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.app.calib2 import parse_options, setup_model
 
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 from ..core import GlobalSettings
 
 GLOBAL_SETTINGS = GlobalSettings()
@@ -73,7 +73,7 @@ def pyfaiRingIcon():
 
 
 
-class PyfaiCalibFrame(ToplevelFrame):
+class PyfaiCalibFrame(BaseFrame):
     def __init__(self, **kwargs):
         mainWindow = kwargs.get('mainWindow', None)
         parent = kwargs.get('parent', None)

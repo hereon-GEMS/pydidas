@@ -89,6 +89,7 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('roi_xhigh'),
     get_generic_parameter('roi_ylow'),
     get_generic_parameter('roi_yhigh'),
+    get_generic_parameter('use_thresholds'),
     get_generic_parameter('threshold_low'),
     get_generic_parameter('threshold_high'),
     get_generic_parameter('binning'),
@@ -205,12 +206,12 @@ class CompositeCreatorApp(BaseApp):
         None.
         """
         super().__init__(*args, **kwargs)
-
         _cmdline_args = self.__parse_arguments()
         self.set_default_params(self.default_params)
+
         # update default_params with command line entries:
         for _key in self.params:
-            if _key in _cmdline_args:
+            if _key in _cmdline_args and _cmdline_args[_key] is not None:
                 self.params.set_value(_key, _cmdline_args[_key])
 
         self.__composite = None
@@ -236,47 +237,47 @@ class CompositeCreatorApp(BaseApp):
             and entered values or  - if missing - the default values.
         """
         parser = argparse.ArgumentParser()
-        parser.add_argument('-first_file', '-f', default=Path(),
+        parser.add_argument('-first_file', '-f',
                             help=DEFAULT_PARAMS['first_file'].tooltip)
-        parser.add_argument('-last_file', '-l', default=Path(),
+        parser.add_argument('-last_file', '-l',
                             help=DEFAULT_PARAMS['last_file'].tooltip)
-        parser.add_argument('-hdf_key', default=HdfKey(''),
+        parser.add_argument('-hdf_key',
                             help=DEFAULT_PARAMS['hdf_key'].tooltip)
-        parser.add_argument('-hdf_first_num', default=0, type=int,
+        parser.add_argument('-hdf_first_num', type=int,
                             help=DEFAULT_PARAMS['hdf_first_num'].tooltip)
-        parser.add_argument('-hdf_last_num', default=-1, type=int,
+        parser.add_argument('-hdf_last_num', type=int,
                             help=DEFAULT_PARAMS['hdf_last_num'].tooltip)
         parser.add_argument('--use_bg_file', action='store_true',
                             help=DEFAULT_PARAMS['use_bg_file'].tooltip)
-        parser.add_argument('-bg_file', default=Path(),
+        parser.add_argument('-bg_file',
                             help=DEFAULT_PARAMS['bg_file'].tooltip)
-        parser.add_argument('-bg_hdf_key', default=HdfKey(''),
+        parser.add_argument('-bg_hdf_key',
                             help=DEFAULT_PARAMS['bg_hdf_key'].tooltip)
-        parser.add_argument('-bg_hdf_num', default=0, type=int,
+        parser.add_argument('-bg_hdf_num', type=int,
                             help=DEFAULT_PARAMS['bg_hdf_num'].tooltip)
-        parser.add_argument('-stepping', '-s', default=1, type=int,
+        parser.add_argument('-stepping', '-s', type=int,
                             help=DEFAULT_PARAMS['stepping'].tooltip)
-        parser.add_argument('-composite_nx', default=1, type=int,
+        parser.add_argument('-composite_nx', type=int,
                             help=DEFAULT_PARAMS['composite_nx'].tooltip)
-        parser.add_argument('-composite_ny', default=-1, type=int,
+        parser.add_argument('-composite_ny', type=int,
                             help=DEFAULT_PARAMS['composite_ny'].tooltip)
         parser.add_argument('--use_roi', action='store_true',
                             help=DEFAULT_PARAMS['use_roi'].tooltip)
-        parser.add_argument('-roi_xlow', default=0, type=int,
+        parser.add_argument('-roi_xlow', type=int,
                             help=DEFAULT_PARAMS['roi_xlow'].tooltip)
-        parser.add_argument('-roi_xhigh', default=-1, type=int,
+        parser.add_argument('-roi_xhigh', type=int,
                             help=DEFAULT_PARAMS['roi_xhigh'].tooltip)
-        parser.add_argument('-roi_ylow', default=0, type=int,
+        parser.add_argument('-roi_ylow', type=int,
                             help=DEFAULT_PARAMS['roi_ylow'].tooltip)
-        parser.add_argument('-roi_yhigh', default=0, type=int,
+        parser.add_argument('-roi_yhigh', type=int,
                             help=DEFAULT_PARAMS['roi_yhigh'].tooltip)
-        parser.add_argument('-threshold_low', default=0, type=int,
+        parser.add_argument('-threshold_low', type=int,
                             help=DEFAULT_PARAMS['threshold_low'].tooltip)
-        parser.add_argument('-threshold_high', default=-1, type=int,
+        parser.add_argument('-threshold_high', type=int,
                             help=DEFAULT_PARAMS['threshold_high'].tooltip)
-        parser.add_argument('-binning', default=1, type=int,
+        parser.add_argument('-binning', type=int,
                             help=DEFAULT_PARAMS['binning'].tooltip)
-        parser.add_argument('--save_name', default=Path(),
+        parser.add_argument('-save_name',
                             help=DEFAULT_PARAMS['save_name'].tooltip)
         return dict(vars(parser.parse_args()))
 

@@ -37,15 +37,15 @@ from PyQt5 import QtWidgets, QtCore
 
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 from ..core import ExperimentalSettings
 from ..widgets.utilities import excepthook
-from ..widgets.param_config import ParamConfigMixIn
+from ..widgets.param_config import ParameterConfigMixIn
 
 EXP_SETTINGS = ExperimentalSettings()
 
 
-class ExperimentSettingsFrame(ToplevelFrame, ParamConfigMixIn):
+class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)

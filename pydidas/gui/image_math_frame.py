@@ -36,11 +36,11 @@ import qtawesome as qta
 
 from silx.gui.plot.ImageView import ImageView
 
-from pydidas.gui.toplevel_frame import ToplevelFrame
+from pydidas.gui.toplevel_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget
-from pydidas.widgets.param_config import ParamConfigMixIn
+from pydidas.widgets.param_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
@@ -59,7 +59,7 @@ _params = {
     }
 
 
-class ImageMathsFrame(ToplevelFrame, ParamConfigMixIn):
+class ImageMathsFrame(BaseFrame, ParameterConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)

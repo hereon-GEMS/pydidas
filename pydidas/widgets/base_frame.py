@@ -74,7 +74,7 @@ class BaseFrame(QtWidgets.QFrame):
             _layout = QtWidgets.QGridLayout(self)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
-        self.initialized = False
+        self._initialized = False
         self.name = name if name else ''
 
     def setParent(self, parent):
@@ -92,9 +92,9 @@ class BaseFrame(QtWidgets.QFrame):
         None.
         """
         super().setParent(parent)
-        if self.parent() and not self.initialized:
+        if self.parent() and not self._initialized:
             self._initialize()
-            self.initialized = True
+            self._initialized = True
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):

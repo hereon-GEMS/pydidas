@@ -29,13 +29,13 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Hdf5DatasetSelection']
+__all__ = ['Hdf5DatasetSelectionPopup']
 
 from PyQt5 import QtWidgets, QtGui
 from ...utils import get_hdf5_populated_dataset_keys
 from ...core import HdfKey
 
-class Hdf5DatasetSelection(QtWidgets.QInputDialog):
+class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
     QInputDialog subclass for showing a pop-up dialogue to select a dataset
     from an hdf5 file..

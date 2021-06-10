@@ -35,6 +35,9 @@ __all__ = ['ScrollArea']
 
 from PyQt5 import QtWidgets
 
+from .utilities import apply_widget_properties
+
+
 class ScrollArea(QtWidgets.QScrollArea):
     """
     Convenience class to simplify the setup of a QScrollArea.
@@ -62,32 +65,9 @@ class ScrollArea(QtWidgets.QScrollArea):
             defined in pixel. The default is None.
         """
         super().__init__(parent)
-        self._parent = parent
-        params = dict(widget=kwargs.get('widget', None),
-                      width=kwargs.get('width', None),
-                      height=kwargs.get('height', None),
-                      fixedHeight=kwargs.get('fixedHeight', None),
-                      minHeight=kwargs.get('minHeight', None),
-                      maxHeight=kwargs.get('maxHeight', None),
-                      fixedWidth=kwargs.get('fixedWidth', None),
-                      minWidth=kwargs.get('minWidth', None),
-                      maxWidth=kwargs.get('maxWidth', None),
-                      )
-        if params['widget']:
-            self.setWidget(params['widget'])
-        self.setWidgetResizable(True)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                           QtWidgets.QSizePolicy.Expanding)
-        self.setAutoFillBackground(True)
-        if params['fixedWidth']:
-            self.setFixedWidth(params['fixedWidth'])
-        if params['minWidth']:
-            self.setMinimumWidth(params['minWidth'])
-        if params['maxWidth']:
-            self.setMinimumWidth(params['maxWidth'])
-        if params['fixedHeight']:
-            self.setFixedHeight(params['fixedHeight'])
-        if params['minHeight']:
-            self.setMinimumHeight(params['minHeight'])
-        if params['maxHeight']:
-            self.setMinimumHeight(params['maxHeight'])
+        kwargs['widgetResizable'] = True
+        kwargs['autoFillBackground'] = True
+        kwargs['sizePolicy'] = (QtWidgets.QSizePolicy.Expanding,
+                                QtWidgets.QSizePolicy.Expanding)
+        kwargs['frameShape'] = QtWidgets.QFrame.NoFrame
+        apply_widget_properties(self, **kwargs)

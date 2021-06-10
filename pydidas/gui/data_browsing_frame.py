@@ -40,9 +40,9 @@ from PyQt5 import QtWidgets, QtCore
 
 from ..widgets import (DirectoryExplorer, Hdf5DatasetSelector,
                        QtaIconButton)
-from .toplevel_frame import ToplevelFrame
+from .toplevel_frame import BaseFrame
 
-class DataBrowsingFrame(ToplevelFrame):
+class DataBrowsingFrame(BaseFrame):
     """
     The DataBrowsingFrame is widget / frame with a directory exporer, a
     data preview window and a main data visualization window. Its main

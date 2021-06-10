@@ -32,7 +32,7 @@ __status__ = "Development"
 __all__ = ['ReadOnlyTextWidget']
 
 from PyQt5 import QtWidgets
-
+from pydidas.widgets.utilities import apply_widget_properties
 
 class ReadOnlyTextWidget(QtWidgets.QTextEdit):
     """
@@ -70,30 +70,17 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         None.
         """
         super().__init__(parent)
-        _params = {'readOnly': params.get('readOnly', True),
-                   'fixedWidth': params.get('fixedWidth', None),
-                   'minimumWidth': params.get('minimumWidth', 500),
-                   'fixedHeight': params.get('fixedHeight', None),
-                   'minimumHeight': params.get('minimumHeight', None),
-                   'visible': params.get('visible', True),
-                   }
-        # if fixed settings are given, overwrite the minimum size settings
-        # because these take precedence in Qt:
-        if _params['fixedWidth'] is not None:
-            _params['minimumWidth'] = None
-        if _params['fixedHeight'] is not None:
-            _params['minimumHeight'] = None
+        params['minimumWidth'] = params.get('minimumWidth', 500)
+        params['readOnly'] = params.get('readOnly', True)
+        params['acceptRichText'] = params.get('acceptRichText', True)
 
-        self.setVisible(_params['visible'])
-        self.setAcceptRichText(True)
-        self.setReadOnly(_params['readOnly'])
-        for _param, _func  in zip(
-                ['fixedWidth', 'minimumWidth', 'fixedHeight', 'minimumHeight'],
-                [self.setFixedWidth, self.setMinimumWidth,
-                 self.setFixedHeight, self.setMinimumHeight]):
-            if _params[_param] is not None:
-                _func(_params[_param])
-        self._params = _params
+        # if fixed settings are given, overwrite the minimum size settings
+        # because the minimumSize take precedence in Qt:
+        if 'fixedWidth' in params and 'minimumWidth' in params:
+            del params['minimumWidth']
+        if 'fixedHeight' in params and 'minimumHeight' in params:
+            del params['minimumHeight']
+        apply_widget_properties(self, **params)
 
     def setText(self, text, title=None, oneLineKeys=False, indent=4):
         """

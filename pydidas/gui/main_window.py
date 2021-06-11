@@ -36,8 +36,8 @@ import re
 from functools import partial
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from pydidas.config import gui_constants, qt_presets
-from pydidas.widgets import CentralWidgetStack, InfoWidget
+from pydidas.widgets import CentralWidgetStack, GetInfoWidget
+from pydidas.core.utilities import get_time_string
 from pydidas._exceptions import FrameConfigError
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -104,8 +104,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def __create_info_box(self):
+        self.__info_widget = GetInfoWidget()
         _dock_widget = QtWidgets.QDockWidget('Logging & information')
-        _dock_widget.setWidget(InfoWidget())
+        _dock_widget.setWidget(self.__info_widget)
         _dock_widget.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFloatable)
         _dock_widget.setBaseSize(500, 50)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
@@ -205,6 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot(str)
     def update_status(self, text):
         self.status.showMessage(text)
+        self.__info_widget.add_status(text)
 
     def __createMenu(self):
         self._menu = self.menuBar()

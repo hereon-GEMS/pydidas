@@ -30,13 +30,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-
+import time
 import os
 import sys
 import tempfile
 from os.path import join as osjoin
 from os.path import dirname, isfile
 
+from numpy import floor
 
 def update_separators(path):
     """
@@ -103,3 +104,40 @@ def create_temp_file():
     _handle, _file = tempfile.mkstemp()
     os.close(_handle)
     return _file
+
+def get_time_string(epoch=None, skipSpecChars=False):
+    """
+    Get a formatted time string.
+
+    This function creates a readable time string from an epoch time. If no
+    epoch time is specified, the current time will be used.
+    By using the "skipSpecChars" flag, the output can be formatted without
+    any separators and special characters, for example for using it for
+    file names.
+
+    Parameter
+    ---------
+    epoch : Union[None, float]
+        The time in epoch. If None, the current system time will be used.
+        The default is None.
+
+    skipSpecChars : bool, optional
+        Flag to skip special separation characters. If False the output
+        will be human-readable friendly with separators. The default is False.
+
+    Returns
+    -------
+
+    :return: Formatted date and time string (YYYY/MM/DD HH:MM:ss.sss)
+    :rtype: str
+    """
+    if epoch is None:
+        epoch = time.time()
+    _time = time.localtime(epoch)
+    _sec = _time[5] + epoch - floor(epoch)
+    if skipSpecChars:
+        return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
+                ''.format(_time[0], _time[1], _time[2], _time[3], _time[4],
+                          _sec))
+    return ('{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
+            ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))

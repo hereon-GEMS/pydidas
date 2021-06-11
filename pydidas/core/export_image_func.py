@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
+# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""
+The parameter module includes the Parameter class which is used to store
+processing parameters.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -29,37 +31,37 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GetInfoWidget']
+__all__ = ['export_image']
 
-from PyQt5 import QtWidgets, QtCore, QtGui
-from ..core.utilities import get_time_string
 
-class _InfoWidget(QtWidgets.QPlainTextEdit):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setReadOnly(True)
-        self.setMinimumHeight(50)
-        self.resize(500, 50)
+import os
+import h5py
+import numpy as np
+import skimage.io
+import matplotlib.pyplot as plt
 
-    def sizeHint(self):
-        return QtCore.QSize(500, 50)
+from pydidas.config import (
+    HDF5_EXTENSIONS, NUMPY_EXTENSIONS, BINARY_EXTENSIONS, TIFF_EXTENSIONS,
+    JPG_EXTENSIONS)
 
-    def add_status(self, text):
-        _cursor = self.textCursor()
-        _cursor.movePosition(QtGui.QTextCursor.Start,
-                             QtGui.QTextCursor.MoveAnchor, 1)
-        self.setTextCursor(_cursor)
-        self.insertPlainText(f'{get_time_string()}: {text}\n')
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)
 
-class _InfoWidgetFactory:
-    def __init__(self):
-        self._instance = None
-
-    def __call__(self):
-        if not self._instance:
-            self._instance = _InfoWidget()
-        return self._instance
-
-GetInfoWidget = _InfoWidgetFactory()
+def export_image(image, output_fname):
+    _ext = os.path.splitext(output_fname)[1].lower()
+    if _ext in NUMPY_EXTENSIONS:
+        np.save(output_fname, image)
+    elif _ext in HDF5_EXTENSIONS:
+        with h5py.File(output_fname, 'r+') as f:
+            f['entry/data/data'] = image
+    elif _ext in BINARY_EXTENSIONS:
+        image.tofile(output_fname)
+    elif _ext in TIFF_EXTENSIONS:
+        skimage.io.imsave(output_fname, image)
+    elif _ext == '.png' or _ext in JPG_EXTENSIONS:
+        fig1 = plt.figure(figsize=(image.shape[0] // 150, image.shape[1] // 150), dpi=10)
+        ax = fig1.add_axes([0, 0, 1, 1])
+        ax.imshow(image, interpolation='none', vmin=np.amin(image),
+                  vmax=np.amax(image), cmap='gray')
+        ax.set_xticks([])
+        ax.set_yticks([])
+        fig1.savefig(output_fname, dpi=150)
+        plt.close(fig1)

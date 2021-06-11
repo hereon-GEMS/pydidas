@@ -238,7 +238,7 @@ class ParameterCollection(dict):
         _item = self.__getitem__(param_name)
         if not isinstance(_item, Parameter):
             raise TypeError(('The stored item referenced by the key '
-                             '"{param_name}" is not a Parameter object.'))
+                             f'"{param_name}" is not a Parameter object.'))
         return _item.value
 
     def set_value(self, param_name, value):

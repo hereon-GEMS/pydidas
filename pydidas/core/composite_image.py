@@ -34,6 +34,7 @@ import numpy as np
 from pydidas.core.parameter_collection import ParameterCollection
 from pydidas.core.object_with_parameter_collection import ParameterCollectionMixIn
 from pydidas.core.generic_parameters import get_generic_parameter
+from pydidas.core.export_image_func import export_image
 
 _composite_image_params = ParameterCollection(
     get_generic_parameter('image_shape'),
@@ -50,6 +51,7 @@ class CompositeImage(ParameterCollectionMixIn):
     The CompositeImage class holds a numpy array to insert individual images
     to a composite.
     """
+
     def __init__(self, **kwargs):
         self.params = ParameterCollection(_composite_image_params)
         super().__init__()
@@ -120,7 +122,7 @@ class CompositeImage(ParameterCollectionMixIn):
         self.__image = np.zeros((_ny, _nx),
                                 dtype = self.get_param_value('datatype'))
 
-    def apply_thresholds(self, low=None, high=None):
+    def apply_thresholds(self, **kwargs):
         """
         Apply thresholds to the composite image.
 
@@ -133,27 +135,33 @@ class CompositeImage(ParameterCollectionMixIn):
 
         Parameters
         ----------
-        low : Union[float, None], optional
-            The lower threshold. If None, the stored lower thresholds from
-            the ParameterCollection will be used. The default is None.
+        low : float, optional
+            The lower threshold. If not specified, the stored lower threshold
+            from the ParameterCollection will be used. By default, that is
+            np.nan which will be ignored.
         high : Union[float, None], optional
-            The upper threshold. If None, the stored upper thresholds from
-            the ParameterCollection will be used. The default is None.
-
-        Returns
-        -------
-        None.
+            The upper threshold. If not specified, the stored upper threshold
+            from the ParameterCollection will be used. By default, that is
+            np.nan which will be ignored.
         """
-        if low is not None:
-            self.set_param_value('threshold_low', low)
-        if high is not None:
-            self.set_param_value('threshold_high', low)
-        _thresh_low= self.get_param_value('threshold_low')
+        if 'low' in kwargs:
+            self.set_param_value('threshold_low', kwargs.get('low'))
+        if 'high' in kwargs:
+            self.set_param_value('threshold_high', kwargs.get('high'))
+        _thresh_low = self.get_param_value('threshold_low')
         if np.isfinite(_thresh_low):
-            self.__composite[self.__composite < _thresh_low] = _thresh_low
+            self.__image[self.__image < _thresh_low] = _thresh_low
         _thresh_high = self.get_param_value('threshold_high')
         if np.isfinite(_thresh_high):
-            self.__composite[self.__composite > _thresh_high] = _thresh_high
+            self.__image[self.__image > _thresh_high] = _thresh_high
+
+    def create_new_image(self):
+        """
+        Create a new image array with the stored Parameters.
+
+        The new image array is accessible through the .image property.
+        """
+        self.__create_image_array()
 
     def insert_image(self, image, index):
         """
@@ -188,6 +196,28 @@ class CompositeImage(ParameterCollectionMixIn):
                        (_ix + 1) * self.get_param_value('image_shape')[1])
         self.__image[yslice, xslice] = image
 
+    def save(self, output_fname):
+        """
+        Save the image in binary npy format.
+
+        Parameters
+        ----------
+        output_fname : str
+            The full filename and path to the output image file.
+        """
+        np.save(output_fname, self.__image)
+
+    def export(self, output_fname):
+        """
+        Export the image to a file.
+
+        Parameters
+        ----------
+        output_fname : str
+            The full file system path and filename for the output image file.
+        """
+        export_image(self.__image, output_fname)
+
     @property
     def image(self):
         """
@@ -197,6 +227,19 @@ class CompositeImage(ParameterCollectionMixIn):
         -------
         np.ndarray
             The composite image.
-
         """
         return self.__image
+
+    @property
+    def shape(self):
+        """
+        Get the shape of the composite image.
+
+        Returns
+        -------
+        tuple
+            The shape of the composite image.
+        """
+        if self.__image is None:
+            return (0, 0)
+        return self.__image.shape

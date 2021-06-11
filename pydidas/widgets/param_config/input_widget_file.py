@@ -36,6 +36,7 @@ import pathlib
 
 from PyQt5 import QtWidgets, QtCore
 from .input_widget_with_button import InputWidgetWithButton
+from ...config import HDF5_EXTENSIONS
 
 class InputWidgetFile(InputWidgetWithButton):
     """
@@ -62,6 +63,7 @@ class InputWidgetFile(InputWidgetWithButton):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
+        self._output_flag = param.refkey.startswith('output')
 
     def button_function(self):
         """
@@ -70,11 +72,16 @@ class InputWidgetFile(InputWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Name of file', None,
-            ('All files (*.*);;HDF5 files (*.nxs *.hdf *.h5)'
-             ';;TIFF files (*.tif, *.tiff)')
-        )[0]
+        if self._output_flag:
+            _func = QtWidgets.QFileDialog.getSaveFileName
+        else:
+            _func = QtWidgets.QFileDialog.getOpenFileName
+        fname = _func(self, 'Name of file', None,
+                      ('All files (*.*);;'
+                       f'HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
+                       'TIFF files (*.tif, *.tiff);;'
+                       'NPY files (*.npy *.npz)')
+            )[0]
         if fname:
             self.setText(fname)
             self.emit_signal()

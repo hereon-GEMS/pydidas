@@ -136,7 +136,7 @@ class ImageReader:
         roi_dtypes = {type(e) for e in roi}
         roi_dtypes.discard(int)
         roi_dtypes.discard(slice)
-        if not roi_dtypes:
+        if roi_dtypes != set():
             raise ValueError(errorstr)
         # convert to slices
         try:

@@ -63,6 +63,9 @@ from .scan_settings import *
 from . import hdf_key
 from .hdf_key import *
 
+from . import export_image_func
+from .export_image_func import *
+
 __all__ += composites.__all__
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
@@ -74,6 +77,7 @@ __all__ += scan_settings.__all__
 __all__ += hdf_key.__all__
 __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
+__all__ += export_image_func.__all__
 
 # Unclutter namespace: remove modules from namespace
 del composites
@@ -87,3 +91,4 @@ del parameter_collection
 del object_with_parameter_collection
 del composite_image
 del generic_parameters
+del export_image_func

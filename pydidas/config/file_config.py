@@ -5,3 +5,5 @@ NUMPY_EXTENSIONS = ['.npy', '.np', '.npz']
 BINARY_EXTENSIONS = ['.raw', '.bin']
 
 TIFF_EXTENSIONS = ['.tif', '.tiff']
+
+JPG_EXTENSIONS = ['.jpg', '.jpeg']

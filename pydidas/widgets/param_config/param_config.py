@@ -248,7 +248,7 @@ class ParameterConfigMixIn:
                                            _config['valign_text'])
         _input_widget = param_widget_factory(param, _config['width'])
         _input_widget.io_edited.connect(
-            partial(self.set_param_value, param, _input_widget)
+            partial(self.__set_param_value, param, _input_widget)
             )
         # store references to the widgets:
         self.param_widgets[param.refkey] = _input_widget
@@ -286,7 +286,7 @@ class ParameterConfigMixIn:
         return self.params[key].value
 
     @staticmethod
-    def set_param_value(param, widget):
+    def __set_param_value(param, widget):
         """
         Update the Parameter value with the entry from the widget.
 

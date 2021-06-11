@@ -49,11 +49,11 @@ GENERIC_PARAMS = ParameterCollection(
         'Hdf dataset key', HdfKey, default=HdfKey(''), refkey='hdf_key',
         tooltip=('Used only for hdf5 files: The dataset key.')),
     Parameter(
-        'First image number', int, default=0, refkey='hdf_first_num',
+        'First image number', int, default=0, refkey='hdf_first_image_num',
         tooltip=('The first image in the hdf5-dataset to be used. The default'
                  ' is 0.')),
     Parameter(
-        'Last image number', int, default=-1, refkey='hdf_last_num',
+        'Last image number', int, default=-1, refkey='hdf_last_image_num',
         tooltip=('The last image in the hdf5-dataset to be used. The value'
                  '-1 will default to the last image. The default is -1.')),
     Parameter(

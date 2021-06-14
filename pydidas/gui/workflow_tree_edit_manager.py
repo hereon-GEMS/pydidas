@@ -32,10 +32,10 @@ __all__ = ['WorkflowEditTreeManager']
 
 from PyQt5 import QtCore
 
-from pydidas.plugin_collection import PluginCollection
+from pydidas.plugin_collection import GetPluginCollection
 from pydidas.widgets.workflow_edit import WorkflowCanvasManager
 
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = GetPluginCollection()
 
 
 class _WorkflowEditTreeManager(QtCore.QObject):

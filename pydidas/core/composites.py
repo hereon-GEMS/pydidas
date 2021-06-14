@@ -37,7 +37,7 @@ import numpy as np
 
 class _CompositesFactory:
     """
-    Singleton factory to make sure that only one PluginCollection exists
+    Singleton factory to make sure that only one CompositesCollection exists
     at runtime.
     """
     def __init__(self):

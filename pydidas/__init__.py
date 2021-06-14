@@ -1,5 +1,5 @@
 from . import plugin_collection
-from .plugin_collection import PluginCollection
+from .plugin_collection import GetPluginCollection
 
 from . import workflow_tree
 from .workflow_tree import WorkflowTree, WorkflowNode

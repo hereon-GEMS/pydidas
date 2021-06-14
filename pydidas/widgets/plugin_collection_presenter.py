@@ -35,10 +35,10 @@ from functools import partial
 
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
-from ..plugin_collection import PluginCollection
+from ..plugin_collection import GetPluginCollection
 from ..config import STYLES
 from .read_only_text_widget import ReadOnlyTextWidget
-PLUGIN_COLLECTION = PluginCollection()
+PLUGIN_COLLECTION = GetPluginCollection()
 
 
 class PluginCollectionPresenter(QtWidgets.QWidget):

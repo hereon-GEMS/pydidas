@@ -19,7 +19,7 @@ import qtawesome as qta
 
 import pydidas
 WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowEditTreeManager()
-PLUGIN_COLLECTION = pydidas.PluginCollection()
+PLUGIN_COLLECTION = pydidas.GetPluginCollection()
 STYLES = pydidas.config.STYLES
 PALETTES = pydidas.config.PALETTES
 STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE

@@ -157,9 +157,10 @@ class Parameter:
                            refkey = kwargs.get('refkey', name))
 
         _choices = kwargs.get('choices', None)
-        self.__meta['choices'] = (_choices if (isinstance(_choices, list)
-                                               or _choices is None)
-                                  else list(_choices))
+        if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
+            raise TypeError('The type of choices (type: "{type(_choices)}"'
+                            'is not supported. Please use list or tuple.')
+        self.__meta['choices'] = None if _choices is None else list(_choices)
         _def = self.__meta['default']
         if not self.__typecheck(_def):
             raise TypeError(f'Default value "{_def}" does not have data'
@@ -188,7 +189,7 @@ class Parameter:
 
         Parameters
         ----------
-        val : type
+        val : any
             The value of the parameter to be checked.
 
         Returns
@@ -311,7 +312,7 @@ class Parameter:
 
         Returns
         -------
-        list or None
+        Union[list, None]
             The allowed choices for the Parameter.
         """
         return self.__meta['choices']
@@ -323,7 +324,7 @@ class Parameter:
 
         Parameters
         ----------
-        choices : Union[list, tuple]
+        choices : Union[list, tuple, set]
             A list or tuple of allowed choices. A check will be performed that
             all entries correspond to the defined data type and that the
             curent parameter value is one of the allowed choices.
@@ -342,7 +343,7 @@ class Parameter:
         -------
         None.
         """
-        if not isinstance(choices, (list, tuple)):
+        if not isinstance(choices, (list, tuple, set)):
             raise TypeError('New choices must be a list or tuple.')
         for _c in choices:
             if not self.__typecheck(_c):
@@ -405,10 +406,6 @@ class Parameter:
         ValueError
             Raised if the type of val does not correspond to the required
             datatype.
-
-        Returns
-        -------
-        None.
         """
         val = self.__convenience_type_conversion(val)
         if self.__meta['choices'] and val not in self.__meta['choices']:
@@ -432,18 +429,6 @@ class Parameter:
         None.
         """
         self.value = self.__meta['default']
-
-    def is_optional(self):
-        """
-        Check whether the parameter is optional.
-
-        Returns
-        -------
-        bool
-            The boolean flag whether the paramter is optional.
-        """
-        return self.__meta['optional']
-
 
     def get_copy(self):
         """

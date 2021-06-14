@@ -36,28 +36,26 @@ from pydidas.core.object_with_parameter_collection import ParameterCollectionMix
 from pydidas.core.generic_parameters import get_generic_parameter
 from pydidas.core.export_image_func import export_image
 
-_composite_image_params = ParameterCollection(
-    get_generic_parameter('image_shape'),
-    get_generic_parameter('composite_nx'),
-    get_generic_parameter('composite_ny'),
-    get_generic_parameter('composite_dir'),
-    get_generic_parameter('datatype'),
-    get_generic_parameter('threshold_low'),
-    get_generic_parameter('threshold_high'),
-)
-
 class CompositeImage(ParameterCollectionMixIn):
     """
     The CompositeImage class holds a numpy array to insert individual images
     to a composite.
     """
+    default_params = ParameterCollection(
+        get_generic_parameter('image_shape'),
+        get_generic_parameter('composite_nx'),
+        get_generic_parameter('composite_ny'),
+        get_generic_parameter('composite_dir'),
+        get_generic_parameter('datatype'),
+        get_generic_parameter('threshold_low'),
+        get_generic_parameter('threshold_high'),
+        )
 
-    def __init__(self, **kwargs):
-        self.params = ParameterCollection(_composite_image_params)
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        self.params = ParameterCollection(self.default_params.get_copy())
         self.__image = None
         for _key in kwargs:
-            self.set_param_value(_key, kwargs[_key])
+              self.set_param_value(_key, kwargs[_key])
         if self.__check_config():
             self.__create_image_array()
 

@@ -35,7 +35,7 @@ from pathlib import Path
 
 from PyQt5 import QtCore
 
-from .parameter import Parameter
+from pydidas.core.parameter import Parameter
 from .parameter_collection import ParameterCollection
 
 
@@ -73,7 +73,7 @@ class ParameterCollectionMixIn:
         """
         self.params.add_param(param)
 
-    def add_params(self, *params):
+    def add_params(self, *params, **kwed_params):
         """
         Add parameters to the object.
 
@@ -87,8 +87,11 @@ class ParameterCollectionMixIn:
         ----------
         *params : Union[Parameter, dict, ParameterCollection]
             Any Parameter or ParameterCollection
+        **kwed_params : dict
+            A dictionary with Parameters. Note that the dictionary keys will
+            be ignored and only the Parameter.refkey attributes will be used.
         """
-        for _param in params:
+        for _param in (params + tuple(kwed_params.values())):
             if isinstance(_param, Parameter):
                 self.add_param(_param)
             elif isinstance(_param, (ParameterCollection, dict)):
@@ -136,6 +139,27 @@ class ParameterCollectionMixIn:
                            'has been registered.')
         return self.params.get_value(param_key)
 
+    def get_param(self, param_key):
+        """
+        Get a parameter.
+
+        *Note*: This method returns the Parameter itself, *not* a copy.
+
+        Parameters
+        ----------
+        param_key : str
+            The key name of the Parameter.
+
+        Returns
+        -------
+        Paramter
+            The Parameter object.
+        """
+        if not param_key in self.params:
+            raise KeyError(f'No parameter with the name "{param_key}" '
+                           'has been registered.')
+        return self.params[param_key]
+
     def set_param_value(self, param_key, value):
         """
         Set a parameter value.
@@ -166,29 +190,6 @@ class ParameterCollectionMixIn:
         for _key in self.params:
             name_val_pairs[self.params[_key].name] = self.params[_key].value
         return name_val_pairs
-
-    def _get_filename_param_ext(self, param_key):
-        """
-        Get the extension of a
-
-        Parameters
-        ----------
-        param_key : TYPE
-            DESCRIPTION.
-
-        Returns
-        -------
-        TYPE
-            DESCRIPTION.
-
-        """
-        _fname = self.get_param_value(param_key)
-        if not isinstance(_fname, Path):
-            raise TypeError(
-                'Cannot determine file extension of non-Path objects '
-                '(requested for {self.params[param_key]}).'
-                )
-        return os.path.splitext(self.get_param_value(param_key))[1]
 
     def print_param_values(self):
         """

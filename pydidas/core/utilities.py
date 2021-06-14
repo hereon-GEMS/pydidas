@@ -101,9 +101,9 @@ def create_temp_file():
     str
         The full path to the temporary file.
     """
-    _handle, _file = tempfile.mkstemp()
+    _handle, _filename = tempfile.mkstemp()
     os.close(_handle)
-    return _file
+    return _filename
 
 def get_time_string(epoch=None, skipSpecChars=False):
     """

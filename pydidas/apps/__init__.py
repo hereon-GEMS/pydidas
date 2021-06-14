@@ -33,6 +33,9 @@ __all__ = []
 from . import composite_creator
 from .composite_creator import *
 
+from . import base_app
+from .base_app import *
+
 # from . import parameter
 # from .parameter import *
 
@@ -55,6 +58,7 @@ from .composite_creator import *
 # from .hdf_key import *
 
 __all__ += composite_creator.__all__
+__all__ += base_app.__all__
 # __all__ += parameter_collection.__all__
 # __all__ += parameter.__all__
 # __all__ += dataset.__all__
@@ -65,7 +69,7 @@ __all__ += composite_creator.__all__
 
 # Unclutter namespace: remove modules from namespace
 del composite_creator
-# del parameter
+del base_app
 # del dataset
 # del global_settings
 # del experimental_settings

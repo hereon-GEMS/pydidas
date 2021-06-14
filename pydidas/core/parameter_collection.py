@@ -34,6 +34,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterCollection']
 
+from itertools import chain
+
 from .parameter import Parameter
 
 class ParameterCollection(dict):
@@ -62,6 +64,38 @@ class ParameterCollection(dict):
     def __copy__(self):
         return self.get_copy()
 
+    def __setitem__(self, key, param):
+        """
+        Assign a value to a dictionary key.
+
+        This method overloads the regular dict.__setitem__ method with
+        additional type and reference key checks.
+
+        Parameters
+        ----------
+        key : str
+            The dictionary key.
+        param : Parameter
+            The value / object to be added to the dictionary.
+
+        Raises
+        ------
+        TypeError
+            If the param argument is not a Parameter object.
+        KeyError
+            If the dictionary key differs from the Parameter reference key.
+        """
+        if not isinstance(param, Parameter):
+            raise TypeError('Only Parameter objects are supported in a '
+                            'ParameterCollection. Cannot add object '
+                            f'"{param}".')
+        if key != param.refkey:
+            raise KeyError(f'The dictionary key "{key}" for Parameter '
+                    f'"{param}" does not match the Parameter '
+                    'reference key: "{param.refkey}". Cannot add item.')
+        self.__check_key(param)
+        super().__setitem__(key, param)
+
     @staticmethod
     def __raise_type_error(item):
         """
@@ -80,36 +114,40 @@ class ParameterCollection(dict):
         raise TypeError(f'Cannot add object "{item}" of type '
                         '"{item.__class__}" to ParameterCollection.')
 
-    def __add_arg_params(self, *params):
+    def __add_arg_params(self, *args):
         """
         Add the passed parameters to the ParameterCollection.
 
         Parameters
         ----------
-        *params : Union[Parameter, ParameterCollection]
+        *args : Union[Parameter, ParameterCollection]
             Single Parameters or ParameterCollections.
+
+        Raises
+        ------
+        KeyError
+            If the key for the Parameter is already in use.
         """
-        if isinstance(params, (ParameterCollection)):
-            self.update(params)
+        if isinstance(args, ParameterCollection):
+            self.update(args)
         else:
-            for _param in params:
+            for _param in args:
                 if isinstance(_param, Parameter):
                     self.add_param(_param)
-                elif isinstance(_param, (ParameterCollection, dict)):
+                elif isinstance(_param, (ParameterCollection)):
                     self.update(_param)
 
-    def __add_kwarg_params(self, **kwparams):
+    def __add_kwarg_params(self, **kwargs):
         """
         Add the passed keyword parameters to the ParameterCollection.
 
         Parameters
         ----------
-        **kwparams : dict
+        **kwargs : dict
             A dictionary of keyword arguments.
         """
-        for _key in kwparams:
-            assert _key == kwparams[_key].refkey
-            self.__setitem__(_key, kwparams[_key])
+        for _key in kwargs:
+            self.__setitem__(_key, kwargs[_key])
 
     def __check_arg_types(self, *args):
         """
@@ -121,7 +159,7 @@ class ParameterCollection(dict):
         This method
         Parameters
         ----------
-        *params : any
+        *args : any
             Any arguments.
         """
         for _param in args:
@@ -135,7 +173,6 @@ class ParameterCollection(dict):
         This method verifies that all passed arguments are either Parameters
         or ParameterCollections.
 
-        This method
         Parameters
         ----------
         *kwargs : any
@@ -144,6 +181,72 @@ class ParameterCollection(dict):
         for _key in kwargs:
             if not isinstance(kwargs[_key], Parameter):
                 self.__raise_type_error(kwargs[_key])
+
+    def __check_duplicate_keys(self, *args, **kwargs):
+        """
+        Check for duplicate keys and raise an error if a duplicate key is
+        found.
+
+        This method compares the reference key of all args with the dictionary
+        keys. Then, it compares the keys of all keyword args with the
+        dictionary and arg keys.
+
+        Parameters
+        ----------
+        *args : Parameters
+            Any number of Parameters.
+        **kwargs : dict
+            A dictionary with Parameter values.
+
+        Raises
+        ------
+        KeyError
+            If the kwargs key of a Parameter differs from the Parameter
+            reference key.
+        """
+        # flatten ParameterCollection arguments and add them to a list
+        _new_args = chain.from_iterable(
+            [p] if isinstance(p, Parameter) else list(p.values())
+            for p in args
+            )
+        for _param in _new_args:
+            _newkeys = (tuple(self.keys())
+                        + tuple(p.refkey for p in _new_args
+                                if p is not _param)
+                        )
+            self.__check_key(_param, keys=_newkeys)
+        _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
+        for _key in kwargs:
+            if _key != kwargs[_key].refkey:
+                raise KeyError(
+                    f'The dictionary key "{_key}" for Parameter '
+                    f'"{kwargs[_key]}" does not match the Parameter '
+                    'reference key: "{kwargs[_key].refkey}".'
+                    )
+            self.__check_key(kwargs[_key], keys=_newkeys)
+
+    def __check_key(self, param, keys=None):
+        """
+        Check if the Parameter refkey is already a registed key.
+
+        Parameters
+        ----------
+        param : Parameter
+            The Parameter to be compared.
+        keys : Union[tuple, list], optional
+            The keys to be compared against. If None, the comparison will be
+            performed against the dictionary keys. The default is None.
+
+        Raises
+        ------
+        KeyError
+            If the key already exists in keys.
+        """
+        if keys is None:
+            keys = self.keys()
+        if param.refkey in keys:
+            raise KeyError('A parameter with the reference key '
+                           f'"{param.name}" already exists.')
 
     def add_param(self, param):
         """
@@ -159,15 +262,13 @@ class ParameterCollection(dict):
         TypeError
             If the passed param argument is not a Parameter instance.
         KeyError
-            If an entry with param.name already exists.
+            If an entry with param.refkey already exists.
         """
         self.__check_arg_types(param)
-        if param.name in self.keys():
-            raise KeyError(f'A parameter with the name "{param.name}" '
-                            'already exists.')
+        self.__check_key(param)
         self.__setitem__(param.refkey, param)
 
-    def add_params(self, *params, **kwparams):
+    def add_params(self, *args, **kwargs):
         """
         Add parameters to the ParameterCollection.
 
@@ -177,16 +278,30 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        *params : Union[Parameter, dict, ParameterCollection]
+        *args : Union[Parameter, dict, ParameterCollection]
             Any Parameter or ParameterCollection
-        **kwparams : dict
+        **kwargs : dict
             A dictionary with Parameter values.
         """
         # perform all type checks before adding any items:
-        self.__check_arg_types(*params)
-        self.__check_kwarg_types(*kwparams)
-        self.__add_arg_params(*params)
-        self.__add_kwarg_params(**kwparams)
+        self.__check_arg_types(*args)
+        self.__check_kwarg_types(**kwargs)
+        self.__check_duplicate_keys(*args, **kwargs)
+        self.__add_arg_params(*args)
+        self.__add_kwarg_params(**kwargs)
+
+    def delete_param(self, key):
+        """
+        Remove a Parameter from the ParameterCollection.
+
+        This method is a wrapper for the intrinsic dict.__delitem__ method.
+
+        Parameters
+        ----------
+        key : str
+            The key of the dictionry entry to be removed.
+        """
+        self.__delitem__(key)
 
     def get_copy(self):
         """
@@ -223,9 +338,6 @@ class ParameterCollection(dict):
         ------
         KeyError
             If the key <param_name> is not registered.
-        TypeError
-            If the item referenced by <param_name> is not a Parameter
-            instance.
 
         Returns
         -------
@@ -235,11 +347,7 @@ class ParameterCollection(dict):
         if param_name not in self.keys():
             raise KeyError(f'No parameter with the name "{param_name}" '
                             'has been registered.')
-        _item = self.__getitem__(param_name)
-        if not isinstance(_item, Parameter):
-            raise TypeError(('The stored item referenced by the key '
-                             f'"{param_name}" is not a Parameter object.'))
-        return _item.value
+        return self.__getitem__(param_name).value
 
     def set_value(self, param_name, value):
         """

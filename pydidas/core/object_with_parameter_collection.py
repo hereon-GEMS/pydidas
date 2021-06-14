@@ -30,10 +30,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterCollectionMixIn', 'ObjectWithParameterCollection']
 
-import os
-from pathlib import Path
-
+from numbers import Integral
 from PyQt5 import QtCore
+from numpy import mod
 
 from pydidas.core.parameter import Parameter
 from .parameter_collection import ParameterCollection
@@ -200,6 +199,40 @@ class ParameterCollectionMixIn:
         for _key in _config:
             print(f'{_key}: {_config[_key]}')
 
+    def _apply_param_modulo(self, param_refkey, modulo):
+        """
+        Apply a modulo to a Parameter.
+
+        This method applies a modulo to a Parameter, referenced by its
+        refkey, for example for converting image sizes of -1 to the actual
+        detector dimensions.
+
+        Parameters
+        ----------
+        param_refkey : str
+            The reference key for the selected Parameter.
+        modulo : int
+            The mathematical modulo to be applied.
+
+        Raises
+        ------
+        ValueError
+            If the datatype of the selected Parameter is not integer.
+
+        Returns
+        -------
+        _val : int
+            The modulated Parameter value
+        """
+        _param = self.params[param_refkey]
+        if _param.type is not Integral:
+            raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
+                             ' is not integer.')
+        _val = mod(_param.value, modulo)
+        # create offset for negative indices to capture the whole array
+        _offset = 1 if _param.value < 0 else 0
+        _param.value = _val + _offset
+        return _val
 
 class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn):
     """

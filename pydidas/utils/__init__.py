@@ -31,12 +31,16 @@ __status__ = "Development"
 __all__ = []
 
 
-from . import hdf_dataset_filter
-from .hdf_dataset_filter import *
+from . import hdf_dataset_utils
+from .hdf_dataset_utils import *
 
-__all__ += hdf_dataset_filter.__all__
+from . import file_checks
+from .file_checks import *
 
+__all__ += hdf_dataset_utils.__all__
+__all__ += file_checks.__all__
 
 # unclutter namespace and delete the references to the modules itself
 # as all functions are imported directly
-del hdf_dataset_filter
+del hdf_dataset_utils
+del file_checks

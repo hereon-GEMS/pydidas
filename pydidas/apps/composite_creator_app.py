@@ -34,7 +34,6 @@ __all__ = ['CompositeCreatorApp']
 import os
 import argparse
 from pathlib import Path
-from numbers import Integral
 
 import numpy as np
 
@@ -43,45 +42,37 @@ from pydidas._exceptions import AppConfigError
 from pydidas.core import (Parameter, HdfKey, ParameterCollection,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
-from pydidas.utils import (get_hdf5_populated_dataset_keys,
-                           get_hdf5_metadata)
+from pydidas.utils import (get_hdf5_metadata, check_file_exists,
+                           check_hdf_key_exists_in_file,
+                           verify_files_in_same_directory,
+                           verify_files_of_range_are_same_size)
 from pydidas.image_reader import read_image
 
-PARAM_TOOLTIPS = {
-    'last_file': ('Used only for file series: The name of the last file to be'
-                  ' added to the composite image.'),
-    'use_bg_file' : ('Keyword to toggle usage of background subtraction.'),
-    'bg_file': ('The name of the file used for background correction.'),
-    'bg_hdf_key': ('For hdf5 background image files: The dataset key.'),
-    'bg_hdf_num' : ('For hdf5 background image files: The image number in the'
-                    ' dataset'),
-    'stepping': ('The step width (in images). A value n > 1 will only add '
-                 'every n-th image to the composite.'),
-    'n_image': ('The toal number of images in the composite images.'),
-    'output_fname': ('The name used for saving the composite image. None will'
-                     ' default to no image saving. The default is None.')
-    }
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('first_file'),
     Parameter('Last file name', Path, default=Path(), refkey='last_file',
-              tooltip=PARAM_TOOLTIPS['last_file']),
+              tooltip=('Used only for file series: The name of the last file '
+                       'to be added to the composite image.')),
     get_generic_parameter('hdf_key'),
     get_generic_parameter('hdf_first_image_num'),
     get_generic_parameter('hdf_last_image_num'),
     Parameter('Subtract background image', int, default=0,
               refkey='use_bg_file', choices=[True, False],
-              tooltip=PARAM_TOOLTIPS['use_bg_file']),
+              tooltip=('Keyword to toggle usage of background subtraction.')),
     Parameter('Background image file', Path, default=Path(), refkey='bg_file',
-              tooltip=PARAM_TOOLTIPS['bg_file']),
+              tooltip=('The name of the file used for background correction.')),
     Parameter('Background Hdf dataset key', HdfKey, default=HdfKey(''),
-              refkey='bg_hdf_key', tooltip=PARAM_TOOLTIPS['bg_hdf_key']),
+              refkey='bg_hdf_key',
+              tooltip=('For hdf5 background image files: The dataset key.')),
     Parameter('Background image number', int, default=0, refkey='bg_hdf_num',
-              tooltip=PARAM_TOOLTIPS['bg_hdf_num']),
+              tooltip=('For hdf5 background image files: The image number in '
+                       'the dataset')),
     Parameter('Stepping', int, default=1, refkey='stepping',
-              tooltip=PARAM_TOOLTIPS['stepping']),
+              tooltip=('The step width (in images). A value n > 1 will only'
+                       ' add every n-th image to the composite.')),
     Parameter('Total number of images', int, default=-1, refkey='n_image',
-              tooltip=PARAM_TOOLTIPS['n_image']),
+              tooltip=('The toal number of images in the composite images.')),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -95,9 +86,11 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('threshold_high'),
     get_generic_parameter('binning'),
     Parameter('Composite image filename', Path, default=Path(),
-              refkey='output_fname', tooltip=PARAM_TOOLTIPS['output_fname'])
+              refkey='output_fname',
+              tooltip=('The name used for saving the composite image. None '
+                       'will default to no automatic image saving. The '
+                       'default is None.'))
     )
-
 
 class CompositeCreatorApp(BaseApp):
     """
@@ -194,20 +187,9 @@ class CompositeCreatorApp(BaseApp):
     def __init__(self, *args, **kwargs):
         """
         Create a CompositeCreatorApp instance.
-
-        Parameters
-        ----------
-        *args : list
-            Any arguments.
-        **kwargs : dict
-            A dictionary of keyword arguments.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(*args, **kwargs)
-        _cmdline_args = self.__parse_arguments()
+        _cmdline_args = __parse_composite_creator_cmdline_arguments()
         self.set_default_params(self.default_params)
 
         # update default_params with command line entries:
@@ -229,91 +211,60 @@ class CompositeCreatorApp(BaseApp):
                          'datatype': None
                          }
 
-    @staticmethod
-    def __parse_arguments():
+    def run(self, *args, **kwargs):
         """
-        Use argparse to get command line arguments.
+        Run the composite creation.
 
-        Returns
-        -------
-        dict
-            A dictionary with the parsed arugments which holds all the entries
-            and entered values or  - if missing - the default values.
+        This method will first call the check_entries method to verify that
+        the parameter entries are consistent. The composite image will be
+        created and stored. If the output_fname has been specified, the
+        composite image will be saved. Otherwise, it will only be available
+        by reference.
+
+        Parameters
+        ----------
+        output_fname : Union[int, Path, None]
+            The name of the output file for the raw data.
         """
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-first_file', '-f',
-                            help=DEFAULT_PARAMS['first_file'].tooltip)
-        parser.add_argument('-last_file', '-l',
-                            help=DEFAULT_PARAMS['last_file'].tooltip)
-        parser.add_argument('-hdf_key',
-                            help=DEFAULT_PARAMS['hdf_key'].tooltip)
-        parser.add_argument('-hdf_first_image_num', type=int,
-                            help=DEFAULT_PARAMS['hdf_first_image_num'].tooltip)
-        parser.add_argument('-hdf_last_image_num', type=int,
-                            help=DEFAULT_PARAMS['hdf_last_image_num'].tooltip)
-        parser.add_argument('--use_bg_file', action='store_true',
-                            help=DEFAULT_PARAMS['use_bg_file'].tooltip)
-        parser.add_argument('-bg_file',
-                            help=DEFAULT_PARAMS['bg_file'].tooltip)
-        parser.add_argument('-bg_hdf_key',
-                            help=DEFAULT_PARAMS['bg_hdf_key'].tooltip)
-        parser.add_argument('-bg_hdf_num', type=int,
-                            help=DEFAULT_PARAMS['bg_hdf_num'].tooltip)
-        parser.add_argument('-stepping', '-s', type=int,
-                            help=DEFAULT_PARAMS['stepping'].tooltip)
-        parser.add_argument('-composite_nx', type=int,
-                            help=DEFAULT_PARAMS['composite_nx'].tooltip)
-        parser.add_argument('-composite_ny', type=int,
-                            help=DEFAULT_PARAMS['composite_ny'].tooltip)
-        parser.add_argument('--use_roi', action='store_true',
-                            help=DEFAULT_PARAMS['use_roi'].tooltip)
-        parser.add_argument('-roi_xlow', type=int,
-                            help=DEFAULT_PARAMS['roi_xlow'].tooltip)
-        parser.add_argument('-roi_xhigh', type=int,
-                            help=DEFAULT_PARAMS['roi_xhigh'].tooltip)
-        parser.add_argument('-roi_ylow', type=int,
-                            help=DEFAULT_PARAMS['roi_ylow'].tooltip)
-        parser.add_argument('-roi_yhigh', type=int,
-                            help=DEFAULT_PARAMS['roi_yhigh'].tooltip)
-        parser.add_argument('--use_thresholds', action='store_true',
-                            help=DEFAULT_PARAMS['use_thresholds'].tooltip)
-        parser.add_argument('-threshold_low', type=int,
-                            help=DEFAULT_PARAMS['threshold_low'].tooltip)
-        parser.add_argument('-threshold_high', type=int,
-                            help=DEFAULT_PARAMS['threshold_high'].tooltip)
-        parser.add_argument('-binning', type=int,
-                            help=DEFAULT_PARAMS['binning'].tooltip)
-        parser.add_argument('-output_fname',
-                            help=DEFAULT_PARAMS['output_fname'].tooltip)
-        _args = dict(vars(parser.parse_args()))
-        # store None for keyword arguments which were not selected:
-        for _key in ['use_roi', 'use_thresholds', 'use_bg_file']:
-            _args[_key] = _args[_key] if _args[_key] else None
-        return _args
+        self.prepare_run()
+        output_fname = kwargs.get('output_fname',
+                                  self.get_param_value('output_fname'))
 
-    def __create_filelist(self):
+        if self.__config['hdffile']:
+            _range = range(self.get_param_value('hdf_first_image_num'),
+                           self.get_param_value('hdf_last_image_num') + 1,
+                           self.get_param_value('stepping'))
+        else:
+            _range = range(len(self.__config['file_list']))
+
+        for compindex, imgindex in enumerate(_range):
+            _fname, _kwargs = self.__get_kwargs_for_read_image(imgindex)
+            self.__composite.insert_image(read_image(_fname, **_kwargs),
+                                          compindex)
+        self.apply_thresholds()
+        if os.path.exists(os.path.dirname(output_fname)):
+            self.__composite.save(output_fname)
+
+    def prepare_run(self):
         """
-        Create the list of all files to be processed.
+        Prepare running the composite creation.
 
-        The list of files to be processed is created based on the filenames
-        of the first and last files. The directory content will be sorted
-        and the first and last files names will be used to select the part
-        of filesnames to be stored.
-
-        Returns
-        -------
-        None.
+        This method will check all settings and create the composite image or
+        tell the CompositeImage to create a new image with changed size.
         """
-        _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
-        _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
-        _file_list = os.listdir(_path1)
-        _file_list.sort()
-        _i1 = _file_list.index(_fname1)
-        _i2 = _file_list.index(_fname2)
-        _file_list = _file_list[_i1:_i2+1:self.get_param_value('stepping')]
-        self.__config['file_list'] = _file_list
-        self.__config['file_path'] = _path1
-        self.__config['n_image'] = len(_file_list)
+        self.check_entries()
+        _shape = (self.__config['final_image_size_y'],
+                  self.__config['final_image_size_x'])
+        if self.__composite is None:
+            self.__composite = CompositeImage(
+                image_shape=_shape,
+                composite_nx=self.get_param_value('composite_nx'),
+                composite_ny=self.get_param_value('composite_ny'),
+                composite_dir=self.get_param_value('composite_dir'),
+                datatype=self.__config['datatype'])
+            return
+        if self.__composite.shape != _shape:
+            self.__composite.create_new_image()
 
     def check_entries(self):
         """
@@ -336,10 +287,6 @@ class CompositeCreatorApp(BaseApp):
               image size covers all selected files / images.
             - If a background subtraction is used, check the background file
               and assert the image size is the same.
-
-        Returns
-        -------
-        None.
         """
         self.__check_files()
         self.__check_roi()
@@ -347,76 +294,58 @@ class CompositeCreatorApp(BaseApp):
         self.__check_and_set_bg_file()
         self.__process_roi()
 
-    @staticmethod
-    def __check_hdf_key(fname, key):
+    def apply_thresholds(self, **kwargs):
         """
-        Veriy that the selected file has a dataset with key.
+        Apply thresholds to the composite image.
+
+        This method is a wrapper for the apply_thresholds method of the
+        CompositeImage object.
 
         Parameters
         ----------
-        fname : str
-            The filename and path.
-        key : str
-            The dataset key.
-
-        Raises
-        ------
-        AppConfigError
-            If the dataset key is not found in the hdf5 file.
+        low : float, optional
+            The lower threshold. If not specified, the stored lower threshold
+            from the ParameterCollection will be used.
+        high : float, optional
+            The upper threshold. If not specified, the stored upper threshold
+            from the ParameterCollection will be used.
         """
-        dsets = get_hdf5_populated_dataset_keys(fname)
-        if key not in dsets:
-            raise AppConfigError(f'hdf_key "{key}" is not a valid key '
-                                 f'for the file "{fname}."')
+        if self.get_param_value('use_thresholds'):
+            if 'low' in kwargs:
+                self.set_param_value('threshold_low', kwargs.get('low'))
+            if 'high' in kwargs:
+                self.set_param_value('threshold_high', kwargs.get('high'))
+            self.__composite.apply_thresholds(
+                low=self.get_param_value('threshold_low'),
+                high=self.get_param_value('threshold_high')
+                )
 
-    @staticmethod
-    def __check_file_exists(fname):
+    def export_image(self, output_fname):
         """
-        Check that a file exists and raise an Exception if not.
+        Export the CompositeImage to a file.
+
+        This method is a wrapper for the CompositeImage.export method.
+        Supported file types for export are: binary, numpy, hdf5, png, tiff,
+        jpg.
 
         Parameters
         ----------
-        fname : str
-            The filename and path.
-
-        Raises
-        ------
-        AppConfigError
-            If the selected filename does not exist.
+        output_fname : str
+            The full file system path and filename for the output image file.
         """
-        if not os.path.isfile(fname):
-            raise AppConfigError(f'The selected filename "{fname}" does not '
-                                 'point to a valid file.')
+        self.__composite.export(output_fname)
 
-    def __store_image_data_from_hdf_file(self):
-        _first_file = self.get_param_value('first_file')
-        _key = self.get_param_value('hdf_key')
-        self.__check_hdf_key(_first_file, _key)
+    @property
+    def composite(self):
+        """
+        Get the composite image.
 
-        _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
-        _n_image = _meta['shape'][0]
-        self.__config['raw_img_shape_y'] = _meta['shape'][1]
-        self.__config['raw_img_shape_x'] = _meta['shape'][2]
-        self.__config['datatype'] = _meta['dtype']
-        _n0 = self.__apply_param_modulo('hdf_first_image_num', _n_image)
-        _n1 = self.__apply_param_modulo('hdf_last_image_num', _n_image)
-        # correct total number of images for stepping *after* the
-        # numbers have been modulated to be in the image range.
-        self.__config['n_image'] = ((_n1 - _n0 + 1)
-                                    // self.get_param_value('stepping'))
-        if not _n0 < _n1:
-            raise AppConfigError(
-                f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
-                ' not describe a correct range.')
-
-    def __store_image_data_from_file_range(self):
-        self.__verify_files_in_same_directory()
-        self.__create_filelist()
-        self.__verify_files_are_same_size()
-        _test_image = read_image(self.get_param_value('first_file'))
-        self.__config['datatype'] = _test_image.dtype
-        self.__config['raw_img_shape_x'] = _test_image.shape[1]
-        self.__config['raw_img_shape_y'] = _test_image.shape[0]
+        Returns
+        -------
+        np.ndarray
+            The composite image in np.ndarray format.
+        """
+        return self.__composite.image
 
     def __check_files(self):
         """
@@ -429,7 +358,7 @@ class CompositeCreatorApp(BaseApp):
             If any of the checks fail.
         """
         _first_file = self.get_param_value('first_file')
-        self.__check_file_exists(_first_file)
+        check_file_exists(_first_file)
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
             self.__config['hdffile'] = True
             self.__store_image_data_from_hdf_file()
@@ -437,41 +366,68 @@ class CompositeCreatorApp(BaseApp):
             self.__config['hdffile'] = False
             self.__store_image_data_from_file_range()
 
-
-    def __apply_param_modulo(self, param_refkey, modulo):
+    def __store_image_data_from_hdf_file(self):
         """
-        Apply a modulo to a Parameter.
-
-        This method applies a modulo to a Parameter, referenced by its
-        refkey, for example for converting image sizes of -1 to the actual
-        detector dimensions.
-
-        Parameters
-        ----------
-        param_refkey : str
-            The reference key for the selected Parameter.
-        modulo : int
-            The mathematical modulo to be applied.
+        Store config metadata from hdf5 file.
 
         Raises
         ------
-        ValueError
-            If the datatype of the selected Parameter is not integer.
-
-        Returns
-        -------
-        _val : int
-            The modulated Parameter value
+        AppConfigError
+            If the selected image range is not included in the hdf5 dataset.
         """
-        _param = self.params[param_refkey]
-        if _param.type is not Integral:
-            raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
-                             ' is not integer.')
-        _val = np.mod(_param.value, modulo)
-        # create offset for negative indices to capture the whole array
-        _offset = 1 if _param.value < 0 else 0
-        _param.value = _val + _offset
-        return _val
+        _first_file = self.get_param_value('first_file')
+        _key = self.get_param_value('hdf_key')
+        check_hdf_key_exists_in_file(_first_file, _key)
+
+        _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
+        _n_image = _meta['shape'][0]
+        self.__config['raw_img_shape_y'] = _meta['shape'][1]
+        self.__config['raw_img_shape_x'] = _meta['shape'][2]
+        self.__config['datatype'] = _meta['dtype']
+        _n0 = self._apply_param_modulo('hdf_first_image_num', _n_image)
+        _n1 = self._apply_param_modulo('hdf_last_image_num', _n_image)
+        # correct total number of images for stepping *after* the
+        # numbers have been modulated to be in the image range.
+        self.__config['n_image'] = ((_n1 - _n0 + 1)
+                                    // self.get_param_value('stepping'))
+        if not _n0 < _n1:
+            raise AppConfigError(
+                f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
+                ' not describe a correct range.')
+
+    def __store_image_data_from_file_range(self):
+        """
+        Store config metadata from file range.
+        """
+        verify_files_in_same_directory(self.get_param_value('first_file'),
+                                       self.get_param_value('last_file'))
+        self.__create_filelist()
+        verify_files_of_range_are_same_size(self.__config['file_path'],
+                                            self.__config['file_list'])
+        _test_image = read_image(self.get_param_value('first_file'))
+        self.__config['datatype'] = _test_image.dtype
+        self.__config['raw_img_shape_x'] = _test_image.shape[1]
+        self.__config['raw_img_shape_y'] = _test_image.shape[0]
+
+    def __create_filelist(self):
+        """
+        Create the list of all files to be processed.
+
+        The list of files to be processed is created based on the filenames
+        of the first and last files. The directory content will be sorted
+        and the first and last files names will be used to select the part
+        of filesnames to be stored.
+        """
+        _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
+        _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
+        _file_list = os.listdir(_path1)
+        _file_list.sort()
+        _i1 = _file_list.index(_fname1)
+        _i2 = _file_list.index(_fname2)
+        _file_list = _file_list[_i1:_i2+1:self.get_param_value('stepping')]
+        self.__config['file_list'] = _file_list
+        self.__config['file_path'] = _path1
+        self.__config['n_image'] = len(_file_list)
 
     def __check_and_set_bg_file(self):
         """
@@ -494,11 +450,12 @@ class CompositeCreatorApp(BaseApp):
         if not self.get_param_value('use_bg_file'):
             return
         _bg_file = self.get_param_value('bg_file')
-        self.__check_file_exists(_bg_file)
+        check_file_exists(_bg_file)
         self.__process_roi()
         # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
-            self.__check_hdf_key(_bg_file, self.get_param_value('bg_hdf_key'))
+            check_hdf_key_exists_in_file(_bg_file,
+                                         self.get_param_value('bg_hdf_key'))
             _params = dict(dataset=self.get_param_value('bg_hdf_key'),
                            binning=self.get_param_value('binning'),
                            imageNo=self.get_param_value('bg_hdf_num'),
@@ -525,14 +482,14 @@ class CompositeCreatorApp(BaseApp):
         """
         if self.get_param_value('use_roi'):
             _warning = ''
-            _x0 = self.__apply_param_modulo('roi_xlow',
-                                            self.__config['raw_img_shape_y'])
-            _x1 = self.__apply_param_modulo('roi_xhigh',
-                                            self.__config['raw_img_shape_y'])
-            _y0 = self.__apply_param_modulo('roi_ylow',
-                                            self.__config['raw_img_shape_x'])
-            _y1 = self.__apply_param_modulo('roi_yhigh',
-                                            self.__config['raw_img_shape_x'])
+            _x0 = self._apply_param_modulo('roi_xlow',
+                                           self.__config['raw_img_shape_y'])
+            _x1 = self._apply_param_modulo('roi_xhigh',
+                                           self.__config['raw_img_shape_y'])
+            _y0 = self._apply_param_modulo('roi_ylow',
+                                           self.__config['raw_img_shape_x'])
+            _y1 = self._apply_param_modulo('roi_yhigh',
+                                           self.__config['raw_img_shape_x'])
             if _x1 < _x0:
                 _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]'
             if _y1 < _y0:
@@ -588,175 +545,92 @@ class CompositeCreatorApp(BaseApp):
                 self.__config['raw_img_shape_y'] // _binning
             self.__config['roi'] = None
 
-    def __put_image_in_composite(self, image, index):
+    def __get_kwargs_for_read_image(self, index):
         """
-        Put the image in the composite image.
-
-        This method will find the correct place for the image in the composite
-        and copy the image data there.
+        Create the required kwargs to pass to the read_image function.
 
         Parameters
         ----------
-        image : np.ndarray
-            The image data.
         index : int
-            The image index. This is needed to find the correct place for
-            the image in the composite.
+            The image index
 
         Returns
         -------
-        None.
+        _fname : str
+            The filename of the file to be opened.
+        _params : dict
+            The required parameters as dictionary.
         """
-        if self.get_param_value('composite_dir') == 'x':
-            _iy = index // self.get_param_value('composite_nx')
-            _ix = index % self.get_param_value('composite_nx')
-        else:
-            _iy = index % self.get_param_value('composite_ny')
-            _ix = index // self.get_param_value('composite_ny')
-        yslice = slice(_iy * self.__config['final_image_size_y'],
-                       (_iy + 1) * self.__config['final_image_size_y'])
-        xslice = slice(_ix * self.__config['final_image_size_x'],
-                       (_ix + 1) * self.__config['final_image_size_x'])
-        if self.__config['bg_image'] is not None:
-            image -= self.__config['bg_image']
-        self.__composite[yslice, xslice] = image
-
-    def apply_thresholds(self, **kwargs):
-        """
-        Apply thresholds to the composite image.
-
-        This method is a wrapper for the apply_thresholds method of the
-        CompositeImage object.
-
-        Parameters
-        ----------
-        low : float, optional
-            The lower threshold. If not specified, the stored lower threshold
-            from the ParameterCollection will be used.
-        high : float, optional
-            The upper threshold. If not specified, the stored upper threshold
-            from the ParameterCollection will be used.
-        """
-        if self.get_param_value('use_thresholds'):
-            if 'low' in kwargs:
-                self.set_param_value('threshold_low', kwargs.get('low'))
-            if 'high' in kwargs:
-                self.set_param_value('threshold_high', kwargs.get('high'))
-            self.__composite.apply_thresholds(
-                low=self.get_param_value('threshold_low'),
-                high=self.get_param_value('threshold_high')
-                )
-
-    def __get_args_for_read_image(self, index):
         if self.__config['hdffile']:
             _params = dict(dataset=self.get_param_value('hdf_key'),
                            binning=self.get_param_value('binning'),
                            ROI=self.__config['roi'], imageNo=index)
             _fname = self.get_param_value('first_file')
         else:
-            _fname = os.path.join(self.__config['file_path'],
+            _fname = os.path.join(self.config['file_path'],
                                   self.__config['file_list'][index])
             _params = dict(binning=self.get_param_value('binning'),
                            ROI=self.__config['roi'])
         return _fname, _params
 
-    def __verify_files_in_same_directory(self):
-        _path1, _name1 = os.path.split(self.get_param_value('first_file'))
-        _path2, _name2 = os.path.split(self.get_param_value('last_file'))
-        if _path1 != _path2:
-            _first_file = self.get_param_value('first_file')
-            _last_file = self.get_param_value('last_file')
-            raise AppConfigError(
-                'The selected files are not in the same directory:\n'
-                f'{_first_file}\nand\n{_last_file}')
 
-    def __verify_files_are_same_size(self):
-        _path1, _name1 = os.path.split(self.get_param_value('first_file'))
-        _fsizes = np.r_[[os.stat(f'{_path1}/{f}').st_size
-                         for f in self.__config['file_list']]]
-        if _fsizes.std() > 0.:
-            raise AppConfigError('The selected files are not all of the '
-                                 'same size.')
+def __parse_composite_creator_cmdline_arguments():
+    """
+    Use argparse to get command line arguments.
 
-    def prepare_run(self):
-        """
-        Prepare running the composite creation.
-
-        This method will check all settings and create the composite image or
-        tell the CompositeImage to create a new image with changed size.
-        """
-        self.check_entries()
-        _shape = (self.__config['final_image_size_y'],
-                  self.__config['final_image_size_x'])
-        if self.__composite is None:
-            self.__composite = CompositeImage(
-                image_shape=_shape,
-                composite_nx=self.get_param_value('composite_nx'),
-                composite_ny=self.get_param_value('composite_ny'),
-                composite_dir=self.get_param_value('composite_dir'),
-                datatype=self.__config['datatype'])
-            return
-        if self.__composite.shape != _shape:
-            self.__composite.create_new_image()
-
-    def run(self, *args, **kwargs):
-        """
-        Run the composite creation.
-
-        This method will first call the check_entries method to verify that
-        the parameter entries are consistent. The composite image will be
-        created and stored. If the output_fname has been specified, the
-        composite image will be saved. Otherwise, it will only be available
-        by reference.
-
-        Parameters
-        ----------
-        output_fname : Union[int, Path, None]
-            The name of the output file for the raw data.
-        """
-        self.prepare_run()
-        output_fname = kwargs.get('output_fname',
-                                  self.get_param_value('output_fname'))
-
-        if self.__config['hdffile']:
-            _range = range(self.get_param_value('hdf_first_image_num'),
-                           self.get_param_value('hdf_last_image_num') + 1,
-                           self.get_param_value('stepping'))
-        else:
-            _range = range(len(self.__config['file_list']))
-
-        for compindex, imgindex in enumerate(_range):
-            _fname, _kwargs = self.__get_args_for_read_image(imgindex)
-            self.__composite.insert_image(read_image(_fname, **_kwargs),
-                                          compindex)
-        self.apply_thresholds()
-        if os.path.exists(os.path.dirname(output_fname)):
-            self.__composite.save(output_fname)
-
-    def export_image(self, output_fname):
-        """
-        Export the CompositeImage to a file.
-
-        This method is a wrapper for the CompositeImage.export method.
-        Supported file types for export are: binary, numpy, hdf5, png, tiff,
-        jpg.
-
-        Parameters
-        ----------
-        output_fname : str
-            The full file system path and filename for the output image file.
-        """
-        self.__composite.export(output_fname)
-
-    @property
-    def composite(self):
-        """
-        Get the composite image.
-
-        Returns
-        -------
-        np.ndarray
-            The composite image in np.ndarray format.
-
-        """
-        return self.__composite.image
+    Returns
+    -------
+    dict
+        A dictionary with the parsed arugments which holds all the entries
+        and entered values or  - if missing - the default values.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-first_file', '-f',
+                        help=DEFAULT_PARAMS['first_file'].tooltip)
+    parser.add_argument('-last_file', '-l',
+                        help=DEFAULT_PARAMS['last_file'].tooltip)
+    parser.add_argument('-hdf_key',
+                        help=DEFAULT_PARAMS['hdf_key'].tooltip)
+    parser.add_argument('-hdf_first_image_num', type=int,
+                        help=DEFAULT_PARAMS['hdf_first_image_num'].tooltip)
+    parser.add_argument('-hdf_last_image_num', type=int,
+                        help=DEFAULT_PARAMS['hdf_last_image_num'].tooltip)
+    parser.add_argument('--use_bg_file', action='store_true',
+                        help=DEFAULT_PARAMS['use_bg_file'].tooltip)
+    parser.add_argument('-bg_file',
+                        help=DEFAULT_PARAMS['bg_file'].tooltip)
+    parser.add_argument('-bg_hdf_key',
+                        help=DEFAULT_PARAMS['bg_hdf_key'].tooltip)
+    parser.add_argument('-bg_hdf_num', type=int,
+                        help=DEFAULT_PARAMS['bg_hdf_num'].tooltip)
+    parser.add_argument('-stepping', '-s', type=int,
+                        help=DEFAULT_PARAMS['stepping'].tooltip)
+    parser.add_argument('-composite_nx', type=int,
+                        help=DEFAULT_PARAMS['composite_nx'].tooltip)
+    parser.add_argument('-composite_ny', type=int,
+                        help=DEFAULT_PARAMS['composite_ny'].tooltip)
+    parser.add_argument('--use_roi', action='store_true',
+                        help=DEFAULT_PARAMS['use_roi'].tooltip)
+    parser.add_argument('-roi_xlow', type=int,
+                        help=DEFAULT_PARAMS['roi_xlow'].tooltip)
+    parser.add_argument('-roi_xhigh', type=int,
+                        help=DEFAULT_PARAMS['roi_xhigh'].tooltip)
+    parser.add_argument('-roi_ylow', type=int,
+                        help=DEFAULT_PARAMS['roi_ylow'].tooltip)
+    parser.add_argument('-roi_yhigh', type=int,
+                        help=DEFAULT_PARAMS['roi_yhigh'].tooltip)
+    parser.add_argument('--use_thresholds', action='store_true',
+                        help=DEFAULT_PARAMS['use_thresholds'].tooltip)
+    parser.add_argument('-threshold_low', type=int,
+                        help=DEFAULT_PARAMS['threshold_low'].tooltip)
+    parser.add_argument('-threshold_high', type=int,
+                        help=DEFAULT_PARAMS['threshold_high'].tooltip)
+    parser.add_argument('-binning', type=int,
+                        help=DEFAULT_PARAMS['binning'].tooltip)
+    parser.add_argument('-output_fname',
+                        help=DEFAULT_PARAMS['output_fname'].tooltip)
+    _args = dict(vars(parser.parse_args()))
+    # store None for keyword arguments which were not selected:
+    for _key in ['use_roi', 'use_thresholds', 'use_bg_file']:
+        _args[_key] = _args[_key] if _args[_key] else None
+    return _args

@@ -81,6 +81,24 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj.set_param_value('Test5', 12)
 
+    def test_apply_param_modulo(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._apply_param_modulo('Test0', 10)
+        self.assertEqual(obj.get_param_value('Test0'), 2)
+
+    def test_apply_param_modulo_ii(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_value('Test0', -1)
+        obj._apply_param_modulo('Test0', 10)
+        self.assertEqual(obj.get_param_value('Test0'), 10)
+
+    def test_apply_param_modulo_iii(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        with self.assertRaises(ValueError):
+            obj._apply_param_modulo('Test3', 10)
 
 if __name__ == "__main__":
     unittest.main()

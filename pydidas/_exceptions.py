@@ -47,6 +47,6 @@ class WidgetLayoutError(Exception):
 
 class AppConfigError(Exception):
     """
-    AppConfigError is used when app parameters are not consistent and cannot
+    AppConfigError is used when app Parameters are not consistent and cannot
     be processed.
     """

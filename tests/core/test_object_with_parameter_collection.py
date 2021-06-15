@@ -100,5 +100,22 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj._apply_param_modulo('Test3', 10)
 
+    def test_get_default_params_copy(self):
+        defaults = ObjectWithParameterCollection.get_default_params_copy()
+        self.assertIsInstance(defaults, ParameterCollection)
+
+    def test_set_default_params(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _params2 = ParameterCollection(
+            Parameter('Test0', int, default=10),
+            Parameter('Test5', str, default='test str'),
+            Parameter('Test6', float, default=-1))
+        obj.set_default_params(_params2)
+        self.assertEqual(obj.get_param_value('Test0'), 12)
+        self.assertEqual(obj.get_param_value('Test5'), 'test str')
+        self.assertEqual(obj.get_param_value('Test6'), -1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -61,9 +61,10 @@ DEFAULT_PARAMS = ParameterCollection(
               refkey='use_bg_file', choices=[True, False],
               tooltip=('Keyword to toggle usage of background subtraction.')),
     Parameter('Background image file', Path, default=Path(), refkey='bg_file',
-              tooltip=('The name of the file used for background correction.')),
-    Parameter('Background Hdf dataset key', HdfKey, default=HdfKey(''),
-              refkey='bg_hdf_key',
+              tooltip=('The name of the file used for background '
+                       'correction.')),
+    Parameter('Background Hdf dataset key', HdfKey,
+              default=HdfKey('/entry/data/data'), refkey='bg_hdf_key',
               tooltip=('For hdf5 background image files: The dataset key.')),
     Parameter('Background image number', int, default=0, refkey='bg_hdf_num',
               tooltip=('For hdf5 background image files: The image number in '
@@ -92,6 +93,7 @@ DEFAULT_PARAMS = ParameterCollection(
                        'default is None.'))
     )
 
+
 class CompositeCreatorApp(BaseApp):
     """
     The CompositeCreatorApp can compose mosaic images of a large number of
@@ -115,7 +117,7 @@ class CompositeCreatorApp(BaseApp):
     last_file : pathlib.Path, optional
         Used only for file series: The name of the last file to be added to
         the composite image.
-    hdf_key : HdfKey
+    hdf_key : HdfKey, optional
         Used only for hdf5 files: The dataset key.
     hdf_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.
@@ -125,7 +127,7 @@ class CompositeCreatorApp(BaseApp):
     use_bg_file : bool, optional
         Keyword to toggle usage of background subtraction. The default is
         False.
-    bg_file : pathlib.Path
+    bg_file : pathlib.Path, optional
         The name of the file used for background correction.
     bg_hdf_key : HdfKey, optional
         Required for hdf5 background image files: The dataset key with the
@@ -135,7 +137,7 @@ class CompositeCreatorApp(BaseApp):
         background image in the  dataset. The default is 0.
     stepping : int, optional
         The step width (in images). A value n > 1 will only add every n-th
-        image to the composite.
+        image to the composite. The default is 1.
     composite_nx : int, optional
         The number of original images combined in the composite image in
         x direction. A value of -1 will determine the number of images in
@@ -189,7 +191,7 @@ class CompositeCreatorApp(BaseApp):
         Create a CompositeCreatorApp instance.
         """
         super().__init__(*args, **kwargs)
-        _cmdline_args = __parse_composite_creator_cmdline_arguments()
+        _cmdline_args = _parse_composite_creator_cmdline_arguments()
         self.set_default_params(self.default_params)
 
         # update default_params with command line entries:
@@ -291,8 +293,8 @@ class CompositeCreatorApp(BaseApp):
         self.__check_files()
         self.__check_roi()
         self.__check_composite_dims()
-        self.__check_and_set_bg_file()
         self.__process_roi()
+        self.__check_and_set_bg_file()
 
     def apply_thresholds(self, **kwargs):
         """
@@ -310,7 +312,8 @@ class CompositeCreatorApp(BaseApp):
             The upper threshold. If not specified, the stored upper threshold
             from the ParameterCollection will be used.
         """
-        if self.get_param_value('use_thresholds'):
+        if (self.get_param_value('use_thresholds')
+                or 'low' in kwargs or 'high' in kwargs):
             if 'low' in kwargs:
                 self.set_param_value('threshold_low', kwargs.get('low'))
             if 'high' in kwargs:
@@ -388,7 +391,7 @@ class CompositeCreatorApp(BaseApp):
         _n1 = self._apply_param_modulo('hdf_last_image_num', _n_image)
         # correct total number of images for stepping *after* the
         # numbers have been modulated to be in the image range.
-        self.__config['n_image'] = ((_n1 - _n0 + 1)
+        self.__config['n_image'] = ((_n1 - _n0)
                                     // self.get_param_value('stepping'))
         if not _n0 < _n1:
             raise AppConfigError(
@@ -420,8 +423,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
         _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
-        _file_list = os.listdir(_path1)
-        _file_list.sort()
+        _file_list = sorted(os.listdir(_path1))
         _i1 = _file_list.index(_fname1)
         _i2 = _file_list.index(_fname2)
         _file_list = _file_list[_i1:_i2+1:self.get_param_value('stepping')]
@@ -451,7 +453,6 @@ class CompositeCreatorApp(BaseApp):
             return
         _bg_file = self.get_param_value('bg_file')
         check_file_exists(_bg_file)
-        self.__process_roi()
         # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf_key_exists_in_file(_bg_file,
@@ -468,7 +469,7 @@ class CompositeCreatorApp(BaseApp):
                                    self.__config['final_image_size_x']):
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not the same image dimensions as the'
-                                 'selected files.')
+                                 ' selected files.')
         self.__config['bg_image'] = _bg_image
 
     def __check_roi(self):
@@ -483,13 +484,13 @@ class CompositeCreatorApp(BaseApp):
         if self.get_param_value('use_roi'):
             _warning = ''
             _x0 = self._apply_param_modulo('roi_xlow',
-                                           self.__config['raw_img_shape_y'])
+                                           self.__config['raw_img_shape_x'])
             _x1 = self._apply_param_modulo('roi_xhigh',
-                                           self.__config['raw_img_shape_y'])
+                                           self.__config['raw_img_shape_x'])
             _y0 = self._apply_param_modulo('roi_ylow',
-                                           self.__config['raw_img_shape_x'])
+                                           self.__config['raw_img_shape_y'])
             _y1 = self._apply_param_modulo('roi_yhigh',
-                                           self.__config['raw_img_shape_x'])
+                                           self.__config['raw_img_shape_y'])
             if _x1 < _x0:
                 _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]'
             if _y1 < _y0:
@@ -567,14 +568,14 @@ class CompositeCreatorApp(BaseApp):
                            ROI=self.__config['roi'], imageNo=index)
             _fname = self.get_param_value('first_file')
         else:
-            _fname = os.path.join(self.config['file_path'],
+            _fname = os.path.join(self.__config['file_path'],
                                   self.__config['file_list'][index])
             _params = dict(binning=self.get_param_value('binning'),
                            ROI=self.__config['roi'])
         return _fname, _params
 
 
-def __parse_composite_creator_cmdline_arguments():
+def _parse_composite_creator_cmdline_arguments():
     """
     Use argparse to get command line arguments.
 

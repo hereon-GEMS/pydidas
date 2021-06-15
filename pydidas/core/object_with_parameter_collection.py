@@ -93,7 +93,7 @@ class ParameterCollectionMixIn:
         for _param in (params + tuple(kwed_params.values())):
             if isinstance(_param, Parameter):
                 self.add_param(_param)
-            elif isinstance(_param, (ParameterCollection, dict)):
+            elif isinstance(_param, ParameterCollection):
                 self.params.update(_param)
             else:
                 raise TypeError(
@@ -113,7 +113,7 @@ class ParameterCollectionMixIn:
         defaults : Union[dict, ParameterCollection, list, tuple, set]
             An iterable with default Parameters.
         """
-        if isinstance(defaults, (dict, ParameterCollection)):
+        if isinstance(defaults, ParameterCollection):
             defaults = defaults.values()
         for _param in defaults:
             if _param.refkey not in self.params:
@@ -232,7 +232,7 @@ class ParameterCollectionMixIn:
         # create offset for negative indices to capture the whole array
         _offset = 1 if _param.value < 0 else 0
         _param.value = _val + _offset
-        return _val
+        return _val + _offset
 
 class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn):
     """

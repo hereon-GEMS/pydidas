@@ -89,7 +89,7 @@ class EmptyDataset(np.ndarray):
 
         Parameters
         ----------
-        _data : dict, list or tuple
+        _data : Union[dict, list, tuple]
             The keys for the axis meta data.
         _text : str
             The name of the calling method (for exception handling)
@@ -142,14 +142,10 @@ class EmptyDataset(np.ndarray):
 
         Parameters
         ----------
-        labels : dict, list or tuple
+        labels : Union[dict, list, tuple]
             The new axis labels. Both tuples and lists (of length ndim) as
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
-
-        Returns
-        -------
-        None
         """
         self.__axis_labels = self.__get_dict(labels, 'axis_labels')
 
@@ -174,14 +170,10 @@ class EmptyDataset(np.ndarray):
 
         Parameters
         ----------
-        labels : dict, list or tuple
+        labels : Union[dict, list, tuple]
             The new axis scales. Both tuples and lists (of length ndim) as
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
-
-        Returns
-        -------
-        None
         """
         self.__axis_scales = self.__get_dict(scales, 'axis_scales')
 
@@ -205,14 +197,10 @@ class EmptyDataset(np.ndarray):
 
         Parameters
         ----------
-        labels : dict, list or tuple
+        labels : Union[dict, list, tuple]
             The new axis units. Both tuples and lists (of length ndim) as
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
-
-        Returns
-        -------
-        None
         """
         self.__axis_units = self.__get_dict(units, 'axis_units')
 
@@ -225,7 +213,6 @@ class EmptyDataset(np.ndarray):
         -------
         integer
             The image ID.
-
         """
         return self.__metadata
 
@@ -243,14 +230,22 @@ class EmptyDataset(np.ndarray):
         ------
         ValueError
             If metadata is not None or dict
-
-        Returns
-        -------
-        None.
         """
         if not (isinstance(metadata, dict) or metadata is None):
             raise ValueError('Image id variable is not an integer.')
         self.__metadata = metadata
+
+    @property
+    def array(self):
+        """
+        Get the raw array data of the dataset.
+
+        Returns
+        -------
+        np.ndarray
+            The array data.
+        """
+        return self.__array__()
 
     def __repr__(self):
         """
@@ -260,7 +255,6 @@ class EmptyDataset(np.ndarray):
         -------
         str
             The representation of the Dataset class.
-
         """
         _info = {'axis_labels': self.axis_labels,
                  'axis_scales': self.axis_scales,
@@ -268,13 +262,13 @@ class EmptyDataset(np.ndarray):
                  'metadata': self.metadata,
                  'array': self.__array__()}
         return (self.__class__.__name__
-                + '('
-                + ', '.join(f'{i}: {_info[i]}' for i in _info)
+                + '(\n'
+                + ', '.join(f'{i}: {_info[i]}\n' for i in _info)
                 + ')')
 
     def __str__(self):
         """
-        Reimplementation of the __str__
+        Reimplementation of the numpy.ndarray.__str__ method.
 
         Returns
         -------
@@ -292,13 +286,13 @@ class Dataset(EmptyDataset):
     ------------------------------
     array : np.ndarray
         The data array.
-    axis_labels : dict, list or tuple, optional
+    axis_labels : Union[dict, list, tuple], optional
         The labels for the axes. The length must correspond to the array
         dimensions. The default is None.
-    axis_scales : dict, list or tuple, optional
+    axis_scales : Union[dict, list, tuple], optional
         The scales for the axes. The length must correspond to the array
         dimensions. The default is None.
-    axis_units : dict, list or tuple, optional
+    axis_units : Union[dict, list, tuple], optional
         The units for the axes. The length must correspond to the array
         dimensions. The default is None.
     metadata : Union[dict, None], optional

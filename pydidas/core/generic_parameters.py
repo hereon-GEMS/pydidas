@@ -46,7 +46,8 @@ GENERIC_PARAMS = ParameterCollection(
         tooltip=('The name of the first file for a file series or of the hdf5'
                  ' file in case of hdf5 file input.')),
     Parameter(
-        'Hdf dataset key', HdfKey, default=HdfKey(''), refkey='hdf_key',
+        'Hdf dataset key', HdfKey, default=HdfKey('/entry/data/data'),
+        refkey='hdf_key',
         tooltip=('Used only for hdf5 files: The dataset key.')),
     Parameter(
         'First image number', int, default=0, refkey='hdf_first_image_num',

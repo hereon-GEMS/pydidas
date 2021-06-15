@@ -50,18 +50,33 @@ def export_image(image, output_fname):
     if _ext in NUMPY_EXTENSIONS:
         np.save(output_fname, image)
     elif _ext in HDF5_EXTENSIONS:
-        with h5py.File(output_fname, 'r+') as f:
+        with h5py.File(output_fname, 'w') as f:
             f['entry/data/data'] = image
     elif _ext in BINARY_EXTENSIONS:
         image.tofile(output_fname)
     elif _ext in TIFF_EXTENSIONS:
         skimage.io.imsave(output_fname, image)
     elif _ext == '.png' or _ext in JPG_EXTENSIONS:
-        fig1 = plt.figure(figsize=(image.shape[0] // 150, image.shape[1] // 150), dpi=10)
+        _backend = plt.get_backend()
+        plt.rcParams['backend'] = 'Agg'
+        _figshape, _dpi = _get_fig_arguments(image)
+        fig1 = plt.figure(figsize=_figshape, dpi=50)
         ax = fig1.add_axes([0, 0, 1, 1])
         ax.imshow(image, interpolation='none', vmin=np.amin(image),
                   vmax=np.amax(image), cmap='gray')
         ax.set_xticks([])
         ax.set_yticks([])
-        fig1.savefig(output_fname, dpi=150)
+        fig1.savefig(output_fname, dpi=_dpi)
         plt.close(fig1)
+        plt.rcParams['backend'] = _backend
+
+
+def _get_fig_arguments(image, target_size_inches=10):
+    nx = image.shape[1]
+    ny = image.shape[0]
+    size_x = target_size_inches * nx / max(nx, ny)
+    size_y = target_size_inches * ny / max(nx, ny)
+    _shape = (size_x, size_y)
+    _dpi = max(nx, ny) / target_size_inches
+    return _shape, _dpi
+

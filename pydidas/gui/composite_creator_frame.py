@@ -37,6 +37,7 @@ from functools import partial
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
+from silx.gui.plot import PlotWindow
 # from silx.gui.plot.ImageView import ImageView
 
 from pydidas.apps import CompositeCreatorApp
@@ -102,6 +103,12 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         self.w_selection_info = ReadOnlyTextWidget(
             fixedWidth=self.CONFIG_WIDGET_WIDTH, fixedHeight=60, visible=False
             )
+        self.w_plot = PlotWindow(
+            parent=self, resetzoom=True, autoScale=False, logScale=False,
+            grid=False, curveStyle=False, colormap=True, aspectRatio=True,
+            yInverted=True, copy=True, save=True, print_=True, control=False,
+            position=False, roi=False, mask=True)
+        self.layout().addWidget(self.w_plot, 0, 3, self.next_row() -1, 1)
 
         for _key in self.params:
             # special formatting for some parameters:
@@ -126,17 +133,26 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
                     )
             # add spacers between groups:
             if _key in ['hdf_last_image_num', 'bg_hdf_num', 'composite_dir',
-                        'roi_yhigh', 'threshold_high', 'binning']:
+                        'roi_yhigh', 'threshold_high', 'binning',
+                        'output_fname']:
                 self.create_line(parent_widget=self.w_config,
                                  fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self.param_widgets['output_fname'].modify_file_selection(
+            ['NPY files (*.npy *.npz)'])
 
         self.w_buttons['exec'] = self.create_button(
             'Generate composite', parent_widget=self.w_config,
             gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH
             )
+        self.w_buttons['show'] = self.create_button(
+            'Show composite', parent_widget=self.w_config,
+            gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH
+            )
         self.w_buttons['save'] = self.create_button(
-            'Save composite image as tif', parent_widget=self.w_config,
+            'Save composite image', parent_widget=self.w_config,
             gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH
             )
@@ -161,6 +177,8 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             partial(self.__clear_entries, 'all', True)
             )
         self.w_buttons['exec'].clicked.connect(self.__run_app)
+        self.w_buttons['save'].clicked.connect(self.__save_composite)
+        self.w_buttons['show'].clicked.connect(self.__show_composite)
 
         self.param_widgets['use_roi'].currentTextChanged.connect(
             self.__toggle_roi_selection )
@@ -205,6 +223,9 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         self.set_status('Started composite image creation.')
         self._app = CompositeCreatorApp(self.params.get_copy())
         self._app.run()
+        self.w_buttons['show'].setEnabled(True)
+        self.w_buttons['save'].setEnabled(True)
+        self.set_status('Finished composite image creation.')
 
     def __selected_first_file(self, fname):
         """
@@ -505,7 +526,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             img2 = self.get_param_value('hdf_last_image_num')
             if img2 == -1:
                 img2 = self.__select_info['hdf_n_image']
-            _n = (img2 - img1 + 1) // step
+            _n = (img2 - img1) // step
         elif self.__select_info['hdf_images'] is False:
             _n = self.__select_info['file_n_image'] // step
         if self.__select_info['hdf_images'] is not None:
@@ -532,6 +553,22 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         if ((num1 - 1) * num2 >= _n_total
                 or num1 * (num2 - 1) >= _n_total):
             self.__update_composite_dim(dim2)
+
+    def __show_composite(self):
+        """
+        Show the composite image in the Viewwer.
+        """
+        self.w_plot.addImage(self._app.composite, replace=True)
+
+    def __save_composite(self):
+        """
+        Save the composite image.
+
+        Returns
+        -------
+        None.
+
+        """
 
 
 if __name__ == '__main__':

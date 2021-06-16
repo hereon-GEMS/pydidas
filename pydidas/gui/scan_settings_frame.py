@@ -36,7 +36,7 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore
 
 
-from .toplevel_frame import BaseFrame
+from .base_frame import BaseFrame
 from ..core import ScanSettings
 from ..widgets.utilities import excepthook
 from ..widgets.param_config import ParameterConfigMixIn
@@ -54,7 +54,8 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
-        super().__init__(parent=parent, name=name, initLayout=False)
+        BaseFrame.__init__(self, parent,name=name, initLayout=False)
+        ParameterConfigMixIn.__init__(self)
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(5, 5, 0, 0)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
@@ -65,7 +66,7 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn):
         self.toggle_dims()
 
     def initWidgets(self):
-        self.add_text_widget('Scan settings\n', fontsize=14, bold=True,
+        self.create_label('Scan settings\n', fontsize=14, bold=True,
                          underline=True, gridPos=(0, 0, 1, 0))
         _but = QtWidgets.QPushButton('Load scan parameters from file')
         _but.setIcon(self.style().standardIcon(42))
@@ -74,18 +75,18 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn):
         _but.setIcon(self.style().standardIcon(42))
         self.layout().addWidget(_but, self.next_row(), 0, 1, 2)
 
-        self.add_text_widget('\nScan dimensionality:', fontsize=11,
+        self.create_label('\nScan dimensionality:', fontsize=11,
                          bold=True, gridPos=(self.next_row(), 0, 1, 2))
 
         param = SCAN_SETTINGS.get_param('scan_dim')
-        self.add_param_widget(param, textwidth = 180)
+        self.create_param_widget(param, textwidth = 180)
         self.param_widgets['scan_dim'].currentTextChanged.connect(
             self.toggle_dims)
         _rowoffset = self.next_row()
         _prefixes = ['scan_dir_', 'n_points_', 'delta_', 'unit_', 'offset_']
         for i_dim in range(4):
             _gridPos = (_rowoffset + 6 * (i_dim % 2), 3 * (i_dim // 2), 1, 2)
-            _box = self.add_text_widget(f'\nScan dimension {i_dim+1}:',
+            _box = self.create_label(f'\nScan dimension {i_dim+1}:',
                                     fontsize=11, bold=True, gridPos= _gridPos)
             self.param_titlewidgets[i_dim + 1] = _box
             for i_item, basename in enumerate(_prefixes):
@@ -93,7 +94,7 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn):
                 _column = 3 * (i_dim // 2)
                 pname = f'{basename}{i_dim+1}'
                 param = SCAN_SETTINGS.get_param(pname)
-                self.add_param_widget(param, row=_row, textwidth = 180, column=_column)
+                self.create_param_widget(param, row=_row, textwidth = 180, column=_column)
 
         _spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
                                         QtWidgets.QSizePolicy.Minimum)

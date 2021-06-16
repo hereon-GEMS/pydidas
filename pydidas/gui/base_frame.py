@@ -32,9 +32,9 @@ __status__ = "Development"
 __all__ = ['BaseFrame']
 
 from PyQt5 import QtWidgets, QtCore
+from ..widgets import CreateWidgetsMixIn
 
-
-class BaseFrame(QtWidgets.QFrame):
+class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
     """
     The BaseFrame is a subclassed QFrame and should be used as the
     base class for all Frames in the pySALADD suite.

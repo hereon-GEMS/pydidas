@@ -35,10 +35,10 @@ from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot.StackView import StackView
 
-from .toplevel_frame import BaseFrame
+from .base_frame import BaseFrame
 from ..core import ScanSettings, Parameter
 from ..workflow_tree import WorkflowTree
-from ..widgets import ReadOnlyTextWidget
+from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
 from ..widgets.param_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
@@ -63,15 +63,17 @@ _params = {
 
 class LargeStackView(StackView):
     """
-    Reimplementatino of the silx StackView with a larger sizeHint.
+    Reimplementation of the silx StackView with a larger sizeHint.
     """
     def sizeHint(self):
         return QtCore.QSize(500, 1000)
 
-class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn):
+class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn,
+                                  CreateWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        super().__init__(parent)
+        BaseFrame.__init__(self, parent)
+        ParameterConfigMixIn.__init__(self)
         self.params = _params
         self._plugin = None
         self.scan_dim = 4
@@ -86,12 +88,12 @@ class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn):
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
 
-        self.add_label_widget('Test of processing workflow', fontsize=14,
+        self.create_label('Test of processing workflow', fontsize=14,
                               gridPos=(0, 0, 1, 5))
-        self.add_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
-        self.add_label_widget('Select image', fontsize=12,
+        self.create_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
+        self.create_label('Select image', fontsize=12,
                               gridPos=(self.next_row(), 0, 1, 2))
-        self.add_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
+        self.create_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
 
         # create button group for switching between
         _frame = QtWidgets.QFrame()
@@ -104,24 +106,24 @@ class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn):
         _row = self.next_row()
         _iow = 40
         _txtw = 120
-        self.add_param_widget(self.params['image_nr'], row=_row, width=_iow,
+        self.create_param_widget(self.params['image_nr'], row=_row, width=_iow,
                               textwidth = _txtw)
-        self.add_param_widget(self.params['scan_index1'], row=_row,
+        self.create_param_widget(self.params['scan_index1'], row=_row,
                               width=_iow, textwidth = _txtw)
-        self.add_param_widget(self.params['scan_index2'], width=_iow,
+        self.create_param_widget(self.params['scan_index2'], width=_iow,
                               textwidth = _txtw)
-        self.add_param_widget(self.params['scan_index3'], width=_iow,
+        self.create_param_widget(self.params['scan_index3'], width=_iow,
                               textwidth = _txtw)
-        self.add_param_widget(self.params['scan_index4'], width=_iow,
+        self.create_param_widget(self.params['scan_index4'], width=_iow,
                               textwidth = _txtw)
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         for i in range(1, 5):
             self.param_widgets[f'scan_index{i}'].setVisible(False)
             self.param_textwidgets[f'scan_index{i}'].setVisible(False)
-        self.add_label_widget('Select plugin', fontsize=12, width=250,
+        self.create_label('Select plugin', fontsize=12, width=250,
                               gridPos=(self.next_row(), 0, 1, 2))
 
-        self.add_param_widget(self.params['plugins'], n_columns=2, width=250,
+        self.create_param_widget(self.params['plugins'], n_columns=2, width=250,
                               n_columns_text=2, linebreak=True,
                               halign_text=QtCore.Qt.AlignLeft)
 
@@ -130,13 +132,13 @@ class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn):
         _layout.addWidget(self.w_plugin_info, self.next_row(), 0, 1, 2,
                           QtCore.Qt.AlignTop)
 
-        self.button_plugin_input = self.add_button(
+        self.button_plugin_input = self.create_button(
             'Show plugin input data', enabled=False,
             gridPos=(self.next_row(), 0, 1, 2))
-        self.button_plugin_exec = self.add_button(
+        self.button_plugin_exec = self.create_button(
             'Execute plugin && show ouput data', enabled=False,
             gridPos=(self.next_row(), 0, 1, 2))
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
                         policy=QtWidgets.QSizePolicy.Expanding)
         self.w_output_data = QtWidgets.QStackedWidget(self)
         self.w_output_data.setSizePolicy(QtWidgets.QSizePolicy.Expanding,

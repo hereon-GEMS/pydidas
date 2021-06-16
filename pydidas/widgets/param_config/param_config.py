@@ -43,7 +43,7 @@ from .input_widget_hdfkey import InputWidgetHdfKey
 
 from ..utilities import excepthook, apply_widget_properties
 from ...config import STANDARD_FONT_SIZE
-from ...core import HdfKey
+from ...core import HdfKey, ParameterCollection
 from ..._exceptions import WidgetLayoutError
 
 
@@ -61,9 +61,9 @@ def param_widget_factory(param, widget_width):
     return _widget
 
 
-def text_widget_factory(param, width, alignment=None):
+def text_widget_factory(param, widget_width, alignment=None):
     _txt = QtWidgets.QLabel(f'{param.name}:')
-    _txt.setFixedWidth(width)
+    _txt.setFixedWidth(widget_width)
     _txt.setFixedHeight(20)
     _txt.setToolTip(param.tooltip)
     _txt.setMargin(0)
@@ -300,10 +300,6 @@ class ParameterConfigMixIn:
             A Parameter class instance from the plugin.
         widget : QWidget
             The input widget used for editing the parameter value.
-
-        Returns
-        -------
-        None.
         """
         try:
             param.value = widget.get_value()
@@ -334,12 +330,9 @@ class ParamConfig(QtWidgets.QFrame, ParameterConfigMixIn):
             is True.
         **kwargs : dict
             Additional keyword arguments
-
-        Returns
-        -------
-        None.
         """
-        super().__init__(parent)
+        QtWidgets.QFrame.__init__(self, parent)
+        ParameterConfigMixIn.__init__(self)
         initLayout = kwargs.get('initLayout', True)
         kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
         kwargs['frameStyle'] = kwargs.get('frameStyle',

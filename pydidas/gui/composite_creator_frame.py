@@ -61,7 +61,8 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        super().__init__(parent)
+        BaseFrame.__init__(self, parent)
+        ParameterConfigMixIn.__init__(self)
         self.params = CompositeCreatorApp.get_default_params_copy()
         self.__select_info = {'hdf_images': None,
                               'composite_dim': 'x'}
@@ -88,7 +89,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             )
         self.layout().addWidget(self.w_config_area, self.next_row(), 0, 1, 1)
 
-        self.create_label_widget(
+        self.create_label(
             'Composite image creator', fontsize=14, gridPos=(0, 0, 1, 2),
             parent_widget=self.w_config, fixedWidth=self.CONFIG_WIDGET_WIDTH
             )
@@ -420,7 +421,8 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             flag = flag == 'True'
         self.set_param_value('use_bg_file', flag)
         self.toggle_widget_visibility('bg_file', flag)
-        if not self._get_filename_param_ext('bg_file') in HDF5_EXTENSIONS:
+        _bg_ext = os.path.splitext(self.get_param_value('bg_file'))[1]
+        if not _bg_ext in HDF5_EXTENSIONS:
             flag = False
         self.toggle_widget_visibility('bg_hdf_key', flag)
         self.toggle_widget_visibility('bg_hdf_num', flag)

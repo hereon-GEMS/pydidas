@@ -36,7 +36,7 @@ import qtawesome as qta
 
 from silx.gui.plot.ImageView import ImageView
 
-from pydidas.gui.toplevel_frame import BaseFrame
+from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget
@@ -62,7 +62,8 @@ _params = {
 class ImageMathsFrame(BaseFrame, ParameterConfigMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        super().__init__(parent)
+        BaseFrame.__init__(self, parent)
+        ParameterConfigMixIn.__init__(self)
         self.params = _params
         self._plugin = None
         self.scan_dim = 4
@@ -80,16 +81,16 @@ class ImageMathsFrame(BaseFrame, ParameterConfigMixIn):
         self.add_label('Image mathematics', fontsize=14,
                        gridPos=(0, 0, 1, 5))
 
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
         self.add_param(self.params['buffer_no'], textwidth=130, width=110)
 
-        self.b_open = self.add_button('Open image', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('ei.folder-open'))
+        self.b_open = self.create_button('Open image', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('ei.folder-open'))
 
-        self.w_operations = self.add_button('Image operations', gridPos=(self.next_row(), 0, 1, 2))
+        self.w_operations = self.create_button('Image operations', gridPos=(self.next_row(), 0, 1, 2))
         self.w_operations.setFixedHeight(400)
         self.w_operations.setFixedWidth(270)
 
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
                         policy = QtWidgets.QSizePolicy.Expanding)
 
 
@@ -101,8 +102,8 @@ class ImageMathsFrame(BaseFrame, ParameterConfigMixIn):
         self.imview = ImageView()
         _layout.addWidget(self.imview, 2, 2, _layout.rowCount(), 1)
         _row = self.next_row()
-        self.b_undo = self.add_button('Undo', gridPos=(_row, 0, 1, 1))
-        self.b_redo = self.add_button('Redo', gridPos=(_row, 1, 1, 1))
+        self.b_undo = self.create_button('Undo', gridPos=(_row, 0, 1, 1))
+        self.b_redo = self.create_button('Redo', gridPos=(_row, 1, 1, 1))
 
         self.w_history.addItem('Image #1 Operation 1')
         self.w_history.addItem('Image #1 Operation 2')

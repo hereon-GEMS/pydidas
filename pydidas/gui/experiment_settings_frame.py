@@ -37,20 +37,22 @@ from PyQt5 import QtWidgets, QtCore
 
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
-from .toplevel_frame import BaseFrame
+from .base_frame import BaseFrame
 from ..core import ExperimentalSettings
-from ..widgets.utilities import excepthook
+from ..widgets import excepthook, CreateWidgetsMixIn
 from ..widgets.param_config import ParameterConfigMixIn
 
 EXP_SETTINGS = ExperimentalSettings()
 
 
-class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
+class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
+                              CreateWidgetsMixIn):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
-        super().__init__(parent=parent, name=name, initLayout=False)
+        BaseFrame.__init__(self, parent, name=name, initLayout=False)
+        ParameterConfigMixIn.__init__(self)
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(5, 5, 0, 0)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
@@ -65,7 +67,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
         #            'detector_dy', 'detector_dist', 'detector_poni1',
         #            'detector_poni2', 'detector_rot1', 'detector_rot2',
         #            'detector_rot3']
-        self.add_text_widget('Experimental settings\n', fontsize=14, bold=True,
+        self.create_label('Experimental settings\n', fontsize=14, bold=True,
                          underline=True, gridPos=(0, 0, 1, 0))
         _but = QtWidgets.QPushButton('Load experimental parameters from file')
         _but.setIcon(self.style().standardIcon(42))
@@ -76,13 +78,13 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
         _rowoffset = 3
         for row, pname in enumerate(_pnames):
             if pname == 'xray_wavelength':
-                self.add_text_widget('\nBeamline X-ray energy:', fontsize=11,
+                self.create_label('\nBeamline X-ray energy:', fontsize=11,
                                  bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
                 _but2 = QtWidgets.QPushButton('Copy X-ray energy from calibration')
                 self.layout().addWidget(_but2, _rowoffset + 1 + row, 0, 1, 3)
                 _rowoffset += 2
             if pname == 'detector_name':
-                self.add_text_widget('\nX-ray detector:', fontsize=11,
+                self.create_label('\nX-ray detector:', fontsize=11,
                                  bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
                 _but = QtWidgets.QPushButton('Select X-ray detector')
                 _but2 = QtWidgets.QPushButton('Copy X-ray detector from calibration')
@@ -92,13 +94,13 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
                 self.layout().addWidget(_but2, _rowoffset + 2 + row, 0, 1, 3)
                 _rowoffset += 3
             if pname == 'detector_dist':
-                self.add_text_widget('\nDetector position:', fontsize=11,
+                self.create_label('\nDetector position:', fontsize=11,
                                  bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
                 _but = QtWidgets.QPushButton('Copy detector position from calibration')
                 self.layout().addWidget(_but, _rowoffset + 1 + row, 0, 1, 3)
                 _rowoffset += 2
             param = EXP_SETTINGS.get_param(pname)
-            self.add_param_widget(param, row=row + _rowoffset, textwidth = 180)
+            self.create_param_widget(param, row=row + _rowoffset, textwidth = 180)
 
             #disconnect directly setting the parameters and route
             # through EXP_SETTINGS to catch wavelength/energy
@@ -107,7 +109,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn):
             _w.io_edited.connect(partial(self.update_param, pname, _w))
 
             _w.setFixedWidth(150)
-            self.add_label_widget(param.unit, gridPos=(row + _rowoffset, 2, 1, 1), width=24)
+            self.create_label(param.unit, gridPos=(row + _rowoffset, 2, 1, 1), fixedWidth=24)
         _row = self.layout().getItemPosition(self.layout().indexOf(_w))[0] + 2
         _spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
                                         QtWidgets.QSizePolicy.Minimum)

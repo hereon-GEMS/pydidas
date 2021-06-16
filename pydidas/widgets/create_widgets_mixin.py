@@ -35,9 +35,11 @@ __all__ = ['CreateWidgetsMixIn']
 
 from PyQt5 import QtWidgets
 
+from .factory import create_spin_box
 from .utilities import apply_widget_properties, apply_font_properties
 from ..config import STANDARD_FONT_SIZE, DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
+
 
 class CreateWidgetsMixIn:
     """
@@ -46,48 +48,7 @@ class CreateWidgetsMixIn:
     inheritance from QtWidgets.QFrame.
     """
 
-    @staticmethod
-    def __get_widget_layout_args(parent, **kwargs):
-        """
-        Get the arguments for adding a widget to the layout.
-
-        Parameters
-        ----------
-        parent : QWidget
-            The parent QWidget to be added to the layout.
-        **kwargs : dict
-            The keyword arguments dictionary from the calling method. This
-            method only takes the "gridPos" and "alignment" arguments from the
-            kwargs.
-
-        Raises
-        ------
-        WidgetLayoutError
-            If the parent widget has no layout.
-
-        Returns
-        -------
-        list
-            The list of layout arguments required for adding the widget to
-            the layout of the parent widget.
-        """
-        if parent.layout() is None:
-            raise WidgetLayoutError('No layout set on parent widget'
-                                    f'"{parent}".')
-        _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
-        _grid_pos = kwargs.get('gridPos', None)
-        if not isinstance(parent.layout(), QtWidgets.QGridLayout):
-            return [0, _alignment]
-        if _grid_pos is None:
-            _row = (kwargs.get('row', parent.layout().rowCount() + 1)
-                    if isinstance(parent.layout(), QtWidgets.QGridLayout)
-                    else kwargs.get('row', -1))
-            _grid_pos = (_row, kwargs.get('column', 0),
-                         kwargs.get('n_rows', 1), kwargs.get('n_columns', 2))
-        return [*_grid_pos, _alignment]
-
-    def create_label_widget(self, text,
-                            **kwargs):
+    def create_label(self, text, **kwargs):
         """
         Add a label to the widget.
 
@@ -125,13 +86,16 @@ class CreateWidgetsMixIn:
 
         _parent = kwargs.get('parent_widget', self)
         _label = QtWidgets.QLabel(text)
-        kwargs['fixedHeight'] = (kwargs['pointSize'] * (1 + text.count('\n'))
-                                 + 10)
+        # TODO : verify the heights of text widgets
+        # _h = _label.fontMetrics().boundingRect(_label.text()).height()
+        # print(_h, text)
+        # kwargs['fixedHeight'] = (kwargs['pointSize'] * (1 + text.count('\n'))
+        #                          + 10)
         kwargs['wordWrap'] = kwargs.get('wordWrap', True)
 
         apply_widget_properties(_label, **kwargs)
 
-        _layout_args = self.__get_widget_layout_args(_parent, **kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_label, *_layout_args)
         return _label
 
@@ -173,7 +137,7 @@ class CreateWidgetsMixIn:
         kwargs['fixedHeight'] = kwargs.get('fixedHeight', 3)
         apply_widget_properties(_line, **kwargs)
         _parent.layout().addWidget(
-            _line, *self.__get_widget_layout_args(_parent, **kwargs)
+            _line, *_get_widget_layout_args(_parent, **kwargs)
             )
         return _line
 
@@ -203,7 +167,7 @@ class CreateWidgetsMixIn:
             kwargs.get('fixedHeight', 20), kwargs.get('fixedWidth', 20),
             _policy, _policy
             )
-        _layout_args = self.__get_widget_layout_args(_parent, **kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
         return _spacer
 
@@ -236,6 +200,74 @@ class CreateWidgetsMixIn:
         _parent = kwargs.get('parent_widget', self)
         _button = QtWidgets.QPushButton(text)
         apply_widget_properties(_button, **kwargs)
-        _layout_args = self.__get_widget_layout_args(_parent, **kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_button, *_layout_args)
         return _button
+
+    def create_spin_box(self, **kwargs):
+        """
+        Create a button and add it to the layout.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Any supported keyword arguments.
+
+        Supported keyword arguments
+        ---------------------------
+        valueRange: tuple, optional
+            The range for the QSpinBox, given as a 2-tuple of (min, max). The
+            default is (0, 1).
+        *Qt settings : any
+            Any supported Qt settings for a QSpinBox (for example value,
+            fixedWidth, visible, enabled)
+
+        Returns
+        -------
+        box : QtWidgets.QSpinBox
+            The instantiated spin box widget.
+        """
+        _parent = kwargs.get('parent_widget', self)
+        _box = create_spin_box(**kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
+        _parent.layout().addWidget(_box, *_layout_args)
+        return _box
+
+def _get_widget_layout_args(parent, **kwargs):
+    """
+    Get the arguments for adding a widget to the layout.
+
+    Parameters
+    ----------
+    parent : QWidget
+        The parent QWidget to be added to the layout.
+    **kwargs : dict
+        The keyword arguments dictionary from the calling method. This
+        method only takes the "gridPos" and "alignment" arguments from the
+        kwargs.
+
+    Raises
+    ------
+    WidgetLayoutError
+        If the parent widget has no layout.
+
+    Returns
+    -------
+    list
+        The list of layout arguments required for adding the widget to
+        the layout of the parent widget.
+    """
+    if parent.layout() is None:
+        raise WidgetLayoutError('No layout set on parent widget'
+                                f'"{parent}".')
+    _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
+    _grid_pos = kwargs.get('gridPos', None)
+    if not isinstance(parent.layout(), QtWidgets.QGridLayout):
+        return [0, _alignment]
+    if _grid_pos is None:
+        _row = (kwargs.get('row', parent.layout().rowCount() + 1)
+                if isinstance(parent.layout(), QtWidgets.QGridLayout)
+                else kwargs.get('row', -1))
+        _grid_pos = (_row, kwargs.get('column', 0),
+                     kwargs.get('n_rows', 1), kwargs.get('n_columns', 2))
+    return [*_grid_pos, _alignment]

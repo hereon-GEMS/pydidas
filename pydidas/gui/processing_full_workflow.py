@@ -34,10 +34,10 @@ __all__ = ['ProcessingFullWorkflowFrame']
 from PyQt5 import QtWidgets, QtCore
 import qtawesome as qta
 
-from pydidas.gui.toplevel_frame import BaseFrame
+from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import ReadOnlyTextWidget
+from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
 from pydidas.widgets.param_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
@@ -57,10 +57,12 @@ _params = {
     }
 
 
-class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigMixIn):
+class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigMixIn,
+                                  CreateWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        super().__init__(parent)
+        BaseFrame.__init__(self, parent)
+        ParameterConfigMixIn.__init__(self)
         self.params = _params
         self._plugin = None
         self.scan_dim = 4
@@ -75,20 +77,20 @@ class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigMixIn):
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
 
-        self.add_label_widget('Full processing workflow', fontsize=14,
+        self.create_label('Full processing workflow', fontsize=14,
                               gridPos=(0, 0, 1, 5))
 
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_verify_cfg = self.add_button('Verify all settings', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('mdi.text-search'))
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
+        self.w_verify_cfg = self.create_button('Verify all settings', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('mdi.text-search'))
 
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.add_param_widget(self.params['run_type'])
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
+        self.create_param_widget(self.params['run_type'])
 
-        self.add_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_run = self.add_button('Run', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('fa5s.play'))
+        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
+        self.w_run = self.create_button('Run', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('fa5s.play'))
 
-        self.add_spacer(height=50, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_run = self.add_button('Processing feedback', gridPos=(self.next_row(), 0, 2, 4))
+        self.create_spacer(height=50, gridPos=(self.next_row(), 0, 1, 2))
+        self.w_run = self.create_button('Processing feedback', gridPos=(self.next_row(), 0, 2, 4))
         self.w_run.setFixedHeight(200)
         self.w_run.setFixedWidth(600)
 

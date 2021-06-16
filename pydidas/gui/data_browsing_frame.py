@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the DataBrowsingFrame which is used to preview data."""
+"""Module with the DataBrowsingFrame which is used to browse data."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -38,39 +38,35 @@ import silx
 
 from PyQt5 import QtWidgets, QtCore
 
-from ..widgets import (DirectoryExplorer, Hdf5DatasetSelector,
+from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
                        QtaIconButton)
-from .toplevel_frame import BaseFrame
+from .base_frame import BaseFrame
 
 class DataBrowsingFrame(BaseFrame):
     """
-    The DataBrowsingFrame is widget / frame with a directory exporer, a
-    data preview window and a main data visualization window. Its main
-    purpose is to browse through datasets.
+    The DataBrowsingFrame is widget / frame with a directory exporer
+    and a main data visualization window. Its main purpose is to browse
+    through datasets.
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         super().__init__(parent=parent, name=name)
-        self.add_text_widget('Data exploration view', fontsize=14)
+        self.create_label('Data exploration view', fontsize=14)
 
         self.initUI()
-        self._tree.clicked.connect(partial(self.__fileSelected, self._preview))
-        self._tree.doubleClicked.connect(partial(self.__fileSelected, self._imview))
-
+        self._tree.doubleClicked.connect(
+            partial(self.__fileSelected, self._imview)
+            )
 
     def initUI(self):
         from silx.gui.plot.ImageView import ImageView
-        from silx.gui.dialog.ImageFileDialog import _ImagePreview
 
         self._tree = DirectoryExplorer()
-        self.hdf_dset_w = Hdf5DatasetSelector()
+        self.hdf_dset_w = Hdf5DatasetSelectorViewOnly()
 
         button_min = QtaIconButton('fa.chevron-left', size=25)
         button_max = QtaIconButton('fa.chevron-right', size=25)
-
-        self._preview = _ImagePreview()
-        self._preview.setFixedHeight(200)
 
         self._selection = QtWidgets.QFrame(self)
         self._selection.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -81,7 +77,6 @@ class DataBrowsingFrame(BaseFrame):
         _layout.addWidget(button_max, 2, 1, 1, 1)
         _layout.setRowStretch(0, 10)
         _layout.addWidget(self.hdf_dset_w, 3, 0, 1, 2)
-        _layout.addWidget(self._preview, 4, 0, 1, 2)
         self._selection.setLayout(_layout)
 
         # self._imview = PlotWindow()
@@ -89,7 +84,6 @@ class DataBrowsingFrame(BaseFrame):
         self._imview.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.hdf_dset_w.register_view_widget(self._imview)
-        self.hdf_dset_w.register_preview_widget(self._preview)
         self.main_splitter = QtWidgets.QSplitter()
         self.main_splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                          QtWidgets.QSizePolicy.Expanding)
@@ -116,7 +110,6 @@ class DataBrowsingFrame(BaseFrame):
         self.set_status(f'New file: {name}')
         if not os.path.isfile(name):
             return
-        self._preview.setData(None)
         if os.path.basename(name).split('.')[-1] in ['hdf', 'nxs', 'h5']:
             self.hdf_dset_w.setVisible(True)
             self.hdf_dset_w.set_filename(name)

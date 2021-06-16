@@ -32,11 +32,33 @@ __all__ = ['create_spin_box']
 
 from PyQt5.QtWidgets import QSpinBox
 
-# from ..utilities import apply_widget_properties
+from ..utilities import apply_widget_properties
 
 def create_spin_box(**kwargs):
+    """
+    Create a QSpinBox widget and set properties.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Any supported keyword arguments.
+
+    Supported keyword arguments
+    ---------------------------
+    valueRange: tuple, optional
+        The range for the QSpinBox, given as a 2-tuple of (min, max). The
+        default is (0, 1).
+    *Qt settings : any
+        Any supported Qt settings for a QSpinBox (for example value,
+        fixedWidth, visible, enabled)
+
+    Returns
+    -------
+    box : QtWidgets.QSpinBox
+        The instantiated spin box widget.
+    """
     kwargs['range'] = kwargs.get('valueRange', (0, 1))
     kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
     _box = QSpinBox()
-    # apply_widget_properties(_box, **kwargs)
+    apply_widget_properties(_box, **kwargs)
     return _box

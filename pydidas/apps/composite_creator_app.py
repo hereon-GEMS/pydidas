@@ -47,7 +47,7 @@ from pydidas.utils import (get_hdf5_metadata, check_file_exists,
                            verify_files_in_same_directory,
                            verify_files_of_range_are_same_size)
 from pydidas.image_reader import read_image
-
+from pydidas.utils import copy_docstring
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('first_file'),
@@ -86,11 +86,11 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('threshold_low'),
     get_generic_parameter('threshold_high'),
     get_generic_parameter('binning'),
-    Parameter('Composite image filename', Path, default=Path(),
+    Parameter('Composite image filename (npy format)', Path, default=Path(),
               refkey='output_fname',
-              tooltip=('The name used for saving the composite image. None '
-                       'will default to no automatic image saving. The '
-                       'default is None.'))
+              tooltip=('The name used for saving the composite image (in '
+                       'numpy file format). An empty Path will default to no '
+                       'automatic image saving. The default is Path().'))
     )
 
 
@@ -180,9 +180,9 @@ class CompositeCreatorApp(BaseApp):
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
-    output_fname : Union[pathlib.Path, None], optional
-        The name used for saving the composite image. None will default to
-        no image saving. The default is None.
+    output_fname : Union[pathlib.Path, str], optional
+        The name used for saving the composite image (in numpy file format).
+        An empty Path will default to no image saving. The default is Path().
     """
     default_params = DEFAULT_PARAMS
 
@@ -225,7 +225,7 @@ class CompositeCreatorApp(BaseApp):
 
         Parameters
         ----------
-        output_fname : Union[int, Path, None]
+        output_fname : Union[str, Path, None]
             The name of the output file for the raw data.
         """
         self.prepare_run()
@@ -234,7 +234,7 @@ class CompositeCreatorApp(BaseApp):
 
         if self.__config['hdffile']:
             _range = range(self.get_param_value('hdf_first_image_num'),
-                           self.get_param_value('hdf_last_image_num') + 1,
+                           self.get_param_value('hdf_last_image_num'),
                            self.get_param_value('stepping'))
         else:
             _range = range(len(self.__config['file_list']))
@@ -296,22 +296,9 @@ class CompositeCreatorApp(BaseApp):
         self.__process_roi()
         self.__check_and_set_bg_file()
 
+    @copy_docstring(CompositeImage)
     def apply_thresholds(self, **kwargs):
-        """
-        Apply thresholds to the composite image.
-
-        This method is a wrapper for the apply_thresholds method of the
-        CompositeImage object.
-
-        Parameters
-        ----------
-        low : float, optional
-            The lower threshold. If not specified, the stored lower threshold
-            from the ParameterCollection will be used.
-        high : float, optional
-            The upper threshold. If not specified, the stored upper threshold
-            from the ParameterCollection will be used.
-        """
+        ### Apply thresholds to the composite image.
         if (self.get_param_value('use_thresholds')
                 or 'low' in kwargs or 'high' in kwargs):
             if 'low' in kwargs:

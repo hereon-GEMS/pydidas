@@ -86,7 +86,7 @@ class InputWidgetHdfKey(InputWidgetWithButton):
             (f'HDF5 files (*{_fnames});; All files (*.*)')
         )[0]
         if fname:
-            dset = Hdf5DatasetSelection(self, fname).get_dset()
+            dset = Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
                 self.setText(str(dset))
                 self.emit_signal()

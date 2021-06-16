@@ -64,6 +64,10 @@ class InputWidgetFile(InputWidgetWithButton):
         """
         super().__init__(parent, param, width)
         self._output_flag = param.refkey.startswith('output')
+        self._file_selection = (
+            'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
+            'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'
+            )
 
     def button_function(self):
         """
@@ -76,12 +80,7 @@ class InputWidgetFile(InputWidgetWithButton):
             _func = QtWidgets.QFileDialog.getSaveFileName
         else:
             _func = QtWidgets.QFileDialog.getOpenFileName
-        fname = _func(self, 'Name of file', None,
-                      ('All files (*.*);;'
-                       f'HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
-                       'TIFF files (*.tif, *.tiff);;'
-                       'NPY files (*.npy *.npz)')
-            )[0]
+        fname = _func(self, 'Name of file', None, self._file_selection)[0]
         if fname:
             self.setText(fname)
             self.emit_signal()
@@ -98,3 +97,14 @@ class InputWidgetFile(InputWidgetWithButton):
         text = self.ledit.text()
         return pathlib.Path(self.get_value_from_text(text))
 
+    def modify_file_selection(self, list_of_choices):
+        """
+        Modify the file selection choices in the popup window.
+
+        Parameters
+        ----------
+        list_of_choices : list
+            The list with string entries for file selection choices in the
+            format 'NAME (*.EXT1 *.EXT2 ...)'
+        """
+        self._file_selection = ';;'.join(list_of_choices)

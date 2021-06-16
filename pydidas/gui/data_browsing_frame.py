@@ -37,10 +37,17 @@ import numpy as np
 import silx
 
 from PyQt5 import QtWidgets, QtCore
+from silx.gui.plot.ImageView import ImageView, PlotWindow
 
 from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
                        QtaIconButton)
 from .base_frame import BaseFrame
+
+class ImageViewNoHist(ImageView):
+    HISTOGRAMS_HEIGHT = 120
+
+    def __init__(self):
+        super().__init__()
 
 class DataBrowsingFrame(BaseFrame):
     """
@@ -60,7 +67,7 @@ class DataBrowsingFrame(BaseFrame):
             )
 
     def initUI(self):
-        from silx.gui.plot.ImageView import ImageView
+
 
         self._tree = DirectoryExplorer()
         self.hdf_dset_w = Hdf5DatasetSelectorViewOnly()
@@ -81,6 +88,10 @@ class DataBrowsingFrame(BaseFrame):
 
         # self._imview = PlotWindow()
         self._imview = ImageView()
+        # self._imview._histoHPlot.setVisible(False)
+        # self._imview._histoVPlot.setVisible(False)
+        # self._imview._radarView.setVisible(False)
+
         self._imview.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.hdf_dset_w.register_view_widget(self._imview)

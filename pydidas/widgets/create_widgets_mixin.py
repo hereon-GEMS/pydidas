@@ -22,7 +22,7 @@
 
 """
 Module with the CreateWidgetsMixIn class which can be inherited from to
-add convenience widget creation methods..
+add convenience widget creation methods.
 """
 
 __author__      = "Malte Storm"
@@ -77,7 +77,7 @@ class CreateWidgetsMixIn:
 
         Returns
         -------
-        QLabel
+        label : QLabel
             The formatted QLabel
         """
         kwargs['pointSize'] = kwargs.get('fontsize', STANDARD_FONT_SIZE)
@@ -123,9 +123,8 @@ class CreateWidgetsMixIn:
 
         Returns
         -------
-        QFrame
-            The line widget.
-
+        line : QFrame
+            The line (in the form of a QFrame widget).
         """
         _parent = kwargs.get('parent_widget', self)
         _line = QtWidgets.QFrame()
@@ -160,6 +159,11 @@ class CreateWidgetsMixIn:
         policy : QtWidgets.QSizePolicy, optional
             The size policy for the spacer (applied both horizontally and
             vertically). The default is QtWidgets.QSizePolicy.Minimum.
+
+        Returns
+        -------
+        spacer : QSpacerItem
+            The new spacer.
         """
         _policy = kwargs.get('policy', QtWidgets.QSizePolicy.Minimum)
         _parent = kwargs.get('parent_widget', self)

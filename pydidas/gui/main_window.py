@@ -105,7 +105,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __create_info_box(self):
         self.__info_widget = GetInfoWidget()
-        _dock_widget = QtWidgets.QDockWidget('Logging & information')
+        _dock_widget = QtWidgets.QDockWidget('Logging && information')
         _dock_widget.setWidget(self.__info_widget)
         _dock_widget.setFeatures(QtWidgets.QDockWidget.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFloatable)
         _dock_widget.setBaseSize(500, 50)

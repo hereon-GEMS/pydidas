@@ -41,7 +41,6 @@ from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from .._exceptions import FrameConfigError
 from ..utils import get_hdf5_populated_dataset_keys
-from .factory import create_spin_box
 from .create_widgets_mixin import CreateWidgetsMixIn
 
 DEFAULT_FILTERS = {'/entry/instrument/detector/detectorSpecific/':

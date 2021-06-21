@@ -7,7 +7,7 @@ import time
 import numpy as np
 
 __all__ = ['stringFill', 'getTimeString', 'getShortTimeString',
-           'timedPrint', 'printWarning']
+           'timedPrint']
 
 
 def stringFill(_string, _len, fill_front=False, fill_spaces=False):

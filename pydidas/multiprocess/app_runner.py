@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-"""Module with the WorkerController class which is a subclassed QThread to
-control multiprocessing of computations."""
+"""Module with the processor function which can be used for iterating over
+multiprocessing function calls."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -29,8 +29,9 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkerController']
+__all__ = ['AppRunner']
 
+import copy
 import time
 import multiprocessing as mp
 from numbers import Integral
@@ -38,9 +39,11 @@ from queue import Empty
 
 from PyQt5 import QtCore
 
+from .worker_controller import WorkerController
 from .processor_func import processor
+from ..apps import BaseApp
 
-class WorkerController(QtCore.QThread):
+class AppRunner(WorkerController):
     """
     The WorkerController is a QThread which can spawn a number of processes
     to perform computations in parallel.
@@ -53,7 +56,7 @@ class WorkerController(QtCore.QThread):
     results = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal()
 
-    def __init__(self, n_workers=4):
+    def __init__(self, app=None, n_workers=4):
         """
         Create a WorkerController.
 
@@ -62,141 +65,52 @@ class WorkerController(QtCore.QThread):
         n_workers : int, optional
             The number of spawned worker processes. The default is 4.
         """
-        super().__init__()
-        self._flag_running = True
-        self._flag_thread_alive = True
-        self._flag_active = False
-        self.__n_workers = n_workers
-        self.__to_process = []
-        self._write_lock = QtCore.QReadWriteLock()
-        self.__workers = None
-        self.__queues = dict(send=mp.Queue(), recv=mp.Queue())
-        self.__function = dict(func=lambda x: x, args=(), kwargs={})
-        self.__progress_done = 0
-        self.__progress_target = 0
+        super().__init__(n_workers)
+        self.__app = copy.copy(app)
 
-    @property
-    def n_workers(self):
+    def call_app_method(self, method_name, *args, **kwargs):
         """
-        Get the number of worker processes.
+        Change a method of the app.
 
-        Returns
-        -------
-        int
-            The number of workers.
-        """
-        return self.__n_workers
-
-    @n_workers.setter
-    def n_workers(self, number):
-        """
-        Change the number of worker processes.
-
-        *Note*: This change does not take effect until the next time a new
-        worker pool is created.
 
         Parameters
         ----------
-        number : int
-            The new number of workers
+        method_name : str
+            The name of the Application.method.
+        *args : type
+            Any arguments which need to be passed to the method..
+        **kwargs : kwargs
+            Any keyword arguments which need to be passed to the method.
 
         Raises
         ------
-        ValueError
-            If number is not of type Integral.
-        """
-        if not isinstance(number, Integral):
-            raise ValueError('The number of workers must be an integer '
-                             'number.')
-        self.__n_workers = number
+        RuntimeError
+            If the Application is currently running.
 
-    def stop(self):
+        Returns
+        -------
+        result : type
+            The return object(s) from the App.method call.
         """
-        Stop the thread from running and clean up.
-        """
-        self.suspend()
-        self._flag_thread_alive = False
+        self.__check_is_running()
+        self.__check_app_method_name(method_name)
+        method = getattr(self.__app, method_name)
+        _result = method(*args, **kwargs)
+        return _result
 
-    def suspend(self):
+    def set_app_param(self, param_name, value):
         """
-        Suspend the event loop.
-
-        This method effectively suspends the event loop and calls for the
-        workers to be joined again. New calculations can be performed by
-        using the :py:meth`WorkerController.restart` method.
-        """
-        self._flag_running = False
-
-    def restart(self):
-        """
-        Restart the event loop.
-
-        This method allow the event loop to run and to submit tasks via the
-        queue to the workers.
-        """
-        self._flag_running = True
-
-    def change_function(self, func, *args, **kwargs):
-        """
-        Change the function called by the workers.
-
-        This method stops any active processing and resets the queue. Then,
-        the function is changed and new workers are spawned. To run the new
-        function, new tasks must be submitted.
+        Set a Parameter of the Application.
 
         Parameters
         ----------
-        func : object
-            The function to be called by the workers.
-        *args : type
-            Any arguments which need to be passed to the function.
-        **kwargs : kwargs
-            Any keyword arguments which need to be passed to the function.
+        param_name : str
+            The name of the Application Parameter.
+        value : type
+            The new value for the selected Parameter.
         """
-        self.suspend()
-        self._wait_for_processes_to_finish()
-        self._reset_task_list()
-        self._update_function(func, *args, **kwargs)
-        self.restart()
-
-    def add_task(self, task_arg):
-        """
-        Add a task to the worker pool.
-
-        This will add a task to the worker pool to call the function defined
-        in :py:meth`WorkerController.change_function` method. Note that the
-        task_arg given here will be interpreted as the first argument
-        required by the function.
-
-        Parameters
-        ----------
-        task_arg : object
-            The first argument for the processing function.
-        """
-        self._write_lock.lockForWrite()
-        self.__to_process.append(task_arg)
-        self._write_lock.unlock()
-        self.__progress_target += 1
-
-    def add_tasks(self, task_args):
-        """
-        Add tasks to the worker pool.
-
-        This will add tasks to the worker pool to call the function defined
-        in :py:meth`WorkerController.change_function` method. Note that the
-        task_arg given here will be interpreted as the first argument
-        required by the function.
-
-        Parameters
-        ----------
-        task_args : Union[list, tuple, set]
-            An iterable of the first argument for the processing function.
-        """
-        self._write_lock.lockForWrite()
-        for task in task_args:
-            self.__to_process.append(task)
-        self._write_lock.unlock()
-        self.__progress_target = len(task_args)
+        self.__check_app_is_set()
+        self.__app.set_param_value(param_name, value)
 
     def run(self):
         """
@@ -304,3 +218,21 @@ class WorkerController(QtCore.QThread):
                 time.sleep(0.002)
             except Empty:
                 break
+
+    def __check_is_running(self):
+        """Verify that the Thread is not actively running."""
+        if self._flag_running:
+            raise RuntimeError('Cannot call Application methods while the'
+                               ' Application is running. Please call .stop()'
+                               ' on the AppRunner first.')
+
+    def __check_app_method_name(self, method_name):
+        """Verify the Application has a method with the given name."""
+        if not hasattr(self.__app, method_name):
+            raise KeyError('The App does not have a method with name '
+                           f'"{method_name}".')
+
+    def __check_app_is_set(self):
+        if not isinstance(self.__app, BaseApp):
+            raise TypeError('Application is not an instance of BaseApp.'
+                            ' Please set application first.')

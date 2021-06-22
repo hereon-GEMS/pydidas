@@ -32,31 +32,45 @@ __status__ = "Development"
 __all__ = ['AppRunner']
 
 import copy
-import time
-import multiprocessing as mp
-from numbers import Integral
-from queue import Empty
 
 from PyQt5 import QtCore
 
-from .worker_controller import WorkerController
-from .processor_func import processor
-from ..apps import BaseApp
+from pydidas.multiprocess.worker_controller import WorkerController
+from pydidas.multiprocess.app_processor_func import app_processor
+from pydidas.apps import BaseApp
+
 
 class AppRunner(WorkerController):
     """
-    The WorkerController is a QThread which can spawn a number of processes
-    to perform computations in parallel.
+    The AppRunner is a subclassed WorkerController (QThread) which can
+    spawn a number of processes to perform computations in parallel.
 
-    A function with defined args and kwargs can be called in separate
-    processes with the first function argument as the variable that differs
-    between function calls.
+    The App runner requires a BaseApp (or subclass) instance with a
+    defined method layout as defined in BaseApp.
+
+    The AppRunner will
+
+    Signals
+    -------
+    progress : QtCore.pyqtSignal
+        This singal emits the current progress (0..1) in the computations,
+        based on the number of returned results relative to the total tasks.
+    results : QtCore.pyqtSignal
+        The results as returned from the multiprocessing Processes.
+    finished : QtCore.pyqtSignal
+        This signal is emitted when the computations are finished. If the
+        AppRunner is running headless, it needs to be connected to the
+        app.exit slot to finish the event loop.
+    final_app_state : QtCore.pyqtSignal
+        This signal emits a copy of the App after all the calculations have
+        been performed if it needs to be used in another context.
     """
     progress = QtCore.pyqtSignal(float)
-    results = QtCore.pyqtSignal(object)
+    results = QtCore.pyqtSignal(int, object)
     finished = QtCore.pyqtSignal()
+    final_app_state = QtCore.pyqtSignal(object)
 
-    def __init__(self, app=None, n_workers=4):
+    def __init__(self, app, n_workers=4):
         """
         Create a WorkerController.
 
@@ -67,11 +81,12 @@ class AppRunner(WorkerController):
         """
         super().__init__(n_workers)
         self.__app = copy.copy(app)
+        self.__check_app_is_set()
+        self._processor['func'] = app_processor
 
     def call_app_method(self, method_name, *args, **kwargs):
         """
         Change a method of the app.
-
 
         Parameters
         ----------
@@ -112,112 +127,47 @@ class AppRunner(WorkerController):
         self.__check_app_is_set()
         self.__app.set_param_value(param_name, value)
 
-    def run(self):
+    def _cycle_pre_run(self):
         """
-        Run the thread event loop.
+        Perform pre-multiprocessing operations.
 
-        This method is automatically called upon starting the thread.
+        This time slot is used to prepare the App by running the
+        :my:meth:`app.multiprocessing_pre_run`, settings the tasks and
+        starting the workers.
         """
-        while self._flag_thread_alive:
-            if self._flag_running:
-                self._create_and_start_workers()
-            while self._flag_running:
-                while len(self.__to_process) > 0:
-                    self._put_next_task_in_queue()
-                time.sleep(0.02)
-                self._get_and_emit_all_queue_items()
-            if self._flag_active:
-                self._join_workers()
-            time.sleep(0.02)
-        self.finished.emit()
+        self.__app.multiprocessing_pre_run()
+        self._processor['args'] = (self._queues['send'], self._queues['recv'],
+                                   *self.__get_app_arguments())
+        _tasks = self.__app.multiprocessing_get_tasks()
+        self.add_tasks(_tasks)
+        self.finalize_tasks()
+        self.results.connect(self.__app.multiprocessing_store_results)
+        self.progress.connect(self.__check_progress)
+        self._create_and_start_workers()
 
-    def _wait_for_processes_to_finish(self, timeout=10):
+    def _cycle_post_run(self):
         """
-        Wait for the processes to finish their calculations.
+        Perform finishing operations of the App and close the multiprocessing
+        Processes.
+        """
+        self._join_workers()
+        self.__app.multiprocessing_post_run()
+        self.final_app_state.emit(self.__app.copy())
 
-        Parameters
-        ----------
-        timeout : float, optional
-            The maximum time to wait (in seconds). The default is 10.
+    @QtCore.pyqtSlot(float)
+    def __check_progress(self, progress):
         """
-        _t0 = time.time()
-        while self._flag_active:
-            time.sleep(0.05)
-            if time.time() - _t0 >= timeout:
-                break
-
-    def _create_and_start_workers(self):
-        """
-        Create and start worker processes.
-        """
-        _worker_args= (self.__queues['send'], self.__queues['recv'],
-                       self.__function['func'], *self.__function['args'])
-        self.__workers = [mp.Process(target=processor, args=_worker_args,
-                                    kwargs=self.__function['kwargs'])
-                         for i in range(self.__n_workers)]
-        for _worker in self.__workers:
-            _worker.start()
-        self._flag_active = True
-        self.__progress_done = 0
-
-    def _join_workers(self):
-        """
-        Join the workers back to the thread and free their resources.
-        """
-        for _worker in self.__workers:
-            self.__queues['send'].put(None)
-            _worker.join()
-        self._flag_active = False
-
-    def _put_next_task_in_queue(self):
-        """
-        Get the next task from the list and put it into the queue.
-        """
-        self._write_lock.lockForWrite()
-        _arg = self.__to_process.pop(0)
-        self._write_lock.unlock()
-        self.__queues['send'].put(_arg)
-
-    def _reset_task_list(self):
-        """
-        Reset and clear the list of tasks.
-        """
-        self._write_lock.lockForWrite()
-        self.__to_process = []
-        self._write_lock.unlock()
-
-    def _update_function(self, func, *args, **kwargs):
-        """
-        Store the new function and its calling (keyword) arguments
-        internally.
+        Check the progress and send the signal to stop the loop if all
+        results have been received.
 
         Parameters
         ----------
-        func : object
-            The function.
-        *args : object
-            The function arguments
-        **kwargs : object
-            The function keyword arguments.
+        progress : float
+            The relative progress of the calculations.
         """
-        self.__function['func'] = func
-        self.__function['args'] = args
-        self.__function['kwargs'] = kwargs
-
-    def _get_and_emit_all_queue_items(self):
-        """
-        Get all items from the queue and emit them as signals.
-        """
-        while True:
-            try:
-                res = self.__queues['recv'].get_nowait()
-                self.results.emit(res)
-                self.__progress_done += 1
-                self.progress.emit(self.__progress_done
-                                   / self.__progress_target)
-                time.sleep(0.002)
-            except Empty:
-                break
+        if progress >= 1:
+            self.suspend()
+            self.stop()
 
     def __check_is_running(self):
         """Verify that the Thread is not actively running."""
@@ -233,6 +183,44 @@ class AppRunner(WorkerController):
                            f'"{method_name}".')
 
     def __check_app_is_set(self):
+        """
+        Verify that the App passed to the AppRunner is a
+        :py:class:`pydidas.apps.BaseApp`.
+        """
         if not isinstance(self.__app, BaseApp):
             raise TypeError('Application is not an instance of BaseApp.'
                             ' Please set application first.')
+
+    def __get_app_arguments(self):
+        """Get the App arguments to pass to the processor."""
+        return (self.__app.__class__, self.__app.params.get_copy(),
+                self.__app.get_config())
+
+
+if __name__ == '__main__':
+    app = None
+    @QtCore.pyqtSlot()
+    def about_to_finish():
+        """Terminate the headless app."""
+        print('received finished signal')
+        _qtapp = QtCore.QCoreApplication.instance()
+        _qtapp.exit()
+
+    @QtCore.pyqtSlot(object)
+    def final_app(_app):
+        global app
+        app = _app
+
+
+    from pydidas.apps.mp_test_app import MpTestApp
+    import sys
+    import time
+    qt_app = QtCore.QCoreApplication(sys.argv)
+    runner = AppRunner(MpTestApp(), 8)
+    runner.set_app_param('hdf_first_image_num', 10)
+    runner.finished.connect(about_to_finish)
+    runner.final_app_state.connect(final_app)
+    runner.start()
+    t0 = time.time()
+    qt_app.exec_()
+    print(time.time() - t0)

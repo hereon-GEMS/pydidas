@@ -36,6 +36,7 @@ import argparse
 from pathlib import Path
 
 import numpy as np
+from PyQt5 import QtCore
 
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
@@ -185,6 +186,7 @@ class CompositeCreatorApp(BaseApp):
         An empty Path will default to no image saving. The default is Path().
     """
     default_params = DEFAULT_PARAMS
+    mp_func_results = QtCore.pyqtSignal(object)
 
     def __init__(self, *args, **kwargs):
         """
@@ -200,7 +202,7 @@ class CompositeCreatorApp(BaseApp):
                 self.params.set_value(_key, _cmdline_args[_key])
 
         self.__composite = None
-        self.__config = {'file_list': [],
+        self._config = {'file_list': [],
                          'file_path': None,
                          'hdffile': None,
                          'raw_img_shape_x': None,
@@ -213,39 +215,68 @@ class CompositeCreatorApp(BaseApp):
                          'datatype': None
                          }
 
-    def run(self, *args, **kwargs):
+    def multiprocessing_pre_run(self):
         """
-        Run the composite creation.
-
-        This method will first call the check_entries method to verify that
-        the parameter entries are consistent. The composite image will be
-        created and stored. If the output_fname has been specified, the
-        composite image will be saved. Otherwise, it will only be available
-        by reference.
-
-        Parameters
-        ----------
-        output_fname : Union[str, Path, None]
-            The name of the output file for the raw data.
+        Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
-        output_fname = kwargs.get('output_fname',
-                                  self.get_param_value('output_fname'))
-
-        if self.__config['hdffile']:
+        if self._config['hdffile']:
             _range = range(self.get_param_value('hdf_first_image_num'),
                            self.get_param_value('hdf_last_image_num'),
                            self.get_param_value('stepping'))
         else:
-            _range = range(len(self.__config['file_list']))
+            _range = range(len(self._config['file_list']))
+        self._config['mp_pre_run_called'] = True
+        self._config['mp_index_offset'] = _range[0]
+        self._config['mp_tasks'] = _range
 
-        for compindex, imgindex in enumerate(_range):
-            _fname, _kwargs = self.__get_kwargs_for_read_image(imgindex)
-            self.__composite.insert_image(read_image(_fname, **_kwargs),
-                                          compindex)
+    def multiprocessing_post_run(self):
+        """
+        Perform operatinos after running main parallel processing function.
+        """
+        output_fname = self.get_param_value('output_fname')
         self.apply_thresholds()
         if os.path.exists(os.path.dirname(output_fname)):
             self.__composite.save(output_fname)
+
+    def multiprocessing_get_tasks(self):
+        """
+        Return all tasks required in multiprocessing.
+        """
+        if 'mp_tasks' not in self._config.keys():
+            raise KeyError('Key "mp_tasks" not found. Please execute'
+                           'multiprocessing_pre_run() first.')
+        return self._config['mp_tasks']
+
+    def multiprocessing_func(self, index):
+        """
+        Perform key operation with parallel processing.
+
+        Returns
+        -------
+        _composite_index : int
+            The image index for the composite image.
+        _image : np.ndarray
+            The (pre-processed) image.
+        """
+        _fname, _kwargs = self.__get_kwargs_for_read_image(index)
+        _composite_index = index - self._config['mp_index_offset']
+        _image = read_image(_fname, **_kwargs)
+        return _composite_index, _image
+
+    @QtCore.pyqtSlot(int, object)
+    def multiprocessing_store_results(self, index, image):
+        """
+        Store the results of the multiprocessing operation.
+
+        Parameters
+        ----------
+        index : int
+            The index in the composite image.
+        image : np.ndarray
+            The image data.
+        """
+        self.__composite.insert_image(image, index)
 
     def prepare_run(self):
         """
@@ -255,15 +286,15 @@ class CompositeCreatorApp(BaseApp):
         tell the CompositeImage to create a new image with changed size.
         """
         self.check_entries()
-        _shape = (self.__config['final_image_size_y'],
-                  self.__config['final_image_size_x'])
+        _shape = (self._config['final_image_size_y'],
+                  self._config['final_image_size_x'])
         if self.__composite is None:
             self.__composite = CompositeImage(
                 image_shape=_shape,
                 composite_nx=self.get_param_value('composite_nx'),
                 composite_ny=self.get_param_value('composite_ny'),
                 composite_dir=self.get_param_value('composite_dir'),
-                datatype=self.__config['datatype'])
+                datatype=self._config['datatype'])
             return
         if self.__composite.shape != _shape:
             self.__composite.create_new_image()
@@ -350,10 +381,10 @@ class CompositeCreatorApp(BaseApp):
         _first_file = self.get_param_value('first_file')
         check_file_exists(_first_file)
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-            self.__config['hdffile'] = True
+            self._config['hdffile'] = True
             self.__store_image_data_from_hdf_file()
         else:
-            self.__config['hdffile'] = False
+            self._config['hdffile'] = False
             self.__store_image_data_from_file_range()
 
     def __store_image_data_from_hdf_file(self):
@@ -371,14 +402,14 @@ class CompositeCreatorApp(BaseApp):
 
         _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
         _n_image = _meta['shape'][0]
-        self.__config['raw_img_shape_y'] = _meta['shape'][1]
-        self.__config['raw_img_shape_x'] = _meta['shape'][2]
-        self.__config['datatype'] = _meta['dtype']
+        self._config['raw_img_shape_y'] = _meta['shape'][1]
+        self._config['raw_img_shape_x'] = _meta['shape'][2]
+        self._config['datatype'] = _meta['dtype']
         _n0 = self._apply_param_modulo('hdf_first_image_num', _n_image)
         _n1 = self._apply_param_modulo('hdf_last_image_num', _n_image)
         # correct total number of images for stepping *after* the
         # numbers have been modulated to be in the image range.
-        self.__config['n_image'] = ((_n1 - _n0)
+        self._config['n_image'] = ((_n1 - _n0)
                                     // self.get_param_value('stepping'))
         if not _n0 < _n1:
             raise AppConfigError(
@@ -392,12 +423,12 @@ class CompositeCreatorApp(BaseApp):
         verify_files_in_same_directory(self.get_param_value('first_file'),
                                        self.get_param_value('last_file'))
         self.__create_filelist()
-        verify_files_of_range_are_same_size(self.__config['file_path'],
-                                            self.__config['file_list'])
+        verify_files_of_range_are_same_size(self._config['file_path'],
+                                            self._config['file_list'])
         _test_image = read_image(self.get_param_value('first_file'))
-        self.__config['datatype'] = _test_image.dtype
-        self.__config['raw_img_shape_x'] = _test_image.shape[1]
-        self.__config['raw_img_shape_y'] = _test_image.shape[0]
+        self._config['datatype'] = _test_image.dtype
+        self._config['raw_img_shape_x'] = _test_image.shape[1]
+        self._config['raw_img_shape_y'] = _test_image.shape[0]
 
     def __create_filelist(self):
         """
@@ -414,9 +445,9 @@ class CompositeCreatorApp(BaseApp):
         _i1 = _file_list.index(_fname1)
         _i2 = _file_list.index(_fname2)
         _file_list = _file_list[_i1:_i2+1:self.get_param_value('stepping')]
-        self.__config['file_list'] = _file_list
-        self.__config['file_path'] = _path1
-        self.__config['n_image'] = len(_file_list)
+        self._config['file_list'] = _file_list
+        self._config['file_path'] = _path1
+        self._config['n_image'] = len(_file_list)
 
     def __check_and_set_bg_file(self):
         """
@@ -447,17 +478,17 @@ class CompositeCreatorApp(BaseApp):
             _params = dict(dataset=self.get_param_value('bg_hdf_key'),
                            binning=self.get_param_value('binning'),
                            imageNo=self.get_param_value('bg_hdf_num'),
-                           ROI=self.__config['roi'])
+                           ROI=self._config['roi'])
         else:
             _params = dict(binning=self.get_param_value('binning'),
-                           ROI=self.__config['roi'])
+                           ROI=self._config['roi'])
         _bg_image = read_image(_bg_file, **_params)
-        if not _bg_image.shape == (self.__config['final_image_size_y'],
-                                   self.__config['final_image_size_x']):
+        if not _bg_image.shape == (self._config['final_image_size_y'],
+                                   self._config['final_image_size_x']):
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not the same image dimensions as the'
                                  ' selected files.')
-        self.__config['bg_image'] = _bg_image
+        self._config['bg_image'] = _bg_image
 
     def __check_roi(self):
         """
@@ -471,13 +502,13 @@ class CompositeCreatorApp(BaseApp):
         if self.get_param_value('use_roi'):
             _warning = ''
             _x0 = self._apply_param_modulo('roi_xlow',
-                                           self.__config['raw_img_shape_x'])
+                                           self._config['raw_img_shape_x'])
             _x1 = self._apply_param_modulo('roi_xhigh',
-                                           self.__config['raw_img_shape_x'])
+                                           self._config['raw_img_shape_x'])
             _y0 = self._apply_param_modulo('roi_ylow',
-                                           self.__config['raw_img_shape_y'])
+                                           self._config['raw_img_shape_y'])
             _y1 = self._apply_param_modulo('roi_yhigh',
-                                           self.__config['raw_img_shape_y'])
+                                           self._config['raw_img_shape_y'])
             if _x1 < _x0:
                 _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]'
             if _y1 < _y0:
@@ -498,20 +529,20 @@ class CompositeCreatorApp(BaseApp):
         _nx = self.get_param_value('composite_nx')
         _ny = self.get_param_value('composite_ny')
         if _nx == -1:
-            _nx = int(np.ceil(self.__config['n_image'] / _ny))
+            _nx = int(np.ceil(self._config['n_image'] / _ny))
             self.params.set_value('composite_nx', _nx)
         if _ny == -1:
-            _ny = int(np.ceil(self.__config['n_image'] / _nx))
+            _ny = int(np.ceil(self._config['n_image'] / _nx))
             self.params.set_value('composite_ny', _ny)
-        if _nx * _ny < self.__config['n_image']:
+        if _nx * _ny < self._config['n_image']:
             raise AppConfigError(
                 'The selected composite dimensions are too small to hold all'
-                f' images. (nx={_nx}, ny={_ny}, n={self.__config["n_image"]})')
-        if ((_nx - 1) * _ny >= self.__config['n_image']
-                or _nx * (_ny - 1) >= self.__config['n_image']):
+                f' images. (nx={_nx}, ny={_ny}, n={self._config["n_image"]})')
+        if ((_nx - 1) * _ny >= self._config['n_image']
+                or _nx * (_ny - 1) >= self._config['n_image']):
             raise AppConfigError(
                 'The selected composite dimensions are too large for all'
-                f' images. (nx={_nx}, ny={_ny}, n={self.__config["n_image"]})')
+                f' images. (nx={_nx}, ny={_ny}, n={self._config["n_image"]})')
 
     def __process_roi(self):
         """
@@ -523,15 +554,15 @@ class CompositeCreatorApp(BaseApp):
             _y1 = self.get_param_value('roi_yhigh')
             _x0 = self.get_param_value('roi_xlow')
             _x1 = self.get_param_value('roi_xhigh')
-            self.__config['final_image_size_x'] = (_x1 - _x0) // _binning
-            self.__config['final_image_size_y'] = (_y1 - _y0) // _binning
-            self.__config['roi'] = (slice(_y0, _y1), slice(_x0, _x1))
+            self._config['final_image_size_x'] = (_x1 - _x0) // _binning
+            self._config['final_image_size_y'] = (_y1 - _y0) // _binning
+            self._config['roi'] = (slice(_y0, _y1), slice(_x0, _x1))
         else:
-            self.__config['final_image_size_x'] = \
-                self.__config['raw_img_shape_x'] // _binning
-            self.__config['final_image_size_y'] = \
-                self.__config['raw_img_shape_y'] // _binning
-            self.__config['roi'] = None
+            self._config['final_image_size_x'] = \
+                self._config['raw_img_shape_x'] // _binning
+            self._config['final_image_size_y'] = \
+                self._config['raw_img_shape_y'] // _binning
+            self._config['roi'] = None
 
     def __get_kwargs_for_read_image(self, index):
         """
@@ -549,16 +580,16 @@ class CompositeCreatorApp(BaseApp):
         _params : dict
             The required parameters as dictionary.
         """
-        if self.__config['hdffile']:
+        if self._config['hdffile']:
             _fname = self.get_param_value('first_file')
             _params = dict(dataset=self.get_param_value('hdf_key'),
                            binning=self.get_param_value('binning'),
-                           ROI=self.__config['roi'], imageNo=index)
+                           ROI=self._config['roi'], imageNo=index)
         else:
-            _fname = os.path.join(self.__config['file_path'],
-                                  self.__config['file_list'][index])
+            _fname = os.path.join(self._config['file_path'],
+                                  self._config['file_list'][index])
             _params = dict(binning=self.get_param_value('binning'),
-                           ROI=self.__config['roi'])
+                           ROI=self._config['roi'])
         return _fname, _params
 
 

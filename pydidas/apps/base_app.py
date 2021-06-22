@@ -31,7 +31,10 @@ __status__ = "Development"
 __all__ = ['BaseApp']
 
 
-from pydidas.core import ObjectWithParameterCollection, ParameterCollection
+import copy
+
+from pydidas.core import ObjectWithParameterCollection
+
 
 class BaseApp(ObjectWithParameterCollection):
     """
@@ -58,15 +61,72 @@ class BaseApp(ObjectWithParameterCollection):
         """
         super().__init__()
         self.add_params(*args, **kwargs)
+        self._config = {}
 
-    def run(self, *args, **kwargs):
+    def run(self):
         """
-        Run the app.
+        Run the app without multiprocessing.
+        """
+        self.multiprocessing_pre_run()
+        tasks = self.multiprocessing_get_tasks()
+        for task in tasks:
+            _results = self.multiprocessing_func(task)
+            self.multiprocessing_store_results(*_results)
+        self.multiprocessing_post_run()
+
+    def multiprocessing_pre_run(self):
+        """
+        Perform operations prior to running main parallel processing function.
         """
         raise NotImplementedError
 
+    def multiprocessing_post_run(self):
+        """
+        Perform operatinos after running main parallel processing function.
+        """
+        raise NotImplementedError
+
+    def multiprocessing_get_tasks(self):
+        """
+        Return all tasks required in multiprocessing.
+        """
+        raise NotImplementedError
+
+    def multiprocessing_func(self, *args):
+        """
+        Perform key operation with parallel processing.
+        """
+        raise NotImplementedError
+
+    def multiprocessing_store_results(self, *args):
+        """
+        Store the results of the multiprocessing operation.
+        """
+        raise NotImplementedError
+
+    def get_config(self):
+        """
+        Get the App configuration.
+
+        Returns
+        -------
+        dict
+            The App configuration stored in the _config dictionary.
+        """
+        return copy.copy(self._config)
+
+    def copy(self):
+        """
+        Get a copy of the App.
+
+        Returns
+        -------
+        App : BaseApp
+            A copy of the App instance.
+        """
+        return copy.copy(self)
+
     def __copy__(self):
-        import copy
         _obj_copy = type(self)()
         for _key in self.__dict__:
             _obj_copy.__dict__[_key] = copy.copy(self.__dict__[_key])

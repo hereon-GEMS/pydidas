@@ -30,10 +30,11 @@ class _ProcThread(threading.Thread):
         self.func = func
         self.func_args = args
         self.func_kwargs = kwargs
+        self.daemon = True
 
     def run(self):
-       processor(self.input_queue, self.output_queue,
-                 self.func, *self.func_args, **self.func_kwargs)
+        processor(self.input_queue, self.output_queue,
+                  self.func, *self.func_args, **self.func_kwargs)
 
 
 class WorkerControl(WorkerController):
@@ -48,15 +49,6 @@ class WorkerControl(WorkerController):
         for _worker in self._workers:
             _worker.start()
         self._flag_active = True
-
-    def _join_workers(self):
-        """
-        Join the workers back to the thread and free their resources.
-        """
-        for _worker in self._workers:
-            self._queues['send'].put(None)
-            _worker.join()
-        self._flag_active = False
 
 
 class TestWorkerController(unittest.TestCase):
@@ -140,17 +132,18 @@ class TestWorkerController(unittest.TestCase):
         result_spy = QtTest.QSignalSpy(wc.results)
         progress_spy = QtTest.QSignalSpy(wc.progress)
         wc.add_tasks(_tasks)
+        wc.finalize_tasks()
         wc.start()
         time.sleep(0.4)
         wc.stop()
-        time.sleep(0.05)
+        time.sleep(0.1)
+        del wc
         _results = get_spy_values(result_spy)
         _progress = get_spy_values(progress_spy)
         _exp_progress = [index / len(_tasks)
                           for index in range(1, len(_tasks) + 1)]
         self.assertEqual(_progress, _exp_progress)
         self.assertEqual(_results, _tasks)
-
 
 if __name__ == "__main__":
     unittest.main()

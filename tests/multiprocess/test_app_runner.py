@@ -73,7 +73,6 @@ class TestAppRunner(unittest.TestCase):
         runner.call_app_method('multiprocessing_post_run')
         self.assertTrue(runner._AppRunner__app._config['mp_post_run_called'])
 
-
     def test_set_app_param(self):
         _num = 12345
         runner = AppRun(self.app)

@@ -87,10 +87,6 @@ class CompositeImage(ParameterCollectionMixIn):
         ------
         ValueError
             If one or more of the required config fields have not been set.
-
-        Returns
-        -------
-        None.
         """
         if not self.__check_config():
             raise ValueError('Not all required values for the creation of a '
@@ -107,11 +103,6 @@ class CompositeImage(ParameterCollectionMixIn):
         ------
         ValueError
             DESCRIPTION.
-
-        Returns
-        -------
-        None.
-
         """
         self.__verify_config()
         _shape = self.get_param_value('image_shape')
@@ -192,6 +183,7 @@ class CompositeImage(ParameterCollectionMixIn):
                        (_iy + 1) * self.get_param_value('image_shape')[0])
         xslice = slice(_ix * self.get_param_value('image_shape')[1],
                        (_ix + 1) * self.get_param_value('image_shape')[1])
+        print(index, self.__image.shape, self.__image[yslice, xslice].shape, image.shape, xslice, yslice)
         self.__image[yslice, xslice] = image
 
     def save(self, output_fname):

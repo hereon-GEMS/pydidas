@@ -35,8 +35,8 @@ import copy
 
 from PyQt5 import QtCore
 
-from pydidas.multiprocess.worker_controller import WorkerController
-from pydidas.multiprocess.app_processor_func import app_processor
+from pydidas.multiprocessing.worker_controller import WorkerController
+from pydidas.multiprocessing.app_processor_func import app_processor
 from pydidas.apps import BaseApp
 
 
@@ -202,7 +202,6 @@ if __name__ == '__main__':
     @QtCore.pyqtSlot()
     def about_to_finish():
         """Terminate the headless app."""
-        print('received finished signal')
         _qtapp = QtCore.QCoreApplication.instance()
         _qtapp.exit()
 

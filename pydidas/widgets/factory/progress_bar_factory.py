@@ -20,16 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from . import spin_box_factory
-from .spin_box_factory import *
+"""Module with a factory function to create formatted QSpinBoxes."""
 
-from . import progress_bar_factory
-from .progress_bar_factory import *
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "MIT"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['create_progress_bar']
 
-__all__ = []
-__all__ += spin_box_factory.__all__
-__all__ += progress_bar_factory.__all__
+from PyQt5.QtWidgets import QProgressBar
 
-# unclutter namespace and remove modules:
-del spin_box_factory
-del progress_bar_factory
+from ..utilities import apply_widget_properties
+
+def create_progress_bar(**kwargs):
+    """
+    Create a QSpinBox widget and set properties.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Any supported keyword arguments.
+
+    Supported keyword arguments
+    ---------------------------
+    *Qt settings : any
+        Any supported Qt settings for a QProgressBar (for example minimum,
+        maximum, fixedWidth, visible, enabled)
+
+    Returns
+    -------
+    bar : QtWidgets.QProgressBar
+        The instantiated progress bar widget.
+    """
+    _bar = QProgressBar()
+    apply_widget_properties(_bar, **kwargs)
+    return _bar

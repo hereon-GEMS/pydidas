@@ -35,10 +35,11 @@ __all__ = ['CreateWidgetsMixIn']
 
 from PyQt5 import QtWidgets
 
-from .factory import create_spin_box
+from .factory import create_spin_box, create_progress_bar
 from .utilities import apply_widget_properties, apply_font_properties
 from ..config import STANDARD_FONT_SIZE, DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
+from ..utils import copy_docstring
 
 
 class CreateWidgetsMixIn:
@@ -208,34 +209,29 @@ class CreateWidgetsMixIn:
         _parent.layout().addWidget(_button, *_layout_args)
         return _button
 
+    @copy_docstring(create_spin_box)
     def create_spin_box(self, **kwargs):
         """
-        Create a button and add it to the layout.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Any supported keyword arguments.
-
-        Supported keyword arguments
-        ---------------------------
-        valueRange: tuple, optional
-            The range for the QSpinBox, given as a 2-tuple of (min, max). The
-            default is (0, 1).
-        *Qt settings : any
-            Any supported Qt settings for a QSpinBox (for example value,
-            fixedWidth, visible, enabled)
-
-        Returns
-        -------
-        box : QtWidgets.QSpinBox
-            The instantiated spin box widget.
+        Please refer to pydidas.widgets.factory.create_spin_box
         """
         _parent = kwargs.get('parent_widget', self)
         _box = create_spin_box(**kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_box, *_layout_args)
         return _box
+
+    @copy_docstring(create_progress_bar)
+    def create_progress_bar(self, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_progress_bar
+        """
+        _parent = kwargs.get('parent_widget', self)
+        _bar = create_progress_bar(**kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
+        _parent.layout().addWidget(_bar, *_layout_args)
+        return _bar
+
+
 
 def _get_widget_layout_args(parent, **kwargs):
     """

@@ -6,7 +6,7 @@ import sys
 import numpy as np
 
 from PyQt5 import QtCore, QtWidgets, QtTest
-from pydidas.multiprocess import AppRunner, app_processor
+from pydidas.multiprocessing import AppRunner, app_processor
 from pydidas.apps.mp_test_app import MpTestApp
 
 def test_func(index, *args, **kwargs):

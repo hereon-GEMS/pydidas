@@ -12,6 +12,6 @@ from . import core
 
 from . import image_reader
 
-from . import multiprocess
+from . import multiprocessing
 
 del plugin_collection

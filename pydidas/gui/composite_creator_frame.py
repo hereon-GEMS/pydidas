@@ -35,6 +35,7 @@ import os
 from functools import partial
 
 import numpy as np
+import matplotlib.image as mplimg
 from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot import PlotWindow
@@ -50,6 +51,7 @@ from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
 from pydidas.widgets.param_config import ParameterConfigMixIn, ParamConfig
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_metadata)
+from pydidas.multiprocessing import AppRunner
 
 
 class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
@@ -68,6 +70,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         self.__select_info = {'hdf_images': None,
                               'composite_dim': 'x'}
         self._app = None
+        self._widgets = {}
         self.init_widgets()
         self.connect_signals()
 
@@ -78,37 +81,43 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.w_buttons = {}
 
-        self.w_config = ParamConfig(self, initLayout=False, lineWidth=0,
-                                    frameStyle=0, midLineWidth=5)
-        self.w_config.setLayout(create_default_grid_layout())
+        self._widgets['config'] = ParamConfig(self, initLayout=False,
+                                              lineWidth=0, frameStyle=0,
+                                              midLineWidth=5)
+        self._widgets['config'].setLayout(create_default_grid_layout())
+        _config_next_row = self._widgets['config'].next_row
 
-        self.w_config_area = ScrollArea(
-            self, widget=self.w_config,
+        self._widgets['config_area'] = ScrollArea(
+            self, widget=self._widgets['config'],
             fixedWidth=self.CONFIG_WIDGET_WIDTH + 55,
             sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding)
-            )
-        self.layout().addWidget(self.w_config_area, self.next_row(), 0, 1, 1)
+                         QtWidgets.QSizePolicy.Expanding))
+        self.layout().addWidget(self._widgets['config_area'], self.next_row(),
+                                0, 1, 1)
 
         self.create_label(
             'Composite image creator', fontsize=14, gridPos=(0, 0, 1, 2),
-            parent_widget=self.w_config, fixedWidth=self.CONFIG_WIDGET_WIDTH
-            )
-        self.create_spacer(gridPos=(self.w_config.next_row(), 0, 1, 2),
-                            parent_widget=self.w_config)
-        self.w_buttons['clear'] = self.create_button(
-            'Clear all entries', gridPos=(self.w_config.next_row(), 0, 1, 2),
-            parent_widget=self.w_config, fixedWidth=self.CONFIG_WIDGET_WIDTH
-            )
-        self.w_selection_info = ReadOnlyTextWidget(
-            fixedWidth=self.CONFIG_WIDGET_WIDTH, fixedHeight=60, visible=False
-            )
-        self.w_plot = PlotWindow(
+            parent_widget=self._widgets['config'],
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self.create_spacer(gridPos=(_config_next_row(), 0, 1, 2),
+                            parent_widget=self._widgets['config'])
+
+        self._widgets['but_clear'] = self.create_button(
+            'Clear all entries', gridPos=(_config_next_row(), 0, 1, 2),
+            parent_widget=self._widgets['config'],
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self._widgets['selection_info'] = ReadOnlyTextWidget(
+            fixedWidth=self.CONFIG_WIDGET_WIDTH, fixedHeight=60, visible=False)
+
+        self._widgets['plot_window']= PlotWindow(
             parent=self, resetzoom=True, autoScale=False, logScale=False,
             grid=False, curveStyle=False, colormap=True, aspectRatio=True,
             yInverted=True, copy=True, save=True, print_=True, control=False,
             position=False, roi=False, mask=True)
-        self.layout().addWidget(self.w_plot, 0, 3, self.next_row() -1, 1)
+        self.layout().addWidget(self._widgets['plot_window'], 0, 3,
+                                self.next_row() -1, 1)
 
         for _key in self.params:
             # special formatting for some parameters:
@@ -119,45 +128,52 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
                                 valign_text=QtCore.Qt.AlignBottom,
                                 width=self.CONFIG_WIDGET_WIDTH,
                                 width_text=self.CONFIG_WIDGET_WIDTH - 50,
-                                parent_widget=self.w_config,
-                                row=self.w_config.next_row())
+                                parent_widget=self._widgets['config'],
+                                row=_config_next_row())
             else:
-                _options = dict(width=100, parent_widget=self.w_config,
-                                width_text=self.CONFIG_WIDGET_WIDTH - 110,
-                                row=self.w_config.next_row())
+                _options = dict(width=100, row=_config_next_row(),
+                                parent_widget=self._widgets['config'],
+                                width_text=self.CONFIG_WIDGET_WIDTH - 110)
             self.create_param_widget(self.params[_key], **_options)
+
             # add selection info box after hdf_key widgets:
             if _key == 'hdf_key':
-                self.w_config.layout().addWidget(
-                    self.w_selection_info, self.w_config.next_row(), 0, 1, 2
-                    )
+                self._widgets['config'].layout().addWidget(
+                    self._widgets['selection_info'], _config_next_row(),
+                    0, 1, 2)
+
             # add spacers between groups:
             if _key in ['hdf_last_image_num', 'bg_hdf_num', 'composite_dir',
                         'roi_yhigh', 'threshold_high', 'binning',
                         'output_fname']:
-                self.create_line(parent_widget=self.w_config,
+                self.create_line(parent_widget=self._widgets['config'],
                                  fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
         self.param_widgets['output_fname'].modify_file_selection(
             ['NPY files (*.npy *.npz)'])
 
-        self.w_buttons['exec'] = self.create_button(
-            'Generate composite', parent_widget=self.w_config,
-            gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
-            fixedWidth=self.CONFIG_WIDGET_WIDTH
-            )
-        self.w_buttons['show'] = self.create_button(
-            'Show composite', parent_widget=self.w_config,
-            gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
-            fixedWidth=self.CONFIG_WIDGET_WIDTH
-            )
-        self.w_buttons['save'] = self.create_button(
-            'Save composite image', parent_widget=self.w_config,
-            gridPos=(self.w_config.next_row(), 0, 1, 2), enabled=False,
-            fixedWidth=self.CONFIG_WIDGET_WIDTH
-            )
-        self.create_spacer(parent_widget=self.w_config,
-                            gridPos=(self.w_config.next_row(), 0, 1, 2),
+        self._widgets['but_exec'] = self.create_button(
+            'Generate composite', parent_widget=self._widgets['config'],
+            gridPos=(_config_next_row(), 0, 1, 2), enabled=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self._widgets['progress'] = self.create_progress_bar(
+            parent_widget=self._widgets['config'],
+            gridPos=(_config_next_row(), 0, 1, 2), visible=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH, minimum=0, maximum=100)
+
+        self._widgets['but_show'] = self.create_button(
+            'Show composite', parent_widget=self._widgets['config'],
+            gridPos=(_config_next_row(), 0, 1, 2), enabled=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self._widgets['but_save'] = self.create_button(
+            'Save composite image', parent_widget=self._widgets['config'],
+            gridPos=(_config_next_row(), 0, 1, 2), enabled=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self.create_spacer(parent_widget=self._widgets['config'],
+                            gridPos=(_config_next_row(), 0, 1, 2),
                             policy = QtWidgets.QSizePolicy.Expanding)
 
         self.param_widgets['n_image'].setEnabled(False)
@@ -173,12 +189,12 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         """
         Connect the required signals between widgets and methods.
         """
-        self.w_buttons['clear'].clicked.connect(
+        self._widgets['but_clear'].clicked.connect(
             partial(self.__clear_entries, 'all', True)
             )
-        self.w_buttons['exec'].clicked.connect(self.__run_app)
-        self.w_buttons['save'].clicked.connect(self.__save_composite)
-        self.w_buttons['show'].clicked.connect(self.__show_composite)
+        self._widgets['but_exec'].clicked.connect(self.__run_app)
+        self._widgets['but_save'].clicked.connect(self.__save_composite)
+        self._widgets['but_show'].clicked.connect(self.__show_composite)
 
         self.param_widgets['use_roi'].currentTextChanged.connect(
             self.__toggle_roi_selection )
@@ -220,11 +236,54 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         ...
 
     def __run_app(self):
+        """
+        Parallel implementation of the execution method.
+        """
+        self.set_status('Started composite image creation.')
+        self._widgets['progress'].setVisible(True)
+        self._widgets['progress'].setValue(0)
+        self._app = CompositeCreatorApp(self.params.get_copy())
+        self._runner = AppRunner(self._app)
+        self._runner.final_app_state.connect(self._set_app)
+        self._runner.progress.connect(self._apprunner_update_progress)
+        self._runner.finished.connect(self._apprunner_finished)
+        self._runner.start()
+
+    @QtCore.pyqtSlot()
+    def _apprunner_finished(self):
+        """
+        Clean up after AppRunner is done.
+        """
+        self._widgets['but_show'].setEnabled(True)
+        self._widgets['but_save'].setEnabled(True)
+        self.set_status('Finished composite image creation.')
+        del self._runner
+
+    def __show_composite(self):
+        """
+        Show the composite image in the Viewwer.
+        """
+        self._widgets['plot_window'].addImage(self._app.composite,
+                                              replace=True)
+
+    def __save_composite(self):
+        """
+        Save the composite image.
+        """
+        _func = QtWidgets.QFileDialog.getSaveFileName
+        fname = _func(self, 'Name of file', None,
+                      'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png)')[0]
+        mplimg.imsave(fname, self._app.composite)
+
+    def __run_app_serial(self):
+        """
+        Serial implementation of the execution method.
+        """
         self.set_status('Started composite image creation.')
         self._app = CompositeCreatorApp(self.params.get_copy())
         self._app.run()
-        self.w_buttons['show'].setEnabled(True)
-        self.w_buttons['save'].setEnabled(True)
+        self._widgets['but_show'].setEnabled(True)
+        self._widgets['but_save'].setEnabled(True)
         self.set_status('Finished composite image creation.')
 
     def __selected_first_file(self, fname):
@@ -288,7 +347,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             self.__clear_entries(['last_file'], hide=False)
             return
         # finally, give information about number of selected files
-        self.w_selection_info.setText(
+        self._widgets['selection_info'].setText(
             (f'Selected directory:\n  [...]/{os.path.basename(_path1)}\n'
              f'Total number of selected files: {index2 - index1 + 1}'))
         self.update_param_value('n_image', index2 - index1 + 1)
@@ -356,14 +415,14 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         _dset = self.get_param_value('hdf_key')
         if self.__verify_hdf_key(_fname, _dset, 'hdf_key'):
             _shape = get_hdf5_metadata(_fname, 'shape', _dset)
-            self.w_selection_info.setText(
+            self._widgets['selection_info'].setText(
                 (f'Number of images in dataset: {_shape[0]}\n\nImage size: '
                  f'{_shape[1]} x {_shape[2]}'))
             self.update_param_value('n_image', _shape[0])
             self.__select_info['hdf_n_image'] = _shape[0]
             self.__finalize_selection()
         else:
-            self.w_buttons['exec'].setEnabled(False)
+            self._widgets['but_exec'].setEnabled(False)
 
     def __selected_bg_hdf_key(self):
         """
@@ -373,16 +432,16 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         _fname = self.get_param_value('bg_file')
         _dset = self.get_param_value('bg_hdf_key')
         if not self.__verify_hdf_key(_fname, _dset, 'bg_hdf_key'):
-            self.w_buttons['exec'].setEnabled(False)
+            self._widgets['but_exec'].setEnabled(False)
 
     def __finalize_selection(self):
         """
         Finalize input file selection.
         """
-        self.w_selection_info.setVisible(True)
+        self._widgets['selection_info'].setVisible(True)
         for _key in ['stepping', 'composite_nx', 'composite_ny']:
             self.toggle_widget_visibility(_key, True)
-        self.w_buttons['exec'].setEnabled(True)
+        self._widgets['but_exec'].setEnabled(True)
 
     def __reset_params(self, keys='all'):
         """
@@ -395,7 +454,9 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
         """
-        self.w_buttons['exec'].setEnabled(False)
+        for _but in ['but_exec', 'but_save', 'but_show']:
+            self._widgets[_but].setEnabled(False)
+        self._widgets['progress'].setVisible(False)
         for _key in keys:
             param = self.params[_key]
             param.restore_default()
@@ -427,7 +488,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         except (KeyError, AssertionError):
             _enable = False
         finally:
-            self.w_buttons['exec'].setEnabled(_enable)
+            self._widgets['but_exec'].setEnabled(_enable)
 
     def __toggle_bg_file_selection(self, flag):
         """
@@ -461,7 +522,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         _check_keys = ['hdf_key', 'hdf_first_image_num', 'hdf_last_image_num',
                        'last_file']
         _should_show_box = not any(_key in reset_keys for _key in _check_keys)
-        self.w_selection_info.setVisible(_should_show_box)
+        self._widgets['selection_info'].setVisible(_should_show_box)
 
     def __toggle_roi_selection(self, flag):
         """
@@ -526,9 +587,9 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
             img2 = self.get_param_value('hdf_last_image_num')
             if img2 == -1:
                 img2 = self.__select_info['hdf_n_image']
-            _n = (img2 - img1) // step
+            _n = len(range(img1, img2, step))
         elif self.__select_info['hdf_images'] is False:
-            _n = self.__select_info['file_n_image'] // step
+            _n = len(range(0, self.__select_info['file_n_image'], step))
         if self.__select_info['hdf_images'] is not None:
             self.update_param_value('n_image', _n)
             self.__update_composite_dim(self.__select_info['composite_dim'])
@@ -546,29 +607,12 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         num1 = self.param_widgets[f'composite_n{dim}'].get_value()
         num2 = int(np.ceil(_n_total / abs(num1)))
         dim2 = 'y' if dim == 'x' else 'x'
-        #self.params[f'composite_n{dim}'].value = n1
         self.update_param_value(f'composite_n{dim2}', num2)
         self.update_param_value(f'composite_n{dim}', abs(num1))
         self.__select_info['composite_dim'] = dim
         if ((num1 - 1) * num2 >= _n_total
                 or num1 * (num2 - 1) >= _n_total):
             self.__update_composite_dim(dim2)
-
-    def __show_composite(self):
-        """
-        Show the composite image in the Viewwer.
-        """
-        self.w_plot.addImage(self._app.composite, replace=True)
-
-    def __save_composite(self):
-        """
-        Save the composite image.
-
-        Returns
-        -------
-        None.
-
-        """
 
 
 if __name__ == '__main__':

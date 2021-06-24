@@ -212,8 +212,7 @@ class CompositeCreatorApp(BaseApp):
                          'roi': None,
                          'final_image_size_x': None,
                          'final_image_size_y': None,
-                         'datatype': None
-                         }
+                         'datatype': None}
 
     def multiprocessing_pre_run(self):
         """
@@ -260,7 +259,8 @@ class CompositeCreatorApp(BaseApp):
             The (pre-processed) image.
         """
         _fname, _kwargs = self.__get_kwargs_for_read_image(index)
-        _composite_index = index - self._config['mp_index_offset']
+        _composite_index = ((index - self._config['mp_index_offset'])
+                            / self.get_param_value('stepping'))
         _image = read_image(_fname, **_kwargs)
         return _composite_index, _image
 
@@ -409,8 +409,8 @@ class CompositeCreatorApp(BaseApp):
         _n1 = self._apply_param_modulo('hdf_last_image_num', _n_image)
         # correct total number of images for stepping *after* the
         # numbers have been modulated to be in the image range.
-        self._config['n_image'] = ((_n1 - _n0)
-                                    // self.get_param_value('stepping'))
+        self._config['n_image'] = len(range(_n0, _n1,
+                                            self.get_param_value('stepping')))
         if not _n0 < _n1:
             raise AppConfigError(
                 f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'

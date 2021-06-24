@@ -29,13 +29,13 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['app_processor']
+__all__ = ['processor']
 
-import queue
 import time
+import queue
 
-
-def app_processor(input_queue, output_queue, app, app_params, app_config):
+def processor(input_queue, output_queue, function, *func_args,
+               **func_kwargs):
     """
     Start a loop to process function calls on individual frames.
 
@@ -50,29 +50,27 @@ def app_processor(input_queue, output_queue, app, app_params, app_config):
         processed.
     output_queue : multiprocessing.Queue
         The queue for transmissing the results to the controlling thread.
-    app : BaseApp
-        The Application class to be called in the process. The App must have a
-        multiprocessing_func method.
-    app_params : ParameterCollection
-        The App ParameterCollection used for creating the app.
-    app_config : dict
-        The dictionary which is used for overwriting the app._config
-        dictionary.
+    function : object
+        The function to be called in the process. The function must accept
+        the first argument from the queue and all additional arguments and
+        keyword arguments from the calling arguments of processor.
+    *func_args : tuple
+        The function calling arguments save the first.
+    **func_kwargs : dict
+        The keyword arguments for the function.
     """
-    _app = app(app_params)
-    _app._config = app_config
-    t0 = time.time()
     while True:
         try:
-            _arg = input_queue.get(timeout=0.5)
-            if _arg is None:
+            _arg1 = input_queue.get(timeout=0.5)
+            if _arg1 is None:
                 break
             try:
-                _results = _app.multiprocessing_func(_arg)
-            except Exception as e:
+                _results = function(_arg1, *func_args, **func_kwargs)
+            except Exception as ex:
                 print('Exception occured during function call to: '
-                      f'{app.multiprocessing_func}: {e}')
+                      f'{function}: {ex}')
                 break
-            output_queue.put([_arg, _results])
+            output_queue.put([_arg1, _results])
         except queue.Empty:
             pass
+        time.sleep(0.01)

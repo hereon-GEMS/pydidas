@@ -154,3 +154,36 @@ class BaseFrame(QtWidgets.QFrame):
             The next empty row.
         """
         return self.layout().rowCount() + 1
+
+    @QtCore.pyqtSlot(object)
+    def _set_app(self, app):
+        """
+        Update the local copy of the App after the AppRunner computations.
+
+        Parameters
+        ----------
+        app : pydidas.apps.BaseApp
+            Any App instance
+        """
+        self._app = app
+
+    @QtCore.pyqtSlot(float)
+    def _apprunner_update_progress(self, progress):
+        """
+        Update the progress of the AppRunner.
+
+        Parameters
+        ----------
+        progress : float
+            The progress, given as numbers 0..1
+        """
+        if 'progress' in self._widgets.keys():
+            _progress = round(progress * 100)
+            self._widgets['progress'].setValue(_progress)
+
+    @QtCore.pyqtSlot()
+    def _apprunner_finished(self):
+        """
+        Clean up after AppRunner is done.
+        """
+        del self._runner

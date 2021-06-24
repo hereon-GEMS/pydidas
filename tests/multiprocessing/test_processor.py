@@ -6,7 +6,7 @@ import queue
 import numpy as np
 import multiprocessing as mp
 
-from pydidas.multiprocess import processor
+from pydidas.multiprocessing import processor
 
 
 def test_func(number, fixed_arg, fixed_arg2, kw_arg=0):

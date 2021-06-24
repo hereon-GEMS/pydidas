@@ -6,8 +6,8 @@ import queue
 import numpy as np
 import multiprocessing as mp
 
-from pydidas.multiprocess import processor
-from pydidas.multiprocess.app_processor_func import app_processor
+from pydidas.multiprocessing import processor
+from pydidas.multiprocessing.app_processor_func import app_processor
 from pydidas.apps.mp_test_app import MpTestApp
 
 

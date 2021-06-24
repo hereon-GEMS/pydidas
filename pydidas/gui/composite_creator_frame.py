@@ -383,6 +383,9 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         if hdf_flag:
             dset = Hdf5DatasetSelectionPopup(self, fname).get_dset()
             self.update_param_value('bg_hdf_key', dset)
+        self.toggle_widget_visibility('bg_hdf_key', hdf_flag)
+        self.toggle_widget_visibility('bg_hdf_num', hdf_flag)
+        self.__check_exec_enable()
 
     def __verify_hdf_key(self, filename, dset, param_key):
         """
@@ -489,9 +492,9 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         Check whether the exec button should be enabled and enable/disable it.
         """
         try:
-            assert self.__select_info['hdffile'] is not None
+            assert self.__select_info['hdf_images'] is not None
             if self.get_param_value('use_bg_file'):
-                assert os.path.exists(self.get_param_value('bg_file'))
+                assert os.path.isfile(self.get_param_value('bg_file'))
             _enable = True
         except (KeyError, AssertionError):
             _enable = False

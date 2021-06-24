@@ -240,6 +240,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         Parallel implementation of the execution method.
         """
         self.set_status('Started composite image creation.')
+        self._widgets['but_exec'].setEnabled(False)
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
         self._app = CompositeCreatorApp(self.params.get_copy())
@@ -254,6 +255,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         """
         Clean up after AppRunner is done.
         """
+        self._widgets['but_exec'].setEnabled(True)
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
         self.set_status('Finished composite image creation.')

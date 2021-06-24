@@ -260,7 +260,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _fname, _kwargs = self.__get_kwargs_for_read_image(index)
         _composite_index = ((index - self._config['mp_index_offset'])
-                            / self.get_param_value('stepping'))
+                            // self.get_param_value('stepping'))
         _image = read_image(_fname, **_kwargs)
         return _composite_index, _image
 

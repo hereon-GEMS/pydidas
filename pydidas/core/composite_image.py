@@ -183,7 +183,6 @@ class CompositeImage(ParameterCollectionMixIn):
                        (_iy + 1) * self.get_param_value('image_shape')[0])
         xslice = slice(_ix * self.get_param_value('image_shape')[1],
                        (_ix + 1) * self.get_param_value('image_shape')[1])
-        print(index, self.__image.shape, self.__image[yslice, xslice].shape, image.shape, xslice, yslice)
         self.__image[yslice, xslice] = image
 
     def save(self, output_fname):

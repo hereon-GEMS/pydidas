@@ -81,6 +81,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(_config['raw_img_shape_y'], 10)
         self.assertEqual(_config['raw_img_shape_x'], 10)
         self.assertEqual(_config['datatype'], np.float64)
+
+    def test__store_image_data_from_hdf_file_wrong_range(self):
+        app = CompositeCreatorApp()
+        app.set_param_value('first_file', self._hdf_fname)
+        app.set_param_value('composite_nx', 8)
+        app.set_param_value('composite_ny', 9)
+        app._CompositeCreatorApp__store_image_data_from_hdf_file()
         app.set_param_value('hdf_first_image_num', 10)
         app.set_param_value('hdf_last_image_num', -45)
         with self.assertRaises(AppConfigError):

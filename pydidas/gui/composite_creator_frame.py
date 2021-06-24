@@ -36,6 +36,8 @@ from functools import partial
 
 import numpy as np
 import matplotlib.image as mplimg
+import skimage.io
+
 from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot import PlotWindow
@@ -43,7 +45,7 @@ from silx.gui.plot import PlotWindow
 
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import ParameterCollectionMixIn
-from pydidas.config import HDF5_EXTENSIONS
+from pydidas.config import HDF5_EXTENSIONS, JPG_EXTENSIONS, TIFF_EXTENSIONS
 from pydidas.widgets import (
     ReadOnlyTextWidget, ScrollArea, CreateWidgetsMixIn,
     create_default_grid_layout, BaseFrame)
@@ -275,7 +277,11 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         _func = QtWidgets.QFileDialog.getSaveFileName
         fname = _func(self, 'Name of file', None,
                       'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png)')[0]
-        mplimg.imsave(fname, self._app.composite)
+        _ext = os.path.splitext(fname)[-1]
+        if _ext in JPG_EXTENSIONS + ['.png']:
+            mplimg.imsave(fname, self._app.composite)
+        elif _ext in TIFF_EXTENSIONS:
+            skimage.io.imsave(fname, self._app.composite)
 
     def __run_app_serial(self):
         """

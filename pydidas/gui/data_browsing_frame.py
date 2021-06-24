@@ -37,11 +37,17 @@ import numpy as np
 import silx
 
 from PyQt5 import QtWidgets, QtCore
-from silx.gui.plot.ImageView import ImageView, PlotWindow
+from silx.gui.plot.ImageView import ImageView
 
 from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
                        QtaIconButton)
 from .base_frame import BaseFrame
+from ..image_reader import ImageReaderFactory, read_image
+from ..config import HDF5_EXTENSIONS
+
+
+IMAGE_READER = ImageReaderFactory()
+
 
 class ImageViewNoHist(ImageView):
     HISTOGRAMS_HEIGHT = 120
@@ -67,7 +73,6 @@ class DataBrowsingFrame(BaseFrame):
             )
 
     def initUI(self):
-
 
         self._tree = DirectoryExplorer()
         self.hdf_dset_w = Hdf5DatasetSelectorViewOnly()
@@ -117,27 +122,19 @@ class DataBrowsingFrame(BaseFrame):
 
     def __fileSelected(self, widget):
         index = self._tree.selectedIndexes()[0]
-        name = self._tree._filemodel.filePath(index)
-        self.set_status(f'New file: {name}')
-        if not os.path.isfile(name):
+        _name = self._tree._filemodel.filePath(index)
+        self.set_status(f'New file: {_name}')
+        if not os.path.isfile(_name):
             return
-        if os.path.basename(name).split('.')[-1] in ['hdf', 'nxs', 'h5']:
+        _extension= f'.{os.path.basename(_name).split(".")[-1]}'
+        _supported_ext = (set(IMAGE_READER._extensions.keys())
+                          - set(HDF5_EXTENSIONS))
+        if _extension in HDF5_EXTENSIONS:
             self.hdf_dset_w.setVisible(True)
-            self.hdf_dset_w.set_filename(name)
+            self.hdf_dset_w.set_filename(_name)
             return
         self.hdf_dset_w.setVisible(False)
-        if os.path.basename(name).split('.')[-1] in ['tif', 'tiff']:
-            import skimage.io
-            _data = skimage.io.imread(name)
-        elif os.path.basename(name).split('.')[-1] in ['npy', 'npz']:
-            _data = np.load(name)
-        elif os.path.basename(name).split('.')[-1] in ['edf']:
-            try:
-                with silx.io.open(name) as f:
-                    _data = f['scan_0/image/data'][...]
-            except OSError:
-                return
-        else:
-            return
-        widget.setData(_data)
+        if _extension in _supported_ext:
+            _data = read_image(_name)
+            widget.setData(_data)
         return

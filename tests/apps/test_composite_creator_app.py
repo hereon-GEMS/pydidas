@@ -24,9 +24,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self._data = np.random.random((50,) + self._img_shape)
         for i in range(50):
             np.save(self._fname(i), self._data[i])
-        self._hdf_fname = os.path.join(self._path, 'test_001.h5')
-        with h5py.File(self._hdf_fname, 'w') as f:
-            f['/entry/data/data'] = self._data
+        self._hdf5_fnames = [os.path.join(self._path, f'test_{i:03d}.h5')
+                            for i in range(10)]
+        for i in range(10):
+            with h5py.File(self._hdf5_fnames[i], 'w') as f:
+                f['/entry/data/data'] = self._data
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -86,7 +88,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test__store_image_data_from_hdf_file(self):
         app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf_fname)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
         app._CompositeCreatorApp__store_image_data_from_hdf5_file()
@@ -98,7 +100,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test__store_image_data_from_hdf_file_wrong_range(self):
         app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf_fname)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
         app._CompositeCreatorApp__store_image_data_from_hdf5_file()
@@ -109,12 +111,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_check_files_hdf(self):
         app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf_fname)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
         app._CompositeCreatorApp__check_files()
 
     def test___check_and_set_bg_file_with_fname(self):
         app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf_fname)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
         app.set_param_value('use_bg_file', True)
@@ -177,6 +179,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.apply_thresholds()
         self.assertTrue((app.composite >= 0.3).all())
         self.assertTrue((app.composite <= 0.6).all())
+
+    def test_hdf5_file_range(self):
+        app = CompositeCreatorApp()
+        app.set_param_value('first_file', self._hdf5_fnames[1])
+        app.set_param_value('last_file', self._hdf5_fnames[4])
+        app.set_param_value('composite_nx', 20)
+        app.set_param_value('composite_ny', 10)
+        app.run()
 
     def test_export_image_png(self):
         app = self.get_default_app()

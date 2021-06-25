@@ -199,7 +199,7 @@ class CompositeCreatorApp(BaseApp):
                          'raw_img_shape_y': None,
                          'n_image_per_file': 1,
                          'n_files': None,
-                         'n_images': None,
+                         'n_total': None,
                          'bg_image': None,
                          'roi': None,
                          'final_image_size_x': None,
@@ -211,15 +211,8 @@ class CompositeCreatorApp(BaseApp):
         Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
-        if self._config['hdffile']:
-            _range = range(self.get_param_value('hdf5_first_image_num'),
-                           self.get_param_value('hdf5_last_image_num'),
-                           self.get_param_value('hdf5_stepping'))
-        else:
-            _range = range(len(self._config['file_list']))
         self._config['mp_pre_run_called'] = True
-        self._config['mp_index_offset'] = _range[0]
-        self._config['mp_tasks'] = _range
+        self._config['mp_tasks'] = range(self._config['n_total'])
 
     def multiprocessing_post_run(self):
         """
@@ -250,11 +243,9 @@ class CompositeCreatorApp(BaseApp):
         _image : np.ndarray
             The (pre-processed) image.
         """
-        _fname, _kwargs = self.__get_kwargs_for_read_image(index)
-        _composite_index = ((index - self._config['mp_index_offset'])
-                            // self.get_param_value('file_stepping'))
+        _fname, _kwargs = self.__get_args_for_read_image(index)
         _image = read_image(_fname, **_kwargs)
-        return _composite_index, _image
+        return index, _image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -370,14 +361,14 @@ class CompositeCreatorApp(BaseApp):
             If any of the checks fail.
         """
         _first_file = self.get_param_value('first_file')
-        _last_file = self.get_param_value('last_file')
         check_file_exists(_first_file)
         self.__create_filelist()
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
             self.__store_image_data_from_hdf5_file()
         else:
             self.__store_image_data_from_single_image()
-
+        self._config['n_total'] = (self._config['n_image_per_file']
+                                   * self._config['n_files'])
         # if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
         #     self._config['hdffile'] = True
         #     self.__store_image_data_from_hdf5_file()
@@ -413,6 +404,7 @@ class CompositeCreatorApp(BaseApp):
         _n_per_file = ((_n1 - _n0 - 1)
                        // self.get_param_value('hdf5_stepping') + 1)
         self._config['n_image_per_file'] = _n_per_file
+        self._config['hdffile'] = True
 
     def __store_image_data_from_single_image(self):
         """
@@ -420,6 +412,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _test_image = read_image(self.get_param_value('first_file'))
         self.__store_image_data(_test_image.shape, _test_image.dtype)
+        self._config['hdffile'] = False
 
     def __store_image_data(self, img_shape, img_dtype):
         """
@@ -436,7 +429,6 @@ class CompositeCreatorApp(BaseApp):
         self._config['datatype'] = img_dtype
         self._config['raw_img_shape_x'] = img_shape[1]
         self._config['raw_img_shape_y'] = img_shape[0]
-
 
     def __create_filelist(self):
         """
@@ -579,7 +571,7 @@ class CompositeCreatorApp(BaseApp):
                 self._config['raw_img_shape_y'] // _binning
             self._config['roi'] = None
 
-    def __get_kwargs_for_read_image(self, index):
+    def __get_args_for_read_image(self, index):
         """
         Create the required kwargs to pass to the read_image function.
 
@@ -595,14 +587,17 @@ class CompositeCreatorApp(BaseApp):
         _params : dict
             The required parameters as dictionary.
         """
+        _i_file = index // self._config['n_image_per_file']
+        _fname = os.path.join(self._config['file_path'],
+                              self._config['file_list'][_i_file])
         if self._config['hdffile']:
-            _fname = self.get_param_value('first_file')
+            _hdf_index = index % self._config['n_image_per_file']
+            _i_hdf = (self.get_param_value('hdf5_first_image_num')
+                      + _hdf_index * self.get_param_value('hdf5_stepping'))
             _params = dict(dataset=self.get_param_value('hdf5_key'),
                            binning=self.get_param_value('binning'),
-                           ROI=self._config['roi'], imageNo=index)
+                           ROI=self._config['roi'], imageNo=_i_hdf)
         else:
-            _fname = os.path.join(self._config['file_path'],
-                                  self._config['file_list'][index])
             _params = dict(binning=self.get_param_value('binning'),
                            ROI=self._config['roi'])
         return _fname, _params

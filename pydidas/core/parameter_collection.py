@@ -112,7 +112,7 @@ class ParameterCollection(dict):
             Error message that object cannot be added to ParameterCollection.
         """
         raise TypeError(f'Cannot add object "{item}" of type '
-                        '"{item.__class__}" to ParameterCollection.')
+                        f'"{item.__class__}" to ParameterCollection.')
 
     def __add_arg_params(self, *args):
         """

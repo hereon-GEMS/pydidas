@@ -246,7 +246,7 @@ class CompositeCreatorFrame(BaseFrame, ParameterConfigMixIn,
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
         self._app = CompositeCreatorApp(self.params.get_copy())
-        self._runner = AppRunner(self._app)
+        self._runner = AppRunner(self._app, 8)
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)

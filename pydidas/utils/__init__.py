@@ -31,8 +31,8 @@ __status__ = "Development"
 __all__ = []
 
 
-from . import hdf_dataset_utils
-from .hdf_dataset_utils import *
+from . import hdf5_dataset_utils
+from .hdf5_dataset_utils import *
 
 from . import file_checks
 from .file_checks import *
@@ -40,12 +40,12 @@ from .file_checks import *
 from . import decorators
 from .decorators import *
 
-__all__ += hdf_dataset_utils.__all__
+__all__ += hdf5_dataset_utils.__all__
 __all__ += file_checks.__all__
 __all__ += decorators.__all__
 
 # unclutter namespace and delete the references to the modules itself
 # as all functions are imported directly
-del hdf_dataset_utils
+del hdf5_dataset_utils
 del file_checks
 del decorators

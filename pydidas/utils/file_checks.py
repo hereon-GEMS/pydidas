@@ -29,7 +29,7 @@ __license__ = "MIT"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['check_hdf_key_exists_in_file',
+__all__ = ['check_hdf5_key_exists_in_file',
            'check_file_exists',
            'verify_files_in_same_directory',
            'verify_files_of_range_are_same_size']
@@ -37,11 +37,11 @@ __all__ = ['check_hdf_key_exists_in_file',
 import os
 from numpy import array
 
-from .hdf_dataset_utils import get_hdf5_populated_dataset_keys
+from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 from .._exceptions import AppConfigError
 
 
-def check_hdf_key_exists_in_file(fname, key):
+def check_hdf5_key_exists_in_file(fname, key):
     """
     Veriy that the selected file has a dataset with key.
 

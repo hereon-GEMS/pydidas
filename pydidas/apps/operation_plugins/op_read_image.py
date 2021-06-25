@@ -44,7 +44,7 @@ from pydidas.core import (Parameter, HdfKey, ParameterCollection,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.utils import (get_hdf5_metadata, check_file_exists,
-                           check_hdf5_key_exists_in_file,
+                           check_hdf_key_exists_in_file,
                            verify_files_in_same_directory,
                            verify_files_of_range_are_same_size)
 from pydidas.image_reader import read_image
@@ -52,16 +52,29 @@ from pydidas.utils import copy_docstring
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('first_file'),
-    get_generic_parameter('last_file'),
-    get_generic_parameter('file_stepping'),
-    get_generic_parameter('hdf5_key'),
-    get_generic_parameter('hdf5_first_image_num'),
-    get_generic_parameter('hdf5_last_image_num'),
-    get_generic_parameter('hdf5_stepping'),
-    get_generic_parameter('use_bg_file'),
-    get_generic_parameter('bg_file'),
-    get_generic_parameter('bg_hdf5_key'),
-    get_generic_parameter('bg_hdf5_num'),
+    Parameter('Last file name', Path, default=Path(), refkey='last_file',
+              tooltip=('Used only for file series: The name of the last file '
+                       'to be added to the composite image.')),
+    get_generic_parameter('hdf_key'),
+    get_generic_parameter('hdf_first_image_num'),
+    get_generic_parameter('hdf_last_image_num'),
+    Parameter('Subtract background image', int, default=0,
+              refkey='use_bg_file', choices=[True, False],
+              tooltip=('Keyword to toggle usage of background subtraction.')),
+    Parameter('Background image file', Path, default=Path(), refkey='bg_file',
+              tooltip=('The name of the file used for background '
+                       'correction.')),
+    Parameter('Background Hdf dataset key', HdfKey,
+              default=HdfKey('/entry/data/data'), refkey='bg_hdf_key',
+              tooltip=('For hdf5 background image files: The dataset key.')),
+    Parameter('Background image number', int, default=0, refkey='bg_hdf_num',
+              tooltip=('For hdf5 background image files: The image number in '
+                       'the dataset')),
+    Parameter('Stepping', int, default=1, refkey='stepping',
+              tooltip=('The step width (in images). A value n > 1 will only'
+                       ' add every n-th image to the composite.')),
+    Parameter('Total number of images', int, default=-1, refkey='n_image',
+              tooltip=('The toal number of images in the composite images.')),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -105,30 +118,27 @@ class CompositeCreatorApp(BaseApp):
     last_file : pathlib.Path, optional
         Used only for file series: The name of the last file to be added to
         the composite image.
-    file_stepping : int, optional
-        The step width (in files). A value n > 1 will only process every n-th
-        image for the composite. The default is 1.
-    hdf5_key : HdfKey, optional
+    hdf_key : HdfKey, optional
         Used only for hdf5 files: The dataset key.
-    hdf5_first_image_num : int, optional
+    hdf_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.
-    hdf5_last_image_num : int, optional
+    hdf_last_image_num : int, optional
         The last image in the hdf5-dataset to be used. The value -1 will
         default to the last image. The default is -1.
-    hdf5_stepping : int, optional
-        The step width (in images) of hdf5 datasets. A value n > 1 will only
-        add every n-th image to the composite. The default is 1.
     use_bg_file : bool, optional
         Keyword to toggle usage of background subtraction. The default is
         False.
     bg_file : pathlib.Path, optional
         The name of the file used for background correction.
-    bg_hdf5_key : HdfKey, optional
+    bg_hdf_key : HdfKey, optional
         Required for hdf5 background image files: The dataset key with the
         image for the background file.
-    bg_hdf5_num : int, optional
+    bg_hdf_num : int, optional
         Required for hdf5 background image files: The image number of the
         background image in the  dataset. The default is 0.
+    stepping : int, optional
+        The step width (in images). A value n > 1 will only add every n-th
+        image to the composite. The default is 1.
     composite_nx : int, optional
         The number of original images combined in the composite image in
         x direction. A value of -1 will determine the number of images in
@@ -197,9 +207,7 @@ class CompositeCreatorApp(BaseApp):
                          'hdffile': None,
                          'raw_img_shape_x': None,
                          'raw_img_shape_y': None,
-                         'n_image_per_file': 1,
-                         'n_files': None,
-                         'n_images': None,
+                         'n_image': None,
                          'bg_image': None,
                          'roi': None,
                          'final_image_size_x': None,
@@ -212,9 +220,9 @@ class CompositeCreatorApp(BaseApp):
         """
         self.prepare_run()
         if self._config['hdffile']:
-            _range = range(self.get_param_value('hdf5_first_image_num'),
-                           self.get_param_value('hdf5_last_image_num'),
-                           self.get_param_value('hdf5_stepping'))
+            _range = range(self.get_param_value('hdf_first_image_num'),
+                           self.get_param_value('hdf_last_image_num'),
+                           self.get_param_value('stepping'))
         else:
             _range = range(len(self._config['file_list']))
         self._config['mp_pre_run_called'] = True
@@ -252,7 +260,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _fname, _kwargs = self.__get_kwargs_for_read_image(index)
         _composite_index = ((index - self._config['mp_index_offset'])
-                            // self.get_param_value('file_stepping'))
+                            // self.get_param_value('stepping'))
         _image = read_image(_fname, **_kwargs)
         return _composite_index, _image
 
@@ -370,22 +378,15 @@ class CompositeCreatorApp(BaseApp):
             If any of the checks fail.
         """
         _first_file = self.get_param_value('first_file')
-        _last_file = self.get_param_value('last_file')
         check_file_exists(_first_file)
-        self.__create_filelist()
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-            self.__store_image_data_from_hdf5_file()
+            self._config['hdffile'] = True
+            self.__store_image_data_from_hdf_file()
         else:
-            self.__store_image_data_from_single_image()
+            self._config['hdffile'] = False
+            self.__store_image_data_from_file_range()
 
-        # if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-        #     self._config['hdffile'] = True
-        #     self.__store_image_data_from_hdf5_file()
-        # else:
-        #     self._config['hdffile'] = False
-        #     self.__store_image_data_from_file_range()
-
-    def __store_image_data_from_hdf5_file(self):
+    def __store_image_data_from_hdf_file(self):
         """
         Store config metadata from hdf5 file.
 
@@ -395,48 +396,38 @@ class CompositeCreatorApp(BaseApp):
             If the selected image range is not included in the hdf5 dataset.
         """
         _first_file = self.get_param_value('first_file')
-        _key = self.get_param_value('hdf5_key')
-        check_hdf5_key_exists_in_file(_first_file, _key)
+        _key = self.get_param_value('hdf_key')
+        check_hdf_key_exists_in_file(_first_file, _key)
 
         _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
-        _n0 = self._apply_param_modulo('hdf5_first_image_num',
-                                       _meta['shape'][0])
-        _n1 = self._apply_param_modulo('hdf5_last_image_num',
-                                       _meta['shape'][0])
+        _n_image = _meta['shape'][0]
+        self._config['raw_img_shape_y'] = _meta['shape'][1]
+        self._config['raw_img_shape_x'] = _meta['shape'][2]
+        self._config['datatype'] = _meta['dtype']
+        _n0 = self._apply_param_modulo('hdf_first_image_num', _n_image)
+        _n1 = self._apply_param_modulo('hdf_last_image_num', _n_image)
+        # correct total number of images for stepping *after* the
+        # numbers have been modulated to be in the image range.
+        self._config['n_image'] = len(range(_n0, _n1,
+                                            self.get_param_value('stepping')))
         if not _n0 < _n1:
             raise AppConfigError(
                 f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
                 ' not describe a correct range.')
-        self.__store_image_data(_meta['shape'][1:3], _meta['dtype'])
-        # correct total number of images for stepping *after* the
-        # numbers have been modulated to be in the image range.
-        _n_per_file = ((_n1 - _n0 - 1)
-                       // self.get_param_value('hdf5_stepping') + 1)
-        self._config['n_image_per_file'] = _n_per_file
 
-    def __store_image_data_from_single_image(self):
+    def __store_image_data_from_file_range(self):
         """
         Store config metadata from file range.
         """
+        verify_files_in_same_directory(self.get_param_value('first_file'),
+                                       self.get_param_value('last_file'))
+        self.__create_filelist()
+        verify_files_of_range_are_same_size(self._config['file_path'],
+                                            self._config['file_list'])
         _test_image = read_image(self.get_param_value('first_file'))
-        self.__store_image_data(_test_image.shape, _test_image.dtype)
-
-    def __store_image_data(self, img_shape, img_dtype):
-        """
-        Store the data about the image shape and datatype.
-
-        Parameters
-        ----------
-        img_shape : tuple
-            The shape of the image.
-        img_dtype : datatype
-            The python datatype of the image.
-        """
-        self._config['n_image_per_file'] = 1
-        self._config['datatype'] = img_dtype
-        self._config['raw_img_shape_x'] = img_shape[1]
-        self._config['raw_img_shape_y'] = img_shape[0]
-
+        self._config['datatype'] = _test_image.dtype
+        self._config['raw_img_shape_x'] = _test_image.shape[1]
+        self._config['raw_img_shape_y'] = _test_image.shape[0]
 
     def __create_filelist(self):
         """
@@ -449,20 +440,13 @@ class CompositeCreatorApp(BaseApp):
         """
         _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
         _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
-        if _path2 == '':
-            self._config['file_list'] = [_fname1]
-            self._config['file_path'] = _path1
-            self._config['n_files'] = 1
-            return
-        verify_files_in_same_directory(self.get_param_value('first_file'),
-                                       self.get_param_value('last_file'))
-        _list = sorted(os.listdir(_path1))
-        _i1 = _list.index(_fname1)
-        _i2 = _list.index(_fname2)
-        _list = _list[_i1:_i2+1:self.get_param_value('file_stepping')]
-        self._config['file_list'] = _list
+        _file_list = sorted(os.listdir(_path1))
+        _i1 = _file_list.index(_fname1)
+        _i2 = _file_list.index(_fname2)
+        _file_list = _file_list[_i1:_i2+1:self.get_param_value('stepping')]
+        self._config['file_list'] = _file_list
         self._config['file_path'] = _path1
-        self._config['n_files'] = len(_list)
+        self._config['n_image'] = len(_file_list)
 
     def __check_and_set_bg_file(self):
         """
@@ -488,11 +472,11 @@ class CompositeCreatorApp(BaseApp):
         check_file_exists(_bg_file)
         # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file,
-                                         self.get_param_value('bg_hdf5_key'))
-            _params = dict(dataset=self.get_param_value('bg_hdf5_key'),
+            check_hdf_key_exists_in_file(_bg_file,
+                                         self.get_param_value('bg_hdf_key'))
+            _params = dict(dataset=self.get_param_value('bg_hdf_key'),
                            binning=self.get_param_value('binning'),
-                           imageNo=self.get_param_value('bg_hdf5_num'),
+                           imageNo=self.get_param_value('bg_hdf_num'),
                            ROI=self._config['roi'])
         else:
             _params = dict(binning=self.get_param_value('binning'),
@@ -501,8 +485,8 @@ class CompositeCreatorApp(BaseApp):
         if not _bg_image.shape == (self._config['final_image_size_y'],
                                    self._config['final_image_size_x']):
             raise AppConfigError(f'The selected background file "{_bg_file}"'
-                                 ' does not have the same image dimensions '
-                                 'as the selected files.')
+                                 ' does not the same image dimensions as the'
+                                 ' selected files.')
         self._config['bg_image'] = _bg_image
 
     def __check_roi(self):
@@ -543,21 +527,21 @@ class CompositeCreatorApp(BaseApp):
         """
         _nx = self.get_param_value('composite_nx')
         _ny = self.get_param_value('composite_ny')
-        _ntotal = self._config['n_image_per_file'] * self._config['n_files']
         if _nx == -1:
-            _nx = int(np.ceil(_ntotal / _ny))
+            _nx = int(np.ceil(self._config['n_image'] / _ny))
             self.params.set_value('composite_nx', _nx)
         if _ny == -1:
-            _ny = int(np.ceil(_ntotal / _nx))
+            _ny = int(np.ceil(self._config['n_image'] / _nx))
             self.params.set_value('composite_ny', _ny)
-        if _nx * _ny < _ntotal:
+        if _nx * _ny < self._config['n_image']:
             raise AppConfigError(
                 'The selected composite dimensions are too small to hold all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
-        if ((_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal):
+                f' images. (nx={_nx}, ny={_ny}, n={self._config["n_image"]})')
+        if ((_nx - 1) * _ny >= self._config['n_image']
+                or _nx * (_ny - 1) >= self._config['n_image']):
             raise AppConfigError(
                 'The selected composite dimensions are too large for all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
+                f' images. (nx={_nx}, ny={_ny}, n={self._config["n_image"]})')
 
     def __process_roi(self):
         """
@@ -597,7 +581,7 @@ class CompositeCreatorApp(BaseApp):
         """
         if self._config['hdffile']:
             _fname = self.get_param_value('first_file')
-            _params = dict(dataset=self.get_param_value('hdf5_key'),
+            _params = dict(dataset=self.get_param_value('hdf_key'),
                            binning=self.get_param_value('binning'),
                            ROI=self._config['roi'], imageNo=index)
         else:
@@ -623,24 +607,22 @@ def _parse_composite_creator_cmdline_arguments():
                         help=DEFAULT_PARAMS['first_file'].tooltip)
     parser.add_argument('-last_file', '-l',
                         help=DEFAULT_PARAMS['last_file'].tooltip)
-    parser.add_argument('-file_stepping', type=int,
-                        help=DEFAULT_PARAMS['file_stepping'].tooltip)
-    parser.add_argument('-hdf5_key',
-                        help=DEFAULT_PARAMS['hdf5_key'].tooltip)
-    parser.add_argument('-hdf5_first_image_num', type=int,
-                        help=DEFAULT_PARAMS['hdf5_first_image_num'].tooltip)
-    parser.add_argument('-hdf5_last_image_num', type=int,
-                        help=DEFAULT_PARAMS['hdf5_last_image_num'].tooltip)
-    parser.add_argument('-hdf5_stepping', type=int,
-                        help=DEFAULT_PARAMS['hdf5_stepping'].tooltip)
+    parser.add_argument('-hdf_key',
+                        help=DEFAULT_PARAMS['hdf_key'].tooltip)
+    parser.add_argument('-hdf_first_image_num', type=int,
+                        help=DEFAULT_PARAMS['hdf_first_image_num'].tooltip)
+    parser.add_argument('-hdf_last_image_num', type=int,
+                        help=DEFAULT_PARAMS['hdf_last_image_num'].tooltip)
     parser.add_argument('--use_bg_file', action='store_true',
                         help=DEFAULT_PARAMS['use_bg_file'].tooltip)
     parser.add_argument('-bg_file',
                         help=DEFAULT_PARAMS['bg_file'].tooltip)
-    parser.add_argument('-bg_hdf5_key',
-                        help=DEFAULT_PARAMS['bg_hdf5_key'].tooltip)
-    parser.add_argument('-bg_hdf5_num', type=int,
-                        help=DEFAULT_PARAMS['bg_hdf5_num'].tooltip)
+    parser.add_argument('-bg_hdf_key',
+                        help=DEFAULT_PARAMS['bg_hdf_key'].tooltip)
+    parser.add_argument('-bg_hdf_num', type=int,
+                        help=DEFAULT_PARAMS['bg_hdf_num'].tooltip)
+    parser.add_argument('-stepping', '-s', type=int,
+                        help=DEFAULT_PARAMS['stepping'].tooltip)
     parser.add_argument('-composite_nx', type=int,
                         help=DEFAULT_PARAMS['composite_nx'].tooltip)
     parser.add_argument('-composite_ny', type=int,

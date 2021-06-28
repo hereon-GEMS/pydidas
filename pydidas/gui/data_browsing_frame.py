@@ -33,9 +33,6 @@ __all__ = ['DataBrowsingFrame']
 import os
 from functools import partial
 
-import numpy as np
-import silx
-
 from PyQt5 import QtWidgets, QtCore
 from silx.gui.plot.ImageView import ImageView
 
@@ -50,6 +47,9 @@ IMAGE_READER = ImageReaderFactory()
 
 
 class ImageViewNoHist(ImageView):
+    """
+    Subclass silx ImageView with a smaller historgram.
+    """
     HISTOGRAMS_HEIGHT = 120
 
     def __init__(self):
@@ -67,13 +67,13 @@ class DataBrowsingFrame(BaseFrame):
         super().__init__(parent=parent, name=name)
         self.create_label('Data exploration view', fontsize=14)
 
-        self.initUI()
+        self.init_widgets()
         self._tree.doubleClicked.connect(
             partial(self.__fileSelected, self._imview)
             )
 
-    def initUI(self):
-
+    def init_widgets(self):
+        """Init the user interface with the widgets."""
         self._tree = DirectoryExplorer()
         self.hdf_dset_w = Hdf5DatasetSelectorViewOnly()
 
@@ -91,12 +91,7 @@ class DataBrowsingFrame(BaseFrame):
         _layout.addWidget(self.hdf_dset_w, 3, 0, 1, 2)
         self._selection.setLayout(_layout)
 
-        # self._imview = PlotWindow()
         self._imview = ImageView()
-        # self._imview._histoHPlot.setVisible(False)
-        # self._imview._histoVPlot.setVisible(False)
-        # self._imview._radarView.setVisible(False)
-
         self._imview.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.hdf_dset_w.register_view_widget(self._imview)

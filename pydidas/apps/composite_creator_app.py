@@ -62,6 +62,8 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('bg_file'),
     get_generic_parameter('bg_hdf5_key'),
     get_generic_parameter('bg_hdf5_num'),
+    Parameter('Total number of images', int, default=0, refkey='n_total',
+              tooltip=('The total number of images.')),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -362,21 +364,15 @@ class CompositeCreatorApp(BaseApp):
         """
         _first_file = self.get_param_value('first_file')
         check_file_exists(_first_file)
-        self.__create_filelist()
+        self._create_filelist()
         if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-            self.__store_image_data_from_hdf5_file()
+            self._store_image_data_from_hdf5_file()
         else:
             self.__store_image_data_from_single_image()
         self._config['n_total'] = (self._config['n_image_per_file']
                                    * self._config['n_files'])
-        # if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-        #     self._config['hdffile'] = True
-        #     self.__store_image_data_from_hdf5_file()
-        # else:
-        #     self._config['hdffile'] = False
-        #     self.__store_image_data_from_file_range()
 
-    def __store_image_data_from_hdf5_file(self):
+    def _store_image_data_from_hdf5_file(self):
         """
         Store config metadata from hdf5 file.
 
@@ -430,7 +426,7 @@ class CompositeCreatorApp(BaseApp):
         self._config['raw_img_shape_x'] = img_shape[1]
         self._config['raw_img_shape_y'] = img_shape[0]
 
-    def __create_filelist(self):
+    def _create_filelist(self):
         """
         Create the list of all files to be processed.
 
@@ -452,6 +448,7 @@ class CompositeCreatorApp(BaseApp):
         _i1 = _list.index(_fname1)
         _i2 = _list.index(_fname2)
         _list = _list[_i1:_i2+1:self.get_param_value('file_stepping')]
+        verify_files_of_range_are_same_size(_path1, _list)
         self._config['file_list'] = _list
         self._config['file_path'] = _path1
         self._config['n_files'] = len(_list)

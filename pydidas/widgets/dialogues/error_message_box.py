@@ -90,10 +90,6 @@ class ErrorMessageBox(QtWidgets.QDialog):
         Show the box.
 
         This method will show the ErrorMessageBox
-
-        Returns
-        -------
-        None.
         """
         self.exec_()
 
@@ -105,9 +101,5 @@ class ErrorMessageBox(QtWidgets.QDialog):
         ----------
         text : str
             The text to be displayed.
-
-        Returns
-        -------
-        None.
         """
         self._label.setText(text)

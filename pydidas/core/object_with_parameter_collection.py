@@ -228,6 +228,8 @@ class ParameterCollectionMixIn:
         if _param.type is not Integral:
             raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
                              ' is not integer.')
+        if _param.value == modulo:
+            return _param.value
         _val = mod(_param.value, modulo)
         # create offset for negative indices to capture the whole array
         _offset = 1 if _param.value < 0 else 0

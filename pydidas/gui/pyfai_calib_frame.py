@@ -37,7 +37,7 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.app.calib2 import parse_options, setup_model
 
 from .base_frame import BaseFrame
-from ..core import ExperimentalSettings
+from ..core.experimental_settings import ExperimentalSettings
 
 EXP_SETTINGS = ExperimentalSettings()
 

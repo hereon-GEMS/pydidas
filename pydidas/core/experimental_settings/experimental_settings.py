@@ -26,12 +26,12 @@ __all__ = ['ExperimentalSettings']
 
 import scipy.constants
 
-from .singleton_factory import SingletonFactory
-from .parameter_collection import ParameterCollection
-from .generic_parameters import get_generic_parameter
-from .object_with_parameter_collection import ObjectWithParameterCollection
+from ..singleton_factory import SingletonFactory
+from ..parameter_collection import ParameterCollection
+from ..generic_parameters import get_generic_parameter
+from ..object_with_parameter_collection import ObjectWithParameterCollection
+from ...config import LAMBDA_TO_E
 
-LAMBDA_TO_E = scipy.constants.h * scipy.constants.c / scipy.constants.e * 1e-3
 
 DEFAULTS = ParameterCollection(
     get_generic_parameter('xray_wavelength'),

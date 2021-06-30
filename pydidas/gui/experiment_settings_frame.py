@@ -24,12 +24,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExperimentSettingsFrame']
 
+import os
 from functools import partial
 
+from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
+from pyFAI.geometry import Geometry
 
 from .base_frame import BaseFrame
-from ..core import ExperimentalSettings, ParameterCollectionMixIn
+from ..config import YAML_EXTENSIONS
+from ..core import ParameterCollectionMixIn
+from ..core.experimental_settings import ExperimentalSettings
 from ..widgets.parameter_config import ParameterConfigMixIn
 from ..widgets.dialogues import CriticalWarning
 
@@ -83,6 +88,8 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
             partial(self.copy_geometry_from_pyFAI, True))
         self._widgets['but_copy_energy_from_pyfai'].clicked.connect(
             partial(self.copy_energy_from_pyFAI, True))
+        self._widgets['but_save_to_file'].clicked.connect(
+            self.__save_to_file)
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
             #disconnect directly setting the parameters and route
@@ -139,7 +146,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         self.create_label(_param.unit, gridPos=(_row, 2, 1, 1),
                           fixedWidth=24)
 
-    def update_param_value(self, param_key, value):
+    def update_param_value(self, key, value):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
@@ -148,20 +155,20 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The Parameter reference key.
         value : object
             The new Parameter value. The datatype is determined by the
             Parameter.
         """
-        EXP_SETTINGS.set_param_value(param_key, value)
-        if param_key in ['xray_energy', 'xray_wavelength']:
+        EXP_SETTINGS.set_param_value(key, value)
+        if key in ['xray_energy', 'xray_wavelength']:
             _energy = self.get_param_value('xray_energy')
             _lambda = self.get_param_value('xray_wavelength')
             self.param_widgets['xray_energy'].set_value(_energy)
             self.param_widgets['xray_wavelength'].set_value(_lambda)
         else:
-            self.param_widgets[param_key].set_value(value)
+            self.param_widgets[key].set_value(value)
 
     def update_param(self, param_key, widget):
         EXP_SETTINGS.set_param_value(param_key,  widget.get_value())
@@ -171,9 +178,9 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
             _w.set_value(EXP_SETTINGS.get_param_value('xray_energy'))
         elif param_key == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
-            _w.set_value(EXP_SETTINGS.get_param_value('xray_wavelength') * 1e10)
+            _w.set_value(EXP_SETTINGS.get_param_value('xray_wavelength'))
 
-    def select_detector(self, name):
+    def select_detector(self):
         from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
         dialog = DetectorSelectorDialog()
         dialog.exec_()
@@ -227,7 +234,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         model = CalibrationContext.instance().getCalibrationModel()
         _geo = model.fittedGeometry()
         if _geo.isValid():
-            _wavelength = _geo.wavelength().value()
+            _wavelength = _geo.wavelength().value() * 1e10
             self.update_param_value('xray_wavelength', _wavelength)
         elif show_warning:
             CriticalWarning('pyFAI geometry invalid',
@@ -238,4 +245,28 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
                             '2. The fit did not succeed.')
 
     def load_parameters_from_file(self):
+        _func = QtWidgets.QFileDialog.getOpenFileName
+        fname = _func(self, 'Name of file', None,
+                      'PONI files (*.poni);;All files (*.*)')[0]
+        ext = os.path.splitext(fname)[1]
+        if fname == '':
+            return
+        if ext == '.poni':
+            self.__load_poni_file(fname)
+        elif ext in YAML_EXTENSIONS:
+            self.__load_yaml_file(fname)
+
+    def __load_poni_file(self, fname):
+        geo = Geometry().load(fname)
+        self.update_detector_params(geo.detector)
+        self.update_param_value('xray_wavelength', geo.wavelength * 1e10)
+        _geodict = geo.getPyFAI()
+        for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
+                    'detector_rot1', 'detector_rot2', 'detector_rot3']:
+            self.update_param_value(key, _geodict[key.split('_')[1]])
+
+    def __load_yaml_file(self, fname):
+        ...
+
+    def __save_to_file(self):
         ...

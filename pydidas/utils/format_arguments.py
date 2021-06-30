@@ -1,15 +1,23 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 31 09:53:08 2021
+# This file is part of pydidas.
 
-@author: ogurreck
-"""
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
 
 def formatArguments(args, kwargs):
     """Function which accepts arguments and keyword arguments and converts
-    them to a argparse-compatible list (for autoProcessing).
+    them to a argparse-compatible list.
     """
     newArgs = [None]
     for item, key in kwargs.items():
@@ -32,9 +40,3 @@ def formatArguments(args, kwargs):
         else:
             newArgs.append(arg)
     return newArgs
-# _formatArguments
-
-args = ['composite_nx=12']
-kwargs = {'composite_ny': 10}
-
-print(formatArguments(args, kwargs))

@@ -1,31 +1,24 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module with the WorkflowEditFrame which is used to create the workflow
 tree."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -44,9 +37,9 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.app.calib2 import parse_options, setup_model
 
 from .base_frame import BaseFrame
-from ..core import GlobalSettings
+from ..core import ExperimentalSettings
 
-GLOBAL_SETTINGS = GlobalSettings()
+EXP_SETTINGS = ExperimentalSettings()
 
 settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
                             QtCore.QSettings.UserScope,
@@ -60,17 +53,16 @@ context.restoreSettings()
 options = parse_options()
 setup_model(context.getCalibrationModel(), options)
 
-# register_param
 
 def pyfaiCalibIcon():
     return QtGui.QIcon('\\'.join([os.path.dirname(pyFAI.__file__),
                                   'resources', 'gui', 'images', 'icon.png']))
 
+
 def pyfaiRingIcon():
     return QtGui.QIcon('\\'.join([os.path.dirname(pyFAI.__file__),
                                   'resources', 'gui', 'icons',
                                   'task-identify-rings.svg']))
-
 
 
 class PyfaiCalibFrame(BaseFrame):
@@ -82,7 +74,6 @@ class PyfaiCalibFrame(BaseFrame):
             context.setParent(mainWindow)
         else:
             context.setParent(self)
-
 
         self._list = QtWidgets.QListWidget(self)
         self._list.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -115,8 +106,8 @@ class PyfaiCalibFrame(BaseFrame):
             item.setIcon(task.windowIcon())
             self._stack.addWidget(task)
             self.__menu_connections[item.text()] = task
-            task.warningUpdated.connect(functools.partial(self.__updateTaskState, task, item))
-        # self.
+            task.warningUpdated.connect(
+                functools.partial(self.__updateTaskState, task, item))
 
         if len(self.__tasks) > 0:
             self._list.setCurrentRow(0)
@@ -161,13 +152,17 @@ class PyfaiCalibFrame(BaseFrame):
         from pyFAI.gui.tasks.GeometryTask import GeometryTask
         from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
 
+        _it = IntegrationTask()
+        _button = QtWidgets.QPushButton('Store geometry for pyDIDAS use')
+        _button.clicked.connect(self._store_geometry)
+        _groupbox = _it.layout().itemAt(1).widget().layout().itemAt(1).widget()
+        _groupbox.layout().addWidget(_button)
         tasks = [
             ExperimentTask(),
             MaskTask(),
             PeakPickingTask(),
             GeometryTask(),
-            IntegrationTask()
-        ]
+            _it]
         return tasks
 
     def model(self):
@@ -185,3 +180,32 @@ class PyfaiCalibFrame(BaseFrame):
         index = self._list.currentRow() + 1
         if index < self._list.count():
             self._list.setCurrentRow(index)
+
+    def _store_geometry(self):
+        print('Store geometry')
+        geo = self.model().fittedGeometry()
+        det = self.model().experimentSettingsModel().detector()
+        EXP_SETTINGS.set_param_value('xray_wavelength',
+                                     geo.wavelength().value())
+        EXP_SETTINGS.set_param_value('detector_dist',
+                                     geo.distance().value())
+        EXP_SETTINGS.set_param_value('detector_poni1',
+                                     geo.poni1().value())
+        EXP_SETTINGS.set_param_value('detector_poni2',
+                                     geo.poni2().value())
+        EXP_SETTINGS.set_param_value('detector_rot1',
+                                     geo.rotation1().value())
+        EXP_SETTINGS.set_param_value('detector_rot2',
+                                     geo.rotation2().value())
+        EXP_SETTINGS.set_param_value('detector_rot3',
+                                     geo.rotation3().value())
+        EXP_SETTINGS.set_param_value('detector_name',
+                                     det.name)
+        EXP_SETTINGS.set_param_value('detector_npixx',
+                                     det.shape[1])
+        EXP_SETTINGS.set_param_value('detector_npixy',
+                                     det.shape[0])
+        EXP_SETTINGS.set_param_value('detector_sizex',
+                                     det.pixel2)
+        EXP_SETTINGS.set_param_value('detector_sizey',
+                                     det.pixel1)

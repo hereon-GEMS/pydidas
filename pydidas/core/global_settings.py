@@ -1,37 +1,32 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-"""Module with the GlobalSettings class which is used to manage global
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Module with the _GlobalSettings class which is used to manage global
 information independant from the individual frames."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GlobalSettings']
+__all__ = ['_GlobalSettings']
 
 from PyQt5 import QtCore
+
+from pydidas.core.singleton_factory import SingletonFactory
 
 
 class _GlobalSettings(QtCore.QObject):
@@ -40,6 +35,7 @@ class _GlobalSettings(QtCore.QObject):
     through its factory, therefore guaranteeing that only a single instance
     exists.
     """
+
     def __init__(self, **kwargs):
         """Setup method"""
         self._params = {}
@@ -65,14 +61,10 @@ class _GlobalSettings(QtCore.QObject):
         ------
         KeyError
             If the key already exists.
-
-        Returns
-        -------
-        None.
         """
         if key in self._params:
             raise KeyError(f'Key {key} is already registered with '
-                           'GlobalSettings.')
+                           '_GlobalSettings.')
         self._params[key] = default_entry
 
     def is_set(self, key):
@@ -133,7 +125,7 @@ class _GlobalSettings(QtCore.QObject):
         """
         if key not in self._params:
             raise KeyError(f'The key {key} is not registered with '
-                           'GlobalSettings!')
+                           '_GlobalSettings!')
         return self._params[key]
 
     def set(self, key, value):
@@ -152,14 +144,10 @@ class _GlobalSettings(QtCore.QObject):
         ------
         KeyError
             If the key does not exist.
-
-        Returns
-        -------
-        None.
         """
         if key not in self._params:
             raise KeyError(f'The key {key} is not registered with '
-                           'GlobalSettings!')
+                           '_GlobalSettings!')
         self._params[key].value = value
 
     def get(self, key):
@@ -183,7 +171,7 @@ class _GlobalSettings(QtCore.QObject):
         """
         if key not in self._params:
             raise KeyError(f'The key {key} is not registered with '
-                           'GlobalSettings!')
+                           '_GlobalSettings!')
         return self._params[key].value
 
     def get_all_keys(self):
@@ -212,28 +200,4 @@ class _GlobalSettings(QtCore.QObject):
         return _list
 
 
-class _GlobalSettingsFactory:
-    """
-    Factory to create a Singleton.
-    """
-    def __init__(self):
-        """
-        Setup method.
-        """
-        self._instance = None
-
-    def __call__(self):
-        """
-        Get the instance of GlobalSettings
-
-        Returns
-        -------
-        GlobalSettings
-            The instance of the GlobalSettings class.
-        """
-        if not self._instance:
-            self._instance = _GlobalSettings()
-        return self._instance
-
-
-GlobalSettings = _GlobalSettingsFactory()
+GlobalSettings = SingletonFactory(_GlobalSettings)

@@ -1,31 +1,24 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module with the WorkflowPluginWidget which is used to create the workflow
 tree."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -38,118 +31,186 @@ from PyQt5 import QtWidgets, QtCore
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
 from .base_frame import BaseFrame
-from ..core import ExperimentalSettings
-from ..widgets import excepthook, CreateWidgetsMixIn
+from ..core import ExperimentalSettings, ParameterCollectionMixIn
+from ..widgets import excepthook
 from ..widgets.param_config import ParameterConfigMixIn
+from ..widgets.dialogues import CriticalWarning
 
 EXP_SETTINGS = ExperimentalSettings()
 
 
+## TODO : Restore default function
+
 class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
-                              CreateWidgetsMixIn):
+                              ParameterCollectionMixIn):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
-        BaseFrame.__init__(self, parent, name=name, initLayout=False)
+        BaseFrame.__init__(self, parent, name=name)
         ParameterConfigMixIn.__init__(self)
-        _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(5, 5, 0, 0)
-        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.setLayout(_layout)
-        self.layout_meta = dict(set=True, grid=True, row=0)
+        self.params = EXP_SETTINGS.params
         self.initWidgets()
+        self.connect_signals()
 
     def initWidgets(self):
-        _pnames = EXP_SETTINGS.get_all_refkeys()
-        # ['xray_wavelength', 'xray_energy', 'detector_name',
-        #            'detector_npixx', 'detector_npixy', 'detector_dx',
-        #            'detector_dy', 'detector_dist', 'detector_poni1',
-        #            'detector_poni2', 'detector_rot1', 'detector_rot2',
-        #            'detector_rot3']
+        self._widgets = {}
+        self.layout().setContentsMargins(5, 5, 0, 0)
+
         self.create_label('Experimental settings\n', fontsize=14, bold=True,
                          underline=True, gridPos=(0, 0, 1, 0))
-        _but = QtWidgets.QPushButton('Load experimental parameters from file')
-        _but.setIcon(self.style().standardIcon(42))
-        self.layout().addWidget(_but, 1, 0, 1, 3)
-        _but = QtWidgets.QPushButton('Copy all experimental parameters from calibration')
-        self.layout().addWidget(_but, 2, 0, 1, 3)
 
-        _rowoffset = 3
-        for row, pname in enumerate(_pnames):
-            if pname == 'xray_wavelength':
+        self._widgets['but_load_from_file'] = self.create_button(
+            'Load experimental parameters from file',
+            icon=self.style().standardIcon(42),
+            gridPos=(-1, 0, 1, 3), alignment=None)
+
+        self._widgets['but_copy_from_pyfai'] = self.create_button(
+            'Copy all experimental parameters from calibration',
+            gridPos=(-1, 0, 1, 3), alignment=None)
+
+        for _param_key in self.params.keys():
+            if _param_key == 'xray_wavelength':
                 self.create_label('\nBeamline X-ray energy:', fontsize=11,
-                                 bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
-                _but2 = QtWidgets.QPushButton('Copy X-ray energy from calibration')
-                self.layout().addWidget(_but2, _rowoffset + 1 + row, 0, 1, 3)
-                _rowoffset += 2
-            if pname == 'detector_name':
-                self.create_label('\nX-ray detector:', fontsize=11,
-                                 bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
-                _but = QtWidgets.QPushButton('Select X-ray detector')
-                _but2 = QtWidgets.QPushButton('Copy X-ray detector from calibration')
-                _but.clicked.connect(self.select_detector)
-                _but2.clicked.connect(self.copy_detector)
-                self.layout().addWidget(_but, _rowoffset + 1 + row, 0, 1, 3)
-                self.layout().addWidget(_but2, _rowoffset + 2 + row, 0, 1, 3)
-                _rowoffset += 3
-            if pname == 'detector_dist':
+                                 bold=True, gridPos=(self.next_row(), 0, 1, 3))
+                self._widgets['but_energy_from_pyfai'] = self.create_button(
+                    'Copy X-ray energy from pyFAI calibration',
+                    gridPos=(-1, 0, 1, 3), alignment=None)
+            if _param_key == 'detector_name':
+                self.create_label('\nX-ray detector:', fontsize=11, bold=True,
+                                  gridPos=(-1, 0, 1, 3))
+                self._widgets['but_select_detector'] = self.create_button(
+                    'Select X-ray detector', gridPos=(-1, 0, 1, 3),
+                    alignment=None)
+                self._widgets['but_copy_det_from_pyfai'] = self.create_button(
+                    'Copy X-ray detector from pyFAI calibration',
+                    gridPos=(-1, 0, 1, 3), alignment=None)
+            if _param_key == 'detector_dist':
                 self.create_label('\nDetector position:', fontsize=11,
-                                 bold=True, gridPos=(_rowoffset + row, 0, 1, 3))
-                _but = QtWidgets.QPushButton('Copy detector position from calibration')
-                self.layout().addWidget(_but, _rowoffset + 1 + row, 0, 1, 3)
-                _rowoffset += 2
-            param = EXP_SETTINGS.get_param(pname)
-            self.create_param_widget(param, row=row + _rowoffset, textwidth = 180)
+                                 bold=True, gridPos=(-1, 0, 1, 3))
+                self._widgets['but_copy_geo_from_pyfai'] = self.create_button(
+                    'Copy X-ray detector geometry from pyFAI calibration',
+                    gridPos=(-1, 0, 1, 3))
+            _row = self.next_row()
+            param = self.get_param(_param_key)
+            self.create_param_widget(param, row=_row, textwidth = 180,
+                                     width=150)
+            self.create_label(param.unit, gridPos=(_row, 2, 1, 1),
+                              fixedWidth=24)
 
+        #_row = self.layout().getItemPosition(self.layout().indexOf(_w))[0] + 2
+        self.create_spacer(gridPos=(-1, 0, 1, 3))
+        # QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
+        #                                 QtWidgets.QSizePolicy.Minimum)
+        # self.layout().addItem(_spacer, _row, 0, 1, 3)
+        self._widgets['but_save_to_file'] = self.create_button(
+            'Save experimental parameters to file', gridPos=(-1, 0, 1, 3),
+            alignment=None,
+            icon=self.style().standardIcon(43))
+
+    def connect_signals(self):
+        self._widgets['but_load_from_file'].clicked.connect(
+            self.load_parameters_from_file)
+        self._widgets['but_copy_from_pyfai'].clicked.connect(
+            self.copy_all_from_pyfai)
+        self._widgets['but_select_detector'].clicked.connect(
+            self.select_detector)
+        self._widgets['but_copy_det_from_pyfai'].clicked.connect(
+            self.copy_detector_from_pyFAI)
+        for _param_key in self.params.keys():
+            param = self.get_param(_param_key)
             #disconnect directly setting the parameters and route
             # through EXP_SETTINGS to catch wavelength/energy
             _w = self.param_widgets[param.refkey]
             _w.io_edited.disconnect()
-            _w.io_edited.connect(partial(self.update_param, pname, _w))
+            _w.io_edited.connect(partial(self.update_param, _param_key, _w))
 
-            _w.setFixedWidth(150)
-            self.create_label(param.unit, gridPos=(row + _rowoffset, 2, 1, 1), fixedWidth=24)
-        _row = self.layout().getItemPosition(self.layout().indexOf(_w))[0] + 2
-        _spacer = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
-                                        QtWidgets.QSizePolicy.Minimum)
-        self.layout().addItem(_spacer, _row, 0, 1, 3)
-        _but = QtWidgets.QPushButton('Save experimental parameters to file')
-        _but.setIcon(self.style().standardIcon(43))
-        self.layout().addWidget(_but, _row + 1, 0, 1, 3)
+    def update_param_value(self, param_key, value):
+        """
+        Update a Parameter value both in the widget and ParameterCollection.
+
+        This method overloads the ParamConfigMixin.update_param_value
+        method to process the linked energy / wavelength parameters.
+
+        Parameters
+        ----------
+        param_key : str
+            The Parameter reference key.
+        value : object
+            The new Parameter value. The datatype is determined by the
+            Parameter.
+        """
+        self.set_param_value(param_key, value)
+        if param_key in ['xray_energy', 'xray_wavelength']:
+            _energy = self.get_param_value('xray_energy')
+            _lambda = self.get_param_value('xray_wavelength')
+            self.param_widgets['xray_energy'].set_value(_energy)
+            self.param_widgets['xray_wavelength'].set_value(_lambda)
+        else:
+            self.param_widgets[param_key].set_value(value)
 
     def update_param(self, pname, widget):
-        try:
-            EXP_SETTINGS.set(pname, widget.get_value())
-        except Exception:
-            widget.set_value(EXP_SETTINGS.get(pname))
-            excepthook(*sys.exc_info())
+        self.set_param_value(pname, widget.get_value())
         # explicitly call update fo wavelength and energy
         if pname == 'xray_wavelength':
             _w = self.param_widgets['xray_energy']
-            _w.set_value(EXP_SETTINGS.get('xray_energy'))
+            _w.set_value(EXP_SETTINGS.get_param_value('xray_energy'))
         elif pname == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
-            _w.set_value(EXP_SETTINGS.get('xray_wavelength') * 1e10)
+            _w.set_value(EXP_SETTINGS.get_param_value('xray_wavelength') * 1e10)
 
     def select_detector(self, name):
         from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
         dialog = DetectorSelectorDialog()
         dialog.exec_()
-
         _det = dialog.selectedDetector()
         if _det is not None:
             self.update_detector_params(_det)
 
-    def copy_detector(self):
+    def copy_all_from_pyfai(self):
+        self.copy_geometry_from_pyFAI()
+        self.copy_detector_from_pyFAI()
+        self.copy_energy_from_pyFAI()
+
+    def copy_detector_from_pyFAI(self):
         context = CalibrationContext.instance()
         model = context.getCalibrationModel()
         _det = model.experimentSettingsModel().detector()
-        self.update_detector_params(_det)
+        if _det is not None:
+            self.update_detector_params(_det)
+        else:
+            CriticalWarning('No pyFAI Detector',
+                            'No detector selected in pyFAI. Cannot copy '
+                            'information.')
 
-    def update_detector_params(self, detector):
+    def update_detector_params(self, det):
+        for key, value in [['detector_name', det.name],
+                           ['detector_npixx', det.shape[1]],
+                           ['detector_npixy', det.shape[0]],
+                           ['detector_sizex', det.pixel2],
+                           ['detector_sizey', det.pixel1]]:
+            # EXP_SETTINGS.set_param_value(key, value)
+            self.update_param_value(key, value)
+
+
+    def copy_geometry_from_pyFAI(self):
+        model = CalibrationContext.instance().getCalibrationModel()
+        _geo = model.fittedGeometry()
+        for key, value in [['detector_dist', _geo.distance().value()],
+                           ['detector_poni1', _geo.poni1().value()],
+                           ['detector_poni2', _geo.poni2().value()],
+                           ['detector_rot1', _geo.rotation1().value()],
+                           ['detector_rot2', _geo.rotation2().value()],
+                           ['detector_rot3', _geo.rotation3().value()]]:
+            # EXP_SETTINGS.set_param_value(key, value)
+            self.update_param_value(key, value)
+
+    def copy_energy_from_pyFAI(self):
+        model = CalibrationContext.instance().getCalibrationModel()
+        _geo = model.fittedGeometry()
+        _wavelength = _geo.wavelength().value()
+        # EXP_SETTINGS.set_param_value('xray_wavelength', _wavelength)
+        self.update_param_value('xray_wavelength', _wavelength)
+
+    def load_parameters_from_file(self):
         ...
-
-    def update_model_from_pyFAI(self):
-        ...
-

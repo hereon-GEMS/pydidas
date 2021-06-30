@@ -87,6 +87,17 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj._apply_param_modulo('Test0', 10)
         self.assertEqual(obj.get_param_value('Test0'), 2)
 
+    def test__check_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        with self.assertRaises(KeyError):
+            obj._check_key('NoKey')
+
+    def test__check_key_correct_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._check_key('Test0')
+
     def test_apply_param_modulo_ii(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
@@ -116,6 +127,20 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         self.assertEqual(obj.get_param_value('Test5'), 'test str')
         self.assertEqual(obj.get_param_value('Test6'), -1)
 
+    def test_restore_all_defaults_no_confirm(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_value('Test2', 12)
+        obj.restore_all_defaults()
+        self.assertEqual(obj.get_param_value('Test2'), 12)
+
+    def test_restore_all_defaults(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj.set_param_value('Test2', 12)
+        obj.restore_all_defaults(True)
+        self.assertEqual(obj.get_param_value('Test2'),
+                         self._params['Test2'].default)
 
 if __name__ == "__main__":
     unittest.main()

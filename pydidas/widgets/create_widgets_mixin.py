@@ -1,24 +1,17 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the CreateWidgetsMixIn class which can be inherited from to
@@ -27,7 +20,7 @@ add convenience widget creation methods.
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -156,7 +149,10 @@ class CreateWidgetsMixIn:
             The width of the spacer in pixel. The default is 20.
         gridPos : Union[tuple, list, None], optional
             A list or tuple of length 4 can be supplied as the gridPos.
-            The default            is None.
+            The default is None.
+        parent_widget : Union[QWidget, None], optional
+            The parent widget to which the label is added. If None, this
+            defaults to the calling widget, ie. "self".
         policy : QtWidgets.QSizePolicy, optional
             The size policy for the spacer (applied both horizontally and
             vertically). The default is QtWidgets.QSizePolicy.Minimum.
@@ -264,10 +260,15 @@ def _get_widget_layout_args(parent, **kwargs):
     _grid_pos = kwargs.get('gridPos', None)
     if not isinstance(parent.layout(), QtWidgets.QGridLayout):
         return [0, _alignment]
+    if (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4 and
+            _grid_pos[0] == -1):
+        _grid_pos = (parent.layout().rowCount() + 1, ) + _grid_pos[1:4]
     if _grid_pos is None:
         _row = (kwargs.get('row', parent.layout().rowCount() + 1)
                 if isinstance(parent.layout(), QtWidgets.QGridLayout)
                 else kwargs.get('row', -1))
         _grid_pos = (_row, kwargs.get('column', 0),
                      kwargs.get('n_rows', 1), kwargs.get('n_columns', 2))
-    return [*_grid_pos, _alignment]
+    if _alignment is not None:
+        return [*_grid_pos, _alignment]
+    return [*_grid_pos]

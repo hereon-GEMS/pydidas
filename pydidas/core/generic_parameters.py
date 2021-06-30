@@ -1,24 +1,17 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with a GENERIC_PARAMS dictionary which includes Parameters which
@@ -26,7 +19,7 @@ are being used several times."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -156,6 +149,58 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter(
         'Datatype', None, default=np.float32, refkey='datatype',
         tooltip='The datatype.'),
+     Parameter('X-ray wavelength', float, default=1, unit='A',
+               refkey='xray_wavelength',
+               tooltip=('The X-ray wavelength (in Angstrom). Any changes to '
+                        'the wavelength will also update the X-ray energy '
+                        'setting.')),
+     Parameter('X-ray energy', float, default=12.398, unit='keV',
+               refkey='xray_energy',
+               tooltip= ('The X-ray energy (in keV). Changing this parameter '
+                         'will also update the X-ray wavelength setting.')),
+    Parameter('Detector name', str, default='', refkey='detector_name',
+              tooltip='The detector name in pyFAI nomenclature.'),
+    Parameter('Detector size X', int, default=0, refkey='detector_npixx',
+              unit='px',
+              tooltip=('The number of detector pixels in x direction '
+                       '(horizontal).')),
+    Parameter('Detector size Y', int, default=0, refkey='detector_npixy',
+              unit='px',
+              tooltip=('The number of detector pixels in y direction '
+                       '(vertical).')),
+    Parameter('Detector pixel size X', float, default=-1, unit='um',
+              refkey='detector_sizex',
+              tooltip='The detector pixel size in X-direction in micrometer.'),
+    Parameter('Detector pixel size Y', float, default=-1, unit='um',
+              refkey='detector_sizey',
+              tooltip='The detector pixel size in Y-direction in micrometer.'),
+    Parameter('Sample-detector distance', float, default=0,
+              refkey='detector_dist',unit='m',
+              tooltip='The sample-detector distance (in m).'),
+    Parameter('Detector PONI1', float, default=0, unit='m',
+              refkey='detector_poni1',
+              tooltip=('The detector PONI1 (point of normal incidence; '
+                       'in y direction). This is measured in meters from the'
+                       'detector origin.')),
+    Parameter('Detector PONI2', float, default=0, unit='m',
+              refkey='detector_poni2',
+              tooltip=('The detector PONI2 (point of normal incidence; '
+                       'in x direction). This is measured in meters from the'
+                       'detector origin.')),
+    Parameter('Detector Rot1', float, default=0, unit='rad',
+              refkey='detector_rot1',
+              tooltip=('The detector rotation 1 (lefthanded around the '
+                      '"up"-axis), given in rad.')),
+    Parameter('Detector Rot2', float, default=0, unit='rad',
+              refkey='detector_rot2',
+              tooltip=('The detector rotation 2 (pitching the detector; '
+                      'positive direction is tilting the detector towards the'
+                      ' floor, i.e. left-handed), given in rad.')),
+    Parameter('Detector Rot3', float, default=0, unit='rad',
+              refkey='detector_rot3',
+              tooltip=('The detector rotation 3 (around the beam axis; '
+                      'right-handed when looking downstream with the beam.),'
+                      ' given in rad.')),
 )
 
 

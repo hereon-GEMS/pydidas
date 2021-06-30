@@ -1,5 +1,21 @@
+# This file is part of pydidas.
+
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
 import abc
 import copy
+from pydidas.core import ParameterCollection, ParameterCollectionMixIn
 
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
@@ -11,7 +27,7 @@ ptype = {BASE_PLUGIN: 'Base plugin',
          PROC_PLUGIN: 'Processing plugin',
          OUTPUT_PLUGIN: 'Output plugin'}
 
-class BasePlugin:
+class BasePlugin(ParameterCollectionMixIn):
     """
     The base plugin class from which all plugins inherit.
 
@@ -24,9 +40,9 @@ class BasePlugin:
     plugin_type : int
         A key to discriminate between the different types of plugins
         (input, processing, output)
-    parameters : list
-        A list with the class parameters which are required to perform
-        the execute operation.
+    parameters : ParameterCollection
+        A ParameterCollection with the class parameters which are required
+        to perform the execute operation.
     input_data : dict
         Dictionary with the required input data set descrptions
     output_data : dict
@@ -35,28 +51,12 @@ class BasePlugin:
     basic_plugin = True
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
-    parameters = []
-    input_data = []
-    output_data = []
+    parameters = ParameterCollection()
+    input_data = {}
+    output_data = {}
 
-    def __init__(self):
-        """Setup the class."""
-        #because lists are mutable, create a new list and copy the class
-        #parameters items into it:
-        self.params = []
-        for param in self.parameters:
-            self.params.append(copy.copy(param))
-        if self.plugin_type not in [-1, 0, 1, 2]:
-            raise ValueError('Unknown value for the plugin type')
-
-
-    def execute(self, *data, **kwargs):
-        """
-        Execute the processing step.
-        """
-        raise NotImplementedError('Execute method has not been implemented.')
-
-    def get_class_description(self, return_list=False):
+    @classmethod
+    def get_class_description(cls, return_list=False):
         """
         Get a description of the plugin.
 
@@ -75,28 +75,39 @@ class BasePlugin:
         _desc : str or list
             The descripion of the plugin.
         """
-        if self.__class__ == type:
-            _name = self.__name__
-        else:
-            _name = self.__class__.__name__
+        _name = cls.__name__
         if return_list:
-            _desc = [['Name', f'{self.plugin_name}\n']]
+            _desc = [['Name', f'{cls.plugin_name}\n']]
             _desc.append(['Class name', f'{_name}\n'])
-            _desc.append(['Plugin type', f'{ptype[self.plugin_type]}\n'])
-            _desc.append(['Plugin description', f'{self.__doc__}\n'])
+            _desc.append(['Plugin type', f'{ptype[cls.plugin_type]}\n'])
+            _desc.append(['Plugin description', f'{cls.__doc__}\n'])
             pstr = ''
-            for param in self.params:
+            for param in cls.parameters:
                 pstr += f'\n{str(param)}'
             _desc.append(['Parameters', pstr[1:]])
         else:
-            _desc = (f'Name: {self.plugin_name}\n'
+            _desc = (f'Name: {cls.plugin_name}\n'
                      f'Class name: {_name}\n'
-                     f'Plugin type: {ptype[self.plugin_type]}\n\n'
-                     f'Plugin description:\n{self.__doc__}\n\n'
+                     f'Plugin type: {ptype[cls.plugin_type]}\n\n'
+                     f'Plugin description:\n{cls.__doc__}\n\n'
                      'Parameters:')
-            for param in self.params:
-                _desc += f'\n{param}: {self.params[param]}'
+            for param in cls.parameters:
+                _desc += f'\n{param}: {cls.parameters[param]}'
         return _desc
+
+    def __init__(self):
+        """Setup the class."""
+        if self.plugin_type not in [BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
+                                    OUTPUT_PLUGIN]:
+            raise ValueError('Unknown value for the plugin type')
+        self.params = self.get_default_params_copy()
+
+
+    def execute(self, *data, **kwargs):
+        """
+        Execute the processing step.
+        """
+        raise NotImplementedError('Execute method has not been implemented.')
 
     def set_param(self, param_name, value):
         """

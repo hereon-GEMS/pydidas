@@ -13,39 +13,50 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-The parameter module includes the Parameter class which is used to store
-processing parameters.
-"""
+"""Module with the SingletonFactory class which is used to create Singleton
+instances of clases.."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__license__ = "GPL 3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['HdfKey']
+__all__ = ['SingletonFactory']
 
 
-class HdfKey(str):
-    """A class used for referencing hdf keys."""
-    def __new__(cls, text):
-        _instance = super().__new__(cls, text)
-        _instance.__hdf_fname = None
-        return _instance
-
-    @property
-    def hdf_filename(self):
+class SingletonFactory:
+    """
+    Factory to create a Singleton.
+    """
+    def __init__(self, cls):
         """
-        Get the filename of the associated hdf5 file.
+        Setup method.
+        """
+        self.__instance = None
+        self.__class = cls
+
+    def __call__(self):
+        """
+        Get the instance of the Singleton.
 
         Returns
         -------
-        str
-            The filename of the associated hdf5 file.
+        object
+            The instance of the Singleton class.
         """
-        return self.__hdf_fname
+        if not self.__instance:
+            self.__instance = self.__class()
+        return self.__instance
 
-    @hdf_filename.setter
-    def hdf_filename(self, txt):
-        self.__hdf_fname = txt
+    def __reset_singleton(self):
+        """
+        Reset the Singleton instance and create a new one.
+        """
+        self.__instance = self.__class()
+
+    def instance(self):
+        """
+        Get the instance. A wrapper for __call__
+        """
+        return self.__call__()

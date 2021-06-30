@@ -1,24 +1,17 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the ImageReaderFactory which returns always the same instance
@@ -27,49 +20,14 @@ of the ImageReader.
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "MIT"
+__license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ImageReaderFactory']
 
 import os
-
-
-class ReaderBuilder:
-    """
-    Builder class to prevent multiple instances of any ImageReader subclass
-    to be created.
-    """
-    def __init__(self, obj):
-        """
-        Initialization
-
-        Parameters
-        ----------
-        obt : ImageReader
-            The concrete implementation of the ImageReader class for this
-            particular reader and file format.
-        """
-        self._instance = None
-        self._object = obj
-
-
-    def __call__(self, **kwargs):
-        """
-        Get the ImageReaer (subclass) instance.
-
-        If an instance exists, it is returned. If no instance exists yet,
-        one is created.
-
-        Returns
-        -------
-        instance : object
-            The instance of the ImageReader
-        """
-        if not self._instance:
-            self._instance = self._object()
-        return self._instance
+from ..core import SingletonFactory
 
 
 class _ImageReaderFactory:
@@ -101,7 +59,7 @@ class _ImageReaderFactory:
             The reader implementation class (not its instance! - The instance
             will be managed by the Builder).
         """
-        self._readers[filetype] = ReaderBuilder(reader)
+        self._readers[filetype] = SingletonFactory(reader)
         for ex in ext:
             self._extensions[ex] = filetype
 
@@ -122,13 +80,12 @@ class _ImageReaderFactory:
         reader : ImageReader
             The instance of the ImageReader implementation.
         """
-        fhead, ext = os.path.splitext(filename)
-        ext = ext.lower()
-        if not ext in self._extensions.keys():
-            raise ValueError(f'Extension "{ext}" not supported.')
-        reader = self._readers.get(self._extensions[ext])
+        _ext = os.path.splitext(filename)[1].lower()
+        if not _ext in self._extensions.keys():
+            raise ValueError(f'Extension "{_ext}" not supported.')
+        reader = self._readers.get(self._extensions[_ext])
         if not reader:
-            raise ValueError(f'Extension "{ext}" not supported.')
+            raise ValueError(f'Extension "{_ext}" not supported.')
         return reader(**kwargs)
 
 

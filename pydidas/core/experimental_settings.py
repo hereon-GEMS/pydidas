@@ -33,7 +33,6 @@ from .object_with_parameter_collection import ObjectWithParameterCollection
 
 LAMBDA_TO_E = scipy.constants.h * scipy.constants.c / scipy.constants.e * 1e-3
 
-
 DEFAULTS = ParameterCollection(
     get_generic_parameter('xray_wavelength'),
     get_generic_parameter('xray_energy'),
@@ -56,11 +55,13 @@ class _ExpSettings(ObjectWithParameterCollection):
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
     """
+    default_params = DEFAULTS
+
     def __init__(self, *args, **kwargs):
         """Setup method"""
         super().__init__()
         self.add_params(*args, **kwargs)
-        self.set_default_params(DEFAULTS)
+        self.set_default_params()
 
     def set_param_value(self, key, value):
         """

@@ -48,7 +48,7 @@ class MpTestApp(BaseApp):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_default_params(self.default_params)
+        self.set_default_params()
         self._config = {'n_image': None,
                         'datatype': None,
                         'mp_pre_run_called': False,

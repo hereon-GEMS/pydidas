@@ -44,9 +44,6 @@ from .composite_image import *
 from . import generic_parameters
 from .generic_parameters import *
 
-from . import global_settings
-from .global_settings import *
-
 from . import experimental_settings
 from .experimental_settings import *
 
@@ -67,7 +64,6 @@ __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
 __all__ += object_with_parameter_collection.__all__
 __all__ += dataset.__all__
-__all__ += global_settings.__all__
 __all__ += experimental_settings.__all__
 __all__ += scan_settings.__all__
 __all__ += hdf_key.__all__
@@ -81,7 +77,6 @@ __all__ += singleton_factory.__all__
 del composites
 del parameter
 del dataset
-del global_settings
 del experimental_settings
 del scan_settings
 del hdf_key

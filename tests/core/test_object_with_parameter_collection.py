@@ -118,11 +118,11 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_set_default_params(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
-        _params2 = ParameterCollection(
+        obj.default_params = ParameterCollection(
             Parameter('Test0', int, default=10),
             Parameter('Test5', str, default='test str'),
             Parameter('Test6', float, default=-1))
-        obj.set_default_params(_params2)
+        obj.set_default_params()
         self.assertEqual(obj.get_param_value('Test0'), 12)
         self.assertEqual(obj.get_param_value('Test5'), 'test str')
         self.assertEqual(obj.get_param_value('Test6'), -1)

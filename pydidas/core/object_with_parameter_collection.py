@@ -93,7 +93,7 @@ class ParameterCollectionMixIn:
                     f'Cannot add object of type "{_param.__class__}" '
                     'to ParameterCollection.')
 
-    def set_default_params(self, defaults):
+    def set_default_params(self):
         """
         Set default entries.
 
@@ -106,9 +106,7 @@ class ParameterCollectionMixIn:
         defaults : Union[dict, ParameterCollection, list, tuple, set]
             An iterable with default Parameters.
         """
-        if isinstance(defaults, ParameterCollection):
-            defaults = defaults.values()
-        for _param in defaults:
+        for _param in self.default_params.values():
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
 

@@ -34,6 +34,9 @@ from .parameter_collection import ParameterCollection
 
 
 GENERIC_PARAMS = ParameterCollection(
+    ###################################
+    ## Parameters for CompositeCreation
+    ###################################
     Parameter(
         'First file name', Path, default=Path(), refkey='first_file',
         tooltip=('The name of the first file for a file series or of the hdf5'
@@ -149,6 +152,9 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter(
         'Datatype', None, default=np.float32, refkey='datatype',
         tooltip='The datatype.'),
+    #################################
+    ## Parameters for global geometry
+    #################################
      Parameter('X-ray wavelength', float, default=1, unit='A',
                refkey='xray_wavelength',
                tooltip=('The X-ray wavelength (in Angstrom). Any changes to '
@@ -201,6 +207,85 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=('The detector rotation 3 (around the beam axis; '
                       'right-handed when looking downstream with the beam.),'
                       ' given in rad.')),
+    ############################
+    ## Parameters for scan setup
+    ############################
+    Parameter('Scan dimension', int, default=2, refkey='scan_dim',
+              unit='', choices=[1, 2, 3, 4],
+              tooltip=('The scan_dimensionality. This is relevant for mosaic '
+                       'and and mesh images.')),
+    Parameter('Name of scan direction 1', str, default='',
+              refkey='scan_dir_1', unit='',
+              tooltip=('The axis name for scan direction 1. This information'
+                       ' will only be used for labelling.')),
+    Parameter('Number of scan points (dir. 1)', int, default=0,
+              refkey='n_points_1', unit='',
+              tooltip='The number of scan points in scan direction 1.'),
+    Parameter('Step width in direction 1', float, default=0, refkey='delta_1',
+              unit='', tooltip=('The step width between two scan points in'
+                                ' scan direction 1.')),
+    Parameter('Unit of direction 1', str, default='', refkey='unit_1',unit='',
+              tooltip=('The unit of the movement / steps / offset in scan '
+                       'direction 1.')),
+    Parameter('Offset of direction 1', float, default=0, refkey='offset_1',
+              unit='',
+              tooltip=('The coordinate offset of the movement in scan '
+                       'direction 1 (i.e. the coutner / motor position for '
+                       'scan position 0).')),
+    Parameter('Name of scan direction 2', str, default='',
+              refkey='scan_dir_2', unit='',
+              tooltip=('The axis name for scan direction 2. This information'
+                       ' will only be used for labelling.')),
+    Parameter('Number of scan points (dir. 2)', int, default=0,
+              refkey='n_points_2', unit='',
+              tooltip='The number of scan points in scan direction 2.'),
+    Parameter('Step width in direction 2', float, default=0, refkey='delta_2',
+              unit='', tooltip=('The step width between two scan points in'
+                                ' scan direction 2.')),
+    Parameter('Unit of direction 2', str, default='', refkey='unit_2',unit='',
+              tooltip=('The unit of the movement / steps / offset in scan '
+                       'direction 2.')),
+    Parameter('Offset of direction 2', float, default=0, refkey='offset_2',
+              unit='',
+              tooltip=('The coordinate offset of the movement in scan '
+                       'direction 2 (i.e. the coutner / motor position for '
+                       'scan position 0).')),
+    Parameter('Name of scan direction 3', str, default='',
+              refkey='scan_dir_3', unit='',
+              tooltip=('The axis name for scan direction 3. This information'
+                       ' will only be used for labelling.')),
+    Parameter('Number of scan points (dir. 3)', int, default=0,
+              refkey='n_points_3', unit='',
+              tooltip='The number of scan points in scan direction 3.'),
+    Parameter('Step width in direction 3', float, default=0, refkey='delta_3',
+              unit='', tooltip=('The step width between two scan points in'
+                                ' scan direction 3.')),
+    Parameter('Unit of direction 3', str, default='', refkey='unit_3',unit='',
+              tooltip=('The unit of the movement / steps / offset in scan '
+                       'direction 3.')),
+    Parameter('Offset of direction 3', float, default=0, refkey='offset_3',
+              unit='',
+              tooltip=('The coordinate offset of the movement in scan '
+                       'direction 3 (i.e. the coutner / motor position for '
+                       'scan position 0).')),
+    Parameter('Name of scan direction 4', str, default='',
+              refkey='scan_dir_4', unit='',
+              tooltip=('The axis name for scan direction 4. This information'
+                       ' will only be used for labelling.')),
+    Parameter('Number of scan points (dir. 4)', int, default=0,
+              refkey='n_points_4', unit='',
+              tooltip='The number of scan points in scan direction 4.'),
+    Parameter('Step width in direction 4', float, default=0, refkey='delta_4',
+              unit='', tooltip=('The step width between two scan points in'
+                                ' scan direction 4.')),
+    Parameter('Unit of direction 4', str, default='', refkey='unit_4',unit='',
+              tooltip=('The unit of the movement / steps / offset in scan '
+                       'direction 4.')),
+    Parameter('Offset of direction 4', float, default=0, refkey='offset_4',
+              unit='',
+              tooltip=('The coordinate offset of the movement in scan '
+                       'direction 4 (i.e. the coutner / motor position for '
+                       'scan position 0).')),
 )
 
 

@@ -179,7 +179,7 @@ class CompositeCreatorApp(BaseApp):
         """
         super().__init__(*args, **kwargs)
         _cmdline_args = _parse_composite_creator_cmdline_arguments()
-        self.set_default_params(self.default_params)
+        self.set_default_params()
 
         # update default_params with command line entries:
         for _key in self.params:

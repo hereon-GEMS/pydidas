@@ -28,7 +28,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from ..widgets import (WorkflowTreeCanvas, PluginCollectionPresenter,
                        ScrollArea)
-from ..widgets.param_config import PluginParamConfig
+from ..widgets.parameter_config import PluginParamConfig
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER

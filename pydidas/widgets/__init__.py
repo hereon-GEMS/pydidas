@@ -28,7 +28,7 @@ __all__ = []
 
 from . import dialogues
 
-from . import param_config
+from . import parameter_config
 
 from . import workflow_edit
 

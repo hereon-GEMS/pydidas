@@ -85,10 +85,10 @@ class _ExpSettings(ObjectWithParameterCollection):
         """
         self._check_key(key)
         if key == 'xray_energy':
-            self.params['xray_wavelength'].value = LAMBDA_TO_E / value
+            self.params['xray_wavelength'].value = LAMBDA_TO_E / (value * 1e-10)
             self.params['xray_energy'].value = value
         elif key == 'xray_wavelength':
-            self.params['xray_wavelength'].value = value * 1e-10
+            self.params['xray_wavelength'].value = value
             self.params['xray_energy'].value = LAMBDA_TO_E / (value * 1e-10)
         else:
             self.params.set_value(key, value)

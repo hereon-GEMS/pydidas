@@ -159,11 +159,11 @@ class BasePlugin(ParameterCollectionMixIn):
         return True
 
     @staticmethod
-    def has_unique_param_config_widget():
+    def has_unique_parameter_config_widget():
         return False
 
 
-    def param_config_widget(self):
+    def parameter_config_widget(self):
         raise NotImplementedError('Generic plugins do not have a unique'
                                   ' parameter config widget.')
 

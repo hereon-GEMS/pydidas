@@ -105,7 +105,7 @@ class ParameterConfigMixIn:
             _io_args = (0, QtCore.Qt.AlignRight)
         return _txt_args, _io_args
 
-    def __get_create_param_config(self, **kwargs):
+    def __get_create_parameter_config(self, **kwargs):
         """
         Get the config with kwargs formatting options.
 
@@ -236,7 +236,7 @@ class ParameterConfigMixIn:
             The formatted QLabel and Input widgets.
         """
         _widget = kwargs.get('parent_widget', self)
-        _config = self.__get_create_param_config(**kwargs)
+        _config = self.__get_create_parameter_config(**kwargs)
         _text_widget = text_widget_factory(param, _config['width_text'],
                                            _config['valign_text'])
         _input_widget = param_widget_factory(param, _config['width'])

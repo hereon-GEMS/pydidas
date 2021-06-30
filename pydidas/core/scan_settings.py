@@ -25,7 +25,6 @@ __status__ = "Development"
 __all__ = ['ScanSettings']
 
 from .generic_parameters import get_generic_parameter
-from .parameter import Parameter
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
 from .singleton_factory import SingletonFactory
@@ -54,7 +53,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('offset_3'),
     get_generic_parameter('offset_4'),
     )
-
 
 
 class _ScanSettings(ObjectWithParameterCollection):

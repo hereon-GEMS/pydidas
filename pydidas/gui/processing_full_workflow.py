@@ -31,7 +31,7 @@ from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
-from pydidas.widgets.param_config import ParameterConfigMixIn
+from pydidas.widgets.parameter_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()

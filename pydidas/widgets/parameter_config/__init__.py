@@ -26,12 +26,12 @@ __all__ = []
 from . import plugin_param_config
 from .plugin_param_config import *
 
-from . import param_config
-from .param_config import *
+from . import parameter_config
+from .parameter_config import *
 
 __all__ += plugin_param_config.__all__
-__all__ += param_config.__all__
+__all__ += parameter_config.__all__
 
 #unclutter the namespace:
 del plugin_param_config
-del param_config
+del parameter_config

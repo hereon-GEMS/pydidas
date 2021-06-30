@@ -32,7 +32,7 @@ from .base_frame import BaseFrame
 from ..core import ScanSettings, Parameter
 from ..workflow_tree import WorkflowTree
 from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
-from ..widgets.param_config import ParameterConfigMixIn
+from ..widgets.parameter_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()

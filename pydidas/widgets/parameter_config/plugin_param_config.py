@@ -26,7 +26,7 @@ __all__ = ['PluginParamConfig']
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
-from .param_config import ParamConfig
+from .parameter_config import ParamConfig
 
 from ..utilities import deleteItemsOfLayout
 
@@ -96,8 +96,8 @@ class PluginParamConfig(ParamConfig):
                        width=385)
         self.add_label(f'Node id: {node_id}', fontsize=12)
         self.add_label('\nParameters:', fontsize=12)
-        if self.plugin.has_unique_param_config_widget():
-            _layout.add(self.plugin.param_config_widget())
+        if self.plugin.has_unique_parameter_config_widget():
+            _layout.add(self.plugin.parameter_config_widget())
         else:
             self.restore_default_button()
             for param in self.plugin.params:

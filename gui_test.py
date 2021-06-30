@@ -26,7 +26,7 @@ STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, BaseFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
     ProcessingFullWorkflowFrame, CompositeCreatorFrame)
-from pydidas.widgets.param_config import ParameterConfigMixIn
+from pydidas.widgets.parameter_config import ParameterConfigMixIn
 
 class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
+    sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
 
     _font = app.font()

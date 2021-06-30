@@ -32,7 +32,6 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot import PlotWindow
-# from silx.gui.plot.ImageView import ImageView
 
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
@@ -40,13 +39,13 @@ from pydidas.core import ParameterCollectionMixIn
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.widgets import (
     ReadOnlyTextWidget, ScrollArea, CreateWidgetsMixIn,
-    create_default_grid_layout, BaseFrame, dialogues, param_config)
+    create_default_grid_layout, BaseFrame, dialogues, parameter_config)
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_metadata)
 from pydidas.multiprocessing import AppRunner
 
 
-class CompositeCreatorFrame(BaseFrame, param_config.ParameterConfigMixIn,
+class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
                             ParameterCollectionMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
@@ -57,7 +56,7 @@ class CompositeCreatorFrame(BaseFrame, param_config.ParameterConfigMixIn,
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
-        param_config.ParameterConfigMixIn.__init__(self)
+        parameter_config.ParameterConfigMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
         self.params = self._app.params
@@ -78,7 +77,7 @@ class CompositeCreatorFrame(BaseFrame, param_config.ParameterConfigMixIn,
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.w_buttons = {}
 
-        self._widgets['config'] = param_config.ParamConfig(
+        self._widgets['config'] = parameter_config.ParamConfig(
             self, initLayout=False, midLineWidth=5)
         self._widgets['config'].setLayout(create_default_grid_layout())
         _config_next_row = self._widgets['config'].next_row

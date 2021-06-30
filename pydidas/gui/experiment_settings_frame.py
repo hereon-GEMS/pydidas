@@ -24,16 +24,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExperimentSettingsFrame']
 
-import sys
 from functools import partial
-from PyQt5 import QtWidgets, QtCore
 
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
 from .base_frame import BaseFrame
 from ..core import ExperimentalSettings, ParameterCollectionMixIn
-from ..widgets import excepthook
-from ..widgets.param_config import ParameterConfigMixIn
+from ..widgets.parameter_config import ParameterConfigMixIn
 from ..widgets.dialogues import CriticalWarning
 
 EXP_SETTINGS = ExperimentalSettings()
@@ -57,52 +54,17 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         self._widgets = {}
         self.layout().setContentsMargins(5, 5, 0, 0)
 
-        self.create_label('Experimental settings\n', fontsize=14, bold=True,
-                         underline=True, gridPos=(0, 0, 1, 0))
-
-        self._widgets['but_load_from_file'] = self.create_button(
-            'Load experimental parameters from file',
-            icon=self.style().standardIcon(42),
-            gridPos=(-1, 0, 1, 3), alignment=None)
-
-        self._widgets['but_copy_from_pyfai'] = self.create_button(
-            'Copy all experimental parameters from calibration',
-            gridPos=(-1, 0, 1, 3), alignment=None)
-
+        self.__create_global_header()
         for _param_key in self.params.keys():
             if _param_key == 'xray_wavelength':
-                self.create_label('\nBeamline X-ray energy:', fontsize=11,
-                                 bold=True, gridPos=(self.next_row(), 0, 1, 3))
-                self._widgets['but_energy_from_pyfai'] = self.create_button(
-                    'Copy X-ray energy from pyFAI calibration',
-                    gridPos=(-1, 0, 1, 3), alignment=None)
+                self.__create_xray_header()
             if _param_key == 'detector_name':
-                self.create_label('\nX-ray detector:', fontsize=11, bold=True,
-                                  gridPos=(-1, 0, 1, 3))
-                self._widgets['but_select_detector'] = self.create_button(
-                    'Select X-ray detector', gridPos=(-1, 0, 1, 3),
-                    alignment=None)
-                self._widgets['but_copy_det_from_pyfai'] = self.create_button(
-                    'Copy X-ray detector from pyFAI calibration',
-                    gridPos=(-1, 0, 1, 3), alignment=None)
+                self.__create_detector_header()
             if _param_key == 'detector_dist':
-                self.create_label('\nDetector position:', fontsize=11,
-                                 bold=True, gridPos=(-1, 0, 1, 3))
-                self._widgets['but_copy_geo_from_pyfai'] = self.create_button(
-                    'Copy X-ray detector geometry from pyFAI calibration',
-                    gridPos=(-1, 0, 1, 3))
-            _row = self.next_row()
-            param = self.get_param(_param_key)
-            self.create_param_widget(param, row=_row, textwidth = 180,
-                                     width=150)
-            self.create_label(param.unit, gridPos=(_row, 2, 1, 1),
-                              fixedWidth=24)
+                self.__create_geometry_header()
+            self.__create_param_widgets(_param_key)
 
-        #_row = self.layout().getItemPosition(self.layout().indexOf(_w))[0] + 2
         self.create_spacer(gridPos=(-1, 0, 1, 3))
-        # QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum,
-        #                                 QtWidgets.QSizePolicy.Minimum)
-        # self.layout().addItem(_spacer, _row, 0, 1, 3)
         self._widgets['but_save_to_file'] = self.create_button(
             'Save experimental parameters to file', gridPos=(-1, 0, 1, 3),
             alignment=None,
@@ -116,7 +78,11 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         self._widgets['but_select_detector'].clicked.connect(
             self.select_detector)
         self._widgets['but_copy_det_from_pyfai'].clicked.connect(
-            self.copy_detector_from_pyFAI)
+            partial(self.copy_detector_from_pyFAI, True))
+        self._widgets['but_copy_geo_from_pyfai'].clicked.connect(
+            partial(self.copy_geometry_from_pyFAI, True))
+        self._widgets['but_copy_energy_from_pyfai'].clicked.connect(
+            partial(self.copy_energy_from_pyFAI, True))
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
             #disconnect directly setting the parameters and route
@@ -124,6 +90,54 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
             _w = self.param_widgets[param.refkey]
             _w.io_edited.disconnect()
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
+
+    def __create_xray_header(self):
+        """Create header items (label / buttons) for X-ray energy settings."""
+        self.create_label('\nBeamline X-ray energy:', fontsize=11,
+                          bold=True, gridPos=(self.next_row(), 0, 1, 3))
+        self._widgets['but_copy_energy_from_pyfai'] = self.create_button(
+            'Copy X-ray energy from pyFAI calibration',
+            gridPos=(-1, 0, 1, 3), alignment=None)
+
+    def __create_detector_header(self):
+        """Create header items (label / buttons) for the detector."""
+        self.create_label('\nX-ray detector:', fontsize=11, bold=True,
+                          gridPos=(-1, 0, 1, 3))
+        self._widgets['but_select_detector'] = self.create_button(
+            'Select X-ray detector', gridPos=(-1, 0, 1, 3),
+            alignment=None)
+        self._widgets['but_copy_det_from_pyfai'] = self.create_button(
+            'Copy X-ray detector from pyFAI calibration',
+            gridPos=(-1, 0, 1, 3), alignment=None)
+
+    def __create_geometry_header(self):
+        """Create header items (label / buttons) for the detector."""
+        self.create_label('\nDetector geometry:', fontsize=11,
+                         bold=True, gridPos=(-1, 0, 1, 3))
+        self._widgets['but_copy_geo_from_pyfai'] = self.create_button(
+            'Copy X-ray detector geometry from pyFAI calibration',
+            gridPos=(-1, 0, 1, 3))
+
+    def __create_global_header(self):
+        """Create global header items (label / buttons). """
+        self.create_label('Experimental settings\n', fontsize=14, bold=True,
+                          underline=True, gridPos=(0, 0, 1, 0))
+        self._widgets['but_load_from_file'] = self.create_button(
+            'Load experimental parameters from file',
+            icon=self.style().standardIcon(42),
+            gridPos=(-1, 0, 1, 3), alignment=None)
+        self._widgets['but_copy_from_pyfai'] = self.create_button(
+            'Copy all experimental parameters from calibration',
+            gridPos=(-1, 0, 1, 3), alignment=None)
+
+    def __create_param_widgets(self, param_key):
+        """Create widgets for a Parameter."""
+        _row = self.next_row()
+        _param = self.get_param(param_key)
+        self.create_param_widget(_param, row=_row, textwidth = 180,
+                                 width=150)
+        self.create_label(_param.unit, gridPos=(_row, 2, 1, 1),
+                          fixedWidth=24)
 
     def update_param_value(self, param_key, value):
         """
@@ -140,7 +154,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
             The new Parameter value. The datatype is determined by the
             Parameter.
         """
-        self.set_param_value(param_key, value)
+        EXP_SETTINGS.set_param_value(param_key, value)
         if param_key in ['xray_energy', 'xray_wavelength']:
             _energy = self.get_param_value('xray_energy')
             _lambda = self.get_param_value('xray_wavelength')
@@ -149,13 +163,13 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         else:
             self.param_widgets[param_key].set_value(value)
 
-    def update_param(self, pname, widget):
-        self.set_param_value(pname, widget.get_value())
+    def update_param(self, param_key, widget):
+        EXP_SETTINGS.set_param_value(param_key,  widget.get_value())
         # explicitly call update fo wavelength and energy
-        if pname == 'xray_wavelength':
+        if param_key == 'xray_wavelength':
             _w = self.param_widgets['xray_energy']
             _w.set_value(EXP_SETTINGS.get_param_value('xray_energy'))
-        elif pname == 'xray_energy':
+        elif param_key == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
             _w.set_value(EXP_SETTINGS.get_param_value('xray_wavelength') * 1e10)
 
@@ -164,53 +178,64 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         dialog = DetectorSelectorDialog()
         dialog.exec_()
         _det = dialog.selectedDetector()
-        if _det is not None:
-            self.update_detector_params(_det)
+        self.update_detector_params(_det, show_warning=False)
 
     def copy_all_from_pyfai(self):
-        self.copy_geometry_from_pyFAI()
         self.copy_detector_from_pyFAI()
-        self.copy_energy_from_pyFAI()
+        self.copy_energy_from_pyFAI(show_warning=False)
+        self.copy_geometry_from_pyFAI()
 
-    def copy_detector_from_pyFAI(self):
+    def copy_detector_from_pyFAI(self, show_warning=True):
         context = CalibrationContext.instance()
         model = context.getCalibrationModel()
         _det = model.experimentSettingsModel().detector()
-        if _det is not None:
-            self.update_detector_params(_det)
-        else:
+        self.update_detector_params(_det, show_warning)
+
+    def update_detector_params(self, det, show_warning=True):
+        if det is not None:
+            for key, value in [['detector_name', det.name],
+                               ['detector_npixx', det.shape[1]],
+                               ['detector_npixy', det.shape[0]],
+                               ['detector_sizex', det.pixel2],
+                               ['detector_sizey', det.pixel1]]:
+                self.update_param_value(key, value)
+        elif show_warning:
             CriticalWarning('No pyFAI Detector',
                             'No detector selected in pyFAI. Cannot copy '
                             'information.')
 
-    def update_detector_params(self, det):
-        for key, value in [['detector_name', det.name],
-                           ['detector_npixx', det.shape[1]],
-                           ['detector_npixy', det.shape[0]],
-                           ['detector_sizex', det.pixel2],
-                           ['detector_sizey', det.pixel1]]:
-            # EXP_SETTINGS.set_param_value(key, value)
-            self.update_param_value(key, value)
-
-
-    def copy_geometry_from_pyFAI(self):
+    def copy_geometry_from_pyFAI(self, show_warning=True):
         model = CalibrationContext.instance().getCalibrationModel()
         _geo = model.fittedGeometry()
-        for key, value in [['detector_dist', _geo.distance().value()],
-                           ['detector_poni1', _geo.poni1().value()],
-                           ['detector_poni2', _geo.poni2().value()],
-                           ['detector_rot1', _geo.rotation1().value()],
-                           ['detector_rot2', _geo.rotation2().value()],
-                           ['detector_rot3', _geo.rotation3().value()]]:
-            # EXP_SETTINGS.set_param_value(key, value)
-            self.update_param_value(key, value)
+        if _geo.isValid():
+            for key, value in [['detector_dist', _geo.distance().value()],
+                               ['detector_poni1', _geo.poni1().value()],
+                               ['detector_poni2', _geo.poni2().value()],
+                               ['detector_rot1', _geo.rotation1().value()],
+                               ['detector_rot2', _geo.rotation2().value()],
+                               ['detector_rot3', _geo.rotation3().value()]]:
+                self.update_param_value(key, value)
+        elif show_warning:
+            CriticalWarning('pyFAI geometry invalid',
+                            'The pyFAI geometry is not valid and cannot be '
+                            'copied. This is probably due to either:\n'
+                            '1. No fit has been performed.\nor\n'
+                            '2. The fit did not succeed.')
 
-    def copy_energy_from_pyFAI(self):
+
+    def copy_energy_from_pyFAI(self, show_warning=True):
         model = CalibrationContext.instance().getCalibrationModel()
         _geo = model.fittedGeometry()
-        _wavelength = _geo.wavelength().value()
-        # EXP_SETTINGS.set_param_value('xray_wavelength', _wavelength)
-        self.update_param_value('xray_wavelength', _wavelength)
+        if _geo.isValid():
+            _wavelength = _geo.wavelength().value()
+            self.update_param_value('xray_wavelength', _wavelength)
+        elif show_warning:
+            CriticalWarning('pyFAI geometry invalid',
+                            'The X-ray energy / wavelength cannot be set '
+                            'because the pyFAI geometry is not valid. '
+                            'This is probably due to either:\n'
+                            '1. No fit has been performed.\nor\n'
+                            '2. The fit did not succeed.')
 
     def load_parameters_from_file(self):
         ...

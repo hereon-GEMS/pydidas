@@ -32,7 +32,7 @@ from PyQt5 import QtWidgets, QtCore
 from .base_frame import BaseFrame
 from ..core import ScanSettings
 from ..widgets.utilities import excepthook
-from ..widgets.param_config import ParameterConfigMixIn
+from ..widgets.parameter_config import ParameterConfigMixIn
 
 SCAN_SETTINGS = ScanSettings()
 

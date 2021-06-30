@@ -34,7 +34,10 @@ from pyFAI.geometry import Geometry
 from .base_frame import BaseFrame
 from ..config import YAML_EXTENSIONS
 from ..core import ParameterCollectionMixIn
-from ..core.experimental_settings import ExperimentalSettings
+from ..core.experimental_settings import (ExperimentalSettings,
+                                          LoadExperimentSettingsFromFile,
+                                          SaveExperimentSettingsToFile)
+
 from ..widgets.parameter_config import ParameterConfigMixIn
 from ..widgets.dialogues import CriticalWarning
 
@@ -248,25 +251,10 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         _func = QtWidgets.QFileDialog.getOpenFileName
         fname = _func(self, 'Name of file', None,
                       'PONI files (*.poni);;All files (*.*)')[0]
-        ext = os.path.splitext(fname)[1]
-        if fname == '':
-            return
-        if ext == '.poni':
-            self.__load_poni_file(fname)
-        elif ext in YAML_EXTENSIONS:
-            self.__load_yaml_file(fname)
-
-    def __load_poni_file(self, fname):
-        geo = Geometry().load(fname)
-        self.update_detector_params(geo.detector)
-        self.update_param_value('xray_wavelength', geo.wavelength * 1e10)
-        _geodict = geo.getPyFAI()
-        for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                    'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.update_param_value(key, _geodict[key.split('_')[1]])
-
-    def __load_yaml_file(self, fname):
-        ...
+        LoadExperimentSettingsFromFile(fname)
 
     def __save_to_file(self):
-        ...
+        _func = QtWidgets.QFileDialog.getSaveFileName
+        _files = 'YAML files (*.yml);;PONI files (*.poni);;All files (*.*)'
+        fname = _func(self, 'Name of file', None, _files)[0]
+        SaveExperimentSettingsToFile(fname)

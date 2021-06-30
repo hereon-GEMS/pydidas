@@ -164,7 +164,7 @@ GENERIC_PARAMS = ParameterCollection(
                refkey='xray_energy',
                tooltip= ('The X-ray energy (in keV). Changing this parameter '
                          'will also update the X-ray wavelength setting.')),
-    Parameter('Detector name', str, default='', refkey='detector_name',
+    Parameter('Detector name', str, default='detector', refkey='detector_name',
               tooltip='The detector name in pyFAI nomenclature.'),
     Parameter('Detector size X', int, default=0, refkey='detector_npixx',
               unit='px',
@@ -180,7 +180,7 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('Detector pixel size Y', float, default=-1, unit='um',
               refkey='detector_sizey',
               tooltip='The detector pixel size in Y-direction in micrometer.'),
-    Parameter('Sample-detector distance', float, default=0,
+    Parameter('Sample-detector distance', float, default=1,
               refkey='detector_dist',unit='m',
               tooltip='The sample-detector distance (in m).'),
     Parameter('Detector PONI1', float, default=0, unit='m',

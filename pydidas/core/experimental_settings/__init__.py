@@ -26,8 +26,8 @@ __all__ = []
 from . import load_experiment_settings_from_file
 from .load_experiment_settings_from_file import *
 
-# from . import dataset
-# from .dataset import *
+from . import save_experiment_settings_to_file
+from .save_experiment_settings_to_file import *
 
 # from . import parameter_collection
 # from .parameter_collection import *
@@ -60,7 +60,7 @@ from .experimental_settings import *
 # from .singleton_factory import *
 
 __all__ += load_experiment_settings_from_file.__all__
-# __all__ += parameter_collection.__all__
+__all__ += save_experiment_settings_to_file.__all__
 # __all__ += parameter.__all__
 # __all__ += object_with_parameter_collection.__all__
 # __all__ += dataset.__all__
@@ -75,7 +75,7 @@ __all__ += experimental_settings.__all__
 
 # Unclutter namespace: remove modules from namespace
 del load_experiment_settings_from_file
-# del parameter
+del save_experiment_settings_to_file
 # del dataset
 del experimental_settings
 # del scan_settings

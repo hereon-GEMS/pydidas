@@ -178,7 +178,7 @@ class ParameterCollectionMixIn:
         """
         name_val_pairs = {}
         for _key in self.params:
-            name_val_pairs[self.params[_key].name] = self.params[_key].value
+            name_val_pairs[self.params[_key].refkey] = self.params[_key].value
         return name_val_pairs
 
     def print_param_values(self):

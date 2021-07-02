@@ -35,6 +35,15 @@ from .parameter_collection import ParameterCollection
 
 GENERIC_PARAMS = ParameterCollection(
     ###################################
+    ## Generic processing paramters
+    ###################################
+    Parameter(
+        'Live processing', int, default=0,refkey='live_processing',
+        choices=[True, False],
+        tooltip=('Set live processing to True if the files do not yet'
+                 'exist at process startup. This will skip checks on'
+                 'file existance and size.')),
+    ###################################
     ## Parameters for CompositeCreation
     ###################################
     Parameter(

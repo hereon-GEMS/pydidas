@@ -73,75 +73,87 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(app.get_param_value('composite_ny'), 5)
         self.assertEqual(app.get_param_value('composite_dir'), 'y')
 
-    def test__store_image_data_from_file_range(self):
+    def test_store_image_data_from_file_range(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._fname(0))
         app.set_param_value('last_file', self._fname(4))
         app.set_param_value('composite_nx', 3)
         app.set_param_value('composite_ny', 2)
-        app._CompositeCreatorApp__store_image_data_from_single_image()
+        app._store_image_data_from_single_image()
         _config = app._config
         self.assertEqual(_config['n_image_per_file'], 1)
         self.assertEqual(_config['raw_img_shape_y'], 10)
         self.assertEqual(_config['raw_img_shape_x'], 10)
         self.assertEqual(_config['datatype'], np.float64)
 
-    def test__store_image_data_from_hdf_file(self):
+    def test_store_image_data_from_hdf_file(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
-        app._CompositeCreatorApp__store_image_data_from_hdf5_file()
+        app._store_image_data_from_hdf5_file()
         _config = app._config
         self.assertEqual(_config['n_image_per_file'], 50)
         self.assertEqual(_config['raw_img_shape_y'], 10)
         self.assertEqual(_config['raw_img_shape_x'], 10)
         self.assertEqual(_config['datatype'], np.float64)
 
-    def test__store_image_data_from_hdf_file_wrong_range(self):
+    def test_store_image_data_from_hdf_file_wrong_range(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
-        app._CompositeCreatorApp__store_image_data_from_hdf5_file()
+        app._store_image_data_from_hdf5_file()
         app.set_param_value('hdf5_first_image_num', 10)
         app.set_param_value('hdf5_last_image_num', -45)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__store_image_data_from_hdf5_file()
+            app._store_image_data_from_hdf5_file()
 
     def test_check_files_hdf(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
-        app._CompositeCreatorApp__check_files()
+        app._check_files()
 
-    def test___check_and_set_bg_file_with_fname(self):
+    def test_live_processing_filelist(self):
+        _last_file = os.path.join(self._path, f'test_10.h5')
+        app = CompositeCreatorApp()
+        app.set_param_value('first_file', self._hdf5_fnames[0])
+        app.set_param_value('last_file', _last_file)
+        app.set_param_value('live_processing', True)
+        app._create_filelist_live_processing()
+        _app_file = os.path.join(app._config['file_path'],
+                                    app._config['file_list'][0])
+        self.assertEqual(_app_file, self._hdf5_fnames[0])
+        self.assertEqual(app._config['n_files'], 11)
+
+    def test_check_and_set_bg_file_with_fname(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('composite_nx', 8)
         app.set_param_value('composite_ny', 9)
         app.set_param_value('use_bg_file', True)
         app.set_param_value('bg_file', self._fname(0))
-        app._CompositeCreatorApp__store_image_data_from_hdf5_file()
-        app._CompositeCreatorApp__process_roi()
-        app._CompositeCreatorApp__check_and_set_bg_file()
+        app._store_image_data_from_hdf5_file()
+        app._process_roi()
+        app._check_and_set_bg_file()
         _image = app._config['bg_image']
         self.assertTrue((_image.array == self._data[0]).all())
 
-    def test__check_roi(self):
+    def test_check_roi(self):
         app = CompositeCreatorApp()
         app._config['raw_img_shape_x'] = 10
         app._config['raw_img_shape_y'] = 10
         app.set_param_value('use_roi', True)
         app.set_param_value('roi_xlow', 15)
         app.set_param_value('roi_ylow', 1)
-        app._CompositeCreatorApp__check_roi()
+        app._check_roi()
         app.set_param_value('roi_xhigh', 3)
         self.assertEqual(app.get_param_value('roi_xlow'), 5)
         self.assertEqual(app.get_param_value('roi_ylow'), 1)
         self.assertEqual(app.get_param_value('roi_xhigh'), 3)
         self.assertEqual(app.get_param_value('roi_yhigh'), 10)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__check_roi()
+            app._check_roi()
 
     def test_check_entries(self):
         app = self.get_default_app()
@@ -150,7 +162,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_prepare_run(self):
         app = self.get_default_app()
         app.prepare_run()
-        _composite = app._CompositeCreatorApp__composite
+        _composite = app._composite
         self.assertIsInstance(_composite, CompositeImage)
 
     def test_run(self):

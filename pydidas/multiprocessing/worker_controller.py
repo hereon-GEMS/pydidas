@@ -65,7 +65,7 @@ class WorkerController(QtCore.QThread):
         self._workers = None
         self._queues = dict(send=mp.Queue(), recv=mp.Queue(), stop=mp.Queue())
         _worker_args = (self._queues['send'], self._queues['recv'],
-                        lambda x: [x])
+                        self._queues['stop'], lambda x: [x])
         self._processor = dict(func=processor, args=_worker_args, kwargs={})
         self.__progress_done = 0
         self.__progress_target = 0
@@ -193,6 +193,23 @@ class WorkerController(QtCore.QThread):
             self._to_process.append(task)
         self._write_lock.unlock()
         self.__progress_target = len(task_args)
+
+    def send_stop_signal(self):
+        """
+        Send stop signal to workers.
+
+        This method will send stop signals to all workers.
+        Note that the runtime of the workers will be determined by the runtime
+        of the called function. This call will be finished before the stop
+        signal will be processed.
+
+        Parameters
+        ----------
+        task_args : Union[list, tuple, set]
+            An iterable of the first argument for the processing function.
+        """
+        for worker in self._workers:
+            self._queues['stop'].put(1)
 
     def finalize_tasks(self):
         """

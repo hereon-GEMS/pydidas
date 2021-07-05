@@ -208,7 +208,9 @@ class CompositeCreatorApp(BaseApp):
                          'final_image_size_x': None,
                          'final_image_size_y': None,
                          'datatype': None,
-                         'file_size': None}
+                         'file_size': None,
+                         'current_fname': None,
+                         'current_kwargs': {}}
 
     def multiprocessing_pre_run(self):
         """
@@ -236,6 +238,21 @@ class CompositeCreatorApp(BaseApp):
                            'multiprocessing_pre_run() first.')
         return self._config['mp_tasks']
 
+    def multiprocessing_pre_cycle(self, index):
+        _fname, _kwargs = self._get_args_for_read_image(index)
+        self._config['current_fname'] = _fname
+        self._config['current_kwargs'] = _kwargs
+
+    def multiprocessing_carryon(self):
+        if self.get_param_value('live_processing'):
+            try:
+                self._wait_for_image(self._config['current_fname'],
+                                     timeout=0.1)
+                return True
+            except FileNotFoundError:
+                return False
+        return True
+
     def multiprocessing_func(self, index):
         """
         Perform key operation with parallel processing.
@@ -247,10 +264,8 @@ class CompositeCreatorApp(BaseApp):
         _image : np.ndarray
             The (pre-processed) image.
         """
-        _fname, _kwargs = self._get_args_for_read_image(index)
-        if self.get_param_value('live_processing'):
-            self._wait_for_image(_fname)
-        _image = read_image(_fname, **_kwargs)
+        _image = read_image(self._config['current_fname'],
+                            **self._config['current_kwargs'])
         return index, _image
 
     @QtCore.pyqtSlot(int, object)

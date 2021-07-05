@@ -27,7 +27,7 @@ __all__ = ['processor']
 import time
 import queue
 
-def processor(input_queue, output_queue, function, *func_args,
+def processor(input_queue, output_queue, stop_queue, function, *func_args,
                **func_kwargs):
     """
     Start a loop to process function calls on individual frames.
@@ -43,6 +43,8 @@ def processor(input_queue, output_queue, function, *func_args,
         processed.
     output_queue : multiprocessing.Queue
         The queue for transmissing the results to the controlling thread.
+    stop_queue : multiprocessing.Queue
+        The queue for sending a termination signal to the worker.
     function : object
         The function to be called in the process. The function must accept
         the first argument from the queue and all additional arguments and
@@ -53,6 +55,13 @@ def processor(input_queue, output_queue, function, *func_args,
         The keyword arguments for the function.
     """
     while True:
+        # check for stop signal
+        try:
+            stop_queue.get_nowait()
+            return
+        except queue.Empty:
+            pass
+        # run processing step
         try:
             _arg1 = input_queue.get(timeout=0.5)
             if _arg1 is None:

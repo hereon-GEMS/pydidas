@@ -17,14 +17,15 @@ class _ProcThread(threading.Thread):
 
     """ Simple Thread to test blocking input / output. """
 
-    def __init__(self, input_queue, output_queue, func):
+    def __init__(self, input_queue, output_queue, stop_queue, func):
         super().__init__()
         self.input_queue = input_queue
         self.output_queue = output_queue
+        self.stop_queue = stop_queue
         self.func = func
 
     def run(self):
-       processor(self.input_queue, self.output_queue,
+       processor(self.input_queue, self.output_queue, self.stop_queue,
                  self.func)
 
 class AppWithFunc:
@@ -39,6 +40,7 @@ class Test_processor(unittest.TestCase):
     def setUp(self):
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
+        self.stop_queue = mp.Queue()
         self.n_test = 20
 
     def tearDown(self):
@@ -58,14 +60,14 @@ class Test_processor(unittest.TestCase):
 
     def test_run_plain(self):
         self.put_ints_in_queue()
-        processor(self.input_queue, self.output_queue,
+        processor(self.input_queue, self.output_queue, self.stop_queue,
                   lambda x: x)
         _input, _output = self.get_results()
         self.assertTrue((_input == _output).all())
 
     def test_run_with_empty_queue(self):
         _thread = _ProcThread(self.input_queue, self.output_queue,
-                              lambda x: x)
+                              self.stop_queue, lambda x: x)
         _thread.start()
         time.sleep(0.1)
         self.input_queue.put(None)
@@ -76,7 +78,7 @@ class Test_processor(unittest.TestCase):
     def test_run_with_args_i(self):
         _args = (0, 1)
         self.put_ints_in_queue()
-        processor(self.input_queue, self.output_queue,
+        processor(self.input_queue, self.output_queue, self.stop_queue,
                   test_func, *_args)
         _input, _output = self.get_results()
         _direct_out = test_func(_input, *_args)
@@ -86,7 +88,7 @@ class Test_processor(unittest.TestCase):
         _args = (0, 1)
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
-        processor(self.input_queue, self.output_queue,
+        processor(self.input_queue, self.output_queue, self.stop_queue,
                   test_func, *_args, **_kwargs)
         _input, _output = self.get_results()
         _direct_out = test_func(_input, *_args, **_kwargs)
@@ -96,7 +98,7 @@ class Test_processor(unittest.TestCase):
         _args = (0, 1)
         self.put_ints_in_queue()
         app = AppWithFunc()
-        processor(self.input_queue, self.output_queue,
+        processor(self.input_queue, self.output_queue, self.stop_queue,
                   app.test_func, *_args)
         _input, _output = self.get_results()
         _direct_out = app.test_func(_input, *_args)

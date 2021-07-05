@@ -130,6 +130,7 @@ class AppRunner(WorkerController):
         """
         self.__app.multiprocessing_pre_run()
         self._processor['args'] = (self._queues['send'], self._queues['recv'],
+                                   self._queues['stop'],
                                    *self.__get_app_arguments())
         _tasks = self.__app.multiprocessing_get_tasks()
         self.add_tasks(_tasks)
@@ -159,6 +160,7 @@ class AppRunner(WorkerController):
             The relative progress of the calculations.
         """
         if progress >= 1:
+            self.send_stop_signal()
             self.suspend()
             self.stop()
 

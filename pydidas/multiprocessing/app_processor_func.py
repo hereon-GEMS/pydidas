@@ -79,6 +79,7 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
             except queue.Empty:
                 _arg = NO_ITEM
         if _arg is not NO_ITEM:
+            _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
                 _results = _app.multiprocessing_func(_arg)

@@ -63,7 +63,10 @@ class BaseApp(ObjectWithParameterCollection):
         self.multiprocessing_pre_run()
         tasks = self.multiprocessing_get_tasks()
         for task in tasks:
-            _results = self.multiprocessing_func(task)
+            self.multiprocessing_pre_cycle(task)
+            _carryon = self.multiprocessing_carryon()
+            if _carryon:
+                _results = self.multiprocessing_func(task)
             self.multiprocessing_store_results(*_results)
         self.multiprocessing_post_run()
 
@@ -112,6 +115,12 @@ class BaseApp(ObjectWithParameterCollection):
             Flag whether processing can continue or should wait.
         """
         return True
+
+    def multiprocessing_pre_cycle(self, *args):
+        """
+        Perform operations in the pre-cycle of every task.
+        """
+        return
 
     def get_config(self):
         """

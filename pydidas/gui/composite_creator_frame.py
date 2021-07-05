@@ -63,8 +63,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._app = CompositeCreatorApp()
         self.params = self._app.params
         self._config = self._app._config
-        self._config.update({'hdf5_image_flag': None,
-                             'composite_dim': 'x',
+        self._config.update({'composite_dim': 'x',
                              'hdf5_dset_shape': None})
         self._app_attributes_to_update.append('_composite')
         self._widgets = {}
@@ -296,6 +295,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._widgets['but_save'].setEnabled(True)
         self.set_status('Finished composite image creation.')
 
+    @QtCore.pyqtSlot(str)
     def __selected_first_file(self, fname):
         """
         Perform required actions after selecting the first image file.
@@ -316,19 +316,24 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                               'last_file','file_stepping', 'n_total',
                               'composite_nx', 'composite_ny'])
         hdf5_flag = os.path.splitext(fname)[1] in HDF5_EXTENSIONS
-        self._config['hdf5_image_flag'] = hdf5_flag
+        self._config['hdf5_file_flag'] = hdf5_flag
         self._app._create_filelist()
         for _key in ['hdf5_key', 'hdf5_first_image_num',
                      'hdf5_last_image_num', 'hdf5_stepping']:
             self.toggle_widget_visibility(_key, hdf5_flag)
         self.toggle_widget_visibility('last_file', True)
-
         if hdf5_flag:
             dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
                 self.update_param_value('hdf5_key', dset)
                 self._app.set_param_value('hdf5_key', dset)
                 self.__selected_hdf5_key()
+        else:
+            _shape = read_image(fname).shape
+            self._widgets['selection_info'].setText(
+                (f'Number of images per file: 1\n\nImage size: '
+                 f'{_shape[0]} x {_shape[1]}'))
+
 
     def __selected_last_file(self):
         """
@@ -469,14 +474,14 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         _check_keys = ['hdf5_key', 'hdf5_first_image_num',
                        'hdf5_last_image_num', 'last_file']
         if any(_key in keys for _key in _check_keys):
-            self._config['hdf5_image_flag'] = None
+            self._config['hdf5_file_flag'] = None
 
     def __check_exec_enable(self):
         """
         Check whether the exec button should be enabled and enable/disable it.
         """
         try:
-            assert self._config['hdf5_image_flag'] is not None
+            assert self._config['hdf5_file_flag'] is not None
             if self.get_param_value('use_bg_file'):
                 assert os.path.isfile(self.get_param_value('bg_file'))
             _enable = True
@@ -589,9 +594,9 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         input parameter.
         """
         print('\nupdate n image\n\n', self._config)
-        if self._config['hdf5_image_flag'] is True:
+        if self._config['hdf5_file_flag'] is True:
             self._app._store_image_data_from_hdf5_file()
-        if self._config['hdf5_image_flag'] is not None:
+        if self._config['hdf5_file_flag'] is not None:
             _n_total = (self._config['n_image_per_file'] *
                         self._config['n_files'])
             self.update_param_value('n_total', _n_total)

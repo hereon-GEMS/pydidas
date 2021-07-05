@@ -54,6 +54,11 @@ class TestMpTestApp(unittest.TestCase):
         app.multiprocessing_store_results(_index, _image)
         self.assertTrue((app._composite.image[:100, :100] > 0).all())
 
+    def test_mp_wait(self):
+        app = MpTestApp()
+        self.assertEqual(app.multiprocessing_carryon(), False)
+        self.assertEqual(app.multiprocessing_carryon(), True)
+
 
 
 

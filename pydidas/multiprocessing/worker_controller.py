@@ -63,7 +63,7 @@ class WorkerController(QtCore.QThread):
         self._to_process = []
         self._write_lock = QtCore.QReadWriteLock()
         self._workers = None
-        self._queues = dict(send=mp.Queue(), recv=mp.Queue())
+        self._queues = dict(send=mp.Queue(), recv=mp.Queue(), stop=mp.Queue())
         _worker_args = (self._queues['send'], self._queues['recv'],
                         lambda x: [x])
         self._processor = dict(func=processor, args=_worker_args, kwargs={})

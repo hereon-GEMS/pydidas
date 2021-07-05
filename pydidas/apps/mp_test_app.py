@@ -24,6 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['MpTestApp']
 
+import time
 
 import numpy as np
 from PyQt5 import QtCore
@@ -53,6 +54,7 @@ class MpTestApp(BaseApp):
                         'datatype': None,
                         'mp_pre_run_called': False,
                         'mp_post_run_called': False,
+                        'calls': 0
                         }
 
     def multiprocessing_pre_run(self, min_index=10, max_index=110):
@@ -68,6 +70,13 @@ class MpTestApp(BaseApp):
 
     def multiprocessing_get_tasks(self):
         return self._config['mp_tasks']
+
+    def multiprocessing_carryon(self):
+        self._config['calls'] += 1
+        if self._config['calls'] % 2:
+            time.sleep(0.01)
+            return False
+        return True
 
     def multiprocessing_func(self, index):
             _fname, _kwargs = 'dummy', {'shape': (100, 100)}

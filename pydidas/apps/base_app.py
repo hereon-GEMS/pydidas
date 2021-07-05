@@ -97,6 +97,22 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
+    def multiprocessing_carryon(self):
+        """
+        Wait for specific tasks to give the clear signal.
+
+        This method is called in the parallel multiprocessing process
+        prior to the actual calculation. Apps can specify wait conditions
+        that need to be fulfilled before carrying on. The method returns
+        a boolean flag whether a timeout was encountered.
+
+        Returns
+        -------
+        carryon : bool
+            Flag whether processing can continue or should wait.
+        """
+        return True
+
     def get_config(self):
         """
         Get the App configuration.

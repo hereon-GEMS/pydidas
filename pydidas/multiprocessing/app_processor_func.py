@@ -24,10 +24,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['app_processor']
 
+
 import queue
+import random
+import string
+
+NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
+                  for i in range(64))
 
 
-def app_processor(input_queue, output_queue, app, app_params, app_config):
+def app_processor(input_queue, output_queue, stop_queue, app, app_params,
+                  app_config):
     """
     Start a loop to process function calls on individual frames.
 
@@ -42,6 +49,8 @@ def app_processor(input_queue, output_queue, app, app_params, app_config):
         processed.
     output_queue : multiprocessing.Queue
         The queue for transmissing the results to the controlling thread.
+    stop_queue : multiprocessing.Queue
+        The queue for sending a termination signal to the worker.
     app : BaseApp
         The Application class to be called in the process. The App must have a
         multiprocessing_func method.
@@ -51,19 +60,26 @@ def app_processor(input_queue, output_queue, app, app_params, app_config):
         The dictionary which is used for overwriting the app._config
         dictionary.
     """
+    _app_carryon = True
     _app = app(app_params)
     _app._config = app_config
     while True:
+        # check for stop signal
         try:
-            _arg = input_queue.get(timeout=0.1)
-            if _arg is None:
-                break
-            try:
-                _results = _app.multiprocessing_func(_arg)
-            except Exception as ex:
-                print('Exception occured during function call to: '
-                      f'{app.multiprocessing_func}: {ex}')
-                break
-            output_queue.put([_arg, _results])
+            stop_queue.get_nowait()
+            return
         except queue.Empty:
             pass
+        # run processing step
+        if _app_carryon:
+            try:
+                _arg = input_queue.get(timeout=0.01)
+                if _arg is None:
+                    return
+            except queue.Empty:
+                _arg = NO_ITEM
+        if _arg is not NO_ITEM:
+            _app_carryon = _app.multiprocessing_carryon()
+            if _app_carryon:
+                _results = _app.multiprocessing_func(_arg)
+                output_queue.put([_arg, _results])

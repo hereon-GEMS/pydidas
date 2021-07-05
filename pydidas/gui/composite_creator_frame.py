@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ['CompositeCreatorFrame']
 
 import os
+import copy
 from functools import partial
 
 import numpy as np
@@ -38,14 +39,15 @@ from pydidas.apps import CompositeCreatorApp
 from pydidas.core import ParameterCollectionMixIn
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.widgets import (
-    ReadOnlyTextWidget, ScrollArea, CreateWidgetsMixIn,
-    create_default_grid_layout, BaseFrame, dialogues, parameter_config)
+    ReadOnlyTextWidget, ScrollArea,
+    create_default_grid_layout, BaseFrameWithApp, dialogues, parameter_config)
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
                            get_hdf5_metadata)
 from pydidas.multiprocessing import AppRunner
 
 
-class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
+class CompositeCreatorFrame(BaseFrameWithApp,
+                            parameter_config.ParameterConfigMixIn,
                             ParameterCollectionMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
@@ -55,7 +57,7 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
+        BaseFrameWithApp.__init__(self, parent)
         parameter_config.ParameterConfigMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
@@ -63,8 +65,8 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         self._config = self._app._config
         self._config.update({'hdf5_image_flag': None,
                              'composite_dim': 'x',
-                             'n_images_hdf5': 1,
                              'hdf5_dset_shape': None})
+        self._app_attributes_to_update.append('_composite')
         self._widgets = {}
         self._runner = None
         self.init_widgets()
@@ -150,17 +152,22 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
 
         self._widgets['but_exec'] = self.create_button(
             'Generate composite', parent_widget=self._widgets['config'],
-            gridPos=(_config_next_row(), 0, 1, 2), enabled=False,
+            gridPos=(-1, 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
         self._widgets['progress'] = self.create_progress_bar(
             parent_widget=self._widgets['config'],
-            gridPos=(_config_next_row(), 0, 1, 2), visible=False,
+            gridPos=(-1, 0, 1, 2), visible=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH, minimum=0, maximum=100)
+
+        self._widgets['but_abort'] = self.create_button(
+            'Abort composite creation', parent_widget=self._widgets['config'],
+            gridPos=(-1, 0, 1, 2), enabled=True, visible=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
         self._widgets['but_show'] = self.create_button(
             'Show composite', parent_widget=self._widgets['config'],
-            gridPos=(_config_next_row(), 0, 1, 2), enabled=False,
+            gridPos=(-1, 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
         self._widgets['but_save'] = self.create_button(
@@ -187,9 +194,10 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         self._widgets['but_clear'].clicked.connect(
             partial(self.__clear_entries, 'all', True)
             )
-        self._widgets['but_exec'].clicked.connect(self.__run_app)
+        self._widgets['but_exec'].clicked.connect(self._run_app)
         self._widgets['but_save'].clicked.connect(self.__save_composite)
         self._widgets['but_show'].clicked.connect(self.__show_composite)
+        self._widgets['but_abort'].clicked.connect(self.__abort_comp_creation)
 
         self.param_widgets['use_roi'].currentTextChanged.connect(
             self.__toggle_roi_selection )
@@ -222,26 +230,6 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         self.param_widgets['composite_ny'].io_edited.connect(
             partial(self.__update_composite_dim, 'y'))
 
-    def _set_app_param(self, param_key, value):
-        """
-        Update the Application Parameter.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter reference key.
-        value : object
-            The new Parameter value. This can by any datatype, depending on
-            the Parameter datatype.
-        """
-        print('App: ', param_key, value)
-        self._app.set_param_value(param_key, value)
-
-    # def _sync_params_from_frame(self):
-    #     self._app.params = self.params.get_copy
-    #     _val = self.get_param_value(param_key)
-    #     self._app.set_param_value(param_key, _val)
-
     def frame_activated(self, index):
         """
         Overload the generic frame_activated method.
@@ -253,15 +241,15 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         """
         ...
 
-    def __run_app(self):
+    def _run_app(self):
         """
         Parallel implementation of the execution method.
         """
         self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
+        self._widgets['but_abort'].setVisible(True)
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
-        self._app = CompositeCreatorApp(self.params.get_copy())
         self._runner = AppRunner(self._app, 8)
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
@@ -276,8 +264,10 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         self._widgets['but_exec'].setEnabled(True)
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
+        self._widgets['but_abort'].setVisible(False)
+        self._widgets['progress'].setVisible(False)
         self.set_status('Finished composite image creation.')
-        del self._runner
+        self._runner = None
 
     def __show_composite(self):
         """
@@ -296,12 +286,11 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
                       'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png)')[0]
         self._app.export_image(fname)
 
-    def __run_app_serial(self):
+    def _run_app_serial(self):
         """
         Serial implementation of the execution method.
         """
         self.set_status('Started composite image creation.')
-        self._app = CompositeCreatorApp(self.params.get_copy())
         self._app.run()
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
@@ -347,7 +336,7 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         """
         # self._sync_param_from_file('last_file')
         try:
-            self._app._CompositeCreatorApp__check_files()
+            self._app._check_files()
         except AppConfigError as _ex:
             self.__clear_entries(['last_file'], hide=False)
             QtWidgets.QMessageBox.critical(self, 'Files wrong size.', str(_ex))
@@ -417,7 +406,7 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         _dset_ok = self.__verify_hdf5_key(_fname, _dset, 'hdf5_key')
         if _dset_ok:
             _shape = get_hdf5_metadata(_fname, 'shape', _dset)
-            self._config['hfd5_dset_shape'] = _shape
+            self._config['hdf5_dset_shape'] = _shape
             self._app._store_image_data_from_hdf5_file()
             _n_total = (self._config['n_image_per_file']
                         * self._config['n_files'])
@@ -530,6 +519,14 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         _should_show_box = not any(_key in reset_keys for _key in _check_keys)
         self._widgets['selection_info'].setVisible(_should_show_box)
 
+    def __abort_comp_creation(self):
+        """
+        Abort the creation of the composite image.
+        """
+        self._runner.stop()
+        self._apprunner_finished()
+
+
     def __toggle_roi_selection(self, flag):
         """
         Show or hide the ROI selection.
@@ -591,11 +588,12 @@ class CompositeCreatorFrame(BaseFrame, parameter_config.ParameterConfigMixIn,
         Update the number of images in the composite upon changing any
         input parameter.
         """
+        print('\nupdate n image\n\n', self._config)
         if self._config['hdf5_image_flag'] is True:
             self._app._store_image_data_from_hdf5_file()
-        _n_total = (self._config['n_image_per_file'] *
-                    self._config['n_files'])
         if self._config['hdf5_image_flag'] is not None:
+            _n_total = (self._config['n_image_per_file'] *
+                        self._config['n_files'])
             self.update_param_value('n_total', _n_total)
             self.__update_composite_dim(self._config['composite_dim'])
 
@@ -629,7 +627,7 @@ if __name__ == '__main__':
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    sys.excepthook = pydidas.widgets.excepthook
+    # sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
     STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 

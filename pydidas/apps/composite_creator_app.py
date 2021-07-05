@@ -27,6 +27,7 @@ __all__ = ['CompositeCreatorApp']
 import os
 import argparse
 import re
+import time
 from pathlib import Path
 
 import numpy as np
@@ -96,6 +97,11 @@ class CompositeCreatorApp(BaseApp):
 
     Parameters
     ----------
+    live_processing : bool, optional
+        Keyword to toggle live processing which means file existance and size
+        checks will be disabled in the setup process and the file processing
+        will wait for files to be created (indefinitely). The default is
+        False.
     first_file : pathlib.Path
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
@@ -191,7 +197,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite = None
         self._config = {'file_list': [],
                          'file_path': None,
-                         'hdffile': None,
+                         'hdf5_file_flag': None,
                          'raw_img_shape_x': None,
                          'raw_img_shape_y': None,
                          'n_image_per_file': 1,
@@ -201,7 +207,8 @@ class CompositeCreatorApp(BaseApp):
                          'roi': None,
                          'final_image_size_x': None,
                          'final_image_size_y': None,
-                         'datatype': None}
+                         'datatype': None,
+                         'file_size': None}
 
     def multiprocessing_pre_run(self):
         """
@@ -241,6 +248,8 @@ class CompositeCreatorApp(BaseApp):
             The (pre-processed) image.
         """
         _fname, _kwargs = self._get_args_for_read_image(index)
+        if self.get_param_value('live_processing'):
+            self._wait_for_image(_fname)
         _image = read_image(_fname, **_kwargs)
         return index, _image
 
@@ -256,6 +265,8 @@ class CompositeCreatorApp(BaseApp):
         image : np.ndarray
             The image data.
         """
+        if self.get_param_value('use_bg_file'):
+            image -= self._config['bg_image']
         self._composite.insert_image(image, index)
 
     def prepare_run(self):
@@ -266,18 +277,16 @@ class CompositeCreatorApp(BaseApp):
         tell the CompositeImage to create a new image with changed size.
         """
         self.check_entries()
-        _shape = (self._config['final_image_size_y'],
-                  self._config['final_image_size_x'])
         if self._composite is None:
             self._composite = CompositeImage(
-                image_shape=_shape,
+                image_shape=(self._config['final_image_size_y'],
+                             self._config['final_image_size_x']),
                 composite_nx=self.get_param_value('composite_nx'),
                 composite_ny=self.get_param_value('composite_ny'),
                 composite_dir=self.get_param_value('composite_dir'),
                 datatype=self._config['datatype'])
             return
-        if self._composite.shape != _shape:
-            self._composite.create_new_image()
+        self.__check_and_update_composite_image()
 
     def check_entries(self):
         """
@@ -396,7 +405,7 @@ class CompositeCreatorApp(BaseApp):
         _n_per_file = ((_n1 - _n0 - 1)
                        // self.get_param_value('hdf5_stepping') + 1)
         self._config['n_image_per_file'] = _n_per_file
-        self._config['hdffile'] = True
+        self._config['hdf5_file_flag'] = True
 
     def _store_image_data_from_single_image(self):
         """
@@ -404,7 +413,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _test_image = read_image(self.get_param_value('first_file'))
         self._store_image_data(_test_image.shape, _test_image.dtype)
-        self._config['hdffile'] = False
+        self._config['hdf5_file_flag'] = False
 
     def _store_image_data(self, img_shape, img_dtype):
         """
@@ -428,10 +437,22 @@ class CompositeCreatorApp(BaseApp):
         """
         verify_files_in_same_directory(self.get_param_value('first_file'),
                                        self.get_param_value('last_file'))
+        if not self._check_second_file_selected():
+            self._create_one_file_list()
+            return
         if self.get_param_value('live_processing'):
             self._create_filelist_live_processing()
         else:
             self._create_filelist_static()
+
+    def _create_one_file_list(self):
+        """
+        Create a filelist with only one the first file.
+        """
+        _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
+        self._config['file_list'] = [_fname1]
+        self._config['file_path'] = _path1
+        self._config['n_files'] = 1
 
     def _create_filelist_static(self):
         """
@@ -466,19 +487,23 @@ class CompositeCreatorApp(BaseApp):
         This method will filter the compare the names of the first and last
         file and try to interprete the selected range.
         """
+        def raise_error():
+            raise AppConfigError(
+                'Could not interprete the filenames. The filenames do not '
+                'differ in exactly one item, as determined by the delimiters.'
+                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}')
         _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
         _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
         _items1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
         _items2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
         diff_index = []
+        if len(_items1) != len(_items2):
+            raise_error()
         for index in range(len(_items1)):
             if _items1[index] != _items2[index]:
                 diff_index.append(index)
         if len(diff_index) != 1:
-            raise AppConfigError(
-                'Could not interprete the filenames. The filenames do not '
-                'differ in exactly one item, as determined by the delimiters.'
-                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}')
+            raise_error()
         diff_index = diff_index[0]
         _index1 = int(_items1[diff_index])
         _index2 = int(_items2[diff_index])
@@ -488,11 +513,13 @@ class CompositeCreatorApp(BaseApp):
 
         _fnames = (_fname1[:_strindex] + '{index:0' + f'{_n}' + 'd}'
                    + _fname1[_strindex + _n:])
+        self._config['file_size'] = os.stat(
+            self.get_param_value('first_file')
+            ).st_size
         self._config['file_list'] = [_fnames.format(index=i) for i in
                                      range(_index1, _index2 + 1)]
         self._config['file_path'] = _path1
         self._config['n_files'] = _index2 - _index1 + 1
-
 
     def _check_and_set_bg_file(self):
         """
@@ -587,6 +614,40 @@ class CompositeCreatorApp(BaseApp):
                 'The selected composite dimensions are too large for all'
                 f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
 
+    def __check_and_update_composite_image(self):
+        _image_shape = (self._config['final_image_size_y'],
+                        self._config['final_image_size_x'])
+        _nx = self.get_param_value('composite_nx')
+        _ny = self.get_param_value('composite_ny')
+        _update_required = False
+        if _image_shape != self._composite.get_param_value('image_shape'):
+            self._composite.set_param_value('image_shape', _image_shape)
+            _update_required = True
+        if _nx != self._composite.get_param_value('composite_nx'):
+            self._composite.set_param_value('composite_nx', _nx)
+            _update_required = True
+        if _ny != self._composite.get_param_value('composite_ny'):
+            self._composite.set_param_value('composite_ny', _ny)
+            _update_required = True
+        if _update_required:
+            self._composite.create_new_image()
+
+    def _check_second_file_selected(self):
+        """
+        Check whether a second file has been selected or the selection is
+        empty.
+
+        Returns
+        -------
+        bool
+            Flag whether the second file selection points to a valid path.
+
+        """
+        _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
+        if _path2 == '':
+            return False
+        return True
+
     def _process_roi(self):
         """
         Process the ROI inputs and store the ROI.
@@ -626,7 +687,7 @@ class CompositeCreatorApp(BaseApp):
         _i_file = index // self._config['n_image_per_file']
         _fname = os.path.join(self._config['file_path'],
                               self._config['file_list'][_i_file])
-        if self._config['hdffile']:
+        if self._config['hdf5_file_flag']:
             _hdf_index = index % self._config['n_image_per_file']
             _i_hdf = (self.get_param_value('hdf5_first_image_num')
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
@@ -638,6 +699,27 @@ class CompositeCreatorApp(BaseApp):
                            ROI=self._config['roi'])
         return _fname, _params
 
+    def _wait_for_image(self, fname, timeout=-1):
+        """
+        Wait for the file to exist in the file system.
+
+        Parameters
+        ----------
+        fname : str
+            The file path & name.
+        timeout : float, optional
+            If a timeout larger than zero is selected, the process will wait
+            a maximum of timeout seconds before raising an Exception.
+            The value "-1" corresponds to no timeout. The default is -1.
+        """
+        _target_size = self._config['file_size']
+        _starttime = time.time()
+        while os.stat(fname).st_size != _target_size:
+            time.sleep(0.5)
+            if timeout > 0 and time.time() - _starttime > timeout:
+                raise FileNotFoundError(
+                    f'The file {fname} was not found during the timeout'
+                    'period. Aborting...')
 
 def _parse_composite_creator_cmdline_arguments():
     """

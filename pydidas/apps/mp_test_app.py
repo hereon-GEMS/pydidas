@@ -33,8 +33,8 @@ from pydidas.core import (ParameterCollection,
                           CompositeImage, get_generic_parameter)
 
 DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('hdf_first_image_num'),
-    get_generic_parameter('hdf_last_image_num'),
+    get_generic_parameter('hdf5_first_image_num'),
+    get_generic_parameter('hdf5_last_image_num'),
     )
 
 
@@ -85,7 +85,7 @@ class MpTestApp(BaseApp):
 
 
 if __name__ == '__main__':
-    from pydidas.multiprocess.app_processor_func import app_processor
+    from pydidas.multiprocessing.app_processor_func import app_processor
     import multiprocessing as mp
     import matplotlib.pyplot as plt
     in_queue, out_queue = mp.Queue(), mp.Queue()
@@ -101,8 +101,8 @@ if __name__ == '__main__':
         app.multiprocessing_store_results(*item[1])
 
     plt.figure(1)
-    plt.imshow(app._MpTestApp__composite.image)
-    _image1 = app._MpTestApp__composite.image
+    plt.imshow(app._composite.image)
+    _image1 = app._composite.image
     app.run()
-    _image2 = app._MpTestApp__composite.image
+    _image2 = app._composite.image
     plt.imshow(_image1 - _image2)

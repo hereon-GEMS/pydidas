@@ -126,6 +126,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(_app_file, self._hdf5_fnames[0])
         self.assertEqual(app._config['n_files'], 11)
 
+    def test_wait_for_image(self):
+        _last_file = os.path.join(self._path, f'test_10.h5')
+        app = CompositeCreatorApp()
+        with self.assertRaises(FileNotFoundError):
+            app._wait_for_image(_last_file, timeout=0.1)
+
     def test_check_and_set_bg_file_with_fname(self):
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])

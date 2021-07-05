@@ -209,7 +209,7 @@ if __name__ == '__main__':
     import time
     qt_app = QtCore.QCoreApplication(sys.argv)
     runner = AppRunner(MpTestApp(), 8)
-    runner.set_app_param('hdf_first_image_num', 10)
+    runner.set_app_param('hdf5_first_image_num', 10)
     runner.finished.connect(about_to_finish)
     runner.final_app_state.connect(final_app)
     runner.start()

@@ -55,7 +55,7 @@ def app_processor(input_queue, output_queue, app, app_params, app_config):
     _app._config = app_config
     while True:
         try:
-            _arg = input_queue.get(timeout=0.5)
+            _arg = input_queue.get(timeout=0.1)
             if _arg is None:
                 break
             try:

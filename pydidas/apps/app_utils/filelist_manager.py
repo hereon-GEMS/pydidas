@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the CompositeCreatorApp class which allows to combine
-images to mosaics."""
+"""Module with the FilelistManager class which is used to manage file lists
+and access to files. """
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -38,6 +38,7 @@ from pydidas.core import (ObjectWithParameterCollection,
 from pydidas.utils import (check_file_exists,
                            verify_files_in_same_directory,
                            verify_files_of_range_are_same_size)
+
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('live_processing'),
@@ -106,8 +107,8 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return copy.copy(self._config)
 
-    def update_params(self, first_file=None, last_file=None,
-                      live_processing=None, file_stepping=None):
+    def update(self, first_file=None, last_file=None,
+               live_processing=None, file_stepping=None):
         """
         Create a filelist with updated parameters.
 

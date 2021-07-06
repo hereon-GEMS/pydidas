@@ -26,7 +26,6 @@ __all__ = ['CompositeCreatorApp']
 
 import os
 import argparse
-import re
 import time
 from pathlib import Path
 
@@ -198,7 +197,11 @@ class CompositeCreatorApp(BaseApp):
                 self.params.set_value(_key, _cmdline_args[_key])
 
         self._composite = None
-        self._filelist = FilelistManager()
+        self._filelist = FilelistManager(self.params.get('first_file'),
+                                         self.params.get('last_file'),
+                                         self.params.get('live_processing'),
+                                         self.params.get('file_stepping'))
+
         self._config = { 'hdf5_file_flag': None,
                          'raw_img_shape_x': None,
                          'raw_img_shape_y': None,
@@ -308,7 +311,7 @@ class CompositeCreatorApp(BaseApp):
             - If a background subtraction is used, check the background file
               and assert the image size is the same.
         """
-        self._create_filelist()
+        self._filelist.update()
         self._get_image_data()
         self._check_composite_dims()
         self._process_roi()
@@ -364,15 +367,6 @@ class CompositeCreatorApp(BaseApp):
             The composite image in np.ndarray format.
         """
         return self._composite.image
-
-    def _create_filelist(self):
-        """
-        Create the filelist required for processing.
-        """
-        self._filelist.update_params(self.get_param_value('first_file'),
-                                     self.get_param_value('last_file'),
-                                     self.get_param_value('live_processing'),
-                                     self.get_param_value('file_stepping'))
 
     def _get_image_data(self):
         _first_file = self.get_param_value('first_file')

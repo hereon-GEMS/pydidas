@@ -185,12 +185,12 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_update_params(self):
         fm = FilelistManager()
-        fm.update_params(self._fname(0), self._fname(49))
+        fm.update(self._fname(0), self._fname(49))
         self.assertEqual(fm._config['n_files'], 50)
 
     def test_get_filename(self):
         fm = FilelistManager()
-        fm.update_params(self._fname(0), self._fname(49))
+        fm.update(self._fname(0), self._fname(49))
         self.assertEqual(fm._config['n_files'], 50)
         self.assertEqual(len(fm._config['file_list']), 50)
         self.assertEqual(self._fname(10), fm.get_filename(10))
@@ -202,7 +202,7 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_get_filename_out_of_range(self):
         fm = FilelistManager()
-        fm.update_params(self._fname(0), self._fname(49))
+        fm.update(self._fname(0), self._fname(49))
         with self.assertRaises(AppConfigError):
             fm.get_filename(80)
 

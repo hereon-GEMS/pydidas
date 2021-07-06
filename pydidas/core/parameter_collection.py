@@ -315,7 +315,7 @@ class ParameterCollection(dict):
         return _copy
 
 
-    def get_value(self, param_name):
+    def get_value(self, param_key):
         """
         Get the value of a stored parameter.
 
@@ -324,25 +324,41 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        param_name : str
+        param_key : str
             The reference key to the parameter in the dictionary.
 
         Raises
         ------
         KeyError
-            If the key <param_name> is not registered.
+            If the key <param_key> is not registered.
 
         Returns
         -------
         object
             The value of the Parameter object in its native data type.
         """
-        if param_name not in self.keys():
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                            'has been registered.')
-        return self.__getitem__(param_name).value
+        self.__check_key_exists(param_key)
+        return self.__getitem__(param_key).value
 
-    def set_value(self, param_name, value):
+    def __check_key_exists(self, param_key):
+        """
+        Check if the Parameter key exists.
+
+        Parameters
+        ----------
+        param_key : str
+            The Parameter key.
+
+        Raises
+        ------
+        KeyError
+            If the param_key does not exist.
+        """
+        if param_key not in self.keys():
+            raise KeyError(f'No parameter with the name "{param_key}" '
+                            'has been registered.')
+
+    def set_value(self, param_key, value):
         """
         Update the value of a stored parameter.
 
@@ -351,7 +367,7 @@ class ParameterCollection(dict):
 
         Parameters
         ----------
-        param_name : str
+        param_key : str
             The reference key to the parameter in the dictionary.
         value : object
              The new value for the Parameter. Note that type-checking is
@@ -360,10 +376,25 @@ class ParameterCollection(dict):
         Raises
         ------
         KeyError
-            If the key <param_name> is not registered.
+            If the key <param_key> is not registered.
         """
-        if param_name not in self.keys():
-            raise KeyError(f'No parameter with the name "{param_name}" '
-                            'has been registered.')
-        _item = self.__getitem__(param_name)
+        self.__check_key_exists(param_key)
+        _item = self.__getitem__(param_key)
         _item.value = value
+
+    def get_param(self, param_key):
+        """
+        Get a Parameter from the ParameterCollection.
+
+        Parameters
+        ----------
+        param_key : str
+            The Parameter key.
+
+        Returns
+        -------
+        Parameter
+            The Parameter instance.
+        """
+        self.__check_key_exists(param_key)
+        return self.__getitem__(param_key)

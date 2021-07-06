@@ -110,18 +110,18 @@ class TestCompositeCreatorApp(unittest.TestCase):
             app._store_image_data_from_hdf5_file()
 
     def test_live_processing_filelist(self):
-        _last_file = os.path.join(self._path, f'test_010.h5')
+        _last_file = os.path.join(self._path, 'test_010.h5')
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('last_file', _last_file)
         app.set_param_value('live_processing', True)
-        app._create_filelist()
+        app._filelist.update()
         _app_file = app._filelist.get_filename(0)
         self.assertEqual(_app_file, self._hdf5_fnames[0])
         self.assertEqual(app._filelist.n_files, 11)
 
     def test_wait_for_image(self):
-        _last_file = os.path.join(self._path, f'test_10.h5')
+        _last_file = os.path.join(self._path, 'test_10.h5')
         app = CompositeCreatorApp()
         with self.assertRaises(FileNotFoundError):
             app._wait_for_image(_last_file, timeout=0.1)

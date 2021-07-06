@@ -190,31 +190,3 @@ class AppRunner(WorkerController):
         """Get the App arguments to pass to the processor."""
         return (self.__app.__class__, self.__app.params.get_copy(),
                 self.__app.get_config())
-
-
-if __name__ == '__main__':
-    app = None
-    @QtCore.pyqtSlot()
-    def about_to_finish():
-        """Terminate the headless app."""
-        _qtapp = QtCore.QCoreApplication.instance()
-        _qtapp.exit()
-
-    @QtCore.pyqtSlot(object)
-    def final_app(_app):
-        global app
-        app = _app
-
-
-    from pydidas.apps.mp_test_app import MpTestApp
-    import sys
-    import time
-    qt_app = QtCore.QCoreApplication(sys.argv)
-    runner = AppRunner(MpTestApp(), 8)
-    runner.set_app_param('hdf5_first_image_num', 10)
-    runner.finished.connect(about_to_finish)
-    runner.final_app_state.connect(final_app)
-    runner.start()
-    t0 = time.time()
-    qt_app.exec_()
-    print(time.time() - t0)

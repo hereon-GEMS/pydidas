@@ -235,7 +235,7 @@ class ParameterConfigMixIn:
         QLabel, InputWidget
             The formatted QLabel and Input widgets.
         """
-        _widget = kwargs.get('parent_widget', self)
+        _parent = kwargs.get('parent_widget', self)
         _config = self.__get_config_for_create_parameter(**kwargs)
         _text_widget = text_widget_factory(param, _config['width_text'],
                                            _config['valign_text'])
@@ -247,12 +247,12 @@ class ParameterConfigMixIn:
         self.param_widgets[param.refkey] = _input_widget
         self.param_textwidgets[param.refkey] = _text_widget
         # add widgets to layout:
-        if _widget.layout() is None:
+        if _parent.layout() is None:
             raise WidgetLayoutError('No layout set.')
         _text_widget_args, _input_widget_args = \
             self.__get_layout_args_for_create_param_widget(_config)
-        _widget.layout().addWidget(_text_widget, *_text_widget_args)
-        _widget.layout().addWidget(_input_widget, *_input_widget_args)
+        _parent.layout().addWidget(_text_widget, *_text_widget_args)
+        _parent.layout().addWidget(_input_widget, *_input_widget_args)
         return _text_widget, _input_widget
 
     def get_param_value(self, key):

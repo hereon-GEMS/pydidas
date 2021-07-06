@@ -55,10 +55,6 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
             responsible for setting up the layout. The default is True.
         **kwargs : object
             Any additional keyword arguments.
-
-        Returns
-        -------
-        None.
         """
         initLayout = kwargs.get('initLayout', True)
         super().__init__(parent=parent)
@@ -66,9 +62,9 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
         if initLayout:
             _layout = QtWidgets.QGridLayout(self)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+            _layout.setContentsMargins(5, 5, 0, 0)
             self.setLayout(_layout)
         self.initialized = False
-        self.name = name if name else ''
 
     def setParent(self, parent):
         """

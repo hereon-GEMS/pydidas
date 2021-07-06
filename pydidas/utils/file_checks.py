@@ -92,7 +92,7 @@ def verify_files_in_same_directory(filename1, filename2):
     _path1, _name1 = os.path.split(filename1)
     _path2, _name2 = os.path.split(filename2)
     if _path2 not in [_path1, '']:
-        raise OSError(
+        raise AppConfigError(
             'The selected files are not in the same directory:\n'
             f'{filename1}\nand\n{filename2}')
 

@@ -19,12 +19,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._fname = lambda i: os.path.join(self._path, f'test{i:02d}.npy')
+        self._fname = lambda i: Path(os.path.join(self._path, f'test{i:02d}.npy'))
         self._img_shape = (10, 10)
         self._data = np.random.random((50,) + self._img_shape)
         for i in range(50):
             np.save(self._fname(i), self._data[i])
-        self._hdf5_fnames = [os.path.join(self._path, f'test_{i:03d}.h5')
+        self._hdf5_fnames = [Path(os.path.join(self._path, f'test_{i:03d}.h5'))
                             for i in range(10)]
         for i in range(10):
             with h5py.File(self._hdf5_fnames[i], 'w') as f:
@@ -109,22 +109,16 @@ class TestCompositeCreatorApp(unittest.TestCase):
         with self.assertRaises(AppConfigError):
             app._store_image_data_from_hdf5_file()
 
-    def test_check_files_hdf(self):
-        app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf5_fnames[0])
-        app._check_files()
-
     def test_live_processing_filelist(self):
-        _last_file = os.path.join(self._path, f'test_10.h5')
+        _last_file = os.path.join(self._path, f'test_010.h5')
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._hdf5_fnames[0])
         app.set_param_value('last_file', _last_file)
         app.set_param_value('live_processing', True)
-        app._create_filelist_live_processing()
-        _app_file = os.path.join(app._config['file_path'],
-                                    app._config['file_list'][0])
+        app._create_filelist()
+        _app_file = app._filelist.get_filename(0)
         self.assertEqual(_app_file, self._hdf5_fnames[0])
-        self.assertEqual(app._config['n_files'], 11)
+        self.assertEqual(app._filelist.n_files, 11)
 
     def test_wait_for_image(self):
         _last_file = os.path.join(self._path, f'test_10.h5')
@@ -152,18 +146,20 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('use_roi', True)
         app.set_param_value('roi_xlow', 15)
         app.set_param_value('roi_ylow', 1)
-        app._check_roi()
-        app.set_param_value('roi_xhigh', 3)
+        app._check_roi_for_consistency()
         self.assertEqual(app.get_param_value('roi_xlow'), 5)
         self.assertEqual(app.get_param_value('roi_ylow'), 1)
-        self.assertEqual(app.get_param_value('roi_xhigh'), 3)
-        self.assertEqual(app.get_param_value('roi_yhigh'), 10)
-        with self.assertRaises(AppConfigError):
-            app._check_roi()
 
-    def test_check_entries(self):
-        app = self.get_default_app()
-        app.check_entries()
+    def test_check_roi_wrong_range(self):
+        app = CompositeCreatorApp()
+        app._config['raw_img_shape_x'] = 10
+        app._config['raw_img_shape_y'] = 10
+        app.set_param_value('use_roi', True)
+        app.set_param_value('roi_xlow', 15)
+        app.set_param_value('roi_ylow', 1)
+        app.set_param_value('roi_xhigh', 3)
+        with self.assertRaises(AppConfigError):
+            app._check_roi_for_consistency()
 
     def test_prepare_run(self):
         app = self.get_default_app()

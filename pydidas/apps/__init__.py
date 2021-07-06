@@ -23,6 +23,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+from . import app_utils
+
 from . import composite_creator_app
 from .composite_creator_app import *
 

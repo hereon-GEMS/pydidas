@@ -25,7 +25,6 @@ __status__ = "Development"
 __all__ = ['CompositeCreatorFrame']
 
 import os
-import copy
 from functools import partial
 
 import numpy as np
@@ -38,6 +37,7 @@ from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import ParameterCollectionMixIn
 from pydidas.config import HDF5_EXTENSIONS
+from pydidas.image_reader import read_image
 from pydidas.widgets import (
     ReadOnlyTextWidget, ScrollArea,
     create_default_grid_layout, BaseFrameWithApp, dialogues, parameter_config)
@@ -593,7 +593,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Update the number of images in the composite upon changing any
         input parameter.
         """
-        print('\nupdate n image\n\n', self._config)
         if self._config['hdf5_file_flag'] is True:
             self._app._store_image_data_from_hdf5_file()
         if self._config['hdf5_file_flag'] is not None:

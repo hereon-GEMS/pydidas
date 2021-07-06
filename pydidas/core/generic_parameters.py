@@ -156,8 +156,12 @@ GENERIC_PARAMS = ParameterCollection(
                  'binning will be applied to the cropped images. The default '
                  'is 1.')),
     Parameter(
+        'Hdf 5 dataset shape', tuple, default=(0, 0, 0),
+        refkey='hdf5_dataset_shape',
+        tooltip='The shape of the hdf5 dataset.'),
+    Parameter(
         'Image shape', tuple, default=(0, 0), refkey='image_shape',
-        tooltip='The image shape of the inserted image'),
+        tooltip='The image shape of the inserted image.'),
     Parameter(
         'Datatype', None, default=np.float32, refkey='datatype',
         tooltip='The datatype.'),

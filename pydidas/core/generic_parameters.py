@@ -61,6 +61,11 @@ GENERIC_PARAMS = ParameterCollection(
         refkey='hdf5_key',
         tooltip=('Used only for hdf5 files: The dataset key.')),
     Parameter(
+        'Hdf5 dataset shape', tuple, default=(0, 0, 0),
+        refkey='hdf5_dataset_shape',
+        tooltip=('The shape of the hdf5 dataset. This corresponds to '
+                 '(nubmer of images, image size y, image size x).')),
+    Parameter(
         'First image number', int, default=0, refkey='hdf5_first_image_num',
         tooltip=('The first image in the hdf5-dataset to be used. The default'
                  ' is 0.')),
@@ -83,8 +88,10 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('Background image number', int, default=0, refkey='bg_hdf5_num',
               tooltip=('For hdf5 background image files: The image number in '
                        'the dataset')),
-    Parameter('Total number of images', int, default=-1, refkey='n_image',
+    Parameter('Total number of images', int, default=0, refkey='n_image',
               tooltip=('The toal number of images in the composite images.')),
+    Parameter('Total number of files', int, default=0, refkey='n_files',
+              tooltip=('The toal number of selected files.')),
     Parameter(
         'Number of images in x', int, default=1, refkey='composite_nx',
         tooltip=('The number of original images combined in the composite'
@@ -156,12 +163,17 @@ GENERIC_PARAMS = ParameterCollection(
                  'binning will be applied to the cropped images. The default '
                  'is 1.')),
     Parameter(
-        'Hdf 5 dataset shape', tuple, default=(0, 0, 0),
-        refkey='hdf5_dataset_shape',
-        tooltip='The shape of the hdf5 dataset.'),
+        'Images per file', int, default=1,
+        refkey='images_per_file',
+        tooltip=('The number of images in the file. For hdf5 files, this '
+                 'corresponds to the number of frames in the hdf5 dataset.')),
     Parameter(
         'Image shape', tuple, default=(0, 0), refkey='image_shape',
-        tooltip='The image shape of the inserted image.'),
+        tooltip=('The shape of an image.')),
+    Parameter(
+        'Raw image shape', tuple, default=(0, 0), refkey='raw_image_shape',
+        tooltip=('The image shape of the original image as loaded from the '
+                 'file.')),
     Parameter(
         'Datatype', None, default=np.float32, refkey='datatype',
         tooltip='The datatype.'),

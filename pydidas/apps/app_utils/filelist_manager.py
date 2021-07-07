@@ -302,16 +302,16 @@ class FilelistManager(ObjectWithParameterCollection):
                                  f'the range of the file list [0, {_n-1}]')
         return self._config['file_list'][index]
 
-    def __copy__(self):
-        """
-        Create a copy of the object.
+    # def __copy__(self):
+    #     """
+    #     Create a copy of the object.
 
-        Returns
-        -------
-        fm : FilelistManager
-            The copy with the same state.
-        """
-        fm = FilelistManager()
-        fm.params = self.params.get_copy()
-        fm._config = copy.copy(self._config)
-        return fm
+    #     Returns
+    #     -------
+    #     fm : FilelistManager
+    #         The copy with the same state.
+    #     """
+    #     fm = FilelistManager()
+    #     fm.params = self.params.get_copy()
+    #     fm._config = copy.copy(self._config)
+    #     return fm

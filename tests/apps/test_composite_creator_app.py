@@ -73,42 +73,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(app.get_param_value('composite_ny'), 5)
         self.assertEqual(app.get_param_value('composite_dir'), 'y')
 
-    def test_store_image_data_from_file_range(self):
-        app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._fname(0))
-        app.set_param_value('last_file', self._fname(4))
-        app.set_param_value('composite_nx', 3)
-        app.set_param_value('composite_ny', 2)
-        app._store_image_data_from_single_image()
-        _config = app._config
-        self.assertEqual(_config['n_image_per_file'], 1)
-        self.assertEqual(_config['raw_img_shape_y'], 10)
-        self.assertEqual(_config['raw_img_shape_x'], 10)
-        self.assertEqual(_config['datatype'], np.float64)
-
-    def test_store_image_data_from_hdf_file(self):
-        app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf5_fnames[0])
-        app.set_param_value('composite_nx', 8)
-        app.set_param_value('composite_ny', 9)
-        app._store_image_data_from_hdf5_file()
-        _config = app._config
-        self.assertEqual(_config['n_image_per_file'], 50)
-        self.assertEqual(_config['raw_img_shape_y'], 10)
-        self.assertEqual(_config['raw_img_shape_x'], 10)
-        self.assertEqual(_config['datatype'], np.float64)
-
-    def test_store_image_data_from_hdf_file_wrong_range(self):
-        app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._hdf5_fnames[0])
-        app.set_param_value('composite_nx', 8)
-        app.set_param_value('composite_ny', 9)
-        app._store_image_data_from_hdf5_file()
-        app.set_param_value('hdf5_first_image_num', 10)
-        app.set_param_value('hdf5_last_image_num', -45)
-        with self.assertRaises(AppConfigError):
-            app._store_image_data_from_hdf5_file()
-
     def test_live_processing_filelist(self):
         _last_file = os.path.join(self._path, 'test_010.h5')
         app = CompositeCreatorApp()

@@ -5,14 +5,6 @@ Created on Thu Mar 11 10:24:52 2021
 """
 
 import sys
-import os
-import re
-import time
-
-from functools import partial
-
-#from qtpy import QtWidgets, QtGui, QtCore
-from PyQt5 import QtWidgets, QtGui, QtCore, Qt
 
 import qtawesome as qta
 

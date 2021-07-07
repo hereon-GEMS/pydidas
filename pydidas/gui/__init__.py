@@ -23,6 +23,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+from . import builders
+
 from . import workflow_tree_edit_manager
 from .workflow_tree_edit_manager import *
 

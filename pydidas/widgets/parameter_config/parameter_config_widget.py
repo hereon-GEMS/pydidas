@@ -67,13 +67,13 @@ def text_widget_factory(param, widget_width, alignment=None):
 
 class ParameterConfigWidgetsMixIn:
     """
-    The ParameterConfigWidgetsMixIn class includes methods which can be added to other
-    classes without having to inherit from ParameterConfigWidget to avoid multiple
-    inheritance from QtWidgets.QFrame.
+    The ParameterConfigWidgetsMixIn class includes methods which can be added
+    to other classes without having to inherit from ParameterConfigWidget to
+    avoid multiple inheritance from QtWidgets.QFrame.
     """
     def __init__(self, *args, **kwargs):
         self.param_widgets = {}
-        self.params = {}
+        self.params = ParameterCollection()
         self.param_textwidgets = {}
 
     def __get_layout_args_for_create_param_widget(self, config):

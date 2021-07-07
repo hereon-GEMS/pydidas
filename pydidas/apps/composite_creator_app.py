@@ -32,7 +32,7 @@ from pathlib import Path
 import numpy as np
 from PyQt5 import QtCore
 
-from pydidas.apps.app_utils import FilelistManager
+from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (Parameter, HdfKey, ParameterCollection,
@@ -51,17 +51,16 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('last_file'),
     get_generic_parameter('file_stepping'),
     get_generic_parameter('hdf5_key'),
-    get_generic_parameter('hdf5_dataset_shape'),
     get_generic_parameter('hdf5_first_image_num'),
     get_generic_parameter('hdf5_last_image_num'),
     get_generic_parameter('hdf5_stepping'),
+    get_generic_parameter('images_per_file'),
     get_generic_parameter('use_bg_file'),
     get_generic_parameter('bg_file'),
     get_generic_parameter('bg_hdf5_key'),
     get_generic_parameter('bg_hdf5_num'),
     Parameter('Total number of images', int, default=0, refkey='n_total',
               tooltip=('The total number of images.')),
-    get_generic_parameter('image_shape'),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -201,17 +200,20 @@ class CompositeCreatorApp(BaseApp):
                                          self.params.get('last_file'),
                                          self.params.get('live_processing'),
                                          self.params.get('file_stepping'))
+        self._image_metadata = ImageMetadataManager(
+            self.params.get('first_file'),
+            self.params.get('hdf5_key'),
+            self.params.get('hdf5_first_image_num'),
+            self.params.get('hdf5_last_image_num'),
+            self.params.get('hdf5_stepping'),
+            self.params.get('images_per_file'),
+            self.params.get('binning'),
+            )
 
-        self._config = { 'hdf5_file_flag': None,
-                         'raw_img_shape_x': None,
-                         'raw_img_shape_y': None,
-                         'n_image_per_file': 1,
-                         'n_total': None,
-                         'bg_image': None,
+        self._config = { 'bg_image': None,
                          'roi': None,
                          'final_image_size_x': None,
                          'final_image_size_y': None,
-                         'datatype': None,
                          'file_size': None,
                          'current_fname': None,
                          'current_kwargs': {}}
@@ -222,7 +224,7 @@ class CompositeCreatorApp(BaseApp):
         """
         self.prepare_run()
         self._config['mp_pre_run_called'] = True
-        self._config['mp_tasks'] = range(self._config['n_total'])
+        self._config['mp_tasks'] = range(self.get_param_value('n_total'))
 
     def multiprocessing_post_run(self):
         """
@@ -312,7 +314,7 @@ class CompositeCreatorApp(BaseApp):
               and assert the image size is the same.
         """
         self._filelist.update()
-        self._get_image_data()
+        self._image_metadata.update_input_data()
         self._check_composite_dims()
         self._process_roi()
         if self.get_param_value('use_bg_file'):
@@ -325,7 +327,7 @@ class CompositeCreatorApp(BaseApp):
                 composite_nx=self.get_param_value('composite_nx'),
                 composite_ny=self.get_param_value('composite_ny'),
                 composite_dir=self.get_param_value('composite_dir'),
-                datatype=self._config['datatype'])
+                datatype=self._image_metadata.datatype)
             return
         self.__check_and_update_composite_image()
 
@@ -367,69 +369,6 @@ class CompositeCreatorApp(BaseApp):
             The composite image in np.ndarray format.
         """
         return self._composite.image
-
-    def _get_image_data(self):
-        _first_file = self.get_param_value('first_file')
-        if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
-            self._store_image_data_from_hdf5_file()
-        else:
-            self._store_image_data_from_single_image()
-        self._config['n_total'] = (self._config['n_image_per_file']
-                                   * self._filelist.n_files)
-
-    def _store_image_data_from_hdf5_file(self):
-        """
-        Store config metadata from hdf5 file.
-
-        Raises
-        ------
-        AppConfigError
-            If the selected image range is not included in the hdf5 dataset.
-        """
-        _first_file = self.get_param_value('first_file')
-        _key = self.get_param_value('hdf5_key')
-        check_hdf5_key_exists_in_file(_first_file, _key)
-
-        _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
-        _n0 = self._apply_param_modulo('hdf5_first_image_num',
-                                       _meta['shape'][0])
-        _n1 = self._apply_param_modulo('hdf5_last_image_num',
-                                       _meta['shape'][0])
-        if not _n0 < _n1:
-            raise AppConfigError(
-                f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
-                ' not describe a correct range.')
-        self._store_image_data(_meta['shape'][1:3], _meta['dtype'])
-        # correct total number of images for stepping *after* the
-        # numbers have been modulated to be in the image range.
-        _n_per_file = ((_n1 - _n0 - 1)
-                       // self.get_param_value('hdf5_stepping') + 1)
-        self._config['n_image_per_file'] = _n_per_file
-        self._config['hdf5_file_flag'] = True
-
-    def _store_image_data_from_single_image(self):
-        """
-        Store config metadata from file range.
-        """
-        _test_image = read_image(self.get_param_value('first_file'))
-        self._store_image_data(_test_image.shape, _test_image.dtype)
-        self._config['hdf5_file_flag'] = False
-
-    def _store_image_data(self, img_shape, img_dtype):
-        """
-        Store the data about the image shape and datatype.
-
-        Parameters
-        ----------
-        img_shape : tuple
-            The shape of the image.
-        img_dtype : datatype
-            The python datatype of the image.
-        """
-        self._config['n_image_per_file'] = 1
-        self._config['datatype'] = img_dtype
-        self._config['raw_img_shape_x'] = img_shape[1]
-        self._config['raw_img_shape_y'] = img_shape[0]
 
     def _check_and_set_bg_file(self):
         """
@@ -484,7 +423,8 @@ class CompositeCreatorApp(BaseApp):
         """
         _nx = self.get_param_value('composite_nx')
         _ny = self.get_param_value('composite_ny')
-        _ntotal = self._config['n_image_per_file'] * self._filelist.n_files
+        _ntotal = (self.get_param_value('images_per_file')
+                   * self._filelist.n_files)
         if _nx == -1:
             _nx = int(np.ceil(_ntotal / _ny))
             self.params.set_value('composite_nx', _nx)
@@ -518,7 +458,6 @@ class CompositeCreatorApp(BaseApp):
         if _update_required:
             self._composite.create_new_image()
 
-
     def _process_roi(self):
         """
         Process the ROI inputs and store the ROI.
@@ -526,7 +465,6 @@ class CompositeCreatorApp(BaseApp):
         _binning = self.get_param_value('binning')
         if self.get_param_value('use_roi'):
             self._check_roi_for_consistency()
-
             _y0 = self.get_param_value('roi_ylow')
             _y1 = self.get_param_value('roi_yhigh')
             _x0 = self.get_param_value('roi_xlow')
@@ -536,9 +474,9 @@ class CompositeCreatorApp(BaseApp):
             self._config['roi'] = (slice(_y0, _y1), slice(_x0, _x1))
         else:
             self._config['final_image_size_x'] = \
-                self._config['raw_img_shape_x'] // _binning
+                self._image_metadata.size_x // _binning
             self._config['final_image_size_y'] = \
-                self._config['raw_img_shape_y'] // _binning
+                self._image_metadata.size_y // _binning
             self._config['roi'] = None
 
     def _check_roi_for_consistency(self):
@@ -551,16 +489,16 @@ class CompositeCreatorApp(BaseApp):
             If the ROI boundaries are not consistent.
         """
         _warning = ''
-        _nx = self._config['raw_img_shape_x']
-        _ny = self._config['raw_img_shape_y']
+        _nx = self._image_metadata.size_x
+        _ny = self._image_metadata.size_y
         _x0 = self._apply_param_modulo('roi_xlow', _nx)
         _x1 = self._apply_param_modulo('roi_xhigh', _nx)
         _y0 = self._apply_param_modulo('roi_ylow', _ny)
         _y1 = self._apply_param_modulo('roi_yhigh', _ny)
         if _x1 < _x0:
-            _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]'
+            _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]. '
         if _y1 < _y0:
-            _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]'
+            _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]. '
         if _warning:
                 raise AppConfigError(_warning)
 
@@ -580,10 +518,10 @@ class CompositeCreatorApp(BaseApp):
         _params : dict
             The required parameters as dictionary.
         """
-        _i_file = index // self._config['n_image_per_file']
+        _i_file = index // self.get_param_value('images_per_file')
         _fname = self._filelist.get_filename(_i_file)
         if self._config['hdf5_file_flag']:
-            _hdf_index = index % self._config['n_image_per_file']
+            _hdf_index = index % self.get_param_value('images_per_file')
             _i_hdf = (self.get_param_value('hdf5_first_image_num')
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
             _params = dict(dataset=self.get_param_value('hdf5_key'),

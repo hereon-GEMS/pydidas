@@ -23,7 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterCollectionMixIn', 'ObjectWithParameterCollection']
 
+from copy import copy
 from numbers import Integral
+
 from PyQt5 import QtCore
 from numpy import mod
 
@@ -282,3 +284,18 @@ class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn):
         """
         super().__init__()
         self.params = ParameterCollection()
+        self._config = {}
+
+    def __copy__(self):
+        """
+        Create a copy of the object.
+
+        Returns
+        -------
+        fm : ObjectWithParameterCollection
+            The copy with the same state.
+        """
+        obj = self.__class__()
+        obj.params = self.params.get_copy()
+        obj._config = copy(self._config)
+        return obj

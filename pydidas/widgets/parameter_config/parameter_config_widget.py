@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the PluginParamConfig class used to edit plugin parameters."""
+"""Module with the PluginParameterConfigWidget class used to edit plugin parameters."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,7 +21,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamConfig', 'ParameterConfigMixIn']
+__all__ = ['ParameterConfigWidget', 'ParameterConfigWidgetsMixIn']
 
 import sys
 import pathlib
@@ -65,10 +65,10 @@ def text_widget_factory(param, widget_width, alignment=None):
     return _txt
 
 
-class ParameterConfigMixIn:
+class ParameterConfigWidgetsMixIn:
     """
-    The ParameterConfigMixIn class includes methods which can be added to other
-    classes without having to inherit from ParamConfig to avoid multiple
+    The ParameterConfigWidgetsMixIn class includes methods which can be added to other
+    classes without having to inherit from ParameterConfigWidget to avoid multiple
     inheritance from QtWidgets.QFrame.
     """
     def __init__(self, *args, **kwargs):
@@ -162,7 +162,7 @@ class ParameterConfigMixIn:
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
-        self.params[key].value = value
+        self.set_param_value(key, value)
         self.param_widgets[key].set_value(value)
 
     def toggle_widget_visibility(self, key, visible):
@@ -301,9 +301,9 @@ class ParameterConfigMixIn:
             excepthook(*sys.exc_info())
 
 
-class ParamConfig(QtWidgets.QFrame, ParameterConfigMixIn):
+class ParameterConfigWidget(QtWidgets.QFrame, ParameterConfigWidgetsMixIn):
     """
-    The ParamConfig widget can be used to create a composite widget for
+    The ParameterConfigWidget widget can be used to create a composite widget for
     updating parameter values.
 
     Depending on the parameter types, automatic typechecks are implemented.
@@ -312,7 +312,7 @@ class ParamConfig(QtWidgets.QFrame, ParameterConfigMixIn):
         """
         Setup method.
 
-        Create an instance on the ParamConfig class.
+        Create an instance on the ParameterConfigWidget class.
 
         Parameters
         ----------
@@ -325,7 +325,7 @@ class ParamConfig(QtWidgets.QFrame, ParameterConfigMixIn):
             Additional keyword arguments
         """
         QtWidgets.QFrame.__init__(self, parent)
-        ParameterConfigMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
         initLayout = kwargs.get('initLayout', True)
         kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
         kwargs['frameStyle'] = kwargs.get('frameStyle',

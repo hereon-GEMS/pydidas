@@ -63,6 +63,7 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
     _app_carryon = True
     _app = app(app_params)
     _app._config = app_config
+    _app.multiprocessing_pre_run()
     while True:
         # check for stop signal
         try:

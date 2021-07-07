@@ -29,16 +29,19 @@ class TestMpTestApp(unittest.TestCase):
 
     def test_mp_get_tasks(self):
         app = MpTestApp()
-        app.multiprocessing_pre_run(*self._indices)
+        app._config['min_index'] = self._indices[0]
+        app._config['max_index'] = self._indices[1]
+        app.multiprocessing_pre_run()
         _tasks = app.multiprocessing_get_tasks()
         self.assertEqual(_tasks, range(*self._indices))
 
     def test_mp_func(self):
-        self._indices = (3, 57)
         app = MpTestApp()
-        app.multiprocessing_pre_run(*self._indices)
+        app._config['min_index'] = self._indices[0]
+        app._config['max_index'] = self._indices[1]
+        app.multiprocessing_pre_run()
         _index, _image = app.multiprocessing_func(self._indices[0])
-        self.assertEqual(_index, 0)
+        self.assertEqual(_index, self._indices[0])
         self.assertIsInstance(_image, np.ndarray)
 
     def test_mp_post_run(self):
@@ -47,9 +50,10 @@ class TestMpTestApp(unittest.TestCase):
         self.assertTrue(app._config['mp_post_run_called'])
 
     def test_mp_store_results(self):
-        self._indices = (3, 57)
         app = MpTestApp()
-        app.multiprocessing_pre_run(*self._indices)
+        app._config['min_index'] = self._indices[0]
+        app._config['max_index'] = self._indices[1]
+        app.multiprocessing_pre_run()
         _index, _image = app.multiprocessing_func(self._indices[0])
         app.multiprocessing_store_results(_index, _image)
         self.assertTrue((app._composite.image[:100, :100] > 0).all())

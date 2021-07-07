@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the PluginParamConfig class used to edit plugin parameters."""
+"""Module with the PluginParameterConfigWidget class used to edit plugin parameters."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,19 +21,19 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginParamConfig']
+__all__ = ['PluginParameterConfigWidget']
 
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
-from .parameter_config import ParamConfig
+from .parameter_config_widget import ParameterConfigWidget
 
 from ..utilities import deleteItemsOfLayout
 
 
-class PluginParamConfig(ParamConfig):
+class PluginParameterConfigWidget(ParameterConfigWidget):
     """
-    The PluginParamConfig widget creates the composite widget for updating
+    The PluginParameterConfigWidget widget creates the composite widget for updating
     parameters and changing default values.
 
     Depending on the parameter types, automatic typechecks are implemented.
@@ -42,7 +42,7 @@ class PluginParamConfig(ParamConfig):
         """
         Setup method.
 
-        Create an instance on the PluginParamConfig class.
+        Create an instance on the PluginParameterConfigWidget class.
 
         Parameters
         ----------

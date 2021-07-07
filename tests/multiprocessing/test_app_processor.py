@@ -38,7 +38,7 @@ class Test_app_processor(unittest.TestCase):
         self.stop_queue = mp.Queue()
         self.app = MpTestApp()
         self.n_test = 100
-        self.app.multiprocessing_pre_run(0, self.n_test)
+        self.app.multiprocessing_pre_run()
 
     def tearDown(self):
         ...

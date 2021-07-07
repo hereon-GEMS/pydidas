@@ -38,7 +38,7 @@ from ..core.experimental_settings import (ExperimentalSettings,
                                           LoadExperimentSettingsFromFile,
                                           SaveExperimentSettingsToFile)
 
-from ..widgets.parameter_config import ParameterConfigMixIn
+from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
 from ..widgets.dialogues import CriticalWarning
 
 EXP_SETTINGS = ExperimentalSettings()
@@ -46,14 +46,14 @@ EXP_SETTINGS = ExperimentalSettings()
 
 ## TODO : Restore default function
 
-class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
+class ExperimentSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                               ParameterCollectionMixIn):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         BaseFrame.__init__(self, parent, name=name)
-        ParameterConfigMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
         self.params = EXP_SETTINGS.params
         self.initWidgets()
         self.connect_signals()
@@ -153,7 +153,7 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigMixIn,
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the ParamConfigMixin.update_param_value
+        This method overloads the ParameterConfigWidgetMixin.update_param_value
         method to process the linked energy / wavelength parameters.
 
         Parameters

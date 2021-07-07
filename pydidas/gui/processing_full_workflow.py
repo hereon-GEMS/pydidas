@@ -31,7 +31,7 @@ from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
-from pydidas.widgets.parameter_config import ParameterConfigMixIn
+from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
@@ -50,12 +50,12 @@ _params = {
     }
 
 
-class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigMixIn,
+class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                   CreateWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
-        ParameterConfigMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
         self.params = _params
         self._plugin = None
         self.scan_dim = 4

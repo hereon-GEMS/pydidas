@@ -206,5 +206,16 @@ class TestFilelistManager(unittest.TestCase):
         with self.assertRaises(AppConfigError):
             fm.get_filename(80)
 
+    def test_copy(self):
+        fm = FilelistManager()
+        fm.set_param_value('first_file', self._fname(0))
+        fm.update()
+        fm2 = copy.copy(fm)
+        self.assertIsInstance(fm2, FilelistManager)
+        self.assertNotEqual(fm.params, fm2.params)
+        self.assertEqual(fm.get_param_value('first_file'),
+                         fm2.get_param_value('first_file'))
+
+
 if __name__ == "__main__":
     unittest.main()

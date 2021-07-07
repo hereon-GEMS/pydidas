@@ -54,17 +54,19 @@ class MpTestApp(BaseApp):
                         'datatype': None,
                         'mp_pre_run_called': False,
                         'mp_post_run_called': False,
-                        'calls': 0
+                        'calls': 0,
+                        'min_index': 0,
+                        'max_index': 100
                         }
 
-    def multiprocessing_pre_run(self, min_index=10, max_index=110):
+    def multiprocessing_pre_run(self):
         self._config['mp_pre_run_called'] = True
-        self._config['mp_index_offset'] = min_index
-        self._config['mp_tasks'] = range(min_index, max_index)
+        self._config['mp_tasks'] = range(self._config['min_index'],
+                                         self._config['max_index'])
         self._composite = CompositeImage(
             image_shape=(100, 100),
             composite_nx=10,
-            composite_ny=int(np.ceil((max_index-min_index)/10)),
+            composite_ny=int(np.ceil((self._config['max_index'])/10)),
             composite_dir='x',
             datatype=np.float64)
 
@@ -80,31 +82,29 @@ class MpTestApp(BaseApp):
 
     def multiprocessing_func(self, index):
             _fname, _kwargs = 'dummy', {'shape': (100, 100)}
-            _composite_index = index - self._config['mp_index_offset']
             _image = get_image(_fname, **_kwargs)
-            return _composite_index, _image
+            return index, _image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
-        self._composite.insert_image(image, index)
+        self._composite.insert_image(image, index - self._config['min_index'])
 
     def multiprocessing_post_run(self):
         self._config['mp_post_run_called'] = True
-
 
 
 if __name__ == '__main__':
     from pydidas.multiprocessing.app_processor_func import app_processor
     import multiprocessing as mp
     import matplotlib.pyplot as plt
-    in_queue, out_queue = mp.Queue(), mp.Queue()
+    in_queue, out_queue, stop_queue = mp.Queue(), mp.Queue(), mp.Queue()
     app = MpTestApp()
     app.multiprocessing_pre_run()
     tasks = app.multiprocessing_get_tasks()
     for task in tasks:
         in_queue.put(task)
     in_queue.put(None)
-    app_processor(in_queue, out_queue, app.__class__, app.params.get_copy(), app._config)
+    app_processor(in_queue, out_queue, stop_queue, app.__class__, app.params.get_copy(), app._config)
     res = [out_queue.get() for i in range(100)]
     for item in res:
         app.multiprocessing_store_results(*item[1])

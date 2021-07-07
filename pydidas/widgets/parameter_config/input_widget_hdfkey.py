@@ -12,7 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-"""Module with the PluginParamConfig class used to edit plugin parameters."""
+"""Module with the InputWidgetHdfKey class used to edit Parameters."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"

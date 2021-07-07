@@ -38,7 +38,7 @@ from ..utils import copy_docstring
 class CreateWidgetsMixIn:
     """
     The CreateWidgetsMixIn class includes methods for easy
-    classes without having to inherit from ParamConfig to avoid multiple
+    classes without having to inherit from ParameterConfigWidget to avoid multiple
     inheritance from QtWidgets.QFrame.
     """
 

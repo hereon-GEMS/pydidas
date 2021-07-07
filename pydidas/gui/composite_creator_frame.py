@@ -47,7 +47,7 @@ from pydidas.multiprocessing import AppRunner
 
 
 class CompositeCreatorFrame(BaseFrameWithApp,
-                            parameter_config.ParameterConfigMixIn,
+                            parameter_config.ParameterConfigWidgetsMixIn,
                             ParameterCollectionMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
@@ -58,13 +58,12 @@ class CompositeCreatorFrame(BaseFrameWithApp,
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
-        parameter_config.ParameterConfigMixIn.__init__(self)
+        parameter_config.ParameterConfigWidgetsMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
+        self._filelist = self._app._filelist
         self.params = self._app.params
         self._config = self._app._config
-        self._config.update({'composite_dim': 'x',
-                             'hdf5_dset_shape': None})
         self._app_attributes_to_update.append('_composite')
         self._widgets = {}
         self._runner = None
@@ -78,7 +77,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.w_buttons = {}
 
-        self._widgets['config'] = parameter_config.ParamConfig(
+        self._widgets['config'] = parameter_config.ParameterConfigWidget(
             self, initLayout=False, midLineWidth=5)
         self._widgets['config'].setLayout(create_default_grid_layout())
         _config_next_row = self._widgets['config'].next_row
@@ -103,9 +102,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             'Clear all entries', gridPos=(_config_next_row(), 0, 1, 2),
             parent_widget=self._widgets['config'],
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
-
-        self._widgets['selection_info'] = ReadOnlyTextWidget(
-            fixedWidth=self.CONFIG_WIDGET_WIDTH, fixedHeight=60, visible=False)
 
         self._widgets['plot_window']= PlotWindow(
             parent=self, resetzoom=True, autoScale=False, logScale=False,
@@ -132,12 +128,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                                 parent_widget=self._widgets['config'],
                                 width_text=self.CONFIG_WIDGET_WIDTH - 110)
             self.create_param_widget(self.params[_key], **_options)
-
-            # add selection info box after hdf5_key widgets:
-            if _key == 'hdf5_key':
-                self._widgets['config'].layout().addWidget(
-                    self._widgets['selection_info'], _config_next_row(),
-                    0, 1, 2)
 
             # add spacers between groups:
             if _key in ['hdf5_stepping', 'bg_hdf5_num', 'composite_dir',
@@ -179,6 +169,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                             policy = QtWidgets.QSizePolicy.Expanding)
 
         self.param_widgets['n_total'].setEnabled(False)
+        self.param_widgets['hdf5_dataset_shape'].setEnabled(False)
+        self.param_widgets['image_shape'].setEnabled(False)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
                      'last_file','hdf5_stepping']:
             self.toggle_widget_visibility(_key, False)
@@ -253,6 +245,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
+        print(self._runner._AppRunner__app._filelist._config['file_list'])
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -317,7 +310,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                               'composite_nx', 'composite_ny'])
         hdf5_flag = os.path.splitext(fname)[1] in HDF5_EXTENSIONS
         self._config['hdf5_file_flag'] = hdf5_flag
-        self._app._create_filelist()
+        self._filelist.update()
+        print(self._filelist, self._filelist.n_files)
         for _key in ['hdf5_key', 'hdf5_first_image_num',
                      'hdf5_last_image_num', 'hdf5_stepping']:
             self.toggle_widget_visibility(_key, hdf5_flag)
@@ -330,10 +324,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                 self.__selected_hdf5_key()
         else:
             _shape = read_image(fname).shape
-            self._widgets['selection_info'].setText(
-                (f'Number of images per file: 1\n\nImage size: '
-                 f'{_shape[0]} x {_shape[1]}'))
-
+            self.set_param_value('image_shape', _shape)
 
     def __selected_last_file(self):
         """
@@ -341,10 +332,10 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         # self._sync_param_from_file('last_file')
         try:
-            self._app._check_files()
+            self._filelist.update()
         except AppConfigError as _ex:
             self.__clear_entries(['last_file'], hide=False)
-            QtWidgets.QMessageBox.critical(self, 'Files wrong size.', str(_ex))
+            QtWidgets.QMessageBox.critical(self, 'Could not create filelist.', str(_ex))
             return
         self.__update_n_image()
         self.__finalize_selection()
@@ -411,10 +402,9 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         _dset_ok = self.__verify_hdf5_key(_fname, _dset, 'hdf5_key')
         if _dset_ok:
             _shape = get_hdf5_metadata(_fname, 'shape', _dset)
-            self._config['hdf5_dset_shape'] = _shape
             self._app._store_image_data_from_hdf5_file()
             _n_total = (self._config['n_image_per_file']
-                        * self._config['n_files'])
+                        * self._filelist.n_files)
             self.update_param_value('n_total', _n_total)
             self._widgets['selection_info'].setText(
                 (f'Number of images in dataset: {_shape[0]}\n\nImage size: '
@@ -437,7 +427,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Finalize input file selection.
         """
-        self._widgets['selection_info'].setVisible(True)
         for _key in ['file_stepping', 'composite_nx', 'composite_ny']:
             self.toggle_widget_visibility(_key, True)
         self._widgets['but_exec'].setEnabled(True)
@@ -510,19 +499,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.toggle_widget_visibility('bg_hdf5_num', flag)
         self.__check_exec_enable()
 
-    def __toggle_selection_infobox_visibility(self, reset_keys):
-        """
-        Show or hide the infobox according to keys which have been reset.
-
-        Parameters
-        ----------
-        reset_keys : Union[list, tuple]
-            The keys which have been reset.
-        """
-        _check_keys = ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-                       'last_file']
-        _should_show_box = not any(_key in reset_keys for _key in _check_keys)
-        self._widgets['selection_info'].setVisible(_should_show_box)
 
     def __abort_comp_creation(self):
         """
@@ -575,7 +551,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         keys = keys if keys != 'all' else list(self.params.keys())
         self.__reset_params(keys)
-        self.__toggle_selection_infobox_visibility(keys)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
                      'last_file', 'hdf5_first_image_num', 'hdf5_last_image_num',
                      'bg_hdf5_key', 'bg_hdf5_num', 'bg_file']:
@@ -597,9 +572,9 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             self._app._store_image_data_from_hdf5_file()
         if self._config['hdf5_file_flag'] is not None:
             _n_total = (self._config['n_image_per_file'] *
-                        self._config['n_files'])
+                        self._filelist.n_files)
             self.update_param_value('n_total', _n_total)
-            self.__update_composite_dim(self._config['composite_dim'])
+            self.__update_composite_dim(self.get_param_value('composite_dir'))
 
     def __update_composite_dim(self, dim):
         """
@@ -616,7 +591,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         dim2 = 'y' if dim == 'x' else 'x'
         self.update_param_value(f'composite_n{dim2}', num2)
         self.update_param_value(f'composite_n{dim}', abs(num1))
-        self._config['composite_dim'] = dim
         if ((num1 - 1) * num2 >= _n_total
                 or num1 * (num2 - 1) >= _n_total):
             self.__update_composite_dim(dim2)

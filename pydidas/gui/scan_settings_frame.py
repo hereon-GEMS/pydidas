@@ -32,12 +32,12 @@ from PyQt5 import QtWidgets, QtCore
 from pydidas.gui import BaseFrame
 from pydidas.core import ScanSettings
 from pydidas.widgets import CreateWidgetsMixIn, excepthook
-from pydidas.widgets.parameter_config import ParameterConfigMixIn
+from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()
 
 
-class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn, CreateWidgetsMixIn):
+class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn, CreateWidgetsMixIn):
     """
     Frame for
     """
@@ -47,7 +47,7 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigMixIn, CreateWidgetsMixIn):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         BaseFrame.__init__(self, parent,name=name)
-        ParameterConfigMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
         self._widgets = {}
         self.initWidgets()
         self.toggle_dims()

@@ -28,7 +28,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from ..widgets import (WorkflowTreeCanvas, PluginCollectionPresenter,
                        ScrollArea)
-from ..widgets.parameter_config import PluginParamConfig
+from ..widgets.parameter_config import PluginParameterConfigWidget
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
@@ -47,7 +47,7 @@ class WorkflowEditFrame(BaseFrame):
 
 
         self.w_workflow_canvas = WorkflowTreeCanvas(self)
-        self.w_plugin_edit_canvas = PluginParamConfig(self)
+        self.w_plugin_edit_canvas = PluginParameterConfigWidget(self)
         self.w_plugin_collection = PluginCollectionPresenter(self)
         self.w_workflow_area = ScrollArea(
             self, widget=self.w_workflow_canvas, minimumHeight=500)

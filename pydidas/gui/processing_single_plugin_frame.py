@@ -32,7 +32,7 @@ from .base_frame import BaseFrame
 from ..core import ScanSettings, Parameter
 from ..workflow_tree import WorkflowTree
 from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
-from ..widgets.parameter_config import ParameterConfigMixIn
+from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
@@ -61,12 +61,12 @@ class LargeStackView(StackView):
     def sizeHint(self):
         return QtCore.QSize(500, 1000)
 
-class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigMixIn,
+class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                   CreateWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
-        ParameterConfigMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
         self.params = _params
         self._plugin = None
         self.scan_dim = 4

@@ -26,7 +26,7 @@ STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, BaseFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
     ProcessingFullWorkflowFrame, CompositeCreatorFrame)
-from pydidas.widgets.parameter_config import ParameterConfigMixIn
+from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
@@ -63,7 +63,7 @@ class ProcessingFrame(BaseFrame):
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
 
-class ResultVisualizationFrame(BaseFrame, ParameterConfigMixIn):
+class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)

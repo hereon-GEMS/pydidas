@@ -97,33 +97,10 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('composite_ny', 9)
         app.set_param_value('use_bg_file', True)
         app.set_param_value('bg_file', self._fname(0))
-        app._store_image_data_from_hdf5_file()
-        app._process_roi()
+        app._image_metadata.update()
         app._check_and_set_bg_file()
         _image = app._config['bg_image']
         self.assertTrue((_image.array == self._data[0]).all())
-
-    def test_check_roi(self):
-        app = CompositeCreatorApp()
-        app._config['raw_img_shape_x'] = 10
-        app._config['raw_img_shape_y'] = 10
-        app.set_param_value('use_roi', True)
-        app.set_param_value('roi_xlow', 15)
-        app.set_param_value('roi_ylow', 1)
-        app._check_roi_for_consistency()
-        self.assertEqual(app.get_param_value('roi_xlow'), 5)
-        self.assertEqual(app.get_param_value('roi_ylow'), 1)
-
-    def test_check_roi_wrong_range(self):
-        app = CompositeCreatorApp()
-        app._config['raw_img_shape_x'] = 10
-        app._config['raw_img_shape_y'] = 10
-        app.set_param_value('use_roi', True)
-        app.set_param_value('roi_xlow', 15)
-        app.set_param_value('roi_ylow', 1)
-        app.set_param_value('roi_xhigh', 3)
-        with self.assertRaises(AppConfigError):
-            app._check_roi_for_consistency()
 
     def test_prepare_run(self):
         app = self.get_default_app()
@@ -188,7 +165,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('composite_nx', _nx)
         app.run()
         _shape = (app.get_param_value('composite_ny') * self._img_shape[0],
-                  app.get_param_value('composite_nx') * (self._img_shape[0] -5))
+                  app.get_param_value('composite_nx') * (self._img_shape[1] -5))
         self.assertEqual(app.composite.shape, _shape)
 
 if __name__ == "__main__":

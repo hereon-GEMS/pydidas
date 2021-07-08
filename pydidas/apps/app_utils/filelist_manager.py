@@ -95,6 +95,20 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return self._config['n_files']
 
+    @property
+    def filesize(self):
+        """
+        Get the file size of the processed files.
+
+        Returns
+        -------
+        float
+            The file size in bytes.
+
+        """
+        return self._config['file_size']
+
+
     def get_config(self):
         """
         Get the full _config dictionary.
@@ -211,6 +225,10 @@ class FilelistManager(ObjectWithParameterCollection):
         self._config['file_list'] = [Path(os.path.join(_path1, f))
                                      for f in _list]
         self._config['n_files'] = len(_list)
+        self._config['file_size'] = os.stat(
+            self.get_param_value('first_file')
+            ).st_size
+
 
     def _create_filelist_live_processing(self):
         """

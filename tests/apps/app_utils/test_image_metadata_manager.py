@@ -85,7 +85,7 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config['datatype'], self._data.dtype)
         self.assertEqual(imm._config['raw_img_shape_x'], self._img_shape[1])
         self.assertEqual(imm._config['raw_img_shape_y'], self._img_shape[0])
-        self.assertEqual(imm.get_param_value('images_per_file'), self._dsize)
+        self.assertEqual(imm._config['images_per_file'], self._dsize)
 
     def test_store_image_data_from_single_image(self):
         imm = ImageMetadataManager()
@@ -95,7 +95,7 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config['raw_img_shape_x'], self._img_shape[1])
         self.assertEqual(imm._config['raw_img_shape_y'], self._img_shape[0])
         self.assertEqual(imm._config['numbers'], [0])
-        self.assertEqual(imm.get_param_value('images_per_file'), 1)
+        self.assertEqual(imm._config['images_per_file'], 1)
 
     def test_store_image_data_from_single_image_no_file(self):
         imm = ImageMetadataManager()
@@ -114,7 +114,7 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config['raw_img_shape_x'], self._img_shape[1])
         self.assertEqual(imm._config['raw_img_shape_y'], self._img_shape[0])
         self.assertEqual(imm._config['numbers'], range(self._dsize))
-        self.assertEqual(imm.get_param_value('images_per_file'), self._dsize)
+        self.assertEqual(imm._config['images_per_file'], self._dsize)
 
     def test_store_image_data_from_hdf5_wrong_key(self):
         imm = ImageMetadataManager()
@@ -129,7 +129,7 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.set_param_value('hdf5_stepping', _step)
         imm.set_param_value('first_file', self._hdf5_fname)
         imm._store_image_data_from_hdf5_file()
-        self.assertEqual(imm.get_param_value('images_per_file'),
+        self.assertEqual(imm._config['images_per_file'],
                          self._dsize // _step + 1)
         self.assertEqual(imm._config['numbers'], range(0, self._dsize, _step))
 
@@ -216,7 +216,7 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
         imm.update_input_data()
-        self.assertEqual(imm.get_param_value('images_per_file'), self._dsize)
+        self.assertEqual(imm._config['images_per_file'], self._dsize)
         self.assertEqual(imm._config['numbers'], range(self._dsize))
 
     def test_property_sizex(self):
@@ -259,5 +259,11 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.update_final_image()
         self.assertEqual(imm.final_shape, self._img_shape)
 
+    def test_property_images_per_file(self):
+        imm = ImageMetadataManager()
+        imm.set_param_value('first_file', self._hdf5_fname)
+        imm.update_input_data()
+        imm.update_final_image()
+        self.assertEqual(imm.images_per_file, self._dsize)
 if __name__ == "__main__":
     unittest.main()

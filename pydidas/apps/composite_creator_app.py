@@ -59,8 +59,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('bg_file'),
     get_generic_parameter('bg_hdf5_key'),
     get_generic_parameter('bg_hdf5_num'),
-    Parameter('Total number of images', int, default=0, refkey='n_total',
-              tooltip=('The total number of images.')),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -208,13 +206,14 @@ class CompositeCreatorApp(BaseApp):
             self.params.get('hdf5_stepping'),
             self.params.get('images_per_file'),
             self.params.get('binning'),
+            self.params.get('use_roi'),
+            self.params.get('roi_xlow'),
+            self.params.get('roi_xhigh'),
+            self.params.get('roi_ylow'),
+            self.params.get('roi_yhigh'),
             )
 
         self._config = { 'bg_image': None,
-                         'roi': None,
-                         'final_image_size_x': None,
-                         'final_image_size_y': None,
-                         'file_size': None,
                          'current_fname': None,
                          'current_kwargs': {}}
 
@@ -224,7 +223,9 @@ class CompositeCreatorApp(BaseApp):
         """
         self.prepare_run()
         self._config['mp_pre_run_called'] = True
-        self._config['mp_tasks'] = range(self.get_param_value('n_total'))
+        _ntotal = (self._image_metadata.images_per_file
+                   * self._filelist.n_files)
+        self._config['mp_tasks'] = range(_ntotal)
 
     def multiprocessing_post_run(self):
         """
@@ -315,21 +316,20 @@ class CompositeCreatorApp(BaseApp):
         """
         self._filelist.update()
         self._image_metadata.update_input_data()
+        self._image_metadata.update_final_image()
         self._check_composite_dims()
-        self._process_roi()
         if self.get_param_value('use_bg_file'):
             self._check_and_set_bg_file()
 
         if self._composite is None:
             self._composite = CompositeImage(
-                image_shape=(self._config['final_image_size_y'],
-                             self._config['final_image_size_x']),
+                image_shape=self._image_metadata.final_shape,
                 composite_nx=self.get_param_value('composite_nx'),
                 composite_ny=self.get_param_value('composite_ny'),
                 composite_dir=self.get_param_value('composite_dir'),
                 datatype=self._image_metadata.datatype)
-            return
-        self.__check_and_update_composite_image()
+        else:
+            self.__check_and_update_composite_image()
 
     @copy_docstring(CompositeImage)
     def apply_thresholds(self, **kwargs):
@@ -397,13 +397,12 @@ class CompositeCreatorApp(BaseApp):
             _params = dict(dataset=self.get_param_value('bg_hdf5_key'),
                            binning=self.get_param_value('binning'),
                            imageNo=self.get_param_value('bg_hdf5_num'),
-                           ROI=self._config['roi'])
+                           ROI=self._image_metadata.roi)
         else:
             _params = dict(binning=self.get_param_value('binning'),
-                           ROI=self._config['roi'])
+                           ROI=self._image_metadata.roi)
         _bg_image = read_image(_bg_file, **_params)
-        if not _bg_image.shape == (self._config['final_image_size_y'],
-                                   self._config['final_image_size_x']):
+        if not _bg_image.shape == self._image_metadata.final_shape:
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not have the same image dimensions '
                                  'as the selected files.')
@@ -423,7 +422,7 @@ class CompositeCreatorApp(BaseApp):
         """
         _nx = self.get_param_value('composite_nx')
         _ny = self.get_param_value('composite_ny')
-        _ntotal = (self.get_param_value('images_per_file')
+        _ntotal = (self._image_metadata.images_per_file
                    * self._filelist.n_files)
         if _nx == -1:
             _nx = int(np.ceil(_ntotal / _ny))
@@ -442,8 +441,7 @@ class CompositeCreatorApp(BaseApp):
 
     def __check_and_update_composite_image(self):
         _update_required = False
-        _image_shape = (self._config['final_image_size_y'],
-                        self._config['final_image_size_x'])
+        _image_shape = self._image_metadata.final_shape
         if _image_shape != self._composite.get_param_value('image_shape'):
             self._composite.set_param_value('image_shape', _image_shape)
             _update_required = True
@@ -458,49 +456,6 @@ class CompositeCreatorApp(BaseApp):
         if _update_required:
             self._composite.create_new_image()
 
-    def _process_roi(self):
-        """
-        Process the ROI inputs and store the ROI.
-        """
-        _binning = self.get_param_value('binning')
-        if self.get_param_value('use_roi'):
-            self._check_roi_for_consistency()
-            _y0 = self.get_param_value('roi_ylow')
-            _y1 = self.get_param_value('roi_yhigh')
-            _x0 = self.get_param_value('roi_xlow')
-            _x1 = self.get_param_value('roi_xhigh')
-            self._config['final_image_size_x'] = (_x1 - _x0) // _binning
-            self._config['final_image_size_y'] = (_y1 - _y0) // _binning
-            self._config['roi'] = (slice(_y0, _y1), slice(_x0, _x1))
-        else:
-            self._config['final_image_size_x'] = \
-                self._image_metadata.size_x // _binning
-            self._config['final_image_size_y'] = \
-                self._image_metadata.size_y // _binning
-            self._config['roi'] = None
-
-    def _check_roi_for_consistency(self):
-        """
-        Check the ROI for consistency.
-
-        Raises
-        ------
-        AppConfigError
-            If the ROI boundaries are not consistent.
-        """
-        _warning = ''
-        _nx = self._image_metadata.size_x
-        _ny = self._image_metadata.size_y
-        _x0 = self._apply_param_modulo('roi_xlow', _nx)
-        _x1 = self._apply_param_modulo('roi_xhigh', _nx)
-        _y0 = self._apply_param_modulo('roi_ylow', _ny)
-        _y1 = self._apply_param_modulo('roi_yhigh', _ny)
-        if _x1 < _x0:
-            _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]. '
-        if _y1 < _y0:
-            _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]. '
-        if _warning:
-                raise AppConfigError(_warning)
 
     def _get_args_for_read_image(self, index):
         """
@@ -518,18 +473,17 @@ class CompositeCreatorApp(BaseApp):
         _params : dict
             The required parameters as dictionary.
         """
-        _i_file = index // self.get_param_value('images_per_file')
+        _images_per_file = self._image_metadata.images_per_file
+        _i_file = index // _images_per_file
         _fname = self._filelist.get_filename(_i_file)
-        if self._config['hdf5_file_flag']:
-            _hdf_index = index % self.get_param_value('images_per_file')
+        _params = dict(binning=self.get_param_value('binning'),
+                       ROI=self._image_metadata.roi)
+        if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
+            _hdf_index = index % _images_per_file
             _i_hdf = (self.get_param_value('hdf5_first_image_num')
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
-            _params = dict(dataset=self.get_param_value('hdf5_key'),
-                           binning=self.get_param_value('binning'),
-                           ROI=self._config['roi'], imageNo=_i_hdf)
-        else:
-            _params = dict(binning=self.get_param_value('binning'),
-                           ROI=self._config['roi'])
+            _params = _params | dict(dataset=self.get_param_value('hdf5_key'),
+                                     imageNo=_i_hdf)
         return _fname, _params
 
     def _wait_for_image(self, fname, timeout=-1):
@@ -545,7 +499,7 @@ class CompositeCreatorApp(BaseApp):
             a maximum of timeout seconds before raising an Exception.
             The value "-1" corresponds to no timeout. The default is -1.
         """
-        _target_size = self._config['file_size']
+        _target_size = self._filelist.filesize
         _starttime = time.time()
         while os.stat(fname).st_size != _target_size:
             time.sleep(0.1)

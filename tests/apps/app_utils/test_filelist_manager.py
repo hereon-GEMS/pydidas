@@ -56,6 +56,11 @@ class TestFilelistManager(unittest.TestCase):
         cfg = fm.get_config()
         self.assertIsInstance(cfg, dict)
 
+    def test_property_filesize(self):
+        fm = FilelistManager()
+        fm.update(self._fname(0), self._fname(40), False, 2)
+        self.assertEqual(fm.filesize, os.stat(self._fname(0)).st_size)
+
     def test__update_params(self):
         fm = FilelistManager()
         fm._update_params(None, self._fname(0), None, None)

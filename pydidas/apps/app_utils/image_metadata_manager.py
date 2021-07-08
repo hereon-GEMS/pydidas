@@ -40,7 +40,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('hdf5_first_image_num'),
     get_generic_parameter('hdf5_last_image_num'),
     get_generic_parameter('hdf5_stepping'),
-    get_generic_parameter('images_per_file'),
     get_generic_parameter('binning'),
     get_generic_parameter('use_roi'),
     get_generic_parameter('roi_ylow'),
@@ -88,7 +87,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
                         'datatype': None,
                         'numbers': None,
                         'final_shape': None,
-                        'roi': None
+                        'roi': None,
+                        'images_per_file': None
                         }
 
     @property
@@ -132,6 +132,20 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         Get the ROI object required to achieve the final image shape.
         """
         return self._config['roi']
+
+    @property
+    def images_per_file(self):
+        """
+        Get the number of images per file.
+        """
+        return self._config['images_per_file']
+
+    def update(self):
+        """
+        Perform a full update.
+        """
+        self.update_input_data()
+        self.update_final_image()
 
     def update_input_data(self):
         """
@@ -215,7 +229,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         n_image : int
             The number of images per file.
         """
-        self.set_param_value('images_per_file', n_image)
+        self._config['images_per_file'] = n_image
         self._config['datatype'] = img_dtype
         self._config['raw_img_shape_x'] = img_shape[1]
         self._config['raw_img_shape_y'] = img_shape[0]

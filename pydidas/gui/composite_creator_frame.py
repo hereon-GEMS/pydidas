@@ -36,7 +36,7 @@ from pydidas.gui.builders import CompositeCreatorFrameBuilder
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollectionMixIn, ParameterCollection,
-                          get_generic_parameter)
+                          get_generic_parameter, Parameter)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.image_reader import read_image
 from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
@@ -83,6 +83,9 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                 self.add_param(get_generic_parameter('raw_image_shape'))
             if param.refkey == 'file_stepping':
                 self.add_param(get_generic_parameter('n_files'))
+                self.add_param(get_generic_parameter('images_per_file'))
+                self.add_param(Parameter('Total number of images', int, default=0, refkey='n_total',
+                                         tooltip=('The total number of images.')))
 
     def connect_signals(self):
         """

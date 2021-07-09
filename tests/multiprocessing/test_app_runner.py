@@ -49,6 +49,7 @@ def quit_app():
     _qtapp = QtCore.QCoreApplication.instance()
     _qtapp.exit()
 
+
 @QtCore.pyqtSlot(object)
 def final_app(_app):
     global app
@@ -58,7 +59,8 @@ def final_app(_app):
 class TestAppRunner(unittest.TestCase):
 
     def setUp(self):
-        self.qt_app = QtCore.QCoreApplication(sys.argv)
+        self.qt_app = QtWidgets.QApplication(sys.argv)
+        #self.qt_app = QtCore.QCoreApplication(sys.argv)
         self.app = MpTestApp()
 
     def tearDown(self):

@@ -88,7 +88,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
                         'numbers': None,
                         'final_shape': None,
                         'roi': None,
-                        'images_per_file': None
+                        'images_per_file': None,
+                        'hdf5_dset_shape': None
                         }
 
     @property
@@ -140,6 +141,13 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         return self._config['images_per_file']
 
+    @property
+    def hdf5_dset_shape(self):
+        """
+        Get the shape of the hdf5 dataset.
+        """
+        return self._config['hdf5_dset_shape']
+
     def update(self):
         """
         Perform a full update.
@@ -183,6 +191,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _step = self.get_param_value('hdf5_stepping')
         _n_per_file = ((_n1 - _n0 - 1) // _step + 1)
         self._config['numbers'] = range(_n0, _n1, _step)
+        self._config['hdf5_dset_shape'] = _meta['shape']
         self._store_image_data(_meta['shape'][1:3], _meta['dtype'],
                                _n_per_file)
 
@@ -214,6 +223,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         _test_image = read_image(self.get_param_value('first_file'))
         self._config['numbers'] = [0]
+        self._config['hdf5_dset_shape'] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)
 
     def _store_image_data(self, img_shape, img_dtype, n_image):

@@ -23,6 +23,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CompositeImage']
 
+from copy import copy
+
 import numpy as np
 from pydidas.core.parameter_collection import ParameterCollection
 from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
@@ -226,3 +228,18 @@ class CompositeImage(ObjectWithParameterCollection):
         if self.__image is None:
             return (0, 0)
         return self.__image.shape
+
+    def __copy__(self):
+        """
+        Create a copy of the object.
+
+        Returns
+        -------
+        fm : ObjectWithParameterCollection
+            The copy with the same state.
+        """
+        obj = self.__class__()
+        obj.params = self.params.get_copy()
+        obj._config = copy(self._config)
+        obj.__image = self.__image
+        return obj

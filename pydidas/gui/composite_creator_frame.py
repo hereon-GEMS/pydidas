@@ -41,7 +41,8 @@ from pydidas.config import HDF5_EXTENSIONS
 from pydidas.image_reader import read_image
 from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
 from pydidas.utils import (get_hdf5_populated_dataset_keys,
-                           get_hdf5_metadata, check_file_exists)
+                           get_hdf5_metadata, check_file_exists,
+                           check_hdf5_key_exists_in_file)
 from pydidas.multiprocessing import AppRunner
 
 
@@ -61,6 +62,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
+        self._image_metadata = self._app._image_metadata
         self._config = self._app._config
         self._app_attributes_to_update.append('_composite')
         self._runner = None
@@ -79,10 +81,10 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             self.add_param(param)
             if param.refkey == 'hdf5_key':
                 self.add_param(get_generic_parameter('hdf5_dataset_shape'))
-            if param.refkey == 'last_file':
-                self.add_param(get_generic_parameter('raw_image_shape'))
             if param.refkey == 'file_stepping':
                 self.add_param(get_generic_parameter('n_files'))
+            if param.refkey == 'hdf5_stepping':
+                self.add_param(get_generic_parameter('raw_image_shape'))
                 self.add_param(get_generic_parameter('images_per_file'))
                 self.add_param(Parameter('Total number of images', int, default=0, refkey='n_total',
                                          tooltip=('The total number of images.')))
@@ -162,7 +164,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
-        print(self._runner._AppRunner__app._filelist._config['file_list'])
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -192,7 +193,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None,
-            'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png)')[0]
+            'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png);;NUMPY (*.npy *.npz)')[0]
         self._app.export_image(fname)
 
     def _run_app_serial(self):
@@ -221,23 +222,27 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         fname : str
             The filename of the first image file.
         """
+        self.__clear_entries(
+            ['last_file', 'hdf5_key', 'hdf5_first_image_num',
+             'hdf5_last_image_num', 'hdf5_stepping', 'file_stepping',
+             'n_total', 'composite_nx', 'composite_ny'])
         if not self.__check_file(fname):
             return
-        self.__clear_entries(['hdf5_key', 'hdf5_first_image_num',
-                              'hdf5_last_image_num', 'hdf5_stepping',
-                              'last_file','file_stepping', 'n_total',
-                              'composite_nx', 'composite_ny'])
-        hdf5_flag = os.path.splitext(fname)[1] in HDF5_EXTENSIONS
-        self._config['hdf5_file_flag'] = hdf5_flag
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        if hdf5_flag:
+        if self.__check_if_hdf5_file():
             self.__popup_select_hdf5_key(fname)
+            if check_hdf5_key_exists_in_file(
+                    self.get_param_value('first_file'),
+                    self.get_param_value('hdf5_key')):
+                self.__selected
         else:
             _shape = read_image(fname).shape
             self.update_param_value('raw_image_shape', _shape)
             self.update_param_value('images_per_file', 1)
-        self.__update_n_total()
+            self.__update_n_total()
+            self.__finalize_selection(True)
+
 
     def __check_file(self, fname):
         if self.get_param_value('live_processing') or os.path.isfile(fname):
@@ -247,11 +252,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                 'File does not exist',
                 f'The selected file\n\n"{fname}"\n\ndoes not exist.')
             self.__clear_entries(['first_file'], hide=False)
-            self.__clear_entries(
-                ['hdf5_key', 'hdf5_first_image_num',
-                 'hdf5_last_image_num', 'hdf5_stepping',
-                 'last_file','file_stepping', 'n_total',
-                 'composite_nx', 'composite_ny'])
         return False
 
     def __update_widgets_after_selecting_first_file(self):
@@ -259,13 +259,25 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Update widget visibilty after selecting the first file based on the
         file format (hdf5 or not).
         """
-        hdf5_flag = self._config['hdf5_file_flag']
+        hdf5_flag = self.__check_if_hdf5_file()
         for _key in ['hdf5_key', 'hdf5_first_image_num',
                      'hdf5_last_image_num', 'hdf5_stepping',
                      'hdf5_dataset_shape']:
             self.toggle_widget_visibility(_key, hdf5_flag)
         self.toggle_widget_visibility('last_file', True)
         self.toggle_widget_visibility('raw_image_shape', not hdf5_flag)
+
+    def __check_if_hdf5_file(self):
+        """
+        Check if the first file is an hdf5 file.
+
+        Returns
+        -------
+        bool
+            Flag whether a hdf5 file has been selected.
+        """
+        _ext = os.path.splitext(self.get_param_value('first_file'))[1]
+        return _ext in HDF5_EXTENSIONS
 
     def __popup_select_hdf5_key(self, fname):
         """
@@ -279,9 +291,10 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
             self.update_param_value('hdf5_key', dset)
-            self._app.set_param_value('hdf5_key', dset)
+            # self._app.set_param_value('hdf5_key', dset)
             self.__selected_hdf5_key()
         else:
+            self.update_param_value('hdf5_key', '')
             self.__clear_entries(['images_per_file', 'n_total',
                                   'hdf5_dataset_shape', 'hdf5_key',
                                   'hdf5_first_image_num',
@@ -346,20 +359,20 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Perform required actions after an hdf5 key has been selected.
         """
-        _fname = self.get_param_value('first_file')
-        _dset = self.get_param_value('hdf5_key')
-        _dset_ok = self.__verify_hdf5_key(_fname, _dset, 'hdf5_key')
-        if _dset_ok:
-            _shape = get_hdf5_metadata(_fname, 'shape', _dset)
-            self._app._store_image_data_from_hdf5_file()
-            _n_total = (self.get_param_value('images_per_file')
-                        * self._filelist.n_files)
-            self.update_param_value('n_total', _n_total)
-            self.update_param_value('hdf5_dataset_shape', _shape)
-            self.__update_n_image()
-            self.__finalize_selection()
-        else:
-            self._widgets['but_exec'].setEnabled(False)
+        try:
+            self._image_metadata.update_input_data()
+            # _n_total = (self._image_metadata.images_per_file
+            #             * self._filelist.n_files)
+            # self.update_param_value('n_total', _n_total)
+            self.update_param_value('hdf5_dataset_shape',
+                                    self._image_metadata.hdf5_dset_shape)
+            self.update_param_value('images_per_file',
+                                    self._image_metadata.images_per_file)
+            # self.__update_n_total()
+            # self.__finalize_selection(True)
+        except AppConfigError:
+            # self.__finalize_selection(False)
+            raise
 
     def __selected_bg_hdf5_key(self):
         """
@@ -370,7 +383,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         _dset = self.get_param_value('bg_hdf5_key')
         if not self.__verify_hdf5_key(_fname, _dset, 'bg_hdf5_key'):
             self._widgets['but_exec'].setEnabled(False)
-
 
     def __reset_params(self, keys='all'):
         """
@@ -392,26 +404,12 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
 
-    def __reset_hdf5_images_key(self, keys):
-        """
-        Reset the selection info key "hdf5_images" if checks fails.
-
-        Parameters
-        ----------
-        keys : list
-            A list with keys which have been reset.
-        """
-        _check_keys = ['hdf5_key', 'hdf5_first_image_num',
-                       'hdf5_last_image_num', 'last_file']
-        if any(_key in keys for _key in _check_keys):
-            self._config['hdf5_file_flag'] = None
-
     def __check_exec_enable(self):
         """
         Check whether the exec button should be enabled and enable/disable it.
         """
         try:
-            assert self._config['hdf5_file_flag'] is not None
+            assert self._image_metadata.final_shape is not None
             if self.get_param_value('use_bg_file'):
                 assert os.path.isfile(self.get_param_value('bg_file'))
             _enable = True
@@ -498,7 +496,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                      'bg_file']:
             if _key in keys:
                 self.toggle_widget_visibility(_key, not hide)
-        self.__reset_hdf5_images_key(keys)
         self.__check_exec_enable()
 
 
@@ -507,14 +504,12 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Update the number of images in the composite upon changing any
         input parameter.
         """
-        if self._config['hdf5_file_flag'] is True:
-            self._app._store_image_data_from_hdf5_file()
-        if self._config['hdf5_file_flag'] is not None:
-            _n_per_file = self.get_param_value('images_per_file')
-            self.param_widgets['images_per_file'].set_value(_n_per_file)
-            _n_total = (_n_per_file * self._filelist.n_files)
-            self.update_param_value('n_total', _n_total)
-            self.__update_composite_dim(self.get_param_value('composite_dir'))
+        self._image_metadata.update_input_data()
+        _n_per_file = self._image_metadata.images_per_file
+        self.param_widgets['images_per_file'].set_value(_n_per_file)
+        _n_total = (_n_per_file * self._filelist.n_files)
+        self.update_param_value('n_total', _n_total)
+        self.__update_composite_dim(self.get_param_value('composite_dir'))
 
     def __update_composite_dim(self, dim):
         """
@@ -539,7 +534,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Update the filelist based on the current selection.
         """
-        print('update file selection')
         try:
             self._filelist.update()
         except AppConfigError as _ex:
@@ -554,24 +548,29 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             return
         self.update_param_value('n_files', self._filelist.n_files)
         self.__update_n_total()
-        self.__finalize_selection()
 
     def __update_n_total(self):
         """
         Update the total number of selected images.
         """
-        _n_total = (self.get_param_value('images_per_file') *
+        self._image_metadata.update_input_data()
+        _n_total = (self._image_metadata.images_per_file *
                     self._filelist.n_files)
         self.update_param_value('n_total', _n_total)
         self.__update_composite_dim(self.get_param_value('composite_dir'))
 
-    def __finalize_selection(self):
+    def __finalize_selection(self, flag):
         """
         Finalize input file selection.
+
+        Parameters
+        ----------
+        flag : bool
+            Flag whether to finalize or lock finalization.
         """
         for _key in ['file_stepping', 'composite_nx', 'composite_ny']:
-            self.toggle_widget_visibility(_key, True)
-        self._widgets['but_exec'].setEnabled(True)
+            self.toggle_widget_visibility(_key, flag)
+        self._widgets['but_exec'].setEnabled(flag)
 
 
 if __name__ == '__main__':

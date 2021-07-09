@@ -265,5 +265,13 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.update_input_data()
         imm.update_final_image()
         self.assertEqual(imm.images_per_file, self._dsize)
+
+    def test_property_hdf5_dset_shape(self):
+        imm = ImageMetadataManager()
+        imm.set_param_value('first_file', self._hdf5_fname)
+        imm.update_input_data()
+        self.assertEqual(imm.hdf5_dset_shape, (self._dsize,) + self._img_shape)
+
+
 if __name__ == "__main__":
     unittest.main()

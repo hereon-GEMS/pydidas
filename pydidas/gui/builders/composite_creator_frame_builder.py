@@ -91,9 +91,9 @@ class CompositeCreatorFrameBuilder:
             # self.__check_to_add_local_params(_key)
 
             # add spacers between groups:
-            if _key in ['file_stepping', 'images_per_file', 'bg_hdf5_num',
+            if _key in ['n_files', 'images_per_file', 'bg_hdf5_num',
                         'composite_dir', 'roi_yhigh', 'threshold_high',
-                        'binning', 'output_fname']:
+                        'binning', 'output_fname', 'n_total']:
                 self.__ccf.create_line(
                     parent_widget=self.__ccf._widgets['config'],
                     fixedWidth=self.__ccf.CONFIG_WIDGET_WIDTH)

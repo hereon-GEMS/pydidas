@@ -5,6 +5,7 @@ Created on Thu Mar 11 10:24:52 2021
 """
 
 import sys
+from PyQt5 import QtWidgets, QtCore, QtGui
 
 import qtawesome as qta
 

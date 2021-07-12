@@ -55,6 +55,7 @@ class BaseApp(ObjectWithParameterCollection):
         super().__init__()
         self.add_params(*args, **kwargs)
         self._config = {}
+        self.slave_mode = False
 
     def run(self):
         """

@@ -35,13 +35,11 @@ from PyQt5 import QtWidgets, QtCore
 from pydidas.gui.builders import CompositeCreatorFrameBuilder
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
-from pydidas.core import (ParameterCollectionMixIn, ParameterCollection,
-                          get_generic_parameter, Parameter)
+from pydidas.core import (ParameterCollectionMixIn, Parameter,
+                          get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
-from pydidas.image_reader import read_image
 from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
 from pydidas.utils import get_hdf5_populated_dataset_keys
-from pydidas.utils.str_utils import timedPrint
 from pydidas.multiprocessing import AppRunner
 
 
@@ -161,13 +159,10 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._widgets['but_abort'].setVisible(True)
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
-        timedPrint('creating runner')
         self._runner = AppRunner(self._app, 8)
-        timedPrint('Connecting states')
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
-        timedPrint('Starting runner')
         self._runner.start()
 
     @QtCore.pyqtSlot()

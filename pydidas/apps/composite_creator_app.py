@@ -321,7 +321,8 @@ class CompositeCreatorApp(BaseApp):
         self._check_composite_dims()
         if self.get_param_value('use_bg_file'):
             self._check_and_set_bg_file()
-
+        if self.slave_mode:
+            return
         if self._composite is None:
             self._composite = CompositeImage(
                 image_shape=self._image_metadata.final_shape,

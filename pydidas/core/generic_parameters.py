@@ -163,7 +163,7 @@ GENERIC_PARAMS = ParameterCollection(
                  'binning will be applied to the cropped images. The default '
                  'is 1.')),
     Parameter(
-        'Images per file', int, default=1,
+        'Images per file', int, default=0,
         refkey='images_per_file',
         tooltip=('The number of images in the file. For hdf5 files, this '
                  'corresponds to the number of frames in the hdf5 dataset.')),

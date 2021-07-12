@@ -23,6 +23,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['InputWidgetWithButton']
 
+from functools import partial
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .input_widget import InputWidget
 from ...config import PARAM_INPUT_WIDGET_HEIGHT
@@ -77,6 +79,7 @@ class InputWidgetWithButton(InputWidget):
         self.setLayout(_layout)
 
         self.ledit.editingFinished.connect(self.emit_signal)
+        self.ledit.returnPressed.connect(partial(self.emit_signal, True))
         self._button.clicked.connect(self.button_function)
         self.set_value(param.value)
 
@@ -86,15 +89,20 @@ class InputWidgetWithButton(InputWidget):
         """
         raise NotImplementedError
 
-    def emit_signal(self):
+    def emit_signal(self, force_update=False):
         """
         Emit a signal that the value has been edited.
 
         This method emits a signal that the combobox selection has been
         changed and the Parameter value needs to be updated.
+
+        Parameters
+        ----------
+        force_update : bool
+            Force an update even if the value has not changed.
         """
         _curr_value = self.ledit.text()
-        if _curr_value != self._oldValue:
+        if _curr_value != self._oldValue or force_update:
             self._oldValue = _curr_value
             self.io_edited.emit(_curr_value)
 

@@ -43,7 +43,7 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_n_files_None(self):
         fm = FilelistManager()
-        self.assertIsNone(fm.n_files)
+        self.assertEqual(fm.n_files, 0)
 
     def test_n_files(self):
         _n = 123
@@ -221,6 +221,12 @@ class TestFilelistManager(unittest.TestCase):
         self.assertEqual(fm.get_param_value('first_file'),
                          fm2.get_param_value('first_file'))
 
+    def test_reset(self):
+        fm = FilelistManager()
+        fm.update(self._fname(0), self._fname(49))
+        fm.reset()
+        self.assertEqual(fm._config['n_files'], 0)
+        self.assertEqual(len(fm._config['file_list']), 0)
 
 if __name__ == "__main__":
     unittest.main()

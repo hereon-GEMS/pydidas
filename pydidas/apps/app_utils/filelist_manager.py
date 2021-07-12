@@ -81,7 +81,7 @@ class FilelistManager(ObjectWithParameterCollection):
         self.set_default_params()
         self._config = {'file_list': [],
                         'file_size': None,
-                        'n_files': None}
+                        'n_files': 0}
 
     @property
     def n_files(self):
@@ -319,6 +319,14 @@ class FilelistManager(ObjectWithParameterCollection):
             raise AppConfigError(f'The selected number "{index}" is out of '
                                  f'the range of the file list [0, {_n-1}]')
         return self._config['file_list'][index]
+
+    def reset(self):
+        """
+        Reset the filelist to the initial configuration.
+        """
+        self._config = {'file_list': [],
+                        'file_size': None,
+                        'n_files': 0}
 
     # def __copy__(self):
     #     """

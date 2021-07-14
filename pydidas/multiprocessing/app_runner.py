@@ -63,7 +63,7 @@ class AppRunner(WorkerController):
     finished = QtCore.pyqtSignal()
     final_app_state = QtCore.pyqtSignal(object)
 
-    def __init__(self, app, n_workers=4):
+    def __init__(self, app, n_workers=None):
         """
         Create a WorkerController.
 

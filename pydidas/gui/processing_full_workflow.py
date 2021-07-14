@@ -27,10 +27,9 @@ __all__ = ['ProcessingFullWorkflowFrame']
 from PyQt5 import QtWidgets, QtCore
 import qtawesome as qta
 
-from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
+from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()

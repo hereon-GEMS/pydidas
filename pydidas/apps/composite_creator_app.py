@@ -54,7 +54,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('hdf5_first_image_num'),
     get_generic_parameter('hdf5_last_image_num'),
     get_generic_parameter('hdf5_stepping'),
-    # get_generic_parameter('images_per_file'),
     get_generic_parameter('use_bg_file'),
     get_generic_parameter('bg_file'),
     get_generic_parameter('bg_hdf5_key'),
@@ -213,7 +212,6 @@ class CompositeCreatorApp(BaseApp):
             )
 
         self._config = { 'bg_image': None,
-                        'n_total': None,
                          'current_fname': None,
                          'current_kwargs': {}}
 
@@ -225,7 +223,6 @@ class CompositeCreatorApp(BaseApp):
         self._config['mp_pre_run_called'] = True
         _ntotal = (self._image_metadata.images_per_file
                    * self._filelist.n_files)
-        self._config['n_total'] = _ntotal
         self._config['mp_tasks'] = range(_ntotal)
 
     def multiprocessing_post_run(self):

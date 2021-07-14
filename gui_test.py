@@ -16,10 +16,12 @@ STYLES = pydidas.config.STYLES
 PALETTES = pydidas.config.PALETTES
 STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
 
-from pydidas.gui import (DataBrowsingFrame,  WorkflowEditFrame, BaseFrame,
+from pydidas.gui import (
+    DataBrowsingFrame,  WorkflowEditFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
     ProcessingFullWorkflowFrame, CompositeCreatorFrame)
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets import BaseFrame
 
 class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
@@ -27,7 +29,7 @@ class HomeFrame(BaseFrame):
         name = kwargs.get('Name', None)
         super().__init__(parent=parent, name=name)
         self.create_label('Welcome to pyDIDAS', fontsize=14, bold=True, fixedWidth=400)
-        self.create_label('the python Diffraction Data Analysis Suite.\n', fontsize=13,
+        self.create_label('- the python Diffraction Data Analysis Suite.\n', fontsize=13,
                          bold=True, fixedWidth=400)
         self.create_label('\nQuickstart:', fontsize=12, bold=True, fixedWidth=400)
         self.create_label('\nMenu toolbar: ', fontsize=11, underline=True, bold=True, fixedWidth=400)
@@ -66,9 +68,9 @@ class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
 
 
 if __name__ == '__main__':
-    from pydidas.gui.main_window import MainWindow
 
     app = QtWidgets.QApplication(sys.argv)
+    from pydidas.gui.main_window import MainWindow
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
@@ -94,7 +96,6 @@ if __name__ == '__main__':
     gui.register_frame('Experimental settings', 'Processing setup/Experimental settings', qta.icon('mdi.card-bulleted-settings-outline'), ExperimentSettingsFrame)
     gui.register_frame('Scan settings', 'Processing setup/Scan settings', qta.icon('ei.move'), ScanSettingsFrame)
     gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame)
-    # gui.register_frame('Help', 'Tools/help', qta.icon('mdi.home'), QtWidgets.QFrame())
     gui.create_toolbars()
 
     gui.show()

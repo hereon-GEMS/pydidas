@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ['CompositeCreatorFrame']
 
 import os
+import time
 from functools import partial
 
 import numpy as np
@@ -150,10 +151,22 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         ...
 
+    def _run_app_serial(self):
+        """
+        Serial implementation of the execution method.
+        """
+        self._image_metadata.update_final_image()
+        self.set_status('Started composite image creation.')
+        self._app.run()
+        self._widgets['but_show'].setEnabled(True)
+        self._widgets['but_save'].setEnabled(True)
+        self.set_status('Finished composite image creation.')
+
     def _run_app(self):
         """
         Parallel implementation of the execution method.
         """
+        self._image_metadata.update_final_image()
         self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
         self._widgets['but_abort'].setVisible(True)
@@ -163,6 +176,10 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
+        if self.get_param_value('live_processing'):
+            self._app.multiprocessing_pre_run()
+            self._config['last_update'] = 0
+            self._runner.results.connect(self.__live_update)
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -178,13 +195,33 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.set_status('Finished composite image creation.')
         self._runner = None
 
+    @QtCore.pyqtSlot(int, object)
+    def __live_update(self, index, image):
+        """
+        Store the results from the live processing and update the image.
+
+        Parameters
+        ----------
+        index : int
+            The image index.
+        image : np.ndarray
+            The processed image.
+        """
+        self._app.multiprocessing_store_results(index, image)
+        if time.time() - self._config['last_update'] > 2:
+            self.__show_composite()
+            self._config['last_update'] = time.time()
+
     def __show_composite(self):
         """
         Show the composite image in the Viewwer.
         """
         self._widgets['plot_window'].setVisible(True)
-        self._widgets['plot_window'].addImage(self._app.composite,
-                                              replace=True)
+        _shape = self._image_metadata.final_shape
+        self._widgets['plot_window'].addImage(
+            self._app.composite, replace=True,
+            origin=(0.5, 0.5),
+            scale=(1 / _shape[1], 1 / _shape[0]))
 
     def __save_composite(self):
         """
@@ -194,16 +231,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             self, 'Name of file', None,
             'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png);;NUMPY (*.npy *.npz)')[0]
         self._app.export_image(fname)
-
-    def _run_app_serial(self):
-        """
-        Serial implementation of the execution method.
-        """
-        self.set_status('Started composite image creation.')
-        self._app.run()
-        self._widgets['but_show'].setEnabled(True)
-        self._widgets['but_save'].setEnabled(True)
-        self.set_status('Finished composite image creation.')
 
     @QtCore.pyqtSlot(str)
     def __selected_first_file(self, fname):
@@ -233,7 +260,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             self._config['input_configured'] = False
             self.__popup_select_hdf5_key(fname)
         else:
-            self._image_metadata.update_input_data()
+            self._image_metadata.update()
             _shape = (self._image_metadata.raw_size_y,
                       self._image_metadata.raw_size_x)
             self.update_param_value('raw_image_shape', _shape)
@@ -244,7 +271,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         else:
             _finalize_flag = False
         self.__update_n_total()
-        self.__finalize_selection(True)
+        self.__finalize_selection(_finalize_flag)
         self.__check_exec_enable()
 
 
@@ -370,7 +397,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.__check_exec_enable()
 
 
-    def __reset_params(self, keys='all'):
+    def __reset_params(self, keys=None):
         """
         Reset parameters to their default values.
 
@@ -381,6 +408,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             all Parameters in the ParameterCollection will be reset to their
             default values. The default is 'all'.
         """
+        keys = keys if keys is not None else []
         for _but in ['but_exec', 'but_save', 'but_show']:
             self._widgets[_but].setEnabled(False)
         self._widgets['progress'].setVisible(False)
@@ -389,6 +417,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
+        if 'first_file' in keys:
+            self._config['input_configured'] = False
 
     def __check_exec_enable(self):
         """
@@ -479,13 +509,12 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         keys = keys if keys != 'all' else list(self.params.keys())
         self.__reset_params(keys)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-                     'first_file', 'last_file', 'hdf5_first_image_num',
+                     'last_file', 'hdf5_first_image_num',
                      'hdf5_last_image_num','bg_hdf5_key', 'bg_hdf5_num',
                      'bg_file']:
             if _key in keys:
                 self.toggle_widget_visibility(_key, not hide)
         self.__check_exec_enable()
-
 
     def __update_n_image(self):
         """
@@ -496,9 +525,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             return
         self._image_metadata.update_input_data()
         _n_per_file = self._image_metadata.images_per_file
-        # _n_total = (_n_per_file * self._filelist.n_files)
         self.update_param_value('images_per_file', _n_per_file)
-        # self.update_param_value('n_total', _n_total)
         self.__update_n_total()
 
     def __update_composite_dim(self, dim):

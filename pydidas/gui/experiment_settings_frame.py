@@ -31,13 +31,13 @@ from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.geometry import Geometry
 
-from .base_frame import BaseFrame
 from ..config import YAML_EXTENSIONS
 from ..core import ParameterCollectionMixIn
 from ..core.experimental_settings import (ExperimentalSettings,
                                           LoadExperimentSettingsFromFile,
                                           SaveExperimentSettingsToFile)
 
+from ..widgets import BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
 from ..widgets.dialogues import CriticalWarning
 

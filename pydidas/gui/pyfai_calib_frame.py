@@ -36,7 +36,7 @@ from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.app.calib2 import parse_options, setup_model
 
-from .base_frame import BaseFrame
+from ..widgets import BaseFrame
 from ..core.experimental_settings import ExperimentalSettings
 
 EXP_SETTINGS = ExperimentalSettings()
@@ -97,7 +97,7 @@ class PyfaiCalibFrame(BaseFrame):
         self.__context = context
         model = context.getCalibrationModel()
 
-        self.__menu_connections ={}
+        self.__menu_connections = {}
         self.__tasks = self.createTasks()
         for task in self.__tasks:
             task.nextTaskRequested.connect(self.nextTask)

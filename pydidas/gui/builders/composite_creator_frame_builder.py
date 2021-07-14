@@ -164,21 +164,3 @@ class CompositeCreatorFrameBuilder:
                            parent_widget=self.__ccf._widgets['config'],
                            width_text=self.CONFIG_WIDGET_WIDTH - 110)
         return _config
-
-    # def __check_to_add_local_params(self, param_key):
-    #     """
-    #     Check whether a local Parameter should be added at this position
-    #     and create widgets if required.
-    #     """
-    #     if param_key == 'hdf5_key':
-    #         _options = self.__get_param_widget_config('hdf5_dataset_shape')
-    #         self.__ccf.create_param_widget(
-    #             self.__ccf._local_params['hdf5_dataset_shape'], **_options)
-    #     if param_key == 'last_file':
-    #         _options = self.__get_param_widget_config('raw_image_shape')
-    #         self.__ccf.create_param_widget(
-    #             self.__ccf._local_params['raw_image_shape'], **_options)
-    #     if param_key == 'file_stepping':
-    #         _options = self.__get_param_widget_config('n_files')
-    #         self.__ccf.create_param_widget(
-    #             self.__ccf._local_params['n_files'], **_options)

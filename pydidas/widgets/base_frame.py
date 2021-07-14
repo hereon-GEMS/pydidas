@@ -67,6 +67,7 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self._initialized = False
+        self.frame_index = -1
         self.name = name if name else ''
 
     def setParent(self, parent):
@@ -78,10 +79,6 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
         ----------
         parent : Union[QWidget, None]
             The parent widget.
-
-        Returns
-        -------
-        None.
         """
         super().setParent(parent)
         if self.parent() and not self._initialized:
@@ -102,10 +99,6 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
         ----------
         index : int
             The index of the activated frame.
-
-        Returns
-        -------
-        None.
         """
 
     def _initialize(self):
@@ -113,11 +106,6 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
         Initialize the frame once parent and name have been set.
 
         This method needs to be overloaded by the subclass implementations.
-
-        Returns
-        -------
-        None.
-
         """
         self._initialized = True
 
@@ -129,10 +117,6 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
         ----------
         text : str
             The status message to be emitted.
-
-        Returns
-        -------
-        None.
         """
         self.status_msg.emit(text)
 
@@ -146,39 +130,3 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
             The next empty row.
         """
         return self.layout().rowCount() + 1
-
-    @QtCore.pyqtSlot(object)
-    def _set_app(self, app):
-        """
-        Update the local copy of the App after the AppRunner computations.
-
-        Parameters
-        ----------
-        app : pydidas.apps.BaseApp
-            Any App instance
-        """
-        for param_key in app.params:
-            self._app.set_param_value(param_key,
-                                      app.get_param_value(param_key))
-        self._app._config = copy.copy(app._config)
-
-    @QtCore.pyqtSlot(float)
-    def _apprunner_update_progress(self, progress):
-        """
-        Update the progress of the AppRunner.
-
-        Parameters
-        ----------
-        progress : float
-            The progress, given as numbers 0..1
-        """
-        if 'progress' in self._widgets.keys():
-            _progress = round(progress * 100)
-            self._widgets['progress'].setValue(_progress)
-
-    @QtCore.pyqtSlot()
-    def _apprunner_finished(self):
-        """
-        Clean up after AppRunner is done.
-        """
-        del self._runner

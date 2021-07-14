@@ -24,7 +24,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-# from . import factory
+from . import windows
+
+from . import factory
 
 from . import dialogues
 

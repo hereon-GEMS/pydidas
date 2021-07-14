@@ -30,8 +30,7 @@ from PyQt5 import QtWidgets, QtCore
 from silx.gui.plot.ImageView import ImageView
 
 from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
-                       QtaIconButton)
-from .base_frame import BaseFrame
+                       QtaIconButton, BaseFrame)
 from ..image_reader import ImageReaderFactory, read_image
 from ..config import HDF5_EXTENSIONS
 
@@ -47,6 +46,7 @@ class ImageViewNoHist(ImageView):
 
     def __init__(self):
         super().__init__()
+
 
 class DataBrowsingFrame(BaseFrame):
     """

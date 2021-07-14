@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Module with the GlobalSettingsFrame which is used for administrating
+global settings."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -22,7 +22,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSettingsFrame']
+__all__ = ['GlobalConfigurationFrame']
 
 import sys
 from functools import partial
@@ -36,8 +36,8 @@ from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 SCAN_SETTINGS = ScanSettings()
 
 
-class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
-                        CreateWidgetsMixIn):
+class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
+                          CreateWidgetsMixIn):
     """
     Frame for
     """
@@ -50,12 +50,14 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         ParameterConfigWidgetsMixIn.__init__(self)
         self._widgets = {}
         self.initWidgets()
-        self.toggle_dims()
 
     def initWidgets(self):
         self._widgets['title'] = self.create_label(
-            'Scan settings\n', fontsize=14, bold=True, underline=True,
+            'Global settings\n', fontsize=14, bold=True, underline=True,
             gridPos=(0, 0, 1, 0))
+
+
+
         self._widgets['but_load']  = self.create_button(
             'Load scan parameters from file', gridPos=(-1, 0, 1, 2),
             icon=self.style().standardIcon(42), alignment=None)
@@ -86,16 +88,6 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                          width_text=self.TEXT_WIDTH)
         self.create_spacer(gridPos=(_rowoffset + 1, 2, 1, 1))
 
-    def toggle_dims(self):
-        _prefixes = ['scan_dir_{n}', 'n_points_{n}', 'delta_{n}',
-                     'unit_{n}', 'offset_{n}']
-        _dim = int(self.param_widgets['scan_dim'].currentText())
-        for i in range(1, 5):
-            _toggle = True if i <= _dim else False
-            self._widgets[f'title_{i}'].setVisible(_toggle)
-            for _pre in _prefixes:
-                self.param_widgets[_pre.format(n=i)].setVisible(_toggle)
-                self.param_textwidgets[_pre.format(n=i)].setVisible(_toggle)
 
     def update_param(self, pname, widget):
         try:
@@ -103,14 +95,6 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         except Exception:
             widget.set_value(SCAN_SETTINGS.get(pname))
             excepthook(*sys.exc_info())
-        # explicitly call update fo wavelength and energy
-        if pname == 'xray_wavelength':
-            _w = self.param_widgets['xray_energy']
-            _w.set_value(SCAN_SETTINGS.get('xray_energy'))
-        elif pname == 'xray_energy':
-            _w = self.param_widgets['xray_wavelength']
-            _w.set_value(SCAN_SETTINGS.get('xray_wavelength') * 1e10)
-
 
 if __name__ == '__main__':
     import pydidas

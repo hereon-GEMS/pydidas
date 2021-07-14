@@ -311,6 +311,28 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=('The coordinate offset of the movement in scan '
                        'direction 4 (i.e. the coutner / motor position for '
                        'scan position 0).')),
+    ############################
+    ## global app settings
+    ############################
+    Parameter('Number of MP workers', int, default=4, refkey='mp_n_workers',
+              unit='',
+              tooltip=('The number of multiprocessing workers. Note that'
+                       ' this number should not be set too high for two '
+                       'reasons:\n1. File reading processes interfere with '
+                       'each other if too many are active at once.\n2. pyFAI'
+                       ' uses Parallelization as well and you can only gain'
+                       'limited performace increases for multiple parallel'
+                       ' processes.')),
+    Parameter('Detector mask file', Path, default=Path(),
+              refkey='det_mask', unit='',
+              tooltip=('The path to the detector mask file.')),
+    Parameter('Mosaic tiling border width', int, default=0,
+              refkey='mosaic_border_width', unit='',
+              tooltip=('The width of the border inserted between adjacent '
+                       'frames in the mosaic creation.')),
+    Parameter('Mosaic border value', float, default=0,
+              refkey='mosaic_border_value', unit='',
+              tooltip='The value to be put in the border pixels in mosaics.'),
 )
 
 

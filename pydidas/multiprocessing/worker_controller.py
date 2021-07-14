@@ -46,7 +46,7 @@ class WorkerController(QtCore.QThread):
     results = QtCore.pyqtSignal(object)
     finished = QtCore.pyqtSignal()
 
-    def __init__(self, n_workers=4):
+    def __init__(self, n_workers=None):
         """
         Create a WorkerController.
 
@@ -59,6 +59,9 @@ class WorkerController(QtCore.QThread):
         self._flag_running = False
         self._flag_thread_alive = True
         self._flag_active = False
+        if n_workers is None:
+            _settings = QtCore.QSettings('Hereon', 'pydidas')
+            n_workers = int(_settings.value('global/mp_n_workers'))
         self._n_workers = n_workers
         self._to_process = []
         self._write_lock = QtCore.QReadWriteLock()
@@ -288,6 +291,8 @@ class WorkerController(QtCore.QThread):
         """
         for _worker in self._workers:
             self._queues['send'].put(None)
+            self._queues['stop'].put(1)
+        for _worker in self._workers:
             _worker.join()
         self._flag_active = False
 

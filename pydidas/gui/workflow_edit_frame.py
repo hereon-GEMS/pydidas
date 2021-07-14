@@ -32,7 +32,7 @@ from ..widgets.parameter_config import PluginParameterConfigWidget
 from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
                                     WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
-from .base_frame import BaseFrame
+from ..widgets import BaseFrame
 
 class WorkflowEditFrame(BaseFrame):
     def __init__(self, **kwargs):

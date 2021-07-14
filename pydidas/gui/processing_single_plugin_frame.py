@@ -28,10 +28,9 @@ from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot.StackView import StackView
 
-from .base_frame import BaseFrame
 from ..core import ScanSettings, Parameter
 from ..workflow_tree import WorkflowTree
-from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn
+from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()

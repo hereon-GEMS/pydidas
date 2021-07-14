@@ -29,10 +29,9 @@ import qtawesome as qta
 
 from silx.gui.plot.ImageView import ImageView
 
-from pydidas.gui.base_frame import BaseFrame
 from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import ReadOnlyTextWidget
+from pydidas.widgets import ReadOnlyTextWidget, BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 
 SCAN_SETTINGS = ScanSettings()

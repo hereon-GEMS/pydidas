@@ -28,10 +28,13 @@ import os
 import re
 from functools import partial
 
+import qtawesome as qta
 from PyQt5 import QtWidgets, QtGui, QtCore
 from pydidas.widgets import CentralWidgetStack, GetInfoWidget
-from pydidas.core.utilities import get_time_string
+from pydidas.core import get_generic_parameter
 from pydidas._exceptions import FrameConfigError
+from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
+from pydidas.config import QSETTINGS_GLOBAL_KEYS
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, parent=None, geometry=None):
@@ -47,6 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.frame_menuentries = []
         self.frame_meta = {}
+        self.windows = {}
 
         self.setCentralWidget(CentralWidgetStack())
         self.status.showMessage('Test status')
@@ -56,6 +60,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__createMenu()
         self.__create_info_box()
         self.setFocus(QtCore.Qt.OtherFocusReason)
+
+        app = QtWidgets.QApplication.instance()
+        app.setOrganizationName("Hereon")
+        app.setOrganizationDomain("Hereon/WPI")
+        app.setApplicationName("pydidas")
+        self.__create_qsettings_if_required()
+
+    def __add_global_config(self):
+        from ..widgets.windows import GlobalConfigWindow
+        self.register_frame('Global configuration', 'Global configuration',
+                            qta.icon('mdi.application-cog'),
+                            GlobalConfigurationFrame)
+
+        _w = CentralWidgetStack().get_widget_by_name('Global configuration')
+        self.windows['global_config'] = GlobalConfigWindow(self)
+        _w2 = self.windows['global_config'].centralWidget()
+        _w.value_changed_signal.connect(_w2.external_update)
+        _w2.value_changed_signal.connect(_w.external_update)
 
     @staticmethod
     def __find_toolbar_bases(items):
@@ -77,8 +99,6 @@ class MainWindow(QtWidgets.QMainWindow):
             item = _base
         return _r[::-1]
 
-
-
     @staticmethod
     def __format_str_for_toolbar(input_str):
         _r = []
@@ -94,7 +114,13 @@ class MainWindow(QtWidgets.QMainWindow):
             _r.append(_s)
         return ''.join(_r).strip()
 
-
+    def __create_qsettings_if_required(self):
+        settings = QtCore.QSettings()
+        for key in QSETTINGS_GLOBAL_KEYS:
+            _val = settings.value(f'global/{key}')
+            if _val is None:
+                _param = get_generic_parameter(key)
+                settings.setValue(f'global/{key}', _param.default)
 
     def __create_info_box(self):
         self.__info_widget = GetInfoWidget()
@@ -105,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
     def create_toolbars(self):
+        self.__add_global_config()
         self._toolbars = {}
         for tb in self.__find_toolbar_bases(self.frame_menuentries):
             tb_title = tb if tb else 'Main toolbar'
@@ -196,6 +223,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_open(self):
         print('open')
 
+    def open_settings(self):
+        self.windows['global_config'].show()
+        # self.floating_settings.widget().frame_activated(0)
+        # self.floating_settings.setVisible(True)
+
+    def closeEvent(self, event):
+        for window in self.windows:
+            self.windows[window].close()
+        event.accept()
+
     @QtCore.pyqtSlot(str)
     def update_status(self, text):
         self.status.showMessage(text)
@@ -247,6 +284,12 @@ class MainWindow(QtWidgets.QMainWindow):
         openMenu.addAction(openTree)
         fileMenu.addAction(exitAction)
 
+        extrasMenu = self._menu.addMenu('&Extras')
+        settingsAction = QtWidgets.QAction('&Settings', self)
+        settingsAction.triggered.connect(self.open_settings)
+        extrasMenu.addAction(settingsAction)
+
         self._menu.addMenu(fileMenu)
+        self._menu.addMenu(extrasMenu)
         self._menu.addMenu("&Edit")
         self._menu.addMenu("&Help")

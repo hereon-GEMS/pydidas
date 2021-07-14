@@ -34,9 +34,6 @@ from .data_browsing_frame import *
 from . import workflow_edit_frame
 from .workflow_edit_frame import *
 
-from . import base_frame
-from .base_frame import *
-
 from . import experiment_settings_frame
 from .experiment_settings_frame import *
 
@@ -55,7 +52,6 @@ from .composite_creator_frame import *
 __all__ += workflow_tree_edit_manager.__all__
 __all__ += data_browsing_frame.__all__
 __all__ += workflow_edit_frame.__all__
-__all__ += base_frame.__all__
 __all__ += experiment_settings_frame.__all__
 __all__ += scan_settings_frame.__all__
 __all__ += processing_single_plugin_frame.__all__
@@ -66,7 +62,6 @@ __all__ += composite_creator_frame.__all__
 del workflow_tree_edit_manager
 del data_browsing_frame
 del workflow_edit_frame
-del base_frame
 del experiment_settings_frame
 del scan_settings_frame
 del processing_single_plugin_frame

@@ -59,11 +59,13 @@ class DataBrowsingFrame(BaseFrame):
         name = kwargs.get('name', None)
         super().__init__(parent=parent, name=name)
         self.create_label('Data exploration view', fontsize=14)
+        self.__settings = QtCore.QSettings('Hereon', 'pydidas')
 
         self.init_widgets()
         self._tree.doubleClicked.connect(
             partial(self.__fileSelected, self._imview)
             )
+        self._tree.clicked.connect(self.__fileHighlighted)
 
     def init_widgets(self):
         """Init the user interface with the widgets."""
@@ -108,10 +110,17 @@ class DataBrowsingFrame(BaseFrame):
         else:
             self.main_splitter.moveSplitter(300, 1)
 
+    def __fileHighlighted(self):
+        index = self._tree.selectedIndexes()[0]
+        _name = self._tree._filemodel.filePath(index)
+        if os.path.isfile(_name):
+            _name = os.path.dirname(_name)
+        self.__settings.setValue('directory_explorer/path', _name)
+
     def __fileSelected(self, widget):
         index = self._tree.selectedIndexes()[0]
         _name = self._tree._filemodel.filePath(index)
-        self.set_status(f'New file: {_name}')
+        self.set_status(f'Opened file: {_name}')
         if not os.path.isfile(_name):
             return
         _extension= f'.{os.path.basename(_name).split(".")[-1]}'

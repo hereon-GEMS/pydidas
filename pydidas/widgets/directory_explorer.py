@@ -49,8 +49,14 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         """
         super().__init__(parent)
 
+        if root_path == '':
+            _settings = QtCore.QSettings('Hereon', 'pydidas')
+            _path = _settings.value('directory_explorer/path', None)
+            if _path is not None:
+                root_path = _path
         self._filemodel = QtWidgets.QFileSystemModel()
         self._filemodel.setRootPath(root_path)
+        self._filemodel.setRootPath('')
         self._filemodel.setReadOnly(True)
         self.setModel(self._filemodel)
         self.header().setSortIndicator(0, QtCore.Qt.AscendingOrder)
@@ -63,6 +69,21 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         self.setColumnWidth(3, 140)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                            QtWidgets.QSizePolicy.Expanding)
+
+        self.__expand_to_path(root_path)
+
+    def __expand_to_path(self, path):
+        """
+        Expand the treeview to a given path.
+        """
+        _index = self._filemodel.index(path)
+        indexes = []
+        ix = _index
+        while ix.isValid():
+            indexes.insert(0, ix)
+            ix = ix.parent()
+        for ix in indexes:
+            self.setExpanded(ix, True)
 
     def sizeHint(self):
         """

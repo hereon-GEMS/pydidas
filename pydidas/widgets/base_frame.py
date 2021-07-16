@@ -27,9 +27,12 @@ __all__ = ['BaseFrame']
 from PyQt5 import QtWidgets, QtCore
 
 from .create_widgets_mixin import CreateWidgetsMixIn
+from ..core import (ParameterCollection, PydidasQsettingsMixin,
+                    ParameterCollectionMixIn)
 
 
-class BaseFrame(CreateWidgetsMixIn, QtWidgets.QFrame):
+class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
+                ParameterCollectionMixIn, QtWidgets.QFrame):
     """
     Inherits from :py:class:`PyQt5.QtWidgets.QFrame`,
     :py:class:`pydidas.widgets.CreateWidgetsMixIn`.
@@ -42,6 +45,7 @@ class BaseFrame(CreateWidgetsMixIn, QtWidgets.QFrame):
     By default, a QGridLayout is applied with an alignment of left/top.
     """
     status_msg = QtCore.pyqtSignal(str)
+    default_params = ParameterCollection()
 
     def __init__(self, parent=None, name=None, **kwargs):
         """
@@ -61,9 +65,13 @@ class BaseFrame(CreateWidgetsMixIn, QtWidgets.QFrame):
         **kwargs : object
             Any additional keyword arguments.
         """
-        init_layout = kwargs.get('initLayout', True)
         QtWidgets.QFrame.__init__(self, parent=parent)
+        PydidasQsettingsMixin.__init__(self)
+
         self.font = QtWidgets.QApplication.font()
+        self.params = ParameterCollection()
+
+        init_layout = kwargs.get('initLayout', True)
         if init_layout:
             _layout = QtWidgets.QGridLayout(self)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)

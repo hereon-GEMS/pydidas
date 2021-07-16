@@ -42,11 +42,11 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('det_mask'),
     get_generic_parameter('mosaic_border_width'),
     get_generic_parameter('mosaic_border_value'),
+    get_generic_parameter('mosaic_max_size'),
     )
 
 
-class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
-                               ParameterCollectionMixIn):
+class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
     """
     Frame which manages global configuration items.
     """
@@ -61,7 +61,6 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         ParameterConfigWidgetsMixIn.__init__(self)
         self.set_default_params()
 
-        self.__settings = QtCore.QSettings('Hereon', 'pydidas')
         self._widgets = {}
         self.init_widgets()
 
@@ -106,6 +105,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                  **_options)
         self.create_param_widget(self.params.get_param('mosaic_border_value'),
                                  **_options)
+        self.create_param_widget(self.params.get_param('mosaic_max_size'),
+                                 **_options)
         self.create_spacer()
 
     def connect_signals(self):
@@ -129,7 +130,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         value : object
             The new value.
         """
-        self.__settings.setValue(f'global/{param_key}', value)
+        self.q_settings.setValue(f'global/{param_key}', value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.pyqtSlot(int)
@@ -149,50 +150,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         if index != self.frame_index:
             return
         for _param_key in self.params:
-            _value = self.__get_qsetting_value(_param_key)
+            _value = self.qsetting_get_global_value(_param_key)
             self.update_param_value(_param_key, _value)
-
-    def __get_qsetting_value(self, param_key):
-        """
-        Get the value from a QSetting.
-
-        Parameters
-        ----------
-        param_key : str
-            The QSetting reference key. A "global/" prefix will be applied
-            to it..
-
-        Returns
-        -------
-        value : object
-            The value, converted to the type associated with the Parameter
-            referenced by param_key.
-        """
-        _value = self.__settings.value(f'global/{param_key}')
-        return self.__convert_value_type(param_key, _value)
-
-    def __convert_value_type(self, param_key, value):
-        """
-        Convert a value to the datatype expected by the Parameter.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter reference key.
-        value : object
-            The value whose type should be converted.
-
-        Returns
-        -------
-        value : object
-            The value in the correct datatype.
-        """
-        _p = self.get_param(param_key)
-        if _p.type == Integral:
-            return int(value)
-        elif _p.type == Real:
-            return float(value)
-        return value
 
     def __reset(self):
         qm = QtGui.QMessageBox
@@ -217,7 +176,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         value : object
             The new value which was set externally.
         """
-        value = self.__convert_value_type(param_key, value)
+        value = self._qsettings_convert_value_type(param_key, value)
         self.update_param_value(param_key, value)
 
 

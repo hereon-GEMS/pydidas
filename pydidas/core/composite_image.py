@@ -107,6 +107,7 @@ class CompositeImage(ObjectWithParameterCollection):
         _shape = self.get_param_value('image_shape')
         _nx = _shape[1] * self.get_param_value('composite_nx')
         _ny = _shape[0] * self.get_param_value('composite_ny')
+
         self.__image = np.zeros((_ny, _nx),
                                 dtype = self.get_param_value('datatype'))
 

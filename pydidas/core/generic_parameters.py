@@ -333,6 +333,9 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('Mosaic border value', float, default=0,
               refkey='mosaic_border_value', unit='',
               tooltip='The value to be put in the border pixels in mosaics.'),
+    Parameter('Mosaic maximum size (Mpx)', float, default=100,
+              refkey='mosaic_max_size', unit='',
+              tooltip='The maximum size (in Mpx) of mosais images.'),
 )
 
 

@@ -59,6 +59,9 @@ from .export_image_func import *
 from . import singleton_factory
 from .singleton_factory import *
 
+from . import pydidas_q_settings_mixin
+from .pydidas_q_settings_mixin import *
+
 __all__ += composites.__all__
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
@@ -71,6 +74,8 @@ __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
 __all__ += export_image_func.__all__
 __all__ += singleton_factory.__all__
+__all__ += pydidas_q_settings_mixin.__all__
+
 
 
 # Unclutter namespace: remove modules from namespace
@@ -86,3 +91,4 @@ del composite_image
 del generic_parameters
 del export_image_func
 del singleton_factory
+del pydidas_q_settings_mixin

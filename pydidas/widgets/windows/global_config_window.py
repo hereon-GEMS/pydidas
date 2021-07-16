@@ -29,11 +29,11 @@ from PyQt5 import QtWidgets
 class GlobalConfigWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None):
-        from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
+        from pydidas.gui.global_configuration_frame import \
+            GlobalConfigurationFrame
 
         super().__init__(parent)
         _frame = GlobalConfigurationFrame()
         _frame.frame_index = 0
         self.setVisible(False)
-        # self.setFloating(True)
         self.setCentralWidget(_frame)

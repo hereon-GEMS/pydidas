@@ -31,6 +31,7 @@ from numpy import mod
 
 from pydidas.core.parameter import Parameter
 from .parameter_collection import ParameterCollection
+from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class ParameterCollectionMixIn:
@@ -142,9 +143,7 @@ class ParameterCollectionMixIn:
         Parameter
             The Parameter object.
         """
-        if not param_key in self.params:
-            raise KeyError(f'No parameter with the name "{param_key}" '
-                           'has been registered.')
+        self._check_key(param_key)
         return self.params[param_key]
 
     def set_param_value(self, param_key, value):
@@ -159,9 +158,7 @@ class ParameterCollectionMixIn:
             The value to be set. This has to be the datatype associated with
             the Parameter.
         """
-        if not param_key in self.params:
-            raise KeyError(f'No parameter with the name "{param_key}" '
-                           'has been registered.')
+        self._check_key(param_key)
         self.params.set_value(param_key, value)
 
     def get_param_values_as_dict(self):
@@ -257,7 +254,8 @@ class ParameterCollectionMixIn:
                            f'{self.__class__.__name__}!')
 
 
-class ObjectWithParameterCollection(ParameterCollectionMixIn, QtCore.QObject):
+class ObjectWithParameterCollection(ParameterCollectionMixIn,
+                                    PydidasQsettingsMixin, QtCore.QObject):
     """
     Inherits from :py:class:`pydidas.core.ParameterCollectionMixIn
     <pydidas.core.ParameterCollectionMixIn>`, :py:class:`PyQt5.QtCore.QObject`
@@ -281,7 +279,9 @@ class ObjectWithParameterCollection(ParameterCollectionMixIn, QtCore.QObject):
             A dictionary of keyword arguments. Defined by the concrete
             subclass.
         """
-        super().__init__()
+        ParameterCollectionMixIn.__init__(self)
+        PydidasQsettingsMixin.__init__(self)
+        QtCore.QObject.__init__(self)
         self.params = ParameterCollection()
         self._config = {}
 

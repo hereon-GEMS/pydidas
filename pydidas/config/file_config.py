@@ -15,4 +15,4 @@ YAML_EXTENSIONS = ['.yaml', '.yml']
 FILENAME_DELIMITERS = '\.|_|-| '
 
 QSETTINGS_GLOBAL_KEYS = ['mp_n_workers', 'det_mask', 'mosaic_border_width',
-                         'mosaic_border_value']
+                         'mosaic_border_value', 'mosaic_max_size']

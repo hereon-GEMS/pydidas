@@ -39,6 +39,8 @@ class DatasetConfigException(Exception):
 
 class EmptyDataset(np.ndarray):
     """
+    Inherits from :py:class:`numpy.ndarray`
+
     Base class of an empty dataset (numpy.ndarray subclass) for instantiation.
     """
     def __new__(cls, *args, **kwargs):
@@ -273,7 +275,10 @@ class EmptyDataset(np.ndarray):
 
 class Dataset(EmptyDataset):
     """
-    Dataset class with metadata to the numpy.ndarray.
+    Inherits from :py:class:`pydidas.core.EmptyDataset
+    <pydidas.core.EmptyDataset>`
+
+    Dataset class, a subclass of a numpy ndarray with metadata.
 
     Parameters for class creation:
     ------------------------------

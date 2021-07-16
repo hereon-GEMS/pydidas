@@ -27,8 +27,8 @@ __all__ = []
 from . import global_config_window
 from .global_config_window import *
 
-# from . import plugin_collection_presenter
-# from .plugin_collection_presenter import *
+from . import global_documentation_window
+from .global_documentation_window import *
 
 # from . import scroll_area
 # from .scroll_area import *
@@ -70,7 +70,7 @@ from .global_config_window import *
 # from .base_frame_with_app import *
 
 __all__ += global_config_window.__all__
-# __all__ += plugin_collection_presenter.__all__
+__all__ += global_documentation_window.__all__
 # __all__ += scroll_area.__all__
 # __all__ += utilities.__all__
 # __all__ += workflow_tree_canvas.__all__
@@ -89,7 +89,7 @@ __all__ += global_config_window.__all__
 
 # unclutter namespace and remove modules:
 del global_config_window
-# del plugin_collection_presenter
+del global_documentation_window
 # del scroll_area
 # del utilities
 # del workflow_tree_canvas

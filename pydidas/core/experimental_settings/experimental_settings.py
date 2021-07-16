@@ -24,8 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExperimentalSettings']
 
-import scipy.constants
-
 from ..singleton_factory import SingletonFactory
 from ..parameter_collection import ParameterCollection
 from ..generic_parameters import get_generic_parameter
@@ -51,9 +49,15 @@ DEFAULTS = ParameterCollection(
 
 class _ExpSettings(ObjectWithParameterCollection):
     """
+    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
+    <pydidas.core.ObjectWithParameterCollection>`
+
     Class which holds experimental settings. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
+
+    The factory will allow access to the single instace through
+    :py:class:`pydidas.core.experimental_settings.ExperimentalSettings`.
     """
     default_params = DEFAULTS
 

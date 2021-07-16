@@ -102,11 +102,6 @@ class ParameterCollectionMixIn:
         This method will go through the supplied defaults iterable.
         If there are no entries for the Parameter keys, it will add a
         Parameter with default value.
-
-        Parameters
-        ----------
-        defaults : Union[dict, ParameterCollection, list, tuple, set]
-            An iterable with default Parameters.
         """
         for _param in self.default_params.values():
             if _param.refkey not in self.params:
@@ -262,8 +257,12 @@ class ParameterCollectionMixIn:
                            f'{self.__class__.__name__}!')
 
 
-class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn):
+class ObjectWithParameterCollection(ParameterCollectionMixIn, QtCore.QObject):
     """
+    Inherits from :py:class:`pydidas.core.ParameterCollectionMixIn
+    <pydidas.core.ParameterCollectionMixIn>`, :py:class:`PyQt5.QtCore.QObject`
+
+
     An object with a ParameterCollection.
 
     This class can be inherited by any class which requires a

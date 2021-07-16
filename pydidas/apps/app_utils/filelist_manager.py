@@ -50,6 +50,9 @@ DEFAULT_PARAMS = ParameterCollection(
 
 class FilelistManager(ObjectWithParameterCollection):
     """
+    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
+    <pydidas.core.ObjectWithParameterCollection>`
+
     The FilelistManager creates and manages a file list from which to select
     items for processing.
 
@@ -327,17 +330,3 @@ class FilelistManager(ObjectWithParameterCollection):
         self._config = {'file_list': [],
                         'file_size': None,
                         'n_files': 0}
-
-    # def __copy__(self):
-    #     """
-    #     Create a copy of the object.
-
-    #     Returns
-    #     -------
-    #     fm : FilelistManager
-    #         The copy with the same state.
-    #     """
-    #     fm = FilelistManager()
-    #     fm.params = self.params.get_copy()
-    #     fm._config = copy.copy(self._config)
-    #     return fm

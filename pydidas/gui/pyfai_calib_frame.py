@@ -182,7 +182,6 @@ class PyfaiCalibFrame(BaseFrame):
             self._list.setCurrentRow(index)
 
     def _store_geometry(self):
-        print('Store geometry')
         geo = self.model().fittedGeometry()
         det = self.model().experimentSettingsModel().detector()
         EXP_SETTINGS.set_param_value('xray_wavelength',

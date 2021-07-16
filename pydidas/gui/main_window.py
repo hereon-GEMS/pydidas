@@ -22,11 +22,12 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['MainWindow']
 
 import os
 import re
 from functools import partial
+
 
 import qtawesome as qta
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -36,7 +37,14 @@ from pydidas._exceptions import FrameConfigError
 from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
 from pydidas.config import QSETTINGS_GLOBAL_KEYS
 
+
 class MainWindow(QtWidgets.QMainWindow):
+    """
+    Inherits from :py:class:`PyQt5.QtWidgets.QMainWindow`.
+
+    The MainWindow is used to organize frames and for managing the menu
+    and global application parameters.
+    """
     def __init__(self, parent=None, geometry=None):
         from pydidas.gui.pyfai_calib_frame import pyfaiRingIcon
         super().__init__(parent)
@@ -55,7 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(CentralWidgetStack())
         self.status.showMessage('Test status')
 
-        self.setWindowTitle('pyDIDAS layout prototype')
+        self.setWindowTitle('pydidas GUI (alpha)')
         self.setWindowIcon(pyfaiRingIcon())
         self.__createMenu()
         self.__create_info_box()
@@ -66,8 +74,12 @@ class MainWindow(QtWidgets.QMainWindow):
         app.setOrganizationDomain("Hereon/WPI")
         app.setApplicationName("pydidas")
         self.__create_qsettings_if_required()
+        self.__add_documentation_window()
 
-    def __add_global_config(self):
+    def __add_global_config_window(self):
+        """
+        Add the required widgets and signals for the global configuration.
+        """
         from ..widgets.windows import GlobalConfigWindow
         self.register_frame('Global configuration', 'Global configuration',
                             qta.icon('mdi.application-cog'),
@@ -78,6 +90,10 @@ class MainWindow(QtWidgets.QMainWindow):
         _w2 = self.windows['global_config'].centralWidget()
         _w.value_changed_signal.connect(_w2.external_update)
         _w2.value_changed_signal.connect(_w.external_update)
+
+    def __add_documentation_window(self):
+        from ..widgets.windows import GlobalDocumentationWindow
+        self.windows['documentation'] = GlobalDocumentationWindow(self)
 
     @staticmethod
     def __find_toolbar_bases(items):
@@ -131,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
     def create_toolbars(self):
-        self.__add_global_config()
+        self.__add_global_config_window()
         self._toolbars = {}
         for tb in self.__find_toolbar_bases(self.frame_menuentries):
             tb_title = tb if tb else 'Main toolbar'
@@ -223,10 +239,23 @@ class MainWindow(QtWidgets.QMainWindow):
     def action_open(self):
         print('open')
 
-    def open_settings(self):
-        self.windows['global_config'].show()
-        # self.floating_settings.widget().frame_activated(0)
-        # self.floating_settings.setVisible(True)
+    def show_window(self, name):
+        """
+        Show a separate window.
+
+        Parameters
+        ----------
+        name : str
+            The name key of the window to be shown.
+        """
+        self.windows[name].show()
+
+    def __action_open_doc_in_browser(self):
+        """
+        Open the link to the documentation in the system web browser.
+        """
+        from ..widgets.windows import get_doc_qurl
+        QtGui.QDesktopServices.openUrl(get_doc_qurl())
 
     def closeEvent(self, event):
         for window in self.windows:
@@ -286,10 +315,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         extrasMenu = self._menu.addMenu('&Extras')
         settingsAction = QtWidgets.QAction('&Settings', self)
-        settingsAction.triggered.connect(self.open_settings)
+        settingsAction.triggered.connect(partial(self.show_window,
+                                                 'global_config'))
         extrasMenu.addAction(settingsAction)
+
+        helpMenu = self._menu.addMenu('&Help')
+        documentation_action = QtWidgets.QAction('Open documentation in '
+                                                'window', self)
+        documentation_action.triggered.connect(partial(self.show_window,
+                                                      'documentation'))
+        doc_in_browser_action = QtWidgets.QAction('Open documentation in '
+                                                  'web browser', self)
+        doc_in_browser_action.triggered.connect(
+            self.__action_open_doc_in_browser)
+        helpMenu.addAction(documentation_action)
+        helpMenu.addAction(doc_in_browser_action)
+
 
         self._menu.addMenu(fileMenu)
         self._menu.addMenu(extrasMenu)
-        self._menu.addMenu("&Edit")
-        self._menu.addMenu("&Help")
+        self._menu.addMenu(helpMenu)

@@ -51,6 +51,9 @@ DEFAULT_PARAMS = ParameterCollection(
 
 class ImageMetadataManager(ObjectWithParameterCollection):
     """
+    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
+    <pydidas.core.ObjectWithParameterCollection>`
+
     The ImageMetadataManager is responsible for keeping track of the
     metadata (shape, datatype, imager per file) of image files.
 

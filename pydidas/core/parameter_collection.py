@@ -330,7 +330,7 @@ class ParameterCollection(dict):
         Raises
         ------
         KeyError
-            If the key <param_key> is not registered.
+            If the key "param_key" is not registered.
 
         Returns
         -------
@@ -352,7 +352,7 @@ class ParameterCollection(dict):
         Raises
         ------
         KeyError
-            If the param_key does not exist.
+            If the "param_key" does not exist.
         """
         if param_key not in self.keys():
             raise KeyError(f'No parameter with the name "{param_key}" '
@@ -376,7 +376,7 @@ class ParameterCollection(dict):
         Raises
         ------
         KeyError
-            If the key <param_key> is not registered.
+            If the key "param_key" is not registered.
         """
         self.__check_key_exists(param_key)
         _item = self.__getitem__(param_key)

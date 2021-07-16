@@ -26,15 +26,18 @@ __all__ = ['CompositeImage']
 from copy import copy
 
 import numpy as np
-from pydidas.core.parameter_collection import ParameterCollection
-from pydidas.core.object_with_parameter_collection import ObjectWithParameterCollection
-from pydidas.core.generic_parameters import get_generic_parameter
-from pydidas.core.export_image_func import export_image
+from .parameter_collection import ParameterCollection
+from .object_with_parameter_collection import ObjectWithParameterCollection
+from .generic_parameters import get_generic_parameter
+from .export_image_func import export_image
 
 class CompositeImage(ObjectWithParameterCollection):
     """
+    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
+    <pydidas.core.ObjectWithParameterCollection>`
+
     The CompositeImage class holds a numpy array to insert individual images
-    to a composite.
+    to a composite and to provide basic insertion and manipulation routines.
     """
     default_params = ParameterCollection(
         get_generic_parameter('image_shape'),

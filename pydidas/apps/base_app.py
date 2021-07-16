@@ -31,9 +31,10 @@ from pydidas.core import ObjectWithParameterCollection
 
 class BaseApp(ObjectWithParameterCollection):
     """
-    The BaseApp.
+    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
+    <pydidas.core.ObjectWithParameterCollection>`
 
-    TO DO
+    The BaseApp is the base class for all pydidas applications.
     """
     def __init__(self, *args, **kwargs):
         """

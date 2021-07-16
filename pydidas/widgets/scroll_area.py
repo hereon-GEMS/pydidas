@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ScrollArea']
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from .utilities import apply_widget_properties
 
@@ -64,3 +64,9 @@ class ScrollArea(QtWidgets.QScrollArea):
                                 QtWidgets.QSizePolicy.Expanding)
         kwargs['frameShape'] = QtWidgets.QFrame.NoFrame
         apply_widget_properties(self, **kwargs)
+
+    def sizeHint(self):
+        if self.widget() is not None:
+            return self.widget().sizeHint()
+        else:
+            return super().sizeHint()

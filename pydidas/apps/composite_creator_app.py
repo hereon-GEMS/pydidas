@@ -80,6 +80,8 @@ DEFAULT_PARAMS = ParameterCollection(
 
 class CompositeCreatorApp(BaseApp):
     """
+    Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`
+
     The CompositeCreatorApp can compose mosaic images of a large number of
     individual image files.
 

@@ -25,6 +25,9 @@ __all__ = []
 
 from . import builders
 
+from . import main_window
+from .main_window import *
+
 from . import workflow_tree_edit_manager
 from .workflow_tree_edit_manager import *
 
@@ -43,27 +46,29 @@ from .scan_settings_frame import *
 from . import processing_single_plugin_frame
 from .processing_single_plugin_frame import *
 
-from . import processing_full_workflow
-from .processing_full_workflow import *
+from . import processing_full_workflow_frame
+from .processing_full_workflow_frame import *
 
 from . import composite_creator_frame
 from .composite_creator_frame import *
 
+__all__ += main_window.__all__
 __all__ += workflow_tree_edit_manager.__all__
 __all__ += data_browsing_frame.__all__
 __all__ += workflow_edit_frame.__all__
 __all__ += experiment_settings_frame.__all__
 __all__ += scan_settings_frame.__all__
 __all__ += processing_single_plugin_frame.__all__
-__all__ += processing_full_workflow.__all__
+__all__ += processing_full_workflow_frame.__all__
 __all__ += composite_creator_frame.__all__
 
 # Unclutter namespace: remove modules from namespace
+del main_window
 del workflow_tree_edit_manager
 del data_browsing_frame
 del workflow_edit_frame
 del experiment_settings_frame
 del scan_settings_frame
 del processing_single_plugin_frame
-del processing_full_workflow
+del processing_full_workflow_frame
 del composite_creator_frame

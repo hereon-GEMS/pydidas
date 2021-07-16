@@ -28,7 +28,11 @@ __all__ = ['HdfKey']
 
 
 class HdfKey(str):
-    """A class used for referencing hdf keys."""
+    """
+    Inherits from :py:class:`str`.
+    
+    A class used for referencing hdf keys.
+    """
     def __new__(cls, text):
         _instance = super().__new__(cls, text)
         _instance.__hdf_fname = None

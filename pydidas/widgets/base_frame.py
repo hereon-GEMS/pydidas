@@ -24,16 +24,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseFrame']
 
-import copy
 from PyQt5 import QtWidgets, QtCore
 
 from .create_widgets_mixin import CreateWidgetsMixIn
 
 
-class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
+class BaseFrame(CreateWidgetsMixIn, QtWidgets.QFrame):
     """
+    Inherits from :py:class:`PyQt5.QtWidgets.QFrame`,
+    :py:class:`pydidas.widgets.CreateWidgetsMixIn`.
+
     The BaseFrame is a subclassed QFrame and should be used as the
-    base class for all Frames in the pySALADD suite.
+    base class for all Frames in the pydidas suite.
     It adds a name attribute and registration routines with the
     CentralWidgetStack.
 
@@ -60,7 +62,7 @@ class BaseFrame(QtWidgets.QFrame, CreateWidgetsMixIn):
             Any additional keyword arguments.
         """
         init_layout = kwargs.get('initLayout', True)
-        super().__init__(parent=parent)
+        QtWidgets.QFrame.__init__(self, parent=parent)
         self.font = QtWidgets.QApplication.font()
         if init_layout:
             _layout = QtWidgets.QGridLayout(self)

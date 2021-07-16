@@ -65,3 +65,20 @@ The module structure is the following (listed in alphabetical order):
 
 Key concepts
 ------------
+
+* **Parameter** - The key data structure used in pydidas is the Parameter. The class documentation
+  can be found here: :doc:`Parameter<./code_docs/core/parameter>`.
+* **ParameterCollection** - An extended dictionary with Parameter values only. This class is used
+  for managing most of the internal data in the pydidas module. Reference:
+  :doc:`ParameterCollection<./code_docs/core/parameter_collection>`
+  
+  
+Module documentation
+--------------------
+
+.. toctree::
+	:maxdepth: 2
+	
+	code_docs/apps
+	code_docs/core
+	code_docs/gui

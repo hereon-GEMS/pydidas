@@ -64,8 +64,8 @@ class Parameter:
     """A class used for storing parameters and associated metadata.
 
     The parameter has the following properties which can be accessed.
-    Only the value property can be edited at runtime, all other properties
-    are fixed at instanciation.
+    Only the value and choices properties can be edited at runtime, all other
+    properties are fixed at instanciation.
 
     +------------+-----------+-------------------------------------------+
     | property   | editable  | description                               |
@@ -74,7 +74,7 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | value      | True      | The current value.                        |
     +------------+-----------+-------------------------------------------+
-    | refkey     | False     | A reference key for the parameter.        |
+    | refkey     | False     | A reference key for the Parameter.        |
     |            |           | This key is used for accessing the        |
     |            |           | Parameter in the ParameterCollection      |
     +------------+-----------+-------------------------------------------+
@@ -82,12 +82,13 @@ class Parameter:
     |            |           | parameter is limited to specific values.  |
     +------------+-----------+-------------------------------------------+
     | optional   | False     | A flag whether the parameter is required  |
-    |            |           |  or optional.                             |
+    |            |           | or optional.                              |
     +------------+-----------+-------------------------------------------+
     | tooltip    | False     | A readable tooltip.                       |
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value                         |
     +------------+-----------+-------------------------------------------+
+
     """
 
     def __init__(self, name, param_type, meta=None, **kwargs):
@@ -133,37 +134,69 @@ class Parameter:
         **kwargs : dict
             All optional parameters can also be passed as a keyword argument
             dictionary.
-
-        Returns
-        -------
-        None.
         """
         super().__init__()
         self.__name = name
         self.__type = _get_base_class(param_type)
         if isinstance(meta, dict):
             kwargs.update(meta)
-        self.__meta = dict(default = kwargs.get('default', None),
-                           tooltip = kwargs.get('tooltip', ''),
+
+        self.__meta = dict(tooltip = kwargs.get('tooltip', ''),
                            unit = kwargs.get('unit', ''),
                            optional = kwargs.get('optional', False),
                            refkey = kwargs.get('refkey', name))
+        self.__process_default_input(kwargs)
+        self.__process_choices_input(kwargs)
+        self.__value = (self.__meta['default'] if 'value' not in kwargs
+                        else kwargs['value'])
 
+    def __process_default_input(self, kwargs):
+        """
+        Process the default value.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The kwargs passed to init.
+
+        Raises
+        ------
+        TypeError
+            If the default value is not of the demanded data type.
+        """
+        default = kwargs.get('default', None)
+        if not self.__typecheck(default):
+            raise TypeError(f'Default value "{default}" does not have data'
+                            f'type {self.__type}!')
+        self.__meta['default'] = default
+
+    def __process_choices_input(self, kwargs):
+        """
+        Process the choices input.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The kwargs passed to init.
+
+        Raises
+        ------
+        TypeError
+            If choices is not of an accepted type (None, list, tuple)
+        ValueError
+            If the default has been set and it is not in choices.
+        """
         _choices = kwargs.get('choices', None)
         if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
             raise TypeError('The type of choices (type: "{type(_choices)}"'
                             'is not supported. Please use list or tuple.')
         self.__meta['choices'] = None if _choices is None else list(_choices)
         _def = self.__meta['default']
-        if not self.__typecheck(_def):
-            raise TypeError(f'Default value "{_def}" does not have data'
-                            f'type {self.__type}!')
         if (self.__meta['choices'] is not None
                 and _def not in self.__meta['choices']):
             raise ValueError(f'The default value "{_def}" does not '
                              'correspond to any of the defined choices: '
                              f'{self.__meta["choices"]}.')
-        self.__value = _def if 'value' not in kwargs else kwargs['value']
 
     def __call__(self):
         """
@@ -301,7 +334,14 @@ class Parameter:
     @property
     def choices(self):
         """
-        Get the allowed choices for the Parameter value.
+        Get or set the allowed choices for the Parameter value.
+
+        Parameters
+        ----------
+        choices : Union[list, tuple, set]
+            A list or tuple of allowed choices. A check will be performed that
+            all entries correspond to the defined data type and that the
+            curent parameter value is one of the allowed choices.
 
         Returns
         -------
@@ -315,13 +355,6 @@ class Parameter:
         """
         Update the allowed choices of a Parameter.
 
-        Parameters
-        ----------
-        choices : Union[list, tuple, set]
-            A list or tuple of allowed choices. A check will be performed that
-            all entries correspond to the defined data type and that the
-            curent parameter value is one of the allowed choices.
-
         Raises
         ------
         TypeError
@@ -331,10 +364,6 @@ class Parameter:
         ValueError
             If the current Parameter value is not included in the list of
             new choices.
-
-        Returns
-        -------
-        None.
         """
         if not isinstance(choices, (list, tuple, set)):
             raise TypeError('New choices must be a list or tuple.')
@@ -375,7 +404,12 @@ class Parameter:
     @property
     def value(self):
         """
-        Get the parameter value.
+        Get or set the parameter value.
+
+        Parameters
+        ----------
+        val : type
+            The new value for the parameter.
 
         Returns
         -------
@@ -388,11 +422,6 @@ class Parameter:
     def value(self, val):
         """
         Set a new value for the parameter.
-
-        Parameters
-        ----------
-        val : type
-            The new value for the parameter.
 
         Raises
         ------
@@ -416,10 +445,6 @@ class Parameter:
     def restore_default(self):
         """
         Restore the parameter to its default value.
-
-        Returns
-        -------
-        None.
         """
         self.value = self.__meta['default']
 
@@ -440,17 +465,13 @@ class Parameter:
 
         Returns
         -------
-        A tuple containing the following data:
         str
-            The name of the parameter
+            The name of the Parameter
         type
-            The type value of the parameter.
-        value
-            The value of the parameter.
-        bool
-            The parameter is optionalflag value.
-        str
-            The description of the parameter.
+            The data type of the Parameter.
+        meta
+            A dictionary with all the metadata information about the
+            Parameter (value, unit, tooltip, refkey, default, choices)
         """
         _meta = self.__meta
         _meta.update({'value': self.__value})

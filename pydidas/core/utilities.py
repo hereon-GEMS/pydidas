@@ -98,7 +98,7 @@ def create_temp_file():
     os.close(_handle)
     return _filename
 
-def get_time_string(epoch=None, skipSpecChars=False):
+def get_time_string(epoch=None, humanReadable=False):
     """
     Get a formatted time string.
 
@@ -113,24 +113,25 @@ def get_time_string(epoch=None, skipSpecChars=False):
     epoch : Union[None, float]
         The time in epoch. If None, the current system time will be used.
         The default is None.
-
-    skipSpecChars : bool, optional
-        Flag to skip special separation characters. If False the output
-        will be human-readable friendly with separators. The default is False.
+    humanReadable : bool, optional
+        Flag to create human-readable format with special separation characters
+        (":" and "/"). If False, the output items will not be separated by
+        separators (e.g. for filenames). The default is True.
 
     Returns
     -------
-
-    :return: Formatted date and time string (YYYY/MM/DD HH:MM:ss.sss)
-    :rtype: str
+    str
+        Formatted date and time string
+        (if humanReadable: YYYY/MM/DD HH:MM:ss.sss;
+         else: YYYYMMDD__HHMMss)
     """
     if epoch is None:
         epoch = time.time()
     _time = time.localtime(epoch)
     _sec = _time[5] + epoch - floor(epoch)
-    if skipSpecChars:
-        return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
+    if humanReadable:
+        return ('{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
                 ''.format(_time[0], _time[1], _time[2], _time[3], _time[4],
                           _sec))
-    return ('{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
+    return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
             ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))

@@ -52,7 +52,8 @@ class EmptyDataset(np.ndarray):
             if item in kwargs:
                 del kwargs[item]
         obj = super().__new__(cls, *args, **kwargs)
-        obj.axis_labels = local_kws.get('axis_labels', _default_vals(obj.ndim))
+        _labels = local_kws.get('axis_labels', _default_vals(obj.ndim))
+        obj.axis_labels = obj.__get_dict(_labels, '__new__')
         obj.axis_scales = local_kws.get('axis_scales', _default_vals(obj.ndim))
         obj.axis_units = local_kws.get('axis_units', _default_vals(obj.ndim))
         obj.metadata = local_kws.get('metadata', None)
@@ -74,7 +75,7 @@ class EmptyDataset(np.ndarray):
                     {i: _item.get(i, None) for i in range(self.ndim)})
         self.metadata = getattr(obj, 'metadata', None)
 
-    def __get_dict(self, _data, _text):
+    def __get_dict(self, _data, method_name):
         """
         Get an ordered dictionary with the axis keys for _data.
 
@@ -86,7 +87,7 @@ class EmptyDataset(np.ndarray):
         ----------
         _data : Union[dict, list, tuple]
             The keys for the axis meta data.
-        _text : str
+        method_name : str
             The name of the calling method (for exception handling)
 
         Raises
@@ -107,15 +108,18 @@ class EmptyDataset(np.ndarray):
         if isinstance(_data, dict):
             if set(_data.keys()) != set(np.arange(self.ndim)):
                 raise DatasetConfigException(
-                    f'The keys for "{_text}" do not match the axis dimensions'
-                )
-            return  _data #{i: _data[i] for i in range(self.ndim)}
+                    f'The keys for "{method_name}" do not match the axis '
+                    'dimensions')
+            return  _data
         if isinstance(_data, (list, tuple)):
-            _data = dict(zip(np.arange(self.ndim), _data))
+            if len(_data) != self.ndim:
+                raise DatasetConfigException(
+                    f'The number of entries for "{method_name}" does'
+                    ' not match the axis dimensions')
+            _data = {index: item for index, item in enumerate(_data)}
             return _data
         raise DatasetConfigException(
-            f'Input {_data} cannot be converted to dictionary'
-        )
+            f'Input {_data} cannot be converted to dictionary')
 
     @property
     def axis_labels(self):
@@ -227,7 +231,7 @@ class EmptyDataset(np.ndarray):
             If metadata is not None or dict
         """
         if not (isinstance(metadata, dict) or metadata is None):
-            raise ValueError('Image id variable is not an integer.')
+            raise TypeError('Metadata must be a dictionary or None.')
         self.__metadata = metadata
 
     @property

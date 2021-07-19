@@ -60,30 +60,21 @@ class PydidasQsettingsMixin:
     This class can be inherited by any class which requires a
     ParameterCollection and access methods for it.
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """
-        Create a Base instance.
-
-        Parameters
-        ----------
-        *args : list
-            Any arguments. Defined by the concrete
-            subclass..
-        **kwargs : dict
-            A dictionary of keyword arguments. Defined by the concrete
-            subclass.
+        Create the q_settings attribute.
         """
         self.q_settings = copyableQSettings('Hereon', 'pydidas')
 
-    def qsetting_get_global_value(self, param_key):
+    def q_settings_get_global_value(self, key):
         """
         Get the value from a QSetting.
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The QSetting reference key. A "global/" prefix will be applied
-            to it..
+            to the selected key.
 
         Returns
         -------
@@ -91,16 +82,16 @@ class PydidasQsettingsMixin:
             The value, converted to the type associated with the Parameter
             referenced by param_key.
         """
-        _value = self.q_settings.value(f'global/{param_key}')
-        return self._qsettings_convert_value_type(param_key, _value)
+        _value = self.q_settings.value(f'global/{key}')
+        return self._qsettings_convert_value_type(key, _value)
 
-    def _qsettings_convert_value_type(self, param_key, value):
+    def _qsettings_convert_value_type(self, key, value):
         """
         Convert a value to the datatype expected by the Parameter.
 
         Parameters
         ----------
-        param_key : str
+        key : str
             The Parameter reference key.
         value : object
             The value whose type should be converted.
@@ -110,13 +101,12 @@ class PydidasQsettingsMixin:
         value : object
             The value in the correct datatype.
         """
-        print(param_key, value)
         try:
-            _p = self.get_param(param_key)
+            _p = self.get_param(key)
             if _p.type == Integral:
                 return int(value)
             elif _p.type == Real:
                 return float(value)
-        except KeyError:
+        except (KeyError, AttributeError):
             pass
         return value

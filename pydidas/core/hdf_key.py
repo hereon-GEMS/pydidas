@@ -26,11 +26,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['HdfKey']
 
+from pathlib import Path
+
 
 class HdfKey(str):
     """
     Inherits from :py:class:`str`.
-    
+
     A class used for referencing hdf keys.
     """
     def __new__(cls, text):
@@ -39,7 +41,7 @@ class HdfKey(str):
         return _instance
 
     @property
-    def hdf_filename(self):
+    def hdf5_filename(self):
         """
         Get the filename of the associated hdf5 file.
 
@@ -50,6 +52,17 @@ class HdfKey(str):
         """
         return self.__hdf_fname
 
-    @hdf_filename.setter
-    def hdf_filename(self, txt):
-        self.__hdf_fname = txt
+    @hdf5_filename.setter
+    def hdf5_filename(self, txt):
+        """
+        Set the hdf_filename property.
+
+        Parameters
+        ----------
+        txt : str
+            The filename (and path) to the hdf5 file.
+        """
+        if type(txt) not in (str, Path):
+            raise TypeError('"hdf5_filename" property must be of type'
+                            ' str or pathlib.Path.')
+        self.__hdf_fname = Path(txt)

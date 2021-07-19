@@ -35,8 +35,8 @@ from .parameter_collection import *
 from . import object_with_parameter_collection
 from .object_with_parameter_collection import *
 
-from . import composites
-from .composites import *
+# from . import composites
+# from .composites import *
 
 from . import composite_image
 from .composite_image import *
@@ -62,7 +62,7 @@ from .singleton_factory import *
 from . import pydidas_q_settings_mixin
 from .pydidas_q_settings_mixin import *
 
-__all__ += composites.__all__
+# __all__ += composites.__all__
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
 __all__ += object_with_parameter_collection.__all__
@@ -79,7 +79,7 @@ __all__ += pydidas_q_settings_mixin.__all__
 
 
 # Unclutter namespace: remove modules from namespace
-del composites
+# del composites
 del parameter
 del dataset
 del experimental_settings

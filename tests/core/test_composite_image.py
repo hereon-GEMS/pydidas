@@ -8,9 +8,10 @@ import shutil
 import unittest
 
 import numpy as np
+from PyQt5 import QtCore
 
 from pydidas.core import CompositeImage
-
+from pydidas._exceptions import AppConfigError
 
 class TestCompositeImage(unittest.TestCase):
 
@@ -97,6 +98,29 @@ class TestCompositeImage(unittest.TestCase):
         obj.export(_fname)
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())
+
+    def test__check_max_size_okay(self):
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
+                             composite_ny=5, datatype=float,
+                             threshold_low=np.nan, threshold_high=np.nan)
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        old_maxsize = q_settings.value('global/mosaic_max_size')
+        q_settings.setValue('global/mosaic_max_size', 100)
+        obj._CompositeImage__check_max_size(95)
+        if old_maxsize is not None:
+            q_settings.setValue('global/mosaic_max_size', old_maxsize)
+
+    def test__check_max_size_too_large(self):
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
+                             composite_ny=5, datatype=float,
+                             threshold_low=np.nan, threshold_high=np.nan)
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        old_maxsize = float(q_settings.value('global/mosaic_max_size'))
+        q_settings.setValue('global/mosaic_max_size', 100)
+        with self.assertRaises(AppConfigError):
+            obj._CompositeImage__check_max_size(105*1e6)
+        if old_maxsize is not None:
+            q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
 
 if __name__ == "__main__":

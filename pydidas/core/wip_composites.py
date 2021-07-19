@@ -23,10 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Composites']
 
-# from collections import OrderedDict
-import numbers
 import multiprocessing
 import numpy as np
+
 
 class _CompositesFactory:
     """
@@ -44,9 +43,11 @@ class _CompositesFactory:
 Composites = _CompositesFactory()
 
 
-
 class _Composites:
-    """Handle composite data which spans individual images
+    """
+    WIP ...
+
+    Handle composite data which spans individual images
     """
 
     def __init__(self):
@@ -57,7 +58,7 @@ class _Composites:
     def set_scan(self, scan):
         if True:
             ...
-            #To do: include class type check
+            #TODO: include class type check
         self.__scan = scan
 
     def new_composite(self, name, dtype=np.float32):

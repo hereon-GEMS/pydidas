@@ -26,6 +26,8 @@ __all__ = ['CompositeImage']
 from copy import copy
 
 import numpy as np
+
+from .._exceptions import AppConfigError
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
 from .generic_parameters import get_generic_parameter
@@ -107,9 +109,31 @@ class CompositeImage(ObjectWithParameterCollection):
         _shape = self.get_param_value('image_shape')
         _nx = _shape[1] * self.get_param_value('composite_nx')
         _ny = _shape[0] * self.get_param_value('composite_ny')
-
+        self.__check_max_size(_nx * _ny)
         self.__image = np.zeros((_ny, _nx),
                                 dtype = self.get_param_value('datatype'))
+
+    def __check_max_size(self, size):
+        """
+        Check that the size of the new image is not larger than the global
+        size limit.
+
+        Parameters
+        ----------
+        size : int
+            The size of the image in pixels.
+
+        Raises
+        ------
+        AppConfigError
+            If the size of the image is larger than the defined global limit.
+        """
+        size *= 1e-6
+        _maxsize = float(self.q_settings_get_global_value('mosaic_max_size'))
+        if size > _maxsize:
+            raise AppConfigError(f'The requested image size ({size} Mpx)'
+                                 ' is too large for the global size limit '
+                                 f'of {_maxsize} Mpx.')
 
     def apply_thresholds(self, **kwargs):
         """

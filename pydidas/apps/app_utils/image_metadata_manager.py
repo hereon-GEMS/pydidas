@@ -31,7 +31,7 @@ from pydidas.core import (ParameterCollection, get_generic_parameter,
                           ObjectWithParameterCollection)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
-from pydidas.image_reader import read_image
+from pydidas.image_io import read_image
 
 
 DEFAULT_PARAMS = ParameterCollection(

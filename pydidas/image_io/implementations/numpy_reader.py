@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the RawReader class for reading raw (binary) images.."""
+"""Module with the NumpyReader implementation of the base ImageReader."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -23,32 +23,37 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-import fabio
+import numpy as np
 
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
-from ...config import FABIO_EXTENSIONS
+from ...config import NUMPY_EXTENSIONS
 
 
-class FabioReader(ImageReader):
-    """ImageReader implementation for raw (binary) files."""
+class NumpyReader(ImageReader):
+    """
+    Reader for numpy data formats.
+    """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, **kwargs)
+    def __init__(self):
+        """
+        Initialization method
+        """
+        super().__init__()
 
     def read_image(self, filename, **kwargs):
         """
-        Read an image from a raw (binary) file.
+        Read and return a numpy image.
 
-        The read_image method extracts an image from a raw binary file
-        and returns it after processing any operations specified by the
-        keywords (binning, cropping).
-
-        The datatype, nx, ny parameters are required.
+        The read_image method loads a numpy format type image and returns
+        it after processing any operations specified by the keywords
+        (binning, cropping).
 
         Parameters
         ----------
+        filename : str
+            The full path and filename of the file to be read.
         ROI : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
@@ -64,17 +69,14 @@ class FabioReader(ImageReader):
 
         Returns
         -------
-        _image : np.ndarray
-            The image in form of an ndarray
-        _metadata : dict
-            The image metadata. For tiff images, this will be None.
+        image : pydidas.core.Dataset
+            The image in form of a Dataset (with embedded metadata)
         """
-        with fabio.open(filename) as _file:
-            _data = _file.data
-            _header = _file.header
-        self._image = Dataset(_data, metadata=_header)
+        _data = np.load(filename)
+        assert len(_data.shape)==2
+        self._image = Dataset(_data)
         return self.return_image(**kwargs)
 
 
 reader = ImageReaderFactory()
-reader.register_format('fabio', FABIO_EXTENSIONS, FabioReader)
+reader.register_format('numpy', NUMPY_EXTENSIONS, NumpyReader)

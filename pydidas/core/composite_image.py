@@ -31,7 +31,7 @@ from .._exceptions import AppConfigError
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
 from .generic_parameters import get_generic_parameter
-from .export_image_func import export_image
+
 
 class CompositeImage(ObjectWithParameterCollection):
     """
@@ -229,6 +229,7 @@ class CompositeImage(ObjectWithParameterCollection):
         output_fname : str
             The full file system path and filename for the output image file.
         """
+        from ..image_io import export_image
         export_image(self.__image, output_fname)
 
     @property

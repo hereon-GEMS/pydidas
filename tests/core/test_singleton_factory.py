@@ -38,5 +38,12 @@ class TestParameterCollection(unittest.TestCase):
         obj = self.factory.instance()
         self.assertIsInstance(obj, TestClass)
 
+    def test__reset(self):
+        obj = self.factory()
+        self.factory._SingletonFactory__reset_singleton()
+        obj2 = self.factory()
+        self.assertNotEqual(obj, obj2)
+
+
 if __name__ == "__main__":
     unittest.main()

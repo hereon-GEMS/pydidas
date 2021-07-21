@@ -82,39 +82,11 @@ class _ImageReaderFactory:
         """
         _ext = os.path.splitext(filename)[1].lower()
         if not _ext in self._extensions.keys():
-            raise ValueError(f'Extension "{_ext}" not supported.')
+            raise KeyError(f'Extension "{_ext}" not supported.')
         reader = self._readers.get(self._extensions[_ext])
         if not reader:
-            raise ValueError(f'Extension "{_ext}" not supported.')
+            raise KeyError(f'Extension "{_ext}" not supported.')
         return reader(**kwargs)
 
 
-class ImageReaderFactoryBuilder:
-    """
-    Builder class to prevent multiple instances of the _ImageReaderFactory to
-    be created.
-    """
-    def __init__(self):
-        """
-        Initialization
-        """
-        self._instance = None
-
-    def __call__(self, **kwargs):
-        """
-        Get the _ImageReaderFactory instance.
-
-        If an instance of ImageReaderFactory exists, it is returned.
-        If no instance exists yet, one is created and returned.
-
-        Returns
-        -------
-        _ImageReaderFactory
-            The class instance.
-        """
-        if not self._instance:
-            self._instance = _ImageReaderFactory()
-        return self._instance
-
-
-ImageReaderFactory = ImageReaderFactoryBuilder()
+ImageReaderFactory = SingletonFactory(_ImageReaderFactory)

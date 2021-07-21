@@ -31,7 +31,7 @@ from silx.gui.plot.ImageView import ImageView
 
 from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
                        QtaIconButton, BaseFrame)
-from ..image_reader import ImageReaderFactory, read_image
+from ..image_io import ImageReaderFactory, read_image
 from ..config import HDF5_EXTENSIONS
 
 

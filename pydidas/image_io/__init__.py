@@ -33,14 +33,24 @@ from .image_reader_factory import *
 from . import image_reader
 from .image_reader import *
 
-from . import read_image_func
-from .read_image_func import *
+from . import _read_image
+from ._read_image import *
+
+from . import _export_image
+from ._export_image import *
+
+from . import rebin_2d
+from .rebin_2d import *
 
 __all__ += image_reader_factory.__all__
 __all__ += image_reader.__all__
-__all__ += read_image_func.__all__
+__all__ += _read_image.__all__
+__all__ += _export_image.__all__
+__all__ += rebin_2d.__all__
 
 # Unclutter namespace: remove modules from namespace
 del image_reader_factory
 del image_reader
-del read_image_func
+del _read_image
+del _export_image
+del rebin_2d

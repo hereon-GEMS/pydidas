@@ -53,9 +53,6 @@ from .scan_settings import *
 from . import hdf_key
 from .hdf_key import *
 
-from . import export_image_func
-from .export_image_func import *
-
 from . import singleton_factory
 from .singleton_factory import *
 
@@ -72,7 +69,6 @@ __all__ += scan_settings.__all__
 __all__ += hdf_key.__all__
 __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
-__all__ += export_image_func.__all__
 __all__ += singleton_factory.__all__
 __all__ += pydidas_q_settings_mixin.__all__
 
@@ -89,6 +85,5 @@ del parameter_collection
 del object_with_parameter_collection
 del composite_image
 del generic_parameters
-del export_image_func
 del singleton_factory
 del pydidas_q_settings_mixin

@@ -47,7 +47,7 @@ from pydidas.utils import (get_hdf5_metadata, check_file_exists,
                            check_hdf_key_exists_in_file,
                            verify_files_in_same_directory,
                            verify_files_of_range_are_same_size)
-from pydidas.image_reader import read_image
+from pydidas.image_io import read_image
 from pydidas.utils import copy_docstring
 
 DEFAULT_PARAMS = ParameterCollection(

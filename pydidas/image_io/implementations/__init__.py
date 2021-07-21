@@ -23,7 +23,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import hdf_reader
+from . import hdf5_reader
 
 from . import tiff_reader
 

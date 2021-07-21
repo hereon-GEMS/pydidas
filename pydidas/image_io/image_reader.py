@@ -25,12 +25,13 @@ __status__ = "Development"
 __all__ = ['ImageReader']
 
 from .rebin_2d import rebin2d
+from .roi_manager import RoiManager
 
 
 class ImageReader:
     """Generic implementation of the image reader."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """Initialization"""
         self._image = None
 
@@ -53,7 +54,7 @@ class ImageReader:
         **kwargs : dict
             A dictionary of keyword arguments. Supported keyword arguments
             include the following
-        returnType : Union[datatype, 'auto'], optional
+        datatype : Union[datatype, 'auto'], optional
             If 'auto', the image will be returned in its native data type.
             If a specific datatype has been selected, the image is converted
             to this type. The default is 'auto'.
@@ -78,10 +79,10 @@ class ImageReader:
         _metadata : dict
             The image metadata, as returned from the concrete reader.
         """
-        _return_type = kwargs.get('returnType', 'auto')
-        _roi = self.check_ROI(**kwargs)
+        _return_type = kwargs.get('datatype', 'auto')
+        _roi = RoiManager(**kwargs).roi
         _binning = kwargs.get('binning', 1)
-        if not hasattr(self, '_image'):
+        if self._image is None:
             raise ValueError('No image has been read.')
         _image = self._image
         if _roi is not None:
@@ -91,60 +92,3 @@ class ImageReader:
         if _return_type not in ('auto', _image.dtype):
             _image = _image.astype(_return_type)
         return _image
-
-    @staticmethod
-    def check_ROI(**kwargs):
-        """Verification of ROI format.
-
-        This method checks the ROI and verifies its format. If the format
-        differs from the expected format (a tuple of two slices),
-        the method tries to convert the ROI to a tuple of two slices.
-
-        Parameters
-        ----------
-            **kwargs: This should include the 'ROI' keyword
-
-        Raises
-        ------
-        ValueError
-            If conversion to two slice objects was not successful.
-
-        Returns
-        -------
-        Union[None, tuple]
-            If ROI is None, None is returned. Else, a tuple of 2 slice
-            objects will be returned.
-        """
-        roi = kwargs.get('ROI', None)
-        errorstr = f'The format of the ROI "{roi}" could not be interpreted.'
-        if roi is None:
-            return roi
-        if isinstance(roi, tuple):
-            roi = list(roi)
-        elif not isinstance(roi, list):
-            raise ValueError(errorstr)
-        # filter strings and convert them to integers:
-        roi = [int(i) if isinstance(i, str) else i for i in roi]
-        # check for other datatypes
-        roi_dtypes = {type(e) for e in roi}
-        roi_dtypes.discard(int)
-        roi_dtypes.discard(slice)
-        if roi_dtypes != set():
-            raise ValueError(errorstr)
-        # convert to slices
-        try:
-            if isinstance(roi[0], int) and isinstance(roi[1], int):
-                out = [slice(roi.pop(0), roi.pop(0))]
-            elif isinstance(roi[0], slice):
-                out = [roi.pop(0)]
-            else:
-                raise ValueError(errorstr)
-            if isinstance(roi[0], int) and isinstance(roi[1], int):
-                out.append(slice(roi.pop(0), roi.pop(0)))
-            elif isinstance(roi[0], slice):
-                out.append(roi.pop(0))
-            else:
-                raise ValueError(errorstr)
-            return tuple(out)
-        except ValueError:
-            raise ValueError(errorstr) from ValueError

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the NumpyReader implementation of the base ImageReader."""
+"""Module with the RawReader class for reading raw (binary) images.."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -28,32 +28,39 @@ import numpy as np
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
-from ...config import NUMPY_EXTENSIONS
+from ...config import BINARY_EXTENSIONS
 
 
-class NumpyReader(ImageReader):
-    """
-    Reader for numpy data formats.
-    """
+class RawReader(ImageReader):
+    """ImageReader implementation for raw (binary) files."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
+        super().__init__()
+
+    def read_image(self, filename, datatype=None, nx=None, ny=None,
+                   **kwargs):
         """
-        Initialization method
-        """
-        super().__init__(args, **kwargs)
+        Read an image from a raw (binary) file.
 
-    def read_image(self, filename, **kwargs):
-        """
-        Read and return a numpy image.
+        The read_image method extracts an image from a raw binary file
+        and returns it after processing any operations specified by the
+        keywords (binning, cropping).
 
-        The read_image method loads a numpy format type image and returns
-        it after processing any operations specified by the keywords
-        (binning, cropping).
+        The datatype, nx, ny parameters are required.
 
         Parameters
         ----------
         filename : str
             The full path and filename of the file to be read.
+        datatype : object
+            The python datatype used for decoding the bit-information of the
+            binary file. The default is None which will raise an exception.
+        nx : int
+            The number of pixels in x-dimension. The default is None which
+            will raise an exception.
+        ny : int
+            The number of pixels in x-dimension. The default is None which
+            will raise an exception.
         ROI : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
@@ -69,16 +76,20 @@ class NumpyReader(ImageReader):
 
         Returns
         -------
-        _image : np.ndarray
-            The image in form of an ndarray
-        _metadata : dict
-            The image metadata. For numpy images, this will be None.
-        """
-        _data = np.load(filename)
-        assert len(_data.shape)==2
-        self._image = Dataset(_data)
+        image : pydidas.core.Dataset
+            The image in form of a Dataset (with embedded metadata)
+       """
+
+        if datatype is None:
+            raise KeyError('The datatype has not been specified.')
+        if nx is None:
+            raise KeyError('The number of pixels in x has not been specified.')
+        if ny is None:
+            raise KeyError('The number of pixels in y has not been specified.')
+        self._image = Dataset(
+            np.fromfile(filename, dtype=datatype).reshape(ny, nx))
         return self.return_image(**kwargs)
 
 
 reader = ImageReaderFactory()
-reader.register_format('numpy', NUMPY_EXTENSIONS, NumpyReader)
+reader.register_format('raw', BINARY_EXTENSIONS, RawReader)

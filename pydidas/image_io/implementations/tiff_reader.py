@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the Hdf5Reader class for reading hdf5 images."""
+"""Module with the TiffReader class for reading tiff images.."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -23,41 +23,33 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from numpy import squeeze
+from skimage.io import imread
 
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
-from ..low_level_readers.read_hdf_slice import read_hdf_slice
-from ...config import HDF5_EXTENSIONS
+from ...config import TIFF_EXTENSIONS
 
-class Hdf5Reader(ImageReader):
-    """ImageReader implementation for hdf5 files."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, **kwargs)
+class TiffReader(ImageReader):
+    """ImageReader implementation for tiff files."""
+
+    def __init__(self):
+        ...
+        # super().__init__()
 
     def read_image(self, filename, **kwargs):
         """
-        Read an image from an hdf5 file.
+        Read an image from a TIFF file.
 
-        The read_image method extracts an image from a HDF file and returns
-        it after processing any operations specified by the keywords
-        (binning, cropping).
-
-        The datapath, imageNo, axisNo parameters are required.
+        The read_image method extracts an image from a TIFF file
+        and returns it after processing any operations specified by the
+        keywords (binning, cropping).
 
         Parameters
         ----------
         filename : str
             The full path and filename of the file to be read.
-        dataset : str
-            The full path to the hdf dataset within the file. The default is
-            None which will raise an exception.
-        imageNo : int
-            The number of the image in the dataset. The default is 0.
-        axisNo : int
-            The number of the axis with the image. The default is 0.
         ROI : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
@@ -73,30 +65,14 @@ class Hdf5Reader(ImageReader):
 
         Returns
         -------
-        _image : np.ndarray
-            The image in form of an ndarray
-        _metadata : dict
-            The image metadata. For hdf5 images, this will be information
-            about the dataset and axis and image numbers.
-       """
-        axisNo = kwargs.get('axisNo', 0)
-        imageNo = kwargs.get('imageNo', 0)
-        dataset = kwargs.get('dataset', None)
-
-        self._image_metadata = {'axisNo': axisNo, 'imageNo': imageNo,
-                                'dataset': dataset}
-        kwargs.update(self._image_metadata)
-        if dataset is None:
-            raise KeyError('The hdf dataset has not been specified.')
-        _img = squeeze(
-            read_hdf_slice(filename, dataset, [None] * axisNo + [imageNo])
-        )
-        self._image = Dataset(_img, metadata={'axisNo': axisNo,
-                                              'imageNo': imageNo,
-                                              'dataset': dataset}
-        )
+        image : pydidas.core.Dataset
+            The image in form of a Dataset (with embedded metadata)
+        """
+        _data = imread(filename)
+        assert len(_data.shape) == 2
+        self._image = Dataset(_data)
         return self.return_image(**kwargs)
 
 
 reader = ImageReaderFactory()
-reader.register_format('hdf5', HDF5_EXTENSIONS, Hdf5Reader)
+reader.register_format('tiff', TIFF_EXTENSIONS, TiffReader)

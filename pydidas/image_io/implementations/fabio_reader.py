@@ -23,22 +23,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-import numpy as np
+import fabio
 
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_factory import ImageReaderFactory
-from ...config import BINARY_EXTENSIONS
+from ...config import FABIO_EXTENSIONS
 
 
-class RawReader(ImageReader):
+class FabioReader(ImageReader):
     """ImageReader implementation for raw (binary) files."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(args, **kwargs)
+    def __init__(self):
+        super().__init__()
 
-    def read_image(self, filename, datatype=None, nx=None, ny=None,
-                   **kwargs):
+    def read_image(self, filename, **kwargs):
         """
         Read an image from a raw (binary) file.
 
@@ -50,17 +49,6 @@ class RawReader(ImageReader):
 
         Parameters
         ----------
-        filename : str
-            The full path and filename of the file to be read.
-        datatype : object
-            The python datatype used for decoding the bit-information of the
-            binary file. The default is None which will raise an exception.
-        nx : int
-            The number of pixels in x-dimension. The default is None which
-            will raise an exception.
-        ny : int
-            The number of pixels in x-dimension. The default is None which
-            will raise an exception.
         ROI : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
@@ -76,22 +64,15 @@ class RawReader(ImageReader):
 
         Returns
         -------
-        _image : np.ndarray
-            The image in form of an ndarray
-        _metadata : dict
-            The image metadata. For raw images, this will be None.
-       """
-
-        if datatype is None:
-            raise KeyError('The datatype has not been specified.')
-        if nx is None:
-            raise KeyError('The number of pixels in x has not been specified.')
-        if ny is None:
-            raise KeyError('The number of pixels in y has not been specified.')
-        self._image = Dataset(
-            np.fromfile(filename, dtype=datatype).reshape(ny, nx))
+        image : pydidas.core.Dataset
+            The image in form of a Dataset (with embedded metadata)
+        """
+        with fabio.open(filename) as _file:
+            _data = _file.data
+            _header = _file.header
+        self._image = Dataset(_data, metadata=_header)
         return self.return_image(**kwargs)
 
 
 reader = ImageReaderFactory()
-reader.register_format('raw', BINARY_EXTENSIONS, RawReader)
+reader.register_format('fabio', FABIO_EXTENSIONS, FabioReader)

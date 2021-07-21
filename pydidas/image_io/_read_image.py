@@ -85,7 +85,7 @@ def read_image(filename, **kwargs):
 
     Returns
     -------
-    image : np.ndarray
+    image : pydidas.core.Dataset
         The processed image.
     """
     reader = IMAGE_READER.get_reader(filename)

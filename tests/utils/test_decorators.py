@@ -24,10 +24,25 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import Parameter, get_generic_parameter
+from pydidas.utils.decorators import copy_docstring
 
 
-class TestGetGenericParameter(unittest.TestCase):
+class TestClass:
+    """Class docstring."""
+    def __init__(self):
+        self.attr1 = 'Test'
+
+    def method1(self):
+        """
+        Test docstring 1.
+        """
+
+    def method2(self):
+        """
+        Test docstring 2.
+        """
+
+class Test_copy_docstring(unittest.TestCase):
 
     def setUp(self):
         ...
@@ -35,13 +50,28 @@ class TestGetGenericParameter(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_get_param(self):
-        _p = get_generic_parameter('first_file')
-        self.assertIsInstance(_p, Parameter)
+    def test_copy_from_class(self):
 
-    def test_get_param_wrong_key(self):
-        with self.assertRaises(KeyError):
-            get_generic_parameter('there_should_be_no_such_key')
+        class NewTest:
+            def __init__(self):
+                ...
+            @copy_docstring(TestClass)
+            def method1(self):
+                ...
+
+        self.assertEqual(NewTest.method1.__doc__,
+                         TestClass.method1.__doc__)
+
+    def test_copy_from_method(self):
+        class NewTest:
+            def __init__(self):
+                ...
+            @copy_docstring(TestClass.method2)
+            def method3(self):
+                ...
+
+        self.assertEqual(NewTest.method3.__doc__,
+                         TestClass.method2.__doc__)
 
 
 if __name__ == "__main__":

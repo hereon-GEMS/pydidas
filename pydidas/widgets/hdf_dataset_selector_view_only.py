@@ -74,7 +74,7 @@ class Hdf5DatasetSelectorViewOnly(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.params = dict(activeDsetFilters = [],
                            currentDset = None,
                            dsetFilterMinSize = 50,
-                           dsetFilterMinDim = 3,
+                           dsetFilterMinDim = 2,
                            currentFname = None,
                            currentIndex = None,
                            dsetFilters = (datasetKeyFilters
@@ -293,8 +293,8 @@ class Hdf5DatasetSelectorViewOnly(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.params['dsetFilterMinDim'] = self.w_min_datadim.value()
         _datasets = get_hdf5_populated_dataset_keys(
             self.params['currentFname'],
-            minDataSize=self.params['dsetFilterMinSize'],
-            minDataDim=self.params['dsetFilterMinDim'],
+            min_size=self.params['dsetFilterMinSize'],
+            min_dim=self.params['dsetFilterMinDim'],
             ignoreKeys=self.params['activeDsetFilters'])
         self.w_select_dataset.currentTextChanged.disconnect()
         self.w_select_dataset.clear()

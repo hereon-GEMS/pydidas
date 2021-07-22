@@ -1,10 +1,28 @@
-"""
-Unittests for the CompositeImage class from the pydidas.core module.
-"""
+# This file is part of pydidas.
+
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Unit tests for pydidas modules."""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
 
 import os
-import tempfile
-import shutil
 import unittest
 
 import yaml
@@ -12,7 +30,6 @@ from pyFAI.geometry import Geometry
 
 from pydidas.core.experimental_settings import (ExperimentalSettings,
                                                 LoadExperimentSettingsFromFile)
-
 
 EXP_SETTINGS = ExperimentalSettings()
 
@@ -36,7 +53,7 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
             obj.load_from_file('None')
 
     def test_load_poni(self):
-        obj = LoadExperimentSettingsFromFile(self._path + 'poni.poni')
+        LoadExperimentSettingsFromFile(self._path + 'poni.poni')
         geo = Geometry().load(self._path + 'poni.poni').getPyFAI()
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
@@ -44,7 +61,7 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
                              geo[key.split('_')[1]])
 
     def test_load_yaml(self):
-        obj = LoadExperimentSettingsFromFile(self._path + 'yaml.yml')
+        LoadExperimentSettingsFromFile(self._path + 'yaml.yml')
         with open(self._path + 'yaml.yml', 'r') as stream:
             _data = yaml.safe_load(stream)
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',

@@ -13,30 +13,42 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Module with format_arguments functions which takes *args and **kwargs and
+converts them into an argparse-compatible list.
+"""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['format_arguments']
+
 import re
 
-def formatArguments(args, kwargs):
+
+def format_arguments(*args, **kwargs):
     """Function which accepts arguments and keyword arguments and converts
     them to a argparse-compatible list.
     """
-    newArgs = [None]
+    newArgs = []
     for item, key in kwargs.items():
         if key is True:
             newArgs.append(f'--{item}')
         else:
             newArgs.append(f'-{item}')
-            if not isinstance(key, str):
-                newArgs.append(str(key))
-            else:
-                newArgs.append(key)
+            newArgs.append(key if isinstance(key, str) else str(key))
+
     for arg in args:
-        if not isinstance(arg, str) :
-            arg = str(arg)
+        arg = arg if isinstance(arg, str) else str(arg)
         if '=' in arg or ' ' in arg:
-            tmp = [item for item in re.split(' |=', arg) if item != '']
-            if tmp[0][0] != '-':
-                tmp[0] = '-{}'.format(tmp[0])
-            newArgs += tmp
+            _split_args = [item for item in re.split(' |=', arg) if item != '']
+            if not _split_args[0].startswith('-'):
+                _split_args[0] = f'-{_split_args[0]}'
+            newArgs += _split_args
         else:
             newArgs.append(arg)
+
     return newArgs

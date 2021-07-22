@@ -32,9 +32,8 @@ import hdf5plugin
 from ..config import HDF5_EXTENSIONS
 
 
-def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
-                                    itemFileRef=None,
-                                    ignoreKeys=None):
+def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
+                                    file_ref=None, ignoreKeys=None):
     """
     Get the dataset keys of all datasets that match the conditions.
 
@@ -50,16 +49,16 @@ def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
     item : Union[str, h5py.File, h5py.Group, h5py.Dataset]
         The item to be checked recursively. A str will be interpreted as
         filepath to the hdf5 file.
-    minDataSize : int, optional
+    min_size : int, optional
         A minimum size which datasets need to have. Any integers between 0
         and 1,000,000,000 are acceptable. The default is 50.
-    minDataDim : int, optional
+    min_dim : int, optional
         The minimum dimensionality of the dataset. Allowed entries are
         between 0 and 3. The default is 3.
-    itemFileRef : h5py.File reference, optional
+    file_ref : h5py.File reference, optional
         A reference to the base hdf5 file. This information is used to
         detect external datasets. If not specified, this information will
-        be queried from the base calling parameter >item>. The default is None.
+        be queried from the base calling parameter <item>. The default is None.
     ignoreKeys : Union[list, None], optional
         Dataset keys (or snippets of key names) to be ignored. Any keys
         starting with any of the items in this list are ignored.
@@ -78,47 +77,48 @@ def get_hdf5_populated_dataset_keys(item, minDataSize=50, minDataDim=3,
     list
         A list with all dataset keys which correspond to the filter criteria.
     """
-    _close_on_exit = False
     _ignore = ignoreKeys if ignoreKeys is not None else []
-    _datasets = []
 
+    # return in case of a dataset
+    if isinstance(item, h5py.Dataset):
+        if hdf5_dataset_check(item, min_size, min_dim, _ignore):
+            return [item.name]
+        return []
+
+    _close_on_exit = False
     if isinstance(item, (str, pathlib.Path)):
         assert os.path.splitext(item)[1] in HDF5_EXTENSIONS
         if os.path.exists(item):
             item = h5py.File(item, 'r')
             _close_on_exit = True
 
-    if itemFileRef is None:
-        itemFileRef = item.file
+    file_ref = item.file if file_ref is None else file_ref
 
-    if hdf5_dataset_check(item, minDataSize, minDataDim, _ignore):
-        return [item.name]
-    elif isinstance(item, h5py.Dataset):
+    if not isinstance(item, (h5py.File, h5py.Group)):
         return []
 
-    if isinstance(item, (h5py.File, h5py.Group)):
-        for key in item:
-            _item = item[key]
-            # add a check to filter external datasets. These are referenced
-            # by their .name in the external datafile, not the current file.
-            if itemFileRef != _item.file:
-                if hdf5_dataset_check(_item, minDataSize, minDataDim, _ignore):
-                    _datasets += [f'{item.name}/{key}']
-                elif isinstance(_item, (h5py.File, h5py.Group)):
-                    raise KeyError('External link to hdf5.Group detected: '
-                                   f'"{item.name}/{key}"'
-                                   ' Cannot follow the link. Aborting ...')
-            else:
-                _datasets += (
-                    get_hdf5_populated_dataset_keys(
-                        item[key], minDataSize, minDataDim,
-                        itemFileRef=itemFileRef, ignoreKeys=_ignore))
+    _datasets = []
+    for key in item:
+        _item = item[key]
+        # add a check to filter external datasets. These are referenced
+        # by their .name in the external datafile, not the current file.
+        if file_ref != _item.file:
+            if hdf5_dataset_check(_item, min_size, min_dim, _ignore):
+                _datasets += [f'{item.name}/{key}']
+            if isinstance(_item, (h5py.File, h5py.Group)):
+                raise KeyError(
+                    'External link to hdf5.Group detected: "{item.name}/{key}'
+                    '". Cannot follow the link. Aborting ...')
+        else:
+            _datasets += (
+                get_hdf5_populated_dataset_keys(
+                    item[key], min_size, min_dim, file_ref, _ignore))
     if _close_on_exit:
         item.close()
     return _datasets
 
 
-def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
+def hdf5_dataset_check(item, min_size=50, min_dim=3, ignoreList=()):
     """
     Check if an h5py item is a dataset which corresponds to the filter
     criteria.
@@ -133,10 +133,10 @@ def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
     item : object
         This is the object to be checked for being an instance of
         :py:class:`h5py.Dataset`.
-    minDataSize : int, optional
+    min_size : int, optional
         The minimum data size of the item. This is the total size of the
         dataset, not the size along any one dimension. The default is 50.
-    minDataDim : int, optional
+    min_dim : int, optional
         The minimum dimensionality of the item. The default is 3.
     ignoreList : Union[list, tuple], optional
         A list or tuple of strings. If the dataset key starts with any
@@ -150,8 +150,8 @@ def hdf5_dataset_check(item, minDataSize=50, minDataDim=3, ignoreList=()):
         and does not start with any keys specified in the ignoreList?
     """
     if (isinstance(item, h5py.Dataset)
-            and len(item.shape) >= minDataDim
-            and item.size >= minDataSize
+            and len(item.shape) >= min_dim
+            and item.size >= min_size
             and not item.name.startswith(tuple(ignoreList))):
         return True
     return False
@@ -186,19 +186,14 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
     dset : str
         The internal path to the dataset.
     """
-    if dset is not None:
-        _dset = dset
-    if not isinstance(fname, (str, pathlib.Path)):
+    fname = str(fname) if isinstance(fname, pathlib.Path) else fname
+    if not isinstance(fname, str):
         raise TypeError('The path must be specified as string or pathlib.Path')
-    if isinstance(fname, pathlib.Path):
-        fname = str(fname)
     if fname.find('://') > 0:
-        _fname, _dset = fname.split('://')
-    else:
-        _fname = fname
-    if _dset is None:
+        fname, dset = fname.split('://')
+    if dset is None:
         raise KeyError('No dataset specified. Cannot access information.')
-    return _fname, _dset
+    return fname, dset
 
 
 def get_hdf5_metadata(fname, meta, dset=None):
@@ -225,15 +220,17 @@ def get_hdf5_metadata(fname, meta, dset=None):
 
     Returns
     -------
-    meta : object
+    meta : dict or type
         The return value. If exactly one metadata information has been
-        requested, this information is return is returned directly. If more
+        requested, this information is returned directly. If more
         than one piece of information has been requested, a dictionary with
         the information will be returned.
     """
     _fname, _dset = _get_hdf5_file_and_dataset_names(fname, dset)
-    if isinstance(meta, str):
-        meta = [meta]
+    meta = [meta] if isinstance(meta, str) else meta
+    if not isinstance(meta, (set, list, tuple)):
+        raise TypeError('meta parameter must be of type str, set, list, '
+                        'tuple.')
     _results = {}
     with h5py.File(_fname, 'r') as f:
         if 'dtype' in meta:
@@ -247,5 +244,5 @@ def get_hdf5_metadata(fname, meta, dset=None):
         if 'nbytes' in meta:
             _results['nbytes'] = f[_dset].nbytes
     if len(_results) == 1:
-        _results = list(_results.values())[0]
+        _results = tuple(_results.values())[0]
     return _results

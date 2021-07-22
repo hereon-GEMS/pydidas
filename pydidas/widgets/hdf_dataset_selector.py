@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with Warning class for showing notifications."""
+"""Module with the Hdf5 dataset selector class for showing notifications."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -23,7 +23,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Hdf5DatasetSelector']
 
-
+import warnings
 from functools import partial
 
 import h5py
@@ -82,12 +82,17 @@ class Hdf5DatasetSelector(QtWidgets.QWidget):
         -------
         None.
         """
+
+        warnings.warn(
+            'Hdf5DatasetSelector isnot maintained, use '
+            'Hdf5DatasetSelectorViewOnly instead.',
+            DeprecationWarning)
         super().__init__(parent)
 
         self.params = dict(activeDsetFilters = [],
                            currentDset = None,
                            dsetFilterMinSize = 50,
-                           dsetFilterMinDim = 3,
+                           dsetFilterMinDim = 2,
                            currentFname = None,
                            currentIndex = None,
                            dsetFilters = (datasetKeyFilters
@@ -366,8 +371,8 @@ class Hdf5DatasetSelector(QtWidgets.QWidget):
         self.params['dsetFilterMinDim'] = self.w_min_datadim.value()
         _datasets = get_hdf5_populated_dataset_keys(
             self.params['currentFname'],
-            minDataSize=self.params['dsetFilterMinSize'],
-            minDataDim=self.params['dsetFilterMinDim'],
+            min_size=self.params['dsetFilterMinSize'],
+            min_dim=self.params['dsetFilterMinDim'],
             ignoreKeys=self.params['activeDsetFilters'])
         self.w_select_dataset.currentTextChanged.disconnect()
         self.w_select_dataset.clear()

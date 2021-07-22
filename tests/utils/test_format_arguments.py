@@ -24,10 +24,10 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import Parameter, get_generic_parameter
+from pydidas.utils._format_str import format_str
 
 
-class TestGetGenericParameter(unittest.TestCase):
+class Test_format_str(unittest.TestCase):
 
     def setUp(self):
         ...
@@ -35,13 +35,20 @@ class TestGetGenericParameter(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_get_param(self):
-        _p = get_generic_parameter('first_file')
-        self.assertIsInstance(_p, Parameter)
+    def test_format_arguments_only_args(self):
+        _args = format_arguments('--test', ' a = 1', 'b=2')
+        self.assertEqual(_args, ['--test', '-a', '1', '-b', '2'])
 
-    def test_get_param_wrong_key(self):
-        with self.assertRaises(KeyError):
-            get_generic_parameter('there_should_be_no_such_key')
+    def test_format_arguments_only_kwargs(self):
+        _args = format_arguments(bool_test=True, c=3, s='string', f=6.6)
+        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
+                                 '-f', '6.6'])
+
+    def test_format_arguments_mixed(self):
+        _args = format_arguments('--test', ' a = 1', 'b=2',
+                                 bool_test=True, c=3, s='string', f=6.6)
+        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
+                                 '-f', '6.6', '--test', '-a', '1', '-b', '2'])
 
 
 if __name__ == "__main__":

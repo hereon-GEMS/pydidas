@@ -47,7 +47,7 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
     status_msg = QtCore.pyqtSignal(str)
     default_params = ParameterCollection()
 
-    def __init__(self, parent=None, name=None, **kwargs):
+    def __init__(self, parent=None, name='', **kwargs):
         """
         Initialize the BaseFrame instance.
 
@@ -57,14 +57,17 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
             The parent widget. The default is None.
         name : Union[str, None], optional
             The reference name of the widget for the CentralWidgetStack.
-            The default is None.
-        initLayout : bool
-            Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
-            If False, no layout will be initialized and the subclass is
-            responsible for setting up the layout. The default is True.
+            The default is an empty string.
+        initLayout : bool, optional
+            Flag to initialize the frame layout with a QtWidgets.QGridLayout
+            and left / top alignment. If False, no layout will be initialized
+            and the subclass is responsible for setting up the layout. The
+            default is True.
         **kwargs : object
-            Any additional keyword arguments.
+            Any additional keyword arguments which might be used by
+            subclasses.
         """
+        CreateWidgetsMixIn.__init__(self)
         QtWidgets.QFrame.__init__(self, parent=parent)
         PydidasQsettingsMixin.__init__(self)
 
@@ -73,27 +76,11 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
 
         init_layout = kwargs.get('initLayout', True)
         if init_layout:
-            _layout = QtWidgets.QGridLayout(self)
+            _layout = QtWidgets.QGridLayout()
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
-        self._initialized = False
         self.frame_index = -1
-        self.name = name if name else ''
-
-    def setParent(self, parent):
-        """
-        Overloaded setParent method which also calls the _initialize
-        method if this has not yet happened.
-
-        Parameters
-        ----------
-        parent : Union[QWidget, None]
-            The parent widget.
-        """
-        super().setParent(parent)
-        if self.parent() and not self._initialized:
-            self._initialize()
-            self._initialized = True
+        self.name = name
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):
@@ -110,14 +97,6 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
         index : int
             The index of the activated frame.
         """
-
-    def _initialize(self):
-        """
-        Initialize the frame once parent and name have been set.
-
-        This method needs to be overloaded by the subclass implementations.
-        """
-        self._initialized = True
 
     def set_status(self, text):
         """
@@ -139,4 +118,6 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
         int
             The next empty row.
         """
-        return self.layout().rowCount() + 1
+        if self .layout().count() == 0:
+            return 0
+        return self.layout().rowCount()

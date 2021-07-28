@@ -1,4 +1,4 @@
-from base_plugins import InputPlugin, INPUT_PLUGIN
+from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.core import Parameter
 
 class MccdLoader(InputPlugin):

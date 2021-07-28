@@ -45,8 +45,8 @@ from .global_documentation_window import *
 # from . import hdf_dataset_selector
 # from .hdf_dataset_selector import *
 
-# from . import hdf_dataset_selector_view_only
-# from .hdf_dataset_selector_view_only import *
+# from . import hdf5_dataset_selector
+# from .hdf5_dataset_selector import *
 
 # from . import qta_button
 # from .qta_button import *
@@ -76,7 +76,7 @@ __all__ += global_documentation_window.__all__
 # __all__ += workflow_tree_canvas.__all__
 # __all__ += central_widget_stack.__all__
 # __all__ += hdf_dataset_selector.__all__
-# __all__ += hdf_dataset_selector_view_only.__all__
+# __all__ += hdf5_dataset_selector.__all__
 # __all__ += qta_button.__all__
 # __all__ += directory_explorer.__all__
 # __all__ += info_widget.__all__
@@ -95,7 +95,7 @@ del global_documentation_window
 # del workflow_tree_canvas
 # del central_widget_stack
 # del hdf_dataset_selector
-# del hdf_dataset_selector_view_only
+# del hdf5_dataset_selector
 # del qta_button
 # del directory_explorer
 # del info_widget

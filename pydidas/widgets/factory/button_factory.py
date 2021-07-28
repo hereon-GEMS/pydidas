@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with a factory function to create formatted QSpinBoxes."""
+"""
+Module with a factory function to create formatted lines as a formatted
+QFrame."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,38 +23,35 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spin_box']
+__all__ = ['create_button']
 
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QPushButton
 
 from ..utilities import apply_widget_properties
 
 
-def create_spin_box(**kwargs):
+def create_button(text, **kwargs):
     """
-    Create a QSpinBox widget and set properties.
+    Create a button.
 
     Parameters
     ----------
+    text : str
+        The button text.
     **kwargs : dict
         Any supported keyword arguments.
 
     Supported keyword arguments
     ---------------------------
-    valueRange: tuple, optional
-        The range for the QSpinBox, given as a 2-tuple of (min, max). The
-        default is (0, 1).
     *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+        Any supported Qt settings for button (for example, icon, visible,
+        enabled, fixedWidth)
 
     Returns
     -------
-    box : QtWidgets.QSpinBox
-        The instantiated spin box widget.
+    button : QtWidgets.QPushButton
+        The instantiated button widget.
     """
-    kwargs['range'] = kwargs.get('valueRange', (0, 1))
-    kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
-    _box = QSpinBox()
-    apply_widget_properties(_box, **kwargs)
-    return _box
+    _button = QPushButton(text)
+    apply_widget_properties(_button, **kwargs)
+    return _button

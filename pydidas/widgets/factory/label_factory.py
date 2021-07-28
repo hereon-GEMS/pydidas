@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with a factory function to create formatted QSpinBoxes."""
+"""Module with a factory function to create formatted QLabels."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,38 +21,44 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spin_box']
+__all__ = ['create_label']
 
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QLabel, QApplication
 
-from ..utilities import apply_widget_properties
+from ..utilities import apply_widget_properties, apply_font_properties
+from ...config import STANDARD_FONT_SIZE
 
 
-def create_spin_box(**kwargs):
+def create_label(text, **kwargs):
     """
-    Create a QSpinBox widget and set properties.
+    This method will create a label with text.
 
     Parameters
     ----------
+    text : str
+        The label text to be printed.
+    fontsize : int, optional
+        The font size in pixels. The default is STANDARD_FONT_SIZE.
     **kwargs : dict
-        Any supported keyword arguments.
+        Any aditional keyword arguments. See below for supported
+        arguments.
 
     Supported keyword arguments
     ---------------------------
-    valueRange: tuple, optional
-        The range for the QSpinBox, given as a 2-tuple of (min, max). The
-        default is (0, 1).
     *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+        Any Qt settings
 
     Returns
     -------
-    box : QtWidgets.QSpinBox
-        The instantiated spin box widget.
+    label : QLabel
+        The formatted QLabel
     """
-    kwargs['range'] = kwargs.get('valueRange', (0, 1))
-    kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
-    _box = QSpinBox()
-    apply_widget_properties(_box, **kwargs)
-    return _box
+    _label = QLabel(text)
+
+    kwargs['pointSize'] = kwargs.get('fontsize', STANDARD_FONT_SIZE)
+    kwargs['wordWrap'] = kwargs.get('wordWrap', True)
+    kwargs['font'] = QApplication.font()
+
+    apply_font_properties(kwargs['font'], **kwargs)
+    apply_widget_properties(_label, **kwargs)
+    return _label

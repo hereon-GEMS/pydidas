@@ -25,7 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CentralWidgetStack']
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
+
+from ..core import SingletonFactory
+
 
 class _CentralWidgetStack(QtWidgets.QStackedWidget):
     """The _CentralWidgetStack is a QStackedWidget with references to all
@@ -58,6 +61,36 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         super().__init__(parent)
         self.widget_indices = {}
         self.widgets = []
+
+    def register_widget(self, name, widget):
+        """
+        Register a widget with the stacke widget.
+
+        This method will register a widget and hold a reference to the widget
+        index by the supplied name.
+
+        Parameters
+        ----------
+        name : str
+            The identifier.
+        widget : QWidget
+            The widget to be registered.
+
+        Raises
+        ------
+        KeyEror
+            When a widget with the same name has already been registered
+            to prevent duplicate entries in the index reference.
+        """
+        if name in self.widget_indices:
+            raise KeyError(f'A widget with the name "{name}" has already been'
+                           ' registered with the CentralWidgetStack.'
+                           ' New widget has not been registered.')
+        index = super().addWidget(widget)
+        widget.frame_index = index
+        self.currentChanged.connect(widget.frame_activated)
+        self.widgets.append(widget)
+        self.widget_indices[name] = index
 
     def get_name_from_index(self, index):
         """
@@ -100,7 +133,8 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
 
         Returns
         -------
-        None.
+        widget : QtWidgets.QWidget
+            The widget referenced by the name.
         """
         if name not in self.widget_indices:
             raise KeyError(f'No widget with the name "{name}" has been'
@@ -118,40 +152,6 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         """
         return [w.name for w in self.widgets]
 
-    def register_widget(self, name, widget):
-        """
-        Register a widget with the stacke widget.
-
-        This method will register a widget and hold a reference to the widget
-        index by the supplied name.
-
-        Parameters
-        ----------
-        name : str
-            The identifier.
-        widget : QWidget
-            The widget to be registered.
-
-        Raises
-        ------
-        KeyEror
-            When a widget with the same name has already been registered
-            to prevent duplicate entries in the index reference.
-
-        Returns
-        -------
-        None.
-        """
-        if name in self.widget_indices:
-            raise KeyError(f'A widget with the name "{name}" has already been'
-                           ' registered with the CENTRAL_WIDGET_STACK.'
-                           ' New widget has not been registered.')
-        index = super().addWidget(widget)
-        widget.frame_index = index
-        self.currentChanged.connect(widget.frame_activated)
-        self.widgets.append(widget)
-        self.widget_indices[name] = index
-
     def activate_widget_by_name(self, name):
         """
         Set the widget referenced by name to the active widget.
@@ -165,18 +165,12 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         ------
         KeyError
             If no widget with the name has been registered.
-
-        Returns
-        -------
-        None.
         """
         if name not in self.widget_indices:
             raise KeyError(f'No widget with the name "{name}" has been'
                            ' registered with the CENTRAL_WIDGET_STACK.')
         index = self.widget_indices[name]
         self.setCurrentIndex(index)
-        print('Active frame ', index)
-        self.active_frame.emit(index)
 
     def remove_widget_by_name(self, name):
         """
@@ -196,10 +190,6 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         ------
         KeyError
             If the reference name has not been used for registering a widget.
-
-        Returns
-        -------
-        None.
         """
         if name not in self.widget_indices:
             raise KeyError(f'No widget width the name "{name}" has been not'
@@ -219,17 +209,9 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         ------
         NotImplementedError
             Reference to the register_widget method is given.
-
-        Returns
-        -------
-        int
-            The index of the newly registered widget.
         """
-        if not name:
-            raise NotImplementedError(
-                'Please use the "register_widget(name, widget)" method.'
-            )
-        return None
+        raise NotImplementedError(
+            'Please use the "register_widget(name, widget)" method.')
 
     def removeWidget(self, widget):
         """
@@ -247,10 +229,6 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         ------
         KeyError
             If the widget is not registed.
-
-        Returns
-        -------
-        None.
         """
         if widget not in self.widgets:
             raise KeyError(f'The widget "{widget}" is not registered.')
@@ -259,8 +237,7 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         name = self.get_name_from_index(index)
         self.widgets.remove(widget)
         self.currentChanged.disconnect(widget.frame_activated)
-        for key in self.widget_indices:
-            cur_index = self.widget_indices[key]
+        for key, cur_index in self.widget_indices.items():
             if cur_index > index:
                 self.widget_indices[key] -= 1
                 self.widget(cur_index).frame_index -= 1
@@ -270,15 +247,11 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
     def reset(self):
         """
         Reset the CentralWidgetStack and delete all widgets from itself.
-
-        Returns
-        -------
-        None.
         """
-        while self.widgets:
-            self.remove_widget(self.widgets[0])
+        while len(self.widgets) > 0:
+            self.removeWidget(self.widgets[0])
 
-    def is_registed(self, widget):
+    def is_registered(self, widget):
         """
         Check if a widget is already registered.
 
@@ -316,41 +289,15 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         ------
         KeyError
             If the widget is not registered at all.
-
-        Returns
-        -------
-        None.
-
         """
-        if not self.is_registed(widget):
+        if not self.is_registered(widget):
             raise KeyError(f'The widget "{widget}" is not registered.')
         index = self.widgets.index(widget)
         name = self.get_name_from_index(index)
         if name != new_name:
             del self.widget_indices[name]
             self.widget_indices[new_name] = index
+            self.widget(index).name = new_name
 
 
-class _CentralWidgetStackFactory:
-    """
-    Factory class which returns always the same instance of the
-    CentralWidgetStack.
-    """
-    def __init__(self):
-        """Setup method."""
-        self._instance = None
-
-    def __call__(self):
-        """
-        Get the instance of the _CentralWidgetStack
-
-        Returns
-        -------
-        _CentralWidgetStack
-            The instance of the _CentralWidgetStack.
-        """
-        if self._instance is None:
-            self._instance = _CentralWidgetStack()
-        return self._instance
-
-CentralWidgetStack = _CentralWidgetStackFactory()
+CentralWidgetStack = SingletonFactory(_CentralWidgetStack)

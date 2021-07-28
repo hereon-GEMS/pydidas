@@ -29,7 +29,7 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore
 from silx.gui.plot.ImageView import ImageView
 
-from ..widgets import (DirectoryExplorer, Hdf5DatasetSelectorViewOnly,
+from ..widgets import (DirectoryExplorer, Hdf5DatasetSelector,
                        QtaIconButton, BaseFrame)
 from ..image_io import ImageReaderFactory, read_image
 from ..config import HDF5_EXTENSIONS
@@ -70,7 +70,7 @@ class DataBrowsingFrame(BaseFrame):
     def init_widgets(self):
         """Init the user interface with the widgets."""
         self._tree = DirectoryExplorer()
-        self.hdf_dset_w = Hdf5DatasetSelectorViewOnly()
+        self.hdf_dset_w = Hdf5DatasetSelector()
 
         button_min = QtaIconButton('fa.chevron-left', size=25)
         button_max = QtaIconButton('fa.chevron-right', size=25)

@@ -14,7 +14,7 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module with the SingletonFactory class which is used to create Singleton
-instances of clases.."""
+instances of clases."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -49,7 +49,7 @@ class SingletonFactory:
             self.__instance = self.__class()
         return self.__instance
 
-    def __reset_singleton(self):
+    def _reset_instance(self):
         """
         Reset the Singleton instance and create a new one.
         """

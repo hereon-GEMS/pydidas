@@ -1,4 +1,4 @@
-from base_plugins import ProcPlugin, PROC_PLUGIN
+from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.core import Parameter
 
 class AzimuthalIntegration(ProcPlugin):

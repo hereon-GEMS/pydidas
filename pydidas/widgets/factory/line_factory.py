@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with a factory function to create formatted QSpinBoxes."""
+"""
+Module with a factory function to create formatted lines as a formatted
+QFrame."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,38 +23,44 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spin_box']
+__all__ = ['create_line']
 
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QFrame
 
 from ..utilities import apply_widget_properties
 
 
-def create_spin_box(**kwargs):
+def create_line(**kwargs):
     """
-    Create a QSpinBox widget and set properties.
+    Create a line widget.
+
+    This method creates a line widget as separator and adds it to the
+    parent widget.
 
     Parameters
     ----------
     **kwargs : dict
-        Any supported keyword arguments.
+        Any aditional keyword arguments. See below for supported
+        arguments.
 
     Supported keyword arguments
     ---------------------------
-    valueRange: tuple, optional
-        The range for the QSpinBox, given as a 2-tuple of (min, max). The
-        default is (0, 1).
     *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+        Any supported Qt settings for QFrame (for example fixedHeight)
 
     Returns
     -------
-    box : QtWidgets.QSpinBox
-        The instantiated spin box widget.
+    line : QFrame
+        The line (in the form of a QFrame widget).
     """
-    kwargs['range'] = kwargs.get('valueRange', (0, 1))
-    kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
-    _box = QSpinBox()
-    apply_widget_properties(_box, **kwargs)
-    return _box
+    _line = QFrame()
+
+    kwargs['frameShape'] = kwargs.get('frameShape',
+                                      QFrame.HLine)
+    kwargs['frameShadow'] = kwargs.get('frameShadow',
+                                       QFrame.Sunken)
+    kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
+    kwargs['fixedHeight'] = kwargs.get('fixedHeight', 3)
+
+    apply_widget_properties(_line, **kwargs)
+    return _line

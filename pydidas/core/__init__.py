@@ -38,6 +38,9 @@ from .object_with_parameter_collection import *
 # from . import composites
 # from .composites import *
 
+# from . import plugin_collection
+# from .plugin_collection import *
+
 from . import composite_image
 from .composite_image import *
 
@@ -71,6 +74,7 @@ __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
 __all__ += singleton_factory.__all__
 __all__ += pydidas_q_settings_mixin.__all__
+# __all__ += plugin_collection.__all__
 
 
 
@@ -87,3 +91,4 @@ del composite_image
 del generic_parameters
 del singleton_factory
 del pydidas_q_settings_mixin
+# del plugin_collection

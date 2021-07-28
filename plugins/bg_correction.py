@@ -1,4 +1,4 @@
-from base_plugins import ProcPlugin, PROC_PLUGIN
+from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.core import Parameter
 
 class BackgroundCorrection(ProcPlugin):
@@ -14,4 +14,3 @@ class BackgroundCorrection(ProcPlugin):
         for _data in data:
             _data -= 1
         return data, kwargs
-

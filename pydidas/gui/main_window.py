@@ -204,7 +204,7 @@ class MainWindow(QtWidgets.QMainWindow):
         _frame.name = menu_name
         _frame.setParent(self)
         _frame.status_msg.connect(self.update_status)
-        if self.centralWidget().is_registed(_frame):
+        if self.centralWidget().is_registered(_frame):
             self.centralWidget().change_reference_name(menu_name, _frame)
         else:
             self.centralWidget().register_widget(menu_name, _frame)

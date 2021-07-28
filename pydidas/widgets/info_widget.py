@@ -25,9 +25,13 @@ __status__ = "Development"
 __all__ = ['GetInfoWidget']
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+
 from ..core.utilities import get_time_string
+from ..core import SingletonFactory
+
 
 class _InfoWidget(QtWidgets.QPlainTextEdit):
+    """Subclassed QPlainTextEdit with an additional method to append text."""
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setReadOnly(True)
@@ -38,6 +42,17 @@ class _InfoWidget(QtWidgets.QPlainTextEdit):
         return QtCore.QSize(500, 50)
 
     def add_status(self, text):
+        """
+        Add a status message to the InfoWidget
+
+        This method will add a status message to the Info/Log widget together
+        with a timestamp.
+
+        Parameters
+        ----------
+        text : str
+            The text to add.
+        """
         _cursor = self.textCursor()
         _cursor.movePosition(QtGui.QTextCursor.Start,
                              QtGui.QTextCursor.MoveAnchor, 1)
@@ -46,13 +61,5 @@ class _InfoWidget(QtWidgets.QPlainTextEdit):
         self.verticalScrollBar().triggerAction(
             QtWidgets.QScrollBar.SliderToMinimum)
 
-class _InfoWidgetFactory:
-    def __init__(self):
-        self._instance = None
 
-    def __call__(self):
-        if not self._instance:
-            self._instance = _InfoWidget()
-        return self._instance
-
-GetInfoWidget = _InfoWidgetFactory()
+GetInfoWidget = SingletonFactory(_InfoWidget)

@@ -13,16 +13,41 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-from . import spin_box_factory
-from .spin_box_factory import *
+from . import button_factory
+from .button_factory import *
 
 from . import progress_bar_factory
 from .progress_bar_factory import *
 
+from . import spin_box_factory
+from .spin_box_factory import *
+
+from . import check_box_factory
+from .check_box_factory import *
+
+from . import label_factory
+from .label_factory import *
+
+from . import line_factory
+from .line_factory import *
+
+from . import spacer_factory
+from .spacer_factory import *
+
 __all__ = []
+__all__ += button_factory.__all__
 __all__ += spin_box_factory.__all__
+__all__ += label_factory.__all__
+__all__ += line_factory.__all__
+__all__ += spacer_factory.__all__
 __all__ += progress_bar_factory.__all__
+__all__ += check_box_factory.__all__
 
 # unclutter namespace and remove modules:
 del spin_box_factory
 del progress_bar_factory
+del check_box_factory
+del button_factory
+del label_factory
+del line_factory
+del spacer_factory

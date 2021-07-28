@@ -21,16 +21,15 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spin_box']
+__all__ = ['create_check_box']
 
-from PyQt5.QtWidgets import QSpinBox
+from PyQt5.QtWidgets import QCheckBox
 
 from ..utilities import apply_widget_properties
 
-
-def create_spin_box(**kwargs):
+def create_check_box(text, **kwargs):
     """
-    Create a QSpinBox widget and set properties.
+    Create a QCheckBox widget and set properties.
 
     Parameters
     ----------
@@ -39,20 +38,17 @@ def create_spin_box(**kwargs):
 
     Supported keyword arguments
     ---------------------------
-    valueRange: tuple, optional
-        The range for the QSpinBox, given as a 2-tuple of (min, max). The
-        default is (0, 1).
+    text: str
+        The text of the checkbox.
     *Qt settings : any
         Any supported Qt settings for a QSpinBox (for example value,
         fixedWidth, visible, enabled)
 
     Returns
     -------
-    box : QtWidgets.QSpinBox
+    box : QtWidgets.QCheckBox
         The instantiated spin box widget.
     """
-    kwargs['range'] = kwargs.get('valueRange', (0, 1))
-    kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
-    _box = QSpinBox()
+    _box = QCheckBox(text)
     apply_widget_properties(_box, **kwargs)
     return _box

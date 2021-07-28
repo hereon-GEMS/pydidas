@@ -48,15 +48,11 @@ class BaseApp(ObjectWithParameterCollection):
         **kwargs : dict
             A dictionary of keyword arguments. Defined by the concrete
             implementation of the app.
-
-        Returns
-        -------
-        None.
         """
         super().__init__()
         self.add_params(*args, **kwargs)
         self._config = {}
-        self.slave_mode = False
+        self.slave_mode = kwargs.get('slave_mode', False)
 
     def run(self):
         """

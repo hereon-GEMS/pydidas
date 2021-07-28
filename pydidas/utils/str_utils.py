@@ -14,178 +14,209 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-The misc module has various stand-alone functions that might be useful in
-a general context.
+The str_utils module has convenience functions for string formatting.
 """
-import time
 
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+
+import time
+from numbers import Real
 import numpy as np
 
-__all__ = ['stringFill', 'getTimeString', 'getShortTimeString',
-           'timedPrint']
+__all__ = ['format_str', 'get_time_string', 'get_short_time_string',
+           'timed_print', 'get_warning']
 
 
-def stringFill(_string, _len, fill_front=False, fill_spaces=False):
-    """Function to fill the string _string up to length _len
-    with dots. If len(_string) > _len, the string is cropped.
-
-    Examples:
-
-        1. stringFill('test 123', 12)
-            -->  'test 123 ...'
-        2. stringFill('test 123', 12, fill_front = True)
-            --> '... test 123'
-
-    :param _string: The string to be processed
-    :type _string: str
-
-    :param _len: The length of the return string
-    :type _len: int
-
-    :param fill_front: Keyword to select whether the input should be padded
-                       in front or at the back. (default: False)
-    :type fill_front: bool
-
-    :param fill_spaces: Keyword to select whether the string should be padded
-                        with spaces instead of dots (default: False)
-    :type fill_spaces: bool
-
-    :return: The padded string
-    :rtype: str
+def format_str(obj, length, fill_back=True, fill_char='.', formatter='{:.3f}',
+               final_space=True):
     """
-    tmp = len(_string)
-    if tmp < _len:
-        if not fill_spaces:
-            if fill_front:
-                return (_len - tmp - 1) * '.' + ' ' + _string
-            return _string + ' ' + (_len - tmp - 1) * '.'
-        if fill_front:
-            return (_len - tmp) * ' ' + _string
-        return _string + (_len - tmp) * ' '
-    return _string[:_len]
-# Stringfill
+    Format an input object to a string of defined length.
+
+    Numerical objects (integer, float) will be converted to a string with
+    the formatter defined in the call, input strings will be processed
+    as they are.
+    If the string is shorter than the required length, it will be filled with
+    chars defined in the call, either in the front or back.
+
+    Parameters
+    ----------
+    string : str
+        The input string to be formatted.
+    length : int
+        The length of the output string.
+    fill_back: bool, optional
+        Keyword to toggle filling the front or end.
+        The default is True (filling the end of the string).
+    fill_char : char, optional
+        The character used for filling the string. Note that if a string is
+        padded, a space is always preserved between the padding and the input.
+        The default is '.'.
+    formatter : str, optional
+        The formatter to convert numbers to strings. The default is "{:.3f}".
+    final_space: bool, optional
+        A keyword to add a final space to the return string. This will be
+        within the length defined in the input parameter. The default is True.
+
+    Returns
+    -------
+    str
+        The formatted string.
+    """
+    if len(fill_char) != 1:
+        raise TypeError('fill_char must be exactly one character.')
+    if Real.__subclasscheck__(type(obj)):
+        obj = formatter.format(obj)
+    if not isinstance(obj, str):
+        obj = repr(obj)
+    if len(obj) + final_space >= length:
+        return obj[:length - final_space] + ' ' * final_space
+    _n = length - len(obj) - 1 - final_space
+    return (_n * fill_char * (not fill_back)
+            + ' ' * (not fill_back)
+            + obj
+            + ' ' * (fill_back)
+            + _n * fill_char * (fill_back)
+            + ' ' * final_space)
 
 
-def getTimeString(epoch=None, specChars=True):
-    """Function to get a string output of the current time in the format
-    (YYYY/MM/DD HH:MM:ss.sss)
+def get_time_string(epoch=None, human_output=True):
+    """
+    Return a formatted time string.
 
-    :param epoch: Keyword to process an epoch input. If None, the current
-                  system time will be used. (default: None)
-    :type epoch: None or float
+    This function creates a string output of a time in the format
+    (YYYY/MM/DD HH:MM:ss.sss). If no epoch-time is specified, the current
+    system time will be used.
 
-    :param specChars: Keyword to control special separation characters.
-                      If True, the output will be human-readable friendly.
-                      (default: True)
-    :type specChars: bool
+    Parameters
+    ----------
+    epoch : Union[float, None]
+        Keyword to process an epoch input. If None, the current
+        system time will be used. The default is None.
 
-    :return: Formatted date and time string (YYYY/MM/DD HH:MM:ss.sss)
-    :rtype: str
+    human_output : bool, optional
+        Keyword to control special  separation characters. If True, the
+        output will be human-readable friendly (with special sep. chars).
+        If False, only a "_" will be included between the date and time.
+        The default is True.
+
+    Returns
+    -------
+    str :
+        The formatted date and time string.
+        If human-readible: (YYYY/MM/DD HH:MM:ss.sss)
+        Else: YYYYMMDD_HHMMss
     """
     if epoch is None:
         epoch = time.time()
     _time = time.localtime(epoch)
     _sec = _time[5] + epoch - np.floor(epoch)
-    if not specChars:
-        return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
-                ''.format(_time[0], _time[1], _time[2], _time[3], _time[4],
-                          _sec))
-    return ('{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
+    if human_output:
+        return (
+            '{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
             ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))
-# getTimeString
+    return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
+            ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))
 
 
-def getShortTimeString(epoch=None):
-    """Function to get a string output of the current time in the format
-    (DD/MM HH:MM:ss)
-
-    :param epoch: Keyword to process an epoch input. If None, the current
-                  system time will be used. (default: None)
-    :type epoch: None or float
-
-    :return: Formatted date and time string (DD/MM HH:MM:ss)
-    :rtype: str
+def get_short_time_string(epoch=None):
     """
-    _time = time.localtime(epoch)
-    return ('{:02d}/{:02d} {:02d}:{:02d}:{:02d}'
-            '').format(_time[2], _time[1], _time[3], _time[4], _time[5])
-# getShortTimeString
+    Return a short time string in the format (DD/MM HH:MM:ss)
 
+    Parameters
+    ----------
+    epoch : Union[float, None]
+        Keyword to process an epoch input. If None, the current
+        system time will be used. The default is None.
 
-def timedPrint(_string, nLines=0, verbose=True):
-    """Function to format a string with an time prefix in the format
-    YYYY/MM/DD HH:MM:ss.sss
+    Returns
+    -------
+    str :
+        Formatted date and time string (DD/MM HH:MM:ss)
+    """
+    return get_time_string(epoch)[5:-4]
 
-    :param _string: The input string to be printed.
-    :type _string: str
+def timed_print(string, new_lines=0, verbose=True):
+    """
+    Print a string with a time prefix.
 
-    :param nLines: The number of preceding empty lines (default: 0)
-    :type nLines: int
+    This function prints a time prefix in the format YYYY/MM/DD HH:MM:ss.sss
+    and the input string. If new_lines > 0, a number of new lines will be
+    printed before the output is returned.
 
-    :param verbose: If set to False, this keyword can "mute" the output,
-                    i.e. prevent any text to be printed. (default: True)
-    :type verbose: bool
+    Parameters
+    ----------
+    string : str
+        The input string to be printed.
 
-    :return: A string printed to stdout, no return value.
+    new_lines : int, optional
+        The number of preceding empty lines. The default is 0.
+
+    verbose : bool, optinoal
+        Keyword to "mute" the output, i.e. prevent any text to be printed.
+        If True, the output will be printed, if False, this function will
+        do nothing. The default is True.
     """
     if verbose:
-        print('{}{}: {}'.format('\n' * nLines, getTimeString(), _string))
-# timedPrint
+        print('{}{}: {}'.format('\n' * new_lines, get_time_string(), string))
 
 
-def getWarning(s, severe=False, nLines=0, printWarning=True, getString=False):
-    """Function to print a warning (formatted string in a "box" of dashes).
+def get_warning(string, severe=False, new_lines=0, print_warning=True,
+                get_warning=False):
+    """
+    Generate a warning message (formatted string in a "box" of dashes).
 
-    :param s: input string to be formatted. A multi-line string can be passed
-              as a list of strings
-    :type s: str or [str, ..., str]
+    This function will create a warning string and add a box of dashes around
+    it. The output to sys.stdout can be controlled with "print_warning" and
+    the formatted string can be returned with the "get_warning" keyword.
 
-    :param severe: Keyword to add an additional frame of double dashes
-                   (default: False)
-    :type severe: bool
-
-    :param nLines: Keyword for the number of empty lines to print before the
-                   warning (default: 0)
-    :type nLines: int
-
-    printWarning : bool, optional
+    Parameters
+    ----------
+    string : Union[str, list, tuple]
+        The input string to be formatted. A multi-line string can be passed
+        as a list or tuple of strings.
+    severe : boo, optional
+        Keyword to add an additional frame of double dashes. The default is
+        False.
+    new_lines : int, optional
+        The number of preceding empty lines. The default is 0.
+    print_warning : bool, optional
         Keyword to print the warning to sys.stdout. The default is True.
-
-    getString : bool, optional
+    get_warning: bool, optional
         Keyword to get the formatted string as return argument. The default
         is False.
 
-    :return: no return value; string printed to stdout
+    Returns
+    -------
+    Union[None, str]
+        If "get_warning" is True, the function returns the formatted string.
+        Else, it will return None.
     """
-    if isinstance(s, str):
-        l = len(s)
-        s = [s]
-    elif isinstance(s, list):
-        l = np.amax(np.r_[[len(_s) for _s in s]])
-    _s = '\n' * nLines
-    if l <= 54:
-        N = 60
-    else:
-        N = 80
-    if severe:
-        _s += '=' * N + '\n'
-    _s += '-' * N + '\n'
-    for li in s:
-        ll = len(li)
+    if isinstance(string, str):
+        _max = len(string)
+        string = [string]
+    elif isinstance(string, (list, tuple)):
+        _max = np.amax(np.r_[[len(_s) for _s in string]])
+    _length = 60 if _max <= 54 else 80
+    _s = ('\n' * new_lines
+          + severe * ('=' * _length + '\n')
+          + '-' * _length + '\n')
+    for item in string:
+        ll = len(item)
         if ll == 0:
-            _s += '-' * N + '\n'
-        elif ll > 0 and (0 < l <= 54):
-            _s += '--- {} {}\n'.format(li, '-' * (60 - ll - 5))
-        elif 0 < ll <= 77:
-            _s += '- {} {}\n'.format(li, '-' * (80 - ll - 3))
+            _s += '-' * _length + '\n'
+        elif ll <= 77:
+            _filler =  '-' * (_length - ll - 3)
+            _s += f'- {item} {_filler}\n'
         else:
-            _s += '- {}[...]\n'.format(li[:73])
-    _s += '-' * N
-    if severe:
-        _s += '\n' +  '=' * N + '\n'
-    if printWarning:
+            _s += f'- {item[:73]}[...]\n'
+    _s += '-' * _length + severe * ('\n' +  '=' * _length)
+    if print_warning:
         print(_s)
-    if getString:
+    if get_warning:
         return _s
     return None
-# printWarning

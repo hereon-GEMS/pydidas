@@ -28,9 +28,10 @@ from functools import partial
 
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
-from ..plugin_collection import GetPluginCollection
+from ..plugins import GetPluginCollection
 from ..config import STYLES
 from .read_only_text_widget import ReadOnlyTextWidget
+
 PLUGIN_COLLECTION = GetPluginCollection()
 
 
@@ -42,7 +43,7 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
     """
     selection_confirmed = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, collection=None):
         """
         Create a PluginCollectionPresenter instance.
 
@@ -50,45 +51,40 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
         ----------
         parent : QWidget, optional
             The parent widget. The default is None.
-
-        Returns
-        -------
-        None.
+        collection : pydidas.PluginCollection
+            The plugin collection. Normally, this defaults to the generic
+            plugin collection and should not be changed by the user.
         """
         super().__init__(parent)
-        self.parent = parent
+        self.collection = (collection if collection is not None
+                           else GetPluginCollection())
 
-        self.w_treeview_plugins = _PluginCollectionTreeWidget(self)
+        _treeview = _PluginCollectionTreeWidget(self, self.collection)
+        self._widgets = dict(plugin_treeview=_treeview,
+                             plugin_description=ReadOnlyTextWidget(self))
+
         self.setMinimumHeight(300)
-        self.w_plugin_description = _PluginDescriptionField(self)
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self.w_treeview_plugins)
-        _layout.addWidget(self.w_plugin_description)
+        _layout.addWidget(self._widgets['plugin_treeview'])
+        _layout.addWidget(self._widgets['plugin_description'])
         self.setLayout(_layout)
 
-        self.w_treeview_plugins.selection_changed.connect(
-           self.__display_plugin_description
-        )
-        self.w_treeview_plugins.selection_confirmed.connect(
-            self.__confirm_selection
-        )
+        self._widgets['plugin_treeview'].selection_changed.connect(
+           self.__display_plugin_description)
+        self._widgets['plugin_treeview'].selection_confirmed.connect(
+            self.__confirm_selection)
 
-    def __confirm_selection(self, signal):
+    @QtCore.pyqtSlot(str)
+    def __confirm_selection(self, name):
         """
         Confirm the selection of the plugin to add it to the workflow tree.
 
         Parameters
         ----------
-        signal : QSignal
-            The signal from the QTreeView.
-
-        Returns
-        -------
-        None.
+        name : str
+            The name of the selected plugin.
         """
-        index = self.w_treeview_plugins.selectedIndexes()[0]
-        name = self.w_treeview_plugins.model().itemFromIndex(index).text()
         if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
             return
         self.selection_confirmed.emit(name)
@@ -102,58 +98,13 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
         ----------
         name : str
             The name of the plugin.
-
-        Returns
-        -------
         None.
         """
         if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
             return
-        p = PLUGIN_COLLECTION.get_plugin_by_name(name)()
-        self.w_plugin_description.setText(
-            p.get_class_description(return_list=True), p.plugin_name)
-        del p
-
-class _PluginDescriptionField(ReadOnlyTextWidget):
-    def setText(self, text, title=None):
-        """
-        Print information.
-
-        This widget accepts both a single text entry and a list of entries
-        for the text. A list of entries will be converted to a single text
-        according to a <key: entry> scheme.
-
-        Parameters
-        ----------
-        text : Union[str, list]
-            The text to be displayed. A string will be processed directly
-            whereas a list will be processed with the first entries of every
-            list entry being interpreted as key, entry.
-        title : str, optional
-            The title. If None, no title will be printed. The default is None.
-
-        Returns
-        -------
-        None.
-        """
-        if isinstance(text, str):
-            super().setText(text)
-        elif isinstance(text, list):
-            super().setText('')
-            if title:
-                self.setFontPointSize(14)
-                self.setFontWeight(75)
-                self.append(f'Plugin description: {title}')
-            self.setFontPointSize(10)
-            self.append('')
-
-            for key, item in text:
-                self.setFontWeight(75)
-                self.append(key + ':')
-                self.setFontWeight(50)
-                self.append(' ' * 4 + item if key != 'Parameters' else item)
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)
+        _p = self.collection.get_plugin_by_name(name)()
+        self._widgets['plugin_description'].setText(
+            _p.get_class_description(return_list=True), _p.plugin_name)
 
 
 class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
@@ -164,7 +115,7 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
     selection_changed = QtCore.pyqtSignal(str)
     selection_confirmed = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, collection=None):
         """
         Create the _PluginCollectionTreeWidget.
 
@@ -175,12 +126,13 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         ----------
         parent : QWidget, optional
             The Qt parent widget. The default is None.
-
-        Returns
-        -------
-        None.
+        collection : pydidas.PluginCollection
+            The plugin collection. Normally, this defaults to the generic
+            plugin collection and should not be changed by the user.
         """
         super().__init__()
+        self.collection = (collection if collection is not None
+                           else GetPluginCollection())
         self.parent = parent
         self.setEditTriggers(Qt.QAbstractItemView.NoEditTriggers)
 
@@ -189,34 +141,45 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.setUniformRowHeights(True)
         self.setSelectionMode(Qt.QAbstractItemView.SingleSelection)
         self.header().setStyleSheet(STYLES['title'])
+        _root, _model = self.__create_tree_model()
+        self.setModel(_model)
+        self.expandAll()
+        self.setItemDelegate(_TreeviewFontDelegate(_root))
+        self.clicked.connect(partial(self.__confirm_selection,
+                                     self.selection_changed))
+        self.doubleClicked.connect(partial(self.__confirm_selection,
+                                           self.selection_confirmed))
 
+    def __create_tree_model(self):
+        """
+        Create the tree model of the plugins.
 
+        Returns
+        -------
+        root_node : QStandardItem
+            The root node item.
+        tree_model : QStandardItemModel
+            The tree view model.
+        """
         tree_model = Qt.QStandardItemModel()
         tree_model.setHorizontalHeaderLabels(['Available plugins'])
 
         root_node = tree_model.invisibleRootItem()
         input_plugins = Qt.QStandardItem('Input plugins')
-        for item in PLUGIN_COLLECTION.plugins['input'].values():
+        for item in self.collection.plugins['input'].values():
             input_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
         root_node.appendRow(input_plugins)
 
         proc_plugins = Qt.QStandardItem('Processing plugins')
-        for item in PLUGIN_COLLECTION.plugins['proc'].values():
+        for item in self.collection.plugins['proc'].values():
             proc_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
         root_node.appendRow(proc_plugins)
 
         output_plugins = Qt.QStandardItem('Output plugins')
-        for item in PLUGIN_COLLECTION.plugins['output'].values():
+        for item in self.collection.plugins['output'].values():
             output_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
         root_node.appendRow(output_plugins)
-
-        self.setModel(tree_model)
-        self.expandAll()
-        self.setItemDelegate(_TreeviewFontDelegate(root_node))
-        self.clicked.connect(partial(self.__confirm_selection,
-                                     self.selection_changed))
-        self.doubleClicked.connect(partial(self.__confirm_selection,
-                                           self.selection_confirmed))
+        return root_node, tree_model
 
     def __confirm_selection(self, signal):
         """
@@ -226,10 +189,6 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         ----------
         signal : Qsignal
             The signal emitted by the QTreeView.
-
-        Returns
-        -------
-        None.
         """
         index = self.selectedIndexes()[0]
         name = self.model().itemFromIndex(index).text()
@@ -248,10 +207,6 @@ class _TreeviewFontDelegate(QtWidgets.QStyledItemDelegate):
         ----------
         root : QStandardItem
             The root node of the QStandardItemModel.
-
-        Returns
-        -------
-        None.
         """
         super().__init__()
         self.root = root
@@ -263,7 +218,7 @@ class _TreeviewFontDelegate(QtWidgets.QStyledItemDelegate):
         Parameters
         ----------
         p_option : type
-            The options
+            The options.
         p_index : type
             The index.
 
@@ -271,7 +226,6 @@ class _TreeviewFontDelegate(QtWidgets.QStyledItemDelegate):
         -------
         size : sizeHint
             The updated sizeHint from the QStyledItemDelegate.
-
         """
         size = QtWidgets.QStyledItemDelegate.sizeHint(self, p_option, p_index)
         size.setHeight(25)
@@ -279,7 +233,8 @@ class _TreeviewFontDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         """
-        Overload the paint function with a custom font size.
+        Overload the paint function with a custom font size for the top level
+        items.
 
         Parameters
         ----------
@@ -289,11 +244,6 @@ class _TreeviewFontDelegate(QtWidgets.QStyledItemDelegate):
             Qt options.
         index : type
             the index.
-
-        Returns
-        -------
-        None.
-
         """
         model = index.model()
         if model.itemFromIndex(index).parent() is None:

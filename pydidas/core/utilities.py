@@ -98,7 +98,7 @@ def create_temp_file():
     os.close(_handle)
     return _filename
 
-def get_time_string(epoch=None, humanReadable=False):
+def get_time_string(epoch=None, humanReadable=True):
     """
     Get a formatted time string.
 

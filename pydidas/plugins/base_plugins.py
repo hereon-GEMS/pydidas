@@ -13,8 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-import abc
-import copy
+"""Module with the basic Plugin classes."""
+
+__author__      = "Malte Storm"
+__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
+
+
 from pydidas.core import ParameterCollection, ParameterCollectionMixIn
 
 BASE_PLUGIN = -1
@@ -52,6 +61,7 @@ class BasePlugin(ParameterCollectionMixIn):
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     parameters = ParameterCollection()
+    _is_pydidas_plugin = True
     input_data = {}
     output_data = {}
 
@@ -103,56 +113,12 @@ class BasePlugin(ParameterCollectionMixIn):
         self.params = self.get_default_params_copy()
 
 
+
     def execute(self, *data, **kwargs):
         """
         Execute the processing step.
         """
         raise NotImplementedError('Execute method has not been implemented.')
-
-    def set_param(self, param_name, value):
-        """
-        Set a parameter value.
-
-        This method sets the parameter
-
-        Parameters
-        ----------
-        param_name : TYPE
-            DESCRIPTION.
-        value : TYPE
-            DESCRIPTION.
-
-        Returns
-        -------
-        None.
-
-        """
-        for param in self.params:
-            if param.name == param_name:
-                param.value = value
-
-    def add_param(self, param):
-        if param.name in [p.name for p in self.params]:
-            raise KeyError(f'A parameter with the name {param.name} already'
-                           ' exists.')
-        self.params.append(param)
-
-    def get_param_value(self, param_name):
-        for param in self.params:
-            if param.name == param_name:
-                return param.value
-        raise KeyError(f'A parameter with the name {param.name} does not'
-                       ' exist.')
-
-    def get_param_names(self):
-        return [p.name for p in self.params]
-
-    def restore_defaults(self, force=False):
-        if not force:
-            raise NotImplementedError('Confirmation of restoring plugin'
-                                      ' defaults not yet implemented.')
-        for param in self.params:
-            param.restore_default()
 
     @staticmethod
     def check_if_plugin():
@@ -161,7 +127,6 @@ class BasePlugin(ParameterCollectionMixIn):
     @staticmethod
     def has_unique_parameter_config_widget():
         return False
-
 
     def parameter_config_widget(self):
         raise NotImplementedError('Generic plugins do not have a unique'
@@ -190,12 +155,3 @@ class OutputPlugin(BasePlugin):
     """
     basic_plugin = True
     plugin_type = OUTPUT_PLUGIN
-
-
-
-class PluginMeta(metaclass=abc.ABCMeta):
-    ...
-
-PluginMeta.register(InputPlugin)
-PluginMeta.register(OutputPlugin)
-PluginMeta.register(ProcPlugin)

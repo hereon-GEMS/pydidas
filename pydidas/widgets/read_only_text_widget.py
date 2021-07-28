@@ -57,10 +57,6 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             The default is None.
         visible : bool, optional
             Flag to set widget visibility at startup.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(parent)
         params['minimumWidth'] = params.get('minimumWidth', 500)
@@ -97,10 +93,6 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             The default is False.
         indent : int, optional
             The indent depth for list entries. The default is 4.
-
-        Returns
-        -------
-        None.
         """
         super().setText('')
         if title is not None:

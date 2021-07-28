@@ -1,11 +1,11 @@
-from base_plugins import ProcPlugin, PROC_PLUGIN
+from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.core import Parameter
 
 
-class DotPeakFitting(ProcPlugin):
+class uuPeakFitting(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    plugin_name = 'Dot peak fitting'
+    plugin_name = 'uu Peak fitting'
     parameters = [Parameter('function', param_type=None, default=None, tooltip='The fit function', choices=['Func 1', 'Func 2', 'Func 3']),
                   Parameter('func_params', param_type=None, default=None, tooltip='The function parameters')
                   ]

@@ -25,8 +25,10 @@ __status__ = "Development"
 __all__ = ['BaseFrameWithApp']
 
 import copy
+
 from PyQt5 import QtCore
 
+from ..apps import BaseApp
 from .base_frame import BaseFrame
 
 
@@ -63,6 +65,7 @@ class BaseFrameWithApp(BaseFrame):
         init_layout = kwargs.get('initLayout', True)
         super().__init__(parent=parent, initLayout=init_layout)
         self._app = None
+        self._runner = None
         self._app_attributes_to_update = []
 
     @QtCore.pyqtSlot(object)
@@ -75,6 +78,11 @@ class BaseFrameWithApp(BaseFrame):
         app : pydidas.apps.BaseApp
             Any App instance
         """
+        if not isinstance(app, BaseApp):
+            raise TypeError('The passed object must be a BaseApp instance.')
+        if not isinstance(self._app, BaseApp):
+            self._app = copy.copy(app)
+            return
         for param_key in app.params:
             self._app.set_param_value(param_key,
                                       app.get_param_value(param_key))
@@ -93,7 +101,7 @@ class BaseFrameWithApp(BaseFrame):
         progress : float
             The progress, given as numbers 0..1
         """
-        if 'progress' in self._widgets.keys():
+        if 'progress' in self._widgets:
             _progress = round(progress * 100)
             self._widgets['progress'].setValue(_progress)
 
@@ -102,4 +110,5 @@ class BaseFrameWithApp(BaseFrame):
         """
         Clean up after AppRunner is done.
         """
-        del self._runner
+        if self._runner is not None:
+            self._runner = None

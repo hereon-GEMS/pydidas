@@ -27,206 +27,98 @@ __status__ = "Development"
 __all__ = ['CreateWidgetsMixIn']
 
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
-from .factory import create_spin_box, create_progress_bar
-from .utilities import apply_widget_properties, apply_font_properties
-from ..config import STANDARD_FONT_SIZE, DEFAULT_ALIGNMENT
+from .factory import (create_spin_box, create_progress_bar, create_check_box,
+                      create_label, create_line, create_spacer, create_button)
+from ..config import DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
 from ..utils import copy_docstring
 
 
 class CreateWidgetsMixIn:
     """
-    The CreateWidgetsMixIn class includes methods for easy
-    classes without having to inherit from ParameterConfigWidget to avoid multiple
-    inheritance from QtWidgets.QFrame.
+    The CreateWidgetsMixIn class includes methods for easy adding of widgets
+    to the layout. The create_something methods from the factories are called
+    and in addition, the layout and positions can be set.
+
+    Use the "gridPos" keyword to define the widget position in the parent's
+    layout.
     """
+    def __init__(self):
+        self._widgets = {}
 
-    def create_label(self, text, **kwargs):
-        """
-        Add a label to the widget.
-
-        This method will add a label with text to the widget. Useful for
-        defining item groups etc.
-
-        Parameters
-        ----------
-        text : str
-            The label text to be printed.
-        fontsize : int, optional
-            The font size in pixels. The default is STANDARD_FONT_SIZE.
-        **kwargs : dict
-            Any aditional keyword arguments. See below for supported
-            arguments.
-
-        Supported keyword arguments
-        ---------------------------
-        gridPos : Union[list, tuple, None], optional
-            The position in the QGridLayout
-        parent_widget : Union[QWidget, None], optional
-            The parent widget to which the label is added. If None, this
-            defaults to the calling widget, ie. "self".
-        *Qt settings : any
-            Any Qt settings
-
-        Returns
-        -------
-        label : QLabel
-            The formatted QLabel
-        """
-        kwargs['pointSize'] = kwargs.get('fontsize', STANDARD_FONT_SIZE)
-        kwargs['font'] = QtWidgets.QApplication.font()
-        apply_font_properties(kwargs['font'], **kwargs)
-
-        _parent = kwargs.get('parent_widget', self)
-        _label = QtWidgets.QLabel(text)
-        # TODO : verify the heights of text widgets
-        # _h = _label.fontMetrics().boundingRect(_label.text()).height()
-        # print(_h, text)
-        # kwargs['fixedHeight'] = (kwargs['pointSize'] * (1 + text.count('\n'))
-        #                          + 10)
-        kwargs['wordWrap'] = kwargs.get('wordWrap', True)
-
-        apply_widget_properties(_label, **kwargs)
-
-        _layout_args = _get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(_label, *_layout_args)
-        return _label
-
-    def create_line(self, **kwargs):
-        """
-        Create a line widget.
-
-        This method creates a line widget as separator and adds it to the
-        parent widget.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Any aditional keyword arguments. See below for supported
-            arguments.
-
-        Supported keyword arguments
-        ---------------------------
-        gridPos : Union[list, tuple, None], optional
-            The position in the QGridLayout
-        parent_widget : Union[QWidget, None], optional
-            The parent widget to which the label is added. If None, this
-            defaults to the calling widget, ie. "self".
-        *Qt settings : any
-
-        Returns
-        -------
-        line : QFrame
-            The line (in the form of a QFrame widget).
-        """
-        _parent = kwargs.get('parent_widget', self)
-        _line = QtWidgets.QFrame()
-        kwargs['frameShape'] = kwargs.get('frameShape',
-                                          QtWidgets.QFrame.HLine)
-        kwargs['frameShadow'] = kwargs.get('frameShadow',
-                                           QtWidgets.QFrame.Sunken)
-        kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
-        kwargs['fixedHeight'] = kwargs.get('fixedHeight', 3)
-        apply_widget_properties(_line, **kwargs)
-        _parent.layout().addWidget(
-            _line, *_get_widget_layout_args(_parent, **kwargs)
-            )
-        return _line
-
+    @copy_docstring(create_spacer)
     def create_spacer(self, **kwargs):
         """
-        Add a spacer to the layout.
-
-        A QSpacerItem will be created and added to the layout. Its size policy
-        is "Minimal" unless overridden.
-
-        Parameters
-        ----------
-        height : int, optional
-            The height of the spacer in pixel. The default is 20.
-        width : int, optional
-            The width of the spacer in pixel. The default is 20.
-        gridPos : Union[tuple, list, None], optional
-            A list or tuple of length 4 can be supplied as the gridPos.
-            The default is None.
-        parent_widget : Union[QWidget, None], optional
-            The parent widget to which the label is added. If None, this
-            defaults to the calling widget, ie. "self".
-        policy : QtWidgets.QSizePolicy, optional
-            The size policy for the spacer (applied both horizontally and
-            vertically). The default is QtWidgets.QSizePolicy.Minimum.
-
-        Returns
-        -------
-        spacer : QSpacerItem
-            The new spacer.
+        Please refer to pydidas.widgets.factory.create_spacer
         """
-        _policy = kwargs.get('policy', QtWidgets.QSizePolicy.Minimum)
         _parent = kwargs.get('parent_widget', self)
-        _spacer = QtWidgets.QSpacerItem(
-            kwargs.get('fixedHeight', 20), kwargs.get('fixedWidth', 20),
-            _policy, _policy
-            )
+        _spacer = create_spacer(**kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
         return _spacer
 
+    @copy_docstring(create_label)
+    def create_label(self, text, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_label
+        """
+        return self.__create_widget(create_label, text, **kwargs)
+
+    @copy_docstring(create_line)
+    def create_line(self, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_line
+        """
+        return self.__create_widget(create_line, **kwargs)
+
+    @copy_docstring(create_button)
     def create_button(self, text, **kwargs):
         """
-        Create a button and add it to the layout.
-
-        Parameters
-        ----------
-        text : str
-            The button text.
-        **kwargs : dict
-            Any supported keyword arguments.
-
-        Supported keyword arguments
-        ---------------------------
-        gridPos : Union[tuple, None], optional
-            The grid position of the widget in the layout. If None, the widget
-            is added to the layout and the layout selects the widget's
-            position. The default is None.
-        *Qt settings : any
-            Any supported Qt settings for button (for example, icon, visible,
-            enabled, fixedWidth)
-
-        Returns
-        -------
-        button : QtWidgets.QPushButton
-            The instantiated button widget.
+        Please refer to pydidas.widgets.factory.create_button
         """
-        _parent = kwargs.get('parent_widget', self)
-        _button = QtWidgets.QPushButton(text)
-        apply_widget_properties(_button, **kwargs)
-        _layout_args = _get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(_button, *_layout_args)
-        return _button
+        return self.__create_widget(create_button, text, **kwargs)
 
     @copy_docstring(create_spin_box)
     def create_spin_box(self, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_spin_box
         """
-        _parent = kwargs.get('parent_widget', self)
-        _box = create_spin_box(**kwargs)
-        _layout_args = _get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(_box, *_layout_args)
-        return _box
+        return self.__create_widget(create_spin_box, **kwargs)
 
     @copy_docstring(create_progress_bar)
     def create_progress_bar(self, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_progress_bar
         """
-        _parent = kwargs.get('parent_widget', self)
-        _bar = create_progress_bar(**kwargs)
-        _layout_args = _get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(_bar, *_layout_args)
-        return _bar
+        return self.__create_widget(create_progress_bar, **kwargs)
 
+    @copy_docstring(create_check_box)
+    def create_check_box(self, text, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_check_box
+        """
+        return self.__create_widget(create_check_box, text, **kwargs)
+
+    def __create_widget(self, method, *args, **kwargs):
+        """
+        Create
+
+        Parameters
+        ----------
+        method : method
+            The method to be called.
+        *args : args
+            Any arguments to the method call
+        **kwargs : dict
+            keyword arguments.
+        """
+        _parent = kwargs.get('parent_widget', self)
+        _widget = method(*args, **kwargs)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
+        _parent.layout().addWidget(_widget, *_layout_args)
+        return _widget
 
 
 def _get_widget_layout_args(parent, **kwargs):
@@ -245,7 +137,8 @@ def _get_widget_layout_args(parent, **kwargs):
     Raises
     ------
     WidgetLayoutError
-        If the parent widget has no layout.
+        If the parent widget has no supported layout. Supported are
+        QBoxLayout, QStackedLayout or QGridLayout and subclasses.
 
     Returns
     -------
@@ -253,22 +146,63 @@ def _get_widget_layout_args(parent, **kwargs):
         The list of layout arguments required for adding the widget to
         the layout of the parent widget.
     """
-    if parent.layout() is None:
-        raise WidgetLayoutError('No layout set on parent widget'
-                                f'"{parent}".')
+    if not isinstance(
+            parent.layout(),(QBoxLayout, QStackedLayout, QGridLayout)):
+        raise WidgetLayoutError(
+            f'Layout of parent widget "{parent}" is not of type '
+            'QBoxLayout, QStackedLayout or QGridLayout.')
+
     _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
-    _grid_pos = kwargs.get('gridPos', None)
-    if not isinstance(parent.layout(), QtWidgets.QGridLayout):
-        return [0, _alignment]
-    if (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4 and
-            _grid_pos[0] == -1):
-        _grid_pos = (parent.layout().rowCount() + 1, ) + _grid_pos[1:4]
-    if _grid_pos is None:
-        _row = (kwargs.get('row', parent.layout().rowCount() + 1)
-                if isinstance(parent.layout(), QtWidgets.QGridLayout)
-                else kwargs.get('row', -1))
-        _grid_pos = (_row, kwargs.get('column', 0),
-                     kwargs.get('n_rows', 1), kwargs.get('n_columns', 2))
+    if isinstance(parent.layout(), QtWidgets.QBoxLayout):
+        return [kwargs.get('stretch', 0), _alignment]
+    if isinstance(parent.layout(), QtWidgets.QStackedLayout):
+        return []
+
+    _grid_pos = _get_grid_pos(parent, **kwargs)
     if _alignment is not None:
         return [*_grid_pos, _alignment]
     return [*_grid_pos]
+
+
+def _get_grid_pos(parent, **kwargs):
+    """
+    Get the gridPos format from the kwargs or create it.
+
+    Parameters
+    ----------
+    parent : QWidget
+        The parent QWidget to be added to the layout.
+    **kwargs : dict
+        The keyword arguments dictionary from the calling method. This
+        method only takes the "gridPos" and "alignment" arguments from the
+        kwargs.
+
+    Raises
+    ------
+    WidgetLayoutError
+        If gridPos has been specified but is not of type tuple and not of
+        length 4.
+
+    Returns
+    -------
+    gridPos : tuple
+        The 4-tuple of the gridPos.
+    """
+    _grid_pos = kwargs.get('gridPos', None)
+    _default_row = (0 if parent.layout().count() == 0
+                    else parent.layout().rowCount())
+
+    if _grid_pos is None:
+        _grid_pos = (kwargs.get('row', _default_row),
+                     kwargs.get('column', 0),
+                     kwargs.get('n_rows', 1),
+                     kwargs.get('n_columns', 2))
+
+    if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
+        raise WidgetLayoutError(
+            'The passed value for "gridPos" is not of type tuple and/or not'
+            ' of length 4.')
+
+    if _grid_pos[0] == -1:
+        _grid_pos = (_default_row, ) + _grid_pos[1:4]
+    return _grid_pos

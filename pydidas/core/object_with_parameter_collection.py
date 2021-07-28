@@ -86,7 +86,7 @@ class ParameterCollectionMixIn:
             A dictionary with Parameters. Note that the dictionary keys will
             be ignored and only the Parameter.refkey attributes will be used.
         """
-        for _param in (params + tuple(kwed_params.values())):
+        for _param in params + tuple(kwed_params.values()):
             if isinstance(_param, Parameter):
                 self.add_param(_param)
             elif isinstance(_param, ParameterCollection):
@@ -175,6 +175,17 @@ class ParameterCollectionMixIn:
             name_val_pairs[self.params[_key].refkey] = self.params[_key].value
         return name_val_pairs
 
+    def get_param_keys(self):
+        """
+        Get the keys of all registered Parameters.
+
+        Returns
+        -------
+        list
+            The keys of all registered Parameters.
+        """
+        return [_p.refkey for _p in self.params.values()]
+
     def print_param_values(self):
         """
         Print the name and value of all Parameters.
@@ -230,7 +241,7 @@ class ParameterCollectionMixIn:
         confirm : bool
             Confirmation flag as safety feature.
         """
-        if not confirm == True:
+        if not confirm:
             return
         for _key in self.params.keys():
             self.params[_key].restore_default()
@@ -266,18 +277,9 @@ class ObjectWithParameterCollection(ParameterCollectionMixIn,
     This class can be inherited by any class which requires a
     ParameterCollection and access methods for it.
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """
         Create a Base instance.
-
-        Parameters
-        ----------
-        *args : list
-            Any arguments. Defined by the concrete
-            subclass..
-        **kwargs : dict
-            A dictionary of keyword arguments. Defined by the concrete
-            subclass.
         """
         ParameterCollectionMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)

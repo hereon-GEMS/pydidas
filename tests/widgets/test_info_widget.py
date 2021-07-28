@@ -23,32 +23,36 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
+import sys
 
-from pydidas.utils._format_arguments import format_arguments
+from PyQt5 import QtWidgets, QtCore
+
+from pydidas.widgets.info_widget import GetInfoWidget
 
 
-class Test_format_arguments(unittest.TestCase):
+class TestCentralWidgetStack(unittest.TestCase):
 
     def setUp(self):
-        ...
+        self.q_app = QtWidgets.QApplication(sys.argv)
+        self.widgets = []
 
     def tearDown(self):
-        ...
+        self.q_app.quit()
 
-    def test_format_arguments_only_args(self):
-        _args = format_arguments('--test', ' a = 1', 'b=2')
-        self.assertEqual(_args, ['--test', '-a', '1', '-b', '2'])
+    def test_init(self):
+        obj = GetInfoWidget()
+        self.assertIsInstance(obj, QtWidgets.QPlainTextEdit)
 
-    def test_format_arguments_only_kwargs(self):
-        _args = format_arguments(bool_test=True, c=3, s='string', f=6.6)
-        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
-                                 '-f', '6.6'])
+    def test_sizeHint(self):
+        obj = GetInfoWidget()
+        self.assertEqual(obj.sizeHint(), QtCore.QSize(500, 50))
 
-    def test_format_arguments_mixed(self):
-        _args = format_arguments('--test', ' a = 1', 'b=2',
-                                 bool_test=True, c=3, s='string', f=6.6)
-        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
-                                 '-f', '6.6', '--test', '-a', '1', '-b', '2'])
+    def test_add_status(self):
+        _test = 'This is the test string'
+        obj = GetInfoWidget()
+        obj.add_status(_test)
+        _text = obj.toPlainText()
+        self.assertTrue(_text.strip().endswith(_test))
 
 
 if __name__ == "__main__":

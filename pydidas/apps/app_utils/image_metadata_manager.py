@@ -82,7 +82,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Create a ImageMetadataManager instance.
         """
-        ObjectWithParameterCollection.__init__(self, *args, **kwargs)
+        ObjectWithParameterCollection.__init__(self)
         self.add_params(*args, **kwargs)
         self.set_default_params()
         self._config = {'raw_img_shape_x': None,

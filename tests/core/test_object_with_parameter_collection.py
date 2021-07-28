@@ -99,6 +99,11 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.set_param_value('Test2', 12)
         self.assertEqual(obj.get_param_value('Test2'), 12)
 
+    def test_get_param_keys(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        self.assertEqual(obj.get_param_keys(), list(obj.params.keys()))
+
     def test_set_param_value_no_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)

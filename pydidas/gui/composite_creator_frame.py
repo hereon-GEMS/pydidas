@@ -65,7 +65,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._config['input_configured'] = False
         self._config['bg_configured'] = False
         self._app_attributes_to_update.append('_composite')
-        self._runner = None
         self._create_param_collection()
 
         CompositeCreatorFrameBuilder(self)

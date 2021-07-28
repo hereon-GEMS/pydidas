@@ -150,7 +150,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
         if index != self.frame_index:
             return
         for _param_key in self.params:
-            _value = self.qsetting_get_global_value(_param_key)
+            _value = self.q_settings_get_global_value(_param_key)
             self.update_param_value(_param_key, _value)
 
     def __reset(self):

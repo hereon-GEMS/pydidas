@@ -23,50 +23,44 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
-import time
 import string
 import random
+import os
 
-from pydidas.core import SingletonFactory
+import numpy as np
+from PyQt5 import QtWidgets, QtCore
 
-
-class TestClass:
-    def __init__(self):
-        self.attr1 = hash(time.time())
-        self.attr2 = ''.join(random.choice(string.ascii_letters)
-                             for i in range(64))
+from pydidas._exceptions import WidgetLayoutError
+from pydidas.widgets.hdf5_dataset_selector import Hdf5DatasetSelector
 
 
-class TestSingletonFactory(unittest.TestCase):
+class TestHdfDatasetSelector(unittest.TestCase):
 
     def setUp(self):
-        self.factory = SingletonFactory(TestClass)
+        self.q_app = QtWidgets.QApplication([])
+        self.widgets = []
 
     def tearDown(self):
-        ...
+        del self.q_app
 
-    def test_setup(self):
-        # test setUp method
-        self.assertIsInstance(self.factory, SingletonFactory)
+    def test_init(self):
+        obj = Hdf5DatasetSelector()
+        self.assertIsInstance(obj, Hdf5DatasetSelector)
 
-    def test_creation(self):
-        obj = self.factory()
-        self.assertIsInstance(obj, TestClass)
+    # def test_sizeHint(self):
+    #     obj = Hdf5DatasetSelector()
+    #     self.assertIsInstance(obj.sizeHint(), QtCore.QSize)
 
-    def test_repeated_call(self):
-        obj = self.factory()
-        obj2 = self.factory()
-        self.assertEqual(obj, obj2)
-
-    def test_instance(self):
-        obj = self.factory.instance()
-        self.assertIsInstance(obj, TestClass)
-
-    def test__reset(self):
-        obj = self.factory()
-        self.factory._reset_instance()
-        obj2 = self.factory()
-        self.assertNotEqual(obj, obj2)
+    # def test__expand_to_path(self):
+    #     _path = os.path.dirname(__file__)
+    #     obj = Hdf5DatasetSelector()
+    #     obj._Hdf5DatasetSelector__expand_to_path(_path)
+    #     while os.path.isdir(_path):
+    #         _index = obj._filemodel.index(_path)
+    #         self.assertTrue(obj.isExpanded(_index))
+    #         if _path == os.path.dirname(_path):
+    #             break
+    #         _path = os.path.dirname(_path)
 
 
 if __name__ == "__main__":

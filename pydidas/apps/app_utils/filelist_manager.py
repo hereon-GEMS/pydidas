@@ -79,7 +79,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         Create a FilelistManager instance.
         """
-        ObjectWithParameterCollection.__init__(self, *args, **kwargs)
+        ObjectWithParameterCollection.__init__(self)
         self.add_params(*args, **kwargs)
         self.set_default_params()
         self._config = {'file_list': [],

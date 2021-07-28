@@ -30,11 +30,12 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from .factory import (create_spin_box, create_progress_bar, create_check_box,
-                      create_label, create_line, create_spacer, create_button)
+                      create_label, create_line, create_spacer, create_button,
+                      create_combo_box)
 from ..config import DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
 from ..utils import copy_docstring
-
+from .utilities import apply_widget_properties
 
 class CreateWidgetsMixIn:
     """
@@ -49,7 +50,7 @@ class CreateWidgetsMixIn:
         self._widgets = {}
 
     @copy_docstring(create_spacer)
-    def create_spacer(self, **kwargs):
+    def create_spacer(self, ref, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_spacer
         """
@@ -57,68 +58,132 @@ class CreateWidgetsMixIn:
         _spacer = create_spacer(**kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
-        return _spacer
+        self._widgets[ref] = _spacer
 
     @copy_docstring(create_label)
-    def create_label(self, text, **kwargs):
+    def create_label(self, ref, text, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_label
         """
-        return self.__create_widget(create_label, text, **kwargs)
+        self.__create_widget(create_label, ref, text, **kwargs)
 
     @copy_docstring(create_line)
-    def create_line(self, **kwargs):
+    def create_line(self, ref, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_line
         """
-        return self.__create_widget(create_line, **kwargs)
+        self.__create_widget(create_line, **kwargs)
 
     @copy_docstring(create_button)
-    def create_button(self, text, **kwargs):
+    def create_button(self, ref, text, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_button
         """
-        return self.__create_widget(create_button, text, **kwargs)
+        self.__create_widget(create_button, ref, text, **kwargs)
 
     @copy_docstring(create_spin_box)
-    def create_spin_box(self, **kwargs):
+    def create_spin_box(self, ref, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_spin_box
         """
-        return self.__create_widget(create_spin_box, **kwargs)
+        self.__create_widget(create_spin_box, ref, **kwargs)
 
     @copy_docstring(create_progress_bar)
-    def create_progress_bar(self, **kwargs):
+    def create_progress_bar(self, ref, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_progress_bar
         """
-        return self.__create_widget(create_progress_bar, **kwargs)
+        self.__create_widget(create_progress_bar, ref, **kwargs)
 
     @copy_docstring(create_check_box)
-    def create_check_box(self, text, **kwargs):
+    def create_check_box(self, ref, text, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_check_box
         """
-        return self.__create_widget(create_check_box, text, **kwargs)
+        self.__create_widget(create_check_box, ref, text, **kwargs)
 
-    def __create_widget(self, method, *args, **kwargs):
+    @copy_docstring(create_combo_box)
+    def create_combo_box(self, ref, **kwargs):
         """
-        Create
+        Please refer to pydidas.widgets.factory.create_check_box
+        """
+        self.__create_widget(create_combo_box, ref, **kwargs)
+
+    def __create_widget(self, function, ref, *args, **kwargs):
+        """
+        Create a widget from a function.
 
         Parameters
         ----------
-        method : method
-            The method to be called.
+        function : function
+            The function to be called.
+        ref : str
+            The reference name in the _widgets dictionary.
         *args : args
-            Any arguments to the method call
+            Any arguments to the function call.
         **kwargs : dict
-            keyword arguments.
+            Keyword arguments for the widget creation.
         """
         _parent = kwargs.get('parent_widget', self)
-        _widget = method(*args, **kwargs)
+        _widget = function(*args, **kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
-        return _widget
+        if ref is not None:
+            self._widgets[ref] = _widget
+
+    def create_any_widget(self, ref, widget_class, *args, **kwargs):
+        """
+        Create any widget with any settings and add it to the layout.
+
+        Note: Widgets must support generic *args and **kwargs arguments.
+
+        Parameters
+        ----------
+        ref : str
+            The reference name in the _widgets dictionary.
+        widget_class : QtWidgets.QWidget
+            The class of the widget.
+        *args : args
+            Any arguments for the widget creation.
+        **kwargs : dict
+            Keyword arguments for the widget creation.
+
+        Raises
+        ------
+        TypeError
+            If the reference "ref" is not of type string.
+        """
+        if not isinstance(ref, str):
+            raise TypeError('Widget reference must be of type string.')
+        self.__create_widget(widget_class, ref, *args, **kwargs)
+        apply_widget_properties(self._widgets[ref])
+
+    def add_any_widget(self, ref, widget, **kwargs):
+        """
+        Add any existing widget with any settings to the layout.
+
+        Parameters
+        ----------
+        ref : str
+            The reference name in the _widgets dictionary.
+        widget : QtWidgets.QWidget
+            The widget instance.
+        **kwargs : dict
+            Keyword arguments for the widget settings and layout.
+
+        Raises
+        ------
+        TypeError
+            If the reference "ref" is not of type string.
+        """
+        if not isinstance(ref, str):
+            raise TypeError('Widget reference must be of type string.')
+        apply_widget_properties(widget)
+        _parent = kwargs.get('parent_widget', self)
+        _layout_args = _get_widget_layout_args(_parent, **kwargs)
+        _parent.layout().addWidget(widget, *_layout_args)
+        if ref is not None:
+            self._widgets[ref] = widget
 
 
 def _get_widget_layout_args(parent, **kwargs):

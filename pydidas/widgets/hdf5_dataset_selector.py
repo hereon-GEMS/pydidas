@@ -35,6 +35,7 @@ from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 from .._exceptions import FrameConfigError
 from ..utils import get_hdf5_populated_dataset_keys
 from .create_widgets_mixin import CreateWidgetsMixIn
+from ..config import COMBO_BOX_SIZE_POLICY
 
 DEFAULT_FILTERS = {'/entry/instrument/detector/detectorSpecific/':
                    '"detectorSpecific"\nkeys (Eiger detector)'}
@@ -47,7 +48,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     dimension of a n-dimensional (n >= 3) dataset is the frame number. Any
     2-dimensional datasets will be interpreted as single frames.
     """
-    new_frame_signal = QtCore.pyqtSlot(object)
+    new_frame_signal = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None, viewWidget=None,
                  datasetKeyFilters=None):
@@ -74,8 +75,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         self._config = dict(activeDsetFilters = [],
                             currentDset = None,
-                            dsetFilterMinSize = 50,
-                            dsetFilterMinDim = 2,
                             currentFname = None,
                             currentIndex = None,
                             dsetFilters = (datasetKeyFilters
@@ -83,7 +82,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
                                            else DEFAULT_FILTERS))
         self.flags = dict(slotActive = False,
                           autoUpdate = 0)
-        self.w_view = viewWidget
+        self._widgets['viewer'] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()
         self.__connect_slots()
@@ -107,44 +106,35 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             _widget.stateChanged.connect(
                 partial(self._toggle_filter_key, _widget, key))
             _w_filter_keys.append(_widget)
-
         for i, widget in enumerate(_w_filter_keys):
             _layout.addWidget(widget, i // 2, i % 2, 1, 2)
 
-        # determine the layout row offset for the other widgets based on
+        # Determine the layout row offset for the other widgets based on
         # the number of filter key checkboxes:
         _row_offset = len(_w_filter_keys) // 2 + len(_w_filter_keys) % 2
 
-        self.create_label('Min. dataset\nsize: ',
+        self.create_label(None, 'Min. dataset\nsize: ',
                           gridPos=(_row_offset, 0, 1, 1))
-        self.create_label('Min. dataset\ndimensions: ',
+        self.create_label(None, 'Min. dataset\ndimensions: ',
                           gridPos=(_row_offset, 3, 1, 1))
-        self.create_label('Filtered datasets: ',
+        self.create_label(None, 'Filtered datasets: ',
                           gridPos=(1 + _row_offset, 0, 1, 1))
-
-        self.w_min_datasize = self.create_spin_box(
-            value=50, valueRange=(0, int(1e9)), gridPos=(_row_offset, 1, 1, 1)
-            )
-        self.w_min_datadim = self.create_spin_box(
-            value=2, valueRange=(0, 3), gridPos=(_row_offset, 4, 1, 1)
-            )
-
-        self.w_select_dataset = QtWidgets.QComboBox()
-        self.w_select_dataset.setSizeAdjustPolicy(
-            QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)
-        self.w_select_dataset.setMinimumContentsLength(25)
-        _layout.addWidget(self.w_select_dataset, 1 + _row_offset, 1, 1, 4)
-
-        self.w_frame_browser = HorizontalSliderWithBrowser()
-        _layout.addWidget(self.w_frame_browser, 2 + _row_offset, 0, 1, 5)
-
-        self.w_but_view = self.create_button(
-            'Show full frame', gridPos=(3 + _row_offset, 3, 1, 2),
-            alignment=QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
-            )
-
-        self.w_auto_update = QtWidgets.QCheckBox('Auto update')
-        _layout.addWidget(self.w_auto_update, 3 + _row_offset, 0, 1, 2)
+        self.create_spin_box('min_datasize', value=50,
+                             valueRange=(0, int(1e9)),
+                             gridPos=(_row_offset, 1, 1, 1))
+        self.create_spin_box('min_datadim', value=2, valueRange=(0, 3),
+                             gridPos=(_row_offset, 4, 1, 1))
+        self.create_combo_box(
+            'select_dataset', minimumContentsLength=25,
+            sizeAdjustPolicy=COMBO_BOX_SIZE_POLICY,
+            gridPos=(1 + _row_offset, 1, 1, 4))
+        self.add_any_widget('frame_browser', HorizontalSliderWithBrowser(),
+                            gridPos=(2 + _row_offset, 0, 1, 5))
+        self.create_button(
+            'but_view', 'Show full frame', gridPos=(3 + _row_offset, 3, 1, 2),
+            alignment=QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
+        self.create_check_box('auto_update', 'Auto update',
+                              gridPos=(3 + _row_offset, 0, 1, 2))
         self.setVisible(False)
 
     def __connect_slots(self):
@@ -152,12 +142,99 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Connect all required widget slots (except for the filter keys
         which are set up dynamically along their widgets)
         """
-        self.w_min_datasize.valueChanged.connect(self.__populate_dataset_list)
-        self.w_min_datadim.valueChanged.connect(self.__populate_dataset_list)
-        self.w_select_dataset.currentTextChanged.connect(self.__select_dataset)
-        self.w_frame_browser.valueChanged.connect(self._index_changed)
-        self.w_but_view.clicked.connect(self.click_view_button)
-        self.w_auto_update.clicked.connect(self._toggle_auto_update)
+        self._widgets['min_datasize'].valueChanged.connect(
+            self.__populate_dataset_list)
+        self._widgets['min_datadim'].valueChanged.connect(
+            self.__populate_dataset_list)
+        self._widgets['select_dataset'].currentTextChanged.connect(
+            self.__select_dataset)
+        self._widgets['frame_browser'].valueChanged.connect(
+            self._index_changed)
+        self._widgets['but_view'].clicked.connect(self.click_view_button)
+        self._widgets['auto_update'].clicked.connect(self._toggle_auto_update)
+
+    def __populate_dataset_list(self):
+        """
+        Populate the dateset selection with a filtered list of datasets.
+
+        This method reads the structure of the hdf5 file and filters the
+        list of datasets according to the selected criteria. The filtered list
+        is used to populate the selection drop-down menu.
+        """
+        _dsetFilterMinSize = self._widgets['min_datasize'].value()
+        _dsetFilterMinDim = self._widgets['min_datadim'].value()
+        _datasets = get_hdf5_populated_dataset_keys(
+            self._config['currentFname'],
+            min_size=_dsetFilterMinSize,
+            min_dim=_dsetFilterMinDim,
+            ignoreKeys=self._config['activeDsetFilters'])
+        self._widgets['select_dataset'].currentTextChanged.disconnect()
+        self._widgets['select_dataset'].clear()
+        self._widgets['select_dataset'].addItems(_datasets)
+        self._widgets['select_dataset'].currentTextChanged.connect(
+            self.__select_dataset)
+        if len(_datasets) > 0:
+            self.__select_dataset()
+        else:
+            self._widgets['but_view'].setEnabled(False)
+
+    def __select_dataset(self):
+        """
+        Select a dataset from the drop-down list.
+
+        This internal method is called by the Qt event system if the QComBoBox
+        text has changed to notify the main program that the user has selected
+        a different dataset to be visualized. This method also updates the
+        accepted frame range for the sliders.
+        """
+        _dset = self._widgets['select_dataset'].currentText()
+        with h5py.File(self._config['currentFname'], 'r') as _file:
+            _shape = _file[_dset].shape
+        n_frames = _shape[0] if len(_shape) >= 3 else 1
+        self._widgets['frame_browser'].setRange(0, n_frames - 1)
+        self._config['currentIndex'] = 0
+        self._widgets['but_view'].setEnabled(True)
+        self.__update()
+
+    def __update(self, newFrame=False):
+        """
+        Propagate an update to any consumers.
+
+        This method will read a new frame from the file if any consumers
+        demand it (consumers must active the signal slot or the automatic
+        update). The new frame will be passed to any active view/preview
+        widgets and a signal emitted if the slot is active.
+
+        Parameters
+        ----------
+        newFrame : bool
+            A flag to tell __updateto process a new frame, e.g. after changing
+            the dataset.
+        """
+        if self.flags['autoUpdate'] or self.flags['slotActive'] or newFrame:
+            self.__get_frame()
+        if self.flags['slotActive']:
+            self.new_frame_signal.emit(self._frame)
+        if (self.flags['autoUpdate']
+                and self._widgets['viewer'] is not None):
+            self._widgets['viewer'].setData(self._frame)
+
+    def __get_frame(self):
+        """
+        Get and store a frame.
+
+        This internal method reads an image frame from the hdf5 dataset and
+        stores it internally for further processing (passing to other widgets
+        / signals)
+        """
+        _dset = self._widgets['select_dataset'].currentText()
+        with h5py.File(self._config['currentFname'], 'r') as _file:
+            _dset = _file[_dset]
+            _ndim = len(_dset.shape)
+            if _ndim >= 3:
+                self._frame = _dset[self._config['currentIndex']]
+            elif _ndim == 2:
+                self._frame = _dset[...]
 
     def register_view_widget(self, widget):
         """
@@ -170,8 +247,18 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         ----------
         widget : QWidget
             A widget with a <setData> method to pass frames.
+
+        Raises
+        ------
+        TypeError
+            If the widget does not have a "setData" method.
         """
-        self.w_view = widget
+        if (isinstance(widget, QtWidgets.QWidget) and
+                hasattr(widget, 'setData')):
+            self._widgets['viewer'] = widget
+            return
+        raise TypeError('Error: Object must be a widget with a setData '
+                        'method.')
 
     def _toggle_filter_key(self, widget, key):
         """
@@ -201,7 +288,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         Toggle automatic updates based on the state of the checkbox widget.
         """
-        self.flags['autoUpdate'] = int(self.w_auto_update.isChecked())
+        self.flags['autoUpdate'] = self._widgets['auto_update'].isChecked()
 
     def enable_signal_slot(self, enable):
         """
@@ -247,91 +334,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._config['currentIndex'] = index
         self.__update(True)
 
-    def __update(self, newFrame=False):
-        """
-        Propagate an update to any consumers.
-
-        This method will read a new frame from the file if any consumers
-        demand it (consumers must active the signal slot or the automatic
-        update). The new frame will be passed to any active view/preview
-        widgets and a signal emitted if the slot is active.
-
-        Parameters
-        ----------
-        newFrame : bool
-            A flag to tell __updateto process a new frame, e.g. after changing
-            the dataset.
-        """
-        if self.flags['autoUpdate'] or self.flags['slotActive'] or newFrame:
-            self.__get_frame()
-        if self.flags['slotActive']:
-            self.new_frame_signal.emit(self._frame)
-        if (self.flags['autoUpdate']
-                and self.w_view is not None):
-            self.w_view.setData(self._frame)
-
-    def __populate_dataset_list(self):
-        """
-        Populate the dateset selection with a filtered list of datasets.
-
-        This method reads the structure of the hdf5 file and filters the
-        list of datasets according to the selected criteria. The filtered list
-        is used to populate the selection drop-down menu.
-
-        Returns
-        -------
-        None.
-        """
-        self._config['dsetFilterMinSize'] = self.w_min_datasize.value()
-        self._config['dsetFilterMinDim'] = self.w_min_datadim.value()
-        _datasets = get_hdf5_populated_dataset_keys(
-            self._config['currentFname'],
-            min_size=self._config['dsetFilterMinSize'],
-            min_dim=self._config['dsetFilterMinDim'],
-            ignoreKeys=self._config['activeDsetFilters'])
-        self.w_select_dataset.currentTextChanged.disconnect()
-        self.w_select_dataset.clear()
-        self.w_select_dataset.addItems(_datasets)
-        self.w_select_dataset.currentTextChanged.connect(self.__select_dataset)
-        if len(_datasets) > 0:
-            self.__select_dataset()
-        else:
-            self.w_but_view.setEnabled(False)
-
-    def __get_frame(self):
-        """
-        Get and store a frame.
-
-        This internal method reads an image frame from the hdf5 dataset and
-        stores it internally for further processing (passing to other widgets
-        / signals)
-        """
-        with h5py.File(self._config['currentFname'], 'r') as f:
-            _dset = f[self._config['currentDset']]
-            _ndim = len(_dset.shape)
-            if _ndim >= 3:
-                self._frame = _dset[self._config['currentIndex']]
-            elif _ndim == 2:
-                self._frame = _dset[...]
-
-    def __select_dataset(self):
-        """
-        Select a dataset from the drop-down list.
-
-        This internal method is called by the Qt event system if the QComBoBox
-        text has changed to notify the main program that the user has selected
-        a different dataset to be visualized. This method also updates the
-        accepted frame range for the sliders.
-        """
-        self._config['currentDset'] = self.w_select_dataset.currentText()
-        with h5py.File(self._config['currentFname'], 'r') as f:
-            _shape = f[self._config['currentDset']].shape
-        n_frames = _shape[0] if len(_shape) >= 3 else 0
-        self.w_frame_browser.setRange(0, n_frames - 1)
-        self._config['currentIndex'] = 0
-        self.w_but_view.setEnabled(True)
-        self.__update()
-
     def click_view_button(self):
         """
         Process clicking the view button.
@@ -340,6 +342,6 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         if not self.flags['autoUpdate']:
             self.__get_frame()
-        if not isinstance(self.w_view, QtWidgets.QWidget):
+        if not isinstance(self._widgets['viewer'], QtWidgets.QWidget):
             raise FrameConfigError('The reference is not a widget')
-        self.w_view.setData(self._frame)
+        self._widgets['viewer'].setData(self._frame)

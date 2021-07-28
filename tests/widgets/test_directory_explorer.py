@@ -30,33 +30,33 @@ from PyQt5 import QtWidgets, QtCore
 from pydidas.widgets.directory_explorer import DirectoryExplorer
 
 
-# class TestDirectoryExplorer(unittest.TestCase):
+class TestDirectoryExplorer(unittest.TestCase):
 
-#     def setUp(self):
-#         self.q_app = QtWidgets.QApplication([])
-#         self.widgets = []
+    def setUp(self):
+        self.q_app = QtWidgets.QApplication([])
+        self.widgets = []
 
-#     def tearDown(self):
-#         del self.q_app
+    def tearDown(self):
+        del self.q_app
 
-#     def test_init(self):
-#         obj = DirectoryExplorer()
-#         self.assertIsInstance(obj, DirectoryExplorer)
+    def test_init(self):
+        obj = DirectoryExplorer()
+        self.assertIsInstance(obj, DirectoryExplorer)
 
-#     def test_sizeHint(self):
-#         obj = DirectoryExplorer()
-#         self.assertIsInstance(obj.sizeHint(), QtCore.QSize)
+    def test_sizeHint(self):
+        obj = DirectoryExplorer()
+        self.assertIsInstance(obj.sizeHint(), QtCore.QSize)
 
-#     def test__expand_to_path(self):
-#         _path = os.path.dirname(__file__)
-#         obj = DirectoryExplorer()
-#         obj._DirectoryExplorer__expand_to_path(_path)
-#         while os.path.isdir(_path):
-#             _index = obj._filemodel.index(_path)
-#             self.assertTrue(obj.isExpanded(_index))
-#             if _path == os.path.dirname(_path):
-#                 break
-#             _path = os.path.dirname(_path)
+    def test__expand_to_path(self):
+        _path = os.path.dirname(__file__)
+        obj = DirectoryExplorer()
+        obj._DirectoryExplorer__expand_to_path(_path)
+        while os.path.isdir(_path):
+            _index = obj._filemodel.index(_path)
+            self.assertTrue(obj.isExpanded(_index))
+            if _path == os.path.dirname(_path):
+                break
+            _path = os.path.dirname(_path)
 
 
 if __name__ == "__main__":

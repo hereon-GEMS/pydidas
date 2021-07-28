@@ -2,7 +2,7 @@
 This module includes constants for defining the look and feel of the
 graphical user interface of the application.
 """
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 PALETTES = {}
 STYLES = {}
@@ -60,3 +60,6 @@ STYLES['workflow_plugin_title'] = "QLabel{font-size: 12px;font: bold;color: rgb(
 
 #DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
 DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+
+COMBO_BOX_SIZE_POLICY = (
+    QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)

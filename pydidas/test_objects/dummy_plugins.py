@@ -46,7 +46,6 @@ def create_plugin_class(number, plugin_type):
     _cls.__doc__ = get_random_string(600)
     return _cls
 
-print('Running DummyPluginCollection creation')
 try:
     _path = tempfile.mkdtemp()
     DummyPluginCollection = _PluginCollection(_path)

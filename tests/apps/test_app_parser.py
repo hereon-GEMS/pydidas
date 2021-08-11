@@ -22,38 +22,32 @@ __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+import copy
 import unittest
+from pathlib import Path
 import sys
 
-from PyQt5 import QtWidgets, QtCore
+from pydidas.apps.app_parsers import (
+    parse_composite_creator_cmdline_arguments)
 
-from pydidas.widgets.info_widget import GetInfoWidget
 
-
-class TestCentralWidgetStack(unittest.TestCase):
+class TestAppParsers(unittest.TestCase):
 
     def setUp(self):
-        self.q_app = QtWidgets.QApplication(sys.argv)
-        self.widgets = []
+        ...
 
     def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
+        ...
 
-    def test_init(self):
-        obj = GetInfoWidget()
-        self.assertIsInstance(obj, QtWidgets.QPlainTextEdit)
-
-    def test_sizeHint(self):
-        obj = GetInfoWidget()
-        self.assertEqual(obj.sizeHint(), QtCore.QSize(500, 50))
-
-    def test_add_status(self):
-        _test = 'This is the test string'
-        obj = GetInfoWidget()
-        obj.add_status(_test)
-        _text = obj.toPlainText()
-        self.assertTrue(_text.strip().endswith(_test))
+    def test_creation_with_cmdline_args(self):
+        _argv = copy.copy(sys.argv)
+        sys.argv = ['test', '-file_stepping', '5', '-binning', '2',
+                    '-first_file', 'testname']
+        parsed = parse_composite_creator_cmdline_arguments()
+        sys.argv = _argv
+        self.assertEqual(parsed['file_stepping'], 5)
+        self.assertEqual(parsed['binning'], 2)
+        self.assertEqual(parsed['first_file'], 'testname')
 
 
 if __name__ == "__main__":

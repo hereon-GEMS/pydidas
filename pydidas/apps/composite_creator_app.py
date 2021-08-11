@@ -35,15 +35,13 @@ from PyQt5 import QtCore
 from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
-from pydidas.core import (Parameter, HdfKey, ParameterCollection,
+from pydidas.core import (Parameter, ParameterCollection,
                           CompositeImage, get_generic_parameter)
-from pydidas.config import HDF5_EXTENSIONS, FILENAME_DELIMITERS
-from pydidas.utils import (get_hdf5_metadata, check_file_exists,
-                           check_hdf5_key_exists_in_file,
-                           verify_files_in_same_directory,
-                           verify_files_of_range_are_same_size)
+from pydidas.config import HDF5_EXTENSIONS
+from pydidas.utils import check_file_exists, check_hdf5_key_exists_in_file
 from pydidas.image_io import read_image
 from pydidas.utils import copy_docstring
+from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('live_processing'),
@@ -180,13 +178,14 @@ class CompositeCreatorApp(BaseApp):
     """
     default_params = DEFAULT_PARAMS
     mp_func_results = QtCore.pyqtSignal(object)
+    parse_func = parse_composite_creator_cmdline_arguments
 
     def __init__(self, *args, **kwargs):
         """
         Create a CompositeCreatorApp instance.
         """
         super().__init__(*args, **kwargs)
-        _cmdline_args = _parse_composite_creator_cmdline_arguments()
+        _cmdline_args = self.parse_func()
         self.set_default_params()
 
         # update default_params with command line entries:
@@ -334,6 +333,9 @@ class CompositeCreatorApp(BaseApp):
 
     @copy_docstring(CompositeImage)
     def apply_thresholds(self, **kwargs):
+        """
+        Please refer to pydidas.core.CompositeImage docstring.
+        """
         if (self.get_param_value('use_thresholds')
                 or 'low' in kwargs or 'high' in kwargs):
             if 'low' in kwargs:
@@ -504,71 +506,7 @@ class CompositeCreatorApp(BaseApp):
         _starttime = time.time()
         while os.stat(fname).st_size != _target_size:
             time.sleep(0.1)
-            if timeout > 0 and time.time() - _starttime > timeout:
+            if time.time() - _starttime > timeout > 0:
                 raise FileNotFoundError(
                     f'The file {fname} was not found during the timeout'
                     'period. Aborting...')
-
-
-def _parse_composite_creator_cmdline_arguments():
-    """
-    Use argparse to get command line arguments.
-
-    Returns
-    -------
-    dict
-        A dictionary with the parsed arugments which holds all the entries
-        and entered values or  - if missing - the default values.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-first_file', '-f',
-                        help=DEFAULT_PARAMS['first_file'].tooltip)
-    parser.add_argument('-last_file', '-l',
-                        help=DEFAULT_PARAMS['last_file'].tooltip)
-    parser.add_argument('-file_stepping', type=int,
-                        help=DEFAULT_PARAMS['file_stepping'].tooltip)
-    parser.add_argument('-hdf5_key',
-                        help=DEFAULT_PARAMS['hdf5_key'].tooltip)
-    parser.add_argument('-hdf5_first_image_num', type=int,
-                        help=DEFAULT_PARAMS['hdf5_first_image_num'].tooltip)
-    parser.add_argument('-hdf5_last_image_num', type=int,
-                        help=DEFAULT_PARAMS['hdf5_last_image_num'].tooltip)
-    parser.add_argument('-hdf5_stepping', type=int,
-                        help=DEFAULT_PARAMS['hdf5_stepping'].tooltip)
-    parser.add_argument('--use_bg_file', action='store_true',
-                        help=DEFAULT_PARAMS['use_bg_file'].tooltip)
-    parser.add_argument('-bg_file',
-                        help=DEFAULT_PARAMS['bg_file'].tooltip)
-    parser.add_argument('-bg_hdf5_key',
-                        help=DEFAULT_PARAMS['bg_hdf5_key'].tooltip)
-    parser.add_argument('-bg_hdf5_num', type=int,
-                        help=DEFAULT_PARAMS['bg_hdf5_num'].tooltip)
-    parser.add_argument('-composite_nx', type=int,
-                        help=DEFAULT_PARAMS['composite_nx'].tooltip)
-    parser.add_argument('-composite_ny', type=int,
-                        help=DEFAULT_PARAMS['composite_ny'].tooltip)
-    parser.add_argument('--use_roi', action='store_true',
-                        help=DEFAULT_PARAMS['use_roi'].tooltip)
-    parser.add_argument('-roi_xlow', type=int,
-                        help=DEFAULT_PARAMS['roi_xlow'].tooltip)
-    parser.add_argument('-roi_xhigh', type=int,
-                        help=DEFAULT_PARAMS['roi_xhigh'].tooltip)
-    parser.add_argument('-roi_ylow', type=int,
-                        help=DEFAULT_PARAMS['roi_ylow'].tooltip)
-    parser.add_argument('-roi_yhigh', type=int,
-                        help=DEFAULT_PARAMS['roi_yhigh'].tooltip)
-    parser.add_argument('--use_thresholds', action='store_true',
-                        help=DEFAULT_PARAMS['use_thresholds'].tooltip)
-    parser.add_argument('-threshold_low', type=int,
-                        help=DEFAULT_PARAMS['threshold_low'].tooltip)
-    parser.add_argument('-threshold_high', type=int,
-                        help=DEFAULT_PARAMS['threshold_high'].tooltip)
-    parser.add_argument('-binning', type=int,
-                        help=DEFAULT_PARAMS['binning'].tooltip)
-    parser.add_argument('-output_fname',
-                        help=DEFAULT_PARAMS['output_fname'].tooltip)
-    _args = dict(vars(parser.parse_args()))
-    # store None for keyword arguments which were not selected:
-    for _key in ['use_roi', 'use_thresholds', 'use_bg_file']:
-        _args[_key] = _args[_key] if _args[_key] else None
-    return _args

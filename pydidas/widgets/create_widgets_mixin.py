@@ -72,7 +72,7 @@ class CreateWidgetsMixIn:
         """
         Please refer to pydidas.widgets.factory.create_line
         """
-        self.__create_widget(create_line, **kwargs)
+        self.__create_widget(create_line, ref, **kwargs)
 
     @copy_docstring(create_button)
     def create_button(self, ref, text, **kwargs):

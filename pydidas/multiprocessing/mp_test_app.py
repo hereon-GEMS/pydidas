@@ -64,7 +64,7 @@ class MpTestApp(BaseApp):
         self._config['mp_tasks'] = range(self._config['min_index'],
                                          self._config['max_index'])
         self._composite = CompositeImage(
-            image_shape=(100, 100),
+            image_shape=(20, 20),
             composite_nx=10,
             composite_ny=int(np.ceil((self._config['max_index'])/10)),
             composite_dir='x',
@@ -76,14 +76,14 @@ class MpTestApp(BaseApp):
     def multiprocessing_carryon(self):
         self._config['calls'] += 1
         if self._config['calls'] % 2:
-            time.sleep(0.01)
+            time.sleep(0.001)
             return False
         return True
 
     def multiprocessing_func(self, index):
-            _fname, _kwargs = 'dummy', {'shape': (100, 100)}
-            _image = get_image(_fname, **_kwargs)
-            return index, _image
+        _fname, _kwargs = 'dummy', {'shape': (20, 20)}
+        _image = get_image(_fname, **_kwargs)
+        return index, _image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -91,27 +91,3 @@ class MpTestApp(BaseApp):
 
     def multiprocessing_post_run(self):
         self._config['mp_post_run_called'] = True
-
-
-if __name__ == '__main__':
-    from pydidas.multiprocessing.app_processor_func import app_processor
-    import multiprocessing as mp
-    import matplotlib.pyplot as plt
-    in_queue, out_queue, stop_queue = mp.Queue(), mp.Queue(), mp.Queue()
-    app = MpTestApp()
-    app.multiprocessing_pre_run()
-    tasks = app.multiprocessing_get_tasks()
-    for task in tasks:
-        in_queue.put(task)
-    in_queue.put(None)
-    app_processor(in_queue, out_queue, stop_queue, app.__class__, app.params.get_copy(), app._config)
-    res = [out_queue.get() for i in range(100)]
-    for item in res:
-        app.multiprocessing_store_results(*item[1])
-
-    plt.figure(1)
-    plt.imshow(app._composite.image)
-    _image1 = app._composite.image
-    app.run()
-    _image2 = app._composite.image
-    plt.imshow(_image1 - _image2)

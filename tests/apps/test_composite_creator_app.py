@@ -22,13 +22,11 @@ __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-import copy
 import os
 import unittest
 import tempfile
 import shutil
 from pathlib import Path
-import sys
 
 import numpy as np
 import h5py
@@ -42,7 +40,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f'test{i:02d}.npy'))
+        self._fname = lambda i: Path(os.path.join(self._path,
+                                                  f'test{i:02d}.npy'))
         self._img_shape = (10, 10)
         self._data = np.random.random((50,) + self._img_shape)
         for i in range(50):
@@ -60,6 +59,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _ny = 5
         _nx = ((self._data.shape[0] // _ny)
                + np.ceil((self._data.shape[0] % _ny) / _ny).astype(int))
+        CompositeCreatorApp.parse_func = lambda x: {}
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._fname(0))
         app.set_param_value('last_file', self._fname(49))
@@ -73,16 +73,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = CompositeCreatorApp()
         self.assertIsInstance(app, CompositeCreatorApp)
 
-    def test_creation_with_cmdline_args(self):
-        _argv = copy.copy(sys.argv)
-        sys.argv = ['test', '-file_stepping', '5', '-binning', '2',
-                    '-first_file', 'testname']
-        app = CompositeCreatorApp()
-        sys.argv = _argv
-        self.assertEqual(app.get_param_value('file_stepping'), 5)
-        self.assertEqual(app.get_param_value('binning'), 2)
-        self.assertEqual(app.get_param_value('first_file'), Path('testname'))
-
     def test_creation_with_args(self):
         _nx = get_generic_parameter('composite_nx')
         _nx.value = 10
@@ -95,6 +85,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(app.get_param_value('composite_nx'), 10)
         self.assertEqual(app.get_param_value('composite_ny'), 5)
         self.assertEqual(app.get_param_value('composite_dir'), 'y')
+
+    def test_creation_with_cmdargs(self):
+        CompositeCreatorApp.parse_func = lambda x: {'binning': 4}
+        app = CompositeCreatorApp()
+        self.assertEqual(app.get_param_value('binning'), 4)
 
     def test_live_processing_filelist(self):
         _last_file = os.path.join(self._path, 'test_010.h5')

@@ -75,7 +75,7 @@ class TestMpTestApp(unittest.TestCase):
         app.multiprocessing_pre_run()
         _index, _image = app.multiprocessing_func(self._indices[0])
         app.multiprocessing_store_results(_index, _image)
-        self.assertTrue((app._composite.image[:100, :100] > 0).all())
+        self.assertTrue((app._composite.image[:20, :20] > 0).all())
 
     def test_mp_wait(self):
         app = MpTestApp()

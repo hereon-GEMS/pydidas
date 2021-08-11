@@ -73,6 +73,8 @@ class TestHdf5DatasetSelector(unittest.TestCase):
                        '/test/test2/data3']
 
     def tearDown(self):
+        self.q_app.deleteLater()
+        self.q_app.quit()
         del self.q_app
         shutil.rmtree(self._path)
 

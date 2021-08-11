@@ -25,22 +25,10 @@ __status__ = "Development"
 import threading
 import unittest
 import sys
-import numpy as np
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtTest
 from pydidas.multiprocessing import AppRunner, app_processor
 from pydidas.multiprocessing.mp_test_app import MpTestApp
-
-def test_func(index, *args, **kwargs):
-    index = (index
-             + np.sum(np.fromiter([arg for arg in args], float))
-             + np.sum(np.fromiter([kwargs[key] for key in kwargs], float))
-             )
-    return 3 * index
-
-
-def get_spy_values(spy):
-    return [spy[index][0] for index in range(len(spy))]
 
 
 class _ProcThread(threading.Thread):
@@ -69,13 +57,8 @@ class AppRun(AppRunner):
 def quit_app():
     """Terminate the headless app."""
     _qtapp = QtCore.QCoreApplication.instance()
+    _qtapp.deleteLater()
     _qtapp.exit()
-
-
-@QtCore.pyqtSlot(object)
-def final_app(_app):
-    global app
-    app = _app
 
 
 class TestAppRunner(unittest.TestCase):
@@ -86,7 +69,11 @@ class TestAppRunner(unittest.TestCase):
         self.app = MpTestApp()
 
     def tearDown(self):
+        # self.qt_app.deleteLater()
         self.qt_app.quit()
+
+    def store_app(self, app):
+        self.new_app = app
 
     def test_setUp(self):
         # this will only test the setup method
@@ -106,11 +93,19 @@ class TestAppRunner(unittest.TestCase):
 
     def test_run(self):
         runner = AppRun(self.app)
+        _spy = QtTest.QSignalSpy(runner.finished)
         runner.finished.connect(quit_app)
-        runner.final_app_state.connect(final_app)
         runner.start()
         self.qt_app.exec_()
-        _image = app._composite.image
+        self.assertEqual(len(_spy), 1)
+
+    def test_final_app_state(self):
+        runner = AppRun(self.app)
+        runner.final_app_state.connect(self.store_app)
+        runner.finished.connect(quit_app)
+        runner.start()
+        self.qt_app.exec_()
+        _image = self.new_app._composite.image
         self.assertTrue((_image > 0).all())
 
 

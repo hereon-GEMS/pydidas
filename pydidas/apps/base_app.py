@@ -36,6 +36,8 @@ class BaseApp(ObjectWithParameterCollection):
 
     The BaseApp is the base class for all pydidas applications.
     """
+    parse_func = None
+
     def __init__(self, *args, **kwargs):
         """
         Create a Base instance.
@@ -98,7 +100,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
-    def multiprocessing_store_results(self, *args):
+    def multiprocessing_func(self, *args):
         """
         Store the results of the multiprocessing operation.
         """

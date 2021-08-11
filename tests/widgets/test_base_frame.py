@@ -50,7 +50,8 @@ class TestBaseFrame(unittest.TestCase):
         self.tester = TestClass()
 
     def tearDown(self):
-        del self.q_app
+        self.q_app.deleteLater()
+        self.q_app.quit()
 
     def get_base_frame(self, **kwargs):
         return BaseFrame(**kwargs)

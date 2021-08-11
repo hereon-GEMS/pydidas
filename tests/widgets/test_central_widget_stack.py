@@ -52,6 +52,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         self.widgets = []
 
     def tearDown(self):
+        self.q_app.deleteLater()
         self.q_app.quit()
         CentralWidgetStack._reset_instance()
 

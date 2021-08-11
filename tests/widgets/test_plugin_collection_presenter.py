@@ -46,6 +46,7 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.widgets = []
 
     def tearDown(self):
+        self.q_app.deleteLater()
         self.q_app.quit()
 
     def tree_click_test(self, double):

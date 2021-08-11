@@ -52,7 +52,8 @@ class TestCreateWidgetsMixin(unittest.TestCase):
         self.widgets = []
 
     def tearDown(self):
-        del self.q_app
+        self.q_app.deleteLater()
+        self.q_app.quit()
 
     def get_widget(self):
         _w = TestWidget()
@@ -143,46 +144,53 @@ class TestCreateWidgetsMixin(unittest.TestCase):
 
     def test_create_label(self):
         obj = self.get_widget()
-        _label = obj.create_label('Test text', parent_widget=obj)
+        obj.create_label('ref', 'Test text', parent_widget=obj)
+        _label = obj._widgets['ref']
         self.assertEqual(_label, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_label, QtWidgets.QLabel)
 
     def test_create_line(self):
         obj = self.get_widget()
-        _line = obj.create_line(parent_widget=obj)
+        obj.create_line('ref', parent_widget=obj)
+        _line = obj._widgets['ref']
         self.assertEqual(_line, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_line, QtWidgets.QFrame)
 
     def test_create_spacer(self):
         obj = self.get_widget()
-        _spacer = obj.create_spacer(parent_widget=obj)
+        obj.create_spacer('ref', parent_widget=obj)
+        _spacer = obj._widgets['ref']
         self.assertEqual(_spacer, obj.layout().itemAtPosition(0, 0))
         self.assertIsInstance(_spacer, QtWidgets.QSpacerItem)
 
     def test_create_button(self):
         _text = 'button text'
         obj = self.get_widget()
-        _but = obj.create_button(_text, parent_widget=obj)
+        obj.create_button('ref', _text, parent_widget=obj)
+        _but = obj._widgets['ref']
         self.assertEqual(_but, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_but, QtWidgets.QPushButton)
         self.assertEqual(_but.text(), _text)
 
     def test_create_spinbox(self):
         obj = self.get_widget()
-        _spin = obj.create_spin_box(parent_widget=obj)
+        obj.create_spin_box('ref', parent_widget=obj)
+        _spin = obj._widgets['ref']
         self.assertEqual(_spin, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_spin, QtWidgets.QSpinBox)
 
     def test_create_progress_bar(self):
         obj = self.get_widget()
-        _bar = obj.create_progress_bar(parent_widget=obj)
+        obj.create_progress_bar('ref', parent_widget=obj)
+        _bar = obj._widgets['ref']
         self.assertEqual(_bar, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_bar, QtWidgets.QProgressBar)
 
     def test_create_check_box(self):
         _text = 'another test text'
         obj = self.get_widget()
-        _box = obj.create_check_box(_text, parent_widget=obj)
+        obj.create_check_box('ref', _text, parent_widget=obj)
+        _box = obj._widgets['ref']
         self.assertEqual(_box, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_box, QtWidgets.QCheckBox)
         self.assertEqual(_box.text(), _text)

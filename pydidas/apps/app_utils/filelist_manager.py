@@ -283,8 +283,8 @@ class FilelistManager(ObjectWithParameterCollection):
             raise_error()
         diff_index = diff_index[0]
         _n = len(_items1[diff_index])
-        _strindex = np.sum(np.r_[[len(_items1[index]) + 1
-                                  for index in range(diff_index)]])
+        _strindex = int(np.sum(np.r_[[len(_items1[index]) + 1
+                                      for index in range(diff_index)]]))
         _fnames = (_path1
                    + os.sep
                    + _fname1[:_strindex]
@@ -315,9 +315,6 @@ class FilelistManager(ObjectWithParameterCollection):
             The filename (and path) of the image file indexed with index.
         """
         _n = self._config['n_files']
-        if _n is None:
-            raise AppConfigError('No files have been selected. Cannot perform'
-                                 ' "get_filename".')
         if not 0 <= index < _n:
             raise AppConfigError(f'The selected number "{index}" is out of '
                                  f'the range of the file list [0, {_n-1}]')

@@ -23,9 +23,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
+import copy
 from numbers import Integral, Real
+from pathlib import Path
 
-from pydidas.core import  Parameter
+import numpy as np
+
+from pydidas.core import Parameter, HdfKey
 
 
 class TestParameter(unittest.TestCase):
@@ -93,10 +97,37 @@ class TestParameter(unittest.TestCase):
         obj = Parameter('Test0', int, default=12, unit='The_unit')
         self.assertEqual(obj.unit, 'The_unit')
 
-    def test_tooltip(self):
+    def test_tooltip_int(self):
         obj = Parameter('Test0', int, default=12, unit='m', value=10,
                         tooltip='Test tooltip')
         self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: integer)')
+
+    def test_tooltip_float(self):
+        obj = Parameter('Test0', float, default=12, unit='m', value=10,
+                        tooltip='Test tooltip')
+        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: float)')
+
+    def test_tooltip_str(self):
+        obj = Parameter('Test0', str, default='', unit='m',
+                        tooltip='Test tooltip')
+        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: str)')
+
+    def test_tooltip_hdfkey(self):
+        obj = Parameter('Test0', HdfKey, default='', unit='m',
+                        tooltip='Test tooltip')
+        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: HdfKey)')
+
+    def test_tooltip_path(self):
+        obj = Parameter('Test0', Path, default='', unit='m',
+                        tooltip='Test tooltip')
+        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: Path)')
+
+    def test_tooltip_other(self):
+        obj = Parameter('Test0', np.ndarray, default=np.zeros((3)), unit='m',
+                        tooltip='Test tooltip')
+        self.assertEqual(
+            obj.tooltip,
+            "Test tooltip (unit: m, type: <class 'numpy.ndarray'>)")
 
     def test_choices_setter(self):
         obj = Parameter('Test0', int, default=12, choices=[0,12])
@@ -184,11 +215,33 @@ class TestParameter(unittest.TestCase):
                                     'value': 12})
 
     def test__copy__(self):
-        import copy
         obj = Parameter('Test0', int, default=12)
-        copy = copy.copy(obj)
-        self.assertNotEqual(obj, copy)
-        self.assertIsInstance(copy, Parameter)
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj, _copy)
+        self.assertIsInstance(_copy, Parameter)
+
+    def test__repr__(self):
+        obj = Parameter('Test0', int, default=12, optional=True)
+        _r = obj.__repr__()
+        self.assertIsInstance(_r, str)
+
+    def test__convenience_type_conversion_any(self):
+        _val = 42
+        obj = Parameter('Test0', int, default=12)
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertEqual(_val, _newval)
+
+    def test__convenience_type_conversion_path(self):
+        _val = __file__
+        obj = Parameter('Test0', Path, default='')
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_newval, Path)
+
+    def test__convenience_type_conversion_hdfkey(self):
+        _val = '/new/test'
+        obj = Parameter('Test0', HdfKey, default='/test')
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_newval, HdfKey)
 
 
 if __name__ == "__main__":

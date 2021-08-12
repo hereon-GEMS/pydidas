@@ -55,10 +55,10 @@ class copyableQSettings(QtCore.QSettings):
 class PydidasQsettingsMixin:
     """
 
-    An object with a ParameterCollection.
+    Mix-in class with access functions to pydidas QSettings values.
 
-    This class can be inherited by any class which requires a
-    ParameterCollection and access methods for it.
+    This class can be inherited by any class which requires access to the
+    global QSettings defined in pydidas.
     """
     def __init__(self):
         """

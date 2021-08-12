@@ -39,7 +39,8 @@ class TestFilelistManager(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path, f'test{i:02d}.npy'))
+        self._fname = lambda i: Path(os.path.join(self._path,
+                                                  f'test_{i:02d}.npy'))
         self._img_shape = (10, 10)
         self._data = np.random.random((50,) + self._img_shape)
         for i in range(50):
@@ -130,6 +131,15 @@ class TestFilelistManager(unittest.TestCase):
         fm._create_one_file_list()
         self.assertEqual(fm._config['n_files'], 1)
         self.assertEqual(fm._config['file_list'], [self._fname(0)])
+
+    def test__create_filelist_with_live(self):
+        fm = FilelistManager()
+        fm.set_param_value('first_file', self._fname(0))
+        fm.set_param_value('last_file', self._fname(49))
+        fm.set_param_value('live_processing', True)
+        fm._create_filelist()
+        self.assertEqual(fm._config['n_files'], 50)
+        self.assertListEqual(fm._config['file_list'], [self._fname(i) for i in range(50)])
 
     def test__create_filelist_static(self):
         fm = FilelistManager()

@@ -56,7 +56,7 @@ class _ExpSettings(ObjectWithParameterCollection):
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
 
-    The factory will allow access to the single instace through
+    The factory will allow access to the single instance through
     :py:class:`pydidas.core.experimental_settings.ExperimentalSettings`.
     """
     default_params = DEFAULTS
@@ -97,5 +97,10 @@ class _ExpSettings(ObjectWithParameterCollection):
         else:
             self.params.set_value(key, value)
 
+    def __copy__(self):
+        """
+        Overload copy to return self.
+        """
+        return self
 
 ExperimentalSettings = SingletonFactory(_ExpSettings)

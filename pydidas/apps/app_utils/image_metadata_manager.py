@@ -190,7 +190,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         self.__verify_selection_range(_meta['shape'][0])
 
         _n0 = self.get_param_value('hdf5_first_image_num')
-        _n1 = self.get_param_value('hdf5_last_image_num')
+        _n1 = self._apply_param_modulo('hdf5_last_image_num',
+                                       _meta['shape'][0])
         _step = self.get_param_value('hdf5_stepping')
         _n_per_file = ((_n1 - _n0 - 1) // _step + 1)
         self._config['numbers'] = range(_n0, _n1, _step)
@@ -254,10 +255,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _binning = self.get_param_value('binning')
         if self.get_param_value('use_roi'):
             self.__check_roi_for_consistency()
-            _y0 = self.get_param_value('roi_ylow')
-            _y1 = self.get_param_value('roi_yhigh')
-            _x0 = self.get_param_value('roi_xlow')
-            _x1 = self.get_param_value('roi_xhigh')
+            _x0, _x1, _y0, _y1 = self.__get_modulated_roi()
             _final_shape = ((_y1 - _y0) // _binning, (_x1 - _x0) // _binning)
             _roi = (slice(_y0, _y1), slice(_x0, _x1))
         else:
@@ -277,15 +275,27 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             If the ROI boundaries are not consistent.
         """
         _warning = ''
-        _nx = self.raw_size_x
-        _ny = self.raw_size_y
-        _x0 = self._apply_param_modulo('roi_xlow', _nx)
-        _x1 = self._apply_param_modulo('roi_xhigh', _nx)
-        _y0 = self._apply_param_modulo('roi_ylow', _ny)
-        _y1 = self._apply_param_modulo('roi_yhigh', _ny)
+        _x0, _x1, _y0, _y1 = self.__get_modulated_roi()
         if _x1 < _x0:
             _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]. '
         if _y1 < _y0:
             _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]. '
         if _warning:
                 raise AppConfigError(_warning)
+
+    def __get_modulated_roi(self):
+        """
+        Get the ROI modulated by the image size.
+
+        Returns
+        -------
+        tuple
+            The tuple with the (x0, x1, y0, y1) indices.
+        """
+        _nx = self.raw_size_x
+        _ny = self.raw_size_y
+        _x0 = self._apply_param_modulo('roi_xlow', _nx)
+        _x1 = self._apply_param_modulo('roi_xhigh', _nx)
+        _y0 = self._apply_param_modulo('roi_ylow', _ny)
+        _y1 = self._apply_param_modulo('roi_yhigh', _ny)
+        return _x0, _x1, _y0, _y1

@@ -54,6 +54,18 @@ class TestImageMetadataManager(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self._path)
 
+    def create_second_dataset(self):
+        self._path = tempfile.mkdtemp()
+        self._fname = lambda i: Path(os.path.join(self._path,
+                                                  f'test_{i:03d}.npy'))
+        _img_shape = (47, 35)
+        _data = np.random.random((self._dsize,) + _img_shape)
+        _hdf5_fname = Path(os.path.join(self._path, 'test_001.h5'))
+        with h5py.File(_hdf5_fname, 'w') as f:
+            f['/entry/data/data'] = _data
+        self._hdf5_fname2 = _hdf5_fname
+        self._img_shape2 = _img_shape
+
     def test_creation(self):
         imm = ImageMetadataManager()
         self.assertIsInstance(imm, ImageMetadataManager)
@@ -168,6 +180,8 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.set_param_value('use_roi', True)
         imm.set_param_value('roi_xlow', 12)
         imm.set_param_value('roi_xhigh', 9)
+        imm.set_param_value('roi_ylow', 12)
+        imm.set_param_value('roi_yhigh', 9)
         with self.assertRaises(AppConfigError):
             imm._ImageMetadataManager__check_roi_for_consistency()
 
@@ -240,6 +254,32 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config['images_per_file'], self._dsize)
         self.assertEqual(imm._config['numbers'], range(self._dsize))
 
+    def test_update_single_file(self):
+        imm = ImageMetadataManager()
+        imm.set_param_value('first_file', self._fname(0))
+        imm.update_input_data()
+        self.assertEqual(imm._config['images_per_file'], 1)
+        self.assertEqual(imm._config['numbers'], [0])
+
+    def test_update_new_data(self):
+        imm = ImageMetadataManager()
+        imm.set_param_value('first_file', self._hdf5_fname)
+        imm.update()
+        self.create_second_dataset()
+        imm.set_param_value('first_file', self._hdf5_fname2)
+        imm.update()
+        self.assertEqual(imm.final_shape, self._img_shape2)
+
+    def test_update_new_data_with_roi(self):
+        imm = ImageMetadataManager()
+        imm.set_param_value('first_file', self._hdf5_fname)
+        imm.set_param_value('roi_xlow', 5)
+        imm.update()
+        self.create_second_dataset()
+        imm.set_param_value('first_file', self._hdf5_fname2)
+        imm.update()
+        self.assertEqual(imm.final_shape, self._img_shape2)
+
     def test_property_sizex(self):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
@@ -256,7 +296,8 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
         imm.update_input_data()
-        self.assertEqual(imm.numbers, range(self._dsize))
+        _n = imm.numbers
+        self.assertEqual(_n, range(self._dsize))
 
     def test_property_datatype(self):
         imm = ImageMetadataManager()
@@ -268,23 +309,20 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
         imm.set_param_value('use_roi', True)
-        imm.update_input_data()
-        imm.update_final_image()
+        imm.update()
         self.assertEqual(imm.roi, (slice(0, self._img_shape[0]),
                                    slice(0, self._img_shape[1])))
 
     def test_property_final_shape(self):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
-        imm.update_input_data()
-        imm.update_final_image()
+        imm.update()
         self.assertEqual(imm.final_shape, self._img_shape)
 
     def test_property_images_per_file(self):
         imm = ImageMetadataManager()
         imm.set_param_value('first_file', self._hdf5_fname)
-        imm.update_input_data()
-        imm.update_final_image()
+        imm.update()
         self.assertEqual(imm.images_per_file, self._dsize)
 
     def test_property_hdf5_dset_shape(self):

@@ -53,50 +53,34 @@ def update_separators(path):
 
 def get_pydidas_module_dir(path):
     """
-    Function to find the pydidas module directory from the input directory.
+    Find the pydidas module directory searching from the input directory.
 
     Parameters
     ----------
-    filename : str
-        The filename of the file to be checked.
-    overwrite : bool
-        Keyword to allow overwriting of existing files. Default: False
-
-    Returns
-    -------
-    bool
-        True if file exists and overwrite or directory is writable.
-        False in other cases.
-    """
-    path = update_separators(os.path.dirname(path) if isfile(path) else path)
-    p = path.split(os.sep)
-    if len(p) == 0:
-        raise IOError('No path given')
-    for i in range(1, len(p)):
-        _p = os.sep.join(p[:-i])
-        if p[-i] == 'tests':
-            if isfile(osjoin(_p, 'pydidas', '__init__.py')):
-                return _p
-        elif p[-i] == 'pydidas' or 'pydidas' in os.listdir(_p):
-            if isfile(osjoin(_p, '__init__.py')):
-                return dirname(_p)
-            if isfile(osjoin(_p, 'pydidas', 'pydidas', '__init__.py')):
-                return osjoin(_p, 'pydidas')
-    raise FileNotFoundError('Could not locate pydidas init file.')
-
-
-def create_temp_file():
-    """
-    Create a temporary file and close the file handle.
+    path : str
+        The name of the directory / file acting as starting point for the
+        search.
 
     Returns
     -------
     str
-        The full path to the temporary file.
+        The path to the pydidas module.
     """
-    _handle, _filename = tempfile.mkstemp()
-    os.close(_handle)
-    return _filename
+    path = update_separators(os.path.dirname(path) if isfile(path) else path)
+    if len(path) == 0:
+        raise IOError('No path given')
+    p = path.split(os.sep)
+    while len(p) > 0:
+        for i_pydidas in range(3):
+            _ptmp = p + ['pydidas'] * i_pydidas
+            _tmppath = os.sep.join(_ptmp)
+            if (_ptmp[-1] == 'pydidas' and
+                    isfile(osjoin(_tmppath, '__init__.py'))):
+                return dirname(_tmppath)
+        p.pop(-1)
+    raise FileNotFoundError('Could not locate pydidas init file in path '
+                            f'"{path}" or subdirectories')
+
 
 def get_time_string(epoch=None, humanReadable=True):
     """

@@ -43,7 +43,8 @@ class TestDataset(unittest.TestCase):
         obj = EmptyDataset((10, 10),
                            axis_labels=self._axis_labels,
                            axis_scales=self._axis_scales,
-                           axis_units=self._axis_units)
+                           axis_units=self._axis_units,
+                           metadata={})
         return obj
 
     def get_dict(self, key):
@@ -131,7 +132,7 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_metadata_property(self):
         obj = self.create_empty_dataset()
-        self.assertEqual(obj.metadata, None)
+        self.assertEqual(obj.metadata, {})
 
     def test_empty_dataset_set_metadata_property(self):
         obj = self.create_empty_dataset()
@@ -164,11 +165,23 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(_array,
                       axis_labels=self._axis_labels,
                       axis_scales=self._axis_scales,
-                      axis_units=self._axis_units)
+                      axis_units=self._axis_units,
+                      metadata={})
         self.assertIsInstance(obj, Dataset)
         self.assertIsInstance(obj.axis_labels, dict)
         self.assertIsInstance(obj.axis_scales, dict)
         self.assertIsInstance(obj.axis_units, dict)
+        self.assertIsInstance(obj.metadata, dict)
+
+    def test__repr__(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        self.assertIsInstance(obj.__repr__(), str)
+
+    def test__str__(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        self.assertIsInstance(str(obj), str)
 
 
 if __name__ == "__main__":

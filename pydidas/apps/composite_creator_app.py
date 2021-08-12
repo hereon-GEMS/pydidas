@@ -209,9 +209,7 @@ class CompositeCreatorApp(BaseApp):
             self.params.get('roi_xlow'),
             self.params.get('roi_xhigh'),
             self.params.get('roi_ylow'),
-            self.params.get('roi_yhigh'),
-            )
-
+            self.params.get('roi_yhigh'))
         self._config = { 'bg_image': None,
                          'current_fname': None,
                          'current_kwargs': {}}
@@ -251,12 +249,8 @@ class CompositeCreatorApp(BaseApp):
 
     def multiprocessing_carryon(self):
         if self.get_param_value('live_processing'):
-            try:
-                self._wait_for_image(self._config['current_fname'],
-                                     timeout=0.1)
-                return True
-            except FileNotFoundError:
-                return False
+            return self._image_exists_check(self._config['current_fname'],
+                                            timeout=0.02)
         return True
 
     def multiprocessing_func(self, index):
@@ -314,8 +308,7 @@ class CompositeCreatorApp(BaseApp):
               and assert the image size is the same.
         """
         self._filelist.update()
-        self._image_metadata.update_input_data()
-        self._image_metadata.update_final_image()
+        self._image_metadata.update()
         self._check_composite_dims()
         if self.get_param_value('use_bg_file'):
             self._check_and_set_bg_file()
@@ -489,7 +482,7 @@ class CompositeCreatorApp(BaseApp):
                                      imageNo=_i_hdf)
         return _fname, _params
 
-    def _wait_for_image(self, fname, timeout=-1):
+    def _image_exists_check(self, fname, timeout=-1):
         """
         Wait for the file to exist in the file system.
 
@@ -501,12 +494,19 @@ class CompositeCreatorApp(BaseApp):
             If a timeout larger than zero is selected, the process will wait
             a maximum of timeout seconds before raising an Exception.
             The value "-1" corresponds to no timeout. The default is -1.
+
+        Returns
+        -------
+        bool
+            Flag if the image exists and has the same size as the refernce
+            file.
         """
         _target_size = self._filelist.filesize
         _starttime = time.time()
+        if not os.path.exists(fname):
+            return False
         while os.stat(fname).st_size != _target_size:
             time.sleep(0.1)
             if time.time() - _starttime > timeout > 0:
-                raise FileNotFoundError(
-                    f'The file {fname} was not found during the timeout'
-                    'period. Aborting...')
+                return False
+        return True

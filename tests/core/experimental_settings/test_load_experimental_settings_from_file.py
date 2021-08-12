@@ -24,8 +24,11 @@ __status__ = "Development"
 
 import os
 import unittest
+import shutil
+import tempfile
 
 import yaml
+import numpy as np
 from pyFAI.geometry import Geometry
 
 from pydidas.core.experimental_settings import (ExperimentalSettings,
@@ -39,9 +42,11 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):
         del self._path
+        shutil.rmtree(self._tmppath)
 
     def test_creation(self):
         obj = LoadExperimentSettingsFromFile()
@@ -68,6 +73,38 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
             self.assertEqual(EXP_SETTINGS.get_param_value(key),
                              _data[key])
+
+    def test_load_yaml_with_error(self):
+        np.save(self._tmppath + 'error.npy', np.zeros((4,4)))
+        shutil.move(self._tmppath + 'error.npy', self._tmppath + 'error.yaml')
+        with self.assertRaises(yaml.YAMLError):
+            LoadExperimentSettingsFromFile(self._tmppath + 'error.yaml')
+
+    def test_load_wrong_ext(self):
+        _fname = self._tmppath + 'unknown.any'
+        with open(_fname, 'w') as f:
+            f.write('test')
+        with self.assertRaises(KeyError):
+            LoadExperimentSettingsFromFile(_fname)
+
+    def test__update_detector_from_pyfai_wrong_type(self):
+        det = 12
+        loader = LoadExperimentSettingsFromFile()
+        with self.assertRaises(TypeError):
+            loader._LoadExperimentSettingsFromFile__update_detector_from_pyFAI(
+                det)
+
+    def test__update_geometry_from_pyFAI_wrong_type(self):
+        det = 12
+        loader = LoadExperimentSettingsFromFile()
+        with self.assertRaises(TypeError):
+            loader._LoadExperimentSettingsFromFile__update_geometry_from_pyFAI(
+                det)
+
+    def test__verify_all_entries_present(self):
+        loader = LoadExperimentSettingsFromFile()
+        with self.assertRaises(KeyError):
+            loader._LoadExperimentSettingsFromFile__verify_all_entries_present()
 
 
 if __name__ == "__main__":

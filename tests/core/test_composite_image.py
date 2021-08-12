@@ -26,6 +26,7 @@ import os
 import tempfile
 import shutil
 import unittest
+import copy
 
 import numpy as np
 from PyQt5 import QtCore
@@ -39,34 +40,60 @@ class TestCompositeImage(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
 
-
     def tearDown(self):
         shutil.rmtree(self._path)
         del self._path
+
+    def get_default_object(self):
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
+                     composite_ny=5, datatype=float,
+                     threshold_low=np.nan, threshold_high=1)
+        return obj
 
     def test_creation(self):
         obj = CompositeImage()
         self.assertIsInstance(obj, CompositeImage)
 
     def test_creation_with_params(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=1)
+        obj = self.get_default_object()
         self.assertIsInstance(obj, CompositeImage)
         self.assertIsInstance(obj.image, np.ndarray)
 
-    def test_create_new_image(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
+    def test__check_config_wrong_params(self):
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
+                             composite_ny=-2, datatype=float,
                              threshold_low=np.nan, threshold_high=1)
+        self.assertFalse(obj._CompositeImage__check_config())
+
+    def test__verify_config_wrong_params(self):
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
+                             composite_ny=-2, datatype=float,
+                             threshold_low=np.nan, threshold_high=1)
+        with self.assertRaises(ValueError):
+            obj._CompositeImage__verify_config()
+
+    def test_create_new_image(self):
+        obj = self.get_default_object()
         obj.set_param_value('composite_nx', 10)
         obj.create_new_image()
         self.assertEqual(obj.image.shape, (100, 200))
 
     def test_insert_image(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=1)
+        obj = self.get_default_object()
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue((obj.image[:20, :20] == img).all())
+
+    def test_insert_image_into_empty_array(self):
+        obj = self.get_default_object()
+        obj._CompositeImage__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue((obj.image[:20, :20] == img).all())
+
+    def test_insert_image_comp_dir_y(self):
+        obj = self.get_default_object()
+        obj.set_param_value('composite_dir', 'y')
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
@@ -99,9 +126,7 @@ class TestCompositeImage(unittest.TestCase):
         self.assertTrue(np.amax(obj.image[:20, :20]) <= 5.)
 
     def test_save(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+        obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         _fname = os.path.join(self._path, 'test.npy')
@@ -110,9 +135,7 @@ class TestCompositeImage(unittest.TestCase):
         self.assertTrue((obj.image == _img).all())
 
     def test_export_npy(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+        obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         _fname = os.path.join(self._path, 'test.npy')
@@ -121,9 +144,7 @@ class TestCompositeImage(unittest.TestCase):
         self.assertTrue((obj.image == _img).all())
 
     def test__check_max_size_okay(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+        obj = self.get_default_object()
         q_settings = QtCore.QSettings('Hereon', 'pydidas')
         old_maxsize = q_settings.value('global/mosaic_max_size')
         q_settings.setValue('global/mosaic_max_size', 100)
@@ -132,9 +153,7 @@ class TestCompositeImage(unittest.TestCase):
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
     def test__check_max_size_too_large(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+        obj = self.get_default_object()
         q_settings = QtCore.QSettings('Hereon', 'pydidas')
         old_maxsize = float(q_settings.value('global/mosaic_max_size'))
         q_settings.setValue('global/mosaic_max_size', 100)
@@ -142,6 +161,21 @@ class TestCompositeImage(unittest.TestCase):
             obj._CompositeImage__check_max_size(105*1e6)
         if old_maxsize is not None:
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
+
+    def test_property_shape(self):
+        obj = self.get_default_object()
+        self.assertEqual(obj.shape, (100, 100))
+
+    def test_property_shape_empty(self):
+        obj = self.get_default_object()
+        obj._CompositeImage__image = None
+        self.assertEqual(obj.shape, (0, 0))
+
+    def test_copy(self):
+        obj = self.get_default_object()
+        obj2 = copy.copy(obj)
+        self.assertIsInstance(obj2, CompositeImage)
+        self.assertNotEqual(obj, obj2)
 
 
 if __name__ == "__main__":

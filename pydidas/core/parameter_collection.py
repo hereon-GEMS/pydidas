@@ -210,12 +210,6 @@ class ParameterCollection(dict):
             self.__check_key(_param, keys=_newkeys)
         _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
         for _key in kwargs:
-            if _key != kwargs[_key].refkey:
-                raise KeyError(
-                    f'The dictionary key "{_key}" for Parameter '
-                    f'"{kwargs[_key]}" does not match the Parameter '
-                    'reference key: "{kwargs[_key].refkey}".'
-                    )
             self.__check_key(kwargs[_key], keys=_newkeys)
 
     def __check_key(self, param, keys=None):

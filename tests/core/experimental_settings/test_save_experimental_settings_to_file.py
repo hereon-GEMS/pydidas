@@ -69,6 +69,17 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
             self.assertEqual(EXP_SETTINGS.get_param_value(key),
                               _data[key])
 
+    def test_save_wrong_type(self):
+        with self.assertRaises(KeyError):
+            SaveExperimentSettingsToFile(self._path + 'yaml.unknown')
+
+    def test_save_poni_without_det_config(self):
+        EXP_SETTINGS.set_param_value('detector_name', 'pilatus1m_cdte')
+        SaveExperimentSettingsToFile(self._path + 'poni.poni')
+        with open(self._path + 'poni.poni', 'r') as f:
+            lines = f.readlines()
+        self.assertTrue('Detector_config: {}\n' in lines)
+
 
 if __name__ == "__main__":
     unittest.main()

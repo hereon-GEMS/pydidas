@@ -85,7 +85,7 @@ class SaveExperimentSettingsToFile:
         _pdata['detector'] = EXP_SETTINGS.get_param_value('detector_name')
         _pdata['distance'] = EXP_SETTINGS.get_param_value('detector_dist')
         if (_pdata['detector'] in pyFAI.detectors.Detector.registry.keys()
-            and _pdata['detector'] != 'detector'):
+                and _pdata['detector'] != 'detector'):
             _pdata['detector_config'] = {}
         else:
             _pdata['detector_config'] = dict(

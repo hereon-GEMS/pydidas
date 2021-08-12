@@ -229,7 +229,6 @@ class ParameterCollectionMixIn:
         _val = mod(_param.value, modulo)
         # create offset for negative indices to capture the whole array
         _offset = 1 if _param.value < 0 else 0
-        _param.value = _val + _offset
         return _val + _offset
 
     def restore_all_defaults(self, confirm=False):

@@ -164,7 +164,8 @@ class Parameter:
         TypeError
             If the default value is not of the demanded data type.
         """
-        default = kwargs.get('default', None)
+        default = self.__convenience_type_conversion(
+            kwargs.get('default', None))
         if not self.__typecheck(default):
             raise TypeError(f'Default value "{default}" does not have data'
                             f'type {self.__type}!')
@@ -327,6 +328,10 @@ class Parameter:
             _t += ' (type: float)'
         elif self.type == str:
             _t += ' (type: str)'
+        elif self.type == HdfKey:
+            _t += ' (type: HdfKey)'
+        elif self.type == Path:
+            _t += ' (type: Path)'
         else:
             _t += f' (type: {str(self.type)})'
         return _t.replace(') (', ', ')

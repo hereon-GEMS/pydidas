@@ -23,8 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
+import copy
 
-from pydidas.core import  Parameter, ParameterCollection
+from pydidas.core import Parameter, ParameterCollection
 
 
 class TestParameterCollection(unittest.TestCase):
@@ -135,6 +136,36 @@ class TestParameterCollection(unittest.TestCase):
         obj.set_value('Test0', 0)
         self.assertEqual(obj.get_value('Test0'), 0)
 
+    def test_copy(self):
+        obj = ParameterCollection(*self._params)
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj, _copy)
+        self.assertIsInstance(_copy, ParameterCollection)
+
+    def test__raise_type_error(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(TypeError):
+            obj._ParameterCollection__raise_type_error('test')
+
+    def test__add_arg_params_with_param_collection(self):
+        obj = ParameterCollection(*self._params)
+        obj2 = ParameterCollection()
+        obj2._ParameterCollection__add_arg_params(obj)
+
+    def test__check_arg_types(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(TypeError):
+            obj._ParameterCollection__check_arg_types(*[0])
+
+    def test__check_kwarg_types(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(TypeError):
+            obj._ParameterCollection__check_kwarg_types({'test': 0})
+
+    def test_get_param(self):
+        obj = ParameterCollection(*self._params)
+        _p = obj.get_param('Test0')
+        self.assertIsInstance(_p, Parameter)
 
 if __name__ == "__main__":
     unittest.main()

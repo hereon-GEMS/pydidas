@@ -50,7 +50,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         None
         """
         super().__init__(parent)
-        dsets = get_hdf5_populated_dataset_keys(fname, minDataDim=2)
+        dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
         font = QtWidgets.QApplication.instance().font()
         metrics = QtGui.QFontMetrics(font)
         width = max([metrics.boundingRect(d).width() for d in dsets])

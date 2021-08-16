@@ -22,7 +22,6 @@ __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-import threading
 import unittest
 import time
 import sys
@@ -31,7 +30,7 @@ import multiprocessing as mp
 import numpy as np
 
 from PyQt5 import QtCore, QtWidgets, QtTest
-from pydidas.multiprocessing import WorkerController, processor
+from pydidas.multiprocessing import WorkerController
 
 
 def local_test_func(index, *args, **kwargs):
@@ -44,36 +43,6 @@ def local_test_func(index, *args, **kwargs):
 
 def get_spy_values(spy, index=0):
     return [spy[_index][index] for _index in range(len(spy))]
-
-
-# class _ProcThread(threading.Thread):
-#     """ Simple Thread to test blocking input / output. """
-#     def __init__(self, input_queue, output_queue, func, *args, **kwargs):
-#         super().__init__()
-#         self.input_queue = input_queue
-#         self.output_queue = output_queue
-#         self.func = func
-#         self.func_args = args
-#         self.func_kwargs = kwargs
-#         self.daemon = True
-
-#     def run(self):
-#         processor(self.input_queue, self.output_queue,
-#                   self.func, *self.func_args, **self.func_kwargs)
-
-
-# class WorkerControl(WorkerController):
-#     """Subclass WorkerController to remove multiprocessing."""
-#     def _create_and_start_workers(self):
-#         """
-#         Create and start worker processes.
-#         """
-#         self._workers = [_ProcThread(*self._processor['args'],
-#                                      **self._processor['kwargs'])
-#                          for i in range(self._n_workers)]
-#         for _worker in self._workers:
-#             _worker.start()
-#         self._flag_active = True
 
 
 class TestWorkerController(unittest.TestCase):

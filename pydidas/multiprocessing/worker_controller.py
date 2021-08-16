@@ -28,7 +28,6 @@ import time
 import multiprocessing as mp
 from numbers import Integral
 from queue import Empty
-from collections.abc import Iterable
 
 from PyQt5 import QtCore
 

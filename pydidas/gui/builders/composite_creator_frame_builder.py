@@ -54,36 +54,36 @@ class CompositeCreatorFrameBuilder:
             self.__ccf, initLayout=False, midLineWidth=5)
         self.__ccf._widgets['config'].setLayout(create_default_grid_layout())
 
-        self.__ccf._widgets['config_area'] = ScrollArea(
-            self.__ccf,
-            widget=self.__ccf._widgets['config'],
+        self.__ccf.create_any_widget(
+            'config_area', ScrollArea, widget=self.__ccf._widgets['config'],
             fixedWidth=self.CONFIG_WIDGET_WIDTH + 55,
             sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding))
-        self.__ccf.layout().addWidget(self.__ccf._widgets['config_area'],
-                                      self.__ccf.next_row(), 0, 1, 1)
+                         QtWidgets.QSizePolicy.Expanding),
+            gridPos=(-1, 0, 1, 1))
 
         self.__ccf.create_label(
-            'Composite image creator', fontsize=14, gridPos=(0, 0, 1, 2),
-            parent_widget=self.__ccf._widgets['config'],
+            'title', 'Composite image creator', fontsize=14,
+            gridPos=(0, 0, 1, 2), parent_widget=self.__ccf._widgets['config'],
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
-        self.__ccf.create_spacer(gridPos=(-1, 0, 1, 2),
+        self.__ccf.create_spacer('spacer1', gridPos=(-1, 0, 1, 2),
                                  parent_widget=self.__ccf._widgets['config'])
 
-        self.__ccf._widgets['but_clear'] = self.__ccf.create_button(
-            'Clear all entries', gridPos=(-1, 0, 1, 2),
+        self.__ccf.create_button(
+            'but_clear', 'Clear all entries', gridPos=(-1, 0, 1, 2),
             parent_widget=self.__ccf._widgets['config'],
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
-        self.__ccf._widgets['plot_window']= PlotWindow(
+        _plot = PlotWindow(
             parent=self.__ccf, resetzoom=True, autoScale=False, logScale=False,
             grid=False, curveStyle=False, colormap=True, aspectRatio=True,
             yInverted=True, copy=True, save=True, print_=True, control=False,
             position=False, roi=False, mask=True)
-        self.__ccf.layout().addWidget(self.__ccf._widgets['plot_window'],
-                                      0, 3, self.__ccf.next_row() -1, 1)
-        self.__ccf._widgets['plot_window'].setVisible(False)
+        self.__ccf.add_any_widget('plot_window', _plot,
+            gridPos=(0, 3, self.__ccf.next_row() -1, 1), visible=False)
+        # self.__ccf.layout().addWidget(self.__ccf._widgets['plot_window'],
+        #                               0, 3, self.__ccf.next_row() -1, 1)
+        # self.__ccf._widgets['plot_window'].setVisible(False)
 
         for _key in self.__ccf.params:
             _options = self.__get_param_widget_config(_key)
@@ -94,43 +94,45 @@ class CompositeCreatorFrameBuilder:
             if _key in ['n_files', 'images_per_file', 'bg_hdf5_num',
                         'composite_dir', 'roi_yhigh', 'threshold_high',
                         'binning', 'output_fname', 'n_total']:
-                self.__ccf.create_line(
+                self.__ccf.create_line(f'line_{_key}',
                     parent_widget=self.__ccf._widgets['config'],
                     fixedWidth=self.__ccf.CONFIG_WIDGET_WIDTH)
 
         self.__ccf.param_widgets['output_fname'].modify_file_selection(
             ['NPY files (*.npy *.npz)'])
 
-        self.__ccf._widgets['but_exec'] = self.__ccf.create_button(
-            'Generate composite', parent_widget=self.__ccf._widgets['config'],
+        self.__ccf.create_button(
+            'but_exec', 'Generate composite',
+            parent_widget=self.__ccf._widgets['config'],
             gridPos=(-1, 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
-        self.__ccf._widgets['progress'] = self.__ccf.create_progress_bar(
-            parent_widget=self.__ccf._widgets['config'],
+        self.__ccf.create_progress_bar(
+            'progress', parent_widget=self.__ccf._widgets['config'],
             gridPos=(-1, 0, 1, 2), visible=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH, minimum=0, maximum=100)
 
-        self.__ccf._widgets['but_abort'] = self.__ccf.create_button(
-            'Abort composite creation',
+        self.__ccf.create_button(
+            'but_abort', 'Abort composite creation',
             parent_widget=self.__ccf._widgets['config'],
             gridPos=(-1, 0, 1, 2), enabled=True, visible=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
-        self.__ccf._widgets['but_show'] = self.__ccf.create_button(
-            'Show composite', parent_widget=self.__ccf._widgets['config'],
-            gridPos=(-1, 0, 1, 2), enabled=False,
-            fixedWidth=self.CONFIG_WIDGET_WIDTH)
-
-        self.__ccf._widgets['but_save'] = self.__ccf.create_button(
-            'Save composite image',
+        self.__ccf.create_button(
+            'but_show', 'Show composite',
             parent_widget=self.__ccf._widgets['config'],
             gridPos=(-1, 0, 1, 2), enabled=False,
             fixedWidth=self.CONFIG_WIDGET_WIDTH)
 
-        self.__ccf.create_spacer(parent_widget=self.__ccf._widgets['config'],
-                            gridPos=(-1, 0, 1, 2),
-                            policy = QtWidgets.QSizePolicy.Expanding)
+        self.__ccf.create_button(
+            'but_save', 'Save composite image',
+            parent_widget=self.__ccf._widgets['config'],
+            gridPos=(-1, 0, 1, 2), enabled=False,
+            fixedWidth=self.CONFIG_WIDGET_WIDTH)
+
+        self.__ccf.create_spacer(
+            'spacer_bottom', parent_widget=self.__ccf._widgets['config'],
+            gridPos=(-1, 0, 1, 2), policy = QtWidgets.QSizePolicy.Expanding)
 
         for _key in ['n_total', 'hdf5_dataset_shape', 'n_files',
                      'raw_image_shape', 'images_per_file']:

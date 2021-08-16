@@ -100,12 +100,6 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
-    def multiprocessing_func(self, *args):
-        """
-        Store the results of the multiprocessing operation.
-        """
-        raise NotImplementedError
-
     def multiprocessing_carryon(self):
         """
         Wait for specific tasks to give the clear signal.

@@ -80,34 +80,34 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
         _section_options = dict(fontsize=13, bold=True,
                                 gridPos=(-1, 0, 2, 0))
 
-        self._widgets['title'] = self.create_label(
-            'Global settings\n', fontsize=14, bold=True, gridPos=(0, 0, 2, 0))
+        self.create_label('title', 'Global settings\n', fontsize=14,
+                          bold=True, gridPos=(0, 0, 2, 0))
 
-        self._widgets['but_reset'] = self.create_button(
-            'Restore defaults', icon=self.style().standardIcon(59),
-            gridPos=(-1, 0, 2, 0), alignment=None)
+        self.create_button('but_reset', 'Restore defaults',
+                           icon=self.style().standardIcon(59),
+                           gridPos=(-1, 0, 2, 0), alignment=None)
 
-        self._widgets['section_multiprocessing'] = self.create_label(
-            'Multiprocessing settings', **_section_options)
+        self.create_label('section_multiprocessing',
+                          'Multiprocessing settings', **_section_options)
         self.create_param_widget(self.params.get_param('mp_n_workers'),
                                  **_options)
-        self.create_spacer()
+        self.create_spacer('spacer_1')
 
-        self._widgets['section_detector'] = self.create_label(
-            'Detector settings', **_section_options)
+        self.create_label('section_detector', 'Detector settings',
+                          **_section_options)
         self.create_param_widget(self.params.get_param('det_mask'),
                                  **_twoline_options)
-        self.create_spacer()
+        self.create_spacer('spacer_2')
 
-        self._widgets['section_mosaic'] = self.create_label(
-            'Composite creator settings', **_section_options)
+        self.create_label('section_mosaic', 'Composite creator settings',
+                          **_section_options)
         self.create_param_widget(self.params.get_param('mosaic_border_width'),
                                  **_options)
         self.create_param_widget(self.params.get_param('mosaic_border_value'),
                                  **_options)
         self.create_param_widget(self.params.get_param('mosaic_max_size'),
                                  **_options)
-        self.create_spacer()
+        self.create_spacer('spacer_3')
 
     def connect_signals(self):
         """
@@ -154,7 +154,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
             self.update_param_value(_param_key, _value)
 
     def __reset(self):
-        qm = QtGui.QMessageBox
+        qm = QtWidgets.QMessageBox
         answer = qm.question(self,'', "Are you sure to reset all the values?",
                              qm.Yes | qm.No)
         if answer == qm.Yes:

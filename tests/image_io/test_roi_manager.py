@@ -48,135 +48,216 @@ class TestRoiManager(unittest.TestCase):
         obj = RoiManager()
         self.assertIsInstance(obj, RoiManager)
 
-    def test__check_roi_key_no_kwarg(self):
+    def test_check_roi_key__no_kwarg(self):
         obj = RoiManager()
         obj._RoiManager__check_roi_key()
         self.assertIsNone(obj._RoiManager__roi_key)
 
-    def test__check_roi_key_w_kwarg(self):
+    def test_check_roi_key__with_kwarg(self):
         _roi = 'Test'
         obj = RoiManager()
         obj._RoiManager__kwargs = {'ROI': _roi}
         obj._RoiManager__check_roi_key()
         self.assertEqual(obj._RoiManager__roi_key, _roi)
 
-    def test__convert_str_roi_key_to_list(self):
-        _list = ['Test', '1234', 'Test2']
-        _roi = '(' + ', '.join(_list) + ']'
+    def test_check_types_roi_key__w_None(self):
         obj = RoiManager()
-        obj._RoiManager__kwargs = {'ROI': _roi}
-        obj._RoiManager__check_roi_key()
-        obj._RoiManager__convert_str_roi_key_to_list()
-        self.assertEqual(obj._RoiManager__roi_key, _list)
+        obj._RoiManager__roi_key = None
+        obj._RoiManager__check_types_roi_key()
+        self.assertEqual(obj._RoiManager__roi_key, None)
 
-    def test__check_types_roi_key_w_str(self):
+    def test_check_types_roi_key__w_list(self):
         _list = ['Test', 'Test2']
-        _roi = ', '.join(_list)
-        obj = self.create_RoiManager(_roi)
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _list
+        obj._RoiManager__check_types_roi_key()
         self.assertEqual(obj._RoiManager__roi_key, _list)
 
-    def test__check_types_roi_key_w_list(self):
-        _roi = ['Test', 'Test2']
-        obj = self.create_RoiManager(_roi)
-        self.assertEqual(obj._RoiManager__roi_key, _roi)
+    def test_check_types_roi_key__w_str(self):
+        _str = 'Test, Test2'
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _str
+        obj._RoiManager__check_types_roi_key()
+        self.assertIsInstance(obj._RoiManager__roi_key, list)
 
-    def test__check_types_roi_key_w_tuple(self):
+    def test_check_types_roi_key__w_tuple(self):
         _roi = ('Test', 'Test2')
-        obj = self.create_RoiManager(_roi)
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__check_types_roi_key()
         self.assertEqual(obj._RoiManager__roi_key, list(_roi))
 
-    def test__check_types_roi_key_w_set(self):
+    def test_check_types_roi_key__w_set(self):
         _roi = {'Test', 'Test2'}
         obj = RoiManager()
-        obj._RoiManager__kwargs = {'ROI': _roi}
-        obj._RoiManager__check_roi_key()
+        obj._RoiManager__roi_key = _roi
         with self.assertRaises(ValueError):
             obj._RoiManager__check_types_roi_key()
 
-    def test__check_and_convert_str_roi_key_entries(self):
+    def test_convert_str_roi_key_to_list__simple(self):
+        _roi = '7, 1234, Test2'
+        _list = [item.strip() for item in _roi.split(',')]
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__convert_str_roi_key_to_list()
+        self.assertEqual(obj._RoiManager__roi_key, _list)
+
+    def test_convert_str_roi_key_to_list__slices(self):
+        _roi = 'slice(1, 4, 1), slice(0, 4)'
+        _list = [item.strip() for item in _roi.split(',')]
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__convert_str_roi_key_to_list()
+        self.assertEqual(obj._RoiManager__roi_key, _list)
+
+    def test_convert_str_roi_key_to_list__with_brackets(self):
+        _roi = '(slice(1, 4, 1), slice(0, 4))'
+        _list = [item.strip() for item in _roi[1:-1].split(',')]
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__convert_str_roi_key_to_list()
+        self.assertEqual(obj._RoiManager__roi_key, _list)
+
+    def test_convert_str_roi_key_to_list__with_straight_brackets(self):
+        _roi = '[slice(1, 4, 1), slice(0, 4)]'
+        _list = [item.strip() for item in _roi[1:-1].split(',')]
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__convert_str_roi_key_to_list()
+        self.assertEqual(obj._RoiManager__roi_key, _list)
+
+    def test_convert_str_roi_key_to_list__only_leading_bracket(self):
+        _roi = '(slice(1, 4, 1), slice(0, 4)'
+        _list = [item.strip() for item in _roi[1:].split(',')]
+        obj = RoiManager()
+        obj._RoiManager__roi_key = _roi
+        obj._RoiManager__convert_str_roi_key_to_list()
+        self.assertEqual(obj._RoiManager__roi_key, _list)
+
+    def test_check_types_roi_key_entries(self):
+        obj = RoiManager()
+        obj._RoiManager__roi_key = [12, slice(0, 2)]
+        obj._RoiManager__check_types_roi_key_entries
+
+    def test_check_types_roi_key_entries__w_float(self):
+        obj = self.create_RoiManager()
+        obj._RoiManager__roi_key = [12, slice(0, 15), 12.3]
+        with self.assertRaises(ValueError):
+            obj._RoiManager__check_types_roi_key_entries()
+
+    def test_check_types_roi_key_entries__w_str(self):
+        obj = self.create_RoiManager()
+        obj._RoiManager__roi_key = [12, slice(0, 15), '12.3']
+        with self.assertRaises(ValueError):
+            obj._RoiManager__check_types_roi_key_entries()
+
+    def test_check_and_convert_str_roi_key_entries__int(self):
         _roi = [1, 2, 3, 4]
         _strroi = ', '.join(str(item) for item in _roi)
         obj = self.create_RoiManager(_strroi)
         obj._RoiManager__check_and_convert_str_roi_key_entries()
         self.assertEqual(obj._RoiManager__roi_key, _roi)
 
-    def test__check_and_convert_str_roi_key_entries_float(self):
+    def test_check_and_convert_str_roi_key_entries__float(self):
         _roi = [1, 2, 3, 4.0]
         _strroi = ', '.join(str(item) for item in _roi)
         obj = self.create_RoiManager(_strroi)
         with self.assertRaises(ValueError):
             obj._RoiManager__check_and_convert_str_roi_key_entries()
 
-    def test__check_and_convert_str_roi_key_entries_slice(self):
+    def test_check_and_convert_str_roi_key_entries__slice_last(self):
         _roi = [1, 2, slice(0, 2)]
         _strroi = ', '.join(str(item) for item in _roi)
         obj = self.create_RoiManager(_strroi)
         obj._RoiManager__check_and_convert_str_roi_key_entries()
         self.assertEqual(obj._RoiManager__roi_key, _roi)
 
-    def test__check_length_of_roi_key_entries(self):
+    def test_check_and_convert_str_roi_key_entries__slice_first(self):
+        _roi = [slice(0, 2), 1, 2]
+        _strroi = ', '.join(str(item) for item in _roi)
+        obj = self.create_RoiManager(_strroi)
+        obj._RoiManager__check_and_convert_str_roi_key_entries()
+        self.assertEqual(obj._RoiManager__roi_key, _roi)
+
+    def test_check_and_convert_str_roi_key_entries__2slices(self):
+        _roi = [slice(1, 3, 5), slice(0, 2)]
+        _strroi = ', '.join(str(item) for item in _roi)
+        obj = self.create_RoiManager(_strroi)
+        obj._RoiManager__check_and_convert_str_roi_key_entries()
+        self.assertEqual(obj._RoiManager__roi_key, _roi)
+
+    def test_check_and_convert_str_roi_key_entries__2slices_wo_steps(self):
+        _strroi  ='(slice(1, 5), slice(0, 2))'
+        obj = self.create_RoiManager(_strroi)
+        obj._RoiManager__check_and_convert_str_roi_key_entries()
+        self.assertEqual(obj._RoiManager__roi_key,
+                         [slice(1, 5), slice(0, 2)])
+
+    def test_check_and_convert_str_roi_key_entries__2slices_with_steps(self):
+        _strroi ='(slice(1, 5, 2), slice(0, 2, 1))'
+        obj = self.create_RoiManager(_strroi)
+        obj._RoiManager__check_and_convert_str_roi_key_entries()
+        self.assertEqual(obj._RoiManager__roi_key,
+                         [slice(1, 5, 2), slice(0, 2, 1)])
+
+    def test_check_length_of_roi_key_entries(self):
         _roi = [1, 2, slice(0, 2)]
         obj = self.create_RoiManager(_roi)
         obj._RoiManager__check_length_of_roi_key_entries()
 
-    def test__check_length_of_roi_key_entries_too_long(self):
+    def test_check_length_of_roi_key_entries__too_long(self):
         _roi = [1, 2, slice(0, 2), 4]
         obj = self.create_RoiManager(_roi)
         with self.assertRaises(ValueError):
             obj._RoiManager__check_length_of_roi_key_entries()
 
-    def test__check_length_of_roi_key_entries_too_short(self):
+    def test_check_length_of_roi_key_entries__too_short(self):
         _roi = [1, 2, 4]
         obj = self.create_RoiManager(_roi)
         with self.assertRaises(ValueError):
             obj._RoiManager__check_length_of_roi_key_entries()
 
-    def test__check_types_roi_key_entries(self):
-        obj = self.create_RoiManager()
-        obj._RoiManager__roi_key = [12, slice(0, 15)]
-        obj._RoiManager__check_types_roi_key_entries()
-
-    def test__check_types_roi_key_entries_w_float(self):
-        obj = self.create_RoiManager()
-        obj._RoiManager__roi_key = [12, slice(0, 15), 12.3]
-        with self.assertRaises(ValueError):
-            obj._RoiManager__check_types_roi_key_entries()
-
-    def test__check_types_roi_key_entries_w_str(self):
-        obj = self.create_RoiManager()
-        obj._RoiManager__roi_key = [12, slice(0, 15), '12.3']
-        with self.assertRaises(ValueError):
-            obj._RoiManager__check_types_roi_key_entries()
-
-    def test__convert_roi_key_to_slice_objects_4_ints(self):
+    def test_convert_roi_key_to_slice_objects__4_ints(self):
         _roi = [1, 5, 0, 7]
         obj = self.create_RoiManager(_roi)
         obj._RoiManager__convert_roi_key_to_slice_objects()
         self.assertEqual(obj._RoiManager__roi,
                          (slice(_roi[0], _roi[1]), slice(_roi[2], _roi[3])))
 
-    def test__convert_roi_key_to_slice_objects_2_slices(self):
+    def test_convert_roi_key_to_slice_objects__2_slices(self):
         _roi = [slice(0, 5), slice(0, 5)]
         obj = self.create_RoiManager(_roi)
         obj._RoiManager__convert_roi_key_to_slice_objects()
         self.assertEqual(obj._RoiManager__roi, (_roi[0], _roi[1]))
 
-    def test__convert_roi_key_to_slice_objects_ints_and_slice(self):
+    def test_convert_roi_key_to_slice_objects__ints_and_slice(self):
         _roi = [1, 5, slice(0, 5)]
         obj = self.create_RoiManager(_roi)
         obj._RoiManager__convert_roi_key_to_slice_objects()
         self.assertEqual(obj._RoiManager__roi,
                          (slice(_roi[0], _roi[1]), _roi[2]))
 
-    def test__convert_roi_key_to_slice_objects_slice_and_ints(self):
+    def test_convert_roi_key_to_slice_objects__slice_and_ints(self):
         _roi = [slice(0, 5), 1, 5]
         obj = self.create_RoiManager(_roi)
         obj._RoiManager__convert_roi_key_to_slice_objects()
         self.assertEqual(obj._RoiManager__roi,
                          (_roi[0], slice(_roi[1], _roi[2])))
 
-    def test__convert_roi_key_to_slice_objects_wrong_order(self):
+    def test_convert_roi_key_to_slice_objects__wrong_order(self):
         _roi = [1, slice(0, 5), 1]
+        obj = self.create_RoiManager(_roi)
+        with self.assertRaises(ValueError):
+            obj._RoiManager__convert_roi_key_to_slice_objects()
+
+    def test_convert_roi_key_to_slice_objects__wrong_trailing_order(self):
+        obj = RoiManager()
+        obj._RoiManager__roi_key = [slice(0, 5), 1, slice(0, 5)]
+        with self.assertRaises(ValueError):
+            obj._RoiManager__convert_roi_key_to_slice_objects()
+
+    def test_convert_roi_key_to_slice_objects__wrong_length(self):
+        _roi = [1, slice(0, 5)]
         obj = self.create_RoiManager(_roi)
         with self.assertRaises(ValueError):
             obj._RoiManager__convert_roi_key_to_slice_objects()

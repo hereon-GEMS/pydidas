@@ -28,7 +28,7 @@ import threading
 import queue
 import multiprocessing as mp
 
-from pydidas.multiprocessing.app_processor_func import app_processor
+from pydidas.multiprocessing import app_processor
 from pydidas.multiprocessing.mp_test_app import MpTestApp
 
 
@@ -57,7 +57,7 @@ class Test_app_processor(unittest.TestCase):
         self.output_queue = mp.Queue()
         self.stop_queue = mp.Queue()
         self.app = MpTestApp()
-        self.n_test = 100
+        self.n_test = self.app._config['max_index']
         self.app.multiprocessing_pre_run()
 
     def tearDown(self):

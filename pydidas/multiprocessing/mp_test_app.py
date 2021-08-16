@@ -56,7 +56,7 @@ class MpTestApp(BaseApp):
                         'mp_post_run_called': False,
                         'calls': 0,
                         'min_index': 0,
-                        'max_index': 100
+                        'max_index': 40
                         }
 
     def multiprocessing_pre_run(self):
@@ -83,7 +83,7 @@ class MpTestApp(BaseApp):
     def multiprocessing_func(self, index):
         _fname, _kwargs = 'dummy', {'shape': (20, 20)}
         _image = get_image(_fname, **_kwargs)
-        return index, _image
+        return _image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):

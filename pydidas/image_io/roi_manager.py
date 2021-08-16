@@ -128,9 +128,24 @@ class RoiManager:
         """
         Convert a string ROI key to a list of entries.
         """
+        _tmpstr = self.__roi_key
+        _valid_chars = ['0', '1', '2', '3', '4', '5', '6',
+                        '7', '8', '9', '-']
+        _index = 0
+        while _index < len(_tmpstr):
+            if _tmpstr[0] not in _valid_chars + ['s']:
+                _tmpstr = _tmpstr[1:]
+                continue
+            _i_slice = _tmpstr.find('slice(', _index)
+            if _i_slice == -1:
+                break
+            _index = _tmpstr.find(')', _index) + 1
+        while len(_tmpstr) > _index:
+            if _tmpstr[len(_tmpstr) - 1] in _valid_chars:
+                break
+            _tmpstr = _tmpstr[:-1]
+        self.__roi_key = [item.strip() for item in _tmpstr.split(',')]
 
-        self.__roi_key = [item.strip() for item in
-                          self.__roi_key.strip('()[]').split(',')]
 
     def __check_types_roi_key_entries(self):
         """
@@ -164,6 +179,7 @@ class RoiManager:
         """
         _tmpkeys = copy.copy(self.__roi_key)
         _newkeys = []
+        # print(_tmpkeys)
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
@@ -173,13 +189,14 @@ class RoiManager:
                 if key.startswith('slice('):
                     _start = int(key[6:])
                     _end = _tmpkeys.pop(0)
+                    # print(key, _start, _end)
                     if _end.endswith(')'):
                         _step = None
+                        _end = _end.strip(')')
                     else:
                         _step = _tmpkeys.pop(0).strip(')')
                         _step = int(_step) if _step != 'None' else None
-                    _end = int(_end.strip(')'))
-                    _newkeys.append(slice(_start, _end, _step))
+                    _newkeys.append(slice(_start, int(_end), _step))
                 else:
                     _newkeys.append(int(key))
         except ValueError as _ve:
@@ -217,7 +234,7 @@ class RoiManager:
         ValueError
             If the conversion does not succeed.
         """
-        _roi = self.__roi_key
+        _roi = copy.copy(self.__roi_key)
         try:
             if isinstance(_roi[0], int) and isinstance(_roi[1], int):
                 _out = [slice(_roi.pop(0), _roi.pop(0))]

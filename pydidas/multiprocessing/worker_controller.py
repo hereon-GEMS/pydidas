@@ -28,10 +28,12 @@ import time
 import multiprocessing as mp
 from numbers import Integral
 from queue import Empty
+from collections.abc import Iterable
 
 from PyQt5 import QtCore
 
-from .processor_func import processor
+from ._processor import processor
+
 
 class WorkerController(QtCore.QThread):
     """
@@ -43,7 +45,7 @@ class WorkerController(QtCore.QThread):
     between function calls.
     """
     progress = QtCore.pyqtSignal(float)
-    results = QtCore.pyqtSignal(object)
+    results = QtCore.pyqtSignal(int, object)
     finished = QtCore.pyqtSignal()
 
     def __init__(self, n_workers=None):
@@ -68,7 +70,7 @@ class WorkerController(QtCore.QThread):
         self._workers = None
         self._queues = dict(send=mp.Queue(), recv=mp.Queue(), stop=mp.Queue())
         _worker_args = (self._queues['send'], self._queues['recv'],
-                        self._queues['stop'], lambda x: [x])
+                        self._queues['stop'], None)
         self._processor = dict(func=processor, args=_worker_args, kwargs={})
         self.__progress_done = 0
         self.__progress_target = 0
@@ -126,15 +128,6 @@ class WorkerController(QtCore.QThread):
         """
         self._flag_running = False
 
-    def restart(self):
-        """
-        Restart the event loop.
-
-        This method allow the event loop to run and to submit tasks via the
-        queue to the workers.
-        """
-        self._flag_running = True
-
     def change_function(self, func, *args, **kwargs):
         """
         Change the function called by the workers.
@@ -157,6 +150,60 @@ class WorkerController(QtCore.QThread):
         self._reset_task_list()
         self._update_function(func, *args, **kwargs)
         self.restart()
+
+    def _wait_for_processes_to_finish(self, timeout=10):
+        """
+        Wait for the processes to finish their calculations.
+
+        Parameters
+        ----------
+        timeout : float, optional
+            The maximum time to wait (in seconds). The default is 10.
+        """
+        _t0 = time.time()
+        while self._flag_active:
+            time.sleep(0.05)
+            if time.time() - _t0 >= timeout:
+                break
+
+    def _reset_task_list(self):
+        """
+        Reset and clear the list of tasks.
+        """
+        self._write_lock.lockForWrite()
+        self._to_process = []
+        self._write_lock.unlock()
+
+    def _update_function(self, func, *args, **kwargs):
+        """
+        Store the new function and its calling (keyword) arguments
+        internally.
+
+        Parameters
+        ----------
+        func : object
+            The function.
+        *args : object
+            The function arguments
+        **kwargs : object
+            The function keyword arguments.
+        """
+        self._processor['args'] = (self._queues['send'],
+                                   self._queues['recv'],
+                                   self._queues['stop'],
+                                   func,
+                                   *args)
+        self._processor['kwargs'] = kwargs
+
+    def restart(self):
+        """
+        Restart the event loop.
+
+        This method allow the event loop to run and to submit tasks via the
+        queue to the workers.
+        """
+        self._flag_running = True
+
 
     def add_task(self, task_arg):
         """
@@ -245,20 +292,6 @@ class WorkerController(QtCore.QThread):
             time.sleep(0.005)
         self.finished.emit()
 
-    def _wait_for_processes_to_finish(self, timeout=10):
-        """
-        Wait for the processes to finish their calculations.
-
-        Parameters
-        ----------
-        timeout : float, optional
-            The maximum time to wait (in seconds). The default is 10.
-        """
-        _t0 = time.time()
-        while self._flag_active:
-            time.sleep(0.05)
-            if time.time() - _t0 >= timeout:
-                break
 
     def _cycle_pre_run(self):
         """
@@ -304,35 +337,6 @@ class WorkerController(QtCore.QThread):
         _arg = self._to_process.pop(0)
         self._write_lock.unlock()
         self._queues['send'].put(_arg)
-        # print('Put item in queue:', _arg)
-
-    def _reset_task_list(self):
-        """
-        Reset and clear the list of tasks.
-        """
-        self._write_lock.lockForWrite()
-        self._to_process = []
-        self._write_lock.unlock()
-
-    def _update_function(self, func, *args, **kwargs):
-        """
-        Store the new function and its calling (keyword) arguments
-        internally.
-
-        Parameters
-        ----------
-        func : object
-            The function.
-        *args : object
-            The function arguments
-        **kwargs : object
-            The function keyword arguments.
-        """
-        self._processor['args'] = (self._queues['send'],
-                                   self._queues['recv'],
-                                   func,
-                                   *args)
-        self._processor['kwargs'] = kwargs
 
     def _get_and_emit_all_queue_items(self):
         """
@@ -341,7 +345,7 @@ class WorkerController(QtCore.QThread):
         while True:
             try:
                 _task, _results = self._queues['recv'].get_nowait()
-                self.results.emit(*_results)
+                self.results.emit(_task, _results)
                 self.__progress_done += 1
                 self.progress.emit(self.__progress_done
                                    / self.__progress_target)

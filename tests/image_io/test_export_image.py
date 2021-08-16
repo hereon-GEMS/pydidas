@@ -30,6 +30,9 @@ import shutil
 import numpy as np
 
 from pydidas.image_io import export_image
+from pydidas.image_io import ImageReaderFactory
+
+ImageReader = ImageReaderFactory()
 
 
 class TestExportImage(unittest.TestCase):
@@ -66,7 +69,6 @@ class TestExportImage(unittest.TestCase):
         _name = f'{self._path}/test.png'
         export_image(self._array, _name)
         self.assertTrue(os.path.isfile(_name))
-
 
 if __name__ == "__main__":
     unittest.main()

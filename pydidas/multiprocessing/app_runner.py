@@ -29,7 +29,7 @@ import copy
 from PyQt5 import QtCore
 
 from pydidas.multiprocessing.worker_controller import WorkerController
-from pydidas.multiprocessing.app_processor_func import app_processor
+from pydidas.multiprocessing._app_processor import app_processor
 from pydidas.apps import BaseApp
 
 
@@ -129,7 +129,8 @@ class AppRunner(WorkerController):
         starting the workers.
         """
         self.__app.multiprocessing_pre_run()
-        self._processor['args'] = (self._queues['send'], self._queues['recv'],
+        self._processor['args'] = (self._queues['send'],
+                                   self._queues['recv'],
                                    self._queues['stop'],
                                    *self.__get_app_arguments())
         _tasks = self.__app.multiprocessing_get_tasks()

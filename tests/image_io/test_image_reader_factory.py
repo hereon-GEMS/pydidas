@@ -44,9 +44,13 @@ class TestImageReaderFactory(unittest.TestCase):
         ...
 
     def tearDown(self):
-        ...
+        ImageReaderFactory._reset_instance()
 
     def test_get_instance(self):
+        obj = ImageReaderFactory.instance()
+        self.assertIsInstance(obj, _ImageReaderFactory)
+
+    def test_call(self):
         obj = ImageReaderFactory()
         self.assertIsInstance(obj, _ImageReaderFactory)
 
@@ -78,7 +82,6 @@ class TestImageReaderFactory(unittest.TestCase):
         obj._extensions['.test'] = None
         with self.assertRaises(KeyError):
             obj.get_reader('test/test2/testname.test')
-
 
 if __name__ == "__main__":
     unittest.main()

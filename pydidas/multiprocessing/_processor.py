@@ -63,7 +63,7 @@ def processor(input_queue, output_queue, stop_queue, function, *func_args,
             pass
         # run processing step
         try:
-            _arg1 = input_queue.get(timeout=0.5)
+            _arg1 = input_queue.get(timeout=0.005)
             if _arg1 is None:
                 break
             try:
@@ -71,6 +71,8 @@ def processor(input_queue, output_queue, stop_queue, function, *func_args,
             except Exception as ex:
                 print('Exception occured during function call to: '
                       f'{function}: {ex}')
+                # Sleep time required to stop queues from becoming corrupted.
+                time.sleep(0.02)
                 break
             output_queue.put([_arg1, _results])
         except queue.Empty:

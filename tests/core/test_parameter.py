@@ -30,6 +30,7 @@ from pathlib import Path
 import numpy as np
 
 from pydidas.core import Parameter, HdfKey
+from pydidas.core.parameter import _get_base_class
 
 
 class TestParameter(unittest.TestCase):
@@ -39,6 +40,42 @@ class TestParameter(unittest.TestCase):
 
     def tearDown(self):
         ...
+
+    def test_get_base_class__None(self):
+        _cls = _get_base_class(None)
+        self.assertEqual(_cls, None)
+
+    def test_get_base_class__generic_int(self):
+        _cls = _get_base_class(int)
+        self.assertEqual(_cls, Integral)
+
+    def test_get_base_class__np_int32(self):
+        _cls = _get_base_class(np.int32)
+        self.assertEqual(_cls, Integral)
+
+    def test_get_base_class__np_int16(self):
+        _cls = _get_base_class(np.int16)
+        self.assertEqual(_cls, Integral)
+
+    def test_get_base_class__np_uint32(self):
+        _cls = _get_base_class(np.uint32)
+        self.assertEqual(_cls, Integral)
+
+    def test_get_base_class__np_uint8(self):
+        _cls = _get_base_class(np.uint8)
+        self.assertEqual(_cls, Integral)
+
+    def test_get_base_class__generic_float(self):
+        _cls = _get_base_class(float)
+        self.assertEqual(_cls, Real)
+
+    def test_get_base_class__np_float32(self):
+        _cls = _get_base_class(np.float32)
+        self.assertEqual(_cls, Real)
+
+    def test_get_base_class__np_float64(self):
+        _cls = _get_base_class(np.float64)
+        self.assertEqual(_cls, Real)
 
     def test_creation(self):
         obj = Parameter('Test0', int, default=12)

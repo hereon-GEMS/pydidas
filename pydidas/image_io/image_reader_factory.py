@@ -81,7 +81,7 @@ class _ImageReaderFactory:
             The instance of the ImageReader implementation.
         """
         _ext = os.path.splitext(filename)[1].lower()
-        if not _ext in self._extensions.keys():
+        if _ext not in self._extensions.keys():
             raise KeyError(f'Extension "{_ext}" not supported.')
         reader = self._readers.get(self._extensions[_ext])
         if not reader:

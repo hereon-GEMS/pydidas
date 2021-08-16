@@ -76,119 +76,6 @@ class ParameterConfigWidgetsMixIn:
         self.params = ParameterCollection()
         self.param_textwidgets = {}
 
-    def __get_layout_args_for_create_param_widget(self, config):
-        """
-        Get the layout insertion arguments based on config.
-
-        Parameters
-        ----------
-        config : dict
-            The dictionary with the layout formatting arguments.
-
-        Returns
-        -------
-        _txt_args : tuple
-            The tuple with the layout formatting args for the text widget.
-        _io_args : tuple
-            The tuple with the layout formatting args for the input widget.
-        """
-        if isinstance(self.layout(), QtWidgets.QGridLayout):
-            _txt_args = (config['row'], config['column'], 1,
-                         config['n_columns_text'],
-                         config['valign_text'] | config['halign_text'])
-            _io_args = (config['row'] + config['linebreak'],
-                        config['column'] + 1 - config['linebreak'], 1,
-                        config['n_columns'],
-                        config['valign_io'] | config['halign_io'])
-        else:
-            _txt_args = (0, QtCore.Qt.AlignRight)
-            _io_args = (0, QtCore.Qt.AlignRight)
-        return _txt_args, _io_args
-
-    def __get_config_for_create_parameter(self, **kwargs):
-        """
-        Get the config with kwargs formatting options.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            All possible formatting options.
-
-        Returns
-        -------
-        config : dict
-            The full formatting options, updated with the default values.
-        """
-        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
-                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
-        config = {'row': _row,
-                  'column': kwargs.get('column', 0),
-                  'width_text': kwargs.get('width_text', 120),
-                  'width': kwargs.get('width', 255),
-                  'n_columns_text': kwargs.get('n_columns_text', 1),
-                  'n_columns': kwargs.get('n_columns', 1),
-                  'linebreak': kwargs.get('linebreak', False),
-                  'halign_io': kwargs.get('halign_io',
-                                          QtCore.Qt.AlignRight),
-                  'halign_text': kwargs.get('halign_text',
-                                            QtCore.Qt.AlignRight),
-                  'valign_io': kwargs.get('valign_io',
-                                          QtCore.Qt.AlignVCenter),
-                  'valign_text': kwargs.get('valign_text',
-                                            QtCore.Qt.AlignVCenter)}
-        return config
-
-
-    def update_param_value(self, key, value):
-        """
-        Update a parameter value both in the Parameter and the widget.
-
-        This method will update the parameter referenced by <key> and
-        update both the Parameter.value as well as the displayed widget
-        entry.
-
-        Parameters
-        ----------
-        key : str
-            The reference key for the Parameter.
-        value : object
-            The new parameter value. This must be of the same type as the
-            Parameter datatype.
-
-        Raises
-        ------
-        KeyError
-            If no parameter or widget has been registered with this key.
-        """
-        if key not in self.params or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        self.set_param_value(key, value)
-        self.param_widgets[key].set_value(value)
-
-    def toggle_widget_visibility(self, key, visible):
-        """
-        Toggle the visibility of widgets referenced with key.
-
-        This method allows to show/hide the label and input widget for a
-        parameter referenced with <key>.
-
-        Parameters
-        ----------
-        key : str
-            The reference key for the Parameter..
-        visible : bool
-            The boolean setting for the visibility.
-
-        Raises
-        ------
-        KeyError
-            If no widget has been registered with this key.
-        """
-        if key not in self.param_textwidgets or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        self.param_widgets[key].setVisible(visible)
-        self.param_textwidgets[key].setVisible(visible)
-
     def create_param_widget(self, param, **kwargs):
         """
         Add a name label and input widget for a specific parameter to the
@@ -254,6 +141,119 @@ class ParameterConfigWidgetsMixIn:
         _parent.layout().addWidget(_text_widget, *_text_widget_args)
         _parent.layout().addWidget(_input_widget, *_input_widget_args)
         return _text_widget, _input_widget
+
+    def __get_config_for_create_parameter(self, **kwargs):
+        """
+        Get the config with kwargs formatting options.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            All possible formatting options.
+
+        Returns
+        -------
+        config : dict
+            The full formatting options, updated with the default values.
+        """
+        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
+                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
+        config = {'row': _row,
+                  'column': kwargs.get('column', 0),
+                  'width_text': kwargs.get('width_text', 120),
+                  'width': kwargs.get('width', 255),
+                  'n_columns_text': kwargs.get('n_columns_text', 1),
+                  'n_columns': kwargs.get('n_columns', 1),
+                  'linebreak': kwargs.get('linebreak', False),
+                  'halign_io': kwargs.get('halign_io',
+                                          QtCore.Qt.AlignRight),
+                  'halign_text': kwargs.get('halign_text',
+                                            QtCore.Qt.AlignRight),
+                  'valign_io': kwargs.get('valign_io',
+                                          QtCore.Qt.AlignVCenter),
+                  'valign_text': kwargs.get('valign_text',
+                                            QtCore.Qt.AlignVCenter)}
+        return config
+
+    def __get_layout_args_for_create_param_widget(self, config):
+        """
+        Get the layout insertion arguments based on config.
+
+        Parameters
+        ----------
+        config : dict
+            The dictionary with the layout formatting arguments.
+
+        Returns
+        -------
+        _txt_args : tuple
+            The tuple with the layout formatting args for the text widget.
+        _io_args : tuple
+            The tuple with the layout formatting args for the input widget.
+        """
+        if isinstance(self.layout(), QtWidgets.QGridLayout):
+            _txt_args = (config['row'], config['column'], 1,
+                         config['n_columns_text'],
+                         config['valign_text'] | config['halign_text'])
+            _io_args = (config['row'] + config['linebreak'],
+                        config['column'] + 1 - config['linebreak'], 1,
+                        config['n_columns'],
+                        config['valign_io'] | config['halign_io'])
+        else:
+            _txt_args = (0, QtCore.Qt.AlignRight)
+            _io_args = (0, QtCore.Qt.AlignRight)
+        return _txt_args, _io_args
+
+    def update_param_value(self, key, value):
+        """
+        Update a parameter value both in the Parameter and the widget.
+
+        This method will update the parameter referenced by <key> and
+        update both the Parameter.value as well as the displayed widget
+        entry.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter.
+        value : object
+            The new parameter value. This must be of the same type as the
+            Parameter datatype.
+
+        Raises
+        ------
+        KeyError
+            If no parameter or widget has been registered with this key.
+        """
+        if key not in self.params or key not in self.param_widgets:
+            raise KeyError(f'No parameter with key "{key}" found.')
+        self.set_param_value(key, value)
+        self.param_widgets[key].set_value(value)
+
+    def toggle_widget_visibility(self, key, visible):
+        """
+        Toggle the visibility of widgets referenced with key.
+
+        This method allows to show/hide the label and input widget for a
+        parameter referenced with <key>.
+
+        Parameters
+        ----------
+        key : str
+            The reference key for the Parameter..
+        visible : bool
+            The boolean setting for the visibility.
+
+        Raises
+        ------
+        KeyError
+            If no widget has been registered with this key.
+        """
+        if key not in self.param_textwidgets or key not in self.param_widgets:
+            raise KeyError(f'No parameter with key "{key}" found.')
+        self.param_widgets[key].setVisible(visible)
+        self.param_textwidgets[key].setVisible(visible)
+
 
     def get_param_value(self, key):
         """

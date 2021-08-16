@@ -81,7 +81,7 @@ def get_args_as_list(args):
 
 def apply_widget_properties(obj, **kwargs):
     """
-    Set widget properties from a supplied dict.
+    Set Qt widget properties from a supplied dict.
 
     This function takes a dictionary (ie. keyword arguments) and iterates
     through all keys. Keys will be interpreted in Qt style: A "property: 12"

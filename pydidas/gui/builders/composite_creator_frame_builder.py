@@ -51,15 +51,10 @@ class CompositeCreatorFrameBuilder:
         self.__ccf.layout().setContentsMargins(0, 0, 0, 0)
 
         self.__ccf._widgets['config'] = ParameterConfigWidget(
-            self.__ccf, initLayout=False, midLineWidth=5)
-        self.__ccf._widgets['config'].setLayout(create_default_grid_layout())
-
-        self.__ccf.create_any_widget(
-            'config_area', ScrollArea, widget=self.__ccf._widgets['config'],
-            fixedWidth=self.CONFIG_WIDGET_WIDTH + 55,
+            self.__ccf, initLayout=False, lineWidth=5,
             sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding),
-            gridPos=(-1, 0, 1, 1))
+                         QtWidgets.QSizePolicy.Expanding))
+        self.__ccf._widgets['config'].setLayout(create_default_grid_layout())
 
         self.__ccf.create_label(
             'title', 'Composite image creator', fontsize=14,
@@ -68,6 +63,14 @@ class CompositeCreatorFrameBuilder:
 
         self.__ccf.create_spacer('spacer1', gridPos=(-1, 0, 1, 2),
                                  parent_widget=self.__ccf._widgets['config'])
+
+        self.__ccf.create_any_widget(
+            'config_area', ScrollArea, widget=self.__ccf._widgets['config'],
+            fixedWidth=self.CONFIG_WIDGET_WIDTH + 55,
+            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
+                          QtWidgets.QSizePolicy.Expanding),
+            gridPos=(-1, 0, 1, 1), stretch=(1, 0),
+            layout_kwargs={'alignment': None})
 
         self.__ccf.create_button(
             'but_clear', 'Clear all entries', gridPos=(-1, 0, 1, 2),
@@ -79,11 +82,11 @@ class CompositeCreatorFrameBuilder:
             grid=False, curveStyle=False, colormap=True, aspectRatio=True,
             yInverted=True, copy=True, save=True, print_=True, control=False,
             position=False, roi=False, mask=True)
-        self.__ccf.add_any_widget('plot_window', _plot,
-            gridPos=(0, 3, self.__ccf.next_row() -1, 1), visible=False)
-        # self.__ccf.layout().addWidget(self.__ccf._widgets['plot_window'],
-        #                               0, 3, self.__ccf.next_row() -1, 1)
-        # self.__ccf._widgets['plot_window'].setVisible(False)
+        self.__ccf.add_any_widget(
+            'plot_window', _plot, alignment=None,
+            gridPos=(0, 3, 1, 1), visible=False, stretch=(1, 1),
+            sizePolicy=(QtWidgets.QSizePolicy.Expanding,
+                        QtWidgets.QSizePolicy.Expanding))
 
         for _key in self.__ccf.params:
             _options = self.__get_param_widget_config(_key)
@@ -132,7 +135,8 @@ class CompositeCreatorFrameBuilder:
 
         self.__ccf.create_spacer(
             'spacer_bottom', parent_widget=self.__ccf._widgets['config'],
-            gridPos=(-1, 0, 1, 2), policy = QtWidgets.QSizePolicy.Expanding)
+            gridPos=(-1, 0, 1, 2), policy = QtWidgets.QSizePolicy.Expanding,
+            height=300)
 
         for _key in ['n_total', 'hdf5_dataset_shape', 'n_files',
                      'raw_image_shape', 'images_per_file']:

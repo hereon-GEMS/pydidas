@@ -49,16 +49,34 @@ class CompositeImage(ObjectWithParameterCollection):
         get_generic_parameter('datatype'),
         get_generic_parameter('threshold_low'),
         get_generic_parameter('threshold_high'),
+        get_generic_parameter('mosaic_border_width'),
+        get_generic_parameter('mosaic_border_value'),
+        get_generic_parameter('mosaic_max_size'),
         )
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
         self.__image = None
         self.set_default_params()
+        self.__set_default_qsettings()
         for _key in kwargs:
               self.set_param_value(_key, kwargs[_key])
         if self.__check_config():
             self.__create_image_array()
+
+    def __set_default_qsettings(self):
+        """
+        Update local Parameters with the global QSetting values.
+        """
+        self.set_param_value(
+            'mosaic_border_width',
+            self.q_settings_get_global_value('mosaic_border_width'))
+        self.set_param_value(
+            'mosaic_border_value',
+            self.q_settings_get_global_value('mosaic_border_value'))
+        self.set_param_value(
+            'mosaic_max_size',
+            self.q_settings_get_global_value('mosaic_max_size'))
 
     def __check_config(self):
         """
@@ -106,21 +124,37 @@ class CompositeImage(ObjectWithParameterCollection):
             DESCRIPTION.
         """
         self.__verify_config()
-        _shape = self.get_param_value('image_shape')
-        _nx = _shape[1] * self.get_param_value('composite_nx')
-        _ny = _shape[0] * self.get_param_value('composite_ny')
-        self.__check_max_size(_nx * _ny)
-        self.__image = np.zeros((_ny, _nx),
-                                dtype = self.get_param_value('datatype'))
+        _shape = self.__get_composite_shape()
+        self.__check_max_size(_shape)
+        self.__image = (np.zeros(_shape,
+                                 dtype = self.get_param_value('datatype'))
+                        + self.get_param_value('mosaic_border_value'))
 
-    def __check_max_size(self, size):
+    def __get_composite_shape(self):
+        """
+        Get the shape of the new array.
+
+        Returns
+        -------
+        tuple
+            The new shape.
+        """
+        _shape = self.get_param_value('image_shape')
+        _border_width = self.get_param_value('mosaic_border_width')
+        _nx =  (self.get_param_value('composite_nx')
+                * (_shape[1] + _border_width) - _border_width)
+        _ny =  (self.get_param_value('composite_ny')
+                * (_shape[0] + _border_width) - _border_width)
+        return (_ny, _nx)
+
+    def __check_max_size(self, shape):
         """
         Check that the size of the new image is not larger than the global
         size limit.
 
         Parameters
         ----------
-        size : int
+        shape : tuple
             The size of the image in pixels.
 
         Raises
@@ -128,10 +162,10 @@ class CompositeImage(ObjectWithParameterCollection):
         AppConfigError
             If the size of the image is larger than the defined global limit.
         """
-        size *= 1e-6
-        _maxsize = float(self.q_settings_get_global_value('mosaic_max_size'))
-        if size > _maxsize:
-            raise AppConfigError(f'The requested image size ({size} Mpx)'
+        _size = 1e-6 * shape[0] * shape[1]
+        _maxsize = self.get_param_value('mosaic_max_size')
+        if _size > _maxsize:
+            raise AppConfigError(f'The requested image size ({_size} Mpx)'
                                  ' is too large for the global size limit '
                                  f'of {_maxsize} Mpx.')
 
@@ -190,23 +224,21 @@ class CompositeImage(ObjectWithParameterCollection):
         index : int
             The image index. This is needed to find the correct place for
             the image in the composite.
-
-        Returns
-        -------
-        None.
         """
         if self.__image is None:
             self.__create_image_array()
+        _image_size = self.get_param_value('image_shape')
+        _border = self.get_param_value('mosaic_border_width')
         if self.get_param_value('composite_dir') == 'x':
             _iy = index // self.get_param_value('composite_nx')
             _ix = index % self.get_param_value('composite_nx')
         else:
             _iy = index % self.get_param_value('composite_ny')
             _ix = index // self.get_param_value('composite_ny')
-        yslice = slice(_iy * self.get_param_value('image_shape')[0],
-                       (_iy + 1) * self.get_param_value('image_shape')[0])
-        xslice = slice(_ix * self.get_param_value('image_shape')[1],
-                       (_ix + 1) * self.get_param_value('image_shape')[1])
+        _start_y = _iy * (_image_size[0] + _border)
+        _start_x = _ix * (_image_size[1] + _border)
+        yslice = slice(_start_y, _start_y + _image_size[0])
+        xslice = slice(_start_x, _start_x + _image_size[1])
         self.__image[yslice, xslice] = image
 
     def save(self, output_fname):

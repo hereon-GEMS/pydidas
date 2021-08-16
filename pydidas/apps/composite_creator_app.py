@@ -25,7 +25,6 @@ __status__ = "Development"
 __all__ = ['CompositeCreatorApp']
 
 import os
-import argparse
 import time
 from pathlib import Path
 
@@ -39,7 +38,7 @@ from pydidas.core import (Parameter, ParameterCollection,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.utils import check_file_exists, check_hdf5_key_exists_in_file
-from pydidas.image_io import read_image
+from pydidas.image_io import read_image, rebin2d
 from pydidas.utils import copy_docstring
 from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
 
@@ -212,7 +211,9 @@ class CompositeCreatorApp(BaseApp):
             self.params.get('roi_yhigh'))
         self._config = { 'bg_image': None,
                          'current_fname': None,
-                         'current_kwargs': {}}
+                         'current_kwargs': {},
+                         'det_mask': None
+                         }
 
     def multiprocessing_pre_run(self):
         """
@@ -223,6 +224,33 @@ class CompositeCreatorApp(BaseApp):
         _ntotal = (self._image_metadata.images_per_file
                    * self._filelist.n_files)
         self._config['mp_tasks'] = range(_ntotal)
+        self._config['det_mask'] = self.__get_detector_mask()
+        self._config['det_mask_value']
+
+    def __get_detector_mask(self):
+        """
+        Get the detector mask from the file specified in the global QSettings.
+
+        Returns
+        -------
+        _mask : Union[None, np.ndarray]
+            If the mask could be loaded from a numpy file, return the mask.
+            Else, None is returned.
+        """
+        _maskfile = self.q_settings_get_global_value('det_mask')
+        try:
+            _mask = np.load(_maskfile)
+        except:
+            return None
+        _roi = self._image_metadata.roi
+        if _roi is not None:
+            _mask = _mask[self._image_metadata.roi]
+        _bin = self.get_param_value('binning')
+        if _bin > 1:
+            _mask = rebin2d(_mask, _bin)
+            _mask[_mask > 0] = 1
+            _mask = _mask.astype(np.bool_)
+        return _mask
 
     def multiprocessing_post_run(self):
         """
@@ -266,7 +294,9 @@ class CompositeCreatorApp(BaseApp):
         """
         _image = read_image(self._config['current_fname'],
                             **self._config['current_kwargs'])
-        return index, _image
+        if self._config['det_mask'] is not None:
+            _image[self._config['det_mask']] = np.nan
+        return _image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -282,6 +312,7 @@ class CompositeCreatorApp(BaseApp):
         """
         if self.get_param_value('use_bg_file'):
             image -= self._config['bg_image']
+
         self._composite.insert_image(image, index)
 
     def prepare_run(self):
@@ -403,8 +434,6 @@ class CompositeCreatorApp(BaseApp):
                                  ' does not have the same image dimensions '
                                  'as the selected files.')
         self._config['bg_image'] = _bg_image
-
-
 
     def _check_composite_dims(self):
         """

@@ -30,6 +30,7 @@ from pathlib import Path
 
 import numpy as np
 import h5py
+from PyQt5 import QtCore
 
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollection,
@@ -53,8 +54,18 @@ class TestCompositeCreatorApp(unittest.TestCase):
         for i in range(10):
             with h5py.File(self._hdf5_fnames[i], 'w') as f:
                 f['/entry/data/data'] = self._data
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        self._border = int(q_settings.value('global/mosaic_border_width'))
+        self._bgvalue = float(q_settings.value('global/mosaic_border_value'))
+        self._globalmask = q_settings.value('global/det_mask')
+        _mask = np.zeros((self._img_shape), dtype=np.bool_)
+        _maskfile = Path(os.path.join(self._path, 'mask.npy'))
+        np.save(_maskfile, _mask)
+        q_settings.setValue('global/det_mask', _maskfile)
 
     def tearDown(self):
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        q_settings.setValue('global/det_mask', self._globalmask)
         shutil.rmtree(self._path)
 
     def get_default_app(self):
@@ -136,7 +147,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('use_bg_file', True)
         app.set_param_value('bg_file', _bg_fname)
         app.run()
-        self.assertTrue((app._composite.image <= 0).all())
+        self.assertTrue((app._composite.image <= self._bgvalue).all())
 
     def test_live_processing_filelist(self):
         _last_file = os.path.join(self._path, 'test_010.h5')
@@ -232,10 +243,17 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_run(self):
         app = self.get_default_app()
         app.run()
-        _data = np.zeros((50, 50))
+        _xsize = 5
+        _ysize = 10
+        _data = np.zeros((_ysize * 5 + self._border * 4,
+                          _xsize * 10 + self._border * 9)) + self._bgvalue
         for i in range(50):
-            _ix = slice(5 * (i % 10), 5 * (i % 10 + 1))
-            _iy = slice(10 * (i // 10), 10 * (i // 10 + 1))
+            _nx = i % 10
+            _ny = i // 10
+            _ix = slice((_xsize + self._border) * _nx,
+                        (_xsize + self._border) * _nx + _xsize)
+            _iy = slice((_ysize + self._border) * _ny,
+                        (_ysize + self._border) * _ny + _ysize)
             _data[_iy, _ix] = self._data[i, :, 5:]
         self.assertTrue((app.composite == _data).all())
 
@@ -285,8 +303,10 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _nx = np.ceil(app.get_param_value('composite_nx') / 2).astype(int)
         app.set_param_value('composite_nx', _nx)
         app.run()
-        _shape = (app.get_param_value('composite_ny') * self._img_shape[0],
-                  app.get_param_value('composite_nx') * (self._img_shape[1] -5))
+        _shape = (app.get_param_value('composite_ny') *
+                  (self._img_shape[0] + self._border) - self._border,
+                  app.get_param_value('composite_nx') *
+                  (self._img_shape[1] -5 + self._border) - self._border)
         self.assertEqual(app.composite.shape, _shape)
 
     def test__check_and_update_composite_image(self):
@@ -303,8 +323,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('first_file', self._fname(self._n))
         app.set_param_value('last_file', self._fname(2 * self._n - 1))
         app.prepare_run()
+        _shape = app._image_metadata.final_shape
+        _size = (_shape[0] * app.get_param_value('composite_ny')
+                  + (app.get_param_value('composite_ny') - 1) * self._border,
+                  _shape[1] * app.get_param_value('composite_nx')
+                  + (app.get_param_value('composite_nx') - 1) * self._border)
         self.assertEqual(app._image_metadata.final_shape, (12, 7))
-        self.assertEqual(app._composite.shape, (12 * _ny, 7 * _nx))
+        self.assertEqual(app._composite.shape, _size)
 
 
 if __name__ == "__main__":

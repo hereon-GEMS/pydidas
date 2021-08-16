@@ -126,6 +126,9 @@ class CreateWidgetsMixIn:
         """
         _parent = kwargs.get('parent_widget', self)
         _widget = function(*args, **kwargs)
+        if isinstance(kwargs.get('layout_kwargs'), dict):
+            kwargs.update(kwargs.get('layout_kwargs'))
+            del kwargs['layout_kwargs']
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
         if ref is not None:
@@ -155,8 +158,8 @@ class CreateWidgetsMixIn:
         """
         if not isinstance(ref, str):
             raise TypeError('Widget reference must be of type string.')
-        self.__create_widget(widget_class, ref, *args, **kwargs)
-        apply_widget_properties(self._widgets[ref])
+        self.__create_widget(widget_class, ref, *args, verbose=True, **kwargs)
+        apply_widget_properties(self._widgets[ref], **kwargs)
 
     def add_any_widget(self, ref, widget, **kwargs):
         """
@@ -168,6 +171,11 @@ class CreateWidgetsMixIn:
             The reference name in the _widgets dictionary.
         widget : QtWidgets.QWidget
             The widget instance.
+        layout_args : dict
+            Any kewword arguments which should be passed to the layout
+            arguments but not to the widget creation. This is important
+            for an "alignment=None" flag which cannot be passed to the
+            widget creation.
         **kwargs : dict
             Keyword arguments for the widget settings and layout.
 
@@ -178,8 +186,11 @@ class CreateWidgetsMixIn:
         """
         if not isinstance(ref, str):
             raise TypeError('Widget reference must be of type string.')
-        apply_widget_properties(widget)
+        apply_widget_properties(widget, **kwargs)
         _parent = kwargs.get('parent_widget', self)
+        if isinstance(kwargs.get('layout_kwargs'), dict):
+            kwargs.update(kwargs.get('layout_kwargs'))
+            del kwargs['layout_kwargs']
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(widget, *_layout_args)
         if ref is not None:

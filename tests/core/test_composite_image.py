@@ -39,6 +39,9 @@ class TestCompositeImage(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        self._maxsize = float(q_settings.value('global/mosaic_max_size'))
+        self._border = float(q_settings.value('global/mosaic_border_width'))
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -76,7 +79,12 @@ class TestCompositeImage(unittest.TestCase):
         obj = self.get_default_object()
         obj.set_param_value('composite_nx', 10)
         obj.create_new_image()
-        self.assertEqual(obj.image.shape, (100, 200))
+        _shape = obj.get_param_value('image_shape')
+        _size = (_shape[0] * obj.get_param_value('composite_ny')
+                 + (obj.get_param_value('composite_ny') - 1) * self._border,
+                 _shape[1] * obj.get_param_value('composite_nx')
+                 + (obj.get_param_value('composite_nx') - 1) * self._border)
+        self.assertEqual(obj.image.shape, _size)
 
     def test_insert_image(self):
         obj = self.get_default_object()
@@ -143,12 +151,28 @@ class TestCompositeImage(unittest.TestCase):
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())
 
+    def test_set_default_qsettings(self):
+        obj = self.get_default_object()
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        _maxsize = float(q_settings.value('global/mosaic_max_size'))
+        self.assertEqual(obj.get_param_value('mosaic_max_size'),
+                         _maxsize)
+
+    def test_set_default_qsettings__overwrite(self):
+        _maxsize_test = 150
+        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
+                     composite_ny=5, datatype=float,
+                     threshold_low=np.nan, threshold_high=1,
+                     mosaic_max_size=_maxsize_test)
+        self.assertEqual(obj.get_param_value('mosaic_max_size'),
+                         _maxsize_test)
+
     def test__check_max_size_okay(self):
         obj = self.get_default_object()
         q_settings = QtCore.QSettings('Hereon', 'pydidas')
         old_maxsize = q_settings.value('global/mosaic_max_size')
         q_settings.setValue('global/mosaic_max_size', 100)
-        obj._CompositeImage__check_max_size(95)
+        obj._CompositeImage__check_max_size((19e3, 5e3))
         if old_maxsize is not None:
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
@@ -158,13 +182,18 @@ class TestCompositeImage(unittest.TestCase):
         old_maxsize = float(q_settings.value('global/mosaic_max_size'))
         q_settings.setValue('global/mosaic_max_size', 100)
         with self.assertRaises(AppConfigError):
-            obj._CompositeImage__check_max_size(105*1e6)
+            obj._CompositeImage__check_max_size((21e3, 5e3))
         if old_maxsize is not None:
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
     def test_property_shape(self):
         obj = self.get_default_object()
-        self.assertEqual(obj.shape, (100, 100))
+        _shape = obj.get_param_value('image_shape')
+        _size = (_shape[0] * obj.get_param_value('composite_ny')
+                 + (obj.get_param_value('composite_ny') - 1) * self._border,
+                 _shape[1] * obj.get_param_value('composite_nx')
+                 + (obj.get_param_value('composite_nx') - 1) * self._border)
+        self.assertEqual(obj.shape,_size)
 
     def test_property_shape_empty(self):
         obj = self.get_default_object()

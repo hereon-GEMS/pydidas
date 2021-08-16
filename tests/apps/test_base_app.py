@@ -63,8 +63,8 @@ class TestApp(BaseApp):
     def multiprocessing_func(self, *args):
         return args
 
-    def multiprocessing_store_results(self, task):
-        self.stored.append(task)
+    def multiprocessing_store_results(self, task, result):
+        self.stored.append(result[0])
 
 
 class TestBaseApp(unittest.TestCase):

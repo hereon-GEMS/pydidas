@@ -67,7 +67,7 @@ class BaseApp(ObjectWithParameterCollection):
             _carryon = self.multiprocessing_carryon()
             if _carryon:
                 _results = self.multiprocessing_func(task)
-                self.multiprocessing_store_results(*_results)
+                self.multiprocessing_store_results(task, _results)
         self.multiprocessing_post_run()
 
     def multiprocessing_pre_run(self):

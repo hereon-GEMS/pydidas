@@ -212,7 +212,8 @@ class CompositeCreatorApp(BaseApp):
         self._config = { 'bg_image': None,
                          'current_fname': None,
                          'current_kwargs': {},
-                         'det_mask': None
+                         'det_mask': None,
+                         'det_mask_val': None,
                          }
 
     def multiprocessing_pre_run(self):
@@ -225,7 +226,8 @@ class CompositeCreatorApp(BaseApp):
                    * self._filelist.n_files)
         self._config['mp_tasks'] = range(_ntotal)
         self._config['det_mask'] = self.__get_detector_mask()
-        self._config['det_mask_value']
+        self._config['det_mask_val'] = float(self.q_settings_get_global_value(
+            'det_mask_val'))
 
     def __get_detector_mask(self):
         """
@@ -240,7 +242,7 @@ class CompositeCreatorApp(BaseApp):
         _maskfile = self.q_settings_get_global_value('det_mask')
         try:
             _mask = np.load(_maskfile)
-        except:
+        except (FileNotFoundError, ValueError):
             return None
         _roi = self._image_metadata.roi
         if _roi is not None:
@@ -248,7 +250,7 @@ class CompositeCreatorApp(BaseApp):
         _bin = self.get_param_value('binning')
         if _bin > 1:
             _mask = rebin2d(_mask, _bin)
-            _mask[_mask > 0] = 1
+            _mask = np.where(_mask > 0, 1, 0)
             _mask = _mask.astype(np.bool_)
         return _mask
 
@@ -281,22 +283,41 @@ class CompositeCreatorApp(BaseApp):
                                             timeout=0.02)
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, *index):
         """
         Perform key operation with parallel processing.
 
         Returns
         -------
-        _composite_index : int
-            The image index for the composite image.
         _image : np.ndarray
             The (pre-processed) image.
         """
         _image = read_image(self._config['current_fname'],
                             **self._config['current_kwargs'])
-        if self._config['det_mask'] is not None:
-            _image[self._config['det_mask']] = np.nan
+        _image = self.__apply_mask(_image)
         return _image
+
+    def __apply_mask(self, image):
+        """
+        Apply the detector mask to the image.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            The image data.
+
+        Returns
+        -------
+        image : np.ndarray
+            The masked image data.
+        """
+        if self._config['det_mask'] is not None:
+            if self._config['det_mask_val'] is None:
+                raise AppConfigError('No numerical value has been defined'
+                                     ' for the mask!')
+            image = np.where(self._config['det_mask'],
+                             self._config['det_mask_val'], image)
+        return image
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -312,7 +333,6 @@ class CompositeCreatorApp(BaseApp):
         """
         if self.get_param_value('use_bg_file'):
             image -= self._config['bg_image']
-
         self._composite.insert_image(image, index)
 
     def prepare_run(self):

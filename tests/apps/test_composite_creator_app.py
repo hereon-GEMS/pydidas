@@ -199,6 +199,39 @@ class TestCompositeCreatorApp(unittest.TestCase):
         with self.assertRaises(AppConfigError):
             app._check_and_set_bg_file()
 
+    def test_apply_mask__no_mask(self):
+        app = CompositeCreatorApp()
+        app._config['det_mask'] = None
+        _image = np.random.random((50, 50))
+        _newimage = app._CompositeCreatorApp__apply_mask(_image)
+        self.assertTrue((_image == _newimage).all())
+
+    def test_apply_mask__with_mask_and_finite_mask_val(self):
+        _shape = ((50, 50))
+        rng = np.random.default_rng(12345)
+        _mask = rng.integers(low=0, high=2, size=_shape)
+        _val = rng.random() * 1e3
+        app = CompositeCreatorApp()
+        app._config['det_mask'] = _mask
+        app._config['det_mask_val'] = _val
+        _image = np.random.random(_shape)
+        _newimage = app._CompositeCreatorApp__apply_mask(_image)
+        _delta = _newimage - _image
+        self.assertTrue((_newimage[_mask == 1] == _val).all())
+        self.assertTrue((_delta[_mask == 0] == 0).all())
+
+    def test_apply_mask__with_mask_and_nan_mask_val(self):
+        _shape = ((50, 50))
+        _val = np.nan
+        rng = np.random.default_rng(12345)
+        _mask = rng.integers(low=0, high=2, size=_shape)
+        app = CompositeCreatorApp()
+        app._config['det_mask'] = _mask
+        app._config['det_mask_val'] = _val
+        _image = np.random.random(_shape)
+        _newimage = app._CompositeCreatorApp__apply_mask(_image)
+        self.assertTrue(np.isnan(_newimage[_mask == 1]).all())
+
     def test_check_composite_dims(self):
         app = self.get_default_app()
         app.prepare_run()

@@ -40,6 +40,7 @@ from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mp_n_workers'),
     get_generic_parameter('det_mask'),
+    get_generic_parameter('det_mask_val'),
     get_generic_parameter('mosaic_border_width'),
     get_generic_parameter('mosaic_border_value'),
     get_generic_parameter('mosaic_max_size'),
@@ -97,6 +98,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
                           **_section_options)
         self.create_param_widget(self.params.get_param('det_mask'),
                                  **_twoline_options)
+        self.create_param_widget(self.params.get_param('det_mask_val'),
+                                 **_options)
         self.create_spacer('spacer_2')
 
         self.create_label('section_mosaic', 'Composite creator settings',

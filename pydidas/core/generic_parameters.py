@@ -326,6 +326,13 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('Detector mask file', Path, default=Path(),
               refkey='det_mask', unit='',
               tooltip=('The path to the detector mask file.')),
+    Parameter('Detector mask value', float, default=0,
+              refkey='det_mask_val', unit='',
+              tooltip=('The value to be used for the pixels masked on the '
+                       'detector. Note that this value will only be used '
+                       'for displaying the images. For pyFAI integration, '
+                       'the pixels will be fully masked and not be '
+                       'included.')),
     Parameter('Mosaic tiling border width', int, default=0,
               refkey='mosaic_border_width', unit='',
               tooltip=('The width of the border inserted between adjacent '
@@ -357,7 +364,6 @@ def get_generic_parameter(refkey):
     -------
     Parameter
         A copy of the Parameter object with the refkey.
-
     """
     if refkey not in GENERIC_PARAMS:
         raise KeyError(f'No Parameter with the reference key "{refkey}"'

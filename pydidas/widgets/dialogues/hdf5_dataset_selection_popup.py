@@ -33,7 +33,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     QInputDialog subclass for showing a pop-up dialogue to select a dataset
     from an hdf5 file..
     """
-    def __init__(self, parent, fname):
+    def __init__(self, parent=None, fname=None):
         """
         Generate a dialogue.
 
@@ -44,22 +44,44 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             The parent widget
         fname : Union[str, pathlib.Path]
             The file path to the hdf5 file.
-
-        Returns
-        -------
-        None
         """
         super().__init__(parent)
-        dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
-        font = QtWidgets.QApplication.instance().font()
-        metrics = QtGui.QFontMetrics(font)
-        width = max([metrics.boundingRect(d).width() for d in dsets])
-
-        self.resize(width + 60, min(300, max(200, 50 + len(dsets)*10)))
-        self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
-        self.setComboBoxItems(dsets)
+        if fname is not None:
+            dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
+            self.__update_combo_box_items(dsets)
         self.setWindowTitle('Select hdf5 dataset')
         self.setLabelText('Hdf5 datasets:')
+
+    def set_filename(self, fname):
+        """
+        Set the filename for the Hdf5 file.
+
+        Parameters
+        ----------
+        fname : str
+            The full path to the Hdf5 file.
+        """
+        dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
+        self.__update_combo_box_items(dsets)
+
+    def __update_combo_box_items(self, items):
+        """
+        Update the ComboBox entries with new items.
+
+        Parameters
+        ----------
+        items : Union[list, set, tuple]
+            The items which are to be displayed. This must be an iterable
+            of string items.
+        """
+        font = QtWidgets.QApplication.instance().font()
+        metrics = QtGui.QFontMetrics(font)
+        width = max([metrics.boundingRect(d).width() for d in items])
+
+        self.resize(width + 60, min(300, max(200, 50 + len(items)*10)))
+        self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems,
+                       True)
+        self.setComboBoxItems(items)
 
     def get_dset(self):
         """

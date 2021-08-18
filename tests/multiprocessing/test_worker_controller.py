@@ -134,6 +134,20 @@ class TestWorkerController(unittest.TestCase):
         wc._cycle_post_run()
         self.assertEqual(wc._WorkerController__progress_done, 0)
 
+    def test_cycle_post_run__no_stop_signal(self):
+        wc = WorkerController()
+        wc._flag_stop_after_run = False
+        wc._flag_thread_alive = True
+        wc._cycle_post_run(timeout=0.01)
+        self.assertTrue(wc._flag_thread_alive)
+
+    def test_cycle_post_run__stop_signal(self):
+        wc = WorkerController()
+        wc._flag_stop_after_run = True
+        wc._flag_thread_alive = True
+        wc._cycle_post_run(timeout=0.01)
+        self.assertFalse(wc._flag_thread_alive)
+
     def test_create_and_start_workers(self):
         wc = WorkerController()
         wc._create_and_start_workers()

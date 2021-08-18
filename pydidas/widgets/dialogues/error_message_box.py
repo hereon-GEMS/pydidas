@@ -58,12 +58,14 @@ class ErrorMessageBox(QtWidgets.QDialog):
 
         self._label = QtWidgets.QLabel()
         self._label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self._label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        self._label.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                  QtWidgets.QSizePolicy.Expanding)
         _scroll_area = QtWidgets.QScrollArea()
 
         _scroll_area.setWidget(self._label)
         _scroll_area.setWidgetResizable(True)
-        _scroll_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        _scroll_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
         _ok_button = QtWidgets.QPushButton('OK')
 
         _layout = QtWidgets.QVBoxLayout()
@@ -76,13 +78,13 @@ class ErrorMessageBox(QtWidgets.QDialog):
         if _text:
             self.set_text(_text)
 
-    def __exec__(self):
-        """
-        Show the box.
+    # def __exec__(self):
+    #     """
+    #     Show the box.
 
-        This method will show the ErrorMessageBox
-        """
-        self.exec_()
+    #     This method will show the ErrorMessageBox
+    #     """
+    #     self.exec_()
 
     def set_text(self, text):
         """

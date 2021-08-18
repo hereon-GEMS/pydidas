@@ -62,6 +62,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _maskfile = Path(os.path.join(self._path, 'mask.npy'))
         np.save(_maskfile, _mask)
         q_settings.setValue('global/det_mask', _maskfile)
+        self._maskfile = _maskfile
 
     def tearDown(self):
         q_settings = QtCore.QSettings('Hereon', 'pydidas')
@@ -198,6 +199,46 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.set_bg_params(app, self._fname(999))
         with self.assertRaises(AppConfigError):
             app._check_and_set_bg_file()
+
+    def test_get_detector_mask__no_file(self):
+        app = CompositeCreatorApp()
+        app.q_settings.setValue('global/det_mask', 'no/such/file.tif')
+        _mask = app._CompositeCreatorApp__get_detector_mask()
+        self.assertIsNone(_mask)
+
+    def test_get_detector_mask__wrong_file(self):
+        app = CompositeCreatorApp()
+        with open(self._maskfile, 'w') as f:
+            f.write('this is not a numpy file.')
+        _mask = app._CompositeCreatorApp__get_detector_mask()
+        self.assertIsNone(_mask)
+
+    def test_get_detector_mask__binning(self):
+        app = CompositeCreatorApp()
+        app.set_param_value('binning', 2)
+        _mask = app._CompositeCreatorApp__get_detector_mask()
+        _binned_shape = (self._img_shape[0] // 2, self._img_shape[1] // 2)
+        self.assertEqual(_mask.shape, _binned_shape)
+
+    def test_get_detector_mask__roi(self):
+        app = CompositeCreatorApp()
+        app.set_param_value('roi_xlow', 5)
+        app.set_param_value('use_roi', True)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
+        app._image_metadata.update()
+        _mask = app._CompositeCreatorApp__get_detector_mask()
+        _target_shape = (self._img_shape[0], self._img_shape[1] - 5)
+        self.assertEqual(_mask.shape, _target_shape)
+
+    def test_get_detector_mask__roi_and_binning(self):
+        app = CompositeCreatorApp()
+        app.set_param_value('roi_xlow', 4)
+        app.set_param_value('use_roi', True)
+        app.set_param_value('binning', 2)
+        app.set_param_value('first_file', self._hdf5_fnames[0])
+        app._image_metadata.update()
+        _mask = app._CompositeCreatorApp__get_detector_mask()
+        self.assertEqual(_mask.shape, app._image_metadata.final_shape)
 
     def test_apply_mask__no_mask(self):
         app = CompositeCreatorApp()

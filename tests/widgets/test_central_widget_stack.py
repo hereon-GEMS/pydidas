@@ -87,10 +87,15 @@ class TestCentralWidgetStack(unittest.TestCase):
         _name = stack.get_name_from_index(0)
         self.assertEqual(_name, self.widgets[0].name)
 
-    def test_get_widget_by_name(self):
+    def test_get_widget_by_name__known_name(self):
         stack = self.create_stack()
         _w = stack.get_widget_by_name(self.widgets[0].name)
         self.assertEqual(_w, self.widgets[0])
+
+    def test_get_widget_by_name__not_registered(self):
+        stack = self.create_stack()
+        with self.assertRaises(KeyError):
+            stack.get_widget_by_name('no such widget')
 
     def test_get_all_widget_names(self):
         stack = self.create_stack()
@@ -154,13 +159,20 @@ class TestCentralWidgetStack(unittest.TestCase):
         stack = self.create_stack()
         self.assertFalse(stack.is_registered(TestWidget()))
 
-    def test_change_reference_name(self):
+    def test_change_reference_name__with_registered_widget(self):
         _new = 'The new widget name'
         stack = self.create_stack()
         w = self.widgets[0]
         stack.change_reference_name(_new, w)
         self.assertIn(_new, stack.widget_indices)
         self.assertEqual(w.name, _new)
+
+    def test_change_reference_name__with_unregistered_widget(self):
+        _new = 'The new widget name'
+        stack = self.create_stack()
+        w = TestWidget()
+        with self.assertRaises(KeyError):
+            stack.change_reference_name(_new, w)
 
 
 if __name__ == "__main__":

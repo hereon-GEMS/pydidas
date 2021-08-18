@@ -55,6 +55,20 @@ class BaseApp(ObjectWithParameterCollection):
         self.add_params(*args, **kwargs)
         self._config = {}
         self.slave_mode = kwargs.get('slave_mode', False)
+        self.set_default_params()
+        self.parse_args_and_set_params()
+
+    def parse_args_and_set_params(self):
+        """
+        Parse the command line arguments and update the corresponding
+        Parameter values.
+        """
+        if self.parse_func is None:
+            return
+        _cmdline_args = self.parse_func()
+        for _key in self.params:
+            if _key in _cmdline_args and _cmdline_args[_key] is not None:
+                self.params.set_value(_key, _cmdline_args[_key])
 
     def run(self):
         """

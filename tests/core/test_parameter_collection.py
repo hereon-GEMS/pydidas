@@ -75,9 +75,25 @@ class TestParameterCollection(unittest.TestCase):
             self.assertIsInstance(obj[f'Test{index}'],
                                  Parameter)
 
+    def test_add_params_with_kwarg_wrong_type(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(TypeError):
+            obj.add_params(Test5=1)
+
     def test_add_params_mixed(self):
         obj = ParameterCollection(*self._params)
         obj.add_params(Parameter('Test5', int, default=12),
+                       Test6=Parameter('Test6', float, default=-1),)
+        for index in range(5,6):
+            self.assertIsInstance(obj[f'Test{index}'],
+                                 Parameter)
+
+    def test_add_params__mixed_with_collection(self):
+        obj = ParameterCollection(*self._params)
+        coll = ParameterCollection(Parameter('Test7', str, default='Test'),
+                                   Parameter('Test8', float, default=0))
+        obj.add_params(Parameter('Test5', int, default=12),
+                       coll,
                        Test6=Parameter('Test6', float, default=-1),)
         for index in range(5,6):
             self.assertIsInstance(obj[f'Test{index}'],
@@ -87,9 +103,7 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         coll = ParameterCollection(Parameter('Test7', str, default='Test'),
                                    Parameter('Test8', float, default=0))
-        obj.add_params(Parameter('Test5', int, default=12),
-                       coll,
-                       Test6=Parameter('Test6', float, default=-1),)
+        obj.add_params(coll)
         for index in range(5,6):
             self.assertIsInstance(obj[f'Test{index}'],
                                  Parameter)

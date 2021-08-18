@@ -87,7 +87,9 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
 
     _close_on_exit = False
     if isinstance(item, (str, pathlib.Path)):
-        assert os.path.splitext(item)[1] in HDF5_EXTENSIONS
+        if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
+            raise TypeError('The file does not have any extension registered'
+                            ' for hdf5 files.')
         if os.path.exists(item):
             item = h5py.File(item, 'r')
             _close_on_exit = True

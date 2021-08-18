@@ -33,20 +33,8 @@ from pydidas.widgets.create_widgets_mixin import (
     CreateWidgetsMixIn, _get_widget_layout_args, _get_grid_pos)
 from pydidas.config import DEFAULT_ALIGNMENT
 
-class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
 
-    def __init__(self, *args, parent=None, **kwargs):
-        super().__init__(parent)
-        self.hash = hash(self)
-        self.name =''.join(random.choice(string.ascii_letters)
-                           for i in range(20))
-
-
-def get_test_widget(*args, **kwargs):
-    return TestWidget()
-
-
-class TestCreateWidgetsMixin(unittest.TestCase):
+class TestCriticalWarning(unittest.TestCase):
 
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
@@ -56,12 +44,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
         self.q_app.deleteLater()
         self.q_app.quit()
 
-    def get_widget(self):
-        _w = TestWidget()
-        _w.setLayout(QtWidgets.QGridLayout())
-        return _w
-
-    def test_get_grid_pos_default(self):
+    def test_CriticalWarning(self):
         obj = self.get_widget()
         _grid_pos = _get_grid_pos(obj)
         self.assertEqual(_grid_pos, (0, 0, 1, 2))

@@ -184,14 +184,6 @@ class CompositeCreatorApp(BaseApp):
         Create a CompositeCreatorApp instance.
         """
         super().__init__(*args, **kwargs)
-        _cmdline_args = self.parse_func()
-        self.set_default_params()
-
-        # update default_params with command line entries:
-        for _key in self.params:
-            if _key in _cmdline_args and _cmdline_args[_key] is not None:
-                self.params.set_value(_key, _cmdline_args[_key])
-
         self._composite = None
         self._filelist = FilelistManager(self.params.get('first_file'),
                                          self.params.get('last_file'),

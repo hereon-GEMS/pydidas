@@ -115,6 +115,7 @@ class WorkerController(QtCore.QThread):
         """
         self.suspend()
         self.add_tasks([None] * self.n_workers)
+        self.send_stop_signal()
         self._flag_thread_alive = False
 
     def suspend(self):
@@ -278,18 +279,22 @@ class WorkerController(QtCore.QThread):
         This method is automatically called upon starting the thread.
         """
         self.restart()
+        print('starting run', self._flag_thread_alive, self._flag_running)
         while self._flag_thread_alive:
             if self._flag_running:
                 self._cycle_pre_run()
+            print('finished pre-run')
             while self._flag_running:
                 while len(self._to_process) > 0:
                     self._put_next_task_in_queue()
                 time.sleep(0.005)
                 self._get_and_emit_all_queue_items()
+            print('finished running cycle')
             if self._flag_active:
                 self._cycle_post_run()
             time.sleep(0.005)
         self.finished.emit()
+        print('finished and emitted signal')
 
 
     def _cycle_pre_run(self):
@@ -344,6 +349,7 @@ class WorkerController(QtCore.QThread):
         while True:
             try:
                 _task, _results = self._queues['recv'].get_nowait()
+                print('emitting ', _task, _results)
                 self.results.emit(_task, _results)
                 self.__progress_done += 1
                 self.progress.emit(self.__progress_done

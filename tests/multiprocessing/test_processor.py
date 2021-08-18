@@ -43,16 +43,18 @@ class _ProcThread(threading.Thread):
 
     """ Simple Thread to test blocking input / output. """
 
-    def __init__(self, input_queue, output_queue, stop_queue, func):
+    def __init__(self, input_queue, output_queue, stop_queue, finished_queue,
+                 func):
         super().__init__()
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.stop_queue = stop_queue
+        self.finished_queue = finished_queue
         self.func = func
 
     def run(self):
        processor(self.input_queue, self.output_queue, self.stop_queue,
-                 self.func)
+                 self.finished_queue, self.func)
 
 
 class AppWithFunc:
@@ -69,6 +71,7 @@ class Test_processor(unittest.TestCase):
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
         self.stop_queue = mp.Queue()
+        self.finished_queue = mp.Queue()
         self.n_test = 20
 
     def tearDown(self):
@@ -89,67 +92,75 @@ class Test_processor(unittest.TestCase):
     def test_run__plain(self):
         self.put_ints_in_queue()
         processor(self.input_queue, self.output_queue, self.stop_queue,
-                  lambda x: x)
+                  self.finished_queue, lambda x: x)
         _input, _output = self.get_results()
         self.assertTrue((_input == _output).all())
 
     def test_run__with_empty_queue(self):
         _thread = _ProcThread(self.input_queue, self.output_queue,
-                              self.stop_queue, lambda x: x)
+                              self.stop_queue, self.finished_queue,
+                              lambda x: x)
         _thread.start()
         time.sleep(0.08)
         self.input_queue.put(None)
         time.sleep(0.08)
         with self.assertRaises(queue.Empty):
             self.output_queue.get(timeout=0.1)
+        self.assertEqual(self.finished_queue.get(), 1)
 
     def test_run__with_stop_signal(self):
         _thread = _ProcThread(self.input_queue, self.output_queue,
-                              self.stop_queue, lambda x: x)
+                              self.stop_queue, self.finished_queue,
+                              lambda x: x)
         self.stop_queue.put(1)
         _thread.start()
         with self.assertRaises(queue.Empty):
             self.output_queue.get(timeout=0.1)
+        self.assertEqual(self.finished_queue.get(), 1)
 
     def test_run__with_args(self):
         _args = (0, 1)
         self.put_ints_in_queue()
         processor(self.input_queue, self.output_queue, self.stop_queue,
-                  test_func, *_args)
+                  self.finished_queue, test_func, *_args)
         _input, _output = self.get_results()
         _direct_out = test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())
+        self.assertEqual(self.finished_queue.get(), 1)
 
     def test_run__exception_in_func(self):
         self.put_ints_in_queue()
         old_stdout = sys.stdout
         sys.stdout = mystdout = io.StringIO()
         processor(self.input_queue, self.output_queue, self.stop_queue,
-                  test_func)
+                  self.finished_queue, test_func)
         sys.stdout = old_stdout
         # Assert that the processor returned directly and did not wait for any
         # queue timeouts.
         self.assertTrue(len(mystdout.getvalue()) > 0)
+        self.assertEqual(self.finished_queue.get(), 1)
 
     def test_run__with_kwargs(self):
         _args = (0, 1)
         _kwargs = dict(kw_arg=12)
         self.put_ints_in_queue()
         processor(self.input_queue, self.output_queue, self.stop_queue,
-                  test_func, *_args, **_kwargs)
+                  self.finished_queue, test_func, *_args, **_kwargs)
         _input, _output = self.get_results()
         _direct_out = test_func(_input, *_args, **_kwargs)
         self.assertTrue((_output == _direct_out).all())
+        self.assertEqual(self.finished_queue.get(), 1)
 
     def test_run__with_class_method(self):
         _args = (0, 1)
         self.put_ints_in_queue()
         app = AppWithFunc()
         processor(self.input_queue, self.output_queue, self.stop_queue,
-                  app.test_func, *_args)
+                  self.finished_queue, app.test_func, *_args)
         _input, _output = self.get_results()
         _direct_out = app.test_func(_input, *_args)
         self.assertTrue((_output == _direct_out).all())
+        self.assertEqual(self.finished_queue.get(), 1)
 
 
 if __name__ == "__main__":

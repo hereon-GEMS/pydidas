@@ -132,6 +132,7 @@ class AppRunner(WorkerController):
         self._processor['args'] = (self._queues['send'],
                                    self._queues['recv'],
                                    self._queues['stop'],
+                                   self._queues['finished'],
                                    *self.__get_app_arguments())
         _tasks = self.__app.multiprocessing_get_tasks()
         self.add_tasks(_tasks)

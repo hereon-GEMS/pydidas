@@ -28,13 +28,14 @@ __all__ = ['app_processor']
 import queue
 import random
 import string
+import time
 
 NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
                   for i in range(64))
 
 
-def app_processor(input_queue, output_queue, stop_queue, app, app_params,
-                  app_config):
+def app_processor(input_queue, output_queue, stop_queue, finished_queue,
+                  app, app_params, app_config):
     """
     Start a loop to process function calls on individual frames.
 
@@ -51,6 +52,9 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
         The queue for transmissing the results to the controlling thread.
     stop_queue : multiprocessing.Queue
         The queue for sending a termination signal to the worker.
+    finished_queue : multiprocessing.Queue
+        The queue which is used by the processor to signal the calling
+        thread that it has finished its cycle.
     app : BaseApp
         The Application class to be called in the process. The App must have a
         multiprocessing_func method.
@@ -69,7 +73,7 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
         # check for stop signal
         try:
             stop_queue.get_nowait()
-            return
+            break
         except queue.Empty:
             pass
         # run processing step
@@ -77,7 +81,7 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
             try:
                 _arg = input_queue.get(timeout=0.01)
                 if _arg is None:
-                    return
+                    break
             except queue.Empty:
                 _arg = NO_ITEM
         if _arg is not NO_ITEM:
@@ -86,3 +90,5 @@ def app_processor(input_queue, output_queue, stop_queue, app, app_params,
             if _app_carryon:
                 _results = _app.multiprocessing_func(_arg)
                 output_queue.put([_arg, _results])
+        time.sleep(0.01)
+    finished_queue.put(1)

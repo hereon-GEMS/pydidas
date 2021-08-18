@@ -33,12 +33,17 @@ from .file_checks import *
 from . import decorators
 from .decorators import *
 
+from . import str_utils
+from .str_utils import *
+
 __all__ += hdf5_dataset_utils.__all__
 __all__ += file_checks.__all__
 __all__ += decorators.__all__
+__all__ += str_utils.__all__
 
 # unclutter namespace and delete the references to the modules itself
 # as all functions are imported directly
 del hdf5_dataset_utils
 del file_checks
 del decorators
+del str_utils

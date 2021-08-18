@@ -53,54 +53,54 @@ class TestWorkerController(unittest.TestCase):
     def tearDown(self):
         self._app.quit()
 
-    def wait_for_queue(self, wc):
+    def wait_for_finish_signal(self, wc, timeout=10):
+        _spy = QtTest.QSignalSpy(wc.finished)
         t0 = time.time()
-        while time.time() - t0 < 10:
+        while len(_spy) == 0 and time.time() - t0 < timeout:
             time.sleep(0.05)
-            if wc._queues['send'].qsize() ==0:
-                break
-        time.sleep(0.1)
+        if time.time() - t0 >= timeout:
+            raise TimeoutError
 
-    # def test_main_object(self):
-    #     # this will only test the setup method
-    #     ...
+    def test_main_object(self):
+        # this will only test the setup method
+        ...
 
-    # def test_test_func_i(self):
-    #     index = 0
-    #     args = (0, 0, 0)
-    #     kwargs = dict(a=0, b=0)
-    #     self.assertEqual(local_test_func(index, *args, **kwargs), 0)
+    def test_test_func_i(self):
+        index = 0
+        args = (0, 0, 0)
+        kwargs = dict(a=0, b=0)
+        self.assertEqual(local_test_func(index, *args, **kwargs), 0)
 
-    # def test_creation(self):
-    #     wc = WorkerController()
-    #     self.assertIsInstance(wc, QtCore.QThread)
+    def test_creation(self):
+        wc = WorkerController()
+        self.assertIsInstance(wc, QtCore.QThread)
 
-    # def test_n_workers_get(self):
-    #     num_workers = 5
-    #     wc = WorkerController(num_workers)
-    #     self.assertEqual(wc.n_workers, num_workers)
+    def test_n_workers_get(self):
+        num_workers = 5
+        wc = WorkerController(num_workers)
+        self.assertEqual(wc.n_workers, num_workers)
 
-    # def test_n_workers_set(self):
-    #     wc = WorkerController()
-    #     num_workers = 5
-    #     wc.n_workers = num_workers
-    #     self.assertEqual(wc.n_workers, num_workers)
+    def test_n_workers_set(self):
+        wc = WorkerController()
+        num_workers = 5
+        wc.n_workers = num_workers
+        self.assertEqual(wc.n_workers, num_workers)
 
-    # def test_n_workers_set_wrong(self):
-    #     wc = WorkerController()
-    #     num_workers = 5.5
-    #     with self.assertRaises(ValueError):
-    #         wc.n_workers = num_workers
+    def test_n_workers_set_wrong(self):
+        wc = WorkerController()
+        num_workers = 5.5
+        with self.assertRaises(ValueError):
+            wc.n_workers = num_workers
 
-    # def test_stop(self):
-    #     wc = WorkerController()
-    #     wc.stop()
-    #     self.assertEqual(wc._flag_thread_alive, False)
+    def test_stop(self):
+        wc = WorkerController()
+        wc.stop()
+        self.assertEqual(wc._flag_thread_alive, False)
 
-    # def test_suspend(self):
-    #     wc = WorkerController()
-    #     wc.suspend()
-    #     self.assertEqual(wc._flag_running, False)
+    def test_suspend(self):
+        wc = WorkerController()
+        wc.suspend()
+        self.assertEqual(wc._flag_running, False)
 
     def test_run(self):
         _tasks = [1, 2, 3, 4]
@@ -110,76 +110,77 @@ class TestWorkerController(unittest.TestCase):
         wc.finalize_tasks()
         _spy = QtTest.QSignalSpy(wc.finished)
         wc.start()
-        self.wait_for_queue(wc)
-        wc.stop()
-        time.sleep(0.5)
+        # wc.stop()
+        self.wait_for_finish_signal(wc)
+        # time.sleep(0.3)
         self.assertEqual(len(_spy), 1)
 
-    # def test_restart(self):
-    #     wc = WorkerController()
-    #     wc.suspend()
-    #     wc.restart()
-    #     self.assertEqual(wc._flag_running, True)
+    def test_restart(self):
+        wc = WorkerController()
+        wc.suspend()
+        wc.restart()
+        self.assertEqual(wc._flag_running, True)
 
-    # def test_change_function(self):
-    #     _args = (0, 0)
-    #     wc = WorkerController()
-    #     wc.change_function(local_test_func, *_args)
-    #     self.assertEqual(wc._processor['args'][3], local_test_func)
-    #     self.assertEqual(wc._processor['args'][4:], _args)
+    def test_change_function(self):
+        _args = (0, 0)
+        wc = WorkerController()
+        wc.change_function(local_test_func, *_args)
+        self.assertEqual(wc._processor['args'][4], local_test_func)
+        self.assertEqual(wc._processor['args'][5:], _args)
 
-    # def test_cycle_pre_run(self):
-    #     wc = WorkerController()
-    #     wc._cycle_pre_run()
-    #     wc._cycle_post_run()
-    #     self.assertEqual(wc._WorkerController__progress_done, 0)
+    def test_cycle_pre_run(self):
+        wc = WorkerController()
+        wc._cycle_pre_run()
+        wc._cycle_post_run()
+        self.assertEqual(wc._WorkerController__progress_done, 0)
 
-    # def test_create_and_start_workers(self):
-    #     wc = WorkerController()
-    #     wc._create_and_start_workers()
-    #     for worker in wc._workers:
-    #         self.assertIsInstance(worker, mp.Process)
-    #     wc._cycle_post_run()
+    def test_create_and_start_workers(self):
+        wc = WorkerController()
+        wc._create_and_start_workers()
+        for worker in wc._workers:
+            self.assertIsInstance(worker, mp.Process)
+        wc._cycle_post_run()
 
-    # def test_add_task(self):
-    #     wc = WorkerController()
-    #     wc.suspend()
-    #     wc.add_task(1)
-    #     self.assertEqual(wc._to_process, [1])
+    def test_add_task(self):
+        wc = WorkerController()
+        wc.suspend()
+        wc.add_task(1)
+        self.assertEqual(wc._to_process, [1])
 
-    # def test_wait_for_processes_to_finish(self):
-    #     _timeout = 0.2
-    #     wc = WorkerController()
-    #     wc._flag_active = True
-    #     t0 = time.time()
-    #     wc._wait_for_processes_to_finish(timeout=_timeout)
-    #     self.assertTrue(time.time() - t0 >= _timeout)
+    def test_wait_for_processes_to_finish(self):
+        _timeout = 0.2
+        wc = WorkerController()
+        wc._flag_active = True
+        t0 = time.time()
+        wc._wait_for_processes_to_finish(timeout=_timeout)
+        self.assertTrue(time.time() - t0 >= _timeout)
 
-    # def test_add_tasks(self):
-    #     _tasks = [1, 2, 3]
-    #     wc = WorkerController()
-    #     wc.suspend()
-    #     wc.add_tasks(_tasks)
-    #     self.assertEqual(wc._to_process, _tasks)
+    def test_add_tasks(self):
+        _tasks = [1, 2, 3]
+        wc = WorkerController()
+        wc.suspend()
+        wc.add_tasks(_tasks)
+        self.assertEqual(wc._to_process, _tasks)
 
-    # def test_put_next_task_in_queue(self):
-    #     wc = WorkerController()
-    #     wc._to_process = [1, 2, 3]
-    #     wc._put_next_task_in_queue()
-    #     self.assertEqual(wc._queues['send'].qsize(), 1)
+    def test_put_next_task_in_queue(self):
+        wc = WorkerController()
+        wc._to_process = [1, 2, 3]
+        wc._put_next_task_in_queue()
+        self.assertEqual(wc._queues['send'].qsize(), 1)
 
-    # def test_get_and_emit_all_queue_items(self):
-    #     _res1 = 3
-    #     _res2 = [1, 1]
-    #     wc = WorkerController()
-    #     wc._queues['recv'].put([0, _res1])
-    #     wc._queues['recv'].put([0, _res2])
-    #     wc._WorkerController__progress_target = 2
-    #     _spy = QtTest.QSignalSpy(wc.results)
-    #     wc._get_and_emit_all_queue_items()
-    #     self.assertEqual(len(_spy), 2)
-    #     self.assertEqual(_spy[0][1], _res1)
-    #     self.assertEqual(_spy[1][1], _res2)
+    def test_get_and_emit_all_queue_items(self):
+        _res1 = 3
+        _res2 = [1, 1]
+        wc = WorkerController()
+        wc._queues['recv'].put([0, _res1])
+        wc._queues['recv'].put([0, _res2])
+        wc._WorkerController__progress_target = 2
+        _spy = QtTest.QSignalSpy(wc.results)
+        time.sleep(0.005)
+        wc._get_and_emit_all_queue_items()
+        self.assertEqual(len(_spy), 2)
+        self.assertEqual(_spy[0][1], _res1)
+        self.assertEqual(_spy[1][1], _res2)
 
     def test_results_signal(self):
         _tasks = [1, 2, 3, 4]
@@ -191,18 +192,53 @@ class TestWorkerController(unittest.TestCase):
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
         wc.start()
-        self.wait_for_queue(wc)
-        wc.stop()
-        wc._wait_for_processes_to_finish()
+        self.wait_for_finish_signal(wc)
         time.sleep(0.1)
         _results = get_spy_values(result_spy, index=1)
         _progress = get_spy_values(progress_spy)
         _exp_progress = [index / len(_tasks)
                           for index in range(1, len(_tasks) + 1)]
-        print('results: ', _results)
-        print('progress', _progress)
         self.assertEqual(set(_results), _target)
         self.assertEqual(_progress, _exp_progress)
+
+    def test_check_if_workers_done__no_signal(self):
+        wc = WorkerController(n_workers=4)
+        wc._flag_running = True
+        wc._workers = [1, 2, 3, 4]
+        wc._check_if_workers_done()
+        self.assertEqual(wc._workers_done, 0)
+        self.assertTrue(wc._flag_running)
+
+    def test_check_if_workers_done__get_numbers(self):
+        wc = WorkerController(n_workers=4)
+        wc._workers = [1, 2, 3, 4]
+        _nfinished = 3
+        for i in range(_nfinished):
+            wc._queues['finished'].put(1)
+        time.sleep(0.005)
+        wc._check_if_workers_done()
+        self.assertEqual(wc._workers_done, _nfinished)
+
+    def test_wait_for_worker_finished_signals__not_running(self):
+        wc = WorkerController(n_workers=4)
+        wc._wait_for_worker_finished_signals(0.1)
+        # assert: does not raise TimeoutError
+
+    def test_wait_for_worker_finished_signals__running_not_done(self):
+        wc = WorkerController(n_workers=4)
+        wc._flag_running = True
+        wc._workers = [1, 2, 3, 4]
+        with self.assertRaises(TimeoutError):
+            wc._wait_for_worker_finished_signals(0.2)
+
+    def test_wait_for_worker_finished_signals__running_done(self):
+        wc = WorkerController(n_workers=4)
+        wc._flag_running = True
+        wc._workers = [1, 2, 3, 4]
+        for i in range(len(wc._workers)):
+            wc._queues['finished'].put(1)
+        # assert: does not raise TimeoutError
+        wc._wait_for_worker_finished_signals(0.2)
 
 
 if __name__ == "__main__":

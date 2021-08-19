@@ -30,11 +30,27 @@ import os
 import time
 
 import numpy as np
-from PyQt5 import  QtWidgets, QtTest, QtCore
+from PyQt5 import  QtWidgets, QtTest, QtCore, QtGui
 
 from pydidas.widgets.dialogues.hdf5_dataset_selection_popup import (
     Hdf5DatasetSelectionPopup)
 from pydidas.utils import timed_print
+
+class Thread(QtCore.QThread):
+    def __init__(self, widget, *args, **kwargs):
+        QtCore.QThread.__init__(self)
+        self.widget = widget(None, *args, **kwargs)
+
+    def run(self):
+        timed_print('create timer')
+        QtCore.QTimer.singleShot(10, self.click_esc)
+        timed_print('exec widget')
+        self.result = self.widget.exec_()
+
+    def click_esc(self):
+        timed_print('click escape')
+        QtTest.QTest.keyClick(self.widget, QtCore.Qt.Key_Escape, delay=1)
+
 
 class TestHdf5DatasetSelectionPopup(unittest.TestCase):
 
@@ -51,10 +67,10 @@ class TestHdf5DatasetSelectionPopup(unittest.TestCase):
 
     def tearDown(self):
         if isinstance(self.obj, QtCore.QObject):
-            QtTest.QTest.keyClick(self.obj, QtCore.Qt.Key_Escape, delay=0)
+            # QtTest.QTest.keyClick(self.obj, QtCore.Qt.Key_Escape, delay=0)
             self.obj.deleteLater()
         self.q_app.deleteLater()
-        self.q_app.quit()
+        self.q_app.exit()
         shutil.rmtree(self._path)
 
     def test_init__plain(self):
@@ -81,48 +97,26 @@ class TestHdf5DatasetSelectionPopup(unittest.TestCase):
             obj.set_filename('something')
 
     def test_exec__esc(self):
-        self.obj = Hdf5DatasetSelectionPopup()
+        obj = Hdf5DatasetSelectionPopup()
         def click_esc():
-            timed_print('click escape')
-            QtTest.QTest.keyClick(self.obj, QtCore.Qt.Key_Escape, delay=1)
-
-        QtCore.QTimer.singleShot(50, click_esc)
-        timed_print('start event loop')
-        _res = self.obj.exec_()
-        timed_print('finished loop')
+            while not obj.isVisible():
+                QtGui.QApplication.processEvents()
+            QtTest.QTest.keyClick(obj, QtCore.Qt.Key_Escape, delay=1)
+        QtCore.QTimer.singleShot(100, click_esc)
+        _res = obj.exec_()
+        time.sleep(0.12)
         self.assertEqual(_res, 0)
 
-    # def test_exec__confirm(self):
-    #     obj = Hdf5DatasetSelectionPopup()
-    #     def click_esc():
-    #         QtTest.QTest.keyClick(obj, QtCore.Qt.Enter, delay=0)
-    #     QtCore.QTimer.singleShot(50, click_esc)
-    #     _res = obj.exec_()
-    #     print(_res)
-    #     self.assertEqual(_res, 0)
-
-        # QtTest.QTest.mouseClick(obj, QtCore.Qt.LeftButton, pos=(0, 0))
-
-#         QTest::mouseClick(lw->viewport(), Qt::LeftButton, 0, itemPt);
-#             QTest::qWait(1000);
-#             // Reopen the combobox
-#             QTest::mouseClick(cb, Qt::LeftButton);
-#             QTest::qWait(1000);
-#         }
-#     }
-# }
-# // Close the combo box popup
-# QTest::keyClick(cb, Qt::Key_Escape);
-
-    # def test_set_text__text(self):
-    #     _text = 'new text'
-    #     obj = Hdf5DatasetSelectionPopup()
-    #     obj.set_text(_text)
-    #     self.assertEqual(obj._label.text(), _text)
-
-    # def test_exec(self):
-    #     obj = Hdf5DatasetSelectionPopup()
-    #     obj.exec_()
+    def test_exec__enter(self):
+        obj = Hdf5DatasetSelectionPopup()
+        def click_esc():
+            while not obj.isVisible():
+                QtGui.QApplication.processEvents()
+            QtTest.QTest.keyClick(obj, QtCore.Qt.Key_Enter, delay=1)
+        QtCore.QTimer.singleShot(100, click_esc)
+        _res = obj.exec_()
+        time.sleep(0.12)
+        self.assertEqual(_res, 1)
 
 
 if __name__ == "__main__":

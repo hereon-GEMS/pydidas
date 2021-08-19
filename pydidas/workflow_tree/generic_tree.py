@@ -34,13 +34,9 @@ class GenericTree:
 
         Parameters
         ----------
-        **kwargs : TYPE
+        **kwargs : dict
             Arbitrary keyword arguments. These will be stored internally
             in an self.options dictionary.
-
-        Returns
-        -------
-        None.
 
         """
         self.root = None
@@ -51,39 +47,21 @@ class GenericTree:
     def clear(self):
         """
         Clear all items from the tree.
-
-        Abstract clear method which needs to be implemented by subclasses.
-
-        Raises
-        ------
-        NotImplementedError
-            This abstract method is not implemented in the base class.
-
-        Returns
-        -------
-        None.
         """
-        raise NotImplementedError()
+        self.nodes = {}
+        self.node_ids = []
+        self.root = None
 
     def set_root(self, *args):
         """
-        Set the tree root.
+        Set the tree root node.
 
         Abstract set root method which needs to be implemented by subclasses.
-
-        Parameters
-        ----------
-        *args : type
-            Any arguments required by the subclasses.
 
         Raises
         ------
         NotImplementedError
             This abstract method is not implemented in the base class.
-
-        Returns
-        -------
-        None.
         """
         raise NotImplementedError()
 
@@ -93,21 +71,10 @@ class GenericTree:
 
         This abstract method needs to be implemented by the subclasses.
 
-        Parameters
-        ----------
-        *args : TYPE
-            Any required arguments.
-        **kwargs : TYPE
-            Any keyword arguments.
-
         Raises
         ------
         NotImplementedError
             This abstract method is not implemented in the base class.
-
-        Returns
-        -------
-        None.
         """
         raise NotImplementedError()
 
@@ -123,12 +90,11 @@ class GenericTree:
         -------
         int
             The new node id.
-
         """
         if not self.node_ids:
             return 0
         i = self.node_ids[-1]
-        return i+1
+        return i + 1
 
     def register_node(self, node, node_id=None):
         """
@@ -158,10 +124,6 @@ class GenericTree:
         ValueError
             Raises ValueError if the node_id of the new node is not larger
             than the last registered node.
-
-        Returns
-        -------
-        None.
         """
         if node_id in self.node_ids:
             raise ValueError('Duplicate node ID detected. Tree node has not'
@@ -170,7 +132,7 @@ class GenericTree:
             raise ValueError('Attempt to reuse a discarded node ID detected'
                              f' (node_id = {node_id}). Please choose another'
                              'node_id. Tree node has not been registered!')
-        if not node_id:
+        if node_id is None:
             node.node_id = self.get_new_nodeid()
         else:
             node.node_id = node_id
@@ -196,7 +158,7 @@ class GenericTree:
         Returns
         -------
         object
-            The node object registered with node_id.
+            The node object registered as node_id.
 
         """
         if not self.nodes:
@@ -228,10 +190,6 @@ class GenericTree:
         ------
         KeyError
             If the node_id is not found.
-
-        Returns
-        -------
-        None.
         """
         if node_id not in self.node_ids:
             raise KeyError('Selected node not found.')

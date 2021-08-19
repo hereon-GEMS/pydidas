@@ -14,12 +14,15 @@
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import copy
+
 from .generic_tree import GenericTree
 from .generic_node import GenericNode
 
 __all__ = ['WorkflowNode', 'WorkflowTree']
 
 class WorkflowNode(GenericNode):
+    """
+    """
     def __init__(self, **kwargs):
         """name=None, parent=None, node_id=None, plugin=None"""
         super().__init__(**kwargs)
@@ -49,16 +52,12 @@ class _WorkflowTree(GenericTree):
     def __init__(self):
         super().__init__()
 
-    def clear(self):
-        self.nodes = {}
-        self.node_ids = []
-
     def set_root(self, name, plugin):
         self.nodes = {0: WorkflowNode(name, plugin=plugin)}
         self.node_ids = [0]
 
     def add_node(self, name, plugin, parent=None, node_id=None):
-        if not len(self.node_ids):
+        if len(self.node_ids) == 0:
             self.set_root(name, plugin)
             return
         _node = WorkflowNode(name, parent, node_id, plugin)

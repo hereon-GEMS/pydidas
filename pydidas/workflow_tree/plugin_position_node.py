@@ -36,30 +36,8 @@ class PluginPositionNode(GenericNode):
     """
     generic_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     generic_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
-    child_spacing = gui_constants.GENERIC_PLUGIN_WIDGET_Y_OFFSET
-    border_spacing = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
-
-    def __init__(self, parent=None, node_id=None):
-        """
-        Setup method.
-
-        Parameters
-        ----------
-        parent : PluginPositionNode, optional
-            The parent node. The default is None.
-        node_id : int, optional
-            The unique node_id. If not specified, the tree will supply a new,
-            unique node_id. The default is None.
-
-        Returns
-        -------
-        None.
-        """
-        super().__init__(parent=parent)
-        self.node_id = node_id
-        self._children = []
-        if parent:
-            parent.add_child(self)
+    child_spacing_y = gui_constants.GENERIC_PLUGIN_WIDGET_Y_OFFSET
+    child_spacing_x = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
 
     @property
     def width(self):
@@ -74,12 +52,12 @@ class PluginPositionNode(GenericNode):
         int
             The width of the tree branch.
         """
-        if self.is_leaf():
+        if self.is_leaf:
             return self.generic_width
-        w = (len(self._children) - 1) * self.child_spacing
+        _w = (len(self._children) - 1) * self.child_spacing_x
         for child in self._children:
-            w += child.width
-        return w
+            _w += child.width
+        return _w
 
     @property
     def height(self):
@@ -94,12 +72,12 @@ class PluginPositionNode(GenericNode):
         int
             The height of the tree branch.
         """
-        if len(self._children) == 0:
+        if self.is_leaf:
             return self.generic_height
-        h = []
+        _h = []
         for child in self._children:
-            h.append(child.height)
-        return max(h) + self.child_spacing + self.generic_height
+            _h.append(child.height)
+        return max(_h) + self.child_spacing_y + self.generic_height
 
     def get_relative_positions(self):
         """
@@ -115,16 +93,16 @@ class PluginPositionNode(GenericNode):
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
         pos = {self.node_id: [(self.width - self.generic_width) // 2, 0]}
-        if self.is_leaf():
+        if self.is_leaf:
             return pos
         xoffset = 0
-        yoffset = self.generic_height + self.child_spacing
+        yoffset = self.generic_height + self.child_spacing_y
         for child in self._children:
             _p = child.get_relative_positions()
             for key in _p:
                 pos.update({key: [_p[key][0] + xoffset,
                                   _p[key][1] + yoffset]})
-            xoffset += child.width + self.child_spacing
+            xoffset += child.width + self.child_spacing_x
         self.make_grid_positions_positive(pos)
         return pos
 

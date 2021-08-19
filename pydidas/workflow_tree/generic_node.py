@@ -5,7 +5,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Foobar is distributed in the hope that it oowill be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
@@ -23,11 +23,33 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericNode']
 
+import copy
+
+
 class GenericNode:
     """
     The GenericNode class is used by trees to manage connections between
     items.
     """
+    @staticmethod
+    def _type_check(item):
+        """
+        Check that an item is of type class and raise a TypeError if not.
+
+        Parameters
+        ----------
+        item : object
+            Any object that needs to be checked for its type.
+
+        Raises
+        ------
+        TypeError
+            If the item is not an instance of its own class.
+        """
+        if not isinstance(item, GenericNode):
+            raise TypeError('Cannot add objects which are not of type '
+                            'GenericNode (or subclasses).')
+
     def __init__(self, **kwargs):
         """
         Setup the generic node.
@@ -45,10 +67,11 @@ class GenericNode:
         -------
         None.
         """
-        self._parent = None
         self.node_id = None
-        if 'parent' in kwargs.keys():
-            self._parent = kwargs['parent']
+        self._parent = kwargs.get('parent', None)
+        if self._parent is not None:
+            self._type_check(self._parent)
+            self._parent.add_child(self)
             del kwargs['parent']
         for key in kwargs:
             setattr(self, key, kwargs[key])
@@ -65,41 +88,16 @@ class GenericNode:
         child : object
             The child object to be registered.
 
-        Returns
+        Raises
         -------
         None.
         """
+        self._type_check(child)
         child._parent = self
         if child not in self._children:
             self._children.append(child)
 
-    def remove_child_reference(self, child):
-        """
-        Remove reference to an object from the node.
-
-        This method will remove the reference to the child but not delete
-        the child itself.
-        Note: This method's main use is to allow children to un-register
-        themselves from their parents before deletion.
-
-        Parameters
-        ----------
-        child : TYPE
-            DESCRIPTION.
-
-        Raises
-        ------
-        ValueError
-            DESCRIPTION.
-
-        Returns
-        -------
-        None.
-        """
-        if child not in self._children:
-            raise ValueError('Instance is not a child!')
-        self._children.remove(child)
-
+    @property
     def is_leaf(self):
         """
         Check if node has children.
@@ -116,11 +114,13 @@ class GenericNode:
             return False
         return True
 
-    def num_children(self):
+    @property
+    def n_children(self):
         """
         Get the number of children.
 
-        This method will return the number of children registered in the node.
+        This property will return the number of children registered in the
+        node.
 
         Returns
         -------
@@ -128,6 +128,18 @@ class GenericNode:
             The number of children.
         """
         return len(self._children)
+
+    @property
+    def parent(self):
+        """
+        Get the node's parent.
+
+        Returns
+        -------
+        parent : Union[GenericNode, None]
+            The parent node.
+
+        """
 
     def get_children(self):
         """
@@ -142,20 +154,6 @@ class GenericNode:
         """
         return self._children
 
-    @property
-    def n_child(self):
-        """
-        Get the number of children.
-
-        This property is similar to the num_children method.
-
-        Returns
-        -------
-        int
-            The number of children.
-        """
-        return len(self._children)
-
     def set_parent(self, parent):
         """
         Set the nodes parent.
@@ -166,10 +164,6 @@ class GenericNode:
         ----------
         parent : object
             The parent object
-
-        Returns
-        -------
-        None.
         """
         self._parent = parent
 
@@ -211,7 +205,7 @@ class GenericNode:
             res += child.get_recursive_ids()
         return res
 
-    def delete_node(self, recursive=True):
+    def remove_node_from_tree(self, recursive=True):
         """
         Delete all references to the node from its parent and children.
 
@@ -232,18 +226,57 @@ class GenericNode:
             If the node has children but recursive is False, a recursion
             error will be raised. This will prevent the children to become
             separated from the tree structure.
-
-        Returns
-        -------
-        None.
         """
-        if not self.is_leaf() and not recursive:
+        if not self.is_leaf and not recursive:
             raise RecursionError('Node children detected but deletion'
                                  'is not recursive.')
         if self._parent is not None:
-            self._parent.remove_child_reference(self)
-        if self.is_leaf():
+            self._parent._remove_child_reference(self)
+        if self.is_leaf:
             return
         for child in self.get_children():
-            child.delete_node(recursive)
+            child.remove_node_from_tree(recursive)
         self._children = []
+
+    def _remove_child_reference(self, child):
+        """
+        Remove reference to an object from the node.
+
+        This method will remove the reference to the child but not delete
+        the child itself.
+        Note: This method's main use is to allow children to un-register
+        themselves from their parents before deletion and should not be called
+        by the user.
+
+        Parameters
+        ----------
+        child : GenericNode
+            The child instance.
+
+        Raises
+        ------
+        ValueError
+            If the referenced child is not included in the node's children.
+        """
+        if child not in self._children:
+            raise ValueError('Instance is not a child!')
+        self._children.remove(child)
+
+    def __copy__(self):
+        """
+        Copy the generic node including any children.
+
+        Returns
+        -------
+        GenericNode
+            The copy.
+        """
+        _copy = self.__class__()
+        for _key in set(self.__dict__.keys()) - {'_children', '_parent'}:
+            _copy.__dict__[_key] = copy.copy(self.__dict__[_key])
+        _copy._children = []
+        _copy._parent = self._parent
+        for _child in self._children:
+            _child_copy = copy.copy(_child)
+            _copy.add_child(_child_copy)
+        return _copy

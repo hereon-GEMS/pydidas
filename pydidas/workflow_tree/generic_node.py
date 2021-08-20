@@ -209,7 +209,8 @@ class GenericNode:
 
     def remove_node_from_tree(self, recursive=True):
         """
-        Delete all references to the node from its parent and children.
+        Delete all references to the node from its parent and children and
+        unreferences all children.
 
         If the node has a parent, the reference to itself is removed from the
         parent. If the node has children, references to these children are
@@ -234,11 +235,8 @@ class GenericNode:
                                  'is not recursive.')
         if self._parent is not None:
             self._parent._remove_child_reference(self)
-        if self.is_leaf:
-            return
-        for child in self.get_children():
+        for child in self._children:
             child.remove_node_from_tree(recursive)
-        self._children = []
 
     def _remove_child_reference(self, child):
         """

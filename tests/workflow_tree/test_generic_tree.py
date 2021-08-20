@@ -207,5 +207,25 @@ class TestGenericTree(unittest.TestCase):
         with self.assertRaises(KeyError):
             tree.find_node_by_id(_id)
 
+    def test_delete_node_by_id__simple(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=1)
+        tree.register_node(node)
+        self.assertTrue(node in tree.nodes.values())
+        tree.delete_node_by_id(1)
+        self.assertFalse(node in tree.nodes.values())
+
+    def test_delete_node_by_id__in_tree(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=1)
+        node2 = GenericNode(parent=node, node_id=2)
+        node3 = GenericNode(parent=node2, node_id=3)
+        tree.register_node(node)
+        tree.delete_node_by_id(2)
+        self.assertTrue(node in tree.nodes.values())
+        self.assertFalse(node2 in tree.nodes.values())
+        self.assertFalse(node3 in tree.nodes.values())
+        self.assertEqual(node._children, [])
+
 if __name__ == '__main__':
     unittest.main()

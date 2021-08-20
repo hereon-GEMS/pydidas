@@ -203,14 +203,7 @@ class GenericTree:
         recursive : bool, optional
             Keyword to toggle deletion of the node's children as well.
             The default is True.
-
-        Raises
-        ------
-        KeyError
-            If the node_id is not found.
-        """
-        if node_id not in self.node_ids:
-            raise KeyError('Selected node not found.')
+       """
         ids = self.nodes[node_id].get_recursive_ids()
         self.nodes[node_id].remove_node_from_tree(recursive=recursive)
         for _id in ids:

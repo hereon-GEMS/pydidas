@@ -27,7 +27,7 @@ import random
 
 import numpy as np
 
-from pydidas.workflow_tree import PluginPositionNode, GenericNode
+from pydidas.workflow_tree import GenericTree, GenericNode
 from pydidas.config import gui_constants
 
 class TestGenericTree(unittest.TestCase):
@@ -39,145 +39,173 @@ class TestGenericTree(unittest.TestCase):
         ...
 
     def create_node_tree(self, depth=3, width=3):
-        root = PluginPositionNode(node_id=0)
+        root = GenericTree(node_id=0)
         _nodes =  [[root]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
             for _parent in _nodes[_depth]:
                 for _ichild in range(width):
-                    _node = PluginPositionNode(node_id=_index)
+                    _node = GenericTree(node_id=_index)
                     _parent.add_child(_node)
                     _index += 1
                     _tiernodes.append(_node)
             _nodes.append(_tiernodes)
         return _nodes, _index
 
-    def get_pos_in_tree(self, index, width, depth):
-        _num_per_row = width ** np.arange(depth + 1)
-        _row_limits = np.concatenate((np.array((0,)), np.cumsum(_num_per_row)))
-        _ntotal = _row_limits[-1]
-        _row_of_index = np.zeros((_ntotal), dtype=np.int16)
-        _pos_in_row_of_index = np.zeros((_ntotal), dtype=np.int16)
-        for _row in range(depth + 1):
-            _row_of_index[_row_limits[_row]:_row_limits[_row + 1]] = _row
-        _pos_in_row_of_index = np.arange(_ntotal) - _row_limits[_row_of_index]
-        return (_row_of_index[index], _pos_in_row_of_index[index])
-
     def test_init__plain(self):
-        root = PluginPositionNode()
-        self.assertIsInstance(root, PluginPositionNode)
+        tree = GenericTree()
+        self.assertIsInstance(tree, GenericTree)
 
-    def test_init__with_parent(self):
-        _parent = GenericNode()
-        root = PluginPositionNode(parent=_parent, testkey=1)
-        self.assertEqual(root._parent, _parent)
+    def test_init__with_kwargs(self):
+        _val1 = 12
+        _val2 = 'something'
+        tree = GenericTree(test1=_val1, test2=_val2)
+        self.assertEqual(tree._config['test1'], _val1)
+        self.assertEqual(tree._config['test2'], _val2)
 
-    def test_init__with_random_key(self):
-        _testval = 1.23
-        root = PluginPositionNode(testkey=_testval)
-        self.assertTrue(hasattr(root, 'testkey'))
-        self.assertEqual(root.testkey, _testval)
+    def test_clear(self):
+        tree = GenericTree()
+        tree.nodes = dict(a=1, b='c')
+        tree.node_ids = [0, 1]
+        tree.root = 12
+        tree.clear()
+        self.assertEqual(tree.nodes, {})
+        self.assertEqual(tree.node_ids, [])
+        self.assertIsNone(tree.root)
 
-    def test_width__no_children(self):
-        root = PluginPositionNode()
-        self.assertEqual(root.width, generic_width)
+    def test_verify_node_type__with_node(self):
+        tree = GenericTree()
+        node = GenericNode()
+        tree._verify_node_type(node)
 
-    def test_width__children_no_tree(self):
-        root = PluginPositionNode()
-        PluginPositionNode(parent=root)
-        PluginPositionNode(parent=root)
-        self.assertEqual(root.width, 2 * generic_width + child_spacing_x)
+    def test_verify_node_type__wrong_object(self):
+        tree = GenericTree()
+        node = 12
+        with self.assertRaises(TypeError):
+            tree._verify_node_type(node)
 
-    def test_width__children_tree(self):
-        _depth = 3
-        _width = 3
-        _nodes, _n_nodes = self.create_node_tree(_depth, _width)
-        _root = _nodes[0][0]
-        _target = (_width ** _depth * generic_width
-                   + child_spacing_x * (_width ** _depth - 1))
-        self.assertEqual(_root.width, _target)
+    def test_set_root__empty_tree(self):
+        tree = GenericTree()
+        node = GenericNode(parent=GenericNode(), node_id=42)
+        tree.set_root(node)
+        self.assertEqual(tree.nodes[0], node)
+        self.assertEqual(node.node_id, 0)
 
-    def test_height__no_children(self):
-        root = PluginPositionNode()
-        self.assertEqual(root.height, generic_height)
+    def test_set_root__node_in_tree(self):
+        tree = GenericTree()
+        parent = GenericNode(node_id=0)
+        node = GenericNode(parent=parent, node_id=42)
+        child = GenericNode(parent=node, node_id=112)
+        self.assertEqual(node.parent, parent)
+        tree.set_root(node)
+        self.assertEqual(tree.nodes[0], node)
+        self.assertEqual(node.node_id, 0)
+        self.assertEqual(node.parent, None)
 
-    def test_height__children_no_tree(self):
-        root = PluginPositionNode()
-        PluginPositionNode(parent=root)
-        PluginPositionNode(parent=root)
-        self.assertEqual(root.height, 2 * generic_height + child_spacing_y)
+    def test_get_new_nodeid__empty_tree(self):
+        tree = GenericTree()
+        self.assertEqual(tree.get_new_nodeid(), 0)
 
-    def test_height__children_tree(self):
-        _childdepth = 3
-        _nodes, _n_nodes = self.create_node_tree(_childdepth)
-        _root = _nodes[0][0]
-        _target = ((_childdepth + 1 ) * generic_height
-                   + child_spacing_y * _childdepth)
-        self.assertEqual(_root.height, _target)
+    def test_get_new_nodeid__single_node(self):
+        _id = 3
+        tree = GenericTree()
+        tree.node_ids = [_id]
+        self.assertEqual(tree.get_new_nodeid(), _id + 1)
 
-    def test_get_relative_positions__no_children(self):
-        root = PluginPositionNode(node_id=0)
-        _pos = root.get_relative_positions()
-        self.assertEqual(_pos[0], [0, 0])
+    def test_get_new_nodeid__multiple_nodes(self):
+        _id = 3
+        tree = GenericTree()
+        tree.node_ids = [_id -1,_id]
+        self.assertEqual(tree.get_new_nodeid(), _id + 1)
 
-    def test_get_relative_positions__with_linear_children(self):
-        _childdepth = 3
-        _width = 1
-        _nodes, _n_nodes = self.create_node_tree(_childdepth, _width)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        for _node_id in range(_childdepth + 1):
-            _ypos = _node_id * (generic_height + child_spacing_y)
-            self.assertEqual(_pos[_node_id], [0, _ypos])
+    def test_check_node_ids__no_ids(self):
+        tree = GenericTree()
+        node = GenericNode()
+        tree._check_node_ids(node.get_recursive_ids())
 
-    def test_get_relative_positions__with_tree_children(self):
-        _childdepth = 3
-        _width = 2
-        _nodes, _n_nodes = self.create_node_tree(_childdepth, _width)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _num_per_row = _width ** np.arange(_childdepth + 1)
-        _row_limits = np.concatenate((np.array((0,)), np.cumsum(_num_per_row)))
-        _ntotal = _row_limits[-1]
-        row_width = lambda n: n * generic_width + (n - 1) * child_spacing_x
-        for _node_id in range(_ntotal):
-            iy, ix = self.get_pos_in_tree(_node_id, _width, _childdepth)
-            _ypos = iy  * (generic_height + child_spacing_y)
-            _deltax = (row_width(_width ** _childdepth)
-                       - row_width(_width ** (iy))) // 2
-            _xpos = _deltax + ix * (generic_width + child_spacing_x)
-            if iy in [0, _childdepth]:
-                self.assertEqual(_pos[_node_id], [_xpos, _ypos])
+    def test_check_node_ids__new_id_okay(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=5)
+        tree.node_ids = [0, 1, 2, 3, 4]
+        tree._check_node_ids(node.get_recursive_ids())
 
-    def test_make_grid_positions_positive__all_positive_pos(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = _pos.copy()
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
+    def test_check_node_ids__new_id_too_small(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=5)
+        tree.node_ids = [0, 1, 2, 3, 4, 6]
+        with self.assertRaises(ValueError):
+            tree._check_node_ids(node.get_recursive_ids())
 
-    def test_make_grid_positions_positive__with_negative_pos(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = {}
-        for key, val in _pos.items():
-            _newpos[key] = (val[0] - 123, val[1] - 5678)
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
+    def test_check_node_ids__new_id_duplicate(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=5)
+        tree.node_ids = [0, 1, 2, 3, 4, 5, 6]
+        with self.assertRaises(ValueError):
+            tree._check_node_ids(node.get_recursive_ids())
 
-    def test_make_grid_positions_positive__with_positive_offset(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = {}
-        for key, val in _pos.items():
-            _newpos[key] = (val[0] - 123, val[1] + 5678)
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
+    def test_check_node_ids__duplicate_in_node_tree(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=7)
+        node2 = GenericNode(parent=node, node_id=6)
+        GenericNode(parent=node2, node_id=8)
+        tree.node_ids = [0, 1, 2, 3, 4, 5, 6]
+        with self.assertRaises(ValueError):
+            tree._check_node_ids(node.get_recursive_ids())
 
+    def test_register_node__wrong_type(self):
+        tree = GenericTree()
+        with self.assertRaises(TypeError):
+            tree.register_node(12)
+
+    def test_register_node__simple_node(self):
+        tree = GenericTree()
+        node = GenericNode()
+        tree.register_node(node)
+        self.assertTrue(node in tree.nodes.values())
+
+    def test_register_node__with_new_nodeid(self):
+        tree = GenericTree()
+        node = GenericNode()
+        tree.register_node(node, node_id=3)
+        self.assertTrue(node in tree.nodes.values())
+
+    def test_register_node__node_tree_with_new_nodeid(self):
+        tree = GenericTree()
+        node = GenericNode()
+        node2 = GenericNode(parent=node)
+        node3 = GenericNode(parent=node2)
+        tree.register_node(node, node_id=3)
+        for _node in [node, node2, node3]:
+            self.assertTrue(_node in tree.nodes.values())
+
+    def test_register_node__node_tree_with_existing_nodeids(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=3)
+        node2 = GenericNode(parent=node)
+        node3 = GenericNode(parent=node2)
+        tree.register_node(node, node_id=3)
+        for _node in [node, node2, node3]:
+            self.assertTrue(_node in tree.nodes.values())
+        tree = GenericTree()
+        node = GenericNode(node_id=7)
+        node2 = GenericNode(parent=node, node_id=6)
+
+    def test_fine_node_by_id(self):
+        _id = 3
+        tree = GenericTree()
+        node = GenericNode(node_id=_id)
+        tree.register_node(node)
+        _node = tree.find_node_by_id(_id)
+        self.assertEqual(node, _node)
+
+    def test_fine_node_by_id__no_node(self):
+        _id = 3
+        tree = GenericTree()
+        node = GenericNode(node_id=_id + 1)
+        tree.register_node(node)
+        with self.assertRaises(KeyError):
+            tree.find_node_by_id(_id)
 
 if __name__ == '__main__':
     unittest.main()

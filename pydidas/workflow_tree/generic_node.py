@@ -32,7 +32,7 @@ class GenericNode:
     items.
     """
     @staticmethod
-    def _type_check(item):
+    def _verify_type(item, allowNone=False):
         """
         Check that an item is of type class and raise a TypeError if not.
 
@@ -40,12 +40,16 @@ class GenericNode:
         ----------
         item : object
             Any object that needs to be checked for its type.
+        allowNone : bool, optional
+            Keyword which allowes "None" items. The default is False.
 
         Raises
         ------
         TypeError
             If the item is not an instance of its own class.
         """
+        if allowNone and item is None:
+            return
         if not isinstance(item, GenericNode):
             raise TypeError('Cannot add objects which are not of type '
                             'GenericNode (or subclasses).')
@@ -62,15 +66,11 @@ class GenericNode:
         ----------
         **kwargs : type
             Any keywords required for this node.
-
-        Returns
-        -------
-        None.
         """
         self.node_id = None
         self._parent = kwargs.get('parent', None)
+        self._verify_type(self._parent, allowNone=True)
         if self._parent is not None:
-            self._type_check(self._parent)
             self._parent.add_child(self)
             del kwargs['parent']
         for key in kwargs:
@@ -87,12 +87,8 @@ class GenericNode:
         ----------
         child : object
             The child object to be registered.
-
-        Raises
-        -------
-        None.
         """
-        self._type_check(child)
+        self._verify_type(child)
         child._parent = self
         if child not in self._children:
             self._children.append(child)
@@ -138,8 +134,27 @@ class GenericNode:
         -------
         parent : Union[GenericNode, None]
             The parent node.
-
         """
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        """
+        Set the nodes parent.
+
+        This method will store a reference to the parent object in the node.
+
+        Parameters
+        ----------
+        parent : object
+            The parent object
+        """
+        self._verify_type(parent, allowNone=True)
+        if self._parent is not None:
+            self._parent._remove_child_reference(self)
+        if parent is not None:
+            parent.add_child(self)
+        self._parent = parent
 
     def get_children(self):
         """
@@ -153,19 +168,6 @@ class GenericNode:
             A list with the children.
         """
         return self._children
-
-    def set_parent(self, parent):
-        """
-        Set the nodes parent.
-
-        This method will store a reference to the parent object in the node.
-
-        Parameters
-        ----------
-        parent : object
-            The parent object
-        """
-        self._parent = parent
 
     def get_recursive_connections(self):
         """

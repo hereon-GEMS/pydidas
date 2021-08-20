@@ -29,8 +29,11 @@ from .generic_node import *
 from . import generic_tree
 from .generic_tree import *
 
-from . import workflow_node_and_tree
-from .workflow_node_and_tree import *
+from . import workflow_node
+from .workflow_node import *
+
+from . import workflow_tree
+from .workflow_tree import *
 
 from . import plugin_position_node
 from .plugin_position_node import *
@@ -38,12 +41,14 @@ from .plugin_position_node import *
 
 __all__ += generic_node.__all__
 __all__ += generic_tree.__all__
-__all__ += workflow_node_and_tree.__all__
+__all__ += workflow_node.__all__
+__all__ += workflow_tree.__all__
 __all__ += plugin_position_node.__all__
 
 
 # Unclutter namespace: remove modules from namespace
 del generic_node
 del generic_tree
-del workflow_node_and_tree
+del workflow_node
+del workflow_tree
 del plugin_position_node

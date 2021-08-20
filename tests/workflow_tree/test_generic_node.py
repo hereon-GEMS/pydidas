@@ -56,6 +56,30 @@ class TestGenericNode(unittest.TestCase):
             _nodes.append(_tiernodes)
         return _nodes, _target_conns, _index
 
+    def test_verify_type__with_node(self):
+        obj = GenericNode()
+        node2 = GenericNode()
+        obj._verify_type(node2)
+
+    def test_verify_type__allowNone_with_node(self):
+        obj = GenericNode()
+        node2 = GenericNode()
+        obj._verify_type(node2, allowNone=True)
+
+    def test_verify_type__allowNone_with_None(self):
+        obj = GenericNode()
+        obj._verify_type(None, allowNone=True)
+
+    def test_verify_type__with_None(self):
+        obj = GenericNode()
+        with self.assertRaises(TypeError):
+            obj._verify_type(None)
+
+    def test_verify_type__with_wrong_type(self):
+        obj = GenericNode()
+        with self.assertRaises(TypeError):
+            obj._verify_type(12)
+
     def test_init__plain(self):
         obj = GenericNode()
         self.assertIsInstance(obj, GenericNode)
@@ -63,7 +87,7 @@ class TestGenericNode(unittest.TestCase):
     def test_init__with_parent(self):
         _parent = GenericNode()
         obj = GenericNode(parent=_parent)
-        self.assertEqual(obj._parent, _parent)
+        self.assertEqual(obj.parent, _parent)
 
     def test_init__with_parent_wrong_type(self):
         _parent = 'Something'
@@ -111,8 +135,24 @@ class TestGenericNode(unittest.TestCase):
     def test_set_parent(self):
         _parent = GenericNode()
         obj = GenericNode()
-        obj.set_parent(_parent)
-        self.assertEqual(obj._parent, _parent)
+        obj.parent = _parent
+        self.assertEqual(obj.parent, _parent)
+
+    def test_set_parent__none(self):
+        _parent = GenericNode()
+        obj = GenericNode(parent=_parent)
+        obj.parent = None
+        self.assertIsNone(obj.parent)
+        self.assertFalse(obj in _parent._children)
+
+    def test_set_parent__with_old_parent(self):
+        _parent = GenericNode()
+        obj = GenericNode(parent=_parent)
+        self.assertEqual(obj.parent, _parent)
+        _newparent = GenericNode()
+        obj.parent = _newparent
+        self.assertEqual(obj.parent, _newparent)
+        self.assertFalse(obj in _parent._children)
 
     def test_get_recursive_connections(self):
         _nodes, _target_conns, _n_nodes = self.create_node_tree()

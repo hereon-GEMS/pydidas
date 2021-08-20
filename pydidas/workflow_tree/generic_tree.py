@@ -23,6 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericTree']
 
+
+from .generic_node import GenericNode
+
 class GenericTree:
     """
     A generic tree used for organising items.
@@ -36,13 +39,13 @@ class GenericTree:
         ----------
         **kwargs : dict
             Arbitrary keyword arguments. These will be stored internally
-            in an self.options dictionary.
+            in an self._config dictionary.
 
         """
         self.root = None
         self.node_ids = []
         self.nodes = {}
-        self.options = kwargs if kwargs else {}
+        self._config = kwargs if kwargs else {}
 
     def clear(self):
         """
@@ -52,31 +55,41 @@ class GenericTree:
         self.node_ids = []
         self.root = None
 
-    def set_root(self, *args):
+    def set_root(self, node):
         """
         Set the tree root node.
 
-        Abstract set root method which needs to be implemented by subclasses.
+        Note that this method will remove any references to the old parent in
+        the node!
+
+        Parameters
+        ----------
+        node : GenericNode
+            The node to become the new root node
+        """
+        self._verify_node_type(node)
+        node.parent = None
+        node.node_id = 0
+        self.nodes = {0: node}
+        self.node_ids = [0]
+
+    def _verify_node_type(self, node):
+        """
+        Check that the node is a GenericNode
+
+        Parameters
+        ----------
+        node : object
+            The object to be checked.
 
         Raises
         ------
-        NotImplementedError
-            This abstract method is not implemented in the base class.
+        TypeError
+            If the node is not a GenericNode.
         """
-        raise NotImplementedError()
-
-    def add_node(self, *args, **kwargs):
-        """
-        Add a node to the tree.
-
-        This abstract method needs to be implemented by the subclasses.
-
-        Raises
-        ------
-        NotImplementedError
-            This abstract method is not implemented in the base class.
-        """
-        raise NotImplementedError()
+        if not isinstance(node, GenericNode):
+            raise TypeError('Can only register GenericNodes (or subclasses'
+                            ' in the tree.')
 
     def get_new_nodeid(self):
         """
@@ -91,7 +104,7 @@ class GenericTree:
         int
             The new node id.
         """
-        if not self.node_ids:
+        if len(self.node_ids) == 0:
             return 0
         i = self.node_ids[-1]
         return i + 1
@@ -116,6 +129,28 @@ class GenericTree:
         node_id : int, optional
             A supplied node_id. If None, the tree will select the next
             suitable node_id automatically. The default is None.
+        """
+        self._verify_node_type(node)
+        _ids = node.get_recursive_ids()
+        self._check_node_ids(_ids)
+        if node_id is None and node.node_id is None:
+            node.node_id = self.get_new_nodeid()
+        elif node_id is not None:
+            node.node_id = node_id
+        self.node_ids.append(node.node_id)
+        self.nodes[node.node_id] = node
+        for _child in node.get_children():
+            self.register_node(_child, _child.node_id)
+
+    def _check_node_ids(self, node_ids):
+        """
+        Check the node_ids of a node (and its children) and verify they are
+        compatible with the tree.
+
+        Parameters
+        ----------
+        node_ids : Union[list, tuple, set]
+            A list (or other iterable) of all the node ids.
 
         Raises
         ------
@@ -125,19 +160,15 @@ class GenericTree:
             Raises ValueError if the node_id of the new node is not larger
             than the last registered node.
         """
-        if node_id in self.node_ids:
-            raise ValueError('Duplicate node ID detected. Tree node has not'
-                             'been registered!')
-        if self.node_ids and node_id < self.node_ids[-1]:
-            raise ValueError('Attempt to reuse a discarded node ID detected'
-                             f' (node_id = {node_id}). Please choose another'
-                             'node_id. Tree node has not been registered!')
-        if node_id is None:
-            node.node_id = self.get_new_nodeid()
-        else:
-            node.node_id = node_id
-        self.node_ids.append(node.node_id)
-        self.nodes[node.node_id] = node
+        for _id in node_ids:
+            if _id in self.node_ids:
+                raise ValueError('Duplicate node ID detected. Tree node has '
+                                 'not been registered!')
+            if _id is not None and self.node_ids and _id < max(self.node_ids):
+                raise ValueError(
+                    'Attempt to reuse a discarded node ID detected'
+                    f' (node_id = {_id}). Please choose another node_id. '
+                    'Tree node has not been registered!')
 
     def find_node_by_id(self, node_id):
         """
@@ -148,29 +179,16 @@ class GenericTree:
         node_id : int
             The node_id of the registered node.
 
-        Raises
-        ------
-        TypeError
-            Raises TypeError if no nodes have been registered.
-        ValueError
-            Raises ValueError if the node_id has not been registered.
-
         Returns
         -------
-        object
+        GenericNode
             The node object registered as node_id.
-
         """
-        if not self.nodes:
-            raise TypeError('No nodes detected in Tree')
-        if not node_id in self.node_ids:
-            raise ValueError(f'No node ID "{node_id}" has been registerd in'
-                             'the tree.')
         return self.nodes[node_id]
 
-    def delete_node(self, node_id, recursive=True):
+    def delete_node_by_id(self, node_id, recursive=True):
         """
-        Delete a node.
+        Remove a node from the tree and delete its object.
 
         This method deletes a node from the tree. With the optional recursive
         keyword, node children will be deleted as well.
@@ -194,6 +212,6 @@ class GenericTree:
         if node_id not in self.node_ids:
             raise KeyError('Selected node not found.')
         ids = self.nodes[node_id].get_recursive_ids()
-        self.nodes[node_id].delete_node(node_id, recursive=recursive)
+        self.nodes[node_id].remove_node_from_tree(recursive=recursive)
         for _id in ids:
             del self.nodes[_id]

@@ -26,8 +26,11 @@ __status__ = "Development"
 __all__ = ['WorkflowNode']
 
 from copy import copy
+from numbers import Integral
+from collections.abc import Iterable
 
 from .generic_node import GenericNode
+from ..plugins import BasePlugin
 
 
 class WorkflowNode(GenericNode):
@@ -38,9 +41,26 @@ class WorkflowNode(GenericNode):
     def __init__(self, **kwargs):
         self.plugin = None
         super().__init__(**kwargs)
+        self.__confirm_plugin_existance_and_type()
+        self.plugin.node_id = self._node_id
+
+    def __confirm_plugin_existance_and_type(self):
+        """
+        Verify that a plugin exists and is of the correct type.
+
+        Raises
+        ------
+        KeyError
+            If no plugin has been selected.
+        TypeError
+            If the plugin is not an instance of BasePlugin.
+        """
         if self.plugin is None:
             raise KeyError('No plugin has been supplied for the WorkflowNode.'
                            ' Node has not been created.')
+        if not isinstance(self.plugin, BasePlugin):
+            raise TypeError('Plugin must be an instance of BasePlugin (or '
+                            'subclass).')
 
     def execute_plugin(self, *args, **kwargs):
         """
@@ -62,7 +82,7 @@ class WorkflowNode(GenericNode):
         """
         return self.plugin.execute(*args, **kwargs)
 
-    def execute_plugin_chain(self, *args, **kwargs):
+    def execute_plugin_chain(self, arg, **kwargs):
         """
         Execute the full plugin chain recursively.
 
@@ -78,9 +98,9 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
-        res, reskws = self.plugin.execute(*copy(args), **copy(kwargs))
+        res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
         for _child in self._children:
-            _child.execute_plugin_chain(*res, **reskws)
+            _child.execute_plugin_chain(res, **reskws)
         if self.is_leaf:
             self.results = res
             self.result_kws = reskws

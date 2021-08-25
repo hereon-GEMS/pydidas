@@ -24,7 +24,7 @@ __status__ = "Development"
 __all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
 
 
-from pydidas.core import ParameterCollection, ParameterCollectionMixIn
+from pydidas.core import ParameterCollection, ObjectWithParameterCollection
 
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
@@ -36,7 +36,7 @@ ptype = {BASE_PLUGIN: 'Base plugin',
          PROC_PLUGIN: 'Processing plugin',
          OUTPUT_PLUGIN: 'Output plugin'}
 
-class BasePlugin(ParameterCollectionMixIn):
+class BasePlugin(ObjectWithParameterCollection):
     """
     The base plugin class from which all plugins inherit.
 
@@ -60,8 +60,7 @@ class BasePlugin(ParameterCollectionMixIn):
     basic_plugin = True
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
-    parameters = ParameterCollection()
-    _is_pydidas_plugin = True
+    default_params = ParameterCollection()
     input_data = {}
     output_data = {}
 
@@ -105,14 +104,18 @@ class BasePlugin(ParameterCollectionMixIn):
                 _desc += f'\n{param}: {cls.parameters[param]}'
         return _desc
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Setup the class."""
+        super().__init__()
         if self.plugin_type not in [BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                     OUTPUT_PLUGIN]:
             raise ValueError('Unknown value for the plugin type')
+        self.add_params(*args)
         self.params = self.get_default_params_copy()
-
-
+        for _kw in kwargs:
+            if _kw in self.params.keys():
+                self.set_param_value(_kw, kwargs[_kw])
+        self._config = {}
 
     def execute(self, *data, **kwargs):
         """
@@ -137,7 +140,6 @@ class InputPlugin(BasePlugin):
     """
     The base plugin class for input plugins.
     """
-    basic_plugin = True
     plugin_type = INPUT_PLUGIN
 
 
@@ -145,7 +147,6 @@ class ProcPlugin(BasePlugin):
     """
     The base plugin class for processing plugins.
     """
-    basic_plugin = True
     plugin_type = PROC_PLUGIN
 
 
@@ -153,5 +154,4 @@ class OutputPlugin(BasePlugin):
     """
     The base class for output (file saving / plotting) plugins.
     """
-    basic_plugin = True
     plugin_type = OUTPUT_PLUGIN

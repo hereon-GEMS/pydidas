@@ -28,7 +28,7 @@ __all__ = ['GlobalDocumentationWindow', 'get_doc_qurl']
 import os
 
 import qtawesome as qta
-from PyQt5 import QtWidgets, QtWebEngineWidgets, QtCore
+from PyQt5 import QtWebEngineWidgets, QtWidgets, QtCore
 
 from ..scroll_area import ScrollArea
 

@@ -67,43 +67,18 @@ class _WorkflowTree(GenericTree):
             parent.add_child(_node)
         self.register_node(_node, node_id)
 
-    # def find_nodes_by_plugin_key(self, key, value):
-    #     """
-    #     Find all nodes by the name of of the associated plugin key.
-
-    #     Parameters
-    #     ----------
-    #     key : str
-    #         The key to identify the plugin.
-    #     value : TYPE
-    #         DESCRIPTION.
-
-    #     Returns
-    #     -------
-    #     res : TYPE
-    #         DESCRIPTION.
-
-    #     """
-    #     res = []
-    #     for node_id in self.nodes:
-    #         _plugin= self.nodes[node_id].plugin
-    #         print(node_id, _plugin)
-    #         if hasattr(_plugin, key) and getattr(_plugin, key) == value:
-    #             res.append(node_id)
-    #     return res
-
-    def execute_process(self, *args, **kwargs):
+    def execute_process(self, arg, **kwargs):
         """
         Execute the process defined in the WorkflowTree for dat analysis.
 
         Parameters
         ----------
-        *args : tuple
-            Any arguments that need to be passed to the plugin chain.
+        arg : object
+            Any argument that need to be passed to the plugin chain.
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        self.nodes[0].execute_plugin_chain(*args, **kwargs)
+        self.nodes[0].execute_plugin_chain(arg, **kwargs)
 
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

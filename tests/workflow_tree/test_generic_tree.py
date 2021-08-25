@@ -39,14 +39,14 @@ class TestGenericTree(unittest.TestCase):
         ...
 
     def create_node_tree(self, depth=3, width=3):
-        root = GenericTree(node_id=0)
+        root = GenericNode(node_id=0)
         _nodes =  [[root]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
             for _parent in _nodes[_depth]:
                 for _ichild in range(width):
-                    _node = GenericTree(node_id=_index)
+                    _node = GenericNode(node_id=_index)
                     _parent.add_child(_node)
                     _index += 1
                     _tiernodes.append(_node)
@@ -102,6 +102,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(tree.nodes[0], node)
         self.assertEqual(node.node_id, 0)
         self.assertEqual(node.parent, None)
+        self.assertTrue(child in tree.nodes.values())
 
     def test_get_new_nodeid__empty_tree(self):
         tree = GenericTree()
@@ -226,6 +227,26 @@ class TestGenericTree(unittest.TestCase):
         self.assertFalse(node2 in tree.nodes.values())
         self.assertFalse(node3 in tree.nodes.values())
         self.assertEqual(node._children, [])
+
+    def test_all_leaves__empty_tree(self):
+        tree = GenericTree()
+        self.assertEqual(tree.get_all_leaves(), [])
+
+    def test_all_leaves__single_node(self):
+        tree = GenericTree()
+        node = GenericNode(node_id=1)
+        tree.register_node(node)
+        self.assertEqual(tree.get_all_leaves(), [node])
+
+    def test_all_leaves__tree(self):
+        _depth = 3
+        _width = 4
+        tree = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
+        tree.register_node(_nodes[0][0])
+        _leaves = tree.get_all_leaves()
+        for _node in _nodes[_depth]:
+            self.assertTrue(_node in _leaves)
 
 if __name__ == '__main__':
     unittest.main()

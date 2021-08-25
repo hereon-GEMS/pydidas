@@ -24,6 +24,7 @@ __status__ = "Development"
 __all__ = ['GenericNode']
 
 import copy
+from numbers import Integral
 
 
 class GenericNode:
@@ -67,12 +68,8 @@ class GenericNode:
         **kwargs : type
             Any keywords required for this node.
         """
-        self.node_id = None
-        self._parent = kwargs.get('parent', None)
-        self._verify_type(self._parent, allowNone=True)
-        if self._parent is not None:
-            self._parent.add_child(self)
-            del kwargs['parent']
+        self._parent = None
+        self._node_id = None
         for key in kwargs:
             setattr(self, key, kwargs[key])
         self._children = []
@@ -92,6 +89,39 @@ class GenericNode:
         child._parent = self
         if child not in self._children:
             self._children.append(child)
+
+    @property
+    def node_id(self):
+        """
+        Get the node_id.
+
+        Returns
+        -------
+        node_id : Union[None, int]
+            The node_id.
+        """
+        return self._node_id
+
+    @node_id.setter
+    def node_id(self, new_id):
+        """
+        Set the node_id.
+
+        Parameters
+        ----------
+        new_id : Union[None, int]
+            The new node ID.
+
+        Raises
+        ------
+        TypeError
+            If the type of the new ID is not int or None.
+        """
+        if new_id is None or isinstance(new_id, Integral):
+            self._node_id = new_id
+            return
+        raise TypeError('The new node_id is not of a correct type and has not'
+                        ' been set.')
 
     @property
     def is_leaf(self):

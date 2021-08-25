@@ -56,6 +56,31 @@ class TestGenericNode(unittest.TestCase):
             _nodes.append(_tiernodes)
         return _nodes, _target_conns, _index
 
+    def test_node_id_property__get(self):
+        obj = GenericNode()
+        self.assertIsNone(obj.node_id)
+
+    def test_node_id_property__get_int(self):
+        _id = 12
+        obj = GenericNode(node_id=_id)
+        self.assertEqual(obj.node_id, _id)
+
+    def test_node_id_property__set_int(self):
+        _id = 12
+        obj = GenericNode()
+        obj.node_id = _id
+        self.assertEqual(obj._node_id, _id)
+
+    def test_node_id_property__set_None(self):
+        obj = GenericNode()
+        obj.node_id = None
+        self.assertIsNone(obj._node_id)
+
+    def test_node_id_property__set_wrong_type(self):
+        obj = GenericNode()
+        with self.assertRaises(TypeError):
+            obj.node_id = [1, 2]
+
     def test_verify_type__with_node(self):
         obj = GenericNode()
         node2 = GenericNode()

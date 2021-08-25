@@ -47,14 +47,6 @@ class GenericTree:
         self.nodes = {}
         self._config = kwargs if kwargs else {}
 
-    def clear(self):
-        """
-        Clear all items from the tree.
-        """
-        self.nodes = {}
-        self.node_ids = []
-        self.root = None
-
     def set_root(self, node):
         """
         Set the tree root node.
@@ -68,10 +60,10 @@ class GenericTree:
             The node to become the new root node
         """
         self._verify_node_type(node)
+        self.clear()
         node.parent = None
         node.node_id = 0
-        self.nodes = {0: node}
-        self.node_ids = [0]
+        self.register_node(node)
 
     def _verify_node_type(self, node):
         """
@@ -91,25 +83,15 @@ class GenericTree:
             raise TypeError('Can only register GenericNodes (or subclasses'
                             ' in the tree.')
 
-    def get_new_nodeid(self):
+    def clear(self):
         """
-        Get a new integer node id.
-
-        This method returns the next unused integer node id. Note that
-        node ids will not be re-used, i.e. the number of nodes is ultimately
-        limited by the integer namespace.
-
-        Returns
-        -------
-        int
-            The new node id.
+        Clear all items from the tree.
         """
-        if len(self.node_ids) == 0:
-            return 0
-        i = self.node_ids[-1]
-        return i + 1
+        self.nodes = {}
+        self.node_ids = []
+        self.root = None
 
-    def register_node(self, node, node_id=None):
+    def register_node(self, node, node_id=None, check_ids=True):
         """
         Register a node with the tree.
 
@@ -129,10 +111,16 @@ class GenericTree:
         node_id : int, optional
             A supplied node_id. If None, the tree will select the next
             suitable node_id automatically. The default is None.
+        check_ids : bool, optional
+            Keyword to enable/disable node_id checking. By default, this should
+            always be on if called by the user. If node trees are added to the
+            GenericTree, the check will only be performed once for the newly
+            added node and not again during registering of its children.
         """
         self._verify_node_type(node)
         _ids = node.get_recursive_ids()
-        self._check_node_ids(_ids)
+        if check_ids:
+            self._check_node_ids(_ids)
         if node_id is None and node.node_id is None:
             node.node_id = self.get_new_nodeid()
         elif node_id is not None:
@@ -140,7 +128,7 @@ class GenericTree:
         self.node_ids.append(node.node_id)
         self.nodes[node.node_id] = node
         for _child in node.get_children():
-            self.register_node(_child, _child.node_id)
+            self.register_node(_child, _child.node_id, check_ids=False)
 
     def _check_node_ids(self, node_ids):
         """
@@ -169,6 +157,24 @@ class GenericTree:
                     'Attempt to reuse a discarded node ID detected'
                     f' (node_id = {_id}). Please choose another node_id. '
                     'Tree node has not been registered!')
+
+    def get_new_nodeid(self):
+        """
+        Get a new integer node id.
+
+        This method returns the next unused integer node id. Note that
+        node ids will not be re-used, i.e. the number of nodes is ultimately
+        limited by the integer namespace.
+
+        Returns
+        -------
+        int
+            The new node id.
+        """
+        if len(self.node_ids) == 0:
+            return 0
+        i = self.node_ids[-1]
+        return i + 1
 
     def find_node_by_id(self, node_id):
         """
@@ -208,3 +214,18 @@ class GenericTree:
         self.nodes[node_id].remove_node_from_tree(recursive=recursive)
         for _id in ids:
             del self.nodes[_id]
+
+    def get_all_leaves(self):
+        """
+        Get all tree nodes which are leaves.
+
+        Returns
+        -------
+        list
+            A list of all leaf nodes.
+        """
+        _leaves = []
+        for _node in self.nodes.values():
+            if _node.is_leaf:
+                _leaves.append(_node)
+        return _leaves

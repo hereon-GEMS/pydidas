@@ -57,14 +57,16 @@ class ProcessingFrame(BaseFrame):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
+        self.create_label('title', 'Processing', fontsize=14,
+                          gridPos=(0, 0, 1, 5))
 
 class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent, name)
-        self.create_label('Result visualization', fontsize=14,
-                              gridPos=(0, 0, 1, 5))
+        self.create_label('title', 'Result visualization', fontsize=14,
+                          gridPos=(0, 0, 1, 5))
 
 
 if __name__ == '__main__':
@@ -84,10 +86,10 @@ if __name__ == '__main__':
 
     from pydidas.gui.pyfai_calib_frame import PyfaiCalibFrame, pyfaiCalibIcon
     gui.register_frame('Home', 'Home', qta.icon('mdi.home'), HomeFrame)
-    # gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
-    # gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
-    # gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
-    # gui.register_frame('Composite image creator', 'Tools/Composite image creator', qta.icon('mdi.view-comfy'), CompositeCreatorFrame)
+    gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
+    gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
+    gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
+    gui.register_frame('Composite image creator', 'Tools/Composite image creator', qta.icon('mdi.view-comfy'), CompositeCreatorFrame)
     gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame)
     gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame)
     # gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)

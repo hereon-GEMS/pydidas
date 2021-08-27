@@ -61,6 +61,7 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     default_params = ParameterCollection()
+    _is_pydidas_plugin = True
     input_data = {}
     output_data = {}
 

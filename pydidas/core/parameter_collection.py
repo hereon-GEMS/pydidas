@@ -200,13 +200,11 @@ class ParameterCollection(dict):
         # flatten ParameterCollection arguments and add them to a list
         _new_args = chain.from_iterable(
             [p] if isinstance(p, Parameter) else list(p.values())
-            for p in args
-            )
+            for p in args)
         for _param in _new_args:
             _newkeys = (tuple(self.keys())
                         + tuple(p.refkey for p in _new_args
-                                if p is not _param)
-                        )
+                                if p is not _param))
             self.__check_key(_param, keys=_newkeys)
         _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
         for _key in kwargs:

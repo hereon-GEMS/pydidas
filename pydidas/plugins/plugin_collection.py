@@ -36,8 +36,9 @@ import inspect
 import sys
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
+from ..core.utilities import flatten_list
 from .plugin_collection_util_funcs import (
-    flatten, get_generic_plugin_path, trim_filename,
+    get_generic_plugin_path, trim_filename,
     plugin_type_check, plugin_consistency_check)
 
 
@@ -45,7 +46,7 @@ class _PluginCollection(PydidasQsettingsMixin):
     """
     Class to hold references of all plugins
     """
-    def __init__(self, plugin_path=None):
+    def __init__(self, **kwargs):
         """
         Setup method.
 
@@ -53,16 +54,12 @@ class _PluginCollection(PydidasQsettingsMixin):
         ----------
         plugin_path : str, optional
             The search directory for plugins. The default is None.
-
-        Returns
-        -------
-        None.
         """
+        plugin_path = kwargs.get('plugin_path', None)
         PydidasQsettingsMixin.__init__(self)
         plugin_paths = self.__process_plugin_path(plugin_path)
-        self.plugins = dict(base={}, proc={}, input={}, output={})
-        self.__plugin_names = []
-        self.__plugin_classes = []
+        self.plugins = {}
+        self.__plugin_type_register = {}
         self.find_plugins(plugin_paths)
 
     def __process_plugin_path(self, plugin_path):
@@ -140,7 +137,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             _m = spec.loader.load_module()
             clsmembers = inspect.getmembers(_m, inspect.isclass)
             for _name, _cls in clsmembers:
-                self.__check_and_register_class(_name, _cls, reload)
+                self.__check_and_register_class(_cls, reload)
             del _m
 
     def get_modules(self, path):
@@ -173,8 +170,9 @@ class _PluginCollection(PydidasQsettingsMixin):
         Search for all python files in path and subdirectories.
 
         This method will search the specified path recursicely for all
-        python files. It will ignore protected files (starting with "__")
-        and hidden files (starting with "."). The
+        python files, defined as files with a .py extension.
+        It will ignore protected files /directories (starting with "__")
+        and hidden files / directories (starting with ".").
 
         Parameters
         ----------
@@ -194,12 +192,12 @@ class _PluginCollection(PydidasQsettingsMixin):
                     if not (item.startswith('__') or item.startswith('.'))]
         _dirs = [item for item in _entries if os.path.isdir(item)]
         _files = [item for item in _entries if os.path.isfile(item)]
-        _results = flatten(
+        _results = flatten_list(
             [self.find_files(os.path.join(path, entry)) for entry in _dirs])
         _results += [f for f in _files if f.endswith('.py')]
         return _results
 
-    def __check_and_register_class(self, name, cls, reload=False):
+    def __check_and_register_class(self, class_, reload=False):
         """
         Check whether a class is a valid plugin and register it.
 
@@ -207,61 +205,126 @@ class _PluginCollection(PydidasQsettingsMixin):
         ----------
         name : str
             The class description name
-        cls : type
+        class_ : type
             The class object.
         reload : bool
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
-        if not plugin_consistency_check(cls):
+        if not plugin_consistency_check(class_):
             return
-        ptype = plugin_type_check(cls)
-        if (name in self.plugins[ptype] and not reload
-                or cls.__name__ in self.__plugin_classes and not reload):
-            return
-        self.plugins[ptype][name] = cls
-        self.__plugin_classes.append(cls.__name__)
+        if class_.__name__ not in self.plugins:
+            self.__add_new_class(class_)
+        elif reload:
+            self.__remove_old_item(class_)
+            self.__add_new_class(class_)
 
-    def get_all_plugins(self):
+    def __add_new_class(self, class_):
         """
-        TO DO
+        Add a new class to the collection.
+
+        Parameters
+        ----------
+        name : str
+            The registration name
+        class_ : type
+            The class object.
         """
-        _res = []
-        for item in {**self.plugins['input'], **self.plugins['proc'],
-                     **self.plugins['output']}.values():
-            _res.append(item)
-        return _res
+
+        self.plugins[class_.__name__] = class_
+        self.__plugin_type_register[class_.__name__] = plugin_type_check(class_)
+
+    def __remove_old_item(self, class_):
+        """
+        Remove an old item from the collection.
+
+        Note: If a class with the same class name is reloaded but has been
+        registered to a different name, this is removed as well.
+
+        Parameters
+        ----------
+        name : str
+            The reference name of the Plugin.
+        class_ : type
+            The class object.
+        """
+        if class_.__name__ in self.plugins:
+            del self.plugins[class_.__name__]
+            del self.__plugin_type_register[class_.__name__]
 
     def get_all_plugin_names(self):
         """
-        TO DO
+        Get a list of all the plugin names currently registered.
+
+        Returns
+        -------
+        names : list
+            The list of all the plugin names.
         """
-        _d = {**self.plugins['input'], **self.plugins['proc'],
-              **self.plugins['output']}
-        _res = []
-        for item in _d.values():
-            _res.append(item.plugin_name)
-        del _d
-        return _res
+        return list(self.plugins.keys())
 
     def get_plugin_by_name(self, name):
         """
-        TO DO
+        Get a plugin by its plugin name.
+
+        Parameters
+        ----------
+        name : str
+            The name of the plugin.
+
+        Returns
+        -------
+        plugin : pydidas.plugins.BasePlugin
+            The Plugin class.
         """
-        for _plugin in self.get_all_plugins():
-            if name == _plugin.plugin_name:
-                return _plugin
+        if name in self.plugins:
+            return self.plugins[name]
         raise KeyError(f'No plugin with name "{name}" has been registered!')
 
-    def get_plugin_by_class_name(self, name):
+    def get_all_plugins(self):
         """
-        TO DO
-        """
-        for _plugin in self.get_all_plugins():
-            if name == _plugin.__name__:
-                return _plugin
-        raise KeyError(f'No plugin with claass name "{name}" has been '
-                       'registered!')
+        Get a list of all plugins.
 
+        Returns
+        -------
+        list
+            A list with all the Plugin classes.
+        """
+        return list(self.plugins.values())
+
+    def get_all_plugins_of_type(self, plugin_type):
+        """
+        Get all Plugins of a specific type (base, input, proc, or output).
+
+        Parameters
+        ----------
+        plugin_type : str, any of 'base', 'input', proc', 'output'
+            The type of the demanded plugins.
+
+        Returns
+        -------
+        list :
+            A list with all Plugins which have the specified type.
+        """
+        _key = {'base': -1, 'input': 0, 'proc': 1, 'output': 2}[plugin_type]
+        _res = []
+        for _name in self.plugins:
+            if self.__plugin_type_register[_name] == _key:
+                _res.append(self.plugins[_name])
+        return _res
+
+    def clear_collection(self, confirmation=False):
+        """
+        Clear the collection and remove all registered plugins.
+
+        Parameters
+        ----------
+        confirmation : bool, optional
+            Confirmation flag which needs to be True to proceed. The default
+            is False.
+        """
+        if confirmation:
+            self.plugins = {}
+            self.__plugin_type_register = {}
 
 PluginCollection = SingletonFactory(_PluginCollection)

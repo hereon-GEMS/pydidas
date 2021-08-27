@@ -23,6 +23,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+import itertools
 import time
 import os
 import sys
@@ -31,6 +32,24 @@ from os.path import join as osjoin
 from os.path import dirname, isfile
 
 from numpy import floor
+
+def flatten_list(nested_list):
+    """
+    Flatten a nested list.
+
+    This function will flatten any nested list.
+
+    Parameters
+    ----------
+    nested_list : list
+        A list with arbitrary nesting.
+
+    Returns
+    -------
+    list
+        The flattened list.
+    """
+    return list(itertools.chain.from_iterable(nested_list))
 
 def update_separators(path):
     """

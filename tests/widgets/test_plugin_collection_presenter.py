@@ -32,7 +32,8 @@ from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
 
 from pydidas.widgets.plugin_collection_presenter import (
     PluginCollectionPresenter, _PluginCollectionTreeWidget)
-from pydidas.test_objects.dummy_plugins import DummyPluginCollection
+from pydidas.unittest_objects.dummy_plugin_collection import (
+    DummyPluginCollection)
 
 _typemap = {0: 'input', 1: 'proc', 2: 'output'}
 

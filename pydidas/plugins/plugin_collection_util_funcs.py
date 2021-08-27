@@ -28,32 +28,13 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['flatten', 'get_generic_plugin_path', 'trim_filename',
+__all__ = ['get_generic_plugin_path', 'trim_filename',
            'plugin_type_check', 'plugin_consistency_check']
 
-import itertools
+
 import os
 
 from .plugin_constants import INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
-
-
-def flatten(nested_list):
-    """
-    Flatten a nested list.
-
-    This function will flatten any nested list.
-
-    Parameters
-    ----------
-    nested_list : list
-        A list with arbitrary nesting.
-
-    Returns
-    -------
-    list
-        The flattened list.
-    """
-    return list(itertools.chain.from_iterable(nested_list))
 
 
 def get_generic_plugin_path():
@@ -126,4 +107,5 @@ def plugin_consistency_check(cls_item):
     bool.
         Returns True if consistency check succeeded and False otherwise.
     """
-    return getattr(cls_item, '_is_pydidas_plugin', False)
+    return (getattr(cls_item, '_is_pydidas_plugin', False)
+            and not getattr(cls_item, 'basic_plugin', True))

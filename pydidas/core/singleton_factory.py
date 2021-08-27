@@ -36,9 +36,15 @@ class SingletonFactory:
         self.__instance = None
         self.__class = cls
 
-    def __call__(self):
+    def __call__(self, **kwargs):
         """
         Get the instance of the Singleton.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Any kwargs which should be passed. Note that this is only used
+            if no instance exists yet.
 
         Returns
         -------
@@ -46,17 +52,29 @@ class SingletonFactory:
             The instance of the Singleton class.
         """
         if not self.__instance:
-            self.__instance = self.__class()
+            self.__instance = self.__class(**kwargs)
         return self.__instance
 
-    def _reset_instance(self):
+    def _reset_instance(self, **kwargs):
         """
         Reset the Singleton instance and create a new one.
-        """
-        self.__instance = self.__class()
 
-    def instance(self):
+         Parameters
+        ----------
+        kwargs : dict
+            Any kwargs which should be passed. Note that this is only used
+            if no instance exists yet.
+        """
+        self.__instance = self.__class(**kwargs)
+
+    def instance(self, **kwargs):
         """
         Get the instance. A wrapper for __call__
+
+        Parameters
+        ----------
+        kwargs : dict
+            Any kwargs which should be passed. Note that this is only used
+            if no instance exists yet.
         """
-        return self.__call__()
+        return self.__call__(**kwargs)

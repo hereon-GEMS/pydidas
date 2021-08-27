@@ -312,6 +312,17 @@ GENERIC_PARAMS = ParameterCollection(
                        'direction 4 (i.e. the coutner / motor position for '
                        'scan position 0).')),
     ############################
+    ## selected scan indices
+    ############################
+    Parameter('Scan dim. 1 index', int, default=0, refkey='scan_index1',
+              tooltip='The position index for the scan dimension 1.'),
+    Parameter('Scan dim. 2 index', int, default=0, refkey='scan_index2',
+              tooltip='The position index for the scan dimension 2.'),
+    Parameter('Scan dim. 3 index', int, default=0, refkey='scan_index3',
+              tooltip='The position index for the scan dimension 3.'),
+    Parameter('Scan dim. 4 index', int, default=0, refkey='scan_index4',
+              tooltip='The position index for the scan dimension 4.'),
+    ############################
     ## global app settings
     ############################
     Parameter('Number of MP workers', int, default=4, refkey='mp_n_workers',

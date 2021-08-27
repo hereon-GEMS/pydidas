@@ -73,7 +73,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self._ny = 5
         self._nx = (self._n // self._ny
                     + int(np.ceil((self._n % self._ny) / self._ny)))
-        CompositeCreatorApp.parse_func = lambda x: {}
+        def parser(obj):
+            return {}
+        CompositeCreatorApp.parse_func = parser
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._fname(0))
         app.set_param_value('last_file', self._fname(self._n - 1))
@@ -246,6 +248,17 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _image = np.random.random((50, 50))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue((_image == _newimage).all())
+
+    def test_apply_mask__with_mask_and_no_value(self):
+        _shape = ((50, 50))
+        rng = np.random.default_rng(12345)
+        _mask = rng.integers(low=0, high=2, size=_shape)
+        app = CompositeCreatorApp()
+        app._config['det_mask'] = _mask
+        app._config['det_mask_val'] = None
+        _image = np.random.random(_shape)
+        with self.assertRaises(AppConfigError):
+            app._CompositeCreatorApp__apply_mask(_image)
 
     def test_apply_mask__with_mask_and_finite_mask_val(self):
         _shape = ((50, 50))

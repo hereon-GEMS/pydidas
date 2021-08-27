@@ -104,7 +104,16 @@ class TestParameterCollection(unittest.TestCase):
         coll = ParameterCollection(Parameter('Test7', str, default='Test'),
                                    Parameter('Test8', float, default=0))
         obj.add_params(coll)
-        for index in range(5,6):
+        for index in range(7, 9):
+            self.assertIsInstance(obj[f'Test{index}'],
+                                 Parameter)
+
+    def test_add_arg_params__with_collection(self):
+        obj = ParameterCollection(*self._params)
+        coll = ParameterCollection(Parameter('Test7', str, default='Test'),
+                                   Parameter('Test8', float, default=0))
+        obj._ParameterCollection__add_arg_params(coll)
+        for index in range(7, 9):
             self.assertIsInstance(obj[f'Test{index}'],
                                  Parameter)
 

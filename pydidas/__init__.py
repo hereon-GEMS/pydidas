@@ -1,7 +1,6 @@
 from PyQt5 import QtWebEngineWidgets
 
 from . import workflow_tree
-from .workflow_tree import WorkflowTree, WorkflowNode
 
 from . import plugins
 

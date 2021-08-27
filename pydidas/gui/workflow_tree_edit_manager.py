@@ -25,10 +25,11 @@ __all__ = ['WorkflowEditTreeManager']
 
 from PyQt5 import QtCore
 
-from pydidas.plugins import GetPluginCollection
+from pydidas.core import SingletonFactory
+from pydidas.plugins import PluginCollection
 from pydidas.widgets.workflow_edit import WorkflowCanvasManager
 
-PLUGIN_COLLECTION = GetPluginCollection()
+PLUGIN_COLLECTION = PluginCollection()
 
 
 class _WorkflowEditTreeManager(QtCore.QObject):
@@ -52,12 +53,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         qt_canvas : QtWidget, optional
             The QtWidget which acts as canvas for the plugin workflow tree.
             The default is None.
-        qt_main : QtMainWindow, optional
-            Reference to the main application. The default is None.
-
-        Returns
-        -------
-        None.
         """
         super().__init__()
         self.root = None
@@ -83,10 +78,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         qt_canvas : QtWidget
             The QtWidget which acts as canvas for the plugin workflow tree.
             The default is None.
-
-        Returns
-        -------
-        None.
         """
         if qt_canvas:
             self.canvas_manager.update_qt_canvas(qt_canvas)
@@ -117,10 +108,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         AttributeError
             AttributeError is raised if the Qt drawing Canvas for the plugins
             has not been defined yet.
-
-        Returns
-        -------
-        None.
         """
         if not self.root:
             _newid = 0
@@ -128,7 +115,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
             _newid = self.node_ids[-1] + 1
 
         self.node_ids.append(_newid)
-
         title = title if title else name
         self.plugins[_newid] = PLUGIN_COLLECTION.get_plugin_by_name(name)()
         self.canvas_manager.add_plugin_node(name, _newid, title)
@@ -152,10 +138,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         KeyError
             A KeyError is raised if the node_id key has not been registered
             with the manager yet.
-
-        Returns
-        -------
-        None.
         """
         if node_id != self.active_node_id:
             if node_id not in self.node_ids:
@@ -193,22 +175,6 @@ class _WorkflowEditTreeManager(QtCore.QObject):
         self.set_active_node(self.node_ids[-1])
 
 
-class _WorkflowEditTreeManagerFactory:
-    """Factory to create a WorkflowEditTreeManager Singleton."""
-    def __init__(self):
-        """Factory setup method."""
-        self._instance = None
-
-    def __call__(self, **kwargs):
-        """
-        Factory call method to return the instance of
-        WorkflowEditTreeManager.
-        """
-        if not self._instance:
-            self._instance = _WorkflowEditTreeManager(**kwargs)
-        return self._instance
-
-
-WorkflowEditTreeManager = _WorkflowEditTreeManagerFactory()
+WorkflowEditTreeManager = SingletonFactory(_WorkflowEditTreeManager)
 
 WORKFLOW_EDIT_MANAGER = WorkflowEditTreeManager()

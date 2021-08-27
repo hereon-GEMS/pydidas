@@ -25,7 +25,7 @@ __status__ = "Development"
 import unittest
 import numpy as np
 
-from pydidas.multiprocessing.mp_test_app import MpTestApp
+from pydidas.unittest_objects.mp_test_app import MpTestApp
 from pydidas.apps import BaseApp
 
 

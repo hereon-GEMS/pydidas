@@ -26,119 +26,47 @@ __all__ = ['ProcessingSinglePluginFrame']
 
 from PyQt5 import QtWidgets, QtCore
 
-from silx.gui.plot.StackView import StackView
 
-from ..core import ScanSettings, Parameter
+from ..core import ScanSettings, Parameter, ParameterCollection
 from ..workflow_tree import WorkflowTree
 from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
+from .builders.processing_single_plugin_frame_builder import (
+    create_processing_single_plugin_frame_widgets_and_layout)
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
 
-_params = {
-    'plugins': Parameter('Plugins', str, default='', refkey='plugins',
-                         choices=['', 'HdfLoader (node 0)',
-                                  'BackgroundCorrection (node 1) test test test test test test test6',
-                                  'AzimuthalIntegration (node 2)']),
-    'image_nr': Parameter('Image number', int, default=0, refkey='image_nr'),
-    'scan_index1': Parameter('Scan dim. 1 index', int, default=0,
-                             refkey='scan_index1'),
-    'scan_index2': Parameter('Scan dim. 2 index', int, default=0,
-                             refkey='scan_index2'),
-    'scan_index3': Parameter('Scan dim. 3 index', int, default=0,
-                             refkey='scan_index3'),
-    'scan_index4': Parameter('Scan dim. 4 index', int, default=0,
-                             refkey='scan_index4'),
-    }
-
-
-class LargeStackView(StackView):
-    """
-    Reimplementation of the silx StackView with a larger sizeHint.
-    """
-    def sizeHint(self):
-        return QtCore.QSize(500, 1000)
+DEFAULT_PARAMS =  ParameterCollection(
+    Parameter('Plugins', str, default='', refkey='plugins',
+              choices=['', 'HdfLoader (node 0)',
+                       'BackgroundCorrection (node 1) test test test test test test test6',
+                       'AzimuthalIntegration (node 2)']),
+    Parameter('Image number', int, default=0, refkey='image_nr'),
+    Parameter('Scan dim. 1 index', int, default=0, refkey='scan_index1'),
+    Parameter('Scan dim. 2 index', int, default=0, refkey='scan_index2'),
+    Parameter('Scan dim. 3 index', int, default=0, refkey='scan_index3'),
+    Parameter('Scan dim. 4 index', int, default=0, refkey='scan_index4'))
 
 class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                   CreateWidgetsMixIn):
+
+    default_params = DEFAULT_PARAMS
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
         ParameterConfigWidgetsMixIn.__init__(self)
-        self.params = _params
+        self.set_default_params()
+
         self._plugin = None
         self.scan_dim = 4
-        self.initWidgets()
+        create_processing_single_plugin_frame_widgets_and_layout(self)
+        self.setup_stackview()
         self.param_widgets['plugins'].currentTextChanged.connect(
             self.select_plugin)
-        self.button_plugin_input.clicked.connect(self.click_plugin_input)
-        self.button_plugin_exec.clicked.connect(self.click_execute_plugin)
-
-    def initWidgets(self):
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
-
-        self.create_label('Test of processing workflow', fontsize=14,
-                              gridPos=(0, 0, 1, 5))
-        self.create_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
-        self.create_label('Select image', fontsize=12,
-                              gridPos=(self.next_row(), 0, 1, 2))
-        self.create_spacer(height=10, gridPos=(self.next_row(), 0, 1, 2))
-
-        # create button group for switching between
-        _frame = QtWidgets.QFrame()
-        _radio1 = QtWidgets.QRadioButton('Using image number', _frame)
-        _radio2 = QtWidgets.QRadioButton('Using scan position', _frame)
-        _radio1.setChecked(True)
-        _layout.addWidget(_radio1, self.next_row(), 0, 1, 2)
-        _layout.addWidget(_radio2, self.next_row(), 0, 1, 2)
-        _radio1.toggled.connect(self.select_image_nr)
-        _row = self.next_row()
-        _iow = 40
-        _txtw = 120
-        self.create_param_widget(self.params['image_nr'], row=_row, width=_iow,
-                              textwidth = _txtw)
-        self.create_param_widget(self.params['scan_index1'], row=_row,
-                              width=_iow, textwidth = _txtw)
-        self.create_param_widget(self.params['scan_index2'], width=_iow,
-                              textwidth = _txtw)
-        self.create_param_widget(self.params['scan_index3'], width=_iow,
-                              textwidth = _txtw)
-        self.create_param_widget(self.params['scan_index4'], width=_iow,
-                              textwidth = _txtw)
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        for i in range(1, 5):
-            self.param_widgets[f'scan_index{i}'].setVisible(False)
-            self.param_textwidgets[f'scan_index{i}'].setVisible(False)
-        self.create_label('Select plugin', fontsize=12, width=250,
-                              gridPos=(self.next_row(), 0, 1, 2))
-
-        self.create_param_widget(self.params['plugins'], n_columns=2, width=250,
-                              n_columns_text=2, linebreak=True,
-                              halign_text=QtCore.Qt.AlignLeft)
-
-        self.w_plugin_info = ReadOnlyTextWidget(None, fixedWidth=250,
-                                                fixedHeight=250)
-        _layout.addWidget(self.w_plugin_info, self.next_row(), 0, 1, 2,
-                          QtCore.Qt.AlignTop)
-
-        self.button_plugin_input = self.create_button(
-            'Show plugin input data', enabled=False,
-            gridPos=(self.next_row(), 0, 1, 2))
-        self.button_plugin_exec = self.create_button(
-            'Execute plugin && show ouput data', enabled=False,
-            gridPos=(self.next_row(), 0, 1, 2))
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
-                        policy=QtWidgets.QSizePolicy.Expanding)
-        self.w_output_data = QtWidgets.QStackedWidget(self)
-        self.w_output_data.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                         QtWidgets.QSizePolicy.Expanding)
-
-        self.w_output_data.addWidget(LargeStackView())
-        _layout.addWidget(self.w_output_data, 1, 3, _layout.rowCount(), 1)
-        self.setup_stackview()
+        self._widgets['but_plugin_input'].clicked.connect(self.click_plugin_input)
+        self._widgets['but_plugin_exec'].clicked.connect(self.click_execute_plugin)
 
     def setup_stackview(self):
         import numpy
@@ -163,8 +91,6 @@ class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                       "dim1: -10 to 5 (150 samples)",
                       "dim2: -5 to 10 (120 samples)"])
 
-
-
     def select_image_nr(self, active):
         self.param_widgets['image_nr'].setVisible(active)
         self.param_textwidgets['image_nr'].setVisible(active)
@@ -185,19 +111,17 @@ class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         ...
 
     def select_plugin(self, text):
-        self.button_plugin_input.setEnabled(True)
-        self.button_plugin_exec.setEnabled(True)
+        self._widgets['but_plugin_input'].setEnabled(True)
+        self._widgets['but_plugin_exec'].setEnabled(True)
         self.w_plugin_info.setText(text)
         ...
 
     def frame_activated(self, index):
         if index == self.frame_index:
-            self.scan_dim = SCAN_SETTINGS.get('scan_dim')
-            # _plugins = self.params['plugins']
-            # _plugins.choices =
+            self.scan_dim = SCAN_SETTINGS.get_param_value('scan_dim')
             _p_w = self.param_widgets['plugins']
             l = max([_p_w.view().fontMetrics().width(_p_w.itemText(i))
                      for i in range(_p_w.count())])
             _p_w.view().setMinimumWidth(l + 25)
-            # TO DO :
+            # TODO :
             # disable buttons

@@ -31,6 +31,8 @@ from pydidas.core import ScanSettings, Parameter
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.gui.builders.processing_full_workflow_frame_builder import (
+    create_processing_full_workflow_frame_widgets_and_layout)
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
@@ -58,59 +60,7 @@ class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         self.params = _params
         self._plugin = None
         self.scan_dim = 4
-        self.initWidgets()
-        # self.param_widgets['plugins'].currentTextChanged.connect(
-        #     self.select_plugin)
-        # self.button_plugin_input.clicked.connect(self.click_plugin_input)
-        # self.button_plugin_exec.clicked.connect(self.click_execute_plugin)
-
-    def initWidgets(self):
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
-
-        self.create_label('Full processing workflow', fontsize=14,
-                              gridPos=(0, 0, 1, 5))
-
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_verify_cfg = self.create_button('Verify all settings', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('mdi.text-search'))
-
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.create_param_widget(self.params['run_type'])
-
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_run = self.create_button('Run', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('fa5s.play'))
-
-        self.create_spacer(height=50, gridPos=(self.next_row(), 0, 1, 2))
-        self.w_run = self.create_button('Processing feedback', gridPos=(self.next_row(), 0, 2, 4))
-        self.w_run.setFixedHeight(200)
-        self.w_run.setFixedWidth(600)
-
-
-    def select_image_nr(self, active):
-        self.param_widgets['image_nr'].setVisible(active)
-        self.param_textwidgets['image_nr'].setVisible(active)
-        for i in range(1, 5):
-            self.param_widgets[f'scan_index{i}'].setVisible(
-                (not active) & (i <= self.scan_dim))
-            self.param_textwidgets[f'scan_index{i}'].setVisible(
-                (not active) & (i <= self.scan_dim))
-
-        ...
-    def update_plugin_list(self):
-        ...
-
-    def click_plugin_input(self):
-        ...
-
-    def click_execute_plugin(self):
-        ...
-
-    def select_plugin(self, text):
-        self.button_plugin_input.setEnabled(True)
-        self.button_plugin_exec.setEnabled(True)
-        self.w_plugin_info.setText(text)
-        ...
+        create_processing_full_workflow_frame_widgets_and_layout(self)
 
     def frame_activated(self, index):
         ...

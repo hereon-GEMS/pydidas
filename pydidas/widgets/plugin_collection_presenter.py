@@ -28,11 +28,11 @@ from functools import partial
 
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
-from ..plugins import GetPluginCollection
+from ..plugins import PluginCollection
 from ..config import STYLES
 from .read_only_text_widget import ReadOnlyTextWidget
 
-PLUGIN_COLLECTION = GetPluginCollection()
+PLUGIN_COLLECTION = PluginCollection()
 
 
 class PluginCollectionPresenter(QtWidgets.QWidget):
@@ -43,7 +43,7 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
     """
     selection_confirmed = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent=None, collection=None):
+    def __init__(self, parent=None, **kwargs):
         """
         Create a PluginCollectionPresenter instance.
 
@@ -56,8 +56,9 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
             plugin collection and should not be changed by the user.
         """
         super().__init__(parent)
-        self.collection = (collection if collection is not None
-                           else GetPluginCollection())
+        self.collection = (kwargs.get('collection', None)
+                           if kwargs.get('collection', None) is not None
+                           else PLUGIN_COLLECTION)
 
         _treeview = _PluginCollectionTreeWidget(self, self.collection)
         self._widgets = dict(plugin_treeview=_treeview,
@@ -132,7 +133,7 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         """
         super().__init__()
         self.collection = (collection if collection is not None
-                           else GetPluginCollection())
+                           else PLUGIN_COLLECTION)
         self.parent = parent
         self.setEditTriggers(Qt.QAbstractItemView.NoEditTriggers)
 

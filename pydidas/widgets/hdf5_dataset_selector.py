@@ -51,7 +51,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     new_frame_signal = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None, viewWidget=None,
-                 datasetKeyFilters=None):
+                 datasetKeyFilters=None, **kwargs):
         """
         Instanciation method.
 

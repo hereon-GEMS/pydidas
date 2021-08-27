@@ -48,6 +48,7 @@ class CreateWidgetsMixIn:
     """
     def __init__(self):
         self._widgets = {}
+        self.__index_unreferenced = 0
 
     @copy_docstring(create_spacer)
     def create_spacer(self, ref, **kwargs):
@@ -58,6 +59,9 @@ class CreateWidgetsMixIn:
         _spacer = create_spacer(**kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
+        if ref is None:
+            ref = f'unreferenced_{self.__index_unreferenced:03d}'
+            self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
     @copy_docstring(create_label)
@@ -109,30 +113,34 @@ class CreateWidgetsMixIn:
         """
         self.__create_widget(create_combo_box, ref, **kwargs)
 
-    def __create_widget(self, function, ref, *args, **kwargs):
+    def __create_widget(self, object_, ref, *args, **kwargs):
         """
-        Create a widget from a function.
+        Create a widget from a object (function / class).
 
         Parameters
         ----------
-        function : function
-            The function to be called.
+        object : object
+            The object to be called.
         ref : str
             The reference name in the _widgets dictionary.
         *args : args
-            Any arguments to the function call.
+            Any arguments to the object call.
         **kwargs : dict
             Keyword arguments for the widget creation.
         """
         _parent = kwargs.get('parent_widget', self)
-        _widget = function(*args, **kwargs)
+        _widget = object_(*args, **kwargs)
         if isinstance(kwargs.get('layout_kwargs'), dict):
             kwargs.update(kwargs.get('layout_kwargs'))
             del kwargs['layout_kwargs']
-        _layout_args = _get_widget_layout_args(_parent, **kwargs)
+        _layout_kwargs = dict(alignment=kwargs.get('alignment', None),
+                              gridPos=kwargs.get('gridPos', None))
+        _layout_args = _get_widget_layout_args(_parent, **_layout_kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
-        if ref is not None:
-            self._widgets[ref] = _widget
+        if ref is None:
+            ref = f'unreferenced_{self.__index_unreferenced:03d}'
+            self.__index_unreferenced += 1
+        self._widgets[ref] = _widget
 
     def create_any_widget(self, ref, widget_class, *args, **kwargs):
         """
@@ -158,7 +166,7 @@ class CreateWidgetsMixIn:
         """
         if not isinstance(ref, str):
             raise TypeError('Widget reference must be of type string.')
-        self.__create_widget(widget_class, ref, *args, verbose=True, **kwargs)
+        self.__create_widget(widget_class, ref, *args, **kwargs)
         apply_widget_properties(self._widgets[ref], **kwargs)
 
     def add_any_widget(self, ref, widget, **kwargs):
@@ -228,7 +236,9 @@ def _get_widget_layout_args(parent, **kwargs):
             f'Layout of parent widget "{parent}" is not of type '
             'QBoxLayout, QStackedLayout or QGridLayout.')
 
-    _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
+    # TODO: Verify alignment
+    # _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
+    _alignment = kwargs.get('alignment', None)
     if isinstance(parent.layout(), QtWidgets.QBoxLayout):
         return [kwargs.get('stretch', 0), _alignment]
     if isinstance(parent.layout(), QtWidgets.QStackedLayout):

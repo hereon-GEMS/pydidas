@@ -48,7 +48,7 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.params = EXP_SETTINGS.params
         self.tmp_params = {}
-        if fname is not None:
+        if fname not in [None, '']:
             self.load_from_file(fname)
 
     def load_from_file(self, fname):
@@ -69,19 +69,55 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
             If the file extension is not recognized.
         """
         if not os.path.exists(fname):
-            raise FileNotFoundError(f'No file with the name {fname} exists.')
+            raise FileNotFoundError(f'No file with the name "{fname}" exists.')
 
         _ext = os.path.splitext(self.fname)[1]
-        if _ext == '.poni':
-            self.__load_poni_file()
-        elif _ext in YAML_EXTENSIONS:
+        if _ext in YAML_EXTENSIONS:
             self.__load_yaml_file()
+        elif _ext == '.poni':
+            self.__load_poni_file()
         else:
             raise KeyError('No interpreter found for file extension '
                            f'"{_ext}". Please try with a different file or'
                            ' rename the current file. Expected extensions '
                            'for poni files: .poni and for yaml files: '
                            f'{YAML_EXTENSIONS}.')
+
+    def __load_yaml_file(self):
+        """
+        Load ExperimentalSettings from a YAML file.
+        """
+        self.__parse_yaml_file()
+        self.__verify_all_entries_present()
+        self.__write_to_exp_settings()
+
+    def __parse_yaml_file(self):
+        """Parse the YAML file and store the contents as dictionary."""
+        with open(self.fname, 'r') as stream:
+            try:
+                self.tmp_params = yaml.safe_load(stream)
+            except yaml.YAMLError as yerr:
+                self.tmp_params = {}
+                raise yaml.YAMLError from yerr
+        self.tmp_params['xray_energy'] = (LAMBDA_TO_E
+                                          / self.tmp_params['xray_wavelength'])
+
+    def __verify_all_entries_present(self):
+        """
+        Verify that the tmp_params dictionary holds all keys from the
+        ExperimentalSettings.
+        """
+        for key in self.params:
+            if key not in self.tmp_params:
+                raise KeyError(f'The setting for "{key}" is missing.')
+
+    def __write_to_exp_settings(self):
+        """
+        Write the loaded (temporary) Parameters to the ExperimentalSettings.
+        """
+        for key in self.tmp_params:
+            self.set_param_value(key, self.tmp_params[key])
+        self.tmp_params = {}
 
     def __load_poni_file(self):
         """
@@ -93,15 +129,6 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         self.__update_geometry_from_pyFAI(geo)
         self.__verify_all_entries_present()
         self.__write_to_exp_settings()
-
-    def __load_yaml_file(self):
-        """
-        Load ExperimentalSettings from a YAML file.
-        """
-        self.__parse_yaml_file()
-        self.__verify_all_entries_present()
-        self.__write_to_exp_settings()
-
 
     def __update_detector_from_pyFAI(self, det):
         """Update the detector information from a pyFAI Detector instance. """
@@ -128,31 +155,3 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
             self.tmp_params[key] = _geodict[key.split('_')[1]]
-
-    def __verify_all_entries_present(self):
-        """
-        Verify that the tmp_params dictionary holds all keys from the
-        ExperimentalSettings.
-        """
-        for key in self.params:
-            if key not in self.tmp_params:
-                raise KeyError(f'The setting for "{key}" is missing.')
-
-    def __write_to_exp_settings(self):
-        """
-        Write the loaded (temporary) Parameters to the ExperimentalSettings.
-        """
-        for key in self.tmp_params:
-            self.set_param_value(key, self.tmp_params[key])
-        self.tmp_params = {}
-
-    def __parse_yaml_file(self):
-        """Parse the YAML file and store the contents as dictionary."""
-        with open(self.fname, 'r') as stream:
-            try:
-                self.tmp_params = yaml.safe_load(stream)
-            except yaml.YAMLError as yerr:
-                self.tmp_params = {}
-                raise yaml.YAMLError from yerr
-        self.tmp_params['xray_energy'] = (LAMBDA_TO_E
-                                          / self.tmp_params['xray_wavelength'])

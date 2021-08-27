@@ -29,7 +29,7 @@ import queue
 import multiprocessing as mp
 
 from pydidas.multiprocessing import app_processor
-from pydidas.multiprocessing.mp_test_app import MpTestApp
+from pydidas.unittest_objects.mp_test_app import MpTestApp
 
 
 class _ProcThread(threading.Thread):

@@ -91,7 +91,7 @@ class BasePlugin(ObjectWithParameterCollection):
             _desc.append(['Plugin type', f'{ptype[cls.plugin_type]}\n'])
             _desc.append(['Plugin description', f'{cls.__doc__}\n'])
             pstr = ''
-            for param in cls.parameters:
+            for param in cls.params:
                 pstr += f'\n{str(param)}'
             _desc.append(['Parameters', pstr[1:]])
         else:
@@ -100,7 +100,7 @@ class BasePlugin(ObjectWithParameterCollection):
                      f'Plugin type: {ptype[cls.plugin_type]}\n\n'
                      f'Plugin description:\n{cls.__doc__}\n\n'
                      'Parameters:')
-            for param in cls.parameters:
+            for param in cls.params:
                 _desc += f'\n{param}: {cls.parameters[param]}'
         return _desc
 

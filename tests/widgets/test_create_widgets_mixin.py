@@ -131,7 +131,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
         items = _get_widget_layout_args(obj, gridPos=_gridPos)
-        self.assertEqual(items, [*_gridPos, DEFAULT_ALIGNMENT])
+        self.assertEqual(items, [*_gridPos])
 
     def test_get_widget_layout_args(self):
         obj = self.get_widget()

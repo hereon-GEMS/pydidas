@@ -40,9 +40,10 @@ from ..core.experimental_settings import (ExperimentalSettings,
 from ..widgets import BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
 from ..widgets.dialogues import CriticalWarning
+from .builders.experiment_settings_frame_builder import (
+    create_experiment_settings_frame_widgets_and_layout)
 
 EXP_SETTINGS = ExperimentalSettings()
-
 
 ## TODO : Restore default function
 
@@ -55,28 +56,8 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         BaseFrame.__init__(self, parent, name=name)
         ParameterConfigWidgetsMixIn.__init__(self)
         self.params = EXP_SETTINGS.params
-        self.initWidgets()
+        create_experiment_settings_frame_widgets_and_layout(self)
         self.connect_signals()
-
-    def initWidgets(self):
-        self._widgets = {}
-        self.layout().setContentsMargins(5, 5, 0, 0)
-
-        self.__create_global_header()
-        for _param_key in self.params.keys():
-            if _param_key == 'xray_wavelength':
-                self.__create_xray_header()
-            if _param_key == 'detector_name':
-                self.__create_detector_header()
-            if _param_key == 'detector_dist':
-                self.__create_geometry_header()
-            self.__create_param_widgets(_param_key)
-
-        self.create_spacer(gridPos=(-1, 0, 1, 3))
-        self._widgets['but_save_to_file'] = self.create_button(
-            'Save experimental parameters to file', gridPos=(-1, 0, 1, 3),
-            alignment=None,
-            icon=self.style().standardIcon(43))
 
     def connect_signals(self):
         self._widgets['but_load_from_file'].clicked.connect(
@@ -100,54 +81,6 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
             _w = self.param_widgets[param.refkey]
             _w.io_edited.disconnect()
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
-
-    def __create_xray_header(self):
-        """Create header items (label / buttons) for X-ray energy settings."""
-        self.create_label('\nBeamline X-ray energy:', fontsize=11,
-                          bold=True, gridPos=(self.next_row(), 0, 1, 3))
-        self._widgets['but_copy_energy_from_pyfai'] = self.create_button(
-            'Copy X-ray energy from pyFAI calibration',
-            gridPos=(-1, 0, 1, 3), alignment=None)
-
-    def __create_detector_header(self):
-        """Create header items (label / buttons) for the detector."""
-        self.create_label('\nX-ray detector:', fontsize=11, bold=True,
-                          gridPos=(-1, 0, 1, 3))
-        self._widgets['but_select_detector'] = self.create_button(
-            'Select X-ray detector', gridPos=(-1, 0, 1, 3),
-            alignment=None)
-        self._widgets['but_copy_det_from_pyfai'] = self.create_button(
-            'Copy X-ray detector from pyFAI calibration',
-            gridPos=(-1, 0, 1, 3), alignment=None)
-
-    def __create_geometry_header(self):
-        """Create header items (label / buttons) for the detector."""
-        self.create_label('\nDetector geometry:', fontsize=11,
-                         bold=True, gridPos=(-1, 0, 1, 3))
-        self._widgets['but_copy_geo_from_pyfai'] = self.create_button(
-            'Copy X-ray detector geometry from pyFAI calibration',
-            gridPos=(-1, 0, 1, 3))
-
-    def __create_global_header(self):
-        """Create global header items (label / buttons). """
-        self.create_label('Experimental settings\n', fontsize=14, bold=True,
-                          underline=True, gridPos=(0, 0, 1, 0))
-        self._widgets['but_load_from_file'] = self.create_button(
-            'Load experimental parameters from file',
-            icon=self.style().standardIcon(42),
-            gridPos=(-1, 0, 1, 3), alignment=None)
-        self._widgets['but_copy_from_pyfai'] = self.create_button(
-            'Copy all experimental parameters from calibration',
-            gridPos=(-1, 0, 1, 3), alignment=None)
-
-    def __create_param_widgets(self, param_key):
-        """Create widgets for a Parameter."""
-        _row = self.next_row()
-        _param = self.get_param(param_key)
-        self.create_param_widget(_param, row=_row, textwidth = 180,
-                                 width=150)
-        self.create_label(_param.unit, gridPos=(_row, 2, 1, 1),
-                          fixedWidth=24)
 
     def update_param_value(self, key, value):
         """

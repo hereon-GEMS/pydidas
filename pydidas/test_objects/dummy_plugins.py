@@ -21,6 +21,7 @@ import shutil
 
 import numpy as np
 
+from pydidas.core import ParameterCollection
 from pydidas.plugins import InputPlugin, ProcPlugin, OutputPlugin
 from pydidas.plugins.plugin_collection import _PluginCollection
 
@@ -42,7 +43,8 @@ def create_plugin_class(number, plugin_type):
     _name = get_random_string(10)
     _cls = type(_name, cls.__bases__, dict(cls.__dict__))
     _cls.plugin_name = _name
-    _cls.number = number
+    _cls.number = number#
+    _cls.params = ParameterCollection()
     _cls.__doc__ = get_random_string(600)
     return _cls
 

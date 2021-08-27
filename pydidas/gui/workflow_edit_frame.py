@@ -24,52 +24,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowEditFrame']
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
 
-from ..widgets import (WorkflowTreeCanvas, PluginCollectionPresenter,
-                       ScrollArea)
-from ..widgets.parameter_config import PluginParameterConfigWidget
-from ..config.gui_constants import (WORKFLOW_EDIT_CANVAS_X,
-                                    WORKFLOW_EDIT_CANVAS_Y)
 from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
 from ..widgets import BaseFrame
+from .builders.workflow_edit_frame_builder import (
+    create_workflow_edit_frame_widgets_and_layout)
+
 
 class WorkflowEditFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
-        params = kwargs.get('params', {})
-        self.params = {
-            'workflow_edit_canvas_x': params.get('workflow_edit_canvas_x',
-                                                 WORKFLOW_EDIT_CANVAS_X),
-            'workflow_edit_canvas_y': params.get('workflow_edit_canvas_y',
-                                                 WORKFLOW_EDIT_CANVAS_Y)}
 
+        create_workflow_edit_frame_widgets_and_layout(self)
 
-        self.w_workflow_canvas = WorkflowTreeCanvas(self)
-        self.w_plugin_edit_canvas = PluginParameterConfigWidget(self)
-        self.w_plugin_collection = PluginCollectionPresenter(self)
-        self.w_workflow_area = ScrollArea(
-            self, widget=self.w_workflow_canvas, minimumHeight=500)
-        self.w_plugin_edit_area = ScrollArea(
-            self, widget=self.w_plugin_edit_canvas, fixedWidth=400,
-            minimumHeight=500)
-        self.w_plugin_edit_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                              QtWidgets.QSizePolicy.Expanding)
-
-        self.w_plugin_collection.selection_confirmed.connect(
+        self._widgets['plugin_collection'].selection_confirmed.connect(
             self.workflow_add_plugin)
-
-        self.w_save_button= QtWidgets.QPushButton('save workflow')
-        _layout = self.layout()
-        _layout.addWidget(self.w_workflow_area, 0, 0, 1, 1)
-        _layout.addWidget(self.w_plugin_collection, 1, 0, 2, 1)
-        _layout.addWidget(self.w_plugin_edit_area, 0, 1, 2, 1)
-        _layout.addWidget(self.w_save_button, 2, 1, 1, 1)
-        # _layout.addWidget()
-        self.setLayout(_layout)
-
-        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self.w_workflow_canvas)
+        WORKFLOW_EDIT_MANAGER.update_qt_canvas(
+            self._widgets['workflow_canvas'])
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
 
     def workflow_add_plugin(self, name):
@@ -78,4 +51,4 @@ class WorkflowEditFrame(BaseFrame):
     @QtCore.pyqtSlot(int)
     def configure_plugin(self, node_id):
         plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
-        self.w_plugin_edit_canvas.configure_plugin(node_id, plugin)
+        self._widgets['plugin_edit_canvas'].configure_plugin(node_id, plugin)

@@ -28,7 +28,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GetPluginCollection']
+__all__ = ['PluginCollection']
 
 import importlib
 import os
@@ -264,4 +264,4 @@ class _PluginCollection(PydidasQsettingsMixin):
                        'registered!')
 
 
-GetPluginCollection = SingletonFactory(_PluginCollection)
+PluginCollection = SingletonFactory(_PluginCollection)

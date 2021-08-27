@@ -23,14 +23,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
-import random
-import copy
-
-import numpy as np
 
 from pydidas.workflow_tree import WorkflowNode
-from _plugins.dummy_loader import DummyLoader
-from _plugins.dummy_proc import DummyProc
+from pydidas.unittest_objects.dummy_loader import DummyLoader
+from pydidas.unittest_objects.dummy_proc import DummyProc
 
 class TestWorkflowNode(unittest.TestCase):
 

@@ -32,6 +32,8 @@ from PyQt5 import QtWidgets, QtCore
 from pydidas.core import ScanSettings
 from pydidas.widgets import CreateWidgetsMixIn, excepthook, BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.gui.builders.scan_settings_frame_builder import (
+    create_scan_settings_frame_widgets_and_layout)
 
 SCAN_SETTINGS = ScanSettings()
 
@@ -39,52 +41,19 @@ SCAN_SETTINGS = ScanSettings()
 class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                         CreateWidgetsMixIn):
     """
-    Frame for
+    Frame for managing the global scan settings.
     """
     TEXT_WIDTH = 180
+    PARAM_INPUT_WIDTH = 120
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         BaseFrame.__init__(self, parent,name=name)
         ParameterConfigWidgetsMixIn.__init__(self)
-        self._widgets = {}
-        self.initWidgets()
+
+        create_scan_settings_frame_widgets_and_layout(self)
         self.toggle_dims()
-
-    def initWidgets(self):
-        self._widgets['title'] = self.create_label(
-            'Scan settings\n', fontsize=14, bold=True, underline=True,
-            gridPos=(0, 0, 1, 0))
-        self._widgets['but_load']  = self.create_button(
-            'Load scan parameters from file', gridPos=(-1, 0, 1, 2),
-            icon=self.style().standardIcon(42), alignment=None)
-        self._widgets['but_import']  = self.create_button(
-            'Open scan parameter import dialogue', gridPos=(-1, 0, 1, 2),
-            icon=self.style().standardIcon(42), alignment=None)
-
-        self.create_label('\nScan dimensionality:', fontsize=11,
-                         bold=True, gridPos=(self.next_row(), 0, 1, 2))
-
-        param = SCAN_SETTINGS.get_param('scan_dim')
-        self.create_param_widget(param, width_text = self.TEXT_WIDTH)
-        self.param_widgets['scan_dim'].currentTextChanged.connect(
-            self.toggle_dims)
-
-        _rowoffset = self.next_row()
-        _prefixes = ['scan_dir_', 'n_points_', 'delta_', 'unit_', 'offset_']
-        for i_dim in range(4):
-            self._widgets[f'title_{i_dim + 1}'] =  self.create_label(
-                f'\nScan dimension {i_dim+1}:',fontsize=11, bold=True,
-                gridPos=(_rowoffset + 6 * (i_dim % 2), 3 * (i_dim // 2), 1, 2))
-            for i_item, basename in enumerate(_prefixes):
-                _row = i_item + _rowoffset + 1 + 6 * (i_dim % 2)
-                _column = 3 * (i_dim // 2)
-                pname = f'{basename}{i_dim+1}'
-                param = SCAN_SETTINGS.get_param(pname)
-                self.create_param_widget(param, row=_row, column=_column,
-                                         width_text=self.TEXT_WIDTH)
-        self.create_spacer(gridPos=(_rowoffset + 1, 2, 1, 1))
 
     def toggle_dims(self):
         _prefixes = ['scan_dir_{n}', 'n_points_{n}', 'delta_{n}',
@@ -97,20 +66,30 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                 self.param_widgets[_pre.format(n=i)].setVisible(_toggle)
                 self.param_textwidgets[_pre.format(n=i)].setVisible(_toggle)
 
-    def update_param(self, pname, widget):
+    def update_param(self, param_ref, widget):
+        """
+        Overload the update of a parameter method to handle the linked
+        X-ray energy / X-ray wavelength variables.
+
+        Parameters
+        ----------
+        param_ref : str
+            The Parameter reference key
+        widget : pydidas.widgets.parameter_config.InputWidget
+            The widget used for the I/O of the Parameter value.
+        """
         try:
-            SCAN_SETTINGS.set(pname, widget.get_value())
+            SCAN_SETTINGS.set(param_ref, widget.get_value())
         except Exception:
-            widget.set_value(SCAN_SETTINGS.get(pname))
+            widget.set_value(SCAN_SETTINGS.get(param_ref))
             excepthook(*sys.exc_info())
         # explicitly call update fo wavelength and energy
-        if pname == 'xray_wavelength':
+        if param_ref == 'xray_wavelength':
             _w = self.param_widgets['xray_energy']
             _w.set_value(SCAN_SETTINGS.get('xray_energy'))
-        elif pname == 'xray_energy':
+        elif param_ref == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
             _w.set_value(SCAN_SETTINGS.get('xray_wavelength') * 1e10)
-
 
 if __name__ == '__main__':
     import pydidas

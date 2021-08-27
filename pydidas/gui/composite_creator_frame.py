@@ -33,7 +33,8 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
 
-from pydidas.gui.builders import CompositeCreatorFrameBuilder
+from pydidas.gui.builders.composite_creator_frame_builder import (
+    create_composite_creator_frame_widgets_and_layout)
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollectionMixIn, Parameter,
@@ -67,7 +68,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._app_attributes_to_update.append('_composite')
         self._create_param_collection()
 
-        CompositeCreatorFrameBuilder(self)
+        create_composite_creator_frame_widgets_and_layout(self)
         self.connect_signals()
         self.setup_initial_state()
 

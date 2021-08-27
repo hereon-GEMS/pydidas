@@ -50,7 +50,7 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.q_app.quit()
 
     def tree_click_test(self, double):
-        obj = _PluginCollectionTreeWidget(None, self.pcoll)
+        obj = _PluginCollectionTreeWidget(None, collection=self.pcoll)
         spy = QtTest.QSignalSpy(obj.selection_changed)
         self.click_index(obj, double)
         _index = obj.selectedIndexes()[0]
@@ -76,12 +76,12 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         return _item
 
     def test_PluginCollectionTreeWidget_init(self):
-        obj = _PluginCollectionTreeWidget(None, self.pcoll)
+        obj = _PluginCollectionTreeWidget(None, collection=self.pcoll)
         self.assertIsInstance(obj, QtWidgets.QTreeView)
         self.assertEqual(obj.width(), 493)
 
     def test_PluginCollectionTreeWidget__create_tree_model(self):
-        obj = _PluginCollectionTreeWidget(None, self.pcoll)
+        obj = _PluginCollectionTreeWidget(None, collection=self.pcoll)
         _root, _model = obj._PluginCollectionTreeWidget__create_tree_model()
         self.assertIsInstance(_root, QtGui.QStandardItem)
         self.assertIsInstance(_model, QtGui.QStandardItemModel)
@@ -97,18 +97,18 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.tree_click_test(True)
 
     def test_PluginCollectionPresenter_init(self):
-        obj = PluginCollectionPresenter(None, self.pcoll)
+        obj = PluginCollectionPresenter(None, collection=self.pcoll)
         self.assertIsInstance(obj, QtWidgets.QWidget)
 
     def test_PluginCollectionPresenter_confirm_selection(self):
-        obj = PluginCollectionPresenter(None, self.pcoll)
+        obj = PluginCollectionPresenter(None, collection=self.pcoll)
         spy = QtTest.QSignalSpy(obj.selection_confirmed)
         _item = self.click_index(obj._widgets['plugin_treeview'], double=True)
         self.assertEqual(len(spy), 1)
         self.assertEqual(spy[0][0], _item.text())
 
     def test_PluginCollectionPresenter_preview_plugin(self):
-        obj = PluginCollectionPresenter(None, self.pcoll)
+        obj = PluginCollectionPresenter(None, collection=self.pcoll)
         _item = self.click_index(obj._widgets['plugin_treeview'])
         _plugin = DummyPluginCollection.get_plugin_by_name(_item.text())
         _text = obj._widgets['plugin_description'].toPlainText()

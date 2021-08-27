@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkflowEditFrame which is used to create the workflow
-tree."""
+"""
+Module with the PyfaiCalibFrame which is a subclassed pyfai-calib2 widget
+to be used within pydidas.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -86,7 +88,6 @@ class PyfaiCalibFrame(BaseFrame):
         self._stack.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                  QtWidgets.QSizePolicy.Expanding)
 
-
         _layout = QtWidgets.QGridLayout()
         _layout.addWidget(self._list, 0, 0, 1, 1)
         _layout.addWidget(self._help, 1, 0, 1, 1)
@@ -136,11 +137,9 @@ class PyfaiCalibFrame(BaseFrame):
         w = self.__menu_connections[text]
         self._stack.setCurrentWidget(w)
 
-
     def closeEvent(self, event):
-        poniFile = self.model().experimentSettingsModel().poniFile()
+        # poniFile = self.model().experimentSettingsModel().poniFile()
         event.accept()
-
         for task in self.__tasks:
             task.aboutToClose()
         # self.__context.saveWindowLocationSettings("main-window", self)
@@ -153,7 +152,7 @@ class PyfaiCalibFrame(BaseFrame):
         from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
 
         _it = IntegrationTask()
-        _button = QtWidgets.QPushButton('Store geometry for pyDIDAS use')
+        _button = QtWidgets.QPushButton('Store geometry for pydidas use')
         _button.clicked.connect(self._store_geometry)
         _groupbox = _it.layout().itemAt(1).widget().layout().itemAt(1).widget()
         _groupbox.layout().addWidget(_button)

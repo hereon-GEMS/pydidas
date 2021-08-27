@@ -22,84 +22,44 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ImageMathsFrame']
+__all__ = ['ImageMathFrame']
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 import qtawesome as qta
 
-from silx.gui.plot.ImageView import ImageView
-
-from pydidas.core import ScanSettings, Parameter
+from pydidas.core import (ScanSettings, Parameter, ParameterCollection,
+                          get_generic_parameter)
 from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import ReadOnlyTextWidget, BaseFrame
+from pydidas.widgets import BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.gui.builders.image_math_frame_builder import (
+    create_image_math_frame_widgets_and_layout)
+
 
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
 
-_params = {
-    'buffer_no': Parameter('Image buffer number', str, default='Image #1', refkey='buffer_no',
-                          choices=['Image #1', 'Image #2', 'Image #3', 'Image #4', 'Image #5']),
-    'scan_index1': Parameter('Scan dim. 1 index', int, default=0,
-                             refkey='scan_index1'),
-    'scan_index2': Parameter('Scan dim. 2 index', int, default=0,
-                             refkey='scan_index2'),
-    'scan_index3': Parameter('Scan dim. 3 index', int, default=0,
-                             refkey='scan_index3'),
-    'scan_index4': Parameter('Scan dim. 4 index', int, default=0,
-                             refkey='scan_index4'),
-    }
+DEFAULT_PARAMS =  ParameterCollection(
+    Parameter('Image buffer number', str, default='Image #1',
+              refkey='buffer_no',
+              choices=['Image #1', 'Image #2', 'Image #3', 'Image #4',
+                       'Image #5']),
+    get_generic_parameter('scan_index1'),
+    get_generic_parameter('scan_index2'),
+    get_generic_parameter('scan_index3'),
+    get_generic_parameter('scan_index4'),
+    )
 
 
-class ImageMathsFrame(BaseFrame, ParameterConfigWidgetsMixIn):
+class ImageMathFrame(BaseFrame, ParameterConfigWidgetsMixIn):
+    default_params = DEFAULT_PARAMS
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
         ParameterConfigWidgetsMixIn.__init__(self)
-        self.params = _params
-        self._plugin = None
-        self.scan_dim = 4
-        self.initWidgets()
-        # self.param_widgets['plugins'].currentTextChanged.connect(
-        #     self.select_plugin)
-        # self.button_plugin_input.clicked.connect(self.click_plugin_input)
-        # self.button_plugin_exec.clicked.connect(self.click_execute_plugin)
-
-    def initWidgets(self):
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
-
-        self.add_label('Image mathematics', fontsize=14,
-                       gridPos=(0, 0, 1, 5))
-
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2))
-        self.add_param(self.params['buffer_no'], textwidth=130, width=110)
-
-        self.b_open = self.create_button('Open image', gridPos=(self.next_row(), 0, 1, 2), icon=qta.icon('ei.folder-open'))
-
-        self.w_operations = self.create_button('Image operations', gridPos=(self.next_row(), 0, 1, 2))
-        self.w_operations.setFixedHeight(400)
-        self.w_operations.setFixedWidth(270)
-
-        self.create_spacer(height=20, gridPos=(self.next_row(), 0, 1, 2),
-                        policy = QtWidgets.QSizePolicy.Expanding)
-
-
-        self.w_history = QtWidgets.QListWidget(None)
-        self.w_history.setFixedWidth(270)
-        self.w_history.setFixedHeight(200)
-        _layout.addWidget(self.w_history, self.next_row(), 0, 1, 2)
-
-        self.imview = ImageView()
-        _layout.addWidget(self.imview, 2, 2, _layout.rowCount(), 1)
-        _row = self.next_row()
-        self.b_undo = self.create_button('Undo', gridPos=(_row, 0, 1, 1))
-        self.b_redo = self.create_button('Redo', gridPos=(_row, 1, 1, 1))
-
-        self.w_history.addItem('Image #1 Operation 1')
-        self.w_history.addItem('Image #1 Operation 2')
-        self.w_history.addItem('Image #1 Operation 3')
+        self.set_default_params()
+        create_image_math_frame_widgets_and_layout(self)
 
     def frame_activated(self, index):
         ...
@@ -125,7 +85,7 @@ if __name__ == '__main__':
     app.setFont(_font)
     gui = MainWindow()
 
-    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'), ImageMathsFrame)
+    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'), ImageMathFrame)
     gui.create_toolbars()
 
     gui.show()

@@ -27,7 +27,7 @@ import sys
 
 from PyQt5 import QtCore, QtTest
 from pydidas.multiprocessing import AppRunner
-from pydidas.multiprocessing.mp_test_app import MpTestApp
+from pydidas.unittest_objects.mp_test_app import MpTestApp
 
 
 def quit_app():

@@ -11,7 +11,7 @@ import qtawesome as qta
 
 import pydidas
 WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowEditTreeManager()
-PLUGIN_COLLECTION = pydidas.GetPluginCollection()
+PLUGIN_COLLECTION = pydidas.plugins.PluginCollection()
 STYLES = pydidas.config.STYLES
 PALETTES = pydidas.config.PALETTES
 STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
@@ -28,12 +28,12 @@ class HomeFrame(BaseFrame):
         parent = kwargs.get('parent', None)
         name = kwargs.get('Name', None)
         super().__init__(parent=parent, name=name)
-        self.create_label('Welcome to pyDIDAS', fontsize=14, bold=True, fixedWidth=400)
-        self.create_label('- the python Diffraction Data Analysis Suite.\n', fontsize=13,
+        self.create_label('label_welcome', 'Welcome to pyDIDAS', fontsize=14, bold=True, fixedWidth=400)
+        self.create_label('label_full_name', '- the python Diffraction Data Analysis Suite.\n', fontsize=13,
                          bold=True, fixedWidth=400)
-        self.create_label('\nQuickstart:', fontsize=12, bold=True, fixedWidth=400)
-        self.create_label('\nMenu toolbar: ', fontsize=11, underline=True, bold=True, fixedWidth=400)
-        self.create_label('Use the menu toolbar on the left to switch between'
+        self.create_label('label_quickstart', '\nQuickstart:', fontsize=12, bold=True, fixedWidth=400)
+        self.create_label('label_toolbar', '\nMenu toolbar: ', fontsize=11, underline=True, bold=True, fixedWidth=400)
+        self.create_label('label_toolbar_use', 'Use the menu toolbar on the left to switch between'
                          ' different Frames. Some menu toolbars will open an '
                          'additional submenu on the left.', fixedWidth=600)
 
@@ -84,15 +84,15 @@ if __name__ == '__main__':
 
     from pydidas.gui.pyfai_calib_frame import PyfaiCalibFrame, pyfaiCalibIcon
     gui.register_frame('Home', 'Home', qta.icon('mdi.home'), HomeFrame)
-    gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
-    gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
-    gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
-    gui.register_frame('Composite image creator', 'Tools/Composite image creator', qta.icon('mdi.view-comfy'), CompositeCreatorFrame)
+    # gui.register_frame('Data browsing', 'Data browsing', qta.icon('mdi.image-search-outline'), DataBrowsingFrame)
+    # gui.register_frame('Tools', 'Tools', qta.icon('mdi.tools'), ToolsFrame)
+    # gui.register_frame('pyFAI calibration', 'Tools/pyFAI calibration', pyfaiCalibIcon(), PyfaiCalibFrame)
+    # gui.register_frame('Composite image creator', 'Tools/Composite image creator', qta.icon('mdi.view-comfy'), CompositeCreatorFrame)
     gui.register_frame('Processing setup', 'Processing setup', qta.icon('mdi.cogs'), ProcessingSetupFrame)
     gui.register_frame('Processing', 'Processing', qta.icon('mdi.sync'), ProcessingFrame)
-    gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)
-    gui.register_frame('Run single plugins', 'Processing/Run single plugins', qta.icon('mdi.debug-step-over'), ProcessingSinglePluginFrame)
-    gui.register_frame('Run full processing', 'Processing/Run full procesing', qta.icon('mdi.play-circle-outline'), ProcessingFullWorkflowFrame)
+    # gui.register_frame('Result visualization', 'Result visualization', qta.icon('mdi.monitor-eye'), ResultVisualizationFrame)
+    # gui.register_frame('Run single plugins', 'Processing/Run single plugins', qta.icon('mdi.debug-step-over'), ProcessingSinglePluginFrame)
+    # gui.register_frame('Run full processing', 'Processing/Run full procesing', qta.icon('mdi.play-circle-outline'), ProcessingFullWorkflowFrame)
     gui.register_frame('Experimental settings', 'Processing setup/Experimental settings', qta.icon('mdi.card-bulleted-settings-outline'), ExperimentSettingsFrame)
     gui.register_frame('Scan settings', 'Processing setup/Scan settings', qta.icon('ei.move'), ScanSettingsFrame)
     gui.register_frame('Workflow editing', 'Processing setup/Workflow editing', qta.icon('mdi.clipboard-flow-outline'), WorkflowEditFrame)

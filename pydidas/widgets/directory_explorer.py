@@ -30,7 +30,7 @@ class DirectoryExplorer(QtWidgets.QTreeView):
     The DirectoryExplorer is an implementation of a QTreeView widget with a
     file system model to display the contents of directories.
     """
-    def __init__(self, parent=None, root_path=''):
+    def __init__(self, parent=None, root_path='', **kwargs):
         """
         Create a DirectoryExplorer instance.
 

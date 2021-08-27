@@ -26,26 +26,16 @@ __all__ = ['DataBrowsingFrame']
 import os
 from functools import partial
 
-from PyQt5 import QtWidgets, QtCore
-from silx.gui.plot.ImageView import ImageView
+from PyQt5 import QtWidgets
 
-from ..widgets import (DirectoryExplorer, Hdf5DatasetSelector,
-                       QtaIconButton, BaseFrame)
-from ..image_io import ImageReaderFactory, read_image
-from ..config import HDF5_EXTENSIONS
+from pydidas.widgets import BaseFrame
+from pydidas.image_io import ImageReaderFactory, read_image
+from pydidas.config import HDF5_EXTENSIONS
+from pydidas.gui.builders.data_browsing_frame_builder import (
+    create_data_browsing_frame_widgets_and_layout)
 
 
 IMAGE_READER = ImageReaderFactory()
-
-
-class ImageViewNoHist(ImageView):
-    """
-    Subclass silx ImageView with a smaller historgram.
-    """
-    HISTOGRAMS_HEIGHT = 120
-
-    def __init__(self):
-        super().__init__()
 
 
 class DataBrowsingFrame(BaseFrame):
@@ -58,80 +48,76 @@ class DataBrowsingFrame(BaseFrame):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         super().__init__(parent=parent, name=name)
-        self.create_label('Data exploration view', fontsize=14)
-        self.__settings = QtCore.QSettings('Hereon', 'pydidas')
 
-        self.init_widgets()
-        self._tree.doubleClicked.connect(
-            partial(self.__fileSelected, self._imview)
-            )
-        self._tree.clicked.connect(self.__fileHighlighted)
+        create_data_browsing_frame_widgets_and_layout(self)
+        self._widgets['tree'].doubleClicked.connect(self.__fileSelected)
+        self._widgets['tree'].clicked.connect(self.__fileHighlighted)
+        self._widgets['but_minimize'].clicked.connect(
+        partial(self.change_splitter_pos, False))
+        self._widgets['but_maximize'].clicked.connect(
+            partial(self.change_splitter_pos, True))
+        self.__selection_width = self._widgets['selection'].width()
 
-    def init_widgets(self):
-        """Init the user interface with the widgets."""
-        self._tree = DirectoryExplorer()
-        self.hdf_dset_w = Hdf5DatasetSelector()
-
-        button_min = QtaIconButton('fa.chevron-left', size=25)
-        button_max = QtaIconButton('fa.chevron-right', size=25)
-
-        self._selection = QtWidgets.QFrame(self)
-        self._selection.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                      QtWidgets.QSizePolicy.Expanding)
-        _layout = QtWidgets.QGridLayout()
-        _layout.addWidget(self._tree, 0, 0, 3, 1)
-        _layout.addWidget(button_min, 0, 1, 1, 1)
-        _layout.addWidget(button_max, 2, 1, 1, 1)
-        _layout.setRowStretch(0, 10)
-        _layout.addWidget(self.hdf_dset_w, 3, 0, 1, 2)
-        self._selection.setLayout(_layout)
-
-        self._imview = ImageView()
-        self._imview.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        self.hdf_dset_w.register_view_widget(self._imview)
-        self.main_splitter = QtWidgets.QSplitter()
-        self.main_splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                         QtWidgets.QSizePolicy.Expanding)
-        self.main_splitter.addWidget(self._selection)
-        self.main_splitter.addWidget(self._imview)
-
-        self.layout().addWidget(self.main_splitter)
-
-        button_min.clicked.connect(partial(self.change_min_widths, False))
-        button_max.clicked.connect(partial(self.change_min_widths, True))
-
-        self.__selectionWidth = self._selection.width()
-        self._imview.setData = self._imview.setImage
-
-    def change_min_widths(self, enlargeDir=True):
+    def change_splitter_pos(self, enlargeDir=True):
         if enlargeDir:
-            self.main_splitter.moveSplitter(770, 1)
+            self._widgets['splitter'].moveSplitter(770, 1)
         else:
-            self.main_splitter.moveSplitter(300, 1)
+            self._widgets['splitter'].moveSplitter(300, 1)
 
     def __fileHighlighted(self):
-        index = self._tree.selectedIndexes()[0]
-        _name = self._tree._filemodel.filePath(index)
+        """
+        Perform actions after a file has been highlighted in the
+        DirectoryExplorer.
+        """
+        index = self._widgets['tree'].selectedIndexes()[0]
+        _name = self._widgets['tree']._filemodel.filePath(index)
         if os.path.isfile(_name):
             _name = os.path.dirname(_name)
-        self.__settings.setValue('directory_explorer/path', _name)
+        self.q_settings.setValue('directory_explorer/path', _name)
 
-    def __fileSelected(self, widget):
-        index = self._tree.selectedIndexes()[0]
-        _name = self._tree._filemodel.filePath(index)
+    def __fileSelected(self):
+        """
+        Open a file after sit has been selected in the DirectoryExplorer.
+        """
+        index = self._widgets['tree'].selectedIndexes()[0]
+        _name = self._widgets['tree']._filemodel.filePath(index)
         self.set_status(f'Opened file: {_name}')
         if not os.path.isfile(_name):
             return
-        _extension= f'.{os.path.basename(_name).split(".")[-1]}'
-        _supported_ext = (set(IMAGE_READER._extensions.keys())
+        _extension= '.' + os.path.basename(_name).split(".")[-1]
+        _supported_nothdf_ext = (set(IMAGE_READER._extensions.keys())
                           - set(HDF5_EXTENSIONS))
         if _extension in HDF5_EXTENSIONS:
-            self.hdf_dset_w.setVisible(True)
-            self.hdf_dset_w.set_filename(_name)
+            self._widgets['hdf_dset'].setVisible(True)
+            self._widgets['hdf_dset'].set_filename(_name)
             return
-        self.hdf_dset_w.setVisible(False)
-        if _extension in _supported_ext:
+        self._widgets['hdf_dset'].setVisible(False)
+        if _extension in _supported_nothdf_ext:
             _data = read_image(_name)
-            widget.setData(_data)
-        return
+            self._widgets['viewer'].setData(_data)
+
+
+if __name__ == '__main__':
+    import pydidas
+    from pydidas.gui.main_window import MainWindow
+    import sys
+    import qtawesome as qta
+    app = QtWidgets.QApplication(sys.argv)
+    #app.setStyle('Fusion')
+
+    # needs to be initialized after the app has been created.
+    # sys.excepthook = pydidas.widgets.excepthook
+    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
+    STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
+
+    _font = app.font()
+    _font.setPointSize(STANDARD_FONT_SIZE)
+    app.setFont(_font)
+    gui = MainWindow()
+    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'),
+                       DataBrowsingFrame)
+    gui.create_toolbars()
+
+    gui.show()
+    sys.exit(app.exec_())
+    app.deleteLater()

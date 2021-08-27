@@ -25,17 +25,15 @@ __status__ = "Development"
 __all__ = ['GlobalConfigurationFrame']
 
 import sys
-from numbers import Integral, Real
 from functools import partial
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 
 
 from pydidas.widgets import BaseFrame
-from pydidas.core import (ParameterCollectionMixIn,
-                          get_generic_parameter, ParameterCollection)
-from pydidas.widgets import excepthook
+from pydidas.core import (get_generic_parameter, ParameterCollection)
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
-
+from pydidas.gui.builders.global_configuration_frame_builder import (
+    create_global_configurataion_frame_widgets_and_layout)
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mp_n_workers'),
@@ -61,56 +59,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
         BaseFrame.__init__(self, parent,name=name)
         ParameterConfigWidgetsMixIn.__init__(self)
         self.set_default_params()
-
-        self._widgets = {}
-        self.init_widgets()
-
-        self.connect_signals()
-
+        create_global_configurataion_frame_widgets_and_layout(self)
         self.frame_activated(self.frame_index)
-
-    def init_widgets(self):
-        """
-        Create the widgets required for GlobalConfigurationFrame.
-        """
-        _twoline_options = dict(width_text=self.TEXT_WIDTH, width=240,
-                                linebreak=True, n_columns=2,
-                                halign_text=QtCore.Qt.AlignLeft,
-                                valign_text=QtCore.Qt.AlignBottom)
-        _options = dict(width_text=self.TEXT_WIDTH, width=60)
-        _section_options = dict(fontsize=13, bold=True,
-                                gridPos=(-1, 0, 2, 0))
-
-        self.create_label('title', 'Global settings\n', fontsize=14,
-                          bold=True, gridPos=(0, 0, 2, 0))
-
-        self.create_button('but_reset', 'Restore defaults',
-                           icon=self.style().standardIcon(59),
-                           gridPos=(-1, 0, 2, 0), alignment=None)
-
-        self.create_label('section_multiprocessing',
-                          'Multiprocessing settings', **_section_options)
-        self.create_param_widget(self.params.get_param('mp_n_workers'),
-                                 **_options)
-        self.create_spacer('spacer_1')
-
-        self.create_label('section_detector', 'Detector settings',
-                          **_section_options)
-        self.create_param_widget(self.params.get_param('det_mask'),
-                                 **_twoline_options)
-        self.create_param_widget(self.params.get_param('det_mask_val'),
-                                 **_options)
-        self.create_spacer('spacer_2')
-
-        self.create_label('section_mosaic', 'Composite creator settings',
-                          **_section_options)
-        self.create_param_widget(self.params.get_param('mosaic_border_width'),
-                                 **_options)
-        self.create_param_widget(self.params.get_param('mosaic_border_value'),
-                                 **_options)
-        self.create_param_widget(self.params.get_param('mosaic_max_size'),
-                                 **_options)
-        self.create_spacer('spacer_3')
 
     def connect_signals(self):
         """

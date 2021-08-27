@@ -140,10 +140,11 @@ class TestBaseApp(unittest.TestCase):
         self.assertIsNone(app.parse_func)
 
     def test_set_parse_func(self):
-        dummy = hash(self)
+        def dummy(obj):
+            return {0: hash(self)}
         BaseApp.parse_func = dummy
         app = BaseApp()
-        self.assertEqual(dummy, app.parse_func)
+        self.assertEqual(dummy(None), app.parse_func())
 
 
 if __name__ == "__main__":

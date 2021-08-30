@@ -33,60 +33,80 @@ __all__ = ['PluginCollection']
 import importlib
 import os
 import inspect
-import sys
+
+from PyQt5 import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
-from ..core.utilities import flatten_list
+from ..utils import find_valid_python_files
 from .plugin_collection_util_funcs import (
-    get_generic_plugin_path, trim_filename,
-    plugin_type_check, plugin_consistency_check)
+    get_generic_plugin_path, plugin_type_check, plugin_consistency_check)
 
 
 class _PluginCollection(PydidasQsettingsMixin):
     """
     Class to hold references of all plugins
     """
+
+    @classmethod
+    def clear_qsettings(cls):
+        """
+        Clear the entry for the QSettings plugin_path.
+        """
+        q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        q_settings.setValue('global/plugin_path', '')
+
     def __init__(self, **kwargs):
         """
         Setup method.
 
         Parameters
         ----------
-        plugin_path : str, optional
-            The search directory for plugins. The default is None.
+        plugin_path : Union[str, list], optional
+            The search directory for plugins. A single path can be supplies
+            as string. Multiple paths can be supplied in a single string
+            separated by ";;" or as a list. None will call to the default
+            paths. The default is None.
         """
-        plugin_path = kwargs.get('plugin_path', None)
-        PydidasQsettingsMixin.__init__(self)
-        plugin_paths = self.__process_plugin_path(plugin_path)
         self.plugins = {}
-        self.__plugin_type_register = {}
-        self.find_plugins(plugin_paths)
+        self.__plugin_types = {}
+        self.__plugin_paths = []
+        PydidasQsettingsMixin.__init__(self)
+        plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
+        if plugin_path is None:
+            plugin_path = self.__get_generic_plugin_path()
+        self.find_and_register_plugins(*plugin_path)
 
-    def __process_plugin_path(self, plugin_path):
+    def __get_plugin_path_from_kwargs(self, **kwargs):
         """
-        Process the plugin path(s) and add them to sys.path.
+        Get the plugin path(s) from the calling keyword arguments.
 
         Parameters
         ----------
-        plugin_path : Union[list, str, None]
-            The plugin path as string, a list of paths or None. If None,
-            the method will default to the QSettings first and if unsuccessful
-            to the generic plugin path.
+        **kwargs : dict
+            The calling keyword arguments
+
+        Returns
+        -------
+        _path : Union[list, None]
+            The plugin paths. If None, no paths have been specified.
+        """
+        _path = kwargs.get('plugin_path', None)
+        if isinstance(_path, str):
+            _path = [item.strip() for item in _path.split(';;')]
+        return _path
+
+    def __get_generic_plugin_path(self):
+        """
+        Get the generic plugin path(s).
 
         Returns
         -------
         plugin_path : list
             A list of plugin paths.
         """
-        if not plugin_path:
-            plugin_path = self.__get_q_settings_plugin_path()
-            if plugin_path is None:
-                plugin_path = get_generic_plugin_path()
-        plugin_path = ([plugin_path] if isinstance(plugin_path, str)
-                       else plugin_path)
-        for _path in plugin_path:
-            if _path not in sys.path:
-                sys.path.insert(0, _path)
+        plugin_path = self.__get_q_settings_plugin_path()
+        if plugin_path == [''] or plugin_path is None:
+            plugin_path = get_generic_plugin_path()
         return plugin_path
 
     def __get_q_settings_plugin_path(self):
@@ -100,26 +120,27 @@ class _PluginCollection(PydidasQsettingsMixin):
             entries.
         """
         _path = self.q_settings_get_global_value('plugin_path')
-        if _path is not None:
+        if isinstance(_path, str):
             return _path.split(';;')
         return _path
 
-    def find_plugins(self, plugin_paths, reload=True):
+    def find_and_register_plugins(self, *plugin_paths, reload=True):
         """
-        Find plugins in the given paths.
+        Find plugins in the given path(s) and register them in the
+        PluginCollection.
 
         Parameters
         ----------
-        path : str
-            The file system search path.
+        plugin_paths : tuple
+            Any number of file system paths in string format.
         reload : bool, optional
             Flag to handle reloading of plugins if a plugin with an identical
             name is encountered. If False, these plugins will be skipped.
         """
         for _path in plugin_paths:
-            self.__find_plugins_in_path(_path, reload)
+            self._find_and_register_plugins_in_path(_path, reload)
 
-    def __find_plugins_in_path(self, path, reload=True):
+    def _find_and_register_plugins_in_path(self, path, reload=True):
         """
         Find the plugin in a specific path.
 
@@ -131,18 +152,31 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to handle reloading of plugins if a plugin with an identical
             name is encountered. If False, these plugins will be skipped.
         """
-        _modules = self.get_modules(path)
-        for _mod in _modules:
-            spec = importlib.util.find_spec(_mod)
-            _m = spec.loader.load_module()
-            clsmembers = inspect.getmembers(_m, inspect.isclass)
-            for _name, _cls in clsmembers:
+        self._store_plugin_path(path)
+        _modules = self._get_valid_modules_and_filenames(path)
+        for _modname, _file in _modules.items():
+            _class_members = self.__import_module_and_get_classes_in_module(
+                _modname, _file)
+            for _name, _cls in _class_members:
                 self.__check_and_register_class(_cls, reload)
-            del _m
 
-    def get_modules(self, path):
+    def _store_plugin_path(self, plugin_path):
         """
-        Get all module names in a specified path (including subdirectories)
+        Store the plugin path.
+
+        Parameters
+        ----------
+        plugin_path : str
+            The plugin path as string
+        """
+        if os.path.exists(plugin_path):
+            self.__plugin_paths.append(plugin_path)
+        _paths = ';;'.join(self.__plugin_paths)
+        self.q_settings.setValue('global/plugin_path', _paths)
+
+    def _get_valid_modules_and_filenames(self, path):
+        """
+        Get all module names in a specified path (including subdirectories).
 
         Parameters
         ----------
@@ -154,48 +188,40 @@ class _PluginCollection(PydidasQsettingsMixin):
         _modules : list
             A list with the module names.
         """
-        _files = self.find_files(path)
+        _files = find_valid_python_files(path)
         _path = path.replace(os.sep, '/')
         _path = _path + (not _path.endswith('/')) * '/'
-        _modules = []
+        _modules = {}
         for _file in _files:
             _file = _file.replace(os.sep, '/')
             _tmpmod = _file.removesuffix('.py').removeprefix(_path)
             _mod = _tmpmod.replace('/', '.')
-            _modules.append(_mod)
-        return _modules
+            _modules[_mod] = _file
+        return  _modules
 
-    def find_files(self, path):
+    def __import_module_and_get_classes_in_module(self, modname, filepath):
         """
-        Search for all python files in path and subdirectories.
-
-        This method will search the specified path recursicely for all
-        python files, defined as files with a .py extension.
-        It will ignore protected files /directories (starting with "__")
-        and hidden files / directories (starting with ".").
+        Import a module from a file and get all class members of the module.
 
         Parameters
         ----------
-        path : str
-            The file system path to search.
-        rel_path : str
-            The relative path (if recursing). Default is None.
+        modname : str
+            The registration name of the module
+        filepath : str
+            The full file path of the module.
 
         Returns
         -------
-        list
-            A list with the full filesystem path of python files in the
-            directory and its subdirectories.
+        clsmembers : tuple
+            A tuple of the class members with entries for each class in the
+            form of (name, class).
         """
-        path = trim_filename(path)
-        _entries = [os.path.join(path, item) for item in os.listdir(path)
-                    if not (item.startswith('__') or item.startswith('.'))]
-        _dirs = [item for item in _entries if os.path.isdir(item)]
-        _files = [item for item in _entries if os.path.isfile(item)]
-        _results = flatten_list(
-            [self.find_files(os.path.join(path, entry)) for entry in _dirs])
-        _results += [f for f in _files if f.endswith('.py')]
-        return _results
+        spec = importlib.util.spec_from_file_location(modname, filepath)
+        tmp_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tmp_module)
+        clsmembers = inspect.getmembers(tmp_module, inspect.isclass)
+        del spec, tmp_module
+        return clsmembers
 
     def __check_and_register_class(self, class_, reload=False):
         """
@@ -211,12 +237,13 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
+
         if not plugin_consistency_check(class_):
             return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)
         elif reload:
-            self.__remove_old_item(class_)
+            self.__remove_plugin_from_collection(class_)
             self.__add_new_class(class_)
 
     def __add_new_class(self, class_):
@@ -232,25 +259,20 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
 
         self.plugins[class_.__name__] = class_
-        self.__plugin_type_register[class_.__name__] = plugin_type_check(class_)
+        self.__plugin_types[class_.__name__] = plugin_type_check(class_)
 
-    def __remove_old_item(self, class_):
+    def __remove_plugin_from_collection(self, class_):
         """
-        Remove an old item from the collection.
-
-        Note: If a class with the same class name is reloaded but has been
-        registered to a different name, this is removed as well.
+        Remove a Plugin from the PluginCollection.
 
         Parameters
         ----------
-        name : str
-            The reference name of the Plugin.
         class_ : type
             The class object.
         """
         if class_.__name__ in self.plugins:
             del self.plugins[class_.__name__]
-            del self.__plugin_type_register[class_.__name__]
+            del self.__plugin_types[class_.__name__]
 
     def get_all_plugin_names(self):
         """
@@ -309,7 +331,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         _key = {'base': -1, 'input': 0, 'proc': 1, 'output': 2}[plugin_type]
         _res = []
         for _name in self.plugins:
-            if self.__plugin_type_register[_name] == _key:
+            if self.__plugin_types[_name] == _key:
                 _res.append(self.plugins[_name])
         return _res
 
@@ -325,6 +347,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         if confirmation:
             self.plugins = {}
-            self.__plugin_type_register = {}
+            self.__plugin_types = {}
+
 
 PluginCollection = SingletonFactory(_PluginCollection)

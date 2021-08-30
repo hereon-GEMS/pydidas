@@ -50,16 +50,10 @@ def create_plugin_class(number, plugin_type):
 
 class DummyPluginCollection(_PluginCollection):
     def __init__(self, **kwargs):
-        self._pluginpath = tempfile.mkdtemp()
-        kwargs['plugin_path'] = self._pluginpath
         super().__init__(**kwargs)
         _nplugins = kwargs.get('n_plugins', 21)
         for num in range(_nplugins):
             _class = create_plugin_class(num // 3, num % 3)
-            _name = _class.plugin_name
-            self.plugins[_class.__name__] = _class
-            self._PluginCollection__plugin_type_register[_class.__name__] = num % 3
-
-
-    def clean_up(self):
-        shutil.rmtree(self._pluginpath)
+            _name = _class.__name__
+            self.plugins[_name] = _class
+            self._PluginCollection__plugin_types[_name] = num % 3

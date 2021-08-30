@@ -28,8 +28,8 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_generic_plugin_path', 'trim_filename',
-           'plugin_type_check', 'plugin_consistency_check']
+__all__ = ['get_generic_plugin_path', 'plugin_type_check',
+           'plugin_consistency_check']
 
 
 import os
@@ -49,32 +49,10 @@ def get_generic_plugin_path():
     str
         The path to the generic plugin folder.
     """
-    return os.path.join(
+    return [os.path.join(
         os.path.dirname(
         os.path.dirname(
-        os.path.dirname(__file__))), 'plugins')
-
-
-def trim_filename(path):
-    """
-    Trim a filename from a path if present.
-
-    Parameters
-    ----------
-    path : str
-        The file system path, including eventual filenames.
-
-    Returns
-    -------
-    path : str
-        The path without filename
-    """
-    path = os.path.dirname(path) if os.path.isfile(path) else path
-    if os.sep == '/':
-        path.replace('\\', os.sep)
-    else:
-        path.replace('/', os.sep)
-    return path
+        os.path.dirname(__file__))), 'plugins')]
 
 
 def plugin_type_check(cls_item):

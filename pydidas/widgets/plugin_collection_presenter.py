@@ -167,18 +167,18 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
         root_node = tree_model.invisibleRootItem()
         input_plugins = Qt.QStandardItem('Input plugins')
-        for item in self.collection.plugins['input'].values():
-            input_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
-        root_node.appendRow(input_plugins)
-
         proc_plugins = Qt.QStandardItem('Processing plugins')
-        for item in self.collection.plugins['proc'].values():
-            proc_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
-        root_node.appendRow(proc_plugins)
-
         output_plugins = Qt.QStandardItem('Output plugins')
-        for item in self.collection.plugins['output'].values():
-            output_plugins.appendRow(Qt.QStandardItem(item.plugin_name))
+
+        for _plugin in self.collection.get_all_plugins_of_type('input'):
+            input_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+        for _plugin in self.collection.get_all_plugins_of_type('proc'):
+            proc_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+        for _plugin in self.collection.get_all_plugins_of_type('output'):
+            output_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+
+        root_node.appendRow(input_plugins)
+        root_node.appendRow(proc_plugins)
         root_node.appendRow(output_plugins)
         return root_node, tree_model
 

@@ -60,13 +60,8 @@ def plugin_type_check(cls_item):
     TO DO
     """
     if cls_item.basic_plugin:
-        return 'base'
-    if cls_item.plugin_type == INPUT_PLUGIN:
-        return 'input'
-    if cls_item.plugin_type == PROC_PLUGIN:
-        return 'proc'
-    if cls_item.plugin_type == OUTPUT_PLUGIN:
-        return 'output'
+        return -1
+    return cls_item.plugin_type
     raise ValueError('Could not determine the plugin type for'
                      'class "{cls_item.__name__}"')
 

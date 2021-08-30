@@ -69,6 +69,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         self.plugins = {}
         self.__plugin_types = {}
+        self.__plugin_names = {}
         self.__plugin_paths = []
         PydidasQsettingsMixin.__init__(self)
         plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
@@ -169,6 +170,9 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin_path : str
             The plugin path as string
         """
+        if plugin_path in self.__plugin_paths:
+            print('Warning. Storing same path again:', plugin_path)
+            return
         if os.path.exists(plugin_path):
             self.__plugin_paths.append(plugin_path)
         _paths = ';;'.join(self.__plugin_paths)
@@ -260,6 +264,7 @@ class _PluginCollection(PydidasQsettingsMixin):
 
         self.plugins[class_.__name__] = class_
         self.__plugin_types[class_.__name__] = plugin_type_check(class_)
+        self.__plugin_names[class_.plugin_name] = class_.__name__
 
     def __remove_plugin_from_collection(self, class_):
         """
@@ -273,6 +278,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         if class_.__name__ in self.plugins:
             del self.plugins[class_.__name__]
             del self.__plugin_types[class_.__name__]
+            del self.__plugin_names[class_.plugin_name]
 
     def get_all_plugin_names(self):
         """
@@ -348,6 +354,8 @@ class _PluginCollection(PydidasQsettingsMixin):
         if confirmation:
             self.plugins = {}
             self.__plugin_types = {}
+            self.__plugin_names = {}
+            self.__plugin_paths = []
 
 
 PluginCollection = SingletonFactory(_PluginCollection)

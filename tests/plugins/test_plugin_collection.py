@@ -196,6 +196,20 @@ class TestPluginCollection(unittest.TestCase):
         for _name in _names:
             self.assertIsInstance(_name, str)
 
+    def test_get_plugin_by_plugin_name__known_name(self):
+        PC = DummyPluginCollection(n_plugins=self.n_plugin,
+                                    plugin_path=self._pluginpath)
+        _name = list(PC._PluginCollection__plugin_names.keys())[0]
+        _plugin = PC.get_plugin_by_plugin_name(_name)
+        self.assertTrue(BasePlugin in _plugin.__bases__[0].__bases__)
+
+    def test_get_plugin_by_plugin_name__no_name(self):
+        PC = DummyPluginCollection(n_plugins=self.n_plugin,
+                                    plugin_path=self._pluginpath)
+        _name = get_random_string(12)
+        with self.assertRaises(KeyError):
+            PC.get_plugin_by_plugin_name(_name)
+
     def test_remove_plugin_from_collection__new_items(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
@@ -217,6 +231,16 @@ class TestPluginCollection(unittest.TestCase):
         PC._PluginCollection__add_new_class(_new_cls)
         self.assertTrue(_new_cls.__name__ in PC.plugins)
         self.assertEqual(PC.plugins[_new_cls.__name__ ], _new_cls)
+
+    def test_add_new_class__duplicate_plugin_name(self):
+        PC = DummyPluginCollection(n_plugins=self.n_plugin,
+                                    plugin_path=self._pluginpath)
+        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls2 = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls2.plugin_name = _new_cls.plugin_name
+        PC._PluginCollection__add_new_class(_new_cls)
+        with self.assertRaises(KeyError):
+            PC._PluginCollection__add_new_class(_new_cls2)
 
     def test_check_and_register_class__new_class(self):
         self.n_plugin = 2

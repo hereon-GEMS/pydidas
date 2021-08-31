@@ -66,44 +66,52 @@ class BasePlugin(ObjectWithParameterCollection):
     output_data = {}
 
     @classmethod
-    def get_class_description(cls, return_list=False):
+    def get_class_description(cls):
         """
-        Get a description of the plugin.
+        Get a description of the plugin as a multi-line string.
 
         This method can generate a description of the plugin with name,
-        plugin type, class name and parameters and the docstring.
-        The default return is a formatted string but a list of entries can
-        be created with the return_list keyword.
-
-        Parameters
-        ----------
-        return_list : bool, optional
-            Keyword to toggle return . The default is False.
+        plugin type, class name and Parameters and the docstring.
+        The return is a formatted string.
 
         Returns
         -------
-        _desc : str or list
+        str
             The descripion of the plugin.
         """
-        _name = cls.__name__
-        if return_list:
-            _desc = [['Name', f'{cls.plugin_name}\n']]
-            _desc.append(['Class name', f'{_name}\n'])
-            _desc.append(['Plugin type', f'{ptype[cls.plugin_type]}\n'])
-            _desc.append(['Plugin description', f'{cls.__doc__}\n'])
-            pstr = ''
-            for param in cls.params:
-                pstr += f'\n{str(param)}'
-            _desc.append(['Parameters', pstr[1:]])
-        else:
-            _desc = (f'Name: {cls.plugin_name}\n'
-                     f'Class name: {_name}\n'
-                     f'Plugin type: {ptype[cls.plugin_type]}\n\n'
-                     f'Plugin description:\n{cls.__doc__}\n\n'
-                     'Parameters:')
-            for param in cls.params:
-                _desc += f'\n{param}: {cls.parameters[param]}'
+        _doc = (cls.__doc__ if cls.__doc__ is not None
+                else 'No docstring available')
+        _desc = (f'Plugin name: {cls.plugin_name}\n'
+                 f'Class name: {cls.__name__}\n'
+                 f'Plugin type: {ptype[cls.plugin_type]}\n\n'
+                 f'Plugin description:\n{_doc}\n\n'
+                 'Parameters:')
+        for param in cls.default_params.values():
+            _desc += f'\n{param}'
         return _desc
+
+    @classmethod
+    def get_class_description_as_dict(cls):
+        """
+        Get a description of the plugin as a dictionary of entries.
+
+        This method can generate a description of the plugin with name,
+        plugin type, class name and Parameters and the docstring.
+        The return is a dictionary of entries.
+
+        Returns
+        -------
+        dict
+            The descripion of the plugin.
+        """
+        _doc = (cls.__doc__ if cls.__doc__ is not None
+                else 'No docstring available')
+        return {'Name': cls.plugin_name,
+                'Class name': cls.__name__,
+                'Plugin type': ptype[cls.plugin_type],
+                'Plugin description': _doc,
+                'Parameters': '\n'.join(
+                    [str(param) for param in cls.default_params.values()])}
 
     def __init__(self, *args, **kwargs):
         """Setup the class."""

@@ -71,9 +71,42 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             del params['minimumHeight']
         apply_widget_properties(self, **params)
 
-    def setText(self, text, title=None, oneLineKeys=False, indent=4):
+    def setText(self, text, title=None):
         """
-        Print information.
+        Set the widget's text.
+
+        Parameters
+        ----------
+        text : str
+            The text to be displayed.
+        title : str, optional
+            The title. If None, no title will be printed. The default is None.
+        """
+        super().setText('')
+        self.__add_title(title)
+        self.append(text)
+        self.verticalScrollBar().triggerAction(
+            QtWidgets.QScrollBar.SliderToMinimum)
+
+    def __add_title(self, title):
+        """
+        Add the title to the box, if given.
+
+        Parameters
+        ----------
+        title : Union[str, None]
+            The title. If None, this method will be skipped.
+        """
+        if title is not None:
+            self.setFontPointSize(14)
+            self.setFontWeight(75)
+            self.append(f'{title}')
+            self.setFontPointSize(10)
+
+    def setTextFromDict(self, text_dict, title=None, oneLineKeys=False,
+                        indent=4):
+        """
+        Set the widget's text.
 
         This widget accepts both a single text entry and a list of entries
         for the text. A list of entries will be converted to a single text
@@ -81,35 +114,27 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
 
         Parameters
         ----------
-        text : Union[str, list]
-            The text to be displayed. A string will be processed directly
-            whereas a list will be processed with the first entries of every
-            list entry being interpreted as key, entry.
+        text : dict
+            The dictionnary of the text to be displayed. The dictionary will
+            be processed with keys as item titles and values as corresponding
+            items.
         title : str, optional
             The title. If None, no title will be printed. The default is None.
         oneLineKeys : bool, optional
-            Used for text lists only. Flag to force printing of keys and
-            entries in one line instead of two lines with an indent.
-            The default is False.
+            Flag to force printing of keys and entries in one line instead
+            of two lines with an indent. The default is False.
         indent : int, optional
             The indent depth for list entries. The default is 4.
         """
         super().setText('')
-        if title is not None:
-            self.setFontPointSize(14)
-            self.setFontWeight(75)
-            self.append(f'{title}')
-            self.setFontPointSize(10)
-        if isinstance(text, str):
-            self.append(text)
-        elif isinstance(text, list):
-            for key, item in text:
-                if oneLineKeys:
-                    self.append(f'{key}: {item}')
-                else:
-                    self.setFontWeight(75)
-                    self.append(key + ':')
-                    self.setFontWeight(50)
+        self.__add_title(title)
+        for _key, _value in text_dict.items():
+            if oneLineKeys:
+                self.append(f'{_key}: {_value}')
+            else:
+                _items = _value.split('\n')
+                self.setFontWeight(75)
+                self.append(f'\n{_key}:')
+                self.setFontWeight(50)
+                for item in _items:
                     self.append(' ' * indent + item)
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)

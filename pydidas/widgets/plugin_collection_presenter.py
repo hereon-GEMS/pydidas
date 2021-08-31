@@ -72,7 +72,7 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
         self.setLayout(_layout)
 
         self._widgets['plugin_treeview'].selection_changed.connect(
-           self.__display_plugin_description)
+            self.__display_plugin_description)
         self._widgets['plugin_treeview'].selection_confirmed.connect(
             self.__confirm_selection)
 
@@ -103,9 +103,9 @@ class PluginCollectionPresenter(QtWidgets.QWidget):
         """
         if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
             return
-        _p = self.collection.get_plugin_by_name(name)()
-        self._widgets['plugin_description'].setText(
-            _p.get_class_description(return_list=True), _p.plugin_name)
+        _p = self.collection.get_plugin_by_plugin_name(name)()
+        self._widgets['plugin_description'].setTextFromDict(
+            _p.get_class_description_as_dict(), _p.plugin_name)
 
 
 class _PluginCollectionTreeWidget(QtWidgets.QTreeView):

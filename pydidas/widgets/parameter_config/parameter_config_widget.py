@@ -54,14 +54,14 @@ def param_widget_factory(param, widget_width):
     return _widget
 
 
-def text_widget_factory(param, widget_width, alignment=None):
+def text_widget_factory(param, widget_width):#, alignment):
     _txt = QtWidgets.QLabel(f'{param.name}:')
     _txt.setFixedWidth(widget_width)
     _txt.setFixedHeight(20)
     _txt.setToolTip(param.tooltip)
     _txt.setMargin(0)
-    if alignment is not None:
-        _txt.setAlignment(alignment)
+    # if alignment is not None:
+    #     _txt.setAlignment(alignment)
     return _txt
 
 
@@ -73,8 +73,8 @@ class ParameterConfigWidgetsMixIn:
     """
     def __init__(self, *args, **kwargs):
         self.param_widgets = {}
-        self.params = ParameterCollection()
         self.param_textwidgets = {}
+        self.params = ParameterCollection()
 
     def create_param_widget(self, param, **kwargs):
         """
@@ -86,7 +86,8 @@ class ParameterConfigWidgetsMixIn:
         param : Parameter
             A Parameter class instance.
         row : int, optional
-            The row in case a grid layout is used.
+            The row in case a grid layout is used. The default is -1 (the
+            next row)
         column : int, optional
             The starting column in case of a grid layout. The default is 0.
         width_text : int, optional
@@ -116,23 +117,19 @@ class ParameterConfigWidgetsMixIn:
         parent_widget : Union[QWidget, None], optional
             The widget to which the label is added. If None, this defaults
             to the calling widget, ie. "self". The default is None.
-
-        Returns
-        -------
-        QLabel, InputWidget
-            The formatted QLabel and Input widgets.
         """
         _parent = kwargs.get('parent_widget', self)
         _config = self.__get_config_for_create_parameter(**kwargs)
-        _text_widget = text_widget_factory(param, _config['width_text'],
-                                           _config['valign_text'])
+        _text_widget = text_widget_factory(param, _config['width_text'])#,
+                                           # _config['valign_text'])
         _input_widget = param_widget_factory(param, _config['width'])
         _input_widget.io_edited.connect(
-            partial(self.__set_param_value, param, _input_widget)
-            )
+            partial(self.__set_param_value, param, _input_widget))
+
         # store references to the widgets:
         self.param_widgets[param.refkey] = _input_widget
         self.param_textwidgets[param.refkey] = _text_widget
+
         # add widgets to layout:
         if _parent.layout() is None:
             raise WidgetLayoutError('No layout set.')
@@ -140,7 +137,6 @@ class ParameterConfigWidgetsMixIn:
             self.__get_layout_args_for_create_param_widget(_config)
         _parent.layout().addWidget(_text_widget, *_text_widget_args)
         _parent.layout().addWidget(_input_widget, *_input_widget_args)
-        return _text_widget, _input_widget
 
     def __get_config_for_create_parameter(self, **kwargs):
         """
@@ -303,8 +299,8 @@ class ParameterConfigWidgetsMixIn:
 
 class ParameterConfigWidget(QtWidgets.QFrame, ParameterConfigWidgetsMixIn):
     """
-    The ParameterConfigWidget widget can be used to create a composite widget for
-    updating parameter values.
+    The ParameterConfigWidget widget can be used to create a composite widget
+    for updating parameter values.
 
     Depending on the parameter types, automatic typechecks are implemented.
     """
@@ -333,7 +329,7 @@ class ParameterConfigWidget(QtWidgets.QFrame, ParameterConfigWidgetsMixIn):
         kwargs['autoFillBackground'] = kwargs.get('autoFillBackground', True)
         apply_widget_properties(self, **kwargs)
         if initLayout:
-            _layout = QtWidgets.QVBoxLayout()
+            _layout = QtWidgets.QGridLayout()
             _layout.setContentsMargins(5, 5, 0, 0)
             _layout.setAlignment(QtCore.Qt.AlignLeft
                                       | QtCore.Qt.AlignTop)

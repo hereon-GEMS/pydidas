@@ -74,7 +74,7 @@ class WorkflowPluginPositionNode(GenericNode):
         int
             The width of the tree branch.
         """
-        if self.is_leaf():
+        if self.is_leaf:
             return self.generic_width
         w = (len(self._children) - 1) * self.child_spacing
         for child in self._children:
@@ -115,7 +115,7 @@ class WorkflowPluginPositionNode(GenericNode):
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
         pos = {self.node_id: [(self.width - self.generic_width) // 2, 0]}
-        if self.is_leaf():
+        if self.is_leaf:
             return pos
         xoffset = 0
         yoffset = self.generic_height + self.child_spacing

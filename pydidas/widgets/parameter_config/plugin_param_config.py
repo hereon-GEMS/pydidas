@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the PluginParameterConfigWidget class used to edit plugin parameters."""
+"""
+Module with the PluginParameterConfigWidget class used to edit plugin
+Parameters.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -28,15 +31,16 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore
 from .parameter_config_widget import ParameterConfigWidget
 
+from ..create_widgets_mixin import CreateWidgetsMixIn
 from ..utilities import deleteItemsOfLayout
 
 
-class PluginParameterConfigWidget(ParameterConfigWidget):
+class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
     """
-    The PluginParameterConfigWidget widget creates the composite widget for updating
-    parameters and changing default values.
+    The PluginParameterConfigWidget widget creates the composite widget for
+    updating Parameters and changing default values.
 
-    Depending on the parameter types, automatic typechecks are implemented.
+    Depending on the Parameter types, automatic typechecks are implemented.
     """
     def __init__(self, parent=None):
         """
@@ -48,21 +52,18 @@ class PluginParameterConfigWidget(ParameterConfigWidget):
         ----------
         parent : QtWidget, optional
             The parent widget. The default is None.
-
-        Returns
-        -------
-        None.
         """
-        super().__init__(parent=parent)
+        ParameterConfigWidget.__init__(self, parent)
+        CreateWidgetsMixIn.__init__(self)
         self.plugin = None
-        self.param_widgets = {}
+        self.node_id = None
 
     def configure_plugin(self, node_id, plugin):
         """
-        Update the panel to show the parameters of a different plugin.
+        Update the panel to show the Parameters of a different Plugin.
 
         This method clears the widget and populates it again with the
-        parameters of the new plugin, defined by the plugin node_id
+        Parameters of the new Plugin, defined by the Plugin node_id
 
         Parameters
         ----------
@@ -70,15 +71,19 @@ class PluginParameterConfigWidget(ParameterConfigWidget):
             The node_id in the workflow edit tree.
         plugin : object
             The instance of the Plugin to be edited.
-
-        Returns
-        -------
-        None.
         """
+        self.__clear_layout()
         self.plugin = plugin
-        self.param_widgets = {}
-        _layout = self.layout()
+        self.node_id = node_id
+        self.__create_widgets_for_new_plugin()
+
+    def __clear_layout(self):
+        """
+        Delete all widgets and items which currently populate the
+        PluginParameterConfigWidget.
+        """
         #delete current widgets
+        _layout = self.layout()
         for i in reversed(range(_layout.count())):
             item = _layout.itemAt(i)
             if isinstance(item, QtWidgets.QLayout):
@@ -90,36 +95,44 @@ class PluginParameterConfigWidget(ParameterConfigWidget):
                 _layout.removeWidget(widgetToRemove)
                 widgetToRemove.setParent(None)
                 widgetToRemove.deleteLater()
+            elif isinstance(item, QtWidgets.QSpacerItem):
+                _layout.removeItem(item)
+        self.param_textwidgets = {}
+        self.param_widgets = {}
 
-        #setup new widgets:
-        self.add_label(f'Plugin: {self.plugin.plugin_name}', fontsize=12,
-                       width=385)
-        self.add_label(f'Node id: {node_id}', fontsize=12)
-        self.add_label('\nParameters:', fontsize=12)
-        if self.plugin.has_unique_parameter_config_widget():
-            _layout.add(self.plugin.parameter_config_widget())
-        else:
-            self.restore_default_button()
-            for param in self.plugin.params:
-                self.add_param(param)
-
-    def restore_default_button(self):
+    def __create_widgets_for_new_plugin(self):
         """
-        Restore default values for all parameters.
+        Create the required widgets for the new plugin.
+        """
+        self.create_label('plugin_name', f'Plugin: {self.plugin.plugin_name}',
+                          fontsize=12, fixedWidth=385, gridPos=(0, 0, 1, 2))
+        self.create_label('node_id', f'Node id: {self.node_id}', fontsize=12,
+                          gridPos=(1, 0, 1, 2))
+        self.create_spacer('spacer', gridPos=(-1, 0, 1, 2))
+        self.create_label('params', 'Parameters:', fontsize=12,
+                          gridPos=(2, 0, 1, 1))
+        if self.plugin.has_unique_parameter_config_widget():
+            self.layout().add(self.plugin.parameter_config_widget())
+        else:
+            self.__add_restore_default_button()
+            for param in self.plugin.params.values():
+                self.create_param_widget(param)
 
-        This method is called on clicks on the "Restore defaults" button and
-        will reset all parameter to their default values.
+    def __add_restore_default_button(self):
+        """
+        Add a "Restore default values" button for all Parameters.
 
-        Returns
-        -------
-        None.
+        This method will create a button to restore the defaults and connect
+        the required slot.
         """
         but = QtWidgets.QPushButton(self.style().standardIcon(59),
                                     'Restore default parameters')
-        but.clicked.connect(partial(self.plugin.restore_defaults, force=True))
+        but.clicked.connect(partial(self.plugin.restore_all_defaults,
+                                    confirm=True))
         but.clicked.connect(self.update_edits)
         but.setFixedHeight(25)
-        self.layout().addWidget(but, 0, QtCore.Qt.AlignRight)
+        self.layout().addWidget(but, 2, 1, 1, 1,
+                                QtCore.Qt.AlignRight)
 
     def update_edits(self):
         """
@@ -127,10 +140,6 @@ class PluginParameterConfigWidget(ParameterConfigWidget):
 
         This method will go through all plugin parameters and populates
         the input fields with the stores parameter values.
-
-        Returns
-        -------
-        None.
         """
-        for param in self.plugin.params:
-            self.param_widgets[param.name].set_value(param.value)
+        for param in self.plugin.params.values():
+            self.param_widgets[param.refkey].set_value(param.value)

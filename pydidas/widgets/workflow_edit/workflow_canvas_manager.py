@@ -73,7 +73,7 @@ class WorkflowCanvasManager(QtCore.QObject):
         self.qt_canvas= qt_canvas
 
         self.node_pos = {}
-        self.widgets = {}
+        self._widget_dict = {}
         self.nodes = {}
         self.node_ids = []
         self.active_node = None
@@ -146,7 +146,7 @@ class WorkflowCanvasManager(QtCore.QObject):
         if not self.root:
             self.root = node
         self.nodes[node_id] = node
-        self.widgets[node_id] = widget
+        self._widget_dict[node_id] = widget
         self.node_ids.append(node_id)
         self.set_active_node(node_id)
 
@@ -186,7 +186,7 @@ class WorkflowCanvasManager(QtCore.QObject):
         for i, key in enumerate(_pos):
             self.node_pos.update({key: pos_vals[i]})
         for node_id in self.node_ids:
-            self.widgets[node_id].move(self.node_pos[node_id][0],
+            self._widget_dict[node_id].move(self.node_pos[node_id][0],
                                        self.node_pos[node_id][1])
         self.qt_canvas.setFixedSize(self.root.width + 2 * self.pos_x_min + _offset,
                                     self.root.height + 2 * self.pos_y_min)
@@ -229,20 +229,16 @@ class WorkflowCanvasManager(QtCore.QObject):
         KeyError
             A KeyError is raised if the node_id key has not been registered
             with the manager yet.
-
-        Returns
-        -------
-        None.
         """
         if node_id == self.active_node_id:
             return
-        if node_id not in self.widgets:
+        if node_id not in self._widget_dict:
             raise KeyError(f'The node_id "{node_id}" has not been registered.')
-        for nid in self.widgets:
+        for nid in self._widget_dict:
             if node_id == nid:
-                self.widgets[nid].widget_select()
+                self._widget_dict[nid].widget_select()
             else:
-                self.widgets[nid].widget_deselect()
+                self._widget_dict[nid].widget_deselect()
         self.active_node = self.nodes[node_id]
         self.active_node_id = node_id
         self.plugin_to_edit.emit(node_id)
@@ -258,17 +254,13 @@ class WorkflowCanvasManager(QtCore.QObject):
         ----------
         node_id : int
             The node_id if the node to be deleted.
-
-        Returns
-        -------
-        None.
         """
         _all_ids = self.nodes[node_id].get_recursive_ids()
-        self.nodes[node_id].delete_node()
+        self.nodes[node_id].remove_node_from_tree()
         for _id in _all_ids:
-            self.widgets[_id].deleteLater()
+            self._widget_dict[_id].deleteLater()
             del self.nodes[_id]
-            del self.widgets[_id]
+            del self._widget_dict[_id]
             del self.node_pos[_id]
         self.node_ids = [_id for _id in self.node_ids if _id not in _all_ids]
         self.__update_node_connections()

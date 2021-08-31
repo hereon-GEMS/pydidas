@@ -55,7 +55,3 @@ class DummyPluginCollection(_PluginCollection):
         for num in range(_nplugins):
             _class = create_plugin_class(num // 3, num % 3)
             self._PluginCollection__add_new_class(_class)
-            # _name = _class.__name__
-            # self.plugins[_name] = _class
-            # self._PluginCollection__plugin_types[_name] = num % 3
-            # self._PluginCollection__plugin_names[_name] = num % 3

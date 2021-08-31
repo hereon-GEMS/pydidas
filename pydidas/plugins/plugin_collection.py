@@ -256,12 +256,13 @@ class _PluginCollection(PydidasQsettingsMixin):
 
         Parameters
         ----------
-        name : str
-            The registration name
         class_ : type
             The class object.
         """
-
+        if class_.plugin_name in self.__plugin_names:
+            raise KeyError('A different class with the same plugin name has '
+                           'already been registered. Adding this class would'
+                           ' destroy the consistency of the PluginCollection')
         self.plugins[class_.__name__] = class_
         self.__plugin_types[class_.__name__] = plugin_type_check(class_)
         self.__plugin_names[class_.plugin_name] = class_.__name__
@@ -291,14 +292,33 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         return list(self.plugins.keys())
 
-    def get_plugin_by_name(self, name):
+    def get_plugin_by_plugin_name(self, plugin_name):
         """
         Get a plugin by its plugin name.
 
         Parameters
         ----------
+        plugin_name : str
+            The plugin_name property of the class.
+
+        Returns
+        -------
+        plugin : pydidas.plugins.BasePlugin
+            The Plugin class.
+        """
+        if plugin_name in self.__plugin_names:
+            return self.plugins[self.__plugin_names[plugin_name]]
+        raise KeyError(f'No plugin with plugin_name "{plugin_name}" has been'
+                       ' registered!')
+
+    def get_plugin_by_name(self, name):
+        """
+        Get a plugin by its class name.
+
+        Parameters
+        ----------
         name : str
-            The name of the plugin.
+            The class name of the plugin.
 
         Returns
         -------

@@ -26,6 +26,8 @@ import unittest
 import random
 import sys
 import itertools
+import tempfile
+import shutil
 
 import numpy as np
 from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
@@ -41,12 +43,16 @@ _typemap = {0: 'input', 1: 'proc', 2: 'output'}
 class TestPluginCollectionPresenter(unittest.TestCase):
 
     def setUp(self):
+        self._pluginpath = tempfile.mkdtemp()
         self.q_app = QtWidgets.QApplication(sys.argv)
-        self.num = 21
-        self.pcoll = DummyPluginCollection
+        self.n_per_type = 8
+        self.num = 3 * self.n_per_type
+        self.pcoll = DummyPluginCollection(n_plugins=self.num,
+                                           plugin_path=self._pluginpath)
         self.widgets = []
 
     def tearDown(self):
+        shutil.rmtree(self._pluginpath)
         self.q_app.deleteLater()
         self.q_app.quit()
 
@@ -59,12 +65,10 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.assertEqual(len(spy), 1)
         self.assertEqual(spy[0][0], _name)
 
-    @staticmethod
-    def click_index(obj, double=False):
+    def click_index(self, obj, double=False):
         model = obj.model()
         _type = random.choice([0, 1, 2])
-        _num_plugins = len(DummyPluginCollection.plugins[_typemap[_type]])
-        _num = random.choice(np.arange(_num_plugins))
+        _num = random.choice(np.arange(self.n_per_type))
         _item = model.item(_type).child(_num)
         index = model.indexFromItem(_item)
         obj.scrollTo(index)
@@ -88,8 +92,7 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.assertIsInstance(_model, QtGui.QStandardItemModel)
         self.assertEqual(_model.rowCount(), 3)
         for _num, _ptype in enumerate(['input', 'proc', 'output']):
-            self.assertEqual(_model.item(_num).rowCount(),
-                             len(self.pcoll.plugins[_ptype]))
+            self.assertEqual(_model.item(_num).rowCount(), self.n_per_type)
 
     def test_PluginCollectionTreeWidget_single_click(self):
         self.tree_click_test(False)
@@ -111,10 +114,10 @@ class TestPluginCollectionPresenter(unittest.TestCase):
     def test_PluginCollectionPresenter_preview_plugin(self):
         obj = PluginCollectionPresenter(None, collection=self.pcoll)
         _item = self.click_index(obj._widgets['plugin_treeview'])
-        _plugin = DummyPluginCollection.get_plugin_by_name(_item.text())
+        _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
         _text = obj._widgets['plugin_description'].toPlainText()
-        _desc = _plugin.get_class_description(return_list=True)
-        for item in list(itertools.chain.from_iterable(_desc)):
+        _desc = _plugin.get_class_description_as_dict()
+        for item in list(itertools.chain.from_iterable(_desc.items())):
             self.assertTrue(_text.find(item) >= 0)
 
 

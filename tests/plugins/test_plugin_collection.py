@@ -139,6 +139,12 @@ class TestPluginCollection(unittest.TestCase):
         self.assertEqual(PC._PluginCollection__plugin_types, {})
         self.assertEqual(PC._PluginCollection__plugin_names, {})
 
+    def test_get_all_registered_paths(self):
+        PC = DummyPluginCollection(n_plugins=self.n_plugin,
+                                    plugin_path=self._pluginpath)
+        _paths = PC.get_all_registered_paths()
+        self.assertEqual(_paths, [self._pluginpath])
+
     def test_get_all_plugins_of_type__base(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)

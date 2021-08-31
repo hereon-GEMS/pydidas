@@ -73,25 +73,31 @@ GENERIC_PARAMS = ParameterCollection(
         'Last image number', int, default=-1, refkey='hdf5_last_image_num',
         tooltip=('The last image in the hdf5-dataset to be used. The value'
                  '-1 will default to the last image. The default is -1.')),
-    Parameter('Hdf5 dataset stepping', int, default=1, refkey='hdf5_stepping',
-              tooltip=('The step width (in files). A value n > 1 will only'
-                       ' proess every n-th file for the composite.')),
-    Parameter('Subtract background image', int, default=0,
-              refkey='use_bg_file', choices=[True, False],
-              tooltip=('Keyword to toggle usage of background subtraction.')),
-    Parameter('Background image file', Path, default=Path(), refkey='bg_file',
-              tooltip=('The name of the file used for background '
-                       'correction.')),
-    Parameter('Background Hdf dataset key', HdfKey,
-              default=HdfKey('/entry/data/data'), refkey='bg_hdf5_key',
-              tooltip=('For hdf5 background image files: The dataset key.')),
-    Parameter('Background image number', int, default=0, refkey='bg_hdf5_num',
-              tooltip=('For hdf5 background image files: The image number in '
-                       'the dataset')),
-    Parameter('Total number of images', int, default=0, refkey='n_image',
-              tooltip=('The toal number of images in the composite images.')),
-    Parameter('Total number of files', int, default=0, refkey='n_files',
-              tooltip=('The toal number of selected files.')),
+    Parameter(
+        'Hdf5 dataset stepping', int, default=1, refkey='hdf5_stepping',
+        tooltip=('The step width (in files). A value n > 1 will only'
+                 ' proess every n-th file for the composite.')),
+    Parameter(
+        'Subtract background image', int, default=0,
+        refkey='use_bg_file', choices=[True, False],
+        tooltip=('Keyword to toggle usage of background subtraction.')),
+    Parameter(
+        'Background image file', Path, default=Path(), refkey='bg_file',
+        tooltip=('The name of the file used for background correction.')),
+    Parameter(
+        'Background Hdf dataset key', HdfKey,
+        default=HdfKey('/entry/data/data'), refkey='bg_hdf5_key',
+        tooltip=('For hdf5 background image files: The dataset key.')),
+    Parameter(
+        'Background image number', int, default=0, refkey='bg_hdf5_num',
+        tooltip=('For hdf5 background image files: The image number in '
+                 'the dataset')),
+    Parameter(
+        'Total number of images', int, default=0, refkey='n_image',
+        tooltip=('The toal number of images in the composite images.')),
+    Parameter(
+        'Total number of files', int, default=0, refkey='n_files',
+        tooltip=('The toal number of selected files.')),
     Parameter(
         'Number of images in x', int, default=1, refkey='composite_nx',
         tooltip=('The number of original images combined in the composite'

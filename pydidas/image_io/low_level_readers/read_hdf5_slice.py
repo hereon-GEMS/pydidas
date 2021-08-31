@@ -33,7 +33,7 @@ import hdf5plugin
 import numpy as np
 
 
-def read_hdf5_slice(h5filename, dataset, axes=None):
+def read_hdf5_slice(h5filename, hdf5_dataset, axes=None):
     """
     Read a n-dimensional slice from an hdf5 file.
 
@@ -46,7 +46,7 @@ def read_hdf5_slice(h5filename, dataset, axes=None):
     ----------
     h5file : str
         The file name of the hdf5 file.
-    dataset : str
+    hdf5_dataset : str
         The path to the dataset in the hdf5 structure
     axes : Union[list, None]
         The indices for the individual axes (order as in the file).
@@ -67,7 +67,7 @@ def read_hdf5_slice(h5filename, dataset, axes=None):
     """
     axes = axes if axes is not None else []
     with h5py.File(h5filename, 'r') as _file:
-        _ds = _file[dataset]
+        _ds = _file[hdf5_dataset]
 
         limits = np.r_[[(0, _shape) for _shape in _ds.shape]]
         for i, _axis in enumerate(axes):

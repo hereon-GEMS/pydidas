@@ -51,7 +51,7 @@ class Hdf5Reader(ImageReader):
         ----------
         filename : str
             The full path and filename of the file to be read.
-        dataset : str
+        hdf5_dataset : str
             The full path to the hdf dataset within the file. The default is
             None which will raise an exception.
         frame : int
@@ -78,13 +78,13 @@ class Hdf5Reader(ImageReader):
        """
         axis = kwargs.get('axis', 0)
         frame = kwargs.get('frame', 0)
-        dataset = kwargs.get('dataset', None)
+        dataset = kwargs.get('hdf5_dataset', None)
 
         self._image_metadata = {'axis': axis, 'frame': frame,
-                                'dataset': dataset}
+                                'hdf5_dataset': dataset}
         kwargs.update(self._image_metadata)
         if dataset is None:
-            raise KeyError('The hdf dataset has not been specified.')
+            raise KeyError('The hdf5 dataset has not been specified.')
         _img = squeeze(
             read_hdf5_slice(filename, dataset, [None] * axis + [frame])
         )

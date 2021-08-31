@@ -74,8 +74,8 @@ def read_image(filename, **kwargs):
         ny : int
             The number of pixels in x-dimension. The default is None which
             will raise an exception.
-    for hdf images additionally:
-        dataset : str
+    for hdf5 images additionally:
+        hdf5_dataset : str
             The full path to the hdf dataset within the file. The default is
             None which will raise an exception.
         imageNo : int

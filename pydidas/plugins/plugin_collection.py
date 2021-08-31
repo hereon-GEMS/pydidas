@@ -1,24 +1,17 @@
-# MIT License
-#
-# Copyright (c) 2021 Malte Storm, Helmholtz-Zentrum Hereon.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# This file is part of pydidas.
 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 """Module with the PluginCollection Singleton class."""
 
@@ -260,9 +253,13 @@ class _PluginCollection(PydidasQsettingsMixin):
             The class object.
         """
         if class_.plugin_name in self.__plugin_names:
-            raise KeyError('A different class with the same plugin name has '
-                           'already been registered. Adding this class would'
-                           ' destroy the consistency of the PluginCollection')
+            _old_cls = self.__plugin_names[class_.plugin_name]
+            _message = ('A different class with the same plugin name '
+                        f'"{class_.plugin_name}" has already been registered.'
+                        ' Adding this class would destroy the consistency of '
+                        'the PluginCollection: '
+                        f'Registered class: {_old_cls}; New class: {class_}')
+            raise KeyError(_message)
         self.plugins[class_.__name__] = class_
         self.__plugin_types[class_.__name__] = plugin_type_check(class_)
         self.__plugin_names[class_.plugin_name] = class_.__name__
@@ -360,6 +357,17 @@ class _PluginCollection(PydidasQsettingsMixin):
             if self.__plugin_types[_name] == _key:
                 _res.append(self.plugins[_name])
         return _res
+
+    def get_all_registered_paths(self):
+        """
+        Get all the paths which have been registered in the PluginCollection.
+
+        Returns
+        -------
+        list
+            The list of all registered paths.
+        """
+        return self.__plugin_paths
 
     def clear_collection(self, confirmation=False):
         """

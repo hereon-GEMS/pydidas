@@ -24,7 +24,8 @@ __status__ = "Development"
 __all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
 
 
-from pydidas.core import ParameterCollection, ObjectWithParameterCollection
+from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
+                          get_generic_parameter, Parameter)
 
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
@@ -61,6 +62,7 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     default_params = ParameterCollection()
+    generic_params = ParameterCollection()
     _is_pydidas_plugin = True
     input_data = {}
     output_data = {}
@@ -120,7 +122,8 @@ class BasePlugin(ObjectWithParameterCollection):
                                     OUTPUT_PLUGIN]:
             raise ValueError('Unknown value for the plugin type')
         self.add_params(*args)
-        self.params = self.get_default_params_copy()
+        self.set_default_params()
+        self.add_params(self.generic_params)
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])
@@ -150,7 +153,18 @@ class InputPlugin(BasePlugin):
     The base plugin class for input plugins.
     """
     plugin_type = INPUT_PLUGIN
-
+    generic_params = BasePlugin.generic_params.get_copy()
+    generic_params.add_params(
+        get_generic_parameter('use_roi'),
+        get_generic_parameter('roi_xlow'),
+        get_generic_parameter('roi_xhigh'),
+        get_generic_parameter('roi_ylow'),
+        get_generic_parameter('roi_yhigh'),
+        get_generic_parameter('use_thresholds'),
+        get_generic_parameter('threshold_low'),
+        get_generic_parameter('threshold_high'),
+        get_generic_parameter('binning'))
+    default_params = BasePlugin.default_params.get_copy()
 
 class ProcPlugin(BasePlugin):
     """

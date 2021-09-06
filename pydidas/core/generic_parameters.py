@@ -370,7 +370,66 @@ GENERIC_PARAMS = ParameterCollection(
                        'uses the local mask settings. Note: The mask value'
                        ' will not be used for integrating but only for '
                        'presentation.')),
-
+    ############################
+    ## pyFAI settings parameters
+    ############################
+    Parameter('Num points radial integration', int, default=1000,
+              refkey='int_rad_npoint',
+              tooltip=('The number of bins in radial direction for the '
+                       'pyFAI integration.')),
+    Parameter('Radial unit', str, default='2\u03b8 / deg',
+              choices=['Q / nm^-1', 'Q / \u212b^-1', '2\u03b8 / deg',
+                       '2\u03b8 / rad'], refkey='int_rad_unit',
+              tooltip=('The unit and type of the azimuthal profile.')),
+    Parameter('Use radial range', int, default=0, choices=[True, False],
+              refkey='int_rad_use_range',
+              tooltip=('Toggle to limit the radial integration range or use'
+                       ' the full data range. If True, boundaries need to be '
+                       'defined in the lower and upper radial range '
+                       'Parameters.')),
+    Parameter('Radial lower range', int, default=0,
+              refkey='int_rad_range_lower',
+              tooltip=('The lower boundary of the radial integration range.'
+                       ' This setting is only used if "Use radial range" is '
+                       'True. This value needs to be given in the unit '
+                       'selected as radial unit.')),
+    Parameter('Radial upper range', int, default=50,
+              refkey='int_rad_range_upper',
+              tooltip=('The upper boundary of the radial integration range.'
+                       ' This setting is only used if "Use radial range" is '
+                       'True. This value needs to be given in the unit '
+                       'selected as radial unit.')),
+    Parameter('Num points azimuthal integration', int, default=1000,
+              refkey='int_azi_npoint',
+              tooltip=('The number of bins in azimuthal direction for the '
+                       'pyFAI integration.')),
+    Parameter('Azimuthal unit', str, default='\u03c7 / deg',
+              choices=['\u03c7 / deg', '\u03c7 / rad'], refkey='int_azi_unit',
+              tooltip=('The unit and type of the azimuthal profile.')),
+    Parameter('Use azimuthal range', int, default=0, choices=[True, False],
+              refkey='int_azi_use_range',
+              tooltip=('Toggle to limit the azimuthal integration range or use'
+                       ' the full data range. If True, boundaries need to be '
+                       'defined in the lower and upper azimuthal range '
+                       'Parameters.')),
+    Parameter('Azimuthal lower range', int, default=0,
+              refkey='int_azi_range_lower',
+              tooltip=('The lower boundary of the azimuthal integration range.'
+                       ' This setting is only used if "Use azimuthal range" is '
+                       'True. This value needs to be given in the unit '
+                       'selected as azimuthal unit.')),
+    Parameter('Azimuthal upper range', int, default=50,
+              refkey='int_azi_range_upper',
+              tooltip=('The upper boundary of the azimuthal integration range.'
+                       ' This setting is only used if "Use azimuthal range" is '
+                       'True. This value needs to be given in the unit '
+                       'selected as azimuthal unit.')),
+    Parameter('PyFAI integration method', str, default='CSR',
+              refkey='int_method',
+              choices=['CSR', 'CSR OpenCL', 'LUT', 'LUT OpenCL'],
+              tooltip=('The integration method. For a full reference, please'
+                       ' visit the pyfai documentation available at: '
+                       'https://pyfai.readthedocs.io/')),
 )
 
 

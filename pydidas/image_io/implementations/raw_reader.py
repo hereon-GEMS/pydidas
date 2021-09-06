@@ -27,7 +27,7 @@ import numpy as np
 
 from ...core import Dataset
 from ..image_reader import ImageReader
-from ..image_reader_factory import ImageReaderFactory
+from ..image_reader_collection import ImageReaderCollection
 from ...config import BINARY_EXTENSIONS
 
 
@@ -91,5 +91,5 @@ class RawReader(ImageReader):
         return self.return_image(**kwargs)
 
 
-reader = ImageReaderFactory()
+reader = ImageReaderCollection()
 reader.register_format('raw', BINARY_EXTENSIONS, RawReader)

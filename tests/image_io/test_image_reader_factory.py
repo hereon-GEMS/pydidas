@@ -26,8 +26,8 @@ import unittest
 
 import numpy as np
 
-from pydidas.image_io.image_reader_factory import (ImageReaderFactory,
-                                                   _ImageReaderFactory)
+from pydidas.image_io.image_reader_collection import (ImageReaderCollection,
+                                                   _ImageReaderCollection)
 
 
 class DummyReader:
@@ -38,47 +38,47 @@ class DummyReader:
         return np.random.random((10, 10))
 
 
-class TestImageReaderFactory(unittest.TestCase):
+class TestImageReaderCollection(unittest.TestCase):
 
     def setUp(self):
         ...
 
     def tearDown(self):
-        ImageReaderFactory._reset_instance()
+        ImageReaderCollection._reset_instance()
 
     def test_get_instance(self):
-        obj = ImageReaderFactory.instance()
-        self.assertIsInstance(obj, _ImageReaderFactory)
+        obj = ImageReaderCollection.instance()
+        self.assertIsInstance(obj, _ImageReaderCollection)
 
     def test_call(self):
-        obj = ImageReaderFactory()
-        self.assertIsInstance(obj, _ImageReaderFactory)
+        obj = ImageReaderCollection()
+        self.assertIsInstance(obj, _ImageReaderCollection)
 
     def test_attributes(self):
-        obj = ImageReaderFactory()
+        obj = ImageReaderCollection()
         self.assertTrue(hasattr(obj, '_readers'))
         self.assertTrue(hasattr(obj, '_extensions'))
 
     def test_register_format(self):
-        obj = ImageReaderFactory()
+        obj = ImageReaderCollection()
         obj.register_format('test', ['.test'], DummyReader)
         self.assertTrue('.test' in obj._extensions)
         self.assertTrue('test' in obj._readers)
         self.assertIsInstance(obj._readers['test'](), DummyReader)
 
     def test_get_reader(self):
-        obj = ImageReaderFactory()
+        obj = ImageReaderCollection()
         obj.register_format('test', ['.test'], DummyReader)
         reader = obj.get_reader('test/test2/testname.test')
         self.assertIsInstance(reader, DummyReader)
 
     def test_get_reader_wrong_ext(self):
-        obj = ImageReaderFactory()
+        obj = ImageReaderCollection()
         with self.assertRaises(KeyError):
             obj.get_reader('test/test2/testname.test')
 
     def test_get_reader_no_reader(self):
-        obj = ImageReaderFactory()
+        obj = ImageReaderCollection()
         obj._extensions['.test'] = None
         with self.assertRaises(KeyError):
             obj.get_reader('test/test2/testname.test')

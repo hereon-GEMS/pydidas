@@ -47,9 +47,10 @@ class TestReadImage(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def test_read_image(self):
-        _img = read_image(self._fname, dataset='test/path', frame=0, axis=0)
+        _img = read_image(self._fname, hdf5_dataset='test/path', frame=0, axis=0)
         self.assertTrue((_img == self._data[0]).all())
-
+        self.assertEqual(_img.axis_labels[0], 'det_y')
+        self.assertEqual(_img.axis_labels[1], 'det_x')
 
 if __name__ == "__main__":
     unittest.main()

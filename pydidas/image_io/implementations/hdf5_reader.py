@@ -27,7 +27,7 @@ from numpy import squeeze
 
 from ...core import Dataset
 from ..image_reader import ImageReader
-from ..image_reader_factory import ImageReaderFactory
+from ..image_reader_collection import ImageReaderCollection
 from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
 from ...config import HDF5_EXTENSIONS
 
@@ -95,5 +95,5 @@ class Hdf5Reader(ImageReader):
         return self.return_image(**kwargs)
 
 
-reader = ImageReaderFactory()
+reader = ImageReaderCollection()
 reader.register_format('hdf5', HDF5_EXTENSIONS, Hdf5Reader)

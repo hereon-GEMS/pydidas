@@ -231,7 +231,7 @@ class ParameterCollection(dict):
             keys = self.keys()
         if param.refkey in keys:
             raise KeyError('A parameter with the reference key '
-                           f'"{param.name}" already exists.')
+                           f'"{param.refkey}" already exists.')
 
     def add_param(self, param):
         """

@@ -89,6 +89,12 @@ class Hdf5fileSeriesLoader(InputPlugin):
             self.get_param('live_processing'),
             self.get_param('file_stepping'))
 
+    def pre_execute(self):
+        """
+        Prepare loading images from a file series.
+        """
+        self._file_manager.update()
+
     def execute(self, index, **kwargs):
         """
         Load a frame from a file.
@@ -108,7 +114,6 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._file_manager.update()
         _images_per_file = self.get_param_value('images_per_file')
         _i_file = index // _images_per_file
         _fname = self._file_manager.get_filename(_i_file)

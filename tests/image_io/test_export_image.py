@@ -30,9 +30,9 @@ import shutil
 import numpy as np
 
 from pydidas.image_io import export_image
-from pydidas.image_io import ImageReaderFactory
+from pydidas.image_io import ImageReaderCollection
 
-ImageReader = ImageReaderFactory()
+ImageReader = ImageReaderCollection()
 
 
 class TestExportImage(unittest.TestCase):

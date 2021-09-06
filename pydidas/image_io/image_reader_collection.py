@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ImageReaderFactory which returns always the same instance
+Module with the ImageReaderCollection which returns always the same instance
 of the ImageReader.
 """
 
@@ -24,13 +24,13 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ImageReaderFactory']
+__all__ = ['ImageReaderCollection']
 
 import os
 from ..core import SingletonFactory
 
 
-class _ImageReaderFactory:
+class _ImageReaderCollection:
     """
     Factory to manage readers for different file types.
     """
@@ -89,4 +89,4 @@ class _ImageReaderFactory:
         return reader(**kwargs)
 
 
-ImageReaderFactory = SingletonFactory(_ImageReaderFactory)
+ImageReaderCollection = SingletonFactory(_ImageReaderCollection)

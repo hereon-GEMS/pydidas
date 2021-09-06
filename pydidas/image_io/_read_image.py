@@ -15,7 +15,7 @@
 
 """
 The read_image_func module includes the read_image function which queries
-the ImageReaderFactory for the correct reader and reads the image from the file.
+the ImageReaderCollection for the correct reader and reads the image from the file.
 """
 
 __author__      = "Malte Storm"
@@ -26,10 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['read_image']
 
-from .image_reader_factory import ImageReaderFactory
+from .image_reader_collection import ImageReaderCollection
+from ._update_image_metadata import update_image_metadata
 
-
-IMAGE_READER = ImageReaderFactory()
+IMAGE_READER = ImageReaderCollection()
 
 
 def read_image(filename, **kwargs):
@@ -89,4 +89,6 @@ def read_image(filename, **kwargs):
         The processed image.
     """
     reader = IMAGE_READER.get_reader(filename)
-    return reader.read_image(filename, **kwargs)
+    _data = reader.read_image(filename, **kwargs)
+    update_image_metadata(_data)
+    return _data

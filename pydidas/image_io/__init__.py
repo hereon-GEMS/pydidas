@@ -27,8 +27,8 @@ __all__ = []
 
 from . import implementations
 
-from . import image_reader_factory
-from .image_reader_factory import *
+from . import image_reader_collection
+from .image_reader_collection import *
 
 from . import image_reader
 from .image_reader import *
@@ -42,14 +42,14 @@ from ._export_image import *
 from . import rebin_2d
 from .rebin_2d import *
 
-__all__ += image_reader_factory.__all__
+__all__ += image_reader_collection.__all__
 __all__ += image_reader.__all__
 __all__ += _read_image.__all__
 __all__ += _export_image.__all__
 __all__ += rebin_2d.__all__
 
 # Unclutter namespace: remove modules from namespace
-del image_reader_factory
+del image_reader_collection
 del image_reader
 del _read_image
 del _export_image

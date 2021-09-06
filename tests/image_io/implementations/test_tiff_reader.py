@@ -30,7 +30,7 @@ import os
 from skimage.io import imsave
 import numpy as np
 
-from pydidas.image_io import ImageReaderFactory
+from pydidas.image_io import ImageReaderCollection
 from pydidas.image_io.implementations.tiff_reader import TiffReader
 from pydidas.core import Dataset
 
@@ -48,11 +48,11 @@ class TestTiffReader(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def test_get_instance(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
+        obj = ImageReaderCollection().get_reader(self._fname)
         self.assertIsInstance(obj, TiffReader)
 
     def test_read_image(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
+        obj = ImageReaderCollection().get_reader(self._fname)
         img = obj.read_image(self._fname)
         self.assertIsInstance(img, Dataset)
         self.assertTrue((img.array == self._data).all())

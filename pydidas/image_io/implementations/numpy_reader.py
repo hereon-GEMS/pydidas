@@ -27,7 +27,7 @@ import numpy as np
 
 from ...core import Dataset
 from ..image_reader import ImageReader
-from ..image_reader_factory import ImageReaderFactory
+from ..image_reader_collection import ImageReaderCollection
 from ...config import NUMPY_EXTENSIONS
 
 
@@ -78,5 +78,5 @@ class NumpyReader(ImageReader):
         return self.return_image(**kwargs)
 
 
-reader = ImageReaderFactory()
+reader = ImageReaderCollection()
 reader.register_format('numpy', NUMPY_EXTENSIONS, NumpyReader)

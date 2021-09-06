@@ -34,11 +34,11 @@ from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.image_io import read_image
 
 
-class PyFAIintegration(ProcPlugin):
+class PyFAIradialIntegration(ProcPlugin):
     """
     Apply a mask to image files.
     """
-    plugin_name = 'Mask image'
+    plugin_name = 'PyFAI radial integration'
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(

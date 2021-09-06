@@ -27,7 +27,7 @@ import fabio
 
 from ...core import Dataset
 from ..image_reader import ImageReader
-from ..image_reader_factory import ImageReaderFactory
+from ..image_reader_collection import ImageReaderCollection
 from ...config import FABIO_EXTENSIONS
 
 
@@ -74,5 +74,5 @@ class FabioReader(ImageReader):
         return self.return_image(**kwargs)
 
 
-reader = ImageReaderFactory()
+reader = ImageReaderCollection()
 reader.register_format('fabio', FABIO_EXTENSIONS, FabioReader)

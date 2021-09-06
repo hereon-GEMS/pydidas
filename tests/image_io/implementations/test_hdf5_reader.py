@@ -30,7 +30,7 @@ import os
 import h5py
 import numpy as np
 
-from pydidas.image_io import ImageReaderFactory
+from pydidas.image_io import ImageReaderCollection
 from pydidas.image_io.implementations.hdf5_reader import Hdf5Reader
 
 
@@ -48,27 +48,27 @@ class TestHdf5Reader(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def test_get_instance(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
+        obj = ImageReaderCollection().get_reader(self._fname)
         self.assertIsInstance(obj, Hdf5Reader)
 
     def test_read_image_missing_dset(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
+        obj = ImageReaderCollection().get_reader(self._fname)
         with self.assertRaises(KeyError):
             obj.read_image(self._fname)
 
     def test_read_image_plain(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
-        img = obj.read_image(self._fname, dataset='test/path')
+        obj = ImageReaderCollection().get_reader(self._fname)
+        img = obj.read_image(self._fname, hdf5_dataset='test/path')
         self.assertTrue((img.array == self._data[0]).all())
 
     def test_read_image_other_axis(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
-        img = obj.read_image(self._fname, dataset='test/path', axis=1)
+        obj = ImageReaderCollection().get_reader(self._fname)
+        img = obj.read_image(self._fname, hdf5_dataset='test/path', axis=1)
         self.assertTrue((img.array == self._data[:,0]).all())
 
     def test_read_image_other_frame(self):
-        obj = ImageReaderFactory().get_reader(self._fname)
-        img = obj.read_image(self._fname, dataset='test/path', frame=4)
+        obj = ImageReaderCollection().get_reader(self._fname)
+        img = obj.read_image(self._fname, hdf5_dataset='test/path', frame=4)
         self.assertTrue((img.array == self._data[4]).all())
 
 if __name__ == "__main__":

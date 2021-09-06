@@ -27,7 +27,7 @@ from skimage.io import imread
 
 from ...core import Dataset
 from ..image_reader import ImageReader
-from ..image_reader_factory import ImageReaderFactory
+from ..image_reader_collection import ImageReaderCollection
 from ...config import TIFF_EXTENSIONS
 
 
@@ -74,5 +74,5 @@ class TiffReader(ImageReader):
         return self.return_image(**kwargs)
 
 
-reader = ImageReaderFactory()
+reader = ImageReaderCollection()
 reader.register_format('tiff', TIFF_EXTENSIONS, TiffReader)

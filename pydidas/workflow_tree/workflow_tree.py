@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
 Module with the WorkflowTree class which is a subclasses GenericTree
 with additional support for plugins and a plugin chain.
@@ -78,6 +78,7 @@ class _WorkflowTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
+        self.nodes[0].prepare_execution()
         self.nodes[0].execute_plugin_chain(arg, **kwargs)
 
 

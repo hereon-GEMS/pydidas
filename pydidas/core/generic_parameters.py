@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with a GENERIC_PARAMS dictionary which includes Parameters which
@@ -360,6 +360,17 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('Mosaic maximum size (Mpx)', float, default=100,
               refkey='mosaic_max_size', unit='',
               tooltip='The maximum size (in Mpx) of mosais images.'),
+    ############################
+    ## global choice settings
+    ############################
+    Parameter('Use global mask', int, default=1, choices=[True, False],
+              refkey='use_global_mask',
+              tooltip=('Select "True" to use the global settings for the '
+                       'detector mask and mask value. A "False" settings '
+                       'uses the local mask settings. Note: The mask value'
+                       ' will not be used for integrating but only for '
+                       'presentation.')),
+
 )
 
 
@@ -384,5 +395,5 @@ def get_generic_parameter(refkey):
     """
     if refkey not in GENERIC_PARAMS:
         raise KeyError(f'No Parameter with the reference key "{refkey}"'
-                       'in the GENERIC_PARAMS collection.')
+                       ' in the GENERIC_PARAMS collection.')
     return Parameter(*GENERIC_PARAMS[refkey].dump())

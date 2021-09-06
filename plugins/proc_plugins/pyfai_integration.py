@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the MaskImage Plugin which can be used to apply a mask to images.
+Module with the PyFAIintegration Plugin which is used to call
+
 """
 
 __author__      = "Malte Storm"
@@ -23,7 +24,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['MaskImage']
+__all__ = ['PyFAIintegration']
 
 
 import numpy as np
@@ -33,7 +34,7 @@ from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.image_io import read_image
 
 
-class MaskImage(ProcPlugin):
+class PyFAIintegration(ProcPlugin):
     """
     Apply a mask to image files.
     """
@@ -64,7 +65,6 @@ class MaskImage(ProcPlugin):
         else:
             self._mask = read_image(self.get_param_value('det_mask'))
             self._maskval = self.get_param_value('det_mask_val')
-
 
     def execute(self, data, **kwargs):
         """

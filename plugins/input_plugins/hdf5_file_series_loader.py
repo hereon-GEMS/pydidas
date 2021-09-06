@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the Hdf5singleFileLoader Plugin which can be used to load
@@ -77,17 +77,17 @@ class Hdf5fileSeriesLoader(InputPlugin):
         get_generic_parameter('live_processing'),
         get_generic_parameter('file_stepping'),
         )
-    input_data = None
+    input_data_dim = None
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_param_value('live_processing', True)
         self._file_manager = FilelistManager(
-            self.params.get('first_file'),
-            self.params.get('last_file'),
-            self.params.get('live_processing'),
-            self.params.get('file_stepping'))
+            self.get_param('first_file'),
+            self.get_param('last_file'),
+            self.get_param('live_processing'),
+            self.get_param('file_stepping'))
 
     def execute(self, index, **kwargs):
         """

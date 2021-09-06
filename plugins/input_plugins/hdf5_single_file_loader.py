@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the Hdf5singleFileLoader Plugin which can be used to load
@@ -47,7 +47,7 @@ class Hdf5singleFileLoader(InputPlugin):
         Parameter('Filename', Path, default=Path(), tooltip='The file name.',
                   refkey='filename'),
         get_generic_parameter('hdf5_key'))
-    input_data = None
+    input_data_dim = None
     output_data_dim = 2
 
     def execute(self, index, **kwargs):

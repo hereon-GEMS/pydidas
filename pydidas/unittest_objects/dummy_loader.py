@@ -17,6 +17,7 @@ class DummyLoader(InputPlugin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._preexecuted = False
 
     def execute(self, index, **kwargs):
         _width = self.get_param_value('image_width')
@@ -24,3 +25,6 @@ class DummyLoader(InputPlugin):
         _data = np.random.random((_width, _height))
         kwargs.update(dict(index=index))
         return _data, kwargs
+
+    def pre_execute(self):
+        self._preexecuted = True

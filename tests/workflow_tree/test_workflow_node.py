@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """Unit tests for pydidas modules."""
 
@@ -73,6 +73,15 @@ class TestWorkflowNode(unittest.TestCase):
         obj = nodes[1][1]
         _res = obj.execute_plugin(0)
         self.assertIsInstance(_res[1], dict)
+
+    def test_prepare_execution(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.prepare_execution()
+        for _d in range(_depth + 1):
+            for _node in nodes[_d]:
+                self.assertTrue(_node.plugin._preexecuted)
 
     def test_execute_plugin_chain(self):
         _depth = 3

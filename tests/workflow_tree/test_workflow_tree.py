@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """Unit tests for pydidas modules."""
 
@@ -97,6 +97,7 @@ class TestWorkflowTree(unittest.TestCase):
         for _node in nodes[_depth]:
             self.assertTrue(hasattr(_node, 'results'))
             self.assertTrue(hasattr(_node, 'result_kws'))
+            self.assertTrue(_node._preexecuted)
         for _d in range(_depth):
             for _node in nodes[_d]:
                 self.assertFalse(hasattr(_node, 'results'))

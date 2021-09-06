@@ -5,13 +5,13 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 
-# Foobar is distributed in the hope that it will be useful,
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """Module with the basic Plugin classes."""
 
@@ -134,6 +134,12 @@ class BasePlugin(ObjectWithParameterCollection):
         Execute the processing step.
         """
         raise NotImplementedError('Execute method has not been implemented.')
+
+    def pre_execute(self):
+        """
+        Run code which needs to be run only prior to the execution.
+        """
+        pass
 
     @staticmethod
     def check_if_plugin():

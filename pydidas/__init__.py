@@ -14,6 +14,6 @@ from . import image_io
 
 from . import multiprocessing
 
-from . import test_objects
+from . import unittest_objects
 
 from . import utils

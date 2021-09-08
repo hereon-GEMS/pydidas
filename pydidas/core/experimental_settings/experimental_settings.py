@@ -24,6 +24,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExperimentalSettings']
 
+
+import pyFAI
+
 from ..singleton_factory import SingletonFactory
 from ..parameter_collection import ParameterCollection
 from ..generic_parameters import get_generic_parameter
@@ -96,6 +99,32 @@ class _ExpSettings(ObjectWithParameterCollection):
             self.params['xray_energy'].value = LAMBDA_TO_E / (value * 1e-10)
         else:
             self.params.set_value(key, value)
+
+    def get_detector(self):
+        """
+        Get the detector. First, it is checked whether a pyFAI detector can
+        be instantiated from the Detector name or a new detector is created
+        and values from the ExperimentalSettings are copied.
+
+        Returns
+        -------
+        _det : pyFAI.detectors.Detector
+            The detector object.
+        """
+        _name = self.get_param_value('detector_name')
+        try:
+            _det = pyFAI.detector_factory(_name)
+        except RuntimeError:
+            _det = pyFAI.detectors.Detector()
+        for key, value in [
+                ['pixel1', self.get_param_value('detector_sizey')],
+                ['pixel2', self.get_param_value('detector_sizex')],
+                ['max_shape', (self.get_param_value('detector_npixy'),
+                               self.get_param_value('detector_npixx'))]
+                ]:
+            if getattr(_det, key) != value:
+                setattr(_det, key, value)
+        return _det
 
     def __copy__(self):
         """

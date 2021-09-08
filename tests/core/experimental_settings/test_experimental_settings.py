@@ -24,12 +24,17 @@ __status__ = "Development"
 
 import unittest
 import copy
+import logging
+
+import pyFAI
 
 from pydidas.core.experimental_settings import ExperimentalSettings
 from pydidas.core.experimental_settings.experimental_settings import (
     _ExpSettings)
 from pydidas.config import LAMBDA_TO_E
 
+logger = logging.getLogger('pyFAI.detectors._common')
+logger.setLevel(logging.CRITICAL)
 
 class TestExperimentalSettings(unittest.TestCase):
 
@@ -64,6 +69,31 @@ class TestExperimentalSettings(unittest.TestCase):
         self.assertEqual(obj.get_param_value('xray_wavelength'), _new_lambda)
         self.assertAlmostEqual(obj.get_param_value('xray_energy'),
                                12.55345175429956, delta=0.0005)
+
+    def test_get_detector__from_param_name(self):
+        _shape = (1000, 1000)
+        obj = ExperimentalSettings()
+        obj.set_param_value('detector_name', 'Eiger 9M')
+        obj.set_param_value('detector_npixy', _shape[0])
+        obj.set_param_value('detector_npixx', _shape[1])
+        _det = obj.get_detector()
+        self.assertIsInstance(_det, pyFAI.detectors.Detector)
+        self.assertEqual(_det.max_shape, _shape)
+
+    def test_get_detector__new_name(self):
+        _shape = (1000, 1000)
+        _pixelsize = 100e-6
+        obj = ExperimentalSettings()
+        obj.set_param_value('detector_name', 'No Eiger')
+        obj.set_param_value('detector_npixy', _shape[0])
+        obj.set_param_value('detector_npixx', _shape[1])
+        obj.set_param_value('detector_sizey', _pixelsize)
+        obj.set_param_value('detector_sizex', _pixelsize)
+        _det = obj.get_detector()
+        self.assertIsInstance(_det, pyFAI.detectors.Detector)
+        self.assertEqual(_det.max_shape, _shape)
+        self.assertEqual(_det.pixel1, _pixelsize)
+        self.assertEqual(_det.pixel2, _pixelsize)
 
     def test_copy(self):
         obj = ExperimentalSettings()

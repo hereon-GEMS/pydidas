@@ -387,13 +387,13 @@ GENERIC_PARAMS = ParameterCollection(
                        ' the full data range. If True, boundaries need to be '
                        'defined in the lower and upper radial range '
                        'Parameters.')),
-    Parameter('Radial lower range', int, default=0,
+    Parameter('Radial lower range', int, default=-1,
               refkey='int_rad_range_lower',
               tooltip=('The lower boundary of the radial integration range.'
                        ' This setting is only used if "Use radial range" is '
                        'True. This value needs to be given in the unit '
                        'selected as radial unit.')),
-    Parameter('Radial upper range', int, default=50,
+    Parameter('Radial upper range', int, default=-1,
               refkey='int_rad_range_upper',
               tooltip=('The upper boundary of the radial integration range.'
                        ' This setting is only used if "Use radial range" is '
@@ -412,13 +412,13 @@ GENERIC_PARAMS = ParameterCollection(
                        ' the full data range. If True, boundaries need to be '
                        'defined in the lower and upper azimuthal range '
                        'Parameters.')),
-    Parameter('Azimuthal lower range', int, default=0,
+    Parameter('Azimuthal lower range', int, default=-1,
               refkey='int_azi_range_lower',
               tooltip=('The lower boundary of the azimuthal integration range.'
                        ' This setting is only used if "Use azimuthal range" is '
                        'True. This value needs to be given in the unit '
                        'selected as azimuthal unit.')),
-    Parameter('Azimuthal upper range', int, default=50,
+    Parameter('Azimuthal upper range', int, default=-1,
               refkey='int_azi_range_upper',
               tooltip=('The upper boundary of the azimuthal integration range.'
                        ' This setting is only used if "Use azimuthal range" is '

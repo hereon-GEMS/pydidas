@@ -65,7 +65,6 @@ class TestPluginCollection(unittest.TestCase):
 
     def create_plugin_file_tree(self, path=None, depth=3, width=2):
         path = self._pluginpath if path is None else path
-        # sys.path.insert(0, path)
         _dirs = self.create_dir_tree(path, depth, width)
         self.populate_with_python_files(_dirs)
         _mods = self.get_modules_from_dirs(_dirs)

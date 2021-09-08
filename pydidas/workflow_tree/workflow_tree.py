@@ -23,13 +23,13 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowNode']
+__all__ = ['WorkflowTree']
 
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
 
-__all__ = ['WorkflowTree']
+
 
 class _WorkflowTree(GenericTree):
     """

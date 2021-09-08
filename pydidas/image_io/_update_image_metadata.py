@@ -30,14 +30,17 @@ from ..core.experimental_settings import ExperimentalSettings
 
 EXP_SETTINGS = ExperimentalSettings()
 
-def update_image_metadata(dataset):
+def update_image_metadata(dataset, **kwargs):
     """
     Apply metadata acquired from the ExperimentalSettings to the image.
 
     Note: As arrays are mutable, there is no return value but the dataset
     is changed in place.
     """
-    dataset.axis_labels = ('det_y', 'det_x')
+    if 'axis_labels' in kwargs:
+        dataset.axis_labels = kwargs['axis_labels']
+    else:
+        dataset.axis_labels = ('det_y', 'det_x')
     if EXP_SETTINGS.get_param_value('detector_sizey') > 0:
         dataset.axis_scales[0] = EXP_SETTINGS.get_param_value('detector_sizey')
         dataset.axis_units[0] = 'm'

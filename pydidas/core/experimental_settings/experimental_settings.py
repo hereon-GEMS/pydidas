@@ -27,12 +27,15 @@ __all__ = ['ExperimentalSettings']
 
 import pyFAI
 
+from ...config import LAMBDA_TO_E
 from ..singleton_factory import SingletonFactory
 from ..parameter_collection import ParameterCollection
 from ..generic_parameters import get_generic_parameter
 from ..object_with_parameter_collection import ObjectWithParameterCollection
-from ...config import LAMBDA_TO_E
-
+from .load_experiment_settings_from_file_mixin import (
+    LoadExperimentSettingsFromFileMixIn)
+from .save_experiment_settings_to_file_mixin import (
+    SaveExperimentSettingsToFileMixIn)
 
 DEFAULTS = ParameterCollection(
     get_generic_parameter('xray_wavelength'),
@@ -50,7 +53,9 @@ DEFAULTS = ParameterCollection(
     get_generic_parameter('detector_rot3'))
 
 
-class _ExpSettings(ObjectWithParameterCollection):
+class _ExpSettings(ObjectWithParameterCollection,
+                   LoadExperimentSettingsFromFileMixIn,
+                   SaveExperimentSettingsToFileMixIn):
     """
     Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
     <pydidas.core.ObjectWithParameterCollection>`
@@ -66,7 +71,7 @@ class _ExpSettings(ObjectWithParameterCollection):
 
     def __init__(self, *args, **kwargs):
         """Setup method"""
-        super().__init__()
+        ObjectWithParameterCollection.__init__(self)
         self.add_params(*args, **kwargs)
         self.set_default_params()
 
@@ -125,6 +130,9 @@ class _ExpSettings(ObjectWithParameterCollection):
             if getattr(_det, key) != value:
                 setattr(_det, key, value)
         return _det
+
+    # def load_from_file(self, filename):
+
 
     def __copy__(self):
         """

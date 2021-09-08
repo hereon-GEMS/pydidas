@@ -22,7 +22,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['LoadExperimentSettingsFromFile']
+__all__ = ['LoadExperimentSettingsFromFileMixIn']
 
 import os
 
@@ -30,27 +30,14 @@ import yaml
 import pyFAI
 
 from ...config import YAML_EXTENSIONS, LAMBDA_TO_E
-from ..object_with_parameter_collection import ObjectWithParameterCollection
-from .experimental_settings import ExperimentalSettings
-
-EXP_SETTINGS = ExperimentalSettings()
 
 
-class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
+class LoadExperimentSettingsFromFileMixIn:
     """
-    The LoadExperimentSettingsFromFile class allows to read Xray wavelength,
-    detector and geometry information from a file and store them internally
-    in the ExperimentalSettings object.
+    The LoadExperimentSettingsFromFileMixIn class allows to read X-ray
+    wavelength, detector and geometry information from a file and store them
+    internally in the ExperimentalSettings object.
     """
-    def __init__(self, fname=None):
-        """Create new instance."""
-        self.fname = fname
-        ObjectWithParameterCollection.__init__(self)
-        self.params = EXP_SETTINGS.params
-        self.tmp_params = {}
-        if fname not in [None, '']:
-            self.load_from_file(fname)
-
     def load_from_file(self, fname):
         """
         Load ExperimentalSettings from a file.
@@ -70,7 +57,7 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         """
         if not os.path.exists(fname):
             raise FileNotFoundError(f'No file with the name "{fname}" exists.')
-
+        self.fname = fname
         _ext = os.path.splitext(self.fname)[1]
         if _ext in YAML_EXTENSIONS:
             self.__load_yaml_file()
@@ -102,6 +89,17 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         self.tmp_params['xray_energy'] = (LAMBDA_TO_E
                                           / self.tmp_params['xray_wavelength'])
 
+    def __load_poni_file(self):
+        """
+        Loada pyFAI type file with geometry information.
+        """
+        geo = pyFAI.geometry.Geometry().load(self.fname)
+        self.tmp_params = {}
+        self.__update_detector_from_pyFAI(geo.detector)
+        self.__update_geometry_from_pyFAI(geo)
+        self.__verify_all_entries_present()
+        self.__write_to_exp_settings()
+
     def __verify_all_entries_present(self):
         """
         Verify that the tmp_params dictionary holds all keys from the
@@ -119,16 +117,6 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
             self.set_param_value(key, self.tmp_params[key])
         self.tmp_params = {}
 
-    def __load_poni_file(self):
-        """
-        Loada pyFAI type file with geometry information.
-        """
-        geo = pyFAI.geometry.Geometry().load(self.fname)
-        self.tmp_params = {}
-        self.__update_detector_from_pyFAI(geo.detector)
-        self.__update_geometry_from_pyFAI(geo)
-        self.__verify_all_entries_present()
-        self.__write_to_exp_settings()
 
     def __update_detector_from_pyFAI(self, det):
         """Update the detector information from a pyFAI Detector instance. """
@@ -150,7 +138,6 @@ class LoadExperimentSettingsFromFile(ObjectWithParameterCollection):
         self.tmp_params['xray_wavelength'] = geo.wavelength * 1e10
         self.tmp_params['xray_energy'] = (LAMBDA_TO_E
                                           / self.tmp_params['xray_wavelength'])
-
         _geodict = geo.getPyFAI()
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:

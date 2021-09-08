@@ -31,10 +31,11 @@ import pyFAI
 from pydidas.core.experimental_settings import ExperimentalSettings
 from pydidas.core.experimental_settings.experimental_settings import (
     _ExpSettings)
-from pydidas.config import LAMBDA_TO_E
+
 
 logger = logging.getLogger('pyFAI.detectors._common')
 logger.setLevel(logging.CRITICAL)
+
 
 class TestExperimentalSettings(unittest.TestCase):
 

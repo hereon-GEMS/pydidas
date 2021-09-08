@@ -33,9 +33,7 @@ from pyFAI.geometry import Geometry
 
 from ..config import YAML_EXTENSIONS
 from ..core import ParameterCollectionMixIn
-from ..core.experimental_settings import (ExperimentalSettings,
-                                          LoadExperimentSettingsFromFile,
-                                          SaveExperimentSettingsToFile)
+from ..core.experimental_settings import ExperimentalSettings
 
 from ..widgets import BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
@@ -184,10 +182,10 @@ class ExperimentSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         _func = QtWidgets.QFileDialog.getOpenFileName
         fname = _func(self, 'Name of file', None,
                       'PONI files (*.poni);;All files (*.*)')[0]
-        LoadExperimentSettingsFromFile(fname)
+        EXP_SETTINGS.load_from_file(fname)
 
     def __save_to_file(self):
         _func = QtWidgets.QFileDialog.getSaveFileName
         _files = 'YAML files (*.yml);;PONI files (*.poni);;All files (*.*)'
         fname = _func(self, 'Name of file', None, _files)[0]
-        SaveExperimentSettingsToFile(fname)
+        EXP_SETTINGS.save_to_file(fname)

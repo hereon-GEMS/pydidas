@@ -29,13 +29,24 @@ import shutil
 import yaml
 from pyFAI.geometry import Geometry
 
-from pydidas.core.experimental_settings import (ExperimentalSettings,
-                                                SaveExperimentSettingsToFile)
+from pydidas.core.experimental_settings import (
+    ExperimentalSettings, SaveExperimentSettingsToFileMixIn)
+from pydidas.core import ObjectWithParameterCollection
+from pydidas.core.experimental_settings.experimental_settings import DEFAULTS
 
 EXP_SETTINGS = ExperimentalSettings()
 
+class TestClass(ObjectWithParameterCollection,
+                SaveExperimentSettingsToFileMixIn):
+    default_params = DEFAULTS
 
-class TestLoadExperimentSettingsFromFile(unittest.TestCase):
+    def __init__(self):
+        ObjectWithParameterCollection.__init__(self)
+        self.set_default_params()
+        self.tmp_params = {}
+
+
+class TestSaveExperimentSettingsToFileMixIn(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
@@ -44,38 +55,39 @@ class TestLoadExperimentSettingsFromFile(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def test_creation(self):
-        obj = SaveExperimentSettingsToFile()
-        self.assertIsInstance(obj, SaveExperimentSettingsToFile)
+        obj = TestClass()
+        self.assertIsInstance(obj, SaveExperimentSettingsToFileMixIn)
 
     def test_save_no_file_extension(self):
-        obj = SaveExperimentSettingsToFile()
-        with self.assertRaises(TypeError):
+        obj = TestClass()
+        with self.assertRaises(KeyError):
             obj.save_to_file('None')
 
-    def test_save_poni(self):
-        SaveExperimentSettingsToFile(self._path + 'poni.poni')
+    def test_save_poni_file(self):
+        obj = TestClass()
+        obj.fname = self._path + 'poni.poni'
+        obj._SaveExperimentSettingsToFileMixIn__save_poni_file()
         geo = Geometry().load(self._path + 'poni.poni').getPyFAI()
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_SETTINGS.get_param_value(key),
+            self.assertEqual(obj.get_param_value(key),
                               geo[key.split('_')[1]])
 
-    def test_save_yaml(self):
-        SaveExperimentSettingsToFile(self._path + 'yaml.yml')
+    def test_save_yaml_file(self):
+        obj = TestClass()
+        obj.fname = self._path + 'yaml.yml'
+        obj._SaveExperimentSettingsToFileMixIn__save_yaml_file()
         with open(self._path + 'yaml.yml', 'r') as stream:
             _data = yaml.safe_load(stream)
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_SETTINGS.get_param_value(key),
+            self.assertEqual(obj.get_param_value(key),
                               _data[key])
 
-    def test_save_wrong_type(self):
-        with self.assertRaises(KeyError):
-            SaveExperimentSettingsToFile(self._path + 'yaml.unknown')
-
     def test_save_poni_without_det_config(self):
-        EXP_SETTINGS.set_param_value('detector_name', 'pilatus1m_cdte')
-        SaveExperimentSettingsToFile(self._path + 'poni.poni')
+        obj = TestClass()
+        obj.set_param_value('detector_name', 'pilatus1m_cdte')
+        obj.save_to_file(self._path + 'poni.poni')
         with open(self._path + 'poni.poni', 'r') as f:
             lines = f.readlines()
         self.assertTrue('Detector_config: {}\n' in lines)

@@ -22,7 +22,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SaveExperimentSettingsToFile']
+__all__ = ['SaveExperimentSettingsToFileMixIn']
 
 import os
 
@@ -30,24 +30,14 @@ import yaml
 import pyFAI
 
 from ...config import YAML_EXTENSIONS
-from .experimental_settings import ExperimentalSettings
-
-EXP_SETTINGS = ExperimentalSettings()
 
 
-class SaveExperimentSettingsToFile:
+class SaveExperimentSettingsToFileMixIn:
     """
     The LoadExperimentSettingsFromFile class allows to read Xray wavelength,
     detector and geometry information from a file and store them internally
     in the ExperimentalSettings object.
     """
-    def __init__(self, fname=None):
-        """Create new instance."""
-        self.fname = fname
-        self.tmp_params = {}
-        if fname is not None:
-            self.save_to_file(fname)
-
     def save_to_file(self, fname):
         """
         Save ExperimentalSettings to a file.
@@ -63,6 +53,7 @@ class SaveExperimentSettingsToFile:
         KeyError
             If the file extension is not recognized.
         """
+        self.fname = fname
         _ext = os.path.splitext(self.fname)[1]
         if _ext == '.poni':
             self.__save_poni_file()
@@ -81,19 +72,19 @@ class SaveExperimentSettingsToFile:
         """
         _pdata = {}
         for key in ['rot1', 'rot2', 'rot3', 'poni1', 'poni2']:
-            _pdata[key] = EXP_SETTINGS.get_param_value(f'detector_{key}')
-        _pdata['detector'] = EXP_SETTINGS.get_param_value('detector_name')
-        _pdata['distance'] = EXP_SETTINGS.get_param_value('detector_dist')
+            _pdata[key] = self.get_param_value(f'detector_{key}')
+        _pdata['detector'] = self.get_param_value('detector_name')
+        _pdata['distance'] = self.get_param_value('detector_dist')
         if (_pdata['detector'] in pyFAI.detectors.Detector.registry.keys()
                 and _pdata['detector'] != 'detector'):
             _pdata['detector_config'] = {}
         else:
             _pdata['detector_config'] = dict(
-                pixel1=EXP_SETTINGS.get_param_value('detector_sizey'),
-                pixel2=EXP_SETTINGS.get_param_value('detector_sizex'),
-                max_shape=(EXP_SETTINGS.get_param_value('detector_npixy'),
-                           EXP_SETTINGS.get_param_value('detector_npixx')))
-        _pdata['wavelength'] = (EXP_SETTINGS.get_param_value('xray_wavelength')
+                pixel1=self.get_param_value('detector_sizey'),
+                pixel2=self.get_param_value('detector_sizex'),
+                max_shape=(self.get_param_value('detector_npixy'),
+                           self.get_param_value('detector_npixx')))
+        _pdata['wavelength'] = (self.get_param_value('xray_wavelength')
                                   * 1e-10)
         pfile = pyFAI.io.ponifile.PoniFile()
         pfile.read_from_dict(_pdata)
@@ -104,7 +95,7 @@ class SaveExperimentSettingsToFile:
         """
         Load ExperimentalSettings from a YAML file.
         """
-        tmp_params = EXP_SETTINGS.get_param_values_as_dict()
+        tmp_params = self.get_param_values_as_dict()
         del tmp_params['xray_energy']
         with open(self.fname, 'w') as stream:
             yaml.safe_dump(tmp_params, stream)

@@ -23,11 +23,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import load_experiment_settings_from_file
-from .load_experiment_settings_from_file import *
+from . import load_experiment_settings_from_file_mixin
+from .load_experiment_settings_from_file_mixin import *
 
-from . import save_experiment_settings_to_file
-from .save_experiment_settings_to_file import *
+from . import save_experiment_settings_to_file_mixin
+from .save_experiment_settings_to_file_mixin import *
 
 # from . import parameter_collection
 # from .parameter_collection import *
@@ -59,8 +59,8 @@ from .experimental_settings import *
 # from . import singleton_factory
 # from .singleton_factory import *
 
-__all__ += load_experiment_settings_from_file.__all__
-__all__ += save_experiment_settings_to_file.__all__
+__all__ += load_experiment_settings_from_file_mixin.__all__
+__all__ += save_experiment_settings_to_file_mixin.__all__
 # __all__ += parameter.__all__
 # __all__ += object_with_parameter_collection.__all__
 # __all__ += dataset.__all__
@@ -74,8 +74,8 @@ __all__ += experimental_settings.__all__
 
 
 # Unclutter namespace: remove modules from namespace
-del load_experiment_settings_from_file
-del save_experiment_settings_to_file
+del load_experiment_settings_from_file_mixin
+del save_experiment_settings_to_file_mixin
 # del dataset
 del experimental_settings
 # del scan_settings

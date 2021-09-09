@@ -27,13 +27,7 @@ __status__ = "Development"
 __all__ = ['pyFAIazimuthalIntegration']
 
 
-import numpy as np
-
-import pyFAI
-
-from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.plugins import (ProcPlugin, PROC_PLUGIN, pyFAIintegrationBase,
-                             pyFAI_UNITS)
+from pydidas.plugins import pyFAIintegrationBase, pyFAI_UNITS
 from pydidas.core.experimental_settings import ExperimentalSettings
 
 EXP_SETTINGS = ExperimentalSettings()
@@ -48,14 +42,9 @@ class pyFAIazimuthalIntegration(pyFAIintegrationBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.params['int_rad_unit'].choices = ['Q / nm^-1', '2\u03b8 / deg',
-                                               'r / mm']
+        self.params['int_rad_unit'].choices = [
+            'Q / nm^-1', '2\u03b8 / deg', 'r / mm']
         self.set_param_value('int_rad_npoint', 1)
-
-    def pre_execute(self):
-        super().pre_execute()
-        if 'CSR' in self.get_param_value('int_method'):
-            self._ai.setup_CSR()
 
     def execute(self, data, **kwargs):
         """
@@ -65,5 +54,6 @@ class pyFAIazimuthalIntegration(pyFAIintegrationBase):
         _newdata = self._ai.integrate1d(
             data, self.get_param_value('int_azi_npoint'), unit=_unit,
             radial_range=self.get_radial_range(),
-            azimuth_range=self.get_azimuthal_range())
+            azimuth_range=self.get_azimuthal_range_native(),
+            mask=self._mask)
         return _newdata, kwargs

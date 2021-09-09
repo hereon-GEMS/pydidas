@@ -30,7 +30,6 @@ from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
 
 
-
 class _WorkflowTree(GenericTree):
     """
     The WorkflowTree is a subclassed GenericTree with support for running
@@ -81,5 +80,36 @@ class _WorkflowTree(GenericTree):
         self.nodes[0].prepare_execution()
         self.nodes[0].execute_plugin_chain(arg, **kwargs)
 
+    def execute_single_plugin(self, node_id, arg, **kwargs):
+        """
+        Execute a single node Plugin and get the return.
+
+        Parameters
+        ----------
+        node_id : int
+            The ID of the node in the tree.
+        arg : object
+            The input argument for the Plugin.
+        **kwargs : dict
+            Any keyword arguments for the Plugin execution.
+
+        Raises
+        ------
+        KeyError
+            If the node ID is not registered.
+
+        Returns
+        -------
+        res : object
+            The return value of the Plugin. Depending on the plugin, it can
+            be a single value or an array.
+        kwargs : dict
+            The (updated) kwargs dictionary.
+        """
+        if not node_id in self.nodes:
+            raise KeyError(f'The node ID "{node_id}" is not in use.')
+        self.nodes[node_id].prepare_execution()
+        _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
+        return _res, kwargs
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

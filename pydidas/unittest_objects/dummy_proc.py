@@ -16,7 +16,7 @@ class DummyProc(ProcPlugin):
         self._preexecuted = False
 
     def execute(self, data, **kwargs):
-        _offset = np.random.random()
+        _offset = kwargs.get('offset', np.random.random())
         _data = data + _offset
         kwargs.update({f'offset_{self.node_id:02d}': _offset})
         return _data, kwargs

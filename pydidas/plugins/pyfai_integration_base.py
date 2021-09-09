@@ -32,6 +32,7 @@ import pathlib
 
 import numpy as np
 import pyFAI
+import pyFAI.azimuthalIntegrator
 
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.core.experimental_settings import ExperimentalSettings
@@ -92,16 +93,17 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Check the use_global_mask Parameter and load the mask image.
         """
-        self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
-            dist=EXP_SETTINGS.get_param_value('detector_dist'),
-            poni1=EXP_SETTINGS.get_param_value('detector_poni1'),
-            poni2=EXP_SETTINGS.get_param_value('detector_poni2'),
-            rot1=EXP_SETTINGS.get_param_value('detector_rot1'),
-            rot2=EXP_SETTINGS.get_param_value('detector_rot2'),
-            rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
-            detector=EXP_SETTINGS.get_detector(),
-            wavelength=EXP_SETTINGS.get_param_value('xray_wavelength'))
-        self.load_and_store_mask()
+        if self._ai is None:
+            self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
+                dist=EXP_SETTINGS.get_param_value('detector_dist'),
+                poni1=EXP_SETTINGS.get_param_value('detector_poni1'),
+                poni2=EXP_SETTINGS.get_param_value('detector_poni2'),
+                rot1=EXP_SETTINGS.get_param_value('detector_rot1'),
+                rot2=EXP_SETTINGS.get_param_value('detector_rot2'),
+                rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
+                detector=EXP_SETTINGS.get_detector(),
+                wavelength=EXP_SETTINGS.get_param_value('xray_wavelength'))
+            self.load_and_store_mask()
 
     def load_and_store_mask(self):
         """

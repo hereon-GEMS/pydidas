@@ -89,6 +89,24 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertIsInstance(self.tree.nodes[_id], GenericNode)
         self.assertEqual(self.tree.nodes[_id].node_id, _id)
 
+    def test_execute_single_plugin__no_node(self):
+        _depth = 3
+        _data = np.random.random((20, 20))
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        with self.assertRaises(KeyError):
+            self.tree.execute_single_plugin(114, _data)
+
+    def test_execute_single_plugin__existing_node(self):
+        _depth = 3
+        _data = np.random.random((20, 20))
+        _offset = 0.4
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        _newdata = self.tree.execute_single_plugin(n_nodes - 2, _data,
+                                                   offset=_offset)
+        self.assertTrue((abs(_newdata -_offset - _data) < 1e-15).all())
+
     def test_execute_process(self):
         _depth = 3
         nodes, n_nodes = self.create_node_tree(depth=_depth)
@@ -97,7 +115,7 @@ class TestWorkflowTree(unittest.TestCase):
         for _node in nodes[_depth]:
             self.assertTrue(hasattr(_node, 'results'))
             self.assertTrue(hasattr(_node, 'result_kws'))
-            self.assertTrue(_node._preexecuted)
+            self.assertTrue(_node.plugin._preexecuted)
         for _d in range(_depth):
             for _node in nodes[_d]:
                 self.assertFalse(hasattr(_node, 'results'))

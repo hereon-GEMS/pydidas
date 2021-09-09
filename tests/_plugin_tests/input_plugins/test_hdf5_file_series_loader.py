@@ -50,8 +50,6 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
             self._data[index] = index
 
         self._hdf5_fnames = []
-        [Path(os.path.join(self._path, f'test_{i:03d}.h5'))
-                             for i in range(self._n_files)]
         for i in range(self._n_files):
             _fname = Path(os.path.join(self._path, f'test_{i:03d}.h5'))
             self._hdf5_fnames.append(_fname)
@@ -78,14 +76,26 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')()
         self.assertIsInstance(plugin, BasePlugin)
 
-    def test_execute__no_input(self):
+    def test_pre_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')()
+        with self.assertRaises(AppConfigError):
+            plugin.pre_execute()
+
+    def test_pre_execute__simple(self):
+        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin.pre_execute()
+        self.assertEqual(plugin._file_manager.n_files, self._n_files)
+
+    def test_execute__no_input(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')(
+            images_per_file=1)
         with self.assertRaises(AppConfigError):
             plugin.execute(0)
 
     def test_execute__simple(self):
         plugin = self.create_plugin_with_hdf5_filelist()
         _index = 0
+        plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
         self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
@@ -94,6 +104,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
 
     def test_execute__get_all_frames(self):
         plugin = self.create_plugin_with_hdf5_filelist()
+        plugin.pre_execute()
         for _index in range(self._n):
             _data, kwargs = plugin.execute(_index)
             self.assertTrue((_data == _index).all())

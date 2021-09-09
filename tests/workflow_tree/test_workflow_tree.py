@@ -103,8 +103,8 @@ class TestWorkflowTree(unittest.TestCase):
         _offset = 0.4
         nodes, n_nodes = self.create_node_tree(depth=_depth)
         self.tree.register_node(nodes[0][0])
-        _newdata = self.tree.execute_single_plugin(n_nodes - 2, _data,
-                                                   offset=_offset)
+        _newdata, kwargs = self.tree.execute_single_plugin(n_nodes - 2, _data,
+                                                           offset=_offset)
         self.assertTrue((abs(_newdata -_offset - _data) < 1e-15).all())
 
     def test_execute_process(self):

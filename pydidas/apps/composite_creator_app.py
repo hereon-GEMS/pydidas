@@ -433,7 +433,7 @@ class CompositeCreatorApp(BaseApp):
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file,
                                           self.get_param_value('bg_hdf5_key'))
-            _params = dict(dataset=self.get_param_value('bg_hdf5_key'),
+            _params = dict(hdf5_dataset=self.get_param_value('bg_hdf5_key'),
                            binning=self.get_param_value('binning'),
                            imageNo=self.get_param_value('bg_hdf5_num'),
                            ROI=self._image_metadata.roi)
@@ -519,8 +519,9 @@ class CompositeCreatorApp(BaseApp):
             _hdf_index = index % _images_per_file
             _i_hdf = (self.get_param_value('hdf5_first_image_num')
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
-            _params = _params | dict(dataset=self.get_param_value('hdf5_key'),
-                                     imageNo=_i_hdf)
+            _params = (_params
+                       | dict(hdf5_dataset=self.get_param_value('hdf5_key'),
+                              imageNo=_i_hdf))
         return _fname, _params
 
     def _image_exists_check(self, fname, timeout=-1):

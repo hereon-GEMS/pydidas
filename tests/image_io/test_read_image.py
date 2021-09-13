@@ -31,7 +31,7 @@ import h5py
 import numpy as np
 
 from pydidas.image_io import read_image
-
+from pydidas.core import Dataset
 
 class TestReadImage(unittest.TestCase):
 
@@ -49,6 +49,7 @@ class TestReadImage(unittest.TestCase):
     def test_read_image(self):
         _img = read_image(self._fname, hdf5_dataset='test/path', frame=0, axis=0)
         self.assertTrue((_img == self._data[0]).all())
+        self.assertIsInstance(_img, Dataset)
         # TODO: Add tests for metadata
         # self.assertEqual(_img.axis_labels[0], 'det_y')
         # self.assertEqual(_img.axis_labels[1], 'det_x')

@@ -34,6 +34,7 @@ class ImageReader:
     def __init__(self):
         """Initialization"""
         self._image = None
+        self._RoiManager = RoiManager()
 
     def read_image(self, filename, **kwargs):
         """
@@ -74,19 +75,19 @@ class ImageReader:
 
         Returns
         -------
-        _image : np.ndarray
+        _image : pydidas.core.Dataset
             The image in form of an ndarray
         _metadata : dict
             The image metadata, as returned from the concrete reader.
         """
         _return_type = kwargs.get('datatype', 'auto')
-        _roi = RoiManager(**kwargs).roi
+        self._RoiManager.roi = kwargs.get('ROI', None)
         _binning = kwargs.get('binning', 1)
         if self._image is None:
             raise ValueError('No image has been read.')
         _image = self._image
-        if _roi is not None:
-            _image = _image[_roi]
+        if self._RoiManager.roi is not None:
+            _image = _image[self._RoiManager.roi]
         if _binning != 1:
             _image = rebin2d(_image, int(_binning))
         if _return_type not in ('auto', _image.dtype):

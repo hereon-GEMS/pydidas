@@ -33,7 +33,7 @@ import h5py
 from PyQt5 import QtCore
 
 from pydidas.apps import CompositeCreatorApp
-from pydidas.core import (ParameterCollection,
+from pydidas.core import (ParameterCollection, Dataset,
                           get_generic_parameter, CompositeImage)
 from pydidas._exceptions import AppConfigError
 
@@ -268,7 +268,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = CompositeCreatorApp()
         app._config['det_mask'] = _mask
         app._config['det_mask_val'] = _val
-        _image = np.random.random(_shape)
+        _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         _delta = _newimage - _image
         self.assertTrue((_newimage[_mask == 1] == _val).all())
@@ -282,7 +282,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = CompositeCreatorApp()
         app._config['det_mask'] = _mask
         app._config['det_mask_val'] = _val
-        _image = np.random.random(_shape)
+        _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isnan(_newimage[_mask == 1]).all())
 

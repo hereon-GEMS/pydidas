@@ -89,21 +89,14 @@ class RoiManager:
         """
         Create new ROI slice objects from the stored (keyword) arguments.
         """
-        self.__check_roi_key()
+        self.__roi_key = self.__kwargs.get('ROI', None)
         if self.__roi_key is None:
+            self.__roi = None
             return
         self.__check_types_roi_key()
         self.__check_types_roi_key_entries()
         self.__check_length_of_roi_key_entries()
         self.__convert_roi_key_to_slice_objects()
-
-    def __check_roi_key(self):
-        """
-        Check if the ROI key exists in kwargs.
-        """
-        _roi = self.__kwargs.get('ROI', None)
-        if _roi is not None:
-            self.__roi_key = _roi
 
     def __check_types_roi_key(self):
         """
@@ -171,6 +164,9 @@ class RoiManager:
         """
         Check the roi_key for string entries and parse these.
 
+        This method will look for "slice" entries and parse these with start,
+        stop (and optional step). Integers will be returned directly.
+
         Raises
         ------
         ValueError
@@ -179,7 +175,6 @@ class RoiManager:
         """
         _tmpkeys = copy.copy(self.__roi_key)
         _newkeys = []
-        # print(_tmpkeys)
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
@@ -189,7 +184,6 @@ class RoiManager:
                 if key.startswith('slice('):
                     _start = int(key[6:])
                     _end = _tmpkeys.pop(0)
-                    # print(key, _start, _end)
                     if _end.endswith(')'):
                         _step = None
                         _end = _end.strip(')')

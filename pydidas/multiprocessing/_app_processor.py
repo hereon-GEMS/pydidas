@@ -30,6 +30,7 @@ import random
 import string
 import time
 
+
 NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
                   for i in range(64))
 
@@ -89,6 +90,6 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
                 _results = _app.multiprocessing_func(_arg)
-                output_queue.put([_arg, _results])
+                output_queue.put([_arg, _results.copy()])
         time.sleep(0.01)
     finished_queue.put(1)

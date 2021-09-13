@@ -34,7 +34,7 @@ from PyQt5 import QtCore
 from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
-from pydidas.core import (Parameter, ParameterCollection,
+from pydidas.core import (Parameter, ParameterCollection, Dataset,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.utils import check_file_exists, check_hdf5_key_exists_in_file
@@ -281,7 +281,7 @@ class CompositeCreatorApp(BaseApp):
 
         Returns
         -------
-        _image : np.ndarray
+        _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
         _image = read_image(self._config['current_fname'],
@@ -303,13 +303,18 @@ class CompositeCreatorApp(BaseApp):
         image : np.ndarray
             The masked image data.
         """
-        if self._config['det_mask'] is not None:
-            if self._config['det_mask_val'] is None:
-                raise AppConfigError('No numerical value has been defined'
-                                     ' for the mask!')
-            image = np.where(self._config['det_mask'],
-                             self._config['det_mask_val'], image)
-        return image
+        if self._config['det_mask'] is None:
+            return image
+
+        if self._config['det_mask_val'] is None:
+            raise AppConfigError('No numerical value has been defined'
+                                  ' for the mask!')
+        return Dataset(np.where(self._config['det_mask'],
+                                self._config['det_mask_val'], image),
+                       axis_scales=image.axis_scales,
+                       axis_labels=image.axis_labels,
+                       axis_units=image.axis_units,
+                       metadata=image.metadata)
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -521,7 +526,7 @@ class CompositeCreatorApp(BaseApp):
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
             _params = (_params
                        | dict(hdf5_dataset=self.get_param_value('hdf5_key'),
-                              imageNo=_i_hdf))
+                              frame=_i_hdf))
         return _fname, _params
 
     def _image_exists_check(self, fname, timeout=-1):

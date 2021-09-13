@@ -34,9 +34,6 @@ from ...config import HDF5_EXTENSIONS
 class Hdf5Reader(ImageReader):
     """ImageReader implementation for hdf5 files."""
 
-    def __init__(self):
-        super().__init__()
-
     def read_image(self, filename, **kwargs):
         """
         Read an image from an hdf5 file.

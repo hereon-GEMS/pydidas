@@ -102,5 +102,7 @@ if __name__ == '__main__':
 
     gui.show()
     sys.exit(app.exec_())
-
+    for widget in CENTRAL_WIDGET_STACK.widgets:
+        widget.deleteLater()
+    CENTRAL_WIDGET_STACK.deleteLater()
     app.deleteLater()

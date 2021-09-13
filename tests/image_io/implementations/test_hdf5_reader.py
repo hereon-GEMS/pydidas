@@ -30,6 +30,7 @@ import os
 import h5py
 import numpy as np
 
+from pydidas.core import Dataset
 from pydidas.image_io import ImageReaderCollection
 from pydidas.image_io.implementations.hdf5_reader import Hdf5Reader
 
@@ -60,6 +61,7 @@ class TestHdf5Reader(unittest.TestCase):
         obj = ImageReaderCollection().get_reader(self._fname)
         img = obj.read_image(self._fname, hdf5_dataset='test/path')
         self.assertTrue((img.array == self._data[0]).all())
+        self.assertIsInstance(img, Dataset)
 
     def test_read_image_other_axis(self):
         obj = ImageReaderCollection().get_reader(self._fname)

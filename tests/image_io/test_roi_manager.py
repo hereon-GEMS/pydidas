@@ -39,26 +39,13 @@ class TestRoiManager(unittest.TestCase):
     def create_RoiManager(self, _roi=None):
         obj = RoiManager()
         if _roi is not None:
-            obj._RoiManager__kwargs = {'ROI': copy.copy(_roi)}
-        obj._RoiManager__check_roi_key()
+            obj._RoiManager__roi_key = copy.copy(_roi)
         obj._RoiManager__check_types_roi_key()
         return obj
 
     def test_creation(self):
         obj = RoiManager()
         self.assertIsInstance(obj, RoiManager)
-
-    def test_check_roi_key__no_kwarg(self):
-        obj = RoiManager()
-        obj._RoiManager__check_roi_key()
-        self.assertIsNone(obj._RoiManager__roi_key)
-
-    def test_check_roi_key__with_kwarg(self):
-        _roi = 'Test'
-        obj = RoiManager()
-        obj._RoiManager__kwargs = {'ROI': _roi}
-        obj._RoiManager__check_roi_key()
-        self.assertEqual(obj._RoiManager__roi_key, _roi)
 
     def test_check_types_roi_key__w_None(self):
         obj = RoiManager()
@@ -292,6 +279,31 @@ class TestRoiManager(unittest.TestCase):
         obj = RoiManager()
         obj.roi = _roi[0], _roi[1], _roi[2]
         self.assertEqual(obj.roi, (_roi[0], slice(_roi[1], _roi[2])))
+
+    def test_roi_setter_from_str(self):
+        _roi = [slice(0, 5), 1, 5]
+        obj = RoiManager()
+        obj.roi = str(_roi)
+        self.assertEqual(obj.roi, (_roi[0], slice(_roi[1], _roi[2])))
+
+    def test_roi_setter__None(self):
+        _roi = None
+        obj = RoiManager()
+        obj.roi = _roi
+        self.assertEqual(obj.roi, None)
+
+    def test_roi_setter__again_from_None(self):
+        _roi = [slice(0, 5), 1, 5]
+        obj = RoiManager()
+        obj.roi = None
+        obj.roi = _roi[0], _roi[1], _roi[2]
+        self.assertEqual(obj.roi, (_roi[0], slice(_roi[1], _roi[2])))
+
+    def test_roi_setter__again_from_ROI(self):
+        obj = RoiManager()
+        obj.roi = [slice(0, 5), 1, 5]
+        obj.roi = None
+        self.assertEqual(obj.roi, None)
 
 
 if __name__ == "__main__":

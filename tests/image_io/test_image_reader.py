@@ -25,7 +25,7 @@ __status__ = "Development"
 import unittest
 
 import numpy as np
-
+np.core.multiarray._reconstruct
 from pydidas.image_io import ImageReader
 
 
@@ -76,7 +76,6 @@ class TestImageReader(unittest.TestCase):
         obj._image = np.random.random((10, 10))
         _image = obj.return_image(binning=2)
         self.assertEqual(_image.shape, (5, 5))
-
 
 if __name__ == "__main__":
     unittest.main()

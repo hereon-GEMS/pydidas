@@ -34,10 +34,6 @@ from ...config import TIFF_EXTENSIONS
 class TiffReader(ImageReader):
     """ImageReader implementation for tiff files."""
 
-    def __init__(self):
-        ...
-        # super().__init__()
-
     def read_image(self, filename, **kwargs):
         """
         Read an image from a TIFF file.

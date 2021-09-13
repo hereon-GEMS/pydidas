@@ -43,6 +43,9 @@ class EmptyDataset(np.ndarray):
 
     Base class of an empty dataset (numpy.ndarray subclass) for instantiation.
     """
+
+    __safe_for_unpickling__ = True
+
     def __new__(cls, *args, **kwargs):
         """
         __new__ method for creation of new numpy.ndarray object.
@@ -51,11 +54,11 @@ class EmptyDataset(np.ndarray):
         for item in ['axis_labels', 'axis_scales', 'axis_units', 'metadata']:
             if item in kwargs:
                 del kwargs[item]
-        obj = super().__new__(cls, *args, **kwargs)
-        _labels = local_kws.get('axis_labels', _default_vals(obj.ndim))
-        obj.axis_labels = obj.__get_dict(_labels, '__new__')
-        obj.axis_scales = local_kws.get('axis_scales', _default_vals(obj.ndim))
-        obj.axis_units = local_kws.get('axis_units', _default_vals(obj.ndim))
+        obj = np.ndarray.__new__(cls, *args, **kwargs)
+        for key in ['axis_labels', 'axis_scales', 'axis_units']:
+            _data = local_kws.get(key, _default_vals(obj.ndim))
+            _labels = obj.__get_dict(_data, '__new__')
+            setattr(obj, key, _labels)
         obj.metadata = local_kws.get('metadata', None)
         return obj
 
@@ -276,6 +279,43 @@ class EmptyDataset(np.ndarray):
         """
         return self.__repr__()
 
+    def __reduce__(self):
+        """
+        Reimplementation of the numpy.ndarray.__reduce__ method to add
+        the Dataset metadata to the pickled version.
+
+        This method will add the cls.__dict__ items to the generic
+        numpy.ndarray__reduce__ results to pass and store the Dataset axis
+        items and metadata.
+
+        Returns
+        -------
+        tuple
+            The arguments required for pickling. Please refer to
+            https://docs.python.org/2/library/pickle.html#object.__reduce__
+            for the full documentation. The class' state is appended with
+            the class' __dict__
+        """
+        _ndarray_reduced = np.ndarray.__reduce__(self)
+        _dataset_state = _ndarray_reduced[2] + (self.__dict__,)
+        return (_ndarray_reduced[0], _ndarray_reduced[1], _dataset_state)
+
+    def __setstate__(self, state):
+        """
+        Reimplementation of the numpy.ndarray.__setstate__.
+
+        This method is called after pickling to restore the object. The
+        Dataset's __setstate__ method adds the restoration of the __dict__
+        to the generic numpy.ndarray.__setstate__.
+
+        Parameters
+        ----------
+        state : tuple
+            The pickled objcts state.
+        """
+        self.__dict__ = state[-1]
+        np.ndarray.__setstate__(self, state[0:-1])
+
 
 class Dataset(EmptyDataset):
     """
@@ -310,8 +350,8 @@ class Dataset(EmptyDataset):
             The data array.
         **kwargs : type
             Accepted keywords are axis_labels, axis_scales, axis_units,
-            image_id. For information on the keywords please refer to the class
-            docstring.
+            metadata. For information on the keywords please refer to the
+            class docstring.
 
         Returns
         -------

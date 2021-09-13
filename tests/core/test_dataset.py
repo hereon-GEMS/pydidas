@@ -173,9 +173,13 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(obj.axis_units, dict)
         self.assertIsInstance(obj.metadata, dict)
 
-    def test__repr__(self):
+    def test_repr__dataset(self):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array)
+        self.assertIsInstance(obj.__repr__(), str)
+
+    def test_repr__empty_dataset(self):
+        obj = EmptyDataset((10, 10, 10))
         self.assertIsInstance(obj.__repr__(), str)
 
     def test__str__(self):
@@ -183,6 +187,25 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(_array)
         self.assertIsInstance(str(obj), str)
 
+    def test_reduce(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        _array_reduce = _array.__reduce__()
+        _obj_reduce = obj.__reduce__()
+        self.assertEqual(_array_reduce[0], _obj_reduce[0])
+        self.assertIsInstance(_obj_reduce[2][-1], dict)
+        for index, item in enumerate(_array_reduce[2]):
+            self.assertEqual(_obj_reduce[2][index], item)
+
+    def test_setstate(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        _obj_state = obj.__reduce__()[2]
+        new_obj = EmptyDataset((1))
+        new_obj.__setstate__(_obj_state)
+        for key in obj.__dict__:
+            self.assertEqual(obj.__dict__[key], new_obj.__dict__[key])
+        self.assertTrue((new_obj.array == obj.array).all())
 
 if __name__ == "__main__":
     unittest.main()

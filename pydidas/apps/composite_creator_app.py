@@ -37,7 +37,8 @@ from pydidas._exceptions import AppConfigError
 from pydidas.core import (Parameter, ParameterCollection, Dataset,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
-from pydidas.utils import check_file_exists, check_hdf5_key_exists_in_file
+from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file,
+                           timed_print)
 from pydidas.image_io import read_image, rebin2d
 from pydidas.utils import copy_docstring
 from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
@@ -177,7 +178,9 @@ class CompositeCreatorApp(BaseApp):
     """
     default_params = DEFAULT_PARAMS
     mp_func_results = QtCore.pyqtSignal(object)
+    updated_composite = QtCore.pyqtSignal()
     parse_func = parse_composite_creator_cmdline_arguments
+    slave_attributes = ['_composite']
 
     def __init__(self, *args, **kwargs):
         """
@@ -328,9 +331,13 @@ class CompositeCreatorApp(BaseApp):
         image : np.ndarray
             The image data.
         """
+        if self.slave_mode:
+            return
         if self.get_param_value('use_bg_file'):
             image -= self._config['bg_image']
         self._composite.insert_image(image, index)
+        timed_print(f'Inserted image in composite: {index}')
+        self.updated_composite.emit()
 
     def prepare_run(self):
         """
@@ -361,6 +368,7 @@ class CompositeCreatorApp(BaseApp):
         if self.get_param_value('use_bg_file'):
             self._check_and_set_bg_file()
         if self.slave_mode:
+            self._composite = None
             return
         if self._composite is None:
             self._composite = CompositeImage(
@@ -412,6 +420,8 @@ class CompositeCreatorApp(BaseApp):
         np.ndarray
             The composite image in np.ndarray format.
         """
+        if self._composite is None:
+            return None
         return self._composite.image
 
     def _check_and_set_bg_file(self):

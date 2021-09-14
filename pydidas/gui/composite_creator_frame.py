@@ -65,7 +65,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._config = self._app._config
         self._config['input_configured'] = False
         self._config['bg_configured'] = False
-        self._app_attributes_to_update.append('_composite')
+        self._update_timer = 0
         self._create_param_collection()
 
         create_composite_creator_frame_widgets_and_layout(self)
@@ -133,6 +133,27 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.param_widgets['composite_ny'].io_edited.disconnect()
         self.param_widgets['composite_ny'].io_edited.connect(
             partial(self.__update_composite_dim, 'y'))
+        self._app.updated_composite.connect(self.__received_composite_update)
+
+    @QtCore.pyqtSlot()
+    def __received_composite_update(self):
+        """
+        Slot to be called on an update signal from the Composite.
+        """
+        if time.time() - self._config['last_update'] > 2:
+            self.__show_composite()
+            self._config['last_update'] = time.time()
+
+    def __show_composite(self):
+        """
+        Show the composite image in the Viewwer.
+        """
+        self._widgets['plot_window'].setVisible(True)
+        _shape = self._image_metadata.final_shape
+        self._widgets['plot_window'].addImage(
+            self._app.composite, replace=True,
+            origin=(0.5, 0.5),
+            scale=(1 / _shape[1], 1 / _shape[0]))
 
     def setup_initial_state(self):
         """
@@ -151,7 +172,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         index : int
             The frame index.
         """
-        ...
+        pass
 
     def _run_app_serial(self):
         """
@@ -169,6 +190,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Parallel implementation of the execution method.
         """
         self._image_metadata.update_final_image()
+        self._app.multiprocessing_pre_run()
+        self._config['last_update'] = time.time()
         self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
         self._widgets['but_abort'].setVisible(True)
@@ -178,10 +201,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
-        if self.get_param_value('live_processing'):
-            self._app.multiprocessing_pre_run()
-            self._config['last_update'] = 0
-            self._runner.results.connect(self.__live_update)
+        self._runner.results.connect(
+            self._app.multiprocessing_store_results)
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -196,34 +217,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._widgets['progress'].setVisible(False)
         self.set_status('Finished composite image creation.')
         self._runner = None
-
-    @QtCore.pyqtSlot(int, object)
-    def __live_update(self, index, image):
-        """
-        Store the results from the live processing and update the image.
-
-        Parameters
-        ----------
-        index : int
-            The image index.
-        image : np.ndarray
-            The processed image.
-        """
-        self._app.multiprocessing_store_results(index, image)
-        if time.time() - self._config['last_update'] > 2:
-            self.__show_composite()
-            self._config['last_update'] = time.time()
-
-    def __show_composite(self):
-        """
-        Show the composite image in the Viewwer.
-        """
-        self._widgets['plot_window'].setVisible(True)
-        _shape = self._image_metadata.final_shape
-        self._widgets['plot_window'].addImage(
-            self._app.composite, replace=True,
-            origin=(0.5, 0.5),
-            scale=(1 / _shape[1], 1 / _shape[0]))
+        self.__show_composite()
 
     def __save_composite(self):
         """
@@ -275,7 +269,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.__update_n_total()
         self.__finalize_selection(_finalize_flag)
         self.__check_exec_enable()
-
 
     def __check_file(self, fname):
         if self.get_param_value('live_processing') or os.path.isfile(fname):
@@ -464,6 +457,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Abort the creation of the composite image.
         """
         self._runner.stop()
+        self._runner._wait_for_processes_to_finish(2)
         self._apprunner_finished()
 
 

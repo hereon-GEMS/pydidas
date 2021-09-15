@@ -33,7 +33,7 @@ from pydidas.widgets import BaseFrame
 from pydidas.core import (get_generic_parameter, ParameterCollection)
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
 from pydidas.gui.builders.global_configuration_frame_builder import (
-    create_global_configurataion_frame_widgets_and_layout)
+    create_global_configuratation_frame_widgets_and_layout)
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mp_n_workers'),
@@ -59,7 +59,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
         BaseFrame.__init__(self, parent,name=name)
         ParameterConfigWidgetsMixIn.__init__(self)
         self.set_default_params()
-        create_global_configurataion_frame_widgets_and_layout(self)
+        create_global_configuratation_frame_widgets_and_layout(self)
+        self.connect_signals()
         self.frame_activated(self.frame_index)
 
     def connect_signals(self):

@@ -26,12 +26,11 @@ __all__ = ['CompositeCreatorFrame']
 
 import os
 import time
+import logging
 from functools import partial
 
 import numpy as np
-
 from PyQt5 import QtWidgets, QtCore
-
 
 from pydidas.gui.builders.composite_creator_frame_builder import (
     create_composite_creator_frame_widgets_and_layout)
@@ -41,8 +40,12 @@ from pydidas.core import (ParameterCollectionMixIn, Parameter,
                           get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
 from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
-from pydidas.utils import get_hdf5_populated_dataset_keys
+from pydidas.utils import (get_hdf5_populated_dataset_keys, get_time_string,
+                           pydidas_logger)
 from pydidas.multiprocessing import AppRunner
+
+
+logger = pydidas_logger(logging.DEBUG)
 
 
 class CompositeCreatorFrame(BaseFrameWithApp,
@@ -189,20 +192,25 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Parallel implementation of the execution method.
         """
+        logger.debug(get_time_string() + ' Updating image metadata')
         self._image_metadata.update_final_image()
+        logger.debug(get_time_string() + ' Running app pre-run')
         self._app.multiprocessing_pre_run()
+        logger.debug(get_time_string() + ' Creating AppRunner')
         self._config['last_update'] = time.time()
         self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
         self._widgets['but_abort'].setVisible(True)
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
-        self._runner = AppRunner(self._app, 8)
+        self._runner = AppRunner(self._app)
+        logger.debug(get_time_string() + ' Connecting signals')
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
         self._runner.results.connect(
             self._app.multiprocessing_store_results)
+        logger.debug(get_time_string() + ' Starting AppRunner')
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -210,6 +218,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Clean up after AppRunner is done.
         """
+        logger.debug(get_time_string() + ' finishing AppRunner')
         self._widgets['but_exec'].setEnabled(True)
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
@@ -217,6 +226,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._widgets['progress'].setVisible(False)
         self.set_status('Finished composite image creation.')
         self._runner = None
+        logger.debug(get_time_string() + ' removed AppRunner')
         self.__show_composite()
 
     def __save_composite(self):

@@ -164,6 +164,7 @@ class AppRunner(WorkerController):
         if progress >= 1:
             self.send_stop_signal()
             self.suspend()
+            # self._wait_for_processes_to_finish()
             self.stop()
 
     def __check_is_running(self):

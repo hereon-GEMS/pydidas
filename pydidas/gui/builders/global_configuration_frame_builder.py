@@ -25,13 +25,13 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_global_configurataion_frame_widgets_and_layout']
+__all__ = ['create_global_configuratation_frame_widgets_and_layout']
 
 
 from PyQt5 import QtCore
 
 
-def create_global_configurataion_frame_widgets_and_layout(frame):
+def create_global_configuratation_frame_widgets_and_layout(frame):
     """
     Create all widgets and initialize their state.
 

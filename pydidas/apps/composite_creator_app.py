@@ -336,7 +336,6 @@ class CompositeCreatorApp(BaseApp):
         if self.get_param_value('use_bg_file'):
             image -= self._config['bg_image']
         self._composite.insert_image(image, index)
-        timed_print(f'Inserted image in composite: {index}')
         self.updated_composite.emit()
 
     def prepare_run(self):
@@ -507,7 +506,6 @@ class CompositeCreatorApp(BaseApp):
             _update_required = True
         if _update_required:
             self._composite.create_new_image()
-
 
     def _get_args_for_read_image(self, index):
         """

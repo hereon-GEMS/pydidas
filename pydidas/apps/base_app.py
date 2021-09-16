@@ -37,7 +37,7 @@ class BaseApp(ObjectWithParameterCollection):
     The BaseApp is the base class for all pydidas applications.
     """
     parse_func = None
-    slave_attributes = []
+    attributes_not_to_copy_to_slave_app = []
 
     def __init__(self, *args, **kwargs):
         """
@@ -142,7 +142,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return copy(self._config)
 
-    def copy(self, slave_app=False):
+    def get_copy(self, slave_app=False):
         """
         Get a copy of the App.
 
@@ -160,9 +160,10 @@ class BaseApp(ObjectWithParameterCollection):
         return self.__copy__(slave_app)
 
     def __copy__(self, slave_app=False):
+        _do_not_copy = self.attributes_not_to_copy_to_slave_app
         _obj_copy = type(self)()
         for _key in self.__dict__:
-            if not (slave_app and _key in self.slave_attributes):
+            if not (slave_app and _key in _do_not_copy):
                 _obj_copy.__dict__[_key] = copy(self.__dict__[_key])
         if slave_app:
             _obj_copy.slave_mode = True

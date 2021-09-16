@@ -124,18 +124,18 @@ class TestBaseApp(unittest.TestCase):
         app = BaseApp()
         self.assertEqual(app.get_config(), {})
 
-    def test_copy(self):
+    def test_get_copy(self):
         app = BaseApp()
-        _copy = app.copy()
+        _copy = app.get_copy()
         self.assertNotEqual(app, _copy)
         self.assertIsInstance(_copy, BaseApp)
 
-    def test_copy__as_slave(self):
+    def test_get_copy__as_slave(self):
         app = BaseApp()
-        app.slave_attributes = ['slave_att']
+        app.attributes_not_to_copy_to_slave_app = ['slave_att']
         app.slave_att = 12
         app.non_slave_att = 42
-        _copy = app.copy(slave_app=True)
+        _copy = app.get_copy(slave_app=True)
         self.assertNotEqual(app, _copy)
         self.assertTrue(hasattr(_copy, 'non_slave_att'))
         self.assertFalse(hasattr(_copy, 'slave_att'))

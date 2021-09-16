@@ -31,7 +31,9 @@ import numpy as np
 
 from PyQt5 import QtCore, QtWidgets, QtTest
 from pydidas.multiprocessing import WorkerController
+from pydidas.utils import pydidas_logger, get_time_string
 
+logger = pydidas_logger()
 
 def local_test_func(index, *args, **kwargs):
     index = (index
@@ -54,6 +56,7 @@ class TestWorkerController(unittest.TestCase):
         self._app.quit()
 
     def wait_for_finish_signal(self, wc, timeout=10):
+        t0 = time.time()
         _spy = QtTest.QSignalSpy(wc.finished)
         t0 = time.time()
         while len(_spy) == 0 and time.time() - t0 < timeout:
@@ -111,7 +114,9 @@ class TestWorkerController(unittest.TestCase):
         _spy = QtTest.QSignalSpy(wc.finished)
         wc.start()
         # wc.stop()
+        logger.debug(get_time_string() + ' Waiting on finish signal')
         self.wait_for_finish_signal(wc)
+        logger.debug(get_time_string() + ' received finish signal')
         # time.sleep(0.3)
         self.assertEqual(len(_spy), 1)
 

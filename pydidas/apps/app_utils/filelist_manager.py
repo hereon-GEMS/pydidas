@@ -29,6 +29,7 @@ import re
 import copy
 
 from pathlib import Path
+
 import numpy as np
 
 from pydidas.config import FILENAME_DELIMITERS

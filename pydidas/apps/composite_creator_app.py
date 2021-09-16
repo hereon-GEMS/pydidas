@@ -180,7 +180,8 @@ class CompositeCreatorApp(BaseApp):
     mp_func_results = QtCore.pyqtSignal(object)
     updated_composite = QtCore.pyqtSignal()
     parse_func = parse_composite_creator_cmdline_arguments
-    slave_attributes = ['_composite']
+    attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
+                                           '_bg_image']
 
     def __init__(self, *args, **kwargs):
         """
@@ -188,6 +189,7 @@ class CompositeCreatorApp(BaseApp):
         """
         super().__init__(*args, **kwargs)
         self._composite = None
+        self._det_mask = None
         self._filelist = FilelistManager(self.params.get('first_file'),
                                          self.params.get('last_file'),
                                          self.params.get('live_processing'),
@@ -204,12 +206,10 @@ class CompositeCreatorApp(BaseApp):
             self.params.get('roi_xhigh'),
             self.params.get('roi_ylow'),
             self.params.get('roi_yhigh'))
-        self._config = { 'bg_image': None,
-                         'current_fname': None,
-                         'current_kwargs': {},
-                         'det_mask': None,
-                         'det_mask_val': None,
-                         }
+        self._config = {'current_fname': None,
+                        'current_kwargs': {},
+                        'det_mask_val': None,
+                        }
 
     def multiprocessing_pre_run(self):
         """
@@ -220,7 +220,7 @@ class CompositeCreatorApp(BaseApp):
         _ntotal = (self._image_metadata.images_per_file
                    * self._filelist.n_files)
         self._config['mp_tasks'] = range(_ntotal)
-        self._config['det_mask'] = self.__get_detector_mask()
+        self._det_mask = self.__get_detector_mask()
         self._config['det_mask_val'] = float(self.q_settings_get_global_value(
             'det_mask_val'))
 
@@ -306,13 +306,12 @@ class CompositeCreatorApp(BaseApp):
         image : np.ndarray
             The masked image data.
         """
-        if self._config['det_mask'] is None:
+        if self._det_mask is None:
             return image
-
         if self._config['det_mask_val'] is None:
             raise AppConfigError('No numerical value has been defined'
                                   ' for the mask!')
-        return Dataset(np.where(self._config['det_mask'],
+        return Dataset(np.where(self._det_mask,
                                 self._config['det_mask_val'], image),
                        axis_scales=image.axis_scales,
                        axis_labels=image.axis_labels,
@@ -334,7 +333,7 @@ class CompositeCreatorApp(BaseApp):
         if self.slave_mode:
             return
         if self.get_param_value('use_bg_file'):
-            image -= self._config['bg_image']
+            image -= self._bg_image
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 
@@ -459,7 +458,7 @@ class CompositeCreatorApp(BaseApp):
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not have the same image dimensions '
                                  'as the selected files.')
-        self._config['bg_image'] = _bg_image
+        self._bg_image = _bg_image
 
     def _check_composite_dims(self):
         """

@@ -184,14 +184,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = CompositeCreatorApp()
         self.set_bg_params(app, self._fname(0))
         app._check_and_set_bg_file()
-        _image = app._config['bg_image']
+        _image = app._bg_image
         self.assertTrue((_image.array == self._data[0]).all())
 
     def test_check_and_set_bg_file_with_hdf5_bg(self):
         app = CompositeCreatorApp()
         self.set_bg_params(app, self._hdf5_fnames[0])
         app._check_and_set_bg_file()
-        _image = app._config['bg_image']
+        _image = app._bg_image
         self.assertTrue((_image.array == self._data[0]).all())
 
     def test_check_and_set_bg_file_wrong_size(self):
@@ -244,7 +244,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_apply_mask__no_mask(self):
         app = CompositeCreatorApp()
-        app._config['det_mask'] = None
         _image = np.random.random((50, 50))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue((_image == _newimage).all())
@@ -254,7 +253,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         rng = np.random.default_rng(12345)
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
-        app._config['det_mask'] = _mask
+        app._det_mask = _mask
         app._config['det_mask_val'] = None
         _image = np.random.random(_shape)
         with self.assertRaises(AppConfigError):
@@ -266,13 +265,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _mask = rng.integers(low=0, high=2, size=_shape)
         _val = rng.random() * 1e3
         app = CompositeCreatorApp()
-        app._config['det_mask'] = _mask
+        app._det_mask = _mask
         app._config['det_mask_val'] = _val
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         _delta = _newimage - _image
-        self.assertTrue((_newimage[_mask == 1] == _val).all())
-        self.assertTrue((_delta[_mask == 0] == 0).all())
+        self.assertTrue((_newimage.array[_mask == 1] == _val).all())
+        self.assertTrue((_delta.array[_mask == 0] == 0).all())
 
     def test_apply_mask__with_mask_and_nan_mask_val(self):
         _shape = ((50, 50))
@@ -280,7 +279,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         rng = np.random.default_rng(12345)
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
-        app._config['det_mask'] = _mask
+        app._det_mask = _mask
         app._config['det_mask_val'] = _val
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)

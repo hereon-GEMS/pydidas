@@ -81,7 +81,7 @@ class BaseFrameWithApp(BaseFrame):
         if not isinstance(app, BaseApp):
             raise TypeError('The passed object must be a BaseApp instance.')
         if not isinstance(self._app, BaseApp):
-            self._app = app.copy()
+            self._app = app.get_copy()
             self._app.slave_app = False
             return
         for param_key in app.params:

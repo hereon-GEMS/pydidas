@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PyFAIintegration Plugin which is used to call
-
+Module with the pyFAIintegrationBase Plugin which is inherited by all
+integration plugins using pyFAI.
 """
 
 __author__      = "Malte Storm"
@@ -61,7 +61,7 @@ pyFAI_METHOD = {'CSR': 'csr',
 
 class pyFAIintegrationBase(ProcPlugin):
     """
-    Apply a mask to image files.
+    Provide basic functionality for the concrete integration plugins.
     """
     plugin_name = 'PyFAI integration base'
     basic_plugin = True
@@ -193,6 +193,25 @@ class pyFAIintegrationBase(ProcPlugin):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
         return _range
 
+    def get_azimuthal_range_in_deg(self):
+        """
+        Get the azimuthal range from the Parameters in degree.
+
+        If use_azimuthal_range is True and both the lower and upper range
+        limits are larger than zero, the  tuple with both values is returned.
+        Otherwise, the return is None  which corresponds to pyFAI auto ranges.
+
+        Returns
+        -------
+        Union[None, tuple]
+            The azimuthal range for the pyFAI integration.
+        """
+        _range = self.get_azimuthal_range_native()
+        if _range is not None:
+            if 'rad' in self.get_param_value('int_azi_unit'):
+                _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
+        return _range
+
     def get_azimuthal_range_native(self):
         """
         Get the azimuthal range from the Parameters in native units.
@@ -214,6 +233,23 @@ class pyFAIintegrationBase(ProcPlugin):
             logger.warning('Warning: Azimuthal range was not correct and'
                            ' has been ignored.')
         return None
+
+    def get_pyFAI_unit_from_param(self, param_name):
+        """
+        Get the unit of the Parameter called param_name in pyFAI notation.
+
+        Parameters
+        ----------
+        param_name : str
+            The reference key of the Parameter with the unit.
+
+        Returns
+        -------
+        str
+            The unit in pyFAI notation.
+        """
+        return pyFAI_UNITS[self.get_param_value(param_name)]
+
 
     def execute(self, data, **kwargs):
         """

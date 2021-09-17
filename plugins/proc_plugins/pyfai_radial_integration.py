@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PyFAIintegration Plugin which is used to call
-
+Module with the PyFAIradialIntegration Plugin which allows radial integration
+to acquire azimuthal profiles.
 """
 
 __author__      = "Malte Storm"
@@ -24,47 +24,29 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PyFAIintegration']
+__all__ = ['PyFAIradialIntegration']
 
 
-import numpy as np
-
-from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.image_io import read_image
+from pydidas.plugins import pyFAIintegrationBase
 
 
-class PyFAIradialIntegration(ProcPlugin):
+class PyFAIradialIntegration(pyFAIintegrationBase):
     """
-    Apply a mask to image files.
+    Integrate in image radially to get an azimuthal profile using pyFAI.
+
+    For a full documentation of the Plugin, please refer to the pyFAI
+    documentation.
     """
     plugin_name = 'PyFAI radial integration'
     basic_plugin = False
-    plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter('use_global_mask'),
-        get_generic_parameter('det_mask'),
-        get_generic_parameter('det_mask_val'),
-        )
     input_data_dim = 2
-    output_data_dim = 2
+    output_data_dim = 1
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-
-    def pre_execute(self):
-        """
-        Check the use_global_mask Parameter and load the mask image.
-        """
-        if self.get_param_value('use_global_mask'):
-            _maskfile = self.q_settings_get_global_value('det_mask')
-            self._mask = read_image(_maskfile)
-            self._maskval = self.q_settings_get_global_value('det_mask_val')
-        else:
-            self._mask = read_image(self.get_param_value('det_mask'))
-            self._maskval = self.get_param_value('det_mask_val')
+        self.set_param_value('int_rad_npoint', 720)
 
     def execute(self, data, **kwargs):
         """
@@ -84,5 +66,12 @@ class PyFAIradialIntegration(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        _maskeddata = np.where(self._mask, self._maskval, data)
-        return _maskeddata, kwargs
+        _newdata = self._ai.integrate_radial(
+            data, self.get_param_value('int_azi_npoint'),
+            npt_rad=self.get_param_value('int_rad_npoint'),
+            polarization_factor=1,
+            unit=self.get_pyFAI_unit_from_param('int_azi_unit'),
+            radial_unit=self.get_pyFAI_unit_from_param('int_rad_unit'),
+            radial_range=self.get_radial_range(),
+            azimuth_range=self.get_azimuthal_range_in_deg())
+        return _newdata, kwargs

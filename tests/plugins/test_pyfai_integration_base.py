@@ -33,7 +33,7 @@ from PyQt5 import QtCore
 import pyFAI
 
 from pydidas.plugins import BasePlugin
-from pydidas.plugins import pyFAIintegrationBase
+from pydidas.plugins import pyFAIintegrationBase, pyFAI_UNITS
 from pydidas.core import get_generic_parameter
 from pydidas.core.experimental_settings import ExperimentalSettings
 
@@ -96,6 +96,11 @@ class TestBasePlugins(unittest.TestCase):
         plugin = pyFAIintegrationBase(_param)
         self.assertEqual(plugin.get_param_value('int_rad_npoint'), _npoints)
 
+    def test_get_pyFAI_unit_from_param__plain(self):
+        plugin = pyFAIintegrationBase(int_rad_unit='Q / nm^-1')
+        self.assertEqual(plugin.get_pyFAI_unit_from_param('int_rad_unit'),
+                         'q_nm^-1')
+
     def test_get_azimuthal_range_native__no_range(self):
         plugin = pyFAIintegrationBase(int_azi_use_range=False)
         _range = plugin.get_azimuthal_range_native()
@@ -136,6 +141,30 @@ class TestBasePlugins(unittest.TestCase):
                                       int_azi_range_upper=_range[1])
         _newrange = plugin.get_azimuthal_range_native()
         self.assertEqual(_range, _newrange)
+
+    def test_get_azimuthal_range_in_deg__empty(self):
+        plugin = pyFAIintegrationBase(int_azi_use_range=False)
+        _newrange = plugin.get_azimuthal_range_in_deg()
+        self.assertIsNone(_newrange)
+
+    def test_get_azimuthal_range_in_deg__degree_input(self):
+        _range = (12, 37)
+        plugin = pyFAIintegrationBase(int_azi_use_range=True,
+                                      int_azi_range_lower=_range[0],
+                                      int_azi_range_upper=_range[1],
+                                      int_azi_unit='\u03c7 / deg')
+        _newrange = plugin.get_azimuthal_range_in_deg()
+        self.assertEqual(_range, _newrange)
+
+    def test_get_azimuthal_range_in_deg__rad_input(self):
+        _range = (12, 37)
+        plugin = pyFAIintegrationBase(int_azi_use_range=True,
+                                      int_azi_range_lower=_range[0],
+                                      int_azi_range_upper=_range[1],
+                                      int_azi_unit='\u03c7 / rad')
+        _newrange = plugin.get_azimuthal_range_in_deg()
+        self.assertAlmostEqual(_newrange[0], _range[0] * 180 / np.pi)
+        self.assertAlmostEqual(_newrange[1], _range[1] * 180 / np.pi)
 
     def test_get_azimuthal_range_in_rad__empty(self):
         plugin = pyFAIintegrationBase(int_azi_use_range=False)

@@ -36,8 +36,8 @@ class _WorkflowEditTreeManager(QtCore.QObject):
     """
     Manage the editing of the workflow tree.
 
-    The WorkflowEditTreeManager is designed as singleton to manage editing
-    the workflow tree, plugin parameters and the corresponding plugins' QT
+    The WorkflowEditTreeManager is designed as Singleton to manage editing
+    the WorkflowTree, plugin parameters and the corresponding plugins' QT
     widgets.
     """
     plugin_to_edit = QtCore.pyqtSignal(int)

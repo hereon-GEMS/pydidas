@@ -27,10 +27,12 @@ __status__ = "Development"
 __all__ = ['PluginParameterConfigWidget']
 
 from functools import partial
+from pathlib import Path
 
 from PyQt5 import QtWidgets, QtCore
-from .parameter_config_widget import ParameterConfigWidget
 
+from ...core import HdfKey
+from .parameter_config_widget import ParameterConfigWidget
 from ..create_widgets_mixin import CreateWidgetsMixIn
 from ..utilities import deleteItemsOfLayout
 
@@ -42,6 +44,8 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
 
     Depending on the Parameter types, automatic typechecks are implemented.
     """
+    FIXED_WIDTH = 385
+
     def __init__(self, parent=None):
         """
         Setup method.
@@ -57,6 +61,7 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
+        self.setFixedWidth(self.FIXED_WIDTH)
 
     def configure_plugin(self, node_id, plugin):
         """
@@ -105,7 +110,8 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         Create the required widgets for the new plugin.
         """
         self.create_label('plugin_name', f'Plugin: {self.plugin.plugin_name}',
-                          fontsize=12, fixedWidth=385, gridPos=(0, 0, 1, 2))
+                          fontsize=12, fixedWidth=self.FIXED_WIDTH,
+                          gridPos=(0, 0, 1, 2))
         self.create_label('node_id', f'Node id: {self.node_id}', fontsize=12,
                           gridPos=(1, 0, 1, 2))
         self.create_spacer('spacer', gridPos=(-1, 0, 1, 2))
@@ -116,7 +122,8 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         else:
             self.__add_restore_default_button()
             for param in self.plugin.params.values():
-                self.create_param_widget(param)
+                _kwargs = self.__get_param_creation_kwargs(param)
+                self.create_param_widget(param, **_kwargs)
 
     def __add_restore_default_button(self):
         """
@@ -133,6 +140,32 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         but.setFixedHeight(25)
         self.layout().addWidget(but, 2, 1, 1, 1,
                                 QtCore.Qt.AlignRight)
+
+    def __get_param_creation_kwargs(self, param):
+        """
+        Get the kwargs to create the widgets for the Parameter in different
+        styles for the different types of keys.
+
+        Parameters
+        ----------
+        param : pydidas.core.Parameter
+            The Parameter for which an I/O widget shall be created.
+
+        Returns
+        -------
+        _kwargs : dict
+            The kwargs to be used for widget creation.
+        """
+        if param.type in [HdfKey, Path]:
+            _kwargs = {'width_text': self.FIXED_WIDTH - 50,
+                       'width': self.FIXED_WIDTH - 80,
+                       'linebreak': True, 'n_columns': 2,
+                       'n_columns_text': 2,
+                       'halign_text': QtCore.Qt.AlignLeft}
+        else:
+            _kwargs = {'width_text': 200,
+                       'width': self.FIXED_WIDTH - 210}
+        return _kwargs
 
     def update_edits(self):
         """

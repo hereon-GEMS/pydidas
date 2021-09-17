@@ -26,7 +26,6 @@ __all__ = ['CompositeCreatorApp']
 
 import os
 import time
-from pathlib import Path
 
 import numpy as np
 from PyQt5 import QtCore
@@ -34,11 +33,10 @@ from PyQt5 import QtCore
 from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
-from pydidas.core import (Parameter, ParameterCollection, Dataset,
+from pydidas.core import (ParameterCollection, Dataset,
                           CompositeImage, get_generic_parameter)
 from pydidas.config import HDF5_EXTENSIONS
-from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file,
-                           timed_print)
+from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file)
 from pydidas.image_io import read_image, rebin2d
 from pydidas.utils import copy_docstring
 from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
@@ -55,7 +53,7 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('use_bg_file'),
     get_generic_parameter('bg_file'),
     get_generic_parameter('bg_hdf5_key'),
-    get_generic_parameter('bg_hdf5_num'),
+    get_generic_parameter('bg_hdf5_frame'),
     get_generic_parameter('composite_nx'),
     get_generic_parameter('composite_ny'),
     get_generic_parameter('composite_dir'),
@@ -68,11 +66,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('threshold_low'),
     get_generic_parameter('threshold_high'),
     get_generic_parameter('binning'),
-    Parameter('Composite image filename (npy format)', Path, default=Path(),
-              refkey='output_fname',
-              tooltip=('The name used for saving the composite image (in '
-                       'numpy file format). An empty Path will default to no '
-                       'automatic image saving. The default is Path().')),
     )
 
 
@@ -127,7 +120,7 @@ class CompositeCreatorApp(BaseApp):
     bg_hdf5_key : HdfKey, optional
         Required for hdf5 background image files: The dataset key with the
         image for the background file.
-    bg_hdf5_num : int, optional
+    bg_hdf5_frame : int, optional
         Required for hdf5 background image files: The image number of the
         background image in the  dataset. The default is 0.
     composite_nx : int, optional
@@ -172,9 +165,6 @@ class CompositeCreatorApp(BaseApp):
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
-    output_fname : Union[pathlib.Path, str], optional
-        The name used for saving the composite image (in numpy file format).
-        An empty Path will default to no image saving. The default is Path().
     """
     default_params = DEFAULT_PARAMS
     mp_func_results = QtCore.pyqtSignal(object)
@@ -190,6 +180,7 @@ class CompositeCreatorApp(BaseApp):
         super().__init__(*args, **kwargs)
         self._composite = None
         self._det_mask = None
+        self._bg_image = None
         self._filelist = FilelistManager(self.params.get('first_file'),
                                          self.params.get('last_file'),
                                          self.params.get('live_processing'),
@@ -224,6 +215,39 @@ class CompositeCreatorApp(BaseApp):
         self._config['det_mask_val'] = float(self.q_settings_get_global_value(
             'det_mask_val'))
 
+    def prepare_run(self):
+        """
+        Prepare running the composite creation.
+
+        This method will check all settings and create the composite image or
+        tell the CompositeImage to create a new image with changed size.
+
+            - Check that filename for the first and last file exist
+            - If first file is hdf5 file: Check that the dataset key
+              exists.
+            - If first file is hdf5 file: Check that the selected image
+              numbers are included in the dataset dimensions.
+            - If first file is not an hdf5 file: Verify that first and last
+              file are in the same directory and that all selected images
+              have the same file size. The file size instead of the actual
+              file content is checked to speed up the process.
+            - Check the ROI settings and assert that the selected dimensions
+              are valid and within the image size.
+            - Check the composite dimensions and assert that the composite
+              image size covers all selected files / images.
+            - If a background subtraction is used, check the background file
+              and assert the image size is the same.
+        """
+        self._filelist.update()
+        self._image_metadata.update()
+        self.__verify_total_number_of_images_in_composite()
+        if self.get_param_value('use_bg_file'):
+            self._check_and_set_bg_file()
+        if self.slave_mode:
+            self._composite = None
+            return
+        self.__check_and_update_composite_image()
+
     def __get_detector_mask(self):
         """
         Get the detector mask from the file specified in the global QSettings.
@@ -249,14 +273,99 @@ class CompositeCreatorApp(BaseApp):
             _mask = _mask.astype(np.bool_)
         return _mask
 
-    def multiprocessing_post_run(self):
+    def __verify_total_number_of_images_in_composite(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Check the dimensions of the composite image and verifies that it holds
+        the right amount of images.
+
+        Raises
+        ------
+        AppConfigError
+            If the composite dimensions are too small or too large to match
+            the total number of images.
         """
-        output_fname = self.get_param_value('output_fname')
-        self.apply_thresholds()
-        if os.path.exists(os.path.dirname(output_fname)):
-            self._composite.save(output_fname)
+        _nx = self.get_param_value('composite_nx')
+        _ny = self.get_param_value('composite_ny')
+        _ntotal = (self._image_metadata.images_per_file
+                   * self._filelist.n_files)
+        if _nx == -1:
+            _nx = int(np.ceil(_ntotal / _ny))
+            self.params.set_value('composite_nx', _nx)
+        if _ny == -1:
+            _ny = int(np.ceil(_ntotal / _nx))
+            self.params.set_value('composite_ny', _ny)
+        if _nx * _ny < _ntotal:
+            raise AppConfigError(
+                'The selected composite dimensions are too small to hold all'
+                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
+        if ((_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal):
+            raise AppConfigError(
+                'The selected composite dimensions are too large for all'
+                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
+
+    def _check_and_set_bg_file(self):
+        """
+        Check the selected background image file for consistency.
+
+        The background image file is checked and if all checks pass, the
+        background image is stored.
+
+        Raises
+        ------
+        AppConfigError
+            - If the selected background file does not exist
+            - If the selected dataset key does not exist (in case of hdf5
+              files)
+            - If the  selected dataset number does not exist (in case of
+              hdf5 files)
+            - If the image dimensions for the background file differ from the
+              image files.
+        """
+        _bg_file = self.get_param_value('bg_file')
+        check_file_exists(_bg_file)
+        _params = dict(binning=self.get_param_value('binning'),
+                       ROI=self._image_metadata.roi)
+        # check hdf5 key and dataset dimensions
+        if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
+            check_hdf5_key_exists_in_file(_bg_file,
+                                          self.get_param_value('bg_hdf5_key'))
+            _params['hdf5_dataset'] = self.get_param_value('bg_hdf5_key')
+            _params['frame'] = self.get_param_value('bg_hdf5_frame')
+        _bg_image = read_image(_bg_file, **_params)
+        if _bg_image.shape != self._image_metadata.final_shape:
+            raise AppConfigError(f'The selected background file "{_bg_file}"'
+                                 ' does not have the same image dimensions '
+                                 'as the selected files.')
+        self._bg_image = _bg_image
+
+    def __check_and_update_composite_image(self):
+        """
+        Check the size of the Composite and create a new Composite if the
+        shape does not match the new input.
+        """
+        if self._composite is None:
+            self._composite = CompositeImage(
+                image_shape=self._image_metadata.final_shape,
+                composite_nx=self.get_param_value('composite_nx'),
+                composite_ny=self.get_param_value('composite_ny'),
+                composite_dir=self.get_param_value('composite_dir'),
+                datatype=self._image_metadata.datatype)
+            return
+        _update_required = False
+        _image_shape = self._image_metadata.final_shape
+        if _image_shape != self._composite.get_param_value('image_shape'):
+            self._composite.set_param_value('image_shape', _image_shape)
+            _update_required = True
+        _nx = self.get_param_value('composite_nx')
+        if _nx != self._composite.get_param_value('composite_nx'):
+            self._composite.set_param_value('composite_nx', _nx)
+            _update_required = True
+        _ny = self.get_param_value('composite_ny')
+        if _ny != self._composite.get_param_value('composite_ny'):
+            self._composite.set_param_value('composite_ny', _ny)
+            _update_required = True
+        if _update_required:
+            self._composite.create_new_image()
 
     def multiprocessing_get_tasks(self):
         """
@@ -268,14 +377,86 @@ class CompositeCreatorApp(BaseApp):
         return self._config['mp_tasks']
 
     def multiprocessing_pre_cycle(self, index):
-        _fname, _kwargs = self._get_args_for_read_image(index)
+        """
+        Run preparatory functions in the cycle prior to the main function.
+
+        Parameters
+        ----------
+        index : int
+            The index of the image / frame.
+        """
+        self._store_args_for_read_image(index)
+
+    def _store_args_for_read_image(self, index):
+        """
+        Create the required kwargs to pass to the read_image function and store
+        them internally.
+
+        Parameters
+        ----------
+        index : int
+            The image index
+        """
+        _images_per_file = self._image_metadata.images_per_file
+        _i_file = index // _images_per_file
+        _fname = self._filelist.get_filename(_i_file)
+        _params = dict(binning=self.get_param_value('binning'),
+                       ROI=self._image_metadata.roi)
+        if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
+            _hdf_index = index % _images_per_file
+            _i_hdf = (self.get_param_value('hdf5_first_image_num')
+                      + _hdf_index * self.get_param_value('hdf5_stepping'))
+            _params = (_params
+                       | dict(hdf5_dataset=self.get_param_value('hdf5_key'),
+                              frame=_i_hdf))
         self._config['current_fname'] = _fname
-        self._config['current_kwargs'] = _kwargs
+        self._config['current_kwargs'] = _params
 
     def multiprocessing_carryon(self):
+        """
+        Get the flag value whether to carry on processing.
+
+        By default, this Flag is always True. In the case of live processing,
+        a check is done whether the current file exists.
+
+        Returns
+        -------
+        bool
+            Flag whether the processing can carry on or needs to wait.
+
+        """
         if self.get_param_value('live_processing'):
             return self._image_exists_check(self._config['current_fname'],
                                             timeout=0.02)
+        return True
+
+    def _image_exists_check(self, fname, timeout=-1):
+        """
+        Wait for the file to exist in the file system.
+
+        Parameters
+        ----------
+        fname : str
+            The file path & name.
+        timeout : float, optional
+            If a timeout larger than zero is selected, the process will wait
+            a maximum of timeout seconds before raising an Exception.
+            The value "-1" corresponds to no timeout. The default is -1.
+
+        Returns
+        -------
+        bool
+            Flag if the image exists and has the same size as the refernce
+            file.
+        """
+        _target_size = self._filelist.filesize
+        _starttime = time.time()
+        if not os.path.exists(fname):
+            return False
+        while os.stat(fname).st_size != _target_size:
+            time.sleep(0.1)
+            if time.time() - _starttime > timeout > 0:
+                return False
         return True
 
     def multiprocessing_func(self, *index):
@@ -318,6 +499,27 @@ class CompositeCreatorApp(BaseApp):
                        axis_units=image.axis_units,
                        metadata=image.metadata)
 
+    def multiprocessing_post_run(self):
+        """
+        Perform operatinos after running main parallel processing function.
+        """
+        self.apply_thresholds()
+
+    @copy_docstring(CompositeImage)
+    def apply_thresholds(self, **kwargs):
+        """
+        Please refer to pydidas.core.CompositeImage docstring.
+        """
+        if (self.get_param_value('use_thresholds')
+                or 'low' in kwargs or 'high' in kwargs):
+            if 'low' in kwargs:
+                self.set_param_value('threshold_low', kwargs.get('low'))
+            if 'high' in kwargs:
+                self.set_param_value('threshold_high', kwargs.get('high'))
+            self._composite.apply_thresholds(
+                low=self.get_param_value('threshold_low'),
+                high=self.get_param_value('threshold_high'))
+
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
         """
@@ -336,62 +538,6 @@ class CompositeCreatorApp(BaseApp):
             image -= self._bg_image
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
-
-    def prepare_run(self):
-        """
-        Prepare running the composite creation.
-
-        This method will check all settings and create the composite image or
-        tell the CompositeImage to create a new image with changed size.
-
-            - Check that filename for the first and last file exist
-            - If first file is hdf5 file: Check that the dataset key
-              exists.
-            - If first file is hdf5 file: Check that the selected image
-              numbers are included in the dataset dimensions.
-            - If first file is not an hdf5 file: Verify that first and last
-              file are in the same directory and that all selected images
-              have the same file size. The file size instead of the actual
-              file content is checked to speed up the process.
-            - Check the ROI settings and assert that the selected dimensions
-              are valid and within the image size.
-            - Check the composite dimensions and assert that the composite
-              image size covers all selected files / images.
-            - If a background subtraction is used, check the background file
-              and assert the image size is the same.
-        """
-        self._filelist.update()
-        self._image_metadata.update()
-        self._check_composite_dims()
-        if self.get_param_value('use_bg_file'):
-            self._check_and_set_bg_file()
-        if self.slave_mode:
-            self._composite = None
-            return
-        if self._composite is None:
-            self._composite = CompositeImage(
-                image_shape=self._image_metadata.final_shape,
-                composite_nx=self.get_param_value('composite_nx'),
-                composite_ny=self.get_param_value('composite_ny'),
-                composite_dir=self.get_param_value('composite_dir'),
-                datatype=self._image_metadata.datatype)
-        else:
-            self.__check_and_update_composite_image()
-
-    @copy_docstring(CompositeImage)
-    def apply_thresholds(self, **kwargs):
-        """
-        Please refer to pydidas.core.CompositeImage docstring.
-        """
-        if (self.get_param_value('use_thresholds')
-                or 'low' in kwargs or 'high' in kwargs):
-            if 'low' in kwargs:
-                self.set_param_value('threshold_low', kwargs.get('low'))
-            if 'high' in kwargs:
-                self.set_param_value('threshold_high', kwargs.get('high'))
-            self._composite.apply_thresholds(
-                low=self.get_param_value('threshold_low'),
-                high=self.get_param_value('threshold_high'))
 
     def export_image(self, output_fname):
         """
@@ -421,146 +567,3 @@ class CompositeCreatorApp(BaseApp):
         if self._composite is None:
             return None
         return self._composite.image
-
-    def _check_and_set_bg_file(self):
-        """
-        Check the selected background image file for consistency.
-
-        The background image file is checked and if all checks pass, the
-        background image is stored.
-
-        Raises
-        ------
-        AppConfigError
-            - If the selected background file does not exist
-            - If the selected dataset key does not exist (in case of hdf5
-              files)
-            - If the  selected dataset number does not exist (in case of
-              hdf5 files)
-            - If the image dimensions for the background file differ from the
-              image files.
-        """
-        _bg_file = self.get_param_value('bg_file')
-        check_file_exists(_bg_file)
-        # check hdf5 key and dataset dimensions
-        if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file,
-                                          self.get_param_value('bg_hdf5_key'))
-            _params = dict(hdf5_dataset=self.get_param_value('bg_hdf5_key'),
-                           binning=self.get_param_value('binning'),
-                           imageNo=self.get_param_value('bg_hdf5_num'),
-                           ROI=self._image_metadata.roi)
-        else:
-            _params = dict(binning=self.get_param_value('binning'),
-                           ROI=self._image_metadata.roi)
-        _bg_image = read_image(_bg_file, **_params)
-        if not _bg_image.shape == self._image_metadata.final_shape:
-            raise AppConfigError(f'The selected background file "{_bg_file}"'
-                                 ' does not have the same image dimensions '
-                                 'as the selected files.')
-        self._bg_image = _bg_image
-
-    def _check_composite_dims(self):
-        """
-        Check the dimensions of the composite image.
-
-        Raises
-        ------
-        AppConfigError
-            If the composite dimensions are too small or too large to match
-            the total number of images.
-        """
-        _nx = self.get_param_value('composite_nx')
-        _ny = self.get_param_value('composite_ny')
-        _ntotal = (self._image_metadata.images_per_file
-                   * self._filelist.n_files)
-        if _nx == -1:
-            _nx = int(np.ceil(_ntotal / _ny))
-            self.params.set_value('composite_nx', _nx)
-        if _ny == -1:
-            _ny = int(np.ceil(_ntotal / _nx))
-            self.params.set_value('composite_ny', _ny)
-        if _nx * _ny < _ntotal:
-            raise AppConfigError(
-                'The selected composite dimensions are too small to hold all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
-        if ((_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal):
-            raise AppConfigError(
-                'The selected composite dimensions are too large for all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
-
-    def __check_and_update_composite_image(self):
-        _update_required = False
-        _image_shape = self._image_metadata.final_shape
-        if _image_shape != self._composite.get_param_value('image_shape'):
-            self._composite.set_param_value('image_shape', _image_shape)
-            _update_required = True
-        _nx = self.get_param_value('composite_nx')
-        if _nx != self._composite.get_param_value('composite_nx'):
-            self._composite.set_param_value('composite_nx', _nx)
-            _update_required = True
-        _ny = self.get_param_value('composite_ny')
-        if _ny != self._composite.get_param_value('composite_ny'):
-            self._composite.set_param_value('composite_ny', _ny)
-            _update_required = True
-        if _update_required:
-            self._composite.create_new_image()
-
-    def _get_args_for_read_image(self, index):
-        """
-        Create the required kwargs to pass to the read_image function.
-
-        Parameters
-        ----------
-        index : int
-            The image index
-
-        Returns
-        -------
-        _fname : str
-            The filename of the file to be opened.
-        _params : dict
-            The required parameters as dictionary.
-        """
-        _images_per_file = self._image_metadata.images_per_file
-        _i_file = index // _images_per_file
-        _fname = self._filelist.get_filename(_i_file)
-        _params = dict(binning=self.get_param_value('binning'),
-                       ROI=self._image_metadata.roi)
-        if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
-            _hdf_index = index % _images_per_file
-            _i_hdf = (self.get_param_value('hdf5_first_image_num')
-                      + _hdf_index * self.get_param_value('hdf5_stepping'))
-            _params = (_params
-                       | dict(hdf5_dataset=self.get_param_value('hdf5_key'),
-                              frame=_i_hdf))
-        return _fname, _params
-
-    def _image_exists_check(self, fname, timeout=-1):
-        """
-        Wait for the file to exist in the file system.
-
-        Parameters
-        ----------
-        fname : str
-            The file path & name.
-        timeout : float, optional
-            If a timeout larger than zero is selected, the process will wait
-            a maximum of timeout seconds before raising an Exception.
-            The value "-1" corresponds to no timeout. The default is -1.
-
-        Returns
-        -------
-        bool
-            Flag if the image exists and has the same size as the refernce
-            file.
-        """
-        _target_size = self._filelist.filesize
-        _starttime = time.time()
-        if not os.path.exists(fname):
-            return False
-        while os.stat(fname).st_size != _target_size:
-            time.sleep(0.1)
-            if time.time() - _starttime > timeout > 0:
-                return False
-        return True

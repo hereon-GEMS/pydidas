@@ -192,11 +192,11 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Parallel implementation of the execution method.
         """
-        logger.debug(get_time_string() + ' Updating image metadata')
+        logger.debug('Updating image metadata')
         self._image_metadata.update_final_image()
-        logger.debug(get_time_string() + ' Running app pre-run')
+        logger.debug('Running app pre-run')
         self._app.multiprocessing_pre_run()
-        logger.debug(get_time_string() + ' Creating AppRunner')
+        logger.debug('Creating AppRunner')
         self._config['last_update'] = time.time()
         self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
@@ -204,13 +204,13 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
         self._runner = AppRunner(self._app)
-        logger.debug(get_time_string() + ' Connecting signals')
+        logger.debug('Connecting signals')
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
         self._runner.results.connect(
             self._app.multiprocessing_store_results)
-        logger.debug(get_time_string() + ' Starting AppRunner')
+        logger.debug('Starting AppRunner')
         self._runner.start()
 
     @QtCore.pyqtSlot()
@@ -218,15 +218,17 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Clean up after AppRunner is done.
         """
-        logger.debug(get_time_string() + ' finishing AppRunner')
+        logger.debug('finishing AppRunner')
+        self._runner.exit()
         self._widgets['but_exec'].setEnabled(True)
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
         self._widgets['but_abort'].setVisible(False)
         self._widgets['progress'].setVisible(False)
         self.set_status('Finished composite image creation.')
+        time.sleep(0.05)
         self._runner = None
-        logger.debug(get_time_string() + ' removed AppRunner')
+        logger.debug('removed AppRunner')
         self.__show_composite()
 
     def __save_composite(self):
@@ -351,7 +353,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         fname : str
             The filename of the background image file.
         """
-        self.__clear_entries(['bg_hdf5_key', 'bg_hdf5_num'])
+        self.__clear_entries(['bg_hdf5_key', 'bg_hdf5_frame'])
         hdf5_flag = os.path.splitext(fname)[1] in HDF5_EXTENSIONS
         self._config['bg_hdf5_images'] = hdf5_flag
         self._config['bg_configured'] = not hdf5_flag
@@ -361,7 +363,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                 self.update_param_value('bg_hdf5_key', dset)
                 self._config['bg_configured'] = True
         self.toggle_widget_visibility('bg_hdf5_key', hdf5_flag)
-        self.toggle_widget_visibility('bg_hdf5_num', hdf5_flag)
+        self.toggle_widget_visibility('bg_hdf5_frame', hdf5_flag)
         self.__check_exec_enable()
 
     def __selected_hdf5_key(self):
@@ -458,7 +460,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         if not _bg_ext in HDF5_EXTENSIONS:
             flag = False
         self.toggle_widget_visibility('bg_hdf5_key', flag)
-        self.toggle_widget_visibility('bg_hdf5_num', flag)
+        self.toggle_widget_visibility('bg_hdf5_frame', flag)
         self.__check_exec_enable()
 
 
@@ -516,7 +518,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.__reset_params(keys)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
                      'last_file', 'hdf5_first_image_num',
-                     'hdf5_last_image_num','bg_hdf5_key', 'bg_hdf5_num',
+                     'hdf5_last_image_num','bg_hdf5_key', 'bg_hdf5_frame',
                      'bg_file']:
             if _key in keys:
                 self.toggle_widget_visibility(_key, not hide)

@@ -59,8 +59,8 @@ def parse_composite_creator_cmdline_arguments(parent=None):
                         help=get_generic_parameter('bg_file').tooltip)
     parser.add_argument('-bg_hdf5_key',
                         help=get_generic_parameter('bg_hdf5_key').tooltip)
-    parser.add_argument('-bg_hdf5_num', type=int,
-                        help=get_generic_parameter('bg_hdf5_num').tooltip)
+    parser.add_argument('-bg_hdf5_frame', type=int,
+                        help=get_generic_parameter('bg_hdf5_frame').tooltip)
     parser.add_argument('-composite_nx', type=int,
                         help=get_generic_parameter('composite_nx').tooltip)
     parser.add_argument('-composite_ny', type=int,

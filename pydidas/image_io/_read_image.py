@@ -78,7 +78,7 @@ def read_image(filename, **kwargs):
         hdf5_dataset : str
             The full path to the hdf dataset within the file. The default is
             None which will raise an exception.
-        imageNo : int
+        frame : int
             The number of the image in the dataset. The default is 0.
         axisNo : int
             The number of the axis with the image. The default is 0.

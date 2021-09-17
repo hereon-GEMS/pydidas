@@ -89,7 +89,7 @@ GENERIC_PARAMS = ParameterCollection(
         default=HdfKey('/entry/data/data'), refkey='bg_hdf5_key',
         tooltip=('For hdf5 background image files: The dataset key.')),
     Parameter(
-        'Background image number', int, default=0, refkey='bg_hdf5_num',
+        'Background hdf5 image frame', int, default=0, refkey='bg_hdf5_frame',
         tooltip=('For hdf5 background image files: The image number in '
                  'the dataset')),
     Parameter(

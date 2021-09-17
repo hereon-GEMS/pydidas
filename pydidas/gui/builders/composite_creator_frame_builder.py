@@ -112,15 +112,12 @@ def create_composite_creator_frame_widgets_and_layout(frame):
         frame.create_param_widget(frame.params[_key], **_options)
 
         # add spacers between groups:
-        if _key in ['n_files', 'images_per_file', 'bg_hdf5_num',
+        if _key in ['n_files', 'images_per_file', 'bg_hdf5_frame',
                     'composite_dir', 'roi_yhigh', 'threshold_high',
                     'binning', 'output_fname', 'n_total']:
             frame.create_line(f'line_{_key}',
                 parent_widget=frame._widgets['config'],
                 fixedWidth=frame.CONFIG_WIDGET_WIDTH)
-
-    frame.param_widgets['output_fname'].modify_file_selection(
-        ['NPY files (*.npy *.npz)'])
 
     frame.create_button(
         'but_exec', 'Generate composite',

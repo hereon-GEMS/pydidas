@@ -20,7 +20,7 @@ with additional support for plugins and a plugin chain.
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowNode']
@@ -113,3 +113,28 @@ class WorkflowNode(GenericNode):
         if self.is_leaf:
             self.results = res
             self.result_kws = reskws
+
+    def dump(self):
+        """
+        Dump the node to a saveable format.
+
+        The dump includes information about the parent and children nodes but
+        not the nodes itself. References to the nodeIDs are stored to allow
+        reconstruction of the tree.
+
+        Returns
+        -------
+        dict
+            The dict with all required information about the node.
+        """
+        _parent = (self._parent if self._parent is None
+                   else [self._parent.__class__, self._parent._node_id])
+        _children = [[child.__class__, child._node_id]
+                     for child in self._children]
+        _rep = dict(node_id=self.node_id,
+                    parent=_parent,
+                    children=_children,
+                    plugin_class=self.plugin.__class__,
+                    plugin_params=[p.dump() for p in self.plugin.params.values()]
+                    )
+        return _rep

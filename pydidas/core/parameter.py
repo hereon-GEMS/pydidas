@@ -21,7 +21,7 @@ processing parameters.
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Parameter']
@@ -481,6 +481,21 @@ class Parameter:
         _meta = self.__meta
         _meta.update({'value': self.__value})
         return (self.__name, self.__type, _meta)
+
+    def saving_dump(self):
+        """
+        Get a abbreviated class information for saving.
+
+        The information from simple_dump can be used to restore Parameter
+        values if the Parameter itself exists.
+
+        Returns
+        -------
+        tuple
+            A tuple with ref_key and value.
+        """
+        return (self.__meta['refkey'], self.__value)
+
 
     def __str__(self):
         """

@@ -27,7 +27,8 @@ __all__ = ['ProcessingSinglePluginFrame']
 from PyQt5 import QtWidgets, QtCore
 
 
-from ..core import ScanSettings, Parameter, ParameterCollection
+from ..core import (ScanSettings, Parameter, ParameterCollection,
+                    get_generic_parameter)
 from ..workflow_tree import WorkflowTree
 from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
@@ -38,15 +39,15 @@ SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
 
 DEFAULT_PARAMS =  ParameterCollection(
-    Parameter('Plugins', str, default='', refkey='plugins',
+    Parameter('plugins', str, '', name='Plugins',
               choices=['', 'HdfLoader (node 0)',
                        'BackgroundCorrection (node 1) test test test test test test test6',
                        'AzimuthalIntegration (node 2)']),
-    Parameter('Image number', int, default=0, refkey='image_nr'),
-    Parameter('Scan dim. 1 index', int, default=0, refkey='scan_index1'),
-    Parameter('Scan dim. 2 index', int, default=0, refkey='scan_index2'),
-    Parameter('Scan dim. 3 index', int, default=0, refkey='scan_index3'),
-    Parameter('Scan dim. 4 index', int, default=0, refkey='scan_index4'))
+    get_generic_parameter('image_num'),
+    get_generic_parameter('scan_index1'),
+    get_generic_parameter('scan_index2'),
+    get_generic_parameter('scan_index3'),
+    get_generic_parameter('scan_index4'))
 
 class ProcessingSinglePluginFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                   CreateWidgetsMixIn):

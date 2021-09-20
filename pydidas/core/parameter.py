@@ -70,28 +70,32 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | property   | editable  | description                               |
     +============+===========+===========================================+
-    | name       | False     | A readable name as description.           |
-    +------------+-----------+-------------------------------------------+
-    | value      | True      | The current value.                        |
-    +------------+-----------+-------------------------------------------+
     | refkey     | False     | A reference key for the Parameter.        |
     |            |           | This key is used for accessing the        |
     |            |           | Parameter in the ParameterCollection      |
     +------------+-----------+-------------------------------------------+
+    | datatype   | False     | The datatype of the Parameter value.      |
+    |            |           | This must be a base class or None.        |
+    |            |           | If None, no type-checking is performed.   |
+    +------------+-----------+-------------------------------------------+
+    | value      | True      | The current value.                        |
+    +------------+-----------+-------------------------------------------+
     | choices    | True      | A list with choices if the value of the   |
     |            |           | parameter is limited to specific values.  |
+    +------------+-----------+-------------------------------------------+
+    | name       | False     | A readable name as description.           |
     +------------+-----------+-------------------------------------------+
     | optional   | False     | A flag whether the parameter is required  |
     |            |           | or optional.                              |
     +------------+-----------+-------------------------------------------+
     | tooltip    | False     | A readable tooltip.                       |
     +------------+-----------+-------------------------------------------+
-    | default    | False     | The default value                         |
+    | default    | False     | The default value.                        |
     +------------+-----------+-------------------------------------------+
 
     """
 
-    def __init__(self, name, param_type, meta=None, **kwargs):
+    def __init__(self, refkey, param_type, default, meta=None, **kwargs):
         """
         Setup method.
 
@@ -100,35 +104,35 @@ class Parameter:
 
         Parameters
         ----------
-        name : str, optional
-            The name of the parameter. The default is None.
-        param_type : type, optional
+        refkey : str
+            The reference key for the Parameter in the Parameter collection.
+            If not specified, this will default to the name.
+        param_type : Union[None, type]
             The datatype of the parameter. If None, no type-checking will be
             performed. If any integer or float value is used, this will be
             changed to the abstract base class of numbers.Integral or
-            numbers.Real. The default is None.
+            numbers.Real.
+        default : Union[type, None]
+            The default value. The data type must be of the same type as
+            param_type. None is only accepted if param_type is None as well.
         meta : Union[dict, None], optional
             A dictionary with meta data. Any keys specified as meta will
             overwrite the kwargs dictionary. This is added merely as
             convenience to facility copying Parameter instances. If None,
             this entry will be ignored. The default is None.
-        refkey : str, optional
-            The reference key for the Parameter in the Parameter collection.
-            If not specified, this will default to the name.
-        default : type, optional
-            The default value. The data type must be of the same type as
-            param_type. The default is None.
-        optional : bool
+        name : str, optional
+            The name of the parameter. The default is None.
+        optional : bool, optional
             Keyword to toggle optional parameters. The default is False.
-        tooltip : str
+        tooltip : str, optional
             A description of the parameter. It will be automatically extended
-            to include certain type and unit information.
-        unit : str
-            The unit of the parameter.
+            to include certain type and unit information. The default is ''.
+        unit : str, optional
+            The unit of the parameter. The default is ''.
         choices : Union[list, tuple, None]
             A list of allowed choices. If None, no checking will be enforced.
             The default is None.
-        value : object
+        value : type
             The value of the parameter. This parameter should only be used
             to restore saved parameters.
         **kwargs : dict
@@ -136,36 +140,34 @@ class Parameter:
             dictionary.
         """
         super().__init__()
-        self.__name = name
+        self.__refkey = refkey
         self.__type = _get_base_class(param_type)
+        self.__value = None
         if isinstance(meta, dict):
             kwargs.update(meta)
-
         self.__meta = dict(tooltip = kwargs.get('tooltip', ''),
                            unit = kwargs.get('unit', ''),
                            optional = kwargs.get('optional', False),
-                           refkey = kwargs.get('refkey', name))
-        self.__process_default_input(kwargs)
+                           name = kwargs.get('name', ''))
+        self.__process_default_input(default)
         self.__process_choices_input(kwargs)
-        self.__value = (self.__meta['default'] if 'value' not in kwargs
-                        else kwargs['value'])
+        self.value = kwargs.get('value', self.__meta['default'])
 
-    def __process_default_input(self, kwargs):
+    def __process_default_input(self, default):
         """
         Process the default value.
 
         Parameters
         ----------
-        kwargs : dict
-            The kwargs passed to init.
+        default : type
+            The default attribute passed to init.
 
         Raises
         ------
         TypeError
             If the default value is not of the demanded data type.
         """
-        default = self.__convenience_type_conversion(
-            kwargs.get('default', None))
+        default = self.__convenience_type_conversion(default)
         if not self.__typecheck(default):
             raise TypeError(f'Default value "{default}" does not have data'
                             f'type {self.__type}!')
@@ -271,7 +273,7 @@ class Parameter:
         str
             The parameter name.
         """
-        return self.__name
+        return self.__meta['name']
 
     @property
     def refkey(self):
@@ -283,7 +285,7 @@ class Parameter:
         str
             The parameter reference key.
         """
-        return self.__meta['refkey']
+        return self.__refkey
 
     @property
     def default(self):
@@ -442,8 +444,8 @@ class Parameter:
         if not (self.__typecheck(val)
                 or self.__meta['optional'] and (val is None)):
             raise ValueError(
-                f'Cannot set Parameter (object ID:{id(self)}, name: '
-                f'"{self.__name}", reference: "{self.__meta["refkey"]}")'
+                f'Cannot set Parameter (object ID:{id(self)}, refkey: '
+                f'"{self.__refkey}", name: "{self.__meta["name"]}")'
                 ' because it is of the wrong data type.')
         self.__value = val
 
@@ -462,6 +464,7 @@ class Parameter:
         Parameter
             A full copy of the object.
         """
+        _key, _type, _default, _meta = self.dump()
         return Parameter(*self.dump())
 
     def dump(self):
@@ -478,9 +481,10 @@ class Parameter:
             A dictionary with all the metadata information about the
             Parameter (value, unit, tooltip, refkey, default, choices)
         """
-        _meta = self.__meta
+        _meta = self.__meta.copy()
         _meta.update({'value': self.__value})
-        return (self.__name, self.__type, _meta)
+        del _meta['default']
+        return (self.__refkey, self.__type, self.__meta['default'], _meta)
 
     def saving_dump(self):
         """
@@ -527,7 +531,7 @@ class Parameter:
         _val = f'{self.value}' if self.value not in (None, '') else '""'
         _def = (f'{self.__meta["default"]}'
                 if self.__meta['default'] not in (None, '') else 'None')
-        _s = f'Parameter <{self.__name} (type: {_type}'
+        _s = f'Parameter <{self.__refkey} (type: {_type}'
         if self.__meta['optional']:
             _s += ', optional'
         _s += f'): {_val} {_unit}(default: {_def})>'

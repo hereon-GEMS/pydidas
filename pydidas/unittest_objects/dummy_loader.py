@@ -8,11 +8,12 @@ class DummyLoader(InputPlugin):
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     input_data = []
-    output_data = {0: {'name': 'image', 'dim': 2, 'labels': ['det_y', 'det_x']}}
+    output_data = {0: {'name': 'image', 'dim': 2,
+                       'labels': ['det_y', 'det_x']}}
     default_params = ParameterCollection(
-        Parameter('The image height', int, default=10, refkey='image_height',
+        Parameter('image_height', int, 10, name='The image height',
                   tooltip='The height of the image.'),
-        Parameter('The image width', int, default=10, refkey='image_width',
+        Parameter('image_width', int, 10, name='The image width',
                   tooltip='The width of the image.'))
 
     def __init__(self, *args, **kwargs):

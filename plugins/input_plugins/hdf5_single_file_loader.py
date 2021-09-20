@@ -44,8 +44,8 @@ class Hdf5singleFileLoader(InputPlugin):
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
-        Parameter('Filename', Path, default=Path(), tooltip='The file name.',
-                  refkey='filename'),
+        Parameter('filename', Path, Path(), tooltip='The file name.',
+                  name='Filename'),
         get_generic_parameter('hdf5_key'))
     input_data_dim = None
     output_data_dim = 2

@@ -27,7 +27,8 @@ __all__ = ['ProcessingFullWorkflowFrame']
 from PyQt5 import QtWidgets, QtCore
 import qtawesome as qta
 
-from pydidas.core import ScanSettings, Parameter
+from pydidas.core import (ScanSettings, Parameter, get_generic_parameter,
+                          ParameterCollection)
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
 from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
@@ -37,27 +38,24 @@ from pydidas.gui.builders.processing_full_workflow_frame_builder import (
 SCAN_SETTINGS = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
 
-_params = {
-    'run_type': Parameter('Run type', str, default='Process in GUI', refkey='run_type',
-                          choices=['Process in GUI', 'Command line', 'Remote command line']),
-    'scan_index1': Parameter('Scan dim. 1 index', int, default=0,
-                             refkey='scan_index1'),
-    'scan_index2': Parameter('Scan dim. 2 index', int, default=0,
-                             refkey='scan_index2'),
-    'scan_index3': Parameter('Scan dim. 3 index', int, default=0,
-                             refkey='scan_index3'),
-    'scan_index4': Parameter('Scan dim. 4 index', int, default=0,
-                             refkey='scan_index4'),
-    }
+DEFAULT_PARAMS = ParameterCollection(
+    get_generic_parameter('run_type'),
+    get_generic_parameter('scan_index1'),
+    get_generic_parameter('scan_index2'),
+    get_generic_parameter('scan_index3'),
+    get_generic_parameter('scan_index4'),
+    )
 
 
 class ProcessingFullWorkflowFrame(BaseFrame, ParameterConfigWidgetsMixIn,
                                   CreateWidgetsMixIn):
+    default_params = DEFAULT_PARAMS
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
         ParameterConfigWidgetsMixIn.__init__(self)
-        self.params = _params
+        self.set_default_params()
         self._plugin = None
         self.scan_dim = 4
         create_processing_full_workflow_frame_widgets_and_layout(self)

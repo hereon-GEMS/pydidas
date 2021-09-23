@@ -70,7 +70,8 @@ class _PluginCollection(PydidasQsettingsMixin):
             plugin_path = self.__get_generic_plugin_path()
         self.find_and_register_plugins(*plugin_path)
 
-    def __get_plugin_path_from_kwargs(self, **kwargs):
+    @staticmethod
+    def __get_plugin_path_from_kwargs(**kwargs):
         """
         Get the plugin path(s) from the calling keyword arguments.
 
@@ -171,7 +172,8 @@ class _PluginCollection(PydidasQsettingsMixin):
         _paths = ';;'.join(self.__plugin_paths)
         self.q_settings.setValue('global/plugin_path', _paths)
 
-    def _get_valid_modules_and_filenames(self, path):
+    @staticmethod
+    def _get_valid_modules_and_filenames(path):
         """
         Get all module names in a specified path (including subdirectories).
 
@@ -196,7 +198,8 @@ class _PluginCollection(PydidasQsettingsMixin):
             _modules[_mod] = _file
         return  _modules
 
-    def __import_module_and_get_classes_in_module(self, modname, filepath):
+    @staticmethod
+    def __import_module_and_get_classes_in_module(modname, filepath):
         """
         Import a module from a file and get all class members of the module.
 

@@ -37,7 +37,7 @@ class WorkflowTreeIoBase(metaclass=WorkflowTreeIoMeta):
     extensions = []
 
     @classmethod
-    def export_to_file(cls, filename, content, **kwargs):
+    def export_to_file(cls, filename, tree, **kwargs):
         """
         Write the content to a file.
 

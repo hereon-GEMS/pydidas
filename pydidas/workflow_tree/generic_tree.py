@@ -23,8 +23,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericTree']
 
+import copy
 
 from .generic_node import GenericNode
+
 
 class GenericTree:
     """
@@ -65,7 +67,8 @@ class GenericTree:
         node.node_id = 0
         self.register_node(node)
 
-    def _verify_node_type(self, node):
+    @staticmethod
+    def _verify_node_type(node):
         """
         Check that the node is a GenericNode
 
@@ -229,3 +232,33 @@ class GenericTree:
             if _node.is_leaf:
                 _leaves.append(_node)
         return _leaves
+
+    def get_copy(self):
+        """
+        Get a copy of the WorkflowTree.
+
+        While this is method is not really useful in the main application
+        (due to the fact that the WorkflowTree is a Singleton), it is required
+        to pass working copies of the Tree to other processes in
+        multiprocessing.
+
+        Returns
+        -------
+        pydidas.workflow_tree.WorkflowTree
+            A new instance of the WorkflowTree
+        """
+        return self.__copy__()
+
+    def __copy__(self):
+        """
+        Get a copy of the WorkflowTree.
+
+        Returns
+        -------
+        pydidas.workflow_tree.WorkflowTree
+            A new instance of the WorkflowTree
+        """
+        _copy = self.__class__()
+        for key, val in self.__dict__.items():
+            _copy.__dict__[key] = copy.deepcopy(val)
+        return _copy

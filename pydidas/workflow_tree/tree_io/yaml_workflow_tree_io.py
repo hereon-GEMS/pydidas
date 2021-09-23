@@ -28,8 +28,8 @@ __all__ = ['YamlWorkflowTreeIo']
 
 import yaml
 
-from .workflow_tree_io_base import WorkflowTreeIoBase
 from pydidas.config import YAML_EXTENSIONS
+from .workflow_tree_io_base import WorkflowTreeIoBase
 
 
 class YamlWorkflowTreeIo(WorkflowTreeIoBase):
@@ -77,7 +77,7 @@ class YamlWorkflowTreeIo(WorkflowTreeIoBase):
         from ..workflow_tree import _WorkflowTree
         from ..workflow_node import WorkflowNode
         from ...plugins import PluginCollection
-        COLLECTION = PluginCollection()
+        plugins = PluginCollection()
 
         with open(filename, 'r') as _file:
             _restoration = yaml.safe_load(_file)
@@ -85,7 +85,7 @@ class YamlWorkflowTreeIo(WorkflowTreeIoBase):
         # Create all nodes first, then add connections in a second step:
         _new_nodes = {}
         for _info in _restoration:
-            _plugin =  COLLECTION.get_plugin_by_name(_info['plugin_class'])()
+            _plugin =  plugins.get_plugin_by_name(_info['plugin_class'])()
             _node = WorkflowNode(node_id=_info['node_id'], plugin=_plugin)
             for key, val in _info['plugin_params']:
                 _node.plugin.set_param_value(key, val)

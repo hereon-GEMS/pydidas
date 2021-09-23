@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ['WorkflowTree']
 
 import os
+import copy
 
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
@@ -155,11 +156,6 @@ class _WorkflowTree(GenericTree):
         TypeError
             If no writer has been registered.
         NotADirectoryError
-
-        Returns
-        -------
-        None.
-
         """
         _ext = os.path.splitext(filename)[1]
         _path = os.path.dirname(filename)

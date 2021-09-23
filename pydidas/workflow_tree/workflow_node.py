@@ -43,6 +43,8 @@ class WorkflowNode(GenericNode):
         super().__init__(**kwargs)
         self.__confirm_plugin_existance_and_type()
         self.plugin.node_id = self._node_id
+        self.results = None
+        self.result_kws = None
 
     def __confirm_plugin_existance_and_type(self):
         """

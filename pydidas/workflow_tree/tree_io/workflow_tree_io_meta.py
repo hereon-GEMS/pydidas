@@ -27,7 +27,9 @@ __all__ = ['WorkflowTreeIoMeta']
 
 
 import os
+
 from pydidas.core import FileExtensionRegistryMetaclass
+
 
 class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
     """
@@ -39,7 +41,7 @@ class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
     registry = {}
 
     @classmethod
-    def export_to_file(cls, filename, tree):
+    def export_to_file(cls, filename, tree, **kwargs):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
@@ -50,11 +52,13 @@ class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
             The full filename and path.
         tree : pydidas.workflow_tree.WorkflowTree
             The instance of the WorkflowTree
+        kwargs : dict
+            Any kwargs which should be passed to the udnerlying exporter.
         """
         _extension = os.path.splitext(filename)[1]
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
-        _io_class.export_to_file(filename, tree)
+        _io_class.export_to_file(filename, tree, **kwargs)
 
     @classmethod
     def import_from_file(cls, filename):

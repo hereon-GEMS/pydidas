@@ -252,6 +252,14 @@ class TestGenericNode(unittest.TestCase):
         self.assertNotEqual(root, root_copy)
         self.assertNotEqual(root._children, root_copy._children)
 
+    def test_get_copy(self):
+        root = GenericNode(node_id=0)
+        GenericNode(node_id=1, parent=root)
+        GenericNode(node_id=2, parent=root)
+        root_copy = root.get_copy()
+        self.assertNotEqual(root, root_copy)
+        self.assertNotEqual(root._children, root_copy._children)
+
     def test_copy__with_parent(self):
         root = GenericNode(node_id=0)
         node = GenericNode(node_id=1, parent=root)

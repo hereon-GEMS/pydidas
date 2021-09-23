@@ -23,14 +23,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
-import random
-import copy
 
 import numpy as np
 
 from pydidas.workflow_tree import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.unittest_objects.dummy_loader import DummyLoader
 from pydidas.unittest_objects.dummy_proc import DummyProc
+
 
 class TestWorkflowTree(unittest.TestCase):
 
@@ -120,6 +119,13 @@ class TestWorkflowTree(unittest.TestCase):
             for _node in nodes[_d]:
                 self.assertFalse(hasattr(_node, 'results'))
                 self.assertFalse(hasattr(_node, 'result_kws'))
+
+    def test_get_copy(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        _new_node = nodes[0][0].get_copy()
+        self.assertIsNot(_new_node, nodes[0][0])
+        self.assertEqual(_new_node.n_children, nodes[0][0].n_children)
 
 
 if __name__ == '__main__':

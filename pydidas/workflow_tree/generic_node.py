@@ -32,6 +32,8 @@ class GenericNode:
     The GenericNode class is used by trees to manage connections between
     items.
     """
+    kwargs_for_copy_creation = []
+
     @staticmethod
     def _verify_type(item, allowNone=False):
         """
@@ -292,6 +294,17 @@ class GenericNode:
             raise ValueError('Instance is not a child!')
         self._children.remove(child)
 
+    def get_copy(self):
+        """
+        Get a copy of the Node.
+
+        Returns
+        -------
+        pydidas.workflow_tree.GenericNode
+            The nodes's copy.
+        """
+        return self.__copy__()
+
     def __copy__(self):
         """
         Copy the generic node including any children.
@@ -301,7 +314,9 @@ class GenericNode:
         GenericNode
             The copy.
         """
-        _copy = self.__class__()
+        kwargs = {arg: getattr(self, arg)
+                  for arg in self.kwargs_for_copy_creation}
+        _copy = self.__class__(**kwargs)
         for _key in set(self.__dict__.keys()) - {'_children', '_parent'}:
             _copy.__dict__[_key] = copy.copy(self.__dict__[_key])
         _copy._children = []

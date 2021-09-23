@@ -281,4 +281,5 @@ def get_generic_parameter(refkey):
     if refkey not in GENERIC_PARAMS:
         raise KeyError(f'No Parameter with the reference key "{refkey}"'
                        'in the GENERIC_PARAMS collection.')
-    return GENERIC_PARAMS.get_param(refkey).get_copy()
+    _param = GENERIC_PARAMS.get_param(refkey)
+    return _param.get_copy()

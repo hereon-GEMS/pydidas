@@ -25,10 +25,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTree']
 
+import os
+
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
-
+from ..config import YAML_EXTENSIONS
+from .tree_io import WorkflowTreeIoMeta
 
 class _WorkflowTree(GenericTree):
     """
@@ -111,5 +114,61 @@ class _WorkflowTree(GenericTree):
         self.nodes[node_id].prepare_execution()
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
+
+    def export_tree_to_file(self, filename):
+        """
+        Export the WorkflowTree to a file using any of the registered
+        exporters.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The filename of the file with the export.
+        """
+        WorkflowTreeIoMeta.export_to_file(filename, self)
+
+    def import_tree_from_file(self, filename):
+        """
+        Import the WorkflowTree from a configuration file.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The filename which holds the WorkflowTree configuration.
+        """
+        _new_tree = WorkflowTreeIoMeta.import_from_file(filename)
+        for _att in ['root', 'node_ids', 'nodes']:
+            setattr(self, _att, getattr(_new_tree, _att))
+
+    def __check_export_filename(self, filename):
+        """
+        Check the filename extension matches a registered writer and that the
+        path exists.
+
+        Parameters
+        ----------
+        filename : str
+            The full filename and path.
+
+        Raises
+        ------
+        TypeError
+            If no writer has been registered.
+        NotADirectoryError
+
+        Returns
+        -------
+        None.
+
+        """
+        _ext = os.path.splitext(filename)[1]
+        _path = os.path.dirname(filename)
+        if not os.path.exists(_path):
+            raise NotADirectoryError('The specified saving path "{_path}" '
+                                     'does not exist.')
+        if _ext in YAML_EXTENSIONS:
+            return
+        raise TypeError('No exporter for file extension "{_ext}" defined.')
+
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

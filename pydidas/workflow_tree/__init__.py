@@ -38,6 +38,8 @@ from .workflow_tree import *
 from . import plugin_position_node
 from .plugin_position_node import *
 
+from . import tree_io
+
 
 __all__ += generic_node.__all__
 __all__ += generic_tree.__all__
@@ -52,3 +54,4 @@ del generic_tree
 del workflow_node
 del workflow_tree
 del plugin_position_node
+

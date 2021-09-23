@@ -233,6 +233,36 @@ class TestParameter(unittest.TestCase):
         self.assertNotEqual(obj, copy)
         self.assertIsInstance(copy, Parameter)
 
+    def test_get_value_for_export__with_Path(self):
+        obj = Parameter('Test0', Path, Path())
+        _val = obj._Parameter__get_value_for_export()
+        self.assertIsInstance(_val, str)
+
+    def test_get_value_for_export__with_HdfKey(self):
+        obj = Parameter('Test0', HdfKey, HdfKey('/test'))
+        _val = obj._Parameter__get_value_for_export()
+        self.assertIsInstance(_val, str)
+
+    def test_get_value_for_export__with_str(self):
+        obj = Parameter('Test0', str, '/test')
+        _val = obj._Parameter__get_value_for_export()
+        self.assertIsInstance(_val, str)
+
+    def test_get_value_for_export__with_float(self):
+        obj = Parameter('Test0', float, 12.34)
+        _val = obj._Parameter__get_value_for_export()
+        self.assertIsInstance(_val, Real)
+
+    def test_get_value_for_export__with_int(self):
+        obj = Parameter('Test0', int, 27)
+        _val = obj._Parameter__get_value_for_export()
+        self.assertIsInstance(_val, Integral)
+
+    def test_get_value_for_export__with_NoneType(self):
+        obj = Parameter('Test0', None, 27.7)
+        with self.assertRaises(TypeError):
+            obj._Parameter__get_value_for_export()
+
     def test_dump(self):
         obj = Parameter('Test0', int, 12)
         self.assertEqual(obj.refkey, 'Test0')
@@ -246,6 +276,12 @@ class TestParameter(unittest.TestCase):
                                    'name': '',
                                    'choices': None,
                                    'value': 12})
+
+    def test__load_from_dump(self):
+        obj = Parameter('Test0', int, 12)
+        obj2 = Parameter(*obj.dump())
+        for _key in obj.__dict__:
+            self.assertEqual(obj.__dict__[_key], obj2.__dict__[_key])
 
     def test__copy__(self):
         obj = Parameter('Test0', int, 12)

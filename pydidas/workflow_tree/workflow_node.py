@@ -26,8 +26,6 @@ __status__ = "Development"
 __all__ = ['WorkflowNode']
 
 from copy import copy
-from numbers import Integral
-from collections.abc import Iterable
 
 from .generic_node import GenericNode
 from ..plugins import BasePlugin
@@ -38,6 +36,8 @@ class WorkflowNode(GenericNode):
     The WorkflowNode subclass of the GenericNode has an added plugin attribute
     to allow it to execute plugins, either individually or the full chain.
     """
+    kwargs_for_copy_creation = ['plugin']
+
     def __init__(self, **kwargs):
         self.plugin = None
         super().__init__(**kwargs)
@@ -128,13 +128,13 @@ class WorkflowNode(GenericNode):
             The dict with all required information about the node.
         """
         _parent = (self._parent if self._parent is None
-                   else [self._parent.__class__, self._parent._node_id])
-        _children = [[child.__class__, child._node_id]
-                     for child in self._children]
+                   else self._parent._node_id)
+        _children = [child._node_id for child in self._children]
         _rep = dict(node_id=self.node_id,
                     parent=_parent,
                     children=_children,
-                    plugin_class=self.plugin.__class__,
-                    plugin_params=[p.dump() for p in self.plugin.params.values()]
+                    plugin_class=self.plugin.__class__.__name__,
+                    plugin_params=[p.export_refkey_and_value()
+                                   for p in self.plugin.params.values()]
                     )
         return _rep

@@ -464,7 +464,6 @@ class Parameter:
         Parameter
             A full copy of the object.
         """
-        _key, _type, _default, _meta = self.dump()
         return Parameter(*self.dump())
 
     def dump(self):
@@ -486,20 +485,33 @@ class Parameter:
         del _meta['default']
         return (self.__refkey, self.__type, self.__meta['default'], _meta)
 
-    def saving_dump(self):
+    def export_refkey_and_value(self):
         """
-        Get a abbreviated class information for saving.
-
-        The information from simple_dump can be used to restore Parameter
-        values if the Parameter itself exists.
+        Export the refkey and value (in a pickleable format) for saving
+        in YAML files.
 
         Returns
         -------
         tuple
-            A tuple with ref_key and value.
+            The tuple of (refkey, value as pickleable format)
         """
-        return (self.__meta['refkey'], self.__value)
+        return (self.__refkey, self.__get_value_for_export())
 
+    def __get_value_for_export(self):
+        """
+        Get the value in a pickleable format for exporting.
+
+        Returns
+        -------
+        Union[str, float, int]
+            The Parameter value in a pickleable format.
+        """
+        if self.__type in (str, HdfKey, Path):
+            return str(self.value)
+        elif self.__type in (numbers.Integral, numbers.Real):
+            return self.value
+        raise TypeError(f'No export format for type {self.__type} has been'
+                        'defined.')
 
     def __str__(self):
         """
@@ -538,4 +550,15 @@ class Parameter:
         return _s
 
     def __copy__(self):
+        """
+        Copy the Parameter object.
+
+        This method is a wrapper for the "get_copy" method to allow the generic
+        Python copy module to make copies of Parameters as well.
+
+        Returns
+        -------
+        Parameter
+            A copy of the Parameter.
+        """
         return self.get_copy()

@@ -27,10 +27,20 @@ __status__ = "Development"
 __all__ = []
 
 
-from . import workflow_canvas_manager
-from .workflow_canvas_manager import *
+from . import plugin_collection_presenter
+from .plugin_collection_presenter import *
 
-__all__ += workflow_canvas_manager.__all__
+from . import workflow_plugin_label
+from .workflow_plugin_label import *
+
+from . import workflow_tree_canvas
+from .workflow_tree_canvas import *
+
+__all__ += plugin_collection_presenter.__all__
+__all__ += workflow_plugin_label.__all__
+__all__ += workflow_tree_canvas.__all__
 
 # unclutter namespace and remove modules:
-del workflow_canvas_manager
+del plugin_collection_presenter
+del workflow_plugin_label
+del workflow_tree_canvas

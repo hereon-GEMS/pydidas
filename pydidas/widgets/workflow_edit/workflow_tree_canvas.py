@@ -24,7 +24,9 @@ __status__ = "Development"
 __all__ = ['WorkflowTreeCanvas']
 
 from PyQt5 import QtWidgets, QtGui
-from ..config import STYLES
+
+from ...config import STYLES
+
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
     """
@@ -40,10 +42,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         ----------
         parent : QtWidget, optional
             The parent widget. The default is None.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(parent=parent)
         self.title = QtWidgets.QLabel(self)
@@ -66,10 +64,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         ----------
         event : object
             The calling event.
-
-        Returns
-        -------
-        None.
         """
         self.painter.begin(self)
         self.painter.setPen(QtGui.QPen(QtGui.QColor(120, 120, 120), 2))
@@ -83,10 +77,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         This method will draw connections between all parent and child plugins.
         Relationships must be supplied through the
         self.update_widget_connections method.
-
-        Returns
-        -------
-        None.
         """
         for x0, y0, x1, y1 in self.widget_connections:
             self.painter.drawLine(x0, y0, x1, y1)
@@ -102,10 +92,6 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         ----------
         widget_conns : list
             A list with coordinate pairs to draw connections.
-
-        Returns
-        -------
-        None.
         """
         self.widget_connections = widget_conns
         self.update()

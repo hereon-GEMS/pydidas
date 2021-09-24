@@ -126,7 +126,6 @@ class PluginPositionNode(GenericNode):
         pos_dict : dict
             A dictionary with entries of the type "node_id: [xpos, ypos]"
             where all positions are positive.
-
         """
         vals = np.asarray(list(pos_dict.values()))
         xoffset = np.amin(vals[:, 0])

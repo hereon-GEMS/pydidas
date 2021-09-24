@@ -212,11 +212,12 @@ class GenericTree:
         recursive : bool, optional
             Keyword to toggle deletion of the node's children as well.
             The default is True.
-       """
+        """
         ids = self.nodes[node_id].get_recursive_ids()
         self.nodes[node_id].remove_node_from_tree(recursive=recursive)
         for _id in ids:
             del self.nodes[_id]
+            self.node_ids.remove(_id)
 
     def get_all_leaves(self):
         """

@@ -26,10 +26,14 @@ __all__ = ['WorkflowEditFrame']
 
 from PyQt5 import QtCore
 
-from .workflow_tree_edit_manager import WORKFLOW_EDIT_MANAGER
-from ..widgets import BaseFrame
-from .builders.workflow_edit_frame_builder import (
+from pydidas.gui.workflow_tree_edit_manager import WorkflowTreeEditManager
+from pydidas.widgets import BaseFrame
+from pydidas.gui.builders.workflow_edit_frame_builder import (
     create_workflow_edit_frame_widgets_and_layout)
+from pydidas.workflow_tree import WorkflowTree
+
+TREE = WorkflowTree()
+WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
 class WorkflowEditFrame(BaseFrame):
@@ -41,14 +45,44 @@ class WorkflowEditFrame(BaseFrame):
 
         self._widgets['plugin_collection'].selection_confirmed.connect(
             self.workflow_add_plugin)
+        WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(
             self._widgets['workflow_canvas'])
-        WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
 
+    @QtCore.pyqtSlot(str)
     def workflow_add_plugin(self, name):
-        WORKFLOW_EDIT_MANAGER.add_plugin_node(name)
+        WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name)
 
     @QtCore.pyqtSlot(int)
     def configure_plugin(self, node_id):
-        plugin = WORKFLOW_EDIT_MANAGER.plugins[node_id]
+        plugin = TREE.nodes[node_id].plugin
+        print('configuring plugin', plugin, plugin.params)
         self._widgets['plugin_edit_canvas'].configure_plugin(node_id, plugin)
+
+
+if __name__ == '__main__':
+    import pydidas
+    from pydidas.gui.main_window import MainWindow
+    import sys
+    import qtawesome as qta
+    from PyQt5 import QtWidgets
+    app = QtWidgets.QApplication(sys.argv)
+    #app.setStyle('Fusion')
+
+    # needs to be initialized after the app has been created.
+    # sys.excepthook = pydidas.widgets.excepthook
+    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
+    STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
+
+    _font = app.font()
+    _font.setPointSize(STANDARD_FONT_SIZE)
+    app.setFont(_font)
+    gui = MainWindow()
+
+    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'),
+                       WorkflowEditFrame)
+    gui.create_toolbars()
+
+    gui.show()
+    sys.exit(app.exec_())
+    app.deleteLater()

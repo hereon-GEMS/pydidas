@@ -29,10 +29,10 @@ __all__ = ['create_workflow_edit_frame_widgets_and_layout']
 
 from PyQt5 import QtWidgets
 
-from pydidas.widgets import (ScrollArea, PluginCollectionPresenter,
-                             WorkflowTreeCanvas)
+from pydidas.widgets import ScrollArea
 from pydidas.widgets.parameter_config import PluginParameterConfigWidget
-
+from pydidas.widgets.workflow_edit import (WorkflowTreeCanvas,
+                                           PluginCollectionPresenter)
 
 def create_workflow_edit_frame_widgets_and_layout(frame):
     """

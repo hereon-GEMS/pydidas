@@ -28,14 +28,18 @@ import os
 import re
 from functools import partial
 
-
 import qtawesome as qta
 from PyQt5 import QtWidgets, QtGui, QtCore
+
 from pydidas.widgets import CentralWidgetStack, GetInfoWidget
 from pydidas.core import get_generic_parameter
 from pydidas._exceptions import FrameConfigError
 from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
 from pydidas.config import QSETTINGS_GLOBAL_KEYS
+from pydidas.workflow_tree import WorkflowTree
+
+TREE = WorkflowTree()
+TREE.clear()
 
 
 class MainWindow(QtWidgets.QMainWindow):

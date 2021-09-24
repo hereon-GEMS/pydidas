@@ -90,7 +90,6 @@ class YamlWorkflowTreeIo(WorkflowTreeIoBase):
             for key, val in _info['plugin_params']:
                 _node.plugin.set_param_value(key, val)
             _new_nodes[_info['node_id']] = _node
-
         for _info in _restoration:
             _node_id = _info['node_id']
             if _info['parent'] is not None:

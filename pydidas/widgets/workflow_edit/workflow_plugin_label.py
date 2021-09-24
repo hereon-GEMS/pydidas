@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""Module with the WorkflowPluginLabel which is a subclassed QLabel and used
+to display plugin processing steps in the workflow tree."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -22,13 +22,16 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['WorkflowPluginLabel']
 
 from PyQt5 import QtWidgets, QtCore
+
 from pydidas.config import gui_constants, qt_presets
 
+
 class WorkflowPluginLabel(QtWidgets.QLabel):
-    """Widget with title and delete button for every selected plugin
+    """
+    Widget with title and delete button for every selected plugin
     in the processing chain.
 
     Note: This class is part of the gui subpackage to avoid circular imports
@@ -39,7 +42,7 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
     widget_activated = QtCore.pyqtSignal(int)
     widget_delete_request = QtCore.pyqtSignal(int)
 
-    def __init__(self, parent=None, title='No title', widget_id=None):
+    def __init__(self, title, widget_id, parent=None):
         """
         Setup the _WorkflowPluginWidget.
 
@@ -49,31 +52,18 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
 
         Parameters
         ----------
-        parent : TYPE, optional
-            DESCRIPTION. The default is None.
-        title : TYPE, optional
-            DESCRIPTION. The default is 'No title'.
-        widget_id : TYPE, optional
-            DESCRIPTION. The default is None.
-
-        Raises
-        ------
-        ValueError
-            DESCRIPTION.
-
-        Returns
-        -------
-        None.
+        title : str
+            The QLabel's title (i.e. text).
+        widget_id : int
+            The widget ID. This is the same as the corresponding node ID.
+        parent : Union[QtWidgets.QWidget, None], optional
+            The widget's parent. The default is None.
         """
         super().__init__(parent)
-        self.qt_parent = parent
         self.active = False
-        if widget_id is None:
-            raise ValueError('No plugin node id given.')
-
         self.widget_id = widget_id
-        self.setText(title)
 
+        self.setText(title)
         self.setFixedSize(self.widget_width, self.widget_height)
         self.setAutoFillBackground(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
@@ -86,17 +76,38 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
         self.qtw_del_button.clicked.connect(self.delete)
 
     def mousePressEvent(self, event):
+        """
+        Extend the generic mousePressEvent by an activation signal.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The original event.
+        """
         event.accept()
         if not self.active:
             self.widget_activated.emit(self.widget_id)
 
     def delete(self):
+        """
+        Reimplement the generic delete method and send it to the
+        WorkflowTreeEditManager.
+        """
         self.widget_delete_request.emit(self.widget_id)
 
-    def widget_select(self):
-        self.setStyleSheet(qt_presets.STYLES['workflow_plugin_active'])
-        self.active = True
+    def widget_select(self, selection):
+        """
+        Select or deselect the widget.
 
-    def widget_deselect(self):
-        self.setStyleSheet(qt_presets.STYLES['workflow_plugin_inactive'])
-        self.active = False
+        Parameters
+        ----------
+        selection : bool
+            Flag whether the widget has been selected (True) or deselected
+            (False).
+        """
+        if selection:
+            _style = qt_presets.STYLES['workflow_plugin_active']
+        else:
+            _style= qt_presets.STYLES['workflow_plugin_inactive']
+        self.setStyleSheet(_style)
+        self.active = selection

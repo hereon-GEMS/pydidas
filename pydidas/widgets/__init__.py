@@ -37,17 +37,11 @@ from . import workflow_edit
 # from . import confirmation_bar
 # from .confirmation_bar import *
 
-from . import plugin_collection_presenter
-from .plugin_collection_presenter import *
-
 from . import scroll_area
 from .scroll_area import *
 
 from . import utilities
 from .utilities import *
-
-from . import workflow_tree_canvas
-from .workflow_tree_canvas import *
 
 from . import central_widget_stack
 from .central_widget_stack import *
@@ -80,10 +74,8 @@ from . import base_frame_with_app
 from .base_frame_with_app import *
 
 # __all__ += confirmation_bar.__all__
-__all__ += plugin_collection_presenter.__all__
 __all__ += scroll_area.__all__
 __all__ += utilities.__all__
-__all__ += workflow_tree_canvas.__all__
 __all__ += central_widget_stack.__all__
 # __all__ += hdf_dataset_selector.__all__
 __all__ += hdf5_dataset_selector.__all__
@@ -99,10 +91,8 @@ __all__ += base_frame_with_app.__all__
 
 # unclutter namespace and remove modules:
 # del confirmation_bar
-del plugin_collection_presenter
 del scroll_area
 del utilities
-del workflow_tree_canvas
 del central_widget_stack
 # del hdf_dataset_selector
 del hdf5_dataset_selector

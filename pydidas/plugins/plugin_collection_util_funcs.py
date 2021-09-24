@@ -29,7 +29,13 @@ __all__ = ['get_generic_plugin_path', 'plugin_type_check',
 
 import os
 
-from .plugin_constants import INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
+import pydidas.core as core
+
+
+import logging
+from pydidas.utils import pydidas_logger
+
+logger = pydidas_logger(logging.DEBUG)
 
 
 def get_generic_plugin_path():
@@ -44,10 +50,10 @@ def get_generic_plugin_path():
     str
         The path to the generic plugin folder.
     """
-    return [os.path.join(
-        os.path.dirname(
-        os.path.dirname(
-        os.path.dirname(__file__))), 'plugins')]
+    _pydidas_module_path = os.path.dirname(
+                os.path.abspath(core.__path__[0]))
+    logger.debug(f'Generic module path: {_pydidas_module_path}')
+    return [os.path.join(os.path.dirname(_pydidas_module_path), 'plugins')]
 
 
 def plugin_type_check(cls_item):

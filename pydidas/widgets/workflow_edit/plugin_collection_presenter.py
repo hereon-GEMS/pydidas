@@ -28,9 +28,9 @@ from functools import partial
 
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
-from ..plugins import PluginCollection
-from ..config import STYLES
-from .read_only_text_widget import ReadOnlyTextWidget
+from ...plugins import PluginCollection
+from ...config import STYLES
+from ..read_only_text_widget import ReadOnlyTextWidget
 
 PLUGIN_COLLECTION = PluginCollection()
 

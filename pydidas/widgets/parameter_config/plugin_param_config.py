@@ -78,9 +78,7 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
             The instance of the Plugin to be edited.
         """
         self.__clear_layout()
-        print('plugin param config old plugin: ', self.plugin)
         self.plugin = plugin
-        print('plugin param config new plugin: ', self.plugin)
         self.node_id = node_id
         self.__create_widgets_for_new_plugin()
 

@@ -123,7 +123,7 @@ class BasePlugin(ObjectWithParameterCollection):
             raise ValueError('Unknown value for the plugin type')
         self.add_params(*args)
         self.set_default_params()
-        self.add_params(self.generic_params)
+        self.add_params(self.generic_params.get_copy())
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])

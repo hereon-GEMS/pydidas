@@ -112,13 +112,13 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.register_node(nodes[0][0])
         self.tree.execute_process(0)
         for _node in nodes[_depth]:
-            self.assertTrue(hasattr(_node, 'results'))
-            self.assertTrue(hasattr(_node, 'result_kws'))
+            self.assertIsNotNone(_node.results)
+            self.assertIsNotNone(_node.result_kws)
             self.assertTrue(_node.plugin._preexecuted)
         for _d in range(_depth):
             for _node in nodes[_d]:
-                self.assertFalse(hasattr(_node, 'results'))
-                self.assertFalse(hasattr(_node, 'result_kws'))
+                self.assertIsNone(_node.results)
+                self.assertIsNone(_node.result_kws)
 
     def test_get_copy(self):
         _depth = 3

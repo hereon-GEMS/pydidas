@@ -27,6 +27,7 @@ __all__ = ['processor']
 import time
 import queue
 
+
 def processor(input_queue, output_queue, stop_queue, finished_queue,
               function, *func_args, **func_kwargs):
     """

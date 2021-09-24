@@ -89,12 +89,12 @@ class TestWorkflowNode(unittest.TestCase):
         obj = nodes[0][0]
         obj.execute_plugin_chain(0)
         for _node in nodes[_depth]:
-            self.assertTrue(hasattr(_node, 'results'))
-            self.assertTrue(hasattr(_node, 'result_kws'))
+            self.assertIsNotNone(_node.results)
+            self.assertIsNotNone(_node.result_kws)
         for _d in range(_depth):
             for _node in nodes[_d]:
-                self.assertFalse(hasattr(_node, 'results'))
-                self.assertFalse(hasattr(_node, 'result_kws'))
+                self.assertIsNone(_node.results)
+                self.assertIsNone(_node.result_kws)
 
 
 if __name__ == '__main__':

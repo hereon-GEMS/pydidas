@@ -34,27 +34,29 @@ from pydidas.workflow_tree.tree_io.yaml_workflow_tree_io import (
 import pydidas
 
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
-_pluginclass = PLUGIN_COLL.get_plugin_by_name('PyFAIazimuthalIntegration')
-_plugin = _pluginclass()
-
-TREE = pydidas.workflow_tree.WorkflowTree()
-TREE.create_and_add_node(_plugin)
-TREE.create_and_add_node(_plugin)
-TREE.create_and_add_node(_plugin, parent=TREE.nodes[0])
-
 
 class TestYamlWorkflowTreeIo(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
         self._filename = os.path.join(self._path, 'test.yaml')
+        self.TREE = pydidas.workflow_tree.WorkflowTree()
 
     def tearDown(self):
         shutil.rmtree(self._path)
 
     def create_test_tree(self):
+
+        _pluginclass = PLUGIN_COLL.get_plugin_by_name('PyFAIazimuthalIntegration')
+        _plugin = _pluginclass()
+        self.TREE.clear()
+        self.TREE.create_and_add_node(_plugin)
+        self.TREE.create_and_add_node(_plugin)
+        self.TREE.create_and_add_node(_plugin, parent=self.TREE.nodes[0])
+
         class _Tree:
             def __init__(self):
+                TREE = pydidas.workflow_tree.WorkflowTree()
                 self.nodes = {node.node_id: node.get_copy() for node in
                               TREE.nodes.values()}
         _tree = _Tree()
@@ -75,19 +77,20 @@ class TestYamlWorkflowTreeIo(unittest.TestCase):
             self.assertEqual(set(_new.nodes), set(_tree.nodes))
 
     def test_export_to_file(self):
-        YamlWorkflowTreeIo.export_to_file(self._filename, TREE)
+        YamlWorkflowTreeIo.export_to_file(self._filename, self.TREE)
         # assert does not raise an error
 
     def test_export_to_file__existing_file_no_overwrite(self):
         with open(self._filename, 'w') as f:
             f.write('test')
         with self.assertRaises(FileExistsError):
-            YamlWorkflowTreeIo.export_to_file(self._filename, TREE)
+            YamlWorkflowTreeIo.export_to_file(self._filename, self.TREE)
 
     def test_export_to_file__existing_file__overwrite(self):
         with open(self._filename, 'w') as f:
             f.write('test')
-        YamlWorkflowTreeIo.export_to_file(self._filename, TREE, overwrite=True)
+        YamlWorkflowTreeIo.export_to_file(self._filename, self.TREE,
+                                          overwrite=True)
         # assert does not raise an error
 
 

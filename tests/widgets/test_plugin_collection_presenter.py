@@ -28,6 +28,7 @@ import sys
 import itertools
 import tempfile
 import shutil
+import copy
 
 import numpy as np
 from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
@@ -47,11 +48,18 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self.q_app = QtWidgets.QApplication(sys.argv)
         self.n_per_type = 8
         self.num = 3 * self.n_per_type
+        self._syspath = copy.deepcopy(sys.path)
+        self._qsettings = QtCore.QSettings('Hereon', 'pydidas')
+        self._qsettings_plugin_path = self._qsettings.value('global/plugin_path')
+        self._qsettings.setValue('global/plugin_path', '')
         self.pcoll = DummyPluginCollection(n_plugins=self.num,
                                            plugin_path=self._pluginpath)
         self.widgets = []
 
     def tearDown(self):
+        sys.path = self._syspath
+        self._qsettings.setValue('global/plugin_path',
+                                 self._qsettings_plugin_path)
         shutil.rmtree(self._pluginpath)
         self.q_app.deleteLater()
         self.q_app.quit()

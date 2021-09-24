@@ -29,17 +29,10 @@ import queue
 import random
 import string
 import time
-import logging
-
-from pydidas.utils import pydidas_logger
-
-logger = pydidas_logger(logging.DEBUG)
 
 
 NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
                   for i in range(64))
-
-logger.debug('Finished imports')
 
 
 def app_processor(input_queue, output_queue, stop_queue, finished_queue,
@@ -72,13 +65,11 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
         The dictionary which is used for overwriting the app._config
         dictionary.
     """
-    logger.debug('Started app processor')
     _app_carryon = True
     _app = app(app_params)
     _app.slave_mode = True
     _app._config = app_config
     _app.multiprocessing_pre_run()
-    logger.debug('Created app')
     while True:
         # check for stop signal
         try:

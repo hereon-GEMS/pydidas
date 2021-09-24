@@ -26,24 +26,18 @@ import unittest
 import random
 import tempfile
 import shutil
-import os
-import copy
-import sys
-from PyQt5 import QtCore
 
 from pydidas.unittest_objects.dummy_plugin_collection import (
-    DummyPluginCollection, get_random_string, create_plugin_class)
+    get_random_string, create_plugin_class)
 
-from pydidas.plugins import BasePlugin, InputPlugin, ProcPlugin, OutputPlugin
-from pydidas.plugins.base_plugins import (INPUT_PLUGIN, PROC_PLUGIN,
-                                          OUTPUT_PLUGIN)
-from pydidas.core import Parameter, ParameterCollection
+from pydidas.plugins import BasePlugin
+from pydidas.plugins.base_plugins import INPUT_PLUGIN
+from pydidas.core import Parameter
 
 class TestBasePlugins(unittest.TestCase):
 
     def setUp(self):
         self._pluginpath = tempfile.mkdtemp()
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._class_names = []
 
     def tearDown(self):

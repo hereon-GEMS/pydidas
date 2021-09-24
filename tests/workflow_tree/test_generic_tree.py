@@ -215,6 +215,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertTrue(node in tree.nodes.values())
         tree.delete_node_by_id(1)
         self.assertFalse(node in tree.nodes.values())
+        self.assertFalse(1 in tree.node_ids)
 
     def test_delete_node_by_id__in_tree(self):
         tree = GenericTree()
@@ -227,6 +228,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertFalse(node2 in tree.nodes.values())
         self.assertFalse(node3 in tree.nodes.values())
         self.assertEqual(node._children, [])
+        self.assertFalse(2 in tree.node_ids)
 
     def test_all_leaves__empty_tree(self):
         tree = GenericTree()

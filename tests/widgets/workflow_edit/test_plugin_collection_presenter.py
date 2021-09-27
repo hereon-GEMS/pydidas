@@ -33,7 +33,7 @@ import copy
 import numpy as np
 from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
 
-from pydidas.widgets.plugin_collection_presenter import (
+from pydidas.widgets.workflow_edit.plugin_collection_presenter import (
     PluginCollectionPresenter, _PluginCollectionTreeWidget)
 from pydidas.unittest_objects.dummy_plugin_collection import (
     DummyPluginCollection)

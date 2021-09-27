@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PyFAI2dIntegration']
 
-
 from pydidas.plugins import pyFAIintegrationBase
+from pydidas.core import Dataset
 
 
 class PyFAI2dIntegration(pyFAIintegrationBase):
@@ -38,7 +38,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
     For a full documentation of the Plugin, please refer to the pyFAI
     documentation.
     """
-    plugin_name = 'PyFAI 2D integration'
+    plugin_name = 'pyFAI 2D integration'
     basic_plugin = False
     input_data_dim = 2
     output_data_dim = 2
@@ -74,4 +74,10 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             unit=self.get_pyFAI_unit_from_param('int_rad_unit'),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg())
-        return _newdata, kwargs
+
+        _label, _unit = self.params['int_rad_unit'].value.split('/')
+        _label = _label.replace('\u03b8', 'theta').strip()
+        _unit = _unit.strip()
+        _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
+
+        return _dataset, kwargs

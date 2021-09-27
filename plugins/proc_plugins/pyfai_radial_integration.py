@@ -37,7 +37,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
     For a full documentation of the Plugin, please refer to the pyFAI
     documentation.
     """
-    plugin_name = 'PyFAI radial integration'
+    plugin_name = 'pyFAI radial integration'
     basic_plugin = False
     input_data_dim = 2
     output_data_dim = 1

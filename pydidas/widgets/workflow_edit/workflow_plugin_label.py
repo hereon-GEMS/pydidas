@@ -35,7 +35,7 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
     in the processing chain.
 
     Note: This class is part of the gui subpackage to avoid circular imports
-    between this class and the WorkflowEditTreeManager.
+    between this class and the WorkflowTreeEditManager.
     """
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT

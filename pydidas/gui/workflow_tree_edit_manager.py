@@ -48,8 +48,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     the WorkflowTree, plugin parameters and the corresponding plugins' QT
     widgets. It is responsible for creating widgets and placing them correctly
     on the canvas of the workflow editor. Most method names correspond to
-    similar methods in WorkflowEditTreeManager class. This class should only
-    be used by the WorkflowEditTreeManager to manage the widget aspect.
+    similar methods in WorkflowTreeEditManager class. This class should only
+    be used by the WorkflowTreeEditManager to manage the widget aspect.
     """
     plugin_to_edit = QtCore.pyqtSignal(int)
     plugin_to_delete = QtCore.pyqtSignal(int)

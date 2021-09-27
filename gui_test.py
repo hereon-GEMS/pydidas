@@ -10,7 +10,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import qtawesome as qta
 
 import pydidas
-WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowEditTreeManager()
+WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowTreeEditManager()
 PLUGIN_COLLECTION = pydidas.plugins.PluginCollection()
 STYLES = pydidas.config.STYLES
 PALETTES = pydidas.config.PALETTES

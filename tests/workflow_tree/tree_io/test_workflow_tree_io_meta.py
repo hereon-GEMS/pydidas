@@ -80,15 +80,15 @@ class TestWorkflowTreeIoMeta(unittest.TestCase):
         WorkflowTreeIoMeta.export_to_file('dummy.test', _test_object)
         self.assertEqual(_test_object, self.test_class.trees['dummy.test'])
 
-    def test_get_string_list_of_formats__empty(self):
-        self.assertEqual(WorkflowTreeIoMeta.get_string_list_of_formats(),
-                         ['All supported files (*)'])
+    def test_get_string_of_formats__empty(self):
+        self.assertEqual(WorkflowTreeIoMeta.get_string_of_formats(),
+                         'All supported files (*)')
 
-    def test_get_string_list_of_formats__with_entry(self):
+    def test_get_string_of_formats__with_entry(self):
         self.create_test_class()
-        _res = WorkflowTreeIoMeta.get_string_list_of_formats()
-        _target = ['All supported files (*.test *.another_test)',
-                   'Test (*.test *.another_test)']
+        _res = WorkflowTreeIoMeta.get_string_of_formats()
+        _target = ('All supported files (*.test *.another_test);;'
+                   'Test (*.test *.another_test)')
         self.assertEqual(_res, _target)
 
     def test_get_registered_formats_and_extensions__empty(self):

@@ -31,7 +31,6 @@ import copy
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
-from ..config import YAML_EXTENSIONS
 from .tree_io import WorkflowTreeIoMeta
 
 class _WorkflowTree(GenericTree):
@@ -140,31 +139,6 @@ class _WorkflowTree(GenericTree):
         _new_tree = WorkflowTreeIoMeta.import_from_file(filename)
         for _att in ['root', 'node_ids', 'nodes']:
             setattr(self, _att, getattr(_new_tree, _att))
-
-    def __check_export_filename(self, filename):
-        """
-        Check the filename extension matches a registered writer and that the
-        path exists.
-
-        Parameters
-        ----------
-        filename : str
-            The full filename and path.
-
-        Raises
-        ------
-        TypeError
-            If no writer has been registered.
-        NotADirectoryError
-        """
-        _ext = os.path.splitext(filename)[1]
-        _path = os.path.dirname(filename)
-        if not os.path.exists(_path):
-            raise NotADirectoryError('The specified saving path "{_path}" '
-                                     'does not exist.')
-        if _ext in YAML_EXTENSIONS:
-            return
-        raise TypeError('No exporter for file extension "{_ext}" defined.')
 
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

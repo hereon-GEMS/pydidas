@@ -130,3 +130,39 @@ class FileExtensionRegistryMetaclass(type):
         if extension in cls.registry:
             return True
         return False
+
+    @classmethod
+    def get_string_of_formats(cls):
+        """
+        Get a list of strings with the different formats and extensions.
+
+        This class method is designed to have an easy way of creating the
+        required lists for QFileDialog windows.
+
+        Returns
+        -------
+        str
+            The string entries for each format and one entry for all formats,
+            each separated by a ";;".
+        """
+        _formats = cls.get_registered_formats()
+        _extensions = list(cls.registry.keys())
+        _all = ([f'All supported files (*{" *".join(_extensions)})']
+                + [f'{name} (*{" *".join(formats)})'
+                   for name, formats in _formats.items()])
+        return ';;'.join(_all)
+
+    @classmethod
+    def get_registered_formats(cls):
+        """
+        Get the names of all registered formats and the corresponding
+        file extensions.
+
+        Returns
+        -------
+        dict
+            A dictionary with <format name> : <extensions> entries.
+        """
+        _formats = {_cls.format_name: _cls.extensions
+                    for _cls in cls.registry.values()}
+        return _formats

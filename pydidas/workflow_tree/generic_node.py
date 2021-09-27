@@ -126,6 +126,20 @@ class GenericNode:
                         ' been set.')
 
     @property
+    def parent_id(self):
+        """
+        Get the parent's node ID.
+
+        Returns
+        -------
+        Union[None, int]
+            The parent's nodeID or None if parent is None
+        """
+        if self.parent is None:
+            return None
+        return self.parent.node_id
+
+    @property
     def is_leaf(self):
         """
         Check if node has children.

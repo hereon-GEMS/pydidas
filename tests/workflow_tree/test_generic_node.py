@@ -71,6 +71,15 @@ class TestGenericNode(unittest.TestCase):
         obj.node_id = _id
         self.assertEqual(obj._node_id, _id)
 
+    def test_parent_id_property__get_None(self):
+        obj = GenericNode()
+        self.assertIsNone(obj.parent_id)
+
+    def test_parent_id_property__get_int(self):
+        _parent = GenericNode()
+        obj = GenericNode(parent=_parent)
+        self.assertEqual(obj.parent_id, _parent.node_id)
+
     def test_node_id_property__set_None(self):
         obj = GenericNode()
         obj.node_id = None

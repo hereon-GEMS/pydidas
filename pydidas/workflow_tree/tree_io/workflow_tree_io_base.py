@@ -35,6 +35,7 @@ class WorkflowTreeIoBase(metaclass=WorkflowTreeIoMeta):
     Base class for WorkflowTree exporters.
     """
     extensions = []
+    format_name = 'unknown'
 
     @classmethod
     def export_to_file(cls, filename, tree, **kwargs):

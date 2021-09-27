@@ -37,6 +37,7 @@ class YamlWorkflowTreeIo(WorkflowTreeIoBase):
     Base class for WorkflowTree exporters.
     """
     extensions = YAML_EXTENSIONS
+    format_name = 'YAML'
 
     @classmethod
     def export_to_file(cls, filename, tree, **kwargs):

@@ -54,12 +54,14 @@ def create_workflow_edit_frame_widgets_and_layout(frame):
         widget=frame._widgets['workflow_canvas'], gridPos=(0, 0, 1, 1))
     frame.create_any_widget('plugin_collection',
                               PluginCollectionPresenter,
-                              gridPos=(1, 0, 2, 1))
+                              gridPos=(1, 0, 3, 1))
     frame.create_any_widget(
         'plugin_edit_area', ScrollArea, minimumHeight=500,
         widget=frame._widgets['plugin_edit_canvas'], fixedWidth=400,
         sizePolicy=(QtWidgets.QSizePolicy.Expanding,
                     QtWidgets.QSizePolicy.Expanding),
         gridPos=(0, 1, 2, 1))
-    frame.create_button('but_save', 'save workflow',
+    frame.create_button('but_load', 'Load workflow from file',
                           gridPos=(2, 1, 1, 1))
+    frame.create_button('but_save', 'Save workflow to file',
+                          gridPos=(3, 1, 1, 1))

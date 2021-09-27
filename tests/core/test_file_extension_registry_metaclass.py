@@ -38,26 +38,45 @@ class TestFileExtensionRegistryMetaclass(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=FileExtensionRegistryMetaclass):
-            extensions = ['dummy', 'test']
+            extensions = ['.dummy', '.test']
+            format_name = 'TEST'
         self.test_class = TestClass()
 
     def create_test_class2(self):
         class TestClass2(metaclass=FileExtensionRegistryMetaclass):
-            extensions = ['test2']
+            extensions = ['.test2']
+            format_name = 'Test2'
         self.test_class2 = TestClass2()
 
     def get_unregistered_test_class(self):
         class TestClass3():
-            extensions = ['test3', 'test4']
+            extensions = ['.test3', '.test4']
+            format_name = 'Test3'
         return TestClass3
 
     def test_empty(self):
         self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
 
+    def test_get_registered_formats__empty(self):
+        self.assertEqual(
+            FileExtensionRegistryMetaclass.get_registered_formats(), {})
+
+    def test_get_registered_formats__with_entry(self):
+        self.create_test_class()
+        _formats = FileExtensionRegistryMetaclass.get_registered_formats()
+        _target = {self.test_class.format_name: self.test_class.extensions}
+        self.assertEqual(_formats, _target)
+
+    def test_get_string_of_formats(self):
+        self.create_test_class()
+        _str = FileExtensionRegistryMetaclass.get_string_of_formats()
+        _target = 'All supported files (*.dummy *.test);;TEST (*.dummy *.test)'
+        self.assertEqual(_str, _target)
+
     def test_is_extension_registered__True(self):
         self.create_test_class()
         self.assertTrue(
-            FileExtensionRegistryMetaclass.is_extension_registered('dummy'))
+            FileExtensionRegistryMetaclass.is_extension_registered('.dummy'))
 
     def test_is_extension_registered__False(self):
         self.create_test_class()
@@ -66,7 +85,7 @@ class TestFileExtensionRegistryMetaclass(unittest.TestCase):
 
     def test_verify_extension_is_registered__correct(self):
         self.create_test_class()
-        FileExtensionRegistryMetaclass.verify_extension_is_registered('test')
+        FileExtensionRegistryMetaclass.verify_extension_is_registered('.test')
         # assert does not raise an error
 
     def test_verify_extension_is_registered__incorrect(self):
@@ -87,7 +106,6 @@ class TestFileExtensionRegistryMetaclass(unittest.TestCase):
         self.create_test_class2()
         for _key in self.test_class.extensions + self.test_class2.extensions:
             self.assertTrue(_key in FileExtensionRegistryMetaclass.registry)
-
 
     def test_clear_registry(self):
         self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())

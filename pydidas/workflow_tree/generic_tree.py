@@ -124,6 +124,8 @@ class GenericTree:
         _ids = node.get_recursive_ids()
         if check_ids:
             self._check_node_ids(_ids)
+        if self.root is None:
+            self.root = node
         if node_id is None and node.node_id is None:
             node.node_id = self.get_new_nodeid()
         elif node_id is not None:

@@ -128,7 +128,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if not self.qt_canvas:
             raise Warning('No QtCanvas defined. Nodes added but cannot be '
                           'displayed')
-            return
         self.update_node_positions()
 
     def __create_position_node(self, node_id):
@@ -161,7 +160,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _widget = WorkflowPluginLabel(title, node_id, parent=self.qt_canvas)
         _widget.widget_activated.connect(self.set_active_node)
         _widget.widget_delete_request.connect(
-            partial(self.delete_node, node_id))
+            partial(self.delete_single_node_and_children, node_id))
         _widget.setVisible(True)
         self._node_widgets[node_id] = _widget
 
@@ -237,7 +236,27 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)
 
-    def delete_node(self, node_id):
+    def update_from_tree(self):
+        """
+        Update the canvas and nodes from the WorkflowTree.
+        """
+        self.__delete_all_nodes_and_widgets()
+        for _node_id, _node in TREE.nodes.items():
+            name = _node.plugin.plugin_name
+            self.active_node_id = _node.parent_id
+            self.__create_position_node(_node_id)
+            self.__create_widget(name, _node_id)
+        self.update_node_positions()
+
+    def __delete_all_nodes_and_widgets(self):
+        """
+        Delete all nodes and widgets from the Tree to prepare loading a
+        new workflow.
+        """
+        _all_ids = list(self._node_widgets.keys())
+        self.__delete_nodes_and_widgets(_all_ids)
+
+    def delete_single_node_and_children(self, node_id):
         """
         Remove a node from the tree.
 
@@ -250,41 +269,36 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_id : int
             The node_id if the node to be deleted.
         """
-        _all_ids = TREE.nodes[node_id].get_recursive_ids()
+        _ids = TREE.nodes[node_id].get_recursive_ids()
         TREE.delete_node_by_id(node_id)
         self._nodes[node_id].remove_node_from_tree()
-        for _id in _all_ids:
-            self._node_widgets[_id].deleteLater()
-            time.sleep(0.0005)
-            del self._nodes[_id]
-            del self._node_widgets[_id]
-            del self._node_positions[_id]
-        if len(TREE.node_ids) == 0:
-            self.root = None
-            self.active_node_id = None
-            self.qt_canvas.update_widget_connections([])
-            return
+        self.__delete_nodes_and_widgets(_ids)
         self.plugin_to_delete.emit(node_id)
-        self.set_active_node(TREE.node_ids[-1])
-        self.update_node_positions()
+        if len(TREE.node_ids) > 0:
+            self.set_active_node(TREE.node_ids[-1])
+            self.update_node_positions()
 
-    @QtCore.pyqtSlot(int)
-    def delete_node_request(self, node_id):
+    def __delete_nodes_and_widgets(self, ids):
         """
-        Receive a request to delete a node and remove it from the tree.
-
-        This method will delete a node and remove it from the tree.
+        Delete all nodes and widgets with corresponding IDs from the manager.
 
         Parameters
         ----------
-        node_id : int
-            The node_id if the node to be deleted.
+        ids : list
+            The list of integer widget/node IDs.
         """
-        TREE.delete_node_by_id(node_id)
-        if len(TREE.node_ids) == 0:
+        for _id in ids:
+            self._node_widgets[_id].deleteLater()
+        # wait to verify that widgets have had time to be removed
+        time.sleep(0.0005)
+        for _id in ids:
+            del self._nodes[_id]
+            del self._node_widgets[_id]
+            del self._node_positions[_id]
+        if len(self._nodes) == 0:
+            self.root = None
             self.active_node_id = None
-            return
-        self.set_active_node(TREE.node_ids[-1])
+            self.qt_canvas.update_widget_connections([])
 
 
 WorkflowTreeEditManager = SingletonFactory(_WorkflowTreeEditManager)

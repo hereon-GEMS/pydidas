@@ -24,13 +24,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowEditFrame']
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 
 from pydidas.gui.workflow_tree_edit_manager import WorkflowTreeEditManager
 from pydidas.widgets import BaseFrame
 from pydidas.gui.builders.workflow_edit_frame_builder import (
     create_workflow_edit_frame_widgets_and_layout)
 from pydidas.workflow_tree import WorkflowTree
+from pydidas.workflow_tree.tree_io import WorkflowTreeIoMeta
 
 TREE = WorkflowTree()
 WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
@@ -48,6 +49,8 @@ class WorkflowEditFrame(BaseFrame):
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(
             self._widgets['workflow_canvas'])
+        self._widgets['but_save'].clicked.connect(self.save_tree_to_file)
+        self._widgets['but_load'].clicked.connect(self.load_tree_from_file)
 
     @QtCore.pyqtSlot(str)
     def workflow_add_plugin(self, name):
@@ -57,6 +60,23 @@ class WorkflowEditFrame(BaseFrame):
     def configure_plugin(self, node_id):
         plugin = TREE.nodes[node_id].plugin
         self._widgets['plugin_edit_canvas'].configure_plugin(node_id, plugin)
+
+    def save_tree_to_file(self):
+        _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
+        _func = QtWidgets.QFileDialog.getSaveFileName
+        fname = _func(self, 'Name of file', None, _file_selection)[0]
+        if fname in ['', None]:
+            return
+        TREE.export_tree_to_file(fname)
+
+    def load_tree_from_file(self):
+        _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
+        _func = QtWidgets.QFileDialog.getOpenFileName
+        fname = _func(self, 'Name of file', None, _file_selection)[0]
+        if fname in ['', None]:
+            return
+        TREE.import_tree_from_file(fname)
+        WORKFLOW_EDIT_MANAGER.update_from_tree()
 
 
 if __name__ == '__main__':

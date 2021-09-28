@@ -28,7 +28,7 @@ import numpy as np
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
-from ...config import BINARY_EXTENSIONS
+from ...constants import BINARY_EXTENSIONS
 
 
 class RawReader(ImageReader):

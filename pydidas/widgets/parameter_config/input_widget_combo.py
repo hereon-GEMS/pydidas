@@ -27,7 +27,8 @@ __all__ = ['InputWidget']
 
 from PyQt5 import QtWidgets, QtCore
 from .input_widget import InputWidget
-
+from ...utils import (convert_unicode_to_ascii,
+                      convert_special_chars_to_unicode)
 
 class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
     """
@@ -59,7 +60,7 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         """
         super().__init__(parent, param, width)
         for choice in param.choices:
-            self.addItem(f'{choice}')
+            self.addItem(f'{convert_special_chars_to_unicode(str(choice))}')
         self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
         self.set_value(param.value)
@@ -99,7 +100,7 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         -------
         None.
         """
-        _curValue = self.currentText()
+        _curValue = convert_unicode_to_ascii(self.currentText())
         if _curValue != self._oldValue:
             self._oldValue = _curValue
             self.io_edited.emit(_curValue)
@@ -114,7 +115,7 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
             The text converted to the required datatype (int, float, path)
             to update the Parameter value.
         """
-        text = self.currentText()
+        text = convert_unicode_to_ascii(self.currentText())
         return self.get_value_from_text(text)
 
     def set_value(self, value):
@@ -129,4 +130,5 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         """
         value = self.__convert_bool(value)
         self._oldValue = value
-        self.setCurrentIndex(self.findText(f'{value}'))
+        _txt_repr = convert_special_chars_to_unicode(str(value))
+        self.setCurrentIndex(self.findText(_txt_repr))

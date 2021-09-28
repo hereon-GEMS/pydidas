@@ -29,7 +29,7 @@ from functools import partial
 from PyQt5 import QtWidgets, Qt, QtGui, QtCore
 
 from ...plugins import PluginCollection
-from ...config import STYLES
+from ...constants import QT_STYLES
 from ..read_only_text_widget import ReadOnlyTextWidget
 
 PLUGIN_COLLECTION = PluginCollection()
@@ -141,7 +141,7 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
         self.setSelectionMode(Qt.QAbstractItemView.SingleSelection)
-        self.header().setStyleSheet(STYLES['title'])
+        self.header().setStyleSheet(QT_STYLES['title'])
         _root, _model = self.__create_tree_model()
         self.setModel(_model)
         self.expandAll()

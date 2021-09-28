@@ -31,7 +31,7 @@ from PyQt5 import  QtWidgets
 from pydidas._exceptions import WidgetLayoutError
 from pydidas.widgets.create_widgets_mixin import (
     CreateWidgetsMixIn, _get_widget_layout_args, _get_grid_pos)
-from pydidas.config import DEFAULT_ALIGNMENT
+
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
 

@@ -45,7 +45,7 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.params['int_rad_unit'].choices = [
-            'Q / nm^-1', '2\u03b8 / deg', 'r / mm']
+            'Q / nm^-1', '2theta / deg', 'r / mm']
         del self.params['int_azi_npoint']
 
     def execute(self, data, **kwargs):
@@ -65,9 +65,9 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
             mask=self._mask, polarization_factor=1)
-
         _label, _unit = self.params['int_rad_unit'].value.split('/')
-        _label = _label.replace('\u03b8', 'theta').strip()
+        _label = _label.strip()
         _unit = _unit.strip()
-        _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
+        _dataset = Dataset(_newdata[1], axis_labels=[_label],
+                           axis_units=[_unit], axis_scales=[_newdata[0]])
         return _dataset, kwargs

@@ -28,7 +28,7 @@ from numbers import Integral, Real
 from PyQt5 import QtCore
 
 from .generic_parameters import get_generic_parameter
-from ..config import QSETTINGS_GLOBAL_KEYS
+from ..constants import QSETTINGS_GLOBAL_KEYS
 
 
 settings = QtCore.QSettings('Hereon', 'pydidas')

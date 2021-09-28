@@ -30,7 +30,7 @@ from PyQt5 import QtWidgets
 
 from pydidas.widgets import BaseFrame
 from pydidas.image_io import ImageReaderCollection, read_image
-from pydidas.config import HDF5_EXTENSIONS
+from pydidas.constants import HDF5_EXTENSIONS
 from pydidas.gui.builders.data_browsing_frame_builder import (
     create_data_browsing_frame_widgets_and_layout)
 

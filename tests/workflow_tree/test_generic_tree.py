@@ -23,12 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
-import random
-
-import numpy as np
 
 from pydidas.workflow_tree import GenericTree, GenericNode
-from pydidas.config import gui_constants
+
 
 class TestGenericTree(unittest.TestCase):
 

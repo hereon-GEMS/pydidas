@@ -29,7 +29,7 @@ import os
 import yaml
 import pyFAI
 
-from ...config import YAML_EXTENSIONS, LAMBDA_TO_E
+from ...constants import YAML_EXTENSIONS, LAMBDA_TO_E
 
 
 class LoadExperimentSettingsFromFileMixIn:

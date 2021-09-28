@@ -27,7 +27,9 @@ import time
 import string
 import random
 
-from pydidas.utils.str_utils import format_str, get_time_string, get_warning
+from pydidas.utils.str_utils import (
+    format_str, get_time_string, get_warning, convert_special_chars_to_unicode,
+    convert_unicode_to_ascii)
 
 
 class Test_str_utils(unittest.TestCase):
@@ -194,6 +196,40 @@ class Test_str_utils(unittest.TestCase):
         w_parts = w.split('\n')
         for i in range(_newlines):
             self.assertEqual(len(w_parts[i]), 0)
+
+    def test_convert_special_chars_to_unicode__list(self):
+        _list = ['chi test', 'test2', 'another thetastr']
+        _target = ['\u03C7 test', 'test2', 'another thetastr']
+        _new_list = convert_special_chars_to_unicode(_list)
+        self.assertEqual(_target, _new_list)
+
+    def test_convert_special_chars_to_unicode__nested_list(self):
+        _list = ['chi test', 'test2', ['another thetastr', 'item']]
+        _target = ['\u03C7 test', 'test2', ['another thetastr', 'item']]
+        _new_list = convert_special_chars_to_unicode(_list)
+        self.assertEqual(_target, _new_list)
+
+    def test_convert_special_chars_to_unicode__str(self):
+        _str = 'chi test test2 Another thetastr^-1'
+        _target = '\u03C7 test test2 Another thetastr\u207b\u00B9'
+        _new_str = convert_special_chars_to_unicode(_str)
+        self.assertEqual(_target, _new_str)
+
+    def test_convert_special_chars_to_unicode__int(self):
+        with self.assertRaises(TypeError):
+            convert_special_chars_to_unicode(12)
+
+    def test_convert_unicode_to_ascii__list(self):
+        _list = ['\u03C7 test', 'test2', 'another thetastr']
+        _target = ['chi test', 'test2', 'another thetastr']
+        _new_list = convert_unicode_to_ascii(_list)
+        self.assertEqual(_target, _new_list)
+
+    def test_convert_unicode_to_ascii__str(self):
+        _str = '\u03C7 test test2 Another thetastr\u207b\u00B9'
+        _target = 'chi test test2 Another thetastr^-1'
+        _new_str = convert_unicode_to_ascii(_str)
+        self.assertEqual(_new_str, _target)
 
 
 if __name__ == "__main__":

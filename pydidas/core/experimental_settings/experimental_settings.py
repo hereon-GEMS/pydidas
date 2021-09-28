@@ -27,7 +27,7 @@ __all__ = ['ExperimentalSettings']
 
 import pyFAI
 
-from ...config import LAMBDA_TO_E
+from ...constants import LAMBDA_TO_E
 from ..singleton_factory import SingletonFactory
 from ..parameter_collection import ParameterCollection
 from ..generic_parameters import get_generic_parameter

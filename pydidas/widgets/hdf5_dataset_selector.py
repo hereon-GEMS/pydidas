@@ -35,7 +35,7 @@ from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 from .._exceptions import FrameConfigError
 from ..utils import get_hdf5_populated_dataset_keys
 from .create_widgets_mixin import CreateWidgetsMixIn
-from ..config import COMBO_BOX_SIZE_POLICY
+from ..constants import QT_COMBO_BOX_SIZE_POLICY
 
 DEFAULT_FILTERS = {'/entry/instrument/detector/detectorSpecific/':
                    '"detectorSpecific"\nkeys (Eiger detector)'}
@@ -126,7 +126,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
                              gridPos=(_row_offset, 4, 1, 1))
         self.create_combo_box(
             'select_dataset', minimumContentsLength=25,
-            sizeAdjustPolicy=COMBO_BOX_SIZE_POLICY,
+            sizeAdjustPolicy=QT_COMBO_BOX_SIZE_POLICY,
             gridPos=(1 + _row_offset, 1, 1, 4))
         self.add_any_widget('frame_browser', HorizontalSliderWithBrowser(),
                             gridPos=(2 + _row_offset, 0, 1, 5))

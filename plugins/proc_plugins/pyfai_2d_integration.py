@@ -76,8 +76,10 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             azimuth_range=self.get_azimuthal_range_in_deg())
 
         _label, _unit = self.params['int_rad_unit'].value.split('/')
-        _label = _label.replace('\u03b8', 'theta').strip()
+        _label = _label.strip()
         _unit = _unit.strip()
-        _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
 
+        _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
+        _dataset = Dataset(_newdata[1], axis_labels=[_label],
+                           axis_units=[_unit], axis_scales=[_newdata[0]])
         return _dataset, kwargs

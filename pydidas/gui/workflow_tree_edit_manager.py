@@ -30,7 +30,7 @@ from functools import partial
 from PyQt5 import QtCore
 import numpy as np
 
-from pydidas.config import gui_constants
+from pydidas.constants import gui_constants
 from pydidas.core import SingletonFactory
 from pydidas.plugins import PluginCollection
 from pydidas.workflow_tree import WorkflowTree, PluginPositionNode

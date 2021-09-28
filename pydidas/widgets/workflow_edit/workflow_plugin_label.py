@@ -26,7 +26,7 @@ __all__ = ['WorkflowPluginLabel']
 
 from PyQt5 import QtWidgets, QtCore
 
-from pydidas.config import gui_constants, qt_presets
+from pydidas.constants import gui_constants, qt_presets
 
 
 class WorkflowPluginLabel(QtWidgets.QLabel):
@@ -72,7 +72,7 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
         self.qtw_del_button.setIcon(self.style().standardIcon(40))
         self.qtw_del_button.setGeometry(self.widget_width - 20, 2, 18, 18)
         for item in [self, self.qtw_del_button]:
-            item.setStyleSheet(qt_presets.STYLES['workflow_plugin_inactive'])
+            item.setStyleSheet(qt_presets.QT_STYLES['workflow_plugin_inactive'])
         self.qtw_del_button.clicked.connect(self.delete)
 
     def mousePressEvent(self, event):
@@ -106,8 +106,8 @@ class WorkflowPluginLabel(QtWidgets.QLabel):
             (False).
         """
         if selection:
-            _style = qt_presets.STYLES['workflow_plugin_active']
+            _style = qt_presets.QT_STYLES['workflow_plugin_active']
         else:
-            _style= qt_presets.STYLES['workflow_plugin_inactive']
+            _style= qt_presets.QT_STYLES['workflow_plugin_inactive']
         self.setStyleSheet(_style)
         self.active = selection

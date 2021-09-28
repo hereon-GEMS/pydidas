@@ -27,7 +27,7 @@ from functools import partial
 
 from PyQt5 import QtCore, QtWidgets
 
-from pydidas.config.qt_presets import STYLES
+from pydidas.constants import QT_STYLES
 
 class _Metadata(QtCore.QObject):
     """Metadata class to connect signals between different widgets."""

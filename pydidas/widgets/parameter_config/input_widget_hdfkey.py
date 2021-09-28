@@ -25,7 +25,7 @@ __all__ = ['InputWidgetHdfKey']
 from PyQt5 import QtWidgets, QtCore
 from .input_widget_with_button import InputWidgetWithButton
 from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
-from pydidas.config import HDF5_EXTENSIONS
+from pydidas.constants import HDF5_EXTENSIONS
 
 class InputWidgetHdfKey(InputWidgetWithButton):
     """

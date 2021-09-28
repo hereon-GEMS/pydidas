@@ -28,7 +28,7 @@ __all__ = ['YamlWorkflowTreeIo']
 
 import yaml
 
-from pydidas.config import YAML_EXTENSIONS
+from pydidas.constants import YAML_EXTENSIONS
 from .workflow_tree_io_base import WorkflowTreeIoBase
 
 

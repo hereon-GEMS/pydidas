@@ -27,7 +27,7 @@ import pathlib
 
 from PyQt5 import QtWidgets, QtCore
 from .input_widget_with_button import InputWidgetWithButton
-from ...config import HDF5_EXTENSIONS
+from ...constants import HDF5_EXTENSIONS
 
 class InputWidgetFile(InputWidgetWithButton):
     """

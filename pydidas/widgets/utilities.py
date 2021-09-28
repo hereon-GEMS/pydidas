@@ -34,7 +34,7 @@ from PyQt5 import QtWidgets, QtCore
 import qtawesome
 
 from .dialogues import ErrorMessageBox
-from ..config import STANDARD_FONT_SIZE
+from ..constants import STANDARD_FONT_SIZE
 
 def deleteItemsOfLayout(layout):
     """

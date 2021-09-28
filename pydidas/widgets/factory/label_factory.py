@@ -26,7 +26,7 @@ __all__ = ['create_label']
 from PyQt5.QtWidgets import QLabel, QApplication
 
 from ..utilities import apply_widget_properties, apply_font_properties
-from ...config import STANDARD_FONT_SIZE
+from ...constants import STANDARD_FONT_SIZE
 
 
 def create_label(text, **kwargs):

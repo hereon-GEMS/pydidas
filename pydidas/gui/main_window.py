@@ -35,7 +35,7 @@ from pydidas.widgets import CentralWidgetStack, GetInfoWidget
 from pydidas.core import get_generic_parameter
 from pydidas._exceptions import FrameConfigError
 from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
-from pydidas.config import QSETTINGS_GLOBAL_KEYS
+from pydidas.constants import QSETTINGS_GLOBAL_KEYS
 from pydidas.workflow_tree import WorkflowTree
 
 TREE = WorkflowTree()
@@ -263,6 +263,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         for window in self.windows:
+            self.windows[window].deleteLater()
             self.windows[window].close()
         event.accept()
 

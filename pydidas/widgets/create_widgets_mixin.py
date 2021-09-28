@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 from .factory import (create_spin_box, create_progress_bar, create_check_box,
                       create_label, create_line, create_spacer, create_button,
                       create_combo_box)
-from ..config import DEFAULT_ALIGNMENT
+from ..constants import QT_DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
 from ..utils import copy_docstring
 from .utilities import apply_widget_properties

@@ -31,7 +31,7 @@ from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.geometry import Geometry
 
-from ..config import YAML_EXTENSIONS
+from ..constants import YAML_EXTENSIONS
 from ..core import ParameterCollectionMixIn
 from ..core.experimental_settings import ExperimentalSettings
 

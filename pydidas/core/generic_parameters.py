@@ -31,7 +31,7 @@ import numpy as np
 from .parameter import Parameter
 from .hdf_key import HdfKey
 from .parameter_collection import ParameterCollection
-from ..config.generic_parameter_tooltips import TOOLTIPS
+from ..constants.generic_parameter_tooltips import TOOLTIPS
 
 GENERIC_PARAMS = ParameterCollection(
     ###################################
@@ -226,9 +226,9 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('int_rad_npoint', int, 1000,
               name='Num points radial integration',
               tooltip=TOOLTIPS['int_rad_npoint']),
-    Parameter('int_rad_unit', str, '2\u03b8 / deg',
-              choices=['Q / nm^-1', 'Q / \u212b^-1', '2\u03b8 / deg',
-                       '2\u03b8 / rad'], name='Radial unit',
+    Parameter('int_rad_unit', str, '2theta / deg',
+              choices=['Q / nm^-1', 'Q / A^-1', '2theta / deg',
+                       '2theta / rad'], name='Radial unit',
               tooltip=TOOLTIPS['int_rad_unit']),
     Parameter('int_rad_use_range', int, 0, choices=[True, False],
               name='Use radial range', tooltip=TOOLTIPS['int_rad_use_range']),
@@ -241,8 +241,8 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('int_azi_npoint', int, 1000,
               name='Num points azimuthal integration',
               tooltip=TOOLTIPS['int_azi_npoint']),
-    Parameter('int_azi_unit', str, '\u03c7 / deg',
-              choices=['\u03c7 / deg', '\u03c7 / rad'], name='Azimuthal unit',
+    Parameter('int_azi_unit', str, 'chi / deg',
+              choices=['chi / deg', 'chi / rad'], name='Azimuthal unit',
               tooltip=TOOLTIPS['int_azi_unit']),
     Parameter('int_azi_use_range', int, 0, choices=[True, False],
               name='Use azimuthal range',

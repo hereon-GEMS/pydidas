@@ -35,12 +35,27 @@ from .input_widget_line import InputWidgetLine
 from .input_widget_hdfkey import InputWidgetHdfKey
 
 from ..utilities import excepthook, apply_widget_properties
-from ...config import STANDARD_FONT_SIZE
 from ...core import HdfKey, ParameterCollection
 from ..._exceptions import WidgetLayoutError
+from ...utils import convert_special_chars_to_unicode
 
 
 def param_widget_factory(param, widget_width):
+    """
+    Create a widget based on the type of Parameter input.
+
+    Parameters
+    ----------
+    param : pydidas.core.Parameter
+        The Parameter requiring an I/O widget.
+    widget_width : int
+        The width of the corresponding widget
+
+    Returns
+    -------
+    pydidas.widgets.parameter_config.ParameterConfigWidget
+        The configuration widget.
+    """
     if param.choices:
         _widget = InputWidgetCombo(None, param, widget_width)
     else:
@@ -55,7 +70,22 @@ def param_widget_factory(param, widget_width):
 
 
 def text_widget_factory(param, widget_width):#, alignment):
-    _txt = QtWidgets.QLabel(f'{param.name}:')
+    """
+    Create the text widget to label the Parameter input.
+
+    Parameters
+    ----------
+    param : pydidas.core.Parameter
+        The Parameter requiring an I/O widget.
+    widget_width : int
+        The width of the corresponding widget
+
+    Returns
+    -------
+    QtWidgets.QLabel
+        The QLabel with the Parameter name
+    """
+    _txt = QtWidgets.QLabel(f'{convert_special_chars_to_unicode(param.name)}:')
     _txt.setFixedWidth(widget_width)
     _txt.setFixedHeight(20)
     _txt.setToolTip(param.tooltip)

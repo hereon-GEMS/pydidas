@@ -12,9 +12,7 @@ import qtawesome as qta
 import pydidas
 WORKFLOW_EDIT_MANAGER = pydidas.gui.WorkflowTreeEditManager()
 PLUGIN_COLLECTION = pydidas.plugins.PluginCollection()
-STYLES = pydidas.config.STYLES
-PALETTES = pydidas.config.PALETTES
-STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
+STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
 
 from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame,
@@ -69,16 +67,13 @@ class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
                           gridPos=(0, 0, 1, 5))
 
 
-if __name__ == '__main__':
-
-    app = QtWidgets.QApplication(sys.argv)
+def run_gui(app):
     from pydidas.gui.main_window import MainWindow
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
     sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-
     _font = app.font()
     _font.setPointSize(STANDARD_FONT_SIZE)
     app.setFont(_font)
@@ -105,4 +100,11 @@ if __name__ == '__main__':
     for widget in CENTRAL_WIDGET_STACK.widgets:
         widget.deleteLater()
     CENTRAL_WIDGET_STACK.deleteLater()
+    gui.deleteLater()
+
+
+if __name__ == '__main__':
+
+    app = QtWidgets.QApplication(sys.argv)
+    run_gui(app)
     app.deleteLater()

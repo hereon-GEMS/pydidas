@@ -28,7 +28,7 @@ import fabio
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
-from ...config import FABIO_EXTENSIONS
+from ...constants import FABIO_EXTENSIONS
 
 
 class FabioReader(ImageReader):

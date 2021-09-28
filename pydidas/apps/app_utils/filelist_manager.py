@@ -32,7 +32,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.config import FILENAME_DELIMITERS
+from pydidas.constants import FILENAME_DELIMITERS
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (ObjectWithParameterCollection,
                           ParameterCollection, get_generic_parameter)

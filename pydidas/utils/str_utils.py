@@ -23,13 +23,15 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
+__all__ = ['format_str', 'get_time_string', 'get_short_time_string',
+           'timed_print', 'get_warning', 'convert_unicode_to_ascii',
+           'convert_special_chars_to_unicode']
 
 import time
 from numbers import Real
 import numpy as np
 
-__all__ = ['format_str', 'get_time_string', 'get_short_time_string',
-           'timed_print', 'get_warning']
+from ..constants import GREEK_ASCII_TO_UNI, GREEK_UNI_TO_ASCII
 
 
 def format_str(obj, length, fill_back=True, fill_char='.', formatter='{:.3f}',
@@ -220,3 +222,67 @@ def get_warning(string, severe=False, new_lines=0, print_warning=True,
     if get_warning:
         return _s
     return None
+
+
+def convert_special_chars_to_unicode(obj):
+    """
+    Convert a selection of special characters to unicode.
+
+    This method will convert Greek letters, Angstrom and ^-1 to unicode.
+
+    Parameters
+    ----------
+    obj : Union[str, list]
+        The input string or list of strings.
+
+    Returns
+    -------
+    Union[str, list]
+        The updated string or list.
+    """
+    if isinstance(obj, list):
+        new_obj = [convert_special_chars_to_unicode(entry) for entry in obj]
+        return new_obj
+    if isinstance(obj, str):
+        _parts = obj.split()
+        for _index, _part in enumerate(_parts):
+            if _part in GREEK_ASCII_TO_UNI.keys():
+                _parts[_index] = GREEK_ASCII_TO_UNI[_part]
+        obj = ' '.join(_parts)
+        # insert Angstrom sign (in context of ^-1):
+        obj = obj.replace('A^-1', '\u212b\u207b\u00B9')
+        obj = obj.replace('^-1', '\u207b\u00B9')
+        return obj
+    raise TypeError(f'Cannot process objects of type {type(obj)}')
+
+
+def convert_unicode_to_ascii(obj):
+    """
+    Convert a selection of special unicode characters to ASCII.
+
+    This method will convert Greek letters, Angstrom and ^-1 to ASCII
+    representations.
+
+    Parameters
+    ----------
+    obj : Union[str, list]
+        The input string or list of strings.
+
+    Returns
+    -------
+    Union[str, list]
+        The updated string or list.
+    """
+    if isinstance(obj, list):
+        new_obj = [convert_unicode_to_ascii(entry) for entry in obj]
+        return new_obj
+    if isinstance(obj, str):
+        _parts = obj.split()
+        for _index, _part in enumerate(_parts):
+            if _part in GREEK_UNI_TO_ASCII.keys():
+                _parts[_index] = GREEK_UNI_TO_ASCII[_part]
+        obj = ' '.join(_parts)
+        obj = obj.replace('\u212b', 'A')
+        obj = obj.replace('\u207b\u00B9', '^-1')
+        return obj
+    raise TypeError(f'Cannot process objects of type {type(obj)}')

@@ -65,6 +65,11 @@ class WebView(QtWebEngineWidgets.QWebEngineView):
     def sizeHint(self):
         return QtCore.QSize(900, 600)
 
+    def closeEvent(self, event):
+        _page = self.page()
+        _page.deleteLater()
+        event.accept()
+
 
 class GlobalDocumentationWindow(QtWidgets.QMainWindow):
     """
@@ -79,3 +84,9 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
                                        widget=WebView())
         self.setCentralWidget(self._scroll_area)
         self.setVisible(False)
+
+    def closeEvent(self, event):
+        _webview = self._scroll_area.widget()
+        _webview.deleteLater()
+        self._scroll_area.deleteLater()
+        event.accept()

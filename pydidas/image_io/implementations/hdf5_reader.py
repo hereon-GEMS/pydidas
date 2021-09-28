@@ -29,7 +29,7 @@ from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
 from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
-from ...config import HDF5_EXTENSIONS
+from ...constants import HDF5_EXTENSIONS
 
 class Hdf5Reader(ImageReader):
     """ImageReader implementation for hdf5 files."""

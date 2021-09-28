@@ -27,12 +27,14 @@ import unittest
 import numpy as np
 
 from pydidas.workflow_tree import PluginPositionNode, GenericNode
-from pydidas.config import gui_constants
+from pydidas.constants import gui_constants
+
 
 generic_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
 generic_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
 child_spacing_y = gui_constants.GENERIC_PLUGIN_WIDGET_Y_OFFSET
 child_spacing_x = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
+
 
 class TestPluginPositionNode(unittest.TestCase):
 

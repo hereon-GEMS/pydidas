@@ -76,7 +76,7 @@ if __name__ == '__main__':
     # needs to be initialized after the app has been created.
     # sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
+    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
 
 
 

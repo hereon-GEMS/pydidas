@@ -4,24 +4,24 @@ graphical user interface of the application.
 """
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-PALETTES = {}
-STYLES = {}
+QT_PALETTES = {}
+QT_STYLES = {}
 STANDARD_FONT_SIZE = 10
 
 pal = QtGui.QPalette()
 pal.setColor(QtGui.QPalette.Background ,QtGui.QColor(255, 255, 255))
-PALETTES['clean_bg'] = pal
+QT_PALETTES['clean_bg'] = pal
 
 pal = QtGui.QPalette()
 pal.setColor(QtGui.QPalette.Background, QtGui.QColor(225, 225, 225))
-PALETTES['workflow_plugin_widget'] = pal
+QT_PALETTES['workflow_plugin_widget'] = pal
 
 pal = QtGui.QPalette()
 pal.setColor(QtGui.QPalette.Background, QtGui.QColor(225, 225, 255))
-PALETTES['workflow_plugin_widget_active'] = pal
+QT_PALETTES['workflow_plugin_widget_active'] = pal
 del pal
 
-STYLES['workflow_plugin_active'] = """
+QT_STYLES['workflow_plugin_active'] = """
     QLabel{
         font-size: 12px;
         font: bold;
@@ -34,7 +34,7 @@ STYLES['workflow_plugin_active'] = """
         margin-bottom: 2px;
     }
     """
-STYLES['workflow_plugin_inactive'] = """
+QT_STYLES['workflow_plugin_inactive'] = """
     QPushButton{
         font-size: 11px;
         color: rgb(65, 65, 65);
@@ -53,13 +53,13 @@ STYLES['workflow_plugin_inactive'] = """
     }
     """
 
-STYLES['title'] = """QWidget {font: bold; font-size: 14pt}"""
-STYLES['subtitle'] = """QWidget {font: bold; font-size: 11pt}"""
-STYLES['workflow_plugin_del_button'] = "QPushButton{font-size: 10px; color: rgb(65, 65, 65);}"
-STYLES['workflow_plugin_title'] = "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}"
+QT_STYLES['title'] = """QWidget {font: bold; font-size: 14pt}"""
+QT_STYLES['subtitle'] = """QWidget {font: bold; font-size: 11pt}"""
+QT_STYLES['workflow_plugin_del_button'] = "QPushButton{font-size: 10px; color: rgb(65, 65, 65);}"
+QT_STYLES['workflow_plugin_title'] = "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}"
 
 #DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
-DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
+QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
-COMBO_BOX_SIZE_POLICY = (
+QT_COMBO_BOX_SIZE_POLICY = (
     QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)

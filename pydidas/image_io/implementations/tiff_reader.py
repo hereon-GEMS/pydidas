@@ -28,7 +28,7 @@ from skimage.io import imread
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
-from ...config import TIFF_EXTENSIONS
+from ...constants import TIFF_EXTENSIONS
 
 
 class TiffReader(ImageReader):

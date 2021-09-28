@@ -29,7 +29,7 @@ import os
 import pathlib
 import h5py
 import hdf5plugin
-from ..config import HDF5_EXTENSIONS
+from ..constants import HDF5_EXTENSIONS
 
 
 def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,

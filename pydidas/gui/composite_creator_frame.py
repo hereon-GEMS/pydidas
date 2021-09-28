@@ -38,7 +38,7 @@ from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollectionMixIn, Parameter,
                           get_generic_parameter)
-from pydidas.config import HDF5_EXTENSIONS
+from pydidas.constants import HDF5_EXTENSIONS
 from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
 from pydidas.utils import (get_hdf5_populated_dataset_keys, get_time_string,
                            pydidas_logger)
@@ -90,8 +90,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                 self.add_param(get_generic_parameter('raw_image_shape'))
                 self.add_param(get_generic_parameter('images_per_file'))
                 self.add_param(
-                    Parameter('Total number of images', int,
-                              default=0, refkey='n_total',
+                    Parameter('n_total', int, 0,
+                              name='Total number of images',
                               tooltip=('The total number of images.')))
 
     def connect_signals(self):
@@ -611,7 +611,7 @@ if __name__ == '__main__':
     # needs to be initialized after the app has been created.
     # sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
+    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
 
     _font = app.font()
     _font.setPointSize(STANDARD_FONT_SIZE)

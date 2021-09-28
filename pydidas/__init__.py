@@ -1,8 +1,13 @@
-from PyQt5 import QtWebEngineWidgets
+# import QtWebEngineWidgets first before creating any QApplication because
+# of problem with binding (cannot import engine after application has been
+# created)
+from PyQt5 import QtCore, QtWebEngineWidgets
 
 from . import workflow_tree
 
 from . import plugins
+
+from . import constants 
 
 from . import widgets
 

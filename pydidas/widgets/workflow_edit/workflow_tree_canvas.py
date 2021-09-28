@@ -25,7 +25,7 @@ __all__ = ['WorkflowTreeCanvas']
 
 from PyQt5 import QtWidgets, QtGui
 
-from ...config import STYLES
+from ...constants import QT_STYLES
 
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
@@ -45,7 +45,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         """
         super().__init__(parent=parent)
         self.title = QtWidgets.QLabel(self)
-        self.title.setStyleSheet(STYLES['title'])
+        self.title.setStyleSheet(QT_STYLES['title'])
         self.title.setText('Workflow tree')
         self.title.move(10, 10)
         self.painter =  QtGui.QPainter()

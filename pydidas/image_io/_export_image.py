@@ -33,7 +33,7 @@ import numpy as np
 import skimage.io
 import matplotlib.pyplot as plt
 
-from pydidas.config import (
+from pydidas.constants import (
     HDF5_EXTENSIONS, NUMPY_EXTENSIONS, BINARY_EXTENSIONS, TIFF_EXTENSIONS,
     JPG_EXTENSIONS)
 

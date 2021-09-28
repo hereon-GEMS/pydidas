@@ -27,7 +27,7 @@ import numbers
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from .input_widget import InputWidget
-from ...config import PARAM_INPUT_WIDGET_HEIGHT
+from ...constants import PARAM_INPUT_WIDGET_HEIGHT
 
 class InputWidgetLine(QtWidgets.QLineEdit, InputWidget):
     """Widgets for I/O during plugin parameter editing without choices."""

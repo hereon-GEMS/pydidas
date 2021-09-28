@@ -26,7 +26,7 @@ __all__ = ['PluginPositionNode']
 import numpy as np
 
 from .generic_node import GenericNode
-from ..config import gui_constants
+from ..constants import gui_constants
 
 class PluginPositionNode(GenericNode):
     """

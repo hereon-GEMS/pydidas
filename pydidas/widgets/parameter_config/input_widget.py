@@ -29,7 +29,7 @@ import pathlib
 from PyQt5 import QtWidgets
 
 from ...core import HdfKey
-from ...config import PARAM_INPUT_WIDGET_HEIGHT
+from ...constants import PARAM_INPUT_WIDGET_HEIGHT
 
 class InputWidget(QtWidgets.QWidget):
     """Base class of widgets for I/O during plugin parameter editing."""

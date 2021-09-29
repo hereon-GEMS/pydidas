@@ -231,37 +231,37 @@ class TestBasePlugins(unittest.TestCase):
         _newrange = plugin.get_radial_range()
         self.assertEqual(_range, _newrange)
 
-    def testget_new_shape__2d_data(self):
+    def testget_result_shape__2d_data(self):
         _range = (1234, 789)
         plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
                                       int_azi_npoint=_range[1])
         plugin.output_data_dim = 2
-        _newrange = plugin.get_new_shape()
+        _newrange = plugin.get_result_shape()
         self.assertEqual(_range, _newrange)
 
-    def testget_new_shape__1d_data_but_both_ranges_set(self):
+    def testget_result_shape__1d_data_but_both_ranges_set(self):
         _range = (1234, 789)
         plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
                                       int_azi_npoint=_range[1])
         plugin.output_data_dim = 1
         with self.assertRaises(ValueError):
-            plugin.get_new_shape()
+            plugin.get_result_shape()
 
-    def testget_new_shape__1d_data_azi(self):
+    def testget_result_shape__1d_data_azi(self):
         _range = 1234
         plugin = pyFAIintegrationBase(int_rad_npoint=1,
                                       int_azi_npoint=_range)
         plugin.output_data_dim = 1
-        _shape = plugin.get_new_shape()
-        self.assertEqual(_range, _shape)
+        _shape = plugin.get_result_shape()
+        self.assertEqual((_range,), _shape)
 
-    def testget_new_shape__1d_data_rad(self):
+    def testget_result_shape__1d_data_rad(self):
         _range = 1234
         plugin = pyFAIintegrationBase(int_rad_npoint=_range,
                                       int_azi_npoint=1)
         plugin.output_data_dim = 1
-        _shape = plugin.get_new_shape()
-        self.assertEqual(_range, _shape)
+        _shape = plugin.get_result_shape()
+        self.assertEqual((_range,), _shape)
 
     def test_load_and_store_mask__local_mask_value(self):
         _maskfilename, _mask = self.create_mask()

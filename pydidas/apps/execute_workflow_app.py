@@ -102,6 +102,7 @@ class ExecuteWorkflowApp(BaseApp):
         Create a CompositeCreatorApp instance.
         """
         super().__init__(*args, **kwargs)
+        self._config['result_shapes'] = []
 
     def multiprocessing_pre_run(self):
         """
@@ -113,9 +114,29 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Prepare running the workflow execution.
         """
+        self.__check_and_store_results_shapes()
+
+    def __check_and_store_results_shapes(self):
         _leaves = TREE.get_all_leaves()
+        if len(self._config['result_shapes']) == len(_leaves):
+            return
+        _shapes = []
         for _leaf in _leaves:
-            _shape = _leaf.get_result_shape()
+            _shapes.append(_leaf.get_result_shape())
+        if (-1,) in _shapes:
+            _shapes = self.__run_tree_to_get_results_shapes()
+
+
+
+    def __run_tree_to_get_results_shapes(self):
+        raise Warning('Unknown shape encountered. Will run the full'
+                      ' processing tree once to get shapes.')
+        TREE.execute_process(0)
+        _leaves = TREE.get_all_leaves()
+        _shapes = []
+        for _leaf in _leaves:
+            _shapes.append(_leaves.results.shape)
+        return _shapes
 
     def multiprocessing_get_tasks(self):
         """

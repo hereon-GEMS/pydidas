@@ -44,11 +44,14 @@ class Hdf5singleFileLoader(InputPlugin):
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
-        Parameter('filename', Path, Path(), tooltip='The file name.',
-                  name='Filename'),
+        get_generic_parameter('filename'),
         get_generic_parameter('hdf5_key'))
     input_data_dim = None
     output_data_dim = 2
+
+    def __init__(self):
+        super().__init__()
+
 
     def execute(self, index, **kwargs):
         fname = self.get_param_value('filename')
@@ -56,3 +59,15 @@ class Hdf5singleFileLoader(InputPlugin):
         kwargs['frame'] = index
         _data = read_image(fname, **kwargs)
         return _data, kwargs
+
+    def get_result_shape(self):
+        """
+        Get the shape of the loaded file.
+
+        Returns
+        -------
+        tuple
+            The tuple with the image dimensions.
+        """
+        image, kwargs = self.execute(0)
+        return image.shape

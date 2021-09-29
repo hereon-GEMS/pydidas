@@ -120,3 +120,15 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs['frame'] = _hdf_index
         _data = read_image(_fname, **kwargs)
         return _data, kwargs
+
+    def get_result_shape(self):
+        """
+        Get the shape of the loaded file.
+
+        Returns
+        -------
+        tuple
+            The tuple with the image dimensions.
+        """
+        image, kwargs = self.execute(0)
+        return image.shape

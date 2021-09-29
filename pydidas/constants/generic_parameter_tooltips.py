@@ -2,6 +2,7 @@ TOOLTIPS = {
     'live_processing': ('Set live processing to True if the files do not yet '
                         'exist at process startup. This will skip checks on'
                         'file existence and size.'),
+    'filename': 'The file name of the input file.',
     'first_file': ('The name of the first file for a file series or of the '
                    'hdf5 file in case of hdf5 file input.'),
     'last_file': ('Used only for file series: The name of the last file '

@@ -46,12 +46,12 @@ logger.setLevel(logging.WARNING)
 EXP_SETTINGS = ExperimentalSettings()
 
 pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
-               'Q / \u212b^-1': 'q_A^-1',
-               '2\u03b8 / deg': '2th_deg',
-               '2\u03b8 / rad': '2th_rad',
+               'Q / A^-1': 'q_A^-1',
+               '2theta / deg': '2th_deg',
+               '2theta / rad': '2th_rad',
                'r / mm': 'r_mm',
-               '\u03c7 / deg': 'chi_deg',
-               '\u03c7 / rad': 'chi_rad'}
+               'chi / deg': 'chi_deg',
+               'chi / rad': 'chi_rad'}
 
 pyFAI_METHOD = {'CSR': 'csr',
                 'CSR OpenCL': 'csr_ocl',
@@ -129,7 +129,7 @@ class pyFAIintegrationBase(ProcPlugin):
         else:
             self._mask = None
 
-    def get_new_shape(self):
+    def get_result_shape(self):
         """
         Get the shape of the integrated dataset to set up the CRS / LUT.
 
@@ -145,10 +145,10 @@ class pyFAIintegrationBase(ProcPlugin):
                     self.get_param_value('int_azi_npoint'))
         if (self.get_param_value('int_rad_npoint') == 1 and
                 self.get_param_value('int_azi_npoint') > 1):
-            return self.get_param_value('int_azi_npoint')
+            return (self.get_param_value('int_azi_npoint'), )
         if (self.get_param_value('int_rad_npoint') > 1 and
                 self.get_param_value('int_azi_npoint') == 1):
-            return self.get_param_value('int_rad_npoint')
+            return (self.get_param_value('int_rad_npoint'), )
         raise ValueError('Could not determine the new shape from the defined'
                          ' number of points')
 

@@ -35,7 +35,7 @@ from pydidas.image_io import read_image
 
 
 DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('first_file'),
+    get_generic_parameter('filename'),
     get_generic_parameter('hdf5_key'),
     get_generic_parameter('hdf5_first_image_num'),
     get_generic_parameter('hdf5_last_image_num'),
@@ -59,7 +59,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
     Parameters
     ----------
-    first_file : pathlib.Path
+    filename : pathlib.Path
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
     hdf5_key : HdfKey, optional
@@ -162,8 +162,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Update the image metadata from new input.
         """
-        _first_file = self.get_param_value('first_file')
-        if os.path.splitext(_first_file)[1] in HDF5_EXTENSIONS:
+        _filename = self.get_param_value('filename')
+        if os.path.splitext(_filename)[1] in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
             self._store_image_data_from_single_image()
@@ -183,10 +183,10 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         AppConfigError
             If the selected image range is not included in the hdf5 dataset.
         """
-        _first_file = self.get_param_value('first_file')
+        _filename = self.get_param_value('filename')
         _key = self.get_param_value('hdf5_key')
-        check_hdf5_key_exists_in_file(_first_file, _key)
-        _meta = get_hdf5_metadata(_first_file, ['shape', 'dtype'], _key)
+        check_hdf5_key_exists_in_file(_filename, _key)
+        _meta = get_hdf5_metadata(_filename, ['shape', 'dtype'], _key)
         self.__verify_selection_range(_meta['shape'][0])
 
         _n0 = self.get_param_value('hdf5_first_image_num')
@@ -225,7 +225,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from file range.
         """
-        _test_image = read_image(self.get_param_value('first_file'))
+        _test_image = read_image(self.get_param_value('filename'))
         self._config['numbers'] = [0]
         self._config['hdf5_dset_shape'] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)

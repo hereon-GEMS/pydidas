@@ -152,11 +152,33 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         Show the composite image in the Viewwer.
         """
         self._widgets['plot_window'].setVisible(True)
-        _shape = self._image_metadata.final_shape
+        _origin, _scales = self.__get_plot_origin_and_scales()
+        print('Origin / scales:', _origin, _scales)
         self._widgets['plot_window'].addImage(
-            self._app.composite, replace=True,
-            origin=(0.5, 0.5),
-            scale=(1 / _shape[1], 1 / _shape[0]))
+            self._app.composite, replace=True, origin=_origin, scale=_scales)
+
+    def __get_plot_origin_and_scales(self):
+        _scales = self._config.get('plot_scales', None)
+        _origin = self._config.get('plot_origin', None)
+        if _origin is None or _scales is None:
+            _shape = self._image_metadata.final_shape
+            _border = self._app._composite.get_param_value(
+                'mosaic_border_width')
+            print('image shape / border', _shape, _border)
+        if _origin is None:
+            _originx = 1 - 0.5 * _shape[1] / (_shape[1] + _border)
+            _originy = 1 - 0.5 * _shape[0] / (_shape[0] + _border)
+            _origin = (_originx, _originy)
+            self._config['plot_origin'] = _origin
+        if _scales is None:
+            _nx = self._app.get_param_value('composite_nx')
+            _ny = self._app.get_param_value('composite_ny')
+            print('nx / ny:', _nx, _ny)
+            _scalex = _shape[1] + _border * (_nx - 1) / _nx
+            _scaley = _shape[0] + _border * (_ny - 1) / _ny
+            _scales = (1 / _scalex, 1 / _scaley)
+            self._config['plot_scales'] = _scales
+        return _origin, _scales
 
     def setup_initial_state(self):
         """
@@ -181,30 +203,36 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Serial implementation of the execution method.
         """
-        self._image_metadata.update_final_image()
-        self.set_status('Started composite image creation.')
+        self._prepare_app_run()
         self._app.run()
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
         self.set_status('Finished composite image creation.')
 
+    def _prepare_app_run(self):
+        """
+        Do preparations for running the CompositeCreatorApp.
+
+        This methods sets the required attributes both for serial and
+        parallel running of the app.
+        """
+        self._config['plot_scales'] = None
+        self._config['plot_origin'] = None
+        self._image_metadata.update_final_image()
+        self.set_status('Started composite image creation.')
+
     def _run_app(self):
         """
         Parallel implementation of the execution method.
         """
-        logger.debug('Updating image metadata')
-        self._image_metadata.update_final_image()
-        logger.debug('Running app pre-run')
+        self._prepare_app_run()
         self._app.multiprocessing_pre_run()
-        logger.debug('Creating AppRunner')
         self._config['last_update'] = time.time()
-        self.set_status('Started composite image creation.')
         self._widgets['but_exec'].setEnabled(False)
         self._widgets['but_abort'].setVisible(True)
         self._widgets['progress'].setVisible(True)
         self._widgets['progress'].setValue(0)
         self._runner = AppRunner(self._app)
-        logger.debug('Connecting signals')
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
@@ -264,6 +292,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
+        self._image_metadata.set_param_value(
+            'filename', self.get_param_value('first_file'))
         if self.__check_if_hdf5_file():
             self._config['input_configured'] = False
             self.__popup_select_hdf5_key(fname)

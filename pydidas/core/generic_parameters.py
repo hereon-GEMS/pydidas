@@ -42,6 +42,8 @@ GENERIC_PARAMS = ParameterCollection(
     ###################################
     ## Parameters for CompositeCreation
     ###################################
+    Parameter('filename', Path, Path(), name='Filename',
+              tooltip=TOOLTIPS['filename']),
     Parameter('first_file', Path, Path(), name='First file name',
       tooltip=TOOLTIPS['first_file']),
     Parameter('last_file', Path, Path(), name='Last file name',

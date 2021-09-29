@@ -186,7 +186,8 @@ class CompositeCreatorApp(BaseApp):
                                          self.params.get('live_processing'),
                                          self.params.get('file_stepping'))
         self._image_metadata = ImageMetadataManager(
-            self.params.get('first_file'),
+            # todo: verify
+            # self.params.get('first_file'),
             self.params.get('hdf5_key'),
             self.params.get('hdf5_first_image_num'),
             self.params.get('hdf5_last_image_num'),
@@ -199,8 +200,7 @@ class CompositeCreatorApp(BaseApp):
             self.params.get('roi_yhigh'))
         self._config = {'current_fname': None,
                         'current_kwargs': {},
-                        'det_mask_val': None,
-                        }
+                        'det_mask_val': None}
 
     def multiprocessing_pre_run(self):
         """
@@ -239,6 +239,8 @@ class CompositeCreatorApp(BaseApp):
               and assert the image size is the same.
         """
         self._filelist.update()
+        self._image_metadata.set_param_value(
+            'filename', self.get_param_value('first_file'))
         self._image_metadata.update()
         self.__verify_total_number_of_images_in_composite()
         if self.get_param_value('use_bg_file'):

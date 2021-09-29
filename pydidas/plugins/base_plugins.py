@@ -25,7 +25,7 @@ __all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
 
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
-                          get_generic_parameter, Parameter)
+                          get_generic_parameter)
 
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
@@ -63,9 +63,8 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_name = 'Base plugin'
     default_params = ParameterCollection()
     generic_params = ParameterCollection()
-    _is_pydidas_plugin = True
-    input_data = {}
-    output_data = {}
+    input_data_dim = -1
+    output_data_dim = -1
 
     @classmethod
     def get_class_description(cls):
@@ -129,7 +128,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.set_param_value(_kw, kwargs[_kw])
         self._config = {}
 
-    def execute(self, *data, **kwargs):
+    def execute(self, data, **kwargs):
         """
         Execute the processing step.
         """
@@ -137,21 +136,59 @@ class BasePlugin(ObjectWithParameterCollection):
 
     def pre_execute(self):
         """
-        Run code which needs to be run only prior to the execution.
+        Run code which needs to be run only once prior to the execution of
+        multiple frames.
         """
         pass
 
-    @staticmethod
-    def check_if_plugin():
-        return True
+    @property
+    def has_unique_parameter_config_widget(self):
+        """
+        Get the flag whether the Plugin has a unique ParameterConfigWidget
 
-    @staticmethod
-    def has_unique_parameter_config_widget():
+        Returns
+        -------
+        bool
+            The flag value-
+        """
         return False
 
-    def parameter_config_widget(self):
+    def get_parameter_config_widget(self):
+        """
+        Get the unique ParameterConfigWidget associated to this Plugin.
+
+        This method is useful if the configuration widget should have any
+        non-standard items, e.g. sliders or interactive capability.
+
+        Raises
+        ------
+        NotImplementedError
+            This method is not implemented in the BasePlugin and needs to be
+            implemented in the concrete subclass, if required.
+
+        Returns
+        -------
+        QtWidgets.QWidget
+            The unique ParameterConfig widget
+        """
         raise NotImplementedError('Generic plugins do not have a unique'
                                   ' parameter config widget.')
+
+    @property
+    def result_shape(self):
+        """
+        Get the shape of the plugin result.
+
+        Unknown dimensions are represented as -1 value.
+
+        Returns
+        -------
+        tuple
+            The shape of the results.
+        """
+        if self.output_data_dim == -1:
+            return (-1,)
+        return (-1,) * self.output_data_dim
 
 
 class InputPlugin(BasePlugin):
@@ -159,6 +196,7 @@ class InputPlugin(BasePlugin):
     The base plugin class for input plugins.
     """
     plugin_type = INPUT_PLUGIN
+    plugin_name = 'Base input plugin'
     generic_params = BasePlugin.generic_params.get_copy()
     generic_params.add_params(
         get_generic_parameter('use_roi'),
@@ -172,11 +210,15 @@ class InputPlugin(BasePlugin):
         get_generic_parameter('binning'))
     default_params = BasePlugin.default_params.get_copy()
 
+
 class ProcPlugin(BasePlugin):
     """
     The base plugin class for processing plugins.
     """
     plugin_type = PROC_PLUGIN
+    plugin_name = 'Base processing plugin'
+    generic_params = BasePlugin.generic_params.get_copy()
+    default_params = BasePlugin.default_params.get_copy()
 
 
 class OutputPlugin(BasePlugin):
@@ -184,3 +226,6 @@ class OutputPlugin(BasePlugin):
     The base class for output (file saving / plotting) plugins.
     """
     plugin_type = OUTPUT_PLUGIN
+    plugin_name = 'Base output plugin'
+    generic_params = BasePlugin.generic_params.get_copy()
+    default_params = BasePlugin.default_params.get_copy()

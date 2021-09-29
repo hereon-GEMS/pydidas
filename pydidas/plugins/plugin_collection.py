@@ -32,8 +32,8 @@ from PyQt5 import QtCore
 from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..utils import find_valid_python_files
 from .plugin_collection_util_funcs import (
-    get_generic_plugin_path, plugin_type_check, plugin_consistency_check)
-
+    get_generic_plugin_path, plugin_type_check)
+from .base_plugins import BasePlugin
 
 class _PluginCollection(PydidasQsettingsMixin):
     """
@@ -237,8 +237,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
-
-        if not plugin_consistency_check(class_):
+        if not issubclass(class_, BasePlugin) or class_.basic_plugin:
             return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)

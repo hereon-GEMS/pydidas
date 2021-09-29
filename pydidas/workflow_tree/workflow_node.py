@@ -140,3 +140,17 @@ class WorkflowNode(GenericNode):
                                    for p in self.plugin.params.values()]
                     )
         return _rep
+
+    def get_result_shape(self):
+        """
+        Get the shape of the results.
+
+        This method is a wrapper for the associated Plugin's result_shape
+        property.
+
+        Returns
+        -------
+        tuple
+            The shape of the result for every frame.
+        """
+        return self.plugin.result_shape

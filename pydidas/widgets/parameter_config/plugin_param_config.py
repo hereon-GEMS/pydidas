@@ -117,8 +117,8 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         self.create_spacer('spacer', gridPos=(-1, 0, 1, 2))
         self.create_label('params', 'Parameters:', fontsize=12,
                           gridPos=(2, 0, 1, 1))
-        if self.plugin.has_unique_parameter_config_widget():
-            self.layout().add(self.plugin.parameter_config_widget())
+        if self.plugin.has_unique_parameter_config_widget:
+            self.layout().add(self.plugin.get_parameter_config_widget())
         else:
             self.__add_restore_default_button()
             for param in self.plugin.params.values():

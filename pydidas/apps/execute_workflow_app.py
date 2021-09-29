@@ -102,9 +102,6 @@ class ExecuteWorkflowApp(BaseApp):
         Create a CompositeCreatorApp instance.
         """
         super().__init__(*args, **kwargs)
-        self._composite = None
-        self._det_mask = None
-        self._bg_image = None
 
     def multiprocessing_pre_run(self):
         """
@@ -117,7 +114,8 @@ class ExecuteWorkflowApp(BaseApp):
         Prepare running the workflow execution.
         """
         _leaves = TREE.get_all_leaves()
-
+        for _leaf in _leaves:
+            _shape = _leaf.get_result_shape()
 
     def multiprocessing_get_tasks(self):
         """

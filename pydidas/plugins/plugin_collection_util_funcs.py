@@ -23,19 +23,15 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_generic_plugin_path', 'plugin_type_check',
-           'plugin_consistency_check']
+__all__ = ['get_generic_plugin_path', 'plugin_type_check']
 
 
 import os
 
 import pydidas.core as core
+from pydidas.utils import pydidas_logger, LOGGING_LEVEL
 
-
-import logging
-from pydidas.utils import pydidas_logger
-
-logger = pydidas_logger(logging.DEBUG)
+logger = pydidas_logger(LOGGING_LEVEL)
 
 
 def get_generic_plugin_path():
@@ -58,28 +54,13 @@ def get_generic_plugin_path():
 
 def plugin_type_check(cls_item):
     """
-    TO DO
+    Check the type of the Plugin (input, processing, output).
+
+    Returns
+    -------
+    int
+        The integer code for the Plugin type.
     """
     if cls_item.basic_plugin:
         return -1
     return cls_item.plugin_type
-    raise ValueError('Could not determine the plugin type for'
-                     'class "{cls_item.__name__}"')
-
-
-def plugin_consistency_check(cls_item):
-    """
-    Verify that plugins pass a rudimentary sanity check.
-
-    Parameters
-    ----------
-    cls_item : plugin object
-        A plugin class.
-
-    Returns
-    -------
-    bool.
-        Returns True if consistency check succeeded and False otherwise.
-    """
-    return (getattr(cls_item, '_is_pydidas_plugin', False)
-            and not getattr(cls_item, 'basic_plugin', True))

@@ -59,12 +59,12 @@ class TestBasePlugins(unittest.TestCase):
 
     def initialize_base_plugin(self, **kwargs):
         for key, value in [['int_rad_npoint', 900],
-                           ['int_rad_unit', '2\u03b8 / deg'],
+                           ['int_rad_unit', '2theta / deg'],
                            ['int_rad_use_range', False],
                            ['int_rad_range_lower', -1],
                            ['int_rad_range_upper', 1],
                            ['int_azi_npoint', 1],
-                           ['int_azi_unit', '\u03c7 / deg'],
+                           ['int_azi_unit', 'chi / deg'],
                            ['int_azi_use_range', False],
                            ['int_azi_range_lower', -1],
                            ['int_azi_range_upper', 1],
@@ -152,7 +152,7 @@ class TestBasePlugins(unittest.TestCase):
         plugin = pyFAIintegrationBase(int_azi_use_range=True,
                                       int_azi_range_lower=_range[0],
                                       int_azi_range_upper=_range[1],
-                                      int_azi_unit='\u03c7 / deg')
+                                      int_azi_unit='chi / deg')
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertEqual(_range, _newrange)
 
@@ -161,7 +161,7 @@ class TestBasePlugins(unittest.TestCase):
         plugin = pyFAIintegrationBase(int_azi_use_range=True,
                                       int_azi_range_lower=_range[0],
                                       int_azi_range_upper=_range[1],
-                                      int_azi_unit='\u03c7 / rad')
+                                      int_azi_unit='chi / rad')
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertAlmostEqual(_newrange[0], _range[0] * 180 / np.pi)
         self.assertAlmostEqual(_newrange[1], _range[1] * 180 / np.pi)
@@ -176,7 +176,7 @@ class TestBasePlugins(unittest.TestCase):
         plugin = pyFAIintegrationBase(int_azi_use_range=True,
                                       int_azi_range_lower=_range[0],
                                       int_azi_range_upper=_range[1],
-                                      int_azi_unit='\u03c7 / deg')
+                                      int_azi_unit='chi / deg')
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertAlmostEqual(_newrange[0] * 180 / np.pi, _range[0])
         self.assertAlmostEqual(_newrange[1] * 180 / np.pi, _range[1])
@@ -186,7 +186,7 @@ class TestBasePlugins(unittest.TestCase):
         plugin = pyFAIintegrationBase(int_azi_use_range=True,
                                       int_azi_range_lower=_range[0],
                                       int_azi_range_upper=_range[1],
-                                      int_azi_unit='\u03c7 / rad')
+                                      int_azi_unit='chi / rad')
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertEqual(_range, _newrange)
 
@@ -297,38 +297,6 @@ class TestBasePlugins(unittest.TestCase):
         self.assertIsInstance(plugin._ai,
                               pyFAI.azimuthalIntegrator.AzimuthalIntegrator)
 
-
-
-
-
-    # def test_get_class_description_as_dict(self):
-    #     plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)
-    #     _doc = plugin.get_class_description_as_dict()
-    #     self.assertIsInstance(_doc, dict)
-    #     for _key, _value in _doc.items():
-    #         self.assertIsInstance(_key, str)
-    #         self.assertIsInstance(_value, str)
-
-    # def test_init__plain(self):
-    #     plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)
-    #     obj = plugin()
-    #     self.assertIsInstance(obj, BasePlugin)
-
-    # def test_init__with_param(self):
-    #     plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)
-    #     _param = Parameter('test', str, default='test')
-    #     obj = plugin(_param)
-    #     self.assertTrue('test' in obj.params)
-
-    # def test_init__with_param_overwriting_default(self):
-    #     _original_param = Parameter('test', str, default='original test')
-    #     plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)
-    #     plugin.default_params.add_param(_original_param)
-    #     _param = Parameter('test', str, default='test')
-    #     obj = plugin(_param)
-        # self.assertEqual(obj.get_param_value('test'), _param.value)
-
-    #TODO generic params
 
 if __name__ == "__main__":
     unittest.main()

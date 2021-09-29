@@ -94,6 +94,36 @@ class TestBasePlugins(unittest.TestCase):
         obj = plugin(_param)
         self.assertEqual(obj.get_param_value('test'), _param.value)
 
+    def test_result_shape__generic(self):
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        _res_shape = plugin.result_shape
+        self.assertEqual(_res_shape, (-1,))
+
+    def test_result_shape__with_dim(self):
+        _dim = 3
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        plugin.output_data_dim = _dim
+        self.assertEqual(plugin.result_shape, (-1,) * _dim)
+
+    def test_get_parameter_config_widget(self):
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        with self.assertRaises(NotImplementedError):
+            plugin.get_parameter_config_widget()
+
+    def test_has_unique_parameter_config_widget(self):
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        self.assertEqual(plugin.has_unique_parameter_config_widget, False)
+
+    def test_pre_execute(self):
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        plugin.pre_execute()
+        # assert no error
+
+    def test_execute(self):
+        plugin = create_plugin_class(INPUT_PLUGIN, INPUT_PLUGIN)()
+        with self.assertRaises(NotImplementedError):
+            plugin.execute(1)
+
     #TODO generic params
 
 if __name__ == "__main__":

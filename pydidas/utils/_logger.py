@@ -28,7 +28,7 @@ import logging
 import multiprocessing as mp
 
 
-__all__ = ['pydidas_logger']
+__all__ = ['pydidas_logger', 'LOGGING_LEVEL']
 
 
 def pydidas_logger(level=logging.DEBUG):
@@ -51,3 +51,6 @@ def pydidas_logger(level=logging.DEBUG):
     if not len(logger.handlers):
         logger.addHandler(handler)
     return logger
+
+
+LOGGING_LEVEL = logging.DEBUG

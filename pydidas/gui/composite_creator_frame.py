@@ -26,7 +26,6 @@ __all__ = ['CompositeCreatorFrame']
 
 import os
 import time
-import logging
 from functools import partial
 
 import numpy as np
@@ -36,21 +35,21 @@ from pydidas.gui.builders.composite_creator_frame_builder import (
     create_composite_creator_frame_widgets_and_layout)
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
-from pydidas.core import (ParameterCollectionMixIn, Parameter,
-                          get_generic_parameter)
+from pydidas.core import Parameter, get_generic_parameter
 from pydidas.constants import HDF5_EXTENSIONS
-from pydidas.widgets import (BaseFrameWithApp, dialogues, parameter_config)
-from pydidas.utils import (get_hdf5_populated_dataset_keys, get_time_string,
-                           pydidas_logger)
+from pydidas.widgets import BaseFrameWithApp, dialogues
+from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
+                           LOGGING_LEVEL)
 from pydidas.multiprocessing import AppRunner
+from pydidas.gui.mixins import SilxPlotWindowMixIn
 
-
-logger = pydidas_logger(logging.DEBUG)
+logger = pydidas_logger(LOGGING_LEVEL)
 
 
 class CompositeCreatorFrame(BaseFrameWithApp,
-                            parameter_config.ParameterConfigWidgetsMixIn,
-                            ParameterCollectionMixIn):
+                            ParameterConfigWidgetsMixIn,
+                            SilxPlotWindowMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
     visualization.
@@ -60,7 +59,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
-        parameter_config.ParameterConfigWidgetsMixIn.__init__(self)
+        ParameterConfigWidgetsMixIn.__init__(self)
+        SilxPlotWindowMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
@@ -143,7 +143,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Slot to be called on an update signal from the Composite.
         """
-        if time.time() - self._config['last_update'] > 2:
+        if time.time() - self._config['last_update'] >= 2:
             self.__show_composite()
             self._config['last_update'] = time.time()
 
@@ -151,34 +151,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         Show the composite image in the Viewwer.
         """
-        self._widgets['plot_window'].setVisible(True)
-        _origin, _scales = self.__get_plot_origin_and_scales()
-        print('Origin / scales:', _origin, _scales)
-        self._widgets['plot_window'].addImage(
-            self._app.composite, replace=True, origin=_origin, scale=_scales)
-
-    def __get_plot_origin_and_scales(self):
-        _scales = self._config.get('plot_scales', None)
-        _origin = self._config.get('plot_origin', None)
-        if _origin is None or _scales is None:
-            _shape = self._image_metadata.final_shape
-            _border = self._app._composite.get_param_value(
-                'mosaic_border_width')
-            print('image shape / border', _shape, _border)
-        if _origin is None:
-            _originx = 1 - 0.5 * _shape[1] / (_shape[1] + _border)
-            _originy = 1 - 0.5 * _shape[0] / (_shape[0] + _border)
-            _origin = (_originx, _originy)
-            self._config['plot_origin'] = _origin
-        if _scales is None:
-            _nx = self._app.get_param_value('composite_nx')
-            _ny = self._app.get_param_value('composite_ny')
-            print('nx / ny:', _nx, _ny)
-            _scalex = _shape[1] + _border * (_nx - 1) / _nx
-            _scaley = _shape[0] + _border * (_ny - 1) / _ny
-            _scales = (1 / _scalex, 1 / _scaley)
-            self._config['plot_scales'] = _scales
-        return _origin, _scales
+        self.show_image_in_plot(self._app.composite)
 
     def setup_initial_state(self):
         """
@@ -197,13 +170,13 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         index : int
             The frame index.
         """
-        pass
 
     def _run_app_serial(self):
         """
         Serial implementation of the execution method.
         """
         self._prepare_app_run()
+        self._prepare_plot_params()
         self._app.run()
         self._widgets['but_show'].setEnabled(True)
         self._widgets['but_save'].setEnabled(True)
@@ -216,10 +189,23 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         This methods sets the required attributes both for serial and
         parallel running of the app.
         """
-        self._config['plot_scales'] = None
+        self._config['plot_scale'] = None
         self._config['plot_origin'] = None
+        self._config['plot_aspect'] = None
         self._image_metadata.update_final_image()
         self.set_status('Started composite image creation.')
+
+    def _prepare_plot_params(self):
+        _shape = self._app.composite.shape
+        _border = self._app._composite.get_param_value(
+            'mosaic_border_width')
+        _nx = self.get_param_value('composite_nx')
+        _ny = self.get_param_value('composite_ny')
+        _rel_border_width_x = 0.5 * _border / (_shape[1] + _border)
+        _rel_border_width_y = 0.5 * _border / (_shape[0] + _border)
+        _range_x = (0.5 + _rel_border_width_x, _nx + 0.5 - _rel_border_width_x)
+        _range_y = (0.5 + _rel_border_width_y, _ny + 0.5 - _rel_border_width_y)
+        self.setup_plot_params(_shape, _range_x, _range_y)
 
     def _run_app(self):
         """
@@ -227,6 +213,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         """
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
+        self._prepare_plot_params()
         self._config['last_update'] = time.time()
         self._widgets['but_exec'].setEnabled(False)
         self._widgets['but_abort'].setVisible(True)
@@ -304,10 +291,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             self.update_param_value('raw_image_shape', _shape)
             self.update_param_value('images_per_file', 1)
             self._config['input_configured'] = True
-        if self._config['input_configured']:
-            _finalize_flag = True
-        else:
-            _finalize_flag = False
+        _finalize_flag = self._config['input_configured']
         self.__update_n_total()
         self.__finalize_selection(_finalize_flag)
         self.__check_exec_enable()
@@ -493,7 +477,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self.toggle_widget_visibility('bg_hdf5_frame', flag)
         self.__check_exec_enable()
 
-
     def __abort_comp_creation(self):
         """
         Abort the creation of the composite image.
@@ -501,7 +484,6 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._runner.stop()
         self._runner._wait_for_processes_to_finish(2)
         self._apprunner_finished()
-
 
     def __toggle_roi_selection(self, flag):
         """

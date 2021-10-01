@@ -31,14 +31,18 @@ from ..core import (ParameterCollection, PydidasQsettingsMixin,
                     ParameterCollectionMixIn)
 
 
-class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
-                ParameterCollectionMixIn, QtWidgets.QFrame):
+class BaseFrame(QtWidgets.QFrame,
+                ParameterCollectionMixIn,
+                PydidasQsettingsMixin,
+                CreateWidgetsMixIn):
     """
     Inherits from :py:class:`PyQt5.QtWidgets.QFrame`,
+    :py:class:`pydidas.core.ParameterCollectionMixIn`,
+    :py:class:`pydidas.core.PydidasQsettingsMixin`,
     :py:class:`pydidas.widgets.CreateWidgetsMixIn`.
 
     The BaseFrame is a subclassed QFrame and should be used as the
-    base class for all Frames in the pydidas suite.
+    base class for all Frames in pydidas.
     It adds a name attribute and registration routines with the
     CentralWidgetStack.
 
@@ -51,7 +55,7 @@ class BaseFrame(CreateWidgetsMixIn, PydidasQsettingsMixin,
         """
         Initialize the BaseFrame instance.
 
-                Parameters
+        Parameters
         ----------
         parent : Union[QWidget, None], optional
             The parent widget. The default is None.

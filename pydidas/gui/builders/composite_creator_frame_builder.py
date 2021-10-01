@@ -100,7 +100,7 @@ def create_composite_creator_frame_widgets_and_layout(frame):
         parent=frame, resetzoom=True, autoScale=False, logScale=False,
         grid=False, curveStyle=False, colormap=True, aspectRatio=True,
         yInverted=True, copy=True, save=True, print_=True, control=False,
-        position=False, roi=False, mask=True)
+        position=True, roi=False, mask=True)
     frame.add_any_widget(
         'plot_window', _plot, alignment=None,
         gridPos=(0, 3, 1, 1), visible=False, stretch=(1, 1),

@@ -85,7 +85,7 @@ class ParameterCollection(dict):
         if key != param.refkey:
             raise KeyError(f'The dictionary key "{key}" for Parameter '
                     f'"{param}" does not match the Parameter '
-                    'reference key: "{param.refkey}". Cannot add item.')
+                    f'reference key: "{param.refkey}". Cannot add item.')
         self.__check_key(param)
         super().__setitem__(key, param)
 

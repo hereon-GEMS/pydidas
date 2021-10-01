@@ -138,34 +138,34 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj._check_key('Test0')
 
-    def test_apply_param_modulo(self):
+    def test_get_param_value_with_modulo(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         _mod = 10
         _test = obj.get_param_value('Test0')
-        _new = obj._apply_param_modulo('Test0', _mod)
+        _new = obj._get_param_value_with_modulo('Test0', _mod)
         self.assertEqual(_new, _test % _mod)
 
-    def test_apply_param_modulo_equal(self):
+    def test_get_param_value_with_modulo_equal(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         _test = obj.get_param_value('Test0')
-        _new = obj._apply_param_modulo('Test0', _test)
+        _new = obj._get_param_value_with_modulo('Test0', _test)
         self.assertEqual(_new, _test)
 
-    def test_apply_param_modulo_negative(self):
+    def test_get_param_value_with_modulo_negative(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.set_param_value('Test0', -1)
         _mod = 10
-        _new = obj._apply_param_modulo('Test0', _mod)
+        _new = obj._get_param_value_with_modulo('Test0', _mod)
         self.assertEqual(_new, _mod)
 
-    def test_apply_param_modulo_not_integer(self):
+    def test_get_param_value_with_modulo_not_integer(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         with self.assertRaises(ValueError):
-            obj._apply_param_modulo('Test3', 10)
+            obj._get_param_value_with_modulo('Test3', 10)
 
     def test_get_default_params_copy(self):
         defaults = ObjectWithParameterCollection.get_default_params_copy()

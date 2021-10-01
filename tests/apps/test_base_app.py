@@ -109,7 +109,7 @@ class TestBaseApp(unittest.TestCase):
 
     def test_multiprocessing_pre_cycle(self):
         app = BaseApp()
-        self.assertIsNone(app.multiprocessing_pre_cycle())
+        self.assertIsNone(app.multiprocessing_pre_cycle(0))
 
     def test_multiprocessing_func(self):
         app = BaseApp()

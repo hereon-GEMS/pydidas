@@ -43,15 +43,13 @@ class BaseFrame(QtWidgets.QFrame,
 
     The BaseFrame is a subclassed QFrame and should be used as the
     base class for all Frames in pydidas.
-    It adds a name attribute and registration routines with the
-    CentralWidgetStack.
 
     By default, a QGridLayout is applied with an alignment of left/top.
     """
     status_msg = QtCore.pyqtSignal(str)
     default_params = ParameterCollection()
 
-    def __init__(self, parent=None, name='', **kwargs):
+    def __init__(self, parent=None, **kwargs):
         """
         Initialize the BaseFrame instance.
 
@@ -59,9 +57,6 @@ class BaseFrame(QtWidgets.QFrame,
         ----------
         parent : Union[QWidget, None], optional
             The parent widget. The default is None.
-        name : Union[str, None], optional
-            The reference name of the widget for the CentralWidgetStack.
-            The default is an empty string.
         initLayout : bool, optional
             Flag to initialize the frame layout with a QtWidgets.QGridLayout
             and left / top alignment. If False, no layout will be initialized
@@ -84,7 +79,6 @@ class BaseFrame(QtWidgets.QFrame,
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
-        self.name = name
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):

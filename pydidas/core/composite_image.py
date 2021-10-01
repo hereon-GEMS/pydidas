@@ -60,7 +60,7 @@ class CompositeImage(ObjectWithParameterCollection):
         self.set_default_params()
         self.__set_default_qsettings()
         for _key in kwargs:
-              self.set_param_value(_key, kwargs[_key])
+            self.set_param_value(_key, kwargs[_key])
         if self.__check_config():
             self.__create_image_array()
 
@@ -117,11 +117,6 @@ class CompositeImage(ObjectWithParameterCollection):
 
         This method creates the array based on the configuration and prepares
         it for inserting images.
-
-        Raises
-        ------
-        ValueError
-            DESCRIPTION.
         """
         self.__verify_config()
         _shape = self.__get_composite_shape()

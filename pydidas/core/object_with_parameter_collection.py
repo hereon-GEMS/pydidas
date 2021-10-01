@@ -195,13 +195,15 @@ class ParameterCollectionMixIn:
         for _key in _config:
             print(f'{_key}: {_config[_key]}')
 
-    def _apply_param_modulo(self, param_refkey, modulo):
+    def _get_param_value_with_modulo(self, param_refkey, modulo):
         """
-        Apply a modulo to a Parameter.
+        Get a Parameter value modulo another value.
 
-        This method applies a modulo to a Parameter, referenced by its
+        This method applies a modulo to a Parameter value, referenced by its
         refkey, for example for converting image sizes of -1 to the actual
         detector dimensions.
+        Note: This method only returns the modulated value and does not update
+        the Parameter itself.
 
         Parameters
         ----------
@@ -220,7 +222,7 @@ class ParameterCollectionMixIn:
         _val : int
             The modulated Parameter value
         """
-        _param = self.params[param_refkey]
+        _param = self.get_param(param_refkey)
         if _param.type is not Integral:
             raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
                              ' is not integer.')

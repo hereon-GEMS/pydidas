@@ -182,16 +182,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.select_item(self.frame_menuentries[0])
         self.centralWidget().setCurrentIndex(0)
 
-        # _toolbar = QtWidgets.QToolBar('Top toolbar')
-        # _toolbar.setStyleSheet("QToolBar{spacing:20px;}")
-        # _toolbar.setIconSize(QtCore.QSize(40, 40))
-        # _toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        # _toolbar.setFixedHeight(30)
-        # _toolbar.setMovable(False)
-        # self.addToolBar(QtCore.Qt.TopToolBarArea, _toolbar)
-        # self.top_toolbar_label = QtWidgets.QLabel(_toolbar)
-        # self.top_toolbar_label
-
     @staticmethod
     def __get_active_toolbars(name):
         _r = [name]
@@ -204,7 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if menu_name in self.frame_menuentries:
             raise FrameConfigError(f'The selected menu entry "{menu_name}"'
                                    ' already exists.')
-        _frame = frame(mainWindow=self)
+        _frame = frame()
         _frame.name = menu_name
         _frame.setParent(self)
         _frame.status_msg.connect(self.update_status)

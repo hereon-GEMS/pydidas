@@ -103,13 +103,13 @@ class BaseApp(ObjectWithParameterCollection):
         """
         raise NotImplementedError
 
-    def multiprocessing_pre_cycle(self, *args):
+    def multiprocessing_pre_cycle(self, index):
         """
         Perform operations in the pre-cycle of every task.
         """
         return
 
-    def multiprocessing_func(self, *args):
+    def multiprocessing_func(self, index):
         """
         Perform key operation with parallel processing.
         """

@@ -44,7 +44,7 @@ class BaseFrameWithApp(BaseFrame):
     """
     status_msg = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent=None, name=None, **kwargs):
+    def __init__(self, parent=None, **kwargs):
         """
         Initialize the BaseFrame instance.
 
@@ -76,7 +76,7 @@ class BaseFrameWithApp(BaseFrame):
         Parameters
         ----------
         app : pydidas.apps.BaseApp
-            Any App instance
+            Any App instance.
         """
         if not isinstance(app, BaseApp):
             raise TypeError('The passed object must be a BaseApp instance.')

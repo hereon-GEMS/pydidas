@@ -28,7 +28,7 @@ import os
 
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (ParameterCollection, get_generic_parameter,
-                          ObjectWithParameterCollection)
+                          ObjectWithParameterCollection, Parameter)
 from pydidas.constants import HDF5_EXTENSIONS
 from pydidas.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
 from pydidas.image_io import read_image
@@ -36,6 +36,7 @@ from pydidas.image_io import read_image
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('filename'),
+    get_generic_parameter('first_file'),
     get_generic_parameter('hdf5_key'),
     get_generic_parameter('hdf5_first_image_num'),
     get_generic_parameter('hdf5_last_image_num'),
@@ -46,6 +47,10 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('roi_yhigh'),
     get_generic_parameter('roi_xlow'),
     get_generic_parameter('roi_xhigh'),
+    Parameter('use_filename', int, True, name='Use "filename" Parameter',
+              tooltip=('Flag to switch between the "filename" and "first_file"'
+                       ' Parameters, based on the associated App.'),
+              choices=[True, False])
     )
 
 
@@ -162,11 +167,24 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Update the image metadata from new input.
         """
-        _filename = self.get_param_value('filename')
+        _filename = self.get_filename()
         if os.path.splitext(_filename)[1] in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
             self._store_image_data_from_single_image()
+
+    def get_filename(self):
+        """
+        Get the filename for processing based on the "use_filename" flag.
+
+        Returns
+        -------
+        pathlib.Path
+            The full path of the selected file.
+        """
+        if self.get_param_value('use_filename'):
+            return self.get_param_value('filename')
+        return self.get_param_value('first_file')
 
     def update_final_image(self):
         """
@@ -183,15 +201,15 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         AppConfigError
             If the selected image range is not included in the hdf5 dataset.
         """
-        _filename = self.get_param_value('filename')
+        _filename = self.get_filename()
         _key = self.get_param_value('hdf5_key')
         check_hdf5_key_exists_in_file(_filename, _key)
         _meta = get_hdf5_metadata(_filename, ['shape', 'dtype'], _key)
         self.__verify_selection_range(_meta['shape'][0])
 
         _n0 = self.get_param_value('hdf5_first_image_num')
-        _n1 = self._apply_param_modulo('hdf5_last_image_num',
-                                       _meta['shape'][0])
+        _n1 = self._get_param_value_with_modulo('hdf5_last_image_num',
+                                                _meta['shape'][0])
         _step = self.get_param_value('hdf5_stepping')
         _n_per_file = ((_n1 - _n0 - 1) // _step + 1)
         self._config['numbers'] = range(_n0, _n1, _step)
@@ -213,8 +231,10 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         AppConfigError
             If the range is not valid.
         """
-        _n0 = self._apply_param_modulo('hdf5_first_image_num', dset_length)
-        _n1 = self._apply_param_modulo('hdf5_last_image_num', dset_length)
+        _n0 = self._get_param_value_with_modulo('hdf5_first_image_num',
+                                                dset_length)
+        _n1 = self._get_param_value_with_modulo('hdf5_last_image_num',
+                                                dset_length)
         if not _n0 < _n1:
             raise AppConfigError(
                 f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
@@ -225,7 +245,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from file range.
         """
-        _test_image = read_image(self.get_param_value('filename'))
+        _test_image = read_image(self.get_filename())
         self._config['numbers'] = [0]
         self._config['hdf5_dset_shape'] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)
@@ -294,8 +314,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         _nx = self.raw_size_x
         _ny = self.raw_size_y
-        _x0 = self._apply_param_modulo('roi_xlow', _nx)
-        _x1 = self._apply_param_modulo('roi_xhigh', _nx)
-        _y0 = self._apply_param_modulo('roi_ylow', _ny)
-        _y1 = self._apply_param_modulo('roi_yhigh', _ny)
+        _x0 = self._get_param_value_with_modulo('roi_xlow', _nx)
+        _x1 = self._get_param_value_with_modulo('roi_xhigh', _nx)
+        _y0 = self._get_param_value_with_modulo('roi_ylow', _ny)
+        _y1 = self._get_param_value_with_modulo('roi_yhigh', _ny)
         return _x0, _x1, _y0, _y1

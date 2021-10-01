@@ -46,7 +46,7 @@ class SilxPlotWindowMixIn:
     """
     def __init__(self):
         """
-
+        Create the required dictionary.
         """
         self._plot_config = {}
 

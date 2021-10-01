@@ -24,8 +24,7 @@ from pydidas.widgets import BaseFrame
 class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('Name', None)
-        super().__init__(parent=parent, name=name)
+        super().__init__(parent)
         self.create_label('label_welcome', 'Welcome to pyDIDAS', fontsize=14, bold=True, fixedWidth=400)
         self.create_label('label_full_name', '- the python Diffraction Data Analysis Suite.\n', fontsize=13,
                          bold=True, fixedWidth=400)
@@ -39,30 +38,27 @@ class HomeFrame(BaseFrame):
 class ProcessingSetupFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('Name', None)
-        super().__init__(parent, name)
+        super().__init__(parent)
 
 
 class ToolsFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('Name', None)
-        super().__init__(parent, name)
+        super().__init__(parent)
 
 
 class ProcessingFrame(BaseFrame):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('Name', None)
-        super().__init__(parent, name)
+        super().__init__(parent)
         self.create_label('title', 'Processing', fontsize=14,
                           gridPos=(0, 0, 1, 5))
+
 
 class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('Name', None)
-        super().__init__(parent, name)
+        super().__init__(parent)
         self.create_label('title', 'Result visualization', fontsize=14,
                           gridPos=(0, 0, 1, 5))
 

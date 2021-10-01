@@ -21,16 +21,13 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
+__all__ = ['BasePlugin', 'ProcPlugin', 'OutputPlugin']
 
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_parameter)
-
-BASE_PLUGIN = -1
-INPUT_PLUGIN = 0
-PROC_PLUGIN = 1
-OUTPUT_PLUGIN = 2
+from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
+                               OUTPUT_PLUGIN)
 
 ptype = {BASE_PLUGIN: 'Base plugin',
          INPUT_PLUGIN: 'Input plugin',
@@ -188,27 +185,10 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         if self.output_data_dim == -1:
             return (-1,)
-        return (-1,) * self.output_data_dim
-
-
-class InputPlugin(BasePlugin):
-    """
-    The base plugin class for input plugins.
-    """
-    plugin_type = INPUT_PLUGIN
-    plugin_name = 'Base input plugin'
-    generic_params = BasePlugin.generic_params.get_copy()
-    generic_params.add_params(
-        get_generic_parameter('use_roi'),
-        get_generic_parameter('roi_xlow'),
-        get_generic_parameter('roi_xhigh'),
-        get_generic_parameter('roi_ylow'),
-        get_generic_parameter('roi_yhigh'),
-        get_generic_parameter('use_thresholds'),
-        get_generic_parameter('threshold_low'),
-        get_generic_parameter('threshold_high'),
-        get_generic_parameter('binning'))
-    default_params = BasePlugin.default_params.get_copy()
+        _shape = self._config.get('result_shape', None)
+        if _shape is None:
+            return (-1,) * self.output_data_dim
+        return _shape
 
 
 class ProcPlugin(BasePlugin):

@@ -33,7 +33,7 @@ from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..utils import find_valid_python_files
 from .plugin_collection_util_funcs import (
     get_generic_plugin_path, plugin_type_check)
-from .base_plugins import BasePlugin
+from .base_plugin import BasePlugin
 
 class _PluginCollection(PydidasQsettingsMixin):
     """

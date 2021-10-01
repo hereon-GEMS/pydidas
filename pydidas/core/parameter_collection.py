@@ -79,14 +79,12 @@ class ParameterCollection(dict):
             If the dictionary key differs from the Parameter reference key.
         """
         if not isinstance(param, Parameter):
-            raise TypeError('Only Parameter objects are supported in a '
-                            'ParameterCollection. Cannot add object '
-                            f'"{param}".')
+            self.__raise_type_error(param)
         if key != param.refkey:
             raise KeyError(f'The dictionary key "{key}" for Parameter '
                     f'"{param}" does not match the Parameter '
                     f'reference key: "{param.refkey}". Cannot add item.')
-        self.__check_key(param)
+        self.__check_key_available(param)
         super().__setitem__(key, param)
 
     @staticmethod
@@ -107,110 +105,7 @@ class ParameterCollection(dict):
         raise TypeError(f'Cannot add object "{item}" of type '
                         f'"{item.__class__}" to ParameterCollection.')
 
-    def __add_arg_params(self, *args):
-        """
-        Add the passed parameters to the ParameterCollection.
-
-        Parameters
-        ----------
-        *args : Union[Parameter, ParameterCollection]
-            Single Parameters or ParameterCollections.
-
-        Raises
-        ------
-        KeyError
-            If the key for the Parameter is already in use.
-        """
-        if isinstance(args, ParameterCollection):
-            self.update(args)
-        else:
-            for _param in args:
-                if isinstance(_param, Parameter):
-                    self.add_param(_param)
-                elif isinstance(_param, (ParameterCollection)):
-                    self.update(_param)
-
-    def __add_kwarg_params(self, **kwargs):
-        """
-        Add the passed keyword parameters to the ParameterCollection.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            A dictionary of keyword arguments.
-        """
-        for _key in kwargs:
-            self.__setitem__(_key, kwargs[_key])
-
-    def __check_arg_types(self, *args):
-        """
-        Check the types of input arguments.
-
-        This method verifies that all passed arguments are either Parameters
-        or ParameterCollections.
-
-        This method
-        Parameters
-        ----------
-        *args : any
-            Any arguments.
-        """
-        for _param in args:
-            if not isinstance(_param, (Parameter, ParameterCollection)):
-                self.__raise_type_error(_param)
-
-    def __check_kwarg_types(self, **kwargs):
-        """
-        Check the types of input keyword arguments.
-
-        This method verifies that all passed arguments are either Parameters
-        or ParameterCollections.
-
-        Parameters
-        ----------
-        *kwargs : any
-            Any keyword arguments.
-        """
-        for _key in kwargs:
-            if not isinstance(kwargs[_key], Parameter):
-                self.__raise_type_error(kwargs[_key])
-
-    def __check_duplicate_keys(self, *args, **kwargs):
-        """
-        Check for duplicate keys and raise an error if a duplicate key is
-        found.
-
-        This method compares the reference key of all args with the dictionary
-        keys. Then, it compares the keys of all keyword args with the
-        dictionary and arg keys.
-
-        Parameters
-        ----------
-        *args : Parameters
-            Any number of Parameters.
-        **kwargs : dict
-            A dictionary with Parameter values.
-
-        Raises
-        ------
-        KeyError
-            If the kwargs key of a Parameter differs from the Parameter
-            reference key.
-        """
-        # flatten ParameterCollection arguments and add them to a list
-        _new_args = chain.from_iterable(
-            [p] if isinstance(p, Parameter) else list(p.values())
-            for p in args)
-        for _param in _new_args:
-            _newkeys = (tuple(self.keys())
-                        + tuple(p.refkey for p in _new_args
-                                if p is not _param))
-            self.__check_key(_param, keys=_newkeys)
-        _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
-        for _key in kwargs:
-            self.__check_key(kwargs[_key], keys=_newkeys)
-
-    def __check_key(self, param, keys=None):
+    def __check_key_available(self, param, keys=None):
         """
         Check if the Parameter refkey is already a registed key.
 
@@ -249,9 +144,28 @@ class ParameterCollection(dict):
         KeyError
             If an entry with param.refkey already exists.
         """
+        if not isinstance(param, Parameter):
+            self.__raise_type_error(param)
         self.__check_arg_types(param)
-        self.__check_key(param)
+        self.__check_key_available(param)
         self.__setitem__(param.refkey, param)
+
+    def __check_arg_types(self, *args):
+        """
+        Check the types of input arguments.
+
+        This method verifies that all passed arguments are either Parameters
+        or ParameterCollections.
+
+        This method
+        Parameters
+        ----------
+        *args : any
+            Any arguments.
+        """
+        for _param in args:
+            if not isinstance(_param, (Parameter, ParameterCollection)):
+                self.__raise_type_error(_param)
 
     def add_params(self, *args, **kwargs):
         """
@@ -274,6 +188,93 @@ class ParameterCollection(dict):
         self.__check_duplicate_keys(*args, **kwargs)
         self.__add_arg_params(*args)
         self.__add_kwarg_params(**kwargs)
+
+    def __check_kwarg_types(self, **kwargs):
+        """
+        Check the types of input keyword arguments.
+
+        This method verifies that all passed arguments are either Parameters
+        or ParameterCollections.
+
+        Parameters
+        ----------
+        *kwargs : any
+            Any keyword arguments.
+        """
+        for _key in kwargs:
+            if not isinstance(kwargs[_key], Parameter):
+                self.__raise_type_error(kwargs[_key])
+
+    def __check_duplicate_keys(self, *args, **kwargs):
+        """
+        Check for duplicate keys and raise an error if a duplicate key is
+        found.
+
+        This method compares the reference key of all args with the dictionary
+        keys. Then, it compares the keys of all keyword args with the
+        dictionary and arg keys.
+
+        Parameters
+        ----------
+        *args : tuple
+            Any number of Parameters.
+        **kwargs : dict
+            A dictionary with Parameter values.
+
+        Raises
+        ------
+        KeyError
+            If the kwargs key of a Parameter differs from the Parameter
+            reference key.
+        """
+        # flatten arguments and add them to a list
+        _new_args = list(chain.from_iterable(
+            [p] if isinstance(p, Parameter) else list(p.values())
+            for p in args))
+        _original_keys = tuple(self.keys())
+        for _param in _new_args:
+            _other_keys = tuple(p.refkey for p in _new_args
+                                if p is not _param)
+            _temp_keys = _original_keys + _other_keys
+            self.__check_key_available(_param, keys=_temp_keys)
+        _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
+        for _key in kwargs:
+            self.__check_key_available(kwargs[_key], keys=_newkeys)
+
+    def __add_arg_params(self, *args):
+        """
+        Add the passed parameters to the ParameterCollection.
+
+        Parameters
+        ----------
+        *args : tuple
+            Single Parameters or ParameterCollections.
+
+        Raises
+        ------
+        KeyError
+            If the key for the Parameter is already in use.
+        """
+        if isinstance(args, ParameterCollection):
+            self.update(args)
+        else:
+            for _param in args:
+                if isinstance(_param, Parameter):
+                    self.add_param(_param)
+                elif isinstance(_param, (ParameterCollection)):
+                    self.update(_param)
+
+    def __add_kwarg_params(self, **kwargs):
+        """
+        Add the passed keyword parameters to the ParameterCollection.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            A dictionary of keyword arguments.
+        """
+        for _key in kwargs:
+            self.__setitem__(_key, kwargs[_key])
 
     def delete_param(self, key):
         """
@@ -306,7 +307,6 @@ class ParameterCollection(dict):
             _copy.add_param(_new_param)
         return _copy
 
-
     def get_value(self, param_key):
         """
         Get the value of a stored parameter.
@@ -319,36 +319,12 @@ class ParameterCollection(dict):
         param_key : str
             The reference key to the parameter in the dictionary.
 
-        Raises
-        ------
-        KeyError
-            If the key "param_key" is not registered.
-
         Returns
         -------
         object
             The value of the Parameter object in its native data type.
         """
-        self.__check_key_exists(param_key)
         return self.__getitem__(param_key).value
-
-    def __check_key_exists(self, param_key):
-        """
-        Check if the Parameter key exists.
-
-        Parameters
-        ----------
-        param_key : str
-            The Parameter key.
-
-        Raises
-        ------
-        KeyError
-            If the "param_key" does not exist.
-        """
-        if param_key not in self.keys():
-            raise KeyError(f'No parameter with the name "{param_key}" '
-                            'has been registered.')
 
     def set_value(self, param_key, value):
         """
@@ -370,7 +346,6 @@ class ParameterCollection(dict):
         KeyError
             If the key "param_key" is not registered.
         """
-        self.__check_key_exists(param_key)
         _item = self.__getitem__(param_key)
         _item.value = value
 
@@ -388,5 +363,23 @@ class ParameterCollection(dict):
         Parameter
             The Parameter instance.
         """
-        self.__check_key_exists(param_key)
         return self.__getitem__(param_key)
+
+    def get_params(self, *keys):
+        """
+        Get multiple keys from an iterable.
+
+        Parameters
+        ----------
+        keys : tuple
+            The reference keys for all Parameters to be returned.
+
+        Returns
+        -------
+        list
+            A list of the Parameters.
+        """
+        _items = []
+        for _key in keys:
+            _items.append(self.__getitem__(_key))
+        return _items

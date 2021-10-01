@@ -52,7 +52,6 @@ class Hdf5singleFileLoader(InputPlugin):
     def __init__(self):
         super().__init__()
 
-
     def execute(self, index, **kwargs):
         fname = self.get_param_value('filename')
         kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')

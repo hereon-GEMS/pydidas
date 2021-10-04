@@ -26,7 +26,7 @@ __all__ = ['Hdf5DatasetSelectionPopup']
 
 from PyQt5 import QtWidgets, QtGui
 from ...utils import get_hdf5_populated_dataset_keys
-from ...core import HdfKey
+from ...core import Hdf5key
 
 class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
@@ -89,10 +89,10 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
 
         Returns
         -------
-        Union[HdfKey, None]
-            If the dialogue is accepted, returns the selected HdfKey.
+        Union[Hdf5key, None]
+            If the dialogue is accepted, returns the selected Hdf5key.
             If it is aborted, it will return None.
         """
         if self.exec_() == QtWidgets.QDialog.Accepted:
-            return HdfKey(self.textValue())
+            return Hdf5key(self.textValue())
         return None

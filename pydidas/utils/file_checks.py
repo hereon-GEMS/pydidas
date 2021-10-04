@@ -56,7 +56,7 @@ def check_hdf5_key_exists_in_file(fname, key):
     key = key if key.startswith('/') else f'/{key}'
     dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
     if key not in dsets:
-        raise AppConfigError(f'hdf_key "{key}" is not a valid key '
+        raise AppConfigError(f'hdf5_key "{key}" is not a valid key '
                              f'for the file "{fname}."')
 
 

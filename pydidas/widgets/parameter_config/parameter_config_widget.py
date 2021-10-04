@@ -32,10 +32,10 @@ from PyQt5 import QtWidgets, QtCore
 from .input_widget_combo import InputWidgetCombo
 from .input_widget_file import InputWidgetFile
 from .input_widget_line import InputWidgetLine
-from .input_widget_hdfkey import InputWidgetHdfKey
+from .input_widget_hdf5key import InputWidgetHdf5Key
 
 from ..utilities import excepthook, apply_widget_properties
-from ...core import HdfKey, ParameterCollection
+from ...core import Hdf5key, ParameterCollection
 from ..._exceptions import WidgetLayoutError
 from ...utils import convert_special_chars_to_unicode
 
@@ -61,8 +61,8 @@ def param_widget_factory(param, widget_width):
     else:
         if param.type == pathlib.Path:
             _widget =  InputWidgetFile(None, param, widget_width)
-        elif param.type == HdfKey:
-            _widget =  InputWidgetHdfKey(None, param, widget_width)
+        elif param.type == Hdf5key:
+            _widget =  InputWidgetHdf5Key(None, param, widget_width)
         else:
             _widget =  InputWidgetLine(None, param, widget_width)
     _widget.set_value(param.value)

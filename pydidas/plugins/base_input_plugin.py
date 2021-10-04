@@ -21,15 +21,14 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BasePlugin', 'InputPlugin', 'ProcPlugin', 'OutputPlugin']
+__all__ = ['InputPlugin']
 
 
-from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
-                          get_generic_parameter)
-from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                               OUTPUT_PLUGIN)
-from .base_plugin import BasePlugin
+from pydidas.core import get_generic_parameter
+from pydidas.constants import INPUT_PLUGIN
 from pydidas.apps.app_utils import ImageMetadataManager
+from pydidas._exceptions import AppConfigError
+from .base_plugin import BasePlugin
 
 
 class InputPlugin(BasePlugin):
@@ -49,47 +48,51 @@ class InputPlugin(BasePlugin):
     default_params = BasePlugin.default_params.get_copy()
 
     def __init__(self, *args, **kwargs):
+        """
+        Create BasicPlugin instance.
+        """
         BasePlugin.__init__(self, *args, **kwargs)
-        self._image_metadata = ImageMetadataManager(
-            *[self.get_param(key)
-              for key in ['use_roi', 'roi_xlow', 'roi_xhigh',
-                          'roi_ylow', 'roi_yhigh', 'binning']])
+        self.__setup_image_magedata_manager()
 
-    @property
-    def result_shape(self):
+    def __setup_image_magedata_manager(self):
         """
-        Get the shape of the plugin result.
+        Setup the ImageMetadataManager to determine the shape of the final
+        image.
 
-        Unknown dimensions are represented as -1 value.
+        The shape of the final image is required to determine the shape of
+        the processed data in the WorkflowTree.
 
-        Returns
-        -------
-        tuple
-            The shape of the results.
+        Raises
+        ------
+        AppConfigError
+            If neither or both "first_file" or "filename" Parameters are used
+            for a non-basic plugin.
         """
-        if self.output_data_dim == -1:
-            return (-1,)
-        _shape = self._config.get('result_shape', None)
-        if _shape is None:
-            return (-1,) * self.output_data_dim
-        return _shape
+        _metadata_params = [self.get_param(key)
+                            for key in ['use_roi', 'roi_xlow', 'roi_xhigh',
+                                        'roi_ylow', 'roi_yhigh', 'binning']]
+        if 'hdf5_key' in self.params:
+            _metadata_params.append(self.get_param('hdf5_key'))
+        _has_first_file = 'first_file' in self.default_params
+        _has_filename = 'filename' in self.default_params
+        if _has_first_file and not _has_filename:
+            _metadata_params.append(self.get_param('first_file'))
+            _use_filename = False
+        elif _has_filename and not _has_first_file:
+            _metadata_params.append(self.get_param('filename'))
+            _use_filename = True
+        elif self.basic_plugin:
+            # create some dummy value
+            _use_filename = True
+        else:
+            raise AppConfigError('Ambiguous choice of Parameters. Use exactly'
+                                 ' one of  both "first_file" and "filename".')
+        self._image_metadata = ImageMetadataManager(*_metadata_params)
+        self._image_metadata.set_param_value('use_filename', _use_filename)
 
-
-class ProcPlugin(BasePlugin):
-    """
-    The base plugin class for processing plugins.
-    """
-    plugin_type = PROC_PLUGIN
-    plugin_name = 'Base processing plugin'
-    generic_params = BasePlugin.generic_params.get_copy()
-    default_params = BasePlugin.default_params.get_copy()
-
-
-class OutputPlugin(BasePlugin):
-    """
-    The base class for output (file saving / plotting) plugins.
-    """
-    plugin_type = OUTPUT_PLUGIN
-    plugin_name = 'Base output plugin'
-    generic_params = BasePlugin.generic_params.get_copy()
-    default_params = BasePlugin.default_params.get_copy()
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin's results.
+        """
+        self._image_metadata.update()
+        self._config['result_shape'] = self._image_metadata.final_shape

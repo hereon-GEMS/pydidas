@@ -1,5 +1,5 @@
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
-from pydidas.core import Parameter, ParameterCollection
+from pydidas.core import Parameter, ParameterCollection, get_generic_parameter
 
 import numpy as np
 
@@ -14,7 +14,8 @@ class DummyLoader(InputPlugin):
         Parameter('image_height', int, 10, name='The image height',
                   tooltip='The height of the image.'),
         Parameter('image_width', int, 10, name='The image width',
-                  tooltip='The width of the image.'))
+                  tooltip='The width of the image.'),
+        get_generic_parameter('filename'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -25,13 +25,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTree']
 
-import os
-import copy
-
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
 from .tree_io import WorkflowTreeIoMeta
+
 
 class _WorkflowTree(GenericTree):
     """

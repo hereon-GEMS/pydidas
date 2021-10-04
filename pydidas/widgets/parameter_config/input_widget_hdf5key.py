@@ -12,7 +12,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-"""Module with the InputWidgetHdfKey class used to edit Parameters."""
+"""Module with the InputWidgetHdf5Key class used to edit Parameters."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -20,14 +20,14 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['InputWidgetHdfKey']
+__all__ = ['InputWidgetHdf5Key']
 
 from PyQt5 import QtWidgets, QtCore
 from .input_widget_with_button import InputWidgetWithButton
 from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
 from pydidas.constants import HDF5_EXTENSIONS
 
-class InputWidgetHdfKey(InputWidgetWithButton):
+class InputWidgetHdf5Key(InputWidgetWithButton):
     """
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)

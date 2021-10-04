@@ -123,7 +123,8 @@ class BasePlugin(ObjectWithParameterCollection):
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])
-        self._config = {}
+        self._config = {'input_shape': None,
+                        'result_shape': None}
 
     def execute(self, data, **kwargs):
         """
@@ -172,9 +173,49 @@ class BasePlugin(ObjectWithParameterCollection):
                                   ' parameter config widget.')
 
     @property
+    def input_shape(self):
+        """
+        Get the shape of the Plugin's input.
+
+        Returns
+        -------
+        Union[tuple, None]
+            The shape of the plugin's input.
+        """
+        return self._config['input_shape']
+
+    @input_shape.setter
+    def input_shape(self, new_shape):
+        """
+        The the shape of the Plugin's input.
+
+        Parameters
+        ----------
+        new_shape : tuple
+            The new shape of the Plugin's input data. The dimensionality of
+            new_shape must match the defined input_data_dim.
+
+        Returns
+        -------
+        Union[tuple, None]
+            The shape of the plugin's input.
+        """
+        if not isinstance(new_shape, tuple):
+            raise TypeError('The new shape must be a tuple.')
+        if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
+            raise ValueError('The new shape must be a tuple of length'
+                             f'{self.input_data_dim}.')
+        self._config['input_shape'] = new_shape
+
+    @property
     def result_shape(self):
         """
         Get the shape of the plugin result.
+
+        Any plugin that knows the shape of its results will return the value
+        as a tuple with one entry for every dimension.
+        If a Plugin knows the dimensionality of its results but not the size
+        of each dimension, a -1 is returned for each unknown dimension.
 
         Unknown dimensions are represented as -1 value.
 
@@ -183,12 +224,27 @@ class BasePlugin(ObjectWithParameterCollection):
         tuple
             The shape of the results.
         """
+        self.calculate_result_shape()
+        return self._config['result_shape']
+
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the results based on the Plugin processing and
+        the input data shape.
+
+        This method only updates the shape and stores it internally. Use the
+        "result_shape" property to access the Plugin's result_shape. The
+        generic implementation assumes the output shape to be equal to the
+        input shape.
+        """
         if self.output_data_dim == -1:
-            return (-1,)
-        _shape = self._config.get('result_shape', None)
+            self._config['result_shape'] = self._config['input_shape']
+            return
+        _shape = self._config.get('input_shape', None)
         if _shape is None:
-            return (-1,) * self.output_data_dim
-        return _shape
+            self._config['result_shape'] = (-1,) * self.output_data_dim
+        else:
+            self._config['result_shape'] = _shape
 
 
 class ProcPlugin(BasePlugin):

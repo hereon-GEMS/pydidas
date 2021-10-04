@@ -68,7 +68,9 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
         if plugin_path is None:
             plugin_path = self.__get_generic_plugin_path()
-        self.find_and_register_plugins(*plugin_path)
+        _create_empty = kwargs.get('create_empty', False)
+        if not _create_empty:
+            self.find_and_register_plugins(*plugin_path)
 
     @staticmethod
     def __get_plugin_path_from_kwargs(**kwargs):

@@ -53,7 +53,8 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         self._qsettings_plugin_path = self._qsettings.value('global/plugin_path')
         self._qsettings.setValue('global/plugin_path', '')
         self.pcoll = DummyPluginCollection(n_plugins=self.num,
-                                           plugin_path=self._pluginpath)
+                                           plugin_path=self._pluginpath,
+                                           create_empty=True)
         self.widgets = []
 
     def tearDown(self):
@@ -75,7 +76,7 @@ class TestPluginCollectionPresenter(unittest.TestCase):
 
     def click_index(self, obj, double=False):
         model = obj.model()
-        _type = random.choice([0, 1, 2])
+        _type = 0 #random.choice([0, 1, 2])
         _num = random.choice(np.arange(self.n_per_type))
         _item = model.item(_type).child(_num)
         index = model.indexFromItem(_item)
@@ -125,7 +126,9 @@ class TestPluginCollectionPresenter(unittest.TestCase):
         _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
         _text = obj._widgets['plugin_description'].toPlainText()
         _desc = _plugin.get_class_description_as_dict()
-        for item in list(itertools.chain.from_iterable(_desc.items())):
+        _desc['Parameters'] = '\n    '.join(_desc['Parameters'].split('\n'))
+        _itemlist = list(_desc.values()) + list(_desc.keys())
+        for n, item in enumerate(_itemlist):
             self.assertTrue(_text.find(item) >= 0)
 
 

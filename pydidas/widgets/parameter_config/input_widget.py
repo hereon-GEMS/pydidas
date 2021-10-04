@@ -28,7 +28,7 @@ import numbers
 import pathlib
 from PyQt5 import QtWidgets
 
-from ...core import HdfKey
+from ...core import Hdf5key
 from ...constants import PARAM_INPUT_WIDGET_HEIGHT
 
 class InputWidget(QtWidgets.QWidget):
@@ -87,8 +87,8 @@ class InputWidget(QtWidgets.QWidget):
             return float(text)
         if self.__ptype == pathlib.Path:
             return pathlib.Path(text)
-        if self.__ptype == HdfKey:
-            return HdfKey(text)
+        if self.__ptype == Hdf5key:
+            return Hdf5key(text)
         return text
 
     def emit_signal(self):

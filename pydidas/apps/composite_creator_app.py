@@ -102,7 +102,7 @@ class CompositeCreatorApp(BaseApp):
     file_stepping : int, optional
         The step width (in files). A value n > 1 will only process every n-th
         image for the composite. The default is 1.
-    hdf5_key : HdfKey, optional
+    hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key.
     hdf5_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.
@@ -117,7 +117,7 @@ class CompositeCreatorApp(BaseApp):
         False.
     bg_file : pathlib.Path, optional
         The name of the file used for background correction.
-    bg_hdf5_key : HdfKey, optional
+    bg_hdf5_key : Hdf5key, optional
         Required for hdf5 background image files: The dataset key with the
         image for the background file.
     bg_hdf5_frame : int, optional

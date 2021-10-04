@@ -119,6 +119,11 @@ class TestPluginCollection(unittest.TestCase):
                 _mods.append(f'{_new_module}.{_name}'.strip('.'))
         return set(_mods)
 
+    def test_init__empty(self):
+        PC = DummyPluginCollection(n_plugins=0, create_empty=True)
+        self.assertIsInstance(PC, _PluginCollection)
+        self.assertEqual(len(PC.get_all_plugins()), 0)
+
     def test_init__empty_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self.assertIsInstance(PC, _PluginCollection)
@@ -156,7 +161,7 @@ class TestPluginCollection(unittest.TestCase):
         _plugins = PC.get_all_plugins_of_type('input')
         self.assertEqual(len(_plugins), self.n_per_type)
         for _plugin in _plugins:
-            self.assertTrue(InputPlugin in _plugin.__bases__)
+            self.assertTrue(issubclass(_plugin, InputPlugin))
 
     def test_get_all_plugins_of_type__proc(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
@@ -164,7 +169,7 @@ class TestPluginCollection(unittest.TestCase):
         _plugins = PC.get_all_plugins_of_type('proc')
         self.assertEqual(len(_plugins), self.n_per_type)
         for _plugin in _plugins:
-            self.assertTrue(ProcPlugin in _plugin.__bases__)
+            self.assertTrue(issubclass(_plugin, ProcPlugin))
 
     def test_get_all_plugins_of_type__output(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
@@ -172,7 +177,7 @@ class TestPluginCollection(unittest.TestCase):
         _plugins = PC.get_all_plugins_of_type('output')
         self.assertEqual(len(_plugins), self.n_per_type)
         for _plugin in _plugins:
-            self.assertTrue(OutputPlugin in _plugin.__bases__)
+            self.assertTrue(issubclass(_plugin, OutputPlugin))
 
     def test_get_all_plugins(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
@@ -191,7 +196,7 @@ class TestPluginCollection(unittest.TestCase):
                                     plugin_path=self._pluginpath)
         _name = list(PC.plugins.keys())[0]
         _plugin = PC.get_plugin_by_name(_name)
-        self.assertTrue(BasePlugin in _plugin.__bases__[0].__bases__)
+        self.assertTrue(issubclass(_plugin, BasePlugin))
 
     def test_get_all_plugin_names(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
@@ -206,7 +211,7 @@ class TestPluginCollection(unittest.TestCase):
                                     plugin_path=self._pluginpath)
         _name = list(PC._PluginCollection__plugin_names.keys())[0]
         _plugin = PC.get_plugin_by_plugin_name(_name)
-        self.assertTrue(BasePlugin in _plugin.__bases__[0].__bases__)
+        self.assertTrue(issubclass(_plugin, BasePlugin))
 
     def test_get_plugin_by_plugin_name__no_name(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,

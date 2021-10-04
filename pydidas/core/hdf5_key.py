@@ -24,12 +24,12 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['HdfKey']
+__all__ = ['Hdf5key']
 
 from pathlib import Path
 
 
-class HdfKey(str):
+class Hdf5key(str):
     """
     Inherits from :py:class:`str`.
 

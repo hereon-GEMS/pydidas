@@ -29,7 +29,7 @@ __all__ = ['Parameter']
 import numbers
 from pathlib import Path
 
-from pydidas.core.hdf_key import HdfKey
+from pydidas.core.hdf5_key import Hdf5key
 
 
 def _get_base_class(cls):
@@ -244,7 +244,7 @@ class Parameter:
         The following conversions are supported:
 
             - str input and Path type
-            - str input and HdfKey type
+            - str input and Hdf5key type
 
         Parameters
         ----------
@@ -259,8 +259,8 @@ class Parameter:
         if isinstance(value, str):
             if self.__type == Path:
                 value = Path(value)
-            elif self.__type == HdfKey:
-                value = HdfKey(value)
+            elif self.__type == Hdf5key:
+                value = Hdf5key(value)
         return value
 
     @property
@@ -330,8 +330,8 @@ class Parameter:
             _t += ' (type: float)'
         elif self.type == str:
             _t += ' (type: str)'
-        elif self.type == HdfKey:
-            _t += ' (type: HdfKey)'
+        elif self.type == Hdf5key:
+            _t += ' (type: Hdf5key)'
         elif self.type == Path:
             _t += ' (type: Path)'
         else:
@@ -506,7 +506,7 @@ class Parameter:
         Union[str, float, int]
             The Parameter value in a pickleable format.
         """
-        if self.__type in (str, HdfKey, Path):
+        if self.__type in (str, Hdf5key, Path):
             return str(self.value)
         elif self.__type in (numbers.Integral, numbers.Real):
             return self.value

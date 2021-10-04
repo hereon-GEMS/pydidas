@@ -67,7 +67,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     filename : pathlib.Path
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
-    hdf5_key : HdfKey, optional
+    hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key.
     hdf5_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.

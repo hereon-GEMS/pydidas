@@ -25,10 +25,10 @@ __status__ = "Development"
 import unittest
 from pathlib import Path
 
-from pydidas.core import HdfKey
+from pydidas.core import Hdf5key
 
 
-class TestHdfKey(unittest.TestCase):
+class TestHdf5key(unittest.TestCase):
 
     def setUp(self):
         ...
@@ -37,22 +37,22 @@ class TestHdfKey(unittest.TestCase):
         ...
 
     def test_creation(self):
-        key = HdfKey('test')
-        self.assertIsInstance(key, HdfKey)
+        key = Hdf5key('test')
+        self.assertIsInstance(key, Hdf5key)
 
     def test_hdf5_filename(self):
-        key = HdfKey('test')
+        key = Hdf5key('test')
         self.assertIsNone(key.hdf5_filename)
 
     def test_hdf5_filename_setter(self):
         _path = 'test_path'
-        key = HdfKey('test')
+        key = Hdf5key('test')
         key.hdf5_filename = _path
         self.assertEqual(key.hdf5_filename, Path(_path))
 
     def test_hdf5_filename_setter_wrong_type(self):
         _path = 123.4
-        key = HdfKey('test')
+        key = Hdf5key('test')
         with self.assertRaises(TypeError):
             key.hdf5_filename = _path
 

@@ -27,18 +27,18 @@ import time
 import string
 import random
 
-from pydidas.plugins import (PluginCollection, BasePlugin, InputPlugin,
+from pydidas.plugins import (BasePlugin, InputPlugin,
                              ProcPlugin, OutputPlugin)
 from pydidas.unittest_objects.dummy_plugin_collection import (
     create_plugin_class, DummyPluginCollection)
+from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
+                               OUTPUT_PLUGIN)
 
-PC = PluginCollection()
 
 class TestDummyPluginCollection(unittest.TestCase):
 
     def setUp(self):
-
-        PluginCollection._reset_instance()
+        ...
 
     def tearDown(self):
         ...
@@ -47,22 +47,19 @@ class TestDummyPluginCollection(unittest.TestCase):
         ...
 
     def test_create_plugin_class__input(self):
-        _cls = create_plugin_class(0, 0)
+        _cls = create_plugin_class(0, INPUT_PLUGIN)
         _instance = _cls()
-        self.assertTrue(InputPlugin in _cls.__bases__)
-        self.assertIsInstance(_instance, BasePlugin)
+        self.assertIsInstance(_instance, InputPlugin)
 
     def test_create_plugin_class__proc(self):
-        _cls = create_plugin_class(0, 1)
+        _cls = create_plugin_class(0, PROC_PLUGIN)
         _instance = _cls()
-        self.assertTrue(ProcPlugin in _cls.__bases__)
-        self.assertIsInstance(_instance, BasePlugin)
+        self.assertIsInstance(_instance, ProcPlugin)
 
     def test_create_plugin_class__output(self):
-        _cls = create_plugin_class(0, 2)
+        _cls = create_plugin_class(0, OUTPUT_PLUGIN)
         _instance = _cls()
-        self.assertTrue(OutputPlugin in _cls.__bases__)
-        self.assertIsInstance(_instance, BasePlugin)
+        self.assertIsInstance(_instance, OutputPlugin)
 
 
 if __name__ == "__main__":

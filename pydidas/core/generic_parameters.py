@@ -29,7 +29,7 @@ from pathlib import Path
 import numpy as np
 
 from .parameter import Parameter
-from .hdf_key import HdfKey
+from .hdf5_key import Hdf5key
 from .parameter_collection import ParameterCollection
 from ..constants.generic_parameter_tooltips import TOOLTIPS
 
@@ -50,8 +50,8 @@ GENERIC_PARAMS = ParameterCollection(
         tooltip=TOOLTIPS['last_file']),
     Parameter('file_stepping', int, 1, name='File stepping',
               tooltip=TOOLTIPS['file_stepping']),
-    Parameter('hdf5_key', HdfKey, HdfKey('/entry/data/data'),
-              name='Hdf dataset key', tooltip=TOOLTIPS['hdf5_key']),
+    Parameter('hdf5_key', Hdf5key, Hdf5key('/entry/data/data'),
+              name='Hdf5 dataset key', tooltip=TOOLTIPS['hdf5_key']),
     Parameter('hdf5_dataset_shape', tuple, (0, 0, 0),
               name='Hdf5 dataset shape',
               tooltip=TOOLTIPS['hdf5_dataset_shape']),
@@ -65,8 +65,8 @@ GENERIC_PARAMS = ParameterCollection(
               choices=[True, False], tooltip=TOOLTIPS['use_bg_file']),
     Parameter('bg_file', Path, Path(), name='Background image file',
               tooltip=TOOLTIPS['bg_file']),
-    Parameter('bg_hdf5_key', HdfKey, HdfKey('/entry/data/data'),
-              name='Background Hdf dataset key',
+    Parameter('bg_hdf5_key', Hdf5key, Hdf5key('/entry/data/data'),
+              name='Background image Hdf5 dataset key',
               tooltip=TOOLTIPS['bg_hdf5_key']),
     Parameter('bg_hdf5_frame', int, 0, name='Background image number',
               tooltip=TOOLTIPS['bg_hdf5_frame']),

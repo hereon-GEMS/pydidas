@@ -31,7 +31,7 @@ from pathlib import Path
 
 from PyQt5 import QtWidgets, QtCore
 
-from ...core import HdfKey
+from ...core import Hdf5key
 from .parameter_config_widget import ParameterConfigWidget
 from ..create_widgets_mixin import CreateWidgetsMixIn
 from ..utilities import deleteItemsOfLayout
@@ -156,7 +156,7 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         _kwargs : dict
             The kwargs to be used for widget creation.
         """
-        if param.type in [HdfKey, Path]:
+        if param.type in [Hdf5key, Path]:
             _kwargs = {'width_text': self.FIXED_WIDTH - 50,
                        'width': self.FIXED_WIDTH - 80,
                        'linebreak': True, 'n_columns': 2,

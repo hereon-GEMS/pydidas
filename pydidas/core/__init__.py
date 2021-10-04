@@ -50,8 +50,8 @@ from .experimental_settings import *
 from . import scan_settings
 from .scan_settings import *
 
-from . import hdf_key
-from .hdf_key import *
+from . import hdf5_key
+from .hdf5_key import *
 
 from . import singleton_factory
 from .singleton_factory import *
@@ -66,7 +66,7 @@ __all__ += object_with_parameter_collection.__all__
 __all__ += dataset.__all__
 __all__ += experimental_settings.__all__
 __all__ += scan_settings.__all__
-__all__ += hdf_key.__all__
+__all__ += hdf5_key.__all__
 __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
 __all__ += singleton_factory.__all__
@@ -81,7 +81,7 @@ del parameter
 del dataset
 del experimental_settings
 del scan_settings
-del hdf_key
+del hdf5_key
 del parameter_collection
 del object_with_parameter_collection
 del composite_image

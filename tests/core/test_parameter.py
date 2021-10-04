@@ -29,7 +29,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import HdfKey
+from pydidas.core import Hdf5key
 from pydidas.core.parameter import _get_base_class, Parameter
 
 
@@ -145,10 +145,10 @@ class TestParameter(unittest.TestCase):
                         tooltip='Test tooltip')
         self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: str)')
 
-    def test_tooltip_hdfkey(self):
-        obj = Parameter('Test0', HdfKey, '', unit='m',
+    def test_tooltip_Hdf5key(self):
+        obj = Parameter('Test0', Hdf5key, '', unit='m',
                         tooltip='Test tooltip')
-        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: HdfKey)')
+        self.assertEqual(obj.tooltip, 'Test tooltip (unit: m, type: Hdf5key)')
 
     def test_tooltip_path(self):
         obj = Parameter('Test0', Path, '', unit='m',
@@ -238,8 +238,8 @@ class TestParameter(unittest.TestCase):
         _val = obj._Parameter__get_value_for_export()
         self.assertIsInstance(_val, str)
 
-    def test_get_value_for_export__with_HdfKey(self):
-        obj = Parameter('Test0', HdfKey, HdfKey('/test'))
+    def test_get_value_for_export__with_Hdf5key(self):
+        obj = Parameter('Test0', Hdf5key, Hdf5key('/test'))
         _val = obj._Parameter__get_value_for_export()
         self.assertIsInstance(_val, str)
 
@@ -306,11 +306,11 @@ class TestParameter(unittest.TestCase):
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertIsInstance(_newval, Path)
 
-    def test__convenience_type_conversion_hdfkey(self):
+    def test__convenience_type_conversion_Hdf5key(self):
         _val = '/new/test'
-        obj = Parameter('Test0', HdfKey, '/test')
+        obj = Parameter('Test0', Hdf5key, '/test')
         _newval = obj._Parameter__convenience_type_conversion(_val)
-        self.assertIsInstance(_newval, HdfKey)
+        self.assertIsInstance(_newval, Hdf5key)
 
 
 if __name__ == "__main__":

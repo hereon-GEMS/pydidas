@@ -76,7 +76,7 @@ class TestPluginCollectionPresenter(unittest.TestCase):
 
     def click_index(self, obj, double=False):
         model = obj.model()
-        _type = 0 #random.choice([0, 1, 2])
+        _type = random.choice([0, 1, 2])
         _num = random.choice(np.arange(self.n_per_type))
         _item = model.item(_type).child(_num)
         index = model.indexFromItem(_item)

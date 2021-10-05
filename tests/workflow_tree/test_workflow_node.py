@@ -96,6 +96,29 @@ class TestWorkflowNode(unittest.TestCase):
                 self.assertIsNone(_node.results)
                 self.assertIsNone(_node.result_kws)
 
+    def test_dump(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        _dump = obj.dump()
+        self.assertIsInstance(_dump, dict)
+        for key in ('node_id', 'parent', 'children', 'plugin_class',
+                    'plugin_params'):
+            self.assertTrue(key in _dump.keys())
+
+    def test_get_result_shape(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        _shape = obj.get_result_shape()
+        self.assertEqual(_shape, obj.plugin.result_shape)
+
+    def test_calculate_and_push_result_shape(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.calculate_and_push_result_shape()
+        _shape = obj.get_result_shape()
+        for _d in range(_depth):
+            for _node in nodes[_d]:
+                self.assertEqual(_node.get_result_shape(), _shape)
+
 
 if __name__ == '__main__':
     unittest.main()

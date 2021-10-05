@@ -21,18 +21,19 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BasePlugin', 'ProcPlugin', 'OutputPlugin']
+__all__ = ['BasePlugin']
 
 
-from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
-                          get_generic_parameter)
+from pydidas.core import ParameterCollection, ObjectWithParameterCollection
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
+
 
 ptype = {BASE_PLUGIN: 'Base plugin',
          INPUT_PLUGIN: 'Input plugin',
          PROC_PLUGIN: 'Processing plugin',
          OUTPUT_PLUGIN: 'Output plugin'}
+
 
 class BasePlugin(ObjectWithParameterCollection):
     """
@@ -137,7 +138,6 @@ class BasePlugin(ObjectWithParameterCollection):
         Run code which needs to be run only once prior to the execution of
         multiple frames.
         """
-        pass
 
     @property
     def has_unique_parameter_config_widget(self):
@@ -245,23 +245,3 @@ class BasePlugin(ObjectWithParameterCollection):
             self._config['result_shape'] = (-1,) * self.output_data_dim
         else:
             self._config['result_shape'] = _shape
-
-
-class ProcPlugin(BasePlugin):
-    """
-    The base plugin class for processing plugins.
-    """
-    plugin_type = PROC_PLUGIN
-    plugin_name = 'Base processing plugin'
-    generic_params = BasePlugin.generic_params.get_copy()
-    default_params = BasePlugin.default_params.get_copy()
-
-
-class OutputPlugin(BasePlugin):
-    """
-    The base class for output (file saving / plotting) plugins.
-    """
-    plugin_type = OUTPUT_PLUGIN
-    plugin_name = 'Base output plugin'
-    generic_params = BasePlugin.generic_params.get_copy()
-    default_params = BasePlugin.default_params.get_copy()

@@ -123,6 +123,8 @@ class WorkflowNode(GenericNode):
         The dump includes information about the parent and children nodes but
         not the nodes itself. References to the nodeIDs are stored to allow
         reconstruction of the tree.
+        Note: This dump is *not* recursive and will only save references to
+        the child layer of the node.
 
         Returns
         -------
@@ -153,8 +155,6 @@ class WorkflowNode(GenericNode):
         tuple
             The shape of the result for every frame.
         """
-        _shape = self.plugin.result_shape
-
         return self.plugin.result_shape
 
     def calculate_and_push_result_shape(self):
@@ -162,17 +162,7 @@ class WorkflowNode(GenericNode):
         Calculate the Plugin's shape of the results and push this to the node's
         children.
         """
-        self.calculate_result_shape()
-        self.push_results_shape_to_children()
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self.plugin.calculate_result_shape()
-
-    def push_results_shape_to_children(self):
-        # for _child in self._children:
-        #     _child.plugin.
-        # todo: finish method
-        pass
+        _result_shape = self.plugin.result_shape
+        for _child in self._children:
+            _child.plugin.input_shape = _result_shape
+            _child.calculate_and_push_result_shape()

@@ -8,7 +8,7 @@ class DummyProc(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     input_data_dim = -1
-    output_data = -1
+    output_data_dim = -1
     default_params = ParameterCollection()
 
     def __init__(self, *args, **kwargs):
@@ -23,3 +23,7 @@ class DummyProc(ProcPlugin):
 
     def pre_execute(self):
         self._preexecuted = True
+
+
+
+ # todo : Check result shape with dummy proc.

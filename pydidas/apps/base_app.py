@@ -53,9 +53,11 @@ class BaseApp(ObjectWithParameterCollection):
             implementation of the app.
         """
         super().__init__()
+        self.slave_mode = kwargs.get('slave_mode', False)
+        if 'slave_mode' in kwargs:
+            del kwargs['slave_mode']
         self.add_params(*args, **kwargs)
         self._config = {}
-        self.slave_mode = kwargs.get('slave_mode', False)
         self.set_default_params()
         self.parse_args_and_set_params()
 
@@ -142,29 +144,29 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return copy(self._config)
 
-    def get_copy(self, slave_app=False):
+    def get_copy(self, slave_mode=False):
         """
         Get a copy of the App.
 
         Parameters
         ----------
-        slave_app : bool, optional
+        slave_mode : bool, optional
             Keyword to toggle creation of a slave app which does not include
-            attributes marked in the classes slave_attribute.
+            attributes marked in the classes slave_mode attribute.
 
         Returns
         -------
         App : BaseApp
             A copy of the App instance.
         """
-        return self.__copy__(slave_app)
+        return self.__copy__(slave_mode)
 
-    def __copy__(self, slave_app=False):
+    def __copy__(self, slave_mode=False):
         _do_not_copy = self.attributes_not_to_copy_to_slave_app
         _obj_copy = type(self)()
         for _key in self.__dict__:
-            if not (slave_app and _key in _do_not_copy):
+            if not (slave_mode and _key in _do_not_copy):
                 _obj_copy.__dict__[_key] = copy(self.__dict__[_key])
-        if slave_app:
+        if slave_mode:
             _obj_copy.slave_mode = True
         return _obj_copy

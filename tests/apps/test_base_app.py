@@ -135,7 +135,7 @@ class TestBaseApp(unittest.TestCase):
         app.attributes_not_to_copy_to_slave_app = ['slave_att']
         app.slave_att = 12
         app.non_slave_att = 42
-        _copy = app.get_copy(slave_app=True)
+        _copy = app.get_copy(slave_mode=True)
         self.assertNotEqual(app, _copy)
         self.assertTrue(hasattr(_copy, 'non_slave_att'))
         self.assertFalse(hasattr(_copy, 'slave_att'))

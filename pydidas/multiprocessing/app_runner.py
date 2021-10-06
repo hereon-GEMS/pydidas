@@ -74,7 +74,7 @@ class AppRunner(WorkerController):
             The number of spawned worker processes. The default is 4.
         """
         super().__init__(n_workers)
-        self.__app = app.get_copy(slave_app=True)
+        self.__app = app.get_copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor['func'] = app_processor
 

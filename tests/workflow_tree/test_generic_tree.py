@@ -189,21 +189,21 @@ class TestGenericTree(unittest.TestCase):
         node = GenericNode(node_id=7)
         node2 = GenericNode(parent=node, node_id=6)
 
-    def test_fine_node_by_id(self):
+    def test_get_node_by_id(self):
         _id = 3
         tree = GenericTree()
         node = GenericNode(node_id=_id)
         tree.register_node(node)
-        _node = tree.find_node_by_id(_id)
+        _node = tree.get_node_by_id(_id)
         self.assertEqual(node, _node)
 
-    def test_fine_node_by_id__no_node(self):
+    def test_get_node_by_id__no_node(self):
         _id = 3
         tree = GenericTree()
         node = GenericNode(node_id=_id + 1)
         tree.register_node(node)
         with self.assertRaises(KeyError):
-            tree.find_node_by_id(_id)
+            tree.get_node_by_id(_id)
 
     def test_delete_node_by_id__simple(self):
         tree = GenericTree()

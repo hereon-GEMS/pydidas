@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the PluginParameterConfigWidget class used to edit plugin parameters."""
+"""
+Module with the ParameterConfigWidget class which is a generic QWidget with a
+GridLayout to add the label, I/O and unit widgets for a Parameter.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -21,159 +24,93 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterConfigWidget', 'ParameterConfigWidgetsMixIn']
+__all__ = ['ParameterConfigWidget']
 
 import sys
-import pathlib
-
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
-from .input_widget_combo import InputWidgetCombo
-from .input_widget_file import InputWidgetFile
-from .input_widget_line import InputWidgetLine
-from .input_widget_hdf5key import InputWidgetHdf5Key
 
-from ..utilities import excepthook, apply_widget_properties
-from ...core import Hdf5key, ParameterCollection
-from ..._exceptions import WidgetLayoutError
+from ..utilities import apply_widget_properties, excepthook
+from ..factory import create_param_widget, create_label, create_spacer
+from ...constants import (PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH,
+                          PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_TEXT_WIDTH,
+                          PARAM_INPUT_UNIT_WIDTH)
 from ...utils import convert_special_chars_to_unicode
 
 
-def param_widget_factory(param, widget_width):
+class ParameterConfigWidget(QtWidgets.QWidget):
     """
-    Create a widget based on the type of Parameter input.
-
-    Parameters
-    ----------
-    param : pydidas.core.Parameter
-        The Parameter requiring an I/O widget.
-    widget_width : int
-        The width of the corresponding widget
-
-    Returns
-    -------
-    pydidas.widgets.parameter_config.ParameterConfigWidget
-        The configuration widget.
+    The ParameterConfigWidget is a generic QWidget with a instantiated
+    QGridLayout to add label, I/O and unit widgets for a Parameter.
     """
-    if param.choices:
-        _widget = InputWidgetCombo(None, param, widget_width)
-    else:
-        if param.type == pathlib.Path:
-            _widget =  InputWidgetFile(None, param, widget_width)
-        elif param.type == Hdf5key:
-            _widget =  InputWidgetHdf5Key(None, param, widget_width)
-        else:
-            _widget =  InputWidgetLine(None, param, widget_width)
-    _widget.set_value(param.value)
-    return _widget
+    io_edited = QtCore.pyqtSignal(str)
 
-
-def text_widget_factory(param, widget_width):#, alignment):
-    """
-    Create the text widget to label the Parameter input.
-
-    Parameters
-    ----------
-    param : pydidas.core.Parameter
-        The Parameter requiring an I/O widget.
-    widget_width : int
-        The width of the corresponding widget
-
-    Returns
-    -------
-    QtWidgets.QLabel
-        The QLabel with the Parameter name
-    """
-    _txt = QtWidgets.QLabel(f'{convert_special_chars_to_unicode(param.name)}:')
-    _txt.setFixedWidth(widget_width)
-    _txt.setFixedHeight(20)
-    _txt.setToolTip(param.tooltip)
-    _txt.setMargin(0)
-    # if alignment is not None:
-    #     _txt.setAlignment(alignment)
-    return _txt
-
-
-class ParameterConfigWidgetsMixIn:
-    """
-    The ParameterConfigWidgetsMixIn class includes methods which can be added
-    to other classes without having to inherit from ParameterConfigWidget to
-    avoid multiple inheritance from QtWidgets.QFrame.
-    """
-    def __init__(self, *args, **kwargs):
-        self.param_widgets = {}
-        self.param_textwidgets = {}
-        self.params = ParameterCollection()
-
-    def create_param_widget(self, param, **kwargs):
+    def __init__(self, param, parent=None, **kwargs):
         """
-        Add a name label and input widget for a specific parameter to the
-        widget.
+        Setup method.
+
+        Create an instance of the ParameterConfigWidget class.
 
         Parameters
         ----------
-        param : Parameter
-            A Parameter class instance.
-        row : int, optional
-            The row in case a grid layout is used. The default is -1 (the
-            next row)
-        column : int, optional
-            The starting column in case of a grid layout. The default is 0.
-        width_text : int, optional
-            The width of the text field for the parameter name. The default
-            is 120.
-        width : int, optional
-            The width of the input widget. The default is 255 pixel.
-        n_columns : int, optional
-            The number of grid columns for the i/o widget. The default is 1.
-        n_columns_text : int, optional
-            The number of grid columns for the text widget. The default is 1.
-        linebreak : bool, optional
-            Keyword to toggle a line break between the text label and the
-            input widget. The default is False.
-        halign_io : QtCore.Qt.Alignment, optional
-            The horizontal alignment for the input widget. The default is
-            QtCore.Qt.AlignRight.
-        halign_text : QtCore.Qt.Alignment, optional
-            The horizontal alignment for the text (label) widget. The default
-            is QtCore.Qt.AlignRight.
-        valign_io : QtCore.Qt.Alignment, optional
-            The vertical alignment for the input widget. The default is
-            QtCore.Qt.AlignTop.
-        valign_text : QtCore.Qt.Alignment, optional
-            The vertical alignment for the text (label) widget. The default
-            is QtCore.Qt.AlignTop.
-        parent_widget : Union[QWidget, None], optional
-            The widget to which the label is added. If None, this defaults
-            to the calling widget, ie. "self". The default is None.
+        param : pydidas.core.Parameter
+            The associated Parameter.
+        parent : QtWidget, optional
+            The parent widget. The default is None.
+        **kwargs : dict
+            Additional keyword arguments
         """
-        _parent = kwargs.get('parent_widget', self)
-        _config = self.__get_config_for_create_parameter(**kwargs)
-        _text_widget = text_widget_factory(param, _config['width_text'])#,
-                                           # _config['valign_text'])
-        _input_widget = param_widget_factory(param, _config['width'])
-        _input_widget.io_edited.connect(
-            partial(self.__set_param_value, param, _input_widget))
+        QtWidgets.QWidget.__init__(self, parent)
+        self.param = param
+        _layout = QtWidgets.QGridLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        _layout.setColumnStretch(1, 1)
+        self.__set_size_from_kwargs(kwargs)
 
-        # store references to the widgets:
-        self.param_widgets[param.refkey] = _input_widget
-        self.param_textwidgets[param.refkey] = _text_widget
+        self.__store_config_from_kwargs(kwargs)
+        self.line1_spacer = None
+        self.name_widget = self.__get_name_widget()
+        self.unit_widget = self.__get_unit_widget()
+        self.io_widget = create_param_widget(param, self.config['width_io'])
 
-        # add widgets to layout:
-        if _parent.layout() is None:
-            raise WidgetLayoutError('No layout set.')
-        _text_widget_args, _input_widget_args = \
-            self.__get_layout_args_for_create_param_widget(_config)
-        _parent.layout().addWidget(_text_widget, *_text_widget_args)
-        _parent.layout().addWidget(_input_widget, *_input_widget_args)
+        _text_widget_args, _input_widget_args, _unit_widget_args = \
+            self.__get_layout_args_for_widgets()
+        _layout.addWidget(self.name_widget, *_text_widget_args)
+        _layout.addWidget(self.io_widget, *_input_widget_args)
+        _layout.addWidget(self.unit_widget, *_unit_widget_args)
 
-    def __get_config_for_create_parameter(self, **kwargs):
+        self.io_widget.io_edited.connect(self.__emit_io_changed)
+        self.io_widget.io_edited.connect(
+            partial(self.__set_param_value, param, self.io_widget))
+        self.setLayout(_layout)
+        apply_widget_properties(self, **kwargs)
+
+    def __set_size_from_kwargs(self, kwargs):
         """
-        Get the config with kwargs formatting options.
+        Set the size of the widget based on the input keyword arguments.
 
         Parameters
         ----------
+        kwargs : dict
+            The keyword arguments.
+        """
+        _linebreak = kwargs.get('linebreak', False)
+        _width = kwargs.get('width_total', PARAM_INPUT_WIDGET_WIDTH)
+        _height = (PARAM_INPUT_WIDGET_HEIGHT
+                   + _linebreak * (PARAM_INPUT_WIDGET_HEIGHT + 4))
+        self.setFixedWidth(_width)
+        self.setFixedHeight(_height)
+
+    def __store_config_from_kwargs(self, kwargs):
+        """
+        Get the config from the kwargs formatting options.
+
+        Parameters
+        ----------
+        parent : QtWidgets.QWidget
+            The parent widget.
         **kwargs : dict
             All possible formatting options.
 
@@ -182,26 +119,76 @@ class ParameterConfigWidgetsMixIn:
         config : dict
             The full formatting options, updated with the default values.
         """
-        _row = (kwargs.get('row', self.layout().rowCount() + 1) if
-                isinstance(self.layout(), QtWidgets.QGridLayout) else -1)
-        config = {'row': _row,
-                  'column': kwargs.get('column', 0),
-                  'width_text': kwargs.get('width_text', 120),
-                  'width': kwargs.get('width', 255),
-                  'n_columns_text': kwargs.get('n_columns_text', 1),
-                  'n_columns': kwargs.get('n_columns', 1),
-                  'linebreak': kwargs.get('linebreak', False),
-                  'halign_io': kwargs.get('halign_io',
-                                          QtCore.Qt.AlignRight),
-                  'halign_text': kwargs.get('halign_text',
-                                            QtCore.Qt.AlignRight),
+        _width = kwargs.get('width_total', PARAM_INPUT_WIDGET_WIDTH)
+        _width_unit = kwargs.get('width_unit', PARAM_INPUT_UNIT_WIDTH)
+        config = {'linebreak': kwargs.get('linebreak', False),
                   'valign_io': kwargs.get('valign_io',
                                           QtCore.Qt.AlignVCenter),
                   'valign_text': kwargs.get('valign_text',
                                             QtCore.Qt.AlignVCenter)}
-        return config
+        if config['linebreak']:
+            config['width_text'] = kwargs.get('width_text', _width - 10)
+            config['width_io'] = kwargs.get('width_io',
+                                            _width - _width_unit - 20)
+            config['halign_text'] = kwargs.get('halign_text',
+                                               QtCore.Qt.AlignLeft)
+            config['halign_io'] = kwargs.get('halign_io',
+                                              QtCore.Qt.AlignRight)
+        else:
+            config['width_text'] = kwargs.get('width_text',
+                                              PARAM_INPUT_TEXT_WIDTH)
+            config['width_io'] = kwargs.get('width_io',
+                                            PARAM_INPUT_EDIT_WIDTH)
+            config['halign_text'] = kwargs.get('halign_text',
+                                               QtCore.Qt.AlignRight)
+            config['halign_io'] = kwargs.get('halign_io',
+                                             QtCore.Qt.AlignLeft)
+        config['width_unit'] = _width_unit
+        config['width_total'] = _width
+        config['halign_unit'] = kwargs.get('halign_unit', QtCore.Qt.AlignLeft)
+        config['valign_unit'] = kwargs.get('valign_unit',
+                                           QtCore.Qt.AlignVCenter)
+        self.config = config
 
-    def __get_layout_args_for_create_param_widget(self, config):
+    def __get_name_widget(self):
+        """
+        Get a widget with the Parameter's name.
+
+        Parameters
+        ----------
+        config : dict
+            The configuration dictionary.
+
+        Returns
+        -------
+        QtWidgets.QLabel
+            The label with the Parameter's name.
+        """
+        _text = convert_special_chars_to_unicode(self.param.name) + ':'
+        return create_label(_text, fixedWidth = self.config['width_text'],
+                            fixedHeight=20, toolTip=self.param.tooltip,
+                            margin=0)
+
+    def __get_unit_widget(self):
+        """
+        Get a widget with the Parameter's unit text.
+
+        Parameters
+        ----------
+        config : dict
+            The configuration dictionary.
+
+        Returns
+        -------
+        QtWidgets.QLabel
+            The label with the Parameter's unit text.
+        """
+        _text = convert_special_chars_to_unicode(self.param.unit)
+        return create_label(_text, fixedWidth = self.config['width_unit'],
+                            fixedHeight=20, toolTip=self.param.tooltip,
+                            margin=0)
+
+    def __get_layout_args_for_widgets(self):
         """
         Get the layout insertion arguments based on config.
 
@@ -212,97 +199,35 @@ class ParameterConfigWidgetsMixIn:
 
         Returns
         -------
-        _txt_args : tuple
-            The tuple with the layout formatting args for the text widget.
-        _io_args : tuple
-            The tuple with the layout formatting args for the input widget.
+        txt_args : tuple
+            The tuple with the layout formatting args for the name widget.
+        io_args : tuple
+            The tuple with the layout formatting args for the io widget.
+        unit_args : tuple
+            The tuple with the layout formatting args for the unit widget.
         """
-        if isinstance(self.layout(), QtWidgets.QGridLayout):
-            _txt_args = (config['row'], config['column'], 1,
-                         config['n_columns_text'],
-                         config['valign_text'] | config['halign_text'])
-            _io_args = (config['row'] + config['linebreak'],
-                        config['column'] + 1 - config['linebreak'], 1,
-                        config['n_columns'],
-                        config['valign_io'] | config['halign_io'])
-        else:
-            _txt_args = (0, QtCore.Qt.AlignRight)
-            _io_args = (0, QtCore.Qt.AlignRight)
-        return _txt_args, _io_args
+        _iline = int(self.config['linebreak'])
+        _txtargs = (0, 0, 1, 1 + 3 * _iline,
+                    self.config['valign_text'] | self.config['halign_text'])
+        _ioargs = (_iline, 1, 1, 1 + _iline,
+                   self.config['valign_io'] | self.config['halign_io'])
+        _unitargs = (_iline, 2 + _iline, 1, 1,
+                     self.config['valign_text'] | self.config['halign_text'])
+        # print(self.param.name, _txtargs, _ioargs, _unitargs)
+        # print(self.param.name, self.config)
+        return _txtargs, _ioargs, _unitargs
 
-    def update_param_value(self, key, value):
+    @QtCore.pyqtSlot(str)
+    def __emit_io_changed(self, value):
         """
-        Update a parameter value both in the Parameter and the widget.
-
-        This method will update the parameter referenced by <key> and
-        update both the Parameter.value as well as the displayed widget
-        entry.
+        Forward the io_changed signal from the IO widget.
 
         Parameters
         ----------
-        key : str
-            The reference key for the Parameter.
-        value : object
-            The new parameter value. This must be of the same type as the
-            Parameter datatype.
-
-        Raises
-        ------
-        KeyError
-            If no parameter or widget has been registered with this key.
+        value : str
+            The value emitted by the IO widget.
         """
-        if key not in self.params or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        self.set_param_value(key, value)
-        self.param_widgets[key].set_value(value)
-
-    def toggle_widget_visibility(self, key, visible):
-        """
-        Toggle the visibility of widgets referenced with key.
-
-        This method allows to show/hide the label and input widget for a
-        parameter referenced with <key>.
-
-        Parameters
-        ----------
-        key : str
-            The reference key for the Parameter..
-        visible : bool
-            The boolean setting for the visibility.
-
-        Raises
-        ------
-        KeyError
-            If no widget has been registered with this key.
-        """
-        if key not in self.param_textwidgets or key not in self.param_widgets:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        self.param_widgets[key].setVisible(visible)
-        self.param_textwidgets[key].setVisible(visible)
-
-
-    def get_param_value(self, key):
-        """
-        Get the value of the Parameter referencey by key.
-
-        Parameters
-        ----------
-        key : str
-            The parameter reference key.
-
-        Raises
-        ------
-        KeyError
-            If no parameter has been registered with key.
-
-        Returns
-        -------
-        object
-            The Parameter value (in the datatype determined by Parameter).
-        """
-        if key not in self.params:
-            raise KeyError(f'No parameter with key "{key}" found.')
-        return self.params[key].value
+        self.io_edited.emit(value)
 
     @staticmethod
     def __set_param_value(param, widget):
@@ -326,52 +251,13 @@ class ParameterConfigWidgetsMixIn:
             widget.set_value(param.value)
             excepthook(*sys.exc_info())
 
-
-class ParameterConfigWidget(QtWidgets.QFrame, ParameterConfigWidgetsMixIn):
-    """
-    The ParameterConfigWidget widget can be used to create a composite widget
-    for updating parameter values.
-
-    Depending on the parameter types, automatic typechecks are implemented.
-    """
-    def __init__(self, parent=None, **kwargs):
+    def sizeHint(self):
         """
-        Setup method.
-
-        Create an instance on the ParameterConfigWidget class.
-
-        Parameters
-        ----------
-        parent : QtWidget, optional
-            The parent widget. The default is None.
-        initLayout : bool, optional
-            Flag to toggle layout creation (with a VBoxLayout). The default
-            is True.
-        **kwargs : dict
-            Additional keyword arguments
-        """
-        QtWidgets.QFrame.__init__(self, parent)
-        ParameterConfigWidgetsMixIn.__init__(self)
-        initLayout = kwargs.get('initLayout', True)
-        kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
-        kwargs['frameStyle'] = kwargs.get('frameStyle',
-                                          QtWidgets.QFrame.Raised)
-        kwargs['autoFillBackground'] = kwargs.get('autoFillBackground', True)
-        apply_widget_properties(self, **kwargs)
-        if initLayout:
-            _layout = QtWidgets.QGridLayout()
-            _layout.setContentsMargins(5, 5, 0, 0)
-            _layout.setAlignment(QtCore.Qt.AlignLeft
-                                      | QtCore.Qt.AlignTop)
-            self.setLayout(_layout)
-
-    def next_row(self):
-        """
-        Get the next empty row in the layout.
+        Set the Qt sizeHint to be the widget's size.
 
         Returns
         -------
-        int
-            The next empty row.
+        QtCore.QSize
+            The size of the widget.
         """
-        return self.layout().rowCount() + 1
+        return QtCore.QSize(self.width(), self.height())

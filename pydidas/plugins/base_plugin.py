@@ -33,6 +33,8 @@ ptype = {BASE_PLUGIN: 'Base plugin',
          INPUT_PLUGIN: 'Input plugin',
          PROC_PLUGIN: 'Processing plugin',
          OUTPUT_PLUGIN: 'Output plugin'}
+data_dim = {i: str(i) for i in range(20)}
+data_dim.update({None: 'None', -1: 'any'})
 
 
 class BasePlugin(ObjectWithParameterCollection):
@@ -78,11 +80,13 @@ class BasePlugin(ObjectWithParameterCollection):
         str
             The descripion of the plugin.
         """
-        _doc = (cls.__doc__ if cls.__doc__ is not None
+        _doc = (cls.__doc__.strip() if cls.__doc__ is not None
                 else 'No docstring available')
         _desc = (f'Plugin name: {cls.plugin_name}\n'
                  f'Class name: {cls.__name__}\n'
                  f'Plugin type: {ptype[cls.plugin_type]}\n\n'
+                 f'Input data dimension: {data_dim[cls.input_data_dim]}\n\n'
+                 f'Output data dimension: {data_dim[cls.output_data_dim]}\n\n'
                  f'Plugin description:\n{_doc}\n\n'
                  'Parameters:')
         for param in cls.default_params.values():
@@ -103,11 +107,13 @@ class BasePlugin(ObjectWithParameterCollection):
         dict
             The descripion of the plugin.
         """
-        _doc = (cls.__doc__ if cls.__doc__ is not None
+        _doc = (cls.__doc__.strip() if cls.__doc__ is not None
                 else 'No docstring available')
         return {'Name': cls.plugin_name,
                 'Class name': cls.__name__,
                 'Plugin type': ptype[cls.plugin_type],
+                'Input data dimension': data_dim[cls.input_data_dim],
+                'Output data dimension': data_dim[cls.output_data_dim],
                 'Plugin description': _doc,
                 'Parameters': '\n'.join(
                     [str(param) for param in cls.default_params.values()])}

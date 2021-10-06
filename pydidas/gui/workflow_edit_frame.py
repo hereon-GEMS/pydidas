@@ -58,6 +58,9 @@ class WorkflowEditFrame(BaseFrame):
 
     @QtCore.pyqtSlot(int)
     def configure_plugin(self, node_id):
+        if node_id == -1:
+            self._widgets['plugin_edit_canvas'].clear_layout()
+            return
         plugin = TREE.nodes[node_id].plugin
         self._widgets['plugin_edit_canvas'].configure_plugin(node_id, plugin)
 

@@ -37,6 +37,7 @@ class InputPlugin(BasePlugin):
     """
     plugin_type = INPUT_PLUGIN
     plugin_name = 'Base input plugin'
+    input_data_dim = None
     generic_params = BasePlugin.generic_params.get_copy()
     generic_params.add_params(
         get_generic_parameter('use_roi'),

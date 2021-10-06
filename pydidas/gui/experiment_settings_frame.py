@@ -36,7 +36,7 @@ from ..core import ParameterCollectionMixIn
 from ..core.experimental_settings import ExperimentalSettings
 
 from ..widgets import BaseFrame
-from ..widgets.parameter_config import ParameterConfigWidgetsMixIn
+from ..widgets.parameter_config import ParameterWidgetsMixIn
 from ..widgets.dialogues import CriticalWarning
 from .builders.experiment_settings_frame_builder import (
     create_experiment_settings_frame_widgets_and_layout)
@@ -45,14 +45,14 @@ EXP_SETTINGS = ExperimentalSettings()
 
 ## TODO : Restore default function
 
-class ExperimentSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
+class ExperimentSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
                               ParameterCollectionMixIn):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         BaseFrame.__init__(self, parent, name=name)
-        ParameterConfigWidgetsMixIn.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
         self.params = EXP_SETTINGS.params
         create_experiment_settings_frame_widgets_and_layout(self)
         self.connect_signals()

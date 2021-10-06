@@ -181,7 +181,7 @@ class GenericTree:
         i = self.node_ids[-1]
         return i + 1
 
-    def find_node_by_id(self, node_id):
+    def get_node_by_id(self, node_id):
         """
         Get the node from the node_id
 

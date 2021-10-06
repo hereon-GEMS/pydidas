@@ -12,7 +12,8 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-"""Module with the InputWidgetHdf5Key class used to edit Parameters."""
+
+"""Module with the InputWidgetFile class used to edit Parameters."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -20,14 +21,16 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['InputWidgetHdf5Key']
+__all__ = ['InputWidgetFile']
+
+import pathlib
 
 from PyQt5 import QtWidgets, QtCore
-from .input_widget_with_button import InputWidgetWithButton
-from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup
-from pydidas.constants import HDF5_EXTENSIONS
 
-class InputWidgetHdf5Key(InputWidgetWithButton):
+from .input_widget_with_button import InputWidgetWithButton
+
+
+class InputWidgetFile(InputWidgetWithButton):
     """
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
@@ -50,14 +53,13 @@ class InputWidgetHdf5Key(InputWidgetWithButton):
             A Parameter instance.
         width : int, optional
             The width of the IOwidget.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(parent, param, width)
-        self._button.setToolTip(
-            'Select a dataset from all dataset keys in a file.')
+        self._output_flag = param.refkey.startswith('output')
+        self._file_selection = (
+            'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
+            'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'
+            )
 
     def button_function(self):
         """
@@ -65,18 +67,36 @@ class InputWidgetHdf5Key(InputWidgetWithButton):
 
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
+        """
+        if self._output_flag:
+            _func = QtWidgets.QFileDialog.getSaveFileName
+        else:
+            _func = QtWidgets.QFileDialog.getOpenFileName
+        fname = _func(self, 'Name of file', None, self._file_selection)[0]
+        if fname:
+            self.setText(fname)
+            self.emit_signal()
+
+    def get_value(self):
+        """
+        Get the current value from the combobox to update the Parameter value.
 
         Returns
         -------
-        None.
+        Path
+            The text converted to a pathlib.Path to update the Parameter value.
         """
-        _fnames = ' *'.join(HDF5_EXTENSIONS)
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Name of file', None,
-            (f'HDF5 files (*{_fnames});; All files (*.*)')
-        )[0]
-        if fname:
-            dset = Hdf5DatasetSelectionPopup(self, fname).get_dset()
-            if dset is not None:
-                self.setText(str(dset))
-                self.emit_signal()
+        text = self.ledit.text()
+        return pathlib.Path(self.get_value_from_text(text))
+
+    def modify_file_selection(self, list_of_choices):
+        """
+        Modify the file selection choices in the popup window.
+
+        Parameters
+        ----------
+        list_of_choices : list
+            The list with string entries for file selection choices in the
+            format 'NAME (*.EXT1 *.EXT2 ...)'
+        """
+        self._file_selection = ';;'.join(list_of_choices)

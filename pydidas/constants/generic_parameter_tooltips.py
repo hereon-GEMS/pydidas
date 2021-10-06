@@ -154,6 +154,10 @@ TOOLTIPS = {
                      ' uses Parallelization as well and you can only gain '
                      'limited performance increases for multiple parallel'
                      ' processes.'),
+    'shared_buffer_size': ('A shared buffer is used to efficiently transport'
+                           ' data between the main App and multiprocessing '
+                           'Processes. This buffer must be large enough to '
+                           'store at least one instance of all result data.'),
     'det_mask': 'The path to the detector mask file.',
     'det_mask_val': ('The value to be used for the pixels masked on the '
                      'detector. Note that this value will only be used '

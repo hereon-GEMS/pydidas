@@ -36,9 +36,9 @@ from pydidas.gui.builders.composite_creator_frame_builder import (
 from pydidas._exceptions import AppConfigError
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import Parameter, get_generic_parameter
-from pydidas.constants import HDF5_EXTENSIONS
+from pydidas.constants import HDF5_EXTENSIONS, PARAM_INPUT_WIDGET_WIDTH
 from pydidas.widgets import BaseFrameWithApp, dialogues
-from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                            LOGGING_LEVEL)
 from pydidas.multiprocessing import AppRunner
@@ -48,18 +48,16 @@ logger = pydidas_logger(LOGGING_LEVEL)
 
 
 class CompositeCreatorFrame(BaseFrameWithApp,
-                            ParameterConfigWidgetsMixIn,
+                            ParameterWidgetsMixIn,
                             SilxPlotWindowMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
     visualization.
     """
-    CONFIG_WIDGET_WIDTH = 300
-
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
-        ParameterConfigWidgetsMixIn.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
         SilxPlotWindowMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
@@ -315,9 +313,9 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         for _key in ['hdf5_key', 'hdf5_first_image_num',
                      'hdf5_last_image_num', 'hdf5_stepping',
                      'hdf5_dataset_shape']:
-            self.toggle_widget_visibility(_key, hdf5_flag)
-        self.toggle_widget_visibility('last_file', True)
-        self.toggle_widget_visibility('raw_image_shape', not hdf5_flag)
+            self.toggle_param_widget_visibility(_key, hdf5_flag)
+        self.toggle_param_widget_visibility('last_file', True)
+        self.toggle_param_widget_visibility('raw_image_shape', not hdf5_flag)
 
     def __check_if_hdf5_file(self):
         """
@@ -376,8 +374,8 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             if dset is not None:
                 self.update_param_value('bg_hdf5_key', dset)
                 self._config['bg_configured'] = True
-        self.toggle_widget_visibility('bg_hdf5_key', hdf5_flag)
-        self.toggle_widget_visibility('bg_hdf5_frame', hdf5_flag)
+        self.toggle_param_widget_visibility('bg_hdf5_key', hdf5_flag)
+        self.toggle_param_widget_visibility('bg_hdf5_frame', hdf5_flag)
         self.__check_exec_enable()
 
     def __selected_hdf5_key(self):
@@ -469,12 +467,12 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         if isinstance(flag, str):
             flag = flag == 'True'
         self.set_param_value('use_bg_file', flag)
-        self.toggle_widget_visibility('bg_file', flag)
+        self.toggle_param_widget_visibility('bg_file', flag)
         _bg_ext = os.path.splitext(self.get_param_value('bg_file'))[1]
         if not _bg_ext in HDF5_EXTENSIONS:
             flag = False
-        self.toggle_widget_visibility('bg_hdf5_key', flag)
-        self.toggle_widget_visibility('bg_hdf5_frame', flag)
+        self.toggle_param_widget_visibility('bg_hdf5_key', flag)
+        self.toggle_param_widget_visibility('bg_hdf5_frame', flag)
         self.__check_exec_enable()
 
     def __abort_comp_creation(self):
@@ -498,7 +496,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             flag = flag == 'True'
         self.set_param_value('use_roi', flag)
         for _key in ['roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh']:
-            self.toggle_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, flag)
 
     def __toggle_threshold_selection(self, flag):
         """
@@ -513,7 +511,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             flag = flag == 'True'
         self.set_param_value('use_thresholds', flag)
         for _key in ['threshold_low', 'threshold_high']:
-            self.toggle_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, flag)
 
     def __clear_entries(self, keys='all', hide=True):
         """
@@ -533,7 +531,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
                      'hdf5_last_image_num','bg_hdf5_key', 'bg_hdf5_frame',
                      'bg_file']:
             if _key in keys:
-                self.toggle_widget_visibility(_key, not hide)
+                self.toggle_param_widget_visibility(_key, not hide)
         self.__check_exec_enable()
 
     def __update_n_image(self):
@@ -608,7 +606,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             Flag whether to finalize or lock finalization.
         """
         for _key in ['file_stepping', 'composite_nx', 'composite_ny']:
-            self.toggle_widget_visibility(_key, flag)
+            self.toggle_param_widget_visibility(_key, flag)
         self._widgets['but_exec'].setEnabled(flag)
 
 

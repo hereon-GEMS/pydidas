@@ -31,7 +31,7 @@ from pydidas.core import (ScanSettings, Parameter, ParameterCollection,
                           get_generic_parameter)
 from pydidas.workflow_tree import WorkflowTree
 from pydidas.widgets import BaseFrame
-from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.image_math_frame_builder import (
     create_image_math_frame_widgets_and_layout)
 
@@ -51,13 +51,13 @@ DEFAULT_PARAMS =  ParameterCollection(
     )
 
 
-class ImageMathFrame(BaseFrame, ParameterConfigWidgetsMixIn):
+class ImageMathFrame(BaseFrame, ParameterWidgetsMixIn):
     default_params = DEFAULT_PARAMS
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
-        ParameterConfigWidgetsMixIn.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
         self.set_default_params()
         create_image_math_frame_widgets_and_layout(self)
 

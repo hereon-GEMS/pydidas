@@ -26,6 +26,7 @@ __all__ = ['InputWidgetWithButton']
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore, QtGui
+
 from .input_widget import InputWidget
 from ...constants import PARAM_INPUT_WIDGET_HEIGHT
 

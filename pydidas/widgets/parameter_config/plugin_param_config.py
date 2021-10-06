@@ -32,12 +32,13 @@ from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 
 from ...core import Hdf5key
-from .parameter_config_widget import ParameterConfigWidget
+from .parameter_collection_config_widget import ParameterCollectionEditWidget
 from ..create_widgets_mixin import CreateWidgetsMixIn
 from ..utilities import deleteItemsOfLayout
 
 
-class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
+class PluginParameterConfigWidget(ParameterCollectionEditWidget,
+                                  CreateWidgetsMixIn):
     """
     The PluginParameterConfigWidget widget creates the composite widget for
     updating Parameters and changing default values.
@@ -57,7 +58,7 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterConfigWidget.__init__(self, parent)
+        ParameterCollectionEditWidget.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
@@ -77,12 +78,12 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         plugin : object
             The instance of the Plugin to be edited.
         """
-        self.__clear_layout()
+        self.clear_layout()
         self.plugin = plugin
         self.node_id = node_id
         self.__create_widgets_for_new_plugin()
 
-    def __clear_layout(self):
+    def clear_layout(self):
         """
         Delete all widgets and items which currently populate the
         PluginParameterConfigWidget.
@@ -158,13 +159,15 @@ class PluginParameterConfigWidget(ParameterConfigWidget, CreateWidgetsMixIn):
         """
         if param.type in [Hdf5key, Path]:
             _kwargs = {'width_text': self.FIXED_WIDTH - 50,
-                       'width': self.FIXED_WIDTH - 80,
-                       'linebreak': True, 'n_columns': 2,
-                       'n_columns_text': 2,
-                       'halign_text': QtCore.Qt.AlignLeft}
+                       'width_io': self.FIXED_WIDTH - 80,
+                       'width_unit': 0,
+                       'width_total': self.FIXED_WIDTH,
+                       'linebreak': True}
+                       #'halign_text': QtCore.Qt.AlignLeft}
         else:
             _kwargs = {'width_text': 200,
-                       'width': self.FIXED_WIDTH - 210}
+                       'width_io': self.FIXED_WIDTH - 240,
+                       'width_total': self.FIXED_WIDTH}
         return _kwargs
 
     def update_edits(self):

@@ -137,6 +137,8 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
                 self.append(f'\n{_key}:')
                 self.setFontWeight(50)
                 for item in _items:
-                    self.append(' ' * indent + item)
+                    _indent = (' ' * indent if item[:indent] != ' ' * indent
+                               else '')
+                    self.append(_indent + item)
         self.verticalScrollBar().triggerAction(
             QtWidgets.QScrollBar.SliderToMinimum)

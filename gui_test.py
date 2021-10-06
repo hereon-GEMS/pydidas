@@ -18,7 +18,7 @@ from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame,
     ExperimentSettingsFrame, ScanSettingsFrame, ProcessingSinglePluginFrame,
     ProcessingFullWorkflowFrame, CompositeCreatorFrame)
-from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.widgets import BaseFrame
 
 class HomeFrame(BaseFrame):
@@ -55,7 +55,7 @@ class ProcessingFrame(BaseFrame):
                           gridPos=(0, 0, 1, 5))
 
 
-class ResultVisualizationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
+class ResultVisualizationFrame(BaseFrame, ParameterWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)

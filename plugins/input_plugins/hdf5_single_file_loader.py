@@ -27,9 +27,7 @@ __status__ = "Development"
 __all__ = ['Hdf5singleFileLoader']
 
 
-from pathlib import Path
-
-from pydidas.core import Parameter, ParameterCollection, get_generic_parameter
+from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.image_io import read_image
 
@@ -38,7 +36,8 @@ class Hdf5singleFileLoader(InputPlugin):
     """
     Load data frames from Hdf5 data files.
 
-    This class is designed to load data from a single Hdf5 file. The
+    This class is designed to load data from a single Hdf5 file. The filename
+    and dataset key must be specified.
     """
     plugin_name = 'HDF5 single file loader'
     basic_plugin = False

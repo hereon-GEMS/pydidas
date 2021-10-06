@@ -31,8 +31,8 @@ from PyQt5 import QtWidgets, QtCore
 from silx.gui.plot import PlotWindow
 
 from pydidas.widgets import (ScrollArea, create_default_grid_layout)
-from pydidas.widgets.parameter_config import ParameterConfigWidget
-
+from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
+from pydidas.constants import PARAM_INPUT_WIDGET_WIDTH
 
 CONFIG_WIDGET_WIDTH = 300
 
@@ -53,23 +53,26 @@ def create_composite_creator_frame_widgets_and_layout(frame):
         # special formatting for some parameters:
         if param_key in ['first_file', 'last_file', 'hdf5_key', 'bg_file',
                          'bg_hdf5_key', 'output_fname']:
-            _config = dict(linebreak=True, n_columns=2, n_columns_text=2,
+            _config = dict(linebreak=True,
                            halign_text=QtCore.Qt.AlignLeft,
                            valign_text=QtCore.Qt.AlignBottom,
-                           width=CONFIG_WIDGET_WIDTH,
-                           width_text=CONFIG_WIDGET_WIDTH - 50,
+                           width_total=CONFIG_WIDGET_WIDTH,
+                           width_io=CONFIG_WIDGET_WIDTH - 50,
+                           width_text=CONFIG_WIDGET_WIDTH - 20,
+                           width_unit=0,
                            parent_widget=frame._widgets['config'],
                            row=_config_next_row())
         else:
-            _config = dict(width=100, row=_config_next_row(),
+            _config = dict(width_io=100, width_unit=0,
                            parent_widget=frame._widgets['config'],
-                           width_text=CONFIG_WIDGET_WIDTH - 110)
+                           width_text=CONFIG_WIDGET_WIDTH - 100,
+                           width_total=CONFIG_WIDGET_WIDTH)
         return _config
 
     frame._widgets = {}
     frame.layout().setContentsMargins(0, 0, 0, 0)
 
-    frame._widgets['config'] = ParameterConfigWidget(
+    frame._widgets['config'] = ParameterCollectionEditWidget(
         frame, initLayout=False, lineWidth=5,
         sizePolicy= (QtWidgets.QSizePolicy.Fixed,
                      QtWidgets.QSizePolicy.Expanding))
@@ -85,7 +88,7 @@ def create_composite_creator_frame_widgets_and_layout(frame):
 
     frame.create_any_widget(
         'config_area', ScrollArea, widget=frame._widgets['config'],
-        fixedWidth=CONFIG_WIDGET_WIDTH + 55,
+        fixedWidth=CONFIG_WIDGET_WIDTH + 40,
         sizePolicy= (QtWidgets.QSizePolicy.Fixed,
                       QtWidgets.QSizePolicy.Expanding),
         gridPos=(-1, 0, 1, 1), stretch=(1, 0),
@@ -117,7 +120,7 @@ def create_composite_creator_frame_widgets_and_layout(frame):
                     'binning', 'output_fname', 'n_total']:
             frame.create_line(f'line_{_key}',
                 parent_widget=frame._widgets['config'],
-                fixedWidth=frame.CONFIG_WIDGET_WIDTH)
+                fixedWidth=CONFIG_WIDGET_WIDTH)
 
     frame.create_button(
         'but_exec', 'Generate composite',
@@ -159,7 +162,7 @@ def create_composite_creator_frame_widgets_and_layout(frame):
     for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
                  'last_file','hdf5_stepping', 'hdf5_dataset_shape',
                  'hdf5_stepping']:
-        frame.toggle_widget_visibility(_key, False)
+        frame.toggle_param_widget_visibility(_key, False)
 
-    frame.toggle_widget_visibility('hdf5_dataset_shape', False)
-    frame.toggle_widget_visibility('raw_image_shape', False)
+    frame.toggle_param_widget_visibility('hdf5_dataset_shape', False)
+    frame.toggle_param_widget_visibility('raw_image_shape', False)

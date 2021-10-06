@@ -326,7 +326,14 @@ class MainWindow(QtWidgets.QMainWindow):
         helpMenu.addAction(documentation_action)
         helpMenu.addAction(doc_in_browser_action)
 
-
         self._menu.addMenu(fileMenu)
         self._menu.addMenu(extrasMenu)
         self._menu.addMenu(helpMenu)
+
+    def deleteLater(self):
+        """
+        Add deleteLater entries for the associated windows.
+        """
+        for _window in self.windows:
+            _window.deleteLater()
+        super().deleteLater()

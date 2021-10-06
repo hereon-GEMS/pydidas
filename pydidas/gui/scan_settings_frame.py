@@ -31,14 +31,14 @@ from PyQt5 import QtWidgets, QtCore
 
 from pydidas.core import ScanSettings
 from pydidas.widgets import CreateWidgetsMixIn, excepthook, BaseFrame
-from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.scan_settings_frame_builder import (
     create_scan_settings_frame_widgets_and_layout)
 
 SCAN_SETTINGS = ScanSettings()
 
 
-class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
+class ScanSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
                         CreateWidgetsMixIn):
     """
     Frame for managing the global scan settings.
@@ -50,7 +50,7 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
         BaseFrame.__init__(self, parent,name=name)
-        ParameterConfigWidgetsMixIn.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
 
         create_scan_settings_frame_widgets_and_layout(self)
         self.toggle_dims()
@@ -63,8 +63,7 @@ class ScanSettingsFrame(BaseFrame, ParameterConfigWidgetsMixIn,
             _toggle = True if i <= _dim else False
             self._widgets[f'title_{i}'].setVisible(_toggle)
             for _pre in _prefixes:
-                self.param_widgets[_pre.format(n=i)].setVisible(_toggle)
-                self.param_textwidgets[_pre.format(n=i)].setVisible(_toggle)
+                self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
 
     def update_param(self, param_ref, widget):
         """

@@ -23,13 +23,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['InputWidget']
 
-
 import numbers
 import pathlib
+
 from PyQt5 import QtWidgets
 
 from ...core import Hdf5key
 from ...constants import PARAM_INPUT_WIDGET_HEIGHT
+
 
 class InputWidget(QtWidgets.QWidget):
     """Base class of widgets for I/O during plugin parameter editing."""

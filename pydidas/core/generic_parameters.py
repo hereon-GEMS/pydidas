@@ -200,6 +200,8 @@ GENERIC_PARAMS = ParameterCollection(
     ############################
     Parameter('mp_n_workers', int, 4, name='Number of MP workers',
               tooltip=TOOLTIPS['mp_n_workers']),
+    Parameter('shared_buffer_size', float, 100, name='Shared buffer size',
+              tooltip=TOOLTIPS['shared_buffer_size'], unit='MB'),
     Parameter('det_mask', Path, Path(), name='Detector mask file',
               tooltip=TOOLTIPS['det_mask']),
     Parameter('det_mask_val', float, 0, name='Detector mask value',
@@ -211,7 +213,7 @@ GENERIC_PARAMS = ParameterCollection(
               name='Mosaic border value',
               tooltip=TOOLTIPS['mosaic_border_value']),
     Parameter('mosaic_max_size', float, 100,
-              name='Mosaic maximum size (Mpx)',
+              name='Mosaic maximum size', unit='Mpx',
               tooltip=TOOLTIPS['mosaic_max_size']),
     Parameter('run_type', str, 'Process in GUI', name='Run type',
               choices=['Process in GUI', 'Command line',

@@ -95,7 +95,7 @@ class ExecuteWorkflowApp(BaseApp):
     mp_func_results = QtCore.pyqtSignal(object)
     updated_composite = QtCore.pyqtSignal()
     parse_func = parse_composite_creator_cmdline_arguments
-    attributes_not_to_copy_to_slave_app = []
+    attributes_not_to_copy_to_slave_app = ['_shared_arrays']
 
     def __init__(self, *args, **kwargs):
         """
@@ -115,28 +115,23 @@ class ExecuteWorkflowApp(BaseApp):
         Prepare running the workflow execution.
         """
         self.__check_and_store_results_shapes()
+        self.__check_size_of_results_and_calc_buffer_size()
+        self.__initialize_shared_memory
 
     def __check_and_store_results_shapes(self):
+        if TREE.root is None:
+            raise AppConfigError('The WorkflowTree has no nodes.')
+        TREE.root.calculate_and_push_result_shape()
         _leaves = TREE.get_all_leaves()
-        if len(self._config['result_shapes']) == len(_leaves):
-            return
-        _shapes = []
-        for _leaf in _leaves:
-            _shapes.append(_leaf.get_result_shape())
-        if (-1,) in _shapes:
-            _shapes = self.__run_tree_to_get_results_shapes()
-
-
-
-    def __run_tree_to_get_results_shapes(self):
-        raise Warning('Unknown shape encountered. Will run the full'
-                      ' processing tree once to get shapes.')
-        TREE.execute_process(0)
-        _leaves = TREE.get_all_leaves()
-        _shapes = []
-        for _leaf in _leaves:
-            _shapes.append(_leaves.results.shape)
-        return _shapes
+        _shapes = {_leaf.node_id: _leaf.get_result_shape()
+                   for _leaf in _leaves}
+        for _id, _shape in _shapes.items():
+            if -1 in _shape:
+                _plugin_cls = TREE.get_node_by_id(_id).plugin.__class__
+                _error = ('Cannot determine the shape of the output for node'
+                          f'"{_id}" (type {_plugin_cls}).')
+                raise AppConfigError(_error)
+        self._config['results_shapes'] = _shapes
 
     def multiprocessing_get_tasks(self):
         """

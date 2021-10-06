@@ -26,17 +26,19 @@ __all__ = ['GlobalConfigurationFrame']
 
 import sys
 from functools import partial
-from PyQt5 import QtWidgets, QtCore
 
+from PyQt5 import QtWidgets, QtCore
 
 from pydidas.widgets import BaseFrame
 from pydidas.core import (get_generic_parameter, ParameterCollection)
-from pydidas.widgets.parameter_config import ParameterConfigWidgetsMixIn
+from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.global_configuration_frame_builder import (
     create_global_configuratation_frame_widgets_and_layout)
 
+
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mp_n_workers'),
+    get_generic_parameter('shared_buffer_size'),
     get_generic_parameter('det_mask'),
     get_generic_parameter('det_mask_val'),
     get_generic_parameter('mosaic_border_width'),
@@ -45,7 +47,7 @@ DEFAULT_PARAMS = ParameterCollection(
     )
 
 
-class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
+class GlobalConfigurationFrame(BaseFrame, ParameterWidgetsMixIn):
     """
     Frame which manages global configuration items.
     """
@@ -56,8 +58,8 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         name = kwargs.get('name', None)
-        BaseFrame.__init__(self, parent,name=name)
-        ParameterConfigWidgetsMixIn.__init__(self)
+        BaseFrame.__init__(self, parent, name=name)
+        ParameterWidgetsMixIn.__init__(self)
         self.set_default_params()
         create_global_configuratation_frame_widgets_and_layout(self)
         self.connect_signals()
@@ -115,7 +117,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterConfigWidgetsMixIn):
             self.restore_all_defaults(True)
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
-                self.param_widgets[_param_key].set_value(_value)
+                self.update_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
 
     @QtCore.pyqtSlot(str, object)

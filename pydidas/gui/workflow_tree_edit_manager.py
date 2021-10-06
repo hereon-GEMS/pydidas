@@ -277,6 +277,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.node_ids[-1])
             self.update_node_positions()
+        else:
+            self.plugin_to_edit.emit(-1)
 
     def __delete_nodes_and_widgets(self, ids):
         """

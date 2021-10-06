@@ -37,6 +37,9 @@ from .spacer_factory import *
 from . import combobox_factory
 from .combobox_factory import *
 
+from . import param_widget_factory
+from .param_widget_factory import *
+
 __all__ = []
 __all__ += button_factory.__all__
 __all__ += spin_box_factory.__all__
@@ -46,6 +49,7 @@ __all__ += spacer_factory.__all__
 __all__ += progress_bar_factory.__all__
 __all__ += check_box_factory.__all__
 __all__ += combobox_factory.__all__
+__all__ += param_widget_factory.__all__
 
 # unclutter namespace and remove modules:
 del spin_box_factory
@@ -56,3 +60,4 @@ del label_factory
 del line_factory
 del spacer_factory
 del combobox_factory
+del param_widget_factory

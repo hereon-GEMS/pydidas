@@ -42,20 +42,23 @@ def create_scan_settings_frame_widgets_and_layout(frame):
         The ScanSettingsFrame instance.
     """
     frame._widgets = {}
+    _width_total = frame.TEXT_WIDTH + frame.PARAM_INPUT_WIDTH + 10
+
     frame.create_label('label_title', 'Scan settings\n', fontsize=14,
-                      bold=True, underline=True, gridPos=(0, 0, 1, 0))
+                      bold=True, underline=True, gridPos=(0, 0, 1, 1))
     frame.create_button('but_load', 'Load scan parameters from file',
-                       gridPos=(-1, 0, 1, 2), alignment=None,
+                       gridPos=(-1, 0, 1, 1), alignment=None,
                        icon=frame.style().standardIcon(42))
     frame.create_button('but_import', 'Open scan parameter import dialogue',
-                       gridPos=(-1, 0, 1, 2), alignment=None,
+                       gridPos=(-1, 0, 1, 1), alignment=None,
                        icon=frame.style().standardIcon(42))
     frame.create_label('scan_dim', '\nScan dimensionality:', fontsize=11,
-                     bold=True, gridPos=(frame.next_row(), 0, 1, 2))
+                     bold=True, gridPos=(frame.next_row(), 0, 1, 1))
 
     param = SCAN_SETTINGS.get_param('scan_dim')
     frame.create_param_widget(param, width_text = frame.TEXT_WIDTH,
-                             width=frame.PARAM_INPUT_WIDTH)
+                             width_io=frame.PARAM_INPUT_WIDTH,
+                             width_total=_width_total, width_unit=0)
     frame.param_widgets['scan_dim'].currentTextChanged.connect(
         frame.toggle_dims)
 
@@ -65,13 +68,15 @@ def create_scan_settings_frame_widgets_and_layout(frame):
         frame.create_label(
             f'title_{i_dim + 1}', f'\nScan dimension {i_dim+1}:',
             fontsize=11, bold=True,
-            gridPos=(_rowoffset + 6 * (i_dim % 2), 3 * (i_dim // 2), 1, 2))
+            gridPos=(_rowoffset + 6 * (i_dim % 2), 2 * (i_dim // 2), 1, 2))
         for i_item, basename in enumerate(_prefixes):
             _row = i_item + _rowoffset + 1 + 6 * (i_dim % 2)
-            _column = 3 * (i_dim // 2)
+            _column = 2 * (i_dim // 2)
             pname = f'{basename}{i_dim+1}'
             param = SCAN_SETTINGS.get_param(pname)
             frame.create_param_widget(param, row=_row, column=_column,
                                      width_text=frame.TEXT_WIDTH,
-                                     width=frame.PARAM_INPUT_WIDTH)
+                                     width_io=frame.PARAM_INPUT_WIDTH,
+                                     width_unit=0,
+                                     width_total=_width_total)
     frame.create_spacer('final_spacer', gridPos=(_rowoffset + 1, 2, 1, 1))

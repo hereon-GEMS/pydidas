@@ -41,41 +41,42 @@ def create_global_configuratation_frame_widgets_and_layout(frame):
         The GlobalConfigurationFrame instance.
     """
     frame._widgets = {}
-    _twoline_options = dict(width_text=frame.TEXT_WIDTH, width=240,
-                            linebreak=True, n_columns=2,
+    _twoline_options = dict(width_text=frame.TEXT_WIDTH, width_io=240,
+                            linebreak=True, width_total=300,
                             halign_text=QtCore.Qt.AlignLeft,
                             valign_text=QtCore.Qt.AlignBottom)
-    _options = dict(width_text=frame.TEXT_WIDTH, width=60)
-    _section_options = dict(fontsize=13, bold=True,
-                            gridPos=(-1, 0, 2, 0))
+    _options = dict(width_text=frame.TEXT_WIDTH, width_io=80, width_total=300)
+    _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 0))
 
     frame.create_label('title', 'Global settings\n', fontsize=14,
-                      bold=True, gridPos=(0, 0, 2, 0))
+                      bold=True, gridPos=(0, 0, 1, 0))
 
     frame.create_button('but_reset', 'Restore defaults',
                        icon=frame.style().standardIcon(59),
-                       gridPos=(-1, 0, 2, 0), alignment=None)
+                       gridPos=(-1, 0, 1, 0), alignment=None)
 
     frame.create_label('section_multiprocessing',
                       'Multiprocessing settings', **_section_options)
     frame.create_param_widget(frame.params.get_param('mp_n_workers'),
-                             **_options)
+                              **_options)
+    frame.create_param_widget(frame.params.get_param('shared_buffer_size'),
+                              **_options)
     frame.create_spacer('spacer_1')
 
     frame.create_label('section_detector', 'Detector settings',
                       **_section_options)
     frame.create_param_widget(frame.params.get_param('det_mask'),
-                             **_twoline_options)
+                              **_twoline_options)
     frame.create_param_widget(frame.params.get_param('det_mask_val'),
-                             **_options)
+                              **_options)
     frame.create_spacer('spacer_2')
 
     frame.create_label('section_mosaic', 'Composite creator settings',
                       **_section_options)
     frame.create_param_widget(frame.params.get_param('mosaic_border_width'),
-                             **_options)
+                              **_options)
     frame.create_param_widget(frame.params.get_param('mosaic_border_value'),
-                             **_options)
+                              **_options)
     frame.create_param_widget(frame.params.get_param('mosaic_max_size'),
-                             **_options)
+                              **_options)
     frame.create_spacer('spacer_3')

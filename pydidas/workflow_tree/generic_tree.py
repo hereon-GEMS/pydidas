@@ -48,6 +48,27 @@ class GenericTree:
         self.node_ids = []
         self.nodes = {}
         self._config = kwargs if kwargs else {}
+        self._tree_changed_flag = False
+
+    @property
+    def tree_has_changed(self):
+        """
+        Get a flag which tells whether the Tree has changed since the last
+        flag reset.
+
+        Returns
+        -------
+        bool
+            The has changed flag.
+        """
+        return self._tree_changed_flag
+
+    def reset_tree_changed_flag(self):
+        """
+        Reset the "has changed" flag for this Tree.
+        """
+        self._tree_changed_flag = False
+
 
     def set_root(self, node):
         """
@@ -134,6 +155,7 @@ class GenericTree:
         self.nodes[node.node_id] = node
         for _child in node.get_children():
             self.register_node(_child, _child.node_id, check_ids=False)
+        self._tree_changed_flag = True
 
     def _check_node_ids(self, node_ids):
         """
@@ -220,6 +242,7 @@ class GenericTree:
         for _id in ids:
             del self.nodes[_id]
             self.node_ids.remove(_id)
+        self._tree_changed_flag = True
 
     def get_all_leaves(self):
         """

@@ -34,19 +34,23 @@ SCAN = ScanSettings()
 
 TREE = WorkflowTree()
 
+
 class _WorkflowResults:
     """
     WorkflowResults is a class for handling composite data which spans
-    individual images
+    individual images.
     """
 
     def __init__(self):
         self.__composites = {}
 
-    def update_shape_from_scan(self):
+    def update_shapes_from_scan(self):
         """
         Update the shape of the results from the ScanSettings.
         """
+        _dim = SCAN.get_param_value('scan_dim')
+        _points = tuple([SCAN.get_param_value(f'n_points_{_n}')
+                         for _n in range(1, _dim + 1)])
 
 
 

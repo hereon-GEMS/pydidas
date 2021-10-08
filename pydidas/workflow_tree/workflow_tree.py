@@ -29,13 +29,15 @@ from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from ..core import SingletonFactory
 from .tree_io import WorkflowTreeIoMeta
-
+from .._exceptions import AppConfigError
 
 class _WorkflowTree(GenericTree):
     """
     The WorkflowTree is a subclassed GenericTree with support for running
     a plugin chain.
     """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def create_and_add_node(self, plugin, parent=None, node_id=None):
         """
@@ -137,6 +139,45 @@ class _WorkflowTree(GenericTree):
         _new_tree = WorkflowTreeIoMeta.import_from_file(filename)
         for _att in ['root', 'node_ids', 'nodes']:
             setattr(self, _att, getattr(_new_tree, _att))
+        self._tree_changed_flag = True
+
+    def get_all_result_shapes(self, force_update=False):
+        """
+        Get the shapes of all leaves in form of a dictionary.
+
+        Parameter
+        ---------
+        force_update : bool, optional
+            Keyword to enforce a new calculation of the result shapes. The
+            default is False.
+
+        Raises
+        ------
+        AppConfigError
+            If the WorkflowTree has no nodes..
+
+        Returns
+        -------
+        shapes : dict
+            A dict with entries of type {node_id: shape} with
+            node_ids of type int and shapes of type tuple.
+        """
+        if self.root is None:
+            raise AppConfigError('The WorkflowTree has no nodes.')
+        _leaves = self.get_all_leaves()
+        _shapes = [_leaf.result_shape for _leaf in _leaves]
+        if None in _shapes or self.tree_has_changed or force_update:
+            self.root.calculate_and_push_result_shape()
+            self.reset_tree_changed_flag()
+        _shapes = {_leaf.node_id: _leaf.result_shape
+                   for _leaf in _leaves if _leaf.output_data_dim is not None}
+        for _id, _shape in _shapes.items():
+            if -1 in _shape:
+                _plugin_cls = self.get_node_by_id(_id).plugin.__class__
+                _error = ('Cannot determine the shape of the output for node '
+                          f'"{_id}" (type {_plugin_cls}).')
+                raise AppConfigError(_error)
+        return _shapes
 
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

@@ -36,7 +36,7 @@ class WorkflowNode(GenericNode):
     The WorkflowNode subclass of the GenericNode has an added plugin attribute
     to allow it to execute plugins, either individually or the full chain.
     """
-    kwargs_for_copy_creation = ['plugin']
+    kwargs_for_copy_creation = ['plugin', '_result_shape']
 
     def __init__(self, **kwargs):
         self.plugin = None
@@ -45,6 +45,7 @@ class WorkflowNode(GenericNode):
         self.plugin.node_id = self._node_id
         self.results = None
         self.result_kws = None
+        self._result_shape = None
 
     def __confirm_plugin_existance_and_type(self):
         """
@@ -143,26 +144,31 @@ class WorkflowNode(GenericNode):
                     )
         return _rep
 
-    def get_result_shape(self):
-        """
-        Get the shape of the results.
-
-        This method is a wrapper for the associated Plugin's result_shape
-        property.
-
-        Returns
-        -------
-        tuple
-            The shape of the result for every frame.
-        """
-        return self.plugin.result_shape
-
     def calculate_and_push_result_shape(self):
         """
         Calculate the Plugin's shape of the results and push this to the node's
         children.
         """
-        _result_shape = self.plugin.result_shape
+        self.update_result_shape_from_plugin()
         for _child in self._children:
-            _child.plugin.input_shape = _result_shape
+            _child.plugin.input_shape = self.result_shape
             _child.calculate_and_push_result_shape()
+
+    def update_result_shape_from_plugin(self):
+        """
+        Update the result shape from the Plugin's value.
+        """
+        self._result_shape = self.plugin.result_shape
+
+    @property
+    def result_shape(self):
+        """
+        Get the result shape of the plugin, if it has been calculated yet.
+
+        Returns
+        -------
+        Union[tuple, None]
+            Returns the shape of the Plugin's results, if it has been
+            calculated. Else, returns None.
+        """
+        return self._result_shape

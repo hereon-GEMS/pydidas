@@ -104,9 +104,14 @@ class TestWorkflowNode(unittest.TestCase):
                     'plugin_params'):
             self.assertTrue(key in _dump.keys())
 
-    def test_get_result_shape(self):
+    def test_result_shape__not_set(self):
         obj = WorkflowNode(plugin=DummyLoader())
-        _shape = obj.get_result_shape()
+        self.assertIsNone(obj.result_shape)
+
+    def test_result_shape(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj.update_result_shape_from_plugin()
+        _shape = obj.result_shape
         self.assertEqual(_shape, obj.plugin.result_shape)
 
     def test_calculate_and_push_result_shape(self):
@@ -114,10 +119,10 @@ class TestWorkflowNode(unittest.TestCase):
         nodes, n_nodes = self.create_node_tree(depth=_depth)
         obj = nodes[0][0]
         obj.calculate_and_push_result_shape()
-        _shape = obj.get_result_shape()
+        _shape = obj.result_shape
         for _d in range(_depth):
             for _node in nodes[_d]:
-                self.assertEqual(_node.get_result_shape(), _shape)
+                self.assertEqual(_node.result_shape, _shape)
 
 
 if __name__ == '__main__':

@@ -141,18 +141,7 @@ class ExecuteWorkflowApp(BaseApp):
         AppConfigError
             If the WorkflowTree has no nodes.
         """
-        if TREE.root is None:
-            raise AppConfigError('The WorkflowTree has no nodes.')
-        TREE.root.calculate_and_push_result_shape()
-        _leaves = TREE.get_all_leaves()
-        _shapes = {_leaf.node_id: _leaf.get_result_shape()
-                   for _leaf in _leaves}
-        for _id, _shape in _shapes.items():
-            if -1 in _shape:
-                _plugin_cls = TREE.get_node_by_id(_id).plugin.__class__
-                _error = ('Cannot determine the shape of the output for node '
-                          f'"{_id}" (type {_plugin_cls}).')
-                raise AppConfigError(_error)
+        _shapes = TREE.get_all_result_shapes()
         self._config['results_shapes'] = _shapes
 
     def __get_and_store_tasks(self):
@@ -160,7 +149,7 @@ class ExecuteWorkflowApp(BaseApp):
         Get the tasks from the global ScanSettings and store them internally.
         """
         _dim = SCAN.get_param_value('scan_dim')
-        _points_per_dim = [SCAN.get_param_value(f'n_points{_n}')
+        _points_per_dim = [SCAN.get_param_value(f'n_points_{_n}')
                            for _n in range(1, _dim + 1)]
         _n_total = np.prod(_points_per_dim)
         self._config['mp_tasks'] = np.arange(_n_total)

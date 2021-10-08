@@ -30,6 +30,7 @@ __all__ = ['Hdf5singleFileLoader']
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.image_io import read_image
+from pydidas.utils import copy_docstring
 
 
 class Hdf5singleFileLoader(InputPlugin):
@@ -57,6 +58,15 @@ class Hdf5singleFileLoader(InputPlugin):
         kwargs['frame'] = index
         _data = read_image(fname, **kwargs)
         return _data, kwargs
+
+    @copy_docstring(InputPlugin)
+    def get_filename(self, index):
+        """
+        For the full docstring, please refer to the
+        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
+        <InputPlugin>` class.
+        """
+        return self.get_param_value('filename')
 
     def get_result_shape(self):
         """

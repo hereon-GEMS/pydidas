@@ -23,6 +23,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['InputPlugin']
 
+import os
 
 from pydidas.core import get_generic_parameter
 from pydidas.constants import INPUT_PLUGIN
@@ -90,6 +91,44 @@ class InputPlugin(BasePlugin):
                                  ' one of  both "first_file" and "filename".')
         self._image_metadata = ImageMetadataManager(*_metadata_params)
         self._image_metadata.set_param_value('use_filename', _use_filename)
+
+    def get_first_file_size(self):
+        """
+        Get the size of the first file to be processed.
+
+        Returns
+        -------
+        int
+            The file size in bytes.
+        """
+        _fname = self._image_metadata.get_filename()
+        self._config['file_size'] = os.stat(_fname).st_size
+        return self._config['file_size']
+
+    def get_filename(self, index):
+        """
+        Get the filename of the file associated with the index.
+
+        Parameters
+        ----------
+        index : int
+            The frame index.
+
+        Raises
+        ------
+        NotImplementedError
+            This method needs to be implemented by the concrete subclass.
+
+        Returns
+        -------
+        str
+            The filename.
+        """
+        raise NotImplementedError
+
+    def pre_execute(self):
+        ...
+
 
     def calculate_result_shape(self):
         """

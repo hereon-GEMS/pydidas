@@ -31,6 +31,7 @@ from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.image_io import read_image
 from pydidas.apps.app_utils import FilelistManager
+from pydidas.utils import copy_docstring
 
 
 class Hdf5fileSeriesLoader(InputPlugin):
@@ -112,14 +113,23 @@ class Hdf5fileSeriesLoader(InputPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        _images_per_file = self.get_param_value('images_per_file')
-        _i_file = index // _images_per_file
-        _fname = self._file_manager.get_filename(_i_file)
-        _hdf_index = index % _images_per_file
+        _fname = self.get_filename(index)
+        _hdf_index = index % self.get_param_value('images_per_file')
         kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')
         kwargs['frame'] = _hdf_index
         _data = read_image(_fname, **kwargs)
         return _data, kwargs
+
+    @copy_docstring(InputPlugin)
+    def get_filename(self, index):
+        """
+        For the full docstring, please refer to the
+        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
+        <InputPlugin>` class.
+        """
+        _images_per_file = self.get_param_value('images_per_file')
+        _i_file = index // _images_per_file
+        return self._file_manager.get_filename(_i_file)
 
     def get_result_shape(self):
         """

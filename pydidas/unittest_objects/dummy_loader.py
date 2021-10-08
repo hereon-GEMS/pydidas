@@ -53,6 +53,9 @@ class DummyLoader(InputPlugin):
         InputPlugin.__init__(self, *args, **kwargs)
         self._preexecuted = False
 
+    def get_first_file_size(self):
+        return 1
+
     def pre_execute(self):
         self._preexecuted = True
 

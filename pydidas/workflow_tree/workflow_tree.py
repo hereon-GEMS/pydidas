@@ -69,7 +69,7 @@ class _WorkflowTree(GenericTree):
 
     def execute_process(self, arg, **kwargs):
         """
-        Execute the process defined in the WorkflowTree for dat analysis.
+        Execute the process defined in the WorkflowTree for data analysis.
 
         Parameters
         ----------

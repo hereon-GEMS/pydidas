@@ -133,6 +133,19 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return True
 
+    def multiprocessing_store_results(self, index, *args):
+        """
+        Store the multiprocessing results for other pydidas apps and processes.
+
+        Parameters
+        ----------
+        index : int
+            The frame index
+        args : object
+            The results. The specific type depends on the app.
+        """
+        raise NotImplementedError
+
     def get_config(self):
         """
         Get the App configuration.

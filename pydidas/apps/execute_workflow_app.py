@@ -47,6 +47,8 @@ TREE = WorkflowTree()
 
 SCAN = ScanSettings()
 
+RESULTS = WorkflowResults()
+
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('live_processing'),
     get_generic_parameter('first_file'),
@@ -127,6 +129,7 @@ class ExecuteWorkflowApp(BaseApp):
             self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
+            RESULTS.update_shapes_from_scan()
         self.__initialize_arrays_from_shared_memory()
         if self.get_param_value('live_processing'):
             self.__get_file_target_size()

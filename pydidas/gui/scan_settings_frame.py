@@ -90,6 +90,7 @@ class ScanSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
             _w = self.param_widgets['xray_wavelength']
             _w.set_value(SCAN_SETTINGS.get('xray_wavelength') * 1e10)
 
+
 if __name__ == '__main__':
     import pydidas
     from pydidas.gui.main_window import MainWindow

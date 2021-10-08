@@ -39,6 +39,7 @@ GENERIC_PARAMS = ParameterCollection(
     ###################################
     Parameter('live_processing', int, 0, name='Live processing',
               choices=[True, False], tooltip=TOOLTIPS['live_processing']),
+    Parameter('label', str, '', name='Label', tooltip=TOOLTIPS['label']),
     ###################################
     ## Parameters for CompositeCreation
     ###################################

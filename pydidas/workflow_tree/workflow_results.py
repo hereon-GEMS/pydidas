@@ -51,21 +51,16 @@ class _WorkflowResults:
         _dim = SCAN.get_param_value('scan_dim')
         _points = tuple([SCAN.get_param_value(f'n_points_{_n}')
                          for _n in range(1, _dim + 1)])
+        _results = TREE.get_all_result_shapes()
+        _shapes = {_key: _points + _shape for _key, _shape in _results.items()}
+        for _node_id, _shape in _shapes.items():
+            self.__composites[_node_id] = np.zeros(_shape, dtype=np.float32)
 
+    def store_results(self, index, results_dict):
+        _scan_index = SCAN.get_frame_position_in_scan(index)
+        for _key, _val in results_dict.items():
+            self.__composites[_key][_scan_index] = _val
 
-
-    def new_composite(self, name, dtype=np.float32):
-        if name in self.__composites:
-            raise KeyError(f'The composite name {name} already exists.')
-        self.__composites[name] = np.zeros((self.__scan.dim), dtype=dtype)
-
-    def set_value(self, name, image_no, value):
-        if name not in self.__composites:
-            raise KeyError(f'The composite name {name} does not exists.')
-        coords = self.__scan.get_image_pos(image_no)
-        self.__lock.acquire()
-        self.__composites[name][coords] = value
-        self.__lock.release()
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

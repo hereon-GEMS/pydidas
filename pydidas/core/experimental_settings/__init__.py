@@ -23,66 +23,36 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import load_experiment_settings_from_file_mixin
-from .load_experiment_settings_from_file_mixin import *
+from . import experimental_settings_io_meta
+from .experimental_settings_io_meta import *
 
-from . import save_experiment_settings_to_file_mixin
-from .save_experiment_settings_to_file_mixin import *
-
-# from . import parameter_collection
-# from .parameter_collection import *
-
-# from . import object_with_parameter_collection
-# from .object_with_parameter_collection import *
-
-# from . import composites
-# from .composites import *
-
-# from . import composite_image
-# from .composite_image import *
-
-# from . import generic_parameters
-# from .generic_parameters import *
+from . import experimental_settings_io_base
+from .experimental_settings_io_base import *
 
 from . import experimental_settings
 from .experimental_settings import *
 
-# from . import scan_settings
-# from .scan_settings import *
-
-# from . import hdf_key
-# from .hdf_key import *
-
-# from . import export_image_func
-# from .export_image_func import *
-
-# from . import singleton_factory
-# from .singleton_factory import *
-
-__all__ += load_experiment_settings_from_file_mixin.__all__
-__all__ += save_experiment_settings_to_file_mixin.__all__
-# __all__ += parameter.__all__
-# __all__ += object_with_parameter_collection.__all__
-# __all__ += dataset.__all__
+__all__ += experimental_settings_io_meta.__all__
+__all__ += experimental_settings_io_base.__all__
 __all__ += experimental_settings.__all__
-# __all__ += scan_settings.__all__
-# __all__ += hdf_key.__all__
-# __all__ += composite_image.__all__
-# __all__ += generic_parameters.__all__
-# __all__ += export_image_func.__all__
-# __all__ += singleton_factory.__all__
-
 
 # Unclutter namespace: remove modules from namespace
-del load_experiment_settings_from_file_mixin
-del save_experiment_settings_to_file_mixin
-# del dataset
+del experimental_settings_io_meta
+del experimental_settings_io_base
 del experimental_settings
-# del scan_settings
-# del hdf_key
-# del parameter_collection
-# del object_with_parameter_collection
-# del composite_image
-# del generic_parameters
-# del export_image_func
-# del singleton_factory
+
+import os
+from importlib import import_module
+_io_classes = [name.replace('.py', '')
+               for name in os.listdir(os.path.dirname(__file__))
+               if name.startswith('experimental_settings_io_')]
+# remove the two generic modules with the metaclass and baseclass:
+_io_classes.remove('experimental_settings_io_base')
+_io_classes.remove('experimental_settings_io_meta')
+
+for _module in _io_classes:
+    _module = import_module(f'.{_module}', __package__)
+    __all__ += _module.__all__
+
+del os
+del import_module

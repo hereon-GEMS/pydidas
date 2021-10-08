@@ -24,6 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ScanSettings']
 
+import numpy as np
+
 from .generic_parameters import get_generic_parameter
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
@@ -67,6 +69,31 @@ class _ScanSettings(ObjectWithParameterCollection):
         """Setup method"""
         super().__init__()
         self.set_default_params()
+
+    def get_frame_position_in_scan(self, frame):
+        """
+        Get the position of a frame number on scan coordinates.
+
+        Parameters
+        ----------
+        frame : int
+            The frame number.
+
+        Returns
+        -------
+        indices : tuple
+            The indices for indexing the position of the frame in the scan.
+            The length of indices is equal to the number of scan dimensions.
+        """
+        _ndim = self.get_param_value('scan_dim')
+        _N = [self.get_param_value(f'n_points_{_n}')
+              for _n in range(1, _ndim + 1)] + [1]
+        _indices = [0] * _ndim
+        for _dim in range(_ndim):
+            _indices[_dim] = frame // np.prod(_N[_dim + 1:])
+            frame -= _indices[_dim] * np.prod(_N[_dim + 1:])
+        return tuple(_indices)
+
 
 
 ScanSettings = SingletonFactory(_ScanSettings)

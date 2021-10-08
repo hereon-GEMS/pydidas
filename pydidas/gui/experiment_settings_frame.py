@@ -24,16 +24,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExperimentSettingsFrame']
 
-import os
 from functools import partial
 
 from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
-from pyFAI.geometry import Geometry
 
-from ..constants import YAML_EXTENSIONS
 from ..core import ParameterCollectionMixIn
-from ..core.experimental_settings import ExperimentalSettings
+from ..core.experimental_settings import (
+    ExperimentalSettings, ExperimentalSettingsIoMeta)
 
 from ..widgets import BaseFrame
 from ..widgets.parameter_config import ParameterWidgetsMixIn
@@ -179,13 +177,15 @@ class ExperimentSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
                             '2. The fit did not succeed.')
 
     def load_parameters_from_file(self):
-        _func = QtWidgets.QFileDialog.getOpenFileName
-        fname = _func(self, 'Name of file', None,
-                      'PONI files (*.poni);;All files (*.*)')[0]
-        EXP_SETTINGS.load_from_file(fname)
+        _formats = ExperimentalSettingsIoMeta.get_string_of_formats()
+        fname = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Name of file', None, _formats)[0]
+        EXP_SETTINGS.import_from_file(fname)
+        for param in EXP_SETTINGS.params.values():
+            self.param_widgets[param.refkey].set_value(param.value)
 
     def __save_to_file(self):
-        _func = QtWidgets.QFileDialog.getSaveFileName
-        _files = 'YAML files (*.yml);;PONI files (*.poni);;All files (*.*)'
-        fname = _func(self, 'Name of file', None, _files)[0]
-        EXP_SETTINGS.save_to_file(fname)
+        _formats = ExperimentalSettingsIoMeta.get_string_of_formats()
+        fname =  QtWidgets.QFileDialog.getSaveFileName(
+            self, 'Name of file', None, _formats)[0]
+        EXP_SETTINGS.export_to_file(fname)

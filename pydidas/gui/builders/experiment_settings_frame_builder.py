@@ -85,7 +85,6 @@ def create_experiment_settings_frame_widgets_and_layout(frame):
                         gridPos=(-1, 0, 1, 1), alignment=None)
 
     for _param in frame.params.values():
-        print(_param)
         if _param.refkey == 'xray_wavelength':
             __create_xray_header()
         if _param.refkey == 'detector_name':

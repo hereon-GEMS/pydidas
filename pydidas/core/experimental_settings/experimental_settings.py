@@ -32,10 +32,7 @@ from ..singleton_factory import SingletonFactory
 from ..parameter_collection import ParameterCollection
 from ..generic_parameters import get_generic_parameter
 from ..object_with_parameter_collection import ObjectWithParameterCollection
-from .load_experiment_settings_from_file_mixin import (
-    LoadExperimentSettingsFromFileMixIn)
-from .save_experiment_settings_to_file_mixin import (
-    SaveExperimentSettingsToFileMixIn)
+from .experimental_settings_io_meta import ExperimentalSettingsIoMeta
 
 DEFAULTS = ParameterCollection(
     get_generic_parameter('xray_wavelength'),
@@ -53,9 +50,7 @@ DEFAULTS = ParameterCollection(
     get_generic_parameter('detector_rot3'))
 
 
-class _ExpSettings(ObjectWithParameterCollection,
-                   LoadExperimentSettingsFromFileMixIn,
-                   SaveExperimentSettingsToFileMixIn):
+class _ExpSettings(ObjectWithParameterCollection):
     """
     Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
     <pydidas.core.ObjectWithParameterCollection>`
@@ -75,7 +70,7 @@ class _ExpSettings(ObjectWithParameterCollection,
         self.add_params(*args, **kwargs)
         self.set_default_params()
 
-    def set_param_value(self, key, value):
+    def set_param_value(self, param_key, value):
         """
         Set a Parameter value.
 
@@ -95,15 +90,15 @@ class _ExpSettings(ObjectWithParameterCollection,
         KeyError
             If the key does not exist.
         """
-        self._check_key(key)
-        if key == 'xray_energy':
+        self._check_key(param_key)
+        if param_key == 'xray_energy':
             self.params['xray_wavelength'].value = LAMBDA_TO_E / (value * 1e-10)
             self.params['xray_energy'].value = value
-        elif key == 'xray_wavelength':
+        elif param_key == 'xray_wavelength':
             self.params['xray_wavelength'].value = value
             self.params['xray_energy'].value = LAMBDA_TO_E / (value * 1e-10)
         else:
-            self.params.set_value(key, value)
+            self.params.set_value(param_key, value)
 
     def get_detector(self):
         """
@@ -131,13 +126,35 @@ class _ExpSettings(ObjectWithParameterCollection,
                 setattr(_det, key, value)
         return _det
 
-    # def load_from_file(self, filename):
+    @staticmethod
+    def import_from_file(filename):
+        """
+        Import ExperimentalSettings from a file.
 
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The full filename.
+        """
+        ExperimentalSettingsIoMeta.import_from_file(filename)
+
+    @staticmethod
+    def export_to_file(filename):
+        """
+        Import ExperimentalSettings from a file.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The full filename.
+        """
+        ExperimentalSettingsIoMeta.export_to_file(filename)
 
     def __copy__(self):
         """
         Overload copy to return self.
         """
         return self
+
 
 ExperimentalSettings = SingletonFactory(_ExpSettings)

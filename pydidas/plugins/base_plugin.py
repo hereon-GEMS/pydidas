@@ -24,7 +24,8 @@ __status__ = "Development"
 __all__ = ['BasePlugin']
 
 
-from pydidas.core import ParameterCollection, ObjectWithParameterCollection
+from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
+                          get_generic_parameter)
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
 
@@ -62,7 +63,7 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     default_params = ParameterCollection()
-    generic_params = ParameterCollection()
+    generic_params = ParameterCollection(get_generic_parameter('label'))
     input_data_dim = -1
     output_data_dim = -1
 
@@ -89,6 +90,8 @@ class BasePlugin(ObjectWithParameterCollection):
                  f'Output data dimension: {data_dim[cls.output_data_dim]}\n\n'
                  f'Plugin description:\n{_doc}\n\n'
                  'Parameters:')
+        for param in cls.generic_params.values():
+            _desc += f'\n{param}'
         for param in cls.default_params.values():
             _desc += f'\n{param}'
         return _desc
@@ -116,7 +119,8 @@ class BasePlugin(ObjectWithParameterCollection):
                 'Output data dimension': data_dim[cls.output_data_dim],
                 'Plugin description': _doc,
                 'Parameters': '\n'.join(
-                    [str(param) for param in cls.default_params.values()])}
+                    [str(param) for param in cls.generic_params.values()]
+                    + [str(param) for param in cls.default_params.values()])}
 
     def __init__(self, *args, **kwargs):
         """Setup the class."""
@@ -124,9 +128,9 @@ class BasePlugin(ObjectWithParameterCollection):
         if self.plugin_type not in [BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                     OUTPUT_PLUGIN]:
             raise ValueError('Unknown value for the plugin type')
+        self.add_params(self.generic_params.get_copy())
         self.add_params(*args)
         self.set_default_params()
-        self.add_params(self.generic_params.get_copy())
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])

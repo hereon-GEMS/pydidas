@@ -45,7 +45,7 @@ from . import generic_parameters
 from .generic_parameters import *
 
 from . import experimental_settings
-from .experimental_settings import *
+from .experimental_settings import ExperimentalSettings
 
 from . import scan_settings
 from .scan_settings import *
@@ -64,7 +64,7 @@ __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
 __all__ += object_with_parameter_collection.__all__
 __all__ += dataset.__all__
-__all__ += experimental_settings.__all__
+__all__ += ['ExperimentalSettings']
 __all__ += scan_settings.__all__
 __all__ += hdf5_key.__all__
 __all__ += composite_image.__all__
@@ -79,7 +79,6 @@ __all__ += pydidas_q_settings_mixin.__all__
 del file_extension_registry_metaclass
 del parameter
 del dataset
-del experimental_settings
 del scan_settings
 del hdf5_key
 del parameter_collection

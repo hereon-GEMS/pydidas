@@ -27,8 +27,6 @@ import unittest
 import shutil
 import tempfile
 
-import yaml
-import numpy as np
 import pyFAI
 from pyFAI.geometry import Geometry
 
@@ -39,6 +37,7 @@ from pydidas.core.experimental_settings.experimental_settings_io_poni import (
 
 EXP_SETTINGS = ExperimentalSettings()
 EXP_IO_PONI = ExperimentalSettingsIoPoni
+
 
 class TestExperimentSettingsIoPoni(unittest.TestCase):
 
@@ -88,6 +87,7 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
         for key in ['Detector', 'Detector_config', 'Distance', 'Poni1',
                     'Poni2', 'Rot1', 'Rot2', 'Rot3', 'Wavelength']:
             self.assertTrue(content.find(key) > 0)
+
 
 if __name__ == "__main__":
     unittest.main()

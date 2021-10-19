@@ -123,6 +123,18 @@ class ExecuteWorkflowApp(BaseApp):
     def prepare_run(self):
         """
         Prepare running the workflow execution.
+
+        For the main App (i.e. running not in slave_mode), this involves the
+        following steps:
+            1. Get the shape of all results from the WorkflowTree and store
+               them for internal reference.
+            2. Get all multiprocessing tasks from the ScanSettings.
+            3. Calculate the required buffer size and verify that the memory
+               requirements are okay.
+            4. Initialize the shared memory arrays.
+
+        Both the slaved and the main applications then initialize local numpy
+        arrays from the shared memory.
         """
         if not self.slave_mode:
             self.__check_and_store_results_shapes()
@@ -133,7 +145,6 @@ class ExecuteWorkflowApp(BaseApp):
         self.__initialize_arrays_from_shared_memory()
         if self.get_param_value('live_processing'):
             self.__get_file_target_size()
-
 
     def __check_and_store_results_shapes(self):
         """
@@ -244,7 +255,6 @@ class ExecuteWorkflowApp(BaseApp):
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
-
         """
         if self.get_param_value('live_processing'):
             _fname = self._tree.root.get_filename(self._index)
@@ -252,8 +262,6 @@ class ExecuteWorkflowApp(BaseApp):
                 _ok = self._config['file_size'] == os.stat(_fname).st_size
                 return _ok
         return True
-
-
 
     def multiprocessing_func(self, *index):
         """
@@ -279,23 +287,20 @@ class ExecuteWorkflowApp(BaseApp):
             if _zeros.size > 0:
                 _buffer_pos = _zeros[0]
                 self._config['buffer_pos'] = _buffer_pos
-                self._shared_arrays['flag']['buffer_pos'] = 1
+                self._shared_arrays['flag'][_buffer_pos] = 1
                 break
             _flag_lock.release()
             time.sleep(0.01)
         for _node_id in self._config['result_shapes']:
-            self._shared_arrays[_node_id]['buffer_pos'] = (
+            self._shared_arrays[_node_id][_buffer_pos] = (
                 self._tree.nodes[_node_id].results)
         _flag_lock.release()
-
-
 
     def multiprocessing_post_run(self):
         """
         Perform operatinos after running main parallel processing function.
         """
         pass
-
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, buffer_pos):
@@ -309,8 +314,11 @@ class ExecuteWorkflowApp(BaseApp):
         buffer_pos : int
             The buffer position of the results.
         """
+        _results = {_key: None for _key in self._config['results_shapes']}
         _flag_lock = self._config['shared_memory']['flag']
         _flag_lock.acquire()
-
-
+        for _key in _results:
+            _results[_key] = self._shared_arrays[_key][buffer_pos]
+        self._shared_arrays['flag'][buffer_pos] = 0
         _flag_lock.release()
+        RESULTS.store_results(index, _results)

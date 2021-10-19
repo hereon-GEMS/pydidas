@@ -33,15 +33,15 @@ import pyFAI
 from pyFAI.geometry import Geometry
 
 from pydidas.core.experimental_settings import ExperimentalSettings
-from pydidas.core.experimental_settings.experimental_settings_io_poni import (
-    ExperimentalSettingsPoniIo)
+from pydidas.core.experimental_settings.experimental_settings_io_yaml import (
+    ExperimentalSettingsIoYaml)
 from pydidas.core.experimental_settings.experimental_settings import DEFAULTS
 from pydidas.core import ObjectWithParameterCollection
 
 EXP_SETTINGS = ExperimentalSettings()
-EXP_IO_PONI = ExperimentalSettingsPoniIo
+EXP_IO_YAML = ExperimentalSettingsIoYaml
 
-class TestExperimentSettingsIoPoni(unittest.TestCase):
+class TestExperimentSettingsIoYaml(unittest.TestCase):
 
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -52,78 +52,37 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
         del self._path
         shutil.rmtree(self._tmppath)
 
-    def test_update_geometry_from_pyFAI__correct(self):
-        geo = pyFAI.geometry.Geometry().load(self._path + 'poni.poni')
-        EXP_IO_PONI._update_geometry_from_pyFAI(geo)
-        for param in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                      'detector_rot1', 'detector_rot2', 'detector_rot3',
-                      'xray_wavelength', 'xray_energy']:
-            self.assertTrue(param in EXP_IO_PONI.imported_params)
-
-    def test_update_geometry_from_pyFAI__wrong_type(self):
-        with self.assertRaises(TypeError):
-            EXP_IO_PONI._update_geometry_from_pyFAI(12)
-
-    def test_update_detector_from_pyfai__correct(self):
-        det = pyFAI.detector_factory('Eiger 9M')
-        EXP_IO_PONI._update_detector_from_pyFAI(det)
-
-    def test_update_detector_from_pyfai__wrong_type(self):
-        det = 12
-        with self.assertRaises(TypeError):
-            EXP_IO_PONI._update_detector_from_pyFAI(det)
-
-    def test_write_to_exp_settings(self):
-        _det_name = 'Test Name'
-        _energy = 123.45
-        EXP_IO_PONI.imported_params = {'detector_name': _det_name,
-                                       'xray_energy': _energy}
-        EXP_IO_PONI._write_to_exp_settings()
-        self.assertEqual(EXP_IO_PONI.get_param_value('detector_name'),
-                         _det_name)
-        self.assertEqual(EXP_IO_PONI.get_param_value('xray_energy'), _energy)
-
-    def test_verify_all_entries_present__correct(self):
-        for param in EXP_SETTINGS.params:
-            EXP_IO_PONI.imported_params[param] = True
-        EXP_IO_PONI._verify_all_entries_present()
-
-    def test_verify_all_entries_present__missing_keys(self):
-        with self.assertRaises(KeyError):
-            EXP_IO_PONI._verify_all_entries_present()
-
-    def test_import_from_file(self):
-        EXP_IO_PONI.import_from_file(self._path + 'poni.poni')
-        geo = Geometry().load(self._path + 'poni.poni').getPyFAI()
-        for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                    'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_IO_PONI.get_param_value(key),
-                             geo[key.split('_')[1]])
-
-    def test_load_yaml(self):
-        obj = TestClass()
-        obj.load_from_file(self._path + 'poni.poni')
+    def test_import_from_file__correct(self):
+        EXP_IO_YAML.import_from_file(self._path + 'yaml.yml')
         with open(self._path + 'yaml.yml', 'r') as stream:
             _data = yaml.safe_load(stream)
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(obj.get_param_value(key),
-                              _data[key])
+            self.assertEqual(EXP_SETTINGS.get_param_value(key),
+                             _data[key])
 
-    def test_load_yaml_with_error(self):
-        obj = TestClass()
-        np.save(self._tmppath + 'error.npy', np.zeros((4,4)))
-        shutil.move(self._tmppath + 'error.npy', self._tmppath + 'error.yaml')
-        with self.assertRaises(yaml.YAMLError):
-            obj.load_from_file(self._tmppath + 'error.yaml')
-
-    def test_load_wrong_ext(self):
-        obj = TestClass()
-        _fname = self._tmppath + 'unknown.any'
-        with open(_fname, 'w') as f:
-            f.write('test')
+    def test_import_from_file__missing_keys(self):
+        with open(self._tmppath + 'yaml.yml', 'w') as stream:
+            stream.write('no_entry: True')
         with self.assertRaises(KeyError):
-            obj.load_from_file(_fname)
+            EXP_IO_YAML.import_from_file(self._tmppath + 'yaml.yml')
+
+    def test_import_from_file__wrong_format(self):
+        with open(self._tmppath + 'yaml.yml', 'w') as stream:
+            stream.write('no_entry =True')
+        with self.assertRaises(AssertionError):
+            EXP_IO_YAML.import_from_file(self._tmppath + 'yaml.yml')
+
+    def test_export_to_file(self):
+        _fname = self._tmppath + 'yaml.yml'
+        EXP_IO_YAML.export_to_file(_fname)
+        with open(self._tmppath + 'yaml.yml', 'r') as stream:
+            _data = yaml.safe_load(stream)
+        for key in EXP_SETTINGS.params:
+            if key != 'xray_energy':
+                self.assertEqual(EXP_SETTINGS.get_param_value(key),
+                                 _data[key])
+
 
 
 if __name__ == "__main__":

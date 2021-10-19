@@ -23,8 +23,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowResults']
 
-import multiprocessing
 import numpy as np
+from PyQt5 import QtCore
 
 from ..core.singleton_factory import SingletonFactory
 from ..core.scan_settings import ScanSettings
@@ -40,6 +40,7 @@ class _WorkflowResults:
     WorkflowResults is a class for handling composite data which spans
     individual images.
     """
+    new_results = QtCore.pyqtSignal()
 
     def __init__(self):
         self.__composites = {}
@@ -60,7 +61,7 @@ class _WorkflowResults:
         _scan_index = SCAN.get_frame_position_in_scan(index)
         for _key, _val in results_dict.items():
             self.__composites[_key][_scan_index] = _val
-
+        self.new_results.emit()
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

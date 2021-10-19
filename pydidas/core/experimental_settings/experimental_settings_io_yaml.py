@@ -27,6 +27,7 @@ __all__ = ['ExperimentalSettingsIoYaml']
 
 
 import yaml
+import numpy as np
 
 from pydidas.constants import YAML_EXTENSIONS, LAMBDA_TO_E
 from .experimental_settings_io_base import ExperimentalSettingsIoBase
@@ -74,7 +75,8 @@ class ExperimentalSettingsIoYaml(ExperimentalSettingsIoBase):
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
+        assert isinstance(cls.imported_params, dict)
         cls.imported_params['xray_energy'] = (
-            LAMBDA_TO_E / cls.imported_params['xray_wavelength'])
+            LAMBDA_TO_E / cls.imported_params.get('xray_wavelength', np.nan))
         cls._verify_all_entries_present()
         cls._write_to_exp_settings()

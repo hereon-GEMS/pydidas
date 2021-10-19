@@ -180,12 +180,14 @@ class ExperimentSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
         _formats = ExperimentalSettingsIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Name of file', None, _formats)[0]
-        EXP_SETTINGS.import_from_file(fname)
-        for param in EXP_SETTINGS.params.values():
-            self.param_widgets[param.refkey].set_value(param.value)
+        if fname != '':
+            EXP_SETTINGS.import_from_file(fname)
+            for param in EXP_SETTINGS.params.values():
+                self.param_widgets[param.refkey].set_value(param.value)
 
     def __save_to_file(self):
         _formats = ExperimentalSettingsIoMeta.get_string_of_formats()
         fname =  QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None, _formats)[0]
-        EXP_SETTINGS.export_to_file(fname)
+        if fname != '':
+            EXP_SETTINGS.export_to_file(fname)

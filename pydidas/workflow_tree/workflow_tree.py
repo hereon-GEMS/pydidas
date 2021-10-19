@@ -65,8 +65,8 @@ class _WorkflowTree(GenericTree):
             self.set_root(_node)
             return
         if not parent:
-            parent = self.nodes[self.node_ids[-1]]
-            parent.add_child(_node)
+            _prospective_parent = self.nodes[self.node_ids[-1]]
+            _prospective_parent.add_child(_node)
         self.register_node(_node, node_id)
 
     def execute_process(self, arg, **kwargs):
@@ -115,19 +115,7 @@ class _WorkflowTree(GenericTree):
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
 
-    def export_tree_to_file(self, filename):
-        """
-        Export the WorkflowTree to a file using any of the registered
-        exporters.
-
-        Parameters
-        ----------
-        filename : Union[str, pathlib.Path]
-            The filename of the file with the export.
-        """
-        WorkflowTreeIoMeta.export_to_file(filename, self)
-
-    def import_tree_from_file(self, filename):
+    def import_from_file(self, filename):
         """
         Import the WorkflowTree from a configuration file.
 
@@ -140,6 +128,18 @@ class _WorkflowTree(GenericTree):
         for _att in ['root', 'node_ids', 'nodes']:
             setattr(self, _att, getattr(_new_tree, _att))
         self._tree_changed_flag = True
+
+    def export_to_file(self, filename):
+        """
+        Export the WorkflowTree to a file using any of the registered
+        exporters.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The filename of the file with the export.
+        """
+        WorkflowTreeIoMeta.export_to_file(filename, self)
 
     def get_all_result_shapes(self, force_update=False):
         """
@@ -154,7 +154,7 @@ class _WorkflowTree(GenericTree):
         Raises
         ------
         AppConfigError
-            If the WorkflowTree has no nodes..
+            If the WorkflowTree has no nodes.
 
         Returns
         -------
@@ -170,7 +170,8 @@ class _WorkflowTree(GenericTree):
             self.root.calculate_and_push_result_shape()
             self.reset_tree_changed_flag()
         _shapes = {_leaf.node_id: _leaf.result_shape
-                   for _leaf in _leaves if _leaf.output_data_dim is not None}
+                   for _leaf in _leaves
+                   if _leaf.plugin.output_data_dim is not None}
         for _id, _shape in _shapes.items():
             if -1 in _shape:
                 _plugin_cls = self.get_node_by_id(_id).plugin.__class__

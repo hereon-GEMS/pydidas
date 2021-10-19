@@ -371,7 +371,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         list
             The list of all registered paths.
         """
-        return self.__plugin_paths
+        return self.__plugin_paths[:]
 
     def clear_collection(self, confirmation=False):
         """

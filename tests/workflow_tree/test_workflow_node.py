@@ -51,17 +51,53 @@ class TestWorkflowNode(unittest.TestCase):
             _nodes.append(_tiernodes)
         return _nodes, _index
 
-    def test_confirm_plugin_existance_and_type__no_plugin(self):
-        with self.assertRaises(KeyError):
-            WorkflowNode()
-
-    def test_confirm_plugin_existance_and_type__wrong_plugin(self):
-        with self.assertRaises(TypeError):
-            WorkflowNode(plugin=12)
-
-    def test_confirm_plugin_existance_and_type__correct_plugin(self):
+    def test_result_shape__not_set(self):
         obj = WorkflowNode(plugin=DummyLoader())
-        self.assertIsInstance(obj, WorkflowNode)
+        self.assertIsNone(obj.result_shape)
+
+    def test_result_shape(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj.update_result_shape_from_plugin()
+        _shape = obj.result_shape
+        self.assertEqual(_shape, obj.plugin.result_shape)
+
+    def test_update_result_shape_from_plugin(self):
+        _shape = (-1, 12, 42)
+        obj = WorkflowNode(plugin=DummyProc())
+        obj.plugin._config['input_shape'] = _shape
+        obj.update_result_shape_from_plugin()
+        self.assertEqual(obj.result_shape, _shape)
+
+    def test_calculate_and_push_result_shape(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.calculate_and_push_result_shape()
+        _shape = obj.result_shape
+        for _d in range(_depth):
+            for _node in nodes[_d]:
+                self.assertEqual(_node.result_shape, _shape)
+
+    def test_dump(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        _dump = obj.dump()
+        self.assertIsInstance(_dump, dict)
+        for key in ('node_id', 'parent', 'children', 'plugin_class',
+                    'plugin_params'):
+            self.assertTrue(key in _dump.keys())
+
+    def test_execute_plugin_chain(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.execute_plugin_chain(0)
+        for _node in nodes[_depth]:
+            self.assertIsNotNone(_node.results)
+            self.assertIsNotNone(_node.result_kws)
+        for _d in range(_depth):
+            for _node in nodes[_d]:
+                self.assertIsNone(_node.results)
+                self.assertIsNone(_node.result_kws)
 
     def test_execute_plugin__simple(self):
         obj = WorkflowNode(plugin=DummyLoader())
@@ -83,46 +119,19 @@ class TestWorkflowNode(unittest.TestCase):
             for _node in nodes[_d]:
                 self.assertTrue(_node.plugin._preexecuted)
 
-    def test_execute_plugin_chain(self):
-        _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        obj = nodes[0][0]
-        obj.execute_plugin_chain(0)
-        for _node in nodes[_depth]:
-            self.assertIsNotNone(_node.results)
-            self.assertIsNotNone(_node.result_kws)
-        for _d in range(_depth):
-            for _node in nodes[_d]:
-                self.assertIsNone(_node.results)
-                self.assertIsNone(_node.result_kws)
+    def test_confirm_plugin_existance_and_type__no_plugin(self):
+        with self.assertRaises(KeyError):
+            WorkflowNode()
 
-    def test_dump(self):
+    def test_confirm_plugin_existance_and_type__wrong_plugin(self):
+        with self.assertRaises(TypeError):
+            WorkflowNode(plugin=12)
+
+    def test_confirm_plugin_existance_and_type__correct_plugin(self):
         obj = WorkflowNode(plugin=DummyLoader())
-        _dump = obj.dump()
-        self.assertIsInstance(_dump, dict)
-        for key in ('node_id', 'parent', 'children', 'plugin_class',
-                    'plugin_params'):
-            self.assertTrue(key in _dump.keys())
+        self.assertIsInstance(obj, WorkflowNode)
 
-    def test_result_shape__not_set(self):
-        obj = WorkflowNode(plugin=DummyLoader())
-        self.assertIsNone(obj.result_shape)
 
-    def test_result_shape(self):
-        obj = WorkflowNode(plugin=DummyLoader())
-        obj.update_result_shape_from_plugin()
-        _shape = obj.result_shape
-        self.assertEqual(_shape, obj.plugin.result_shape)
-
-    def test_calculate_and_push_result_shape(self):
-        _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        obj = nodes[0][0]
-        obj.calculate_and_push_result_shape()
-        _shape = obj.result_shape
-        for _d in range(_depth):
-            for _node in nodes[_d]:
-                self.assertEqual(_node.result_shape, _shape)
 
 
 if __name__ == '__main__':

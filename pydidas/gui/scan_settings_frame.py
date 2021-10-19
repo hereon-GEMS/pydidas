@@ -25,11 +25,11 @@ __status__ = "Development"
 __all__ = ['ScanSettingsFrame']
 
 import sys
-from functools import partial
 from PyQt5 import QtWidgets, QtCore
 
 
 from pydidas.core import ScanSettings
+from pydidas.core.scan_settings import ScanSettingsIoMeta
 from pydidas.widgets import CreateWidgetsMixIn, excepthook, BaseFrame
 from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.scan_settings_frame_builder import (
@@ -53,6 +53,9 @@ class ScanSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
         ParameterWidgetsMixIn.__init__(self)
 
         create_scan_settings_frame_widgets_and_layout(self)
+        self._widgets['but_save'].clicked.connect(self.export_to_file)
+        self._widgets['but_load'].clicked.connect(self.load_from_file)
+        self._widgets['but_reset'].clicked.connect(self.reset_entries)
         self.toggle_dims()
 
     def toggle_dims(self):
@@ -89,6 +92,41 @@ class ScanSettingsFrame(BaseFrame, ParameterWidgetsMixIn,
         elif param_ref == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
             _w.set_value(SCAN_SETTINGS.get('xray_wavelength') * 1e10)
+
+    def load_from_file(self):
+        """
+        Load ScanSettings from a file.
+
+        This method will open a QFileDialog to select the file to be read.
+        """
+        _formats = ScanSettingsIoMeta.get_string_of_formats()
+        fname = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Name of file', None, _formats)[0]
+        if fname != '':
+            SCAN_SETTINGS.import_from_file(fname)
+            for param in SCAN_SETTINGS.params.values():
+                self.param_widgets[param.refkey].set_value(param.value)
+
+    def export_to_file(self):
+        """
+        Save ScanSettings to a file.
+
+        This method will open a QFileDialog to select a filename for the
+        file in which the information shall be written.
+        """
+        _formats = ScanSettingsIoMeta.get_string_of_formats()
+        fname =  QtWidgets.QFileDialog.getSaveFileName(
+            self, 'Name of file', None, _formats)[0]
+        if fname != '':
+            SCAN_SETTINGS.export_to_file(fname)
+
+    def reset_entries(self):
+        """
+        Reset all ScanSetting entries to their default values.
+        """
+        SCAN_SETTINGS.restore_all_defaults(True)
+        for param in SCAN_SETTINGS.params.values():
+            self.param_widgets[param.refkey].set_value(param.value)
 
 
 if __name__ == '__main__':

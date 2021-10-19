@@ -24,17 +24,16 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import FileExtensionRegistryMetaclass
+from pydidas.core.io import FileExtensionRegistryMetaclass
 
 
 class TestFileExtensionRegistryMetaclass(unittest.TestCase):
 
     def setUp(self):
         FileExtensionRegistryMetaclass.clear_registry()
-        ...
 
     def tearDown(self):
-        ...
+        FileExtensionRegistryMetaclass.clear_registry()
 
     def create_test_class(self):
         class TestClass(metaclass=FileExtensionRegistryMetaclass):

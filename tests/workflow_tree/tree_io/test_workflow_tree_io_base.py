@@ -45,7 +45,7 @@ class TestWorkflowTreeIoBase(unittest.TestCase):
     def test_import_from_file(self):
         obj = WorkflowTreeIoBase
         with self.assertRaises(NotImplementedError):
-            obj.export_to_file('something', 1)
+            obj.export_to_file('something')
 
     def test_export_to_file(self):
         obj = WorkflowTreeIoBase

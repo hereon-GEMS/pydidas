@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Subpackage with GUI elements."""
-
+"""
+The experimental_settings sub-package includes the ExperimentalSettings 
+singleton and importers / exporters for it.
+"""
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
@@ -36,11 +38,13 @@ __all__ += experimental_settings_io_meta.__all__
 __all__ += experimental_settings_io_base.__all__
 __all__ += experimental_settings.__all__
 
-# Unclutter namespace: remove modules from namespace
+# Unclutter namespace: remove modules from namespace:
 del experimental_settings_io_meta
 del experimental_settings_io_base
 del experimental_settings
 
+# Automatically find and import IO classes to have them registered
+# with the Metaclass:
 import os
 from importlib import import_module
 _io_classes = [name.replace('.py', '')

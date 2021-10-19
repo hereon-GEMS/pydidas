@@ -207,7 +207,7 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=TOOLTIPS['det_mask']),
     Parameter('det_mask_val', float, 0, name='Detector mask value',
               tooltip=TOOLTIPS['det_mask_val']),
-    Parameter('mosaic_border_width', int, 0,
+    Parameter('mosaic_border_width', int, 0, unit='px',
               name='Mosaic tiling border width',
               tooltip=TOOLTIPS['mosaic_border_width']),
     Parameter('mosaic_border_value', float, 0,

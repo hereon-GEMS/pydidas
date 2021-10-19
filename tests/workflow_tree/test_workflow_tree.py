@@ -23,12 +23,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
+import tempfile
+import shutil
+import os
 
 import numpy as np
 
+from pydidas import unittest_objects
 from pydidas.workflow_tree import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.unittest_objects.dummy_loader import DummyLoader
 from pydidas.unittest_objects.dummy_proc import DummyProc
+from pydidas._exceptions import AppConfigError
+from pydidas.plugins import PluginCollection
+
+COLL = PluginCollection()
+_PLUGIN_PATHS = COLL.get_all_registered_paths()
 
 
 class TestWorkflowTree(unittest.TestCase):
@@ -36,9 +45,16 @@ class TestWorkflowTree(unittest.TestCase):
     def setUp(self):
         self.tree = WorkflowTree()
         self.tree.clear()
+        self._tmpdir = tempfile.mkdtemp()
+        _path = os.path.dirname(unittest_objects.__file__)
+        if _path not in _PLUGIN_PATHS:
+            COLL.find_and_register_plugins(_path)
 
     def tearDown(self):
-        ...
+        shutil.rmtree(self._tmpdir)
+        COLL.clear_collection(True)
+        COLL.find_and_register_plugins(*_PLUGIN_PATHS)
+        # PluginCollection._reset_instance()
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=DummyLoader())
@@ -54,6 +70,80 @@ class TestWorkflowTree(unittest.TestCase):
                     _tiernodes.append(_node)
             _nodes.append(_tiernodes)
         return _nodes, _index
+
+    def test_get_all_result_shapes__no_nodes(self):
+        with self.assertRaises(AppConfigError):
+            self.tree.get_all_result_shapes()
+
+    def test_get_all_result_shapes__single_node(self):
+        self.tree.create_and_add_node(DummyLoader())
+        _shapes = self.tree.get_all_result_shapes()
+        self.assertEqual(_shapes[0], DummyLoader().result_shape)
+
+    def test_get_all_result_shapes__tree(self):
+        _shape = DummyLoader().result_shape
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
+                                      node_id=2)
+        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
+                                      node_id=3)
+        _shapes = self.tree.get_all_result_shapes()
+        self.assertEqual(_shapes[2], _shape)
+        self.assertEqual(_shapes[3], _shape)
+
+    def test_export_to_file(self):
+        _fname = os.path.join(self._tmpdir, 'export.yaml')
+        _nodes, _index = self.create_node_tree()
+        self.tree.register_node(_nodes[0][0])
+        self.tree.export_to_file(_fname)
+        with open(_fname, 'r') as f:
+            content = f.read()
+        for node_id in self.tree.nodes:
+            self.assertTrue(content.find(f'node_id: {node_id}') > 0)
+
+    def test_import_from_file(self):
+        tree = WorkflowTree()
+        _nodes, _index = self.create_node_tree()
+        tree.register_node(_nodes[0][0])
+        _fname = os.path.join(self._tmpdir, 'export.yaml')
+        tree.export_to_file(_fname)
+        self.tree.import_from_file(_fname)
+        for node_id in tree.nodes:
+            self.assertTrue(node_id in self.tree.nodes)
+            self.assertEqual(tree.nodes[node_id].plugin.__class__,
+                              self.tree.nodes[node_id].plugin.__class__)
+
+    def test_execute_single_plugin__no_node(self):
+        _depth = 3
+        _data = np.random.random((20, 20))
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        with self.assertRaises(KeyError):
+            self.tree.execute_single_plugin(114, _data)
+
+    def test_execute_single_plugin__existing_node(self):
+        _depth = 3
+        _data = np.random.random((20, 20))
+        _offset = 0.4
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        _newdata, kwargs = self.tree.execute_single_plugin(n_nodes - 2, _data,
+                                                            offset=_offset)
+        self.assertTrue((abs(_newdata -_offset - _data) < 1e-15).all())
+
+    def test_execute_process(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        self.tree.execute_process(0)
+        for _node in nodes[_depth]:
+            self.assertIsNotNone(_node.results)
+            self.assertIsNotNone(_node.result_kws)
+            self.assertTrue(_node.plugin._preexecuted)
+        for _d in range(_depth):
+            for _node in nodes[_d]:
+                self.assertIsNone(_node.results)
+                self.assertIsNone(_node.result_kws)
 
     def test_create_and_add_node__wrong_plugin(self):
         with self.assertRaises(TypeError):
@@ -87,45 +177,6 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[_id], GenericNode)
         self.assertEqual(self.tree.nodes[_id].node_id, _id)
-
-    def test_execute_single_plugin__no_node(self):
-        _depth = 3
-        _data = np.random.random((20, 20))
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        self.tree.register_node(nodes[0][0])
-        with self.assertRaises(KeyError):
-            self.tree.execute_single_plugin(114, _data)
-
-    def test_execute_single_plugin__existing_node(self):
-        _depth = 3
-        _data = np.random.random((20, 20))
-        _offset = 0.4
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        self.tree.register_node(nodes[0][0])
-        _newdata, kwargs = self.tree.execute_single_plugin(n_nodes - 2, _data,
-                                                           offset=_offset)
-        self.assertTrue((abs(_newdata -_offset - _data) < 1e-15).all())
-
-    def test_execute_process(self):
-        _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        self.tree.register_node(nodes[0][0])
-        self.tree.execute_process(0)
-        for _node in nodes[_depth]:
-            self.assertIsNotNone(_node.results)
-            self.assertIsNotNone(_node.result_kws)
-            self.assertTrue(_node.plugin._preexecuted)
-        for _d in range(_depth):
-            for _node in nodes[_d]:
-                self.assertIsNone(_node.results)
-                self.assertIsNone(_node.result_kws)
-
-    def test_get_copy(self):
-        _depth = 3
-        nodes, n_nodes = self.create_node_tree(depth=_depth)
-        _new_node = nodes[0][0].get_copy()
-        self.assertIsNot(_new_node, nodes[0][0])
-        self.assertEqual(_new_node.n_children, nodes[0][0].n_children)
 
 
 if __name__ == '__main__':

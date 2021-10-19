@@ -23,40 +23,44 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSettingsIoBase']
+__all__ = ['ScanSettingsIoBase']
 
-from .experimental_settings_io_meta import ExperimentalSettingsIoMeta
-from .experimental_settings import ExperimentalSettings
+from .scan_settings_io_meta import ScanSettingsIoMeta
+from .scan_settings import ScanSettings
 from ..io import GenericIoBase
 
 
-EXP_SETTINGS = ExperimentalSettings()
+SCAN = ScanSettings()
 
 
-class ExperimentalSettingsIoBase(GenericIoBase,
-                                 metaclass=ExperimentalSettingsIoMeta):
+class ScanSettingsIoBase(GenericIoBase,
+                         metaclass=ScanSettingsIoMeta):
     """
-    Base class for ExperimentalSettings importer/exporters.
+    Base class for ScanSettings importer/exporters.
     """
     extensions = []
     format_name = 'unknown'
     imported_params = {}
 
+
     @classmethod
     def _verify_all_entries_present(cls):
         """
         Verify that the tmp_params dictionary holds all keys from the
-        ExperimentalSettings.
+        scanSettings.
         """
-        for key in EXP_SETTINGS.params:
-            if key not in cls.imported_params:
-                raise KeyError(f'The setting for "{key}" is missing.')
+        n_dim = cls.imported_params.get('scan_dim')
+        for _dim in range(1, n_dim + 1):
+            for _key in ['scan_dir', 'n_points', 'delta', 'unit', 'offset']:
+                _item = f'{_key}_{_dim}'
+                if _item not in cls.imported_params:
+                    raise KeyError(f'The setting for "{_item}" is missing.')
 
     @classmethod
-    def _write_to_exp_settings(cls):
+    def _write_to_scan_settings(cls):
         """
-        Write the loaded (temporary) Parameters to the ExperimentalSettings.
+        Write the loaded (temporary) Parameters to the scanSettings.
         """
         for key in cls.imported_params:
-            EXP_SETTINGS.set_param_value(key, cls.imported_params[key])
+            SCAN.set_param_value(key, cls.imported_params[key])
         cls.imported_params = {}

@@ -46,12 +46,15 @@ def create_scan_settings_frame_widgets_and_layout(frame):
 
     frame.create_label('label_title', 'Scan settings\n', fontsize=14,
                       bold=True, underline=True, gridPos=(0, 0, 1, 1))
-    frame.create_button('but_load', 'Load scan parameters from file',
+    frame.create_button('but_load', 'Load scan settings from file',
                        gridPos=(-1, 0, 1, 1), alignment=None,
                        icon=frame.style().standardIcon(42))
     frame.create_button('but_import', 'Open scan parameter import dialogue',
                        gridPos=(-1, 0, 1, 1), alignment=None,
                        icon=frame.style().standardIcon(42))
+    frame.create_button('but_reset', 'Reset all scan settings',
+                       gridPos=(-1, 0, 1, 1), alignment=None,
+                       icon=frame.style().standardIcon(59))
     frame.create_label('scan_dim', '\nScan dimensionality:', fontsize=11,
                      bold=True, gridPos=(frame.next_row(), 0, 1, 1))
 
@@ -79,4 +82,9 @@ def create_scan_settings_frame_widgets_and_layout(frame):
                                      width_io=frame.PARAM_INPUT_WIDTH,
                                      width_unit=0,
                                      width_total=_width_total)
+
+    frame.create_button('but_save', 'Save scan settings',
+                        gridPos=(-1, 0, 1, 1),
+                        icon=frame.style().standardIcon(43))
+
     frame.create_spacer('final_spacer', gridPos=(_rowoffset + 1, 2, 1, 1))

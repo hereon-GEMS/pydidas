@@ -26,10 +26,11 @@ __all__ = ['ScanSettings']
 
 import numpy as np
 
-from .generic_parameters import get_generic_parameter
-from .parameter_collection import ParameterCollection
-from .object_with_parameter_collection import ObjectWithParameterCollection
-from .singleton_factory import SingletonFactory
+from .scan_settings_io_meta import ScanSettingsIoMeta
+from ..generic_parameters import get_generic_parameter
+from ..parameter_collection import ParameterCollection
+from ..object_with_parameter_collection import ObjectWithParameterCollection
+from ..singleton_factory import SingletonFactory
 
 
 DEFAULT_PARAMS = ParameterCollection(
@@ -65,7 +66,7 @@ class _ScanSettings(ObjectWithParameterCollection):
     """
     default_params = DEFAULT_PARAMS
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """Setup method"""
         super().__init__()
         self.set_default_params()
@@ -94,6 +95,29 @@ class _ScanSettings(ObjectWithParameterCollection):
             frame -= _indices[_dim] * np.prod(_N[_dim + 1:])
         return tuple(_indices)
 
+    @staticmethod
+    def import_from_file(filename):
+        """
+        Import ScanSettings from a file.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The full filename.
+        """
+        ScanSettingsIoMeta.import_from_file(filename)
+
+    @staticmethod
+    def export_to_file(filename):
+        """
+        Import ScanSettings from a file.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The full filename.
+        """
+        ScanSettingsIoMeta.export_to_file(filename)
 
 
 ScanSettings = SingletonFactory(_ScanSettings)

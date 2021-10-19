@@ -13,29 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the ExperimentalSettingsIoMeta class which is used for creating
+Module with the ScanSettingsIoMeta class which is used for creating
 exporter/importer classes for the ExperimentalSetting singleton and
 registering them.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSettingsIoMeta']
+__all__ = ['ScanSettingsIoMeta']
 
 
 from ..io import GenericIoMeta
 
 
-class ExperimentalSettingsIoMeta(GenericIoMeta):
+class ScanSettingsIoMeta(GenericIoMeta):
     """
-    Metaclass for ExperimentalSettings exporters and importers which holds the
+    Metaclass for ScanSettings exporters and importers which holds the
     registry with all associated file extensions for imprting/ exporting
     ExperimentalSettings.
     """
     # need to redefine the registry to have a unique registry for
-    # ExperimentalSettingsIoMeta
+    # ScanSettingsIoMeta
     registry = {}

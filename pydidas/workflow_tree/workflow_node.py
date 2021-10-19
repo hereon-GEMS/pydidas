@@ -113,7 +113,7 @@ class WorkflowNode(GenericNode):
         res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
         for _child in self._children:
             _child.execute_plugin_chain(res, **reskws)
-        if self.is_leaf:
+        if self.is_leaf and self.plugin.output_data_dim is not None:
             self.results = res
             self.result_kws = reskws
 

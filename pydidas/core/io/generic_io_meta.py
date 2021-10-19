@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowTreeIoMeta class which is used for creating
-exporter/importer classes and registering them.
+Module with the ExperimentalSettingsIoMeta class which is used for creating
+exporter/importer classes for the ExperimentalSetting singleton and
+registering them.
 """
 
 __author__      = "Malte Storm"
@@ -23,25 +24,25 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTreeIoMeta']
+__all__ = ['GenericIoMeta']
 
 
 import os
 
-from pydidas.core.io import FileExtensionRegistryMetaclass
+from .file_extension_registry_metaclass import FileExtensionRegistryMetaclass
 
 
-class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
+class GenericIoMeta(FileExtensionRegistryMetaclass):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.
     """
     # need to redefine the registry to have a unique registry for
-    # WorkflowTreeIoMeta
+    # ExperimentalSettingsIoMeta
     registry = {}
 
     @classmethod
-    def export_to_file(cls, filename, tree, **kwargs):
+    def export_to_file(cls, filename, **kwargs):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
@@ -58,7 +59,7 @@ class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
         _extension = os.path.splitext(filename)[1]
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
-        _io_class.export_to_file(filename, tree, **kwargs)
+        _io_class.export_to_file(filename, **kwargs)
 
     @classmethod
     def import_from_file(cls, filename):
@@ -79,5 +80,4 @@ class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
         _extension = os.path.splitext(filename)[1]
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
-        _tree = _io_class.import_from_file(filename)
-        return _tree
+        _io_class.import_from_file(filename)

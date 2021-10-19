@@ -23,6 +23,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+# import sub-packages:
+from . import io
+
+from . import scan_settings
+from .scan_settings import ScanSettings
+
+from . import experimental_settings
+from .experimental_settings import ExperimentalSettings
+
+__all__ += ['ExperimentalSettings', 'ScanSettings']
+
+
+# import modules:
+
 from . import parameter
 from .parameter import *
 
@@ -35,20 +49,11 @@ from .parameter_collection import *
 from . import object_with_parameter_collection
 from .object_with_parameter_collection import *
 
-from . import file_extension_registry_metaclass
-from .file_extension_registry_metaclass import *
-
 from . import composite_image
 from .composite_image import *
 
 from . import generic_parameters
 from .generic_parameters import *
-
-from . import experimental_settings
-from .experimental_settings import ExperimentalSettings
-
-from . import scan_settings
-from .scan_settings import *
 
 from . import hdf5_key
 from .hdf5_key import *
@@ -59,27 +64,21 @@ from .singleton_factory import *
 from . import pydidas_q_settings_mixin
 from .pydidas_q_settings_mixin import *
 
-__all__ += file_extension_registry_metaclass.__all__
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
 __all__ += object_with_parameter_collection.__all__
 __all__ += dataset.__all__
-__all__ += ['ExperimentalSettings']
-__all__ += scan_settings.__all__
 __all__ += hdf5_key.__all__
 __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
 __all__ += singleton_factory.__all__
 __all__ += pydidas_q_settings_mixin.__all__
-# __all__ += plugin_collection.__all__
 
 
 
 # Unclutter namespace: remove modules from namespace
-del file_extension_registry_metaclass
 del parameter
 del dataset
-del scan_settings
 del hdf5_key
 del parameter_collection
 del object_with_parameter_collection

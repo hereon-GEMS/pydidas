@@ -82,14 +82,14 @@ class GenericTree:
         node : GenericNode
             The node to become the new root node
         """
-        self._verify_node_type(node)
+        self.verify_node_type(node)
         self.clear()
         node.parent = None
         node.node_id = 0
         self.register_node(node)
 
     @staticmethod
-    def _verify_node_type(node):
+    def verify_node_type(node):
         """
         Check that the node is a GenericNode
 
@@ -141,7 +141,7 @@ class GenericTree:
             GenericTree, the check will only be performed once for the newly
             added node and not again during registering of its children.
         """
-        self._verify_node_type(node)
+        self.verify_node_type(node)
         _ids = node.get_recursive_ids()
         if check_ids:
             self._check_node_ids(_ids)

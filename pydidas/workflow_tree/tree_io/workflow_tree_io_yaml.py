@@ -23,7 +23,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['YamlWorkflowTreeIo']
+__all__ = ['WorkflowTreeIoYaml']
 
 
 import yaml
@@ -32,7 +32,7 @@ from pydidas.constants import YAML_EXTENSIONS
 from .workflow_tree_io_base import WorkflowTreeIoBase
 
 
-class YamlWorkflowTreeIo(WorkflowTreeIoBase):
+class WorkflowTreeIoYaml(WorkflowTreeIoBase):
     """
     Base class for WorkflowTree exporters.
     """

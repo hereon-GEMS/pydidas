@@ -71,16 +71,16 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(tree.node_ids, [])
         self.assertIsNone(tree.root)
 
-    def test_verify_node_type__with_node(self):
+    def testverify_node_type__with_node(self):
         tree = GenericTree()
         node = GenericNode()
-        tree._verify_node_type(node)
+        tree.verify_node_type(node)
 
-    def test_verify_node_type__wrong_object(self):
+    def testverify_node_type__wrong_object(self):
         tree = GenericTree()
         node = 12
         with self.assertRaises(TypeError):
-            tree._verify_node_type(node)
+            tree.verify_node_type(node)
 
     def test_set_root__empty_tree(self):
         tree = GenericTree()

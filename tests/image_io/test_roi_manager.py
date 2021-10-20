@@ -31,7 +31,7 @@ from pydidas.image_io.roi_manager import RoiManager
 class TestRoiManager(unittest.TestCase):
 
     def setUp(self):
-        self._target_ROI = (slice(0, 5, None), slice(0, 5, None))
+        self._target_roi = (slice(0, 5, None), slice(0, 5, None))
 
     def tearDown(self):
         ...
@@ -251,21 +251,21 @@ class TestRoiManager(unittest.TestCase):
 
     def test_full_init(self):
         _roi = [slice(0, 5), 1, 5]
-        obj = RoiManager(ROI=_roi)
+        obj = RoiManager(roi=_roi)
         self.assertEqual(obj._RoiManager__roi,
                          (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_create_roi_slices(self):
         _roi = [slice(0, 5), 1, 5]
         obj = RoiManager()
-        obj._RoiManager__kwargs = {'ROI': _roi}
+        obj._config = {'roi': _roi}
         obj.create_roi_slices()
         self.assertEqual(obj._RoiManager__roi,
                          (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_roi_getter(self):
         _roi = [slice(0, 5), 1, 5]
-        obj = RoiManager(ROI=_roi)
+        obj = RoiManager(roi=_roi)
         self.assertEqual(obj.roi, (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_roi_setter_from_list(self):
@@ -299,7 +299,7 @@ class TestRoiManager(unittest.TestCase):
         obj.roi = _roi[0], _roi[1], _roi[2]
         self.assertEqual(obj.roi, (_roi[0], slice(_roi[1], _roi[2])))
 
-    def test_roi_setter__again_from_ROI(self):
+    def test_roi_setter__again_from_roi(self):
         obj = RoiManager()
         obj.roi = [slice(0, 5), 1, 5]
         obj.roi = None

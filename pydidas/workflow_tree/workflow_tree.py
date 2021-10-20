@@ -69,6 +69,31 @@ class _WorkflowTree(GenericTree):
             _prospective_parent.add_child(_node)
         self.register_node(_node, node_id)
 
+    def execute_process_and_get_results(self, arg, **kwargs):
+        """
+        Execute the WorkflowTree process and get the results.
+
+        Parameters
+        ----------
+        arg : object
+            Any argument that need to be passed to the plugin chain.
+        **kwargs : dict
+            Any keyword arguments which need to be passed to the plugin chain.
+
+        Returns
+        -------
+        results : dict
+            A dictionary with results in the form of entries with node_id keys
+            and results items.
+        """
+        self.execute_process(arg, **kwargs)
+        _leaves = self.get_all_leaves()
+        _results = {}
+        for _leaf in _leaves:
+            if _leaf.results is not None:
+                _results[_leaf.node_id] = _leaf.results
+        return _results
+
     def execute_process(self, arg, **kwargs):
         """
         Execute the process defined in the WorkflowTree for data analysis.

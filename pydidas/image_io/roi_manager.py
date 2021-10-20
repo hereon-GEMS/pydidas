@@ -51,11 +51,13 @@ def error_msg(roi, exception=''):
 
 
 class RoiManager:
-    """Generic implementation of the image reader."""
+    """
+    The RoiManager is used to create slice objects to crop images with a
+    region of interest."""
 
     def __init__(self, **kwargs):
         """Initialization"""
-        self.__kwargs = kwargs
+        self._config = kwargs
         self.__roi = None
         self.__roi_key = None
         self.create_roi_slices()
@@ -82,14 +84,14 @@ class RoiManager:
         *args : type
             ROI creation arguments.
         """
-        self.__kwargs['ROI'] = args[0]
+        self._config['roi'] = args[0]
         self.create_roi_slices()
 
     def create_roi_slices(self):
         """
         Create new ROI slice objects from the stored (keyword) arguments.
         """
-        self.__roi_key = self.__kwargs.get('ROI', None)
+        self.__roi_key = self._config.get('roi', None)
         if self.__roi_key is None:
             self.__roi = None
             return

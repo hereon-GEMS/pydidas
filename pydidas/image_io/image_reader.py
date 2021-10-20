@@ -62,7 +62,7 @@ class ImageReader:
         binning : int, optional
             The reb-inning factor to be applied to the image. The default
             is 1.
-        ROI : Union[tuple, None], optional
+        roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
             as 2-tuples of integers or slice  objects. If None, the full image
@@ -77,11 +77,9 @@ class ImageReader:
         -------
         _image : pydidas.core.Dataset
             The image in form of an ndarray
-        _metadata : dict
-            The image metadata, as returned from the concrete reader.
         """
         _return_type = kwargs.get('datatype', 'auto')
-        self._RoiManager.roi = kwargs.get('ROI', None)
+        self._RoiManager.roi = kwargs.get('roi', None)
         _binning = kwargs.get('binning', 1)
         if self._image is None:
             raise ValueError('No image has been read.')

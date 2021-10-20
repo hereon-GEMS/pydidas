@@ -55,7 +55,7 @@ class Hdf5Reader(ImageReader):
             The number of the image in the dataset. The default is 0.
         axis : int
             The number of the axis with the image. The default is 0.
-        ROI : Union[tuple, None], optional
+        roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
             as 2-tuples of integers or slice  objects. If None, the full image
@@ -67,6 +67,11 @@ class Hdf5Reader(ImageReader):
         binning : int, optional
             The reb-inning factor to be applied to the image. The default
             is 1.
+
+        Raises
+        ------
+        KeyError
+            If the hdf5_dataset has not been specified.
 
         Returns
         -------
@@ -83,12 +88,10 @@ class Hdf5Reader(ImageReader):
         if dataset is None:
             raise KeyError('The hdf5 dataset has not been specified.')
         _img = squeeze(
-            read_hdf5_slice(filename, dataset, [None] * axis + [frame])
-        )
+            read_hdf5_slice(filename, dataset, [None] * axis + [frame]))
         self._image = Dataset(_img, metadata={'axis': axis,
                                               'frame': frame,
-                                              'dataset': dataset}
-        )
+                                              'dataset': dataset})
         return self.return_image(**kwargs)
 
 

@@ -93,6 +93,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         Prepare loading images from a file series.
         """
         self._file_manager.update()
+        self._image_metadata.update()
 
     def execute(self, index, **kwargs):
         """
@@ -117,6 +118,8 @@ class Hdf5fileSeriesLoader(InputPlugin):
         _hdf_index = index % self.get_param_value('images_per_file')
         kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')
         kwargs['frame'] = _hdf_index
+        kwargs['binning'] = self.get_param_value('binning')
+        kwargs['roi'] = self._image_metadata.roi
         _data = read_image(_fname, **kwargs)
         return _data, kwargs
 

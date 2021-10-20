@@ -49,7 +49,7 @@ class FabioReader(ImageReader):
 
         Parameters
         ----------
-        ROI : Union[tuple, None], optional
+        roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
             as 2-tuples of integers or slice  objects. If None, the full image

@@ -32,7 +32,7 @@ from pydidas.image_io import ImageReader
 class TestImageReader(unittest.TestCase):
 
     def setUp(self):
-        self._target_ROI = (slice(0, 5, None), slice(0, 5, None))
+        self._target_roi = (slice(0, 5, None), slice(0, 5, None))
 
     def tearDown(self):
         ...
@@ -58,11 +58,11 @@ class TestImageReader(unittest.TestCase):
         self.assertTrue((obj._image == _image).all())
 
     def test_return_image_w_roi(self):
-        _ROI = [2, 8, 2, 8]
+        _roi = [2, 8, 2, 8]
         obj = ImageReader()
         obj._image = np.random.random((10, 10))
-        _cropped_image = obj._image[_ROI[0]:_ROI[1], _ROI[2]:_ROI[3]]
-        _image = obj.return_image(ROI=_ROI)
+        _cropped_image = obj._image[_roi[0]:_roi[1], _roi[2]:_roi[3]]
+        _image = obj.return_image(roi=_roi)
         self.assertTrue((_cropped_image == _image).all())
 
     def test_return_image_w_return_type(self):

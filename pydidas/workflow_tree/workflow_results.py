@@ -44,6 +44,7 @@ class _WorkflowResults:
 
     def __init__(self):
         self.__composites = {}
+        self._config = {}
 
     def update_shapes_from_scan(self):
         """
@@ -56,12 +57,37 @@ class _WorkflowResults:
         _shapes = {_key: _points + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
             self.__composites[_node_id] = np.zeros(_shape, dtype=np.float32)
+            self._config['shapes'] = _shapes
 
-    def store_results(self, index, results_dict):
+
+    def store_results(self, index, results):
+        """
+        Store results from one frame in the WorkflowResults.
+
+        Parameters
+        ----------
+        index : int
+            The frame index
+        results: dict
+            The results as dictionary with entries of the type
+            <node_id: array>.
+        """
         _scan_index = SCAN.get_frame_position_in_scan(index)
-        for _key, _val in results_dict.items():
+        for _key, _val in results.items():
             self.__composites[_key][_scan_index] = _val
         self.new_results.emit()
+
+    @property
+    def shapes(self):
+        """
+        Return the shapes of the results in form of a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with entries of the form <node_id: results_shape>
+        """
+        return self._config['shapes']
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

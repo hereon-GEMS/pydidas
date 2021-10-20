@@ -324,7 +324,7 @@ class CompositeCreatorApp(BaseApp):
         _bg_file = self.get_param_value('bg_file')
         check_file_exists(_bg_file)
         _params = dict(binning=self.get_param_value('binning'),
-                       ROI=self._image_metadata.roi)
+                       roi=self._image_metadata.roi)
         # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file,
@@ -401,7 +401,7 @@ class CompositeCreatorApp(BaseApp):
         _i_file = index // _images_per_file
         _fname = self._filelist.get_filename(_i_file)
         _params = dict(binning=self.get_param_value('binning'),
-                       ROI=self._image_metadata.roi)
+                       roi=self._image_metadata.roi)
         if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
             _hdf_index = index % _images_per_file
             _i_hdf = (self.get_param_value('hdf5_first_image_num')

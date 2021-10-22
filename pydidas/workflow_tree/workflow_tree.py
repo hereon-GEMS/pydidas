@@ -99,6 +99,7 @@ class _WorkflowTree(GenericTree):
         Prepare the execution of the WorkflowTree by running all the nodes'
         prepare_execution methods.
         """
+        self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
 
     def execute_process(self, arg, **kwargs):

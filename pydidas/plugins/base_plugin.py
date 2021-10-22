@@ -138,6 +138,7 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.set_param_value(_kw, kwargs[_kw])
         self._config = {'input_shape': None,
                         'result_shape': None}
+        self._legacy_image_ops_meta = {'num': 0, 'included': False}
         self._legacy_image_ops = []
         self._original_image_shape = None
 
@@ -268,11 +269,18 @@ class BasePlugin(ObjectWithParameterCollection):
         Update the legacy image operations list with any ROI and binning
         operations performed in this plugin.
         """
+        _num = self._legacy_image_ops_meta['num']
+        if (self._legacy_image_ops_meta['included'] and _num > 0):
+            self._legacy_image_ops = self._legacy_image_ops[:-_num]
+            self._legacy_image_ops_meta['num'] = 0
         if self.get_param_value('use_roi', False):
             self._legacy_image_ops.append(['roi', self._image_metadata.roi])
+            self._legacy_image_ops_meta['num'] += 1
         _bin = self.get_param_value('binning', 1)
         if _bin != 1:
             self._legacy_image_ops.append(['binning', _bin])
+            self._legacy_image_ops_meta['num'] += 1
+        self._legacy_image_ops_meta['included'] = True
 
     def get_single_ops_from_legacy(self):
         """

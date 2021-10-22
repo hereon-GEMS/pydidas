@@ -30,7 +30,7 @@ import numpy as np
 
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.image_io import read_image
+from pydidas.image_io import read_image, rebin2d
 
 
 class MaskImage(ProcPlugin):
@@ -52,7 +52,6 @@ class MaskImage(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self._image_params = {}
 
     def pre_execute(self):
         """
@@ -84,7 +83,9 @@ class MaskImage(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        _roi = kwargs.get('roi', None)
-        _binning = kwargs.get('binning', 1)
+        if data.shape != self._mask.shape:
+            _roi, _binning = self.get_single_ops_from_legacy()
+            self._mask  = np.where(
+                rebin2d(self._mask[_roi], _binning) > 0, 1, 0)
         _maskeddata = np.where(self._mask, self._maskval, data)
         return _maskeddata, kwargs

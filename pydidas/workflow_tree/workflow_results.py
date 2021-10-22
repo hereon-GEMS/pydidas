@@ -28,6 +28,7 @@ from PyQt5 import QtCore
 
 from ..core.singleton_factory import SingletonFactory
 from ..core.scan_settings import ScanSettings
+from ..core import Dataset
 from .workflow_tree import WorkflowTree
 
 SCAN = ScanSettings()
@@ -35,7 +36,7 @@ SCAN = ScanSettings()
 TREE = WorkflowTree()
 
 
-class _WorkflowResults:
+class _WorkflowResults(QtCore.QObject):
     """
     WorkflowResults is a class for handling composite data which spans
     individual images.
@@ -43,6 +44,7 @@ class _WorkflowResults:
     new_results = QtCore.pyqtSignal()
 
     def __init__(self):
+        super().__init__()
         self.__composites = {}
         self._config = {}
 
@@ -56,9 +58,9 @@ class _WorkflowResults:
         _results = TREE.get_all_result_shapes()
         _shapes = {_key: _points + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
-            self.__composites[_node_id] = np.zeros(_shape, dtype=np.float32)
+            self.__composites[_node_id] = Dataset(
+                np.zeros(_shape, dtype=np.float32))
             self._config['shapes'] = _shapes
-
 
     def store_results(self, index, results):
         """
@@ -88,6 +90,23 @@ class _WorkflowResults:
             A dictionary with entries of the form <node_id: results_shape>
         """
         return self._config['shapes']
+
+    def get_results(self, node_id):
+        """
+        Get the combined results for the requested node_id
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which results should be retured.
+
+        Returns
+        -------
+        np.ndarray
+            DESCRIPTION.
+
+        """
+        return self.__composites[node_id]
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

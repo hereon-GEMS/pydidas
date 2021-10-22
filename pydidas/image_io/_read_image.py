@@ -90,6 +90,7 @@ def read_image(filename, **kwargs):
     """
     reader = IMAGE_READER.get_reader(filename)
     _data = reader.read_image(filename, **kwargs)
+
     # TODO: implement correct metadata also for integrated images and not
     # only raw detector images.
     # update_image_metadata(_data, **kwargs)

@@ -77,7 +77,7 @@ class Hdf5Reader(ImageReader):
         -------
         image : pydidas.core.Dataset
             The image in form of a Dataset (with embedded metadata)
-       """
+        """
         axis = kwargs.get('axis', 0)
         frame = kwargs.get('frame', 0)
         dataset = kwargs.get('hdf5_dataset', None)

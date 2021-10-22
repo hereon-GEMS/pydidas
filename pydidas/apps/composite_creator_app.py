@@ -211,7 +211,6 @@ class CompositeCreatorApp(BaseApp):
         _ntotal = (self._image_metadata.images_per_file
                    * self._filelist.n_files)
         self._config['mp_tasks'] = range(_ntotal)
-        self._det_mask = self.__get_detector_mask()
         self._config['det_mask_val'] = float(self.q_settings_get_global_value(
             'det_mask_val'))
 
@@ -247,31 +246,6 @@ class CompositeCreatorApp(BaseApp):
             self._composite = None
             return
         self.__check_and_update_composite_image()
-
-    def __get_detector_mask(self):
-        """
-        Get the detector mask from the file specified in the global QSettings.
-
-        Returns
-        -------
-        _mask : Union[None, np.ndarray]
-            If the mask could be loaded from a numpy file, return the mask.
-            Else, None is returned.
-        """
-        _maskfile = self.q_settings_get_global_value('det_mask')
-        try:
-            _mask = np.load(_maskfile)
-        except (FileNotFoundError, ValueError):
-            return None
-        _roi = self._image_metadata.roi
-        if _roi is not None:
-            _mask = _mask[self._image_metadata.roi]
-        _bin = self.get_param_value('binning')
-        if _bin > 1:
-            _mask = rebin2d(_mask, _bin)
-            _mask = np.where(_mask > 0, 1, 0)
-            _mask = _mask.astype(np.bool_)
-        return _mask
 
     def __verify_total_number_of_images_in_composite(self):
         """

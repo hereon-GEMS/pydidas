@@ -94,6 +94,13 @@ class _WorkflowTree(GenericTree):
                 _results[_leaf.node_id] = _leaf.results
         return _results
 
+    def prepare_execution(self):
+        """
+        Prepare the execution of the WorkflowTree by running all the nodes'
+        prepare_execution methods.
+        """
+        self.root.prepare_execution()
+
     def execute_process(self, arg, **kwargs):
         """
         Execute the process defined in the WorkflowTree for data analysis.
@@ -105,8 +112,8 @@ class _WorkflowTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        self.nodes[0].prepare_execution()
-        self.nodes[0].execute_plugin_chain(arg, **kwargs)
+        # self.root.prepare_execution()
+        self.root.execute_plugin_chain(arg, **kwargs)
 
     def execute_single_plugin(self, node_id, arg, **kwargs):
         """
@@ -192,7 +199,7 @@ class _WorkflowTree(GenericTree):
         _leaves = self.get_all_leaves()
         _shapes = [_leaf.result_shape for _leaf in _leaves]
         if None in _shapes or self.tree_has_changed or force_update:
-            self.root.calculate_and_push_result_shape()
+            self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
         _shapes = {_leaf.node_id: _leaf.result_shape
                    for _leaf in _leaves

@@ -52,6 +52,7 @@ class MaskImage(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
+        self._image_params = {}
 
     def pre_execute(self):
         """
@@ -59,12 +60,11 @@ class MaskImage(ProcPlugin):
         """
         if self.get_param_value('use_global_mask'):
             _maskfile = self.q_settings_get_global_value('det_mask')
-            self._mask = read_image(_maskfile)
             self._maskval = self.q_settings_get_global_value('det_mask_val')
         else:
-            self._mask = read_image(self.get_param_value('det_mask'))
+            _maskfile = self.get_param_value('det_mask')
             self._maskval = self.get_param_value('det_mask_val')
-
+        self._mask = read_image(_maskfile)
 
     def execute(self, data, **kwargs):
         """
@@ -84,5 +84,7 @@ class MaskImage(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        _roi = kwargs.get('roi', None)
+        _binning = kwargs.get('binning', 1)
         _maskeddata = np.where(self._mask, self._maskval, data)
         return _maskeddata, kwargs

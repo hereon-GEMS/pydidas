@@ -139,11 +139,19 @@ class TestWorkflowTree(unittest.TestCase):
         for _node in nodes[_depth]:
             self.assertIsNotNone(_node.results)
             self.assertIsNotNone(_node.result_kws)
-            self.assertTrue(_node.plugin._preexecuted)
+            self.assertTrue(_node.plugin._executed)
         for _d in range(_depth):
             for _node in nodes[_d]:
                 self.assertIsNone(_node.results)
                 self.assertIsNone(_node.result_kws)
+
+    def test_prepare_execution(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        self.tree.prepare_execution()
+        for _node in nodes[_depth]:
+            self.assertTrue(_node.plugin._preexecuted)
 
     def test_create_and_add_node__wrong_plugin(self):
         with self.assertRaises(TypeError):

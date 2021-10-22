@@ -26,6 +26,7 @@ __all__ = ['BasePlugin']
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_parameter)
+from pydidas.image_io import RoiManager
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
 
@@ -66,6 +67,7 @@ class BasePlugin(ObjectWithParameterCollection):
     generic_params = ParameterCollection(get_generic_parameter('label'))
     input_data_dim = -1
     output_data_dim = -1
+    new_dataset = False
 
     @classmethod
     def get_class_description(cls):
@@ -136,6 +138,8 @@ class BasePlugin(ObjectWithParameterCollection):
                 self.set_param_value(_kw, kwargs[_kw])
         self._config = {'input_shape': None,
                         'result_shape': None}
+        self._legacy_image_ops = []
+        self._original_image_shape = None
 
     def execute(self, data, **kwargs):
         """
@@ -222,6 +226,9 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         Get the shape of the plugin result.
 
+        Note that this property will always perform an update of the value
+        before returning a result.
+
         Any plugin that knows the shape of its results will return the value
         as a tuple with one entry for every dimension.
         If a Plugin knows the dimensionality of its results but not the size
@@ -255,3 +262,46 @@ class BasePlugin(ObjectWithParameterCollection):
             self._config['result_shape'] = (-1,) * self.output_data_dim
         else:
             self._config['result_shape'] = _shape
+
+    def update_image_ops(self):
+        """
+        Update the legacy image operations list with any ROI and binning
+        operations performed in this plugin.
+        """
+        if self.get_param_value('use_roi', False):
+            self._legacy_image_ops.append(['roi', self._image_metadata.roi])
+        _bin = self.get_param_value('binning', 1)
+        if _bin != 1:
+            self._legacy_image_ops.append(['binning', _bin])
+
+    def get_single_ops_from_legacy(self):
+        """
+        Get a single ROI and binning operation from combining all legacy
+        operations.
+
+        Returns
+        -------
+        roi : tuple
+            The ROI which needs to be applied to the original image.
+        binning : int
+            The binning factor which needs to be applied to the original image.
+        """
+        _roi = RoiManager(roi=(0, self._original_image_shape[0],
+                               0, self._original_image_shape[1]),
+                          input_shape=self._original_image_shape)
+        _binning = 1
+        while len(self._legacy_image_ops) > 0:
+            _op_name, _op = self._legacy_image_ops.pop(0)
+            if _op_name == 'binning':
+                _y = int(_roi.roi[0].stop - _roi.roi[0].start)
+                _x = int(_roi.roi[1].stop - _roi.roi[1].start)
+                _dy = int(((_y // _binning) % _op) * _binning)
+                _dx = int(((_x // _binning) % _op) * _binning)
+                _tmproi = (0, _y - _dy, 0, _x - _dx)
+                _roi.apply_second_roi(_tmproi)
+                _binning *= _op
+            if _op_name == 'roi':
+                _roi_unbinned = [_binning * _r
+                                 for _r in RoiManager(roi=_op).roi_coords]
+                _roi.apply_second_roi(_roi_unbinned)
+        return _roi.roi, _binning

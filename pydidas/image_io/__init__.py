@@ -42,10 +42,14 @@ from ._export_image import *
 from . import rebin_2d
 from .rebin_2d import *
 
+from . import roi_manager
+from .roi_manager import *
+
 __all__ += image_reader_collection.__all__
 __all__ += image_reader.__all__
 __all__ += _read_image.__all__
 __all__ += _export_image.__all__
+__all__ += roi_manager.__all__
 __all__ += rebin_2d.__all__
 
 # Unclutter namespace: remove modules from namespace
@@ -53,4 +57,5 @@ del image_reader_collection
 del image_reader
 del _read_image
 del _export_image
+del roi_manager
 del rebin_2d

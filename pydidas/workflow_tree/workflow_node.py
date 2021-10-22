@@ -144,21 +144,31 @@ class WorkflowNode(GenericNode):
                     )
         return _rep
 
-    def calculate_and_push_result_shape(self):
+    def propagate_shapes_and_global_config(self):
         """
         Calculate the Plugin's shape of the results and push this to the node's
         children.
         """
-        self.update_result_shape_from_plugin()
-        for _child in self._children:
-            _child.plugin.input_shape = self.result_shape
-            _child.calculate_and_push_result_shape()
+        self.update_plugin_data_shapes()
+        self.propagate_to_children()
 
-    def update_result_shape_from_plugin(self):
+    def update_plugin_data_shapes(self):
         """
         Update the result shape from the Plugin's value.
         """
+        self.plugin.update_image_ops()
         self._result_shape = self.plugin.result_shape
+
+    def propagate_to_children(self):
+        """
+        Propagate the global binning and ROI to the children.
+        """
+        for _child in self._children:
+            _plugin = _child.plugin
+            _plugin.input_shape = self.plugin.result_shape
+            if not self.plugin.new_dataset:
+                _plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
+            _child.propagate_shapes_and_global_config()
 
     @property
     def result_shape(self):

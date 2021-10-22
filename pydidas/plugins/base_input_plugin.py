@@ -27,6 +27,7 @@ import os
 
 from pydidas.core import get_generic_parameter
 from pydidas.constants import INPUT_PLUGIN
+from pydidas.image_io import RoiManager
 from pydidas.apps.app_utils import ImageMetadataManager
 from pydidas._exceptions import AppConfigError
 from .base_plugin import BasePlugin
@@ -127,8 +128,9 @@ class InputPlugin(BasePlugin):
         raise NotImplementedError
 
     def pre_execute(self):
-        ...
-
+        """
+        Run the pre-execution routines.
+        """
 
     def calculate_result_shape(self):
         """
@@ -136,3 +138,6 @@ class InputPlugin(BasePlugin):
         """
         self._image_metadata.update()
         self._config['result_shape'] = self._image_metadata.final_shape
+        self._original_image_shape = (self._image_metadata.raw_size_y,
+                                      self._image_metadata.raw_size_x)
+        self.update_image_ops()

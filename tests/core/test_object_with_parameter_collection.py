@@ -101,6 +101,12 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj.get_param_value('Test5')
 
+    def test_get_param_value__no_key_with_default(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _default = 124.434
+        self.assertEqual(obj.get_param_value('Test5', _default), _default)
+
     def test_print_param_values(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)

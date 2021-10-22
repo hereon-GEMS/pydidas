@@ -27,10 +27,12 @@ __all__ = ['RoiManager']
 
 import copy
 
+from numpy import mod
+
 
 def error_msg(roi, exception=''):
     """
-    Get
+    Get a formatted error message.
 
     Parameters
     ----------
@@ -53,14 +55,47 @@ def error_msg(roi, exception=''):
 class RoiManager:
     """
     The RoiManager is used to create slice objects to crop images with a
-    region of interest."""
+    region of interest.
+
+    Input must be given in form of a list or tuple. Acceptable formats for each
+    input are:
+        - int for any boundary
+        - slice objects for a direction
+        - string representations of any of the above entries.
+    """
 
     def __init__(self, **kwargs):
         """Initialization"""
-        self._config = kwargs
         self.__roi = None
-        self.__roi_key = None
+        self.__input_shape = kwargs.get('input_shape', None)
+        self.__roi_key = kwargs.get('roi', None)
         self.create_roi_slices()
+
+    @property
+    def input_shape(self):
+        """
+        Get the shape of the input image, if given.
+
+        Returns
+        -------
+        Union[None, tuple]
+            The shape of the input image.
+        """
+        return self.__input_shape
+
+    @input_shape.setter
+    def input_shape(self, shape):
+        """
+        Set the input shape of the image.
+
+        Parameters
+        ----------
+        shape : tuple
+            The shape of the input image.
+        """
+        if not isinstance(shape, tuple):
+            raise TypeError('The input shape must be a tuple.')
+        self.__input_shape = shape
 
     @property
     def roi(self):
@@ -84,21 +119,99 @@ class RoiManager:
         *args : type
             ROI creation arguments.
         """
-        self._config['roi'] = args[0]
+        self.__roi_key = args[0]
         self.create_roi_slices()
+
+    @property
+    def roi_coords(self):
+        """
+        Get the pixel coordinates of the lower and upper boundaries of the
+        ROI.
+
+        Returns
+        -------
+        Union[None, tuple]
+            If the ROI is not set, this property returns None. Else, it
+            returns a tuple with (y_low, y_high, x_low, x_high) values.
+        """
+        if self.__roi is None:
+            return None
+        return (self.__roi[0].start, self.__roi[0].stop,
+                self.__roi[1].start, self.__roi[1].stop)
+
+    def apply_second_roi(self, roi2):
+        """
+        Apply a second ROI to the ROI.
+
+        Parameters
+        ----------
+        roi2 : Union[tuple, list]
+            A ROI in the same format accepted by the roi property or roi
+            keyword.
+
+        Raises
+        ------
+        TypeError
+            If the ROI could not be added.
+        """
+        try:
+            self.__original_roi = self.__roi
+            self.__original_input_shape = self.__input_shape
+            self.__roi_key = roi2
+            self.__input_shape = (self.__roi[0].stop - self.__roi[0].start,
+                                  self.__roi[1].stop - self.__roi[1].start)
+            self.create_roi_slices()
+            self.__merge_rois()
+        except ValueError as _error:
+            self.__roi = self.__original_roi
+            raise TypeError(f'Cannot add second ROI: {_error}')
+        finally:
+            self.__input_shape = self.__original_input_shape
+
+    def __merge_rois(self):
+        """
+        Merge two ROIs and store them as the new ROI.
+
+        Raises
+        ------
+        ValueError
+            If negative stop indices are used. Merging only supports positive
+            (i.e. absolute) slices ranges.
+        """
+        # slice combine explained here for all cases:
+        # https://stackoverflow.com/questions/19257498/combining-two-slicing-operations
+        _roi = []
+        for _axis in [0, 1]:
+            _slice1 = self.__original_roi[_axis]
+            _slice2 = self.__roi[_axis]
+            _step1 = _slice1.step if _slice1.step is not None else 1
+            _step2 = _slice2.step if _slice2.step is not None else 1
+            _step = _step1 * _step2
+            _start = _slice1.start + _step1 * _slice2.start
+            _stop1 = _slice1.stop if _slice1.stop is not None else -1
+            _stop2 = _slice2.stop if _slice2.stop is not None else -1
+            if _stop1 < 0 or _stop2 < 0:
+                raise ValueError('Cannot merge ROIs with negative indices. '
+                                 'Please change indices to positive numbers.')
+            _stop = min(_slice1.start + _stop2 * _step1, _stop1)
+            _roi.append(slice(_start, _stop, _step))
+        self.__roi = tuple(_roi)
 
     def create_roi_slices(self):
         """
         Create new ROI slice objects from the stored (keyword) arguments.
         """
-        self.__roi_key = self._config.get('roi', None)
         if self.__roi_key is None:
             self.__roi = None
             return
         self.__check_types_roi_key()
         self.__check_types_roi_key_entries()
+        self.__convert_str_roi_key_entries()
         self.__check_length_of_roi_key_entries()
         self.__convert_roi_key_to_slice_objects()
+        if self.input_shape is not None:
+            self.__modulate_roi_keys()
+
 
     def __check_types_roi_key(self):
         """
@@ -112,35 +225,41 @@ class RoiManager:
         if self.__roi_key is None:
             return
         if isinstance(self.__roi_key, str):
-            self.__convert_str_roi_key_to_list()
+            self.__convert_str_roi_key()
         if isinstance(self.__roi_key, tuple):
             self.__roi_key = list(self.__roi_key)
         if not isinstance(self.__roi_key, list):
             _msg = error_msg(self.__roi_key, 'Not of type (list, tuple).')
             raise ValueError(_msg)
 
-    def __convert_str_roi_key_to_list(self):
+    def __convert_str_roi_key(self):
         """
-        Convert a string ROI key to a list of entries.
+        Convert a string ROI key to a list of entries and strip any leading
+        and trailing brackets and empty characters.
+        """
+        self.__strip_string_roi_key()
+        self.__roi_key = [item.strip() for item in self.__roi_key.split(',')]
+
+    def __strip_string_roi_key(self):
+        """
+        Strip a ROI key of type string of any leadind and trailing chars which
+        do not belong (i.e. brackets, spaces etc.)
         """
         _tmpstr = self.__roi_key
         _valid_chars = ['0', '1', '2', '3', '4', '5', '6',
                         '7', '8', '9', '-']
-        _index = 0
-        while _index < len(_tmpstr):
-            if _tmpstr[0] not in _valid_chars + ['s']:
-                _tmpstr = _tmpstr[1:]
-                continue
-            _i_slice = _tmpstr.find('slice(', _index)
-            if _i_slice == -1:
+        # strip leading chars:
+        while True:
+            if _tmpstr[0] in _valid_chars + ['s']:
                 break
-            _index = _tmpstr.find(')', _index) + 1
-        while len(_tmpstr) > _index:
-            if _tmpstr[len(_tmpstr) - 1] in _valid_chars:
+            _tmpstr = _tmpstr[1:]
+        # strip trailing chars:
+        while True:
+            if _tmpstr[-1] in _valid_chars or (_tmpstr[-1] == ')'
+                    and _tmpstr.count(')') == _tmpstr.count('slice(')):
                 break
             _tmpstr = _tmpstr[:-1]
-        self.__roi_key = [item.strip() for item in _tmpstr.split(',')]
-
+        self.__roi_key = _tmpstr
 
     def __check_types_roi_key_entries(self):
         """
@@ -153,16 +272,16 @@ class RoiManager:
         ValueError
             If datatypes apart from integer and slice are encountered.
         """
-        self.__check_and_convert_str_roi_key_entries()
         roi_dtypes = {type(e) for e in self.__roi_key}
         roi_dtypes.discard(int)
         roi_dtypes.discard(slice)
+        roi_dtypes.discard(str)
         if roi_dtypes != set():
             _msg = error_msg(self.__roi_key,
                              'Non-integer, non-slice datatypes encountered.')
             raise ValueError(_msg)
 
-    def __check_and_convert_str_roi_key_entries(self):
+    def __convert_str_roi_key_entries(self):
         """
         Check the roi_key for string entries and parse these.
 
@@ -180,7 +299,7 @@ class RoiManager:
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
-                if not isinstance(key, str):
+                if isinstance(key, (int, slice)):
                     _newkeys.append(key)
                     continue
                 if key.startswith('slice('):
@@ -251,3 +370,23 @@ class RoiManager:
             self.__roi = tuple(_out)
         except ValueError as _ve:
             raise ValueError(error_msg(self.__roi_key, _ve)) from _ve
+
+    def __modulate_roi_keys(self):
+        """
+        Modulate the ROI keys by the input shape to remove negative
+        indices and limit it to the image dimensions.
+        """
+        def apply_neg_mod(value, modulo):
+            if value >= modulo:
+                value = modulo
+            elif value < 0:
+                value = mod(value, modulo) + 1
+            return value
+        _new_roi = []
+        for _axis in [0, 1]:
+            _mod = self.input_shape[_axis]
+            _start = apply_neg_mod(self.__roi[_axis].start, _mod)
+            _step = self.__roi[_axis].step
+            _stop = apply_neg_mod(self.__roi[_axis].stop, _mod)
+            _new_roi.append(slice(_start, _stop, _step))
+        self.__roi = tuple(_new_roi)

@@ -57,15 +57,15 @@ class TestWorkflowNode(unittest.TestCase):
 
     def test_result_shape(self):
         obj = WorkflowNode(plugin=DummyLoader())
-        obj.update_plugin_data_shapes()
+        obj.update_plugin_result_data_shape()
         _shape = obj.result_shape
         self.assertEqual(_shape, obj.plugin.result_shape)
 
-    def test_update_plugin_data_shapes(self):
+    def test_update_plugin_result_data_shape(self):
         _shape = (-1, 12, 42)
         obj = WorkflowNode(plugin=DummyProc())
         obj.plugin._config['input_shape'] = _shape
-        obj.update_plugin_data_shapes()
+        obj.update_plugin_result_data_shape()
         self.assertEqual(obj.result_shape, _shape)
 
     def test_propagate_shapes_and_global_config(self):

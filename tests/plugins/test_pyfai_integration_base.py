@@ -43,7 +43,7 @@ logger = logging.getLogger('pydidas_logger')
 logger.setLevel(logging.ERROR)
 
 
-class TestBasePlugins(unittest.TestCase):
+class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
@@ -274,25 +274,29 @@ class TestBasePlugins(unittest.TestCase):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.setValue('global/det_mask', _maskfilename)
         plugin = pyFAIintegrationBase()
+        plugin._original_image_shape = (123, 50)
         plugin.load_and_store_mask()
-        self.assertTrue((plugin._mask == _mask).all())
+        self.assertTrue(np.equal(plugin._mask, _mask).all())
 
     def test_load_and_store_mask__wrong_local_mask_and_q_settings(self):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.setValue('global/det_mask', _maskfilename)
         plugin = pyFAIintegrationBase()
+        plugin._original_image_shape = (123, 50)
         plugin.set_param_value('det_mask',
                                os.path.join(self._temppath, 'no_mask.npy'))
         plugin.load_and_store_mask()
-        self.assertTrue((plugin._mask == _mask).all())
+        self.assertTrue(np.equal(plugin._mask, _mask).all())
 
     def test_load_and_store_mask__no_mask(self):
         plugin = pyFAIintegrationBase()
+        plugin._original_image_shape = (123, 45)
         plugin.load_and_store_mask()
         self.assertIsNone(plugin._mask)
 
     def test_pre_execute(self):
         plugin = pyFAIintegrationBase()
+        plugin._original_image_shape = (123, 45)
         plugin.pre_execute()
         self.assertIsInstance(plugin._ai,
                               pyFAI.azimuthalIntegrator.AzimuthalIntegrator)

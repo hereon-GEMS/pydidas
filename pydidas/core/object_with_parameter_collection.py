@@ -200,13 +200,15 @@ class ParameterCollectionMixIn:
         for _key in _config:
             print(f'{_key}: {_config[_key]}')
 
-    def _get_param_value_with_modulo(self, param_refkey, modulo):
+    def _get_param_value_with_modulo(self, param_refkey, modulo,
+                                     none_low=True):
         """
         Get a Parameter value modulo another value.
 
         This method applies a modulo to a Parameter value, referenced by its
         refkey, for example for converting image sizes of -1 to the actual
-        detector dimensions.
+        detector dimensions. None keys can be converted to zero or the modulo,
+        depending on the settings of "none_low".
         Note: This method only returns the modulated value and does not update
         the Parameter itself.
 
@@ -216,6 +218,10 @@ class ParameterCollectionMixIn:
             The reference key for the selected Parameter.
         modulo : int
             The mathematical modulo to be applied.
+        none_low : bool, optional
+            Keyword to define the behaviour of None values. If True, None
+            will be interpreted as 0. If False, None will be interpreted as
+            the modulo range.
 
         Raises
         ------
@@ -233,6 +239,8 @@ class ParameterCollectionMixIn:
                              ' is not integer.')
         if _param.value == modulo:
             return _param.value
+        if _param.value is None:
+            return modulo * (not none_low)
         _val = mod(_param.value, modulo)
         # create offset for negative indices to capture the whole array
         _offset = 1 if _param.value < 0 else 0

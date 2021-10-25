@@ -81,29 +81,49 @@ class TestParameter(unittest.TestCase):
         obj = Parameter('Test0', int, 12)
         self.assertIsInstance(obj, Parameter)
 
-    def test_creation_no_arguments(self):
+    def test_creation__no_arguments(self):
         with self.assertRaises(TypeError):
             Parameter()
 
-    def test_creation_with_meta_dict(self):
+    def test_creation__with_meta_dict(self):
         obj = Parameter('Test0', int, 0,  dict())
         self.assertIsInstance(obj, Parameter)
 
-    def test_creation_missing_default(self):
+    def test_creation__missing_default(self):
         with self.assertRaises(TypeError):
             Parameter('Test0', int)
 
-    def test_creation_wrong_choices(self):
+    def test_creation__wrong_choices(self):
         with self.assertRaises(ValueError):
             Parameter('Test0', int, 12, choices=[0, 10])
 
-    def test_creation_choices_wrong_type(self):
+    def test_creation__choices_wrong_type(self):
         with self.assertRaises(TypeError):
             Parameter('Test0', int, 12, choices=12)
 
-    def test_creation_wrong_datatype(self):
+    def test_creation__wrong_datatype(self):
         with self.assertRaises(TypeError):
             Parameter('Test0', int, '12')
+
+    def test_creation__with_allow_None(self):
+        param = Parameter('Test0', int, 12, allow_None=True)
+        self.assertTrue(param._Parameter__meta['allow_None'])
+
+    def test_typecheck__no_type(self):
+        param = Parameter('Test0', None, 12)
+        for item in [12, '12', None, [1,2,3]]:
+            self.assertTrue(param._Parameter__typecheck(item))
+
+    def test_typecheck__int(self):
+        param = Parameter('Test0', int, 12)
+        self.assertTrue(param._Parameter__typecheck(12))
+        for item in ['12', None, [1,2,3]]:
+            self.assertFalse(param._Parameter__typecheck(item))
+
+    def test_typecheck__int_w_allow_none(self):
+        param = Parameter('Test0', int, 12, allow_None=True)
+        self.assertTrue(param._Parameter__typecheck(12))
+        self.assertTrue(param._Parameter__typecheck(None))
 
     def test_call(self):
         obj = Parameter('Test0', int, 12)
@@ -206,10 +226,19 @@ class TestParameter(unittest.TestCase):
         obj = Parameter('Test0', int, 12)
         self.assertEqual(obj.value, 12)
 
+    def test_get_allow_None(self):
+        obj = Parameter('Test0', int, 12, allow_None=True)
+        self.assertTrue(obj.allow_None)
+
     def test_set_value(self):
         obj = Parameter('Test0', int, 12)
         obj.value = 24
         self.assertEqual(obj.value, 24)
+
+    def test_set_value__w_allow_None(self):
+        obj = Parameter('Test0', int, 12, allow_None=True)
+        obj.value = None
+        self.assertEqual(obj.value, None)
 
     def test_set_value_wrong_type(self):
         obj = Parameter('Test0', int, 12)
@@ -273,6 +302,7 @@ class TestParameter(unittest.TestCase):
         self.assertEqual(dump[3], {'tooltip': '',
                                    'unit': '',
                                    'optional': False,
+                                   'allow_None': False,
                                    'name': '',
                                    'choices': None,
                                    'value': 12})

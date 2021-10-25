@@ -234,7 +234,30 @@ class CompositeImage(ObjectWithParameterCollection):
         _start_x = _ix * (_image_size[1] + _border)
         yslice = slice(_start_y, _start_y + _image_size[0])
         xslice = slice(_start_x, _start_x + _image_size[1])
+        image = self.__apply_thresholds_to_data(image)
         self.__image[yslice, xslice] = image
+
+    def __apply_thresholds_to_data(self, image):
+        """
+        Apply thresholds to the data.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            The input image
+
+        Returns
+        -------
+        image : np.ndarray
+            The image with thresholds applied.
+        """
+        _low = self.get_param_value('threshold_low')
+        _high = self.get_param_value('threshold_high')
+        if _low is not None:
+            image = np.where(image < _low, _low, image)
+        if _high is not None:
+            image = np.where(image > _high, _high, image)
+        return image
 
     def save(self, output_fname):
         """

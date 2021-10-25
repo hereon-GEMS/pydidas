@@ -92,7 +92,6 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value.                        |
     +------------+-----------+-------------------------------------------+
-
     """
 
     def __init__(self, refkey, param_type, default, meta=None, **kwargs):
@@ -135,6 +134,9 @@ class Parameter:
         value : type
             The value of the parameter. This parameter should only be used
             to restore saved parameters.
+        allow_None : bool, optional
+            Keyword to allow None instead of the usual datatype. The default
+            is False.
         **kwargs : dict
             All optional parameters can also be passed as a keyword argument
             dictionary.
@@ -148,7 +150,8 @@ class Parameter:
         self.__meta = dict(tooltip = kwargs.get('tooltip', ''),
                            unit = kwargs.get('unit', ''),
                            optional = kwargs.get('optional', False),
-                           name = kwargs.get('name', ''))
+                           name = kwargs.get('name', ''),
+                           allow_None = kwargs.get('allow_None', False))
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
         self.value = kwargs.get('value', self.__meta['default'])
@@ -214,7 +217,7 @@ class Parameter:
 
     def __typecheck(self, val):
         """
-        Check type of
+        Check the type of a new input.
 
         Parameters
         ----------
@@ -231,6 +234,8 @@ class Parameter:
         if not self.__type:
             return True
         if isinstance(val, self.__type):
+            return True
+        if val is None and self.__meta['allow_None']:
             return True
         return False
 
@@ -274,6 +279,18 @@ class Parameter:
             The parameter name.
         """
         return self.__meta['name']
+
+    @property
+    def allow_None(self):
+        """
+        Returns the flag to allow "None" as value.
+
+        Returns
+        -------
+        bool
+            The flag setting.
+        """
+        return self.__meta['allow_None']
 
     @property
     def refkey(self):
@@ -529,10 +546,12 @@ class Parameter:
 
         _type =( f'{self.__type.__name__}' if self.__type is not None else
                 'None')
+        if self.__meta['allow_None']:
+            _type += '/None'
         _def = (f'{self.__meta["default"]}'
                 if self.__meta['default'] not in (None, '') else 'None')
         _unit = f' {self.unit}' if self.unit else ''
-        return (f'{self.name}: {self.value}{_unit} (type: {_type}, '
+        return (f'{self.refkey}: {self.value}{_unit} (type: {_type}, '
                 f'default: {_def} {self.__meta["unit"]})')
 
     def __repr__(self):
@@ -540,7 +559,7 @@ class Parameter:
                 'None')
         _unit= (f'{self.__meta["unit"]} ' if self.__meta['unit'] !=''
                 else self.__meta['unit'])
-        _val = f'{self.value}' if self.value not in (None, '') else '""'
+        _val = f'{self.value}' if self.value != '' else '""'
         _def = (f'{self.__meta["default"]}'
                 if self.__meta['default'] not in (None, '') else 'None')
         _s = f'Parameter <{self.__refkey} (type: {_type}'

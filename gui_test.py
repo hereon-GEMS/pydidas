@@ -68,7 +68,7 @@ def run_gui(app):
     #app.setStyle('Fusion')
 
     # needs to be initialized after the app has been created.
-    sys.excepthook = pydidas.widgets.excepthook
+    # sys.excepthook = pydidas.widgets.excepthook
     CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
     _font = app.font()
     _font.setPointSize(STANDARD_FONT_SIZE)

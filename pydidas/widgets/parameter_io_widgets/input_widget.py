@@ -26,10 +26,13 @@ __all__ = ['InputWidget']
 import numbers
 import pathlib
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
+from numpy import nan
 
 from ...core import Hdf5key
-from ...constants import PARAM_INPUT_WIDGET_HEIGHT
+from ...constants import (PARAM_INPUT_WIDGET_HEIGHT,
+                          QT_REG_EXP_FLOAT_VALIDATOR,
+                          QT_REG_EXP_INT_VALIDATOR)
 
 
 class InputWidget(QtWidgets.QWidget):
@@ -61,6 +64,29 @@ class InputWidget(QtWidgets.QWidget):
         self._oldValue = None
         self.setToolTip(f'{param.tooltip}')
 
+    def set_validator(self, param):
+        """
+        Set the widget's validator based on the Parameter datatype and
+        allow_None settings.
+
+        Parameters
+        ----------
+        param : pydidas.core.Parameter
+            The associated Parameter.
+        """
+        if param.type == numbers.Integral:
+            if param.allow_None:
+                self.setValidator(QT_REG_EXP_INT_VALIDATOR)
+            else:
+                self.setValidator(QtGui.QIntValidator())
+        elif param.type == numbers.Real:
+            if param.allow_None:
+                self.setValidator(QT_REG_EXP_FLOAT_VALIDATOR)
+            else:
+                _validator = QtGui.QDoubleValidator()
+                _validator.setNotation(QtGui.QDoubleValidator.ScientificNotation)
+                self.setValidator(_validator)
+
     def get_value_from_text(self, text):
         """
         Get a value from the text entry to update the Parameter value.
@@ -79,9 +105,13 @@ class InputWidget(QtWidgets.QWidget):
         # need to process True and False explicitly because bool is a subtype
         # of int but the strings 'True' and 'False' cannot be converted to int
         if text == 'True':
-            text = True
+            return True
         if text == 'False':
-            text = False
+            return False
+        if text.upper() == 'NAN':
+            return nan
+        if text.upper() == 'NONE':
+            return None
         if self.__ptype == numbers.Integral:
             return int(text)
         if self.__ptype == numbers.Real:

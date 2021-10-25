@@ -37,7 +37,7 @@ import pyFAI.azimuthalIntegrator
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.core.experimental_settings import ExperimentalSettings
 from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.image_io import read_image
+from pydidas.image_io import read_image, rebin2d
 
 
 logger = logging.getLogger('pydidas_logger')
@@ -103,7 +103,8 @@ class pyFAIintegrationBase(ProcPlugin):
                 rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
                 detector=EXP_SETTINGS.get_detector(),
                 wavelength=EXP_SETTINGS.get_param_value('xray_wavelength'))
-            self.load_and_store_mask()
+
+        self.load_and_store_mask()
 
     def load_and_store_mask(self):
         """
@@ -126,8 +127,12 @@ class pyFAIintegrationBase(ProcPlugin):
                                'settings.')
         if os.path.isfile(_mask_qsetting):
             self._mask = read_image(_mask_qsetting)
+            _roi, _binning = self.get_single_ops_from_legacy()
+            # self._mask = self._mask[_roi] if _roi is not None else self._mask
+            self._mask = rebin2d(self._mask[_roi], _binning)
         else:
             self._mask = None
+
 
     def get_result_shape(self):
         """

@@ -212,7 +212,6 @@ class RoiManager:
         if self.input_shape is not None:
             self.__modulate_roi_keys()
 
-
     def __check_types_roi_key(self):
         """
         Check the type of the ROI and convert if required.
@@ -276,6 +275,7 @@ class RoiManager:
         roi_dtypes.discard(int)
         roi_dtypes.discard(slice)
         roi_dtypes.discard(str)
+        roi_dtypes.discard(type(None))
         if roi_dtypes != set():
             _msg = error_msg(self.__roi_key,
                              'Non-integer, non-slice datatypes encountered.')
@@ -299,7 +299,7 @@ class RoiManager:
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
-                if isinstance(key, (int, slice)):
+                if isinstance(key, (int, slice, type(None))):
                     _newkeys.append(key)
                     continue
                 if key.startswith('slice('):
@@ -331,7 +331,7 @@ class RoiManager:
         """
         _n = 0
         for key in self.__roi_key:
-            if isinstance(key, int):
+            if isinstance(key, (int, type(None))):
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
@@ -350,43 +350,43 @@ class RoiManager:
             If the conversion does not succeed.
         """
         _roi = copy.copy(self.__roi_key)
-        try:
-            if isinstance(_roi[0], int) and isinstance(_roi[1], int):
-                _out = [slice(_roi.pop(0), _roi.pop(0))]
-            elif isinstance(_roi[0], slice):
-                _out = [_roi.pop(0)]
-            else:
-                _msg = error_msg(self.__roi_key, 'Cannot create the slice '
-                                 'object for dimension 0.')
-                raise ValueError(_msg)
-            if isinstance(_roi[0], int) and isinstance(_roi[1], int):
-                _out.append(slice(_roi.pop(0), _roi.pop(0)))
-            elif isinstance(_roi[0], slice):
-                _out.append(_roi.pop(0))
-            else:
-                _msg = error_msg(self.__roi_key, 'Cannot create the slice '
-                                 'object for dimension 1.')
-                raise ValueError(_msg)
-            self.__roi = tuple(_out)
-        except ValueError as _ve:
-            raise ValueError(error_msg(self.__roi_key, _ve)) from _ve
+        _out = []
+        for _dim in [1, 2]:
+            try:
+                if (isinstance(_roi[0], (int, type(None)))
+                        and isinstance(_roi[1], (int, type(None)))):
+                    _index0 = _roi.pop(0)
+                    _index0 = _index0 if _index0 is not None else 0
+                    _index1 = _roi.pop(0)
+                    _out.append(slice(_index0, _index1))
+                elif isinstance(_roi[0], slice):
+                    _out.append(_roi.pop(0))
+                else:
+                    _msg = error_msg(self.__roi_key, 'Cannot create the slice '
+                                      f'object for dimension {_dim}.')
+                    raise ValueError(_msg)
+            except ValueError as _ve:
+                raise ValueError(error_msg(self.__roi_key, _ve)) from _ve
+        self.__roi = tuple(_out)
 
     def __modulate_roi_keys(self):
         """
         Modulate the ROI keys by the input shape to remove negative
         indices and limit it to the image dimensions.
         """
-        def apply_neg_mod(value, modulo):
-            if value >= modulo:
+        def apply_neg_mod(value, modulo, start=True):
+            if value is None:
+                return (not start) * modulo
+            elif value >= modulo:
                 value = modulo
             elif value < 0:
-                value = mod(value, modulo) + 1
+                value = mod(value, modulo)
             return value
         _new_roi = []
         for _axis in [0, 1]:
             _mod = self.input_shape[_axis]
-            _start = apply_neg_mod(self.__roi[_axis].start, _mod)
+            _start = apply_neg_mod(self.__roi[_axis].start, _mod, True)
             _step = self.__roi[_axis].step
-            _stop = apply_neg_mod(self.__roi[_axis].stop, _mod)
+            _stop = apply_neg_mod(self.__roi[_axis].stop, _mod, False)
             _new_roi.append(slice(_start, _stop, _step))
         self.__roi = tuple(_new_roi)

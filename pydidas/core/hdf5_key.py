@@ -29,6 +29,7 @@ __all__ = ['Hdf5key']
 from pathlib import Path
 
 
+
 class Hdf5key(str):
     """
     Inherits from :py:class:`str`.

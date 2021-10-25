@@ -208,7 +208,6 @@ class QtaIconButton(QtWidgets.QPushButton):
             self.setFixedSize(*size)
 
 
-
 def excepthook(exc_type, exception, trace):
     """
     Catch global exceptions.

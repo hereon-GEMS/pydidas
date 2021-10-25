@@ -78,15 +78,20 @@ class TestWorkflowTree(unittest.TestCase):
     def test_get_all_result_shapes__single_node(self):
         self.tree.create_and_add_node(DummyLoader())
         _shapes = self.tree.get_all_result_shapes()
-        self.assertEqual(_shapes[0], DummyLoader().result_shape)
+        _dummy = DummyLoader()
+        _dummy.calculate_result_shape()
+        self.assertEqual(_shapes[0], _dummy.result_shape)
 
     def test_get_all_result_shapes__tree(self):
-        _shape = DummyLoader().result_shape
+        _dummy = DummyLoader()
+        _dummy.calculate_result_shape()
+        _shape = _dummy.result_shape
         self.tree.create_and_add_node(DummyLoader())
         self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
                                       node_id=2)
         self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
                                       node_id=3)
+        self.tree.prepare_execution()
         _shapes = self.tree.get_all_result_shapes()
         self.assertEqual(_shapes[2], _shape)
         self.assertEqual(_shapes[3], _shape)

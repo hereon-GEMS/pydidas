@@ -66,6 +66,16 @@ class TestRoiManager(unittest.TestCase):
         self.assertEqual(obj.roi[0], _roi[0])
         self.assertEqual(obj.roi[1], slice(_roi[1].start, _shape[1]))
 
+    def test_modulate_roi_keys__with_None_key_and_shape(self):
+        _roi = (slice(None, 7), slice(1, None))
+        _shape = (12, 12)
+        obj = RoiManager()
+        obj._RoiManager__roi = _roi
+        obj._RoiManager__input_shape = _shape
+        obj._RoiManager__modulate_roi_keys()
+        self.assertEqual(obj.roi[0], slice(0, 7))
+        self.assertEqual(obj.roi[1], slice(_roi[1].start, _shape[1]))
+
     def test_modulate_roi_keys__negative_final_value(self):
         _roi = (slice(3, 7), slice(1, -1))
         _shape = (12, 12)
@@ -74,7 +84,7 @@ class TestRoiManager(unittest.TestCase):
         obj._RoiManager__input_shape = _shape
         obj._RoiManager__modulate_roi_keys()
         self.assertEqual(obj.roi[0], _roi[0])
-        self.assertEqual(obj.roi[1], slice(_roi[1].start, _shape[1]))
+        self.assertEqual(obj.roi[1], slice(_roi[1].start, _shape[1] - 1))
 
     def test_modulate_roi_keys__negative_value(self):
         _roi = (slice(3, 7), slice(-5, -2))
@@ -85,8 +95,8 @@ class TestRoiManager(unittest.TestCase):
         obj._RoiManager__modulate_roi_keys()
         self.assertEqual(obj.roi[0], _roi[0])
         self.assertEqual(obj.roi[1],
-                         slice(_roi[1].start + _shape[1] + 1,
-                               _roi[1].stop + _shape[1] + 1))
+                         slice(_roi[1].start + _shape[1],
+                               _roi[1].stop + _shape[1]))
 
     def test_check_types_roi_key__w_None(self):
         obj = RoiManager()
@@ -428,11 +438,30 @@ class TestRoiManager(unittest.TestCase):
         _roi2 = _y2 + _x2
         obj.apply_second_roi(_roi2)
         _new_y = (_y1[0] + _y2[0], _y2[1] + _y1[0])
-        _new_x = (_x1[0] + _x2[0], _x1[1] + 1 + _x2[1])
+        _new_x = (_x1[0] + _x2[0], _x1[1] + _x2[1])
         self.assertEqual(obj.roi[0].start, _new_y[0])
         self.assertEqual(obj.roi[0].stop, _new_y[1])
         self.assertEqual(obj.roi[1].start, _new_x[0])
         self.assertEqual(obj.roi[1].stop, _new_x[1])
+
+    def test_merge_rois__two_rois_with_None_and_shape(self):
+        _y1 = (12, -3)
+        _x1 = (6, None)
+        _y2 = (None, 97)
+        _x2 = (43, -4)
+        _shape = (150, 150)
+        obj = RoiManager(roi=[slice(*_y1), slice(*_x1)],
+                         input_shape=_shape)
+        _roi2 = [slice(*_y2), slice(*_x2)]
+        _roi2 = _y2 + _x2
+        obj.apply_second_roi(_roi2)
+        _new_y = (_y1[0] + 0, _y2[1] + _y1[0])
+        _new_x = (_x1[0] + _x2[0], _shape[1] + _x2[1])
+        self.assertEqual(obj.roi[0].start, _new_y[0])
+        self.assertEqual(obj.roi[0].stop, _new_y[1])
+        self.assertEqual(obj.roi[1].start, _new_x[0])
+        self.assertEqual(obj.roi[1].stop, _new_x[1])
+
 
 if __name__ == "__main__":
     unittest.main()

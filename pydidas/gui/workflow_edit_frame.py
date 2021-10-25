@@ -70,7 +70,7 @@ class WorkflowEditFrame(BaseFrame):
         fname = _func(self, 'Name of file', None, _file_selection)[0]
         if fname in ['', None]:
             return
-        TREE.export_tree_to_file(fname)
+        TREE.export_to_file(fname, overwrite=True)
 
     def load_tree_from_file(self):
         _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
@@ -78,7 +78,7 @@ class WorkflowEditFrame(BaseFrame):
         fname = _func(self, 'Name of file', None, _file_selection)[0]
         if fname in ['', None]:
             return
-        TREE.import_tree_from_file(fname)
+        TREE.import_from_file(fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree()
 
 

@@ -38,6 +38,7 @@ class _WorkflowTree(GenericTree):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._preexecuted = False
 
     def create_and_add_node(self, plugin, parent=None, node_id=None):
         """
@@ -101,6 +102,7 @@ class _WorkflowTree(GenericTree):
         """
         self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
+        self._preexecuted = True
 
     def execute_process(self, arg, **kwargs):
         """
@@ -113,7 +115,8 @@ class _WorkflowTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        # self.root.prepare_execution()
+        if not self._preexecuted:
+            self.prepare_execution()
         self.root.execute_plugin_chain(arg, **kwargs)
 
     def execute_single_plugin(self, node_id, arg, **kwargs):
@@ -162,7 +165,7 @@ class _WorkflowTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._tree_changed_flag = True
 
-    def export_to_file(self, filename):
+    def export_to_file(self, filename, **kwargs):
         """
         Export the WorkflowTree to a file using any of the registered
         exporters.
@@ -172,7 +175,7 @@ class _WorkflowTree(GenericTree):
         filename : Union[str, pathlib.Path]
             The filename of the file with the export.
         """
-        WorkflowTreeIoMeta.export_to_file(filename, self)
+        WorkflowTreeIoMeta.export_to_file(filename, self, **kwargs)
 
     def get_all_result_shapes(self, force_update=False):
         """

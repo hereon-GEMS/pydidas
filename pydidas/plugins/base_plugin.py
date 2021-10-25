@@ -26,7 +26,7 @@ __all__ = ['BasePlugin']
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_parameter)
-from pydidas.image_io import RoiManager
+from pydidas.image_io import RoiManager, rebin2d
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
 
@@ -242,7 +242,6 @@ class BasePlugin(ObjectWithParameterCollection):
         tuple
             The shape of the results.
         """
-        self.calculate_result_shape()
         return self._config['result_shape']
 
     def calculate_result_shape(self):
@@ -264,7 +263,27 @@ class BasePlugin(ObjectWithParameterCollection):
         else:
             self._config['result_shape'] = _shape
 
-    def update_image_ops(self):
+    def apply_legacy_image_ops_to_data(self, data):
+        """
+        Apply the legacy image operations to a new data frame and return the
+        updated data.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input data frame.
+
+        Returns
+        -------
+        new_data : np.ndarray
+            The updated data frame with ROI and binning applied.
+        """
+        self.update_legacy_image_ops_with_this_plugin()
+        _roi, _binning = self.get_single_ops_from_legacy()
+        _new_data = rebin2d(data[_roi], _binning)
+        return _new_data
+
+    def update_legacy_image_ops_with_this_plugin(self):
         """
         Update the legacy image operations list with any ROI and binning
         operations performed in this plugin.
@@ -274,7 +293,7 @@ class BasePlugin(ObjectWithParameterCollection):
             self._legacy_image_ops = self._legacy_image_ops[:-_num]
             self._legacy_image_ops_meta['num'] = 0
         if self.get_param_value('use_roi', False):
-            self._legacy_image_ops.append(['roi', self._image_metadata.roi])
+            self._legacy_image_ops.append(['roi', self._get_own_roi()])
             self._legacy_image_ops_meta['num'] += 1
         _bin = self.get_param_value('binning', 1)
         if _bin != 1:
@@ -282,10 +301,18 @@ class BasePlugin(ObjectWithParameterCollection):
             self._legacy_image_ops_meta['num'] += 1
         self._legacy_image_ops_meta['included'] = True
 
+    def _get_own_roi(self):
+        _roi = RoiManager(roi=(self.get_param_value('roi_ylow'),
+                               self.get_param_value('roi_yhigh'),
+                               self.get_param_value('roi_xlow'),
+                               self.get_param_value('roi_xhigh')),
+                          input_shape=self.input_shape)
+        return _roi.roi
+
     def get_single_ops_from_legacy(self):
         """
-        Get a single ROI and binning operation from combining all legacy
-        operations.
+        Get the parameters for a single ROI and binning operation from
+        combining all legacy operations on the data.
 
         Returns
         -------
@@ -298,8 +325,9 @@ class BasePlugin(ObjectWithParameterCollection):
                                0, self._original_image_shape[1]),
                           input_shape=self._original_image_shape)
         _binning = 1
-        while len(self._legacy_image_ops) > 0:
-            _op_name, _op = self._legacy_image_ops.pop(0)
+        _all_ops = self._legacy_image_ops[:]
+        while len(_all_ops) > 0:
+            _op_name, _op = _all_ops.pop(0)
             if _op_name == 'binning':
                 _y = int(_roi.roi[0].stop - _roi.roi[0].start)
                 _x = int(_roi.roi[1].stop - _roi.roi[1].start)
@@ -313,3 +341,4 @@ class BasePlugin(ObjectWithParameterCollection):
                                  for _r in RoiManager(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
+

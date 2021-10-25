@@ -140,4 +140,3 @@ class InputPlugin(BasePlugin):
         self._config['result_shape'] = self._image_metadata.final_shape
         self._original_image_shape = (self._image_metadata.raw_size_y,
                                       self._image_metadata.raw_size_x)
-        self.update_image_ops()

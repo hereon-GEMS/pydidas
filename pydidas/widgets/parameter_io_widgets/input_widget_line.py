@@ -28,7 +28,9 @@ import numbers
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from .input_widget import InputWidget
-from ...constants import PARAM_INPUT_WIDGET_HEIGHT
+from ...constants import (PARAM_INPUT_WIDGET_HEIGHT,
+                          QT_REG_EXP_FLOAT_VALIDATOR,
+                          QT_REG_EXP_INT_VALIDATOR)
 
 
 class InputWidgetLine(QtWidgets.QLineEdit, InputWidget):
@@ -53,13 +55,7 @@ class InputWidgetLine(QtWidgets.QLineEdit, InputWidget):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
-        if param.type == numbers.Integral:
-            self.setValidator(QtGui.QIntValidator())
-        elif param.type == numbers.Real:
-            _validator = QtGui.QDoubleValidator()
-            _validator.setNotation(QtGui.QDoubleValidator.ScientificNotation)
-            self.setValidator(_validator)
-
+        self.set_validator(param)
         self.editingFinished.connect(self.emit_signal)
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self.set_value(param.value)

@@ -152,19 +152,35 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         _new = obj._get_param_value_with_modulo('Test0', _mod)
         self.assertEqual(_new, _test % _mod)
 
-    def test_get_param_value_with_modulo_equal(self):
+    def test_get_param_value_with_modulo__equal(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         _test = obj.get_param_value('Test0')
         _new = obj._get_param_value_with_modulo('Test0', _test)
         self.assertEqual(_new, _test)
 
-    def test_get_param_value_with_modulo_negative(self):
+    def test_get_param_value_with_modulo__negative(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.set_param_value('Test0', -1)
         _mod = 10
         _new = obj._get_param_value_with_modulo('Test0', _mod)
+        self.assertEqual(_new, _mod)
+
+    def test_get_param_value_with_modulo__none_type_low(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(Parameter('Test0', int, 12, allow_None=True))
+        obj.set_param_value('Test0', None)
+        _mod = 10
+        _new = obj._get_param_value_with_modulo('Test0', _mod, none_low=True)
+        self.assertEqual(_new, 0)
+
+    def test_get_param_value_with_modulo__none_type_high(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(Parameter('Test0', int, 12, allow_None=True))
+        obj.set_param_value('Test0', None)
+        _mod = 10
+        _new = obj._get_param_value_with_modulo('Test0', _mod, none_low=False)
         self.assertEqual(_new, _mod)
 
     def test_get_param_value_with_modulo_not_integer(self):

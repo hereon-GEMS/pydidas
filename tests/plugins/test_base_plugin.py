@@ -33,7 +33,7 @@ from pydidas.unittest_objects.dummy_plugin_collection import (
 
 from pydidas.plugins import BasePlugin
 from pydidas.constants import BASE_PLUGIN
-from pydidas.core import Parameter
+from pydidas.core import Parameter, get_generic_parameter
 from pydidas.image_io import rebin2d, RoiManager
 
 
@@ -169,6 +169,73 @@ class TestBasePlugin(unittest.TestCase):
         _new_image = rebin2d(_image[_roi], _binning)
         self.assertTrue(np.allclose(_final_image, _new_image))
 
+    def test_get_own_roi(self):
+        _this_roi = (3, 436, 17, 357)
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        for _name in ['use_roi', 'roi_ylow', 'roi_yhigh',
+                      'roi_xlow', 'roi_xhigh']:
+            plugin.add_param(get_generic_parameter(_name))
+        plugin.set_param_value('use_roi', True)
+        plugin.set_param_value('roi_ylow', _this_roi[0])
+        plugin.set_param_value('roi_yhigh', _this_roi[1])
+        plugin.set_param_value('roi_xlow', _this_roi[2])
+        plugin.set_param_value('roi_xhigh', _this_roi[3])
+        plugin.input_shape = (1257, 1235)
+        _roi = plugin._get_own_roi()
+        self.assertEqual(_roi[0].start, _this_roi[0])
+        self.assertEqual(_roi[0].stop, _this_roi[1])
+        self.assertEqual(_roi[1].start, _this_roi[2])
+        self.assertEqual(_roi[1].stop, _this_roi[3])
+
+
+    def test_update_legacy_image_ops_with_this_plugin__fresh(self):
+        _roi1 = (5, -55, 5, -55)
+        _this_roi = (slice(3, 436, None), slice(17, 967, None))
+        _bin1 = 3
+        _this_bin = 4
+        _shape = (1257, 1235)
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        plugin.input_shape = _shape
+        for _name in ['binning', 'use_roi', 'roi_ylow', 'roi_yhigh',
+                      'roi_xlow', 'roi_xhigh']:
+            plugin.add_param(get_generic_parameter(_name))
+        plugin.set_param_value('binning', _this_bin)
+        plugin.set_param_value('use_roi', True)
+        plugin.set_param_value('roi_ylow', _this_roi[0].start)
+        plugin.set_param_value('roi_yhigh', _this_roi[0].stop)
+        plugin.set_param_value('roi_xlow', _this_roi[1].start)
+        plugin.set_param_value('roi_xhigh', _this_roi[1].stop)
+        plugin._legacy_image_ops.append(['roi', _roi1])
+        plugin._legacy_image_ops.append(['binning', _bin1])
+        plugin.update_legacy_image_ops_with_this_plugin()
+        self.assertEqual(plugin._legacy_image_ops_meta['num'], 2)
+        self.assertTrue(plugin._legacy_image_ops_meta['included'])
+        for _index, _item in enumerate([['roi', _roi1],
+                                        ['binning', _bin1],
+                                        ['roi', _this_roi],
+                                        ['binning', _this_bin]]):
+            self.assertEqual(plugin._legacy_image_ops[_index], _item)
+
+    def test_apply_legacy_image_ops_to_data(self):
+        _roi1 = (5, -55, 5, -55)
+        _roi2 = (3, 436, 17, -5)
+        _bin1 = 3
+        _bin2 = 4
+        _shape = (1257, 1235)
+        _image = np.random.random((_shape))
+        _final_image = _image[RoiManager(roi=_roi1).roi]
+        _final_image = rebin2d(_final_image, _bin1)
+        _final_image = rebin2d(_final_image, _bin2)
+        _final_image = _final_image[RoiManager(roi=_roi2).roi]
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        plugin._original_image_shape = _shape
+        plugin._legacy_image_ops.append(['roi', _roi1])
+        plugin._legacy_image_ops.append(['binning', _bin1])
+        plugin._legacy_image_ops.append(['binning', _bin2])
+        plugin._legacy_image_ops.append(['roi', _roi2])
+        _new_image = plugin.apply_legacy_image_ops_to_data(_image)
+        self.assertTrue(np.allclose(_final_image, _new_image))
+
     def test_calculate_result_shape__output_dim_neg1_no_input(self):
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
         plugin.calculate_result_shape()
@@ -203,6 +270,7 @@ class TestBasePlugin(unittest.TestCase):
         _shape = (123, 534, 245)
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
         plugin._config['input_shape'] = _shape
+        plugin.calculate_result_shape()
         self.assertEqual(plugin.result_shape, _shape)
 
     def test_input_shape_getter(self):

@@ -315,7 +315,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _nx = self.raw_size_x
         _ny = self.raw_size_y
         _x0 = self._get_param_value_with_modulo('roi_xlow', _nx)
-        _x1 = self._get_param_value_with_modulo('roi_xhigh', _nx)
+        _x1 = self._get_param_value_with_modulo('roi_xhigh', _nx,
+                                                none_low=False)
         _y0 = self._get_param_value_with_modulo('roi_ylow', _ny)
-        _y1 = self._get_param_value_with_modulo('roi_yhigh', _ny)
+        _y1 = self._get_param_value_with_modulo('roi_yhigh', _ny,
+                                                none_low=False)
         return _x0, _x1, _y0, _y1

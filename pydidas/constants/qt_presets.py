@@ -63,3 +63,13 @@ QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
 QT_COMBO_BOX_SIZE_POLICY = (
     QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+
+QT_REG_EXP_FLOAT_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(
+    '-?\\d*\.?\d*|None|nan',
+    QtCore.QRegularExpression.CaseInsensitiveOption))
+
+QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression(
+    '-?\\d*|None|nan',
+    QtCore.QRegularExpression.CaseInsensitiveOption))

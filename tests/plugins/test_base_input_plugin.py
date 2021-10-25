@@ -40,7 +40,7 @@ from pydidas.core import get_generic_parameter
 from pydidas.apps.app_utils import ImageMetadataManager
 from pydidas._exceptions import AppConfigError
 
-class TestBasePlugin(unittest.TestCase):
+class TestBaseInputPlugin(unittest.TestCase):
 
     def setUp(self):
         self._datashape = (130, 140)
@@ -103,6 +103,7 @@ class TestBasePlugin(unittest.TestCase):
         plugin.set_param_value('filename', self._fname)
         plugin._InputPlugin__setup_image_magedata_manager()
         plugin._image_metadata.update()
+        plugin.calculate_result_shape()
         self.assertEqual(plugin.result_shape, self._datashape)
 
     def test_calculate_result_shape(self):

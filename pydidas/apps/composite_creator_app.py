@@ -213,6 +213,7 @@ class CompositeCreatorApp(BaseApp):
         self._config['mp_tasks'] = range(_ntotal)
         self._config['det_mask_val'] = float(self.q_settings_get_global_value(
             'det_mask_val'))
+        self._det_mask = self.__get_detector_mask()
 
     def prepare_run(self):
         """
@@ -246,6 +247,31 @@ class CompositeCreatorApp(BaseApp):
             self._composite = None
             return
         self.__check_and_update_composite_image()
+        self.__check_and_store_thresholds()
+
+    def __get_detector_mask(self):
+        """
+        Get the detector mask from the file specified in the global QSettings.
+        Returns
+        -------
+        _mask : Union[None, np.ndarray]
+            If the mask could be loaded from a numpy file, return the mask.
+            Else, None is returned.
+        """
+        _maskfile = self.q_settings_get_global_value('det_mask')
+        try:
+            _mask = np.load(_maskfile)
+        except (FileNotFoundError, ValueError):
+            return None
+        _roi = self._image_metadata.roi
+        if _roi is not None:
+            _mask = _mask[self._image_metadata.roi]
+        _bin = self.get_param_value('binning')
+        if _bin > 1:
+            _mask = rebin2d(_mask, _bin)
+            _mask = np.where(_mask > 0, 1, 0)
+            _mask = _mask.astype(np.bool_)
+        return _mask
 
     def __verify_total_number_of_images_in_composite(self):
         """
@@ -340,6 +366,21 @@ class CompositeCreatorApp(BaseApp):
             _update_required = True
         if _update_required:
             self._composite.create_new_image()
+
+    def __check_and_store_thresholds(self):
+        """
+        Check for thresholds and store them in the local config.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments which can include
+        """
+        if self.get_param_value('use_thresholds'):
+            self._composite.set_param_value(
+                'threshold_low', self.get_param_value('threshold_low'))
+            self._composite.set_param_value(
+                'threshold_high', self.get_param_value('threshold_high'))
 
     def multiprocessing_get_tasks(self):
         """
@@ -477,7 +518,6 @@ class CompositeCreatorApp(BaseApp):
         """
         Perform operatinos after running main parallel processing function.
         """
-        self.apply_thresholds()
 
     @copy_docstring(CompositeImage)
     def apply_thresholds(self, **kwargs):

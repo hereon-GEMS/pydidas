@@ -149,14 +149,16 @@ class WorkflowNode(GenericNode):
         Calculate the Plugin's shape of the results and push this to the node's
         children.
         """
-        self.update_plugin_data_shapes()
+        self.update_plugin_result_data_shape()
         self.propagate_to_children()
 
-    def update_plugin_data_shapes(self):
+    def update_plugin_result_data_shape(self):
         """
-        Update the result shape from the Plugin's value.
+        Update the result shape from the Plugin's input image shape and legacy
+        operations.
         """
-        self.plugin.update_image_ops()
+        self.plugin.update_legacy_image_ops_with_this_plugin()
+        self.plugin.calculate_result_shape()
         self._result_shape = self.plugin.result_shape
 
     def propagate_to_children(self):
@@ -164,11 +166,12 @@ class WorkflowNode(GenericNode):
         Propagate the global binning and ROI to the children.
         """
         for _child in self._children:
-            _plugin = _child.plugin
-            _plugin.input_shape = self.plugin.result_shape
+            _child_plugin = _child.plugin
+            _child_plugin.input_shape = self.plugin.result_shape
             if not self.plugin.new_dataset:
-                _plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
-                _plugin._original_image_shape = (
+                _child_plugin._legacy_image_ops = (
+                    self.plugin._legacy_image_ops[:])
+                _child_plugin._original_image_shape = (
                     self.plugin._original_image_shape)
             _child.propagate_shapes_and_global_config()
 

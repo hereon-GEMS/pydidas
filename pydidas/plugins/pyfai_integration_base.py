@@ -128,10 +128,8 @@ class pyFAIintegrationBase(ProcPlugin):
                                'settings.')
         if os.path.isfile(_mask_qsetting):
             self._mask = read_image(_mask_qsetting)
-            _roi, _binning = self.get_single_ops_from_legacy()
-            # self._mask = self._mask[_roi] if _roi is not None else self._mask
-            self._mask = np.where(rebin2d(self._mask[_roi], _binning) > 0,
-                                  1, 0)
+            _roi, _bin = self.get_single_ops_from_legacy()
+            self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
         else:
             self._mask = None
 

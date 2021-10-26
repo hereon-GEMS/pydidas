@@ -103,6 +103,7 @@ class _WorkflowTree(GenericTree):
         self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
         self._preexecuted = True
+        self.reset_tree_changed_flag()
 
     def execute_process(self, arg, **kwargs):
         """
@@ -202,7 +203,7 @@ class _WorkflowTree(GenericTree):
             raise AppConfigError('The WorkflowTree has no nodes.')
         _leaves = self.get_all_leaves()
         _shapes = [_leaf.result_shape for _leaf in _leaves]
-        if None in _shapes or self.tree_has_changed or force_update:
+        if None in _shapes or self._tree_changed_flag or force_update:
             self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
         _shapes = {_leaf.node_id: _leaf.result_shape

@@ -100,7 +100,7 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=TOOLTIPS['threshold_high'], allow_None=True),
     Parameter('binning', int, 1, name='Binning factor',
               tooltip=TOOLTIPS['binning']),
-    Parameter('images_per_file', int, 0, name='Images per file',
+    Parameter('images_per_file', int, -1, name='Images per file',
               tooltip=TOOLTIPS['images_per_file']),
     Parameter('image_shape', tuple, (0, 0), name='Image shape',
               tooltip=TOOLTIPS['image_shape'], unit='px'),

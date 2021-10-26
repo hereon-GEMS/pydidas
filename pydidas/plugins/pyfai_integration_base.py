@@ -82,6 +82,7 @@ class pyFAIintegrationBase(ProcPlugin):
         )
     input_data_dim = 2
     output_data_dim = 2
+    new_dataset = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,6 +95,7 @@ class pyFAIintegrationBase(ProcPlugin):
         Check the use_global_mask Parameter and load the mask image.
         """
         if self._ai is None:
+            _lambda_in_A = EXP_SETTINGS.get_param_value('xray_wavelength')
             self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
                 dist=EXP_SETTINGS.get_param_value('detector_dist'),
                 poni1=EXP_SETTINGS.get_param_value('detector_poni1'),
@@ -102,8 +104,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 rot2=EXP_SETTINGS.get_param_value('detector_rot2'),
                 rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
                 detector=EXP_SETTINGS.get_detector(),
-                wavelength=EXP_SETTINGS.get_param_value('xray_wavelength'))
-
+                wavelength=1e-10 * _lambda_in_A)
         self.load_and_store_mask()
 
     def load_and_store_mask(self):
@@ -129,12 +130,12 @@ class pyFAIintegrationBase(ProcPlugin):
             self._mask = read_image(_mask_qsetting)
             _roi, _binning = self.get_single_ops_from_legacy()
             # self._mask = self._mask[_roi] if _roi is not None else self._mask
-            self._mask = rebin2d(self._mask[_roi], _binning)
+            self._mask = np.where(rebin2d(self._mask[_roi], _binning) > 0,
+                                  1, 0)
         else:
             self._mask = None
 
-
-    def get_result_shape(self):
+    def calculate_result_shape(self):
         """
         Get the shape of the integrated dataset to set up the CRS / LUT.
 
@@ -146,16 +147,20 @@ class pyFAIintegrationBase(ProcPlugin):
             is returned.
         """
         if self.output_data_dim == 2:
-            return (self.get_param_value('int_rad_npoint'),
-                    self.get_param_value('int_azi_npoint'))
-        if (self.get_param_value('int_rad_npoint') == 1 and
-                self.get_param_value('int_azi_npoint') > 1):
-            return (self.get_param_value('int_azi_npoint'), )
-        if (self.get_param_value('int_rad_npoint') > 1 and
-                self.get_param_value('int_azi_npoint') == 1):
-            return (self.get_param_value('int_rad_npoint'), )
-        raise ValueError('Could not determine the new shape from the defined'
-                         ' number of points')
+            self._config['result_shape'] = (
+                self.get_param_value('int_rad_npoint'),
+                self.get_param_value('int_azi_npoint'))
+        elif (self.get_param_value('int_rad_npoint', 1) == 1 and
+                self.get_param_value('int_azi_npoint', 1) > 1):
+            self._config['result_shape'] = (
+                self.get_param_value('int_azi_npoint'), )
+        elif (self.get_param_value('int_rad_npoint', 1) > 1 and
+                self.get_param_value('int_azi_npoint', 1) == 1):
+            self._config['result_shape'] = (
+                self.get_param_value('int_rad_npoint'), )
+        else:
+            raise ValueError('Could not determine the new shape from the '
+                             'defined number of points')
 
     def get_radial_range(self):
         """

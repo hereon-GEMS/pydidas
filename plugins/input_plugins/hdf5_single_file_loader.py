@@ -30,7 +30,7 @@ __all__ = ['Hdf5singleFileLoader']
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.image_io import read_image
-from pydidas.utils import copy_docstring
+from pydidas.utils import copy_docstring, get_hdf5_metadata
 
 
 class Hdf5singleFileLoader(InputPlugin):
@@ -52,6 +52,26 @@ class Hdf5singleFileLoader(InputPlugin):
     def __init__(self):
         super().__init__()
 
+    def pre_execute(self):
+        """
+        Prepare loading of images from a single hdf5 file.
+        """
+        self._image_metadata.update()
+        if self.get_param_value('images_per_file') == -1:
+            self.__update_images_per_file()
+
+    def __update_images_per_file(self):
+        """
+        Update the number of images per file.
+
+        This method reads the first file of the list, extracts the number
+        of frames in this dataset and stores the information.
+        """
+        _n_per_file = get_hdf5_metadata(
+            self.get_param_value('first_file'), 'shape',
+            dset=self.get_param_value('hdf5_key'))[0]
+        self.set_param_value('images_per_file', _n_per_file)
+
     def execute(self, index, **kwargs):
         fname = self.get_param_value('filename')
         kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')
@@ -67,15 +87,3 @@ class Hdf5singleFileLoader(InputPlugin):
         <InputPlugin>` class.
         """
         return self.get_param_value('filename')
-
-    def get_result_shape(self):
-        """
-        Get the shape of the loaded file.
-
-        Returns
-        -------
-        tuple
-            The tuple with the image dimensions.
-        """
-        image, kwargs = self.execute(0)
-        return image.shape

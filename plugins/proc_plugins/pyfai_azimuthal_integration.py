@@ -59,12 +59,6 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         kwargs : dict
             Any keyword arguments from the ProcessingTree.
         """
-        print('keywords: ')
-        print('npoint: ', self.get_param_value('int_rad_npoint'))
-        print('unit: ', self.get_pyFAI_unit_from_param('int_rad_unit'))
-        print('radial_range: ', self.get_radial_range())
-        print('azi range: ', self.get_azimuthal_range_in_deg())
-
         _newdata = self._ai.integrate1d(
             data, self.get_param_value('int_rad_npoint'),
             unit=self.get_pyFAI_unit_from_param('int_rad_unit'),

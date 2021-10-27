@@ -70,6 +70,52 @@ class TestBaseInputPlugin(unittest.TestCase):
             _param = plugin.generic_params.get_param(att)
             self.assertIsInstance(_param, Parameter)
 
+    def test_get_filename(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        plugin = _class()
+        with self.assertRaises(NotImplementedError):
+            plugin.get_filename(1)
+
+    def test_input_available__file_exists_and_size_ok(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        plugin = _class()
+        plugin._config['file_size'] = os.stat(self._fname).st_size
+        plugin._index = 1
+        plugin.get_filename = lambda x: self._fname
+        self.assertTrue(plugin.input_available(1))
+
+    def test_input_available__file_exists_and_wrong_size(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        plugin = _class()
+        plugin._config['file_size'] = 37
+        plugin._index = 1
+        plugin.get_filename = lambda x: self._fname
+        self.assertFalse(plugin.input_available(1))
+
+    def test_input_available__file_does_not_exist(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        plugin = _class()
+        plugin._config['file_size'] = 37
+        plugin._index = 1
+        plugin.get_filename = lambda x: os.path.join(self._testpath,
+                                                     'no_file.h5')
+        self.assertFalse(plugin.input_available(1))
+
+    def test_get_first_file_size(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
+        plugin = _class()
+        plugin._image_metadata.get_filename = lambda : self._fname
+        self.assertEqual(plugin.get_first_file_size(),
+                         os.stat(self._fname).st_size)
+
+    def test_prepare_carryon_check(self):
+        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
+        plugin = _class()
+        plugin._image_metadata.get_filename = lambda : self._fname
+        plugin.prepare_carryon_check()
+        self.assertEqual(plugin._config['file_size'],
+                         os.stat(self._fname).st_size)
+
     def test_setup_image_metadata_manager__with_firstfile(self):
         _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
         plugin = _class()

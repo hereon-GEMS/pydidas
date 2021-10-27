@@ -144,7 +144,7 @@ class ExecuteWorkflowApp(BaseApp):
             RESULTS.update_shapes_from_scan()
         self.__initialize_arrays_from_shared_memory()
         if self.get_param_value('live_processing'):
-            self.__get_file_target_size()
+            self.__store_file_target_size()
 
     def __check_and_store_results_shapes(self):
         """
@@ -218,12 +218,6 @@ class ExecuteWorkflowApp(BaseApp):
                 self._config['shared_memory']['flag'].get_obj(),
                 dtype=np.int32)
 
-    def __store_file_target_size(self):
-        """
-        Get and store the file target size for live processing.
-        """
-        self._config['file_size'] = self._tree.root.get_first_file_size(self)
-
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
@@ -257,10 +251,7 @@ class ExecuteWorkflowApp(BaseApp):
             Flag whether the processing can carry on or needs to wait.
         """
         if self.get_param_value('live_processing'):
-            _fname = self._tree.root.get_filename(self._index)
-            if os.path.exists(_fname):
-                _ok = self._config['file_size'] == os.stat(_fname).st_size
-                return _ok
+            return self.root.plugin.input_available()
         return True
 
     def multiprocessing_func(self, *index):

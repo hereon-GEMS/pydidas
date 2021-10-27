@@ -93,6 +93,29 @@ class InputPlugin(BasePlugin):
         self._image_metadata = ImageMetadataManager(*_metadata_params)
         self._image_metadata.set_param_value('use_filename', _use_filename)
 
+    def pre_execute(self):
+        """
+        Run the pre-execution routines.
+        """
+
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin's results.
+        """
+        self._image_metadata.update()
+        self._config['result_shape'] = self._image_metadata.final_shape
+        self._original_image_shape = (self._image_metadata.raw_size_y,
+                                      self._image_metadata.raw_size_x)
+
+    def prepare_carryon_check(self):
+        """
+        Prepare the checks of the multiprocessing carryon.
+
+        By default, this gets and stores the file target size for live
+        processing.
+        """
+        self._config['file_size'] = self.get_first_file_size()
+
     def get_first_file_size(self):
         """
         Get the size of the first file to be processed.
@@ -105,6 +128,28 @@ class InputPlugin(BasePlugin):
         _fname = self._image_metadata.get_filename()
         self._config['file_size'] = os.stat(_fname).st_size
         return self._config['file_size']
+
+    def input_available(self, index):
+        """
+        Check whether a new input file is available.
+
+        Note: This function returns False by default. It is intended to be
+        used only for checks during live processing.
+
+        Parameters
+        ----------
+        index : int
+            The frame index.
+
+        Returns
+        -------
+        bool
+            flag whether the file for the frame #<index> is ready for reading.
+        """
+        _fname = self.get_filename(self._index)
+        if os.path.exists(_fname):
+            return self._config['file_size'] == os.stat(_fname).st_size
+        return False
 
     def get_filename(self, index):
         """
@@ -126,17 +171,3 @@ class InputPlugin(BasePlugin):
             The filename.
         """
         raise NotImplementedError
-
-    def pre_execute(self):
-        """
-        Run the pre-execution routines.
-        """
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self._image_metadata.update()
-        self._config['result_shape'] = self._image_metadata.final_shape
-        self._original_image_shape = (self._image_metadata.raw_size_y,
-                                      self._image_metadata.raw_size_x)

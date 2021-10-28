@@ -27,10 +27,10 @@ __status__ = "Development"
 __all__ = ['Hdf5fileSeriesLoader']
 
 
-from pydidas.core import ParameterCollection, get_generic_parameter
+from pydidas.core import (ParameterCollection, get_generic_parameter,
+                          FilelistManager)
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
 from pydidas.image_io import read_image
-from pydidas.apps.app_utils import FilelistManager
 from pydidas.utils import copy_docstring, get_hdf5_metadata
 
 

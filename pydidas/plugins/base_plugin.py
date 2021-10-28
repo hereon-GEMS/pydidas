@@ -23,6 +23,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BasePlugin']
 
+import copy
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_parameter)
@@ -141,6 +142,39 @@ class BasePlugin(ObjectWithParameterCollection):
         self._legacy_image_ops_meta = {'num': 0, 'included': False}
         self._legacy_image_ops = []
         self._original_image_shape = None
+
+    def __copy__(self):
+        """
+        Implement a (deep)copy routine for Plugins.
+
+        Returns
+        -------
+        BasePlugin
+            The copy of the plugin.
+
+        """
+        _obj_copy = type(self)()
+        for _key in self.__dict__:
+            _obj_copy.__dict__[_key] = copy.copy(self.__dict__[_key])
+        return _obj_copy
+
+    def __getstate__(self):
+        """
+        Get the state of the Plugin for pickling.
+
+        Returns
+        -------
+        dict
+            A dictionary with Parameter refkeys and the associated values.
+        """
+        _state = self.__dict__.copy()
+        # _params = [p.export_refkey_and_value()
+        #            for p in self.params.values()]
+        return _state
+
+    def __setstate__(self, state):
+        for key, val in state.items():
+            setattr(self, key, val)
 
     def execute(self, data, **kwargs):
         """
@@ -341,4 +375,5 @@ class BasePlugin(ObjectWithParameterCollection):
                                  for _r in RoiManager(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
+
 

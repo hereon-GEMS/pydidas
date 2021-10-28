@@ -25,6 +25,8 @@ __status__ = "Development"
 import unittest
 import tempfile
 import shutil
+import copy
+import pickle
 
 import numpy as np
 
@@ -35,6 +37,7 @@ from pydidas.plugins import BasePlugin
 from pydidas.constants import BASE_PLUGIN
 from pydidas.core import Parameter, get_generic_parameter
 from pydidas.image_io import rebin2d, RoiManager
+from pydidas.unittest_objects import get_random_string
 
 
 class TestBasePlugin(unittest.TestCase):
@@ -319,29 +322,67 @@ class TestBasePlugin(unittest.TestCase):
         plugin.pre_execute()
         # assert no error
 
+    def test_getstate(self):
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        _state = plugin.__getstate__()
+        for key, param in _state['params'].items():
+            self.assertEqual(plugin.get_param_value(key), param.value)
+
+    def test_setstate(self):
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        _new_params = {get_random_string(6): get_random_string(12)
+                       for i in range(7)}
+        for _key, _val in _new_params.items():
+            plugin.add_param(Parameter(_key, str, ''))
+        _state = {'params': plugin.params.get_copy()}
+        for _key, _param in _new_params.items():
+            _state['params'][_key].value = _new_params[_key]
+        plugin.__setstate__(_state)
+        for key, val in _new_params.items():
+            self.assertEqual(plugin.get_param_value(key), val)
+
+    def test_pickle(self):
+        plugin = BasePlugin()
+        _new_params = {get_random_string(6): get_random_string(12)
+                       for i in range(7)}
+        for _key, _val in _new_params.items():
+            plugin.add_param(Parameter(_key, str, _val))
+        plugin2 = pickle.loads(pickle.dumps(plugin))
+        for _key in plugin.params:
+            self.assertEqual(plugin.get_param_value(_key),
+                             plugin2.get_param_value(_key))
+
     def test_execute(self):
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
         with self.assertRaises(NotImplementedError):
             plugin.execute(1)
 
-    def test_init__plain(self):
+    def test_copy(self):
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)
         obj = plugin()
-        self.assertIsInstance(obj, BasePlugin)
+        obj.set_param_value('label', 'Test 12423536')
+        cp = copy.copy(obj)
+        self.assertEqual(obj.__class__, cp.__class__)
+        self.assertEqual(obj.get_param_value('label'),
+                         cp.get_param_value('label'))
+
+    def test_init__plain(self):
+        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
+        self.assertIsInstance(plugin, BasePlugin)
 
     def test_init__with_param(self):
-        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)
+        _cls = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)
         _param = Parameter('test', str, default='test')
-        obj = plugin(_param)
-        self.assertTrue('test' in obj.params)
+        plugin = _cls(_param)
+        self.assertTrue('test' in plugin.params)
 
     def test_init__with_param_overwriting_default(self):
-        _original_param = Parameter('test', str, default='original test')
-        plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)
-        plugin.default_params.add_param(_original_param)
-        _param = Parameter('test', str, default='test')
-        obj = plugin(_param)
-        self.assertEqual(obj.get_param_value('test'), _param.value)
+        _original_param = Parameter('test', str, 'original test')
+        _cls = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)
+        _cls.default_params.add_param(_original_param)
+        _param = Parameter('test', str, 'test')
+        plugin = _cls(_param)
+        self.assertEqual(plugin.get_param_value('test'), _param.value)
 
 
 if __name__ == "__main__":

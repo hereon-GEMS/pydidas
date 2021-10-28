@@ -28,6 +28,7 @@ import numpy as np
 from .generic_node import GenericNode
 from ..constants import gui_constants
 
+
 class PluginPositionNode(GenericNode):
     """
     The WorkflowTreePluginPositionNode class manages the sizes and positions of

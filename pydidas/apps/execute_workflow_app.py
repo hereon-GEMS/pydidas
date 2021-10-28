@@ -30,7 +30,6 @@ import multiprocessing as mp
 import numpy as np
 from PyQt5 import QtCore
 
-from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (ParameterCollection, Dataset,
@@ -39,7 +38,7 @@ from pydidas.constants import HDF5_EXTENSIONS
 from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file)
 from pydidas.image_io import read_image, rebin2d
 from pydidas.utils import copy_docstring
-from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
+from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 
 
@@ -50,30 +49,9 @@ SCAN = ScanSettings()
 RESULTS = WorkflowResults()
 
 DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('live_processing'),
-    get_generic_parameter('first_file'),
-    get_generic_parameter('last_file'),
-    get_generic_parameter('file_stepping'),
-    get_generic_parameter('hdf5_key'),
-    get_generic_parameter('hdf5_first_image_num'),
-    get_generic_parameter('hdf5_last_image_num'),
-    get_generic_parameter('hdf5_stepping'),
-    get_generic_parameter('use_bg_file'),
-    get_generic_parameter('bg_file'),
-    get_generic_parameter('bg_hdf5_key'),
-    get_generic_parameter('bg_hdf5_frame'),
-    get_generic_parameter('composite_nx'),
-    get_generic_parameter('composite_ny'),
-    get_generic_parameter('composite_dir'),
-    get_generic_parameter('use_roi'),
-    get_generic_parameter('roi_xlow'),
-    get_generic_parameter('roi_xhigh'),
-    get_generic_parameter('roi_ylow'),
-    get_generic_parameter('roi_yhigh'),
-    get_generic_parameter('use_thresholds'),
-    get_generic_parameter('threshold_low'),
-    get_generic_parameter('threshold_high'),
-    get_generic_parameter('binning'),
+    get_generic_parameter('autosave_results'),
+    get_generic_parameter('autosave_dir'),
+    get_generic_parameter('autosave_format'),
     )
 
 
@@ -100,7 +78,7 @@ class ExecuteWorkflowApp(BaseApp):
     default_params = DEFAULT_PARAMS
     mp_func_results = QtCore.pyqtSignal(object)
     updated_composite = QtCore.pyqtSignal()
-    parse_func = parse_composite_creator_cmdline_arguments
+    parse_func = parse_execute_workflow_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index']
 
     def __init__(self, *args, **kwargs):
@@ -110,9 +88,9 @@ class ExecuteWorkflowApp(BaseApp):
         super().__init__(*args, **kwargs)
         self._config['result_shapes'] = {}
         self._config['shared_memory'] = {}
+        self._config['tree'] = TREE.get_copy()
         self._shared_arrays = {}
-        self._index
-        self._tree = TREE.get_copy()
+        self._index = None
 
     def multiprocessing_pre_run(self):
         """
@@ -143,8 +121,10 @@ class ExecuteWorkflowApp(BaseApp):
             self.__initialize_shared_memory()
             RESULTS.update_shapes_from_scan()
         self.__initialize_arrays_from_shared_memory()
+        self._redefine_multiprocessing_carryon()
         if self.get_param_value('live_processing'):
             self.__store_file_target_size()
+
 
     def __check_and_store_results_shapes(self):
         """
@@ -218,6 +198,22 @@ class ExecuteWorkflowApp(BaseApp):
                 self._config['shared_memory']['flag'].get_obj(),
                 dtype=np.int32)
 
+    def _redefine_multiprocessing_carryon(self):
+        """
+        Redefine the multiprocessing_carryon method based on the the
+        live_processing settings.
+
+        To speed up processing, this method will link the required function
+        directly to multiprocessing_carryon. If live_processing is used,
+        this will be the input_available check of the input plugin. If not,
+        the return value will always be True.
+        """
+        if self.get_param_value('live_processing'):
+            self.multiprocessing_carryon = (
+                self._config['tree'].root.plugin.input_available)
+        else:
+            self.multiprocessing_carryon = lambda: True
+
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
@@ -245,13 +241,14 @@ class ExecuteWorkflowApp(BaseApp):
         By default, this Flag is always True. In the case of live processing,
         a check is done whether the current file exists.
 
+        Note: This method is a dummy which will be overwritten in the
+        prepare_run method depending on the settings for the live processing.
+
         Returns
         -------
         bool
             Flag whether the processing can carry on or needs to wait.
         """
-        if self.get_param_value('live_processing'):
-            return self.root.plugin.input_available()
         return True
 
     def multiprocessing_func(self, *index):
@@ -263,7 +260,7 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        self._tree.execute_process(0)
+        self._config['tree'].execute_process(index)
         self.__write_results_to_shared_arrays()
         return self._config['buffer_pos']
 
@@ -284,7 +281,7 @@ class ExecuteWorkflowApp(BaseApp):
             time.sleep(0.01)
         for _node_id in self._config['result_shapes']:
             self._shared_arrays[_node_id][_buffer_pos] = (
-                self._tree.nodes[_node_id].results)
+                self._config['tree'].nodes[_node_id].results)
         _flag_lock.release()
 
     def multiprocessing_post_run(self):
@@ -305,6 +302,8 @@ class ExecuteWorkflowApp(BaseApp):
         buffer_pos : int
             The buffer position of the results.
         """
+        if self.slave_mode:
+            return
         _results = {_key: None for _key in self._config['results_shapes']}
         _flag_lock = self._config['shared_memory']['flag']
         _flag_lock.acquire()

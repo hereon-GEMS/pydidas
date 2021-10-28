@@ -26,11 +26,14 @@ import unittest
 import tempfile
 import shutil
 import os
+import copy
+import pickle
 
 import numpy as np
 
 from pydidas import unittest_objects
 from pydidas.workflow_tree import WorkflowNode, WorkflowTree, GenericNode
+from pydidas.workflow_tree.workflow_tree import _WorkflowTree
 from pydidas.unittest_objects.dummy_loader import DummyLoader
 from pydidas.unittest_objects.dummy_proc import DummyProc
 from pydidas._exceptions import AppConfigError
@@ -190,6 +193,24 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[_id], GenericNode)
         self.assertEqual(self.tree.nodes[_id].node_id, _id)
+
+    def test_tree_copy_with_plugins(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        tree2 = copy.copy(self.tree)
+        self.assertIsInstance(tree2, _WorkflowTree)
+        for _node in tree2.nodes.values():
+            self.assertIsInstance(_node, WorkflowNode)
+
+    def test_tree_pickling(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        tree2 = pickle.loads(pickle.dumps(self.tree))
+        self.assertIsInstance(tree2, _WorkflowTree)
+        for _node in tree2.nodes.values():
+            self.assertIsInstance(_node, WorkflowNode)
 
 
 if __name__ == '__main__':

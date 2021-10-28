@@ -93,3 +93,27 @@ def parse_composite_creator_cmdline_arguments(parent=None):
     for _key in ['use_roi', 'use_thresholds', 'use_bg_file']:
         _args[_key] = _args[_key] if _args[_key] else None
     return _args
+
+
+def parse_execute_workflow_cmdline_arguments(parent=None):
+    """
+    Use argparse to get command line arguments.
+
+    Returns
+    -------
+    dict
+        A dictionary with the parsed arugments which holds all the entries
+        and entered values or  - if missing - the default values.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--autosave', action='store_true',
+                        help=get_generic_parameter('autosave_results').tooltip)
+    parser.add_argument('-autosave_dir', '-d',
+                        help=get_generic_parameter('autosave_dir').tooltip)
+    parser.add_argument('-autosave_format', '-f',
+                        help=get_generic_parameter('autosave_format').tooltip)
+    _args = dict(vars(parser.parse_args()))
+    # store None for keyword arguments which were not selected:
+    for _key in ['autosave']:
+        _args[_key] = True if _args[_key] else False
+    return _args

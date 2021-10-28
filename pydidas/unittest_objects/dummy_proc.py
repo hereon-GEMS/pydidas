@@ -1,5 +1,33 @@
+# This file is part of pydidas.
+
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""
+The dummy_proc module includes the DummyProc class which can be used to
+test workflows and Plugins without any file system operations.
+"""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.1"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['DummyProc']
+
 from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.core import Parameter, ParameterCollection
+from pydidas.core import ParameterCollection
 
 import numpy as np
 
@@ -25,7 +53,3 @@ class DummyProc(ProcPlugin):
 
     def pre_execute(self):
         self._preexecuted = True
-
-
-
- # todo : Check result shape with dummy proc.

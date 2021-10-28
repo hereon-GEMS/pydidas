@@ -26,6 +26,7 @@ import unittest
 import io
 import sys
 import copy
+import pickle
 
 from pydidas.core import (ObjectWithParameterCollection, Parameter,
                           ParameterCollection)
@@ -226,6 +227,34 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj2 = copy.copy(obj)
         self.assertIsInstance(obj2, ObjectWithParameterCollection)
 
+    def test_getstate(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config['test'] = 'Test'
+        _state = obj.__getstate__()
+        for _key, _param in _state['params'].items():
+            self.assertEqual(_param.value, obj.get_param_value(_key))
+        for _key, _value in _state['_config'].items():
+            self.assertEqual(_value, obj._config[_key])
+
+    def test_setstate(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _state = {'params': obj.params.get_copy(),
+                  '_config': {'test_key': True, 'another_key': 'entry'}}
+        obj.__setstate__(_state)
+        for _key, _param in _state['params'].items():
+            self.assertEqual(_param.value, obj.get_param_value(_key))
+        for _key, _value in _state['_config'].items():
+            self.assertEqual(_value, obj._config[_key])
+
+    def test_pickle(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        new_obj = pickle.loads(pickle.dumps(obj))
+        self.assertIsInstance(new_obj, ObjectWithParameterCollection)
+        for _key, _param in obj.params.items():
+            self.assertEqual(_param.value, new_obj.get_param_value(_key))
 
 if __name__ == "__main__":
     unittest.main()

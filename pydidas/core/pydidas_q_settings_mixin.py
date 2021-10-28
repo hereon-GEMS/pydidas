@@ -51,6 +51,13 @@ class copyableQSettings(QtCore.QSettings):
         return copyableQSettings(self.organizationName(),
                                  self.applicationName())
 
+    def __getstate__(self):
+        return {'org_name': self.organizationName(),
+                'app_name': self.applicationName()}
+
+    def __setstate__(self, state):
+        super().__init__(state['org_name'], state['app_name'])
+
 
 class PydidasQsettingsMixin:
     """

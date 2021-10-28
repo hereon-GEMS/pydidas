@@ -31,8 +31,7 @@ from pathlib import Path
 import numpy as np
 
 
-from pydidas.apps.app_utils import FilelistManager
-from pydidas.core import get_generic_parameter
+from pydidas.core import get_generic_parameter, FilelistManager
 from pydidas._exceptions import AppConfigError
 
 class TestFilelistManager(unittest.TestCase):

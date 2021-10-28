@@ -277,14 +277,28 @@ class GenericTree:
 
     def __copy__(self):
         """
-        Get a copy of the WorkflowTree.
+        Get a copy of the GenericTree.
 
         Returns
         -------
-        pydidas.workflow_tree.WorkflowTree
-            A new instance of the WorkflowTree
+        pydidas.workflow_tree.GenericTree
+            A new instance of the GenericTree
         """
-        _copy = self.__class__()
+        cls = self.__class__
+        _copy = cls.__new__(cls)
         for key, val in self.__dict__.items():
             _copy.__dict__[key] = copy.deepcopy(val)
         return _copy
+
+    def __deepcopy__(self):
+        """
+        Get a deep copy of the GenericTree.
+
+        Note: The implementation of copy and deepcopy is the same for Trees.
+
+        Returns
+        -------
+        pydidas.workflow_tree.GenericTree
+            A new instance of the GenericTree
+        """
+        return self.__copy__()

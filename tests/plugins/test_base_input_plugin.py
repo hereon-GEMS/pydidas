@@ -35,9 +35,8 @@ from pydidas.unittest_objects.dummy_plugin_collection import (
 
 from pydidas.plugins import InputPlugin
 from pydidas.constants import INPUT_PLUGIN
-from pydidas.core import Parameter
-from pydidas.core import get_generic_parameter
-from pydidas.apps.app_utils import ImageMetadataManager
+from pydidas.core import (Parameter, get_generic_parameter,
+                          ImageMetadataManager)
 from pydidas._exceptions import AppConfigError
 
 class TestBaseInputPlugin(unittest.TestCase):

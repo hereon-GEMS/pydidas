@@ -31,8 +31,7 @@ from pathlib import Path
 import numpy as np
 import h5py
 
-from pydidas.apps.app_utils import ImageMetadataManager
-from pydidas.core import get_generic_parameter
+from pydidas.core import get_generic_parameter, ImageMetadataManager
 from pydidas._exceptions import AppConfigError
 
 

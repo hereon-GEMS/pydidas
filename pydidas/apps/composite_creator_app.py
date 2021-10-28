@@ -30,11 +30,11 @@ import time
 import numpy as np
 from PyQt5 import QtCore
 
-from pydidas.apps.app_utils import FilelistManager, ImageMetadataManager
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (ParameterCollection, Dataset,
-                          CompositeImage, get_generic_parameter)
+                          CompositeImage, get_generic_parameter,
+                          FilelistManager, ImageMetadataManager)
 from pydidas.constants import HDF5_EXTENSIONS
 from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file)
 from pydidas.image_io import read_image, rebin2d

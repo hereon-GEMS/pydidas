@@ -214,4 +214,13 @@ TOOLTIPS = {
     'int_method': ('The integration method. For a full reference, please'
                    ' visit the pyfai documentation available at: '
                    'https://pyfai.readthedocs.io/'),
+    'autosave_results': ('Save the results automatically after finishing'
+                         ' processing. The results for each plugin will be'
+                         ' saved in a separete file (or files if multiple '
+                         'formats have been selected).'),
+    'autosave_dir': 'The directory for autosave files.',
+    'autosave_format': ('The file format(s) for the data to be saved after '
+                        'the workflow has been excuted. All data will be saved'
+                        ' in a single folder for each run with one file for '
+                        'each plugin.')
 }

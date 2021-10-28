@@ -262,7 +262,19 @@ GENERIC_PARAMS = ParameterCollection(
               name='PyFAI integration method',
               choices=['CSR', 'CSR OpenCL', 'LUT', 'LUT OpenCL'],
               tooltip=TOOLTIPS['int_method']),
+    ############################
+    ## Autosave results settings
+    ############################
+    Parameter('autosave_results', int, 0,
+              name='Autosave results', choices=[True, False],
+              tooltip=TOOLTIPS['autosave_results']),
+    Parameter('autosave_dir', Path, Path(), name='Autosave directory',
+              tooltip=TOOLTIPS['autosave_dir']),
+    Parameter('autosave_format', str, 'HDF5', name='Autosave formats',
+              choices=['HDF5', 'PNG', 'HDF5 & PNG'],
+              tooltip=TOOLTIPS['autosave_format']),
 )
+
 
 def get_generic_parameter(refkey):
     """

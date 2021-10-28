@@ -295,7 +295,6 @@ class ObjectWithParameterCollection(ParameterCollectionMixIn,
         """
         Create a Base instance.
         """
-        ParameterCollectionMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         QtCore.QObject.__init__(self)
         self.params = ParameterCollection()
@@ -314,3 +313,29 @@ class ObjectWithParameterCollection(ParameterCollectionMixIn,
         obj.params = self.params.get_copy()
         obj._config = copy(self._config)
         return obj
+
+    def __getstate__(self):
+        """
+        Get the ObjectWithParameterCollection state for pickling.
+
+        Returns
+        -------
+        state : dict
+            The state dictionary.
+        """
+        _state = {'params': self.params.get_copy(),
+                  '_config': copy(self._config)}
+        return _state
+
+    def __setstate__(self, state):
+        """
+        Set the ObjectWithParameterCollection state from a pickled state.
+
+        Parameters
+        ----------
+        state : dict
+            The pickled state.
+        """
+        for _key, _value in state.items():
+            setattr(self, _key, _value)
+

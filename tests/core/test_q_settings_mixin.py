@@ -24,6 +24,7 @@ __status__ = "Development"
 
 import unittest
 import copy
+import pickle
 
 from PyQt5 import QtCore
 
@@ -91,11 +92,38 @@ class TestQSettingsMixin(unittest.TestCase):
         _val = obj.q_settings_get_global_value('param_float')
         self.assertEqual(_val, self._params.get_value('param_float'))
 
+    def test_q_settings_pickle(self):
+        obj = PydidasQsettingsMixin()
+        obj.params = self._params
+        new_obj = pickle.loads(pickle.dumps(obj))
+        self.assertIsInstance(new_obj, PydidasQsettingsMixin)
+
     def test_copyableQSettings_copy(self):
         _qsettings = copyableQSettings('Hereon', 'pydidas')
         _copy = copy.copy(_qsettings)
         self.assertIsInstance(_copy, copyableQSettings)
         self.assertNotEqual(_qsettings, _copy)
+
+    def test_copyableQSettings_getstate(self):
+        _qsettings = copyableQSettings('some', 'thing')
+        _state = _qsettings.__getstate__()
+        self.assertEqual(_state['org_name'], 'some')
+        self.assertEqual(_state['app_name'], 'thing')
+
+    def test_copyableQSettings_setstate(self):
+        _qsettings = copyableQSettings('some', 'thing')
+        _state = {'org_name': 'Hereon', 'app_name': 'pydidas'}
+        _qsettings.__setstate__(_state)
+        self.assertEqual(_qsettings.organizationName(), _state['org_name'])
+        self.assertEqual(_qsettings.applicationName(), _state['app_name'])
+
+    def test_copyableQSettings_pickle(self):
+        _qsettings = copyableQSettings('Hereon', 'pydidas')
+        _new = pickle.loads(pickle.dumps(_qsettings))
+        self.assertIsInstance(_new, copyableQSettings)
+        self.assertEqual(_qsettings.organizationName(), 'Hereon')
+        self.assertEqual(_qsettings.applicationName(), 'pydidas')
+
 
 
 if __name__ == "__main__":

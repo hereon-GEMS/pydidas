@@ -35,9 +35,6 @@ SCAN = ScanSettings()
 
 TREE = WorkflowTree()
 
-from pydidas.unittest_objects.dummy_loader import DummyLoader
-from pydidas.unittest_objects.dummy_proc import DummyProc
-
 
 class _WorkflowResults(QtCore.QObject):
     """

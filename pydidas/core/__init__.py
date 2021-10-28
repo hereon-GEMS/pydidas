@@ -64,6 +64,13 @@ from .singleton_factory import *
 from . import pydidas_q_settings_mixin
 from .pydidas_q_settings_mixin import *
 
+from . import image_metadata_manager
+from .image_metadata_manager import *
+
+from . import filelist_manager
+from .filelist_manager import *
+
+
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
 __all__ += object_with_parameter_collection.__all__
@@ -73,7 +80,8 @@ __all__ += composite_image.__all__
 __all__ += generic_parameters.__all__
 __all__ += singleton_factory.__all__
 __all__ += pydidas_q_settings_mixin.__all__
-
+__all__ += image_metadata_manager.__all__
+__all__ += filelist_manager.__all__
 
 
 # Unclutter namespace: remove modules from namespace
@@ -86,4 +94,5 @@ del composite_image
 del generic_parameters
 del singleton_factory
 del pydidas_q_settings_mixin
-# del plugin_collection
+del image_metadata_manager
+del filelist_manager

@@ -25,9 +25,12 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
+__all__ = ['get_random_string', 'create_plugin_class', 'DummyPluginCollection']
+
 import random
 import copy
 import string
+import inspect
 
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, ProcPlugin, OutputPlugin, BasePlugin
@@ -54,7 +57,7 @@ def get_random_string(length):
     return ''.join(random.choice(string.ascii_letters) for i in range(length))
 
 
-def create_base_class(_base):
+def create_base_class(base):
     """
     Create a single-use base class for a temporary plugin to allow
     managemant of classs attributes.
@@ -69,9 +72,12 @@ def create_base_class(_base):
     _cls : type
         A duplicate with a unique set of class attributes.
     """
-    _cls = type(f'Test{_base.__name__}', (_base,),
+    _cls = type(f'Test{base.__name__}', (base,),
                 {key: copy.copy(val)
-                 for key, val in _base.__dict__.items()})
+                 for key, val in base.__dict__.items()
+                 if not inspect.ismethod(getattr(base, key))})
+    _cls.default_params = base.default_params.get_copy()
+    _cls.generic_params = base.generic_params.get_copy()
     return _cls
 
 
@@ -96,7 +102,7 @@ def create_plugin_class(number, plugin_type, use_filename=True):
         or OutputPlugin.
     """
     if plugin_type == BASE_PLUGIN:
-        _cls = BasePlugin
+        _cls = create_base_class(BasePlugin)
     if plugin_type == INPUT_PLUGIN:
         _cls = create_base_class(InputPlugin)
     elif plugin_type == PROC_PLUGIN:

@@ -23,16 +23,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import app_utils
-
 from . import composite_creator_app
 from .composite_creator_app import *
 
 from . import base_app
 from .base_app import *
 
-# from . import parameter
-# from .parameter import *
+from . import execute_workflow_app
+from .execute_workflow_app import *
 
 # from . import parameter_collection
 # from .parameter_collection import *
@@ -54,7 +52,7 @@ from .base_app import *
 
 __all__ += composite_creator_app.__all__
 __all__ += base_app.__all__
-# __all__ += parameter_collection.__all__
+__all__ += execute_workflow_app.__all__
 # __all__ += parameter.__all__
 # __all__ += dataset.__all__
 # __all__ += global_settings.__all__
@@ -65,7 +63,7 @@ __all__ += base_app.__all__
 # Unclutter namespace: remove modules from namespace
 del composite_creator_app
 del base_app
-# del dataset
+del execute_workflow_app
 # del global_settings
 # del experimental_settings
 # del scan_settings

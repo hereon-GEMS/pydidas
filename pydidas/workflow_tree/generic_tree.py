@@ -288,6 +288,8 @@ class GenericTree:
         _copy = cls.__new__(cls)
         for key, val in self.__dict__.items():
             _copy.__dict__[key] = copy.deepcopy(val)
+        _copy.clear()
+        _copy.register_node(copy.deepcopy(self.root))
         return _copy
 
     def __deepcopy__(self):

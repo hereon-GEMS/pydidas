@@ -256,6 +256,10 @@ class TestGenericTree(unittest.TestCase):
         _copy = tree.__copy__()
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
+        for _node in _copy.root._children:
+            self.assertTrue(_node in _copy.nodes.values())
+        for key in set(tree.__dict__.keys()) - {'root', 'nodes'}:
+            self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
     def test_get_copy(self):
         _depth = 3

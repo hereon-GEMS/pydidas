@@ -75,21 +75,37 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             SCAN.set_param_value(f'delta_{i}', self._scandelta[i-1])
             SCAN.set_param_value(f'offset_{i}', self._scanoffset[i-1])
 
-    def test_creation(self):
+    # def test_creation(self):
+    #     app = ExecuteWorkflowApp()
+    #     self.assertIsInstance(app, ExecuteWorkflowApp)
+
+    # def test_creation_with_args(self):
+    #     _autosave = get_generic_parameter('autosave_results')
+    #     _autosave.value = True
+    #     app = ExecuteWorkflowApp(_autosave)
+    #     self.assertTrue(app.get_param_value('autosave_results'))
+
+    # def test_creation_with_cmdargs(self):
+    #     ExecuteWorkflowApp.parse_func = lambda x: {'autosave_results': True}
+    #     app = ExecuteWorkflowApp()
+    #     self.assertTrue(app.get_param_value('autosave_results'))
+
+    # def test_multiprocessing_pre_run(self):
+    #     app = ExecuteWorkflowApp()
+    #     app.multiprocessing_pre_run()
+    #     # assert does not raise error
+
+    # def test_multiprocessing_prepare_run(self):
+    #     app = ExecuteWorkflowApp()
+    #     app.prepare_run()
+    #     # todo
+
+    def test_check_and_store_results_shapes(self):
         app = ExecuteWorkflowApp()
-        self.assertIsInstance(app, ExecuteWorkflowApp)
-
-    def test_creation_with_args(self):
-        _autosave = get_generic_parameter('autosave_results')
-        _autosave.value = True
-        app = ExecuteWorkflowApp(_autosave)
-        self.assertTrue(app.get_param_value('autosave_results'))
-
-    def test_creation_with_cmdargs(self):
-        ExecuteWorkflowApp.parse_func = lambda x: {'autosave_results': True}
-        app = ExecuteWorkflowApp()
-        self.assertTrue(app.get_param_value('autosave_results'))
-
+        app._config['tree'] = TREE.get_copy()
+        app._ExecuteWorkflowApp__check_and_store_results_shapes()
+        self.assertEqual(app._config['results_shapes'],
+                         TREE.get_all_result_shapes())
 
 
 if __name__ == "__main__":

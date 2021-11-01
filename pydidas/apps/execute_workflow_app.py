@@ -88,7 +88,7 @@ class ExecuteWorkflowApp(BaseApp):
         super().__init__(*args, **kwargs)
         self._config['result_shapes'] = {}
         self._config['shared_memory'] = {}
-        self._config['tree'] = TREE.get_copy()
+        self._config['tree'] = None
         self._shared_arrays = {}
         self._index = None
 
@@ -115,6 +115,7 @@ class ExecuteWorkflowApp(BaseApp):
         arrays from the shared memory.
         """
         if not self.slave_mode:
+            self._config['tree'] = TREE.get_copy()
             self.__check_and_store_results_shapes()
             self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()
@@ -135,7 +136,7 @@ class ExecuteWorkflowApp(BaseApp):
         AppConfigError
             If the WorkflowTree has no nodes.
         """
-        _shapes = TREE.get_all_result_shapes()
+        _shapes = self._config['tree'].get_all_result_shapes()
         self._config['results_shapes'] = _shapes
 
     def __get_and_store_tasks(self):

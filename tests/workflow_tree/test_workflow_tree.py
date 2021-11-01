@@ -197,11 +197,15 @@ class TestWorkflowTree(unittest.TestCase):
     def test_tree_copy_with_plugins(self):
         self.tree.create_and_add_node(DummyLoader())
         self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root)
         tree2 = copy.copy(self.tree)
         self.assertIsInstance(tree2, _WorkflowTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
+        for _node in tree2.root._children:
+            self.assertTrue(_node in tree2.nodes.values())
+        for key in set(self.tree.__dict__.keys()) - {'root', 'nodes'}:
+            self.assertEqual(getattr(self.tree, key), getattr(tree2, key))
 
     def test_tree_pickling(self):
         self.tree.create_and_add_node(DummyLoader())

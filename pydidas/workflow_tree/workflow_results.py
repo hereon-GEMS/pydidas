@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""The composites module includes the Composite class for handling composite image data."""
+"""
+The workflow_results module includes the WorkflowResults Singleton class for
+storing and accessing the composite results of the processing.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -104,6 +107,25 @@ class _WorkflowResults(QtCore.QObject):
         _unit = SCAN.get_param_value(f'unit_{index + 1}')
         return _label, _unit, _range
 
+    def update_frame_metadata(self, metadata):
+        """
+        Manually supply metadata for the non-scan dimensions of the results
+        and update the stored metadata.
+
+        Parameters
+        ----------
+        metadata : dict
+            The metadata in form of a dictionary with nodeID keys and dict
+            items containing the axis_units, -_labels, and -_scales keys with
+            the associated data.
+        """
+        for node_id, _meta in metadata.items():
+            _dim_offset = SCAN.get_param_value('scan_dim')
+            for _key, _items in _meta.items():
+                _obj = getattr(self.__composites[node_id], _key)
+                for _dim, _val in _items.items():
+                    _obj[_dim + _dim_offset] = _val
+        self._config['metadata_complete'] = True
 
     def store_results(self, index, results):
         """
@@ -136,7 +158,7 @@ class _WorkflowResults(QtCore.QObject):
         for node_id, result in results.items():
             if not isinstance(result, Dataset):
                 continue
-            _dim_offset = self.__composites[node_id].ndim - result.ndim
+            _dim_offset = SCAN.get_param_value('scan_dim')
             for _dim in range(result.ndim):
                 self.__composites[node_id].axis_labels[_dim + _dim_offset] = (
                     result.axis_labels[_dim])
@@ -173,9 +195,6 @@ class _WorkflowResults(QtCore.QObject):
             The combined results of all frames for a specific node.
         """
         return self.__composites[node_id]
-
-    def update_frame_metadata(self, metadata):
-        ...
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

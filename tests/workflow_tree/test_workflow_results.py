@@ -49,8 +49,8 @@ class TestWorkflowResults(unittest.TestCase):
         RES.clear_all_results()
 
     def tearDown(self):
-        # shutil.rmtree(self._tmpdir)
-        RES.clear_all_results()
+        # RES.clear_all_results()
+        ...
 
     def set_up_scan(self):
         self._scan_n = (21, 3, 7)
@@ -81,21 +81,43 @@ class TestWorkflowResults(unittest.TestCase):
         TREE.nodes[2]._result_shape = self._result2_shape
 
     def generate_test_datasets(self):
-        _shape1 = (50, 50)
+        _shape1 = self._input_shape
         _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
                         axis_scales=[np.arange(_shape1[0]),
                                      _shape1[1] - np.arange(_shape1[1])])
-        _shape2 = (123, )
-        _res2 = Dataset(np.random.random(_shape2), axis_units=['m'],
-                        axis_labels=['dim1'],
-                        axis_scales=[12 + np.arange(_shape2[0])])
+        _shape2 = self._result2_shape
+        _res2 = Dataset(np.random.random(_shape2),
+                        axis_units=['m', 'Test', None],
+                        axis_labels=['dim1', '2nd dim', 'dim #3'],
+                        axis_scales=[12 + np.arange(_shape2[0]), None, None])
         _results = {1: _res1, 2: _res2}
         RES._WorkflowResults__composites[1] = (
             Dataset(np.zeros(self._scan_n + _shape1)))
         RES._WorkflowResults__composites[2] = (
             Dataset(np.zeros(self._scan_n + _shape2)))
         return _shape1, _shape2, _results
+
+    def generate_test_metadata(self):
+        _shape1 = self._input_shape
+        _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
+                        axis_labels=['dim1', 'dim 2'],
+                        axis_scales=[np.arange(_shape1[0]),
+                                     _shape1[1] - np.arange(_shape1[1])])
+        _shape2 = self._result2_shape
+        _res2 = Dataset(np.random.random(_shape2),
+                        axis_units=['m', 'Test', None],
+                        axis_labels=['dim1', '2nd dim', 'dim #3'],
+                        axis_scales=[12 + np.arange(_shape2[0]),
+                                     4 + np.arange(_shape2[1]),
+                                     np.arange(_shape2[2]) - 42])
+        _meta1 = {'axis_units': _res1.axis_units,
+                  'axis_labels': _res1.axis_labels,
+                  'axis_scales': _res1.axis_scales}
+        _meta2 = {'axis_units': _res2.axis_units,
+                  'axis_labels': _res2.axis_labels,
+                  'axis_scales': _res2.axis_scales}
+        return {1: _meta1, 2: _meta2}
 
     def test_init(self):
         ...
@@ -155,7 +177,6 @@ class TestWorkflowResults(unittest.TestCase):
         RES._WorkflowResults__composites[2] = (
             Dataset(np.zeros(self._scan_n + _shape2)))
         RES._WorkflowResults__update_composite_metadata(_results)
-
         RES.store_results(_index, _results)
         _scan_indices = SCAN.get_frame_position_in_scan(_index)
         self.assertTrue(
@@ -165,6 +186,28 @@ class TestWorkflowResults(unittest.TestCase):
             np.equal(_results[2],
                       RES._WorkflowResults__composites[2][_scan_indices]).all())
         self.assertTrue(RES._config['metadata_complete'])
+
+    def test_update_frame_metadata(self):
+        RES.update_shapes_from_scan()
+        _meta = self.generate_test_metadata()
+        RES.update_frame_metadata(_meta)
+        self.assertTrue(RES._config['metadata_complete'])
+        _dim_offset = SCAN.get_param_value('scan_dim')
+        for _node in _meta:
+            _res = RES.get_results(_node)
+            self.assertEqual(self._scan_label
+                             + tuple(_meta[_node]['axis_labels'].values()),
+                             tuple(_res.axis_labels.values()))
+            self.assertEqual(self._scan_unit
+                             + tuple(_meta[_node]['axis_units'].values()),
+                             tuple(_res.axis_units.values()))
+            for _dim, _scale in _res.axis_scales.items():
+                if _dim < SCAN.get_param_value('scan_dim'):
+                    _label, _unit, _range = RES.get_scan_data_for_dim(_dim)
+                    self.assertTrue(np.equal(_range, _scale).all())
+                else:
+                    _target = _meta[_node]['axis_scales'][_dim - _dim_offset]
+                    self.assertTrue(np.equal(_target, _scale).all())
 
     def test_get_scan_data_for_dim(self):
         _dim = 1

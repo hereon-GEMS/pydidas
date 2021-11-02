@@ -63,7 +63,7 @@ class DummyLoader(InputPlugin):
     def execute(self, index, **kwargs):
         _width = self.get_param_value('image_width')
         _height =self.get_param_value('image_height')
-        _data = np.random.random((_width, _height))
+        _data = np.random.random((_height, _width))
         _data[_data == 0] = 0.0001
         kwargs.update(dict(index=index))
         return Dataset(_data), kwargs

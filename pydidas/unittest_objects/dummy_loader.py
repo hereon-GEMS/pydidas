@@ -29,7 +29,8 @@ __all__ = ['DummyLoader']
 import numpy as np
 
 from pydidas.plugins import InputPlugin, INPUT_PLUGIN
-from pydidas.core import Parameter, ParameterCollection, get_generic_parameter
+from pydidas.core import (Parameter, ParameterCollection, Dataset,
+                          get_generic_parameter)
 
 
 class DummyLoader(InputPlugin):
@@ -63,8 +64,9 @@ class DummyLoader(InputPlugin):
         _width = self.get_param_value('image_width')
         _height =self.get_param_value('image_height')
         _data = np.random.random((_width, _height))
+        _data[_data == 0] = 0.0001
         kwargs.update(dict(index=index))
-        return _data, kwargs
+        return Dataset(_data), kwargs
 
     def calculate_result_shape(self):
         """

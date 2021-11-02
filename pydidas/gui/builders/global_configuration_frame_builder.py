@@ -57,26 +57,28 @@ def create_global_configuratation_frame_widgets_and_layout(frame):
 
     frame.create_label('section_multiprocessing',
                       'Multiprocessing settings', **_section_options)
-    frame.create_param_widget(frame.params.get_param('mp_n_workers'),
+    frame.create_param_widget(frame.get_param('mp_n_workers'),
                               **_options)
-    frame.create_param_widget(frame.params.get_param('shared_buffer_size'),
+    frame.create_param_widget(frame.get_param('shared_buffer_size'),
+                              **_options)
+    frame.create_param_widget(frame.get_param('shared_buffer_max_n'),
                               **_options)
     frame.create_spacer('spacer_1')
 
     frame.create_label('section_detector', 'Detector settings',
                       **_section_options)
-    frame.create_param_widget(frame.params.get_param('det_mask'),
+    frame.create_param_widget(frame.get_param('det_mask'),
                               **_twoline_options)
-    frame.create_param_widget(frame.params.get_param('det_mask_val'),
+    frame.create_param_widget(frame.get_param('det_mask_val'),
                               **_options)
     frame.create_spacer('spacer_2')
 
     frame.create_label('section_mosaic', 'Composite creator settings',
                       **_section_options)
-    frame.create_param_widget(frame.params.get_param('mosaic_border_width'),
+    frame.create_param_widget(frame.get_param('mosaic_border_width'),
                               **_options)
-    frame.create_param_widget(frame.params.get_param('mosaic_border_value'),
+    frame.create_param_widget(frame.get_param('mosaic_border_value'),
                               **_options)
-    frame.create_param_widget(frame.params.get_param('mosaic_max_size'),
+    frame.create_param_widget(frame.get_param('mosaic_max_size'),
                               **_options)
     frame.create_spacer('spacer_3')

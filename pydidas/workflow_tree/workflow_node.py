@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ['WorkflowNode']
 
 from copy import copy
+from numbers import Integral
 
 from .generic_node import GenericNode
 from ..plugins import BasePlugin
@@ -39,13 +40,38 @@ class WorkflowNode(GenericNode):
     kwargs_for_copy_creation = ['plugin', '_result_shape']
 
     def __init__(self, **kwargs):
-        self.plugin = None
+        kwargs = self.__preprocess_kwargs(**kwargs)
         super().__init__(**kwargs)
         self.__confirm_plugin_existance_and_type()
+        self.__process_node_id()
         self.plugin.node_id = self._node_id
         self.results = None
         self.result_kws = None
         self._result_shape = None
+
+    def __preprocess_kwargs(self, **kwargs):
+        """
+        Preprocess the keyword arguments and store and remove the node_id key
+        from them.
+
+        The node ID key must be set after the plugin has been stored to
+        force syncing of Plugin node ID and WorkflowNode node ID.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            The calling keyword arguments.
+
+        Returns
+        -------
+        kwargs : dict
+            The calling keyword arguments (minus the node_id key).
+        """
+        self.plugin = None
+        self.__tmp_node_id = kwargs.get('node_id', None)
+        if 'node_id' in kwargs:
+            del kwargs['node_id']
+        return kwargs
 
     def __confirm_plugin_existance_and_type(self):
         """
@@ -64,6 +90,49 @@ class WorkflowNode(GenericNode):
         if not isinstance(self.plugin, BasePlugin):
             raise TypeError('Plugin must be an instance of BasePlugin (or '
                             'subclass).')
+
+    def __process_node_id(self):
+        """
+        Process the node ID and set if for both the WorkflowNode and the
+        Plugin.
+        """
+        if self.__tmp_node_id is not None:
+            self.node_id = self.__tmp_node_id
+        del self.__tmp_node_id
+
+    @property
+    def node_id(self):
+        """
+        Get the node_id.
+
+        Returns
+        -------
+        node_id : Union[None, int]
+            The node_id.
+        """
+        return self._node_id
+
+    @node_id.setter
+    def node_id(self, new_id):
+        """
+        Set the node_id.
+
+        Parameters
+        ----------
+        new_id : Union[None, int]
+            The new node ID.
+
+        Raises
+        ------
+        TypeError
+            If the type of the new ID is not int or None.
+        """
+        if new_id is None or isinstance(new_id, Integral):
+            self._node_id = new_id
+            self.plugin.node_id = new_id
+            return
+        raise TypeError('The new node_id is not of a correct type and has not'
+                        ' been set.')
 
     def prepare_execution(self):
         """

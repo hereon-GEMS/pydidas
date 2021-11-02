@@ -39,6 +39,7 @@ from pydidas.gui.builders.global_configuration_frame_builder import (
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mp_n_workers'),
     get_generic_parameter('shared_buffer_size'),
+    get_generic_parameter('shared_buffer_max_n'),
     get_generic_parameter('det_mask'),
     get_generic_parameter('det_mask_val'),
     get_generic_parameter('mosaic_border_width'),

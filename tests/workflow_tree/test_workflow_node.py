@@ -51,6 +51,22 @@ class TestWorkflowNode(unittest.TestCase):
             _nodes.append(_tiernodes)
         return _nodes, _index
 
+    def test_node_id_property__get(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        self.assertIsNone(obj.node_id)
+
+    def test_node_id_property__get_int(self):
+        _id = 12
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=_id)
+        self.assertEqual(obj.node_id, _id)
+
+    def test_node_id_property__set_int(self):
+        _id = 12
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj.node_id = _id
+        self.assertEqual(obj._node_id, _id)
+        self.assertEqual(obj.plugin.node_id, _id)
+
     def test_result_shape__not_set(self):
         obj = WorkflowNode(plugin=DummyLoader())
         self.assertIsNone(obj.result_shape)

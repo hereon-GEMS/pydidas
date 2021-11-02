@@ -162,6 +162,10 @@ TOOLTIPS = {
                            ' data between the main App and multiprocessing '
                            'Processes. This buffer must be large enough to '
                            'store at least one instance of all result data.'),
+    'shared_buffer_max_n': ('The maximum number of datasets in the buffer. '
+                            'A dataset consists of all results for one frame. '
+                            'For performance reasons, the buffer should not '
+                            'be too large.'),
     'det_mask': 'The path to the detector mask file.',
     'det_mask_val': ('The value to be used for the pixels masked on the '
                      'detector. Note that this value will only be used '
@@ -222,5 +226,5 @@ TOOLTIPS = {
     'autosave_format': ('The file format(s) for the data to be saved after '
                         'the workflow has been excuted. All data will be saved'
                         ' in a single folder for each run with one file for '
-                        'each plugin.')
+                        'each plugin.'),
 }

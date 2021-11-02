@@ -66,7 +66,7 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
         dictionary.
     """
     _app_carryon = True
-    _app = app(app_params, slave_mode = True)
+    _app = app(app_params, slave_mode=True)
     _app._config = app_config
     _app.multiprocessing_pre_run()
     while True:
@@ -89,6 +89,6 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
                 _results = _app.multiprocessing_func(_arg)
-                output_queue.put([_arg, _results.copy()])
+                output_queue.put([_arg, _results])
         time.sleep(0.01)
     finished_queue.put(1)

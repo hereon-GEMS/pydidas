@@ -27,7 +27,7 @@ __status__ = "Development"
 __all__ = ['DummyProc']
 
 from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.core import ParameterCollection
+from pydidas.core import ParameterCollection, Dataset
 
 import numpy as np
 
@@ -47,7 +47,7 @@ class DummyProc(ProcPlugin):
     def execute(self, data, **kwargs):
         self._executed = True
         _offset = kwargs.get('offset', np.random.random())
-        _data = data + _offset
+        _data = Dataset(data + _offset)
         kwargs.update({f'offset_{self.node_id:02d}': _offset})
         return _data, kwargs
 

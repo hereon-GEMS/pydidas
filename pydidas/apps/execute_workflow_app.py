@@ -13,7 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the ExecuteWorkflowApp class which allows to run workflows."""
+"""
+Module with the ExecuteWorkflowApp class which allows to run WorkflowTrees
+for processing diffraction data.
+"""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -23,7 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExecuteWorkflowApp']
 
-import os
 import time
 import multiprocessing as mp
 
@@ -32,12 +34,8 @@ from PyQt5 import QtCore
 
 from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
-from pydidas.core import (ParameterCollection, Dataset,
-                          CompositeImage, get_generic_parameter, ScanSettings)
-from pydidas.constants import HDF5_EXTENSIONS
-from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file)
-from pydidas.image_io import read_image, rebin2d
-from pydidas.utils import copy_docstring
+from pydidas.core import (ParameterCollection,get_generic_parameter,
+                          ScanSettings, Dataset)
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 
@@ -52,6 +50,7 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('autosave_results'),
     get_generic_parameter('autosave_dir'),
     get_generic_parameter('autosave_format'),
+    get_generic_parameter('live_processing'),
     )
 
 
@@ -74,6 +73,18 @@ class ExecuteWorkflowApp(BaseApp):
 
     Parameters
     ----------
+    autosave_results : bool, optional
+        Use this flag to control whether result data should be automatically
+        saved to disk. The default is False.
+    autosave_dir : Union[pathlib.Path, str], optional
+        The directory for autosave_files. If autosave_results is True, the
+        directory must be set.
+    autosave_format : str
+        The formats for saving the results. This must be chosen from the list
+        of available formats.
+    live_processing : bool, optional
+        Flag to enable live processing. This will implement checks on file
+        existance before processing starts. The default is False.
     """
     default_params = DEFAULT_PARAMS
     mp_func_results = QtCore.pyqtSignal(object)
@@ -88,6 +99,8 @@ class ExecuteWorkflowApp(BaseApp):
         super().__init__(*args, **kwargs)
         self._config['result_shapes'] = {}
         self._config['shared_memory'] = {}
+        self._config['result_metadata'] = {}
+        self._config['result_metadata_set'] = False
         self._config['tree'] = None
         self._shared_arrays = {}
         self._index = None
@@ -116,7 +129,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         if not self.slave_mode:
             self._config['tree'] = TREE.get_copy()
-            self.__check_and_store_results_shapes()
+            self.__check_and_store_result_shapes()
             self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
@@ -126,8 +139,7 @@ class ExecuteWorkflowApp(BaseApp):
         if self.get_param_value('live_processing'):
             self.__store_file_target_size()
 
-
-    def __check_and_store_results_shapes(self):
+    def __check_and_store_result_shapes(self):
         """
         Run through the WorkflowTree to get the shapes of all results.
 
@@ -137,7 +149,7 @@ class ExecuteWorkflowApp(BaseApp):
             If the WorkflowTree has no nodes.
         """
         _shapes = self._config['tree'].get_all_result_shapes()
-        self._config['results_shapes'] = _shapes
+        self._config['result_shapes'] = _shapes
 
     def __get_and_store_tasks(self):
         """
@@ -159,10 +171,11 @@ class ExecuteWorkflowApp(BaseApp):
         AppConfigError
             If the buffer is too small to store a one dataset per MP worker.
         """
-        _buffer = self.get_global_q_setting_value('shared_buffer_size')
-        _n_worker = self.get_global_q_setting_value('mp_workers')
-        _req_points_per_dataset = np.sum(
-            [np.prod(s) for s in self._config['results_shapes'].items()])
+        _buffer = self.q_settings_get_global_value('shared_buffer_size', float)
+        _n_worker = self.q_settings_get_global_value('mp_n_workers', int)
+        _n_data = self.q_settings_get_global_value('shared_buffer_max_n', int)
+        _req_points_per_dataset = sum(
+            np.prod(s) for s in self._config['result_shapes'].values())
         _req_mem_per_dataset = 4 * _req_points_per_dataset / 2**20
         _n_dataset_in_buffer = int(np.floor(_buffer / _req_mem_per_dataset))
         if _n_dataset_in_buffer < _n_worker:
@@ -172,7 +185,8 @@ class ExecuteWorkflowApp(BaseApp):
                      f'MB and {_n_worker} workers have been defined. The '
                      f'minimum buffer size must be {_min_buffer:.2f} MB.')
             raise AppConfigError(_error)
-        self._config['buffer_n'] = _n_dataset_in_buffer
+        self._config['buffer_n'] = min(_n_dataset_in_buffer, _n_data,
+                                       self._config['mp_tasks'].size)
 
     def __initialize_shared_memory(self):
         """
@@ -182,15 +196,15 @@ class ExecuteWorkflowApp(BaseApp):
         _n = self._config['buffer_n']
         _share = self._config['shared_memory']
         _share['flag'] = mp.Array('I', _n, lock=mp.Lock())
-        for _key in self._config['results_shapes']:
-            _shape = (_n, ) + self._config['results_shapes'][_key]
-            _share[_key] = mp.Array('f', _shape, lock=mp.Lock())
+        for _key in self._config['result_shapes']:
+            _num = int(_n * np.prod(self._config['result_shapes'][_key]))
+            _share[_key] = mp.Array('f', _num, lock=mp.Lock())
 
     def __initialize_arrays_from_shared_memory(self):
         """
         Initialize the numpy arrays from the shared memory buffers.
         """
-        for _key, _shape in self._config['results_shapes']:
+        for _key, _shape in self._config['result_shapes'].items():
             _share = self._config['shared_memory'][_key]
             _arr_shape = (self._config['buffer_n'],) + _shape
             self._shared_arrays[_key] = np.frombuffer(
@@ -252,7 +266,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return True
 
-    def multiprocessing_func(self, *index):
+    def multiprocessing_func(self, index):
         """
         Perform key operation with parallel processing.
 
@@ -263,7 +277,29 @@ class ExecuteWorkflowApp(BaseApp):
         """
         self._config['tree'].execute_process(index)
         self.__write_results_to_shared_arrays()
-        return self._config['buffer_pos']
+        if self._config['result_metadata_set']:
+            return self._config['buffer_pos']
+        self.__store_result_metadata()
+        return (self._config['buffer_pos'], self._config['result_metadata'])
+
+    def __store_result_metadata(self):
+        """
+        Store the result metadata because it cannot be broadcast to the shared
+        array.
+        """
+        for _node_id in self._config['result_shapes']:
+            _res = self._config['tree'].nodes[_node_id].results
+            if isinstance(_res, Dataset):
+                self._config['result_metadata'][_node_id] = {
+                    'axis_labels': _res.axis_labels,
+                    'axis_scales': _res.axis_scales,
+                    'axis_units': _res.axis_units}
+            else:
+                self._config['result_metadata'][_node_id] = {
+                    'axis_labels': {i: None for i in range(_res.ndim)},
+                    'axis_scales': {i: None for i in range(_res.ndim)},
+                    'axis_units': {i: None for i in range(_res.ndim)}}
+        self._config['result_metadata_set'] = True
 
     def __write_results_to_shared_arrays(self):
         """
@@ -287,12 +323,14 @@ class ExecuteWorkflowApp(BaseApp):
 
     def multiprocessing_post_run(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Perform operations after running main parallel processing function.
+
+        The ExecutiveWorkflowApp will update the
         """
         pass
 
     @QtCore.pyqtSlot(int, object)
-    def multiprocessing_store_results(self, index, buffer_pos):
+    def multiprocessing_store_results(self, index, data):
         """
         Store the results of the multiprocessing operation.
 
@@ -300,16 +338,22 @@ class ExecuteWorkflowApp(BaseApp):
         ----------
         index : int
             The index in the composite image.
-        buffer_pos : int
-            The buffer position of the results.
+        result : Union[tuple, int]
+            The results from multiprocessing_func. This can be either a tuple
+            with (buffer_pos, metadata) or the integer buffer_pos.
         """
         if self.slave_mode:
             return
-        _results = {_key: None for _key in self._config['results_shapes']}
+        if isinstance(data, tuple):
+            RESULTS.update_frame_metadata(data[1])
+            buffer_pos = data[0]
+        else:
+            buffer_pos = data
+        _new_results = {_key: None for _key in self._config['result_shapes']}
         _flag_lock = self._config['shared_memory']['flag']
         _flag_lock.acquire()
-        for _key in _results:
-            _results[_key] = self._shared_arrays[_key][buffer_pos]
+        for _key in _new_results:
+            _new_results[_key] = self._shared_arrays[_key][buffer_pos]
         self._shared_arrays['flag'][buffer_pos] = 0
         _flag_lock.release()
-        RESULTS.store_results(index, _results)
+        RESULTS.store_results(index, _new_results)

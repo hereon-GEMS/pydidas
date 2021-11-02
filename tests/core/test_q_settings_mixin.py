@@ -85,11 +85,17 @@ class TestQSettingsMixin(unittest.TestCase):
         _newval = obj._qsettings_convert_value_type('param_str', _value)
         self.assertEqual(_value, _newval)
 
-    def test_q_settings_get_global_value(self):
+    def test_q_settings_get_global_value__plain(self):
         obj = PydidasQsettingsMixin()
         obj.params = self._params
         obj.get_param = obj.params.get
         _val = obj.q_settings_get_global_value('param_float')
+        self.assertEqual(_val, self._params.get_value('param_float'))
+
+    def test_q_settings_get_global_value__with_argtype(self):
+        obj = PydidasQsettingsMixin()
+        _val = obj.q_settings_get_global_value('param_float', float)
+        self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value('param_float'))
 
     def test_q_settings_pickle(self):

@@ -134,6 +134,8 @@ class _WorkflowResults(QtCore.QObject):
             The results for a single processing step.
         """
         for node_id, result in results.items():
+            if not isinstance(result, Dataset):
+                continue
             _dim_offset = self.__composites[node_id].ndim - result.ndim
             for _dim in range(result.ndim):
                 self.__composites[node_id].axis_labels[_dim + _dim_offset] = (
@@ -171,6 +173,9 @@ class _WorkflowResults(QtCore.QObject):
             The combined results of all frames for a specific node.
         """
         return self.__composites[node_id]
+
+    def update_frame_metadata(self, metadata):
+        ...
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

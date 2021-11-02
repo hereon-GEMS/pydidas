@@ -203,6 +203,8 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=TOOLTIPS['mp_n_workers']),
     Parameter('shared_buffer_size', float, 100, name='Shared buffer size',
               tooltip=TOOLTIPS['shared_buffer_size'], unit='MB'),
+    Parameter('shared_buffer_max_n', int, 20, name='Buffer dataframe limit',
+              tooltip=TOOLTIPS['shared_buffer_max_n'], unit=''),
     Parameter('det_mask', Path, Path(), name='Detector mask file',
               tooltip=TOOLTIPS['det_mask']),
     Parameter('det_mask_val', float, 0, name='Detector mask value',

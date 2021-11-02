@@ -145,7 +145,7 @@ class InputPlugin(BasePlugin):
         bool
             flag whether the file for the frame #<index> is ready for reading.
         """
-        _fname = self.get_filename(self._index)
+        _fname = self.get_filename(index)
         if os.path.exists(_fname):
             return self._config['file_size'] == os.stat(_fname).st_size
         return False

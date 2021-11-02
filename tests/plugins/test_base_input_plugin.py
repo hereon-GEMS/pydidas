@@ -79,7 +79,6 @@ class TestBaseInputPlugin(unittest.TestCase):
         _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = os.stat(self._fname).st_size
-        plugin._index = 1
         plugin.get_filename = lambda x: self._fname
         self.assertTrue(plugin.input_available(1))
 
@@ -87,7 +86,6 @@ class TestBaseInputPlugin(unittest.TestCase):
         _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = 37
-        plugin._index = 1
         plugin.get_filename = lambda x: self._fname
         self.assertFalse(plugin.input_available(1))
 
@@ -95,7 +93,6 @@ class TestBaseInputPlugin(unittest.TestCase):
         _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = 37
-        plugin._index = 1
         plugin.get_filename = lambda x: os.path.join(self._testpath,
                                                      'no_file.h5')
         self.assertFalse(plugin.input_available(1))

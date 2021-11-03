@@ -26,6 +26,7 @@ import os
 import unittest
 import tempfile
 import shutil
+import pickle
 from pathlib import Path
 
 import numpy as np
@@ -33,6 +34,8 @@ import h5py
 
 from pydidas._exceptions import AppConfigError
 from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.unittest_objects import get_random_string
+from pydidas.core import Parameter
 
 PLUGIN_COLLECTION = PluginCollection()
 
@@ -136,6 +139,17 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
             self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
             self.assertEqual(_data.metadata['frame'],
                              self.get_index_in_file(_index))
+
+    def test_pickle(self):
+        plugin = self.create_plugin_with_hdf5_filelist()
+        _new_params = {get_random_string(6): get_random_string(12)
+                       for i in range(7)}
+        for _key, _val in _new_params.items():
+            plugin.add_param(Parameter(_key, str, _val))
+        plugin2 = pickle.loads(pickle.dumps(plugin))
+        for _key in plugin.params:
+            self.assertEqual(plugin.get_param_value(_key),
+                             plugin2.get_param_value(_key))
 
 
 if __name__ == "__main__":

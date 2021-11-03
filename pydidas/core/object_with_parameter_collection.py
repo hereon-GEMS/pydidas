@@ -29,7 +29,7 @@ from numbers import Integral
 from PyQt5 import QtCore
 from numpy import mod
 
-from pydidas.core.parameter import Parameter
+from .parameter import Parameter
 from .parameter_collection import ParameterCollection
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the basic Plugin classes."""
+"""Module with the basic BasePlugin class."""
 
 __author__      = "Malte Storm"
 __copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -30,7 +30,6 @@ from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
 from pydidas.image_io import RoiManager, rebin2d
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
-
 
 ptype = {BASE_PLUGIN: 'Base plugin',
          INPUT_PLUGIN: 'Input plugin',
@@ -142,6 +141,7 @@ class BasePlugin(ObjectWithParameterCollection):
         self._legacy_image_ops_meta = {'num': 0, 'included': False}
         self._legacy_image_ops = []
         self._original_image_shape = None
+        self.node_id = None
 
     def __copy__(self):
         """
@@ -168,13 +168,36 @@ class BasePlugin(ObjectWithParameterCollection):
             A dictionary with Parameter refkeys and the associated values.
         """
         _state = self.__dict__.copy()
-        # _params = [p.export_refkey_and_value()
-        #            for p in self.params.values()]
         return _state
 
     def __setstate__(self, state):
+        """
+        Set the Plugin state after pickling.
+
+        Parameters
+        ----------
+        state : dict
+            A state dictionary for restoring the object.
+        """
         for key, val in state.items():
             setattr(self, key, val)
+
+    def __reduce__(self):
+        """
+        Redefine the __reduce__ method to allow picking of classes dynamically
+        loaded through the PluginCollection.
+
+        Returns
+        -------
+        plugin_getter : callable
+            The callable function to create a new instance.
+        tuple
+            The arguments for plugin_getter. This is only the class name.
+        dict
+            The state to set the state of the new object.
+        """
+        from .plugin_getter_func import plugin_getter
+        return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
     def execute(self, data, **kwargs):
         """

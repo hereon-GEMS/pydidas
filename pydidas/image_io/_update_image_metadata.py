@@ -26,9 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['update_image_metadata']
 
-from ..core.experimental_settings import ExperimentalSettings
-
-EXP_SETTINGS = ExperimentalSettings()
 
 def update_image_metadata(dataset, **kwargs):
     """
@@ -37,6 +34,9 @@ def update_image_metadata(dataset, **kwargs):
     Note: As arrays are mutable, there is no return value but the dataset
     is changed in place.
     """
+    from ..core.experimental_settings import ExperimentalSettings
+    EXP_SETTINGS = ExperimentalSettings()
+
     if 'axis_labels' in kwargs:
         dataset.axis_labels = kwargs['axis_labels']
     else:

@@ -167,7 +167,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             The plugin path as string
         """
         if plugin_path in self.__plugin_paths:
-            print('Warning. Storing same path again:', plugin_path)
+            print('Warning. Storing same path again: ', plugin_path)
             return
         if os.path.exists(plugin_path):
             self.__plugin_paths.append(plugin_path)
@@ -239,7 +239,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
-        if not issubclass(class_, BasePlugin) or class_.basic_plugin:
+        if not issubclass(class_, BasePlugin):
             return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)

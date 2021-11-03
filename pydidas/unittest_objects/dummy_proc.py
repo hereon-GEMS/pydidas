@@ -44,11 +44,30 @@ class DummyProc(ProcPlugin):
         self._preexecuted = False
         self._executed = False
 
+    def __reduce__(self):
+        """
+        Reduce the DummyLoader for Pickling.
+
+        Returns
+        -------
+        dummy_getter : callable
+            The callable function to create a new instance.
+        tuple
+            The arguments for plugin_getter. This is only the class name.
+        dict
+            The state to set the state of the new object.
+        """
+        from .dummy_getter_func import dummy_getter
+        return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
+
     def execute(self, data, **kwargs):
         self._executed = True
         _offset = kwargs.get('offset', np.random.random())
         _data = Dataset(data + _offset)
-        kwargs.update({f'offset_{self.node_id:02d}': _offset})
+        if self.node_id is not None:
+            kwargs.update({f'offset_{self.node_id:02d}': _offset})
+        else:
+            kwargs.update({f'offset_no_ID': _offset})
         return _data, kwargs
 
     def pre_execute(self):

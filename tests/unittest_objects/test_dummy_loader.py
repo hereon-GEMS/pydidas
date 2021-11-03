@@ -25,12 +25,11 @@ __status__ = "Development"
 import unittest
 import pickle
 
-import numpy as np
-
 from pydidas.core import Dataset
-from pydidas.unittest_objects.dummy_proc import DummyProc
+from pydidas.unittest_objects.dummy_loader import DummyLoader
 
-class TestDummyProc(unittest.TestCase):
+
+class TestDummyLoader(unittest.TestCase):
 
     def setUp(self):
         ...
@@ -39,29 +38,30 @@ class TestDummyProc(unittest.TestCase):
         ...
 
     def test_init(self):
-        plugin = DummyProc()
-        self.assertIsInstance(plugin, DummyProc)
+        plugin = DummyLoader()
+        self.assertIsInstance(plugin, DummyLoader)
         self.assertFalse(plugin._preexecuted)
-        self.assertFalse(plugin._executed)
 
     def test_pre_execute(self):
-        plugin = DummyProc()
+        plugin = DummyLoader()
         plugin.pre_execute()
         self.assertTrue(plugin._preexecuted)
 
     def test_execute(self):
-        _shape = (12, 12)
-        _offset = np.random.random()
-        plugin = DummyProc()
-        _data = np.random.random(_shape)
-        _newdata, _kws = plugin.execute(_data, offset=_offset)
+        _shape = (134, 54)
+        _index = 37
+        plugin = DummyLoader()
+        plugin.set_param_value('image_height', _shape[0])
+        plugin.set_param_value('image_width', _shape[1])
+        _newdata, _kws = plugin.execute(_index)
         self.assertIsInstance(_newdata, Dataset)
-        self.assertTrue(np.allclose(_data + _offset, _newdata))
+        self.assertEqual(_newdata.shape, _shape)
+        self.assertEqual(_kws['index'], _index)
 
     def test_pickle_unpickle(self):
-        plugin = DummyProc()
+        plugin = DummyLoader()
         new_plugin = pickle.loads(pickle.dumps(plugin))
-        self.assertIsInstance(new_plugin, DummyProc)
+        self.assertIsInstance(new_plugin, DummyLoader)
 
 
 if __name__ == '__main__':

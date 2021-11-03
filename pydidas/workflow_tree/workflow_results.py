@@ -29,9 +29,7 @@ __all__ = ['WorkflowResults']
 import numpy as np
 from PyQt5 import QtCore
 
-from ..core.singleton_factory import SingletonFactory
-from ..core.scan_settings import ScanSettings
-from ..core import Dataset
+from ..core import Dataset, SingletonFactory, ScanSettings
 from .workflow_tree import WorkflowTree
 
 SCAN = ScanSettings()

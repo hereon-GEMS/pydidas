@@ -27,6 +27,7 @@ import tempfile
 import shutil
 import h5py
 import os
+import pickle
 
 import numpy as np
 
@@ -38,6 +39,8 @@ from pydidas.constants import INPUT_PLUGIN
 from pydidas.core import (Parameter, get_generic_parameter,
                           ImageMetadataManager)
 from pydidas._exceptions import AppConfigError
+from pydidas.unittest_objects import get_random_string
+
 
 class TestBaseInputPlugin(unittest.TestCase):
 
@@ -154,6 +157,17 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.set_param_value('filename', self._fname)
         plugin.calculate_result_shape()
         self.assertEqual(self._datashape, plugin.result_shape)
+
+    def test_pickle(self):
+        plugin = InputPlugin()
+        _new_params = {get_random_string(6): get_random_string(12)
+                       for i in range(7)}
+        for _key, _val in _new_params.items():
+            plugin.add_param(Parameter(_key, str, _val))
+        plugin2 = pickle.loads(pickle.dumps(plugin))
+        for _key in plugin.params:
+            self.assertEqual(plugin.get_param_value(_key),
+                             plugin2.get_param_value(_key))
 
 
 if __name__ == "__main__":

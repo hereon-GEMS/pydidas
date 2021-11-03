@@ -36,7 +36,6 @@ from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin, ProcPlugin, OutputPlugin, BasePlugin
 from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
-
 from pydidas.plugins.plugin_collection import _PluginCollection
 
 

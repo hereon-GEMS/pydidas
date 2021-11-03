@@ -39,7 +39,6 @@ from pydidas.core import (ParameterCollection,get_generic_parameter,
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 
-
 TREE = WorkflowTree()
 
 SCAN = ScanSettings()

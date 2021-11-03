@@ -33,6 +33,7 @@ from .hdf5_key import Hdf5key
 from .parameter_collection import ParameterCollection
 from ..constants.generic_parameter_tooltips import TOOLTIPS
 
+
 GENERIC_PARAMS = ParameterCollection(
     ###################################
     ## Generic processing paramters

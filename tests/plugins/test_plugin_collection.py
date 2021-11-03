@@ -43,7 +43,8 @@ class TestPluginCollection(unittest.TestCase):
     def setUp(self):
         self._pluginpath = tempfile.mkdtemp()
         self._otherpaths = []
-        self._class_names = []
+        self._class_names = ['BasePlugin', 'InputPlugin', 'ProcPlugin',
+                             'OutputPlugin']
         self.n_per_type = 8
         self.n_plugin = 3 * self.n_per_type
         self._good_filenames = ['test.py', 'test_2.py', 'test3.py']
@@ -97,8 +98,9 @@ class TestPluginCollection(unittest.TestCase):
     def get_random_class_def(self, store_name=False):
         _plugin = random.choice(['InputPlugin', 'ProcPlugin', 'OutputPlugin'])
         _name = get_random_string(11)
-        _str = ('from pydidas.plugins import InputPlugin, ProcPlugin, '
-                f'OutputPlugin\n\nclass {_name.upper()}({_plugin}):'
+        _str = ('from pydidas.plugins import BasePlugin, InputPlugin, '
+                'ProcPlugin, OutputPlugin\n'
+                f'\nclass {_name.upper()}({_plugin}):'
                 '\n    basic_plugin = False'
                 f'\n    plugin_name = "{_name}"'
                 '\n\n    def __init__(self, **kwargs):'
@@ -362,14 +364,14 @@ class TestPluginCollection(unittest.TestCase):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         PC.clear_collection(True)
         PC._find_and_register_plugins_in_path(self._pluginpath)
-        self.assertEqual(len(PC.plugins), len(self._good_filenames))
+        self.assertEqual(len(PC.plugins), len(self._good_filenames) + 4)
 
     def test_find_and_register_plugins__single_path(self):
         _dirs, _mods = self.create_plugin_file_tree()
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         PC.clear_collection(True)
         PC.find_and_register_plugins(self._pluginpath)
-        self.assertEqual(len(_mods), len(PC.plugins))
+        self.assertEqual(len(_mods), len(PC.plugins) - 4)
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_find_and_register_plugins__multiple_paths(self):
@@ -380,7 +382,7 @@ class TestPluginCollection(unittest.TestCase):
         PC.clear_collection(True)
         PC.find_and_register_plugins(self._pluginpath, self._otherpaths[0])
         _newmods = _mods | _mods2
-        self.assertEqual(len(_newmods), len(PC.plugins))
+        self.assertEqual(len(_newmods), len(PC.plugins) - 4)
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_get_q_settings_plugin_path__no_path_set(self):

@@ -29,7 +29,7 @@ __all__ = ['Parameter']
 import numbers
 from pathlib import Path
 
-from pydidas.core.hdf5_key import Hdf5key
+from .hdf5_key import Hdf5key
 
 
 def _get_base_class(cls):

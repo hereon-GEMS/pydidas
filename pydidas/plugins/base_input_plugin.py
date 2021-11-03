@@ -27,7 +27,6 @@ import os
 
 from pydidas.core import get_generic_parameter, ImageMetadataManager
 from pydidas.constants import INPUT_PLUGIN
-from pydidas.image_io import RoiManager
 from pydidas._exceptions import AppConfigError
 from .base_plugin import BasePlugin
 

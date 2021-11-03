@@ -27,11 +27,11 @@ import itertools
 import time
 import os
 import sys
-import tempfile
 from os.path import join as osjoin
 from os.path import dirname, isfile
 
 from numpy import floor
+
 
 def flatten_list(nested_list):
     """
@@ -50,6 +50,7 @@ def flatten_list(nested_list):
         The flattened list.
     """
     return list(itertools.chain.from_iterable(nested_list))
+
 
 def update_separators(path):
     """

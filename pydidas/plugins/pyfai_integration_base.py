@@ -24,7 +24,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['pyFAIintegrationBase', 'pyFAI_UNITS']
+__all__ = ['pyFAIintegrationBase', 'pyFAI_UNITS', 'pyFAI_METHOD']
 
 import os
 import logging
@@ -54,9 +54,9 @@ pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
                'chi / rad': 'chi_rad'}
 
 pyFAI_METHOD = {'CSR': 'csr',
-                'CSR OpenCL': 'csr_ocl',
+                'CSR OpenCL': 'csr ocl',
                 'LUT': 'lut',
-                'LUT OpenCL': 'lut_ocl'}
+                'LUT OpenCL': 'lut ocl'}
 
 
 class pyFAIintegrationBase(ProcPlugin):

@@ -29,7 +29,7 @@ import os
 import shutil
 
 from pydidas.core.utilities import (
-    update_separators, get_pydidas_module_dir, get_time_string)
+    update_separators, get_pydidas_module_dir)
 
 
 class TestCoreUtilities(unittest.TestCase):
@@ -83,21 +83,6 @@ class TestCoreUtilities(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             get_pydidas_module_dir(_new)
 
-    def test_get_time_string__plain(self):
-        _s = get_time_string()
-        for index_dash in [4, 7]:
-            self.assertEqual(_s[index_dash], '/')
-        for index_colon in [13, 16]:
-            self.assertEqual(_s[index_colon], ':')
-        self.assertEqual(_s[19], '.')
-
-    def test_get_time_string__machine(self):
-        _s = get_time_string(humanReadable=False)
-        self.assertEqual(_s[8], '_')
-
-    def test_get_time_string__epoch(self):
-        _s = get_time_string(0, humanReadable=False)
-        self.assertEqual(_s[8], '_')
 
 if __name__ == "__main__":
     unittest.main()

@@ -26,7 +26,7 @@ __all__ = ['GetInfoWidget']
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-from ..core.utilities import get_time_string
+from ..utils import get_time_string
 from ..core import SingletonFactory
 
 

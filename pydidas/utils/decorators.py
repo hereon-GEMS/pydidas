@@ -42,6 +42,7 @@ def copy_docstring(origin):
     ValueError
         If the origin class does not have the method with the same name.
     """
+    # @functools.wraps
     def _docstring(dest, origin):
         if not isinstance(dest, type) and isinstance(origin, type):
             try:

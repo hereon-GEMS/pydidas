@@ -26,11 +26,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowResults']
 
+import os
+import re
+
 import numpy as np
 from PyQt5 import QtCore
 
 from ..core import Dataset, SingletonFactory, ScanSettings
 from .workflow_tree import WorkflowTree
+from .result_savers import WorkflowResultSaverMeta
+
+RESULT_SAVER = WorkflowResultSaverMeta
 
 SCAN = ScanSettings()
 
@@ -48,11 +54,12 @@ class _WorkflowResults(QtCore.QObject):
         super().__init__()
         self.__composites = {}
         self._config = {'shapes': None,
+                        'labels': {},
                         'metadata_complete': False}
 
-    def update_shapes_from_scan(self):
+    def update_shapes_from_scan_and_workflow(self):
         """
-        Update the shape of the results from the ScanSettings.
+        Update the shape of the results from the ScanSettings and WorkflowTree
         """
         self.clear_all_results()
         _dim = SCAN.get_param_value('scan_dim')
@@ -69,14 +76,14 @@ class _WorkflowResults(QtCore.QObject):
                 _dset.axis_scales[index] = _range
             self.__composites[_node_id] = _dset
             self._config['shapes'] = _shapes
+            self._config['labels'][_node_id] = (
+                TREE.nodes[_node_id].plugin.get_param_value('label'))
 
     def clear_all_results(self):
         """
         Clear all interally stored results and reset the instance attributes.
         """
-        self.__composites = {}
-        self._config = {'shapes': None,
-                        'metadata_complete': False}
+        self.__init__()
 
     @staticmethod
     def get_scan_data_for_dim(index):
@@ -178,6 +185,19 @@ class _WorkflowResults(QtCore.QObject):
         """
         return self._config['shapes']
 
+    @property
+    def labels(self):
+        """
+        Return the labels of the results in form of a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with entries of the form <node_id: label>
+        """
+        return self._config['labels']
+
+
     def get_results(self, node_id):
         """
         Get the combined results for the requested node_id.
@@ -193,6 +213,23 @@ class _WorkflowResults(QtCore.QObject):
             The combined results of all frames for a specific node.
         """
         return self.__composites[node_id]
+
+    def prepare_files_for_saving(self, save_dir, save_formats,
+                                 overwrite=False):
+
+        if (os.path.exists(save_dir) and len(os.listdir(save_dir)) > 0
+                and not overwrite):
+            raise FileExistsError(f'The specified directory "{save_dir}" '
+                                  'exists and is not empty. Please select'
+                                  ' a different directory.')
+        self._save_dir = save_dir
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        save_formats = [s.strip() for s in re.split('&|/', save_formats)]
+        RESULT_SAVER.set_active_savers(save_formats)
+        RESULT_SAVER.prepare_active_savers(self._save_dir, self.shapes,
+                                           self.labels)
+
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

@@ -188,7 +188,7 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertTrue(RES._config['metadata_complete'])
 
     def test_update_frame_metadata(self):
-        RES.update_shapes_from_scan()
+        RES.update_shapes_from_scan_and_workflow()
         _meta = self.generate_test_metadata()
         RES.update_frame_metadata(_meta)
         self.assertTrue(RES._config['metadata_complete'])
@@ -228,8 +228,8 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertIsNone(RES._config['shapes'])
         self.assertFalse(RES._config['metadata_complete'])
 
-    def test_update_shapes_from_scan(self):
-        RES.update_shapes_from_scan()
+    def test_update_shapes_from_scan_and_workflow(self):
+        RES.update_shapes_from_scan_and_workflow()
         self.assertEqual(RES.shapes[1], self._scan_n + self._input_shape)
         self.assertEqual(RES.shapes[2], self._scan_n + self._result2_shape)
         self.assertEqual(RES.get_results(1).shape, RES.shapes[1])

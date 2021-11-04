@@ -12,10 +12,9 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
-Script to reset all stored QSettings to default in case a setting breaks
-the GUI startup.
+Module with the WorkflowTreeExporterBase class which exporters should inherit
+from.
 """
 
 __author__      = "Malte Storm"
@@ -24,6 +23,32 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ['WorkflowResultSaverHdf5']
 
-from .constants.q_settings import QSETTINGS_GLOBAL_KEYS
+
+
+from .workflow_result_saver_base import WorkflowResultSaverBase
+
+
+class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
+    """
+    Base class for WorkflowTree exporters.
+    """
+    extensions = ['HDF5']
+    format_name = 'HDF5'
+
+    @classmethod
+    def export_to_file(cls, filename, tree, **kwargs):
+        """
+        Write the content to a file.
+
+        This method needs to be implemented by the concrete subclass.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the file to be written.
+        content : type
+            The content in any format.
+        """
+

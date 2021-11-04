@@ -36,7 +36,6 @@ from pydidas.apps.base_app import BaseApp
 from pydidas._exceptions import AppConfigError
 from pydidas.core import (ParameterCollection,get_generic_parameter,
                           ScanSettings, Dataset)
-from pydidas.utils import pydidas_logger
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 
@@ -53,7 +52,6 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('live_processing'),
     )
 
-logger = pydidas_logger()
 
 class ExecuteWorkflowApp(BaseApp):
     """
@@ -134,11 +132,15 @@ class ExecuteWorkflowApp(BaseApp):
             self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
-            RESULTS.update_shapes_from_scan()
+            RESULTS.update_shapes_from_scan_and_workflow()
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
         if self.get_param_value('live_processing'):
             self.__store_file_target_size()
+            if not self.slave_mode:
+                RESULTS.prepare_files_for_saving(
+                    self.get_param_value('autosave_dir'),
+                    self.get_param_value('autosave_format'))
 
     def __check_and_store_result_shapes(self):
         """
@@ -237,7 +239,6 @@ class ExecuteWorkflowApp(BaseApp):
         if 'mp_tasks' not in self._config.keys():
             raise KeyError('Key "mp_tasks" not found. Please execute'
                            'multiprocessing_pre_run() first.')
-        logger.debug('Getting tasks')
         return self._config['mp_tasks']
 
     def multiprocessing_pre_cycle(self, index):
@@ -277,7 +278,6 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        logger.debug(f'running processing for frame {index}')
         self._config['tree'].execute_process(index)
         self.__write_results_to_shared_arrays()
         if self._config['result_metadata_set']:
@@ -360,4 +360,3 @@ class ExecuteWorkflowApp(BaseApp):
         self._shared_arrays['flag'][buffer_pos] = 0
         _flag_lock.release()
         RESULTS.store_results(index, _new_results)
-        logger.debug(f'stored results for frame {index}')

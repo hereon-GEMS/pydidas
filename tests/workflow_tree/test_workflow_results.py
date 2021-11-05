@@ -203,23 +203,11 @@ class TestWorkflowResults(unittest.TestCase):
                              tuple(_res.axis_units.values()))
             for _dim, _scale in _res.axis_scales.items():
                 if _dim < SCAN.get_param_value('scan_dim'):
-                    _label, _unit, _range = RES.get_scan_data_for_dim(_dim)
+                    _range = SCAN.get_range_for_dim(_dim + 1)
                     self.assertTrue(np.equal(_range, _scale).all())
                 else:
                     _target = _meta[_node]['axis_scales'][_dim - _dim_offset]
                     self.assertTrue(np.equal(_target, _scale).all())
-
-    def test_get_scan_data_for_dim(self):
-        _dim = 1
-        _label, _unit, _range = RES.get_scan_data_for_dim(_dim)
-        self.assertEqual(_label, self._scan_label[_dim])
-        self.assertEqual(_unit, self._scan_unit[_dim])
-        _start = self._scan_offsets[_dim]
-        _delta = self._scan_delta[_dim]
-        _stop = _start + (self._scan_n[_dim] - 1) * _delta
-        _target_range = np.linspace(_start, _stop, num=self._scan_n[_dim],
-                              endpoint=True)
-        self.assertTrue(np.equal(_range, _target_range).all())
 
     def test_clear_all_results(self):
         RES._config['shapes'] = True

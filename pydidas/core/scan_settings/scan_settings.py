@@ -35,6 +35,7 @@ from ..singleton_factory import SingletonFactory
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('scan_dim'),
+    get_generic_parameter('scan_name'),
     get_generic_parameter('scan_dir_1'),
     get_generic_parameter('scan_dir_2'),
     get_generic_parameter('scan_dir_3'),
@@ -94,6 +95,55 @@ class _ScanSettings(ObjectWithParameterCollection):
             _indices[_dim] = frame // np.prod(_N[_dim + 1:])
             frame -= _indices[_dim] * np.prod(_N[_dim + 1:])
         return tuple(_indices)
+
+    def get_metadata_for_dim(self, index):
+        """
+        Get the label, unit and range of the specified scan dimension.
+
+        Note: The scan dimensions are 1 .. 4 and do not start with 0.
+
+        Parameters
+        ----------
+        index : Union[1, 2, 3, 4]
+            The index of the scan dimension.
+
+        Returns
+        -------
+        label : str
+            The label / motor name for this scan dimension.
+        unit : str
+            The unit for the range.
+        range : np.ndarray
+            The numerical positions of the scan.
+        """
+        _label = self.get_param_value(f'scan_dir_{index}')
+        _unit = self.get_param_value(f'unit_{index}')
+        _range = self.get_range_for_dim(index)
+        return _label, _unit, _range
+
+    def get_range_for_dim(self, index):
+        """
+        Get the Scan range for the specified dimension.
+
+        Note: The scan dimensions are 1 .. 4 and do not start with 0.
+
+        Parameters
+        ----------
+        index : Union[1, 2, 3, 4]
+            The scan dimension
+
+        Returns
+        -------
+        np.ndarray
+            The scan range as numpy array.
+        """
+        if index not in [1, 2, 3, 4]:
+            raise ValueError('Only the scan dimensions [1, 2, 3, 4] are '
+                             'supported.')
+        _f0 = self.get_param_value(f'offset_{index}')
+        _df = self.get_param_value(f'delta_{index}')
+        _n = self.get_param_value(f'n_points_{index}')
+        return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
     @staticmethod
     def import_from_file(filename):

@@ -37,6 +37,7 @@ class WorkflowResultSaverBase(GenericIoBase,
     """
     extensions = []
     format_name = 'unknown'
+    scan_title = ''
 
     @classmethod
     def prepare_files_and_directories(cls, save_dir, shapes, labels):
@@ -54,7 +55,6 @@ class WorkflowResultSaverBase(GenericIoBase,
             The labels of the results in form of a dictionary with nodeID
             keys and label values.
         """
-        pass
 
     @classmethod
     def get_directory_names_from_labels(cls, labels):
@@ -83,11 +83,22 @@ class WorkflowResultSaverBase(GenericIoBase,
                 for _key in [' ', '\n', '\t', '\r']:
                     _label = _label.replace(_key, '_')
                 _names[_node_id] = (f'node_{_node_id:02d}_{_label}_'
-                                    f'{cls.format_name}')
+                                    f'{cls.format_name}').replace('__', '_')
         return _names
 
     @classmethod
-    def export_to_file(cls, index,  frame_result_dict, **kwargs):
+    def export_full_data_to_file(cls, full_data):
+        """
+        Export the full dataset to disk,
+
+        Parameters
+        ----------
+        full_data : dict
+            The result dictionary with nodeID keys and result values.
+        """
+
+    @classmethod
+    def export_to_file(cls, index, frame_result_dict, **kwargs):
         """
         Export the results of one frame and store them on disk.
 

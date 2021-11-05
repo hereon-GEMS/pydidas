@@ -49,6 +49,10 @@ class ScanSettingsIoBase(GenericIoBase,
         Verify that the tmp_params dictionary holds all keys from the
         scanSettings.
         """
+        if 'scan_dim' not in cls.imported_params:
+            raise KeyError('The scan dimension key "scan_dim" is missing.')
+        if 'scan_name' not in cls.imported_params:
+            raise KeyError('The scan name key "scan_name" is missing.')
         n_dim = cls.imported_params.get('scan_dim')
         for _dim in range(1, n_dim + 1):
             for _key in ['scan_dir', 'n_points', 'delta', 'unit', 'offset']:

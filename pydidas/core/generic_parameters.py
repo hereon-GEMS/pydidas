@@ -143,6 +143,8 @@ GENERIC_PARAMS = ParameterCollection(
     ############################
     Parameter('scan_dim', int, 2, name='Scan dimension', choices=[1, 2, 3, 4],
               tooltip=TOOLTIPS['scan_dim']),
+    Parameter('scan_name', str, '', name='Scan name/title',
+              tooltip=TOOLTIPS['scan_name']),
     Parameter('scan_dir_1', str, '',
               name='Name of scan direction 1', tooltip=TOOLTIPS['scan_dir_1']),
     Parameter('n_points_1', int, 0, name='Number of scan points (dir. 1)',

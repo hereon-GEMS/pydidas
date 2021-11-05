@@ -51,7 +51,7 @@ class SingletonFactory:
         object
             The instance of the Singleton class.
         """
-        if not self.__instance:
+        if self.__instance is None:
             self.__instance = self.__class(**kwargs)
         return self.__instance
 

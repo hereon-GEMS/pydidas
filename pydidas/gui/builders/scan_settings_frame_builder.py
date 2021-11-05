@@ -57,11 +57,17 @@ def create_scan_settings_frame_widgets_and_layout(frame):
                        icon=frame.style().standardIcon(59))
     frame.create_label('scan_dim', '\nScan dimensionality:', fontsize=11,
                      bold=True, gridPos=(frame.next_row(), 0, 1, 1))
+    frame.create_label('scan_name', 'Scan name:', fontsize=11, bold=True,
+                     gridPos=(-1, 0, 1, 1))
 
     param = SCAN_SETTINGS.get_param('scan_dim')
     frame.create_param_widget(param, width_text = frame.TEXT_WIDTH,
-                             width_io=frame.PARAM_INPUT_WIDTH,
-                             width_total=_width_total, width_unit=0)
+                              width_io=frame.PARAM_INPUT_WIDTH,
+                              width_total=_width_total, width_unit=0)
+    frame.create_param_widget(SCAN_SETTINGS.get_param('scan_name'),
+                              width_text = frame.TEXT_WIDTH,
+                              width_io=_width_total - 20, linebreak=True,
+                              width_total=_width_total, width_unit=0)
     frame.param_widgets['scan_dim'].currentTextChanged.connect(
         frame.toggle_dims)
 

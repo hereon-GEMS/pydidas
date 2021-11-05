@@ -107,8 +107,10 @@ TOOLTIPS = {
     'detector_rot3': ('The detector rotation 3 (around the beam axis; '
                       'right-handed when looking downstream with the beam.)'
                       ', given in rad.'),
-    'scan_dim': ('The scan_dimensionality. This is relevant for mosaic '
-                 'and mesh images.'),
+    'scan_dim': ('The scan dimensionality. This defines the number of '
+                 'processed dimensions.'),
+    'scan_name': ('The scan name or title. This is used exclusively for '
+                  'reference in result exporters.'),
     'scan_dir_1': ('The axis name for scan direction 1. This information'
                    ' will only be used for labelling.'),
     'n_points_1': 'The number of scan points in scan direction 1.',

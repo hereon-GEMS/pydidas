@@ -58,6 +58,10 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         SAVER.export_to_file(0, {})
         # assert does not raise an Exception
 
+    def test_export_full_data_to_file(self):
+        SAVER.export_full_data_to_file({})
+        # assert does not raise an Exception
+
     def test_prepare_files_and_directories(self):
         SAVER.prepare_files_and_directories('Dir', {}, {})
         # assert does not raise an Exception

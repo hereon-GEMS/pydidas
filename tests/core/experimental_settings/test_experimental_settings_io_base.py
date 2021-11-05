@@ -35,13 +35,12 @@ from pyFAI.geometry import Geometry
 from pydidas.core.experimental_settings import ExperimentalSettings
 from pydidas.core.experimental_settings.experimental_settings_io_base import (
     ExperimentalSettingsIoBase)
-from pydidas.core.experimental_settings.experimental_settings import DEFAULTS
-from pydidas.core import ObjectWithParameterCollection
 
 EXP_SETTINGS = ExperimentalSettings()
 EXP_IO = ExperimentalSettingsIoBase
 
-class TestExperimentSettingsIoPoni(unittest.TestCase):
+
+class TestExperimentSettingsIoBase(unittest.TestCase):
 
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

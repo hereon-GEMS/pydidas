@@ -37,6 +37,7 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
     # WorkflowResultsSaverMeta
     registry = {}
     active_savers = []
+    scan_title = ''
 
     @classmethod
     def reset(cls):
@@ -47,7 +48,7 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         cls.active_savers = []
 
     @classmethod
-    def set_active_savers(cls, savers):
+    def set_active_savers_and_title(cls, savers, title='unknown'):
         """
         Set the active savers so they do not need to be specified individually
         later on.
@@ -56,8 +57,12 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         ----------
         savers : list
             A list of the names of the savers.
+        title : str, optional
+            The title of the scan. If not provided, the title will default to
+            "unknown".
         """
         cls.active_savers = []
+        cls.scan_title = title
         for _saver in savers:
             cls.verify_extension_is_registered(_saver)
             if _saver not in cls.active_savers:
@@ -82,6 +87,7 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
+            _saver.scan_title = cls.scan_title
             _saver.prepare_files_and_directories(save_dir, shapes, labels)
 
     @classmethod
@@ -126,6 +132,36 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
             _saver.export_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod
+    def export_full_data_to_active_savers(cls, data):
+        """
+        Export the full data to all active savers.
+
+        Parameters
+        ----------
+        data : dict
+            The result dictionary with nodeID keys and result values.
+        """
+        for _ext in cls.active_savers:
+            _saver = cls.registry[_ext]
+            _saver.export_full_data_to_file(data)
+
+    @classmethod
+    def export_full_data_to_file(cls, extension, data):
+        """
+        Export the full data to all active savers.
+
+        Parameters
+        ----------
+        extension : str
+            The file extension for the saver.
+        data : dict
+            The result dictionary with nodeID keys and result values.
+        """
+        cls.verify_extension_is_registered(extension)
+        _saver = cls.registry[extension]
+        _saver.export_full_data_to_file(data)
+
+    @classmethod
     def export_to_file(cls, index, extension, frame_result_dict, **kwargs):
         """
         Call the concrete export_to_file method in the subclass registered
@@ -145,5 +181,3 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
         _saver.export_to_file(index, frame_result_dict, **kwargs)
-
-

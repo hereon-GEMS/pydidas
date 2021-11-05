@@ -43,6 +43,9 @@ def export_to_file(saver, index, frame_result_dict, **kwargs):
                        'frame_results': frame_result_dict,
                        'kwargs': kwargs}
 
+def export_full_data_to_file(saver, full_data):
+    saver._exported = {'full_data': full_data}
+
 def prepare_files_and_directories(saver, save_dir, shapes, labels):
     saver._prepared = {'save_dir': save_dir,
                        'shapes': shapes,
@@ -54,7 +57,7 @@ class TestWorkflowResults(unittest.TestCase):
         META.reset()
 
     def tearDown(self):
-        ...
+        META.reset()
 
     def create_saver_class(self, title, ext):
         _cls = META(title.upper(), (WorkflowResultSaverBase, ),
@@ -109,17 +112,19 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertTrue(hasattr(META, 'registry'))
         self.assertTrue(hasattr(META, 'active_savers'))
 
-    def test_set_active_savers(self):
+    def test_set_active_savers_and_title(self):
+        _title = 'no title'
         self.create_saver_class('SAVER','Test')
         self.create_saver_class('SAVER2','Test2')
-        META.set_active_savers(['TEST', 'TEST2'])
+        META.set_active_savers_and_title(['TEST', 'TEST2'], _title)
         self.assertTrue('TEST' in META.active_savers)
         self.assertTrue('TEST2' in META.active_savers)
+        self.assertEqual(META.scan_title, _title)
 
-    def test_set_active_savers__not_registered(self):
+    def test_set_active_savers_and_title__not_registered(self):
         self.create_saver_class('SAVER','Test')
         with self.assertRaises(KeyError):
-            META.set_active_savers(['TEST', 'TEST2'])
+            META.set_active_savers_and_title(['TEST', 'TEST2'])
 
     def test_export_to_file(self):
         _index = 127
@@ -133,12 +138,35 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertTrue(np.equal(_Saver._exported['frame_results'][2],
                                  _frame_results[2]).all())
 
+    def test_export_full_data_to_active_savers(self):
+        _results = {1: np.random.random((10, 10, 10)),
+                          2: np.random.random((11, 27, 25))}
+        _Saver = self.create_saver_class('SAVER','Test')
+        _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
+        META.set_active_savers_and_title(['TEST'])
+        META.export_full_data_to_active_savers(_results)
+        self.assertTrue(np.equal(_Saver._exported['full_data'][1],
+                                 _results[1]).all())
+        self.assertTrue(np.equal(_Saver._exported['full_data'][2],
+                                 _results[2]).all())
+
+    def test_export_full_data_to_file(self):
+        _frame_results = {1: np.random.random((10, 10, 10)),
+                          2: np.random.random((11, 27, 25))}
+        _Saver = self.create_saver_class('SAVER','Test')
+        _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
+        META.export_full_data_to_file('TEST', _frame_results)
+        self.assertTrue(np.equal(_Saver._exported['full_data'][1],
+                                 _frame_results[1]).all())
+        self.assertTrue(np.equal(_Saver._exported['full_data'][2],
+                                 _frame_results[2]).all())
+
     def test_prepare_active_savers(self):
         _save_dir, _shapes, _labels = self.get_save_dir_label_and_shapes()
         _Saver = self.create_saver_class('SAVER','Test')
         _Saver.prepare_files_and_directories = classmethod(
             prepare_files_and_directories)
-        META.set_active_savers(['TEST'])
+        META.set_active_savers_and_title(['TEST'])
         META.prepare_active_savers(_save_dir, _shapes, _labels)
         self.assertEqual(_Saver._prepared['save_dir'], _save_dir)
         self.assertEqual(_Saver._prepared['shapes'], _shapes)
@@ -162,4 +190,3 @@ class TestWorkflowResults(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

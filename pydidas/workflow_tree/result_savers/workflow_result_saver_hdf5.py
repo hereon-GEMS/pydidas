@@ -197,6 +197,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             for _dim in range(data.ndim):
                 _group = _file['entry/data']
                 _axisgroup = _group.create_group(f'axis_{_dim + _ndim}')
-                _axisgroup.create_dataset('label', data=data.axis_labels[_dim])
-                _axisgroup.create_dataset('unit', data=data.axis_units[_dim])
-                _axisgroup.create_dataset('range', data=data.axis_ranges[_dim])
+                for _key in ['label', 'unit', 'range']:
+                    _dict = getattr(data, f'axis_{_key}s')
+                    _data = 'None' if _dict[_dim] is None else _dict[_dim]
+                    _axisgroup.create_dataset(_key, data=_data)

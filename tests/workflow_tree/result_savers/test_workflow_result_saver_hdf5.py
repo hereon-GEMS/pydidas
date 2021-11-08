@@ -73,6 +73,16 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
                                               self._labels)
 
+    def populate_metadata(self, dataset):
+        _labels = {_key: get_random_string(8) for _key in dataset.axis_labels}
+        _units = {_key: get_random_string(3) for _key in dataset.axis_units}
+        _ranges = {_key: random.random() * np.arange(_len) + random.random()
+                   for _key, _len in enumerate(dataset.shape)}
+        for _axis in _labels:
+            dataset.axis_labels[_axis] = _labels[_axis]
+            dataset.axis_units[_axis] = _units[_axis]
+            dataset.axis_ranges[_axis] = _ranges[_axis]
+        return dataset, _labels, _units, _ranges
 
     def test__class(self):
         self.assertEqual(H5SAVER.__class__, META)
@@ -97,57 +107,79 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             self.assertEqual(_data.shape, self._shapes[1])
             self.assertIsInstance(_data, h5py.Dataset)
 
-    # def test_update_node_metadata__with_None(self):
-    #     self.prepare_with_defaults()
-    #     _data = {_key: Dataset(np.random.random(_shape[3:]))
-    #              for _key, _shape in self._shapes.items()}
-    #     _data1 = _data[1]
-    #     H5SAVER.update_node_metadata(1, _data1)
+    def test_update_node_metadata__with_None(self):
+        self.prepare_with_defaults()
+        _data = {_key: Dataset(np.random.random(_shape[3:]))
+                  for _key, _shape in self._shapes.items()}
+        _data1 = _data[1]
+        H5SAVER.update_node_metadata(1, _data1)
 
-    # def test_update_node_metadata__with_entries(self):
-    #     self.prepare_with_defaults()
-    #     _data = {_key: Dataset(np.random.random(_shape[3:]))
-    #              for _key, _shape in self._shapes.items()}
-    #     _data1 = _data[1]
-    #     _labels = {3: get_random_string(8), 4: get_random_string(8)}
-    #     _units = {3: get_random_string(3), 4: get_random_string(3)}
-    #     _range = {3: np.arange(self._shapes[1][3]),
-    #               4: 3 - np.arange(self._shapes[1][4])}
-    #     for _axis in [3, 4]:
-    #         _data1.axis_labels[_axis] = _labels[_axis]
-    #         _data1.axis_units[_axis] = _units[_axis]
-    #         _data1.axis_range[_axis] = _range[_axis]
-    #     H5SAVER.update_node_metadata(1, _data1)
+    def test_update_node_metadata__with_entries(self):
+        self.prepare_with_defaults()
 
-    # def test_export_to_file(self):
-    #     self.prepare_with_defaults()
-    #     _data = {_key: Dataset(np.random.random(_shape[3:]))
-    #              for _key, _shape in self._shapes.items()}
-    #     _index = 23
-    #     _scanindex = SCAN.get_frame_position_in_scan(_index)
-    #     H5SAVER.export_to_file(_index, _data)
-    #     for _node_id in self._shapes:
-    #         _fname = os.path.join(self._resdir, self._filenames[_node_id])
-    #         with h5py.File(_fname, 'r') as _file:
-    #             _written_data = _file['entry/data/data'][_scanindex]
-    #         self.assertTrue(np.allclose(_written_data, _data[_node_id]))
+        _data = {_key: Dataset(np.random.random(_shape[3:]))
+                  for _key, _shape in self._shapes.items()}
+        _data[1], _labels, _units, _ranges = self.populate_metadata(_data[1])
+        H5SAVER.update_node_metadata(1, _data[1])
+        _fname = os.path.join(self._resdir, self._filenames[1])
+        with h5py.File(_fname, 'r') as _file:
+            for _ax in [3, 4]:
+                _axentry = _file[f'entry/data/axis_{_ax}']
+                self.assertEqual(_axentry['label'][()].decode('UTF-8'),
+                                 _labels[_ax - 3])
+                self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
+                                 _units[_ax - 3])
+                self.assertTrue(np.allclose(_axentry['range'][()],
+                                            _ranges[_ax - 3]))
 
-    # def test_export_full_data_to_file(self):
-    #     SAVER.export_full_data_to_file({})
-    #     # assert does not raise an Exception
+    def test_write_metadata_to_files(self):
+        self.prepare_with_defaults()
+        _data = {_key: Dataset(np.random.random(_shape[3:]))
+                  for _key, _shape in self._shapes.items()}
+        _metadata = {}
+        for _node_id in self._shapes:
+            _data[_node_id], _labels, _units, _ranges = (
+                self.populate_metadata(_data[_node_id]))
+            _metadata[_node_id] = dict(labels=_labels, units=_units,
+                                       ranges=_ranges)
+        H5SAVER.write_metadata_to_files(_data)
+        for _node_id in self._shapes:
+            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            with h5py.File(_fname, 'r') as _file:
+                for _ax in range(3, _data[_node_id].ndim):
+                    _axentry = _file[f'entry/data/axis_{_ax}']
+                    self.assertEqual(_axentry['label'][()].decode('UTF-8'),
+                                     _metadata[_node_id]['labels'][_ax - 3])
+                    self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
+                                      _metadata[_node_id]['units'][_ax - 3])
+                    self.assertTrue(np.allclose(
+                        _axentry['range'][()],
+                        _metadata[_node_id]['ranges'][_ax - 3]))
 
-    # def test_prepare_files_and_directories(self):
-    #     SAVER.prepare_files_and_directories('Dir', {}, {})
-    #     # assert does not raise an Exception
+    def test_export_full_data_to_file(self):
+        self.prepare_with_defaults()
+        _data = {_key: Dataset(np.random.random(_shape))
+                 for _key, _shape in self._shapes.items()}
+        H5SAVER.export_full_data_to_file(_data)
+        for _node_id in self._shapes:
+            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            with h5py.File(_fname, 'r') as _file:
+                _writtendata = _file['entry/data/data'][()]
+            self.assertTrue(np.allclose(_writtendata, _data[_node_id]))
 
-    # def test_get_directory_names_from_labels(self):
-    #     _labels = {0: None, 1: 'some thing', 2: '\nanother name', 3: 'label'}
-    #     _names = SAVER.get_directory_names_from_labels(_labels)
-    #     for _node_id, _name in _names.items():
-    #         self.assertTrue(_name.startswith(f'node_{_node_id:02d}_'))
-    #         self.assertTrue(_name.endswith('_Test'))
-    #         self.assertNotIn(' ', _name)
-    #         self.assertNotIn('\n', _name)
+    def test_export_to_file(self):
+        self.prepare_with_defaults()
+        _data = {_key: Dataset(np.random.random(_shape[3:]))
+                  for _key, _shape in self._shapes.items()}
+        _index = 23
+        _scanindex = SCAN.get_frame_position_in_scan(_index)
+        H5SAVER.export_to_file(_index, _data)
+        for _node_id in self._shapes:
+            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            with h5py.File(_fname, 'r') as _file:
+                _written_data = _file['entry/data/data'][_scanindex]
+            self.assertTrue(np.allclose(_written_data, _data[_node_id]))
+
 
 if __name__ == '__main__':
     unittest.main()

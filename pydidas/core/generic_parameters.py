@@ -276,7 +276,7 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('autosave_dir', Path, Path(), name='Autosave directory',
               tooltip=TOOLTIPS['autosave_dir']),
     Parameter('autosave_format', str, 'HDF5', name='Autosave formats',
-              choices=['HDF5', 'PNG', 'HDF5 & PNG'],
+              choices=['HDF5'],
               tooltip=TOOLTIPS['autosave_format']),
 )
 

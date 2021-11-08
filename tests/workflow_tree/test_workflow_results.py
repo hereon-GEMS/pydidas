@@ -84,13 +84,13 @@ class TestWorkflowResults(unittest.TestCase):
         _shape1 = self._input_shape
         _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
-                        axis_scales=[np.arange(_shape1[0]),
+                        axis_ranges=[np.arange(_shape1[0]),
                                      _shape1[1] - np.arange(_shape1[1])])
         _shape2 = self._result2_shape
         _res2 = Dataset(np.random.random(_shape2),
                         axis_units=['m', 'Test', None],
                         axis_labels=['dim1', '2nd dim', 'dim #3'],
-                        axis_scales=[12 + np.arange(_shape2[0]), None, None])
+                        axis_ranges=[12 + np.arange(_shape2[0]), None, None])
         _results = {1: _res1, 2: _res2}
         RES._WorkflowResults__composites[1] = (
             Dataset(np.zeros(self._scan_n + _shape1)))
@@ -102,21 +102,21 @@ class TestWorkflowResults(unittest.TestCase):
         _shape1 = self._input_shape
         _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
-                        axis_scales=[np.arange(_shape1[0]),
+                        axis_ranges=[np.arange(_shape1[0]),
                                      _shape1[1] - np.arange(_shape1[1])])
         _shape2 = self._result2_shape
         _res2 = Dataset(np.random.random(_shape2),
                         axis_units=['m', 'Test', None],
                         axis_labels=['dim1', '2nd dim', 'dim #3'],
-                        axis_scales=[12 + np.arange(_shape2[0]),
+                        axis_ranges=[12 + np.arange(_shape2[0]),
                                      4 + np.arange(_shape2[1]),
                                      np.arange(_shape2[2]) - 42])
         _meta1 = {'axis_units': _res1.axis_units,
                   'axis_labels': _res1.axis_labels,
-                  'axis_scales': _res1.axis_scales}
+                  'axis_ranges': _res1.axis_ranges}
         _meta2 = {'axis_units': _res2.axis_units,
                   'axis_labels': _res2.axis_labels,
-                  'axis_scales': _res2.axis_scales}
+                  'axis_ranges': _res2.axis_ranges}
         return {1: _meta1, 2: _meta2}
 
     def test_init(self):
@@ -146,8 +146,8 @@ class TestWorkflowResults(unittest.TestCase):
                                   _results[j].axis_labels[i])
                 self.assertEqual(RES.get_results(j).axis_units[i+3],
                                   _results[j].axis_units[i])
-                self.assertTrue(np.equal(RES.get_results(j).axis_scales[i+3],
-                                          _results[j].axis_scales[i]).all())
+                self.assertTrue(np.equal(RES.get_results(j).axis_ranges[i+3],
+                                          _results[j].axis_ranges[i]).all())
         self.assertTrue(RES._config['metadata_complete'])
 
     def test_store_results(self):
@@ -201,12 +201,12 @@ class TestWorkflowResults(unittest.TestCase):
             self.assertEqual(self._scan_unit
                              + tuple(_meta[_node]['axis_units'].values()),
                              tuple(_res.axis_units.values()))
-            for _dim, _scale in _res.axis_scales.items():
+            for _dim, _scale in _res.axis_ranges.items():
                 if _dim < SCAN.get_param_value('scan_dim'):
                     _range = SCAN.get_range_for_dim(_dim + 1)
                     self.assertTrue(np.equal(_range, _scale).all())
                 else:
-                    _target = _meta[_node]['axis_scales'][_dim - _dim_offset]
+                    _target = _meta[_node]['axis_ranges'][_dim - _dim_offset]
                     self.assertTrue(np.equal(_target, _scale).all())
 
     def test_clear_all_results(self):

@@ -51,11 +51,11 @@ class EmptyDataset(np.ndarray):
         __new__ method for creation of new numpy.ndarray object.
         """
         local_kws = kwargs.copy()
-        for item in ['axis_labels', 'axis_scales', 'axis_units', 'metadata']:
+        for item in ['axis_labels', 'axis_ranges', 'axis_units', 'metadata']:
             if item in kwargs:
                 del kwargs[item]
         obj = np.ndarray.__new__(cls, *args, **kwargs)
-        for key in ['axis_labels', 'axis_scales', 'axis_units']:
+        for key in ['axis_labels', 'axis_ranges', 'axis_units']:
             _data = local_kws.get(key, _default_vals(obj.ndim))
             _labels = obj.__get_dict(_data, '__new__')
             setattr(obj, key, _labels)
@@ -72,7 +72,7 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None:
             return
-        for key in ['axis_labels', 'axis_scales', 'axis_units']:
+        for key in ['axis_labels', 'axis_ranges', 'axis_units']:
             _item = getattr(obj, key, _default_vals(self.ndim))
             setattr(self, key,
                     {i: _item.get(i, None) for i in range(self.ndim)})
@@ -152,9 +152,9 @@ class EmptyDataset(np.ndarray):
         self.__axis_labels = self.__get_dict(labels, 'axis_labels')
 
     @property
-    def axis_scales(self):
+    def axis_ranges(self):
         """
-        Get the axis scales. These arrays for every dimension give the range
+        Get the axis ranges. These arrays for every dimension give the range
         of the data (in conjunction with the units).
 
         Returns
@@ -163,12 +163,12 @@ class EmptyDataset(np.ndarray):
             The axis scales: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
-        return self.__axis_scales
+        return self.__axis_ranges
 
-    @axis_scales.setter
-    def axis_scales(self, scales):
+    @axis_ranges.setter
+    def axis_ranges(self, scales):
         """
-        Set the axis_scales metadata.
+        Set the axis_ranges metadata.
 
         Parameters
         ----------
@@ -177,7 +177,7 @@ class EmptyDataset(np.ndarray):
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        self.__axis_scales = self.__get_dict(scales, 'axis_scales')
+        self.__axis_ranges = self.__get_dict(scales, 'axis_ranges')
 
     @property
     def axis_units(self):
@@ -259,7 +259,7 @@ class EmptyDataset(np.ndarray):
             The representation of the Dataset class.
         """
         _info = {'axis_labels': self.axis_labels,
-                 'axis_scales': self.axis_scales,
+                 'axis_ranges': self.axis_ranges,
                  'axis_units': self.axis_units,
                  'metadata': self.metadata,
                  'array': self.__array__()}
@@ -331,7 +331,7 @@ class Dataset(EmptyDataset):
     axis_labels : Union[dict, list, tuple], optional
         The labels for the axes. The length must correspond to the array
         dimensions. The default is None.
-    axis_scales : Union[dict, list, tuple], optional
+    axis_ranges : Union[dict, list, tuple], optional
         The scales for the axes. The length must correspond to the array
         dimensions. The default is None.
     axis_units : Union[dict, list, tuple], optional
@@ -349,7 +349,7 @@ class Dataset(EmptyDataset):
         array : np.ndarray
             The data array.
         **kwargs : type
-            Accepted keywords are axis_labels, axis_scales, axis_units,
+            Accepted keywords are axis_labels, axis_ranges, axis_units,
             metadata. For information on the keywords please refer to the
             class docstring.
 
@@ -361,8 +361,8 @@ class Dataset(EmptyDataset):
         obj = np.asarray(array).view(cls)
         if 'axis_labels' in kwargs:
             obj.axis_labels = kwargs.get('axis_labels')
-        if 'axis_scales' in kwargs:
-            obj.axis_scales = kwargs.get('axis_scales')
+        if 'axis_ranges' in kwargs:
+            obj.axis_ranges = kwargs.get('axis_ranges')
         if 'axis_units' in kwargs:
             obj.axis_units = kwargs.get('axis_units')
         if 'metadata' in kwargs:

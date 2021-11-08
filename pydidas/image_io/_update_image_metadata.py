@@ -42,9 +42,9 @@ def update_image_metadata(dataset, **kwargs):
     else:
         dataset.axis_labels = ('det_y', 'det_x')
     if EXP_SETTINGS.get_param_value('detector_sizey') > 0:
-        dataset.axis_scales[0] = EXP_SETTINGS.get_param_value('detector_sizey')
+        dataset.axis_ranges[0] = EXP_SETTINGS.get_param_value('detector_sizey')
         dataset.axis_units[0] = 'm'
     if EXP_SETTINGS.get_param_value('detector_sizex') > 0:
-        dataset.axis_scales[1] = EXP_SETTINGS.get_param_value('detector_sizex')
+        dataset.axis_ranges[1] = EXP_SETTINGS.get_param_value('detector_sizex')
         dataset.axis_units[1] = 'm'
     return dataset

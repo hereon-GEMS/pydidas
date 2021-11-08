@@ -33,7 +33,7 @@ class TestDataset(unittest.TestCase):
 
     def setUp(self):
         self._axis_labels = ['axis0', 'axis1']
-        self._axis_scales = [1, 10]
+        self._axis_ranges = [1, 10]
         self._axis_units = {0: 'm', 1: 'rad'}
 
     def tearDown(self):
@@ -42,7 +42,7 @@ class TestDataset(unittest.TestCase):
     def create_empty_dataset(self):
         obj = EmptyDataset((10, 10),
                            axis_labels=self._axis_labels,
-                           axis_scales=self._axis_scales,
+                           axis_ranges=self._axis_ranges,
                            axis_units=self._axis_units,
                            metadata={})
         return obj
@@ -55,7 +55,7 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset_new(self):
         obj = EmptyDataset((10, 10))
         self.assertIsInstance(obj, EmptyDataset)
-        for key in ('axis_labels', 'axis_scales', 'axis_units', 'metadata'):
+        for key in ('axis_labels', 'axis_ranges', 'axis_units', 'metadata'):
             self.assertTrue(hasattr(obj, key))
 
     def test__get_dict_w_dict_missing_key(self):
@@ -94,7 +94,7 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset_new_kwargs(self):
         obj = self.create_empty_dataset()
         self.assertIsInstance(obj.axis_labels, dict)
-        self.assertIsInstance(obj.axis_scales, dict)
+        self.assertIsInstance(obj.axis_ranges, dict)
         self.assertIsInstance(obj.axis_units, dict)
 
     def test_empty_dataset_axis_labels_property(self):
@@ -105,9 +105,9 @@ class TestDataset(unittest.TestCase):
         obj = self.create_empty_dataset()
         self.assertEqual(obj.axis_units, self.get_dict('_axis_units'))
 
-    def test_empty_dataset_axis_scales_property(self):
+    def test_empty_dataset_axis_ranges_property(self):
         obj = self.create_empty_dataset()
-        self.assertEqual(obj.axis_scales, self.get_dict('_axis_scales'))
+        self.assertEqual(obj.axis_ranges, self.get_dict('_axis_ranges'))
 
     def test_empty_dataset_set_axis_labels_property(self):
         obj = self.create_empty_dataset()
@@ -123,11 +123,11 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(obj.axis_units,
                          {i: o for i, o in enumerate(_newkeys)})
 
-    def test_empty_dataset_set_axis_scales_property(self):
+    def test_empty_dataset_set_axis_ranges_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
-        obj.axis_scales = _newkeys
-        self.assertEqual(obj.axis_scales,
+        obj.axis_ranges = _newkeys
+        self.assertEqual(obj.axis_ranges,
                          {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_metadata_property(self):
@@ -164,12 +164,12 @@ class TestDataset(unittest.TestCase):
         _array = np.random.random((10, 10))
         obj = Dataset(_array,
                       axis_labels=self._axis_labels,
-                      axis_scales=self._axis_scales,
+                      axis_ranges=self._axis_ranges,
                       axis_units=self._axis_units,
                       metadata={})
         self.assertIsInstance(obj, Dataset)
         self.assertIsInstance(obj.axis_labels, dict)
-        self.assertIsInstance(obj.axis_scales, dict)
+        self.assertIsInstance(obj.axis_ranges, dict)
         self.assertIsInstance(obj.axis_units, dict)
         self.assertIsInstance(obj.metadata, dict)
 

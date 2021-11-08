@@ -23,7 +23,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys',
-           'get_hdf5_metadata']
+           'get_hdf5_metadata', 'write_hdf5_dataset']
 
 import os
 import pathlib
@@ -248,3 +248,24 @@ def get_hdf5_metadata(fname, meta, dset=None):
     if len(_results) == 1:
         _results = tuple(_results.values())[0]
     return _results
+
+
+def write_hdf5_dataset(origin, group, dset_name, **dset_kws):
+    """
+    Create an hdf5 datase
+
+    Parameters
+    ----------
+    origin : Union[h5py.File, h5py.Group]
+        The original object where the data shall be appended.
+    group : str
+        The path to the group, relative to origin.
+    dset_name : str
+        The name of the dataset
+    **dset_kws : dict
+        Any creation keywords for the h5py.Dataset.
+    """
+    _group = origin.get(group)
+    if _group is None:
+        _group = origin.create_group(group)
+    _group.create_dataset(dset_name, **dset_kws)

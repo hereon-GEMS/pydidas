@@ -74,13 +74,13 @@ class TestWorkflowResults(unittest.TestCase):
         _shape1 = self._input_shape
         _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
-                        axis_scales=[np.arange(_shape1[0]),
+                        axis_ranges=[np.arange(_shape1[0]),
                                      _shape1[1] - np.arange(_shape1[1])])
         _shape2 = self._result2_shape
         _res2 = Dataset(np.random.random(_shape2),
                         axis_units=['m', 'Test', None],
                         axis_labels=['dim1', '2nd dim', 'dim #3'],
-                        axis_scales=[12 + np.arange(_shape2[0]), None, None])
+                        axis_ranges=[12 + np.arange(_shape2[0]), None, None])
         _results = {1: _res1, 2: _res2}
         return _results
 
@@ -88,21 +88,21 @@ class TestWorkflowResults(unittest.TestCase):
         _shape1 = self._input_shape
         _res1 = Dataset(np.random.random(_shape1), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
-                        axis_scales=[np.arange(_shape1[0]),
+                        axis_ranges=[np.arange(_shape1[0]),
                                      _shape1[1] - np.arange(_shape1[1])])
         _shape2 = self._result2_shape
         _res2 = Dataset(np.random.random(_shape2),
                         axis_units=['m', 'Test', None],
                         axis_labels=['dim1', '2nd dim', 'dim #3'],
-                        axis_scales=[12 + np.arange(_shape2[0]),
+                        axis_ranges=[12 + np.arange(_shape2[0]),
                                      4 + np.arange(_shape2[1]),
                                      np.arange(_shape2[2]) - 42])
         _meta1 = {'axis_units': _res1.axis_units,
                   'axis_labels': _res1.axis_labels,
-                  'axis_scales': _res1.axis_scales}
+                  'axis_ranges': _res1.axis_ranges}
         _meta2 = {'axis_units': _res2.axis_units,
                   'axis_labels': _res2.axis_labels,
-                  'axis_scales': _res2.axis_scales}
+                  'axis_ranges': _res2.axis_ranges}
         return {1: _meta1, 2: _meta2}
 
     def test__class_type(self):

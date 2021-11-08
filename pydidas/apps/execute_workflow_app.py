@@ -295,12 +295,12 @@ class ExecuteWorkflowApp(BaseApp):
             if isinstance(_res, Dataset):
                 self._config['result_metadata'][_node_id] = {
                     'axis_labels': _res.axis_labels,
-                    'axis_scales': _res.axis_scales,
+                    'axis_ranges': _res.axis_ranges,
                     'axis_units': _res.axis_units}
             else:
                 self._config['result_metadata'][_node_id] = {
                     'axis_labels': {i: None for i in range(_res.ndim)},
-                    'axis_scales': {i: None for i in range(_res.ndim)},
+                    'axis_ranges': {i: None for i in range(_res.ndim)},
                     'axis_units': {i: None for i in range(_res.ndim)}}
         self._config['result_metadata_set'] = True
 

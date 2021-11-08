@@ -510,7 +510,7 @@ class CompositeCreatorApp(BaseApp):
                                   ' for the mask!')
         return Dataset(np.where(self._det_mask,
                                 self._config['det_mask_val'], image),
-                       axis_scales=image.axis_scales,
+                       axis_ranges=image.axis_ranges,
                        axis_labels=image.axis_labels,
                        axis_units=image.axis_units,
                        metadata=image.metadata)

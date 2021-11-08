@@ -82,5 +82,5 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
         _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
-                           axis_units=[_unit], axis_scales=[_newdata[0]])
+                           axis_units=[_unit], axis_ranges=[_newdata[0]])
         return _dataset, kwargs

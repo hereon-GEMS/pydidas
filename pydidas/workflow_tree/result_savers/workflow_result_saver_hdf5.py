@@ -30,6 +30,7 @@ import os
 import h5py
 
 from pydidas.core import ExperimentalSettings, ScanSettings
+from pydidas.utils import write_hdf5_dataset
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
 EXP = ExperimentalSettings()
@@ -66,6 +67,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             keys and label values.
         """
         cls._save_dir = save_dir
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         cls._filenames = {_i: _s.removesuffix('_HDF5') + '.h5' for _i, _s in
                           cls.get_directory_names_from_labels(labels).items()}
         cls._shapes = shapes
@@ -75,51 +78,46 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             cls._create_file_and_populate_metadata(_index)
 
     @classmethod
-    def _create_file_and_populate_metadata(cls, index):
+    def _create_file_and_populate_metadata(cls, node_id):
         """
         Create a hdf5 file and populate it with the Scan metadata.
 
         Parameters
         ----------
-        index : int
+        node_id : int
             The nodeID.
         """
         _ndim = SCAN.get_param_value('scan_dim')
-        with h5py.File(os.path.join(cls._save_dir, cls._filenames[index]),
+        _dsets = [
+            ['entry', 'title', {'data': cls.scan_title}],
+            ['entry', 'label', {'data': cls._labels[node_id]}],
+            ['entry', 'definition', {'data': 'custom (NXxbase-aligned)'}],
+            ['entry/instrument/source', 'probe', {'data': 'x-ray'}],
+            ['entry/instrument/source', 'type', {'data': 'synchrotron'}],
+            ['entry/instrument/detector', 'frame_start_number', {'data': (0)}],
+            ['entry/instrument/detector', 'x_pixel_size',
+             {'data': EXP.get_param_value('detector_sizex')}],
+            ['entry/instrument/detector', 'y_pixel_size',
+             {'data': EXP.get_param_value('detector_sizey')}],
+            ['entry/instrument/detector', 'distance',
+             {'data': EXP.get_param_value('detector_dist')}],
+            ['entry/data', 'data', {'shape': cls._shapes[node_id]}],
+            ['entry/scan', 'scan_dimension', {'data': _ndim}]]
+        scanval = SCAN.get_param_value
+        for _dim in range(_ndim):
+            _dsets.append([f'entry/scan/dim_{_dim}', 'name',
+                           {'data': scanval(f'scan_dir_{_dim + 1}')}])
+            _dsets.append([f'entry/scan/dim_{_dim}', 'unit',
+                           {'data': scanval(f'unit_{_dim + 1}')}])
+            _dsets.append([f'entry/scan/dim_{_dim}', 'range',
+                           {'data': SCAN.get_range_for_dim(_dim + 1)}])
+
+        with h5py.File(os.path.join(cls._save_dir, cls._filenames[node_id]),
                        'w') as _file:
-            _nxbase = _file.create_group('entry')
-            _nxbase.create_dataset('title', data=cls.scan_title)
-            _nxbase.create_dataset('label', data=cls._labels[index])
-            _nxbase.create_dataset('definition',
-                                   data='custom (NXxbase-aligned)')
-            _nxbase.create_group('instrument')
-            _source = _nxbase['instrument'].create_group('source')
-            _source.create_dataset('probe', data='x-ray')
-            _source.create_dataset('name', data='PETRA III')
-            _source.create_dataset('type', data='synchrotron')
-            _det = _nxbase['instrument'].create_group('detector')
-            _det.create_dataset('frame_start_number', data=(0))
-            _det.create_dataset('x_pixel_size',
-                                data=EXP.get_param_value('detector_sizex'))
-            _det.create_dataset('y_pixel_size',
-                                data=EXP.get_param_value('detector_sizey'))
-            _det.create_dataset('distance',
-                                data=EXP.get_param_value('detector_dist'))
-            _nxbase.create_group('sample')
-            _data = _nxbase.create_group('data')
-            _data.create_dataset('data', shape=cls._shapes[index])
-            _scan =_nxbase.create_group('scan')
-            _scan.create_dataset('scan_dimension',
-                                 data=(_ndim))
+            for _group, _name, kws in _dsets:
+                write_hdf5_dataset(_file, _group, _name, **kws)
             for _dim in range(_ndim):
-                _scandim = _scan.create_group(f'dim_{_dim}')
-                _scandim.create_dataset(
-                    'name', data=SCAN.get_param_value(f'scan_dir_{_dim + 1}'))
-                _scandim.create_dataset(
-                    'unit', data=SCAN.get_param_value(f'unit_{_dim + 1}'))
-                _range = SCAN.get_range_for_dim(_dim + 1)
-                _scandim.create_dataset('range', data=_range)
-                _data[f'axis_{_dim}'] = h5py.SoftLink(
+                _file[f'entry/data/axis_{_dim}'] = h5py.SoftLink(
                     f'/entry/scan/dim_{_dim}')
 
     @classmethod
@@ -201,4 +199,4 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 _axisgroup = _group.create_group(f'axis_{_dim + _ndim}')
                 _axisgroup.create_dataset('label', data=data.axis_labels[_dim])
                 _axisgroup.create_dataset('unit', data=data.axis_units[_dim])
-                _axisgroup.create_dataset('range', data=data.axis_scales[_dim])
+                _axisgroup.create_dataset('range', data=data.axis_ranges[_dim])

@@ -73,7 +73,7 @@ class _WorkflowResults(QtCore.QObject):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index + 1)
                 _dset.axis_labels[index] = _label
                 _dset.axis_units[index] = _unit
-                _dset.axis_scales[index] = _range
+                _dset.axis_ranges[index] = _range
             self.__composites[_node_id] = _dset
             self._config['shapes'] = _shapes
             self._config['labels'][_node_id] = (
@@ -142,8 +142,8 @@ class _WorkflowResults(QtCore.QObject):
                     result.axis_labels[_dim])
                 self.__composites[node_id].axis_units[_dim + _dim_offset] = (
                     result.axis_units[_dim])
-                self.__composites[node_id].axis_scales[_dim + _dim_offset] = (
-                    result.axis_scales[_dim])
+                self.__composites[node_id].axis_ranges[_dim + _dim_offset] = (
+                    result.axis_ranges[_dim])
         self._config['metadata_complete'] = True
 
     @property

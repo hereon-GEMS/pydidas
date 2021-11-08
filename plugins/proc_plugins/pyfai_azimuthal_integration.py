@@ -70,5 +70,5 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         _label = _label.strip()
         _unit = _unit.strip()
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
-                           axis_units=[_unit], axis_scales=[_newdata[0]])
+                           axis_units=[_unit], axis_ranges=[_newdata[0]])
         return _dataset, kwargs

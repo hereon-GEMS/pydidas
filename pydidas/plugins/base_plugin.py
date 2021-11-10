@@ -196,7 +196,7 @@ class BasePlugin(ObjectWithParameterCollection):
         dict
             The state to set the state of the new object.
         """
-        from .plugin_getter_func import plugin_getter
+        from .plugin_getter_ import plugin_getter
         return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
     def execute(self, data, **kwargs):
@@ -398,5 +398,3 @@ class BasePlugin(ObjectWithParameterCollection):
                                  for _r in RoiManager(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
-
-

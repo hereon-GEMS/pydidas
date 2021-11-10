@@ -26,7 +26,9 @@ import unittest
 
 import numpy as np
 
-from pydidas.core.dataset import Dataset, EmptyDataset, DatasetConfigException
+from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals,
+                                  _insert_axis_key)
+from pydidas._exceptions import DatasetConfigException
 
 
 class TestDataset(unittest.TestCase):
@@ -47,10 +49,39 @@ class TestDataset(unittest.TestCase):
                            metadata={})
         return obj
 
+    def create_large_dataset(self):
+        self._dset = {'shape': (10, 12, 14, 16),
+                      'labels': ['a', 'b', 'c', 'd'],
+                      'ranges': [np.arange(10), np.arange(12),
+                                 np.arange(14), np.arange(16)],
+                      'units': ['ua', 'ub', 'uc', 'ud']}
+        obj = Dataset(np.random.random(self._dset['shape']),
+                      axis_labels=self._dset['labels'],
+                      axis_ranges=self._dset['ranges'],
+                      axis_units=self._dset['units'],
+                      metadata={})
+        return obj
+
     def get_dict(self, key):
         if isinstance(getattr(self, key), dict):
             return getattr(self, key)
         return {i: item for i, item in enumerate(getattr(self, key))}
+
+    def test_default_vals(self):
+        _ndim = 7
+        _vals = _default_vals(_ndim)
+        for _dim in range(_ndim):
+            self.assertTrue(_dim in _vals.keys())
+            self.assertIsNone(_vals[_dim])
+
+    def test_insert_axis_key(self):
+        _original = {0: 0, 1: 1, 2: 2, 3: 3}
+        _newdict = _insert_axis_key(_original, 2)
+        self.assertEqual(_newdict[0], 0)
+        self.assertEqual(_newdict[1], 1)
+        self.assertIsNone(_newdict[2])
+        self.assertEqual(_newdict[3], 2)
+        self.assertEqual(_newdict[4], 3)
 
     def test_empty_dataset_new(self):
         obj = EmptyDataset((10, 10))
@@ -58,40 +89,155 @@ class TestDataset(unittest.TestCase):
         for key in ('axis_labels', 'axis_ranges', 'axis_units', 'metadata'):
             self.assertTrue(hasattr(obj, key))
 
-    def test__get_dict_w_dict_missing_key(self):
+    def test_empty_dataset_array_finalize__simple_indexing(self):
+        obj = self.create_large_dataset()
+        _new = obj[0]
+        self.assertEqual(list(_new.axis_labels.values()),
+                          self._dset['labels'][1:])
+        for _new_range, _original_range in zip(list(_new.axis_ranges.values()),
+                                                self._dset['ranges'][1:]):
+            self.assertTrue(np.allclose(_new_range, _original_range))
+        self.assertEqual(list(_new.axis_units.values()),
+                          self._dset['units'][1:])
+
+    def test_empty_dataset_array_finalize__simple_indexing_in_middle(self):
+        obj = self.create_large_dataset()
+        _new = obj[:, 0]
+        self.assertEqual(list(_new.axis_labels.values()),
+                          [self._dset['labels'][0]] + self._dset['labels'][2:])
+        for _new_range, _original_range in zip(
+                list(_new.axis_ranges.values()),
+                [self._dset['ranges'][0]] + self._dset['ranges'][2:]):
+            self.assertTrue(np.allclose(_new_range, _original_range))
+        self.assertEqual(list(_new.axis_units.values()),
+                          [self._dset['units'][0]] + self._dset['units'][2:])
+
+
+    def test_empty_dataset_array_finalize__simple_multi_indexing(self):
+        obj = self.create_large_dataset()
+        _new = obj[:, 7, 6]
+        self.assertEqual(tuple(_new.axis_labels.values()),
+                          (self._dset['labels'][0], self._dset['labels'][3]))
+        for _new_range, _original_range in zip(
+                _new.axis_ranges.values(),
+                (self._dset['ranges'][0], self._dset['ranges'][3])):
+            self.assertTrue(np.allclose(_new_range, _original_range))
+        self.assertEqual(tuple(_new.axis_units.values()),
+                          (self._dset['units'][0], self._dset['units'][3]))
+
+    def test_empty_dataset_array_finalize__single_slicing(self):
+        obj = self.create_large_dataset()
+        _new = obj[1:4]
+        self.assertEqual(list(_new.axis_labels.values()), self._dset['labels'])
+        self.assertEqual(list(_new.axis_units.values()), self._dset['units'])
+        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+            if _dim == 0:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][0][1:4]))
+            else:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][_dim]))
+
+    def test_empty_dataset_array_finalize__empty_shape(self):
+        obj = self.create_large_dataset()
+        self.assertTrue((obj == obj).all())
+
+    def test_empty_dataset_array_finalize__with_array_mask(self):
+        obj = self.create_large_dataset()
+        _mask = np.zeros(obj.shape)
+        obj[_mask == 0] = 1
+        self.assertTrue((obj == obj).all())
+
+    def test_empty_dataset_array_finalize__get_masked(self):
+        obj = self.create_large_dataset()
+        _mask = np.zeros(obj.shape)
+        _new = obj[_mask == 0]
+        self.assertTrue(np.allclose(obj.flatten(), _new))
+
+    def test_empty_dataset_flatten(self):
+        obj = self.create_large_dataset()
+        _new = obj.flatten()
+        self.assertEqual(_new.size, obj.size)
+        self.assertIsNone(_new.axis_labels[0])
+        self.assertIsNone(_new.axis_units[0])
+        self.assertIsNone(_new.axis_ranges[0])
+
+    def test_empty_dataset__comparison_with_allclose(self):
+        obj = self.create_large_dataset()
+        _new = np.zeros((obj.shape))
+        self.assertFalse(np.allclose(obj, _new))
+
+    def test_empty_dataset_array_finalize__multiple_ops(self):
+        obj = self.create_large_dataset()
+        _new = obj[0, 0]
+        _new2 = obj[0]
+        self.assertIsNone(obj._getitem_key)
+
+    def test_empty_dataset_array_finalize__multiple_slicing(self):
+        obj = self.create_large_dataset()
+        _new = obj[:, 3:7, 5:10]
+        self.assertEqual(list(_new.axis_labels.values()), self._dset['labels'])
+        self.assertEqual(list(_new.axis_units.values()), self._dset['units'])
+        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+            if _dim == 1:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][1][3:7]))
+            elif _dim == 2:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][2][5:10]))
+            else:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][_dim]))
+
+    def test_empty_dataset_array_finalize__insert_data_simple(self):
+        obj = self.create_large_dataset()
+        _new = np.random.random((12,14,16))
+        obj[2] = _new
+
+    def test_empty_dataset_array_finalize__insert_data(self):
+        obj = self.create_large_dataset()
+        _new = np.random.random((14,16))
+        obj[2, 3] = _new
+
+    def test_empty_dataset_getitem__simple(self):
+        obj = self.create_large_dataset()
+        _new = obj.__getitem__((0,0))
+        self.assertIsInstance(_new, Dataset)
+
+    def test_empty_dataset_get_dict__w_dict_missing_key(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
             obj._EmptyDataset__get_dict({1: 0}, 'test')
 
-    def test__get_dict_w_dict_too_many_keys(self):
+    def test_empty_dataset_get_dict__w_dict_too_many_keys(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
             obj._EmptyDataset__get_dict({0: 1, 1: 2, 2: 3}, 'test')
 
-    def test__get_dict_w_dict(self):
+    def test_empty_dataset_get_dict__w_dict(self):
         obj = EmptyDataset((10, 10))
         obj._EmptyDataset__get_dict({0: 0, 1: 1}, 'test')
 
-    def test__get_dict_w_list_missing_entry(self):
+    def test_empty_dataset_get_dict__w_list_missing_entry(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
             obj._EmptyDataset__get_dict([0], 'test')
 
-    def test__get_dict_w_list_too_many_entries(self):
+    def test_empty_dataset_get_dict__w_list_too_many_entries(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
             obj._EmptyDataset__get_dict([1, 2, 3], 'test')
 
-    def test__get_dict_w_list(self):
+    def test_empty_dataset_get_dict__w_list(self):
         obj = EmptyDataset((10, 10))
         obj._EmptyDataset__get_dict([0, 1], 'test')
 
-    def test__get_dict_w_value(self):
+    def test_empty_dataset_get_dict__w_value(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
             obj._EmptyDataset__get_dict(0, 'test')
 
-    def test_empty_dataset_new_kwargs(self):
+    def test_empty_dataset__new__kwargs(self):
         obj = self.create_empty_dataset()
         self.assertIsInstance(obj.axis_labels, dict)
         self.assertIsInstance(obj.axis_ranges, dict)
@@ -114,21 +260,21 @@ class TestDataset(unittest.TestCase):
         _newkeys = [123, 456]
         obj.axis_labels = _newkeys
         self.assertEqual(obj.axis_labels,
-                         {i: o for i, o in enumerate(_newkeys)})
+                          {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_set_axis_units_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_units = _newkeys
         self.assertEqual(obj.axis_units,
-                         {i: o for i, o in enumerate(_newkeys)})
+                          {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_set_axis_ranges_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_ranges = _newkeys
         self.assertEqual(obj.axis_ranges,
-                         {i: o for i, o in enumerate(_newkeys)})
+                          {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_metadata_property(self):
         obj = self.create_empty_dataset()
@@ -182,7 +328,7 @@ class TestDataset(unittest.TestCase):
         obj = EmptyDataset((10, 10, 10))
         self.assertIsInstance(obj.__repr__(), str)
 
-    def test__str__(self):
+    def test_str__(self):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array)
         self.assertIsInstance(str(obj), str)

@@ -23,9 +23,9 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['FrameConfigError', 'WidgetLayoutError', 'AppConfigError']
+__all__ = ['FrameConfigError', 'WidgetLayoutError', 'AppConfigError',
+           'DatasetConfigException']
 
-import numpy as np
 
 class FrameConfigError(Exception):
     """
@@ -34,14 +34,22 @@ class FrameConfigError(Exception):
     """
     ...
 
+
 class WidgetLayoutError(Exception):
     """
     WidgetLayoutError is used if a widget attempts to add items to a layout
     without having a layout.
     """
 
+
 class AppConfigError(Exception):
     """
     AppConfigError is used when app Parameters are not consistent and cannot
     be processed.
+    """
+
+
+class DatasetConfigException(Exception):
+    """
+    Exception class for Dataset class configuration of metadata.
     """

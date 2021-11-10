@@ -196,11 +196,11 @@ class TestWorkflowResults(unittest.TestCase):
         for _node in _meta:
             _res = RES.get_results(_node)
             self.assertEqual(self._scan_label
-                             + tuple(_meta[_node]['axis_labels'].values()),
-                             tuple(_res.axis_labels.values()))
+                              + tuple(_meta[_node]['axis_labels'].values()),
+                              tuple(_res.axis_labels.values()))
             self.assertEqual(self._scan_unit
-                             + tuple(_meta[_node]['axis_units'].values()),
-                             tuple(_res.axis_units.values()))
+                              + tuple(_meta[_node]['axis_units'].values()),
+                              tuple(_res.axis_units.values()))
             for _dim, _scale in _res.axis_ranges.items():
                 if _dim < SCAN.get_param_value('scan_dim'):
                     _range = SCAN.get_range_for_dim(_dim + 1)

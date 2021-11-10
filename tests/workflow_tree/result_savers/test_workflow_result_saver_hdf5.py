@@ -49,7 +49,6 @@ for d in range(1, 4):
     SCAN.set_param_value(f'delta_{d}', random.choice([0.1, 0.5, 1, 1.5]))
     SCAN.set_param_value(f'offset_{d}', random.choice([-0.1, 0.5, 1]))
     SCAN.set_param_value(f'scan_dir_{d}', get_random_string(12))
-_scan_shape = tuple(SCAN.get_param_value(f'n_points_{i}') for i in [1, 2, 3])
 
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
@@ -64,6 +63,8 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         shutil.rmtree(self._dir)
 
     def prepare_with_defaults(self):
+        _scan_shape = tuple(SCAN.get_param_value(f'n_points_{i}')
+                            for i in [1, 2, 3])
         self._shapes = {1: _scan_shape + (12, 7), 2: _scan_shape + (23,),
                    3: _scan_shape + (1, 3, 7)}
         self._labels = {1: 'Test', 2: 'not again', 3: 'another'}
@@ -126,9 +127,9 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             for _ax in [3, 4]:
                 _axentry = _file[f'entry/data/axis_{_ax}']
                 self.assertEqual(_axentry['label'][()].decode('UTF-8'),
-                                 _labels[_ax - 3])
+                                  _labels[_ax - 3])
                 self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
-                                 _units[_ax - 3])
+                                  _units[_ax - 3])
                 self.assertTrue(np.allclose(_axentry['range'][()],
                                             _ranges[_ax - 3]))
 
@@ -141,7 +142,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             _data[_node_id], _labels, _units, _ranges = (
                 self.populate_metadata(_data[_node_id]))
             _metadata[_node_id] = dict(labels=_labels, units=_units,
-                                       ranges=_ranges)
+                                        ranges=_ranges)
         H5SAVER.write_metadata_to_files(_data)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
@@ -149,7 +150,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                 for _ax in range(3, _data[_node_id].ndim):
                     _axentry = _file[f'entry/data/axis_{_ax}']
                     self.assertEqual(_axentry['label'][()].decode('UTF-8'),
-                                     _metadata[_node_id]['labels'][_ax - 3])
+                                      _metadata[_node_id]['labels'][_ax - 3])
                     self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
                                       _metadata[_node_id]['units'][_ax - 3])
                     self.assertTrue(np.allclose(
@@ -165,7 +166,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, 'r') as _file:
                 _writtendata = _file['entry/data/data'][()]
-            self.assertTrue(np.allclose(_writtendata, _data[_node_id]))
+            self.assertTrue(np.allclose(_data[_node_id], _writtendata))
 
     def test_export_to_file(self):
         self.prepare_with_defaults()

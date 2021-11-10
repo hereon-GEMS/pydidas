@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The dummy_getter_func module includes the dummy_getter function which is needed
+The dummy_getter_ module includes the dummy_getter function which is needed
 by the __reduce__ methods of the DummyPlugins to allow pickling.
 """
 

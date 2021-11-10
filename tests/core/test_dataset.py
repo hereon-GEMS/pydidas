@@ -22,12 +22,14 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+import warnings
 import unittest
 
 import numpy as np
 
 from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals,
                                   _insert_axis_key)
+from pydidas.image_io import rebin2d, rebin
 from pydidas._exceptions import DatasetConfigException
 
 
@@ -154,6 +156,14 @@ class TestDataset(unittest.TestCase):
         _new = obj[_mask == 0]
         self.assertTrue(np.allclose(obj.flatten(), _new))
 
+    def test_get_rebinned_copy__bin2(self):
+        obj = self.create_large_dataset()
+        _new = obj.get_rebinned_copy(2)
+        self.assertIsInstance(_new, Dataset)
+        self.assertNotEqual(id(obj), id(_new))
+        self.assertEqual(tuple(_s // 2 for _s in self._dset['shape']),
+                         _new.shape)
+
     def test_empty_dataset_flatten(self):
         obj = self.create_large_dataset()
         _new = obj.flatten()
@@ -199,6 +209,11 @@ class TestDataset(unittest.TestCase):
         _new = np.random.random((14,16))
         obj[2, 3] = _new
 
+    def test_empty_dataset__with_rebin2d(self):
+        obj = Dataset(np.random.random((11, 11)), axis_labels=[0, 1])
+        _new = rebin2d(obj, 2)
+
+
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
         _new = obj.__getitem__((0,0))
@@ -206,13 +221,15 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_get_dict__w_dict_missing_key(self):
         obj = EmptyDataset((10, 10))
-        with self.assertRaises(DatasetConfigException):
+        with warnings.catch_warnings(record=True) as w:
             obj._EmptyDataset__get_dict({1: 0}, 'test')
+            self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_dict_too_many_keys(self):
         obj = EmptyDataset((10, 10))
-        with self.assertRaises(DatasetConfigException):
+        with warnings.catch_warnings(record=True) as w:
             obj._EmptyDataset__get_dict({0: 1, 1: 2, 2: 3}, 'test')
+            self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_dict(self):
         obj = EmptyDataset((10, 10))
@@ -220,13 +237,15 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_get_dict__w_list_missing_entry(self):
         obj = EmptyDataset((10, 10))
-        with self.assertRaises(DatasetConfigException):
+        with warnings.catch_warnings(record=True) as w:
             obj._EmptyDataset__get_dict([0], 'test')
+            self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_list_too_many_entries(self):
         obj = EmptyDataset((10, 10))
-        with self.assertRaises(DatasetConfigException):
+        with warnings.catch_warnings(record=True) as w:
             obj._EmptyDataset__get_dict([1, 2, 3], 'test')
+            self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_list(self):
         obj = EmptyDataset((10, 10))

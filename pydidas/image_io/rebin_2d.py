@@ -26,6 +26,8 @@ __all__ = ['rebin2d', 'rebin']
 
 import numpy as np
 
+from pydidas.core import Dataset
+
 
 def rebin2d(image, binning):
     """
@@ -48,6 +50,8 @@ def rebin2d(image, binning):
     """
     if binning == 1:
         return image
+    if isinstance(image, Dataset):
+        return image.get_rebinned_copy(binning)
     _shape = image.shape
     if _shape[0] % binning != 0:
         _r0 = _shape[0] % binning
@@ -59,7 +63,6 @@ def rebin2d(image, binning):
     _s1 = _shape[1] // binning
     _sh = _s0, image.shape[0] // _s0, _s1, image.shape[1] // _s1
     return image.reshape(_sh).mean(-1).mean(1)
-
 
 def rebin(data, binning):
     """
@@ -88,7 +91,7 @@ def rebin(data, binning):
     _highlim[_highlim == _lowlim] += 1
     _slices = tuple(slice(low, high) for low, high in zip(_lowlim, _highlim))
     data = data[_slices]
-    _newshape = ()
+    _newshape = tuple()
     for _s in data.shape:
         _addon = (1, 1) if _s == 1 else (_s // binning, binning)
         _newshape = _newshape + _addon

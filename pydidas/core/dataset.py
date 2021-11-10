@@ -24,6 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Dataset']
 
+import warnings
 from numbers import Integral
 from collections.abc import Iterable
 from copy import copy
@@ -104,6 +105,23 @@ class EmptyDataset(np.ndarray):
         obj.metadata = local_kws.get('metadata', None)
         return obj
 
+    def __getitem__(self, key):
+        """
+        Overwrite the generic __getitem__ method to catch the the slicing
+        keys.
+
+        Parameters
+        ----------
+        key : Union[int, tuple]
+            The slicing objects
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The sliced new dataset.
+        """
+        self._getitem_key = (key,) if isinstance(key, (int, slice)) else key
+        return super().__getitem__(key)
 
     def __array_finalize__(self, obj):
         """
@@ -181,25 +199,50 @@ class EmptyDataset(np.ndarray):
         self._axis_units = {0: None}
         return super().flatten()
 
-    def __getitem__(self, key):
+    def get_rebinned_copy(self, binning):
         """
-        Overwrite the generic __getitem__ method to catch the the slicing
-        keys.
+        Get a binned copy of the Dataset.
+
+        This method will create a binned copy and copy all axis metadata.
+        It will also modify the ranges, if required.
 
         Parameters
         ----------
-        key : Union[int, tuple]
-            The slicing objects
+        binning : int
+            The binning factor.
 
         Returns
         -------
         pydidas.core.Dataset
-            The sliced new dataset.
+            The binned Dataset.
         """
-        self._getitem_key = (key,) if isinstance(key, (int, slice)) else key
-        _new = super().__getitem__(key)
-        # self._getitem_key = None
-        return _new
+        if binning == 1:
+            return self.copy()
+        _shape = np.asarray(self.shape)
+        _lowlim = (_shape % binning) // 2
+        _highlim = _shape - (_shape % binning) + _lowlim
+        _highlim[_highlim == _lowlim] += 1
+        _slices = tuple(slice(low, high)
+                        for low, high in zip(_lowlim, _highlim))
+        _copy = self.__getitem__(_slices)
+        _newshape = tuple()
+        for _s in self.shape:
+            _addon = (1, 1) if _s == 1 else (_s // binning, binning)
+            _newshape = _newshape + _addon
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _copy.shape = _newshape
+            _copy = np.mean(_copy, axis=tuple(np.arange(1, _copy.ndim, 2)))
+        _copy.axis_labels = self.axis_labels.copy()
+        _copy.axis_units = self.axis_units.copy()
+        _axis_ranges = self.axis_ranges.copy()
+        for _dim, _range in _axis_ranges.items():
+            if isinstance(_range, np.ndarray):
+                _new = _range[_slices[_dim]]
+                _new = _new.reshape(_new.size // binning, binning).mean(-1)
+                _axis_ranges[_dim] = _new
+        _copy.axis_ranges = _axis_ranges
+        return _copy
 
     def __get_dict(self, _data, method_name):
         """
@@ -233,15 +276,17 @@ class EmptyDataset(np.ndarray):
         """
         if isinstance(_data, dict):
             if set(_data.keys()) != set(np.arange(self.ndim)):
-                raise DatasetConfigException(
-                    f'The keys for "{method_name}" do not match the axis '
-                    'dimensions')
+                warnings.warn('The number of keys does not match the number '
+                              'of array dimensions. Resettings keys to '
+                              'defaults')
+                return _default_vals(self.ndim)
             return  _data
         if isinstance(_data, (list, tuple)):
             if len(_data) != self.ndim:
-                raise DatasetConfigException(
-                    f'The number of entries for "{method_name}" does'
-                    ' not match the axis dimensions')
+                warnings.warn('The number of keys does not match the number '
+                              'of array dimensions. Resettings keys to '
+                              'defaults')
+                return _default_vals(self.ndim)
             _data = {index: item for index, item in enumerate(_data)}
             return _data
         raise DatasetConfigException(

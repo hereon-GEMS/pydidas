@@ -4,6 +4,7 @@ import copy
 import numpy as np
 
 from pydidas.image_io import rebin2d, rebin
+from pydidas.core import Dataset
 
 
 class TestRebin2d(unittest.TestCase):
@@ -16,6 +17,12 @@ class TestRebin2d(unittest.TestCase):
 
     def tearDown(self):
         ...
+
+    def test_rebin2d__with_Dataset(self):
+        ori = Dataset((np.random.random(self._2dshape )))
+        img = rebin2d(ori, 2)
+        _shape = np.array(img.shape)
+        self.assertTrue((_shape  == self._2dshape // 2).all())
 
     def test_2d_bin1(self):
         img = rebin2d(self._2dimage, 1)

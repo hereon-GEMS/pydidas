@@ -111,3 +111,14 @@ class WorkflowResultSaverBase(GenericIoBase,
         kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
         """
+
+    @classmethod
+    def update_frame_metadata(cls, metadata):
+        """
+        Update the metadata of the individual frame.
+
+        Parameters
+        ----------
+        metadata : dict
+            The metadata dictionary with results of one frame for each node.
+        """

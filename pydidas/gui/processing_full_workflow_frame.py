@@ -29,13 +29,15 @@ import qtawesome as qta
 
 from pydidas.core import (ScanSettings, Parameter, get_generic_parameter,
                           ParameterCollection)
+from pydidas.apps import ExecuteWorkflowApp
 from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
+from pydidas.widgets import (ReadOnlyTextWidget, CreateWidgetsMixIn,
+                             BaseFrameWithApp)
 from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.processing_full_workflow_frame_builder import (
     create_processing_full_workflow_frame_widgets_and_layout)
 
-SCAN_SETTINGS = ScanSettings()
+SCAN = ScanSettings()
 WORKFLOW_TREE = WorkflowTree()
 
 DEFAULT_PARAMS = ParameterCollection(
@@ -47,22 +49,52 @@ DEFAULT_PARAMS = ParameterCollection(
     )
 
 
-class ProcessingFullWorkflowFrame(BaseFrame, ParameterWidgetsMixIn,
+class ProcessingFullWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
                                   CreateWidgetsMixIn):
     default_params = DEFAULT_PARAMS
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
+        BaseFrameWithApp.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
+        self._app = ExecuteWorkflowApp()
+        self._create_param_collection()
         self.set_default_params()
-        self._plugin = None
-        self.scan_dim = 4
         create_processing_full_workflow_frame_widgets_and_layout(self)
+        self.__connect_signals()
+
+    def _create_param_collection(self):
+        """
+        Create the local ParameterCollection which is an updated
+        CompositeCreatorApp collection.
+        """
+        self.add_params(self._app.params)
+        # for param in self._app.params.values():
+        #     self.add_param(param)
+        #     if param.refkey == 'hdf5_key':
+        #         self.add_param(get_generic_parameter('hdf5_dataset_shape'))
+        #     if param.refkey == 'file_stepping':
+        #         self.add_param(get_generic_parameter('n_files'))
+        #     if param.refkey == 'hdf5_stepping':
+        #         self.add_param(get_generic_parameter('raw_image_shape'))
+        #         self.add_param(get_generic_parameter('images_per_file'))
+        #         self.add_param(
+        #             Parameter('n_total', int, 0,
+        #                       name='Total number of images',
+        #                       tooltip=('The total number of images.')))
+
+    def __connect_signals(self):
+        self.param_widgets['autosave_results'].io_edited.connect(
+            self.__update_autosave_widget_visibility)
+
 
     def frame_activated(self, index):
         ...
 
+    def __update_autosave_widget_visibility(self):
+        _vis = self.get_param_value('autosave_results')
+        for _key in ['autosave_dir', 'autosave_format']:
+            self.toggle_param_widget_visibility(_key, _vis)
 
 if __name__ == '__main__':
     import pydidas

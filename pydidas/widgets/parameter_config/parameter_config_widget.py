@@ -32,7 +32,7 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore
 
 from ..utilities import apply_widget_properties, excepthook
-from ..factory import create_param_widget, create_label, create_spacer
+from ..factory import create_param_widget, create_label
 from ...constants import (PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH,
                           PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_TEXT_WIDTH,
                           PARAM_INPUT_UNIT_WIDTH)

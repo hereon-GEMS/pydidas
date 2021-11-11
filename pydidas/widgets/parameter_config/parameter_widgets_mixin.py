@@ -201,26 +201,3 @@ class ParameterWidgetsMixIn:
             The value. The type depends on the Parameter's value.
         """
         self.param_widgets[param_key].set_value(value)
-
-    # def get_param_value(self, key):
-    #     """
-    #     Get the value of the Parameter referencey by key.
-
-    #     Parameters
-    #     ----------
-    #     key : str
-    #         The parameter reference key.
-
-    #     Raises
-    #     ------
-    #     KeyError
-    #         If no parameter has been registered with key.
-
-    #     Returns
-    #     -------
-    #     object
-    #         The Parameter value (in the datatype determined by Parameter).
-    #     """
-    #     if key not in self.params:
-    #         raise KeyError(f'No parameter with key "{key}" found.')
-    #     return self.params[key].value

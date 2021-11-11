@@ -137,12 +137,11 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         _indices = SCAN.get_frame_position_in_scan(index)
         if not cls._metadata_written:
             cls.write_metadata_to_files(frame_result_dict)
-            cls._metadata_written = True
         for _node_id, _data in frame_result_dict.items():
             with h5py.File(os.path.join(cls._save_dir,
                                         cls._filenames[_node_id]),
                            'r+') as _file:
-                _file['entry/data/data'][_indices] = _data.array
+                _file['entry/data/data'][_indices] = _data
 
     @classmethod
     def export_full_data_to_file(cls, full_data):
@@ -158,7 +157,6 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             _indices = SCAN.get_frame_position_in_scan(0)
             cls.write_metadata_to_files({_id: _data[_indices] for _id, _data
                                          in full_data.items()})
-            cls._metadata_written = True
         for _node_id, _data in full_data.items():
             with h5py.File(os.path.join(cls._save_dir,
                                         cls._filenames[_node_id]),
@@ -178,6 +176,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         """
         for _node_id, _data in frame_result_dict.items():
             cls.update_node_metadata(_node_id, _data)
+        cls._metadata_written = True
 
     @classmethod
     def update_node_metadata(cls, index, data):
@@ -201,3 +200,29 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                     _dict = getattr(data, f'axis_{_key}s')
                     _data = 'None' if _dict[_dim] is None else _dict[_dim]
                     _axisgroup.create_dataset(_key, data=_data)
+
+    @classmethod
+    def update_frame_metadata(cls, metadata):
+        """
+        Update the frame metadata with a separately supplied metadata
+        dictionary.
+
+        Parameters
+        ----------
+        metadata : dict
+            The metadata in dictionary form with entries of the form
+            node_id: node_metadata.
+        """
+        _ndim = SCAN.get_param_value('scan_dim')
+        for _id, _metadata in metadata.items():
+            with h5py.File(os.path.join(cls._save_dir, cls._filenames[_id]),
+                           'r+') as _file:
+                _ndim_frame = len(_metadata['axis_labels'])
+                for _dim in range(_ndim_frame):
+                    _group = _file['entry/data']
+                    _axisgroup = _group.create_group(f'axis_{_dim + _ndim}')
+                    for _key in ['label', 'unit', 'range']:
+                        _val = _metadata[f'axis_{_key}s'][_dim]
+                        _val = 'None' if _val is None else _val
+                        _axisgroup.create_dataset(_key, data=_val)
+        cls._metadata_written = True

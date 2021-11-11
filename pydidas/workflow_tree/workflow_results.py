@@ -109,6 +109,9 @@ class _WorkflowResults(QtCore.QObject):
         """
         Store results from one frame in the WorkflowResults.
 
+        Note: If write_to_disk is enabled, please be advised that this may
+        slow down the WorkflowResults
+
         Parameters
         ----------
         index : int
@@ -207,7 +210,7 @@ class _WorkflowResults(QtCore.QObject):
             Flag to enable overwriting of existing files. The default is False.
         """
         self.prepare_files_for_saving(save_dir, save_formats, overwrite)
-        RESULT_SAVER.export_full_data_to_file(self.__composites)
+        RESULT_SAVER.export_full_data_to_active_savers(self.__composites)
 
     def prepare_files_for_saving(self, save_dir, save_formats,
                                  overwrite=False):

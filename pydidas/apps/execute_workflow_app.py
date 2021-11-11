@@ -38,12 +38,14 @@ from pydidas.core import (ParameterCollection,get_generic_parameter,
                           ScanSettings, Dataset)
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
+from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
 
 TREE = WorkflowTree()
 
 SCAN = ScanSettings()
 
 RESULTS = WorkflowResults()
+RESULT_SAVER = WorkflowResultSaverMeta
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('autosave_results'),
@@ -133,14 +135,14 @@ class ExecuteWorkflowApp(BaseApp):
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
             RESULTS.update_shapes_from_scan_and_workflow()
+            if self.get_param_value('autosave_results'):
+                RESULTS.prepare_files_for_saving(
+                    self.get_param_value('autosave_dir'),
+                    self.get_param_value('autosave_format'))
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
         if self.get_param_value('live_processing'):
             self.__store_file_target_size()
-            if not self.slave_mode:
-                RESULTS.prepare_files_for_saving(
-                    self.get_param_value('autosave_dir'),
-                    self.get_param_value('autosave_format'))
 
     def __check_and_store_result_shapes(self):
         """
@@ -348,8 +350,10 @@ class ExecuteWorkflowApp(BaseApp):
         if self.slave_mode:
             return
         if isinstance(data, tuple):
-            RESULTS.update_frame_metadata(data[1])
             buffer_pos = data[0]
+            if not self._config['result_metadata_set']:
+                RESULTS.update_frame_metadata(data[1])
+                self._store_frame_metadata(data[1])
         else:
             buffer_pos = data
         _new_results = {_key: None for _key in self._config['result_shapes']}
@@ -360,3 +364,23 @@ class ExecuteWorkflowApp(BaseApp):
         self._shared_arrays['flag'][buffer_pos] = 0
         _flag_lock.release()
         RESULTS.store_results(index, _new_results)
+        if self.get_param_value('autosave_results'):
+            RESULT_SAVER.export_to_active_savers(index, _new_results)
+
+    def _store_frame_metadata(self, metadata, index=None):
+        """
+        Store the (separate) metadata from a frame internally.
+
+        Parameters
+        ----------
+        metadata : dict
+            The metadata dictionary.
+        """
+        for _node_id in self._config['result_shapes']:
+            _node_metadata = metadata[_node_id]
+            self._config['result_metadata'][_node_id] = {
+                'axis_labels': _node_metadata['axis_labels'],
+                'axis_ranges': _node_metadata['axis_ranges'],
+                'axis_units': _node_metadata['axis_units']}
+        self._config['result_metadata_set'] = True
+        RESULT_SAVER.push_frame_metadata_to_active_savers(metadata)

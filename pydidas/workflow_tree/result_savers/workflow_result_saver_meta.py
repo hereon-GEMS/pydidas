@@ -114,6 +114,25 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         _saver.prepare_files_and_directories(save_dir, shapes, labels)
 
     @classmethod
+    def push_frame_metadata_to_active_savers(cls, metadata):
+        """
+        Push the frame metadata to all active savers.
+
+        This method is required if the ExecuteWorkflowApp is used with the
+        AppRunner because the metadata cannot be transferred through the
+        shared numpy.buffers and needs to be forwarded independently of the
+        frame data.
+
+        Parameters
+        ----------
+        metadata : dict
+            The dictionary with the metadata.
+        """
+        for _ext in cls.active_savers:
+            _saver = cls.registry[_ext]
+            _saver.update_frame_metadata(metadata)
+
+    @classmethod
     def export_to_active_savers(cls, index, frame_result_dict, **kwargs):
         """
         Export the results of a frame to all active savers.

@@ -37,6 +37,7 @@ from pydidas._exceptions import AppConfigError
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.unittest_objects import get_random_string
+from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 
 TREE = WorkflowTree()
 SCAN = ScanSettings()
@@ -58,6 +59,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         shutil.rmtree(self._path)
         self.q_settings.setValue('global/shared_buffer_size', self._buf_size)
         self.q_settings.setValue('global/mp_n_workers', self._n_workers)
+        ExecuteWorkflowApp.parse_func = (
+            parse_execute_workflow_cmdline_arguments)
 
     def generate_tree(self):
         TREE.clear()
@@ -243,5 +246,3 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-

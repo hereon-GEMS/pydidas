@@ -27,7 +27,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_processing_full_workflow_frame_widgets_and_layout']
 
-import qtawesome as qta
+from PyQt5 import QtCore, QtWidgets
+from silx.gui.plot import PlotWindow
+
+CONFIG_WIDGET_WIDTH = 300
 
 
 def create_processing_full_workflow_frame_widgets_and_layout(frame):
@@ -44,22 +47,77 @@ def create_processing_full_workflow_frame_widgets_and_layout(frame):
     _layout.setHorizontalSpacing(10)
     _layout.setVerticalSpacing(5)
 
+    def __get_param_widget_config(param_key):
+        """
+        Get Formatting options for create_param_widget instances.
+        """
+        if param_key in ['autosave_dir', 'run_type']:
+            return  dict(linebreak=True,
+                         halign_text=QtCore.Qt.AlignLeft,
+                         valign_text=QtCore.Qt.AlignBottom,
+                         width_total=CONFIG_WIDGET_WIDTH,
+                         width_io=CONFIG_WIDGET_WIDTH - 50,
+                         width_text=CONFIG_WIDGET_WIDTH - 20,
+                         width_unit=0)
+        return dict(width_io=100, width_unit=0,
+                    width_text=CONFIG_WIDGET_WIDTH - 100,
+                    width_total=CONFIG_WIDGET_WIDTH)
+
     frame.create_label('title', 'Full processing workflow', fontsize=14,
                        gridPos=(0, 0, 1, 5))
+    frame.create_spacer('title_spacer', height=20, gridPos=(-1, 0, 1, 1))
 
-    frame.create_spacer('title_spacer', height=20, gridPos=(-1, 0, 1, 2))
-    frame.create_button('but_verify_config', 'Verify all settings',
-                        gridPos=(-1, 0, 1, 2),
-                        icon=qta.icon('mdi.text-search'))
+    frame.create_param_widget(frame.get_param('autosave_results'),
+                              **__get_param_widget_config('autosave_results'))
+    frame.create_param_widget(frame.get_param('autosave_dir'),
+                              **__get_param_widget_config('autosave_dir'))
+    frame.create_param_widget(frame.get_param('autosave_format'),
+                              **__get_param_widget_config('autosave_format'))
+    frame.create_param_widget(frame.get_param('run_type'),
+                              **__get_param_widget_config('run_type'))
+    for _key in ['autosave_dir', 'autosave_format']:
+        frame.toggle_param_widget_visibility(_key, False)
 
-    frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
-    frame.create_param_widget(frame.params['run_type'])
+    frame.create_spacer('runtype_spacer', height=20, gridPos=(-1, 0, 1, 1))
 
-    frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
-    frame.create_button('but_run', 'Run', gridPos=(-1, 0, 1, 2),
-                        icon=qta.icon('fa5s.play'), fixedHeight=50,
-                        fixedWidth=600)
+    frame.create_button('but_exec', 'Start processing', gridPos=(-1, 0, 1, 1),
+                        fixedWidth=CONFIG_WIDGET_WIDTH)
 
-    frame.create_spacer(None, height=50, gridPos=(-1, 0, 1, 2))
-    frame.create_button('but_feedback', 'Processing feedback',
-                        gridPos=(-1, 0, 1, 2))
+    frame.create_progress_bar('progress', gridPos=(-1, 0, 1, 1), visible=False,
+                              fixedWidth=CONFIG_WIDGET_WIDTH, minimum=0,
+                              maximum=100)
+
+    frame.create_button('but_abort', 'Abort composite creation',
+                        gridPos=(-1, 0, 1, 1), enabled=True, visible=False,
+                        fixedWidth=CONFIG_WIDGET_WIDTH)
+
+    frame.create_button('but_show', 'Show composite', enabled=False,
+                        gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH)
+
+    frame.create_button('but_save', 'Save composite image', enabled=False,
+                        gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH)
+
+    frame.create_spacer('vis_spacer', height=20, gridPos=(-1, 0, 1, 1))
+
+    _plot = PlotWindow(
+        parent=frame, resetzoom=True, autoScale=False, logScale=False,
+        grid=False, curveStyle=False, colormap=True, aspectRatio=True,
+        yInverted=True, copy=True, save=True, print_=True, control=False,
+        position=True, roi=False, mask=True)
+    frame.add_any_widget(
+        'plot_window', _plot, alignment=None,
+        gridPos=(0, 3, 1, 1), visible=False, stretch=(1, 1),
+        sizePolicy=(QtWidgets.QSizePolicy.Expanding,
+                    QtWidgets.QSizePolicy.Expanding))
+
+    # frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
+    # frame.create_param_widget(frame.params['run_type'])
+
+    # frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
+    # frame.create_button('but_run', 'Run', gridPos=(-1, 0, 1, 2),
+    #                     icon=qta.icon('fa5s.play'), fixedHeight=50,
+    #                     fixedWidth=600)
+
+    # frame.create_spacer(None, height=50, gridPos=(-1, 0, 1, 2))
+    # frame.create_button('but_feedback', 'Processing feedback',
+    #                     gridPos=(-1, 0, 1, 2))

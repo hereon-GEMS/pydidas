@@ -36,39 +36,39 @@ TREE = WorkflowTree()
 SCAN = ScanSettings()
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
-META.reset()
 
-class SAVER(WorkflowResultSaverBase):
-    extensions = ['TEST']
-    format_name = 'Test'
 
 
 class TestWorkflowResultSaverBase(unittest.TestCase):
 
     def setUp(self):
-        ...
+        META.reset()
+        class SAVER(WorkflowResultSaverBase):
+            extensions = ['TEST']
+            format_name = 'Test'
+        self.SAVER = SAVER
 
     def tearDown(self):
-        ...
+        META.reset()
 
     def test__class_existance(self):
-        self.assertIn(WorkflowResultSaverBase, SAVER.__bases__)
+        self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)
 
     def test_export_to_file(self):
-        SAVER.export_to_file(0, {})
+        self.SAVER.export_to_file(0, {})
         # assert does not raise an Exception
 
     def test_export_full_data_to_file(self):
-        SAVER.export_full_data_to_file({})
+        self.SAVER.export_full_data_to_file({})
         # assert does not raise an Exception
 
     def test_prepare_files_and_directories(self):
-        SAVER.prepare_files_and_directories('Dir', {}, {})
+        self.SAVER.prepare_files_and_directories('Dir', {}, {})
         # assert does not raise an Exception
 
     def test_get_directory_names_from_labels(self):
         _labels = {0: None, 1: 'some thing', 2: '\nanother name', 3: 'label'}
-        _names = SAVER.get_directory_names_from_labels(_labels)
+        _names = self.SAVER.get_directory_names_from_labels(_labels)
         for _node_id, _name in _names.items():
             self.assertTrue(_name.startswith(f'node_{_node_id:02d}_'))
             self.assertTrue(_name.endswith('_Test'))

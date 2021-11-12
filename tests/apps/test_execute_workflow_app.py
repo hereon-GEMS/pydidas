@@ -26,6 +26,10 @@ import unittest
 import tempfile
 import shutil
 import random
+import copy
+import os
+import threading
+import time
 import multiprocessing as mp
 
 import numpy as np
@@ -35,6 +39,7 @@ from pydidas.apps import ExecuteWorkflowApp
 from pydidas.core import get_generic_parameter, ScanSettings
 from pydidas._exceptions import AppConfigError
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
+from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.unittest_objects import get_random_string
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
@@ -42,11 +47,38 @@ from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 TREE = WorkflowTree()
 SCAN = ScanSettings()
 RESULTS = WorkflowResults()
+RESULT_SAVER = WorkflowResultSaverMeta
+
+class TestLock(threading.Thread):
+    def __init__(self, memory_addresses, n_buffer, array_shapes):
+        super().__init__()
+        self._mem = memory_addresses
+        self._n_buffer = n_buffer
+        self._shapes = array_shapes
+        self._shared_arrays = {}
+        for _key, _shape in array_shapes.items():
+            _share = memory_addresses[_key]
+            _arr_shape = (n_buffer,) + _shape
+            self._shared_arrays[_key] = np.frombuffer(
+                _share.get_obj(), dtype=np.float32).reshape(_arr_shape)
+        self._shared_arrays['flag'] = np.frombuffer(
+                memory_addresses['flag'].get_obj(), dtype=np.int32)
+
+    def run(self):
+        self._mem['flag'].acquire()
+        self._shared_arrays['flag'][:] = 1
+        self._mem['flag'].release()
+        time.sleep(0.1)
+        self._mem['flag'].acquire()
+        self._shared_arrays['flag'][:] = 0
+        self._mem['flag'].release()
+
 
 
 class TestExecuteWorkflowApp(unittest.TestCase):
 
     def setUp(self):
+        RESULT_SAVER.set_active_savers_and_title([])
         self._path = tempfile.mkdtemp()
         self.generate_tree()
         self.generate_scan()
@@ -96,15 +128,58 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         self.assertTrue(app.get_param_value('autosave_results'))
 
-    # def test_multiprocessing_pre_run(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.multiprocessing_pre_run()
-    #     # assert does not raise error
+    def test_multiprocessing_pre_run(self):
+        app = ExecuteWorkflowApp()
+        app.multiprocessing_pre_run()
+        # assert does not raise error
 
-    # def test_multiprocessing_prepare_run(self):
-    #     app = ExecuteWorkflowApp()
-    #     app.prepare_run()
-    #     # todo
+    def test_multiprocessing_carryon(self):
+        app = ExecuteWorkflowApp()
+        self.assertTrue(app.multiprocessing_carryon())
+
+    def test_prepare_run__master_not_live_no_autosave(self):
+        app = ExecuteWorkflowApp()
+        app.set_param_value('autosave_results', False)
+        app.set_param_value('live_processing', False)
+        app.prepare_run()
+        self.assertIsInstance(app._shared_arrays[1], np.ndarray)
+        self.assertIsInstance(app._shared_arrays[2], np.ndarray)
+        self.assertTrue(app.multiprocessing_carryon())
+
+    def test_prepare_run__master_not_live_w_autosave(self):
+        app = ExecuteWorkflowApp()
+        app.set_param_value('autosave_results', True)
+        app.set_param_value('autosave_dir', self._path)
+        app.set_param_value('live_processing', False)
+        app.prepare_run()
+        self.assertTrue(os.path.exists(os.path.join(self._path, 'node_01.h5')))
+        self.assertTrue(os.path.exists(os.path.join(self._path, 'node_02.h5')))
+
+    def test_prepare_run__slave_not_live_no_autosave(self):
+        app = ExecuteWorkflowApp()
+        app.set_param_value('autosave_results', False)
+        app.set_param_value('live_processing', False)
+        app.prepare_run()
+        app2 = app.get_copy()
+        app2.prepare_run()
+        app2.slave_mode = True
+        self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
+        self.assertIsInstance(app2._shared_arrays[2], np.ndarray)
+        self.assertEqual(app._config['shared_memory'][1],
+                         app2._config['shared_memory'][1])
+        self.assertEqual(app._config['shared_memory'][2],
+                         app2._config['shared_memory'][2])
+        self.assertTrue(app.multiprocessing_carryon())
+
+    def test_prepare_run__master_live_no_autosave(self):
+        app = ExecuteWorkflowApp()
+        app.set_param_value('autosave_results', False)
+        app.set_param_value('live_processing', True)
+        app.prepare_run()
+        app._index = 1
+        self.assertIsInstance(app._shared_arrays[1], np.ndarray)
+        self.assertIsInstance(app._shared_arrays[2], np.ndarray)
+        self.assertTrue(app.multiprocessing_carryon())
 
     def test_check_and_store_results_shapes(self):
         app = ExecuteWorkflowApp()
@@ -173,8 +248,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         app.set_param_value('live_processing', True)
         app._redefine_multiprocessing_carryon()
-        _s = get_random_string(8)
-        self.assertEqual(app.multiprocessing_carryon(_s), _s)
+        app._index = get_random_string(8)
+        self.assertEqual(app.multiprocessing_carryon(), app._index)
 
     def test_multiprocessing_get_tasks__normal(self):
         app = ExecuteWorkflowApp()
@@ -234,15 +309,85 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.multiprocessing_store_results(_index, _pos)
         self.assertEqual(app._shared_arrays['flag'][0], 0)
 
+    def test_multiprocessing_store_results__slave(self):
+        _index = 12
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app.slave_mode = True
+        app._config['result_metadata_set'] = True
+        _pos = app.multiprocessing_func(_index)
+        app.multiprocessing_store_results(_index, _pos)
+        self.assertEqual(app._shared_arrays['flag'][0], 1)
+
     def test_multiprocessing_store_results__with_metadata(self):
         _index = 12
         app = ExecuteWorkflowApp()
         app.prepare_run()
-        app._config['result_metadata_set'] = False
         _res = app.multiprocessing_func(_index)
+        app._config['result_metadata_set'] = False
         self.assertEqual(app._shared_arrays['flag'][0], 1)
         app.multiprocessing_store_results(_index, _res)
         self.assertEqual(app._shared_arrays['flag'][0], 0)
+
+    def test_multiprocessing_store_results__with_autosave(self):
+        _index = 12
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app.set_param_value('autosave_results', True)
+        _pos = app.multiprocessing_func(_index)
+        self.assertEqual(app._shared_arrays['flag'][0], 1)
+        app.multiprocessing_store_results(_index, _pos)
+        self.assertEqual(app._shared_arrays['flag'][0], 0)
+
+    def test_multiprocesssing_post_run(self):
+        app = ExecuteWorkflowApp()
+        app.multiprocessing_post_run()
+        # assert does not raise an Exception
+
+    def test_store_result_metadata__with_dataset(self):
+        _index = 12
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app._config['result_metadata_set'] = False
+        app._config['tree'].execute_process(_index)
+        app._ExecuteWorkflowApp__store_result_metadata()
+        self.assertTrue(app._config['result_metadata_set'])
+
+    def test_store_result_metadata__with_ndarray(self):
+        _index = 12
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app._config['result_metadata_set'] = False
+        app._config['tree'].execute_process(_index)
+        for _node_id in app._config['result_shapes']:
+            app._config['tree'].nodes[_node_id].results = np.ones((10, 10))
+        app._ExecuteWorkflowApp__store_result_metadata()
+        self.assertTrue(app._config['result_metadata_set'])
+
+    def test_write_results_to_shared_arrays__lock_test(self):
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app._config['tree'].execute_process(0)
+        _locker = TestLock(app._config['shared_memory'],
+                           app._config['buffer_n'],
+                           app._config['result_shapes'])
+        _locker.start()
+        app._ExecuteWorkflowApp__write_results_to_shared_arrays()
+
+    def test_store_frame_metadata(self):
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app._config['tree'].execute_process(0)
+        app._config['result_metadata_set'] = False
+        _metadata = {}
+        for _id in app._config['result_shapes']:
+            _res = app._config['tree'].nodes[_id].results
+            _metadata[_id] = {'axis_labels': _res.axis_labels,
+                              'axis_units': _res.axis_units,
+                              'axis_ranges': _res.axis_ranges}
+        app._store_frame_metadata(_metadata)
+        self.assertTrue(app._config['result_metadata_set'])
+
 
 if __name__ == "__main__":
     unittest.main()

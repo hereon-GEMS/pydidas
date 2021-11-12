@@ -56,7 +56,8 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         Parameters
         ----------
         savers : list
-            A list of the names of the savers.
+            A list of the names of the savers. "None" is a valid Saver to
+            clear the list.
         title : str, optional
             The title of the scan. If not provided, the title will default to
             "unknown".
@@ -64,9 +65,10 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         cls.active_savers = []
         cls.scan_title = title
         for _saver in savers:
-            cls.verify_extension_is_registered(_saver)
-            if _saver not in cls.active_savers:
-                cls.active_savers.append(_saver)
+            if not (_saver is None or _saver == 'None'):
+                cls.verify_extension_is_registered(_saver)
+                if _saver not in cls.active_savers:
+                    cls.active_savers.append(_saver)
 
     @classmethod
     def prepare_active_savers(cls, save_dir, shapes, labels):

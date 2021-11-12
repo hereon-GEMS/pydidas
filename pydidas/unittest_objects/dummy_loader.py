@@ -52,6 +52,7 @@ class DummyLoader(InputPlugin):
     def __init__(self, *args, **kwargs):
         InputPlugin.__init__(self, *args, **kwargs)
         self._preexecuted = False
+        self._config['input_available'] = 12
 
     def __reduce__(self):
         """
@@ -71,6 +72,14 @@ class DummyLoader(InputPlugin):
 
     def get_first_file_size(self):
         return 1
+
+    def get_filename(self, index):
+        return index
+
+    def input_available(self, index):
+        if index is None:
+            return False
+        return index <= self._config['input_available']
 
     def pre_execute(self):
         self._preexecuted = True

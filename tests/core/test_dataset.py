@@ -140,6 +140,14 @@ class TestDataset(unittest.TestCase):
                 self.assertTrue(np.allclose(_new_range,
                                             self._dset['ranges'][_dim]))
 
+    def test_empty_dataset_array_finalize__add_dimension(self):
+        obj = self.create_large_dataset()
+        _new = obj[None, :]
+        self.assertEqual(list(_new.axis_labels.values()),
+                         [None] + self._dset['labels'])
+        self.assertEqual(list(_new.axis_units.values()),
+                         [None] + self._dset['units'])
+
     def test_empty_dataset_array_finalize__empty_shape(self):
         obj = self.create_large_dataset()
         self.assertTrue((obj == obj).all())
@@ -163,6 +171,13 @@ class TestDataset(unittest.TestCase):
         self.assertNotEqual(id(obj), id(_new))
         self.assertEqual(tuple(_s // 2 for _s in self._dset['shape']),
                          _new.shape)
+
+    def test_get_rebinned_copy__bin1(self):
+        obj = self.create_large_dataset()
+        _new = obj.get_rebinned_copy(1)
+        self.assertIsInstance(_new, Dataset)
+        self.assertNotEqual(id(obj), id(_new))
+        self.assertEqual(obj.shape, _new.shape)
 
     def test_empty_dataset_flatten(self):
         obj = self.create_large_dataset()

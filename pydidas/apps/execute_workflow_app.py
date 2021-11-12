@@ -142,7 +142,7 @@ class ExecuteWorkflowApp(BaseApp):
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
         if self.get_param_value('live_processing'):
-            self.__store_file_target_size()
+            self._config['tree'].root.plugin.prepare_carryon_check()
 
     def __check_and_store_result_shapes(self):
         """
@@ -229,10 +229,21 @@ class ExecuteWorkflowApp(BaseApp):
         the return value will always be True.
         """
         if self.get_param_value('live_processing'):
-            self.multiprocessing_carryon = (
-                self._config['tree'].root.plugin.input_available)
+            self.multiprocessing_carryon = self.__live_mp_carryon
         else:
             self.multiprocessing_carryon = lambda: True
+
+    def __live_mp_carryon(self):
+        """
+        Check the state of the latest file to allow continuation of the
+        processing.
+
+        Returns
+        -------
+        bool
+            Flag whether the input is available on the file system.
+        """
+        return self._config['tree'].root.plugin.input_available(self._index)
 
     def multiprocessing_get_tasks(self):
         """

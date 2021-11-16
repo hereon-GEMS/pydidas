@@ -33,6 +33,10 @@ from pydidas.multiprocessing._app_processor import app_processor
 from pydidas.apps import BaseApp
 
 
+from pydidas.utils import pydidas_logger
+import logging
+logger = pydidas_logger()
+logger.setLevel(logging.DEBUG)
 
 class AppRunner(WorkerController):
     """
@@ -73,10 +77,12 @@ class AppRunner(WorkerController):
         n_workers : int, optional
             The number of spawned worker processes. The default is 4.
         """
+        logger.debug('Starting AppRunner')
         super().__init__(n_workers)
         self.__app = app.get_copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor['func'] = app_processor
+        logger.debug('Finished init')
 
     def call_app_method(self, method_name, *args, **kwargs):
         """

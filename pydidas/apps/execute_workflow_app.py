@@ -39,6 +39,7 @@ from pydidas.core import (ParameterCollection,get_generic_parameter,
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
+from pydidas.utils import pydidas_logger
 
 TREE = WorkflowTree()
 
@@ -130,6 +131,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         if not self.slave_mode:
             self._config['tree'] = TREE.get_copy()
+            self._config['tree'].prepare_execution()
             self.__check_and_store_result_shapes()
             self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()

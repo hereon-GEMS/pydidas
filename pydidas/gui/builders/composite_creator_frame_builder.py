@@ -32,9 +32,9 @@ from silx.gui.plot import PlotWindow
 
 from pydidas.widgets import (ScrollArea, create_default_grid_layout)
 from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
-from pydidas.constants import PARAM_INPUT_WIDGET_WIDTH
 
 CONFIG_WIDGET_WIDTH = 300
+
 
 def create_composite_creator_frame_widgets_and_layout(frame):
     """

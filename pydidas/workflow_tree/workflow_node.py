@@ -31,6 +31,12 @@ from numbers import Integral
 from .generic_node import GenericNode
 from ..plugins import BasePlugin
 
+from pydidas.utils import pydidas_logger
+import logging
+logger = pydidas_logger()
+logger.setLevel(logging.DEBUG)
+
+
 
 class WorkflowNode(GenericNode):
     """
@@ -179,9 +185,12 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
+        logger.debug(f'Starting plugin chain  {id(self)}')
         res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
         for _child in self._children:
+            logger.debug('Passing result to child')
             _child.execute_plugin_chain(res, **reskws)
+        logger.debug(f'Saving data {id(self)}')
         if self.is_leaf and self.plugin.output_data_dim is not None:
             self.results = res
             self.result_kws = reskws

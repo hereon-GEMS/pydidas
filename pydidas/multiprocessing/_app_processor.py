@@ -30,9 +30,14 @@ import random
 import string
 import time
 
-
 NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
                   for i in range(64))
+
+
+import pydidas
+import logging
+logger = pydidas.utils.pydidas_logger()
+logger.setLevel(logging.DEBUG)
 
 
 def app_processor(input_queue, output_queue, stop_queue, finished_queue,
@@ -66,9 +71,13 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
         dictionary.
     """
     _app_carryon = True
+    logger.debug('Started process')
     _app = app(app_params, slave_mode=True)
+    logger.debug('Started app')
     _app._config = app_config
     _app.multiprocessing_pre_run()
+    logger.debug('Starting processing')
+
     while True:
         # check for stop signal
         try:

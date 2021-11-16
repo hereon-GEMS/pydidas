@@ -222,8 +222,7 @@ GENERIC_PARAMS = ParameterCollection(
               name='Mosaic maximum size', unit='Mpx',
               tooltip=TOOLTIPS['mosaic_max_size']),
     Parameter('run_type', str, 'Process in GUI', name='Run type',
-              choices=['Process in GUI', 'Command line',
-                       'Remote command line'],
+              choices=['Process in GUI', 'Command line'],
               tooltip=TOOLTIPS['run_type']),
     ############################
     ## global choice settings
@@ -276,7 +275,7 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('autosave_dir', Path, Path(), name='Autosave directory',
               tooltip=TOOLTIPS['autosave_dir']),
     Parameter('autosave_format', str, 'HDF5', name='Autosave formats',
-              choices=['HDF5'],
+              choices=['None', 'HDF5'],
               tooltip=TOOLTIPS['autosave_format']),
 )
 

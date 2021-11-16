@@ -38,8 +38,6 @@ class ParameterCollectionEditWidget(QtWidgets.QFrame,
     """
     The ParameterCollectionEditWidget widget can be used to create a composite
     widget for updating multiple Parameter values.
-
-    Depending on the Parameter types, automatic typechecks are implemented.
     """
     def __init__(self, parent=None, **kwargs):
         """

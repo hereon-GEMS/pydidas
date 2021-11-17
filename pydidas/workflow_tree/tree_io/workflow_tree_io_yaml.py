@@ -76,25 +76,10 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
             The restored WorkflowTree.
         """
         from ..workflow_tree import _WorkflowTree
-        from ..workflow_node import WorkflowNode
-        from ...plugins import PluginCollection
-        plugins = PluginCollection()
 
         with open(filename, 'r') as _file:
             _restoration = yaml.safe_load(_file)
 
-        # Create all nodes first, then add connections in a second step:
-        _new_nodes = {}
-        for _info in _restoration:
-            _plugin =  plugins.get_plugin_by_name(_info['plugin_class'])()
-            _node = WorkflowNode(node_id=_info['node_id'], plugin=_plugin)
-            for key, val in _info['plugin_params']:
-                _node.plugin.set_param_value(key, val)
-            _new_nodes[_info['node_id']] = _node
-        for _info in _restoration:
-            _node_id = _info['node_id']
-            if _info['parent'] is not None:
-                _new_nodes[_node_id].parent = _new_nodes[_info['parent']]
         _tree = _WorkflowTree()
-        _tree.set_root(_new_nodes[0])
+        _tree.restore_from_list_of_nodes(_restoration)
         return _tree

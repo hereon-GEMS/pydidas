@@ -234,6 +234,10 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertIsInstance(self.tree.nodes[_id].plugin,
                                   tree.nodes[_id].plugin.__class__)
 
+    def test_restore_from_list_of_nodes__wrong_type(self):
+        with self.assertRaises(TypeError):
+            self.tree.restore_from_list_of_nodes({0: 0, 1: 1})
+
     def test_restore_from_string(self):
         self.tree.create_and_add_node(DummyLoader())
         self.tree.create_and_add_node(DummyProc())
@@ -245,6 +249,20 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertTrue(_id in self.tree.nodes.keys())
             self.assertIsInstance(self.tree.nodes[_id].plugin,
                                   tree.nodes[_id].plugin.__class__)
+
+    def test_restore_from_string__empty(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.restore_from_string('')
+        self.assertEqual(self.tree.nodes, dict())
+
+    def test_restore_from_string__empty_list(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.restore_from_string('[]')
+        self.assertEqual(self.tree.nodes, dict())
 
 
 if __name__ == '__main__':

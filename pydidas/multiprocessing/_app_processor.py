@@ -72,6 +72,7 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
     """
     _app_carryon = True
     logger.debug('Started process')
+    logger.debug(f'app_config: {app_config}')
     _app = app(app_params, slave_mode=True)
     logger.debug('Started app')
     _app._config = app_config

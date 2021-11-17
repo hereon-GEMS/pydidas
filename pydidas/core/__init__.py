@@ -70,6 +70,8 @@ from .image_metadata_manager import *
 from . import filelist_manager
 from .filelist_manager import *
 
+from . import pydidas_q_settings
+from .pydidas_q_settings import *
 
 __all__ += parameter_collection.__all__
 __all__ += parameter.__all__
@@ -82,6 +84,7 @@ __all__ += singleton_factory.__all__
 __all__ += pydidas_q_settings_mixin.__all__
 __all__ += image_metadata_manager.__all__
 __all__ += filelist_manager.__all__
+__all__ += pydidas_q_settings.__all__
 
 
 # Unclutter namespace: remove modules from namespace
@@ -96,3 +99,4 @@ del singleton_factory
 del pydidas_q_settings_mixin
 del image_metadata_manager
 del filelist_manager
+del pydidas_q_settings

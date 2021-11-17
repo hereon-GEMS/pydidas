@@ -205,7 +205,10 @@ class _WorkflowTree(GenericTree):
         string : str
             The representation.
         """
-        _nodes = ast.literal_eval(string)
+        try:
+            _nodes = ast.literal_eval(string)
+        except SyntaxError:
+            _nodes = []
         self.restore_from_list_of_nodes(_nodes)
 
     def restore_from_list_of_nodes(self, list_of_nodes):
@@ -219,6 +222,8 @@ class _WorkflowTree(GenericTree):
             A list of nodes with a dictionary entry for each node holding all
             the required information.
         """
+        if not isinstance(list_of_nodes, (list, tuple)):
+            raise TypeError('Nodes must be supplied as a list.')
         from ..plugins import PluginCollection
         plugins = PluginCollection()
 
@@ -233,7 +238,10 @@ class _WorkflowTree(GenericTree):
             _node_id = _item['node_id']
             if _item['parent'] is not None:
                 _new_nodes[_node_id].parent = _new_nodes[_item['parent']]
-        self.set_root(_new_nodes[0])
+        if 0 in _new_nodes:
+            self.set_root(_new_nodes[0])
+        else:
+            self.clear()
         self._tree_changed_flag = True
 
     def get_all_result_shapes(self, force_update=False):

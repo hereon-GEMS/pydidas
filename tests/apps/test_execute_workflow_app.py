@@ -43,11 +43,16 @@ from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
 from pydidas.unittest_objects import DummyLoader, DummyProc
 from pydidas.unittest_objects import get_random_string
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
+from pydidas.plugins import PluginCollection
+from pydidas import unittest_objects
 
 TREE = WorkflowTree()
 SCAN = ScanSettings()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultSaverMeta
+COLL = PluginCollection()
+_PLUGIN_PATHS = COLL.get_all_registered_paths()
+
 
 class TestLock(threading.Thread):
     def __init__(self, memory_addresses, n_buffer, array_shapes):
@@ -74,7 +79,6 @@ class TestLock(threading.Thread):
         self._mem['flag'].release()
 
 
-
 class TestExecuteWorkflowApp(unittest.TestCase):
 
     def setUp(self):
@@ -86,6 +90,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self._buf_size = float(
             self.q_settings.value('global/shared_buffer_size'))
         self._n_workers = int(self.q_settings.value('global/mp_n_workers'))
+        _path = os.path.dirname(unittest_objects.__file__)
+        if _path not in _PLUGIN_PATHS:
+            COLL.find_and_register_plugins(_path)
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -93,6 +100,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.q_settings.setValue('global/mp_n_workers', self._n_workers)
         ExecuteWorkflowApp.parse_func = (
             parse_execute_workflow_cmdline_arguments)
+        COLL.clear_collection(True)
+        COLL.find_and_register_plugins(*_PLUGIN_PATHS)
 
     def generate_tree(self):
         TREE.clear()
@@ -160,9 +169,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.set_param_value('autosave_results', False)
         app.set_param_value('live_processing', False)
         app.prepare_run()
-        app2 = app.get_copy()
+        app2 = app.get_copy(slave_mode=True)
         app2.prepare_run()
-        app2.slave_mode = True
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app2._shared_arrays[2], np.ndarray)
         self.assertEqual(app._config['shared_memory'][1],
@@ -183,21 +191,18 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_check_and_store_results_shapes(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         self.assertEqual(app._config['result_shapes'],
                          TREE.get_all_result_shapes())
 
     def test_get_and_store_tasks(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._ExecuteWorkflowApp__get_and_store_tasks()
-        self.assertTrue(np.equal(app._config['mp_tasks'],
+        self.assertTrue(np.equal(app._mp_tasks,
                                  np.arange(np.prod(self._nscan))).all())
 
     def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
@@ -205,14 +210,12 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_check_size_of_results_and_calc_buffer_size__res_too_large(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._config['result_shapes'] = {1: (10000, 10000), 2: (15000, 20000)}
         with self.assertRaises(AppConfigError):
             app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
 
     def test_initialize_shared_memory(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
@@ -223,7 +226,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_initialize_arrays_from_shared_memory(self):
         app = ExecuteWorkflowApp()
-        app._config['tree'] = TREE.get_copy()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
@@ -260,9 +262,6 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_multiprocessing_get_tasks__no_tasks(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
-        del app._config['mp_tasks']
-        with self.assertRaises(KeyError):
-            app.multiprocessing_get_tasks()
 
     def test_multiprocessing_pre_cycle(self):
         _index = int(np.ceil(np.random.random() * 1e5))
@@ -292,7 +291,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_write_results_to_shared_arrays(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
-        app._config['tree'].execute_process(0)
+        TREE.execute_process(0)
         self.assertTrue((app._shared_arrays[1][0] == 0).all())
         self.assertTrue((app._shared_arrays[2][0] == 0).all())
         app._ExecuteWorkflowApp__write_results_to_shared_arrays()
@@ -349,7 +348,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app.prepare_run()
         app._config['result_metadata_set'] = False
-        app._config['tree'].execute_process(_index)
+        TREE.execute_process(_index)
         app._ExecuteWorkflowApp__store_result_metadata()
         self.assertTrue(app._config['result_metadata_set'])
 
@@ -358,16 +357,16 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app.prepare_run()
         app._config['result_metadata_set'] = False
-        app._config['tree'].execute_process(_index)
+        TREE.execute_process(_index)
         for _node_id in app._config['result_shapes']:
-            app._config['tree'].nodes[_node_id].results = np.ones((10, 10))
+            TREE.nodes[_node_id].results = np.ones((10, 10))
         app._ExecuteWorkflowApp__store_result_metadata()
         self.assertTrue(app._config['result_metadata_set'])
 
     def test_write_results_to_shared_arrays__lock_test(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
-        app._config['tree'].execute_process(0)
+        TREE.execute_process(0)
         _locker = TestLock(app._config['shared_memory'],
                            app._config['buffer_n'],
                            app._config['result_shapes'])
@@ -377,16 +376,29 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_store_frame_metadata(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
-        app._config['tree'].execute_process(0)
+        TREE.execute_process(0)
         app._config['result_metadata_set'] = False
         _metadata = {}
         for _id in app._config['result_shapes']:
-            _res = app._config['tree'].nodes[_id].results
+            _res = TREE.nodes[_id].results
             _metadata[_id] = {'axis_labels': _res.axis_labels,
                               'axis_units': _res.axis_units,
                               'axis_ranges': _res.axis_ranges}
         app._store_frame_metadata(_metadata)
         self.assertTrue(app._config['result_metadata_set'])
+
+    def test_run__single_processing(self):
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app.run()
+        #assert does not raise Exception
+
+    def test_run__multiple_runs(self):
+        app = ExecuteWorkflowApp()
+        app.prepare_run()
+        app.run()
+        app.run()
+        #assert does not raise Exception
 
 
 if __name__ == "__main__":

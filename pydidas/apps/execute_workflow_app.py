@@ -42,7 +42,6 @@ from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
 from pydidas.utils import pydidas_logger
 
 TREE = WorkflowTree()
-
 SCAN = ScanSettings()
 
 RESULTS = WorkflowResults()
@@ -92,7 +91,8 @@ class ExecuteWorkflowApp(BaseApp):
     mp_func_results = QtCore.pyqtSignal(object)
     updated_composite = QtCore.pyqtSignal()
     parse_func = parse_execute_workflow_cmdline_arguments
-    attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index']
+    attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
+                                           '_result_metadata', '_mp_tasks']
 
     def __init__(self, *args, **kwargs):
         """
@@ -101,10 +101,18 @@ class ExecuteWorkflowApp(BaseApp):
         super().__init__(*args, **kwargs)
         self._config['result_shapes'] = {}
         self._config['shared_memory'] = {}
-        self._config['result_metadata'] = {}
+        self._config['tree_str'] = '[]'
+        self.reset_runtime_vars()
+
+    def reset_runtime_vars(self):
+        """
+        Reset the runtime variables for a new run.
+        """
         self._config['result_metadata_set'] = False
-        self._config['tree'] = None
+        self._config['scan_vals'] = {}
         self._shared_arrays = {}
+        self._result_metadata = {}
+        self._mp_tasks = np.array(())
         self._index = None
 
     def multiprocessing_pre_run(self):
@@ -129,11 +137,16 @@ class ExecuteWorkflowApp(BaseApp):
         Both the slaved and the main applications then initialize local numpy
         arrays from the shared memory.
         """
+        self.reset_runtime_vars()
+        self.__get_and_store_tasks()
+        if self.slave_mode:
+            TREE.restore_from_string(self._config['tree_str'])
+            for _key, _val in self._config['scan_vals'].items():
+                SCAN.set_param_value(_key, _val)
         if not self.slave_mode:
-            self._config['tree'] = TREE.get_copy()
-            self._config['tree'].prepare_execution()
+            self._config['tree_str'] = TREE.export_to_string()
+            self._config['scan_vals'] = SCAN.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
-            self.__get_and_store_tasks()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
             RESULTS.update_shapes_from_scan_and_workflow()
@@ -143,8 +156,9 @@ class ExecuteWorkflowApp(BaseApp):
                     self.get_param_value('autosave_format'))
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()
+        TREE.prepare_execution()
         if self.get_param_value('live_processing'):
-            self._config['tree'].root.plugin.prepare_carryon_check()
+            TREE.root.plugin.prepare_carryon_check()
 
     def __check_and_store_result_shapes(self):
         """
@@ -155,7 +169,7 @@ class ExecuteWorkflowApp(BaseApp):
         AppConfigError
             If the WorkflowTree has no nodes.
         """
-        _shapes = self._config['tree'].get_all_result_shapes()
+        _shapes = TREE.get_all_result_shapes()
         self._config['result_shapes'] = _shapes
 
     def __get_and_store_tasks(self):
@@ -166,7 +180,7 @@ class ExecuteWorkflowApp(BaseApp):
         _points_per_dim = [SCAN.get_param_value(f'n_points_{_n}')
                            for _n in range(1, _dim + 1)]
         _n_total = np.prod(_points_per_dim)
-        self._config['mp_tasks'] = np.arange(_n_total)
+        self._mp_tasks = np.arange(_n_total)
 
     def __check_size_of_results_and_calc_buffer_size(self):
         """
@@ -193,7 +207,7 @@ class ExecuteWorkflowApp(BaseApp):
                      f'minimum buffer size must be {_min_buffer:.2f} MB.')
             raise AppConfigError(_error)
         self._config['buffer_n'] = min(_n_dataset_in_buffer, _n_data,
-                                       self._config['mp_tasks'].size)
+                                       self._mp_tasks.size)
 
     def __initialize_shared_memory(self):
         """
@@ -245,16 +259,13 @@ class ExecuteWorkflowApp(BaseApp):
         bool
             Flag whether the input is available on the file system.
         """
-        return self._config['tree'].root.plugin.input_available(self._index)
+        return TREE.root.plugin.input_available(self._index)
 
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
         """
-        if 'mp_tasks' not in self._config.keys():
-            raise KeyError('Key "mp_tasks" not found. Please execute'
-                           'multiprocessing_pre_run() first.')
-        return self._config['mp_tasks']
+        return self._mp_tasks
 
     def multiprocessing_pre_cycle(self, index):
         """
@@ -293,12 +304,12 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        self._config['tree'].execute_process(index)
+        TREE.execute_process(index)
         self.__write_results_to_shared_arrays()
         if self._config['result_metadata_set']:
             return self._config['buffer_pos']
         self.__store_result_metadata()
-        return (self._config['buffer_pos'], self._config['result_metadata'])
+        return (self._config['buffer_pos'], self._result_metadata)
 
     def __store_result_metadata(self):
         """
@@ -306,18 +317,20 @@ class ExecuteWorkflowApp(BaseApp):
         array.
         """
         for _node_id in self._config['result_shapes']:
-            _res = self._config['tree'].nodes[_node_id].results
+            _res = TREE.nodes[_node_id].results
             if isinstance(_res, Dataset):
-                self._config['result_metadata'][_node_id] = {
+                self._result_metadata[_node_id] = {
                     'axis_labels': _res.axis_labels,
                     'axis_ranges': _res.axis_ranges,
                     'axis_units': _res.axis_units}
             else:
-                self._config['result_metadata'][_node_id] = {
+                self._result_metadata[_node_id] = {
                     'axis_labels': {i: None for i in range(_res.ndim)},
                     'axis_ranges': {i: None for i in range(_res.ndim)},
                     'axis_units': {i: None for i in range(_res.ndim)}}
         self._config['result_metadata_set'] = True
+        RESULT_SAVER.push_frame_metadata_to_active_savers(
+            self._result_metadata)
 
     def __write_results_to_shared_arrays(self):
         """
@@ -336,7 +349,7 @@ class ExecuteWorkflowApp(BaseApp):
             time.sleep(0.01)
         for _node_id in self._config['result_shapes']:
             self._shared_arrays[_node_id][_buffer_pos] = (
-                self._config['tree'].nodes[_node_id].results)
+                TREE.nodes[_node_id].results)
         _flag_lock.release()
 
     def multiprocessing_post_run(self):
@@ -391,7 +404,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         for _node_id in self._config['result_shapes']:
             _node_metadata = metadata[_node_id]
-            self._config['result_metadata'][_node_id] = {
+            self._result_metadata[_node_id] = {
                 'axis_labels': _node_metadata['axis_labels'],
                 'axis_ranges': _node_metadata['axis_ranges'],
                 'axis_units': _node_metadata['axis_units']}

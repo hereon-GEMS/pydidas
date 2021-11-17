@@ -94,6 +94,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
     def __abort_execution(self):
         if self._runner is not None:
             self._runner.send_stop_signal()
+        self._widgets['but_abort'].setVisible(False)
+        self._widgets['progress'].setVisible(False)
+        self._widgets['but_exec'].setEnabled(True)
+        self.set_status('Aborted processing of full workflow.')
 
     def __execute(self):
         """
@@ -156,7 +160,6 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self._widgets['progress'].setVisible(False)
         self.set_status('Finished processing of full workflow.')
         self._runner = None
-        self.__show_composite()
 
     def __run_cmd_process(self):
         # subprocess.Popen(executable, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS, close_fds=True)

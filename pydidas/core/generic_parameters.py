@@ -277,6 +277,7 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('autosave_format', str, 'HDF5', name='Autosave formats',
               choices=['None', 'HDF5'],
               tooltip=TOOLTIPS['autosave_format']),
+    Parameter('plugin_path', str, name='Plugin paths', default='')
 )
 
 

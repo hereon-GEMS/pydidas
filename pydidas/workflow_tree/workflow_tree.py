@@ -25,6 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTree']
 
+import ast
+
 from ..core import SingletonFactory
 from .._exceptions import AppConfigError
 
@@ -179,6 +181,60 @@ class _WorkflowTree(GenericTree):
             The filename of the file with the export.
         """
         WorkflowTreeIoMeta.export_to_file(filename, self, **kwargs)
+
+    def export_to_string(self):
+        """
+        Export the Tree to a simplified string representation.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        return str([node.dump() for node in self.nodes.values()])
+
+    def restore_from_string(self, string):
+        """
+        Restore the WorkflowTree from a string representation.
+
+        This method will accept string representations written with the
+        "export_to_string" method.
+
+        Parameters
+        ----------
+        string : str
+            The representation.
+        """
+        _nodes = ast.literal_eval(string)
+        self.restore_from_list_of_nodes(_nodes)
+
+    def restore_from_list_of_nodes(self, list_of_nodes):
+        """
+        Restore the WorkflowTree from a list of Nodes with the required
+        information.
+
+        Parameters
+        ----------
+        list_of_nodes : list
+            A list of nodes with a dictionary entry for each node holding all
+            the required information.
+        """
+        from ..plugins import PluginCollection
+        plugins = PluginCollection()
+
+        _new_nodes = {}
+        for _item in list_of_nodes:
+            _plugin =  plugins.get_plugin_by_name(_item['plugin_class'])()
+            _node = WorkflowNode(node_id=_item['node_id'], plugin=_plugin)
+            for key, val in _item['plugin_params']:
+                _node.plugin.set_param_value(key, val)
+            _new_nodes[_item['node_id']] = _node
+        for _item in list_of_nodes:
+            _node_id = _item['node_id']
+            if _item['parent'] is not None:
+                _new_nodes[_node_id].parent = _new_nodes[_item['parent']]
+        self.set_root(_new_nodes[0])
+        self._tree_changed_flag = True
 
     def get_all_result_shapes(self, force_update=False):
         """

@@ -185,7 +185,7 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
-        logger.debug(f'Starting plugin chain  {id(self)}')
+        logger.debug(f'Starting plugin chain  {self.node_id}')
         res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
         for _child in self._children:
             logger.debug('Passing result to child')

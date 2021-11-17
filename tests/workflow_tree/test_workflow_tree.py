@@ -216,6 +216,36 @@ class TestWorkflowTree(unittest.TestCase):
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
 
+    def test_export_to_string(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        _str = self.tree.export_to_string()
+        self.assertIsInstance(_str, str)
+
+    def test_restore_from_list_of_nodes(self):
+        tree = WorkflowTree()
+        _nodes, _index = self.create_node_tree()
+        tree.set_root(_nodes[0][0])
+        _dump = [node.dump() for node in tree.nodes.values()]
+        self.tree.restore_from_list_of_nodes(_dump)
+        for _id, _node in tree.nodes.items():
+            self.assertTrue(_id in self.tree.nodes.keys())
+            self.assertIsInstance(self.tree.nodes[_id].plugin,
+                                  tree.nodes[_id].plugin.__class__)
+
+    def test_restore_from_string(self):
+        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(DummyProc())
+        _str = self.tree.export_to_string()
+        tree = WorkflowTree()
+        tree.restore_from_string(_str)
+        for _id, _node in tree.nodes.items():
+            self.assertTrue(_id in self.tree.nodes.keys())
+            self.assertIsInstance(self.tree.nodes[_id].plugin,
+                                  tree.nodes[_id].plugin.__class__)
+
 
 if __name__ == '__main__':
     unittest.main()

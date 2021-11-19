@@ -277,7 +277,13 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('autosave_format', str, 'HDF5', name='Autosave formats',
               choices=['None', 'HDF5'],
               tooltip=TOOLTIPS['autosave_format']),
-    Parameter('plugin_path', str, name='Plugin paths', default='')
+    Parameter('plugin_path', str, name='Plugin paths', default=''),
+    ############################
+    ## Result selection settings
+    ############################
+    Parameter('selected_results', str, 'No selection',
+              name='Select node result to display', choices=['No selection'],
+              tooltip=TOOLTIPS['selected_results']),
 )
 
 

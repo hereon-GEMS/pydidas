@@ -73,6 +73,9 @@ from .base_frame import *
 from . import base_frame_with_app
 from .base_frame_with_app import *
 
+from . import result_selector_for_output
+from .result_selector_for_output import *
+
 # __all__ += confirmation_bar.__all__
 __all__ += scroll_area.__all__
 __all__ += utilities.__all__
@@ -86,7 +89,7 @@ __all__ += read_only_text_widget.__all__
 __all__ += create_widgets_mixin.__all__
 __all__ += base_frame.__all__
 __all__ += base_frame_with_app.__all__
-
+__all__ += result_selector_for_output.__all__
 
 
 # unclutter namespace and remove modules:
@@ -103,3 +106,4 @@ del read_only_text_widget
 del create_widgets_mixin
 del base_frame
 del base_frame_with_app
+del result_selector_for_output

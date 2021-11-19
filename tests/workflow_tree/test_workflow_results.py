@@ -128,6 +128,14 @@ class TestWorkflowResults(unittest.TestCase):
         _res = RES.get_results(0)
         self.assertTrue(np.equal(_res, _tmpres).all())
 
+    def test_get_result_metadata(self):
+        _tmpres = np.random.random((50, 50))
+        RES._WorkflowResults__composites[0] = Dataset(_tmpres)
+        _res = RES.get_result_metadata(0)
+        self.assertIsInstance(_res, dict)
+        for _key in ['axis_labels', 'axis_ranges', 'axis_units', 'metadata']:
+            self.assertTrue(_key in _res)
+
     def test_shapes__empty(self):
         self.assertIsNone(RES.shapes)
 

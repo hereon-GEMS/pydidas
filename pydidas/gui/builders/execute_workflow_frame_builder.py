@@ -30,10 +30,10 @@ __all__ = ['create_execute_workflow_frame_widgets_and_layout']
 from PyQt5 import QtCore, QtWidgets
 from silx.gui.plot import PlotWindow
 
-from pydidas.widgets import (ScrollArea, create_default_grid_layout)
+from pydidas.widgets import (ScrollArea, create_default_grid_layout,
+                             ReadOnlyTextWidget)
 from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
-
-CONFIG_WIDGET_WIDTH = 300
+from pydidas.constants import CONFIG_WIDGET_WIDTH
 
 
 def create_execute_workflow_frame_widgets_and_layout(frame):
@@ -49,7 +49,7 @@ def create_execute_workflow_frame_widgets_and_layout(frame):
         """
         Get Formatting options for create_param_widget instances.
         """
-        if param_key in ['autosave_dir', 'run_type']:
+        if param_key in ['autosave_dir', 'run_type', 'selected_results']:
             return  dict(linebreak=True,
                          parent_widget=frame._widgets['io_frame'],
                          halign_text=QtCore.Qt.AlignLeft,
@@ -109,6 +109,26 @@ def create_execute_workflow_frame_widgets_and_layout(frame):
                         fixedWidth=CONFIG_WIDGET_WIDTH,
                         parent_widget=frame._widgets['io_frame'])
 
+    frame.create_spacer('result_sec_spacer', height=20,
+                        gridPos=(-1, 0, 1, 1),
+                        parent_widget=frame._widgets['io_frame'])
+    frame.create_label('label_results', 'Results:', fontsize=11,
+                       underline=True, visible=False,
+                       parent_widget=frame._widgets['io_frame'])
+    frame.create_param_widget(frame.get_param('selected_results'),
+                              **__get_param_widget_config('selected_results'),
+                              visible=False)
+    frame.create_combo_box('combo_results', gridPos=(-1, 0, 1, 1),
+                            fixedWidth=CONFIG_WIDGET_WIDTH, visible=False,
+                            parent_widget=frame._widgets['io_frame'])
+    frame.create_any_widget('result_info',  ReadOnlyTextWidget,
+                            gridPos=(-1, 0, 1, 1),
+                            fixedWidth=CONFIG_WIDGET_WIDTH,
+                            fixedHeight=150, visible=False,
+                            alignment=QtCore.Qt.AlignTop,
+                            parent_widget=frame._widgets['io_frame'])
+
+
     frame.create_button('but_show', 'Show composite', enabled=False,
                         gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
                         parent_widget=frame._widgets['io_frame'])
@@ -117,7 +137,13 @@ def create_execute_workflow_frame_widgets_and_layout(frame):
                         gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
                         parent_widget=frame._widgets['io_frame'])
 
-    frame.create_spacer('vis_spacer', height=20, gridPos=(-1, 0, 1, 1))
+
+    frame.create_spacer('io_frame_terminal_spacer', height=20,
+                        gridPos=(-1, 0, 1, 1),
+                        parent_widget=frame._widgets['io_frame'])
+
+    frame.create_spacer('menu_bottom_spacer', height=20,
+                        gridPos=(-1, 0, 1, 1))
 
     _plot = PlotWindow(
         parent=frame, resetzoom=True, autoScale=False, logScale=False,

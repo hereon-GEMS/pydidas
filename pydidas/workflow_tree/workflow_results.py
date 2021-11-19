@@ -189,6 +189,27 @@ class _WorkflowResults(QtCore.QObject):
         """
         return self.__composites[node_id]
 
+    def get_result_metadata(self, node_id):
+        """
+        Get the stored metadata for the results of the specified node.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID identifier.
+
+        Returns
+        -------
+        dict
+            A dictionary with the metadata stored using the "axis_labels",
+            "axis_ranges", "axis_units" and "metadata" keys.
+        """
+        return  {'axis_labels': self.__composites[node_id].axis_labels,
+                 'axis_units': self.__composites[node_id].axis_units,
+                 'axis_ranges': self.__composites[node_id].axis_ranges,
+                 'metadata': self.__composites[node_id].metadata}
+
+
     def save_results_to_disk(self, save_dir, save_formats, overwrite=False):
         """
         Save all results to disk.

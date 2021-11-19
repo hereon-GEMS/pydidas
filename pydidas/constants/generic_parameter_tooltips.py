@@ -229,4 +229,6 @@ TOOLTIPS = {
                         'the workflow has been excuted. All data will be saved'
                         ' in a single folder for each run with one file for '
                         'each plugin.'),
+    'selected_results': ('The selected node of the WorkflowTree to display'
+                         ' the corresponding results.'),
 }

@@ -279,12 +279,11 @@ class ParameterCollectionMixIn:
                            f'{self.__class__.__name__}!')
 
 
-class ObjectWithParameterCollection(ParameterCollectionMixIn,
-                                    PydidasQsettingsMixin, QtCore.QObject):
+class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn,
+                                    PydidasQsettingsMixin):
     """
     Inherits from :py:class:`pydidas.core.ParameterCollectionMixIn
     <pydidas.core.ParameterCollectionMixIn>`, :py:class:`PyQt5.QtCore.QObject`
-
 
     An object with a ParameterCollection.
 
@@ -338,4 +337,3 @@ class ObjectWithParameterCollection(ParameterCollectionMixIn,
         """
         for _key, _value in state.items():
             setattr(self, _key, _value)
-

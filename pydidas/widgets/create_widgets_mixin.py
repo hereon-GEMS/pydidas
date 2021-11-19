@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from .factory import (create_spin_box, create_progress_bar, create_check_box,
                       create_label, create_line, create_spacer, create_button,
-                      create_combo_box)
+                      create_combo_box, create_radio_button_group)
 from ..constants import QT_DEFAULT_ALIGNMENT
 from .._exceptions import WidgetLayoutError
 from ..utils import copy_docstring
@@ -112,6 +112,14 @@ class CreateWidgetsMixIn:
         Please refer to pydidas.widgets.factory.create_check_box
         """
         self.__create_widget(create_combo_box, ref, **kwargs)
+
+    @copy_docstring(create_radio_button_group)
+    def create_radio_button_group(self, ref, entries, vertical=True, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_radio_button_group
+        """
+        self.__create_widget(create_radio_button_group, ref, entries,
+                             vertical, **kwargs)
 
     def __create_widget(self, object_, ref, *args, **kwargs):
         """

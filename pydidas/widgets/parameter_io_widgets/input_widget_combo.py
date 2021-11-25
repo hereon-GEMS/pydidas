@@ -27,7 +27,7 @@ from PyQt5 import QtWidgets, QtCore
 
 from .input_widget import InputWidget
 from ...utils import (convert_unicode_to_ascii,
-                      convert_special_chars_to_unicode)
+                      convert_special_chars_to_unicode, SignalBlocker)
 
 
 class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
@@ -119,7 +119,8 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         value = self.__convert_bool(value)
         self._oldValue = value
         _txt_repr = convert_special_chars_to_unicode(str(value))
-        self.setCurrentIndex(self.findText(_txt_repr))
+        # self.setCurrentIndex(self.findText(_txt_repr))
+        self.setCurrentText(_txt_repr)
 
     def update_choices(self, new_choices):
         """
@@ -134,10 +135,17 @@ class InputWidgetCombo(QtWidgets.QComboBox, InputWidget):
         new_choices : collections.abc.Iterable
             Any iterable with new choices.
         """
-        self.currentIndexChanged.disconnect(self.emit_signal)
-        self.clear()
-        for choice in new_choices:
-            self.addItem(f'{convert_special_chars_to_unicode(str(choice))}')
-        self.__items = [self.itemText(i) for i in range(self.count())]
-        self.currentIndexChanged.connect(self.emit_signal)
-        self.set_value(new_choices[0])
+        with SignalBlocker(self):
+            self.clear()
+            for choice in new_choices:
+                _itemstr = convert_special_chars_to_unicode(str(choice))
+                self.addItem(_itemstr)
+            self.__items = [self.itemText(i) for i in range(self.count())]
+            self.set_value(new_choices[0])
+        # self.currentIndexChanged.disconnect(self.emit_signal)
+        # self.clear()
+        # for choice in new_choices:
+        #     self.addItem(f'{convert_special_chars_to_unicode(str(choice))}')
+        # self.__items = [self.itemText(i) for i in range(self.count())]
+        # self.currentIndexChanged.connect(self.emit_signal)
+        # self.set_value(new_choices[0])

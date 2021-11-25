@@ -53,7 +53,7 @@ class _WorkflowResults(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.__composites = {}
-        self._config = {'shapes': None,
+        self._config = {'shapes': {},
                         'labels': {},
                         'metadata_complete': False}
 
@@ -172,6 +172,19 @@ class _WorkflowResults(QtCore.QObject):
             A dictionary with entries of the form <node_id: label>
         """
         return self._config['labels']
+
+    @property
+    def ndims(self):
+        """
+        Return the number of dimensions of the results in form of a dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with entries of the form <node_id: n_dim>
+        """
+        return {_key: self.__composites[_key].ndim
+                for _key in self.__composites}
 
     def get_results(self, node_id):
         """

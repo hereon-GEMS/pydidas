@@ -45,6 +45,9 @@ from ._logger import *
 from . import timer
 from .timer import *
 
+from . import signal_blocker
+from .signal_blocker import *
+
 __all__ += hdf5_dataset_utils.__all__
 __all__ += file_checks.__all__
 __all__ += decorators.__all__
@@ -52,6 +55,7 @@ __all__ += str_utils.__all__
 __all__ += file_utils.__all__
 __all__ += _logger.__all__
 __all__ += timer.__all__
+__all__ += signal_blocker.__all__
 
 # unclutter namespace and delete the references to the modules itself
 # as all functions are imported directly
@@ -62,3 +66,4 @@ del str_utils
 del file_utils
 del _logger
 del timer
+del signal_blocker

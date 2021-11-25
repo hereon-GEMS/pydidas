@@ -137,13 +137,23 @@ class TestWorkflowResults(unittest.TestCase):
             self.assertTrue(_key in _res)
 
     def test_shapes__empty(self):
-        self.assertIsNone(RES.shapes)
+        self.assertEqual(RES.shapes, {})
 
     def test_shapes__simple(self):
         _shapes = {0: (12, 43), 5: (6, 54), 6: (12,)}
         RES._config['shapes'] = _shapes.copy()
         _res = RES.shapes
         self.assertEqual(_shapes, _res)
+
+    def test_ndims__empty(self):
+        self.assertEqual(RES.ndims, {})
+
+    def test_ndims__regular(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _ndims = RES.ndims
+        self.assertEqual(_ndims[1], len(self._input_shape) + len(self._scan_n))
+        self.assertEqual(_ndims[2],
+                         len(self._result2_shape) + len(self._scan_n))
 
     def test_update_composite_metadata(self):
         _shape1, _shape2, _results = self.generate_test_datasets()
@@ -221,7 +231,7 @@ class TestWorkflowResults(unittest.TestCase):
         RES._config['shapes'] = True
         RES._config['metadata_complete'] = True
         RES.clear_all_results()
-        self.assertIsNone(RES._config['shapes'])
+        self.assertEqual(RES._config['shapes'], {})
         self.assertFalse(RES._config['metadata_complete'])
 
     def test_update_shapes_from_scan_and_workflow(self):

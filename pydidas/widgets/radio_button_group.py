@@ -25,6 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['RadioButtonGroup']
 
+
+from pydidas.constants import CONFIG_WIDGET_WIDTH
 from PyQt5 import QtCore, QtWidgets
 
 
@@ -36,7 +38,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
 
     new_button = QtCore.pyqtSignal(int, str)
 
-    def __init__(self, parent=None, entries=None, vertical=True):
+    def __init__(self, parent=None, entries=None, vertical=True, title=None):
         """
         Create a new RadioButtonGroup.
 
@@ -50,18 +52,22 @@ class RadioButtonGroup(QtWidgets.QWidget):
             Keyword to toggle between vertical and horizontal alignment of
             the QRadioButtons. Select True for vertical and False for
             horizontal alignment. The default is True.
+        title : Union[str, None]
+            The title of the group. If None, no label will be added. The
+            default is None.
         """
         super().__init__(parent)
 
+        self._size = (0, 0)
         self._emit_signal = True
         self._active_index = 0
         self._buttons = {}
         self._button_indices = {}
         self._button_label = {}
         if entries is not None:
-            self.__initUI(entries, vertical)
+            self.__initUI(entries, vertical, title)
 
-    def __initUI(self, entries, vertical):
+    def __initUI(self, entries, vertical, title):
         """
         Initialize the user interface with Widgets and Layout.
 
@@ -71,22 +77,45 @@ class RadioButtonGroup(QtWidgets.QWidget):
             The list of entries as passed from __init__.
         vertical : bool
             The vertical flag, as passed from __init__.
+        title : Union[str, None]
+            The title flag, as passed from __init__.
         """
+        _xoffset = 0
+        _yoffset = 0
+        _height =  5 if vertical else 25
+
         self.q_button_group = QtWidgets.QButtonGroup(self)
-        _layout = (QtWidgets.QVBoxLayout() if vertical
-                   else QtWidgets.QHBoxLayout())
+        _layout = QtWidgets.QGridLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.setSpacing(0)
+        if title is not None:
+            _label = QtWidgets.QLabel(title)
+            _label.setFixedHeight(18)
+            _columnspan = len(entries) if vertical else 1
+            _layout.addWidget(_label, 0, 0, 1, _columnspan,
+                              QtCore.Qt.AlignBottom)
+            _yoffset = 1
+            _height += 20
 
         for _index, _entry in enumerate(entries):
             _button = QtWidgets.QRadioButton(_entry, self)
             _button.toggled.connect(self.__toggled)
+            _button.setFixedHeight(20)
             self._button_indices[id(_button)] = _index
             self._button_label[_entry] = _index
             self._buttons[_index] = _button
             self.q_button_group.addButton(_button)
-            _layout.addWidget(_button)
-
+            _layout.addWidget(_button, _yoffset, _xoffset, 1, 1,
+                              QtCore.Qt.AlignTop)
+            if vertical:
+                _yoffset += 1
+                _height += 20
+            else:
+                _xoffset += 1
+        self._size = (CONFIG_WIDGET_WIDTH, _height)
         self._buttons[0].setChecked(True)
         self.setLayout(_layout)
+        self.setFixedHeight(_height)
 
     @property
     def emit_signal(self):
@@ -115,7 +144,6 @@ class RadioButtonGroup(QtWidgets.QWidget):
         elif value is False:
             self._emit_signal = False
         raise ValueError('The new value must be boolean.')
-
 
     @QtCore.pyqtSlot()
     def __toggled(self):

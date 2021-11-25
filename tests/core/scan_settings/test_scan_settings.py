@@ -23,11 +23,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 import unittest
-import copy
 
 import numpy as np
 
-from pydidas.core import Parameter, ParameterCollection, ScanSettings
+from pydidas.core import ScanSettings
 from pydidas.core.scan_settings.scan_settings import _ScanSettings
 from pydidas.unittest_objects import get_random_string
 
@@ -77,6 +76,11 @@ class TestScanSettings(unittest.TestCase):
         SCAN = _ScanSettings()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.shape, self._scan_shape)
+
+    def test_ndim(self):
+        SCAN = _ScanSettings()
+        self.set_scan_params(SCAN)
+        self.assertEqual(SCAN.ndim, 4)
 
     def test_get_range_for_dim__wrong_dim(self):
         SCAN = _ScanSettings()

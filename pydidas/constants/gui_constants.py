@@ -12,4 +12,5 @@ PARAM_INPUT_EDIT_WIDTH = 255
 PARAM_INPUT_TEXT_WIDTH = 120
 PARAM_INPUT_UNIT_WIDTH = 25
 
+# The width of config widgets for the App Parameters
 CONFIG_WIDGET_WIDTH = 300

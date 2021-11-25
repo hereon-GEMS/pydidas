@@ -27,20 +27,25 @@ from ..radio_button_group import RadioButtonGroup
 from ..utilities import apply_widget_properties
 
 
-def create_radio_button_group(entries, vertical=True, **kwargs):
+def create_radio_button_group(entries, vertical=True, title=None, **kwargs):
     """
     Create a RadioButtonGroup widget and set properties.
 
     Parameters
     ----------
+    entries : list
+        The list of labels for the RadioButtons.
+    vertical : bool
+        Keyword to arrange the RadioButtons vertically. If False, a horizontal
+        alignment is used. The default is True.
+    title : Union[str, None]
+        The title/label of the RadioButtonGroup. If None, no title is used.
+        The default is None.
     **kwargs : dict
         Any supported keyword arguments.
 
     Supported keyword arguments
     ---------------------------
-    valueRange: tuple, optional
-        The range for the QSpinBox, given as a 2-tuple of (min, max). The
-        default is (0, 1).
     *Qt settings : any
         Any supported Qt settings for a QSpinBox (for example value,
         fixedWidth, visible, enabled)
@@ -50,6 +55,6 @@ def create_radio_button_group(entries, vertical=True, **kwargs):
     box : RadioButtonGroup
         The instantiated spin box widget.
     """
-    _box = RadioButtonGroup(None, entries, vertical)
+    _box = RadioButtonGroup(None, entries, vertical, title)
     apply_widget_properties(_box, **kwargs)
     return _box

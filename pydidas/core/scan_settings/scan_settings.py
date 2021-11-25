@@ -169,11 +169,15 @@ class _ScanSettings(ObjectWithParameterCollection):
         Returns
         -------
         int
-            DESCRIPTION.
-
+            The total number of images.
         """
         return np.prod([self.get_param_value(f'n_points_{_i}') for _i
                         in range(1, self.get_param_value('scan_dim') + 1)])
+
+    @property
+    def ndim(self):
+        return self.get_param_value('scan_dim')
+
 
     @staticmethod
     def import_from_file(filename):

@@ -87,6 +87,9 @@ class _ScanSettings(ObjectWithParameterCollection):
             The indices for indexing the position of the frame in the scan.
             The length of indices is equal to the number of scan dimensions.
         """
+        if frame < 0 or frame >= self.n_total:
+            raise ValueError(f'The demanded frame number "{frame}" is out of '
+                             f'the scope of the Scan (0, {self.n_total}).')
         _ndim = self.get_param_value('scan_dim')
         _N = [self.get_param_value(f'n_points_{_n}')
               for _n in range(1, _ndim + 1)] + [1]
@@ -144,6 +147,33 @@ class _ScanSettings(ObjectWithParameterCollection):
         _df = self.get_param_value(f'delta_{index}')
         _n = self.get_param_value(f'n_points_{index}')
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
+
+    @property
+    def shape(self):
+        """
+        Get the shape of the Scan.
+
+        Returns
+        -------
+        tuple
+            The tuple with an entry of the length for each dimension.
+        """
+        return tuple(self.get_param_value(f'n_points_{_i}')
+                     for _i in range(1, self.get_param_value('scan_dim') + 1))
+
+    @property
+    def n_total(self):
+        """
+        Get the total number of points in the Scan.
+
+        Returns
+        -------
+        int
+            DESCRIPTION.
+
+        """
+        return np.prod([self.get_param_value(f'n_points_{_i}') for _i
+                        in range(1, self.get_param_value('scan_dim') + 1)])
 
     @staticmethod
     def import_from_file(filename):

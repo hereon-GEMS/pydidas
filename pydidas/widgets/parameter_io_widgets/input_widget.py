@@ -37,6 +37,7 @@ from ...constants import (PARAM_INPUT_WIDGET_HEIGHT,
 
 class InputWidget(QtWidgets.QWidget):
     """Base class of widgets for I/O during plugin parameter editing."""
+
     def __init__(self, parent, param, width=255):
         """
         Setup the widget.
@@ -52,10 +53,6 @@ class InputWidget(QtWidgets.QWidget):
             A Parameter instance.
         width: int, optional
             The width of the IO widget.
-
-        Returns
-        -------
-        None.
         """
         super().__init__(parent)
         self.setFixedWidth(width)
@@ -133,10 +130,6 @@ class InputWidget(QtWidgets.QWidget):
         NotImplementedError
             If the subclass has not implemented its own emit_signal method,
             this exception will be raised.
-
-        Returns
-        -------
-        None.
         """
         raise NotImplementedError
 
@@ -151,10 +144,6 @@ class InputWidget(QtWidgets.QWidget):
         NotImplementedError
             If the subclass has not implemented its own get_value method,
             this exception will be raised.
-
-        Returns
-        -------
-        None.
         """
         raise NotImplementedError
 
@@ -169,9 +158,5 @@ class InputWidget(QtWidgets.QWidget):
         NotImplementedError
             If the subclass has not implemented its own set_value method,
             this exception will be raised.
-
-        Returns
-        -------
-        None.
         """
         raise NotImplementedError

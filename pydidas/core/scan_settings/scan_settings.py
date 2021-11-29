@@ -176,8 +176,17 @@ class _ScanSettings(ObjectWithParameterCollection):
 
     @property
     def ndim(self):
-        return self.get_param_value('scan_dim')
+        """
+        Get the number of dimensions in the ScanSettings.
 
+        This method is a simplified wrapper for the ParameterValue "scan_dim".
+
+        Returns
+        -------
+        int
+            The number of dimensions.
+        """
+        return self.get_param_value('scan_dim')
 
     @staticmethod
     def import_from_file(filename):

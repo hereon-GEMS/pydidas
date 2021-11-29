@@ -159,7 +159,7 @@ class _WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: results_shape>
         """
-        return self._config['shapes']
+        return self._config['shapes'].copy()
 
     @property
     def labels(self):
@@ -171,7 +171,7 @@ class _WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: label>
         """
-        return self._config['labels']
+        return self._config['labels'].copy()
 
     @property
     def ndims(self):

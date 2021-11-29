@@ -84,9 +84,3 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
                                        widget=WebView())
         self.setCentralWidget(self._scroll_area)
         self.setVisible(False)
-
-    # def closeEvent(self, event):
-    #     _webview = self._scroll_area.widget()
-    #     _webview.deleteLater()
-    #     self._scroll_area.deleteLater()
-    #     event.accept()

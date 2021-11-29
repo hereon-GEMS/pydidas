@@ -329,6 +329,20 @@ class TestParameterCollection(unittest.TestCase):
             self.assertEqual(obj[f'Test{index}'],
                               self._params[index])
 
+    def test_values_equal__wrong_key(self):
+        obj = ParameterCollection(*self._params)
+        with self.assertRaises(KeyError):
+            obj.values_equal('Test2', 'Test6')
+
+    def test_values_equal__different_values(self):
+        obj = ParameterCollection(*self._params)
+        self.assertFalse(obj.values_equal('Test2', 'Test3'))
+
+    def test_values_equal__same_values(self):
+        obj = ParameterCollection(*self._params)
+        self.assertTrue(obj.values_equal('Test0', 'Test3'))
+
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -383,3 +383,34 @@ class ParameterCollection(dict):
         for _key in keys:
             _items.append(self.__getitem__(_key))
         return _items
+
+    def values_equal(self, *args):
+        """
+        Compare all Parameters references by their keys in args and check
+        if they have the same value.
+
+        Parameters
+        ----------
+        *args : tuple
+            Any number of Parameter keys.
+
+        Raises
+        ------
+        KeyError
+            If any of the Parameter reference keys have not been registered
+            with the ParameterCollection.
+
+        Returns
+        -------
+        bool
+            Flag whether all Parameters have identical values or not.
+        """
+        _vals = set()
+        for _arg in args:
+            if _arg not in self.keys():
+                raise KeyError(f'No Parameter with the key "{_arg}" has '
+                               'been registered.')
+            _vals.add(self.get_value(_arg))
+        if len(_vals) == 1:
+            return True
+        return False

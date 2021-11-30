@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+import copy
 import warnings
 import unittest
 
@@ -29,7 +30,7 @@ import numpy as np
 
 from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals,
                                   _insert_axis_key)
-from pydidas.image_io import rebin2d, rebin
+from pydidas.image_io import rebin2d
 from pydidas._exceptions import DatasetConfigException
 
 
@@ -186,6 +187,64 @@ class TestDataset(unittest.TestCase):
         self.assertIsNone(_new.axis_labels[0])
         self.assertIsNone(_new.axis_units[0])
         self.assertIsNone(_new.axis_ranges[0])
+
+    def test_empty_dataest_flatten_dims__simple(self):
+        _dims = (1, 2)
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims)
+        self.assertEqual(obj.ndim, len(self._dset['shape']) - 1)
+        for key, preset in zip(['axis_labels', 'axis_units', 'axis_ranges'],
+                               ['Flattened', '', None]):
+            self.assertEqual(getattr(obj, key)[_dims[0]], preset)
+
+    def test_empty_dataest_flatten_dims__1dim_only(self):
+        obj = self.create_large_dataset()
+        obj2 = copy.copy(obj)
+        obj2.flatten_dims(1)
+        self.assertTrue(np.equal(obj, obj2).all())
+
+    def test_empty_dataest_flatten_dims__distributed_dims(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.flatten_dims(1, 3)
+
+    def test_empty_dataest_flatten_dims__new_label(self):
+        _dims = (1, 2)
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims)
+        _new_label = 'new label'
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims, new_dim_label=_new_label)
+        _labels = [self._dset['labels'][i]
+                   for i in range(len(self._dset['labels'])) if i not in _dims]
+        _labels.insert(_dims[0], _new_label)
+        self.assertEqual(list(obj.axis_labels.values()), _labels)
+
+    def test_empty_dataest_flatten_dims__new_unit(self):
+        _dims = (1, 2)
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims)
+        _new_unit = 'new unit'
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims, new_dim_unit=_new_unit)
+        _units = [self._dset['units'][i]
+                   for i in range(len(self._dset['units'])) if i not in _dims]
+        _units.insert(_dims[0], _new_unit)
+        self.assertEqual(list(obj.axis_units.values()), _units)
+
+    def test_empty_dataest_flatten_dims__new_range(self):
+        _dims = (1, 2)
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims)
+        _new_range = np.arange(self._dset['shape'][_dims[0]]
+                               * self._dset['shape'][_dims[1]])
+        obj = self.create_large_dataset()
+        obj.flatten_dims(*_dims, new_dim_range=_new_range)
+        _range = [self._dset['ranges'][i]
+                   for i in range(len(self._dset['ranges'])) if i not in _dims]
+        _range.insert(_dims[0], _new_range)
+        self.assertTrue(np.equal(obj.axis_ranges[_dims[0]], _new_range).all())
+
 
     def test_empty_dataset__comparison_with_allclose(self):
         obj = self.create_large_dataset()

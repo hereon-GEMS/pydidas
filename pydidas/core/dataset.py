@@ -199,6 +199,56 @@ class EmptyDataset(np.ndarray):
         self._axis_units = {0: None}
         return super().flatten()
 
+    def flatten_dims(self, *args, new_dim_label='Flattened',
+                     new_dim_unit='', new_dim_range=None):
+        """
+        Flatten the specified dimensions in place in the Dataset.
+
+        This method will reduce the dimensionality of the Dataset by len(args).
+
+        Warning: Flattening distributed dimensions throughout the dataset will
+        destroy the data organisation and only adjacent dimensions can be
+        processed.
+
+        Parameters
+        ----------
+        *args : tuple
+            The tuple of the dimensions to be flattened. Each dimension must
+            be an integer entry.
+        new_dim_label : str, optional
+            The label for the new, flattened dimension. The default is
+            'Flattened'.
+        new_dim_unit : str, optional
+            The unit for the new, flattened dimension. The default is ''.
+        new_dim_range : object, optional
+            The new range for the flattened dimension. The default is None.
+        """
+        if len(args) < 2:
+            return
+        if set(np.diff(args)) != set([1]):
+            raise ValueError('The dimensions to flatten must be adjacent.')
+        _axis_labels = []
+        _axis_units = []
+        _axis_ranges = []
+        _new_shape = []
+        for _dim in range(self.ndim):
+            if _dim not in args:
+                _axis_labels.append(self._axis_labels[_dim])
+                _axis_units.append(self._axis_units[_dim])
+                _axis_ranges.append(self._axis_ranges[_dim])
+                _new_shape.append(self.shape[_dim])
+            elif _dim == args[0]:
+                _axis_labels.append(new_dim_label)
+                _axis_units.append(new_dim_unit)
+                _axis_ranges.append(new_dim_range)
+                _new_shape.append(np.prod([self.shape[_arg] for _arg in args]))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.shape = _new_shape
+        self.axis_labels = _axis_labels
+        self.axis_units = _axis_units
+        self.axis_ranges = _axis_ranges
+
     def get_rebinned_copy(self, binning):
         """
         Get a binned copy of the Dataset.

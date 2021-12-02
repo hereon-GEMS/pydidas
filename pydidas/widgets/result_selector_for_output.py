@@ -125,7 +125,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         Create all sub-widgets and populate the UI.
         """
         _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(5, 5, 0, 0)
+        _layout.setContentsMargins(0, 5, 0, 0)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.setLayout(_layout)
 

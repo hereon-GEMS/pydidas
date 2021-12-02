@@ -156,6 +156,7 @@ class AppRunner(WorkerController):
                                     args=self._processor['args'], daemon=True)
                           for i in range(self._n_workers)]
         for _worker in self._workers:
+            logger.debug('Starting Worker')
             _worker.start()
         self._flag_active = True
         self.__progress_done = 0

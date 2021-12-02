@@ -84,7 +84,7 @@ class ExecuteWorkflowFrame_BuilderMixin():
         """
         Build the frame and create all widgets.
         """
-        self.create_label('title', 'Full processing workflow', fontsize=14,
+        self.create_label('title', 'Full workflow processing', fontsize=14,
                            gridPos=(0, 0, 1, 5))
 
         self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
@@ -135,7 +135,8 @@ class ExecuteWorkflowFrame_BuilderMixin():
             select_results_param=self.get_param('selected_results'))
 
         self.create_button('but_save', 'Save composite image', enabled=False,
-                            gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
+                            gridPos=(-1, 0, 1, 1),
+                            fixedWidth=CONFIG_WIDGET_WIDTH,
                             parent_widget=self._widgets['config'])
 
         self.create_spacer('config_terminal_spacer', height=20,

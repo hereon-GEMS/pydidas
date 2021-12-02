@@ -45,6 +45,7 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('mosaic_border_width'),
     get_generic_parameter('mosaic_border_value'),
     get_generic_parameter('mosaic_max_size'),
+    get_generic_parameter('plot_update_time')
     )
 
 

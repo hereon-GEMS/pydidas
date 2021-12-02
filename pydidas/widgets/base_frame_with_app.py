@@ -24,8 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseFrameWithApp']
 
-import copy
-
 from PyQt5 import QtCore
 
 from ..apps import BaseApp

@@ -25,10 +25,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['format_str', 'get_time_string', 'get_short_time_string',
            'timed_print', 'get_warning', 'convert_unicode_to_ascii',
-           'convert_special_chars_to_unicode']
+           'convert_special_chars_to_unicode', 'get_range_as_formatted_string']
 
 import time
-from numbers import Real
+from numbers import Real, Integral
+
 import numpy as np
 
 from ..constants import GREEK_ASCII_TO_UNI, GREEK_UNI_TO_ASCII
@@ -286,3 +287,35 @@ def convert_unicode_to_ascii(obj):
         obj = obj.replace('\u207b\u00B9', '^-1')
         return obj
     raise TypeError(f'Cannot process objects of type {type(obj)}')
+
+
+def get_range_as_formatted_string(obj):
+    """
+    Get a formatted string representation of an iterable range.
+
+    Parameters
+    ----------
+    _range : Union[np.ndarray, list, tuple]
+        The input range.
+
+    Returns
+    -------
+    str :
+        The formatted string representation
+    """
+    if isinstance(obj, str):
+        return obj
+    try:
+        _min, _max = obj[0], obj[-1]
+        _str_items = []
+        for _item in [_min, _max]:
+            if isinstance(_item, Integral):
+                _item = f'{_item:d}'
+            elif isinstance(_item, Real):
+                _item = f'{_item:.6f}'
+            else:
+                _item = str(_item)
+            _str_items.append(_item)
+        return _str_items[0] + ' ... ' + _str_items[1]
+    except TypeError:
+        return 'unknown range'

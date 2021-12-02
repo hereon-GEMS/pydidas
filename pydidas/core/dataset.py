@@ -120,7 +120,8 @@ class EmptyDataset(np.ndarray):
         pydidas.core.Dataset
             The sliced new dataset.
         """
-        self._getitem_key = (key,) if isinstance(key, (int, slice)) else key
+        self._getitem_key = ((key,) if isinstance(key, (Integral, slice))
+                             else key)
         return super().__getitem__(key)
 
     def __array_finalize__(self, obj):
@@ -186,17 +187,17 @@ class EmptyDataset(np.ndarray):
         if self.ndim == 1 and (len(keys['axis_ranges']) > 1
                                or len(keys['axis_units']) > 1
                                or len(keys['axis_labels']) > 1):
-            keys['axis_labels'] = {0: 'flattened'}
-            keys['axis_ranges'] = {0: None}
-            keys['axis_units'] = {0: None}
+            keys['axis_labels'] = {0: 'Flattened'}
+            keys['axis_ranges'] = {0: np.arange(self.size)}
+            keys['axis_units'] = {0: ''}
 
     def flatten(self):
         """
         Clear the metadata when flattening the array.
         """
-        self._axis_labels = {0: None}
-        self._axis_ranges = {0: None}
-        self._axis_units = {0: None}
+        self._axis_labels = {0: 'Flattened'}
+        self._axis_ranges = {0: np.arange(self.size)}
+        self._axis_units = {0: ''}
         return super().flatten()
 
     def flatten_dims(self, *args, new_dim_label='Flattened',

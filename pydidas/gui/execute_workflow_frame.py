@@ -39,9 +39,10 @@ from pydidas.multiprocessing import AppRunner
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 from pydidas.widgets import (ReadOnlyTextWidget, CreateWidgetsMixIn,
                              BaseFrameWithApp)
+from pydidas.widgets.dialogues import QuestionBox
 from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.gui.builders.execute_workflow_frame_builder import (
-    create_execute_workflow_frame_widgets_and_layout)
+    ExecuteWorkflowFrame_BuilderMixin)
 from pydidas.utils import timed_print
 
 
@@ -52,10 +53,7 @@ TREE = WorkflowTree()
 
 DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('run_type'),
-    get_generic_parameter('scan_index1'),
-    get_generic_parameter('scan_index2'),
-    get_generic_parameter('scan_index3'),
-    get_generic_parameter('scan_index4'),
+    get_generic_parameter('selected_results')
     )
 
 SCAN.import_from_file('H:/myPython/pydidas/tests_of_workflow/__scan_settings.yaml')
@@ -76,43 +74,52 @@ for _i in [1, 2]:
 
 
 class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
-                           CreateWidgetsMixIn):
+                           CreateWidgetsMixIn,
+                           ExecuteWorkflowFrame_BuilderMixin):
+    """
+    The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
+    and visualize the results.
+    """
     default_params = DEFAULT_PARAMS
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
-        self._config = {}
+        ExecuteWorkflowFrame_BuilderMixin.__init__(self)
+        _global_plot_update_time = self.q_settings_get_global_value(
+            'plot_update_time', argtype=float)
+        self._config = {'data_use_timeline': False,
+                        'plot_dim': 2,
+                        'plot_active': True,
+                        'active_node': None,
+                        'data_slices': (),
+                        'plot_last_update': 0,
+                        'plot_update_time': _global_plot_update_time,
+                        'frame_active': True}
         self._app = ExecuteWorkflowApp()
-        self.__create_param_collection()
         self.set_default_params()
-        create_execute_workflow_frame_widgets_and_layout(self)
-        self.__connect_signals()
-        self.__update_result_selection()
-
-    def __create_param_collection(self):
-        """
-        Create the local ParameterCollection which is an updated
-        CompositeCreatorApp collection.
-        """
         self.add_params(self._app.params)
-        self.add_param(get_generic_parameter('selected_results'))
-
+        self.build_frame()
         self.__update_choices_of_selected_results()
+        self.__connect_signals()
+        self.__update_result_node_information()
 
     def __connect_signals(self):
+        """
+        Connect all required Qt slots and signals.
+        """
         self.param_widgets['autosave_results'].io_edited.connect(
             self.__update_autosave_widget_visibility)
         self._widgets['but_exec'].clicked.connect(self.__execute)
         self._widgets['but_abort'].clicked.connect(self.__abort_execution)
-        # self._widgets['combo_results'].currentIndexChanged.connect(
-        #     self.__result_selection_changed)
-        self.param_widgets['selected_results'].currentIndexChanged.connect(
-            self.__result_selection_changed)
-
+        self._widgets['result_selector'].new_selection.connect(
+            self.__update_result_selection)
 
     def __abort_execution(self):
+        """
+        Abort the execution of the AppRunner.
+        """
         if self._runner is not None:
             self._runner.send_stop_signal()
         self.set_status('Aborted processing of full workflow.')
@@ -131,33 +138,19 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         """
         Parallel implementation of the execution method.
         """
-        import pydidas
-        import logging
-        logger = pydidas.utils.pydidas_logger()
-        logger.setLevel(logging.DEBUG)
-
-        logger.debug('Starting')
         self._prepare_app_run()
-        logger.debug('Prepared app_run')
         self._app.multiprocessing_pre_run()
-        logger.debug('Finished MP pre-run')
         self._config['last_update'] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
-
-        # self._widgets['but_exec'].setEnabled(False)
-        # self._widgets['but_abort'].setVisible(True)
-        # self._widgets['progress'].setVisible(True)
-        self._widgets['progress'].setValue(0)
         self._runner = AppRunner(self._app)
-        logger.debug('Created  AppRunner')
         self._runner.final_app_state.connect(self._set_app)
         self._runner.progress.connect(self._apprunner_update_progress)
         self._runner.finished.connect(self._apprunner_finished)
         self._runner.results.connect(
             self._app.multiprocessing_store_results)
-        self._runner.results.connect(self.__update_result_selection)
+        self._runner.results.connect(self.__update_result_node_information)
+        self._runner.results.connect(self.__check_for_plot_update)
         self._runner.start()
-        logger.debug('Started AppRunner')
 
     def _prepare_app_run(self):
         """
@@ -167,14 +160,27 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         parallel running of the app.
         """
         self.set_status('Started processing of full workflow.')
+        self._widgets['progress'].setValue(0)
         self.__clear_selected_results_entries()
+        self.__clear_plot()
 
     def __clear_selected_results_entries(self):
+        """
+        Clear the selection of the results and reset the view. This method
+        will hide the data selection widgets.
+        """
         self.set_param_value('selected_results', 'No selection')
         self.params['selected_results'].choices = ['No selection']
-        self.toggle_param_widget_visibility('selected_results', False)
-        self.param_widgets['selected_results'].update_choices(['No selection'])
-        print('Combo text: ', self.param_widgets['selected_results'].currentText())
+        self._widgets['result_selector'].reset()
+
+    def __clear_plot(self):
+        """
+        Clear all curves / images from the plot and disable any new updates.
+        """
+        self._config['plot_active'] = False
+        for _plot in [self._widgets['plot1d'], self._widgets['plot2d']]:
+            for _item in _plot.getItems():
+                _plot.removeItem(_item)
 
     @QtCore.pyqtSlot()
     def _apprunner_finished(self):
@@ -186,28 +192,106 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self._runner = None
         self.set_status('Finished processing of full workflow.')
         self.__finish_processing()
+        self.__update_plot()
+
 
     @QtCore.pyqtSlot()
-    def __update_result_selection(self):
+    def __update_result_node_information(self):
+        """
+        Update the information about the nodes' results after the AppRunner
+        has sent the first results.
+        """
+        self._widgets['result_selector'].get_and_store_result_node_infos()
         try:
-            self._runner.results.disconnect(self.__update_result_selection)
+            self._runner.results.disconnect(
+                self.__update_result_node_information)
         except AttributeError:
             pass
-        self.param_widgets['selected_results'].currentIndexChanged.disconnect(
-            self.__result_selection_changed)
 
-        self.__update_choices_of_selected_results()
-        self.toggle_param_widget_visibility('selected_results', True)
-        self.param_widgets['selected_results'].update_choices(
-            self.get_param('selected_results').choices)
-        self.param_widgets['selected_results'].currentIndexChanged.connect(
-            self.__result_selection_changed)
+    @QtCore.pyqtSlot(bool, int, int, object)
+    def __update_result_selection(self, use_timeline, plot_dim, node_id,
+                                  slices):
+        """
+        Update the selection of results to show in the plot.
 
+        Parameters
+        ----------
+        use_timeline : bool
+            Flag whether to use a timeline and collapse all scan dimensions
+            or not.
+        plot_dim : int
+            The dimension of the plot results.
+        node_id : int
+            The result node ID.
+        slices : tuple
+            The tuple with the slices which select the data for plotting.
+        """
+        self._config['plot_active'] = True
+        self._config['data_use_timeline'] = use_timeline
+        self._config['plot_dim'] = plot_dim
+        self._config['active_node'] = node_id
+        self._config['data_slices'] = slices
+        self.__update_plot()
 
+    @QtCore.pyqtSlot()
+    def __check_for_plot_update(self):
+        _dt = time.time() - self._config['plot_last_update']
+        if (_dt > self._config['plot_update_time']
+                and self._config['frame_active']):
+            self._config['plot_last_update'] = time.time()
+            self.__update_plot()
+
+    def __update_plot(self):
+        """
+        Update the plot.
+
+        This method will get the latest result (subset) from the
+        WorkflowResults and update the plot.
+        """
+        if not self._config['plot_active']:
+            return
+        _dim = self._config['plot_dim']
+        _node = self._config['active_node']
+        _data = RESULTS.get_result_subset(_node, self._config['data_slices'],
+                                          self._config['data_use_timeline'])
+        if not isinstance(_data.axis_ranges[0], np.ndarray):
+            _data.axis_ranges[0] = np.arange(_data.shape[0])
+        self._widgets['plot_stack'].setCurrentIndex(_dim - 1)
+        _plot = self._widgets[f'plot{_dim}d']
+        _plot.setGraphTitle(RESULTS.labels[_node])
+        _label = lambda i: (_data.axis_labels[i]
+                            + (' / ' + _data.axis_units[i]
+                               if len(_data.axis_units[i]) > 0 else ''))
+        if _dim == 1:
+            _plot.addCurve(_data.axis_ranges[0], _data.array, replace=True,
+                           linewidth=1.5)
+            _plot.setGraphYLabel(RESULTS.labels[_node])
+            _plot.setGraphXLabel(_label(0))
+        elif _dim == 2:
+            if not isinstance(_data.axis_ranges[1], np.ndarray):
+                _data.axis_ranges[1] = np.arange(_data.shape[1])
+            _plot.addImage(_data, replace=True, copy=False)
+            _plot.setGraphYLabel(_label(0))
+            _plot.setGraphXLabel(_label(1))
+
+    def frame_activated(self, index):
+        if index == self.frame_index:
+            _box = QuestionBox(
+                'Update results?',
+                'Do you want to update the global WorkflowResults?',
+                ('Selecting "Yes" will  remove all current results and create '
+                 'empty containers for the new results. Only do this when you '
+                 'changed the WorkflowTree, but then it is mandatory.'))
+            if _box.exec_():
+                RESULTS.update_shapes_from_scan_and_workflow()
+                self.__clear_selected_results_entries()
+                self.__clear_plot()
+            self.__update_choices_of_selected_results()
+            self.__check_for_plot_update()
+        self._config['frame_active'] = (index == self.frame_index)
 
     def __finish_processing(self):
         self.__set_proc_widget_visibility_for_running(False)
-        # self.__populate_results_combo()
         self.__update_choices_of_selected_results()
 
     def __set_proc_widget_visibility_for_running(self, running):
@@ -222,69 +306,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
             accordingly or not.
         """
         self._widgets['but_exec'].setEnabled(not running)
-        self._widgets['label_results'].setVisible(not running)
-        self._widgets['combo_results'].setVisible(not running)
         self._widgets['but_abort'].setVisible(running)
         self._widgets['progress'].setVisible(running)
-        self._widgets['but_show'].setEnabled(not running)
         self._widgets['but_save'].setEnabled(not running)
 
-    def __populate_results_combo(self):
-        """
-        Populate the results QComboBox with entries for all WorkflowResults.
-        """
-        self._widgets['combo_results'].currentIndexChanged.disconnect()
-        _combo = self._widgets['combo_results']
-        _combo.clear()
-        _combo.addItem('None')
-        for _id, _label in RESULTS.labels.items():
-            _combo.addItem(f'{_label} (node #{_id:03d})')
-        _combo.setCurrentIndex(0)
-        self._widgets['combo_results'].currentIndexChanged.connect(
-            self.__result_selection_changed)
-
-
-
-    @QtCore.pyqtSlot(int)
-    def __result_selection_changed(self, index):
-        """
-        Received signal that the selection in the results combo box has
-        changed.
-
-        Parameters
-        ----------
-        index : int
-            The new QComboBox selection index.
-        """
-        print('New index: ', index)
-        print(f'Combo entry: "{self.param_widgets["selected_results"].currentText()}"')
-        print(f'Param value: "{self.get_param_value("selected_results")}"')
-        self.__update_text_description_of_node_results()
-
-    def __update_text_description_of_node_results(self):
-        # _txt = self._widgets['combo_results'].currentText()
-        _txt = self.param_widgets["selected_results"].currentText()
-        if _txt in ['None', 'No selection', '']:
-            self._widgets['result_info'].setVisible(False)
-            return
-        self._widgets['result_info'].setVisible(True)
-        print(_txt, _txt == '', _txt is None)
-        _id = int(_txt[-4:-1])
-        _meta = RESULTS.get_result_metadata(_id)
-        _ax_labels = _meta['axis_labels']
-        _ax_units= _meta['axis_units']
-        _ax_ranges = _meta['axis_ranges']
-        _txt = ''
-        for _axis in _ax_labels:
-            if isinstance(_ax_ranges[_axis], (np.ndarray, list, tuple)):
-                _range = (f'{_ax_ranges[_axis][0]:.6f} .. '
-                          f'{_ax_ranges[_axis][-1]:.6f} {_ax_units[_axis]}')
-            else:
-                _range = f'unknown range (unit: {_ax_units[_axis]}'
-            _txt += (f'Axis #{_axis:02d}:\n'
-                     f'  Label: {_ax_labels[_axis]}\n'
-                     f'  Range: {_range}\n')
-        self._widgets['result_info'].setText(_txt)
 
     def __run_cmd_process(self):
         # subprocess.Popen(executable, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS, close_fds=True)
@@ -304,13 +329,6 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
                                                  'No selection')
         self.params['selected_results'].choices = _new_choices
 
-
-
-
-    def frame_activated(self, index):
-        if index == self.frame_index:
-            RESULTS.update_shapes_from_scan_and_workflow()
-            self.__update_choices_of_selected_results()
 
     def __update_autosave_widget_visibility(self):
         _vis = self.get_param_value('autosave_results')

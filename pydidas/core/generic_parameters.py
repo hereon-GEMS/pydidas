@@ -41,6 +41,8 @@ GENERIC_PARAMS = ParameterCollection(
     Parameter('live_processing', int, 0, name='Live processing',
               choices=[True, False], tooltip=TOOLTIPS['live_processing']),
     Parameter('label', str, '', name='Label', tooltip=TOOLTIPS['label']),
+    Parameter('plot_update_time', float, 1.0, unit='s',
+              name='Plot update time', tooltip=TOOLTIPS['plot_update_time']),
     ###################################
     ## Parameters for CompositeCreation
     ###################################

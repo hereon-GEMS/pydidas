@@ -66,8 +66,7 @@ class ParameterCollectionEditWidget(QtWidgets.QFrame,
         if initLayout:
             _layout = QtWidgets.QGridLayout()
             _layout.setContentsMargins(5, 5, 0, 0)
-            _layout.setAlignment(QtCore.Qt.AlignLeft
-                                      | QtCore.Qt.AlignTop)
+            _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
 
     def next_row(self):

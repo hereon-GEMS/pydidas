@@ -15,8 +15,8 @@
 
 """
 Module with the ResultSelectorForOutput widget which can handle the selection
-of choices from the WorkflowResults and returns a signal with new data
-selection.
+of a node with results from the WorkflowResults and returns a signal with
+information on how to access the new data selection.
 """
 
 __author__      = "Malte Storm"
@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ResultSelectorForOutput']
 
-from numbers import Integral, Real
 from functools import partial
 from copy import copy
 
@@ -35,8 +34,9 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
 from pydidas.core import (ScanSettings, Parameter, ParameterCollection,
-                          ParameterCollectionMixIn, get_generic_parameter)
+                          ParameterCollectionMixIn)
 from pydidas.constants import CONFIG_WIDGET_WIDTH
+from pydidas.utils import get_range_as_formatted_string
 from pydidas.workflow_tree import WorkflowResults
 from pydidas.widgets.create_widgets_mixin import CreateWidgetsMixIn
 from pydidas.widgets.read_only_text_widget import ReadOnlyTextWidget
@@ -66,47 +66,34 @@ def _param_widget_config(param_key):
                 visible=False)
 
 
-def _get_range_as_formatted_string(_range):
-    """
-    Get a formatted string representation of an iterable range.
-
-    Parameters
-    ----------
-    _range : Union[np.ndarray, list, tuple]
-        The input range.
-
-    Returns
-    -------
-    str :
-        The formatted string representation
-    """
-    if isinstance(_range, str):
-        return _range
-    try:
-        _min, _max = _range[0], _range[-1]
-        _str_items = []
-        for _item in [_min, _max]:
-            if isinstance(_item, Integral):
-                _item = f'{_item:d}'
-            elif isinstance(_item, Real):
-                _item = f'{_item:.6f}'
-            else:
-                _item = str(_item)
-            _str_items.append(_item)
-        return _str_items[0] + ' ... ' + _str_items[1]
-    except TypeError:
-        return 'unknown range'
-
-
 class ResultSelectorForOutput(QtWidgets.QWidget,
                               CreateWidgetsMixIn,
                               ParameterWidgetsMixIn,
                               ParameterCollectionMixIn):
     """
-    Widgets for I/O during plugin parameter editing with predefined
-    choices.
+    The ResultSelectorForOutput widget allows to select data slices for
+    plotting using meta information from the
+    :py:class:`ScanSettings <pydidas.core.ScanSettings<` and
+    :py:class:`WorkflowResults <pydidas.workflow_tree.WorkflowResults>`
+    singletons.
+
+    The widget allows to select a :py:class:`WorkflowNode
+    <pydidas.workflow_tree.WorkflowNode>`, display all the meta information
+    for all dimensions in the results (label, unit, range) and select data
+    dimension(s) (based on the dimensionality of the plot) and slice indices
+    for other dimensions. In addition, an option to hande the Scan as a
+    "timeline" is given. In a timeline, all Scan points will be flattened to
+    a 1d-dataset.
+
+    Parameters
+    ----------
+    parent : QtWidgets.QWidget
+        The parent widget.
+    select_results_param : pydidas.core.Parameter
+        The select_results Parameter instance. This instance should be
+        shared between the ResultSelectorForOutput and the parent.
     """
-    new_selection = QtCore.pyqtSignal(bool, int, object)
+    new_selection = QtCore.pyqtSignal(bool, int, int, object)
 
     default_params = ParameterCollection(
         Parameter('n_dim', int, -1, name='Total result dimensionality'),
@@ -115,18 +102,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         Parameter('plot_ax2', int, 1, name='Data axis no. 2 for plot',
                   choices=[0, 1]),)
 
-    def __init__(self, parent=None, select_results_param=None):
-        """
-        Create a new ResultSelectorForOutput instance.
-
-        Parameters
-        ----------
-        parent : QtWidgets.QWidget
-            The parent widget.
-        select_results_param : pydidas.core.Parameter
-            The select_results Parameter instance. This instance should be
-            shared between the ResultSelectorForOutput and the parent.
-        """
+    def __init__(self, parent=None, select_results_param=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
@@ -186,9 +162,9 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         """
         self.param_widgets['selected_results'].currentIndexChanged.connect(
             self.__selected_new_node)
-        self._widgets['radio_datashape'].new_button.connect(
+        self._widgets['radio_datashape'].new_button_index.connect(
             self.__new_selection_of_plot_dimension)
-        self._widgets['radio_arrangement'].new_button.connect(
+        self._widgets['radio_arrangement'].new_button_index.connect(
             self.__new_selection_of_scan_result_arrangement)
         self.param_widgets['plot_ax1'].currentIndexChanged.connect(
             partial(self.__selected_new_plot_axis, 1))
@@ -196,6 +172,29 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             partial(self.__selected_new_plot_axis, 2))
         self._widgets['but_confirm'].clicked.connect(self.__confirm_selection)
 
+    def reset(self):
+        """
+        Reset the instance to its default selection, for example when a new
+        processing has been started and te old information is no longer valid.
+        """
+        self._config = {'widget_visibility': False,
+                        'scan_use_timeline': False,
+                        'result_ndim': -1,
+                        '2d_plot': False,
+                        'n_slice_params': self._config['n_slice_params'],
+                        }
+        self._active_node = -1
+        with SignalBlocker(self.param_widgets['selected_results']):
+            self.param_widgets['selected_results'].update_choices(
+                ['No selection'])
+        self.param_widgets['selected_results'].setCurrentText('No selection')
+        with SignalBlocker(self._widgets['radio_datashape']):
+            self._widgets['radio_datashape'].select_by_index(0)
+        with SignalBlocker(self._widgets['radio_arrangement']):
+            self._widgets['radio_arrangement'].select_by_index(0)
+        self.__set_derived_widget_visibility(False)
+
+    @QtCore.pyqtSlot()
     def get_and_store_result_node_infos(self):
         """
         Get and store the labels of the current nodes in the WorkflowResults.
@@ -215,36 +214,40 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self.param_widgets['selected_results'].update_choices(_new_choices)
             self.param_widgets['selected_results'].setCurrentText(_curr_choice)
 
-    @QtCore.pyqtSlot(int, str)
-    def __new_selection_of_plot_dimension(self, dim_index, dim_label):
+    @QtCore.pyqtSlot(int)
+    def __new_selection_of_plot_dimension(self, index):
         """
         Update the selection
 
         Parameters
         ----------
-        dim_index : int
-            THe index of the dimension selection.
-        dim_label : str
-            The label of the dimension selection.
+        index : int
+            The index of the dimension selection.
         """
-        self._config['2d_plot'] = bool(dim_index)
+        self._config['2d_plot'] = bool(index)
         self.param_composite_widgets['plot_ax2'].setVisible(
-            dim_index and self._config['widget_visibility'])
+            index and self._config['widget_visibility'])
         self.__change_slice_param_widget_visibility()
 
-
-    def __change_slice_param_widget_visibility(self):
+    def __change_slice_param_widget_visibility(self, hide_all=False):
         """
         Change the visibility of Parameter selection widgets for the slice
         dimensions in the dataset.
+
+        Parameters
+        ----------
+        hide_all : bool, optional
+            Keyword to force hiding of all Parameter slice dimension widgets.
         """
         _frozendims = [self.get_param_value('plot_ax1')]
         if self._config['2d_plot']:
             _frozendims.append(self.get_param_value('plot_ax2'))
         for _dim in range(self._config['n_slice_params']):
             _refkey = f'plot_slice_{_dim}'
-            self.param_composite_widgets[_refkey].setVisible(
-                _dim < self._config['result_ndim'] and _dim not in _frozendims)
+            _vis = (False if hide_all else
+                    (_dim < self._config['result_ndim']
+                     and _dim not in _frozendims))
+            self.param_composite_widgets[_refkey].setVisible(_vis)
 
     @QtCore.pyqtSlot(int)
     def __selected_new_node(self, index):
@@ -259,7 +262,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         """
         if index == 0:
             self._active_node = -1
-            self.__change_derived_widget_visibility(False)
+            self.__set_derived_widget_visibility(False)
         elif index > 0:
             self._active_node = int(
                 self.param_widgets["selected_results"].currentText()[-4:-1])
@@ -268,8 +271,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self.__update_dim_choices_for_plot_selection()
             self.__check_and_create_params_for_slice_selection()
 
-
-    def __change_derived_widget_visibility(self, visible):
+    def __set_derived_widget_visibility(self, visible):
         """
         Change the visibility of all 'derived' widgets.
 
@@ -289,6 +291,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         self.param_composite_widgets['plot_ax2'].setVisible(
             visible and self._config['2d_plot'])
         self._widgets['but_confirm'].setVisible(visible)
+        self.__change_slice_param_widget_visibility(hide_all=not visible)
 
     def __calc_and_store_ndim_of_results(self):
         """
@@ -307,7 +310,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         """
         _txt = self.__get_edited_result_metadata_string()
         self._widgets['result_info'].setText(_txt)
-        self.__change_derived_widget_visibility(True)
+        self.__set_derived_widget_visibility(True)
 
     def __get_edited_result_metadata_string(self):
         """
@@ -322,7 +325,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         _scandim = SCAN.get_param_value('scan_dim')
         _ax_labels = copy(_meta['axis_labels'])
         _ax_units= copy(_meta['axis_units'])
-        _ax_ranges = {_key: _get_range_as_formatted_string(_range)
+        _ax_ranges = {_key: get_range_as_formatted_string(_range)
                          for _key, _range in _meta['axis_ranges'].items()}
         _ax_types = {_key: ('(scan)' if _key < _scandim else '(data)')
                      for _key in _meta['axis_labels'].keys()}
@@ -344,8 +347,8 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                          f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n')
                         for _axis in _ax_labels])
 
-    @QtCore.pyqtSlot(int, str)
-    def __new_selection_of_scan_result_arrangement(self, index, label):
+    @QtCore.pyqtSlot(int)
+    def __new_selection_of_scan_result_arrangement(self, index):
         """
         Get and store the current selection for the organization of the
         scan results in a timeline or using the ScanSettings shape.
@@ -357,8 +360,6 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         ----------
         index : int
             The index of the newly activated button.
-        label : str
-            The label of the newly activated button.
         """
         self._config['scan_use_timeline'] = bool(index)
         self.__calc_and_store_ndim_of_results()
@@ -424,7 +425,8 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         if _plot_dim == 2:
             _plotax2 = self.get_param_value('plot_ax2')
             _selection[_plotax2] = slice(0, _npoints[_plotax2], 1)
-        self.new_selection.emit(_flag, _plot_dim, tuple(_selection))
+        self.new_selection.emit(_flag, _plot_dim, self._active_node,
+                                tuple(_selection))
 
     def __update_dim_choices_for_plot_selection(self):
         """
@@ -471,38 +473,3 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         self._config['n_slice_params'] = max(self._config['n_slice_params'],
                                              RESULTS.ndims[self._active_node])
         self.__change_slice_param_widget_visibility()
-
-
-
-if __name__ == '__main__':
-    import pickle
-    import sys
-    from pydidas.core import Dataset
-    from pydidas.constants import STANDARD_FONT_SIZE
-    RESULTS.__dict__ = pickle.load(
-        open('d:/tmp/saved_results/results.pickle', 'rb'))
-    for _i in [1, 2]:
-        _data = Dataset(np.load(f'd:/tmp/saved_results/node_{_i:02d}.npy'))
-        _meta = pickle.load(
-            open(f'd:/tmp/saved_results/node_{_i:02d}.pickle', 'rb'))
-        _data.axis_labels = _meta['axis_labels']
-        _data.axis_units = _meta['axis_units']
-        _data.axis_ranges = _meta['axis_ranges']
-        RESULTS._WorkflowResults__composites[_i] = _data
-
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = QtWidgets.QMainWindow()
-    _w = ResultSelectorForOutput(
-        None, get_generic_parameter('selected_results'))
-    _w.get_and_store_result_node_infos()
-    gui.setCentralWidget(_w)
-
-    gui.show()
-    sys.exit(app.exec_())
-
-    # app.deleteLater()

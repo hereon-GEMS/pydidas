@@ -36,7 +36,8 @@ class RadioButtonGroup(QtWidgets.QWidget):
     in a QButtonGroup. Creation is automated based on the entries.
     """
 
-    new_button = QtCore.pyqtSignal(int, str)
+    new_button_index = QtCore.pyqtSignal(int)
+    new_button_label = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None, entries=None, vertical=True, title=None):
         """
@@ -159,7 +160,8 @@ class RadioButtonGroup(QtWidgets.QWidget):
             _entry = _button.text()
             self._active_index = _index
             if self._emit_signal:
-                self.new_button.emit(_index, _entry)
+                self.new_button_index.emit(_index)
+                self.new_button_label.emit(_entry)
 
     def which_is_checked(self):
         """

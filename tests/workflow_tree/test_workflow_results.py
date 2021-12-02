@@ -26,6 +26,7 @@ import unittest
 import tempfile
 import shutil
 import os
+from numbers import Real
 
 import numpy as np
 
@@ -135,6 +136,48 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertIsInstance(_res, dict)
         for _key in ['axis_labels', 'axis_ranges', 'axis_units', 'metadata']:
             self.assertTrue(_key in _res)
+
+    def test_get_result_subset__no_flatten_single_point(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (0, 0, 0, 0, 0)
+        _node_id = 1
+        _res = RES.get_result_subset(_node_id, _slice)
+        self.assertIsInstance(_res, Real)
+
+    def test_get_result_subset__no_flatten_w_array(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (slice(0, self._scan_n[0]), 0, slice(0, self._scan_n[2]), 0,
+                  0)
+        _node_id = 1
+        _res = RES.get_result_subset(_node_id, _slice)
+        self.assertIsInstance(_res, np.ndarray)
+        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
+
+    def test_get_result_subset__flatten_single_point(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (0, 0, 0)
+        _node_id = 1
+        _res = RES.get_result_subset(_node_id, _slice, flattened_scan_dim=True)
+        self.assertIsInstance(_res, Real)
+
+    def test_get_result_subset__flatten_array(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (slice(0, self._scan_n[0] -3 ), 0, slice(0,  self._scan_n[2]))
+        _node_id = 1
+        _res = RES.get_result_subset(_node_id, _slice, flattened_scan_dim=True)
+        self.assertIsInstance(_res, np.ndarray)
+        self.assertEqual(_res.shape, (self._scan_n[0] - 3, self._scan_n[2]))
+
+    def test_get_result_subset__flatten_array_multidim(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (slice(0, self._scan_n[0] -3 ), 0,
+                  slice(0,  self._result2_shape[1] - 1))
+        _node_id = 2
+        _res = RES.get_result_subset(_node_id, _slice, flattened_scan_dim=True)
+        self.assertIsInstance(_res, np.ndarray)
+        self.assertEqual(_res.shape,
+                         (self._scan_n[0] - 3, self._result2_shape[1] - 1,
+                         self._result2_shape[2]))
 
     def test_shapes__empty(self):
         self.assertEqual(RES.shapes, {})

@@ -82,3 +82,8 @@ def create_global_configuratation_frame_widgets_and_layout(frame):
     frame.create_param_widget(frame.get_param('mosaic_max_size'),
                               **_options)
     frame.create_spacer('spacer_3')
+
+    frame.create_label('section_plotting', 'Plotting settings',
+                      **_section_options)
+    frame.create_param_widget(frame.get_param('plot_update_time'),
+                              **_options)

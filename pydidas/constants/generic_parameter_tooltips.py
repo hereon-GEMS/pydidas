@@ -6,6 +6,9 @@ TOOLTIPS = {
               'Internally, all Plugins are identified by their node IDs, this'
               ' additional label is merely a handle for easier human '
               'identification.'),
+    'plot_update_time': ('The delay before any plot updates will be '
+                         'processed. This will prevent multiple frequent '
+                         'update of plots.'),
     'filename': 'The file name of the input file.',
     'first_file': ('The name of the first file for a file series or of the '
                    'hdf5 file in case of hdf5 file input.'),

@@ -184,9 +184,10 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = obj.flatten()
         self.assertEqual(_new.size, obj.size)
-        self.assertIsNone(_new.axis_labels[0])
-        self.assertIsNone(_new.axis_units[0])
-        self.assertIsNone(_new.axis_ranges[0])
+        self.assertEqual(_new.axis_labels[0], 'Flattened')
+        self.assertEqual(_new.axis_units[0], '')
+        self.assertTrue(
+            np.equal(_new.axis_ranges[0], np.arange(_new.size)).all())
 
     def test_empty_dataest_flatten_dims__simple(self):
         _dims = (1, 2)

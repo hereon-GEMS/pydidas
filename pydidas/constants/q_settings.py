@@ -6,4 +6,5 @@ QSETTINGS_GLOBAL_KEYS = ['mp_n_workers',
                          'mosaic_border_width',
                          'mosaic_border_value',
                          'mosaic_max_size',
-                         'plugin_path']
+                         'plugin_path',
+                         'plot_update_time']

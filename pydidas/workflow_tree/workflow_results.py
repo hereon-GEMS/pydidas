@@ -202,6 +202,40 @@ class _WorkflowResults(QtCore.QObject):
         """
         return self.__composites[node_id]
 
+    def get_result_subset(self, node_id, slices, flattened_scan_dim=False):
+        """
+        Get a slices subset of a node_id result.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which results should be retured.
+        slices : tuple
+            The tuple used for slicing/indexing the np.ndaray.
+        flattened_scan_dim : bool, optional
+            Keyword to process flattened Scan dimensions. If True, the Scan
+            is assumed to be 1-d only and the first slice item will be used
+            for the Scan whereas the remaining slice items will be used for
+            the resulting data. The default is False.
+
+        Returns
+        -------
+        np.ndarray
+            The subset of the results.
+        """
+        if flattened_scan_dim:
+            _tmpslices = (tuple(slice(0, SCAN.shape[_i], 1)
+                                for _i in range(SCAN.ndim))
+                          + slices[1:])
+            _data = self.__composites[node_id][_tmpslices].copy()
+            _data.flatten_dims(*range(SCAN.ndim),
+                               new_dim_label='Scan timeline',
+                               new_dim_range=np.arange(SCAN.n_total))
+            return _data[slices[0]]
+        else:
+            _data = self.__composites[node_id].copy()
+            return _data[slices]
+
     def get_result_metadata(self, node_id):
         """
         Get the stored metadata for the results of the specified node.

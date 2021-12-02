@@ -25,145 +25,132 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_execute_workflow_frame_widgets_and_layout']
+__all__ = ['ExecuteWorkflowFrame_BuilderMixin']
 
 from PyQt5 import QtCore, QtWidgets
-from silx.gui.plot import PlotWindow
+from silx.gui.plot import Plot1D, Plot2D
 
-from pydidas.widgets import (ScrollArea, create_default_grid_layout,
-                             ReadOnlyTextWidget)
+from pydidas.widgets import ScrollArea, ResultSelectorForOutput
 from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
 from pydidas.constants import CONFIG_WIDGET_WIDTH
 
 
-def create_execute_workflow_frame_widgets_and_layout(frame):
+class ExecuteWorkflowFrame_BuilderMixin():
     """
-    Create all widgets and initialize their state.
+    Mix-in class which includes the build_frame method to populate the
+    base class's UI and initialize all widgets.
+    """
+    def __init__(self):
+        self._widgets = {}
+        _layout = self.layout()
+        _layout.setHorizontalSpacing(10)
+        _layout.setVerticalSpacing(5)
 
-    Parameters
-    ----------
-    frame : pydidas.gui.ProcessingFullWorkflowFrame
-        The ProcessingFullWorkflowFrame instance.
-    """
-    def __get_param_widget_config(param_key):
+    def __param_widget_config(self, param_key):
         """
-        Get Formatting options for create_param_widget instances.
+        Get Formatting options for create_param_widget calls.
+
+        Parameters
+        ----------
+        param_key : str
+            The Parameter reference key.
+
+        Returns
+        -------
+        dict :
+            The dictionary with the formatting options.
         """
         if param_key in ['autosave_dir', 'run_type', 'selected_results']:
-            return  dict(linebreak=True,
-                         parent_widget=frame._widgets['io_frame'],
+            _dict = dict(linebreak=True,
+                         parent_widget=self._widgets['config'],
                          halign_text=QtCore.Qt.AlignLeft,
                          valign_text=QtCore.Qt.AlignBottom,
                          width_total=CONFIG_WIDGET_WIDTH,
                          width_io=CONFIG_WIDGET_WIDTH - 50,
                          width_text=CONFIG_WIDGET_WIDTH - 20,
                          width_unit=0,
-                         row=frame._widgets['io_frame'].next_row())
-        return dict(parent_widget=frame._widgets['io_frame'],
-                    width_io=100, width_unit=0,
-                    width_text=CONFIG_WIDGET_WIDTH - 100,
-                    width_total=CONFIG_WIDGET_WIDTH,
-                    row=frame._widgets['io_frame'].next_row())
+                         row=self._widgets['config'].next_row())
+        else:
+            _dict = dict(parent_widget=self._widgets['config'],
+                         width_io=100, width_unit=0,
+                         width_text=CONFIG_WIDGET_WIDTH - 100,
+                         width_total=CONFIG_WIDGET_WIDTH,
+                         row=self._widgets['config'].next_row())
+        if param_key in ['autosave_dir', 'autosave_format']:
+            _dict['visible'] = False
+        return _dict
 
-    frame._widgets = {}
-    _layout = frame.layout()
-    _layout.setHorizontalSpacing(10)
-    _layout.setVerticalSpacing(5)
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        self.create_label('title', 'Full processing workflow', fontsize=14,
+                           gridPos=(0, 0, 1, 5))
 
-    frame.create_label('title', 'Full processing workflow', fontsize=14,
-                       gridPos=(0, 0, 1, 5))
-    frame.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
+        self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
 
-    frame._widgets['io_frame'] = ParameterCollectionEditWidget(
-        frame, initLayout=False, lineWidth=5,
-        sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                     QtWidgets.QSizePolicy.Expanding))
-    frame._widgets['io_frame'].setLayout(create_default_grid_layout())
-    _layout.addWidget(frame._widgets['io_frame'], 2, 0, 1, 1)
+        self._widgets['config'] = ParameterCollectionEditWidget(
+            parent=None, initLayout=True, lineWidth=5,
+            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
+                         QtWidgets.QSizePolicy.Expanding))
 
-    frame.create_param_widget(frame.get_param('autosave_results'),
-                              **__get_param_widget_config('autosave_results'))
-    frame.create_param_widget(frame.get_param('autosave_dir'),
-                              **__get_param_widget_config('autosave_dir'))
-    frame.create_param_widget(frame.get_param('autosave_format'),
-                              **__get_param_widget_config('autosave_format'))
-    frame.create_param_widget(frame.get_param('run_type'),
-                              **__get_param_widget_config('run_type'))
-    for _key in ['autosave_dir', 'autosave_format']:
-        frame.toggle_param_widget_visibility(_key, False)
+        self.create_spacer('spacer1', gridPos=(-1, 0, 1, 2),
+                            parent_widget=self._widgets['config'])
 
-    frame.create_spacer('runtype_spacer', height=20, gridPos=(-1, 0, 1, 1),
-                        parent_widget=frame._widgets['io_frame'])
+        self.create_any_widget(
+            'config_area', ScrollArea, widget=self._widgets['config'],
+            fixedWidth=CONFIG_WIDGET_WIDTH + 40,
+            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
+                         QtWidgets.QSizePolicy.Expanding),
+            gridPos=(-1, 0, 1, 1), stretch=(1, 0),
+            layout_kwargs={'alignment': None})
 
-    frame.create_button('but_exec', 'Start processing', gridPos=(-1, 0, 1, 1),
-                        fixedWidth=CONFIG_WIDGET_WIDTH,
-                        parent_widget=frame._widgets['io_frame'])
+        for _param in ['autosave_results', 'autosave_dir', 'autosave_format',
+                       'run_type']:
+            self.create_param_widget(self.get_param(_param),
+                                     **self.__param_widget_config(_param))
 
-    frame.create_progress_bar('progress', gridPos=(-1, 0, 1, 1), visible=False,
-                              fixedWidth=CONFIG_WIDGET_WIDTH, minimum=0,
-                              maximum=100,
-                              parent_widget=frame._widgets['io_frame'])
+        self.create_button(
+            'but_exec', 'Start processing', gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'])
 
-    frame.create_button('but_abort', 'Abort processing',
-                        gridPos=(-1, 0, 1, 1), enabled=True, visible=False,
-                        fixedWidth=CONFIG_WIDGET_WIDTH,
-                        parent_widget=frame._widgets['io_frame'])
+        self.create_progress_bar(
+            'progress', gridPos=(-1, 0, 1, 1), visible=False, minimum=0,
+            maximum=100, fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'])
 
-    frame.create_spacer('result_sec_spacer', height=20,
-                        gridPos=(-1, 0, 1, 1),
-                        parent_widget=frame._widgets['io_frame'])
-    frame.create_label('label_results', 'Results:', fontsize=11,
-                       underline=True, visible=False,
-                       parent_widget=frame._widgets['io_frame'])
-    frame.create_param_widget(frame.get_param('selected_results'),
-                              **__get_param_widget_config('selected_results'),
-                              visible=False)
-    frame.create_combo_box('combo_results', gridPos=(-1, 0, 1, 1),
-                            fixedWidth=CONFIG_WIDGET_WIDTH, visible=False,
-                            parent_widget=frame._widgets['io_frame'])
-    frame.create_any_widget('result_info',  ReadOnlyTextWidget,
+        self.create_button(
+            'but_abort', 'Abort processing', gridPos=(-1, 0, 1, 1),
+            enabled=True, visible=False, fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'])
+
+        self.create_spacer(
+            'result_sec_spacer', height=20, gridPos=(-1, 0, 1, 1),
+            parent_widget=self._widgets['config'])
+
+        self.create_any_widget(
+            'result_selector', ResultSelectorForOutput,
+            parent_widget=self._widgets['config'], gridpos=(-1, 0, 1, 1),
+            select_results_param=self.get_param('selected_results'))
+
+        self.create_button('but_save', 'Save composite image', enabled=False,
+                            gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
+                            parent_widget=self._widgets['config'])
+
+        self.create_spacer('config_terminal_spacer', height=20,
                             gridPos=(-1, 0, 1, 1),
-                            fixedWidth=CONFIG_WIDGET_WIDTH,
-                            fixedHeight=150, visible=False,
-                            alignment=QtCore.Qt.AlignTop,
-                            parent_widget=frame._widgets['io_frame'])
+                            parent_widget=self._widgets['config'])
 
+        self.create_spacer('menu_bottom_spacer', height=20,
+                            gridPos=(-1, 0, 1, 1))
 
-    frame.create_button('but_show', 'Show composite', enabled=False,
-                        gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
-                        parent_widget=frame._widgets['io_frame'])
-
-    frame.create_button('but_save', 'Save composite image', enabled=False,
-                        gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
-                        parent_widget=frame._widgets['io_frame'])
-
-
-    frame.create_spacer('io_frame_terminal_spacer', height=20,
-                        gridPos=(-1, 0, 1, 1),
-                        parent_widget=frame._widgets['io_frame'])
-
-    frame.create_spacer('menu_bottom_spacer', height=20,
-                        gridPos=(-1, 0, 1, 1))
-
-    _plot = PlotWindow(
-        parent=frame, resetzoom=True, autoScale=False, logScale=False,
-        grid=False, curveStyle=False, colormap=True, aspectRatio=True,
-        yInverted=True, copy=True, save=True, print_=True, control=False,
-        position=True, roi=False, mask=True)
-    frame.add_any_widget(
-        'plot_window', _plot, alignment=None,
-        gridPos=(0, 1, 3, 1), visible=True, stretch=(1, 1),
-        sizePolicy=(QtWidgets.QSizePolicy.Expanding,
-                    QtWidgets.QSizePolicy.Expanding))
-
-    # frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
-    # frame.create_param_widget(frame.params['run_type'])
-
-    # frame.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))
-    # frame.create_button('but_run', 'Run', gridPos=(-1, 0, 1, 2),
-    #                     icon=qta.icon('fa5s.play'), fixedHeight=50,
-    #                     fixedWidth=600)
-
-    # frame.create_spacer(None, height=50, gridPos=(-1, 0, 1, 2))
-    # frame.create_button('but_feedback', 'Processing feedback',
-    #                     gridPos=(-1, 0, 1, 2))
+        self._widgets['plot1d'] = Plot1D()
+        self._widgets['plot2d'] = Plot2D()
+        self.add_any_widget(
+            'plot_stack', QtWidgets.QStackedWidget(), alignment=None,
+            gridPos=(0, 1, 3, 1), visible=True, stretch=(1, 1),
+            sizePolicy=(QtWidgets.QSizePolicy.Expanding,
+                        QtWidgets.QSizePolicy.Expanding))
+        self._widgets['plot_stack'].addWidget(self._widgets['plot1d'])
+        self._widgets['plot_stack'].addWidget(self._widgets['plot2d'])

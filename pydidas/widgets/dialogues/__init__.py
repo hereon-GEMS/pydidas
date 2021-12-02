@@ -28,11 +28,15 @@ from .hdf5_dataset_selection_popup import *
 from . import critical_warning
 from .critical_warning import *
 
+from . import question_box
+from .question_box import *
+
 __all__ = []
 __all__ += warning_box.__all__
 __all__ += error_message_box.__all__
 __all__ += hdf5_dataset_selection_popup.__all__
 __all__ += critical_warning.__all__
+__all__ += question_box.__all__
 
 
 # remove modules from namespace after importing their content
@@ -40,3 +44,4 @@ del warning_box
 del error_message_box
 del hdf5_dataset_selection_popup
 del critical_warning
+del question_box

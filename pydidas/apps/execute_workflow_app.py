@@ -39,7 +39,7 @@ from pydidas.core import (ParameterCollection,get_generic_parameter,
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
 from pydidas.workflow_tree import WorkflowTree, WorkflowResults
 from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
-from pydidas.utils import pydidas_logger
+
 
 TREE = WorkflowTree()
 SCAN = ScanSettings()
@@ -51,8 +51,7 @@ DEFAULT_PARAMS = ParameterCollection(
     get_generic_parameter('autosave_results'),
     get_generic_parameter('autosave_dir'),
     get_generic_parameter('autosave_format'),
-    get_generic_parameter('live_processing'),
-    )
+    get_generic_parameter('live_processing'))
 
 
 class ExecuteWorkflowApp(BaseApp):
@@ -88,20 +87,20 @@ class ExecuteWorkflowApp(BaseApp):
         existance before processing starts. The default is False.
     """
     default_params = DEFAULT_PARAMS
-    mp_func_results = QtCore.pyqtSignal(object)
-    updated_composite = QtCore.pyqtSignal()
     parse_func = parse_execute_workflow_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
                                            '_result_metadata', '_mp_tasks']
 
+    mp_func_results = QtCore.pyqtSignal(object)
+    updated_composite = QtCore.pyqtSignal()
+
     def __init__(self, *args, **kwargs):
-        """
-        Create a CompositeCreatorApp instance.
-        """
         super().__init__(*args, **kwargs)
         self._config['result_shapes'] = {}
         self._config['shared_memory'] = {}
         self._config['tree_str'] = '[]'
+        self._mp_tasks = np.array(())
+        self._index = -1
         self.reset_runtime_vars()
 
     def reset_runtime_vars(self):
@@ -358,7 +357,6 @@ class ExecuteWorkflowApp(BaseApp):
 
         The ExecutiveWorkflowApp will update the
         """
-        pass
 
     @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, data):
@@ -393,7 +391,7 @@ class ExecuteWorkflowApp(BaseApp):
         if self.get_param_value('autosave_results'):
             RESULT_SAVER.export_to_active_savers(index, _new_results)
 
-    def _store_frame_metadata(self, metadata, index=None):
+    def _store_frame_metadata(self, metadata):
         """
         Store the (separate) metadata from a frame internally.
 

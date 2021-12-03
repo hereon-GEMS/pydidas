@@ -19,8 +19,8 @@ function which is used to populate the ImageMathFrame with
 widgets.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,8 +28,8 @@ __status__ = "Development"
 __all__ = ['create_image_math_frame_widgets_and_layout']
 
 
-from PyQt5 import QtWidgets
 import qtawesome as qta
+from PyQt5 import QtWidgets
 from silx.gui.plot.ImageView import ImageView
 
 

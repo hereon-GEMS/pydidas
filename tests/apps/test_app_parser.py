@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -24,7 +24,6 @@ __status__ = "Development"
 
 import copy
 import unittest
-from pathlib import Path
 import sys
 
 from pydidas.apps.app_parsers import (

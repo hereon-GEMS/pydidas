@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -35,10 +35,9 @@ from pydidas.unittest_objects.dummy_plugin_collection import (
     create_plugin_class)
 
 from pydidas.plugins import InputPlugin
-from pydidas.constants import INPUT_PLUGIN
+from pydidas.constants import INPUT_PLUGIN, AppConfigError
 from pydidas.core import (Parameter, get_generic_parameter,
                           ImageMetadataManager)
-from pydidas._exceptions import AppConfigError
 from pydidas.unittest_objects import get_random_string
 
 

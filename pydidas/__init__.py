@@ -3,11 +3,11 @@
 # created)
 from PyQt5 import QtCore, QtWebEngineWidgets
 
-from . import workflow_tree
+from . import workflow
 
 from . import plugins
 
-from . import constants 
+from . import constants
 
 from . import widgets
 

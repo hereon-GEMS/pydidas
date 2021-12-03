@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,11 +28,12 @@ import unittest
 import tempfile
 import shutil
 from pathlib import Path
+
 import numpy as np
 
-
 from pydidas.core import get_generic_parameter, FilelistManager
-from pydidas._exceptions import AppConfigError
+from pydidas.constants import AppConfigError
+
 
 class TestFilelistManager(unittest.TestCase):
 

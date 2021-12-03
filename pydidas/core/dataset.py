@@ -16,8 +16,8 @@
 """ The dataset module includes subclasses of numpy.ndarray with additional
 embedded metadata."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -31,7 +31,7 @@ from copy import copy
 
 import numpy as np
 
-from pydidas._exceptions import DatasetConfigException
+from ..constants import DatasetConfigException
 
 
 def _default_vals(ndim):
@@ -100,7 +100,7 @@ class EmptyDataset(np.ndarray):
         obj = np.ndarray.__new__(cls, *args, **kwargs)
         for key in ['axis_labels', 'axis_ranges', 'axis_units']:
             _data = local_kws.get(key, _default_vals(obj.ndim))
-            _labels = obj.__get_dict(_data, '__new__')
+            _labels = obj._get_dict(_data, '__new__')
             setattr(obj, key, _labels)
         obj.metadata = local_kws.get('metadata', None)
         return obj
@@ -191,14 +191,24 @@ class EmptyDataset(np.ndarray):
             keys['axis_ranges'] = {0: np.arange(self.size)}
             keys['axis_units'] = {0: ''}
 
-    def flatten(self):
+    def flatten(self, order='C'):
         """
         Clear the metadata when flattening the array.
+
+        Parameters
+        ----------
+        order : {'C', 'F', 'A', 'K'}, optional
+            'C' means to flatten in row-major (C-style) order.
+            'F' means to flatten in column-major (Fortran-style) order.
+            'A' means to flatten in column-major order if `a` is Fortran
+            *contiguous* in memory, row-major order otherwise.
+            'K' means to flatten `a` in the order the elements occur in memory.
+            The default is 'C'.
         """
         self._axis_labels = {0: 'Flattened'}
         self._axis_ranges = {0: np.arange(self.size)}
         self._axis_units = {0: ''}
-        return super().flatten()
+        return super().flatten(order)
 
     def flatten_dims(self, *args, new_dim_label='Flattened',
                      new_dim_unit='', new_dim_range=None):
@@ -295,7 +305,7 @@ class EmptyDataset(np.ndarray):
         _copy.axis_ranges = _axis_ranges
         return _copy
 
-    def __get_dict(self, _data, method_name):
+    def _get_dict(self, _data, method_name):
         """
         Get an ordered dictionary with the axis keys for _data.
 
@@ -318,7 +328,7 @@ class EmptyDataset(np.ndarray):
         DatasetConfigException
             If a tuple of list is passed and the length of entries is not
             equal to ndim.
-○
+
         Returns
         -------
         dict
@@ -329,19 +339,22 @@ class EmptyDataset(np.ndarray):
             if set(_data.keys()) != set(np.arange(self.ndim)):
                 warnings.warn('The number of keys does not match the number '
                               'of array dimensions. Resettings keys to '
-                              'defaults')
+                              'defaults. (Error encountered in '
+                              f'{method_name}).')
                 return _default_vals(self.ndim)
             return  _data
         if isinstance(_data, (list, tuple)):
             if len(_data) != self.ndim:
                 warnings.warn('The number of keys does not match the number '
                               'of array dimensions. Resettings keys to '
-                              'defaults')
+                              'defaults.(Error encountered in '
+                              f'{method_name}).')
                 return _default_vals(self.ndim)
-            _data = {index: item for index, item in enumerate(_data)}
+            _data = dict(enumerate(_data))
             return _data
         raise DatasetConfigException(
-            f'Input {_data} cannot be converted to dictionary')
+            f'Input {_data} cannot be converted to dictionary for property'
+            f' {method_name}')
 
     @property
     def axis_labels(self):
@@ -368,7 +381,7 @@ class EmptyDataset(np.ndarray):
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        self._axis_labels = self.__get_dict(labels, 'axis_labels')
+        self._axis_labels = self._get_dict(labels, 'axis_labels')
 
     @property
     def axis_ranges(self):
@@ -396,7 +409,7 @@ class EmptyDataset(np.ndarray):
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        self._axis_ranges = self.__get_dict(scales, 'axis_ranges')
+        self._axis_ranges = self._get_dict(scales, 'axis_ranges')
 
     @property
     def axis_units(self):
@@ -423,7 +436,7 @@ class EmptyDataset(np.ndarray):
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        self._axis_units = self.__get_dict(units, 'axis_units')
+        self._axis_units = self._get_dict(units, 'axis_units')
 
     @property
     def metadata(self):

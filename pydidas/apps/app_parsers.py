@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with parsers to parse command line arguments for apps.."""
+"""Module with parsers to parse command line arguments for apps."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -25,12 +25,18 @@ __all__ = ['parse_composite_creator_cmdline_arguments']
 
 import argparse
 
-from pydidas.core import get_generic_parameter
+from pydidas.core import get_generic_parameter as generic_param
 
 
-def parse_composite_creator_cmdline_arguments(parent=None):
+def parse_composite_creator_cmdline_arguments(caller=None):
     """
     Use argparse to get command line arguments.
+
+    Parameters
+    ----------
+    caller : object, optional
+        If this function is called by a class as method, it requires a single
+        argument which corresponds to the instance.
 
     Returns
     -------
@@ -40,49 +46,49 @@ def parse_composite_creator_cmdline_arguments(parent=None):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-first_file', '-f',
-                        help=get_generic_parameter('first_file').tooltip)
+                        help=generic_param('first_file').tooltip)
     parser.add_argument('-last_file', '-l',
-                        help=get_generic_parameter('last_file').tooltip)
+                        help=generic_param('last_file').tooltip)
     parser.add_argument('-file_stepping', type=int,
-                        help=get_generic_parameter('file_stepping').tooltip)
+                        help=generic_param('file_stepping').tooltip)
     parser.add_argument('-hdf5_key',
-                        help=get_generic_parameter('hdf5_key').tooltip)
+                        help=generic_param('hdf5_key').tooltip)
     parser.add_argument('-hdf5_first_image_num', type=int,
-                        help=get_generic_parameter('hdf5_first_image_num').tooltip)
+                        help=generic_param('hdf5_first_image_num').tooltip)
     parser.add_argument('-hdf5_last_image_num', type=int,
-                        help=get_generic_parameter('hdf5_last_image_num').tooltip)
+                        help=generic_param('hdf5_last_image_num').tooltip)
     parser.add_argument('-hdf5_stepping', type=int,
-                        help=get_generic_parameter('hdf5_stepping').tooltip)
+                        help=generic_param('hdf5_stepping').tooltip)
     parser.add_argument('--use_bg_file', action='store_true',
-                        help=get_generic_parameter('use_bg_file').tooltip)
+                        help=generic_param('use_bg_file').tooltip)
     parser.add_argument('-bg_file',
-                        help=get_generic_parameter('bg_file').tooltip)
+                        help=generic_param('bg_file').tooltip)
     parser.add_argument('-bg_hdf5_key',
-                        help=get_generic_parameter('bg_hdf5_key').tooltip)
+                        help=generic_param('bg_hdf5_key').tooltip)
     parser.add_argument('-bg_hdf5_frame', type=int,
-                        help=get_generic_parameter('bg_hdf5_frame').tooltip)
+                        help=generic_param('bg_hdf5_frame').tooltip)
     parser.add_argument('-composite_nx', type=int,
-                        help=get_generic_parameter('composite_nx').tooltip)
+                        help=generic_param('composite_nx').tooltip)
     parser.add_argument('-composite_ny', type=int,
-                        help=get_generic_parameter('composite_ny').tooltip)
+                        help=generic_param('composite_ny').tooltip)
     parser.add_argument('--use_roi', action='store_true',
-                        help=get_generic_parameter('use_roi').tooltip)
+                        help=generic_param('use_roi').tooltip)
     parser.add_argument('-roi_xlow', type=int,
-                        help=get_generic_parameter('roi_xlow').tooltip)
+                        help=generic_param('roi_xlow').tooltip)
     parser.add_argument('-roi_xhigh', type=int,
-                        help=get_generic_parameter('roi_xhigh').tooltip)
+                        help=generic_param('roi_xhigh').tooltip)
     parser.add_argument('-roi_ylow', type=int,
-                        help=get_generic_parameter('roi_ylow').tooltip)
+                        help=generic_param('roi_ylow').tooltip)
     parser.add_argument('-roi_yhigh', type=int,
-                        help=get_generic_parameter('roi_yhigh').tooltip)
+                        help=generic_param('roi_yhigh').tooltip)
     parser.add_argument('--use_thresholds', action='store_true',
-                        help=get_generic_parameter('use_thresholds').tooltip)
+                        help=generic_param('use_thresholds').tooltip)
     parser.add_argument('-threshold_low', type=int,
-                        help=get_generic_parameter('threshold_low').tooltip)
+                        help=generic_param('threshold_low').tooltip)
     parser.add_argument('-threshold_high', type=int,
-                        help=get_generic_parameter('threshold_high').tooltip)
+                        help=generic_param('threshold_high').tooltip)
     parser.add_argument('-binning', type=int,
-                        help=get_generic_parameter('binning').tooltip)
+                        help=generic_param('binning').tooltip)
     parser.add_argument('-output_fname',
                         help=('The name used for saving the composite image '
                               '(in numpy file format). An empty Path will '
@@ -95,9 +101,15 @@ def parse_composite_creator_cmdline_arguments(parent=None):
     return _args
 
 
-def parse_execute_workflow_cmdline_arguments(parent=None):
+def parse_execute_workflow_cmdline_arguments(caller):
     """
     Use argparse to get command line arguments.
+
+    Parameters
+    ----------
+    caller : object, optional
+        If this function is called by a class as method, it requires a single
+        argument which corresponds to the instance.
 
     Returns
     -------
@@ -107,13 +119,13 @@ def parse_execute_workflow_cmdline_arguments(parent=None):
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--autosave', action='store_true',
-                        help=get_generic_parameter('autosave_results').tooltip)
+                        help=generic_param('autosave_results').tooltip)
     parser.add_argument('-autosave_dir', '-d',
-                        help=get_generic_parameter('autosave_dir').tooltip)
+                        help=generic_param('autosave_dir').tooltip)
     parser.add_argument('-autosave_format', '-f',
-                        help=get_generic_parameter('autosave_format').tooltip)
+                        help=generic_param('autosave_format').tooltip)
     _args = dict(vars(parser.parse_args()))
-    # store None for keyword arguments which were not selected:
+    # store False for keyword arguments which were not selected:
     for _key in ['autosave']:
-        _args[_key] = True if _args[_key] else False
+        _args[_key] = bool(_args[_key])
     return _args

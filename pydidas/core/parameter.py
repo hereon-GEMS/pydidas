@@ -14,17 +14,18 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The parameter module includes the Parameter class which is used to store
-processing parameters.
+The parameter module includes the Parameter class which is used to have a
+consistent interface for various data types.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Parameter']
+
 
 import numbers
 from pathlib import Path
@@ -525,7 +526,7 @@ class Parameter:
         """
         if self.__type in (str, Hdf5key, Path):
             return str(self.value)
-        elif self.__type in (numbers.Integral, numbers.Real):
+        if self.__type in (numbers.Integral, numbers.Real):
             return self.value
         raise TypeError(f'No export format for type {self.__type} has been'
                         'defined.')

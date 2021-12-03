@@ -19,8 +19,8 @@ of a node with results from the WorkflowResults and returns a signal with
 information on how to access the new data selection.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -33,16 +33,16 @@ from copy import copy
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
-from pydidas.core import (ScanSettings, Parameter, ParameterCollection,
+from pydidas.core import (Parameter, ParameterCollection,
                           ParameterCollectionMixIn)
 from pydidas.constants import CONFIG_WIDGET_WIDTH
 from pydidas.utils import get_range_as_formatted_string
-from pydidas.workflow_tree import WorkflowResults
 from pydidas.widgets.create_widgets_mixin import CreateWidgetsMixIn
 from pydidas.widgets.read_only_text_widget import ReadOnlyTextWidget
 from pydidas.widgets.parameter_config.parameter_widgets_mixin import (
     ParameterWidgetsMixIn)
 from pydidas.utils import SignalBlocker
+from pydidas.workflow import ScanSettings, WorkflowResults
 
 RESULTS = WorkflowResults()
 SCAN = ScanSettings()
@@ -74,11 +74,11 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     The ResultSelectorForOutput widget allows to select data slices for
     plotting using meta information from the
     :py:class:`ScanSettings <pydidas.core.ScanSettings<` and
-    :py:class:`WorkflowResults <pydidas.workflow_tree.WorkflowResults>`
+    :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
     singletons.
 
     The widget allows to select a :py:class:`WorkflowNode
-    <pydidas.workflow_tree.WorkflowNode>`, display all the meta information
+    <pydidas.workflow.WorkflowNode>`, display all the meta information
     for all dimensions in the results (label, unit, range) and select data
     dimension(s) (based on the dimensionality of the plot) and slice indices
     for other dimensions. In addition, an option to hande the Scan as a

@@ -16,11 +16,11 @@
 """
 The parameter_collection module includes the ParameterCollection class which
 is an dict implementation with additional methods to get and set
-values of Parameters..
+values of Parameters.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,6 +30,7 @@ __all__ = ['ParameterCollection']
 from itertools import chain
 
 from .parameter import Parameter
+
 
 class ParameterCollection(dict):
     """

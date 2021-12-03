@@ -16,8 +16,8 @@
 """Module with the CompositeCreatorFrame which allows to combine images to
 mosaics."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -31,18 +31,17 @@ from functools import partial
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
-from pydidas.gui.builders.composite_creator_frame_builder import (
-    create_composite_creator_frame_widgets_and_layout)
-from pydidas._exceptions import AppConfigError
-from pydidas.apps import CompositeCreatorApp
-from pydidas.core import Parameter, get_generic_parameter
-from pydidas.constants import HDF5_EXTENSIONS, PARAM_INPUT_WIDGET_WIDTH
-from pydidas.widgets import BaseFrameWithApp, dialogues
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
-from pydidas.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
+from ..apps import CompositeCreatorApp
+from ..core import Parameter, get_generic_parameter
+from ..constants import HDF5_EXTENSIONS, AppConfigError
+from ..widgets import BaseFrameWithApp, dialogues
+from ..widgets.parameter_config import ParameterWidgetsMixIn
+from ..utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                            LOGGING_LEVEL)
-from pydidas.multiprocessing import AppRunner
-from pydidas.gui.mixins import SilxPlotWindowMixIn
+from ..multiprocessing import AppRunner
+from .builders.composite_creator_frame_builder import (
+    create_composite_creator_frame_widgets_and_layout)
+from .mixins import SilxPlotWindowMixIn
 
 logger = pydidas_logger(LOGGING_LEVEL)
 

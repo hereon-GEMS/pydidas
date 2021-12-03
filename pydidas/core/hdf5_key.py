@@ -14,12 +14,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The parameter module includes the Parameter class which is used to store
-processing parameters.
+The Hdf5key is a subclassed string to have a unique identifier for Hdf5 dataset
+keys.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -33,7 +33,7 @@ class Hdf5key(str):
     """
     Inherits from :py:class:`str`.
 
-    A class used for referencing hdf keys.
+    A class used for referencing hdf5 keys.
     """
     def __new__(cls, text):
         _instance = super().__new__(cls, text)

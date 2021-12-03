@@ -17,18 +17,19 @@
 The str_utils module has convenience functions for string formatting.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
+__all__ = ['pydidas_logger', 'LOGGING_LEVEL']
 
 import logging
 import multiprocessing as mp
 
 
-__all__ = ['pydidas_logger', 'LOGGING_LEVEL']
+LOGGING_LEVEL = logging.DEBUG
 
 
 def pydidas_logger(level=logging.DEBUG):
@@ -51,6 +52,3 @@ def pydidas_logger(level=logging.DEBUG):
     if not len(logger.handlers):
         logger.addHandler(handler)
     return logger
-
-
-LOGGING_LEVEL = logging.DEBUG

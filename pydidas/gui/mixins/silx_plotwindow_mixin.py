@@ -17,8 +17,8 @@
 Module with the SilxPlotWindowMixIn which allows to control a silx PlotWindow.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,7 +30,7 @@ import warnings
 import numpy as np
 from silx.gui.plot.backends.BackendMatplotlib import BackendMatplotlibQt
 
-from pydidas.utils import pydidas_logger, LOGGING_LEVEL
+from ...utils import pydidas_logger, LOGGING_LEVEL
 
 
 logger = pydidas_logger(LOGGING_LEVEL)

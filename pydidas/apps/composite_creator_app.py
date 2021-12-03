@@ -16,8 +16,8 @@
 """Module with the CompositeCreatorApp class which allows to combine
 images to mosaics."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,16 +30,15 @@ import time
 import numpy as np
 from PyQt5 import QtCore
 
-from pydidas.apps.base_app import BaseApp
-from pydidas.apps.app_parsers import parse_composite_creator_cmdline_arguments
-from pydidas._exceptions import AppConfigError
-from pydidas.core import (ParameterCollection, Dataset,
-                          CompositeImage, get_generic_parameter,
-                          FilelistManager, ImageMetadataManager)
-from pydidas.constants import HDF5_EXTENSIONS
-from pydidas.utils import (check_file_exists, check_hdf5_key_exists_in_file,
+from ..core import (ParameterCollection, Dataset,
+                    CompositeImage, get_generic_parameter,
+                    FilelistManager, ImageMetadataManager)
+from ..constants import HDF5_EXTENSIONS, AppConfigError
+from ..utils import (check_file_exists, check_hdf5_key_exists_in_file,
                            copy_docstring)
-from pydidas.image_io import read_image, rebin2d
+from ..image_io import read_image, rebin2d
+from .base_app import BaseApp
+from .app_parsers import parse_composite_creator_cmdline_arguments
 
 
 DEFAULT_PARAMS = ParameterCollection(

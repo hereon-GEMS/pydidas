@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -26,7 +26,6 @@ import unittest
 import tempfile
 import shutil
 import random
-import copy
 import os
 import threading
 import time
@@ -36,13 +35,11 @@ import numpy as np
 from PyQt5 import QtCore
 
 from pydidas.apps import ExecuteWorkflowApp
-from pydidas.core import get_generic_parameter, ScanSettings
-from pydidas._exceptions import AppConfigError
-from pydidas.workflow_tree import WorkflowTree, WorkflowResults
-from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
-from pydidas.unittest_objects import DummyLoader, DummyProc
-from pydidas.unittest_objects import get_random_string
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
+from pydidas.core import get_generic_parameter
+from pydidas.constants import AppConfigError
+from pydidas.workflow import WorkflowTree, WorkflowResults, ScanSettings
+from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 from pydidas.plugins import PluginCollection
 from pydidas import unittest_objects
 
@@ -105,9 +102,10 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def generate_tree(self):
         TREE.clear()
-        TREE.create_and_add_node(DummyLoader())
-        TREE.create_and_add_node(DummyProc())
-        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(unittest_objects.DummyLoader())
+        TREE.create_and_add_node(unittest_objects.DummyProc())
+        TREE.create_and_add_node(unittest_objects.DummyProc(),
+                                 parent=TREE.root)
 
     def generate_scan(self):
         SCAN.restore_all_defaults(True)
@@ -250,7 +248,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         app.set_param_value('live_processing', True)
         app._redefine_multiprocessing_carryon()
-        app._index = get_random_string(8)
+        app._index = unittest_objects.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
 
     def test_multiprocessing_get_tasks__normal(self):

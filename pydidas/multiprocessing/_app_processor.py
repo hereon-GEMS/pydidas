@@ -16,8 +16,8 @@
 """Module with the processor function which can be used for iterating over
 multiprocessing function calls."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -29,15 +29,15 @@ import queue
 import random
 import string
 import time
+import logging
+
+# from ..utils import pydidas_logger
+# logger = pydidas_logger()
+# logger.setLevel(logging.DEBUG)
+
 
 NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
                   for i in range(64))
-
-
-import pydidas
-import logging
-logger = pydidas.utils.pydidas_logger()
-logger.setLevel(logging.DEBUG)
 
 
 def app_processor(input_queue, output_queue, stop_queue, finished_queue,
@@ -71,13 +71,13 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
         dictionary.
     """
     _app_carryon = True
-    logger.debug('Started process')
-    logger.debug(f'app_config: {app_config}')
+    # logger.debug('Started process')
+    # logger.debug(f'app_config: {app_config}')
     _app = app(app_params, slave_mode=True)
-    logger.debug('Started app')
+    # logger.debug('Started app')
     _app._config = app_config
     _app.multiprocessing_pre_run()
-    logger.debug('Starting processing')
+    # logger.debug('Starting processing')
 
     while True:
         # check for stop signal

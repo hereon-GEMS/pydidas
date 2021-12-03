@@ -18,8 +18,8 @@ Module with the PluginParameterConfigWidget class used to edit plugin
 Parameters.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,7 +30,7 @@ __all__ = ['ParameterWidgetsMixIn']
 from PyQt5 import QtWidgets, QtCore
 
 from .parameter_config_widget import ParameterConfigWidget
-from ..._exceptions import WidgetLayoutError
+from ...constants import WidgetLayoutError
 
 
 class ParameterWidgetsMixIn:

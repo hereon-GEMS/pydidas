@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkerController class which is a subclassed QThread to
-control multiprocessing of computations."""
+"""
+Module with the WorkerController class which is a subclassed QThread to
+control multiprocessing of computations.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -263,7 +265,7 @@ class WorkerController(QtCore.QThread):
         task_args : Union[list, tuple, set]
             An iterable of the first argument for the processing function.
         """
-        for worker in self._workers:
+        for _ in self._workers:
             self._queues['stop'].put(1)
 
     def finalize_tasks(self):

@@ -13,25 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the ImageMetadataManager class which is used to organize
-image metadata."""
+"""
+Module with the ImageMetadataManager class which is used to organize
+image metadata.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ImageMetadataManager']
 
+
 import os
 
-from pydidas._exceptions import AppConfigError
-from pydidas.core import (ParameterCollection, get_generic_parameter,
-                          ObjectWithParameterCollection, Parameter)
-from pydidas.constants import HDF5_EXTENSIONS
-from pydidas.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
-from pydidas.image_io import read_image
+from ..constants import HDF5_EXTENSIONS, AppConfigError
+from ..utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
+from .parameter import Parameter
+from .parameter_collection import ParameterCollection
+from .object_with_parameter_collection import ObjectWithParameterCollection
+from .generic_parameters import get_generic_parameter
 
 
 DEFAULT_PARAMS = ParameterCollection(
@@ -60,7 +63,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     <pydidas.core.ObjectWithParameterCollection>`
 
     The ImageMetadataManager is responsible for keeping track of the
-    metadata (shape, datatype, imager per file) of image files.
+    metadata (shape, datatype, imager per file) of image files. All the
+    metadata is available for the user through class properties.
 
     Parameters
     ----------
@@ -245,6 +249,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from file range.
         """
+        from ..image_io import read_image
         _test_image = read_image(self.get_filename())
         self._config['numbers'] = [0]
         self._config['hdf5_dset_shape'] = (0, 0, 0)
@@ -301,7 +306,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         if _y1 < _y0:
             _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]. '
         if _warning:
-                raise AppConfigError(_warning)
+            raise AppConfigError(_warning)
 
     def __get_modulated_roi(self):
         """

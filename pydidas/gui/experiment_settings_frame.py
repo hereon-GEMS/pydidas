@@ -16,8 +16,8 @@
 """Module with the WorkflowPluginWidget which is used to create the workflow
 tree."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,7 +30,7 @@ from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
 from ..core import ParameterCollectionMixIn
-from ..core.experimental_settings import (
+from ..workflow.experimental_settings import (
     ExperimentalSettings, ExperimentalSettingsIoMeta)
 
 from ..widgets import BaseFrame

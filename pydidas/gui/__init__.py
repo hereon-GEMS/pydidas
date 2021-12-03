@@ -13,18 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Subpackage with GUI elements."""
+"""
+Subpackage with GUI elements.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+#import subpackages
 from . import builders
 
+from . import mixins
+
+# import modules:
 from . import main_window
 from .main_window import *
 
@@ -52,15 +58,16 @@ from .execute_workflow_frame import *
 from . import composite_creator_frame
 from .composite_creator_frame import *
 
-__all__ += main_window.__all__
-__all__ += workflow_tree_edit_manager.__all__
-__all__ += data_browsing_frame.__all__
-__all__ += workflow_edit_frame.__all__
-__all__ += experiment_settings_frame.__all__
-__all__ += scan_settings_frame.__all__
-__all__ += processing_single_plugin_frame.__all__
-__all__ += execute_workflow_frame.__all__
-__all__ += composite_creator_frame.__all__
+from . import global_configuration_frame
+from .global_configuration_frame import *
+
+# Add all modules' __all__ to the package's __all__
+for _module in [
+        main_window, workflow_tree_edit_manager, data_browsing_frame,
+        workflow_edit_frame, experiment_settings_frame, scan_settings_frame,
+        processing_single_plugin_frame, execute_workflow_frame,
+        composite_creator_frame, global_configuration_frame]:
+    __all__ += _module.__all__
 
 # Unclutter namespace: remove modules from namespace
 del main_window
@@ -72,3 +79,4 @@ del scan_settings_frame
 del processing_single_plugin_frame
 del execute_workflow_frame
 del composite_creator_frame
+del global_configuration_frame

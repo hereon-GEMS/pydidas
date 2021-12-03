@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -36,7 +36,8 @@ from PyQt5 import QtCore, QtTest
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollection, Dataset,
                           get_generic_parameter, CompositeImage)
-from pydidas._exceptions import AppConfigError
+from pydidas.constants import AppConfigError
+
 
 class TestCompositeCreatorApp(unittest.TestCase):
 
@@ -203,7 +204,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _thresh_low = 0.3
         _thresh_high = 0.6
         app = self.get_default_app()
-        _image = self.create_single_composite_and_insert_image(app)
+        _ = self.create_single_composite_and_insert_image(app)
         app.set_param_value('use_thresholds', True)
         app.set_param_value('threshold_low', _thresh_low)
         app.set_param_value('threshold_high', _thresh_high)
@@ -215,7 +216,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _thresh_low = 0.3
         _thresh_high = 0.6
         app = self.get_default_app()
-        _image = self.create_single_composite_and_insert_image(app)
+        _ = self.create_single_composite_and_insert_image(app)
         app.apply_thresholds(low=_thresh_low, high=_thresh_high)
         self.assertEqual(np.where(app.composite < _thresh_low)[0].size, 0)
         self.assertEqual(np.where(app.composite > _thresh_high)[0].size, 0)
@@ -298,22 +299,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertTrue(app.multiprocessing_carryon())
 
     def test_multiprocessing_carryon__live(self):
-        _last_file = self._fname(10)
-        app = self.get_default_app()
-        app.run()
-        app.set_param_value('live_processing', True)
-        app._config['current_fname'] = _last_file
-        self.assertTrue(app.multiprocessing_carryon())
-
-    def test_multiprocessing_carryon__no_file(self):
-        _last_file = self._fname(80)
-        app = self.get_default_app()
-        app.run()
-        app.set_param_value('live_processing', True)
-        app._config['current_fname'] = _last_file
-        self.assertFalse(app.multiprocessing_carryon())
-
-    def test_multiprocessing_carryon(self):
         _last_file = self._fname(10)
         app = self.get_default_app()
         app.run()

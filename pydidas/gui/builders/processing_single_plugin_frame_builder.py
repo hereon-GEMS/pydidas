@@ -19,8 +19,8 @@ function which is used to populate the ProcessingSinglePluginFrame with
 widgets.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -31,8 +31,8 @@ __all__ = ['create_processing_single_plugin_frame_widgets_and_layout']
 from PyQt5 import QtWidgets, QtCore
 from silx.gui.plot.StackView import StackView
 
-from pydidas.widgets import ReadOnlyTextWidget
-from pydidas.core import ScanSettings
+from ...widgets import ReadOnlyTextWidget
+from ...workflow import ScanSettings
 
 SCAN_SETTINGS = ScanSettings()
 

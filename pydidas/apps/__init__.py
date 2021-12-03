@@ -13,59 +13,35 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Subpackage with GUI elements."""
+"""
+The apps module includes stand-alone applications which can be run from
+the command line to perform specific tasks. Integration of apps in the
+GUI is included in the gui module.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import composite_creator_app
-from .composite_creator_app import *
 
 from . import base_app
 from .base_app import *
 
+from . import composite_creator_app
+from .composite_creator_app import *
+
 from . import execute_workflow_app
 from .execute_workflow_app import *
 
-# from . import parameter_collection
-# from .parameter_collection import *
-
-# from . import dataset
-# from .dataset import *
-
-# from . import global_settings
-# from .global_settings import *
-
-# from . import experimental_settings
-# from .experimental_settings import *
-
-# from . import scan_settings
-# from .scan_settings import *
-
-# from . import hdf_key
-# from .hdf_key import *
-
-__all__ += composite_creator_app.__all__
 __all__ += base_app.__all__
+__all__ += composite_creator_app.__all__
 __all__ += execute_workflow_app.__all__
-# __all__ += parameter.__all__
-# __all__ += dataset.__all__
-# __all__ += global_settings.__all__
-# __all__ += experimental_settings.__all__
-# __all__ += scan_settings.__all__
-# __all__ += hdf_key.__all__
 
 # Unclutter namespace: remove modules from namespace
 del composite_creator_app
 del base_app
 del execute_workflow_app
-# del global_settings
-# del experimental_settings
-# del scan_settings
-# del hdf_key
-# del parameter_collection

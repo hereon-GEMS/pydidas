@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -32,7 +32,7 @@ import numpy as np
 from PyQt5 import QtCore
 
 from pydidas.core import CompositeImage
-from pydidas._exceptions import AppConfigError
+from pydidas.constants import AppConfigError
 
 
 class TestCompositeImage(unittest.TestCase):

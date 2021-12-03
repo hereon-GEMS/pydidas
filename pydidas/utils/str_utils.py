@@ -17,16 +17,19 @@
 The str_utils module has convenience functions for string formatting.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['format_str', 'get_time_string', 'get_short_time_string',
            'timed_print', 'get_warning', 'convert_unicode_to_ascii',
-           'convert_special_chars_to_unicode', 'get_range_as_formatted_string']
+           'convert_special_chars_to_unicode', 'get_range_as_formatted_string',
+           'update_separators']
 
+import sys
+import os
 import time
 from numbers import Real, Integral
 
@@ -319,3 +322,22 @@ def get_range_as_formatted_string(obj):
         return _str_items[0] + ' ... ' + _str_items[1]
     except TypeError:
         return 'unknown range'
+
+
+def update_separators(path):
+    """
+    Check the separators and update to os.sep if required.
+
+    Parameters
+    ----------
+    path : str
+        The file path to be checked
+
+    Returns
+    -------
+    str
+        The path with separators updated to os.sep standard.
+    """
+    if sys.platform in ['win32', 'win64']:
+        return path.replace('/', os.sep)
+    return path.replace('\\', os.sep)

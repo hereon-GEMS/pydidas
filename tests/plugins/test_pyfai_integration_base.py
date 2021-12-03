@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -33,9 +33,9 @@ from PyQt5 import QtCore
 import pyFAI
 
 from pydidas.plugins import BasePlugin
-from pydidas.plugins import pyFAIintegrationBase, pyFAI_UNITS
+from pydidas.plugins import pyFAIintegrationBase
 from pydidas.core import get_generic_parameter
-from pydidas.core.experimental_settings import ExperimentalSettings
+from pydidas.workflow import ExperimentalSettings
 
 EXP_SETTINGS = ExperimentalSettings()
 

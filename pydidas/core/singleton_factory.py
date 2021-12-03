@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the SingletonFactory class which is used to create Singleton
-instances of clases."""
+"""
+Module with the SingletonFactory class which is used to create Singleton
+instances of classes.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL 3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,6 +30,11 @@ __all__ = ['SingletonFactory']
 class SingletonFactory:
     """
     Factory to create a Singleton.
+
+    Parameters
+    ----------
+    cls : class
+        The Python class which should be managed by the SingletonFactory.
     """
     def __init__(self, cls):
         """

@@ -13,10 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the BaseApp from which all apps should inherit.."""
+"""
+This module includes the ParameterCollectionMixIn class which can be used
+to extend class functionality to make simplified use of the pydidas
+ParameterCollection. The :py:class:`ObjectWithParameterCollection` is a class
+which includes an inherent ParameterCollection and is serializable
+(ie. pickleable).
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -128,7 +134,7 @@ class ParameterCollectionMixIn:
             if len(default) == 0:
                 raise KeyError(f'No parameter with the name "{param_key}" '
                                'has been registered.')
-            elif len(default) >= 1:
+            if len(default) >= 1:
                 return default[0]
         return self.params.get_value(param_key)
 

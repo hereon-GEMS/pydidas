@@ -16,8 +16,8 @@
 """Module with the WorkflowPluginWidget which is used to create the workflow
 tree."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,11 +28,10 @@ import sys
 from PyQt5 import QtWidgets, QtCore
 
 
-from pydidas.core import ScanSettings
-from pydidas.core.scan_settings import ScanSettingsIoMeta
-from pydidas.widgets import CreateWidgetsMixIn, excepthook, BaseFrame
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
-from pydidas.gui.builders.scan_settings_frame_builder import (
+from ..workflow.scan_settings import ScanSettings, ScanSettingsIoMeta
+from ..widgets import CreateWidgetsMixIn, excepthook, BaseFrame
+from ..widgets.parameter_config import ParameterWidgetsMixIn
+from .builders.scan_settings_frame_builder import (
     create_scan_settings_frame_widgets_and_layout)
 
 SCAN_SETTINGS = ScanSettings()

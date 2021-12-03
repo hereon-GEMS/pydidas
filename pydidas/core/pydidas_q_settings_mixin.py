@@ -13,22 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the BaseApp from which all apps should inherit.."""
+"""
+Module with the PydidasQsettingsMixin class which can be used to give classes
+access to global QSetting values.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasQsettingsMixin']
+__all__ = ['PydidasQsettingsMixin', 'copyableQSettings']
 
 
 from numbers import Integral, Real
+
 from PyQt5 import QtCore
 
-from .generic_parameters import get_generic_parameter
 from ..constants import QSETTINGS_GLOBAL_KEYS
+from .generic_parameters import get_generic_parameter
 
 
 settings = QtCore.QSettings('Hereon', 'pydidas')

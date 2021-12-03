@@ -15,8 +15,8 @@
 
 """Module with Warning class for showing notifications."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -32,10 +32,9 @@ import hdf5plugin
 from PyQt5 import QtWidgets, QtCore
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
-from .._exceptions import FrameConfigError
 from ..utils import get_hdf5_populated_dataset_keys
 from .create_widgets_mixin import CreateWidgetsMixIn
-from ..constants import QT_COMBO_BOX_SIZE_POLICY
+from ..constants import QT_COMBO_BOX_SIZE_POLICY, FrameConfigError
 
 DEFAULT_FILTERS = {'/entry/instrument/detector/detectorSpecific/':
                    '"detectorSpecific"\nkeys (Eiger detector)'}

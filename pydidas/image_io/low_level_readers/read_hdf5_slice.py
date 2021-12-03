@@ -18,8 +18,8 @@ Module with the read_hdf_slice function which is the low-level implementation
 of the hdf5 file reader with support for indexing and chunking.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,6 +28,7 @@ __all__ = ['read_hdf5_slice']
 
 import itertools
 from numbers import Integral
+
 import h5py
 import hdf5plugin
 import numpy as np

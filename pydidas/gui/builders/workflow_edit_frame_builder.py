@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-
 """
 Module with the create_workflow_edit_frame_widgets_and_layout function
 which is used to populate the WorkflowEditFrame with widgets.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -33,6 +32,7 @@ from pydidas.widgets import ScrollArea
 from pydidas.widgets.parameter_config import PluginParameterConfigWidget
 from pydidas.widgets.workflow_edit import (WorkflowTreeCanvas,
                                            PluginCollectionPresenter)
+
 
 def create_workflow_edit_frame_widgets_and_layout(frame):
     """

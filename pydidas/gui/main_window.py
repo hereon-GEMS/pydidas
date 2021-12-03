@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkflowPluginWidget which is used to create the workflow
-tree."""
+"""
+Module with the MainWindow class which is the main widget and manages the
+option and selection bars.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -31,12 +33,11 @@ from functools import partial
 import qtawesome as qta
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-from pydidas.widgets import CentralWidgetStack, GetInfoWidget
-from pydidas.core import get_generic_parameter
-from pydidas._exceptions import FrameConfigError
-from pydidas.gui.global_configuration_frame import GlobalConfigurationFrame
-from pydidas.constants import QSETTINGS_GLOBAL_KEYS
-from pydidas.workflow_tree import WorkflowTree
+from ..constants import QSETTINGS_GLOBAL_KEYS, FrameConfigError
+from ..core import get_generic_parameter
+from ..widgets import CentralWidgetStack, GetInfoWidget
+from ..workflow import WorkflowTree
+from .global_configuration_frame import GlobalConfigurationFrame
 
 TREE = WorkflowTree()
 TREE.clear()

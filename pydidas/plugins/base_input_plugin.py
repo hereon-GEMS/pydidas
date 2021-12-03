@@ -15,8 +15,8 @@
 
 """Module with the basic Plugin classes."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -26,8 +26,7 @@ __all__ = ['InputPlugin']
 import os
 
 from pydidas.core import get_generic_parameter, ImageMetadataManager
-from pydidas.constants import INPUT_PLUGIN
-from pydidas._exceptions import AppConfigError
+from pydidas.constants import INPUT_PLUGIN, AppConfigError
 from .base_plugin import BasePlugin
 
 

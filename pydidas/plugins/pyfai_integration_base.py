@@ -18,8 +18,8 @@ Module with the pyFAIintegrationBase Plugin which is inherited by all
 integration plugins using pyFAI.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -35,7 +35,7 @@ import pyFAI
 import pyFAI.azimuthalIntegrator
 
 from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.core.experimental_settings import ExperimentalSettings
+from pydidas.workflow import ExperimentalSettings
 from pydidas.plugins import ProcPlugin, PROC_PLUGIN
 from pydidas.image_io import read_image, rebin2d
 

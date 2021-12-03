@@ -18,8 +18,8 @@ Module with the create_composite_creator_frame_widgets_and_layout function
 which is used to populate the CompositeCreatorFrame with widgets.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,9 +30,9 @@ from PyQt5 import QtWidgets, QtCore
 
 from silx.gui.plot import PlotWindow
 
+from ...constants import CONFIG_WIDGET_WIDTH
 from pydidas.widgets import (ScrollArea, create_default_grid_layout)
 from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
-from pydidas.constants import CONFIG_WIDGET_WIDTH
 
 
 def create_composite_creator_frame_widgets_and_layout(frame):

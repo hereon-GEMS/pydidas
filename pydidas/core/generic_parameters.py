@@ -15,10 +15,11 @@
 
 """
 Module with a GENERIC_PARAMS dictionary which includes Parameters which
-are being used several times."""
+are being used several times throughout the package.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
@@ -28,10 +29,10 @@ __all__ = ['GENERIC_PARAMS', 'get_generic_parameter']
 from pathlib import Path
 import numpy as np
 
-from .parameter import Parameter
-from .hdf5_key import Hdf5key
-from .parameter_collection import ParameterCollection
 from ..constants.generic_parameter_tooltips import TOOLTIPS
+from .parameter import Parameter
+from .parameter_collection import ParameterCollection
+from .hdf5_key import Hdf5key
 
 
 GENERIC_PARAMS = ParameterCollection(
@@ -200,7 +201,6 @@ GENERIC_PARAMS = ParameterCollection(
               tooltip=TOOLTIPS['scan_index4']),
     Parameter('image_num', int, 0, name='Image number',
               tooltip=TOOLTIPS['image_num']),
-
     ############################
     ## global app settings
     ############################

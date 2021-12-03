@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,10 +28,10 @@ import unittest
 
 import numpy as np
 
+from pydidas.constants import DatasetConfigException
 from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals,
                                   _insert_axis_key)
 from pydidas.image_io import rebin2d
-from pydidas._exceptions import DatasetConfigException
 
 
 class TestDataset(unittest.TestCase):
@@ -297,39 +297,39 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset_get_dict__w_dict_missing_key(self):
         obj = EmptyDataset((10, 10))
         with warnings.catch_warnings(record=True) as w:
-            obj._EmptyDataset__get_dict({1: 0}, 'test')
+            obj._get_dict({1: 0}, 'test')
             self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_dict_too_many_keys(self):
         obj = EmptyDataset((10, 10))
         with warnings.catch_warnings(record=True) as w:
-            obj._EmptyDataset__get_dict({0: 1, 1: 2, 2: 3}, 'test')
+            obj._get_dict({0: 1, 1: 2, 2: 3}, 'test')
             self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_dict(self):
         obj = EmptyDataset((10, 10))
-        obj._EmptyDataset__get_dict({0: 0, 1: 1}, 'test')
+        obj._get_dict({0: 0, 1: 1}, 'test')
 
     def test_empty_dataset_get_dict__w_list_missing_entry(self):
         obj = EmptyDataset((10, 10))
         with warnings.catch_warnings(record=True) as w:
-            obj._EmptyDataset__get_dict([0], 'test')
+            obj._get_dict([0], 'test')
             self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_list_too_many_entries(self):
         obj = EmptyDataset((10, 10))
         with warnings.catch_warnings(record=True) as w:
-            obj._EmptyDataset__get_dict([1, 2, 3], 'test')
+            obj._get_dict([1, 2, 3], 'test')
             self.assertEqual(len(w), 1)
 
     def test_empty_dataset_get_dict__w_list(self):
         obj = EmptyDataset((10, 10))
-        obj._EmptyDataset__get_dict([0, 1], 'test')
+        obj._get_dict([0, 1], 'test')
 
     def test_empty_dataset_get_dict__w_value(self):
         obj = EmptyDataset((10, 10))
         with self.assertRaises(DatasetConfigException):
-            obj._EmptyDataset__get_dict(0, 'test')
+            obj._get_dict(0, 'test')
 
     def test_empty_dataset__new__kwargs(self):
         obj = self.create_empty_dataset()

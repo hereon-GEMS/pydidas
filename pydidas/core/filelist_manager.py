@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the FilelistManager class which is used to manage file lists
-and access to files. """
+"""
+Module with the FilelistManager class which is used to manage file lists
+and access files based on their index.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -27,18 +29,17 @@ __all__ = ['FilelistManager']
 import os
 import re
 import copy
-
 from pathlib import Path
 
 import numpy as np
 
-from pydidas.constants import FILENAME_DELIMITERS
-from pydidas._exceptions import AppConfigError
-from pydidas.core import (ObjectWithParameterCollection,
-                          ParameterCollection, get_generic_parameter)
-from pydidas.utils import (check_file_exists,
+from ..constants import FILENAME_DELIMITERS, AppConfigError
+from ..utils import (check_file_exists,
                            verify_files_in_same_directory,
                            verify_files_of_range_are_same_size)
+from .parameter_collection import ParameterCollection
+from .object_with_parameter_collection import ObjectWithParameterCollection
+from .generic_parameters import get_generic_parameter
 
 
 DEFAULT_PARAMS = ParameterCollection(

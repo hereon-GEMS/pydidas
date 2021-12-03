@@ -18,8 +18,8 @@ Module with the ExecuteWorkflowFrame which allows to run the full
 processing workflow and visualize the results.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -32,19 +32,16 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 import qtawesome as qta
 
-from pydidas.core import (ScanSettings, Parameter, get_generic_parameter,
-                          ParameterCollection, ExperimentalSettings)
-from pydidas.apps import ExecuteWorkflowApp
-from pydidas.multiprocessing import AppRunner
-from pydidas.workflow_tree import WorkflowTree, WorkflowResults
-from pydidas.widgets import (ReadOnlyTextWidget, CreateWidgetsMixIn,
-                             BaseFrameWithApp)
-from pydidas.widgets.dialogues import QuestionBox
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
-from pydidas.gui.builders.execute_workflow_frame_builder import (
+from ..core import ParameterCollection, get_generic_parameter
+from ..apps import ExecuteWorkflowApp
+from ..multiprocessing import AppRunner
+from ..workflow import (WorkflowTree, WorkflowResults, ScanSettings,
+                        ExperimentalSettings)
+from ..widgets import CreateWidgetsMixIn, BaseFrameWithApp
+from ..widgets.dialogues import QuestionBox
+from ..widgets.parameter_config import ParameterWidgetsMixIn
+from .builders.execute_workflow_frame_builder import (
     ExecuteWorkflowFrame_BuilderMixin)
-from pydidas.utils import timed_print
-
 
 EXP = ExperimentalSettings()
 SCAN = ScanSettings()

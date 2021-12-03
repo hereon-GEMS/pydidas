@@ -15,28 +15,18 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-import copy
-import os
-import unittest
-from unittest import mock
-import tempfile
-import shutil
-from pathlib import Path
-import sys
 
-import numpy as np
-import h5py
+import unittest
 
 from pydidas.apps import BaseApp
-from pydidas.core import (ParameterCollection,
-                          get_generic_parameter, CompositeImage)
+from pydidas.core import (ParameterCollection, get_generic_parameter)
 
 
 class TestApp(BaseApp):

@@ -15,8 +15,8 @@
 
 """Module with the Hdf5Reader class for reading hdf5 images."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -25,11 +25,11 @@ __all__ = []
 
 from numpy import squeeze
 
+from ...constants import HDF5_EXTENSIONS
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
 from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
-from ...constants import HDF5_EXTENSIONS
 
 class Hdf5Reader(ImageReader):
     """ImageReader implementation for hdf5 files."""

@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -33,7 +33,7 @@ import sys
 from pydidas.unittest_objects.dummy_plugin_collection import (
     get_random_string)
 from pydidas.utils import find_valid_python_files
-from pydidas.core.utilities import flatten_list
+from pydidas.utils import flatten_list
 
 class TestPluginCollection(unittest.TestCase):
 

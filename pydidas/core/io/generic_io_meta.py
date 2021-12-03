@@ -13,19 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the ExperimentalSettingsIoMeta class which is used for creating
-exporter/importer classes for the ExperimentalSetting singleton and
-registering them.
+Module with the GenericIoMeta class which is used as a template for creating
+exporter/importer classes and registering them.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericIoMeta']
-
 
 import os
 
@@ -51,7 +49,7 @@ class GenericIoMeta(FileExtensionRegistryMetaclass):
         ----------
         filename : str
             The full filename and path.
-        tree : pydidas.workflow_tree.WorkflowTree
+        tree : pydidas.workflow.WorkflowTree
             The instance of the WorkflowTree
         kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
@@ -74,7 +72,7 @@ class GenericIoMeta(FileExtensionRegistryMetaclass):
 
         Returns
         -------
-        pydidas.workflow_tree.WorkflowTree
+        pydidas.workflow.WorkflowTree
             The new WorkflowTree instance.
         """
         _extension = os.path.splitext(filename)[1]

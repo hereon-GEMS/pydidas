@@ -13,30 +13,34 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the processor function which can be used for iterating over
-multiprocessing function calls."""
+"""
+Module with the AppRunner class which is a QThread which can spawn and control
+worker processes and run in parallel to an event thread.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['AppRunner']
 
+
+import logging
 import multiprocessing as mp
 
 from PyQt5 import QtCore
 
-from pydidas.multiprocessing.worker_controller import WorkerController
-from pydidas.multiprocessing._app_processor import app_processor
-from pydidas.apps import BaseApp
+from ..apps import BaseApp
+from ..utils import pydidas_logger
+from .worker_controller import WorkerController
+from ._app_processor import app_processor
 
 
-from pydidas.utils import pydidas_logger
-import logging
 logger = pydidas_logger()
 logger.setLevel(logging.DEBUG)
+
 
 class AppRunner(WorkerController):
     """

@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -35,7 +35,7 @@ from pydidas.utils.file_checks import (check_hdf5_key_exists_in_file,
                                        verify_files_in_same_directory,
                                        verify_files_of_range_are_same_size,
                                        file_is_writable)
-from pydidas._exceptions import AppConfigError
+from pydidas.constants import AppConfigError
 
 
 class Test_file_checks(unittest.TestCase):

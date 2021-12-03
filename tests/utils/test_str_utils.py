@@ -15,13 +15,14 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+import sys
 import unittest
 import time
 import string
@@ -29,7 +30,7 @@ import random
 
 from pydidas.utils.str_utils import (
     format_str, get_time_string, get_warning, convert_special_chars_to_unicode,
-    convert_unicode_to_ascii)
+    convert_unicode_to_ascii, update_separators)
 
 
 class Test_str_utils(unittest.TestCase):
@@ -230,6 +231,14 @@ class Test_str_utils(unittest.TestCase):
         _target = 'chi test test2 Another thetastr^-1'
         _new_str = convert_unicode_to_ascii(_str)
         self.assertEqual(_new_str, _target)
+
+    def test_update_separators(self):
+        _test = 'this\\string/has\\mixed/separators'
+        _new = update_separators(_test)
+        if sys.platform in ['win32', 'win64']:
+            self.assertEqual(_new.find('/'), -1)
+        else:
+            self.assertEqual(_new.find('\\'), -1)
 
 
 if __name__ == "__main__":

@@ -15,8 +15,8 @@
 
 """Unit tests for pydidas modules."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -28,7 +28,7 @@ import random
 
 from PyQt5 import  QtWidgets
 
-from pydidas._exceptions import WidgetLayoutError
+from pydidas.constants import WidgetLayoutError
 from pydidas.widgets.create_widgets_mixin import (
     CreateWidgetsMixIn, _get_widget_layout_args, _get_grid_pos)
 

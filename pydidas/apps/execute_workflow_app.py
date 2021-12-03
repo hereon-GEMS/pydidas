@@ -18,13 +18,14 @@ Module with the ExecuteWorkflowApp class which allows to run WorkflowTrees
 for processing diffraction data.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExecuteWorkflowApp']
+
 
 import time
 import multiprocessing as mp
@@ -32,13 +33,12 @@ import multiprocessing as mp
 import numpy as np
 from PyQt5 import QtCore
 
-from pydidas.apps.base_app import BaseApp
-from pydidas._exceptions import AppConfigError
-from pydidas.core import (ParameterCollection,get_generic_parameter,
-                          ScanSettings, Dataset)
-from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
-from pydidas.workflow_tree import WorkflowTree, WorkflowResults
-from pydidas.workflow_tree.result_savers import WorkflowResultSaverMeta
+from ..core import (ParameterCollection,get_generic_parameter, Dataset)
+from ..constants import AppConfigError
+from ..workflow import ScanSettings, WorkflowTree, WorkflowResults
+from ..workflow.result_savers import WorkflowResultSaverMeta
+from .base_app import BaseApp
+from .app_parsers import parse_execute_workflow_cmdline_arguments
 
 
 TREE = WorkflowTree()

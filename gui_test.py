@@ -23,7 +23,7 @@ from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
 from pydidas.widgets import BaseFrame
 
 from pydidas.core import ExperimentalSettings, ScanSettings
-from pydidas.workflow_tree import WorkflowResults, WorkflowTree
+from pydidas.workflow import WorkflowResults, WorkflowTree
 
 EXP = ExperimentalSettings()
 SCAN = ScanSettings()

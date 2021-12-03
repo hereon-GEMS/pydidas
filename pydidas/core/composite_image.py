@@ -13,21 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the CompositeImage class used for creating mosaic images."""
+"""
+Module with the CompositeImage class used for creating mosaic images.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CompositeImage']
 
+
 from copy import copy
 
 import numpy as np
 
-from .._exceptions import AppConfigError
+from ..constants import AppConfigError
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
 from .generic_parameters import get_generic_parameter

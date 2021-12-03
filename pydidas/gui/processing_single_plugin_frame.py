@@ -16,21 +16,18 @@
 """Module with the ProcessingTestFrame which allows to test the processing
 workflow and individual plugins on a single file."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ProcessingSinglePluginFrame']
 
-from PyQt5 import QtWidgets, QtCore
 
-
-from ..core import (ScanSettings, Parameter, ParameterCollection,
-                    get_generic_parameter)
-from ..workflow_tree import WorkflowTree
-from ..widgets import ReadOnlyTextWidget, CreateWidgetsMixIn, BaseFrame
+from ..core import Parameter, ParameterCollection, get_generic_parameter
+from ..workflow import WorkflowTree, ScanSettings
+from ..widgets import CreateWidgetsMixIn, BaseFrame
 from ..widgets.parameter_config import ParameterWidgetsMixIn
 from .builders.processing_single_plugin_frame_builder import (
     create_processing_single_plugin_frame_widgets_and_layout)

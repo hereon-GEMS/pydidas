@@ -19,8 +19,8 @@ function which is used to populate the DataBrowsingFrame with
 widgets.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -31,7 +31,7 @@ from PyQt5 import QtWidgets, QtCore
 import qtawesome as qta
 from silx.gui.plot.ImageView import ImageView
 
-from pydidas.widgets import (DirectoryExplorer, Hdf5DatasetSelector)
+from ...widgets import (DirectoryExplorer, Hdf5DatasetSelector)
 
 
 class ImageViewSmallHist(ImageView):

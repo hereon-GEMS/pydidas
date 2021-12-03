@@ -18,8 +18,8 @@ Module with the CreateWidgetsMixIn class which can be inherited from to
 add convenience widget creation methods.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -32,8 +32,7 @@ from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 from .factory import (create_spin_box, create_progress_bar, create_check_box,
                       create_label, create_line, create_spacer, create_button,
                       create_combo_box, create_radio_button_group)
-from ..constants import QT_DEFAULT_ALIGNMENT
-from .._exceptions import WidgetLayoutError
+from ..constants import QT_DEFAULT_ALIGNMENT, WidgetLayoutError
 from ..utils import copy_docstring
 from .utilities import apply_widget_properties
 

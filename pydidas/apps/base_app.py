@@ -12,11 +12,12 @@
 
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+"""
+Module with the BaseApp class from which all apps should inherit.
+"""
 
-"""Module with the BaseApp from which all apps should inherit.."""
-
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -34,7 +35,23 @@ class BaseApp(ObjectWithParameterCollection):
     Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
     <pydidas.core.ObjectWithParameterCollection>`
 
-    The BaseApp is the base class for all pydidas applications.
+    The BaseApp is the base class for all pydidas applications. It includes
+    core functionalities and pre-defines the template of required methods
+    for Apps to allow running the multiprocessing :py:class:`AppRunner`.
+
+    The following is a schematic of the calling scheme in the AppRunner
+
+    a. Call app.multiprocessing_pre_run to perform general setup tasks
+       for multiprocessing. This method should only be called once.
+    b. Run a loop <for index in frame indices>:
+        b.1. Check app.multiprocessing_carryon value. If False, wait and
+             repeat the check. If True, continue with processing.
+        b.2. Call app.multiprocessing_func(index) to perform the main
+             calculation task and put the results in a queue or transfer
+             via a signal.
+        b.3. Call app.multiprocessing_store_results (optionally). If the apps
+             are running in parallel, they will skip this step.
+    c. Call app.multiprocessing_post_run to perform cleanup steps.
     """
     parse_func = None
     attributes_not_to_copy_to_slave_app = []

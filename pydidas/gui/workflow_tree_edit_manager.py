@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the WorkflowTreeEditManager which interfaces the WorkflowTree
-with the editing Canvas."""
+"""
+Module with the WorkflowTreeEditManager which interfaces the WorkflowTree
+with the editing Canvas.
+"""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -30,11 +32,12 @@ from functools import partial
 from PyQt5 import QtCore
 import numpy as np
 
-from pydidas.constants import gui_constants
-from pydidas.core import SingletonFactory
-from pydidas.plugins import PluginCollection
-from pydidas.workflow_tree import WorkflowTree, PluginPositionNode
-from pydidas.widgets.workflow_edit import WorkflowPluginLabel
+from ..constants import gui_constants
+from ..core import SingletonFactory
+from ..plugins import PluginCollection
+from ..workflow import WorkflowTree, PluginPositionNode
+from ..widgets.workflow_edit import WorkflowPluginLabel
+
 
 PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()

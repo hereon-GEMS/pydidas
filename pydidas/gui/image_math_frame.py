@@ -16,8 +16,8 @@
 """Module with the ImageMathsFrame which allows to perform mathematical
 operations on images."""
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -27,12 +27,12 @@ __all__ = ['ImageMathFrame']
 from PyQt5 import QtWidgets
 import qtawesome as qta
 
-from pydidas.core import (ScanSettings, Parameter, ParameterCollection,
+from ..core import (ScanSettings, Parameter, ParameterCollection,
                           get_generic_parameter)
-from pydidas.workflow_tree import WorkflowTree
-from pydidas.widgets import BaseFrame
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
-from pydidas.gui.builders.image_math_frame_builder import (
+from ..workflow import WorkflowTree
+from ..widgets import BaseFrame
+from ..widgets.parameter_config import ParameterWidgetsMixIn
+from .builders.image_math_frame_builder import (
     create_image_math_frame_widgets_and_layout)
 
 

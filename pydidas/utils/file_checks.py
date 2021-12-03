@@ -18,8 +18,8 @@ Module with file check functions to interact with files and perform some
 basic checks for existance, size and same directory.
 """
 
-__author__      = "Malte Storm"
-__copyright__   = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
@@ -34,7 +34,7 @@ import os
 from numpy import array
 
 from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
-from .._exceptions import AppConfigError
+from ..constants import AppConfigError
 
 
 def check_hdf5_key_exists_in_file(fname, key):

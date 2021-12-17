@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,15 +31,15 @@ from numbers import Real
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.workflow import (WorkflowNode, WorkflowTree, WorkflowResults,
-                              ScanSettings)
+from pydidas.workflow import WorkflowNode, WorkflowTree, WorkflowResults
+from pydidas.experiment import ScanSetup
 from pydidas.core import Dataset
 from pydidas.unittest_objects.dummy_loader import DummyLoader
 from pydidas.unittest_objects.dummy_proc import DummyProc
-from pydidas.constants import AppConfigError
+from pydidas.core import AppConfigError, get_generic_parameter, Parameter
 from pydidas.plugins import PluginCollection
 
-SCAN = ScanSettings()
+SCAN = ScanSetup()
 TREE = WorkflowTree()
 RES = WorkflowResults()
 
@@ -284,6 +284,57 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertEqual(RES.shapes[2], self._scan_n + self._result2_shape)
         self.assertEqual(RES.get_results(1).shape, RES.shapes[1])
         self.assertEqual(RES.get_results(2).shape, RES.shapes[2])
+
+    def test_update_param_choices_from_label__curr_choice_okay(self):
+        _param = get_generic_parameter('selected_results')
+        RES._config['labels'] = {1: 'a', 2: 'b', 3: 'c', 5: ''}
+        RES.update_param_choices_from_labels(_param)
+        _choices = _param.choices
+        self.assertIn('No selection', _choices)
+        for _key, _label in RES.labels.items():
+            if len(_label) > 0:
+                _item = f'{_label} (node #{_key:03d})'
+            else:
+                _item = f'(node #{_key:03d})'
+            self.assertIn(_item, _choices)
+
+    def test_update_param_choices_from_label__curr_choice_not_okay(self):
+        _param = Parameter('test', str, 'something', choices=['something'])
+        RES._config['labels'] = {1: 'a', 2: 'b', 3: 'c', 5: ''}
+        RES.update_param_choices_from_labels(_param)
+        _choices = _param.choices
+        self.assertIn('No selection', _choices)
+        for _key, _label in RES.labels.items():
+            if len(_label) > 0:
+                _item = f'{_label} (node #{_key:03d})'
+            else:
+                _item = f'(node #{_key:03d})'
+            self.assertIn(_item, _choices)
+
+    def test_update_param_choices_from_label__only_node_entries(self):
+        _param = get_generic_parameter('selected_results')
+        RES._config['labels'] = {1: 'a', 2: 'b', 3: 'c', 5: ''}
+        RES.update_param_choices_from_labels(_param, False)
+        _choices = _param.choices
+        for _key, _label in RES.labels.items():
+            if len(_label) > 0:
+                _item = f'{_label} (node #{_key:03d})'
+            else:
+                _item = f'(node #{_key:03d})'
+            self.assertIn(_item, _choices)
+
+    def test_update_param_choices_from_label__node_only_bad_choice(self):
+        _param = Parameter('test', str, 'something', choices=['something'])
+        RES._config['labels'] = {1: 'a', 2: 'b', 3: 'c', 5: ''}
+        RES.update_param_choices_from_labels(_param, False)
+        _choices = _param.choices
+        for _key, _label in RES.labels.items():
+            if len(_label) > 0:
+                _item = f'{_label} (node #{_key:03d})'
+            else:
+                _item = f'(node #{_key:03d})'
+            self.assertIn(_item, _choices)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -62,9 +62,10 @@ def _get_base_class(cls):
 
 
 class Parameter:
-    """A class used for storing parameters and associated metadata.
+    """
+    A class used for storing a value and associated metadata.
 
-    The parameter has the following properties which can be accessed.
+    The Parameter has the following properties which can be accessed.
     Only the value and choices properties can be edited at runtime, all other
     properties are fixed at instanciation.
 
@@ -86,6 +87,8 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | name       | False     | A readable name as description.           |
     +------------+-----------+-------------------------------------------+
+    | unit       | False     | The unit of the Parameter value.          |
+    +------------+-----------+-------------------------------------------+
     | optional   | False     | A flag whether the parameter is required  |
     |            |           | or optional.                              |
     +------------+-----------+-------------------------------------------+
@@ -93,55 +96,51 @@ class Parameter:
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value.                        |
     +------------+-----------+-------------------------------------------+
+
+    Parameters can be passed either as a complete meta_dict or as individual
+    keyword arguments. The meta_dict will take precendence.
+
+    Parameters
+    ----------
+    refkey : str
+        The reference key for the Parameter in the Parameter collection.
+        If not specified, this will default to the name.
+    param_type : Union[None, type]
+        The datatype of the parameter. If None, no type-checking will be
+        performed. If any integer or float value is used, this will be
+        changed to the abstract base class of numbers.Integral or
+        numbers.Real.
+    default : Union[type, None]
+        The default value. The data type must be of the same type as
+        param_type. None is only accepted if param_type is None as well.
+    meta : Union[dict, None], optional
+        A dictionary with meta data. Any keys specified as meta will
+        overwrite the kwargs dictionary. This is added merely as
+        convenience to facility copying Parameter instances. If None,
+        this entry will be ignored. The default is None.
+    name : str, optional
+        The name of the parameter. The default is None.
+    optional : bool, optional
+        Keyword to toggle optional parameters. The default is False.
+    tooltip : str, optional
+        A description of the parameter. It will be automatically extended
+        to include certain type and unit information. The default is ''.
+    unit : str, optional
+        The unit of the parameter. The default is ''.
+    choices : Union[list, tuple, None]
+        A list of allowed choices. If None, no checking will be enforced.
+        The default is None.
+    value : type
+        The value of the parameter. This parameter should only be used
+        to restore saved parameters.
+    allow_None : bool, optional
+        Keyword to allow None instead of the usual datatype. The default
+        is False.
+    **kwargs : dict
+        All optional parameters can also be passed as a keyword argument
+        dictionary.
     """
-
     def __init__(self, refkey, param_type, default, meta=None, **kwargs):
-        """
-        Setup method.
-
-        Parameters can be passed either as a complete meta_dict or as
-        indicidual keyword arguments. The meta_dict will take precend
-
-        Parameters
-        ----------
-        refkey : str
-            The reference key for the Parameter in the Parameter collection.
-            If not specified, this will default to the name.
-        param_type : Union[None, type]
-            The datatype of the parameter. If None, no type-checking will be
-            performed. If any integer or float value is used, this will be
-            changed to the abstract base class of numbers.Integral or
-            numbers.Real.
-        default : Union[type, None]
-            The default value. The data type must be of the same type as
-            param_type. None is only accepted if param_type is None as well.
-        meta : Union[dict, None], optional
-            A dictionary with meta data. Any keys specified as meta will
-            overwrite the kwargs dictionary. This is added merely as
-            convenience to facility copying Parameter instances. If None,
-            this entry will be ignored. The default is None.
-        name : str, optional
-            The name of the parameter. The default is None.
-        optional : bool, optional
-            Keyword to toggle optional parameters. The default is False.
-        tooltip : str, optional
-            A description of the parameter. It will be automatically extended
-            to include certain type and unit information. The default is ''.
-        unit : str, optional
-            The unit of the parameter. The default is ''.
-        choices : Union[list, tuple, None]
-            A list of allowed choices. If None, no checking will be enforced.
-            The default is None.
-        value : type
-            The value of the parameter. This parameter should only be used
-            to restore saved parameters.
-        allow_None : bool, optional
-            Keyword to allow None instead of the usual datatype. The default
-            is False.
-        **kwargs : dict
-            All optional parameters can also be passed as a keyword argument
-            dictionary.
-        """
         super().__init__()
         self.__refkey = refkey
         self.__type = _get_base_class(param_type)
@@ -232,7 +231,7 @@ class Parameter:
             or if type is None.
 
         """
-        if not self.__type:
+        if self.__type is None:
             return True
         if isinstance(val, self.__type):
             return True

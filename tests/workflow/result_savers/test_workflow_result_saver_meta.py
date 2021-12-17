@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,11 +28,12 @@ import numpy as np
 
 from pydidas.workflow.result_savers import (
     WorkflowResultSaverBase, WorkflowResultSaverMeta)
-from pydidas.workflow import WorkflowTree, WorkflowResults, ScanSettings
+from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.experiment import ScanSetup
 from pydidas.core import Dataset
 
 TREE = WorkflowTree()
-SCAN = ScanSettings()
+SCAN = ScanSetup()
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
 
@@ -104,10 +105,10 @@ class TestWorkflowResults(unittest.TestCase):
                   'axis_ranges': _res2.axis_ranges}
         return {1: _meta1, 2: _meta2}
 
-    def test__class_type(self):
+    def test_class_type(self):
         self.assertEqual(META.__class__, type)
 
-    def test__class_attributes(self):
+    def test_class_attributes(self):
         self.assertTrue(hasattr(META, 'registry'))
         self.assertTrue(hasattr(META, 'active_savers'))
 

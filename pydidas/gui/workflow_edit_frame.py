@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -30,15 +30,14 @@ from PyQt5 import QtCore, QtWidgets
 from ..widgets import BaseFrame
 from ..workflow import WorkflowTree
 from ..workflow.workflow_tree_io import WorkflowTreeIoMeta
-from .workflow_tree_edit_manager import WorkflowTreeEditManager
-from .builders.workflow_edit_frame_builder import (
-    create_workflow_edit_frame_widgets_and_layout)
+from .managers import WorkflowTreeEditManager
+from .builders import WorkflowEditFrame_BuilderMixin
 
 TREE = WorkflowTree()
 WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
-class WorkflowEditFrame(BaseFrame):
+class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
     """
     The WorkflowEditFrame includes three major objects:
         a. The editing canvas which shows the WorkflowTree structure.
@@ -49,10 +48,15 @@ class WorkflowEditFrame(BaseFrame):
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        super().__init__(parent)
+        BaseFrame.__init__(self, parent)
+        WorkflowEditFrame_BuilderMixin.__init__(self)
+        self.build_frame()
+        self.connect_signals()
 
-        create_workflow_edit_frame_widgets_and_layout(self)
-
+    def connect_signals(self):
+        """
+        Connect all signals and slots in the frame.
+        """
         self._widgets['plugin_collection'].selection_confirmed.connect(
             self.workflow_add_plugin)
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
@@ -119,40 +123,15 @@ class WorkflowEditFrame(BaseFrame):
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):
         """
-        Overload the frame_activated method of the BaseFrame class to update
-        the synchronize the displayed Tree with the WorkflowTree singleton.
+        Received a signal that a new frame has been selected.
+
+        This method checks whether the selected frame is the current class
+        and if yes, it will call some updates.
 
         Parameters
         ----------
         index : int
-            The frame index.
+            The index of the newly activated frame.
         """
         if self.frame_index == index:
             WORKFLOW_EDIT_MANAGER.update_from_tree()
-
-
-if __name__ == '__main__':
-    import pydidas
-    from pydidas.gui.main_window import MainWindow
-    import sys
-    import qtawesome as qta
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = MainWindow()
-
-    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'),
-                       WorkflowEditFrame)
-    gui.create_toolbars()
-
-    gui.show()
-    sys.exit(app.exec_())
-    app.deleteLater()

@@ -23,7 +23,7 @@ copyright = '2021, Malte Storm, Helmholtz-Zentrum Hereon'
 author = 'Malte Storm'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.0'
+release = '0.0.1'
 version = 'alpha'
 
 # -- General configuration ---------------------------------------------------
@@ -59,9 +59,9 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 # nature scheme options
-#html_theme_options = {'sidebarwidth': '350px', 
-#                     "body_min_width": 800,
-#                     }
+# html_theme_options = {'sidebarwidth': '350px', 
+#                       "body_min_width": 800,
+#                      }
 html_theme_options = {
     'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
     'analytics_anonymize_ip': False,

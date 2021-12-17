@@ -1,21 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with a factory function to create formatted lines as a formatted
-QFrame."""
+Module with a factory function to create a QPushButton.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -27,7 +27,8 @@ __all__ = ['create_button']
 
 from PyQt5.QtWidgets import QPushButton
 
-from ..utilities import apply_widget_properties
+from ..utilities import (apply_widget_properties,
+                         get_pyqt_icon_from_str_reference)
 
 
 def create_button(text, **kwargs):
@@ -53,5 +54,7 @@ def create_button(text, **kwargs):
         The instantiated button widget.
     """
     _button = QPushButton(text)
+    if isinstance(kwargs.get('icon', None), str):
+        kwargs['icon'] = get_pyqt_icon_from_str_reference(kwargs.get('icon'))
     apply_widget_properties(_button, **kwargs)
     return _button

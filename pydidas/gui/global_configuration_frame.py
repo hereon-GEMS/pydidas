@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -26,37 +26,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GlobalConfigurationFrame']
 
-import sys
 from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
 
-from pydidas.widgets import BaseFrame
-from pydidas.core import (get_generic_parameter, ParameterCollection)
-from pydidas.widgets.parameter_config import ParameterWidgetsMixIn
-from pydidas.gui.builders.global_configuration_frame_builder import (
-    create_global_configuratation_frame_widgets_and_layout)
+from ..widgets import BaseFrame
+from ..core import get_generic_param_collection
+from ..widgets.parameter_config import ParameterWidgetsMixIn
+from .builders import GlobalConfiguration_FrameBuilder
 
 
-DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('mp_n_workers'),
-    get_generic_parameter('shared_buffer_size'),
-    get_generic_parameter('shared_buffer_max_n'),
-    get_generic_parameter('det_mask'),
-    get_generic_parameter('det_mask_val'),
-    get_generic_parameter('mosaic_border_width'),
-    get_generic_parameter('mosaic_border_value'),
-    get_generic_parameter('mosaic_max_size'),
-    get_generic_parameter('plot_update_time')
-    )
-
-
-class GlobalConfigurationFrame(BaseFrame, ParameterWidgetsMixIn):
+class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
     """
     Frame which manages global configuration items.
     """
-    TEXT_WIDTH = 180
-    default_params = DEFAULT_PARAMS
+    default_params = get_generic_param_collection(
+        'mp_n_workers', 'shared_buffer_size', 'shared_buffer_max_n',
+        'det_mask', 'det_mask_val', 'mosaic_border_width',
+        'mosaic_border_value', 'mosaic_max_size', 'plot_update_time')
+
     value_changed_signal = QtCore.pyqtSignal(str, object)
 
     def __init__(self, **kwargs):
@@ -65,7 +53,7 @@ class GlobalConfigurationFrame(BaseFrame, ParameterWidgetsMixIn):
         BaseFrame.__init__(self, parent, name=name)
         ParameterWidgetsMixIn.__init__(self)
         self.set_default_params()
-        create_global_configuratation_frame_widgets_and_layout(self)
+        self.build_frame()
         self.connect_signals()
         self.frame_activated(self.frame_index)
 
@@ -80,12 +68,12 @@ class GlobalConfigurationFrame(BaseFrame, ParameterWidgetsMixIn):
 
     def update_qsetting(self, param_key, value):
         """
-        Update a QSetting value
+        Update a QSettings value
 
         Parameters
         ----------
         param_key : str
-            The QSetting reference key. A "global/" prefix will be applied
+            The QSettings reference key. A "global/" prefix will be applied
             to it.
         value : object
             The new value.
@@ -138,28 +126,3 @@ class GlobalConfigurationFrame(BaseFrame, ParameterWidgetsMixIn):
         """
         value = self._qsettings_convert_value_type(param_key, value)
         self.update_param_value(param_key, value)
-
-
-if __name__ == '__main__':
-    import pydidas
-    from pydidas.gui.main_window import MainWindow
-    import sys
-    import qtawesome as qta
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = MainWindow()
-
-    gui.create_toolbars()
-
-    gui.show()
-    sys.exit(app.exec_())
-    app.deleteLater()

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -34,9 +34,9 @@ from pydidas.unittest_objects.dummy_plugin_collection import (
     create_plugin_class)
 
 from pydidas.plugins import BasePlugin
-from pydidas.constants import BASE_PLUGIN
+from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core import Parameter, get_generic_parameter
-from pydidas.image_io import rebin2d, RoiManager
+from pydidas.image_io import rebin2d, RoiController
 from pydidas.unittest_objects import get_random_string
 
 
@@ -115,7 +115,7 @@ class TestBasePlugin(unittest.TestCase):
 
     def test_get_single_ops_from_legacy__roi(self):
         _roi1 = (5, 55, 5, 55)
-        _rm = RoiManager(roi=_roi1)
+        _rm = RoiController(roi=_roi1)
         _shape = (125, 125)
         _image = np.random.random((_shape))
         _final_image = _image[_rm.roi]
@@ -131,7 +131,7 @@ class TestBasePlugin(unittest.TestCase):
         _roi2 = (3, 1235, 17, -5)
         _roi3 = (12, 758, 146, 745)
         _shape = (1257, 1235)
-        _rm = RoiManager(roi=_roi1, input_shape=_shape)
+        _rm = RoiController(roi=_roi1, input_shape=_shape)
         _rm.apply_second_roi(_roi2)
         _rm.apply_second_roi(_roi3)
         _image = np.random.random((_shape))
@@ -154,11 +154,11 @@ class TestBasePlugin(unittest.TestCase):
         _bin3 = 2
         _shape = (1257, 1235)
         _image = np.random.random((_shape))
-        _final_image = _image[RoiManager(roi=_roi1).roi]
+        _final_image = _image[RoiController(roi=_roi1).roi]
         _final_image = rebin2d(_final_image, _bin1)
         _final_image = rebin2d(_final_image, _bin2)
-        _final_image = _final_image[RoiManager(roi=_roi2).roi]
-        _final_image = _final_image[RoiManager(roi=_roi3).roi]
+        _final_image = _final_image[RoiController(roi=_roi2).roi]
+        _final_image = _final_image[RoiController(roi=_roi3).roi]
         _final_image = rebin2d(_final_image, _bin3)
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
         plugin._legacy_image_ops.append(['roi', _roi1])
@@ -226,10 +226,10 @@ class TestBasePlugin(unittest.TestCase):
         _bin2 = 4
         _shape = (1257, 1235)
         _image = np.random.random((_shape))
-        _final_image = _image[RoiManager(roi=_roi1).roi]
+        _final_image = _image[RoiController(roi=_roi1).roi]
         _final_image = rebin2d(_final_image, _bin1)
         _final_image = rebin2d(_final_image, _bin2)
-        _final_image = _final_image[RoiManager(roi=_roi2).roi]
+        _final_image = _final_image[RoiController(roi=_roi2).roi]
         plugin = create_plugin_class(BASE_PLUGIN, BASE_PLUGIN)()
         plugin._original_image_shape = _shape
         plugin._legacy_image_ops.append(['roi', _roi1])

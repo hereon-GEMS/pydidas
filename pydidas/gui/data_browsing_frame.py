@@ -1,19 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the DataBrowsingFrame which is used to browse data."""
+"""
+Module with the DataBrowsingFrame which is used to browse data in filesystem
+viewer and show it in a view window.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -26,45 +29,64 @@ __all__ = ['DataBrowsingFrame']
 import os
 from functools import partial
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore
 
-from pydidas.widgets import BaseFrame
-from pydidas.image_io import ImageReaderCollection, read_image
-from pydidas.constants import HDF5_EXTENSIONS
-from pydidas.gui.builders.data_browsing_frame_builder import (
-    create_data_browsing_frame_widgets_and_layout)
+from ..image_io import ImageReaderCollection, read_image
+from ..core.constants import HDF5_EXTENSIONS
+from ..widgets import BaseFrame
+from .builders import DataBrowsingFrame_BuilderMixin
 
 
 IMAGE_READER = ImageReaderCollection()
 
 
-class DataBrowsingFrame(BaseFrame):
+class DataBrowsingFrame(BaseFrame, DataBrowsingFrame_BuilderMixin):
     """
-    The DataBrowsingFrame is widget / frame with a directory exporer
+    The DataBrowsingFrame is frame with a directory exporer
     and a main data visualization window. Its main purpose is to browse
     through datasets.
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('name', None)
-        super().__init__(parent=parent, name=name)
+        BaseFrame.__init__(self, parent)
+        DataBrowsingFrame_BuilderMixin.__init__(self)
+        self.build_frame()
+        self.connect_signals()
 
-        create_data_browsing_frame_widgets_and_layout(self)
-        self._widgets['tree'].doubleClicked.connect(self.__fileSelected)
-        self._widgets['tree'].clicked.connect(self.__fileHighlighted)
+    def connect_signals(self):
+        """
+        Connect all required signals and slots between widgets and class
+        methods.
+        """
+        self._widgets['tree'].doubleClicked.connect(self.__file_selected)
+        self._widgets['tree'].clicked.connect(self.__file_highlighted)
         self._widgets['but_minimize'].clicked.connect(
         partial(self.change_splitter_pos, False))
         self._widgets['but_maximize'].clicked.connect(
             partial(self.change_splitter_pos, True))
         self.__selection_width = self._widgets['selection'].width()
 
-    def change_splitter_pos(self, enlargeDir=True):
-        if enlargeDir:
+    @QtCore.pyqtSlot(bool)
+    def change_splitter_pos(self, enlarge_dir=True):
+        """
+        Change the position of the window splitter to one of two predefined
+        positions.
+
+        The positions toggled using the enlarge_dir keyword.
+
+        Parameters
+        ----------
+        enlarge_dir : bool, optional
+            Keyword to enlarge the directory view. If False, the plot window
+            is enlarged instead of the directory viewer. The default is True.
+        """
+        if enlarge_dir:
             self._widgets['splitter'].moveSplitter(770, 1)
         else:
             self._widgets['splitter'].moveSplitter(300, 1)
 
-    def __fileHighlighted(self):
+    @QtCore.pyqtSlot()
+    def __file_highlighted(self):
         """
         Perform actions after a file has been highlighted in the
         DirectoryExplorer.
@@ -75,7 +97,8 @@ class DataBrowsingFrame(BaseFrame):
             _name = os.path.dirname(_name)
         self.q_settings.setValue('directory_explorer/path', _name)
 
-    def __fileSelected(self):
+    @QtCore.pyqtSlot()
+    def __file_selected(self):
         """
         Open a file after sit has been selected in the DirectoryExplorer.
         """
@@ -95,29 +118,3 @@ class DataBrowsingFrame(BaseFrame):
         if _extension in _supported_nothdf_ext:
             _data = read_image(_name)
             self._widgets['viewer'].setData(_data)
-
-
-if __name__ == '__main__':
-    import pydidas
-    from pydidas.gui.main_window import MainWindow
-    import sys
-    import qtawesome as qta
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.config.STANDARD_FONT_SIZE
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = MainWindow()
-    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'),
-                       DataBrowsingFrame)
-    gui.create_toolbars()
-
-    gui.show()
-    sys.exit(app.exec_())
-    app.deleteLater()

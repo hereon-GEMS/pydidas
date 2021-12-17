@@ -1,19 +1,23 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the PluginCollection Singleton class."""
+"""
+Module with the PluginCollection Singleton class which is used for storing
+information about all Plugins and to get the plugin classwes to instantiate
+them.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -30,10 +34,11 @@ import inspect
 from PyQt5 import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
-from ..utils import find_valid_python_files
+from ..core.utils import find_valid_python_files
 from .plugin_collection_util_funcs import (
     get_generic_plugin_path, plugin_type_check)
 from .base_plugin import BasePlugin
+
 
 class _PluginCollection(PydidasQsettingsMixin):
     """
@@ -275,7 +280,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         Parameters
         ----------
         class_ : type
-            The class object.
+            The class object to be removed.
         """
         if class_.__name__ in self.plugins:
             del self.plugins[class_.__name__]

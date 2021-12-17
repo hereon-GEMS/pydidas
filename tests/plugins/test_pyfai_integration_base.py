@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -35,9 +35,9 @@ import pyFAI
 from pydidas.plugins import BasePlugin
 from pydidas.plugins import pyFAIintegrationBase
 from pydidas.core import get_generic_parameter
-from pydidas.workflow import ExperimentalSettings
+from pydidas.experiment import ExperimentalSetup
 
-EXP_SETTINGS = ExperimentalSettings()
+EXP_SETTINGS = ExperimentalSetup()
 
 logger = logging.getLogger('pydidas_logger')
 logger.setLevel(logging.ERROR)
@@ -231,40 +231,48 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _newrange = plugin.get_radial_range()
         self.assertEqual(_range, _newrange)
 
-    def test_calculate_result_shape__2d_data(self):
-        _range = (1234, 789)
-        plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
-                                      int_azi_npoint=_range[1])
-        plugin.output_data_dim = 2
-        plugin.calculate_result_shape()
-        _newrange = plugin.result_shape
-        self.assertEqual(_range, _newrange)
-
-    def test_calculate_result_shape__1d_data_but_both_ranges_set(self):
+    def test_calculate_result_shape(self):
         _range = (1234, 789)
         plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
                                       int_azi_npoint=_range[1])
         plugin.output_data_dim = 1
-        with self.assertRaises(ValueError):
+        with self.assertRaises(NotImplementedError):
             plugin.calculate_result_shape()
 
-    def test_calculate_result_shape__1d_data_azi(self):
-        _range = 1234
-        plugin = pyFAIintegrationBase(int_rad_npoint=1,
-                                      int_azi_npoint=_range)
-        plugin.output_data_dim = 1
-        plugin.calculate_result_shape()
-        _shape = plugin.result_shape
-        self.assertEqual((_range,), _shape)
+    # def test_calculate_result_shape__2d_data(self):
+    #     _range = (1234, 789)
+    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
+    #                                   int_azi_npoint=_range[1])
+    #     plugin.output_data_dim = 2
+    #     plugin.calculate_result_shape()
+    #     _newrange = plugin.result_shape
+    #     self.assertEqual(_range, _newrange)
 
-    def test_calculate_result_shape__1d_data_rad(self):
-        _range = 1234
-        plugin = pyFAIintegrationBase(int_rad_npoint=_range,
-                                      int_azi_npoint=1)
-        plugin.output_data_dim = 1
-        plugin.calculate_result_shape()
-        _shape = plugin.result_shape
-        self.assertEqual((_range,), _shape)
+    # def test_calculate_result_shape__1d_data_but_both_ranges_set(self):
+    #     _range = (1234, 789)
+    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
+    #                                   int_azi_npoint=_range[1])
+    #     plugin.output_data_dim = 1
+    #     with self.assertRaises(NotImplementedError):
+    #         plugin.calculate_result_shape()
+
+    # def test_calculate_result_shape__1d_data_azi(self):
+    #     _range = 1234
+    #     plugin = pyFAIintegrationBase(int_rad_npoint=1,
+    #                                   int_azi_npoint=_range)
+    #     plugin.output_data_dim = 1
+    #     plugin.calculate_result_shape()
+    #     _shape = plugin.result_shape
+    #     self.assertEqual((_range,), _shape)
+
+    # def test_calculate_result_shape__1d_data_rad(self):
+    #     _range = 1234
+    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range,
+    #                                   int_azi_npoint=1)
+    #     plugin.output_data_dim = 1
+    #     plugin.calculate_result_shape()
+    #     _shape = plugin.result_shape
+    #     self.assertEqual((_range,), _shape)
 
     def test_load_and_store_mask__local_mask_value(self):
         _maskfilename, _mask = self.create_mask()

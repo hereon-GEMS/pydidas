@@ -1,20 +1,20 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas.core module defines base classes used throughout the full pydidas
+The core package defines base classes used throughout the full pydidas
 suite.
 """
 
@@ -26,71 +26,75 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+from PyQt5 import QtCore
 
 # import sub-packages:
-from . import io
+from . import constants
+from . import io_registry
+from . import utils
+__all__.extend(['constants', 'io_registry', 'utils'])
 
-# import modules:
-from . import composite_image
-from .composite_image import *
-
-from . import dataset
+# import __all__ items from modules:
 from .dataset import *
-
-from . import parameter
-from .parameter import *
-
-from . import parameter_collection
-from .parameter_collection import *
-
-from . import object_with_parameter_collection
-from .object_with_parameter_collection import *
-
-from . import generic_parameters
+from .exceptions import *
 from .generic_parameters import *
-
-from . import hdf5_key
 from .hdf5_key import *
-
-from . import singleton_factory
+from .object_with_parameter_collection import *
+from .parameter import *
+from .parameter_collection import *
+from .pydidas_q_settings import *
+from .pydidas_q_settings_mixin import *
 from .singleton_factory import *
 
+# add modules' __all__ items to package's __all__ items and unclutter the
+# namespace by deleting the module references:
+from . import dataset
+__all__.extend(dataset.__all__)
+del dataset
+
+from . import exceptions
+__all__.extend(exceptions.__all__)
+del exceptions
+
+from . import generic_parameters
+__all__.extend(generic_parameters.__all__)
+del generic_parameters
+
+from . import hdf5_key
+__all__.extend(hdf5_key.__all__)
+del hdf5_key
+
+from . import object_with_parameter_collection
+__all__.extend(object_with_parameter_collection.__all__)
+del object_with_parameter_collection
+
+from . import parameter
+__all__.extend(parameter.__all__)
+del parameter
+
+from . import parameter_collection
+__all__.extend(parameter_collection.__all__)
+del parameter_collection
+
+from . import singleton_factory
+__all__.extend(singleton_factory.__all__)
+del singleton_factory
+
 from . import pydidas_q_settings
-from .pydidas_q_settings import *
+__all__.extend(pydidas_q_settings.__all__)
+del pydidas_q_settings
 
 from . import pydidas_q_settings_mixin
-from .pydidas_q_settings_mixin import *
-
-from . import image_metadata_manager
-from .image_metadata_manager import *
-
-from . import filelist_manager
-from .filelist_manager import *
-
-
-__all__ += composite_image.__all__
-__all__ += dataset.__all__
-__all__ += parameter.__all__
-__all__ += parameter_collection.__all__
-__all__ += object_with_parameter_collection.__all__
-__all__ += generic_parameters.__all__
-__all__ += hdf5_key.__all__
-__all__ += singleton_factory.__all__
-__all__ += pydidas_q_settings.__all__
-__all__ += pydidas_q_settings_mixin.__all__
-__all__ += image_metadata_manager.__all__
-__all__ += filelist_manager.__all__
-
-# Unclutter namespace: remove modules from namespace
-del composite_image
-del dataset
-del parameter
-del parameter_collection
-del object_with_parameter_collection
-del generic_parameters
-del hdf5_key
-del singleton_factory
-del pydidas_q_settings
+__all__.extend(pydidas_q_settings_mixin.__all__)
 del pydidas_q_settings_mixin
-del image_metadata_manager
-del filelist_manager
+
+# if not existing, initialize all QSettings with the default values from the
+# default Parameters to avoid having "None" keys returned.
+settings = QtCore.QSettings('Hereon', 'pydidas')
+for _key in constants.QSETTINGS_GLOBAL_KEYS:
+    _val = settings.value(f'global/{_key}')
+    if _val is None:
+        _param = get_generic_parameter(_key)
+        settings.setValue(f'global/{_key}', _param.default)
+del settings
+del QtCore

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -29,66 +29,43 @@ __all__ = ['ExecuteWorkflowFrame']
 import time
 
 import numpy as np
-from PyQt5 import QtWidgets, QtCore
-import qtawesome as qta
+from PyQt5 import QtCore
 
-from ..core import ParameterCollection, get_generic_parameter
 from ..apps import ExecuteWorkflowApp
+from ..core import get_generic_param_collection
+from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
-from ..workflow import (WorkflowTree, WorkflowResults, ScanSettings,
-                        ExperimentalSettings)
-from ..widgets import CreateWidgetsMixIn, BaseFrameWithApp
+from ..widgets import BaseFrameWithApp
 from ..widgets.dialogues import QuestionBox
-from ..widgets.parameter_config import ParameterWidgetsMixIn
+from ..workflow import WorkflowTree, WorkflowResults
 from .builders.execute_workflow_frame_builder import (
     ExecuteWorkflowFrame_BuilderMixin)
 
-EXP = ExperimentalSettings()
-SCAN = ScanSettings()
+
+EXP = ExperimentalSetup()
+SCAN = ScanSetup()
 RESULTS = WorkflowResults()
 TREE = WorkflowTree()
 
-DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('run_type'),
-    get_generic_parameter('selected_results')
-    )
 
-SCAN.import_from_file('H:/myPython/pydidas/tests_of_workflow/__scan_settings.yaml')
-EXP.import_from_file('H:/myPython/pydidas/tests_of_workflow/__calib.poni')
-TREE.import_from_file('H:/myPython/pydidas/tests_of_workflow/__workflow_new.yaml')
-
-
-import pickle
-from pydidas.core import Dataset
-RESULTS.__dict__ = pickle.load(open('d:/tmp/saved_results/results.pickle', 'rb'))
-for _i in [1, 2]:
-    _data = Dataset(np.load(f'd:/tmp/saved_results/node_{_i:02d}.npy'))
-    _meta = pickle.load(open(f'd:/tmp/saved_results/node_{_i:02d}.pickle', 'rb'))
-    _data.axis_labels = _meta['axis_labels']
-    _data.axis_units = _meta['axis_units']
-    _data.axis_ranges = _meta['axis_ranges']
-    RESULTS._WorkflowResults__composites[_i] = _data
-
-
-class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
-                           CreateWidgetsMixIn,
+class ExecuteWorkflowFrame(BaseFrameWithApp,
                            ExecuteWorkflowFrame_BuilderMixin):
     """
     The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
     and visualize the results.
     """
-    default_params = DEFAULT_PARAMS
+    default_params = get_generic_param_collection('run_type',
+                                                  'selected_results')
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
-        ParameterWidgetsMixIn.__init__(self)
         ExecuteWorkflowFrame_BuilderMixin.__init__(self)
         _global_plot_update_time = self.q_settings_get_global_value(
             'plot_update_time', argtype=float)
         self._config = {'data_use_timeline': False,
                         'plot_dim': 2,
-                        'plot_active': True,
+                        'plot_active': False,
                         'active_node': None,
                         'data_slices': (),
                         'plot_last_update': 0,
@@ -98,11 +75,11 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self.set_default_params()
         self.add_params(self._app.params)
         self.build_frame()
+        self.connect_signals()
         self.__update_choices_of_selected_results()
-        self.__connect_signals()
         self.__update_result_node_information()
 
-    def __connect_signals(self):
+    def connect_signals(self):
         """
         Connect all required Qt slots and signals.
         """
@@ -191,14 +168,13 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self.__finish_processing()
         self.__update_plot()
 
-
     @QtCore.pyqtSlot()
     def __update_result_node_information(self):
         """
         Update the information about the nodes' results after the AppRunner
         has sent the first results.
         """
-        self._widgets['result_selector'].get_and_store_result_node_infos()
+        self._widgets['result_selector'].get_and_store_result_node_labels()
         try:
             self._runner.results.disconnect(
                 self.__update_result_node_information)
@@ -271,7 +247,19 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
             _plot.setGraphYLabel(_label(0))
             _plot.setGraphXLabel(_label(1))
 
+    @QtCore.pyqtSlot(int)
     def frame_activated(self, index):
+        """
+        Received a signal that a new frame has been selected.
+
+        This method checks whether the selected frame is the current class
+        and if yes, it will call some updates.
+
+        Parameters
+        ----------
+        index : int
+            The index of the newly activated frame.
+        """
         if index == self.frame_index:
             _box = QuestionBox(
                 'Update results?',
@@ -288,6 +276,9 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self._config['frame_active'] = (index == self.frame_index)
 
     def __finish_processing(self):
+        """
+        Perform finishing touches after the processing has terminated.
+        """
         self.__set_proc_widget_visibility_for_running(False)
         self.__update_choices_of_selected_results()
 
@@ -307,9 +298,14 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         self._widgets['progress'].setVisible(running)
         self._widgets['but_save'].setEnabled(not running)
 
-
     def __run_cmd_process(self):
-        # subprocess.Popen(executable, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS, close_fds=True)
+        """
+        Run the processing in a separate command line process.
+        """
+        # TODO : implement
+        # subprocess.Popen(executable,
+        # creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+        # | subprocess.DETACHED_PROCESS, close_fds=True)
         ...
 
     def __update_choices_of_selected_results(self):
@@ -317,47 +313,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp, ParameterWidgetsMixIn,
         Update the choices of the "selected_results" Parameter based on the
         latest WorkflowResults.
         """
-        _curr_display = self.get_param_value('selected_results')
-        _new_choices = (['No selection'] +
-                        [f'{_val} (node #{_key:03d})'
-                         for _key, _val in RESULTS.labels.items()])
-        if _curr_display not in _new_choices:
-            _curr_display = self.set_param_value('selected_results',
-                                                 'No selection')
-        self.params['selected_results'].choices = _new_choices
-
+        _param = self.get_param('selected_results')
+        RESULTS.update_param_choices_from_labels(_param)
 
     def __update_autosave_widget_visibility(self):
         _vis = self.get_param_value('autosave_results')
         for _key in ['autosave_dir', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)
-
-
-
-if __name__ == '__main__':
-    import pydidas
-    from pydidas.gui.main_window import MainWindow
-    import sys
-    import qtawesome as qta
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
-
-
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = MainWindow()
-
-    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'), ExecuteWorkflowFrame)
-    gui.create_toolbars()
-
-    gui.show()
-    sys.exit(app.exec_())
-
-    app.deleteLater()

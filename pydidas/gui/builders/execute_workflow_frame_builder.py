@@ -1,22 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the create_execute_workflow_frame_widgets_and_layout
-function which is used to populate the ProcessingFullWorkflowFrame with
-widgets.
+Module with the ExecuteWorkflowFrame_BuilderMixin class which is used to
+populate the ExecuteWorkflowFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -30,18 +29,23 @@ __all__ = ['ExecuteWorkflowFrame_BuilderMixin']
 from PyQt5 import QtCore, QtWidgets
 from silx.gui.plot import Plot1D, Plot2D
 
-from pydidas.widgets import ScrollArea, ResultSelectorForOutput
-from pydidas.widgets.parameter_config import ParameterCollectionEditWidget
-from pydidas.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...widgets.factory import CreateWidgetsMixIn
+from ...widgets import ScrollArea
+from ...widgets.selection import ResultSelectorForOutput
+from ...widgets.parameter_config import (ParameterEditFrame,
+                                         ParameterWidgetsMixIn)
 
 
-class ExecuteWorkflowFrame_BuilderMixin():
+class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
+                                        ParameterWidgetsMixIn):
     """
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
     def __init__(self):
-        self._widgets = {}
+        CreateWidgetsMixIn.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
         _layout = self.layout()
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
@@ -89,8 +93,8 @@ class ExecuteWorkflowFrame_BuilderMixin():
 
         self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
 
-        self._widgets['config'] = ParameterCollectionEditWidget(
-            parent=None, initLayout=True, lineWidth=5,
+        self._widgets['config'] = ParameterEditFrame(
+            parent=None, init_layout=True, lineWidth=5,
             sizePolicy= (QtWidgets.QSizePolicy.Fixed,
                          QtWidgets.QSizePolicy.Expanding))
 

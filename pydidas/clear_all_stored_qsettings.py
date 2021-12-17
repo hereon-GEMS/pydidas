@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -39,10 +39,9 @@ def clear_all_stored_QSettings():
     """
     Clear all stored pydidas QSetting values and write None.
     """
-    from constants.q_settings import QSETTINGS_GLOBAL_KEYS
     qs = QSettings('Hereon', 'pydidas')
-    for key in QSETTINGS_GLOBAL_KEYS:
-        qs.setValue(f'global/{key}', None)
+    for _key in qs.allKeys():
+        qs.setValue(_key, None)
 
 
 if __name__ == '__main__':

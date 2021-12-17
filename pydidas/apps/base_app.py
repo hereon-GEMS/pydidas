@@ -1,17 +1,18 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the BaseApp class from which all apps should inherit.
 """
@@ -24,10 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseApp']
 
-
 from copy import copy
 
-from pydidas.core import ObjectWithParameterCollection
+from ..core import ObjectWithParameterCollection
 
 
 class BaseApp(ObjectWithParameterCollection):
@@ -52,23 +52,19 @@ class BaseApp(ObjectWithParameterCollection):
         b.3. Call app.multiprocessing_store_results (optionally). If the apps
              are running in parallel, they will skip this step.
     c. Call app.multiprocessing_post_run to perform cleanup steps.
-    """
+
+    Parameters
+    ----------
+    *args : list
+        Any arguments. Defined by the concrete
+        implementation of the app.
+    **kwargs : dict
+        A dictionary of keyword arguments. Defined by the concrete
+        implementation of the app.    """
     parse_func = None
     attributes_not_to_copy_to_slave_app = []
 
     def __init__(self, *args, **kwargs):
-        """
-        Create a Base instance.
-
-        Parameters
-        ----------
-        *args : list
-            Any arguments. Defined by the concrete
-            implementation of the app.
-        **kwargs : dict
-            A dictionary of keyword arguments. Defined by the concrete
-            implementation of the app.
-        """
         super().__init__()
         self.slave_mode = kwargs.get('slave_mode', False)
         if 'slave_mode' in kwargs:
@@ -145,7 +141,7 @@ class BaseApp(ObjectWithParameterCollection):
 
         Returns
         -------
-        carryon : bool
+        bool
             Flag whether processing can continue or should wait.
         """
         return True

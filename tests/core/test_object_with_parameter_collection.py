@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -48,26 +48,26 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj = ObjectWithParameterCollection()
         self.assertIsInstance(obj, ObjectWithParameterCollection)
 
-    def test_add_params_with_args(self):
+    def test_add_params__with_args(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(*self._params.values())
         for index in range(4):
             self.assertEqual(obj.params[f'Test{index}'],
                              self._params.get(f'Test{index}'))
 
-    def test_add_params_with_dict(self):
+    def test_add_params__with_dict(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         for index in range(4):
             self.assertEqual(obj.params[f'Test{index}'],
                              self._params.get(f'Test{index}'))
 
-    def test_add_params_wrong_type(self):
+    def test_add_params__wrong_type(self):
         obj = ObjectWithParameterCollection()
         with self.assertRaises(TypeError):
             obj.add_params(['test'])
 
-    def test_add_params_with_kwargs(self):
+    def test_add_params__with_kwargs(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(param1=self._params.get('Test0'),
                        param2=self._params.get('Test1'),
@@ -84,19 +84,50 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_param(Parameter('Test5', float, default=-1))
         self.assertIsInstance(obj.get_param('Test5'), Parameter)
 
-    def test_add_param_duplicate(self):
+    def test_add_param__duplicate(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.add_param(Parameter('Test5', float, default=-1))
         with self.assertRaises(KeyError):
             obj.add_param(Parameter('Test5', float, default=-1))
 
+    def test_get_param__wrong_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        with self.assertRaises(KeyError):
+            obj.get_param('no such param')
+
+    def test_get_param(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _p = obj.get_param('Test0')
+        self.assertIsInstance(_p, Parameter)
+        self.assertEqual(_p, obj.params['Test0'])
+
+    def test_get_params__empty(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _res = obj.get_params()
+        self.assertEqual(_res, [])
+
+    def test_get_params__single(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _res = obj.get_params('Test0')
+        self.assertEqual(_res, [self._params['Test0']])
+
+    def test_get_params__multiple(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _res = obj.get_params('Test0', 'Test2')
+        self.assertEqual(_res, [self._params['Test0'], self._params['Test2']])
+
     def test_get_param_value(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         self.assertEqual(obj.get_param_value('Test2'), 3)
 
-    def test_get_param_value_no_key(self):
+    def test_get_param_value__no_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         with self.assertRaises(KeyError):
@@ -128,19 +159,19 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         self.assertEqual(obj.get_param_keys(), list(obj.params.keys()))
 
-    def test_set_param_value_no_key(self):
+    def test_set_param_value__no_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         with self.assertRaises(KeyError):
             obj.set_param_value('Test5', 12)
 
-    def test__check_key(self):
+    def test_check_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         with self.assertRaises(KeyError):
             obj._check_key('NoKey')
 
-    def test__check_key_correct_key(self):
+    def test_check_key__correct_key(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj._check_key('Test0')
@@ -184,7 +215,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         _new = obj._get_param_value_with_modulo('Test0', _mod, none_low=False)
         self.assertEqual(_new, _mod)
 
-    def test_get_param_value_with_modulo_not_integer(self):
+    def test_get_param_value_with_modulo__not_integer(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         with self.assertRaises(ValueError):
@@ -206,7 +237,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         self.assertEqual(obj.get_param_value('Test5'), 'test str')
         self.assertEqual(obj.get_param_value('Test6'), -1)
 
-    def test_restore_all_defaults_no_confirm(self):
+    def test_restore_all_defaults__no_confirm(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.set_param_value('Test2', 12)

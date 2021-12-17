@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -32,7 +32,8 @@ import h5py
 import numpy as np
 
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
-from pydidas.workflow import WorkflowTree, WorkflowResults, ScanSettings
+from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.experiment import ScanSetup
 from pydidas.core import Dataset
 from pydidas.workflow.result_savers.workflow_result_saver_hdf5 import (
     WorkflowResultSaverHdf5)
@@ -40,7 +41,7 @@ from pydidas.unittest_objects import get_random_string
 
 
 TREE = WorkflowTree()
-SCAN = ScanSettings()
+SCAN = ScanSetup()
 SCAN.set_param_value('scan_dim', 3)
 for d in range(1, 4):
     SCAN.set_param_value(f'n_points_{d}', random.choice([3, 5, 7, 8]))
@@ -84,7 +85,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             dataset.axis_ranges[_axis] = _ranges[_axis]
         return dataset, _labels, _units, _ranges
 
-    def test__class(self):
+    def test_class(self):
         self.assertEqual(H5SAVER.__class__, META)
 
     def test_prepare_files_and_directories(self):

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,23 +27,24 @@ __status__ = "Development"
 __all__ = ['pyFAIintegrationBase', 'pyFAI_UNITS', 'pyFAI_METHOD']
 
 import os
-import logging
 import pathlib
 
 import numpy as np
 import pyFAI
 import pyFAI.azimuthalIntegrator
 
-from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.workflow import ExperimentalSettings
-from pydidas.plugins import ProcPlugin, PROC_PLUGIN
-from pydidas.image_io import read_image, rebin2d
+from ..core.constants import PROC_PLUGIN
+from ..core import get_generic_param_collection
+from ..core.utils import pydidas_logger, LOGGING_LEVEL
+from ..image_io import read_image, rebin2d
+from ..experiment import ExperimentalSetup
+from .base_proc_plugin import ProcPlugin
 
 
-logger = logging.getLogger('pydidas_logger')
-logger.setLevel(logging.WARNING)
+logger = pydidas_logger()
+logger.setLevel(LOGGING_LEVEL)
 
-EXP_SETTINGS = ExperimentalSettings()
+EXP_SETTINGS = ExperimentalSetup()
 
 pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
                'Q / A^-1': 'q_A^-1',
@@ -66,20 +67,11 @@ class pyFAIintegrationBase(ProcPlugin):
     plugin_name = 'PyFAI integration base'
     basic_plugin = True
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter('int_rad_npoint'),
-        get_generic_parameter('int_rad_unit'),
-        get_generic_parameter('int_rad_use_range'),
-        get_generic_parameter('int_rad_range_lower'),
-        get_generic_parameter('int_rad_range_upper'),
-        get_generic_parameter('int_azi_npoint'),
-        get_generic_parameter('int_azi_unit'),
-        get_generic_parameter('int_azi_use_range'),
-        get_generic_parameter('int_azi_range_lower'),
-        get_generic_parameter('int_azi_range_upper'),
-        get_generic_parameter('int_method'),
-        get_generic_parameter('det_mask'),
-        )
+    default_params = get_generic_param_collection(
+        'int_rad_npoint', 'int_rad_unit', 'int_rad_use_range',
+        'int_rad_range_lower', 'int_rad_range_upper', 'int_azi_npoint',
+        'int_azi_unit', 'int_azi_use_range', 'int_azi_range_lower',
+        'int_azi_range_upper', 'int_method', 'det_mask')
     input_data_dim = 2
     output_data_dim = 2
     new_dataset = True
@@ -121,11 +113,10 @@ class pyFAIintegrationBase(ProcPlugin):
             if os.path.isfile(_mask_param):
                 self._mask = read_image(_mask_param)
                 return
-            else:
-                logger.warning('The locally defined detector mask file '
-                               f' "{_mask_param}" does not exist. Falling '
-                               'back to default defined in the global '
-                               'settings.')
+            logger.warning(
+                ('The locally defined detector mask file "%s" does not exist.'
+                 ' Falling back  to the default defined in the global '
+                 'settings.'), _mask_param)
         if os.path.isfile(_mask_qsetting):
             self._mask = read_image(_mask_qsetting)
             _roi, _bin = self.get_single_ops_from_legacy()
@@ -144,21 +135,25 @@ class pyFAIintegrationBase(ProcPlugin):
             returned. For 2-dimensional integrations a tuple of two integers
             is returned.
         """
-        if self.output_data_dim == 2:
-            self._config['result_shape'] = (
-                self.get_param_value('int_rad_npoint'),
-                self.get_param_value('int_azi_npoint'))
-        elif (self.get_param_value('int_rad_npoint', 1) == 1 and
-                self.get_param_value('int_azi_npoint', 1) > 1):
-            self._config['result_shape'] = (
-                self.get_param_value('int_azi_npoint'), )
-        elif (self.get_param_value('int_rad_npoint', 1) > 1 and
-                self.get_param_value('int_azi_npoint', 1) == 1):
-            self._config['result_shape'] = (
-                self.get_param_value('int_rad_npoint'), )
-        else:
-            raise ValueError('Could not determine the new shape from the '
-                             'defined number of points')
+        raise NotImplementedError('Must be implemented by the concrete '
+                                  'pyFAI integration plugin')
+        # if self.output_data_dim == 2:
+        #     self._config['result_shape'] = (
+        #         self.get_param_value('int_rad_npoint'),
+        #         self.get_param_value('int_azi_npoint'))
+        # elif (self.get_param_value('int_rad_npoint', 1) == 1 and
+        #         self.get_param_value('int_azi_npoint', 1) > 1):
+        #     self._config['result_shape'] = (
+        #         self.get_param_value('int_azi_npoint'), )
+        # elif (self.get_param_value('int_rad_npoint', 1) > 1 and
+        #         self.get_param_value('int_azi_npoint', 1) == 1):
+        #     self._config['result_shape'] = (
+        #         self.get_param_value('int_rad_npoint'), )
+        # else:
+        #     print('Shapes (rad/azi): ', self.get_param_value('int_rad_npoint'),
+        #           self.get_param_value('int_rad_npoint'))
+        #     raise ValueError('Could not determine the new shape from the '
+        #                      'defined number of points')
 
     def get_radial_range(self):
         """

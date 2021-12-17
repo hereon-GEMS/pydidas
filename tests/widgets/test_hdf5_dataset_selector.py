@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,8 +31,8 @@ import shutil
 import numpy as np
 from PyQt5 import QtWidgets, QtTest
 
-from pydidas.constants import FrameConfigError
-from pydidas.widgets.hdf5_dataset_selector import Hdf5DatasetSelector
+from pydidas.core import FrameConfigError
+from pydidas.widgets.selection.hdf5_dataset_selector import Hdf5DatasetSelector
 
 
 class TestWidget(QtWidgets.QWidget):
@@ -134,7 +134,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj._toggle_filter_key(widget, 'test')
         self.assertEqual(obj._config['activeDsetFilters'], ['test'])
 
-    def test__populate_dataset_list_no_limit(self):
+    def test_populate_dataset_list_no_limit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         obj._widgets['min_datasize'].setValue(0)
@@ -143,7 +143,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         _items = [_widget.itemText(i) for i in range(_widget.count())]
         self.assertEqual(_items, self._dsets)
 
-    def test__populate_dataset_list_limit(self):
+    def test_populate_dataset_list_limit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         obj._widgets['min_datasize'].setValue(50)
@@ -152,7 +152,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         _items = [_widget.itemText(i) for i in range(_widget.count())]
         self.assertEqual(_items, ['/test/test2/data2', '/test/test2/data3'])
 
-    def test__populate_dataset_list_dimlimit(self):
+    def test_populate_dataset_list_dimlimit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         obj._widgets['min_datasize'].setValue(0)
@@ -161,14 +161,14 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         _items = [_widget.itemText(i) for i in range(_widget.count())]
         self.assertEqual(_items, ['/test/test2/data2', '/test/test2/data3'])
 
-    def test__get_frame_3d(self):
+    def test_get_frame_3d(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         obj._widgets['select_dataset'].setCurrentIndex(1)
         obj._Hdf5DatasetSelector__get_frame()
         self.assertTrue(np.allclose(self.data3d[0], obj._frame))
 
-    def test__get_frame_2d(self):
+    def test_get_frame_2d(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         obj._widgets['select_dataset'].setCurrentIndex(0)

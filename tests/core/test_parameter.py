@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -302,41 +302,41 @@ class TestParameter(unittest.TestCase):
         self.assertEqual(dump[3], {'tooltip': '',
                                    'unit': '',
                                    'optional': False,
-                                   'allow_None': False,
                                    'name': '',
+                                   'allow_None': False,
                                    'choices': None,
                                    'value': 12})
 
-    def test__load_from_dump(self):
+    def test_load_from_dump(self):
         obj = Parameter('Test0', int, 12)
         obj2 = Parameter(*obj.dump())
         for _key in obj.__dict__:
             self.assertEqual(obj.__dict__[_key], obj2.__dict__[_key])
 
-    def test__copy__(self):
+    def test_copy__(self):
         obj = Parameter('Test0', int, 12)
         _copy = copy.copy(obj)
         self.assertNotEqual(obj, _copy)
         self.assertIsInstance(_copy, Parameter)
 
-    def test__repr__(self):
+    def test_repr__(self):
         obj = Parameter('Test0', int, 12, optional=True)
         _r = obj.__repr__()
         self.assertIsInstance(_r, str)
 
-    def test__convenience_type_conversion_any(self):
+    def test_convenience_type_conversion_any(self):
         _val = 42
         obj = Parameter('Test0', int, 12)
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertEqual(_val, _newval)
 
-    def test__convenience_type_conversion_path(self):
+    def test_convenience_type_conversion_path(self):
         _val = __file__
         obj = Parameter('Test0', Path, '')
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertIsInstance(_newval, Path)
 
-    def test__convenience_type_conversion_Hdf5key(self):
+    def test_convenience_type_conversion_Hdf5key(self):
         _val = '/new/test'
         obj = Parameter('Test0', Hdf5key, '/test')
         _newval = obj._Parameter__convenience_type_conversion(_val)

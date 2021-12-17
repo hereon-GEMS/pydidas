@@ -1,19 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the Hdf5Reader class for reading hdf5 images."""
+"""
+Module with the Hdf5Reader class for reading hdf5 images.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -25,11 +27,12 @@ __all__ = []
 
 from numpy import squeeze
 
-from ...constants import HDF5_EXTENSIONS
+from ...core.constants import HDF5_EXTENSIONS
 from ...core import Dataset
 from ..image_reader import ImageReader
 from ..image_reader_collection import ImageReaderCollection
 from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
+
 
 class Hdf5Reader(ImageReader):
     """ImageReader implementation for hdf5 files."""

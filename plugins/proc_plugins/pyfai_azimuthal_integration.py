@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -72,3 +72,15 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
                            axis_units=[_unit], axis_ranges=[_newdata[0]])
         return _dataset, kwargs
+
+    def calculate_result_shape(self):
+        """
+        Get the shape of the integrated dataset to set up the CRS / LUT.
+
+        Returns
+        -------
+        tuple
+            The new shape. This is a tuple with a single integer value.
+        """
+        self._config['result_shape'] = (
+               self.get_param_value('int_rad_npoint'), )

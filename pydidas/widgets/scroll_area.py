@@ -1,21 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with ScrollArea, a QScrollArea implementation with convenience
-features for formatting.
+calling arguments for simplified formatting.
 """
 
 __author__ = "Malte Storm"
@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ScrollArea']
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 
 from .utilities import apply_widget_properties
 
@@ -34,29 +34,28 @@ from .utilities import apply_widget_properties
 class ScrollArea(QtWidgets.QScrollArea):
     """
     Convenience class to simplify the setup of a QScrollArea.
+
+    Parameters
+    ----------
+    parent : QWidget, optional
+        The parent widget. The default is None.
+    **kwargs : Any supported Qt arguments
+        Any arguments which have an associated setArgName method in
+        Qt can be defined at creation.
+
+    Examples of supported keywords
+    ------------------------------
+    widget : QWidget, optional
+        The scroll area's own widget which is displayed.
+        The default is None.
+    fixedWidth : int, optional
+        If the scroll area shall have a fixed width, this value can be
+        defined in pixel. The default is None.
+    fixedHeight : int, optional
+        If the scroll area shall have a fixed height, this value can be
+        defined in pixel. The default is None.
     """
     def __init__(self, parent=None, **kwargs):
-        """
-        Create a QScrollArea with defined widgets, width and height.
-
-        Parameters
-        ----------
-        parent : QWidget, optional
-            The parent widget. The default is None.
-        **kwargs : keyword arguments
-
-        Supported keywords
-        ------------------
-        widget : QWidget, optional
-            The scroll area's own widget which is displayed.
-            The default is None.
-        fixedWidth : int, optional
-            If the scroll area shall have a fixed width, this value can be
-            defined in pixel. The default is None.
-        fixedHeight : int, optional
-            If the scroll area shall have a fixed height, this value can be
-            defined in pixel. The default is None.
-        """
         super().__init__(parent)
         kwargs['widgetResizable'] = True
         kwargs['autoFillBackground'] = True
@@ -66,7 +65,18 @@ class ScrollArea(QtWidgets.QScrollArea):
         apply_widget_properties(self, **kwargs)
 
     def sizeHint(self):
+        """
+        Get the size hint.
+
+        If a widget has been set, the ScrollArea will use the widget's sizeHint
+        to determine the required size. If no widget is set, it will default
+        to the QScrollArea sizeHint.
+
+        Returns
+        -------
+        QtCore.QSize
+            The size hint for the ScrollArea.
+        """
         if self.widget() is not None:
             return self.widget().sizeHint()
-        else:
-            return super().sizeHint()
+        return super().sizeHint()

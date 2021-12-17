@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,9 +28,8 @@ import unittest
 
 import numpy as np
 
-from pydidas.constants import DatasetConfigException
-from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals,
-                                  _insert_axis_key)
+from pydidas.core import DatasetConfigException
+from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals)
 from pydidas.image_io import rebin2d
 
 
@@ -77,15 +76,6 @@ class TestDataset(unittest.TestCase):
             self.assertTrue(_dim in _vals.keys())
             self.assertIsNone(_vals[_dim])
 
-    def test_insert_axis_key(self):
-        _original = {0: 0, 1: 1, 2: 2, 3: 3}
-        _newdict = _insert_axis_key(_original, 2)
-        self.assertEqual(_newdict[0], 0)
-        self.assertEqual(_newdict[1], 1)
-        self.assertIsNone(_newdict[2])
-        self.assertEqual(_newdict[3], 2)
-        self.assertEqual(_newdict[4], 3)
-
     def test_empty_dataset_new(self):
         obj = EmptyDataset((10, 10))
         self.assertIsInstance(obj, EmptyDataset)
@@ -119,6 +109,8 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset_array_finalize__simple_multi_indexing(self):
         obj = self.create_large_dataset()
         _new = obj[:, 7, 6]
+        self.assertEqual(tuple(np.arange(_new.ndim)),
+                         tuple(_new.axis_labels.keys()))
         self.assertEqual(tuple(_new.axis_labels.values()),
                           (self._dset['labels'][0], self._dset['labels'][3]))
         for _new_range, _original_range in zip(
@@ -141,13 +133,26 @@ class TestDataset(unittest.TestCase):
                 self.assertTrue(np.allclose(_new_range,
                                             self._dset['ranges'][_dim]))
 
+    def test_empty_dataset_array_finalize__single_slicing_with_ndarray(self):
+        obj = self.create_large_dataset()
+        _new = obj[np.arange(1, 4)]
+        self.assertEqual(list(_new.axis_labels.values()), self._dset['labels'])
+        self.assertEqual(list(_new.axis_units.values()), self._dset['units'])
+        for _dim, _new_range in enumerate(_new.axis_ranges.values()):
+            if _dim == 0:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][0][1:4]))
+            else:
+                self.assertTrue(np.allclose(_new_range,
+                                            self._dset['ranges'][_dim]))
+
     def test_empty_dataset_array_finalize__add_dimension(self):
         obj = self.create_large_dataset()
         _new = obj[None, :]
         self.assertEqual(list(_new.axis_labels.values()),
-                         [None] + self._dset['labels'])
+                          [None] + self._dset['labels'])
         self.assertEqual(list(_new.axis_units.values()),
-                         [None] + self._dset['units'])
+                          [None] + self._dset['units'])
 
     def test_empty_dataset_array_finalize__empty_shape(self):
         obj = self.create_large_dataset()
@@ -171,7 +176,7 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(_new, Dataset)
         self.assertNotEqual(id(obj), id(_new))
         self.assertEqual(tuple(_s // 2 for _s in self._dset['shape']),
-                         _new.shape)
+                          _new.shape)
 
     def test_get_rebinned_copy__bin1(self):
         obj = self.create_large_dataset()
@@ -195,7 +200,7 @@ class TestDataset(unittest.TestCase):
         obj.flatten_dims(*_dims)
         self.assertEqual(obj.ndim, len(self._dset['shape']) - 1)
         for key, preset in zip(['axis_labels', 'axis_units', 'axis_ranges'],
-                               ['Flattened', '', None]):
+                                ['Flattened', '', None]):
             self.assertEqual(getattr(obj, key)[_dims[0]], preset)
 
     def test_empty_dataest_flatten_dims__1dim_only(self):
@@ -217,7 +222,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_label=_new_label)
         _labels = [self._dset['labels'][i]
-                   for i in range(len(self._dset['labels'])) if i not in _dims]
+                    for i in range(len(self._dset['labels'])) if i not in _dims]
         _labels.insert(_dims[0], _new_label)
         self.assertEqual(list(obj.axis_labels.values()), _labels)
 
@@ -229,7 +234,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_unit=_new_unit)
         _units = [self._dset['units'][i]
-                   for i in range(len(self._dset['units'])) if i not in _dims]
+                    for i in range(len(self._dset['units'])) if i not in _dims]
         _units.insert(_dims[0], _new_unit)
         self.assertEqual(list(obj.axis_units.values()), _units)
 
@@ -238,11 +243,11 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims)
         _new_range = np.arange(self._dset['shape'][_dims[0]]
-                               * self._dset['shape'][_dims[1]])
+                                * self._dset['shape'][_dims[1]])
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_range=_new_range)
         _range = [self._dset['ranges'][i]
-                   for i in range(len(self._dset['ranges'])) if i not in _dims]
+                    for i in range(len(self._dset['ranges'])) if i not in _dims]
         _range.insert(_dims[0], _new_range)
         self.assertTrue(np.equal(obj.axis_ranges[_dims[0]], _new_range).all())
 
@@ -256,7 +261,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = obj[0, 0]
         _new2 = obj[0]
-        self.assertIsNone(obj._getitem_key)
+        self.assertIsNone(obj.getitem_key)
 
     def test_empty_dataset_array_finalize__multiple_slicing(self):
         obj = self.create_large_dataset()

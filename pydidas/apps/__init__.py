@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,21 +27,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-
-from . import base_app
+# import __all__ items from modules:
 from .base_app import *
-
-from . import composite_creator_app
 from .composite_creator_app import *
-
-from . import execute_workflow_app
 from .execute_workflow_app import *
 
-__all__ += base_app.__all__
-__all__ += composite_creator_app.__all__
-__all__ += execute_workflow_app.__all__
-
-# Unclutter namespace: remove modules from namespace
-del composite_creator_app
+# add modules' __all__ items to package's __all__ items and unclutter the
+# namespace by deleting the module references:
+from . import base_app
+__all__.extend(base_app.__all__)
 del base_app
+
+from . import composite_creator_app
+__all__.extend(composite_creator_app.__all__)
+del composite_creator_app
+
+from . import execute_workflow_app
+__all__.extend(execute_workflow_app.__all__)
 del execute_workflow_app

@@ -1,21 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the PydidasQsettingsMixin class which can be used to give classes
-access to global QSetting values.
+access to global QSettings values.
 """
 
 __author__ = "Malte Storm"
@@ -24,35 +24,20 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasQsettingsMixin', 'copyableQSettings']
-
+__all__ = ['PydidasQsettingsMixin', 'CopyableQSettings']
 
 from numbers import Integral, Real
 
 from PyQt5 import QtCore
 
-from ..constants import QSETTINGS_GLOBAL_KEYS
-from .generic_parameters import get_generic_parameter
 
-
-settings = QtCore.QSettings('Hereon', 'pydidas')
-for key in QSETTINGS_GLOBAL_KEYS:
-    _val = settings.value(f'global/{key}')
-    if _val is None:
-        _param = get_generic_parameter(key)
-        settings.setValue(f'global/{key}', _param.default)
-del settings
-
-
-class copyableQSettings(QtCore.QSettings):
+class CopyableQSettings(QtCore.QSettings):
     """
-    QtCore.QSettings subclass with an added copy method.
+    QtCore.QSettings subclass with added copy, setstate and getstate methods
+    to allow pickling.
     """
-    def __init__(self, *args):
-        super().__init__(*args)
-
     def __copy__(self):
-        return copyableQSettings(self.organizationName(),
+        return CopyableQSettings(self.organizationName(),
                                  self.applicationName())
 
     def __getstate__(self):
@@ -65,17 +50,13 @@ class copyableQSettings(QtCore.QSettings):
 
 class PydidasQsettingsMixin:
     """
-
     Mix-in class with access functions to pydidas QSettings values.
 
     This class can be inherited by any class which requires access to the
     global QSettings defined in pydidas.
     """
     def __init__(self):
-        """
-        Create the q_settings attribute.
-        """
-        self.q_settings = copyableQSettings('Hereon', 'pydidas')
+        self.q_settings = CopyableQSettings('Hereon', 'pydidas')
 
     def q_settings_get_global_value(self, key, argtype=None):
         """
@@ -121,7 +102,7 @@ class PydidasQsettingsMixin:
             _p = self.get_param(key)
             if _p.type == Integral:
                 return int(value)
-            elif _p.type == Real:
+            if _p.type == Real:
                 return float(value)
         except (KeyError, AttributeError):
             pass

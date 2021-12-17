@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,46 +31,40 @@ from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
 
+from ...core.constants import (
+    PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH,
+    PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_TEXT_WIDTH, PARAM_INPUT_UNIT_WIDTH)
+from ...core.utils import convert_special_chars_to_unicode
 from ..utilities import apply_widget_properties, excepthook
 from ..factory import create_param_widget, create_label
-from ...constants import (PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH,
-                          PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_TEXT_WIDTH,
-                          PARAM_INPUT_UNIT_WIDTH)
-from ...utils import convert_special_chars_to_unicode
 
 
 class ParameterConfigWidget(QtWidgets.QWidget):
     """
     The ParameterConfigWidget is a generic QWidget with a instantiated
     QGridLayout to add label, I/O and unit widgets for a Parameter.
+
+    Parameters
+    ----------
+    param : pydidas.core.Parameter
+        The associated Parameter.
+    parent : QtWidget, optional
+        The parent widget. The default is None.
+    **kwargs : dict
+        Additional keyword arguments
     """
     io_edited = QtCore.pyqtSignal(str)
 
     def __init__(self, param, parent=None, **kwargs):
-        """
-        Setup method.
-
-        Create an instance of the ParameterConfigWidget class.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The associated Parameter.
-        parent : QtWidget, optional
-            The parent widget. The default is None.
-        **kwargs : dict
-            Additional keyword arguments
-        """
         QtWidgets.QWidget.__init__(self, parent)
+        self.__set_size_from_kwargs(kwargs)
+        self.__store_config_from_kwargs(kwargs)
+
         self.param = param
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         _layout.setColumnStretch(1, 1)
-        self.__set_size_from_kwargs(kwargs)
-
-        self.__store_config_from_kwargs(kwargs)
-        self.line1_spacer = None
         self.name_widget = self.__get_name_widget()
         self.unit_widget = self.__get_unit_widget()
         self.io_widget = create_param_widget(param, self.config['width_io'])
@@ -165,7 +159,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             The label with the Parameter's name.
         """
         _text = convert_special_chars_to_unicode(self.param.name) + ':'
-        return create_label(_text, fixedWidth = self.config['width_text'],
+        return create_label(_text, fixedWidth=self.config['width_text'],
                             fixedHeight=20, toolTip=self.param.tooltip,
                             margin=0)
 
@@ -184,7 +178,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             The label with the Parameter's unit text.
         """
         _text = convert_special_chars_to_unicode(self.param.unit)
-        return create_label(_text, fixedWidth = self.config['width_unit'],
+        return create_label(_text, fixedWidth=self.config['width_unit'],
                             fixedHeight=20, toolTip=self.param.tooltip,
                             margin=0)
 
@@ -245,7 +239,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         """
         try:
             param.value = widget.get_value()
-        except Exception:
+        except ValueError:
             widget.set_value(param.value)
             excepthook(*sys.exc_info())
 

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,8 +28,9 @@ __all__ = ['MaskImage']
 
 import numpy as np
 
+from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.plugins import ProcPlugin, PROC_PLUGIN
+from pydidas.plugins import ProcPlugin
 from pydidas.image_io import read_image, rebin2d
 
 

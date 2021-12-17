@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -29,13 +29,12 @@ import os
 
 import h5py
 
-from ..experimental_settings import ExperimentalSettings
-from ..scan_settings import ScanSettings
-from ...utils import write_hdf5_dataset
+from ...experiment import ExperimentalSetup, ScanSetup
+from ...core.utils import create_hdf5_dataset
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
-EXP = ExperimentalSettings()
-SCAN = ScanSettings()
+EXP = ExperimentalSetup()
+SCAN = ScanSetup()
 
 
 class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
@@ -116,7 +115,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         with h5py.File(os.path.join(cls._save_dir, cls._filenames[node_id]),
                        'w') as _file:
             for _group, _name, kws in _dsets:
-                write_hdf5_dataset(_file, _group, _name, **kws)
+                create_hdf5_dataset(_file, _group, _name, **kws)
             for _dim in range(_ndim):
                 _file[f'entry/data/axis_{_dim}'] = h5py.SoftLink(
                     f'/entry/scan/dim_{_dim}')

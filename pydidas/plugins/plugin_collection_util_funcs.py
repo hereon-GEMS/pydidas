@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -25,11 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['get_generic_plugin_path', 'plugin_type_check']
 
-
 import os
 
 import pydidas.core as core
-from pydidas.utils import pydidas_logger, LOGGING_LEVEL
+from ..core.utils import pydidas_logger, LOGGING_LEVEL
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
@@ -43,12 +42,12 @@ def get_generic_plugin_path():
 
     Returns
     -------
-    str
-        The path to the generic plugin folder.
+    list
+        A list with the path to the generic plugin folder as the only entry.
     """
     _pydidas_module_path = os.path.dirname(
                 os.path.abspath(core.__path__[0]))
-    logger.debug(f'Generic module path: {_pydidas_module_path}')
+    logger.debug('Generic module path: %s', _pydidas_module_path)
     return [os.path.join(os.path.dirname(_pydidas_module_path), 'plugins')]
 
 

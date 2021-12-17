@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,8 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PyFAI2dIntegration']
 
-from pydidas.plugins import pyFAIintegrationBase, pyFAI_METHOD
 from pydidas.core import Dataset
+from pydidas.plugins import pyFAIintegrationBase, pyFAI_METHOD
 
 
 class PyFAI2dIntegration(pyFAIintegrationBase):
@@ -67,7 +67,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        _newdata = self._ai.integrate_2d(
+        _newdata = self._ai.integrate2d(
             data, self.get_param_value('int_rad_npoint'),
             npt_azim=self.get_param_value('int_azi_npoint'),
             polarization_factor=1,
@@ -84,3 +84,16 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
                            axis_units=[_unit], axis_ranges=[_newdata[0]])
         return _dataset, kwargs
+
+    def calculate_result_shape(self):
+        """
+        Get the shape of the integrated dataset to set up the CRS / LUT.
+
+        Returns
+        -------
+        tuple
+            The new shape: A tuple of two integers is returned.
+        """
+        self._config['result_shape'] = (
+            self.get_param_value('int_rad_npoint'),
+            self.get_param_value('int_azi_npoint'))

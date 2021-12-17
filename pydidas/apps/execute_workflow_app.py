@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -26,32 +26,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExecuteWorkflowApp']
 
-
 import time
 import multiprocessing as mp
 
 import numpy as np
 from PyQt5 import QtCore
 
-from ..core import (ParameterCollection,get_generic_parameter, Dataset)
-from ..constants import AppConfigError
-from ..workflow import ScanSettings, WorkflowTree, WorkflowResults
+from ..core import (ParameterCollection, get_generic_param_collection, Dataset,
+                    AppConfigError)
+from ..experiment import ScanSetup
+from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
 from .base_app import BaseApp
 from .app_parsers import parse_execute_workflow_cmdline_arguments
 
 
 TREE = WorkflowTree()
-SCAN = ScanSettings()
-
+SCAN = ScanSetup()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultSaverMeta
-
-DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('autosave_results'),
-    get_generic_parameter('autosave_dir'),
-    get_generic_parameter('autosave_format'),
-    get_generic_parameter('live_processing'))
 
 
 class ExecuteWorkflowApp(BaseApp):
@@ -86,7 +79,9 @@ class ExecuteWorkflowApp(BaseApp):
         Flag to enable live processing. This will implement checks on file
         existance before processing starts. The default is False.
     """
-    default_params = DEFAULT_PARAMS
+    default_params = get_generic_param_collection(
+        'autosave_results', 'autosave_dir', 'autosave_format',
+        'live_processing')
     parse_func = parse_execute_workflow_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
                                            '_result_metadata', '_mp_tasks']
@@ -96,9 +91,9 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._config['result_shapes'] = {}
-        self._config['shared_memory'] = {}
-        self._config['tree_str'] = '[]'
+        self._config.update({'result_shapes': {},
+                             'shared_memory': {},
+                             'tree_str_rep': '[]'})
         self._mp_tasks = np.array(())
         self._index = -1
         self.reset_runtime_vars()
@@ -128,7 +123,7 @@ class ExecuteWorkflowApp(BaseApp):
         following steps:
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the ScanSettings.
+            2. Get all multiprocessing tasks from the ScanSetup.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -139,11 +134,11 @@ class ExecuteWorkflowApp(BaseApp):
         self.reset_runtime_vars()
         self.__get_and_store_tasks()
         if self.slave_mode:
-            TREE.restore_from_string(self._config['tree_str'])
+            TREE.restore_from_string(self._config['tree_str_rep'])
             for _key, _val in self._config['scan_vals'].items():
                 SCAN.set_param_value(_key, _val)
         if not self.slave_mode:
-            self._config['tree_str'] = TREE.export_to_string()
+            self._config['tree_str_rep'] = TREE.export_to_string()
             self._config['scan_vals'] = SCAN.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_calc_buffer_size()
@@ -173,7 +168,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __get_and_store_tasks(self):
         """
-        Get the tasks from the global ScanSettings and store them internally.
+        Get the tasks from the global ScanSetup and store them internally.
         """
         _dim = SCAN.get_param_value('scan_dim')
         _points_per_dim = [SCAN.get_param_value(f'n_points_{_n}')
@@ -328,8 +323,9 @@ class ExecuteWorkflowApp(BaseApp):
                     'axis_ranges': {i: None for i in range(_res.ndim)},
                     'axis_units': {i: None for i in range(_res.ndim)}}
         self._config['result_metadata_set'] = True
-        RESULT_SAVER.push_frame_metadata_to_active_savers(
-            self._result_metadata)
+        if not self.slave_mode:
+            RESULT_SAVER.push_frame_metadata_to_active_savers(
+                self._result_metadata)
 
     def __write_results_to_shared_arrays(self):
         """
@@ -354,8 +350,6 @@ class ExecuteWorkflowApp(BaseApp):
     def multiprocessing_post_run(self):
         """
         Perform operations after running main parallel processing function.
-
-        The ExecutiveWorkflowApp will update the
         """
 
     @QtCore.pyqtSlot(int, object)

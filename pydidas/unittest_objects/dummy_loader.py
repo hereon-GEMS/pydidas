@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,9 +28,12 @@ __all__ = ['DummyLoader']
 
 import numpy as np
 
-from pydidas.plugins import InputPlugin, INPUT_PLUGIN
+# because these Plugins will be loaded directly by importlib, absolute imports
+# are required:
 from pydidas.core import (Parameter, ParameterCollection, Dataset,
-                          get_generic_parameter)
+                    get_generic_parameter)
+from pydidas.core.constants import INPUT_PLUGIN
+from pydidas.plugins import InputPlugin
 
 class DummyLoader(InputPlugin):
     """
@@ -71,20 +74,83 @@ class DummyLoader(InputPlugin):
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
     def get_first_file_size(self):
+        """
+        Reimplement the "get_first_file_size" and return a dummy value.
+
+        Returns
+        -------
+        int
+            The dummy file size.
+        """
         return 1
 
     def get_filename(self, index):
+        """
+        Get the filename associated with the input index.
+
+        The DummyLoader simply uses the input index and returns it directly.
+
+        Parameters
+        ----------
+        index : int
+            The input index.
+
+        Returns
+        -------
+        index : int
+            The input index.
+        """
         return index
 
     def input_available(self, index):
+        """
+        Check if input is available for the given index.
+
+        A config setting can be used to determine the cut-off point up to which
+        input is avaible and the method returns True.
+
+        Parameters
+        ----------
+        index : Union[int, None]
+            The input index to be checked.
+
+        Returns
+        -------
+        bool
+            The input available flag.
+        """
         if index is None:
             return False
         return index <= self._config['input_available']
 
     def pre_execute(self):
+        """
+        Run the pre-execution routine and store a variable that this method
+        has been called.
+        """
         self._preexecuted = True
 
     def execute(self, index, **kwargs):
+        """
+        Execute the actual computations.
+
+        This method will create a new Dataset with random data.
+
+        Parameters
+        ----------
+        index : int
+            The input index. This is not used except to store the index in the
+            kwargs dictionary.
+        **kwargs : dict
+            The kwargs dictionary with the input keyword arguments.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The random image data.
+        kwargs : dict
+            The updated input kwargs dictionary.
+        """
         _width = self.get_param_value('image_width')
         _height =self.get_param_value('image_height')
         _data = np.random.random((_height, _width))

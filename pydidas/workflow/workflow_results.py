@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -34,13 +34,13 @@ import numpy as np
 from PyQt5 import QtCore
 
 from ..core import Dataset, SingletonFactory
+from ..experiment import ScanSetup
 from .workflow_tree import WorkflowTree
 from .result_savers import WorkflowResultSaverMeta
-from .scan_settings import ScanSettings
 
 
 RESULT_SAVER = WorkflowResultSaverMeta
-SCAN = ScanSettings()
+SCAN = ScanSetup()
 TREE = WorkflowTree()
 
 
@@ -61,7 +61,7 @@ class _WorkflowResults(QtCore.QObject):
 
     def update_shapes_from_scan_and_workflow(self):
         """
-        Update the shape of the results by querying ScanSettings and
+        Update the shape of the results by querying ScanSetup and
         WorkflowTree for their current dimensions and shapes.
         """
         self.clear_all_results()
@@ -319,6 +319,36 @@ class _WorkflowResults(QtCore.QObject):
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         RESULT_SAVER.prepare_active_savers(save_dir, self.shapes,
                                            self.labels)
+
+    def update_param_choices_from_labels(self, param,
+                                         add_no_selection_entry=True):
+        """
+        Store the current WorkflowResults node labels in the specified
+        Parameter's choices.
+
+        A neutral entry of "No selection" can be added with the optional flag.
+
+        Parameters
+        ----------
+        param : pydidas.core.Parameter
+            The Parameter to be updated.
+        add_no_selection_entry : bool, optional
+            Flag to add an entry of no selection in addition to the entries
+            from the nodes. The default is True.
+        """
+        _curr_choice = param.value
+        _new_choices = ['No selection'] if add_no_selection_entry else []
+        _new_choices.extend(
+            [(f'{_val} (node #{_key:03d})' if len(_val) > 0
+              else f'(node #{_key:03d})')
+             for _key, _val in self._config['labels'].items()])
+        if _curr_choice in _new_choices:
+            param.choices = _new_choices
+        else:
+            _new_choices.append(_curr_choice)
+            param.choices = _new_choices
+            param.value = _new_choices[0]
+            param.choices = _new_choices[:-1]
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

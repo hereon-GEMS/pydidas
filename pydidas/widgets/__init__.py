@@ -1,20 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Package with modified widgets required for creating the graphical user
-interface"""
+"""
+Package with modified widgets required for creating the pydidas graphical user
+interface.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -24,86 +26,58 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import windows
-
-from . import factory
-
+# import sub-packages:
 from . import dialogues
-
+from . import factory
 from . import parameter_config
-
+from . import selection
 from . import workflow_edit
+__all__.extend(['dialogues', 'factory', 'parameter_config', 'selection', 'workflow_edit'])
 
-# from . import confirmation_bar
-# from .confirmation_bar import *
+# explicitly import items from subpackages into the module:
+from .factory import CreateWidgetsMixIn
+__all__.extend(['CreateWidgetsMixIn'])
 
-from . import scroll_area
+# import __all__ items from modules:
+from .base_frame import *
+from .base_frame_with_app import *
+from .central_widget_stack import *
+from .info_widget import *
+from .qta_button import *
+from .read_only_text_widget import *
 from .scroll_area import *
-
-from . import utilities
 from .utilities import *
 
-from . import central_widget_stack
-from .central_widget_stack import *
-
-# from . import hdf_dataset_selector
-# from .hdf_dataset_selector import *
-
-from . import hdf5_dataset_selector
-from .hdf5_dataset_selector import *
-
-from . import qta_button
-from .qta_button import *
-
-from . import directory_explorer
-from .directory_explorer import *
-
-from . import info_widget
-from .info_widget import *
-
-from . import read_only_text_widget
-from .read_only_text_widget import *
-
-from . import create_widgets_mixin
-from .create_widgets_mixin import *
-
+# add modules' __all__ items to package's __all__ items and unclutter the
+# namespace by deleting the module references:
 from . import base_frame
-from .base_frame import *
+__all__.extend(base_frame.__all__)
+del base_frame
 
 from . import base_frame_with_app
-from .base_frame_with_app import *
-
-from . import result_selector_for_output
-from .result_selector_for_output import *
-
-# __all__ += confirmation_bar.__all__
-__all__ += scroll_area.__all__
-__all__ += utilities.__all__
-__all__ += central_widget_stack.__all__
-# __all__ += hdf_dataset_selector.__all__
-__all__ += hdf5_dataset_selector.__all__
-__all__ += qta_button.__all__
-__all__ += directory_explorer.__all__
-__all__ += info_widget.__all__
-__all__ += read_only_text_widget.__all__
-__all__ += create_widgets_mixin.__all__
-__all__ += base_frame.__all__
-__all__ += base_frame_with_app.__all__
-__all__ += result_selector_for_output.__all__
-
-
-# unclutter namespace and remove modules:
-# del confirmation_bar
-del scroll_area
-del utilities
-del central_widget_stack
-# del hdf_dataset_selector
-del hdf5_dataset_selector
-del qta_button
-del directory_explorer
-del info_widget
-del read_only_text_widget
-del create_widgets_mixin
-del base_frame
+__all__.extend(base_frame_with_app.__all__)
 del base_frame_with_app
-del result_selector_for_output
+
+from . import central_widget_stack
+__all__.extend(central_widget_stack.__all__)
+del central_widget_stack
+
+from . import info_widget
+__all__.extend(info_widget.__all__)
+del info_widget
+
+from . import qta_button
+__all__.extend(qta_button.__all__)
+del qta_button
+
+from . import read_only_text_widget
+__all__.extend(read_only_text_widget.__all__)
+del read_only_text_widget
+
+from . import scroll_area
+__all__.extend(scroll_area.__all__)
+del scroll_area
+
+from . import utilities
+__all__.extend(utilities.__all__)
+del utilities

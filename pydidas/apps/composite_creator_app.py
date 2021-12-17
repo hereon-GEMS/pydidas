@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -30,49 +30,18 @@ import time
 import numpy as np
 from PyQt5 import QtCore
 
-from ..core import (ParameterCollection, Dataset,
-                    CompositeImage, get_generic_parameter,
-                    FilelistManager, ImageMetadataManager)
-from ..constants import HDF5_EXTENSIONS, AppConfigError
-from ..utils import (check_file_exists, check_hdf5_key_exists_in_file,
-                           copy_docstring)
-from ..image_io import read_image, rebin2d
+from ..core import Dataset, AppConfigError, get_generic_param_collection
+from ..core.constants import HDF5_EXTENSIONS
+from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
+                          copy_docstring)
+from ..image_io import CompositeImage, read_image, rebin2d
+from ..managers import FilelistManager, ImageMetadataManager
 from .base_app import BaseApp
 from .app_parsers import parse_composite_creator_cmdline_arguments
 
 
-DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter('live_processing'),
-    get_generic_parameter('first_file'),
-    get_generic_parameter('last_file'),
-    get_generic_parameter('file_stepping'),
-    get_generic_parameter('hdf5_key'),
-    get_generic_parameter('hdf5_first_image_num'),
-    get_generic_parameter('hdf5_last_image_num'),
-    get_generic_parameter('hdf5_stepping'),
-    get_generic_parameter('use_bg_file'),
-    get_generic_parameter('bg_file'),
-    get_generic_parameter('bg_hdf5_key'),
-    get_generic_parameter('bg_hdf5_frame'),
-    get_generic_parameter('composite_nx'),
-    get_generic_parameter('composite_ny'),
-    get_generic_parameter('composite_dir'),
-    get_generic_parameter('use_roi'),
-    get_generic_parameter('roi_xlow'),
-    get_generic_parameter('roi_xhigh'),
-    get_generic_parameter('roi_ylow'),
-    get_generic_parameter('roi_yhigh'),
-    get_generic_parameter('use_thresholds'),
-    get_generic_parameter('threshold_low'),
-    get_generic_parameter('threshold_high'),
-    get_generic_parameter('binning'),
-    )
-
-
 class CompositeCreatorApp(BaseApp):
     """
-    Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`
-
     The CompositeCreatorApp can compose mosaic images of a large number of
     individual image files.
 
@@ -143,7 +112,7 @@ class CompositeCreatorApp(BaseApp):
     roi_xhigh : int, optional
         The upper boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size. The default is -1
+        -1 is equivalent with the full image size. The default is None.
     roi_ylow : int, optional
         The lower boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width.
@@ -151,7 +120,7 @@ class CompositeCreatorApp(BaseApp):
     roi_yhigh : int, optional
         THe upper boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size. The default is -1
+        -1 is equivalent with the full image size. The default is None.
     threshold_low : int, optional
         The lower threshold of the composite image. If a value  other than -1
         is used, any pixels with a value below the threshold will be replaced
@@ -166,7 +135,13 @@ class CompositeCreatorApp(BaseApp):
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
     """
-    default_params = DEFAULT_PARAMS
+    default_params = get_generic_param_collection(
+        'live_processing', 'first_file', 'last_file', 'file_stepping',
+        'hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
+        'hdf5_stepping', 'use_bg_file', 'bg_file', 'bg_hdf5_key',
+        'bg_hdf5_frame', 'composite_nx', 'composite_ny', 'composite_dir',
+        'use_roi', 'roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh',
+        'use_thresholds', 'threshold_low', 'threshold_high', 'binning')
     mp_func_results = QtCore.pyqtSignal(object)
     updated_composite = QtCore.pyqtSignal()
     parse_func = parse_composite_creator_cmdline_arguments
@@ -174,29 +149,16 @@ class CompositeCreatorApp(BaseApp):
                                            '_bg_image']
 
     def __init__(self, *args, **kwargs):
-        """
-        Create a CompositeCreatorApp instance.
-        """
         super().__init__(*args, **kwargs)
         self._composite = None
         self._det_mask = None
         self._bg_image = None
-        self._filelist = FilelistManager(self.params.get('first_file'),
-                                         self.params.get('last_file'),
-                                         self.params.get('live_processing'),
-                                         self.params.get('file_stepping'))
-        self._image_metadata = ImageMetadataManager(
-            self.params.get('first_file'),
-            self.params.get('hdf5_key'),
-            self.params.get('hdf5_first_image_num'),
-            self.params.get('hdf5_last_image_num'),
-            self.params.get('hdf5_stepping'),
-            self.params.get('binning'),
-            self.params.get('use_roi'),
-            self.params.get('roi_xlow'),
-            self.params.get('roi_xhigh'),
-            self.params.get('roi_ylow'),
-            self.params.get('roi_yhigh'))
+        self._filelist = FilelistManager(*self.get_params(
+            'first_file', 'last_file', 'live_processing', 'file_stepping'))
+        self._image_metadata = ImageMetadataManager(*self.get_params(
+            'first_file', 'hdf5_key', 'hdf5_first_image_num',
+            'hdf5_last_image_num', 'hdf5_stepping', 'binning', 'use_roi',
+            'roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh'))
         self._image_metadata.set_param_value('use_filename', False)
         self._config = {'current_fname': None,
                         'current_kwargs': {},
@@ -252,6 +214,7 @@ class CompositeCreatorApp(BaseApp):
     def __get_detector_mask(self):
         """
         Get the detector mask from the file specified in the global QSettings.
+
         Returns
         -------
         _mask : Union[None, np.ndarray]
@@ -325,7 +288,6 @@ class CompositeCreatorApp(BaseApp):
         check_file_exists(_bg_file)
         _params = dict(binning=self.get_param_value('binning'),
                        roi=self._image_metadata.roi)
-        # check hdf5 key and dataset dimensions
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file,
                                           self.get_param_value('bg_hdf5_key'))
@@ -370,11 +332,6 @@ class CompositeCreatorApp(BaseApp):
     def __check_and_store_thresholds(self):
         """
         Check for thresholds and store them in the local config.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Keyword arguments which can include
         """
         if self.get_param_value('use_thresholds'):
             self._composite.set_param_value(

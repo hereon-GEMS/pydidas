@@ -1,19 +1,23 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the basic BasePlugin class."""
+"""
+Module with the BasePlugin base class from which all plugins must inherit.
+Direct inheritance from BasePlugin is limited to the InputPlugin, ProcPlugin
+and OutputPlugin base classes.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -24,26 +28,34 @@ __status__ = "Development"
 __all__ = ['BasePlugin']
 
 import copy
+from numbers import Integral
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_parameter)
-from pydidas.image_io import RoiManager, rebin2d
-from pydidas.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
+from pydidas.image_io import rebin2d, RoiController
+from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
+
 
 ptype = {BASE_PLUGIN: 'Base plugin',
          INPUT_PLUGIN: 'Input plugin',
          PROC_PLUGIN: 'Processing plugin',
          OUTPUT_PLUGIN: 'Output plugin'}
-data_dim = {i: str(i) for i in range(20)}
-data_dim.update({None: 'None', -1: 'any'})
+
+
+def _data_dim(entry):
+    if entry is None:
+        return 'None'
+    if entry == -1:
+        return 'any'
+    if isinstance(entry, Integral) and entry >= 0:
+        return str(entry)
+    raise TypeError('Entry type not understood.')
 
 
 class BasePlugin(ObjectWithParameterCollection):
     """
     The base plugin class from which all plugins inherit.
-
-    Class attributes are:
 
     Class attributes
     ----------------
@@ -59,6 +71,9 @@ class BasePlugin(ObjectWithParameterCollection):
         Dictionary with the required input data set descrptions
     output_data : dict
         Dictionary with a description of the output datasets.
+    new_dataset : bool
+        Keyword that the Plugin creates a new dataset. This will trigger a
+        re-evaluation of the output data shape.
     """
     basic_plugin = True
     plugin_type = BASE_PLUGIN
@@ -88,8 +103,8 @@ class BasePlugin(ObjectWithParameterCollection):
         _desc = (f'Plugin name: {cls.plugin_name}\n'
                  f'Class name: {cls.__name__}\n'
                  f'Plugin type: {ptype[cls.plugin_type]}\n\n'
-                 f'Input data dimension: {data_dim[cls.input_data_dim]}\n\n'
-                 f'Output data dimension: {data_dim[cls.output_data_dim]}\n\n'
+                 f'Input data dimension: {_data_dim(cls.input_data_dim)}\n\n'
+                 f'Output data dimension: {_data_dim(cls.output_data_dim)}\n\n'
                  f'Plugin description:\n{_doc}\n\n'
                  'Parameters:')
         for param in cls.generic_params.values():
@@ -117,15 +132,14 @@ class BasePlugin(ObjectWithParameterCollection):
         return {'Name': cls.plugin_name,
                 'Class name': cls.__name__,
                 'Plugin type': ptype[cls.plugin_type],
-                'Input data dimension': data_dim[cls.input_data_dim],
-                'Output data dimension': data_dim[cls.output_data_dim],
+                'Input data dimension': _data_dim(cls.input_data_dim),
+                'Output data dimension': _data_dim(cls.output_data_dim),
                 'Plugin description': _doc,
                 'Parameters': '\n'.join(
                     [str(param) for param in cls.generic_params.values()]
                     + [str(param) for param in cls.default_params.values()])}
 
     def __init__(self, *args, **kwargs):
-        """Setup the class."""
         super().__init__()
         if self.plugin_type not in [BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                     OUTPUT_PLUGIN]:
@@ -151,7 +165,6 @@ class BasePlugin(ObjectWithParameterCollection):
         -------
         BasePlugin
             The copy of the plugin.
-
         """
         _obj_copy = type(self)()
         for _key in self.__dict__:
@@ -210,6 +223,7 @@ class BasePlugin(ObjectWithParameterCollection):
         Run code which needs to be run only once prior to the execution of
         multiple frames.
         """
+        pass
 
     @property
     def has_unique_parameter_config_widget(self):
@@ -359,7 +373,19 @@ class BasePlugin(ObjectWithParameterCollection):
         self._legacy_image_ops_meta['included'] = True
 
     def _get_own_roi(self):
-        _roi = RoiManager(roi=(self.get_param_value('roi_ylow'),
+        """
+        Get the ROI defined within the plugin.
+
+        Note: This method will not check whether the Plugin has the required
+        Parameters to define a ROI. This check must be performed by the user
+        or calling method.
+
+        Returns
+        -------
+        tuple
+            The tuple with two slice objects which define the image ROI.
+        """
+        _roi = RoiController(roi=(self.get_param_value('roi_ylow'),
                                self.get_param_value('roi_yhigh'),
                                self.get_param_value('roi_xlow'),
                                self.get_param_value('roi_xhigh')),
@@ -378,7 +404,7 @@ class BasePlugin(ObjectWithParameterCollection):
         binning : int
             The binning factor which needs to be applied to the original image.
         """
-        _roi = RoiManager(roi=(0, self._original_image_shape[0],
+        _roi = RoiController(roi=(0, self._original_image_shape[0],
                                0, self._original_image_shape[1]),
                           input_shape=self._original_image_shape)
         _binning = 1
@@ -395,6 +421,6 @@ class BasePlugin(ObjectWithParameterCollection):
                 _binning *= _op
             if _op_name == 'roi':
                 _roi_unbinned = [_binning * _r
-                                 for _r in RoiManager(roi=_op).roi_coords]
+                                 for _r in RoiController(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning

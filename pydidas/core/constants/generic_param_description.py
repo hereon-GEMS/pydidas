@@ -1,0 +1,1001 @@
+# This file is part of pydidas.
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""
+The generic_parameter_tooltips module holds all the tooltips for generic
+Parameters in the form of a dictionary.
+"""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__version__ = "0.0.1"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ['GENERIC_PARAM_DESCRIPTION']
+
+import numpy as np
+
+
+GENERIC_PARAM_DESCRIPTION = {
+    ###################################
+    ## Generic processing paramters
+    ###################################
+    'live_processing': {
+        'type': int,
+        'default': 0,
+        'name': 'Live processing',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Set live processing to True if the files do not yet '
+                    'exist at process startup. This will skip checks on'
+                    'file existence and size.')},
+    'label': {
+        'type': str,
+        'default': '',
+        'name': 'Label',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('A label for identifying the Plugin in the results. '
+                    'Internally, all Plugins are identified by their node '
+                    'IDs, this additional label is merely a handle for easier'
+                    ' human identification.')},
+    ###################################
+    ## Parameters for CompositeCreation
+    ###################################
+    'filename': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Filename',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The file name of the input file.'},
+    'first_file': {
+        'type': 'Path',
+        'default': '',
+        'name': 'First file name',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The name of the first file for a file series or of the '
+                    'hdf5 file in case of hdf5 file input.')},
+    'last_file': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Last file name',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Used only for file series: The name of the last file '
+                    'to be added to the composite image.')},
+    'file_stepping': {
+        'type': int,
+        'default': 1,
+        'name': 'File stepping',
+        'choices': None,
+        'allow_None': False,
+        'tooltip': ('The step width (in files), A value n > 1 will only '
+                    'process every n-th file for the composite.')},
+    'hdf5_key': {
+        'type': 'Hdf5key',
+        'default': '/entry/data/data',
+        'name': 'Hdf5 dataset key',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Used only for hdf5 files: The dataset key.')},
+    'hdf5_dataset_shape': {
+        'type': tuple,
+        'default': (0, 0, 0),
+        'name': 'Hdf5 dataset shape',
+        'choices': None,
+        'allow_None': False,
+        'tooltip': ('The shape of the hdf5 dataset. This corresponds to '
+                    '(number of images, image size y, image size x).')},
+    'hdf5_first_image_num': {
+        'type': int,
+        'default': 0,
+        'name': 'First image number',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The first image in the hdf5-dataset to be used.'},
+    'hdf5_last_image_num': {
+        'type': int,
+        'default': -1,
+        'name': 'Last image number',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The last image in the hdf5-dataset to be used. '
+                    'The value -1 will default to the last image.')},
+    'hdf5_stepping': {
+        'type': int,
+        'default': 1,
+        'name': 'Hdf5 dataset stepping',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The step width (in frames). A value n > 1 will only '
+                    'process every n-th frame.')},
+    'use_bg_file': {
+        'type': int,
+        'default': 0,
+        'name': 'Subtract background image',
+        'choices': [True, False],
+        'allow_None': False,
+        'tooltip': 'Keyword to toggle usage of background subtraction.'},
+    'bg_file': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Background image file',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The name of the file used for background correction.'},
+    'bg_hdf5_key': {
+        'type': 'Hdf5key',
+        'default': '/entry/data/data',
+        'name': 'Background image Hdf5 dataset key',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'For hdf5 background image files: The dataset key.'},
+    'bg_hdf5_frame': {
+        'type': int,
+        'default': 0,
+        'name': 'Background image number',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('For hdf5 background image files: The image number in '
+                    'the dataset')},
+    'n_image': {
+        'type': int,
+        'default': 0,
+        'name': 'Total number of images',
+        'choices': None,
+        'unit': '',
+   'tooltip': 'The toal number of images in the composite images.'},
+    'n_files': {
+        'type': int,
+        'default': 0,
+        'name': 'Total number of files',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The toal number of selected files.'},
+    'composite_nx': {
+        'type': int,
+        'default': 1,
+        'name': 'Number of images in x',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of original images combined in the composite'
+                    ' image in x direction. A value of -1 will determine the'
+                    ' number of images in x direction automatically based on'
+                    ' the number of images in y direction.')},
+    'composite_ny': {
+        'type': int,
+        'default': -1,
+        'name': 'Number of images in y',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of original images combined in the composite'
+                    ' image in y direction. A value of -1 will determine the'
+                    ' number of images in y direction automatically based on'
+                    ' the number of images in x direction.')},
+    'composite_dir': {
+        'type': str,
+        'default': 'x',
+        'name': 'Preferred composite direction',
+        'choices': ['x', 'y'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The "fast" direction of the composite image. This '
+                    'dimension will be filled first before going to the'
+                    ' next row/column.')},
+    'use_roi': {
+        'type': int,
+        'default': 0,
+        'name': 'Use ROI',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Keyword to toggle use of the ROI for cropping the '
+                    'original images before processing them.')},
+    'roi_xlow': {
+        'type': int,
+        'default': 0,
+        'name': 'ROI lower x limit',
+        'choices': None,
+        'unit': 'p',
+        'allow_None': False,
+        'tooltip': ('The lower boundary (in pixel) for cropping images in x, '
+                    'if use_roi is enabled. Negative values will be modulated '
+                    'with the image width.')},
+    'roi_xhigh': {
+        'type': int,
+        'default': None,
+        'name': 'ROI upper x limit',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': True,
+        'tooltip': ('The upper boundary (in pixel) for cropping images in x, '
+                    'if use_roi is enabled. Negative values will be modulated '
+                    'with the image width, i.e. -1 is equivalent with the full'
+                    'image size minus 1. To take the full image, use "None" '
+                    'as value for the upper ROI limit.')},
+    'roi_ylow': {
+        'type': int,
+        'default': 0,
+        'name': 'ROI lower y limit',
+        'choices': None,
+        'unit': 'p',
+        'allow_None': False,
+        'tooltip': ('The lower boundary (in pixel) for cropping images in y, '
+                    'if use_roi is enabled. Negative values will be modulated '
+                    'with the image width.')},
+    'roi_yhigh': {
+        'type': int,
+        'default': None,
+        'name': 'ROI upper y limit',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': True,
+        'tooltip': ('The upper boundary (in pixel) for cropping images in y, '
+                    'if use_roi is enabled. Negative values will be modulated '
+                    'with the image width, i.e. -1 is equivalent with the full'
+                    'image size minus 1. To take the full image, use "None" '
+                    'as value for the upper ROI limit.')},
+    'use_thresholds': {
+        'type': int,
+        'default': 0,
+        'name': 'Use thresholds',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Keyword to toggle use of the thresholds for clipping '
+                    'the data range in the original images before combining '
+                    'them.')},
+    'threshold_low': {
+        'type': float,
+        'default': None,
+        'name': 'Lower threshold',
+        'choices': None,
+        'unit': '',
+        'allow_None': True,
+        'tooltip': ('The lower threshold of the composite image. If any '
+                    'finite value (i.e. not np.nan or None) is used, any '
+                    'pixels with a value below the threshold will be replaced'
+                    ' by the threshold. A value of np.nan or None will ignore'
+                    ' the threshold.')},
+    'threshold_high': {
+        'type': float,
+        'default': None,
+        'name': 'Upper threshold',
+        'choices': None,
+        'unit': '',
+        'allow_None': True,
+        'tooltip': ('The upper threshold of the composite image. If any '
+                    'finite value (i.e. not np.nan or None) is used, any '
+                    'pixels with a value above the threshold will be replaced'
+                    ' by the threshold. A value of np.nan or None will ignore'
+                    ' the threshold.')},
+    'binning': {
+        'type': int,
+        'default': 1,
+        'name': 'Binning factor',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The re-binning factor for the images in the composite. '
+                    'The binning will be applied to the cropped images.')},
+    'images_per_file': {
+        'type': int,
+        'default': -1,
+        'name': 'Images per file',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of images in the file. For hdf5 files, this '
+                    'corresponds to the number of frames in the hdf5 dataset.')
+        },
+    'image_shape': {
+        'type': tuple,
+        'default': (0, 0),
+        'name': 'Image shape',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': False,
+        'tooltip': 'The shape of an image.'},
+    'raw_image_shape': {
+        'type': tuple,
+        'default': (0, 0),
+        'name': '',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': False,
+        'tooltip': ('The image shape of the original image as loaded from '
+                    'the file.')},
+    'datatype': {
+        'type': None,
+        'default': np.float32,
+        'name': 'Datatype',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The datatype.'},
+    #################################
+    ## Parameters for global geometry
+    #################################
+    'xray_wavelength': {
+        'type': float,
+        'default': 1,
+        'name': 'X-ray wavelength',
+        'choices': None,
+        'unit': 'A',
+        'allow_None': False,
+        'tooltip': ('The X-ray wavelength (in Angstrom). Any changes to the '
+                    'wavelength will also update the X-ray energy setting.')},
+    'xray_energy': {
+        'type': float,
+        'default': 12.398,
+        'name': 'X-ray energy',
+        'choices': None,
+        'unit': 'keV',
+        'allow_None': False,
+        'tooltip': ('The X-ray energy (in keV). Changing this parameter '
+                    'will also update the X-ray wavelength setting.')},
+    'detector_name': {
+        'type': str,
+        'default': 'detector',
+        'name': 'Detector name',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The detector name in pyFAI nomenclature.'},
+    'detector_npixx': {
+        'type': int,
+        'default': 0,
+        'name': 'Detector size X',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': False,
+        'tooltip': 'The number of detector pixels in x direction (horizontal).'
+        },
+    'detector_npixy': {
+        'type': int,
+        'default': 0,
+        'name': 'Detector size Y',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': False,
+        'tooltip': 'The number of detector pixels in x direction (vertical).'
+        },
+    'detector_sizex': {
+        'type': float,
+        'default': -1,
+        'name': 'Detector pixel size X',
+        'choices': None,
+        'unit': 'um',
+        'allow_None': False,
+        'tooltip': 'The detector pixel size in X-direction.'},
+    'detector_sizey': {
+        'type': float,
+        'default': -1,
+        'name': 'Detector pixel size Y',
+        'choices': None,
+        'unit': 'um',
+        'allow_None': False,
+        'tooltip': 'The detector pixel size in Y-direction.'},
+    'detector_dist': {
+        'type': float,
+        'default': 1,
+        'name': 'Sample-detector distance',
+        'choices': None,
+        'unit': 'm',
+        'allow_None': False,
+        'tooltip': 'The sample-detector distance.'},
+    'detector_poni1': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector PONI1',
+        'choices': None,
+        'unit': 'm',
+        'allow_None': False,
+        'tooltip': ('The detector PONI1 (point of normal incidence; in y '
+                    'direction). This is measured in meters from the detector'
+                    'origin.')},
+    'detector_poni2': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector PONI2',
+        'choices': None,
+        'unit': 'm',
+        'allow_None': False,
+        'tooltip': ('The detector PONI2 (point of normal incidence; in x '
+                    'direction). This is measured in meters from the detector'
+                       'origin.')},
+    'detector_rot1': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector Rot1',
+        'choices': None,
+        'unit': 'rad',
+        'allow_None': False,
+        'tooltip': 'The detector rotation 1 (lefthanded around the "up"-axis)'
+        },
+    'detector_rot2': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector Rot2',
+        'choices': None,
+        'unit': 'rad',
+        'allow_None': False,
+        'tooltip':  ('The detector rotation 2 (pitching the detector; '
+                     'positive direction is tilting the detector top upstream '
+                     'while keeping the bottom of the detector stationary.')},
+    'detector_rot3': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector Rot3',
+        'choices': None,
+        'unit': 'rad',
+        'allow_None': False,
+        'tooltip': ('The detector rotation 3 (around the beam axis; '
+                    'right-handed when looking downstream with the beam.)')},
+    ############################
+    ## Parameters for scan setup
+    ############################
+    'scan_dim': {
+        'type': int,
+        'default': 2,
+        'name': 'Scan dimension',
+        'choices': [1, 2, 3, 4],
+        'unit': '',
+        'allow_None': False,
+        'tooltip':  ('The scan dimensionality. This defines the number of '
+                     'processed dimensions.')},
+    'scan_name': {
+        'type': str,
+        'default': '',
+        'name': 'Scan name/title',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The scan name or title. This is used exclusively for '
+                    'reference in result exporters.')},
+     'scan_dir_1': {
+        'type': str,
+        'default': '',
+        'name': 'Name of scan direction 1',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis name for scan direction 1. This information'
+                    ' will only be used for labelling.')},
+     'n_points_1': {
+        'type': int,
+        'default': 0,
+        'name': 'Number of scan points (dir. 1)',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The number of scan points in scan direction 1.'},
+
+    'delta_1': {
+        'type': float,
+        'default': 1,
+        'name': 'Step width in direction 1',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The step width between two scan points in scan '
+                    'direction 1.')},
+    'offset_1': {
+        'type': float,
+        'default': 0,
+        'name': 'Offset of direction 1',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The coordinate offset of the movement in scan direction '
+                    '1 (i.e. the counter / motor position for scan step #0).')
+        },
+    'unit_1': {
+        'type': str,
+        'default': '',
+        'name': 'Unit of direction 1',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The unit of the movement / steps / offset in scan '
+                    'direction 1.')},
+     'scan_dir_2': {
+        'type': str,
+        'default': '',
+        'name': 'Name of scan direction 2',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis name for scan direction 2. This information'
+                    ' will only be used for labelling.')},
+     'n_points_2': {
+        'type': int,
+        'default': 0,
+        'name': 'Number of scan points (dir. 2)',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The number of scan points in scan direction 2.'},
+
+    'delta_2': {
+        'type': float,
+        'default': 1,
+        'name': 'Step width in direction 2',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The step width between two scan points in scan '
+                    'direction 2.')},
+    'offset_2': {
+        'type': float,
+        'default': 0,
+        'name': 'Offset of direction 2',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The coordinate offset of the movement in scan direction '
+                    '2 (i.e. the counter / motor position for scan step #0).')
+        },
+    'unit_2': {
+        'type': str,
+        'default': '',
+        'name': 'Unit of direction 2',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The unit of the movement / steps / offset in scan '
+                    'direction 2.')},
+     'scan_dir_3': {
+        'type': str,
+        'default': '',
+        'name': 'Name of scan direction 3',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis name for scan direction 3. This information'
+                    ' will only be used for labelling.')},
+     'n_points_3': {
+        'type': int,
+        'default': 0,
+        'name': 'Number of scan points (dir. 3)',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The number of scan points in scan direction 3.'},
+
+    'delta_3': {
+        'type': float,
+        'default': 1,
+        'name': 'Step width in direction 3',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The step width between two scan points in scan '
+                    'direction 3.')},
+    'offset_3': {
+        'type': float,
+        'default': 0,
+        'name': 'Offset of direction 3',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The coordinate offset of the movement in scan direction '
+                    '3 (i.e. the counter / motor position for scan step #0).')
+        },
+    'unit_3': {
+        'type': str,
+        'default': '',
+        'name': 'Unit of direction 3',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The unit of the movement / steps / offset in scan '
+                    'direction 3.')},
+     'scan_dir_4': {
+        'type': str,
+        'default': '',
+        'name': 'Name of scan direction 4',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis name for scan direction 4. This information'
+                    ' will only be used for labelling.')},
+     'n_points_4': {
+        'type': int,
+        'default': 0,
+        'name': 'Number of scan points (dir. 4)',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The number of scan points in scan direction 4.'},
+
+    'delta_4': {
+        'type': float,
+        'default': 1,
+        'name': 'Step width in direction 4',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The step width between two scan points in scan '
+                    'direction 4.')},
+    'offset_4': {
+        'type': float,
+        'default': 0,
+        'name': 'Offset of direction 4',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The coordinate offset of the movement in scan direction '
+                    '4 (i.e. the counter / motor position for scan step #0).')
+        },
+    'unit_4': {
+        'type': str,
+        'default': '',
+        'name': 'Unit of direction 4',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The unit of the movement / steps / offset in scan '
+                    'direction 4.')},
+    ############################
+    ## selected scan indices
+    ############################
+    'scan_index1': {
+        'type': int,
+        'default': 0,
+        'name': 'Scan dim. 1 index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The position index for the scan dimension 1.'},
+    'scan_index2': {
+        'type': int,
+        'default': 0,
+        'name': 'Scan dim. 2 index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The position index for the scan dimension 2.'},
+    'scan_index3': {
+        'type': int,
+        'default': 0,
+        'name': 'Scan dim. 3 index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The position index for the scan dimension 3.'},
+    'scan_index4': {
+        'type': int,
+        'default': 0,
+        'name': 'Scan dim. 4 index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The position index for the scan dimension 4.'},
+    'image_num': {
+        'type': int,
+        'default': 0,
+        'name': 'Image number',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The image number to be processed.'},
+    ############################
+    ## global app settings
+    ############################
+    'mp_n_workers': {
+        'type': int,
+        'default': 4,
+        'name': 'Number of MP workers',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of multiprocessing workers. Note that this '
+                    'number should not be set too high for two reasons:\n1. '
+                    'File reading processes interfere with each other if too '
+                    'many are active at once.\n2. pyFAI already inherently '
+                    'uses parallelization and you can only gain limited '
+                    'performance increases for multiple parallel processes.')},
+    'shared_buffer_size': {
+        'type': float,
+        'default': 100,
+        'name': 'Shared buffer size',
+        'choices': None,
+        'unit': 'MB',
+        'allow_None': False,
+        'tooltip': ('A shared buffer is used to efficiently transport data '
+                    'between the main App and multiprocessing Processes. This '
+                    'buffer must be large enough to store at least one '
+                    'instance of all result data.')},
+    'shared_buffer_max_n': {
+        'type': int,
+        'default': 20,
+        'name': 'Buffer dataframe limit',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The maximum number of datasets in the buffer. A dataset '
+                    'consists of all results for one frame. For performance '
+                    'reasons, the buffer should not be too large.')},
+    'det_mask': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Detector mask file',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The path to the detector mask file.'},
+    'det_mask_val': {
+        'type': float,
+        'default': 0,
+        'name': 'Detector mask value',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip':  ('The value to be used for the pixels masked on the '
+                     'detector. Note that this value will only be used '
+                     'for displaying the images. For pyFAI integration, '
+                     'the pixels will be fully masked and not be '
+                     'included.')},
+    'mosaic_border_width': {
+        'type': int,
+        'default': 0,
+        'name': 'Mosaic tiling border width',
+        'choices': None,
+        'unit': 'px',
+        'allow_None': False,
+        'tooltip': ('The width of the border inserted between adjacent frames'
+                    ' in the mosaic creation.')},
+    'mosaic_border_value': {
+        'type': float,
+        'default': 0,
+        'name': 'Mosaic border value',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The value to be put in the border pixels in mosaics.'},
+    'mosaic_max_size': {
+        'type': float,
+        'default': 100,
+        'name': 'Mosaic maximum size',
+        'choices': None,
+        'unit': 'Mpx',
+        'allow_None': False,
+        'tooltip': 'The maximum size (in megapixels) of mosaic images.'},
+    'run_type': {
+        'type': str,
+        'default': 'Process in GUI',
+        'name': 'Run type',
+        'choices': ['Process in GUI', 'Command line'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Specify how the processing shall be performed.')},
+    'plugin_path': {
+        'type': str,
+        'default': '',
+        'name': 'Plugin paths',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The paths to all plugin locations. Individual entries are'
+                    'separated by a semicolon.')},
+    'plot_update_time': {
+        'type': float,
+        'default': 1.0,
+        'name': 'Plot update time',
+        'choices': None,
+        'allow_None': False,
+        'tooltip': ('The delay before any plot updates will be processed. This'
+                    ' will prevent multiple frequent update of plots.')},
+    ############################
+    ## global choice settings
+    ############################
+    'use_global_mask': {
+        'type': int,
+        'default': 1,
+        'name': 'Use global mask',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Select "True" to use the global settings for the '
+                    'detector mask and mask value. A "False" settings '
+                    'uses the local mask settings. Note: The mask value'
+                    ' will not be used for integrating but only for '
+                    'presentation or by using the MaskImage plugin.')},
+    ############################
+    ## pyFAI settings parameters
+    ############################
+    'int_rad_npoint': {
+        'type': int,
+        'default': 1000,
+        'name': 'Num points radial integration',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of bins in radial direction for the pyFAI '
+                    'integration.')},
+    'int_rad_unit': {
+        'type': str,
+        'default': '2theta / deg',
+        'name': 'Radial unit',
+        'choices': ['Q / nm^-1', 'Q / A^-1', '2theta / deg', '2theta / rad'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The unit and type of the azimuthal profile.'},
+    'int_rad_use_range': {
+        'type': int,
+        'default': 0,
+        'name': 'Use radial range',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Toggle to limit the radial integration range or use the '
+                    'full data range. If True, boundaries need to be defined '
+                    'in the lower and upper radial range Parameters.')},
+    'int_rad_range_lower': {
+        'type': float,
+        'default': 0,
+        'name': 'Radial lower range',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The lower boundary of the radial integration range. This'
+                    'setting is only used if "Use radial range" is  True. '
+                    'This value needs to be given in the unit selected as '
+                    'radial unit.')},
+    'int_rad_range_upper': {
+        'type': float,
+        'default': -1,
+        'name': 'Radial upper range',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The upper boundary of the radial integration range. This'
+                    ' setting is only used if "Use radial range" is  True. '
+                    'This value needs to be given in the unit selected as '
+                    'radial unit.')},
+    'int_azi_npoint': {
+        'type': int,
+        'default': 1000,
+        'name': 'Num points azimuthal integration',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The number of bins in azimuthal direction for the '
+                    'pyFAI integration.')},
+    'int_azi_unit': {
+        'type': str,
+        'default': 'chi / deg',
+        'name': 'Azimuthal unit',
+        'choices': ['chi / deg', 'chi / rad'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The unit and type of the azimuthal profile.'},
+    'int_azi_use_range': {
+        'type': int,
+        'default': 0,
+        'name': 'Use azimuthal range',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Toggle to limit the azimuthal integration range or use '
+                    'the full data range. If True, boundaries need to be '
+                    'defined in the lower and upper azimuthal range '
+                    'Parameters.')},
+    'int_azi_range_lower': {
+        'type': float,
+        'default': 0,
+        'name': 'Azimuthal lower range',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The lower boundary of the azimuthal integration range. '
+                    'This setting is only used if "Use azimuthal range" is '
+                    'True. This value needs to be given in the unit selected'
+                    ' as azimuthal unit.')},
+    'int_azi_range_upper': {
+        'type': float,
+        'default': -1,
+        'name': 'Azimuthal upper range',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The upper boundary of the azimuthal integration range. '
+                    'This setting is only used if "Use azimuthal range" is '
+                    'True. This value needs to be given in the unit selected '
+                    'as azimuthal unit.')},
+    'int_method': {
+        'type': str,
+        'default': 'CSR',
+        'name': 'PyFAI integration method',
+        'choices': ['CSR', 'CSR OpenCL', 'LUT', 'LUT OpenCL'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The integration method. For a full reference, please'
+                    ' visit the pyfai documentation available at: '
+                    'https://pyfai.readthedocs.io/')},
+    ############################
+    ## Autosave results settings
+    ############################
+    'autosave_results': {
+        'type': int,
+        'default': 0,
+        'name': 'Autosave results',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Save the results automatically after finishing '
+                    'processing. The results for each plugin will be saved '
+                    'in a separete file (or files if multiple formats have '
+                    'been selected).')},
+    'autosave_dir': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Autosave directory',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The directory for autosave files.'},
+    'autosave_format': {
+        'type': str,
+        'default': 'HDF5',
+        'name': 'Autosave formats',
+        'choices': ['None', 'HDF5'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The file format(s) for the data to be saved after the '
+                    'workflow has been excuted. All data will be saved in a '
+                    'single folder for each run with one file for each '
+                    'plugin.')},
+
+    ############################
+    ## Result selection settings
+    ############################
+    'selected_results': {
+        'type': str,
+        'default': 'No selection',
+        'name': 'Select node result to display',
+        'choices': ['No selection'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The selected node of the WorkflowTree to display '
+                    'the corresponding results.')},
+    # '': {
+    #     'type': int,
+    #     'default': ,
+    #     'name': '',
+    #     'choices': None,
+    #     'unit': '',
+    #     'allow_None': False,
+    #     'tooltip': },
+    }

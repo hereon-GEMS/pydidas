@@ -1,20 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-""" The dataset module includes subclasses of numpy.ndarray with additional
-embedded metadata."""
+"""
+The dataset module includes subclasses of numpy.ndarray with additional
+embedded metadata.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -31,7 +33,7 @@ from copy import copy
 
 import numpy as np
 
-from ..constants import DatasetConfigException
+from .exceptions import DatasetConfigException
 
 
 def _default_vals(ndim):
@@ -51,42 +53,12 @@ def _default_vals(ndim):
     return {i: None for i in range(ndim)}
 
 
-def _insert_axis_key(original_dict, dim):
-    """
-    Insert a new axis key at the specified dimension.
-
-    Parameters
-    ----------
-    original_dict : dict
-        The original dictionary.
-    dim : int
-        The dimension in front of which the new key shall be inserted.
-
-    Returns
-    -------
-    dict
-        The updated dict with a new key and the other (higher-dim)
-        keys shifted by one.
-    """
-    _copy = {}
-    for _key in sorted(original_dict):
-        if _key < dim:
-            _copy[_key] = original_dict[_key]
-        elif _key == dim:
-            _copy[_key] = None
-            _copy[_key + 1] = original_dict[_key]
-        else:
-            _copy[_key + 1] = original_dict[_key]
-    return _copy
-
-
 class EmptyDataset(np.ndarray):
     """
     Inherits from :py:class:`numpy.ndarray`
 
     Base class of an empty dataset (numpy.ndarray subclass) for instantiation.
     """
-
     __safe_for_unpickling__ = True
 
     def __new__(cls, *args, **kwargs):
@@ -102,7 +74,8 @@ class EmptyDataset(np.ndarray):
             _data = local_kws.get(key, _default_vals(obj.ndim))
             _labels = obj._get_dict(_data, '__new__')
             setattr(obj, key, _labels)
-        obj.metadata = local_kws.get('metadata', None)
+        obj.metadata = local_kws.get('metadata', {})
+        obj.getitem_key = None
         return obj
 
     def __getitem__(self, key):
@@ -120,8 +93,7 @@ class EmptyDataset(np.ndarray):
         pydidas.core.Dataset
             The sliced new dataset.
         """
-        self._getitem_key = ((key,) if isinstance(key, (Integral, slice))
-                             else key)
+        self.getitem_key = key if isinstance(key, tuple) else (key,)
         return super().__getitem__(key)
 
     def __array_finalize__(self, obj):
@@ -134,62 +106,110 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None or self.shape == tuple():
             return
+        self.metadata = getattr(obj, 'metadata', {})
+        self.getitem_key = getattr(obj, 'getitem_key', None)
+
+        self.__check_and_set_default_axis_attributes()
+        self._keys = {_key: copy(getattr(obj, _key, _default_vals(self.ndim)))
+                      for _key in ['axis_labels', 'axis_ranges', 'axis_units']}
+
+        if self.getitem_key is not None:
+            self.__modify_axis_keys()
+        self.__update_keys_for_flattened_array()
+
+        for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
+            setattr(self, f'_{_key}', self._keys[_key])
+        if isinstance(obj, EmptyDataset):
+            obj.getitem_key = None
+        self.getitem_key = None
+
+    def __check_and_set_default_axis_attributes(self):
+        """
+        Check whether the attributes for axis_labels, -units and -ranges exist
+        and initialize them with default values if not.
+        """
         for _att in ['_axis_labels', '_axis_units', '_axis_ranges']:
             if not hasattr(self, _att):
                 setattr(self, _att, _default_vals(self.ndim))
-        self.metadata = getattr(obj, 'metadata', None)
-        self._getitem_key = getattr(obj, '_getitem_key', None)
-        _keys = {_key: copy(getattr(obj, _key, _default_vals(self.ndim)))
-                 for _key in ['axis_labels', 'axis_ranges', 'axis_units']}
-        if self._getitem_key is not None:
-            self.__modify_axis_keys(_keys)
-        self.__update_keys_for_flattened_array(_keys)
-        for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
-            setattr(self, _key, list(_keys[_key].values()))
-        self._getitem_key = None
-        if isinstance(obj, EmptyDataset):
-            obj._getitem_key = None
 
-    def __modify_axis_keys(self, keys):
+    def __modify_axis_keys(self):
         """
         Modify the axis keys (axis_labels, -_units, and -_ranges) and store
         the new values in place.
+        """
+        for _dim, _cutter in enumerate(self.getitem_key):
+            # in the case of a masked array, keep all axis keys.
+            if isinstance(_cutter, np.ndarray) and _cutter.ndim > 1:
+                return
+            if isinstance(_cutter, Integral):
+                self.__store_keys_in_metadata(_dim, _cutter)
+                for _item in ['axis_labels', 'axis_units', 'axis_ranges']:
+                    del self._keys[_item][_dim]
+            elif isinstance(_cutter, (slice, Iterable, np.ndarray)):
+                if self._keys['axis_ranges'][_dim] is not None:
+                    self._keys['axis_ranges'][_dim] = (
+                        self._keys['axis_ranges'][_dim][_cutter])
+            elif _cutter is None:
+                self.__insert_axis_keys(_dim)
+        # finally, shift all keys to have a consistent numbering:
+        for _item in ['axis_labels', 'axis_units', 'axis_ranges']:
+            _itemdict = self._keys[_item]
+            _newkeys = {_index: _itemdict[_key] for _index, _key
+                        in enumerate(sorted(_itemdict))}
+            self._keys[_item] = _newkeys
+
+    def __store_keys_in_metadata(self, dim, cutter):
+        """
+        Store the sliced key in the metadata.
 
         Parameters
         ----------
-        keys : dict
-            A dictionary with the axis keys.
+        dim : int
+            The sliced dimension.
+        cutter : Union[int, slice]
+            The cutting object to reduce the specified dimension.
         """
-        if (isinstance(self._getitem_key, np.ndarray)
-                and self._getitem_key.ndim > 1):
-            return
-        for _dim, _cutter in enumerate(self._getitem_key):
-            if isinstance(_cutter, Integral):
-                for _item in ['axis_labels', 'axis_units', 'axis_ranges']:
-                    del keys[_item][_dim]
-            elif isinstance(_cutter, (slice, Iterable)):
-                if keys['axis_ranges'][_dim] is not None:
-                    keys['axis_ranges'][_dim] = (
-                        keys['axis_ranges'][_dim][_cutter])
-            elif _cutter is None:
-                for _item in ['axis_labels', 'axis_units', 'axis_ranges']:
-                    keys[_item] = _insert_axis_key(keys[_item], _dim)
+        for _item in ['axis_labels', 'axis_units']:
+            _refkey = f'sliced_dim_{dim:02d}_{_item[5:-1]}'
+            self.metadata[_refkey] = self._keys[_item][dim]
+        _refkey = f'sliced_dim_{dim:02d}_range_value'
+        if self._keys['axis_ranges'][dim] is not None:
+            self.metadata[_refkey] = self._keys['axis_ranges'][dim][cutter]
+        else:
+            self.metadata[_refkey] = None
 
-    def __update_keys_for_flattened_array(self, keys):
+    def __insert_axis_keys(self, dim):
+        """
+        Insert a new axis key at the specified dimension.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension in front of which the new key shall be inserted.
+        """
+        for _item in ['axis_labels', 'axis_units', 'axis_ranges']:
+            _copy = {}
+            _dict = self._keys[_item]
+            for _key in sorted(_dict):
+                if _key < dim:
+                    _copy[_key] = _dict[_key]
+                elif _key == dim:
+                    _copy[_key] = None
+                    _copy[_key + 1] = _dict[_key]
+                else:
+                    _copy[_key + 1] = _dict[_key]
+            self._keys[_item] = _copy
+
+    def __update_keys_for_flattened_array(self):
         """
         Update the keys for flattened arrays.
-
-        Parameters
-        ----------
-        keys : dict
-            A dictionary with the axis keys.
         """
-        if self.ndim == 1 and (len(keys['axis_ranges']) > 1
-                               or len(keys['axis_units']) > 1
-                               or len(keys['axis_labels']) > 1):
-            keys['axis_labels'] = {0: 'Flattened'}
-            keys['axis_ranges'] = {0: np.arange(self.size)}
-            keys['axis_units'] = {0: ''}
+        if self.ndim == 1 and (len(self._keys['axis_ranges']) > 1
+                               or len(self._keys['axis_units']) > 1
+                               or len(self._keys['axis_labels']) > 1):
+            self._keys['axis_labels'] = {0: 'Flattened'}
+            self._keys['axis_ranges'] = {0: np.arange(self.size)}
+            self._keys['axis_units'] = {0: ''}
 
     def flatten(self, order='C'):
         """
@@ -594,5 +614,5 @@ class Dataset(EmptyDataset):
         obj.axis_units = kwargs.get('axis_units', _default_vals(obj.ndim))
         obj.axis_labels = kwargs.get('axis_labels', _default_vals(obj.ndim))
         obj.axis_ranges = kwargs.get('axis_ranges', _default_vals(obj.ndim))
-        obj.metadata = kwargs.get('metadata', None)
+        obj.metadata = kwargs.get('metadata', {})
         return obj

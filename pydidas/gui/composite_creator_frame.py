@@ -1,20 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the CompositeCreatorFrame which allows to combine images to
-mosaics."""
+"""
+Module with the CompositeCreatorFrame which allows to combine images to
+mosaics.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -32,23 +34,19 @@ import numpy as np
 from PyQt5 import QtWidgets, QtCore
 
 from ..apps import CompositeCreatorApp
-from ..core import Parameter, get_generic_parameter
-from ..constants import HDF5_EXTENSIONS, AppConfigError
+from ..core import Parameter, get_generic_parameter, AppConfigError
+from ..core.constants import HDF5_EXTENSIONS
 from ..widgets import BaseFrameWithApp, dialogues
-from ..widgets.parameter_config import ParameterWidgetsMixIn
-from ..utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
+from ..core.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                            LOGGING_LEVEL)
 from ..multiprocessing import AppRunner
-from .builders.composite_creator_frame_builder import (
-    create_composite_creator_frame_widgets_and_layout)
-from .mixins import SilxPlotWindowMixIn
+from ..gui.builders import CompositeCreator_FrameBuilder
+
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
 
-class CompositeCreatorFrame(BaseFrameWithApp,
-                            ParameterWidgetsMixIn,
-                            SilxPlotWindowMixIn):
+class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
     visualization.
@@ -56,8 +54,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrameWithApp.__init__(self, parent)
-        ParameterWidgetsMixIn.__init__(self)
-        SilxPlotWindowMixIn.__init__(self)
+        CompositeCreator_FrameBuilder.__init__(self)
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
@@ -68,7 +65,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         self._update_timer = 0
         self._create_param_collection()
 
-        create_composite_creator_frame_widgets_and_layout(self)
+        self.build_frame()
         self.connect_signals()
         self.setup_initial_state()
 
@@ -297,7 +294,7 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         if self.get_param_value('live_processing') or os.path.isfile(fname):
             return True
         if fname not in ['', '.']:
-            dialogues.CriticalWarning(
+            dialogues.critical_warning(
                 'File does not exist',
                 f'The selected file\n\n"{fname}"\n\ndoes not exist.')
             self.__clear_entries(['first_file'], hide=False)
@@ -406,14 +403,13 @@ class CompositeCreatorFrame(BaseFrameWithApp,
             _flag = True
         else:
             self.__clear_entries(['bg_hdf5_key'], hide=False)
-            dialogues.CriticalWarning(
+            dialogues.critical_warning(
                 'Dataset key error',
                 (f'The selected file\n\n"{_fname}"\n\ndoes not have the '
                  f'selected dataset\n\n"{_dset}"'))
             _flag = False
         self._config['bg_configured'] = _flag
         self.__check_exec_enable()
-
 
     def __reset_params(self, keys=None):
         """
@@ -607,30 +603,3 @@ class CompositeCreatorFrame(BaseFrameWithApp,
         for _key in ['file_stepping', 'composite_nx', 'composite_ny']:
             self.toggle_param_widget_visibility(_key, flag)
         self._widgets['but_exec'].setEnabled(flag)
-
-
-if __name__ == '__main__':
-    import pydidas
-    from pydidas.gui.main_window import MainWindow
-    import sys
-    import qtawesome as qta
-    app = QtWidgets.QApplication(sys.argv)
-    #app.setStyle('Fusion')
-
-    # needs to be initialized after the app has been created.
-    # sys.excepthook = pydidas.widgets.excepthook
-    CENTRAL_WIDGET_STACK = pydidas.widgets.CentralWidgetStack()
-    STANDARD_FONT_SIZE = pydidas.constants.STANDARD_FONT_SIZE
-
-    _font = app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    app.setFont(_font)
-    gui = MainWindow()
-
-    gui.register_frame('Test', 'Test', qta.icon('mdi.clipboard-flow-outline'),
-                       CompositeCreatorFrame)
-    gui.create_toolbars()
-
-    gui.show()
-    sys.exit(app.exec_())
-    app.deleteLater()

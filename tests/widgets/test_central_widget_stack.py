@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -34,6 +34,9 @@ from pydidas.widgets.central_widget_stack import CentralWidgetStack
 
 
 class TestWidget(QtWidgets.QWidget):
+    ref_name = ''
+    title = ''
+    menuicon = None
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -102,7 +105,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         _names = stack.get_all_widget_names()
         self.assertEqual(len(self.widgets), len(_names))
         for w in self.widgets:
-            self.assertTrue(w.name in _names)
+            self.assertTrue(w.ref_name in _names)
 
     def test_activate_widget_by_name(self):
         stack = self.create_stack()
@@ -165,7 +168,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         w = self.widgets[0]
         stack.change_reference_name(_new, w)
         self.assertIn(_new, stack.widget_indices)
-        self.assertEqual(w.name, _new)
+        self.assertEqual(w.ref_name, _new)
 
     def test_change_reference_name__with_unregistered_widget(self):
         _new = 'The new widget name'

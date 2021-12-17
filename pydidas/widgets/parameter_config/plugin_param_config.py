@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -32,16 +32,15 @@ from pathlib import Path
 from PyQt5 import QtWidgets, QtCore
 
 from ...core import Hdf5key
-from .parameter_collection_config_widget import ParameterCollectionEditWidget
-from ..create_widgets_mixin import CreateWidgetsMixIn
-from ..utilities import deleteItemsOfLayout
+from ..factory import CreateWidgetsMixIn
+from ..utilities import delete_all_items_in_layout
+from .parameter_edit_frame import ParameterEditFrame
 
 
-class PluginParameterConfigWidget(ParameterCollectionEditWidget,
-                                  CreateWidgetsMixIn):
+class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
     """
     The PluginParameterConfigWidget widget creates the composite widget for
-    updating Parameters and changing default values.
+    updating and changing values of all Parameters in a Plugin.
 
     Depending on the Parameter types, automatic typechecks are implemented.
     """
@@ -58,7 +57,7 @@ class PluginParameterConfigWidget(ParameterCollectionEditWidget,
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterCollectionEditWidget.__init__(self, parent)
+        ParameterEditFrame.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
@@ -93,18 +92,18 @@ class PluginParameterConfigWidget(ParameterCollectionEditWidget,
         for i in reversed(range(_layout.count())):
             item = _layout.itemAt(i)
             if isinstance(item, QtWidgets.QLayout):
-                deleteItemsOfLayout(item)
+                delete_all_items_in_layout(item)
                 _layout.removeItem(item)
                 item.deleteLater()
             elif isinstance(item.widget(), QtWidgets.QWidget):
-                widgetToRemove = item.widget()
-                _layout.removeWidget(widgetToRemove)
-                widgetToRemove.setParent(None)
-                widgetToRemove.deleteLater()
+                _widget_to_remove = item.widget()
+                _layout.removeWidget(_widget_to_remove)
+                _widget_to_remove.setParent(None)
+                _widget_to_remove.deleteLater()
             elif isinstance(item, QtWidgets.QSpacerItem):
                 _layout.removeItem(item)
-        self.param_textwidgets = {}
         self.param_widgets = {}
+        self.param_composite_widgets = {}
 
     def __create_widgets_for_new_plugin(self):
         """

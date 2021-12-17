@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -36,15 +36,15 @@ from PyQt5 import QtCore
 
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
-from pydidas.core import get_generic_parameter
-from pydidas.constants import AppConfigError
-from pydidas.workflow import WorkflowTree, WorkflowResults, ScanSettings
+from pydidas.core import get_generic_parameter, AppConfigError
+from pydidas.experiment import ScanSetup
+from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 from pydidas.plugins import PluginCollection
 from pydidas import unittest_objects
 
 TREE = WorkflowTree()
-SCAN = ScanSettings()
+SCAN = ScanSetup()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultSaverMeta
 COLL = PluginCollection()

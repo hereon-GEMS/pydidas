@@ -1,20 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the BaseFrame, the main window widget from which all
-main frames should inherit."""
+"""
+Module with the BaseFrame, the widget from which all main pydidas frames
+should inherit.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -26,7 +28,7 @@ __all__ = ['BaseFrame']
 
 from PyQt5 import QtWidgets, QtCore
 
-from .create_widgets_mixin import CreateWidgetsMixIn
+from .factory import CreateWidgetsMixIn
 from ..core import (ParameterCollection, PydidasQsettingsMixin,
                     ParameterCollectionMixIn)
 
@@ -36,36 +38,30 @@ class BaseFrame(QtWidgets.QFrame,
                 PydidasQsettingsMixin,
                 CreateWidgetsMixIn):
     """
-    Inherits from :py:class:`PyQt5.QtWidgets.QFrame`,
-    :py:class:`pydidas.core.ParameterCollectionMixIn`,
-    :py:class:`pydidas.core.PydidasQsettingsMixin`,
-    :py:class:`pydidas.widgets.CreateWidgetsMixIn`.
-
     The BaseFrame is a subclassed QFrame and should be used as the
     base class for all Frames in pydidas.
 
     By default, a QGridLayout is applied with an alignment of left/top.
+
+    Parameters
+    ----------
+    parent : Union[QWidget, None], optional
+        The parent widget. The default is None.
+    init_layout : bool, optional
+        Flag to initialize the frame layout with a QtWidgets.QGridLayout
+        and left / top alignment. If False, no layout will be initialized
+        and the subclass is responsible for setting up the layout. The
+        default is True.
+    **kwargs : object
+        Any additional keyword arguments which might be used by
+        subclasses.
     """
+    show_frame = True
+    menuicon = 'qt-std::7'
     status_msg = QtCore.pyqtSignal(str)
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        """
-        Initialize the BaseFrame instance.
-
-        Parameters
-        ----------
-        parent : Union[QWidget, None], optional
-            The parent widget. The default is None.
-        initLayout : bool, optional
-            Flag to initialize the frame layout with a QtWidgets.QGridLayout
-            and left / top alignment. If False, no layout will be initialized
-            and the subclass is responsible for setting up the layout. The
-            default is True.
-        **kwargs : object
-            Any additional keyword arguments which might be used by
-            subclasses.
-        """
         CreateWidgetsMixIn.__init__(self)
         QtWidgets.QFrame.__init__(self, parent=parent)
         PydidasQsettingsMixin.__init__(self)
@@ -73,12 +69,14 @@ class BaseFrame(QtWidgets.QFrame,
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
 
-        init_layout = kwargs.get('initLayout', True)
+        init_layout = kwargs.get('init_layout', True)
         if init_layout:
             _layout = QtWidgets.QGridLayout()
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
+        self.ref_name = ''
+        self.title = ''
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):

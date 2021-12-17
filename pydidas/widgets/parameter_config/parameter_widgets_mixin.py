@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -26,11 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterWidgetsMixIn']
 
-
 from PyQt5 import QtWidgets, QtCore
 
 from .parameter_config_widget import ParameterConfigWidget
-from ...constants import WidgetLayoutError
+from ...core import WidgetLayoutError
 
 
 class ParameterWidgetsMixIn:
@@ -39,7 +38,7 @@ class ParameterWidgetsMixIn:
     to other classes without having to inherit from ParameterConfigWidget to
     avoid multiple inheritance from QtWidgets.QFrame.
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.param_widgets = {}
         self.param_composite_widgets = {}
 

@@ -1,20 +1,23 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the BaseFrame, the main window widget from which all
-main frames should inherit."""
+"""
+Module with the BaseFrameWithApp, a subclass of the BaseFrame from which all
+main pydidas frames should inherit. This subclass includes some methods for
+using a pydidas App in multiprocessing.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -35,33 +38,29 @@ class BaseFrameWithApp(BaseFrame):
     The BaseFrameWithApp is a subclassed BaseFrame and should be used as the
     base class for all Frames with an associated Application in the pydidas
     suite.
-    It adds a name attribute and registration routines with the
-    CentralWidgetStack.
 
-    By default, a QGridLayout is applied with an alignment of left/top.
+    It adds (internal) methods required for running a pydidas app to the
+    BaseFrame.
+
+    Parameters
+    ----------
+    parent : Union[QWidget, None], optional
+        The parent widget. The default is None.
+    name : Union[str, None], optional
+        The reference name of the widget for the CentralWidgetStack.
+        The default is None.
+    init_layout : bool
+        Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
+        If False, no layout will be initialized and the subclass is
+        responsible for setting up the layout. The default is True.
+    **kwargs : object
+        Any additional keyword arguments.
     """
     status_msg = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None, **kwargs):
-        """
-        Initialize the BaseFrame instance.
-
-                Parameters
-        ----------
-        parent : Union[QWidget, None], optional
-            The parent widget. The default is None.
-        name : Union[str, None], optional
-            The reference name of the widget for the CentralWidgetStack.
-            The default is None.
-        initLayout : bool
-            Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
-            If False, no layout will be initialized and the subclass is
-            responsible for setting up the layout. The default is True.
-        **kwargs : object
-            Any additional keyword arguments.
-        """
-        init_layout = kwargs.get('initLayout', True)
-        super().__init__(parent=parent, initLayout=init_layout)
+        init_layout = kwargs.get('init_layout', True)
+        BaseFrame.__init__(self, parent=parent, init_layout=init_layout)
         self._app = None
         self._runner = None
         self._app_attributes_to_update = []
@@ -83,8 +82,8 @@ class BaseFrameWithApp(BaseFrame):
             self._app.slave_mode = False
             return
         for param_key in app.params:
-            self._app.set_param_value(param_key,
-                                      app.get_param_value(param_key))
+            self._app.set_param_value(
+                param_key, app.get_param_value(param_key))
         self._app._config.update(app._config)
         for att in self._app_attributes_to_update:
             _att_val = getattr(app, att)

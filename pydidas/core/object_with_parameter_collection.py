@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -157,6 +157,27 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         return self.params[param_key]
 
+    def get_params(self, *param_keys):
+        """
+        Get multiple parameters based on their reference keys.
+
+        Parameters
+        ----------
+        *param_keys : str
+            Any number of reference keys.
+
+        Returns
+        -------
+        list
+            A list with the Parameter instances referenced by the supplied
+            keys.
+        """
+        _params = []
+        for _key in param_keys:
+            self._check_key(_key)
+            _params.append(self.params[_key])
+        return _params
+
     def set_param_value(self, param_key, value):
         """
         Set a parameter value.
@@ -288,18 +309,13 @@ class ParameterCollectionMixIn:
 class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn,
                                     PydidasQsettingsMixin):
     """
-    Inherits from :py:class:`pydidas.core.ParameterCollectionMixIn
-    <pydidas.core.ParameterCollectionMixIn>`, :py:class:`PyQt5.QtCore.QObject`
-
     An object with a ParameterCollection.
 
     This class can be inherited by any class which requires a
-    ParameterCollection and access methods for it.
+    ParameterCollection and access methods defined for it in the
+    ParameterCollectionMixIn.
     """
     def __init__(self):
-        """
-        Create a Base instance.
-        """
         PydidasQsettingsMixin.__init__(self)
         QtCore.QObject.__init__(self)
         self.params = ParameterCollection()

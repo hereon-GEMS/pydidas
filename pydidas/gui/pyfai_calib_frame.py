@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -24,13 +24,12 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PyfaiCalibFrame']
+__all__ = ['PyfaiCalibFrame', 'get_pyfai_calib_icon']
 
 import os
-from PyQt5 import QtWidgets, QtGui, QtCore
-
 import functools
 
+from PyQt5 import QtWidgets, QtGui, QtCore
 import pyFAI
 from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.utils import projecturl
@@ -39,43 +38,69 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.app.calib2 import parse_options, setup_model
 
 from ..widgets import BaseFrame
-from ..core.experimental_settings import ExperimentalSettings
+from ..experiment import ExperimentalSetup
 
-EXP_SETTINGS = ExperimentalSettings()
 
-settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
-                            QtCore.QSettings.UserScope,
-                            "pyfai",
-                            "pyfai-calib2",
-                            None)
+EXP_SETTINGS = ExperimentalSetup()
+
+PYFAI_SETTINGS = QtCore.QSettings(
+    QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope,
+    "pyfai", "pyfai-calib2", None)
 
 CalibrationContext._releaseSingleton()
-context = CalibrationContext(settings)
-context.restoreSettings()
+CALIB_CONTEXT = CalibrationContext(PYFAI_SETTINGS)
+CALIB_CONTEXT.restoreSettings()
 options = parse_options()
-setup_model(context.getCalibrationModel(), options)
+setup_model(CALIB_CONTEXT.getCalibrationModel(), options)
 
 
-def pyfaiCalibIcon():
-    return QtGui.QIcon('\\'.join([os.path.dirname(pyFAI.__file__),
-                                  'resources', 'gui', 'images', 'icon.png']))
+def get_pyfai_calib_icon():
+    """
+    Get the pyFAI calibration icon.
+
+    Returns
+    -------
+    QtGui.QIcon
+        A QIcon instance with the calibration icon.
+    """
+    return QtGui.QIcon(
+        os.sep.join([os.path.dirname(pyFAI.__file__),
+                     'resources', 'gui', 'images', 'icon.png']))
 
 
 def pyfaiRingIcon():
-    return QtGui.QIcon('\\'.join([os.path.dirname(pyFAI.__file__),
-                                  'resources', 'gui', 'icons',
-                                  'task-identify-rings.svg']))
+    """
+    Get the pyFAI ring icon.
+
+    Returns
+    -------
+    QtGui.QIcon
+        A QIcon instance with the ring icon.
+    """
+    return QtGui.QIcon(
+        os.sep.join([os.path.dirname(pyFAI.__file__),
+                     'resources', 'gui', 'icons', 'task-identify-rings.svg']))
 
 
 class PyfaiCalibFrame(BaseFrame):
+    """
+    A pyFAI Calibration frame similar to the "pyfai-calib2", adapted to be
+    used within pydidas.
+
+    Note: Because this code is taking almost 100 % from pyFAI, the names,
+    nomenclature and code structure is different from the rest of pydidas.
+
+    Acknowledgements go to the creators of pyFAI for making it freely
+    available.
+    """
     def __init__(self, **kwargs):
         mainWindow = kwargs.get('mainWindow', None)
         parent = kwargs.get('parent', None)
-        super().__init__(parent, initLayout=False)
+        super().__init__(parent)
         if mainWindow:
-            context.setParent(mainWindow)
+            CALIB_CONTEXT.setParent(mainWindow)
         else:
-            context.setParent(self)
+            CALIB_CONTEXT.setParent(self)
 
         self._list = QtWidgets.QListWidget(self)
         self._list.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -88,15 +113,12 @@ class PyfaiCalibFrame(BaseFrame):
         self._stack.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                  QtWidgets.QSizePolicy.Expanding)
 
-        _layout = QtWidgets.QGridLayout()
-        _layout.addWidget(self._list, 0, 0, 1, 1)
-        _layout.addWidget(self._help, 1, 0, 1, 1)
-        _layout.addWidget(self._stack, 0, 1, 2, 1)
+        self.layout().addWidget(self._list, 0, 0, 1, 1)
+        self.layout().addWidget(self._help, 1, 0, 1, 1)
+        self.layout().addWidget(self._stack, 0, 1, 2, 1)
 
-        self.setLayout(_layout)
-
-        self.__context = context
-        model = context.getCalibrationModel()
+        self.__context = CALIB_CONTEXT
+        model = CALIB_CONTEXT.getCalibrationModel()
 
         self.__menu_connections = {}
         self.__tasks = self.createTasks()

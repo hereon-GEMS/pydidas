@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,8 +28,8 @@ import random
 
 from PyQt5 import  QtWidgets
 
-from pydidas.constants import WidgetLayoutError
-from pydidas.widgets.create_widgets_mixin import (
+from pydidas.core import WidgetLayoutError
+from pydidas.widgets.factory.create_widgets_mixin import (
     CreateWidgetsMixIn, _get_widget_layout_args, _get_grid_pos)
 
 
@@ -95,12 +95,12 @@ class TestCreateWidgetsMixin(unittest.TestCase):
         _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
         self.assertEqual(_grid_pos, (_nwidget, ) + _gridPos[1:])
 
-    def test__get_widget_layout_args_no_layout(self):
+    def test_get_widget_layout_args_no_layout(self):
         obj = TestWidget()
         with self.assertRaises(WidgetLayoutError):
             _get_widget_layout_args(obj)
 
-    def test__get_widget_layout_box(self):
+    def test_get_widget_layout_box(self):
         _stretch = 1.3
         _alignment = 'random'
         obj = TestWidget()
@@ -109,7 +109,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
                                         alignment=_alignment)
         self.assertEqual(items, [_stretch, _alignment])
 
-    def test__get_widget_layout_stacked(self):
+    def test_get_widget_layout_stacked(self):
         _stretch = 1.3
         _alignment = 'random'
         obj = TestWidget()
@@ -118,7 +118,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
                                         alignment=_alignment)
         self.assertEqual(items, [])
 
-    def test__get_widget_layout_grid_no_alignment(self):
+    def test_get_widget_layout_grid_no_alignment(self):
         _gridPos = (2, 7, 5, 3)
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
@@ -126,7 +126,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
                                         alignment=None)
         self.assertEqual(items, [*_gridPos])
 
-    def test__get_widget_layout_grid(self):
+    def test_get_widget_layout_grid(self):
         _gridPos = (2, 7, 5, 3)
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())

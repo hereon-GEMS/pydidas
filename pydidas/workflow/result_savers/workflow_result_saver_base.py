@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
@@ -27,7 +27,7 @@ __all__ = ['WorkflowResultSaverBase']
 
 
 from .workflow_result_saver_meta import WorkflowResultSaverMeta
-from ...core.io import GenericIoBase
+from ...core.io_registry import GenericIoBase
 
 
 class WorkflowResultSaverBase(GenericIoBase,

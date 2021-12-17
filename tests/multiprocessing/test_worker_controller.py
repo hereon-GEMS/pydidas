@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,7 +31,7 @@ import numpy as np
 
 from PyQt5 import QtCore, QtWidgets, QtTest
 from pydidas.multiprocessing import WorkerController
-from pydidas.utils import pydidas_logger, get_time_string
+from pydidas.core.utils import pydidas_logger, get_time_string
 
 logger = pydidas_logger()
 

@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -26,20 +26,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['AppRunner']
 
-
-import logging
 import multiprocessing as mp
 
 from PyQt5 import QtCore
 
 from ..apps import BaseApp
-from ..utils import pydidas_logger
+from ..core.utils import pydidas_logger, LOGGING_LEVEL
 from .worker_controller import WorkerController
-from ._app_processor import app_processor
+from .app_processor_ import app_processor
 
 
 logger = pydidas_logger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(LOGGING_LEVEL)
 
 
 class AppRunner(WorkerController):
@@ -165,12 +163,13 @@ class AppRunner(WorkerController):
         self._flag_active = True
         self.__progress_done = 0
 
-    def _cycle_post_run(self):
+    def _cycle_post_run(self, timeout=10):
         """
         Perform finishing operations of the App and close the multiprocessing
         Processes.
         """
         self._join_workers()
+        self._wait_for_worker_finished_signals(timeout)
         self.__app.multiprocessing_post_run()
         self.final_app_state.emit(self.__app.get_copy())
 

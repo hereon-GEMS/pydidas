@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -31,12 +31,12 @@ from copy import copy
 from numbers import Integral
 
 from ..plugins import BasePlugin
-from ..utils import pydidas_logger
+from ..core.utils import pydidas_logger, LOGGING_LEVEL
 from .generic_node import GenericNode
 
 
 logger = pydidas_logger()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(LOGGING_LEVEL)
 
 
 class WorkflowNode(GenericNode):
@@ -222,8 +222,7 @@ class WorkflowNode(GenericNode):
                     children=_children,
                     plugin_class=self.plugin.__class__.__name__,
                     plugin_params=[p.export_refkey_and_value()
-                                   for p in self.plugin.params.values()]
-                    )
+                                   for p in self.plugin.params.values()])
         return _rep
 
     def propagate_shapes_and_global_config(self):

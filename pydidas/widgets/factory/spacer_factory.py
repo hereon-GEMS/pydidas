@@ -1,21 +1,21 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with a factory function to create formatted lines as a formatted
-QFrame."""
+Module with a factory function to create a QSpacerItem.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -46,6 +46,10 @@ def create_spacer(**kwargs):
     policy : QtWidgets.QSizePolicy, optional
         The size policy for the spacer (applied both horizontally and
         vertically). The default is QtWidgets.QSizePolicy.Minimum.
+    vertical_policy : QtWidgets.QSizePolicy, optional
+        The vertical size policy for the spacer. This setting will overwrite
+        the general "policy" settings. The default is
+        QtWidgets.QSizePolicy.Minimum.
 
     Returns
     -------
@@ -53,8 +57,10 @@ def create_spacer(**kwargs):
         The new spacer.
     """
     _policy = kwargs.get('policy', QSizePolicy.Minimum)
+    _vertical_policy = kwargs.get('vertical_policy', _policy)
     _spacer = QSpacerItem(kwargs.get('fixedHeight', 20),
-                          kwargs.get('fixedWidth', 20), _policy, _policy)
+                          kwargs.get('fixedWidth', 20),
+                          _policy, _vertical_policy)
 
     apply_widget_properties(_spacer, **kwargs)
     return _spacer

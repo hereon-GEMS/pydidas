@@ -1,15 +1,15 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,10 +27,11 @@ __status__ = "Development"
 __all__ = ['Hdf5singleFileLoader']
 
 
+from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.plugins import InputPlugin, INPUT_PLUGIN
+from pydidas.plugins import InputPlugin
 from pydidas.image_io import read_image
-from pydidas.utils import copy_docstring, get_hdf5_metadata
+from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 
 
 class Hdf5singleFileLoader(InputPlugin):

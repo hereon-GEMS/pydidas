@@ -1,20 +1,22 @@
 # This file is part of pydidas.
-
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-
+#
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the ImageReader base class from which all readers should
-inherit."""
+"""
+Module with the ImageReader base class from which all readers should
+inherit.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -25,7 +27,7 @@ __status__ = "Development"
 __all__ = ['ImageReader']
 
 from .rebin_2d import rebin2d
-from .roi_manager import RoiManager
+from .roi_controller import RoiController
 
 
 class ImageReader:
@@ -34,7 +36,7 @@ class ImageReader:
     def __init__(self):
         """Initialization"""
         self._image = None
-        self._RoiManager = RoiManager()
+        self._roi_controller = RoiController()
 
     def read_image(self, filename, **kwargs):
         """
@@ -44,7 +46,7 @@ class ImageReader:
         """
         raise NotImplementedError
 
-    def return_image(self, *args, **kwargs):
+    def return_image(self, **kwargs):
         """
         Return the stored image
 
@@ -79,13 +81,13 @@ class ImageReader:
             The image in form of an ndarray
         """
         _return_type = kwargs.get('datatype', 'auto')
-        self._RoiManager.roi = kwargs.get('roi', None)
+        self._roi_controller.roi = kwargs.get('roi', None)
         _binning = kwargs.get('binning', 1)
         if self._image is None:
             raise ValueError('No image has been read.')
         _image = self._image
-        if self._RoiManager.roi is not None:
-            _image = _image[self._RoiManager.roi]
+        if self._roi_controller.roi is not None:
+            _image = _image[self._roi_controller.roi]
         if _binning != 1:
             _image = rebin2d(_image, int(_binning))
         if _return_type not in ('auto', _image.dtype):

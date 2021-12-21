@@ -22,10 +22,10 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import random
 import sys
-import itertools
 import tempfile
 import shutil
 import copy
@@ -33,12 +33,11 @@ import copy
 import numpy as np
 from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
 
-from pydidas.widgets.workflow_edit.plugin_collection_browser import (
-    PluginCollectionBrowser)
-from pydidas.widgets.workflow_edit.plugin_collection_tree_widget import (
-    PluginCollectionTreeWidget)
+from pydidas.widgets.workflow_edit import (
+    PluginCollectionBrowser, PluginCollectionTreeWidget)
 from pydidas.unittest_objects.dummy_plugin_collection import (
     DummyPluginCollection)
+
 
 _typemap = {0: 'input', 1: 'proc', 2: 'output'}
 

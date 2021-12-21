@@ -22,26 +22,22 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
-import tempfile
-import shutil
-import os
 from numbers import Real
 
 import numpy as np
 
-from pydidas import unittest_objects
-from pydidas.workflow import WorkflowNode, WorkflowTree, WorkflowResults
+from pydidas.core import Dataset, get_generic_parameter, Parameter
 from pydidas.experiment import ScanSetup
-from pydidas.core import Dataset
-from pydidas.unittest_objects.dummy_loader import DummyLoader
-from pydidas.unittest_objects.dummy_proc import DummyProc
-from pydidas.core import AppConfigError, get_generic_parameter, Parameter
-from pydidas.plugins import PluginCollection
+from pydidas.unittest_objects import DummyProc, DummyLoader
+from pydidas.workflow import WorkflowTree, WorkflowResults
+
 
 SCAN = ScanSetup()
 TREE = WorkflowTree()
 RES = WorkflowResults()
+
 
 class TestWorkflowResults(unittest.TestCase):
 
@@ -63,10 +59,12 @@ class TestWorkflowResults(unittest.TestCase):
         SCAN.set_param_value('scan_dim', len(self._scan_n))
         for _dim in range(len(self._scan_n)):
             SCAN.set_param_value(f'n_points_{_dim + 1}', self._scan_n[_dim])
-            SCAN.set_param_value(f'offset_{_dim + 1}', self._scan_offsets[_dim])
+            SCAN.set_param_value(f'offset_{_dim + 1}',
+                                 self._scan_offsets[_dim])
             SCAN.set_param_value(f'delta_{_dim + 1}', self._scan_delta[_dim])
             SCAN.set_param_value(f'unit_{_dim + 1}', self._scan_unit[_dim])
-            SCAN.set_param_value(f'scan_dir_{_dim + 1}', self._scan_label[_dim])
+            SCAN.set_param_value(f'scan_dir_{_dim + 1}',
+                                 self._scan_label[_dim])
 
     def set_up_tree(self):
         self._input_shape = (127, 324)
@@ -226,10 +224,10 @@ class TestWorkflowResults(unittest.TestCase):
         _scan_indices = SCAN.get_frame_position_in_scan(_index)
         self.assertTrue(
             np.equal(_results[1],
-                      RES._WorkflowResults__composites[1][_scan_indices]).all())
+                     RES._WorkflowResults__composites[1][_scan_indices]).all())
         self.assertTrue(
             np.equal(_results[2],
-                      RES._WorkflowResults__composites[2][_scan_indices]).all())
+                     RES._WorkflowResults__composites[2][_scan_indices]).all())
 
     def test_store_results__no_previous_metadata(self):
         _index = 247
@@ -243,10 +241,10 @@ class TestWorkflowResults(unittest.TestCase):
         _scan_indices = SCAN.get_frame_position_in_scan(_index)
         self.assertTrue(
             np.equal(_results[1],
-                      RES._WorkflowResults__composites[1][_scan_indices]).all())
+                     RES._WorkflowResults__composites[1][_scan_indices]).all())
         self.assertTrue(
             np.equal(_results[2],
-                      RES._WorkflowResults__composites[2][_scan_indices]).all())
+                     RES._WorkflowResults__composites[2][_scan_indices]).all())
         self.assertTrue(RES._config['metadata_complete'])
 
     def test_update_frame_metadata(self):

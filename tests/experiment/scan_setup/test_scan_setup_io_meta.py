@@ -28,16 +28,16 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.experimental_setup import (
-    ExperimentalSetup, ExperimentalSetupIoBase, ExperimentalSetupIoMeta)
+from pydidas.experiment.scan_setup import (
+    ScanSetup, ScanSetupIoBase, ScanSetupIoMeta)
 
 
-EXP_SETTINGS = ExperimentalSetup()
-EXP_IO_META = ExperimentalSetupIoMeta
-EXP_IO_META.clear_registry()
+SCAN_SETTINGS = ScanSetup()
+SCAN_IO_META = ScanSetupIoMeta
+SCAN_IO_META.clear_registry()
 
 
-class TestIo(ExperimentalSetupIoBase):
+class TestIo(ScanSetupIoBase):
     extensions = ['.test']
     format_name = 'Test'
 
@@ -67,21 +67,21 @@ class TestExperimentSettingsIoMeta(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._tmppath)
-        EXP_SETTINGS.restore_all_defaults(True)
+        SCAN_SETTINGS.restore_all_defaults(True)
 
     def test_export_to_file(self):
         _fname = os.path.join(self._tmppath, 'test.test')
-        EXP_IO_META.export_to_file(_fname)
+        SCAN_IO_META.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
     def test_import_from_file(self):
         _fname = os.path.join(self._tmppath, 'test.test')
-        EXP_IO_META.import_from_file(_fname)
+        SCAN_IO_META.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
 
 
 if __name__ == "__main__":
     unittest.main()
-    EXP_IO_META.clear_registry()
+    SCAN_IO_META.clear_registry()

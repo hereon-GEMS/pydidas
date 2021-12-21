@@ -22,12 +22,13 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 import numpy as np
 
-from pydidas.workflow import PluginPositionNode, GenericNode
 from pydidas.core.constants import gui_constants
+from pydidas.workflow import PluginPositionNode, GenericNode
 
 
 generic_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH

@@ -26,12 +26,15 @@ __status__ = "Development"
 __all__ = ['get_fixed_length_str', 'get_time_string', 'get_short_time_string',
            'timed_print', 'get_warning', 'convert_unicode_to_ascii',
            'convert_special_chars_to_unicode', 'get_range_as_formatted_string',
-           'update_separators', 'format_input_to_multiline_str']
+           'update_separators', 'format_input_to_multiline_str',
+           'get_random_string']
 
 import re
 import sys
 import os
 import time
+import random
+import string
 from numbers import Real, Integral
 
 import numpy as np
@@ -395,3 +398,20 @@ def format_input_to_multiline_str(input_str, max_line_length=12,
                                      + _item
                                      + ' ' * _delta_back)
     return '\n'.join(_result_lines)
+
+
+def get_random_string(length):
+    """
+    Get a random string of a specific length.
+
+    Parameters
+    ----------
+    length : int
+        The length of the output string.
+
+    Returns
+    -------
+    str
+        The random string.
+    """
+    return ''.join(random.choice(string.ascii_letters) for i in range(length))

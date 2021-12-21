@@ -22,17 +22,18 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import os
 import tempfile
-import h5py
 import shutil
 
+import h5py
 import numpy as np
 from PyQt5 import QtWidgets, QtTest
 
 from pydidas.core import FrameConfigError
-from pydidas.widgets.selection.hdf5_dataset_selector import Hdf5DatasetSelector
+from pydidas.widgets.selection import Hdf5DatasetSelector
 
 
 class TestWidget(QtWidgets.QWidget):

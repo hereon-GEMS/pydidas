@@ -22,12 +22,14 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
+from pydidas.experiment import ScanSetup
 from pydidas.workflow.result_savers import (
     WorkflowResultSaverBase, WorkflowResultSaverMeta)
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.experiment import ScanSetup
+
 
 TREE = WorkflowTree()
 SCAN = ScanSetup()
@@ -50,8 +52,8 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
     def test_class_existance(self):
         self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)
 
-    def test_export_to_file(self):
-        self.SAVER.export_to_file(0, {})
+    def test_export_frame_to_file(self):
+        self.SAVER.export_frame_to_file(0, {})
         # assert does not raise an Exception
 
     def test_export_full_data_to_file(self):
@@ -70,6 +72,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
             self.assertTrue(_name.endswith('_Test'))
             self.assertNotIn(' ', _name)
             self.assertNotIn('\n', _name)
+
 
 if __name__ == '__main__':
     unittest.main()

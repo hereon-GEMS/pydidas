@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import os
 import unittest
 import tempfile
@@ -31,6 +32,7 @@ import numpy as np
 
 from pydidas.image_io import export_image
 from pydidas.image_io import ImageReaderCollection
+
 
 ImageReader = ImageReaderCollection()
 
@@ -69,6 +71,7 @@ class TestExportImage(unittest.TestCase):
         _name = f'{self._path}/test.png'
         export_image(self._array, _name)
         self.assertTrue(os.path.isfile(_name))
+
 
 if __name__ == "__main__":
     unittest.main()

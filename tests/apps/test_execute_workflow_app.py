@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
@@ -34,14 +35,15 @@ import multiprocessing as mp
 import numpy as np
 from PyQt5 import QtCore
 
+from pydidas import unittest_objects
+from pydidas.core import get_generic_parameter, AppConfigError, utils
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
-from pydidas.core import get_generic_parameter, AppConfigError
 from pydidas.experiment import ScanSetup
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 from pydidas.plugins import PluginCollection
-from pydidas import unittest_objects
+
 
 TREE = WorkflowTree()
 SCAN = ScanSetup()
@@ -248,7 +250,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         app.set_param_value('live_processing', True)
         app._redefine_multiprocessing_carryon()
-        app._index = unittest_objects.get_random_string(8)
+        app._index = utils.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
 
     def test_multiprocessing_get_tasks__normal(self):

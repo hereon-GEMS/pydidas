@@ -33,6 +33,7 @@ import h5py
 
 from pydidas.plugins import PluginCollection, BasePlugin
 
+
 PLUGIN_COLLECTION = PluginCollection()
 
 

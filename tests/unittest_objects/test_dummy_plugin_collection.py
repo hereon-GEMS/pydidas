@@ -22,17 +22,11 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-import unittest
-import time
-import string
-import random
 
-from pydidas.plugins import (BasePlugin, InputPlugin,
-                             ProcPlugin, OutputPlugin)
-from pydidas.unittest_objects.dummy_plugin_collection import (
-    create_plugin_class, DummyPluginCollection)
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                               OUTPUT_PLUGIN)
+import unittest
+
+from pydidas.plugins.plugin_collection import _PluginCollection
+from pydidas.unittest_objects import DummyPluginCollection
 
 
 class TestDummyPluginCollection(unittest.TestCase):
@@ -43,23 +37,16 @@ class TestDummyPluginCollection(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_init__no_path(self):
-        ...
+    def test_dummy_plugin_collection(self):
+        PC = DummyPluginCollection()
+        self.assertIsInstance(PC, _PluginCollection)
+        self.assertEqual(len(PC.get_all_plugins()), 21)
 
-    def test_create_plugin_class__input(self):
-        _cls = create_plugin_class(0, INPUT_PLUGIN)
-        _instance = _cls()
-        self.assertIsInstance(_instance, InputPlugin)
-
-    def test_create_plugin_class__proc(self):
-        _cls = create_plugin_class(0, PROC_PLUGIN)
-        _instance = _cls()
-        self.assertIsInstance(_instance, ProcPlugin)
-
-    def test_create_plugin_class__output(self):
-        _cls = create_plugin_class(0, OUTPUT_PLUGIN)
-        _instance = _cls()
-        self.assertIsInstance(_instance, OutputPlugin)
+    def test_dummy_plugin_collection_w_n_plugins(self):
+        _n = 13
+        PC = DummyPluginCollection(n_plugins=_n)
+        self.assertIsInstance(PC, _PluginCollection)
+        self.assertEqual(len(PC.get_all_plugins()), _n)
 
 
 if __name__ == "__main__":

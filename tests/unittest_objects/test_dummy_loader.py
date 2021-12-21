@@ -22,12 +22,13 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import pickle
 
 from pydidas.core import Dataset
-# from pydidas.unittest_objects.dummy_loader import DummyLoader
-from pydidas.unittest_objects import get_random_string, DummyLoader
+from pydidas.core.utils import get_random_string
+from pydidas.unittest_objects import DummyLoader
 
 
 class TestDummyLoader(unittest.TestCase):

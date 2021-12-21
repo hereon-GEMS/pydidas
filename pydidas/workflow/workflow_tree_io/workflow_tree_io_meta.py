@@ -28,10 +28,10 @@ __all__ = ['WorkflowTreeIoMeta']
 
 import os
 
-from pydidas.core.io_registry import FileExtensionRegistryMetaclass
+from pydidas.core.io_registry import GenericIoMeta
 
 
-class WorkflowTreeIoMeta(FileExtensionRegistryMetaclass):
+class WorkflowTreeIoMeta(GenericIoMeta):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.

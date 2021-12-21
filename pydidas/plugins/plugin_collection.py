@@ -35,9 +35,9 @@ from PyQt5 import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..core.utils import find_valid_python_files
+from .base_plugin import BasePlugin
 from .plugin_collection_util_funcs import (
     get_generic_plugin_path, plugin_type_check)
-from .base_plugin import BasePlugin
 
 
 class _PluginCollection(PydidasQsettingsMixin):
@@ -70,12 +70,13 @@ class _PluginCollection(PydidasQsettingsMixin):
         self.__plugin_names = {}
         self.__plugin_paths = []
         PydidasQsettingsMixin.__init__(self)
-        plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
-        if plugin_path is None:
-            plugin_path = self.__get_generic_plugin_path()
-        _create_empty = kwargs.get('create_empty', False)
-        if not _create_empty:
-            self.find_and_register_plugins(*plugin_path)
+        _plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
+        if _plugin_path is None:
+            _plugin_path = self.__get_generic_plugin_path()
+        self._config = {'initial_plugin_path': _plugin_path,
+                        'initialized': False}
+        if kwargs.get('force_initialization', False):
+            self.verify_is_initialized()
 
     @staticmethod
     def __get_plugin_path_from_kwargs(**kwargs):
@@ -162,7 +163,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             for _name, _cls in _class_members:
                 self.__check_and_register_class(_cls, reload)
 
-    def _store_plugin_path(self, plugin_path):
+    def _store_plugin_path(self, plugin_path, verbose=False):
         """
         Store the plugin path.
 
@@ -170,9 +171,12 @@ class _PluginCollection(PydidasQsettingsMixin):
         ----------
         plugin_path : str
             The plugin path as string
+        verbose : bool, optional
+            Keyword to toggle printed warnings. The default is False
         """
         if plugin_path in self.__plugin_paths:
-            print('Warning. Storing same path again: ', plugin_path)
+            if verbose:
+                print('Warning. Storing same path again: ', plugin_path)
             return
         if os.path.exists(plugin_path):
             self.__plugin_paths.append(plugin_path)
@@ -287,6 +291,20 @@ class _PluginCollection(PydidasQsettingsMixin):
             del self.__plugin_types[class_.__name__]
             del self.__plugin_names[class_.plugin_name]
 
+    def verify_is_initialized(self):
+        """
+        Verify that the PluginCollection is initialized and that the default
+        plugin paths have been processed.
+
+        This method is called internally in every public method to make sure
+        that the PluginCollection is always initialized before any user
+        interaction occurs.
+        """
+        if self._config['initialized']:
+            return
+        self.find_and_register_plugins(*self._config['initial_plugin_path'])
+        self._config['initialized'] = True
+
     def get_all_plugin_names(self):
         """
         Get a list of all the plugin names currently registered.
@@ -296,6 +314,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         names : list
             The list of all the plugin names.
         """
+        self.verify_is_initialized()
         return list(self.plugins.keys())
 
     def get_plugin_by_plugin_name(self, plugin_name):
@@ -312,6 +331,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin : pydidas.plugins.BasePlugin
             The Plugin class.
         """
+        self.verify_is_initialized()
         if plugin_name in self.__plugin_names:
             return self.plugins[self.__plugin_names[plugin_name]]
         raise KeyError(f'No plugin with plugin_name "{plugin_name}" has been'
@@ -331,6 +351,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin : pydidas.plugins.BasePlugin
             The Plugin class.
         """
+        self.verify_is_initialized()
         if name in self.plugins:
             return self.plugins[name]
         raise KeyError(f'No plugin with name "{name}" has been registered!')
@@ -344,6 +365,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         list
             A list with all the Plugin classes.
         """
+        self.verify_is_initialized()
         return list(self.plugins.values())
 
     def get_all_plugins_of_type(self, plugin_type):
@@ -360,6 +382,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         list :
             A list with all Plugins which have the specified type.
         """
+        self.verify_is_initialized()
         _key = {'base': -1, 'input': 0, 'proc': 1, 'output': 2}[plugin_type]
         _res = []
         for _name in self.plugins:
@@ -376,6 +399,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         list
             The list of all registered paths.
         """
+        self.verify_is_initialized()
         return self.__plugin_paths[:]
 
     def clear_collection(self, confirmation=False):

@@ -22,20 +22,21 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
 import os
 import logging
 
+import pyFAI
 import numpy as np
 from PyQt5 import QtCore
-import pyFAI
 
-from pydidas.plugins import BasePlugin
-from pydidas.plugins import pyFAIintegrationBase
+from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 from pydidas.core import get_generic_parameter
 from pydidas.experiment import ExperimentalSetup
+
 
 EXP_SETTINGS = ExperimentalSetup()
 
@@ -238,41 +239,6 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         plugin.output_data_dim = 1
         with self.assertRaises(NotImplementedError):
             plugin.calculate_result_shape()
-
-    # def test_calculate_result_shape__2d_data(self):
-    #     _range = (1234, 789)
-    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
-    #                                   int_azi_npoint=_range[1])
-    #     plugin.output_data_dim = 2
-    #     plugin.calculate_result_shape()
-    #     _newrange = plugin.result_shape
-    #     self.assertEqual(_range, _newrange)
-
-    # def test_calculate_result_shape__1d_data_but_both_ranges_set(self):
-    #     _range = (1234, 789)
-    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
-    #                                   int_azi_npoint=_range[1])
-    #     plugin.output_data_dim = 1
-    #     with self.assertRaises(NotImplementedError):
-    #         plugin.calculate_result_shape()
-
-    # def test_calculate_result_shape__1d_data_azi(self):
-    #     _range = 1234
-    #     plugin = pyFAIintegrationBase(int_rad_npoint=1,
-    #                                   int_azi_npoint=_range)
-    #     plugin.output_data_dim = 1
-    #     plugin.calculate_result_shape()
-    #     _shape = plugin.result_shape
-    #     self.assertEqual((_range,), _shape)
-
-    # def test_calculate_result_shape__1d_data_rad(self):
-    #     _range = 1234
-    #     plugin = pyFAIintegrationBase(int_rad_npoint=_range,
-    #                                   int_azi_npoint=1)
-    #     plugin.output_data_dim = 1
-    #     plugin.calculate_result_shape()
-    #     _shape = plugin.result_shape
-    #     self.assertEqual((_range,), _shape)
 
     def test_load_and_store_mask__local_mask_value(self):
         _maskfilename, _mask = self.create_mask()

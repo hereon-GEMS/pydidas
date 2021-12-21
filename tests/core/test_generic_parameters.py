@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 from pydidas.core import (Parameter, get_generic_parameter,

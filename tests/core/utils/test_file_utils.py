@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import random
 import tempfile
@@ -30,9 +31,8 @@ import os
 import copy
 import sys
 
-from pydidas.unittest_objects.dummy_plugin_collection import (
-    get_random_string)
-from pydidas.core.utils import find_valid_python_files, flatten_list
+from pydidas.core.utils import (find_valid_python_files, flatten_list,
+                                get_random_string)
 
 
 class TestPluginCollection(unittest.TestCase):
@@ -112,6 +112,7 @@ class TestPluginCollection(unittest.TestCase):
             [[os.path.join(_dir, _file)
               for _file in self._good_filenames] for _dir in _dirs]))
         self.assertEqual(_files, _target)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import time
 import threading
@@ -117,6 +118,7 @@ class Test_app_processor(unittest.TestCase):
         self.stop_queue.put(1)
         time.sleep(0.1)
         self.assertEqual(self.finished_queue.get(), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -26,9 +26,9 @@ import unittest
 import time
 import threading
 import queue
-import multiprocessing as mp
 import sys
 import io
+import multiprocessing as mp
 
 import numpy as np
 

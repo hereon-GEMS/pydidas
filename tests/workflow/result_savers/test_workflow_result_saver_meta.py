@@ -22,15 +22,17 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 import numpy as np
 
-from pydidas.workflow.result_savers import (
-    WorkflowResultSaverBase, WorkflowResultSaverMeta)
+from pydidas.core import Dataset
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.experiment import ScanSetup
-from pydidas.core import Dataset
+from pydidas.workflow.result_savers import (
+    WorkflowResultSaverBase, WorkflowResultSaverMeta)
+
 
 TREE = WorkflowTree()
 SCAN = ScanSetup()
@@ -38,18 +40,21 @@ RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
 
 
-def export_to_file(saver, index, frame_result_dict, **kwargs):
+def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
     saver._exported = {'index': index,
                        'frame_results': frame_result_dict,
                        'kwargs': kwargs}
 
+
 def export_full_data_to_file(saver, full_data):
     saver._exported = {'full_data': full_data}
+
 
 def prepare_files_and_directories(saver, save_dir, shapes, labels):
     saver._prepared = {'save_dir': save_dir,
                        'shapes': shapes,
                        'labels': labels}
+
 
 class TestWorkflowResults(unittest.TestCase):
 
@@ -126,13 +131,13 @@ class TestWorkflowResults(unittest.TestCase):
         with self.assertRaises(KeyError):
             META.set_active_savers_and_title(['TEST', 'TEST2'])
 
-    def test_export_to_file(self):
+    def test_export_frame_to_file(self):
         _index = 127
         _frame_results = {1: np.random.random((10, 10)),
                           2: np.random.random((11, 27))}
         _Saver = self.create_saver_class('SAVER','Test')
-        _Saver.export_to_file = classmethod(export_to_file)
-        META.export_to_file(_index, 'TEST', _frame_results)
+        _Saver.export_frame_to_file = classmethod(export_frame_to_file)
+        META.export_frame_to_file(_index, 'TEST', _frame_results)
         self.assertTrue(np.equal(_Saver._exported['frame_results'][1],
                                  _frame_results[1]).all())
         self.assertTrue(np.equal(_Saver._exported['frame_results'][2],

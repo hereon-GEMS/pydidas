@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import os
@@ -31,24 +32,17 @@ import random
 import h5py
 import numpy as np
 
+from pydidas.core import Dataset
+from pydidas.experiment import ScanSetup
+from pydidas.core.utils import get_random_string
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.experiment import ScanSetup
-from pydidas.core import Dataset
 from pydidas.workflow.result_savers.workflow_result_saver_hdf5 import (
     WorkflowResultSaverHdf5)
-from pydidas.unittest_objects import get_random_string
 
 
 TREE = WorkflowTree()
 SCAN = ScanSetup()
-SCAN.set_param_value('scan_dim', 3)
-for d in range(1, 4):
-    SCAN.set_param_value(f'n_points_{d}', random.choice([3, 5, 7, 8]))
-    SCAN.set_param_value(f'delta_{d}', random.choice([0.1, 0.5, 1, 1.5]))
-    SCAN.set_param_value(f'offset_{d}', random.choice([-0.1, 0.5, 1]))
-    SCAN.set_param_value(f'scan_dir_{d}', get_random_string(12))
-
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
 H5SAVER = WorkflowResultSaverHdf5
@@ -57,6 +51,13 @@ H5SAVER = WorkflowResultSaverHdf5
 class TestWorkflowResultSaverHdf5(unittest.TestCase):
 
     def setUp(self):
+        SCAN.set_param_value('scan_dim', 3)
+        for d in range(1, 4):
+            SCAN.set_param_value(f'n_points_{d}', random.choice([3, 5, 7, 8]))
+            SCAN.set_param_value(f'delta_{d}',
+                                 random.choice([0.1, 0.5, 1, 1.5]))
+            SCAN.set_param_value(f'offset_{d}', random.choice([-0.1, 0.5, 1]))
+            SCAN.set_param_value(f'scan_dir_{d}', get_random_string(12))
         self._dir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -117,7 +118,8 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
 
     def test_update_node_metadata__with_entries(self):
         self.prepare_with_defaults()
-
+        H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
+                                              self._labels)
         _data = {_key: Dataset(np.random.random(_shape[3:]))
                   for _key, _shape in self._shapes.items()}
         _data[1], _labels, _units, _ranges = self.populate_metadata(_data[1])
@@ -160,7 +162,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
     def test_export_full_data_to_file(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape))
-                 for _key, _shape in self._shapes.items()}
+                  for _key, _shape in self._shapes.items()}
         H5SAVER.export_full_data_to_file(_data)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
@@ -168,13 +170,13 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                 _writtendata = _file['entry/data/data'][()]
             self.assertTrue(np.allclose(_data[_node_id], _writtendata))
 
-    def test_export_to_file(self):
+    def test_export_frame_to_file(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape[3:]))
                   for _key, _shape in self._shapes.items()}
         _index = 23
         _scanindex = SCAN.get_frame_position_in_scan(_index)
-        H5SAVER.export_to_file(_index, _data)
+        H5SAVER.export_frame_to_file(_index, _data)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
             with h5py.File(_fname, 'r') as _file:

@@ -22,13 +22,15 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 import numpy as np
 
+from pydidas.core.utils import get_random_string
 from pydidas.experiment import ScanSetup
 from pydidas.experiment.scan_setup.scan_setup import _ScanSetup
-from pydidas.unittest_objects import get_random_string
+
 
 class TestScanSetup(unittest.TestCase):
 
@@ -141,7 +143,6 @@ class TestScanSetup(unittest.TestCase):
         self.set_scan_params(SCAN)
         with self.assertRaises(ValueError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
-
 
 
 if __name__ == "__main__":

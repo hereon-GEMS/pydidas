@@ -1,0 +1,22 @@
+delta_1: 1
+delta_2: 0.1
+delta_3: 10
+delta_4: 1
+n_points_1: 4
+n_points_2: 21
+n_points_3: 0
+n_points_4: 0
+offset_1: -40
+offset_2: 10.0
+offset_3: 0
+offset_4: 0
+scan_dim: 2
+scan_dir_1: Direction 1
+scan_dir_2: Dir 2
+scan_dir_3: Direction 3
+scan_dir_4: ''
+scan_name: Test
+unit_1: m
+unit_2: um
+unit_3: mm
+unit_4: ''

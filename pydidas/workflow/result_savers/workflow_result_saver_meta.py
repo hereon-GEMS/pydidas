@@ -29,10 +29,10 @@ __status__ = "Development"
 __all__ = ['WorkflowResultSaverMeta']
 
 
-from ...core.io_registry import FileExtensionRegistryMetaclass
+from ...core.io_registry import GenericIoMeta
 
 
-class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
+class WorkflowResultSaverMeta(GenericIoMeta):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.
@@ -187,7 +187,8 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         _saver.export_full_data_to_file(data)
 
     @classmethod
-    def export_to_file(cls, index, extension, frame_result_dict, **kwargs):
+    def export_frame_to_file(cls, index, extension, frame_result_dict,
+                             **kwargs):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
@@ -205,4 +206,4 @@ class WorkflowResultSaverMeta(FileExtensionRegistryMetaclass):
         """
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
-        _saver.export_to_file(index, frame_result_dict, **kwargs)
+        _saver.export_frame_to_file(index, frame_result_dict, **kwargs)

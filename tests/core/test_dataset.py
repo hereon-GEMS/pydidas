@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import copy
 import warnings
 import unittest
@@ -247,7 +248,8 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_range=_new_range)
         _range = [self._dset['ranges'][i]
-                    for i in range(len(self._dset['ranges'])) if i not in _dims]
+                    for i in range(len(self._dset['ranges']))
+                    if i not in _dims]
         _range.insert(_dims[0], _new_range)
         self.assertTrue(np.equal(obj.axis_ranges[_dims[0]], _new_range).all())
 
@@ -259,8 +261,8 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_array_finalize__multiple_ops(self):
         obj = self.create_large_dataset()
-        _new = obj[0, 0]
-        _new2 = obj[0]
+        _ = obj[0, 0]
+        _ = obj[0]
         self.assertIsNone(obj.getitem_key)
 
     def test_empty_dataset_array_finalize__multiple_slicing(self):
@@ -292,7 +294,7 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset__with_rebin2d(self):
         obj = Dataset(np.random.random((11, 11)), axis_labels=[0, 1])
         _new = rebin2d(obj, 2)
-
+        self.assertEqual(_new.shape, (5, 5))
 
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
@@ -451,6 +453,7 @@ class TestDataset(unittest.TestCase):
         for key in obj.__dict__:
             self.assertEqual(obj.__dict__[key], new_obj.__dict__[key])
         self.assertTrue((new_obj.array == obj.array).all())
+
 
 if __name__ == "__main__":
     unittest.main()

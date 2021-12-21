@@ -22,18 +22,21 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import time
 import sys
 import multiprocessing as mp
 
 import numpy as np
-
 from PyQt5 import QtCore, QtWidgets, QtTest
+
 from pydidas.multiprocessing import WorkerController
 from pydidas.core.utils import pydidas_logger, get_time_string
 
+
 logger = pydidas_logger()
+
 
 def local_test_func(index, *args, **kwargs):
     index = (index

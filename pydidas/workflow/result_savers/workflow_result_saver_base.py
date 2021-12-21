@@ -98,7 +98,7 @@ class WorkflowResultSaverBase(GenericIoBase,
         """
 
     @classmethod
-    def export_to_file(cls, index, frame_result_dict, **kwargs):
+    def export_frame_to_file(cls, index, frame_result_dict, **kwargs):
         """
         Export the results of one frame and store them on disk.
 

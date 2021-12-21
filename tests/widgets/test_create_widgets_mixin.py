@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import string
 import random
@@ -221,6 +222,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
         obj = self.get_widget()
         obj.add_any_widget('ref', TestWidget(), layout_kwargs={})
         self.assertTrue('ref' in obj._widgets)
+
 
 if __name__ == "__main__":
     unittest.main()

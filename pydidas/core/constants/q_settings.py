@@ -14,8 +14,10 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The q_settings module holds information about the global keys used in pydidas.
-This information is required for initializing or resetting all global keys.
+The QSETTINGS_GLOBAL_KEYS constant holds the names of all global QSetting keys
+used in pydidas. These are required to verify that these settings have been
+written and exist. Pydidas will perform an existance check upon
+module holds information about the global keys used in pydidas.
 """
 
 __author__ = "Malte Storm"

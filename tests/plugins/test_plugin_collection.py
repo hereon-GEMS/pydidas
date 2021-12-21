@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import random
 import tempfile
@@ -29,14 +30,16 @@ import shutil
 import os
 import copy
 import sys
+
 from PyQt5 import QtCore
 
-from pydidas.unittest_objects.dummy_plugin_collection import (
-    DummyPluginCollection, get_random_string, create_plugin_class)
+from pydidas.core.utils import get_random_string
+from pydidas.unittest_objects import DummyPluginCollection, create_plugin_class
+from pydidas.plugins import BasePlugin, InputPlugin, ProcPlugin, OutputPlugin
 from pydidas.plugins.plugin_collection import _PluginCollection
 from pydidas.plugins.plugin_collection_util_funcs import (
     get_generic_plugin_path)
-from pydidas.plugins import BasePlugin, InputPlugin, ProcPlugin, OutputPlugin
+
 
 class TestPluginCollection(unittest.TestCase):
 
@@ -122,7 +125,7 @@ class TestPluginCollection(unittest.TestCase):
         return set(_mods)
 
     def test_init__empty(self):
-        PC = DummyPluginCollection(n_plugins=0, create_empty=True)
+        PC = DummyPluginCollection(n_plugins=0, plugin_path='')
         self.assertIsInstance(PC, _PluginCollection)
         self.assertEqual(len(PC.get_all_plugins()), 0)
 
@@ -225,7 +228,7 @@ class TestPluginCollection(unittest.TestCase):
     def test_remove_plugin_from_collection__new_items(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         PC._PluginCollection__remove_plugin_from_collection(_new_cls)
         self.assertEqual(len(PC.plugins), self.n_plugin)
 
@@ -239,7 +242,7 @@ class TestPluginCollection(unittest.TestCase):
     def test_add_new_class(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         PC._PluginCollection__add_new_class(_new_cls)
         self.assertTrue(_new_cls.__name__ in PC.plugins)
         self.assertEqual(PC.plugins[_new_cls.__name__ ], _new_cls)
@@ -247,8 +250,8 @@ class TestPluginCollection(unittest.TestCase):
     def test_add_new_class__duplicate_plugin_name(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
-        _new_cls2 = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
+        _new_cls2 = create_plugin_class(0, number=self.n_plugin + 1)
         _new_cls2.plugin_name = _new_cls.plugin_name
         PC._PluginCollection__add_new_class(_new_cls)
         with self.assertRaises(KeyError):
@@ -258,7 +261,7 @@ class TestPluginCollection(unittest.TestCase):
         self.n_plugin = 2
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
         PC._PluginCollection__check_and_register_class(_new_cls)
         self.assertEqual(PC.plugins[_new_cls.__name__], _new_cls)
 
@@ -276,8 +279,8 @@ class TestPluginCollection(unittest.TestCase):
         self.n_plugin = 2
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
-        _new_cls2 = create_plugin_class(self.n_plugin + 2, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
+        _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
         PC._PluginCollection__check_and_register_class(_new_cls)
         PC._PluginCollection__check_and_register_class(_new_cls2)
@@ -288,8 +291,8 @@ class TestPluginCollection(unittest.TestCase):
         self.n_plugin = 2
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        _new_cls = create_plugin_class(self.n_plugin + 1, 0)
-        _new_cls2 = create_plugin_class(self.n_plugin + 2, 0)
+        _new_cls = create_plugin_class(0, number=self.n_plugin + 1)
+        _new_cls2 = create_plugin_class(0, number=self.n_plugin + 2)
         _new_cls2.__name__ = _new_cls.__name__
         _new_cls2.plugin_name = _new_cls.plugin_name
         PC._PluginCollection__check_and_register_class(_new_cls)
@@ -327,15 +330,16 @@ class TestPluginCollection(unittest.TestCase):
 
     def test_store_plugin_path__no_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC.verify_is_initialized()
         _path = os.path.join(self._pluginpath, get_random_string(8))
         PC._store_plugin_path(_path)
         _qplugin_path = PC.q_settings.value('global/plugin_path')
-
         self.assertEqual(_qplugin_path, self._pluginpath)
         self.assertNotIn(_path, sys.path)
 
     def test_store_plugin_path__existing_paths(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC.verify_is_initialized()
         for index in range(3):
             _path = tempfile.mkdtemp()
             self._otherpaths.append(_path)
@@ -386,7 +390,8 @@ class TestPluginCollection(unittest.TestCase):
         self.assertEqual(set(PC.plugins.keys()), set(self._class_names))
 
     def test_get_q_settings_plugin_path__no_path_set(self):
-        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
+        PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath,
+                                   force_initialization=True)
         _qplugin_path = PC._PluginCollection__get_q_settings_plugin_path()
         self.assertEqual(_qplugin_path, [self._pluginpath])
 
@@ -461,6 +466,7 @@ class TestPluginCollection(unittest.TestCase):
         self._qsettings.setValue('global/plugin_path', get_random_string(30))
         DummyPluginCollection.clear_qsettings()
         self.assertEqual(self._qsettings.value('global/plugin_path'), '')
+
 
 if __name__ == "__main__":
     unittest.main()

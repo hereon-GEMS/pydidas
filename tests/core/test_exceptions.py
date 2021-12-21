@@ -24,7 +24,6 @@ __status__ = "Development"
 
 import unittest
 
-
 from pydidas.core import (AppConfigError, FrameConfigError, WidgetLayoutError,
                           DatasetConfigException)
 

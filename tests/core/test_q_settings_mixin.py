@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import copy
 import pickle
@@ -29,8 +30,7 @@ import pickle
 from PyQt5 import QtCore
 
 from pydidas.core import (PydidasQsettingsMixin, ParameterCollection,
-                          Parameter)
-from pydidas.core.pydidas_q_settings_mixin import CopyableQSettings
+                          Parameter, CopyableQSettings)
 
 
 class TestQSettingsMixin(unittest.TestCase):
@@ -129,7 +129,6 @@ class TestQSettingsMixin(unittest.TestCase):
         self.assertIsInstance(_new, CopyableQSettings)
         self.assertEqual(_qsettings.organizationName(), 'Hereon')
         self.assertEqual(_qsettings.applicationName(), 'pydidas')
-
 
 
 if __name__ == "__main__":

@@ -32,10 +32,9 @@ from pathlib import Path
 import numpy as np
 import h5py
 
-from pydidas.core import AppConfigError
-from pydidas.core import Parameter
+from pydidas.core import AppConfigError, Parameter
+from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.unittest_objects import get_random_string
 
 
 PLUGIN_COLLECTION = PluginCollection()

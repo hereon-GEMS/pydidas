@@ -23,7 +23,8 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['parse_composite_creator_cmdline_arguments']
+__all__ = ['parse_composite_creator_cmdline_arguments',
+           'parse_execute_workflow_cmdline_arguments']
 
 import argparse
 
@@ -103,7 +104,7 @@ def parse_composite_creator_cmdline_arguments(caller=None):
     return _args
 
 
-def parse_execute_workflow_cmdline_arguments(caller):
+def parse_execute_workflow_cmdline_arguments(caller=None):
     """
     Parse the command line arguments for the ExecuteWorkflowApp.
 

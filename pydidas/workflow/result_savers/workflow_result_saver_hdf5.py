@@ -33,6 +33,7 @@ from ...experiment import ExperimentalSetup, ScanSetup
 from ...core.utils import create_hdf5_dataset
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
+
 EXP = ExperimentalSetup()
 SCAN = ScanSetup()
 
@@ -121,7 +122,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                     f'/entry/scan/dim_{_dim}')
 
     @classmethod
-    def export_to_file(cls, index, frame_result_dict, **kwargs):
+    def export_frame_to_file(cls, index, frame_result_dict, **kwargs):
         """
         Export the results of one frame and store them on disk.
 

@@ -30,7 +30,7 @@ import shutil
 from pydidas.core.utils import get_pydidas_module_dir
 
 
-class TestCoreUtilities(unittest.TestCase):
+class TestGetModuleDir(unittest.TestCase):
 
     def setUp(self):
         self._path = get_pydidas_module_dir(__file__)

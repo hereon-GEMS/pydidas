@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
@@ -33,7 +34,9 @@ from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import (
     WorkflowTreeIoYaml)
 import pydidas
 
+
 PLUGIN_COLL = pydidas.plugins.PluginCollection()
+
 
 class TestWorkflowTreeIoYaml(unittest.TestCase):
 
@@ -47,7 +50,8 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
 
     def create_test_tree(self):
 
-        _pluginclass = PLUGIN_COLL.get_plugin_by_name('PyFAIazimuthalIntegration')
+        _pluginclass = PLUGIN_COLL.get_plugin_by_name(
+            'PyFAIazimuthalIntegration')
         _plugin = _pluginclass()
         self.TREE.clear()
         self.TREE.create_and_add_node(_plugin)

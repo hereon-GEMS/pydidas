@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import pickle
 
@@ -29,6 +30,7 @@ import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.unittest_objects.dummy_proc import DummyProc
+
 
 class TestDummyProc(unittest.TestCase):
 

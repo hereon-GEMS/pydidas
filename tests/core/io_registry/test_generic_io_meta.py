@@ -22,27 +22,28 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
-from pydidas.core.io_registry import FileExtensionRegistryMetaclass
+from pydidas.core.io_registry import GenericIoMeta
 
 
-class TestFileExtensionRegistryMetaclass(unittest.TestCase):
+class TestGenericIoMeta(unittest.TestCase):
 
     def setUp(self):
-        FileExtensionRegistryMetaclass.clear_registry()
+        GenericIoMeta.clear_registry()
 
     def tearDown(self):
-        FileExtensionRegistryMetaclass.clear_registry()
+        GenericIoMeta.clear_registry()
 
     def create_test_class(self):
-        class TestClass(metaclass=FileExtensionRegistryMetaclass):
+        class TestClass(metaclass=GenericIoMeta):
             extensions = ['.dummy', '.test']
             format_name = 'TEST'
         self.test_class = TestClass()
 
     def create_test_class2(self):
-        class TestClass2(metaclass=FileExtensionRegistryMetaclass):
+        class TestClass2(metaclass=GenericIoMeta):
             extensions = ['.test2']
             format_name = 'Test2'
         self.test_class2 = TestClass2()
@@ -54,86 +55,85 @@ class TestFileExtensionRegistryMetaclass(unittest.TestCase):
         return TestClass3
 
     def test_empty(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
 
     def test_get_registered_formats__empty(self):
         self.assertEqual(
-            FileExtensionRegistryMetaclass.get_registered_formats(), {})
+            GenericIoMeta.get_registered_formats(), {})
 
     def test_get_registered_formats__with_entry(self):
         self.create_test_class()
-        _formats = FileExtensionRegistryMetaclass.get_registered_formats()
+        _formats = GenericIoMeta.get_registered_formats()
         _target = {self.test_class.format_name: self.test_class.extensions}
         self.assertEqual(_formats, _target)
 
     def test_get_string_of_formats(self):
         self.create_test_class()
-        _str = FileExtensionRegistryMetaclass.get_string_of_formats()
+        _str = GenericIoMeta.get_string_of_formats()
         _target = 'All supported files (*.dummy *.test);;TEST (*.dummy *.test)'
         self.assertEqual(_str, _target)
 
     def test_is_extension_registered__True(self):
         self.create_test_class()
         self.assertTrue(
-            FileExtensionRegistryMetaclass.is_extension_registered('.dummy'))
+            GenericIoMeta.is_extension_registered('.dummy'))
 
     def test_is_extension_registered__False(self):
         self.create_test_class()
         self.assertFalse(
-            FileExtensionRegistryMetaclass.is_extension_registered('none'))
+            GenericIoMeta.is_extension_registered('none'))
 
     def test_verify_extension_is_registered__correct(self):
         self.create_test_class()
-        FileExtensionRegistryMetaclass.verify_extension_is_registered('.test')
+        GenericIoMeta.verify_extension_is_registered('.test')
         # assert does not raise an error
 
     def test_verify_extension_is_registered__incorrect(self):
         self.create_test_class()
         with self.assertRaises(KeyError):
-            FileExtensionRegistryMetaclass.verify_extension_is_registered(
+            GenericIoMeta.verify_extension_is_registered(
                 'none')
 
     def test_new__method(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         self.create_test_class()
         for _key in self.test_class.extensions:
-            self.assertTrue(_key in FileExtensionRegistryMetaclass.registry)
+            self.assertTrue(_key in GenericIoMeta.registry)
 
     def test_new__method__multiple(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         self.create_test_class()
         self.create_test_class2()
         for _key in self.test_class.extensions + self.test_class2.extensions:
-            self.assertTrue(_key in FileExtensionRegistryMetaclass.registry)
+            self.assertTrue(_key in GenericIoMeta.registry)
 
     def test_clear_registry(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         self.create_test_class()
-        FileExtensionRegistryMetaclass.clear_registry()
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        GenericIoMeta.clear_registry()
+        self.assertEqual(GenericIoMeta.registry, dict())
 
     def test_register_class__plain(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         klass = self.get_unregistered_test_class()
-        FileExtensionRegistryMetaclass.register_class(klass)
+        GenericIoMeta.register_class(klass)
         for _key in klass.extensions:
-            self.assertTrue(_key in FileExtensionRegistryMetaclass.registry)
+            self.assertTrue(_key in GenericIoMeta.registry)
 
     def test_register_class__same_ext_no_update(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         klass = self.get_unregistered_test_class()
-        FileExtensionRegistryMetaclass.register_class(klass)
+        GenericIoMeta.register_class(klass)
         with self.assertRaises(KeyError):
-            FileExtensionRegistryMetaclass.register_class(klass)
+            GenericIoMeta.register_class(klass)
 
     def test_register_class__same_ext_and_update(self):
-        self.assertEqual(FileExtensionRegistryMetaclass.registry, dict())
+        self.assertEqual(GenericIoMeta.registry, dict())
         klass = self.get_unregistered_test_class()
-        FileExtensionRegistryMetaclass.register_class(klass)
-        FileExtensionRegistryMetaclass.register_class(klass,
-                                                      update_registry=True)
+        GenericIoMeta.register_class(klass)
+        GenericIoMeta.register_class(klass, update_registry=True)
         for _key in klass.extensions:
-            self.assertTrue(_key in FileExtensionRegistryMetaclass.registry)
+            self.assertTrue(_key in GenericIoMeta.registry)
 
 
 if __name__ == "__main__":

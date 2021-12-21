@@ -22,10 +22,12 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import sys
 
 from PyQt5 import QtCore, QtTest
+
 from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 
@@ -40,12 +42,10 @@ def quit_app():
 class TestAppRunnerner(unittest.TestCase):
 
     def setUp(self):
-        # self.qt_app = QtWidgets.QApplication(sys.argv)
         self.qt_app = QtCore.QCoreApplication(sys.argv)
         self.app = MpTestApp()
 
     def tearDown(self):
-        # self.qt_app.deleteLater()
         self.qt_app.quit()
 
     def store_app(self, app):
@@ -123,6 +123,7 @@ class TestAppRunnerner(unittest.TestCase):
         runner = AppRunner(self.app)
         _args = runner._AppRunner__get_app_arguments()
         self.assertIsInstance(_args, tuple)
+
 
 if __name__ == "__main__":
     unittest.main()

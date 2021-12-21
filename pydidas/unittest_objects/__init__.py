@@ -28,6 +28,7 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .create_dummy_plugins import *
 from .dummy_loader import *
 from .dummy_plugin_collection import *
 from .dummy_proc import *
@@ -35,6 +36,10 @@ from .mp_test_app import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import create_dummy_plugins
+__all__.extend(create_dummy_plugins.__all__)
+del create_dummy_plugins
+
 from . import dummy_loader
 __all__.extend(dummy_loader.__all__)
 del dummy_loader

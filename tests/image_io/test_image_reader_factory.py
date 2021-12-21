@@ -22,12 +22,13 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 import numpy as np
 
-from pydidas.image_io.image_reader_collection import (ImageReaderCollection,
-                                                   _ImageReaderCollection)
+from pydidas.image_io.image_reader_collection import (
+    ImageReaderCollection, _ImageReaderCollection)
 
 
 class DummyReader:
@@ -82,6 +83,7 @@ class TestImageReaderCollection(unittest.TestCase):
         obj._extensions['.test'] = None
         with self.assertRaises(KeyError):
             obj.get_reader('test/test2/testname.test')
+
 
 if __name__ == "__main__":
     unittest.main()

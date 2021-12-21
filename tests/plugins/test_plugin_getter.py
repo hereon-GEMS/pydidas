@@ -13,9 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-The constants module holds constant nmumber defitions needed in pydidas.
-"""
+"""Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -23,28 +21,25 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['LAMBDA_TO_E', 'BASE_PLUGIN', 'INPUT_PLUGIN', 'PROC_PLUGIN',
-           'OUTPUT_PLUGIN', 'pyFAI_UNITS', 'pyFAI_METHOD']
-
-import scipy.constants
 
 
-LAMBDA_TO_E = scipy.constants.h * scipy.constants.c / scipy.constants.e * 1e-3
+import unittest
 
-BASE_PLUGIN = -1
-INPUT_PLUGIN = 0
-PROC_PLUGIN = 1
-OUTPUT_PLUGIN = 2
+from pydidas.plugins import BasePlugin, plugin_getter
 
-pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
-               'Q / A^-1': 'q_A^-1',
-               '2theta / deg': '2th_deg',
-               '2theta / rad': '2th_rad',
-               'r / mm': 'r_mm',
-               'chi / deg': 'chi_deg',
-               'chi / rad': 'chi_rad'}
 
-pyFAI_METHOD = {'CSR': 'csr',
-                'CSR OpenCL': 'csr ocl',
-                'LUT': 'lut',
-                'LUT OpenCL': 'lut ocl'}
+class TestPluginGetter(unittest.TestCase):
+
+    def setUp(self):
+        ...
+
+    def tearDown(self):
+        ...
+
+    def test_plugin_getter(self):
+        _plugin = plugin_getter('BasePlugin')
+        self.assertIsInstance(_plugin, BasePlugin)
+
+
+if __name__ == "__main__":
+    unittest.main()

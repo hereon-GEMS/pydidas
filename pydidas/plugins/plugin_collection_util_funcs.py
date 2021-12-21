@@ -27,7 +27,7 @@ __all__ = ['get_generic_plugin_path', 'plugin_type_check']
 
 import os
 
-import pydidas.core as core
+from .. import core
 from ..core.utils import pydidas_logger, LOGGING_LEVEL
 
 logger = pydidas_logger(LOGGING_LEVEL)

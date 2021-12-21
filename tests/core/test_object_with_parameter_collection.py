@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import io
 import sys
@@ -286,6 +287,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         self.assertIsInstance(new_obj, ObjectWithParameterCollection)
         for _key, _param in obj.params.items():
             self.assertEqual(_param.value, new_obj.get_param_value(_key))
+
 
 if __name__ == "__main__":
     unittest.main()

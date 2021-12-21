@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
@@ -32,12 +33,11 @@ import pickle
 import numpy as np
 
 from pydidas import unittest_objects
+from pydidas.core import AppConfigError
 from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.workflow.workflow_tree import _WorkflowTree
-from pydidas.unittest_objects.dummy_loader import DummyLoader
-from pydidas.unittest_objects.dummy_proc import DummyProc
-from pydidas.core import AppConfigError
 from pydidas.plugins import PluginCollection
+
 
 COLL = PluginCollection()
 _PLUGIN_PATHS = COLL.get_all_registered_paths()
@@ -60,14 +60,15 @@ class TestWorkflowTree(unittest.TestCase):
         # PluginCollection._reset_instance()
 
     def create_node_tree(self, depth=3, width=3):
-        obj00 = WorkflowNode(node_id=0, plugin=DummyLoader())
+        obj00 = WorkflowNode(node_id=0, plugin=unittest_objects.DummyLoader())
         _nodes =  [[obj00]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
             for _parent in _nodes[_depth]:
                 for _ichild in range(width):
-                    _node = WorkflowNode(node_id=_index, plugin=DummyProc())
+                    _node = WorkflowNode(node_id=_index,
+                                         plugin=unittest_objects.DummyProc())
                     _parent.add_child(_node)
                     _index += 1
                     _tiernodes.append(_node)
@@ -79,21 +80,21 @@ class TestWorkflowTree(unittest.TestCase):
             self.tree.get_all_result_shapes()
 
     def test_get_all_result_shapes__single_node(self):
-        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
         _shapes = self.tree.get_all_result_shapes()
-        _dummy = DummyLoader()
+        _dummy = unittest_objects.DummyLoader()
         _dummy.calculate_result_shape()
         self.assertEqual(_shapes[0], _dummy.result_shape)
 
     def test_get_all_result_shapes__tree(self):
-        _dummy = DummyLoader()
+        _dummy = unittest_objects.DummyLoader()
         _dummy.calculate_result_shape()
         _shape = _dummy.result_shape
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
-                                      node_id=2)
-        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root,
-                                      node_id=3)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      parent=self.tree.root, node_id=2)
+        self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      parent=self.tree.root, node_id=3)
         self.tree.prepare_execution()
         _shapes = self.tree.get_all_result_shapes()
         self.assertEqual(_shapes[2], _shape)
@@ -166,38 +167,41 @@ class TestWorkflowTree(unittest.TestCase):
             self.tree.create_and_add_node(12)
 
     def test_create_and_add_node__empty_tree(self):
-        self.tree.create_and_add_node(DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.assertEqual(len(self.tree.nodes), 1)
         self.assertIsInstance(self.tree.nodes[0], GenericNode)
 
     def test_create_and_add_node__in_tree_no_parent(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.assertEqual(len(self.tree.nodes), 2)
         self.assertIsInstance(self.tree.nodes[1], GenericNode)
         self.assertEqual(self.tree.nodes[0].n_children, 1)
 
     def test_create_and_add_node__in_tree_with_parent(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc(), parent=self.tree.nodes[0])
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      parent=self.tree.nodes[0])
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[2], GenericNode)
         self.assertEqual(self.tree.nodes[0].n_children, 2)
 
     def test_create_and_add_node__in_tree_with_node_id(self):
         _id = 42
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc(), node_id=_id)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      node_id=_id)
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[_id], GenericNode)
         self.assertEqual(self.tree.nodes[_id].node_id, _id)
 
     def test_tree_copy_with_plugins(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc(), parent=self.tree.root)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      parent=self.tree.root)
         tree2 = copy.copy(self.tree)
         self.assertIsInstance(tree2, _WorkflowTree)
         for _node in tree2.nodes.values():
@@ -208,18 +212,18 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertEqual(getattr(self.tree, key), getattr(tree2, key))
 
     def test_tree_pickling(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         tree2 = pickle.loads(pickle.dumps(self.tree))
         self.assertIsInstance(tree2, _WorkflowTree)
         for _node in tree2.nodes.values():
             self.assertIsInstance(_node, WorkflowNode)
 
     def test_export_to_string(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         _str = self.tree.export_to_string()
         self.assertIsInstance(_str, str)
 
@@ -239,9 +243,9 @@ class TestWorkflowTree(unittest.TestCase):
             self.tree.restore_from_list_of_nodes({0: 0, 1: 1})
 
     def test_restore_from_string(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         _str = self.tree.export_to_string()
         tree = WorkflowTree()
         tree.restore_from_string(_str)
@@ -251,16 +255,16 @@ class TestWorkflowTree(unittest.TestCase):
                                   tree.nodes[_id].plugin.__class__)
 
     def test_restore_from_string__empty(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.restore_from_string('')
         self.assertEqual(self.tree.nodes, dict())
 
     def test_restore_from_string__empty_list(self):
-        self.tree.create_and_add_node(DummyLoader())
-        self.tree.create_and_add_node(DummyProc())
-        self.tree.create_and_add_node(DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.restore_from_string('[]')
         self.assertEqual(self.tree.nodes, dict())
 

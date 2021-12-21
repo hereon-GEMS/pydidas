@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
@@ -31,14 +32,12 @@ import pickle
 
 import numpy as np
 
-from pydidas.unittest_objects.dummy_plugin_collection import (
-    create_plugin_class)
-
-from pydidas.plugins import InputPlugin
+from pydidas.core import Parameter, get_generic_parameter, AppConfigError
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import (Parameter, get_generic_parameter, AppConfigError)
+from pydidas.core.utils import get_random_string
 from pydidas.managers import ImageMetadataManager
-from pydidas.unittest_objects import get_random_string
+from pydidas.unittest_objects import create_plugin_class
+from pydidas.plugins import InputPlugin
 
 
 class TestBaseInputPlugin(unittest.TestCase):
@@ -54,45 +53,45 @@ class TestBaseInputPlugin(unittest.TestCase):
         shutil.rmtree(self._testpath)
 
     def test_create_base_plugin(self):
-        plugin = create_plugin_class(0, INPUT_PLUGIN)
+        plugin = create_plugin_class(INPUT_PLUGIN)
         self.assertIsInstance(plugin(), InputPlugin)
 
     def test_class_atributes(self):
-        plugin = create_plugin_class(0, INPUT_PLUGIN)
+        plugin = create_plugin_class(INPUT_PLUGIN)
         for att in ('basic_plugin', 'plugin_type', 'plugin_name',
                     'default_params', 'generic_params', 'input_data_dim',
                     'output_data_dim'):
             self.assertTrue(hasattr(plugin, att))
 
     def test_class_generic_params(self):
-        plugin = create_plugin_class(0, INPUT_PLUGIN)
+        plugin = create_plugin_class(INPUT_PLUGIN)
         for att in ('use_roi', 'roi_xlow', 'roi_xhigh', 'roi_ylow',
                     'roi_yhigh', 'binning'):
             _param = plugin.generic_params.get_param(att)
             self.assertIsInstance(_param, Parameter)
 
     def test_get_filename(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         with self.assertRaises(NotImplementedError):
             plugin.get_filename(1)
 
     def test_input_available__file_exists_and_size_ok(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = os.stat(self._fname).st_size
         plugin.get_filename = lambda x: self._fname
         self.assertTrue(plugin.input_available(1))
 
     def test_input_available__file_exists_and_wrong_size(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = 37
         plugin.get_filename = lambda x: self._fname
         self.assertFalse(plugin.input_available(1))
 
     def test_input_available__file_does_not_exist(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin._config['file_size'] = 37
         plugin.get_filename = lambda x: os.path.join(self._testpath,
@@ -100,14 +99,14 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertFalse(plugin.input_available(1))
 
     def test_get_first_file_size(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         plugin = _class()
         plugin._image_metadata.get_filename = lambda : self._fname
         self.assertEqual(plugin.get_first_file_size(),
                          os.stat(self._fname).st_size)
 
     def test_prepare_carryon_check(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         plugin = _class()
         plugin._image_metadata.get_filename = lambda : self._fname
         plugin.prepare_carryon_check()
@@ -115,7 +114,7 @@ class TestBaseInputPlugin(unittest.TestCase):
                          os.stat(self._fname).st_size)
 
     def test_setup_image_metadata_manager__with_firstfile(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=False)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         plugin = _class()
         plugin.set_param_value('first_file', self._fname)
         plugin._InputPlugin__setup_image_magedata_manager()
@@ -123,7 +122,7 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertFalse(plugin._image_metadata.get_param_value('use_filename'))
 
     def test_setup_image_metadata_manager__with_filename(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin.set_param_value('filename', self._fname)
         plugin._InputPlugin__setup_image_magedata_manager()
@@ -131,14 +130,14 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertTrue(plugin._image_metadata.get_param_value('use_filename'))
 
     def test_setup_image_metadata_manager__with_firstfile_and_filename(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         _class.default_params.add_param(get_generic_parameter('first_file'))
         with self.assertRaises(AppConfigError):
             plugin._InputPlugin__setup_image_magedata_manager()
 
     def test_setup_image_metadata_manager__with_different_hdf5_key(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         _class.default_params.add_param(get_generic_parameter('hdf5_key'))
         plugin = _class()
         with h5py.File(self._fname, 'w') as f:
@@ -151,7 +150,7 @@ class TestBaseInputPlugin(unittest.TestCase):
         self.assertEqual(plugin.result_shape, self._datashape)
 
     def test_calculate_result_shape(self):
-        _class = create_plugin_class(0, INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         plugin.set_param_value('filename', self._fname)
         plugin.calculate_result_shape()

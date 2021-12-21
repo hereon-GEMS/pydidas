@@ -22,11 +22,12 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 
 from pydidas.workflow import WorkflowNode
-from pydidas.unittest_objects.dummy_loader import DummyLoader
-from pydidas.unittest_objects.dummy_proc import DummyProc
+from pydidas.unittest_objects import DummyLoader, DummyProc
+
 
 class TestWorkflowNode(unittest.TestCase):
 
@@ -146,8 +147,6 @@ class TestWorkflowNode(unittest.TestCase):
     def test_confirm_plugin_existance_and_type__correct_plugin(self):
         obj = WorkflowNode(plugin=DummyLoader())
         self.assertIsInstance(obj, WorkflowNode)
-
-
 
 
 if __name__ == '__main__':

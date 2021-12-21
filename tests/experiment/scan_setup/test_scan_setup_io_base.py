@@ -28,22 +28,21 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.experimental_setup import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_base \
-    import ExperimentalSetupIoBase
+from pydidas.experiment.scan_setup import ScanSetup
+from pydidas.experiment.scan_setup.scan_setup_io_base import ScanSetupIoBase
 
 
-EXP_SETTINGS = ExperimentalSetup()
-EXP_IO = ExperimentalSetupIoBase
+SCAN = ScanSetup()
+SCAN_IO = ScanSetupIoBase
 
 
-class TestExperimentSettingsIoBase(unittest.TestCase):
+class TestScanSettingsIoBase(unittest.TestCase):
 
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._path = os.path.join(_test_dir, '_data', 'load_test_scan_setup_')
         self._tmppath = tempfile.mkdtemp()
-        EXP_IO.imported_params = {}
+        SCAN_IO.imported_params = {}
 
     def tearDown(self):
         del self._path
@@ -54,38 +53,28 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         with open(_fname, 'w') as f:
             f.write('test entry')
         with self.assertRaises(FileExistsError):
-            EXP_IO.check_for_existing_file(_fname)
+            SCAN_IO.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_present_and_overwrite(self):
         _fname = os.path.join(self._tmppath, 'test.txt')
         with open(_fname, 'w') as f:
             f.write('test entry')
-        EXP_IO.check_for_existing_file(_fname, overwrite=True)
+        SCAN_IO.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise FileExistsError
 
     def test_check_for_existing_file__file_new(self):
         _fname = os.path.join(self._tmppath, 'test.txt')
-        EXP_IO.check_for_existing_file(_fname)
+        SCAN_IO.check_for_existing_file(_fname)
         # assert does not raise FileExistsError
 
     def test_verify_all_entries_present__correct(self):
-        for param in EXP_SETTINGS.params:
-            EXP_IO.imported_params[param] = True
-        EXP_IO._verify_all_entries_present()
+        for param in SCAN.params:
+            SCAN_IO.imported_params[param] = True
+        SCAN_IO._verify_all_entries_present()
 
     def test_verify_all_entries_present__missing_keys(self):
         with self.assertRaises(KeyError):
-            EXP_IO._verify_all_entries_present()
-
-    def test_write_to_exp_settings(self):
-        _det_name = 'Test Name'
-        _energy = 123.45
-        EXP_IO.imported_params = {'detector_name': _det_name,
-                                       'xray_energy': _energy}
-        EXP_IO._write_to_exp_settings()
-        self.assertEqual(EXP_SETTINGS.get_param_value('detector_name'),
-                         _det_name)
-        self.assertEqual(EXP_SETTINGS.get_param_value('xray_energy'), _energy)
+            SCAN_IO._verify_all_entries_present()
 
 
 if __name__ == "__main__":

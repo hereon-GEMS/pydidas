@@ -31,7 +31,7 @@ import random
 from pydidas.core.utils.str_utils import (
     get_fixed_length_str, get_time_string, get_warning,
     convert_special_chars_to_unicode, format_input_to_multiline_str,
-    convert_unicode_to_ascii, update_separators)
+    convert_unicode_to_ascii, update_separators, get_random_string)
 
 
 class Test_str_utils(unittest.TestCase):
@@ -285,6 +285,14 @@ class Test_str_utils(unittest.TestCase):
         _test = 'test testtest'
         _new = format_input_to_multiline_str(_test, pad_to_max_length=True)
         self.assertEqual(_new, '    test    \n  testtest  ')
+
+    def test_get_random_string(self):
+        _len = 37
+        _test = get_random_string(_len)
+        self.assertEqual(len(_test), _len)
+        for _char in _test:
+            self.assertIn(_char, string.ascii_letters)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,19 +22,18 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import time
-import string
-import random
 
 from pydidas.core import SingletonFactory
+from pydidas.core.utils import get_random_string
 
 
 class TestClass:
     def __init__(self):
         self.attr1 = hash(time.time())
-        self.attr2 = ''.join(random.choice(string.ascii_letters)
-                             for i in range(64))
+        self.attr2 = get_random_string(64)
 
 
 class TestSingletonFactory(unittest.TestCase):

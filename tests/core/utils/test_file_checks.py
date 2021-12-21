@@ -30,13 +30,13 @@ import os
 import numpy as np
 import h5py
 
+from pydidas.core import AppConfigError
 from pydidas.core.utils.file_checks import (
     check_hdf5_key_exists_in_file, check_file_exists, file_is_writable,
     verify_files_in_same_directory, verify_files_of_range_are_same_size)
-from pydidas.core import AppConfigError
 
 
-class Test_file_checks(unittest.TestCase):
+class TestFileCheckFunctions(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()

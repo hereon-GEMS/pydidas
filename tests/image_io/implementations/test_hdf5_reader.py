@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import tempfile
 import shutil
@@ -72,6 +73,7 @@ class TestHdf5Reader(unittest.TestCase):
         obj = ImageReaderCollection().get_reader(self._fname)
         img = obj.read_image(self._fname, hdf5_dataset='test/path', frame=4)
         self.assertTrue((img.array == self._data[4]).all())
+
 
 if __name__ == "__main__":
     unittest.main()

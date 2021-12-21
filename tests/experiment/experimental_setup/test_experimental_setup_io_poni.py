@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import os
 import unittest
 import shutil
@@ -34,8 +35,6 @@ from pyFAI.geometry import Geometry
 from pydidas.experiment import ExperimentalSetup
 from pydidas.experiment.experimental_setup.experimental_setup_io_poni import \
     ExperimentalSetupIoPoni
-
-import pyFAI.geometry
 
 
 EXP_SETTINGS = ExperimentalSetup()
@@ -57,7 +56,7 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
         shutil.rmtree(self._tmppath)
 
     def test_update_geometry_from_pyFAI__correct(self):
-        geo = pyFAI.geometry.Geometry().load(self._path + 'poni.poni')
+        geo = Geometry().load(self._path + 'poni.poni')
         EXP_IO_PONI._update_geometry_from_pyFAI(geo)
         for param in ['detector_dist', 'detector_poni1', 'detector_poni2',
                       'detector_rot1', 'detector_rot2', 'detector_rot3',

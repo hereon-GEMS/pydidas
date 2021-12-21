@@ -22,6 +22,7 @@ __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+
 import unittest
 import copy
 
@@ -323,8 +324,7 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(Test0=self._params[0],
                                   Test1=self._params[1],
                                   Test2=self._params[2],
-                                  Test3=self._params[3],
-                                  )
+                                  Test3=self._params[3])
         for index in range(4):
             self.assertEqual(obj[f'Test{index}'],
                               self._params[index])
@@ -341,7 +341,6 @@ class TestParameterCollection(unittest.TestCase):
     def test_values_equal__same_values(self):
         obj = ParameterCollection(*self._params)
         self.assertTrue(obj.values_equal('Test0', 'Test3'))
-
 
 
 if __name__ == "__main__":

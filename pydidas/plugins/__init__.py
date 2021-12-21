@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from .pyfai_integration_base import *
 # import __all__ items from modules:
 from .base_input_plugin import *
 from .base_output_plugin import *
@@ -35,6 +34,7 @@ from .base_plugin import *
 from .base_proc_plugin import *
 from .plugin_collection import *
 from .plugin_getter_ import *
+from .pyfai_integration_base import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:

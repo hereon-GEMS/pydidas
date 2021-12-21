@@ -57,7 +57,8 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
-        self._output_flag = param.refkey.startswith('output')
+        self._flag_is_output = param.refkey.startswith('output')
+        self._flag_is_dir = 'directory' in param.name
         self._file_selection = (
             'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
             'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'
@@ -70,11 +71,17 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        if self._output_flag:
-            _func = QtWidgets.QFileDialog.getSaveFileName
+        if self._flag_is_dir:
+            _arg = QtWidgets.QFileDialog.ShowDirsOnly
+            _func = QtWidgets.QFileDialog.getExistingDirectory
+            fname = _func(self, 'Name of file', None, _arg)
         else:
-            _func = QtWidgets.QFileDialog.getOpenFileName
-        fname = _func(self, 'Name of file', None, self._file_selection)[0]
+            _arg = self._file_selection
+            if self._flag_is_output:
+                _func = QtWidgets.QFileDialog.getSaveFileName
+            else:
+                _func = QtWidgets.QFileDialog.getOpenFileName
+            fname = _func(self, 'Name of file', None, _arg)[0]
         if fname:
             self.setText(fname)
             self.emit_signal()

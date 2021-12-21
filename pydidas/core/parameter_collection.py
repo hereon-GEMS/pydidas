@@ -58,6 +58,22 @@ class ParameterCollection(dict):
     def __copy__(self):
         return self.get_copy()
 
+    def __hash__(self):
+        """
+        Create a hash value for the ParameterCollection.
+
+        This hash value is based on the hashed values of the dictionary keys
+        and values.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _keys = tuple(hash(_key) for _key in self.keys())
+        _values = tuple(hash(_val) for _val in self.values())
+        return hash((_keys, _values))
+
     def __setitem__(self, key, param):
         """
         Assign a value to a dictionary key.

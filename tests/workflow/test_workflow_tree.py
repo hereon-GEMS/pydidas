@@ -269,5 +269,38 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(self.tree.nodes, dict())
 
 
+    def test_hash___empty_tree(self):
+        tree = WorkflowTree()
+        self.assertIsInstance(hash(tree), int)
+
+    def test_hash___simple_tree(self):
+        tree = WorkflowTree()
+        tree2 = WorkflowTree()
+        self.assertEqual(hash(tree), hash(tree2))
+
+    def test_hash___full_tree(self):
+        tree = _WorkflowTree()
+        tree.create_and_add_node(unittest_objects.DummyLoader())
+        tree.create_and_add_node(unittest_objects.DummyProc())
+        tree.create_and_add_node(unittest_objects.DummyProc())
+        tree2 = _WorkflowTree()
+        tree2.create_and_add_node(unittest_objects.DummyLoader())
+        tree2.create_and_add_node(unittest_objects.DummyProc())
+        tree2.create_and_add_node(unittest_objects.DummyProc())
+        self.assertEqual(hash(tree), hash(tree2))
+
+    def test_hash___full_tree_w_different_plugin_param(self):
+        tree = _WorkflowTree()
+        tree.create_and_add_node(unittest_objects.DummyLoader())
+        tree.create_and_add_node(unittest_objects.DummyProc())
+        tree.create_and_add_node(unittest_objects.DummyProc())
+        tree2 = _WorkflowTree()
+        tree2.create_and_add_node(unittest_objects.DummyLoader())
+        tree2.create_and_add_node(unittest_objects.DummyProc())
+        tree2.create_and_add_node(unittest_objects.DummyProc())
+        tree2.root.plugin.set_param_value('image_height', 127)
+        self.assertNotEqual(hash(tree), hash(tree2))
+
+
 if __name__ == '__main__':
     unittest.main()

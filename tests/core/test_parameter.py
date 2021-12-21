@@ -24,6 +24,7 @@ __status__ = "Development"
 
 
 import unittest
+import warnings
 import copy
 from numbers import Integral, Real
 from pathlib import Path
@@ -32,12 +33,13 @@ import numpy as np
 
 from pydidas.core import Hdf5key
 from pydidas.core.parameter import _get_base_class, Parameter
+from pydidas.core.utils import get_random_string
 
 
 class TestParameter(unittest.TestCase):
 
     def setUp(self):
-        ...
+        warnings.simplefilter("ignore")
 
     def tearDown(self):
         ...
@@ -342,6 +344,51 @@ class TestParameter(unittest.TestCase):
         obj = Parameter('Test0', Hdf5key, '/test')
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertIsInstance(_newval, Hdf5key)
+
+    def test_hash__simple_str(self):
+        _param = Parameter('Test', str, '')
+        _param2 = Parameter('Test', str, '')
+        self.assertEqual(hash(_param), hash(_param2))
+
+    def test_hash__full_str(self):
+        _param = Parameter('Test', str, get_random_string(12), name='Name')
+        _param2 = Parameter('Test', str, _param.value, name='Name')
+        self.assertEqual(hash(_param), hash(_param2))
+
+    def test_hash__different_str(self):
+        _param = Parameter('Test', str, get_random_string(12), name='Name')
+        _param2 = Parameter('Test', str, get_random_string(12), name='Name')
+        self.assertNotEqual(hash(_param), hash(_param2))
+
+    def test_hash__simple_int(self):
+        _param = Parameter('Test', int, 0)
+        _param2 = Parameter('Test', int, 0)
+        self.assertEqual(hash(_param), hash(_param2))
+
+    def test_hash__full_int(self):
+        _param = Parameter('Test', int, 0, name='The name', unit='m')
+        _param2 = Parameter('Test', int, 0, name='The name', unit='m')
+        _param.value = 42
+        _param2.value = 42
+        self.assertEqual(hash(_param), hash(_param2))
+
+    def test_hash__different_int_value(self):
+        _param = Parameter('Test', int, 0, name='The name', unit='m')
+        _param2 = Parameter('Test', int, 0, name='The name', unit='m')
+        _param.value = 42
+        _param2.value = 41
+        self.assertNotEqual(hash(_param), hash(_param2))
+
+    def test_hash__non_hashable_type(self):
+        _param = Parameter('Test', None, [0, 1], name='The name', unit='m')
+        self.assertIsInstance(hash(_param), int)
+
+    def test_hash__compare_non_hashable_type(self):
+        _param = Parameter('Test', None, [0, 1], name='The name', unit='m')
+        _param2 = Parameter('Test', None, [0, 2], name='The name', unit='m')
+        _param3 = Parameter('Test', None, [0, 1], name='Other name', unit='m')
+        self.assertEqual(hash(_param), hash(_param2))
+        self.assertNotEqual(hash(_param), hash(_param3))
 
 
 if __name__ == "__main__":

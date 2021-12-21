@@ -148,6 +148,54 @@ class TestWorkflowNode(unittest.TestCase):
         obj = WorkflowNode(plugin=DummyLoader())
         self.assertIsInstance(obj, WorkflowNode)
 
+    def test_hash__simple(self):
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        self.assertIsInstance(hash(obj), int)
+
+    def test_hash__simple_comparison(self):
+        obj = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj2 = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        self.assertEqual(hash(obj), hash(obj2))
+
+    def test_hash__complex_comparison(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj2 = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        self.assertEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_child(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj2 = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        _ = WorkflowNode(plugin=DummyProc(), node_id=1, parent=obj)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_different_node_id(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj2 = WorkflowNode(plugin=DummyProc(), node_id=2, parent=_parent)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_different_parent(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        _parent2 = WorkflowNode(plugin=DummyProc(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj2 = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent2)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_different_plugin(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj2 = WorkflowNode(plugin=DummyLoader(), node_id=2, parent=_parent)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_different_plugin_param(self):
+        _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
+        obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
+        obj.plugin.set_param_value('label', 'Test')
+        obj2 = WorkflowNode(plugin=DummyProc(), node_id=2, parent=_parent)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -268,3 +268,20 @@ class WorkflowNode(GenericNode):
             calculated. Else, returns None.
         """
         return self._result_shape
+
+    def __hash__(self):
+        """
+        Get the hash value for the WorkflowNode.
+
+        The hash value is calculated by using the plugin, the number of
+        children and the parent.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _hashables = [len(self._children), self._parent, self._node_id,
+                      self.plugin]
+        _hashes = tuple(hash(_item) for _item in _hashables)
+        return hash(_hashes)

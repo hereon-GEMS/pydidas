@@ -29,6 +29,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterCollectionMixIn', 'ObjectWithParameterCollection']
 
+import warnings
 from copy import copy
 from numbers import Integral
 
@@ -359,3 +360,31 @@ class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn,
         """
         for _key, _value in state.items():
             setattr(self, _key, _value)
+
+    def __hash__(self):
+        """
+        Get a hash value.
+
+        The hash value is based on the associated ParameterCollection and
+        additional data in the _config dictionary.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _config_keys = []
+        _config_vals = []
+        _param_hash = hash(self.params)
+        for _key, _val in self._config.items():
+            try:
+                _hash = hash(_key)
+                _config_keys.append(_hash)
+            except TypeError:
+                warnings.warn(f'Could not hash the dictionary key "{_key}".')
+            try:
+                _hash = hash(_val)
+                _config_vals.append(_hash)
+            except TypeError:
+                warnings.warn(f'Could not hash the dictionary value "{_val}".')
+        return hash((_param_hash, tuple(_config_keys), tuple(_config_vals)))

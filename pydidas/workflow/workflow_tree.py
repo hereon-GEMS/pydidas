@@ -27,6 +27,7 @@ __status__ = "Development"
 __all__ = ['WorkflowTree']
 
 import ast
+import warnings
 
 from ..core import SingletonFactory, AppConfigError
 from ..plugins import PluginCollection

@@ -24,6 +24,7 @@ __status__ = "Development"
 
 
 import unittest
+import warnings
 import io
 import sys
 import copy
@@ -36,6 +37,7 @@ from pydidas.core import (ObjectWithParameterCollection, Parameter,
 class TestObjectWithParameterCollection(unittest.TestCase):
 
     def setUp(self):
+        warnings.simplefilter('ignore')
         self._params = ParameterCollection(
             Parameter('Test0', int, default=12),
             Parameter('Test1', str, default='test str'),
@@ -287,6 +289,42 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         self.assertIsInstance(new_obj, ObjectWithParameterCollection)
         for _key, _param in obj.params.items():
             self.assertEqual(_param.value, new_obj.get_param_value(_key))
+
+    def test_hash__empty_object(self):
+        obj = ObjectWithParameterCollection()
+        _hash = hash(obj)
+        self.assertIsInstance(_hash, int)
+
+    def test_hash__simple_comparison(self):
+        obj = ObjectWithParameterCollection()
+        obj2 = ObjectWithParameterCollection()
+        self.assertEqual(hash(obj), hash(obj2))
+
+    def test_hash__complex_comparison(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config['Test'] = [1, 2, 3, 4, 5]
+        obj2 = ObjectWithParameterCollection()
+        obj2._config['Test'] = [1, 2, 3, 4, 5, 6]
+        obj2.add_params(self._params.get_copy())
+        self.assertEqual(hash(obj), hash(obj2))
+
+    def test_hash__complex_comparison_w_difference(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config['Test'] = [1, 2, 3, 4, 5]
+        obj2 = ObjectWithParameterCollection()
+        obj2._config['Test'] = [1, 2, 3, 4, 5, 6]
+        obj2.add_params(self._params.get_copy())
+        obj2.set_param_value('Test0', 13)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
+    def test_hash__from_pickle(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config['Test'] = [1, 2, 3, 4, 5]
+        obj2 = pickle.loads(pickle.dumps(obj))
+        self.assertEqual(hash(obj), hash(obj2))
 
 
 if __name__ == "__main__":

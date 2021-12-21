@@ -28,6 +28,7 @@ __all__ = ['Parameter']
 
 
 import numbers
+import warnings
 from pathlib import Path
 
 from .hdf5_key import Hdf5key
@@ -203,17 +204,6 @@ class Parameter:
             raise ValueError(f'The default value "{_def}" does not '
                              'correspond to any of the defined choices: '
                              f'{self.__meta["choices"]}.')
-
-    def __call__(self):
-        """
-        Calling method to get the value.
-
-        Returns
-        -------
-        value
-            The stored parameter value-
-        """
-        return self.__value
 
     def __typecheck(self, val):
         """
@@ -581,3 +571,44 @@ class Parameter:
             A copy of the Parameter.
         """
         return self.get_copy()
+
+    def __call__(self):
+        """
+        Calling method to get the value.
+
+        Returns
+        -------
+        value
+            The stored parameter value-
+        """
+        return self.__value
+
+    def __hash__(self):
+        """
+        Get a hash value for the Parameter.
+
+        The generated hash key depends on the reference key, type, value,
+        default, name, unit and choices of the Parameter.
+
+        Warning: In case of non-hashable values, the Parameter will still
+        generate a hash value based on the other items but this value might
+        not be representative because it cannot capture changing values.
+
+        Returns
+        -------
+        int
+            The hashed value for the Parameter.
+        """
+        _hash_vals = []
+        _choices = (tuple() if self.__meta['choices'] is None else
+                    tuple(self.__meta['choices']))
+        for _item in [self.__refkey, self.__type, self.__value,
+                      self.__meta['default'], self.__meta['name'],
+                      self.__meta['unit'], _choices]:
+            try:
+                _val = hash(_item)
+                _hash_vals.append(_val)
+            except TypeError:
+                warnings.warn(f'Could not hash "{_item}". The hash value for '
+                              'the Parameter might not be accurate.')
+        return hash(tuple(_hash_vals))

@@ -248,7 +248,7 @@ class TestGenericTree(unittest.TestCase):
         for _node in _nodes[_depth]:
             self.assertTrue(_node in _leaves)
 
-    def test_copy__(self):
+    def test_copy(self):
         _depth = 3
         _width = 4
         tree = GenericTree()
@@ -271,6 +271,25 @@ class TestGenericTree(unittest.TestCase):
         _copy = tree.get_copy()
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
+
+    def test_hash___empty_tree(self):
+        tree = GenericTree()
+        self.assertIsInstance(hash(tree), int)
+
+    def test_hash___simple_tree(self):
+        tree = GenericTree()
+        tree2 = GenericTree()
+        self.assertEqual(hash(tree), hash(tree2))
+
+    def test_hash___full_tree(self):
+        _depth = 3
+        _width = 4
+        tree = GenericTree()
+        tree2 = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
+        tree.register_node(_nodes[0][0])
+        tree2.register_node(_nodes[0][0].get_copy())
+        self.assertEqual(hash(tree), hash(tree2))
 
 
 if __name__ == '__main__':

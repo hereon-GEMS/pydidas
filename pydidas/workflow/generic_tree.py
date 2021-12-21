@@ -28,6 +28,7 @@ __all__ = ['GenericTree']
 
 
 import copy
+import warnings
 
 from .generic_node import GenericNode
 
@@ -307,3 +308,29 @@ class GenericTree:
             A new instance of the GenericTree
         """
         return self.__copy__()
+
+    def __hash__(self):
+        """
+        Get the hash value for the GenericTree.
+
+        The hash value is calculated by using all nodes' IDs and node hashes.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _node_keys = []
+        _node_vals = []
+        for _key, _val in self.nodes.items():
+            try:
+                _hash = hash(_key)
+                _node_keys.append(_hash)
+            except TypeError:
+                warnings.warn(f'Could not hash the dictionary key "{_key}".')
+            try:
+                _hash = hash(_val)
+                _node_vals.append(_hash)
+            except TypeError:
+                warnings.warn(f'Could not hash the dictionary value "{_val}".')
+        return hash((tuple(_node_keys), tuple(_node_vals)))

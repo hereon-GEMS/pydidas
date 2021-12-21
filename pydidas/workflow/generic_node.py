@@ -345,3 +345,19 @@ class GenericNode:
             _child_copy = copy.copy(_child)
             _copy.add_child(_child_copy)
         return _copy
+
+    def __hash__(self):
+        """
+        Get a hash value for the GenericNode.
+
+        The hash is determined by the node ID, the parent and the number of
+        children (but not by the children themselves to prevent circural
+        recursion).
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        return hash((hash(len(self._children)), hash(self._parent),
+                     hash(self._node_id)))

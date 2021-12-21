@@ -310,6 +310,21 @@ class TestParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj['Test6'] = Parameter('Test5', float, default=-1)
 
+    def test_hash__simple(self):
+        obj = ParameterCollection(*self._params)
+        self.assertIsInstance(hash(obj), int)
+
+    def test_hash__comparison_of_equal_collections(self):
+        obj = ParameterCollection(*self._params)
+        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        self.assertEqual(hash(obj), hash(obj2))
+
+    def test_hash__comparison_w_different_param_value(self):
+        obj = ParameterCollection(*self._params)
+        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        obj.set_value('Test0', 13)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
     def test_creation(self):
         obj = ParameterCollection()
         self.assertIsInstance(obj, ParameterCollection)

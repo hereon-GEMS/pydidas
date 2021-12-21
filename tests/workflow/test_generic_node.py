@@ -280,6 +280,22 @@ class TestGenericNode(unittest.TestCase):
         self.assertEqual(node._parent, node_copy._parent)
         self.assertFalse(node3 in node_copy._children)
 
+    def test_hash__simple_node(self):
+        node = GenericNode(node_id=0)
+        node2 = GenericNode(node_id=0)
+        self.assertEqual(hash(node), hash(node2))
+
+    def test_hash__w_child(self):
+        node = GenericNode(node_id=0)
+        GenericNode(node_id=1, parent=node)
+        node2 = GenericNode(node_id=0)
+        self.assertNotEqual(hash(node), hash(node2))
+
+    def test_hash__w_parent(self):
+        node = GenericNode(node_id=1, parent=GenericNode(node_id=0))
+        node2 = GenericNode(node_id=0)
+        self.assertNotEqual(hash(node), hash(node2))
+
 
 if __name__ == '__main__':
     unittest.main()

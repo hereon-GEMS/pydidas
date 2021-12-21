@@ -506,6 +506,9 @@ class MainWindow(QtWidgets.QMainWindow):
             The status message.
         """
         self.statusBar().showMessage(text)
+        if text[-1] != '\n':
+            text += '\n'
+
         self.__info_widget.add_status(text)
 
     @QtCore.pyqtSlot(str)

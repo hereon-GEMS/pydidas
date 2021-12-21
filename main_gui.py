@@ -72,8 +72,6 @@ def run_gui(qtapp):
                        'Tools/Composite image creator', 'qta::mdi.view-comfy')
     gui.register_frame(ProcessingSetupFrame, 'Processing setup',
                        'Processing setup', 'qta::mdi.cogs')
-    gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
-                       'Run full procesing', 'qta::mdi.sync')
     gui.register_frame(ExperimentalSetupFrame, 'Experimental settings',
                        'Processing setup/Experimental settings',
                        'qta::mdi.card-bulleted-settings-outline')
@@ -82,6 +80,8 @@ def run_gui(qtapp):
     gui.register_frame(WorkflowEditFrame, 'Workflow editing',
                        'Processing setup/Workflow editing',
                        'qta::mdi.clipboard-flow-outline')
+    gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
+                       'Run full procesing', 'qta::mdi.sync')
     # gui.register_frame(ResultVisualizationFrame, 'Result visualization',
     #                    'Result visualization', 'qta::mdi.monitor-eye')
     gui.show()

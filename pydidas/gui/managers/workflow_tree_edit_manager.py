@@ -168,7 +168,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets[node_id] = _widget
 
     @QtCore.pyqtSlot(int)
-    def set_active_node(self, node_id):
+    def set_active_node(self, node_id, force_update=False):
         """
         Set the node with node_id to be the active node.
 
@@ -178,6 +178,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         ----------
         node_id : int
             The unique identifier for the node to be activated.
+        force_update : bool, optional
+            Keyword to force an update cycle. This must be used after loading
+            a new WorkflowTree or after activating the Frame.
 
         Raises
         ------
@@ -185,7 +188,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             A KeyError is raised if the node_id key has not been registered
             with the manager yet.
         """
-        if node_id == self.active_node_id:
+        if node_id not in self._nodes.keys():
+            return
+        if node_id == self.active_node_id and not force_update:
             return
         for nid in self._node_widgets:
             self._node_widgets[nid].widget_select(node_id == nid)
@@ -239,10 +244,17 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)
 
-    def update_from_tree(self):
+    def update_from_tree(self, reset_active_node=False):
         """
         Update the canvas and nodes from the WorkflowTree.
+
+        Parameters
+        ----------
+        reset_active_node : bool, optional
+            Flag to toggle resetting the active node. After loading a
+            WorkflowTree from file, this can be used to reset the selection.
         """
+        _stored_active_node = self.active_node_id
         self.__delete_all_nodes_and_widgets()
         for _node_id, _node in TREE.nodes.items():
             name = _node.plugin.plugin_name
@@ -250,6 +262,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.__create_position_node(_node_id)
             self.__create_widget(name, _node_id)
         self.update_node_positions()
+        if reset_active_node:
+            self.active_node_id = None
+            self.plugin_to_edit.emit(-1)
+            return
+        self.active_node_id = _stored_active_node
+        self.set_active_node(_stored_active_node, force_update=True)
 
     def __delete_all_nodes_and_widgets(self):
         """

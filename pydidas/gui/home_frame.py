@@ -58,6 +58,8 @@ _proc_setup_text = (
     '\n\nEach object has its own dedicated setup frame with importers and '
     'exporters for the various supported formats.')
 
+_proc_text = ''
+
 
 class HomeFrame(BaseFrame):
     def __init__(self, **kwargs):
@@ -82,10 +84,10 @@ class HomeFrame(BaseFrame):
 
         self.create_label('label_help_header', 'Online help:', fontsize=11,
                           underline=True, bold=True, fixedWidth=400)
-        self.create_label('label_help', _help_text, fixedWidth=600,
-                          textFormat=QtCore.Qt.RichText,
-                          openExternalLinks=True,
-                          textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse)
+        self.create_label(
+            'label_help', _help_text, fixedWidth=600, openExternalLinks=True,
+            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
+            textFormat=QtCore.Qt.RichText)
         self._widgets['label_help'].linkActivated.connect(self.open_link)
         self.create_spacer(None)
 

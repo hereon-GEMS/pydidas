@@ -118,7 +118,7 @@ class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
         if fname in ['', None]:
             return
         TREE.import_from_file(fname)
-        WORKFLOW_EDIT_MANAGER.update_from_tree()
+        WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):

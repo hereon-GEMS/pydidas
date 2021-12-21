@@ -29,7 +29,7 @@ __all__ = ['ExecuteWorkflowFrame']
 import time
 
 import numpy as np
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 
 from ..apps import ExecuteWorkflowApp
 from ..core import get_generic_param_collection
@@ -70,7 +70,8 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
                         'data_slices': (),
                         'plot_last_update': 0,
                         'plot_update_time': _global_plot_update_time,
-                        'frame_active': True}
+                        'frame_active': True,
+                        'source_hash': RESULTS.source_hash}
         self._app = ExecuteWorkflowApp()
         self.set_default_params()
         self.add_params(self._app.params)
@@ -99,14 +100,40 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.set_status('Aborted processing of full workflow.')
         self.__finish_processing()
 
+    @QtCore.pyqtSlot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
         """
         if self.get_param_value('run_type') == 'Process in GUI':
+            self._verify_result_shapes_uptodate()
             self._run_app()
         elif self.get_param_value('run_type') == 'Command line':
             self.__run_cmd_process()
+
+    def _verify_result_shapes_uptodate(self):
+        """
+        Verify that the underlying information for the WorkflowResults
+        (i.e. the ScanSetup and WorkflowTree) have not changed.
+        """
+        _hash = RESULTS.source_hash
+        if _hash != self._config['source_hash']:
+            RESULTS.update_shapes_from_scan_and_workflow()
+            self._config['source_hash'] = RESULTS.source_hash
+            self.__clear_selected_results_entries()
+            self.__clear_plot()
+            self.__update_choices_of_selected_results()
+            _box = QtWidgets.QMessageBox.information(
+                self, 'Results need to be updated',
+                ('Underlying information for the WorkflowResults has changed '
+                 'and the WorkflowResults must be updated. This will clear '
+                 'all present results.\n'
+                 'Either the WorkflowTree or the ScanSetup has been modified '
+                 'and the consistency of the results cannot be guaranteed '
+                 'without calculating them from scratch.'))
+            # _box.exec_()
+
+
 
     def _run_app(self):
         """
@@ -261,16 +288,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             The index of the newly activated frame.
         """
         if index == self.frame_index:
-            _box = QuestionBox(
-                'Update results?',
-                'Do you want to update the global WorkflowResults?',
-                ('Selecting "Yes" will  remove all current results and create '
-                 'empty containers for the new results. Only do this when you '
-                 'changed the WorkflowTree, but then it is mandatory.'))
-            if _box.exec_():
-                RESULTS.update_shapes_from_scan_and_workflow()
-                self.__clear_selected_results_entries()
-                self.__clear_plot()
+            self._verify_result_shapes_uptodate()
             self.__update_choices_of_selected_results()
             self.__check_for_plot_update()
         self._config['frame_active'] = (index == self.frame_index)

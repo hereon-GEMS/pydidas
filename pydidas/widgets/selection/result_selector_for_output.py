@@ -176,7 +176,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     def reset(self):
         """
         Reset the instance to its default selection, for example when a new
-        processing has been started and te old information is no longer valid.
+        processing has been started and the old information is no longer valid.
         """
         self._config = {'widget_visibility': False,
                         'scan_use_timeline': False,
@@ -204,6 +204,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         items.
         """
         _param = self.get_param('selected_results')
+        # store the labels for the different nodes from the RESULTS
         RESULTS.update_param_choices_from_labels(_param)
         with SignalBlocker(self.param_widgets['selected_results']):
             self.param_widgets['selected_results'].update_choices(

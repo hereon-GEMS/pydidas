@@ -55,6 +55,7 @@ class _WorkflowResults(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self.__composites = {}
+        self.__source_hash = hash((hash(SCAN), hash(TREE)))
         self._config = {'shapes': {},
                         'labels': {},
                         'metadata_complete': False}
@@ -81,6 +82,7 @@ class _WorkflowResults(QtCore.QObject):
             self._config['shapes'] = _shapes
             self._config['labels'][_node_id] = (
                 TREE.nodes[_node_id].plugin.get_param_value('label'))
+        self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     def clear_all_results(self):
         """
@@ -188,6 +190,19 @@ class _WorkflowResults(QtCore.QObject):
         """
         return {_key: self.__composites[_key].ndim
                 for _key in self.__composites}
+
+    @property
+    def source_hash(self):
+        """
+        Get the source hash from the input WorkflowTree ans ScanSetup.
+
+        Returns
+        -------
+        int
+            The hash value of the combined input data.
+        """
+        self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        return self.__source_hash
 
     def get_results(self, node_id):
         """

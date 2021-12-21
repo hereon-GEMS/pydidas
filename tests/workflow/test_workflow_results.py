@@ -333,6 +333,22 @@ class TestWorkflowResults(unittest.TestCase):
                 _item = f'(node #{_key:03d})'
             self.assertIn(_item, _choices)
 
+    def test_source_hash__simple(self):
+        _hash = RES.source_hash
+        self.assertIsInstance(_hash, int)
+
+    def test_source_hash__change_in_scansetup(self):
+        _hash = RES.source_hash
+        SCAN.set_param_value('unit_1', 'a new unit value')
+        _new_hash = RES.source_hash
+        self.assertNotEqual(_hash, _new_hash)
+
+    def test_source_hash__change_in_tree(self):
+        _hash = RES.source_hash
+        TREE.nodes[0].plugin.set_param_value('image_height', 12345)
+        _new_hash = RES.source_hash
+        self.assertNotEqual(_hash, _new_hash)
+
 
 if __name__ == '__main__':
     unittest.main()

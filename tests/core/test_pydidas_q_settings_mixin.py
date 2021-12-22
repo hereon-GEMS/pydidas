@@ -33,7 +33,7 @@ from pydidas.core import (PydidasQsettingsMixin, ParameterCollection,
                           Parameter, CopyableQSettings)
 
 
-class TestQSettingsMixin(unittest.TestCase):
+class TestPydidasQSettingsMixin(unittest.TestCase):
 
     def setUp(self):
         self._params = ParameterCollection(

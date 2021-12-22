@@ -27,20 +27,27 @@ import unittest
 import time
 import string
 import random
+import tempfile
+import os
+import shutil
+from contextlib import redirect_stdout
+
 
 from pydidas.core.utils.str_utils import (
-    get_fixed_length_str, get_time_string, get_warning,
+    get_fixed_length_str, get_time_string, get_warning, timed_print,
     convert_special_chars_to_unicode, format_input_to_multiline_str,
-    convert_unicode_to_ascii, update_separators, get_random_string)
+    convert_unicode_to_ascii, update_separators, get_random_string,
+    get_short_time_string, get_range_as_formatted_string)
 
 
 class Test_str_utils(unittest.TestCase):
 
     def setUp(self):
         self.length = 20
+        self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
-        ...
+        shutil.rmtree(self._tmpdir)
 
     def test_get_fixed_length_str_length(self):
         self.assertEqual(len(get_fixed_length_str('test', self.length)), self.length)
@@ -132,10 +139,39 @@ class Test_str_utils(unittest.TestCase):
 
     def test_time_str_epoch(self):
         _str = get_time_string(epoch=0)
+        # check only for year, month, day and minute, second because of
+        # conversion of time in different time zones.
         self.assertTrue(_str.startswith('1970/01/01'))
         self.assertTrue(_str.endswith(':00:00.000'))
 
-    def test_get_warning_simple(self):
+    def test_get_short_time_string(self):
+        _str = get_short_time_string(epoch=0)
+        # check only for year, month, day and minute, second because of
+        # conversion of time in different time zones.
+        self.assertTrue(_str.startswith('01/01'))
+        self.assertTrue(_str.endswith(':00:00'))
+
+    def test_timed_print(self):
+        _teststr = 'afs 4-2 version 1.0'
+        _fname = os.path.join(self._tmpdir, 'out.txt')
+        with open(_fname, 'w') as _f:
+            with redirect_stdout(_f):
+                timed_print(_teststr)
+        with open(_fname, 'r') as _f:
+            _text = _f.read()
+        self.assertIn(_teststr, _text)
+
+    def test_timed_print_verbose_false(self):
+        _teststr = 'afs 4-2 version 1.0'
+        _fname = os.path.join(self._tmpdir, 'out.txt')
+        with open(_fname, 'w') as _f:
+            with redirect_stdout(_f):
+                timed_print(_teststr, verbose=False)
+        with open(_fname, 'r') as _f:
+            _text = _f.read()
+        self.assertNotIn(_teststr, _text)
+
+    def test_get_warning__simple(self):
         _teststr = 'test'
         w = get_warning(_teststr, return_warning=True, print_warning=False)
         w_parts = w.split('\n')
@@ -145,7 +181,27 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(w_lens, [60] * len(w_parts))
         self.assertTrue(w_parts[1].startswith(f'- {_teststr} -'))
 
-    def test_get_warning_multiline(self):
+    def test_get_warning__w_print(self):
+        _teststr = 'test'
+        _fname = os.path.join(self._tmpdir, 'out.txt')
+        with open(_fname, 'w') as _f:
+            with redirect_stdout(_f):
+                get_warning(_teststr, return_warning=False, print_warning=True)
+        with open(_fname, 'r') as _f:
+            _text = _f.read().strip()
+        w_parts = _text.split('\n')
+        w_lens = [len(_w) for _w in w_parts]
+        self.assertEqual(len(w_parts), 3)
+        self.assertEqual(w_parts[0], '-' * 60)
+        self.assertEqual(w_lens, [60] * len(w_parts))
+        self.assertTrue(w_parts[1].startswith(f'- {_teststr} -'))
+
+    def test_get_warning__no_return(self):
+        _teststr = 'test'
+        w = get_warning(_teststr, return_warning=False, print_warning=False)
+        self.assertIsNone(w)
+
+    def test_get_warning__multiline(self):
         _teststr = ['test', 'test2']
         w = get_warning(_teststr, return_warning=True, print_warning=False)
         w_parts = w.split('\n')
@@ -155,6 +211,19 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(w_lens, [60] * len(w_parts))
         self.assertTrue(w_parts[1].startswith(f'- {_teststr[0]} -'))
         self.assertTrue(w_parts[2].startswith(f'- {_teststr[1]} -'))
+
+    def test_get_warning__multiline_with_empty_line(self):
+        _teststr = ['test', '', 'test2']
+        w = get_warning(_teststr, return_warning=True, print_warning=False)
+        w_parts = w.split('\n')
+        w_lens = [len(_w) for _w in w_parts]
+        self.assertEqual(len(w_parts), 5)
+        self.assertEqual(w_lens, [60] * len(w_parts))
+        self.assertEqual(w_parts[0], '-' * 60)
+        self.assertTrue(w_parts[1].startswith(f'- {_teststr[0]} -'))
+        self.assertEqual(w_parts[2], '-' * 60)
+        self.assertTrue(w_parts[3].startswith(f'- {_teststr[2]} -'))
+
 
     def test_get_warning_long(self):
         _teststr = ''.join(random.choice(string.ascii_letters)
@@ -232,6 +301,55 @@ class Test_str_utils(unittest.TestCase):
         _target = 'chi test test2 Another thetastr^-1'
         _new_str = convert_unicode_to_ascii(_str)
         self.assertEqual(_new_str, _target)
+
+    def test_convert_unicode_to_ascii__wrong_type(self):
+        with self.assertRaises(TypeError):
+            convert_unicode_to_ascii((1, 2, 3))
+
+    def test_get_range_as_formatted_string__w_string(self):
+        _input = '12321'
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_input, _output)
+
+    def test_get_range_as_formatted_string__w_list(self):
+        _input = [0, 1, 2, 3]
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, '0 ... 3')
+
+    def test_get_range_as_formatted_string__w_tuple(self):
+        _input = (0, 1, 2, 3)
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, '0 ... 3')
+
+    def test_get_range_as_formatted_string__w_iterator(self):
+        _input = range(0, 4)
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, '0 ... 3')
+
+    def test_get_range_as_formatted_string__w_float(self):
+        _input = (0.1, 1.2, 2.3, 3.4)
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, '0.100000 ... 3.400000')
+
+    def test_get_range_as_formatted_string__w_strings(self):
+        _input = ('a', 'b', 'c')
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, 'a ... c')
+
+    def test_get_range_as_formatted_string__w_mixed(self):
+        _input = ('a', 'b', 4)
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, 'a ... 4')
+
+    def test_get_range_as_formatted_string__range_of_len_one(self):
+        _input = ('a', )
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, 'a ... a')
+
+    def test_get_range_as_formatted_string__with_value(self):
+        _input = 12
+        _output = get_range_as_formatted_string(_input)
+        self.assertEqual(_output, 'unknown range')
 
     def test_update_separators(self):
         _test = 'this\\string/has\\mixed/separators'

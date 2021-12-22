@@ -103,7 +103,6 @@ class ExecuteWorkflowApp(BaseApp):
         Reset the runtime variables for a new run.
         """
         self._config['result_metadata_set'] = False
-        self._config['scan_vals'] = {}
         self._shared_arrays = {}
         self._result_metadata = {}
         self._mp_tasks = np.array(())

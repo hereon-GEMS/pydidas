@@ -377,11 +377,7 @@ class ObjectWithParameterCollection(QtCore.QObject, ParameterCollectionMixIn,
         _config_vals = []
         _param_hash = hash(self.params)
         for _key, _val in self._config.items():
-            try:
-                _hash = hash(_key)
-                _config_keys.append(_hash)
-            except TypeError:
-                warnings.warn(f'Could not hash the dictionary key "{_key}".')
+            _config_keys.append(hash(_key))
             try:
                 _hash = hash(_val)
                 _config_vals.append(_hash)

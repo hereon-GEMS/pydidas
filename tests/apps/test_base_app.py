@@ -92,6 +92,11 @@ class TestBaseApp(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             app.multiprocessing_post_run()
 
+    def test_multiprocessing_store_results(self):
+        app = BaseApp()
+        with self.assertRaises(NotImplementedError):
+            app.multiprocessing_store_results(0, 0)
+
     def test_multiprocessing_get_tasks(self):
         app = BaseApp()
         with self.assertRaises(NotImplementedError):

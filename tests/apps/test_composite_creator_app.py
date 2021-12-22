@@ -506,7 +506,20 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = self.get_default_app()
         self.set_bg_params(app, self._fname(0))
         app.prepare_run()
-        # assert does not raise an error
+        self.assertIsInstance(app._bg_image, np.ndarray)
+
+    def test_prepare_run__with_thresholds(self):
+        _thresh_low = -12
+        _thresh_high = 42
+        app = self.get_default_app()
+        app.set_param_value('use_thresholds', True)
+        app.set_param_value('threshold_low', _thresh_low)
+        app.set_param_value('threshold_high', _thresh_high)
+        app.prepare_run()
+        self.assertEqual(app._composite.get_param_value('threshold_low'),
+                         _thresh_low)
+        self.assertEqual(app._composite.get_param_value('threshold_high'),
+                         _thresh_high)
 
     def test_prepare_run__slave_mode(self):
         app = self.get_default_app()

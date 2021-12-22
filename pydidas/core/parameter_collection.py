@@ -266,20 +266,12 @@ class ParameterCollection(dict):
         ----------
         *args : tuple
             Single Parameters or ParameterCollections.
-
-        Raises
-        ------
-        KeyError
-            If the key for the Parameter is already in use.
         """
-        if isinstance(args, ParameterCollection):
-            self.update(args)
-        else:
-            for _param in args:
-                if isinstance(_param, Parameter):
-                    self.add_param(_param)
-                elif isinstance(_param, (ParameterCollection)):
-                    self.update(_param)
+        for _param in args:
+            if isinstance(_param, Parameter):
+                self.add_param(_param)
+            elif isinstance(_param, (ParameterCollection)):
+                self.update(_param)
 
     def __add_kwarg_params(self, **kwargs):
         """

@@ -155,6 +155,16 @@ class TestDataset(unittest.TestCase):
         self.assertEqual(list(_new.axis_units.values()),
                           [None] + self._dset['units'])
 
+    def test_empty_dataset_array_finalize__add_dimension_in_middle(self):
+        obj = self.create_large_dataset()
+        _new = obj[:, None, :]
+        self.assertEqual(
+            list(_new.axis_labels.values()),
+            [self._dset['labels'][0]] + [None] + self._dset['labels'][1:])
+        self.assertEqual(
+            list(_new.axis_units.values()),
+            [self._dset['units'][0]] + [None] + self._dset['units'][1:])
+
     def test_empty_dataset_array_finalize__empty_shape(self):
         obj = self.create_large_dataset()
         self.assertTrue((obj == obj).all())

@@ -93,10 +93,10 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
         if os.path.exists(item):
             item = h5py.File(item, 'r')
             _close_on_exit = True
-    file_ref = item.file if file_ref is None else file_ref
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
+    file_ref = item.file if file_ref is None else file_ref
     for key in item:
         _item = item[key]
         # add a check to filter external datasets. These are referenced

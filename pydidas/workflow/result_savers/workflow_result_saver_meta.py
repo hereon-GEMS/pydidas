@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the WorkflowResultSaverMeta class which is used for creating
 exporter/importer classes and registering them.
@@ -139,7 +140,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             _saver.update_frame_metadata(metadata)
 
     @classmethod
-    def export_to_active_savers(cls, index, frame_result_dict, **kwargs):
+    def export_frame_to_active_savers(cls, index, frame_result_dict, **kwargs):
         """
         Export the results of a frame to all active savers.
 
@@ -154,7 +155,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.export_to_file(index, frame_result_dict, **kwargs)
+            _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod
     def export_full_data_to_active_savers(cls, data):

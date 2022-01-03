@@ -75,6 +75,10 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
                                               self._labels)
 
+    def get_datasets(self, start_dim=3):
+        return {_key: Dataset(np.random.random(_shape[start_dim:]))
+                for _key, _shape in self._shapes.items()}
+
     def populate_metadata(self, dataset):
         _labels = {_key: get_random_string(8) for _key in dataset.axis_labels}
         _units = {_key: get_random_string(3) for _key in dataset.axis_units}
@@ -118,8 +122,6 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
 
     def test_update_node_metadata__with_entries(self):
         self.prepare_with_defaults()
-        H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
-                                              self._labels)
         _data = {_key: Dataset(np.random.random(_shape[3:]))
                   for _key, _shape in self._shapes.items()}
         _data[1], _labels, _units, _ranges = self.populate_metadata(_data[1])
@@ -135,10 +137,35 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                 self.assertTrue(np.allclose(_axentry['range'][()],
                                             _ranges[_ax - 3]))
 
-    def test_write_metadata_to_files(self):
+    def test_update_frame_metadata__standard(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape[3:]))
                   for _key, _shape in self._shapes.items()}
+        for _key in _data:
+            _data[_key], _, _, _ = self.populate_metadata(_data[_key])
+        _metadata = {_key: dict(axis_units=_item.axis_units,
+                                axis_labels=_item.axis_labels,
+                                axis_ranges=_item.axis_ranges)
+                     for _key, _item in _data.items()}
+        H5SAVER.update_frame_metadata(_metadata)
+        for _node_id in self._shapes:
+            _fname = os.path.join(self._resdir, self._filenames[_node_id])
+            with h5py.File(_fname, 'r') as _file:
+                for _ax in range(3, _data[_node_id].ndim):
+                    _axentry = _file[f'entry/data/axis_{_ax}']
+                    self.assertEqual(
+                        _axentry['label'][()].decode('UTF-8'),
+                        _metadata[_node_id]['axis_labels'][_ax - 3])
+                    self.assertEqual(
+                        _axentry['unit'][()].decode('UTF-8'),
+                        _metadata[_node_id]['axis_units'][_ax - 3])
+                    self.assertEqual(
+                        _axentry['range'][()].decode('UTF-8'),
+                        _metadata[_node_id]['axis_ranges'][_ax - 3])
+
+    def test_write_metadata_to_files(self):
+        self.prepare_with_defaults()
+        _data = self.get_datasets()
         _metadata = {}
         for _node_id in self._shapes:
             _data[_node_id], _labels, _units, _ranges = (
@@ -161,8 +188,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
 
     def test_export_full_data_to_file(self):
         self.prepare_with_defaults()
-        _data = {_key: Dataset(np.random.random(_shape))
-                  for _key, _shape in self._shapes.items()}
+        _data = self.get_datasets(start_dim=0)
         H5SAVER.export_full_data_to_file(_data)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
@@ -172,8 +198,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
 
     def test_export_frame_to_file(self):
         self.prepare_with_defaults()
-        _data = {_key: Dataset(np.random.random(_shape[3:]))
-                  for _key, _shape in self._shapes.items()}
+        _data = self.get_datasets()
         _index = 23
         _scanindex = SCAN.get_frame_position_in_scan(_index)
         H5SAVER.export_frame_to_file(_index, _data)

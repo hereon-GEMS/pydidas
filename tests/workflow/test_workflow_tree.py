@@ -33,7 +33,7 @@ import pickle
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import AppConfigError
+from pydidas.core import AppConfigError, Dataset
 from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.workflow.workflow_tree import _WorkflowTree
 from pydidas.plugins import PluginCollection
@@ -153,6 +153,15 @@ class TestWorkflowTree(unittest.TestCase):
             for _node in nodes[_d]:
                 self.assertIsNone(_node.results)
                 self.assertIsNone(_node.result_kws)
+
+    def test_execute_process_and_get_results(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        self.tree.register_node(nodes[0][0])
+        _res = self.tree.execute_process_and_get_results(0)
+        for _leaf in self.tree.get_all_leaves():
+            _id = _leaf.node_id
+            self.assertIsInstance(_res[_id], Dataset)
 
     def test_prepare_execution(self):
         _depth = 3

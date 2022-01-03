@@ -382,7 +382,7 @@ class ExecuteWorkflowApp(BaseApp):
         _flag_lock.release()
         RESULTS.store_results(index, _new_results)
         if self.get_param_value('autosave_results'):
-            RESULT_SAVER.export_to_active_savers(index, _new_results)
+            RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
 
     def _store_frame_metadata(self, metadata):
         """

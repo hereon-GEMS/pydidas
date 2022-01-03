@@ -168,6 +168,14 @@ class Test_file_checks(unittest.TestCase):
             self.assertFalse(hdf5_dataset_check(_file['test/data'],
                                                 to_ignore=('test/data')))
 
+    def test_get_hdf5_populated_dataset__unknown_extension(self):
+        with self.assertRaises(TypeError):
+            get_hdf5_populated_dataset_keys(self._fname(1) + '.other')
+
+    def test_get_hdf5_populated_dataset__wrong_input_datatype(self):
+        _res = get_hdf5_populated_dataset_keys([1,2,3])
+        self.assertEqual(_res, [])
+
     def test_get_hdf5_populated_dataset_keys_str(self):
         _res = get_hdf5_populated_dataset_keys(self._fname(1))
         self.assertEqual(set(_res), set(self._fulldsets))

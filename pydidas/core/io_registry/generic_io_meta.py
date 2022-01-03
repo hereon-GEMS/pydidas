@@ -69,7 +69,6 @@ class GenericIoMeta(type):
         """
         cls.registry = {}
 
-
     @classmethod
     def register_class(cls, new_class, update_registry=False):
         """

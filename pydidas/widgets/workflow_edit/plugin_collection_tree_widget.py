@@ -46,12 +46,12 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
     Parameters
     ----------
-    parent : QWidget, optional
+    parent : Union[QWidget, None], optional
         The Qt parent widget. The default is None.
-    collection : pydidas.PluginCollection
+    collection : Union[pydidas.PluginCollection, None], optional
         The plugin collection. Normally, this defaults to the generic
         plugin collection and should not be changed by the user.
-    *kwargs : dict
+    **kwargs : dict
         Additional keyword arguments for widget modifications.
     """
     selection_changed = QtCore.pyqtSignal(str)

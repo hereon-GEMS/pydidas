@@ -28,20 +28,22 @@ __all__ = ['ProcessingSinglePluginFrame']
 
 from PyQt5 import QtCore
 
-from pydidas.core import (Parameter, ParameterCollection,
+from ..core import (Parameter, ParameterCollection,
                           get_generic_param_collection)
-from pydidas.experiment import ScanSetup
-from pydidas.workflow import WorkflowTree
-from pydidas.widgets import  BaseFrame
-from pydidas.gui.builders import ProcessingSinglePlugin_FrameBuilder
+from ..experiment import ScanSetup
+from ..workflow import WorkflowTree
+from ..widgets import BaseFrame
+from ..gui.builders import ProcessingSinglePlugin_FrameBuilder
 
 
 SCAN_SETTINGS = ScanSetup()
 WORKFLOW_TREE = WorkflowTree()
+
 _plugin_param = Parameter(
     'plugins', str, '', name='Plugins',
     choices=['', 'HdfLoader (node 0)', 'BackgroundCorrection (node 1)',
              'AzimuthalIntegration (node 2)'])
+
 
 class ProcessingSinglePluginFrame(BaseFrame,
                                   ProcessingSinglePlugin_FrameBuilder):
@@ -77,7 +79,6 @@ class ProcessingSinglePluginFrame(BaseFrame,
             self.click_plugin_input)
         self._widgets['but_plugin_exec'].clicked.connect(
             self.click_execute_plugin)
-
 
     def setup_stackview(self):
         """

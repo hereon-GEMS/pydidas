@@ -36,13 +36,12 @@ def create_progress_bar(**kwargs):
     Parameters
     ----------
     **kwargs : dict
-        Any supported keyword arguments.
-
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any supported Qt settings for a QProgressBar (for example minimum,
-        maximum, fixedWidth, visible, enabled)
+        Any additional keyword arguments. See below for supported
+        arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QProgressBar. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``.
 
     Returns
     -------

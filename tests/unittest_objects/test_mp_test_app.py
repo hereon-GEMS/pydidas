@@ -27,7 +27,7 @@ import unittest
 import numpy as np
 
 from pydidas.unittest_objects.mp_test_app import MpTestApp
-from pydidas.apps import BaseApp
+from pydidas.core import BaseApp
 
 
 class TestMpTestApp(unittest.TestCase):

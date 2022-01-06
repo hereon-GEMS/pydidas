@@ -40,13 +40,12 @@ def create_button(text, **kwargs):
     text : str
         The button text.
     **kwargs : dict
-        Any supported keyword arguments.
+        Any additional keyword arguments. See below for supported arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QPushButton. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``icon``, ``fixedWidth``, ``visible``, ``enabled``.
 
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any supported Qt settings for button (for example, icon, visible,
-        enabled, fixedWidth)
 
     Returns
     -------

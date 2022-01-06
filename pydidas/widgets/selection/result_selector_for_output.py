@@ -86,6 +86,18 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     "timeline" is given. In a timeline, all Scan points will be flattened to
     a 1d-dataset.
 
+    Notes
+    -----
+    The ResultSelectorForOutput offers the following signal which can be
+    used:
+
+        new_selection : QtCore.pyqtSignal(use_timeline : int, scan_dim : int,\
+                                          active_node : int, selection : tuple)
+            The signal signature is: flag to use timeline or scan shape,
+            plot dimension, node ID of the active node, the selection in form
+            of a tuple with one entry for every dimension (either an integer
+            or a slice).
+
     Parameters
     ----------
     parent : QtWidgets.QWidget

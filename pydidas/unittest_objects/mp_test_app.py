@@ -33,8 +33,7 @@ from PyQt5 import QtCore
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.apps.base_app import BaseApp
-from pydidas.core import get_generic_param_collection
+from pydidas.core import get_generic_param_collection, BaseApp
 from pydidas.image_io import CompositeImage
 
 

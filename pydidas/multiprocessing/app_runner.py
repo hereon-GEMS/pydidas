@@ -30,7 +30,7 @@ import multiprocessing as mp
 
 from PyQt5 import QtCore
 
-from ..apps import BaseApp
+from ..core import BaseApp
 from ..core.utils import pydidas_logger, LOGGING_LEVEL
 from .worker_controller import WorkerController
 from .app_processor_ import app_processor
@@ -46,24 +46,37 @@ class AppRunner(WorkerController):
     spawn a number of processes to perform computations in parallel.
 
     The App runner requires a BaseApp (or subclass) instance with a
-    defined method layout as defined in BaseApp.
+    defined method layout as defined in the BaseApp.
 
-    The AppRunner will
+    The AppRunner will create a local copy of the Application and only
+    modify the local version.
 
-    Signals
-    -------
-    progress : QtCore.pyqtSignal
-        This singal emits the current progress (0..1) in the computations,
-        based on the number of returned results relative to the total tasks.
-    results : QtCore.pyqtSignal
+    Notes
+    -----
+
+    The AppRunner has the following signals which can be connected to:
+
+    progress : QtCore.pyqtSignal(float)
+        This singal emits the current relative progress in the interval (0..1)
+        in the computations, based on the number of returned results relative
+        to the total tasks.
+    results : QtCore.pyqtSignal(int, object)
         The results as returned from the multiprocessing Processes.
-    finished : QtCore.pyqtSignal
+    finished : QtCore.pyqtSignal()
         This signal is emitted when the computations are finished. If the
         AppRunner is running headless, it needs to be connected to the
         app.exit slot to finish the event loop.
-    final_app_state : QtCore.pyqtSignal
+    final_app_state : QtCore.pyqtSignal(object)
         This signal emits a copy of the App after all the calculations have
         been performed if it needs to be used in another context.
+
+    Parameters
+    ----------
+    app : pydidas.core.BaseApp
+        The instance of the application to be run.
+    n_workers : int, optional
+        The number of spawned worker processes. The default is None which will
+        use the globally defined pydidas setting for the number of workers.
     """
     progress = QtCore.pyqtSignal(float)
     results = QtCore.pyqtSignal(int, object)
@@ -71,14 +84,6 @@ class AppRunner(WorkerController):
     final_app_state = QtCore.pyqtSignal(object)
 
     def __init__(self, app, n_workers=None):
-        """
-        Create a WorkerController.
-
-        Parameters
-        ----------
-        n_workers : int, optional
-            The number of spawned worker processes. The default is 4.
-        """
         logger.debug('Starting AppRunner')
         super().__init__(n_workers)
         self.__app = app.get_copy(slave_mode=True)
@@ -88,13 +93,13 @@ class AppRunner(WorkerController):
 
     def call_app_method(self, method_name, *args, **kwargs):
         """
-        Change a method of the app.
+        Call a method of the app on the AppRunner's copy.
 
         Parameters
         ----------
         method_name : str
             The name of the Application.method.
-        *args : type
+        *args : tuple
             Any arguments which need to be passed to the method..
         **kwargs : kwargs
             Any keyword arguments which need to be passed to the method.

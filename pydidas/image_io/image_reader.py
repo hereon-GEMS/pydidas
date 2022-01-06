@@ -52,19 +52,17 @@ class ImageReader:
 
         Parameters
         ----------
-        *args : object
-            A list of arguments. Currently not used.
         **kwargs : dict
             A dictionary of keyword arguments. Supported keyword arguments
-            include the following
-        datatype : Union[datatype, 'auto'], optional
+            are:
+        **datatype : Union[datatype, 'auto'], optional
             If 'auto', the image will be returned in its native data type.
             If a specific datatype has been selected, the image is converted
             to this type. The default is 'auto'.
-        binning : int, optional
+        **binning : int, optional
             The reb-inning factor to be applied to the image. The default
             is 1.
-        roi : Union[tuple, None], optional
+        **roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
             as 2-tuples of integers or slice  objects. If None, the full image

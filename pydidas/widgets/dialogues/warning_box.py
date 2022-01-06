@@ -32,30 +32,23 @@ class WarningBox(QtWidgets.QMessageBox):
     """
     QMessageBox subclass which simplifies the calling syntax to generate
     user warning.
+
+    The WarningBox class will set title and message of the QMessageBox
+    and call the execute function to display it with a single line of
+    code.
+
+    Parameters
+    ----------
+    title : str
+        The message box title.
+    msg : str
+        The message box text.
+    info : str, optional
+        Additional informative text. The default is None.
+    details : str, optional
+        Addition details for the warning. The default is None.
     """
     def __init__(self, title, msg, info=None, details=None):
-        """
-        Generate a warning box.
-
-        The __init__ function will set title and message of the QMessageBox
-        and call the ececute function to display it with a single line of
-        code.
-
-        Parameters
-        ----------
-        title : str
-            The message box title.
-        msg : str
-            The message box text.
-        info : str, optional
-            Additional informative text. The default is None.
-        details : str, optional
-            Addition details for the warning. The default is None.
-
-        Returns
-        -------
-        None.
-        """
         super().__init__()
         self.setIcon(self.Warning)
         self.setWindowTitle(title)
@@ -69,10 +62,6 @@ class WarningBox(QtWidgets.QMessageBox):
 
     def __exec__(self):
         """
-        Show the QMessageBox
-
-        Returns
-        -------
-        None.
+        Show the QMessageBox.
         """
         self.exec_()

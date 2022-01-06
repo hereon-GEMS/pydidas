@@ -45,8 +45,10 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     metadata (shape, datatype, imager per file) of image files. All the
     metadata is available for the user through class properties.
 
-    Parameters
-    ----------
+    Note
+    ----
+    The ImageMetadataManager uses the following generic Parameters:
+
     filename : pathlib.Path
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
@@ -63,6 +65,13 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
+
+    Parameters
+    ----------
+    *args : tuple
+        Any of the Parameters in use can be given as instances.
+    **kwargs : dict
+        Parameters can also be supplied as kwargs, referencey by their refkey.
     """
     default_params = ParameterCollection(
         get_generic_param_collection(

@@ -36,13 +36,8 @@ class ErrorMessageBox(QtWidgets.QDialog):
     ----------
     *args : tuple
         Arguments passed to QtWidgets.QDialogue instanciation.
-    **kwargs : TYPE
+    **kwargs : dict
         Keyword arguments passed to QtWidgets.QDialogue instanciation.
-
-    Methods
-    -------
-    setText(str) :
-        Set the message box text to the input string.
     """
     def __init__(self, *args, **kwargs):
         _text = None

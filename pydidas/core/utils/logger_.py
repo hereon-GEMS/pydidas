@@ -30,7 +30,7 @@ import os
 import logging
 import time
 import multiprocessing as mp
-import pyFAI
+
 
 LOGGING_LEVEL = logging.WARNING
 
@@ -51,8 +51,8 @@ def pydidas_logger(level=logging.DEBUG):
     logger.setLevel(level)
     formatter = logging.Formatter(\
         '[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(
-        os.path.dirname(__file__))), 'logs')
+    _logpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.dirname(__file__)))), 'logs')
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
     _time = time.localtime()

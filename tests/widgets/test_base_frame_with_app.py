@@ -28,8 +28,7 @@ from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
-from pydidas.apps import BaseApp
-from pydidas.core import get_generic_parameter
+from pydidas.core import get_generic_parameter, BaseApp
 from pydidas.widgets.base_frame_with_app import BaseFrameWithApp
 
 

@@ -35,6 +35,7 @@ from . import utils
 __all__.extend(['constants', 'io_registry', 'utils'])
 
 # import __all__ items from modules:
+from .base_app import *
 from .dataset import *
 from .exceptions import *
 from .generic_parameters import *
@@ -42,12 +43,17 @@ from .hdf5_key import *
 from .object_with_parameter_collection import *
 from .parameter import *
 from .parameter_collection import *
+from .parameter_collection_mixin import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
 from .singleton_factory import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import base_app
+__all__.extend(base_app.__all__)
+del base_app
+
 from . import dataset
 __all__.extend(dataset.__all__)
 del dataset
@@ -75,6 +81,10 @@ del parameter
 from . import parameter_collection
 __all__.extend(parameter_collection.__all__)
 del parameter_collection
+
+from . import parameter_collection_mixin
+__all__.extend(parameter_collection_mixin.__all__)
+del parameter_collection_mixin
 
 from . import singleton_factory
 __all__.extend(singleton_factory.__all__)

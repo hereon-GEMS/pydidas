@@ -63,9 +63,12 @@ def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
     # import cannot be prevented while maintaining the desired module
     # structure.
     from ..parameter_config.param_io_widget_file import ParamIoWidgetFile
-    from ..parameter_config.param_io_widget_combo_box import ParamIoWidgetComboBox
-    from ..parameter_config.param_io_widget_lineedit import ParamIoWidgetLineEdit
     from ..parameter_config.param_io_widget_hdf5key import ParamIoWidgetHdf5Key
+    from ..parameter_config.param_io_widget_combo_box import (
+        ParamIoWidgetComboBox)
+    from ..parameter_config.param_io_widget_lineedit import (
+        ParamIoWidgetLineEdit)
+
     if param.choices:
         _widget = ParamIoWidgetComboBox(None, param, widget_width)
     else:

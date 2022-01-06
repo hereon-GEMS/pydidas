@@ -60,9 +60,21 @@ class RoiController:
 
     Input must be given in form of a list or tuple. Acceptable formats for each
     input are:
+
         - int for any boundary
         - slice objects for a direction
         - string representations of any of the above entries.
+
+    Parameters
+    ----------
+    **kwargs : dict
+        Any keyword arguments
+    **input_shape : Union[None, tuple], optional
+        The input shape of the images. This value is only required if negative
+        indices are used in the ROI to generate the correct size of the ROI.
+    **roi : Union[None, tuple, dict]
+        The region of interest to be used in an image. If not given at
+        initialization, this value can be supplied through the .roi property.
     """
 
     def __init__(self, **kwargs):
@@ -113,16 +125,16 @@ class RoiController:
         return self.__roi
 
     @roi.setter
-    def roi(self, *args):
+    def roi(self, _roi):
         """
         Create new ROI slice objects from the input.
 
         Parameters
         ----------
-        *args : type
+        _roi : Union[tuple, list, str]
             ROI creation arguments.
         """
-        self.__roi_key = args[0]
+        self.__roi_key = _roi
         self.create_roi_slices()
 
     @property

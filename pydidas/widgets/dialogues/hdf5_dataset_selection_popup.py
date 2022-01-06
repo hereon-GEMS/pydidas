@@ -36,19 +36,15 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
     QInputDialog subclass for showing a pop-up dialogue to select a dataset
     from an hdf5 file..
+
+    Parameters
+    ----------
+    parent : Union[None, QWidget]
+        The parent widget
+    fname : Union[str, pathlib.Path]
+        The file path to the hdf5 file.
     """
     def __init__(self, parent=None, fname=None):
-        """
-        Generate a dialogue.
-
-
-        Parameters
-        ----------
-        parent : Union[None, QWidget]
-            The parent widget
-        fname : Union[str, pathlib.Path]
-            The file path to the hdf5 file.
-        """
         super().__init__(parent)
         if fname is not None:
             dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)

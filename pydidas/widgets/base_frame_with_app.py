@@ -29,7 +29,7 @@ __all__ = ['BaseFrameWithApp']
 
 from PyQt5 import QtCore
 
-from ..apps import BaseApp
+from ..core import BaseApp
 from .base_frame import BaseFrame
 
 
@@ -46,15 +46,12 @@ class BaseFrameWithApp(BaseFrame):
     ----------
     parent : Union[QWidget, None], optional
         The parent widget. The default is None.
-    name : Union[str, None], optional
-        The reference name of the widget for the CentralWidgetStack.
-        The default is None.
-    init_layout : bool
+    **kwargs : dict
+        Any additional keyword arguments.
+    **init_layout : bool
         Flag to initialize the frame layout with a QtWidgets.QVBoxLayout.
         If False, no layout will be initialized and the subclass is
         responsible for setting up the layout. The default is True.
-    **kwargs : object
-        Any additional keyword arguments.
     """
     status_msg = QtCore.pyqtSignal(str)
 

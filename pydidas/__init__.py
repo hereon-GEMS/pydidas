@@ -17,7 +17,7 @@
 The pydidas (PYthon DIffraction Data Analysis Suite) package is designed to
 speed up and facilitate diffraction data analysis at Synchrotron beamlines.
 
-It is being developed by Helmholtz-Zentrum Hereon
+It is being developed by Helmholtz-Zentrum Hereon.
 """
 
 __author__ = "Malte Storm"
@@ -54,7 +54,9 @@ import subprocess
 import sys
 import os
 _doc_path = os.path.join(os.path.dirname(os.path.dirname((__file__))), 'docs')
-if not os.path.exists(os.path.join(_doc_path, 'build', 'html', 'index.html')):
+_sphinx_running = 'sphinx-build' in sys.argv[0]
+if (not os.path.exists(os.path.join(_doc_path, 'build', 'html', 'index.html'))
+    and not _sphinx_running):
     print('=' * 60)
     print('-' * 60)
     print('----- The html documentation has not yet been created! -----')

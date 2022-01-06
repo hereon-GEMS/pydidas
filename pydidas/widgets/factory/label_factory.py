@@ -39,16 +39,15 @@ def create_label(text, **kwargs):
     ----------
     text : str
         The label text to be printed.
-    fontsize : int, optional
-        The font size in pixels. The default is STANDARD_FONT_SIZE.
     **kwargs : dict
         Any aditional keyword arguments. See below for supported
         arguments.
-
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any Qt settings
+    **fontsize : int, optional
+        The font size in pixels. The default is STANDARD_FONT_SIZE.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes are supported by the QLabel. Use the Qt attribute
+        name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``, ``enabled``.
 
     Returns
     -------

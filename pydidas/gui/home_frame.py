@@ -58,7 +58,19 @@ _proc_setup_text = (
     '\n\nEach object has its own dedicated setup frame with importers and '
     'exporters for the various supported formats.')
 
-_proc_text = ''
+_proc_doc_address = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    'docs', 'build', 'html', 'index.html').replace('\\', '/')
+_proc_text = (
+    'The processing can be started and visualized in the '
+    '"Run Full Processing" frame.\n'
+    'Once the processing has been started, it will run in a separate'
+    ' process and the GUI will stay responsive. \n'
+    'Results can be visualized on the fly while the processing is '
+    'running by selecting the desired node and axes.\n'
+    'For a full tutorial, please visit the corresponding help page: '
+    f'<a href="file:///{_proc_doc_address}">open the processing documentation'
+    ' in a browser</a>.')
 
 
 class HomeFrame(BaseFrame):
@@ -95,6 +107,13 @@ class HomeFrame(BaseFrame):
                           underline=True, bold=True, fixedWidth=400)
         self.create_label('label_processing_setup', _proc_setup_text,
                           fixedWidth=600)
+
+        self.create_label('label_proc', 'Processing:', fontsize=11,
+                          underline=True, bold=True, fixedWidth=400)
+        self.create_label(
+            'label_processing', _proc_text, fixedWidth=600,
+            openExternalLinks=True, textFormat=QtCore.Qt.RichText,
+            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse)
 
     @QtCore.pyqtSlot(str)
     def open_link(self, link_str):

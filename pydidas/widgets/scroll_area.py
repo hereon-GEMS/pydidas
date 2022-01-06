@@ -39,21 +39,12 @@ class ScrollArea(QtWidgets.QScrollArea):
     ----------
     parent : QWidget, optional
         The parent widget. The default is None.
-    **kwargs : Any supported Qt arguments
-        Any arguments which have an associated setArgName method in
-        Qt can be defined at creation.
-
-    Examples of supported keywords
-    ------------------------------
-    widget : QWidget, optional
-        The scroll area's own widget which is displayed.
-        The default is None.
-    fixedWidth : int, optional
-        If the scroll area shall have a fixed width, this value can be
-        defined in pixel. The default is None.
-    fixedHeight : int, optional
-        If the scroll area shall have a fixed height, this value can be
-        defined in pixel. The default is None.
+    **kwargs : dict
+        Any additional keyword arguments. See below for supported arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the RadioButtonGroup. Use the
+        Qt attribute name with a lowercase first character. Examples are
+        ``widget``, ``fixedWidth``, ``fixedHeight``.
     """
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)

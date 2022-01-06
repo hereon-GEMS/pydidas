@@ -34,10 +34,10 @@ import qtawesome
 
 class QtaIconButton(QtWidgets.QPushButton):
     """
-    A QPushButton with a reference to a qtawesome icon to be used as
+    A QPushButton with a reference to a ``qtawesome`` icon to be used as
     icon.
 
-     Parameters
+    Parameters
     ----------
     icon: Union[str, QtIcon]
         The icon to be used for the button. If a string is passed, this is

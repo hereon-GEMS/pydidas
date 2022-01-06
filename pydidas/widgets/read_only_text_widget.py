@@ -43,25 +43,22 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
     **kwargs : Any supported Qt arguments
         Any arguments which have an associated setArgName method in
         Qt can be defined at creation.
-
-    Supported keyword arguments
-    ---------------------------
-    readOnly : bool, optional
-         Flag to set the field to read only. The default is True.
-     minimumWidth : Union[int, None], optional
-         The minimum width of the widget. If None, no minimum width will be
-         set for the widget. The default is 500.
-     fixedWidth : Union[int, None], optional
-         A fixed width for the widget. If None, no fixedWidth will be set.
-         The default is None.
-     minimumHeight : Union[int, None], optional
-         The minimum Height of the widget. If None, no minimum height will
-         be set for the widget. The default is None.
-     fixedHeight : Union[int, None], optional
-         A fixed height for the widget. If None, no fixedHeight will be set.
-         The default is None.
-     visible : bool, optional
-         Flag to set widget visibility at startup.
+    **readOnly : bool, optional
+        Flag to set the field to read only. The default is True.
+    **minimumWidth : Union[int, None], optional
+        The minimum width of the widget. If None, no minimum width will be
+        set for the widget. The default is 500.
+    **fixedWidth : Union[int, None], optional
+        A fixed width for the widget. If None, no fixedWidth will be set.
+        The default is None.
+    **minimumHeight : Union[int, None], optional
+        The minimum Height of the widget. If None, no minimum height will
+        be set for the widget. The default is None.
+    **fixedHeight : Union[int, None], optional
+        A fixed height for the widget. If None, no fixedHeight will be set.
+        The default is None.
+    **visible : bool, optional
+        Flag to set widget visibility at startup. The default is True.
     """
 
     def __init__(self, parent=None, **params):

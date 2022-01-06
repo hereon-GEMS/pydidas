@@ -25,7 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['get_pydidas_module_dir']
 
-
 import os
 
 from .str_utils import update_separators

@@ -36,16 +36,15 @@ def create_check_box(text, **kwargs):
 
     Parameters
     ----------
-    **kwargs : dict
-        Any supported keyword arguments.
-
-    Supported keyword arguments
-    ---------------------------
     text: str
         The text of the checkbox.
-    *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+    **kwargs : dict
+        Any additional keyword arguments. See below for supported
+        arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QCheckBox. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``, ``enabled``.
 
     Returns
     -------

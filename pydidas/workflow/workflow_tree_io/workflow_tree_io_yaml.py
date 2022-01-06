@@ -25,7 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTreeIoYaml']
 
-
 import yaml
 
 from ...core.constants import YAML_EXTENSIONS

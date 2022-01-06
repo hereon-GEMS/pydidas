@@ -25,8 +25,8 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.apps import BaseApp
-from pydidas.core import (ParameterCollection, get_generic_parameter)
+from pydidas.core import (ParameterCollection, get_generic_parameter,
+                          BaseApp)
 
 
 class TestApp(BaseApp):

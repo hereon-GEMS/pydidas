@@ -42,10 +42,6 @@ class PluginPositionNode(GenericNode):
     items in a tree. This class only manages the position data without any
     reference to actual widgets.
     """
-    generic_width = GENERIC_PLUGIN_WIDGET_WIDTH
-    generic_height = GENERIC_PLUGIN_WIDGET_HEIGHT
-    child_spacing_y = GENERIC_PLUGIN_WIDGET_Y_OFFSET
-    child_spacing_x = GENERIC_PLUGIN_WIDGET_X_OFFSET
 
     @property
     def width(self):
@@ -61,8 +57,8 @@ class PluginPositionNode(GenericNode):
             The width of the tree branch.
         """
         if self.is_leaf:
-            return self.generic_width
-        _w = (len(self._children) - 1) * self.child_spacing_x
+            return GENERIC_PLUGIN_WIDGET_WIDTH
+        _w = (len(self._children) - 1) * GENERIC_PLUGIN_WIDGET_X_OFFSET
         for child in self._children:
             _w += child.width
         return _w
@@ -81,11 +77,13 @@ class PluginPositionNode(GenericNode):
             The height of the tree branch.
         """
         if self.is_leaf:
-            return self.generic_height
+            return GENERIC_PLUGIN_WIDGET_HEIGHT
         _h = []
         for child in self._children:
             _h.append(child.height)
-        return max(_h) + self.child_spacing_y + self.generic_height
+        return (max(_h)
+                + GENERIC_PLUGIN_WIDGET_Y_OFFSET
+                + GENERIC_PLUGIN_WIDGET_HEIGHT)
 
     def get_relative_positions(self):
         """
@@ -100,17 +98,18 @@ class PluginPositionNode(GenericNode):
         pos : dict
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
-        pos = {self.node_id: [(self.width - self.generic_width) // 2, 0]}
+        pos = {self.node_id: \
+                   [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
         if self.is_leaf:
             return pos
         xoffset = 0
-        yoffset = self.generic_height + self.child_spacing_y
+        yoffset = GENERIC_PLUGIN_WIDGET_HEIGHT + GENERIC_PLUGIN_WIDGET_Y_OFFSET
         for child in self._children:
             _p = child.get_relative_positions()
             for key in _p:
                 pos.update({key: [_p[key][0] + xoffset,
                                   _p[key][1] + yoffset]})
-            xoffset += child.width + self.child_spacing_x
+            xoffset += child.width + GENERIC_PLUGIN_WIDGET_X_OFFSET
         self.make_grid_positions_positive(pos)
         return pos
 

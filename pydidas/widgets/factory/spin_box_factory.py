@@ -37,16 +37,14 @@ def create_spin_box(**kwargs):
     Parameters
     ----------
     **kwargs : dict
-        Any supported keyword arguments.
-
-    Supported keyword arguments
-    ---------------------------
-    valueRange: tuple, optional
+        Any additional keyword arguments. See below for supported arguments.
+    **valueRange: tuple, optional
         The range for the QSpinBox, given as a 2-tuple of (min, max). The
         default is (0, 1).
-    *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QSpinBox. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``.
 
     Returns
     -------

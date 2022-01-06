@@ -36,7 +36,6 @@ from ..core import get_generic_param_collection
 from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
 from ..widgets import BaseFrameWithApp
-from ..widgets.dialogues import QuestionBox
 from ..workflow import WorkflowTree, WorkflowResults
 from .builders.execute_workflow_frame_builder import (
     ExecuteWorkflowFrame_BuilderMixin)
@@ -123,7 +122,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             self.__clear_selected_results_entries()
             self.__clear_plot()
             self.__update_choices_of_selected_results()
-            _box = QtWidgets.QMessageBox.information(
+            QtWidgets.QMessageBox.information(
                 self, 'Results need to be updated',
                 ('Underlying information for the WorkflowResults has changed '
                  'and the WorkflowResults must be updated. This will clear '
@@ -131,9 +130,6 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
                  'Either the WorkflowTree or the ScanSetup has been modified '
                  'and the consistency of the results cannot be guaranteed '
                  'without calculating them from scratch.'))
-            # _box.exec_()
-
-
 
     def _run_app(self):
         """
@@ -258,7 +254,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             _data.axis_ranges[0] = np.arange(_data.shape[0])
         self._widgets['plot_stack'].setCurrentIndex(_dim - 1)
         _plot = self._widgets[f'plot{_dim}d']
-        _plot.setGraphTitle(RESULTS.labels[_node])
+        _plot.setGraphTitle(RESULTS.labels[_node] + f'(node #{_node:03d}')
         _label = lambda i: (_data.axis_labels[i]
                             + (' / ' + _data.axis_units[i]
                                if len(_data.axis_units[i]) > 0 else ''))
@@ -270,7 +266,13 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         elif _dim == 2:
             if not isinstance(_data.axis_ranges[1], np.ndarray):
                 _data.axis_ranges[1] = np.arange(_data.shape[1])
-            _plot.addImage(_data, replace=True, copy=False)
+            _origin = (_data.axis_ranges[1][0], _data.axis_ranges[0][0])
+            _scale_y = ((_data.axis_ranges[0][-1] - _data.axis_ranges[0][0])
+                        / _data.axis_ranges[0].size)
+            _scale_x = ((_data.axis_ranges[1][-1] - _data.axis_ranges[1][0])
+                        / _data.axis_ranges[1].size)
+            _plot.addImage(_data, replace=True, copy=False, origin=_origin,
+                           scale=(_scale_x, _scale_y))
             _plot.setGraphYLabel(_label(0))
             _plot.setGraphXLabel(_label(1))
 

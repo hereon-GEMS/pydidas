@@ -160,7 +160,11 @@ class CreateWidgetsMixIn:
         """
         Create any widget with any settings and add it to the layout.
 
-        Note: Widgets must support generic *args and **kwargs arguments.
+        Note
+        ----
+        Widgets must support generic *args and **kwargs arguments. This means
+        that generic PyQt widgets cannot be created using this method. They
+        can be added, however, using the ``add_any_widget`` method.
 
         Parameters
         ----------
@@ -187,19 +191,34 @@ class CreateWidgetsMixIn:
         """
         Add any existing widget with any settings to the layout.
 
+        Note
+        ----
+        This method can also be used to add a new widget to the layout
+        be simply creating an instance of the widget in the call
+        (see examples).
+
         Parameters
         ----------
         ref : str
             The reference name in the _widgets dictionary.
         widget : QtWidgets.QWidget
             The widget instance.
-        layout_args : dict
-            Any kewword arguments which should be passed to the layout
+        **kwargs : dict
+            Keyword arguments for the widget settings and layout.
+        **layout_args : dict
+            Any keyword arguments which should be passed to the layout
             arguments but not to the widget creation. This is important
             for an "alignment=None" flag which cannot be passed to the
             widget creation.
-        **kwargs : dict
-            Keyword arguments for the widget settings and layout.
+
+        Example
+        -------
+        To add a new widget, in this example a QLabel without any alignment
+        and with a width of 600 pixel, create a new instance on the fly and
+        add it to the object:
+
+        >>> object.add_any_widget('new_label', QLabel(), width=600,
+                                  layout_args={'alignment': None})
 
         Raises
         ------

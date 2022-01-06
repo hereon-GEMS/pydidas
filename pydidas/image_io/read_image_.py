@@ -47,41 +47,44 @@ def read_image(filename, **kwargs):
     *args : any
         further arguments (currently not used)
     **kwargs : dict
-        keyword arguments
-
-    Supported keyword arguments:
-
-    for all images:
-        roi : Union[tuple, None], optional
-            A region of interest for cropping. Acceptable are both 4-tuples
-            of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice  objects. If None, the full image
-            will be returned. The default is None.
-        returnType : Union[datatype, 'auto'], optional
-            If 'auto', the image will be returned in its native data type.
-            If a specific datatype has been selected, the image is converted
-            to this type. The default is 'auto'.
-        binning : int, optional
-            The reb-inning factor to be applied to the image. The default
-            is 1.
-    for raw (binary) images additionally:
-        datatype : object
-            The python datatype used for decoding the bit-information of the
-            binary file. The default is None which will raise an exception.
-        nx : int
-            The number of pixels in x-dimension. The default is None which
-            will raise an exception.
-        ny : int
-            The number of pixels in x-dimension. The default is None which
-            will raise an exception.
-    for hdf5 images additionally:
-        hdf5_dataset : str
-            The full path to the hdf dataset within the file. The default is
-            None which will raise an exception.
-        frame : int
-            The number of the image in the dataset. The default is 0.
-        axisNo : int
-            The number of the axis with the image. The default is 0.
+        Keyword arguments. All supported keyword arguments are given below:
+    **roi : Union[tuple, None], optional
+        [available for all image types]
+        A region of interest for cropping. Acceptable are both 4-tuples
+        of integers in the format (y_low, y_high, x_low, x_high) as well
+        as 2-tuples of integers or slice  objects. If None, the full image
+        will be returned. The default is None.
+    **returnType : Union[datatype, 'auto'], optional
+        [available for all image types]
+        If 'auto', the image will be returned in its native data type.
+        If a specific datatype has been selected, the image is converted
+        to this type. The default is 'auto'.
+    **binning : int, optional
+        [available for all image types]
+        The reb-inning factor to be applied to the image. The default
+        is 1.
+    **datatype : object
+        [for raw (binary) images only]
+        The python datatype used for decoding the bit-information of the
+        binary file. The default is None which will raise an exception.
+    **nx : int
+        [for raw (binary) images only]
+        The number of pixels in x-dimension. The default is None which
+        will raise an exception.
+    **ny : int
+        [for raw (binary) images only]
+        The number of pixels in x-dimension. The default is None which
+        will raise an exception.
+    **hdf5_dataset : str
+        [for hdf5 images only]
+        The full path to the hdf dataset within the file. The default is
+        None which will raise an exception.
+    **frame : int
+        [for hdf5 images only]
+        The number of the image in the dataset. The default is 0.
+    **axisNo : int
+        [for hdf5 images only]
+        The number of the axis with the image. The default is 0.
 
     Returns
     -------

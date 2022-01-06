@@ -26,7 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericTree']
 
-
 import copy
 import warnings
 

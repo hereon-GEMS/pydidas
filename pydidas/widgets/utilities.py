@@ -32,7 +32,7 @@ import time
 import traceback
 from io import StringIO
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 import qtawesome
 
 from ..core.constants import STANDARD_FONT_SIZE
@@ -46,7 +46,7 @@ def delete_all_items_in_layout(layout):
     Parameters
     ----------
     layout : QLayout
-        The layout to be cleard.
+        The layout to be cleared.
     """
     if layout is not None:
         while layout.count():

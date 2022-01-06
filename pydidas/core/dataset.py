@@ -55,8 +55,6 @@ def _default_vals(ndim):
 
 class EmptyDataset(np.ndarray):
     """
-    Inherits from :py:class:`numpy.ndarray`
-
     Base class of an empty dataset (numpy.ndarray subclass) for instantiation.
     """
     __safe_for_unpickling__ = True
@@ -571,25 +569,24 @@ class EmptyDataset(np.ndarray):
 
 class Dataset(EmptyDataset):
     """
-    Inherits from :py:class:`pydidas.core.EmptyDataset
-    <pydidas.core.EmptyDataset>`
-
     Dataset class, a subclass of a numpy ndarray with metadata.
 
-    Parameters for class creation:
-    ------------------------------
+    Parameters
+    ----------
     array : np.ndarray
         The data array.
-    axis_labels : Union[dict, list, tuple], optional
+    **kwargs : dict
+        Optional keyword arguments.
+    **axis_labels : Union[dict, list, tuple], optional
         The labels for the axes. The length must correspond to the array
         dimensions. The default is None.
-    axis_ranges : Union[dict, list, tuple], optional
+    **axis_ranges : Union[dict, list, tuple], optional
         The scales for the axes. The length must correspond to the array
         dimensions. The default is None.
-    axis_units : Union[dict, list, tuple], optional
+    **axis_units : Union[dict, list, tuple], optional
         The units for the axes. The length must correspond to the array
         dimensions. The default is None.
-    metadata : Union[dict, None], optional
+    **metadata : Union[dict, None], optional
         A dictionary with metadata. The default is None.
     """
     def __new__(cls, array, *args, **kwargs):

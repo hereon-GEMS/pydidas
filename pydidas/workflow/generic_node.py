@@ -26,7 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GenericNode']
 
-
 import copy
 from numbers import Integral
 

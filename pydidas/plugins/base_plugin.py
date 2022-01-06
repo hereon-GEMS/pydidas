@@ -57,20 +57,27 @@ class BasePlugin(ObjectWithParameterCollection):
     """
     The base plugin class from which all plugins inherit.
 
-    Class attributes
-    ----------------
+    Class attributes are used in the descriptions of individual plugins and
+    all these attributes should be re-defined in individual plugins to
+    prevent falling back to the base class attributes:
+
     basic_plugin : bool
         A keyword to mark basic plugin classes.
     plugin_type : int
         A key to discriminate between the different types of plugins
         (input, processing, output)
-    parameters : ParameterCollection
+    default_params : ParameterCollection
         A ParameterCollection with the class parameters which are required
         to perform the execute operation.
-    input_data : dict
-        Dictionary with the required input data set descrptions
-    output_data : dict
-        Dictionary with a description of the output datasets.
+    generic_params : ParameterCollection
+        A ParameterCollection with the generic parameters for all plugins of
+        a specific type.
+    input_data_dim : int
+        The dimensionality of the input data. Use -1 for arbitraty
+        dimensionality.
+    output_data_dim : int
+        The dimensionality of the output data. Use -1 for arbitraty
+        dimensionality.
     new_dataset : bool
         Keyword that the Plugin creates a new dataset. This will trigger a
         re-evaluation of the output data shape.
@@ -233,7 +240,8 @@ class BasePlugin(ObjectWithParameterCollection):
         Returns
         -------
         bool
-            The flag value-
+            The flag value whether the plugin has a unique configuration
+            widget associated with it.
         """
         return False
 
@@ -306,12 +314,11 @@ class BasePlugin(ObjectWithParameterCollection):
         If a Plugin knows the dimensionality of its results but not the size
         of each dimension, a -1 is returned for each unknown dimension.
 
-        Unknown dimensions are represented as -1 value.
-
         Returns
         -------
         tuple
-            The shape of the results.
+            The shape of the results with a value for each dimension. Unknown
+            dimensions are represented as -1 value.
         """
         return self._config['result_shape']
 

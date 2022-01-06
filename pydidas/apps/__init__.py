@@ -28,16 +28,11 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .base_app import *
 from .composite_creator_app import *
 from .execute_workflow_app import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import base_app
-__all__.extend(base_app.__all__)
-del base_app
-
 from . import composite_creator_app
 __all__.extend(composite_creator_app.__all__)
 del composite_creator_app

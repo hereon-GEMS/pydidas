@@ -27,8 +27,9 @@ __status__ = "Development"
 __all__ = ['ImageMathFrame']
 
 
-from ..core import (ScanSetup, Parameter, ParameterCollection,
+from ..core import (Parameter, ParameterCollection,
                     get_generic_param_collection)
+from ..experiment import ScanSetup
 from ..workflow import WorkflowTree
 from ..widgets import BaseFrame
 from .builders import ImageMath_FrameBuilder
@@ -38,9 +39,9 @@ SCAN_SETTINGS = ScanSetup()
 WORKFLOW_TREE = WorkflowTree()
 
 _buffer_param = Parameter(
-    'Image buffer number', str, default='Image #1',
-    refkey='buffer_no', choices=[
-        'Image #1', 'Image #2', 'Image #3', 'Image #4', 'Image #5'])
+    'buffer_no', str, 'Image #1',
+    name='Image buffer number',
+    choices=['Image #1', 'Image #2', 'Image #3', 'Image #4', 'Image #5'])
 
 
 class ImageMathFrame(BaseFrame, ImageMath_FrameBuilder):

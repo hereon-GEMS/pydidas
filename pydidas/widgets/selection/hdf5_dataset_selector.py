@@ -63,6 +63,12 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         of displayed datasets. Entries must be in the format
         {<Key to filter>: <Descriptive text for checkbox>}.
         The default is None.
+    **kwargs : dict
+        Any additional keyword arguments. See below for supported arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the generic QWidget. Use the
+        Qt attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``fixedHeight``.
     """
     new_frame_signal = QtCore.pyqtSignal(object)
 
@@ -240,17 +246,17 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Register a view widget to be used for full visualization of data.
 
         This method registers an external view widget for data visualization.
-        Note that the widget must accept frames through a <setData> method.
+        Note that the widget must accept frames through a ``setData`` method.
 
         Parameters
         ----------
         widget : QWidget
-            A widget with a <setData> method to pass frames.
+            A widget with a ``setData`` method to pass frames.
 
         Raises
         ------
         TypeError
-            If the widget does not have a "setData" method.
+            If the widget does not have a ``setData`` method.
         """
         if (isinstance(widget, QtWidgets.QWidget) and
                 hasattr(widget, 'setData')):

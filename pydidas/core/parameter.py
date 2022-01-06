@@ -119,27 +119,26 @@ class Parameter:
         overwrite the kwargs dictionary. This is added merely as
         convenience to facility copying Parameter instances. If None,
         this entry will be ignored. The default is None.
-    name : str, optional
+    **kwargs : dict
+        All optional parameters can be passed as keyword arguments.
+    **name : str, optional
         The name of the parameter. The default is None.
-    optional : bool, optional
+    **optional : bool, optional
         Keyword to toggle optional parameters. The default is False.
-    tooltip : str, optional
+    **tooltip : str, optional
         A description of the parameter. It will be automatically extended
         to include certain type and unit information. The default is ''.
-    unit : str, optional
+    **unit : str, optional
         The unit of the parameter. The default is ''.
-    choices : Union[list, tuple, None]
+    **choices : Union[list, tuple, None]
         A list of allowed choices. If None, no checking will be enforced.
         The default is None.
-    value : type
+    **value : type
         The value of the parameter. This parameter should only be used
         to restore saved parameters.
-    allow_None : bool, optional
+    **allow_None : bool, optional
         Keyword to allow None instead of the usual datatype. The default
         is False.
-    **kwargs : dict
-        All optional parameters can also be passed as a keyword argument
-        dictionary.
     """
     def __init__(self, refkey, param_type, default, meta=None, **kwargs):
         super().__init__()

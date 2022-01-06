@@ -30,8 +30,8 @@ from functools import partial
 
 from PyQt5 import QtWidgets, QtCore
 
-from ..widgets import BaseFrame
 from ..core import get_generic_param_collection
+from ..widgets import BaseFrame
 from ..widgets.parameter_config import ParameterWidgetsMixIn
 from .builders import GlobalConfiguration_FrameBuilder
 

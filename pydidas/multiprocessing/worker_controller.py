@@ -44,21 +44,18 @@ class WorkerController(QtCore.QThread):
     A function with defined args and kwargs can be called in separate
     processes with the first function argument as the variable that differs
     between function calls.
+
+    Parameters
+    ----------
+    n_workers : int, optional
+        The number of spawned worker processes. The default is None which will
+        use the globally defined pydidas setting for the number of workers.
     """
     progress = QtCore.pyqtSignal(float)
     results = QtCore.pyqtSignal(int, object)
     finished = QtCore.pyqtSignal()
 
     def __init__(self, n_workers=None):
-        """
-        Create a WorkerController.
-
-        Parameters
-        ----------
-        n_workers : int, optional
-            The number of spawned worker processes. The default is defined
-            in the global QSettings.
-        """
         super().__init__()
         self._flag_running = False
         self._flag_thread_alive = True
@@ -162,9 +159,9 @@ class WorkerController(QtCore.QThread):
         ----------
         func : object
             The function to be called by the workers.
-        *args : type
+        *args : tuple
             Any arguments which need to be passed to the function.
-        **kwargs : kwargs
+        **kwargs : dict
             Any keyword arguments which need to be passed to the function.
         """
         self.suspend()
@@ -189,9 +186,9 @@ class WorkerController(QtCore.QThread):
         ----------
         func : object
             The function.
-        *args : object
+        *args : tuple
             The function arguments
-        **kwargs : object
+        **kwargs : dict
             The function keyword arguments.
         """
         self._processor['args'] = (self._queues['send'],

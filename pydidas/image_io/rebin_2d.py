@@ -23,10 +23,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['rebin2d', 'rebin']
 
-
 import numpy as np
 
-from pydidas.core import Dataset
+from ..core import Dataset
 
 
 def rebin2d(image, binning):
@@ -38,15 +37,15 @@ def rebin2d(image, binning):
 
     Parameters
     ----------
-    image : np.ndarray
+    image : Union[np.ndarray, Dataset]
         The 2d image to be re-binned.
     binning : int
         The re-binning factor.
 
     Returns
     -------
-    image : np.ndarray
-        The re-binned image.
+    image : np.ndarray or Dataset
+        The re-binned image in the same data type as the input image.
     """
     if binning == 1:
         return image

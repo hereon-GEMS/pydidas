@@ -43,16 +43,6 @@ from ..experiment import ExperimentalSetup
 
 EXP_SETTINGS = ExperimentalSetup()
 
-PYFAI_SETTINGS = QtCore.QSettings(
-    QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope,
-    "pyfai", "pyfai-calib2", None)
-
-CalibrationContext._releaseSingleton()
-CALIB_CONTEXT = CalibrationContext(PYFAI_SETTINGS)
-CALIB_CONTEXT.restoreSettings()
-options = parse_options()
-setup_model(CALIB_CONTEXT.getCalibrationModel(), options)
-
 
 def get_pyfai_calib_icon():
     """
@@ -97,10 +87,11 @@ class PyfaiCalibFrame(BaseFrame):
         mainWindow = kwargs.get('mainWindow', None)
         parent = kwargs.get('parent', None)
         super().__init__(parent)
+        self._setup_pyfai_context()
         if mainWindow:
-            CALIB_CONTEXT.setParent(mainWindow)
+            self._CALIB_CONTEXT.setParent(mainWindow)
         else:
-            CALIB_CONTEXT.setParent(self)
+            self._CALIB_CONTEXT.setParent(self)
 
         self._list = QtWidgets.QListWidget(self)
         self._list.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
@@ -117,8 +108,8 @@ class PyfaiCalibFrame(BaseFrame):
         self.layout().addWidget(self._help, 1, 0, 1, 1)
         self.layout().addWidget(self._stack, 0, 1, 2, 1)
 
-        self.__context = CALIB_CONTEXT
-        model = CALIB_CONTEXT.getCalibrationModel()
+        self.__context = self._CALIB_CONTEXT
+        model = self._CALIB_CONTEXT.getCalibrationModel()
 
         self.__menu_connections = {}
         self.__tasks = self.createTasks()
@@ -145,6 +136,22 @@ class PyfaiCalibFrame(BaseFrame):
             self._help.setText("Online help...")
         self._helpText = self._help.text()
         self._help.clicked.connect(self.__displayHelp)
+
+
+    def _setup_pyfai_context(self):
+        """
+        Setup the context for the pyfai calibration.
+        """
+        PYFAI_SETTINGS = QtCore.QSettings(
+            QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope,
+            "pyfai", "pyfai-calib2", None)
+
+        CalibrationContext._releaseSingleton()
+        _calib_context = CalibrationContext(PYFAI_SETTINGS)
+        _calib_context.restoreSettings()
+        options = parse_options()
+        setup_model(_calib_context.getCalibrationModel(), options)
+        self._CALIB_CONTEXT = _calib_context
 
     def __displayHelp(self):
         subpath = "usage/cookbook/calib-gui/index.html"

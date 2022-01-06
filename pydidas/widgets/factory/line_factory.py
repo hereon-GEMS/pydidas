@@ -41,13 +41,13 @@ def create_line(**kwargs):
     Parameters
     ----------
     **kwargs : dict
-        Any aditional keyword arguments. See below for supported
+        Any additional keyword arguments. See below for supported
         arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QFrame. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``lineWidth``, ``fixedWidth``, ``fixedHeight``.
 
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any supported Qt settings for QFrame (for example fixedHeight)
 
     Returns
     -------

@@ -25,10 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTreeIoMeta']
 
-
 import os
 
-from pydidas.core.io_registry import GenericIoMeta
+from ...core.io_registry import GenericIoMeta
 
 
 class WorkflowTreeIoMeta(GenericIoMeta):

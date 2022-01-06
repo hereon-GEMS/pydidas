@@ -40,6 +40,7 @@ from .execute_workflow_frame import *
 from .experimental_setup_frame import *
 from .global_configuration_frame import *
 from .home_frame import *
+from .image_math_frame import *
 from .main_window import *
 from .processing_single_plugin_frame import *
 from .pyfai_calib_frame import *
@@ -71,6 +72,10 @@ del global_configuration_frame
 from . import home_frame
 __all__.extend(home_frame.__all__)
 del home_frame
+
+from . import image_math_frame
+__all__.extend(image_math_frame.__all__)
+del image_math_frame
 
 from . import main_window
 __all__.extend(main_window.__all__)

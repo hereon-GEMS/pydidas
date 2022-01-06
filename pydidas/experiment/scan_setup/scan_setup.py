@@ -26,9 +26,9 @@ __all__ = ['ScanSetup']
 
 import numpy as np
 
-from .scan_setup_io_meta import ScanSetupIoMeta
 from ...core import (SingletonFactory, get_generic_param_collection,
                      ObjectWithParameterCollection)
+from .scan_setup_io_meta import ScanSetupIoMeta
 
 
 class _ScanSetup(ObjectWithParameterCollection):
@@ -78,7 +78,9 @@ class _ScanSetup(ObjectWithParameterCollection):
         """
         Get the label, unit and range of the specified scan dimension.
 
-        Note: The scan dimensions are 1 .. 4 and do not start with 0.
+        Note
+        ----
+        The scan dimensions are 1 .. 4 and do not start with 0.
 
         Parameters
         ----------
@@ -103,7 +105,9 @@ class _ScanSetup(ObjectWithParameterCollection):
         """
         Get the Scan range for the specified dimension.
 
-        Note: The scan dimensions are 1 .. 4 and do not start with 0.
+        Note
+        ----
+        The scan dimensions are 1 .. 4 and do not start with 0.
 
         Parameters
         ----------

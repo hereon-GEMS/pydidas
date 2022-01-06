@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the CompositeCreatorApp class which allows to combine
-images to mosaics."""
+"""
+Module with the CompositeCreatorApp class which allows to combine
+images to mosaics.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -30,13 +32,13 @@ import time
 import numpy as np
 from PyQt5 import QtCore
 
-from ..core import Dataset, AppConfigError, get_generic_param_collection
+from ..core import (Dataset, AppConfigError, get_generic_param_collection,
+                    BaseApp)
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
                           copy_docstring)
 from ..image_io import CompositeImage, read_image, rebin2d
 from ..managers import FilelistManager, ImageMetadataManager
-from .base_app import BaseApp
 from .app_parsers import parse_composite_creator_cmdline_arguments
 
 
@@ -55,8 +57,10 @@ class CompositeCreatorApp(BaseApp):
     For keyword arguments, parameters must be passed during instantiation
     using the standard <parameter name>=<value>.
 
-    Parameters
-    ----------
+    Notes
+    -----
+    The full list of Parameters used by the CompositeCreatorApp:
+
     live_processing : bool, optional
         Keyword to toggle live processing which means file existance and size
         checks will be disabled in the setup process and the file processing
@@ -134,6 +138,15 @@ class CompositeCreatorApp(BaseApp):
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
+
+    Parameters
+    ----------
+    *args : tuple
+        Any number of Parameters. These will be added to the app's
+        ParameterCollection.
+    **kwargs : dict
+        Parameters supplied with their reference key as dict key and the
+        Parameter itself as value.
     """
     default_params = get_generic_param_collection(
         'live_processing', 'first_file', 'last_file', 'file_stepping',
@@ -532,8 +545,9 @@ class CompositeCreatorApp(BaseApp):
 
         Returns
         -------
-        np.ndarray
-            The composite image in np.ndarray format.
+        image : Union[None, np.ndarray]
+            The composite image in np.ndarray format. If no composite has
+            been created, this property returns None.
         """
         if self._composite is None:
             return None

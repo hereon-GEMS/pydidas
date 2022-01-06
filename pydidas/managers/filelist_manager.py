@@ -33,13 +33,12 @@ from pathlib import Path
 
 import numpy as np
 
-from ..core.constants import FILENAME_DELIMITERS
-from ..core.utils import (check_file_exists,
-                     verify_files_in_same_directory,
-                     verify_files_of_range_are_same_size)
 from ..core import (ObjectWithParameterCollection, AppConfigError,
                     get_generic_param_collection)
-
+from ..core.constants import FILENAME_DELIMITERS
+from ..core.utils import (check_file_exists,
+                          verify_files_in_same_directory,
+                          verify_files_of_range_are_same_size)
 
 
 class FilelistManager(ObjectWithParameterCollection):
@@ -50,8 +49,14 @@ class FilelistManager(ObjectWithParameterCollection):
     The FilelistManager creates and manages a file list from which to select
     items for processing.
 
-    Parameters
-    ----------
+    Any required Parameters can be supplied as arguments or with
+    ``refkey=<ParameterInstance>`` as kwargs. Any Parameter not given will
+    default to new instances with the default values.
+
+    Note
+    ----
+    The FilelistManager uses the following generic Parameters:
+
     live_processing : bool, optional
         Keyword to toggle live processing which means file existance and size
         checks will be disabled in the setup process and the file processing
@@ -66,6 +71,13 @@ class FilelistManager(ObjectWithParameterCollection):
     file_stepping : int, optional
         The step width (in files). A value n > 1 will only process every n-th
         image for the composite. The default is 1.
+
+    Parameters
+    ----------
+    *args : tuple
+        Any of the Parameters in use can be given as instances.
+    **kwargs : dict
+        Parameters can also be supplied as kwargs, referencey by their refkey.
     """
     default_params = get_generic_param_collection(
         'live_processing', 'first_file', 'last_file', 'file_stepping')

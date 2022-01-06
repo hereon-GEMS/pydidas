@@ -44,13 +44,11 @@ def create_radio_button_group(entries, vertical=True, title=None, **kwargs):
         The title/label of the RadioButtonGroup. If None, no title is used.
         The default is None.
     **kwargs : dict
-        Any supported keyword arguments.
-
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any supported Qt settings for a QSpinBox (for example value,
-        fixedWidth, visible, enabled)
+        Any additional keyword arguments. See below for supported arguments.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the RadioButtonGroup. Use the
+        Qt attribute name with a lowercase first character. Examples are
+        ``icon``, ``fixedWidth``, ``visible``, ``enabled``.
 
     Returns
     -------

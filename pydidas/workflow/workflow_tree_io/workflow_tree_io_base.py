@@ -25,9 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTreeIoBase']
 
-
-from .workflow_tree_io_meta import WorkflowTreeIoMeta
 from ...core.io_registry import GenericIoBase
+from .workflow_tree_io_meta import WorkflowTreeIoMeta
 
 
 class WorkflowTreeIoBase(GenericIoBase,

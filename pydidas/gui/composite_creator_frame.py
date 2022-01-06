@@ -36,11 +36,11 @@ from PyQt5 import QtWidgets, QtCore
 from ..apps import CompositeCreatorApp
 from ..core import Parameter, get_generic_parameter, AppConfigError
 from ..core.constants import HDF5_EXTENSIONS
-from ..widgets import BaseFrameWithApp, dialogues
 from ..core.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                            LOGGING_LEVEL)
+from ..widgets import BaseFrameWithApp, dialogues
 from ..multiprocessing import AppRunner
-from ..gui.builders import CompositeCreator_FrameBuilder
+from .builders import CompositeCreator_FrameBuilder
 
 
 logger = pydidas_logger(LOGGING_LEVEL)

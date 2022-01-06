@@ -25,9 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowResultSaverBase']
 
-
-from .workflow_result_saver_meta import WorkflowResultSaverMeta
 from ...core.io_registry import GenericIoBase
+from .workflow_result_saver_meta import WorkflowResultSaverMeta
 
 
 class WorkflowResultSaverBase(GenericIoBase,

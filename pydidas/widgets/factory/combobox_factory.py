@@ -39,13 +39,12 @@ def create_combo_box(**kwargs):
     Parameters
     ----------
     **kwargs : dict
-        Any aditional keyword arguments. See below for supported
+        Any additional keyword arguments. See below for supported
         arguments.
-
-    Supported keyword arguments
-    ---------------------------
-    *Qt settings : any
-        Any supported Qt settings for QFrame (for example fixedHeight)
+    **QtAttribute : depends on the attribute
+        Any Qt attributes which are supported by the QComboBox. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``, ``enabled``.
 
     Returns
     -------

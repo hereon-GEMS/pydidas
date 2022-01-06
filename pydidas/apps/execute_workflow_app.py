@@ -32,12 +32,11 @@ import multiprocessing as mp
 import numpy as np
 from PyQt5 import QtCore
 
-from ..core import (ParameterCollection, get_generic_param_collection, Dataset,
+from ..core import (get_generic_param_collection, Dataset, BaseApp,
                     AppConfigError)
 from ..experiment import ScanSetup
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
-from .base_app import BaseApp
 from .app_parsers import parse_execute_workflow_cmdline_arguments
 
 
@@ -64,8 +63,10 @@ class ExecuteWorkflowApp(BaseApp):
     For keyword arguments, parameters must be passed during instantiation
     using the keyword argument syntax of standard <parameter name>=<value>.
 
-    Parameters
-    ----------
+    Notes
+    -----
+    The full list of Parameters used by the ExecuteWorkflowApp:
+
     autosave_results : bool, optional
         Use this flag to control whether result data should be automatically
         saved to disk. The default is False.
@@ -78,6 +79,15 @@ class ExecuteWorkflowApp(BaseApp):
     live_processing : bool, optional
         Flag to enable live processing. This will implement checks on file
         existance before processing starts. The default is False.
+
+    Parameters
+    ----------
+    *args : tuple
+        Any number of Parameters. These will be added to the app's
+        ParameterCollection.
+    **kwargs : dict
+        Parameters supplied with their reference key as dict key and the
+        Parameter itself as value.
     """
     default_params = get_generic_param_collection(
         'autosave_results', 'autosave_dir', 'autosave_format',
@@ -120,6 +130,7 @@ class ExecuteWorkflowApp(BaseApp):
 
         For the main App (i.e. running not in slave_mode), this involves the
         following steps:
+
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
             2. Get all multiprocessing tasks from the ScanSetup.

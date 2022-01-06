@@ -36,15 +36,12 @@ from .experimental_setup_io_meta import ExperimentalSetupIoMeta
 
 class _ExpSetup(ObjectWithParameterCollection):
     """
-    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
-    <pydidas.core.ObjectWithParameterCollection>`
-
     Class which holds experimental settings. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
 
-    The factory will allow access to the single instance through
-    :py:class:`pydidas.core.experimental_setup.ExperimentalSetup`.
+    The singleton factory will allow access to the single instance through
+    :py:class:`pydidas.experiment.experimental_setup.ExperimentalSetup`.
     """
     default_params = get_generic_param_collection(
         'xray_wavelength', 'xray_energy', 'detector_name', 'detector_npixx',
@@ -90,13 +87,15 @@ class _ExpSetup(ObjectWithParameterCollection):
 
     def get_detector(self):
         """
-        Get the detector. First, it is checked whether a pyFAI detector can
-        be instantiated from the Detector name or a new detector is created
+        Get the pyFAI detector object.
+
+        If a pyFAI detector can be instantiated from the "detector" Parameter
+        value, this object will be used. Otherwise, a new detector is created
         and values from the ExperimentalSetup are copied.
 
         Returns
         -------
-        _det : pyFAI.detectors.Detector
+        det : pyFAI.detectors.Detector
             The detector object.
         """
         _name = self.get_param_value('detector_name')

@@ -47,14 +47,14 @@ class BaseFrame(QtWidgets.QFrame,
     ----------
     parent : Union[QWidget, None], optional
         The parent widget. The default is None.
-    init_layout : bool, optional
+    **kwargs : dict
+        Any additional keyword arguments which might be used by
+        subclasses.
+    **init_layout : bool, optional
         Flag to initialize the frame layout with a QtWidgets.QGridLayout
         and left / top alignment. If False, no layout will be initialized
         and the subclass is responsible for setting up the layout. The
         default is True.
-    **kwargs : object
-        Any additional keyword arguments which might be used by
-        subclasses.
     """
     show_frame = True
     menuicon = 'qt-std::7'

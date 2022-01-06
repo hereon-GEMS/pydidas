@@ -47,9 +47,12 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
     ----------
     parent : QWidget, optional
         The parent widget. The default is None.
-    collection : pydidas.PluginCollection
-        The plugin collection. Normally, this defaults to the generic
-        plugin collection and should not be changed by the user.
+    **kwargs : dict
+        Any keyword arguments. Supported keywords are listed below.
+    **collection : Union[pydidas.PluginCollection, None]
+        The plugin collection. Normally, this entry should not be changed by
+        the user. If None, this defaults to the generic plugin collection.
+        The default is None.
     """
     selection_confirmed = QtCore.pyqtSignal(str)
 

@@ -39,17 +39,24 @@ def create_spacer(**kwargs):
 
     Parameters
     ----------
-    height : int, optional
+    **kwargs : dict
+        Any aditional keyword arguments. See below for supported arguments.
+    **height : int, optional
         The height of the spacer in pixel. The default is 20.
-    width : int, optional
+    **width : int, optional
         The width of the spacer in pixel. The default is 20.
-    policy : QtWidgets.QSizePolicy, optional
+    **policy : QtWidgets.QSizePolicy, optional
         The size policy for the spacer (applied both horizontally and
         vertically). The default is QtWidgets.QSizePolicy.Minimum.
-    vertical_policy : QtWidgets.QSizePolicy, optional
+    **vertical_policy : QtWidgets.QSizePolicy, optional
         The vertical size policy for the spacer. This setting will overwrite
         the general "policy" settings. The default is
         QtWidgets.QSizePolicy.Minimum.
+    **QtAttribute : depends on the attribute
+        Any Qt attributes are supported by the QSpacerItem. Use the Qt
+        attribute name with a lowercase first character. Examples are
+        ``fixedWidth``, ``visible``.
+
 
     Returns
     -------

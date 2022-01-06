@@ -31,13 +31,11 @@ from PyQt5 import QtWidgets, QtCore
 from ...core.constants import gui_constants, qt_presets
 from ..utilities import apply_widget_properties
 
+
 class PluginInWorkflowBox(QtWidgets.QLabel):
     """
     Widget with title and delete button for every selected plugin
     in the processing chain.
-
-    Note: This class is part of the gui subpackage to avoid circular imports
-    between this class and the WorkflowTreeEditManager.
 
     Parameters
     ----------

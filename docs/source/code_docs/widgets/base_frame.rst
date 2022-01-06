@@ -13,6 +13,7 @@
 
 .. autoclass:: pydidas.widgets.BaseFrame
 	:members:
+	:show-inheritance:
 
 .. _all_methods_BaseFrame:
 
@@ -21,6 +22,7 @@
 
 .. autoclass:: pydidas.widgets.BaseFrame
 	:members:
+	:show-inheritance:
 	:inherited-members: QFrame
 	
 

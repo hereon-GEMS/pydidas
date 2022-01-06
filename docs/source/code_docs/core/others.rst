@@ -3,4 +3,5 @@ Other core classes and functions
 
 .. automodule:: pydidas.core
 	:members:
-	:exclude-members: CompositeImage, Parameter, ParameterCollection, ObjectWithParameterCollection
+	:show-inheritance:
+	:exclude-members: BaseApp, Parameter, ParameterCollection, ObjectWithParameterCollection

@@ -7,13 +7,12 @@ pydidas
 =======
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: Contents:
    
    introduction
    manuals
    code_documentation
-   README
 
 
 Indices and tables

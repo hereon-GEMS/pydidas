@@ -1,14 +1,14 @@
-.. |class_name| replace:: CompositeCreatorApp
+.. |class_name| replace:: ExecuteWorkflowApp
 
 |class_name|
 ============
 
-.. _all_methods_CompositeCreatorApp:
+.. _all_methods_ExecuteWorkflowApp:
 
 |class_name| with inherited methods
 -----------------------------------
 
-.. autoclass:: pydidas.apps.CompositeCreatorApp
+.. autoclass:: pydidas.apps.ExecuteWorkflowApp
 	:members:
 	:show-inheritance:
 	:inherited-members: QObject

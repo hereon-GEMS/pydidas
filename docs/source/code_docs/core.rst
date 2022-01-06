@@ -9,6 +9,5 @@ the core submodule directly.
 	core/parameter
 	core/parameter_collection
 	core/object_with_parameter_collection
-	core/composite_image
+	core/base_app
 	core/others
-	core/experimental_settings

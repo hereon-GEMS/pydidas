@@ -12,15 +12,12 @@ provides methods to register frames and create menus.
 
 	gui/main_window
 	gui/composite_creator_frame
-	gui/data_browing_frame
-	gui/experiment_setting_frame
+	gui/experimental_setup_frame
 	gui/global_configuration_frame
-	gui/global_settings_frame
 	gui/image_math_frame
-	gui/processing_full_workflow_frame
+	gui/execute_workflow_frame
 	gui/processing_single_plugin_frame
 	gui/pyfai_calib_frame
-	gui/scan_settings_frame
+	gui/scan_setup_frame
 	gui/workflow_edit_frame
-	gui/workflow_tree_edit_manager
 	gui/builders

@@ -1,8 +1,9 @@
+************
 Introduction
-============
+************
 
 pyDIDAS (**py**\ thon **DI**\ ffraction **D**\ ata **A**\ nalysis **S**\ uite) 
-is a toolset developed at Helmholtz-Zentrum hereon to improve the ease of use
+is a toolset developed at Helmholtz-Zentrum Hereon to improve the ease of use
 and efficiency of diffraction data analysis. A key requirement is to create
 a graphical user interface of the software and processing which scales with
 available resources to allow running pyDIDAS on a wide range of machines from
@@ -33,6 +34,7 @@ The pyDIDAS project is funded by `Helmholtz-Zentrum hereon
 <http://www.hereon.de>`_\ .
 
 The pyDIDAS software uses widgets and tools from the  
-`pyFAI <https://pyfai.readthedocs.io/>`_ project at the ESRF. The azimuthal
-integration routines are also taken from the pyFAI distribution.
+`pyFAI <https://pyfai.readthedocs.io/>`_ and `silx <http://www.silx.org/>`_ 
+projects at the ESRF. The azimuthal integration routines are also taken 
+from the pyFAI distribution.
 

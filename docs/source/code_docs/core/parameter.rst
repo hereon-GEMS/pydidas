@@ -5,3 +5,4 @@
 
 .. autoclass:: pydidas.core.Parameter
 	:members:
+	:show-inheritance:

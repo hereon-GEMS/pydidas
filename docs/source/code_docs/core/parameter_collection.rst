@@ -13,6 +13,7 @@
 
 .. autoclass:: pydidas.core.ParameterCollection
 	:members:
+	:show-inheritance:
 
 .. _all_methods_ParameterCollection:
 
@@ -21,6 +22,7 @@
 
 .. autoclass:: pydidas.core.ParameterCollection
 	:members:
+	:show-inheritance:
 	:inherited-members: QObject
 	
 

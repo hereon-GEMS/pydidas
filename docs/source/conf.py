@@ -59,7 +59,7 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 # nature scheme options
-# html_theme_options = {'sidebarwidth': '350px', 
+# html_theme_options = {'sidebarwidth': '350px',
 #                       "body_min_width": 800,
 #                      }
 html_theme_options = {
@@ -86,3 +86,6 @@ html_theme_options = {
 html_static_path = ['_static']
 html_logo = './images/logo/rings.png'
 html_title = 'pydidas'
+
+def setup(app):
+    app.add_css_file('_css/pydidas-custom.css')

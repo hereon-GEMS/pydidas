@@ -28,34 +28,32 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .experimental_setup import *
-from .experimental_setup_io_base import *
+from .workflow_tree_io_base import *
+from .workflow_tree_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import experimental_setup
-__all__.extend(experimental_setup.__all__)
-del experimental_setup
+from . import workflow_tree_io_base
+__all__.extend(workflow_tree_io_base.__all__)
+del workflow_tree_io_base
 
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+from . import workflow_tree_io_meta
+__all__.extend(workflow_tree_io_meta.__all__)
+del workflow_tree_io_meta
 
-# import all IO class files to have them registered in the registry metaclass.
+# Automatically find and import IO classes to have them registered
+# with the Metaclass:
 import os
 import importlib
 _dir = os.path.dirname(__file__)
-_files = set(item for item in os.listdir(_dir)
-             if (item.startswith('experimental_setup_io')
-                 and not item[-7:] in ['base.py', 'meta.py']))
+_io_classes = set(item.strip('.py') for item in os.listdir(_dir)
+                  if (item.startswith('workflow_tree_io')
+                      and not item[-7:] in ['base.py', 'meta.py']))
 
-for _module in _files:
-    _modname = _module.strip('.py')
-    _filepath = os.path.join(_dir, _module)
-    _spec = importlib.util.spec_from_file_location(_modname, _filepath)
-    _tmp_module = importlib.util.module_from_spec(_spec)
-    _spec.loader.exec_module(_tmp_module)
-    del _tmp_module
+for _module in _io_classes:
+    _module = importlib.import_module(f'.{_module}', __package__)
+    __all__ += _module.__all__
 
+del _module
 del os
 del importlib

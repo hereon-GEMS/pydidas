@@ -57,8 +57,7 @@ def pydidas_logger(level=logging.DEBUG):
         os.makedirs(_logpath)
     _time = time.localtime()
     _timestr = f'{_time.tm_year:04d}{_time.tm_mon:02d}{_time.tm_mday:02d}'
-    _logfile = os.path.join(os.path.dirname(os.path.dirname(
-        os.path.dirname(__file__))), 'logs', f'pydidas_log{_timestr}.log')
+    _logfile = os.path.join(_logpath, f'pydidas_log{_timestr}.log')
     handler = logging.FileHandler(_logfile)
     handler.setFormatter(formatter)
     # this will make sure you won't have duplicated messages in the output

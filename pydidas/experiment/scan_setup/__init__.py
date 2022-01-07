@@ -29,6 +29,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .scan_setup import *
+from .scan_setup_io_base import *
 from .scan_setup_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -37,24 +38,27 @@ from . import scan_setup
 __all__.extend(scan_setup.__all__)
 del scan_setup
 
+from . import scan_setup_io_base
+__all__.extend(scan_setup_io_base.__all__)
+del scan_setup_io_base
+
 from . import scan_setup_io_meta
 __all__.extend(scan_setup_io_meta.__all__)
 del scan_setup_io_meta
 
-# import all IO class files to have them registered in the registry metaclass.
+# Automatically find and import IO classes to have them registered
+# with the Metaclass:
 import os
 import importlib
 _dir = os.path.dirname(__file__)
-_files = set(item for item in os.listdir(_dir)
-             if (item.startswith('scan_setup_io')
-                 and not item[-7:] in ['base.py', 'meta.py']))
+_io_classes = set(item.strip('.py') for item in os.listdir(_dir)
+                  if (item.startswith('scan_setup_io')
+                      and not item[-7:] in ['base.py', 'meta.py']))
 
-for _module in _files:
-    _spec = importlib.util.spec_from_file_location(
-        _module.strip('.py'), os.path.join(_dir, _module))
-    _tmp_module = importlib.util.module_from_spec(_spec)
-    _spec.loader.exec_module(_tmp_module)
-    del _tmp_module
+for _module in _io_classes:
+    _module = importlib.import_module(f'.{_module}', __package__)
+    __all__ += _module.__all__
 
+del _module
 del os
 del importlib

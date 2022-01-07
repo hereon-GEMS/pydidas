@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
+The gui.managers subpackage includes gui-specific managers to handle
+specific aspects of the program.
 """
 
 __author__ = "Malte Storm"
@@ -28,15 +27,10 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .composite_creator_app import *
-from .execute_workflow_app import *
+from .workflow_tree_edit_manager import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
-
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+from . import workflow_tree_edit_manager
+__all__.extend(workflow_tree_edit_manager.__all__)
+del workflow_tree_edit_manager

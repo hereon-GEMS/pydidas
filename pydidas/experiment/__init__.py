@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
+The experiment package defines singleton classes used for handling global
+data about the experiment and scan.
 """
 
 __author__ = "Malte Storm"
@@ -27,16 +26,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-# import __all__ items from modules:
-from .composite_creator_app import *
-from .execute_workflow_app import *
+# import sub-packages:
+from . import experimental_setup
+from . import scan_setup
+__all__.extend(['experimental_setup', 'scan_setup'])
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
-
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+# explicitly import the singleton factories from the subpackages
+from .experimental_setup import ExperimentalSetup
+from .scan_setup import ScanSetup
+__all__.extend(['ExperimentalSetup', 'ScanSetup'])

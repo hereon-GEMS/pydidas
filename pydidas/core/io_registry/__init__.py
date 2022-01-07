@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
+The core.io_registry package provides the framework for an extension-based
+registry of classes which are managed by a metaclass.
 """
 
 __author__ = "Malte Storm"
@@ -27,16 +26,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+
 # import __all__ items from modules:
-from .composite_creator_app import *
-from .execute_workflow_app import *
+from .generic_io_base import *
+from .generic_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
+from . import generic_io_base
+__all__.extend(generic_io_base.__all__)
+del generic_io_base
 
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+from . import generic_io_meta
+__all__.extend(generic_io_meta.__all__)
+del generic_io_meta

@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
+The workflow package defines classes to create and manage the workflow and
+to import / export.
 """
 
 __author__ = "Malte Storm"
@@ -27,16 +26,41 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+# import sub-packages:
+from . import result_savers
+from . import workflow_tree_io
+__all__.extend(['result_savers', 'workflow_tree_io'])
+
 # import __all__ items from modules:
-from .composite_creator_app import *
-from .execute_workflow_app import *
+from .generic_node import *
+from .generic_tree import *
+from .plugin_position_node import *
+from .workflow_node import *
+from .workflow_results import *
+from .workflow_tree import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
+from . import generic_node
+__all__.extend(generic_node.__all__)
+del generic_node
 
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+from . import generic_tree
+__all__.extend(generic_tree.__all__)
+del generic_tree
+
+from . import plugin_position_node
+__all__.extend(plugin_position_node.__all__)
+del plugin_position_node
+
+from . import workflow_node
+__all__.extend(workflow_node.__all__)
+del workflow_node
+
+from . import workflow_results
+__all__.extend(workflow_results.__all__)
+del workflow_results
+
+from . import workflow_tree
+__all__.extend(workflow_tree.__all__)
+del workflow_tree

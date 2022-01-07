@@ -14,9 +14,9 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
+The scan_setup package includes a singleton class with the scan settings and
+importers/exporters for different formats as well as a registry metaclass to
+handle actual imports/exports.
 """
 
 __author__ = "Malte Storm"
@@ -28,15 +28,33 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .composite_creator_app import *
-from .execute_workflow_app import *
+from .scan_setup import *
+from .scan_setup_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
+from . import scan_setup
+__all__.extend(scan_setup.__all__)
+del scan_setup
 
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+from . import scan_setup_io_meta
+__all__.extend(scan_setup_io_meta.__all__)
+del scan_setup_io_meta
+
+# import all IO class files to have them registered in the registry metaclass.
+import os
+import importlib
+_dir = os.path.dirname(__file__)
+_files = set(item for item in os.listdir(_dir)
+             if (item.startswith('scan_setup_io')
+                 and not item[-7:] in ['base.py', 'meta.py']))
+
+for _module in _files:
+    _spec = importlib.util.spec_from_file_location(
+        _module.strip('.py'), os.path.join(_dir, _module))
+    _tmp_module = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_tmp_module)
+    del _tmp_module
+
+del os
+del importlib

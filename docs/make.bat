@@ -56,12 +56,12 @@ echo checkout out required files from %USE_BRANCH%
 echo Currently in directory %cd%.
 %SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 echo Finished creating html docs
-move build/html/* ../ -force
+move ./build/html/* ../ -force
 echo moved Paged to root dir
 del ../logs -r -force
 del ../pydidas -r -force
-del build -r -force
-del source /-r -force
+del ./build -r -force
+del ./source /-r -force
 echo deleted local files
 git checkout %USE_BRANCH% make.bat
 echo Updated make.bat file

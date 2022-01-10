@@ -2,7 +2,6 @@
 REM Command file for Sphinx documentation
 
 pushd %~dp0
-cd ..
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
@@ -10,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
+set GH_PAGES_SOURCES=../pydidas source make.bat
 
 if "%1" == "" goto help
 if "%1" == "gh-pages" (
@@ -43,7 +42,7 @@ git fetch origin gh-pages
 echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
-for /f %%a in ('dir /b') do (
+for /f %%a in ('dir .. /b') do (
 	if %%a NEQ docs (
 		echo deleting object %%a
 		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
@@ -55,12 +54,13 @@ git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 echo checkout out required files from %USE_BRANCH%
 echo Currently in directory %cd%.
-./docs/make.bat html
-move docs/build/html/* ../ -force
-del logs -r -force
-del pydidas -r -force
-del docs/* -r -force
-git checkout %USE_BRANCH% docs/make.bat
+./make.bat html
+move build/html/* ../ -force
+del ../logs -r -force
+del ../pydidas -r -force
+del build /r /force
+del source -r -force
+git checkout %USE_BRANCH% make.bat
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

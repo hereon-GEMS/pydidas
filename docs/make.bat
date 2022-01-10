@@ -41,9 +41,9 @@ goto end
 :gh-pages
 git fetch origin gh-pages
 git checkout gh-pages
-for %%a in ('dir -name') (
-	if ($a -ne "docs") (
-		del $a -r -force
+for /f %%a in ('dir /b') do (	
+	if (%%a != "docs") (
+		del %%a -r -force
 	)
 )
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%

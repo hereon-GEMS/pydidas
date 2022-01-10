@@ -45,7 +45,7 @@ echo Checkout out gh-pages branch
 for /f %%a in ('dir .. /b') do (
 	if %%a NEQ docs (
 		echo deleting object %%a
-		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
+		rmdir "../%%a" /s/q 2>NUL || del "../%%a" /s/q >NUL
 rem old:		del %%a -r -force -s -q
 	)
 )
@@ -54,7 +54,7 @@ git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 echo checkout out required files from %USE_BRANCH%
 echo Currently in directory %cd%.
-./make.bat html
+%SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 echo Finished creating html docs
 move build/html/* ../ -force
 echo moved Paged to root dir

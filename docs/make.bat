@@ -39,6 +39,7 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
+git fetch origin gh-pages
 git checkout gh-pages
 for %%a in ('dir -name') (
 	if ($a -ne "docs") (

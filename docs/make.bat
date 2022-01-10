@@ -50,7 +50,7 @@ git reset HEAD
 move docs/build/html/* ./ -force
 del logs -r -force
 del pydidas -r -force
-del docs -r -force
+del docs/* -r -force
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

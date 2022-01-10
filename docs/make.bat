@@ -40,11 +40,11 @@ goto end
 
 :gh-pages
 git checkout gh-pages
-foreach ($a in (dir -name)) {
-	if ($a -ne "docs") {
+for %%a in ('dir -name') (
+	if ($a -ne "docs") (
 		del $a -r -force
-	}
-}
+	)
+)
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ./docs/make.bat html

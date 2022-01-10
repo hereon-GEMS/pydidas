@@ -38,14 +38,13 @@ goto end
 
 :gh-pages
 set GH_PAGES_SOURCES=../pydidas source make.bat
-set LOCAL_PATH=
-set RESULTS=../
 
 git checkout gh-pages
-del build -r -force
-del _sources -r -force
-del _static -r -force
-del _images -r -force
+foreach ($a in (dir ../ -name)) {
+	if ($a -ne "docs") {
+		del ../$a -r -force
+	}
+}
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ./make.bat html

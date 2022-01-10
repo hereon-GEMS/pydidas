@@ -27,10 +27,9 @@ The rational behind these two use cases are
 - Support users with managing and automatically analyzing ever growing
   datasets.
 
-
 **Acknowledgements**
 
-The pyDIDAS project is funded by `Helmholtz-Zentrum hereon 
+The pyDIDAS project is funded by `Helmholtz-Zentrum Hereon 
 <http://www.hereon.de>`_\ .
 
 The pyDIDAS software uses widgets and tools from the  

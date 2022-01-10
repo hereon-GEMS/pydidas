@@ -45,7 +45,8 @@ git checkout gh-pages
 echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (
 	if %%a NEQ 'docs' (
-		del %%a -r -force
+		echo deleting object %%a
+		del %%a -r -force -s -q
 	)
 )
 echo Deleted local files

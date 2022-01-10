@@ -33,7 +33,7 @@ goto end
 :gh-pages
 git checkout gh-pages
 del /r /f  build _sources _static
-git checkout master %GH_PAGES_SOURCES%
+git checkout develop %GH_PAGES_SOURCES%
 git reset HEAD
 ./make.bat html
 move /Y build/html/* ./

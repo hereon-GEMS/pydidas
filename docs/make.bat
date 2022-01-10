@@ -41,13 +41,17 @@ goto end
 :gh-pages
 git fetch origin gh-pages
 git checkout gh-pages
+echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (	
 	if (%%a != "docs") (
 		del %%a -r -force
 	)
 )
+echo Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
+echo checkout out required files from %USE_BRANCH%
+echo Currently in directory %cd%.
 ./docs/make.bat html
 move docs/build/html/* ../ -force
 del logs -r -force

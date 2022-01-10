@@ -2,8 +2,6 @@
 REM Command file for Sphinx documentation
 
 pushd %~dp0
-set CUR_LOC=%CD%
-echo The current locaction is %CUR_LOC%
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
@@ -39,30 +37,22 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
-echo The current locaction is %CUR_LOC%
-if %CUR_LOC:~-4% == "docs" (
-	cd ..
-	set GH_PAGES_SOURCES=../pydidas source make.bat
-	set LOCAL_PATH=
-	set RESULTS=../
-)
-if %CUR_LOC:~-7% == "pydidas" (
-	set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
-	set LOCAL_PATH=docs/
-	set RESULTS=
-)
+set GH_PAGES_SOURCES=../pydidas source make.bat
+set LOCAL_PATH=
+set RESULTS=../
+
 git checkout gh-pages
-del %LOCAL_PATH%build -r -force
-del %RESULTS%_sources -r -force
-del %RESULTS%_static -r -force
-del %RESULTS%_images -r -force
+del build -r -force
+del _sources -r -force
+del _static -r -force
+del _images -r -force
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-./%LOCAL_PATH%make.bat html
-move %LOCAL_PATH%/build/html/* ./ -force
-del %RESULTS%logs -r -force
-del %RESULTS%pydidas -r -force
-del %RESULTS%docs/* -r -force
+./make.bat html
+move build/html/* ../ -force
+del ../logs -r -force
+del ../pydidas -r -force
+del * -r -force
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

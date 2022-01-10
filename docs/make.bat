@@ -4,17 +4,6 @@ pushd %~dp0
 
 REM Command file for Sphinx documentation
 
-set "CUR_LOC=%CD%"
-echo The current locaction is %CUR_LOC%
-if %CUR_LOC:~-4% == "docs" (
-	cd ..
-	set GH_PAGES_SOURCES=../pydidas source make.bat
-)
-
-if %CUR_LOC:~-7% == "pydidas" (
-	set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
-)
-
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
@@ -24,11 +13,11 @@ set BUILDDIR=build
 
 if "%1" == "" goto help
 if "%1" == "gh-pages" (
-	set %USE_BRANCH%=master
+	set USE_BRANCH=master
 	goto gh-pages
 )
 if "%1" == "gh-pages-dev" (
-	set %USE_BRANCH%=develop
+	set USE_BRANCH=develop
 	goto gh-pages
 )
 
@@ -45,11 +34,23 @@ if errorlevel 9009 (
 	exit /b 1
 )
 
-
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
 :gh-pages
+set "CUR_LOC=%CD%"
+echo The current locaction is %CUR_LOC%
+if %CUR_LOC:~-4% == "docs" (
+	cd ..
+	set GH_PAGES_SOURCES=../pydidas source make.bat
+	set LOCAL_PATH=""
+	set RESULTS=../
+)
+if %CUR_LOC:~-7% == "pydidas" (
+	set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
+	set LOCAL_PATH="docs/"
+	set RESULTS=""
+)
 git checkout gh-pages
 del build -r -force
 del _sources -r -force
@@ -57,11 +58,11 @@ del _static -r -force
 del _images -r -force
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-./docs/make.bat html
-move docs/build/html/* ./ -force
-del logs -r -force
-del pydidas -r -force
-del docs/* -r -force
+./%LOCAL_PATH%make.bat html
+move %LOCAL_PATH%/build/html/* ./ -force
+del %RESULTS%logs -r -force
+del %RESULTS%pydidas -r -force
+del %RESULTS%docs/* -r -force
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

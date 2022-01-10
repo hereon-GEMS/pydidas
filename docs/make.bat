@@ -43,19 +43,19 @@ echo The current locaction is %CUR_LOC%
 if %CUR_LOC:~-4% == "docs" (
 	cd ..
 	set GH_PAGES_SOURCES=../pydidas source make.bat
-	set LOCAL_PATH=""
+	set LOCAL_PATH=
 	set RESULTS=../
 )
 if %CUR_LOC:~-7% == "pydidas" (
 	set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
-	set LOCAL_PATH="docs/"
-	set RESULTS=""
+	set LOCAL_PATH=docs/
+	set RESULTS=
 )
 git checkout gh-pages
-del build -r -force
-del _sources -r -force
-del _static -r -force
-del _images -r -force
+del %LOCAL_PATH%build -r -force
+del %RESULTS%_sources -r -force
+del %RESULTS%_static -r -force
+del %RESULTS%_images -r -force
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ./%LOCAL_PATH%make.bat html

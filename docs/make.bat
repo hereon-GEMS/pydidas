@@ -43,8 +43,8 @@ git fetch origin gh-pages
 echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
-for /f %%a in ('dir /b') do (	
-	if (%%a NEQ 'docs') (
+for /f %%a in ('dir /b') do (
+	if %%a NEQ 'docs' (
 		del %%a -r -force
 	)
 )

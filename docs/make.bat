@@ -41,6 +41,7 @@ set GH_PAGES_SOURCES=../pydidas source make.bat
 
 git checkout gh-pages
 foreach ($a in (dir ../ -name)) {
+	echo found item $a
 	if ($a -ne "docs") {
 		del ../$a -r -force
 	}

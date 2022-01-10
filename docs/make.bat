@@ -9,9 +9,16 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=source pydidas make.bat
+set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
 if "%1" == "" goto help
-if "%1" == "gh-pages" goto gh-pages
+if "%1" == "gh-pages" (
+	set %USE_BRANCH%=master
+	goto gh-pages
+)
+if "%1" == "gh-pages-dev" (
+	set %USE_BRANCH%=develop
+	goto gh-pages
+)
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -31,15 +38,23 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
+cd ..
 git checkout gh-pages
-del /r /f  build _sources _static
-git checkout develop %GH_PAGES_SOURCES%
+del build -r -force
+del _sources -r -force
+del _static -r -force
+del _images -r -force
+git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-./make.bat html
-move /Y build/html/* ./
-del /r /f %GH_PAGES_SOURCES% build
+./docs/make.bat html
+move docs/build/html/* ./ -force
+del logs -r -force
+del pydidas -r -force
+del docs -r -force
 git add -A
-git ci -m "Generated gh-pages for `git log master -1 --pretty=short --abbrev-commit`" && git push origin gh-pages ; git checkout master
+git commit -m "Generated gh-pages for %USE_BRANCH%"
+git push origin gh-pages
+git checkout %USE_BRANCH%
 
 
 :help

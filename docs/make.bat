@@ -2,6 +2,7 @@
 REM Command file for Sphinx documentation
 
 pushd %~dp0
+cd ..
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
@@ -9,6 +10,7 @@ if "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
+set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
 
 if "%1" == "" goto help
 if "%1" == "gh-pages" (
@@ -37,22 +39,19 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
-set GH_PAGES_SOURCES=../pydidas source make.bat
-
 git checkout gh-pages
-foreach ($a in (dir ../ -name)) {
-	echo found item $a
+foreach ($a in (dir -name)) {
 	if ($a -ne "docs") {
-		del ../$a -r -force
+		del $a -r -force
 	}
 }
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-./make.bat html
-move build/html/* ../ -force
-del ../logs -r -force
-del ../pydidas -r -force
-del * -r -force
+./docs/make.bat html
+move docs/build/html/* ../ -force
+del logs -r -force
+del pydidas -r -force
+del docs/* -r -force
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

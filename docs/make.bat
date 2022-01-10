@@ -3,6 +3,7 @@ REM Command file for Sphinx documentation
 
 pushd %~dp0
 set CUR_LOC=%CD%
+echo The current locaction is %CUR_LOC%
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build

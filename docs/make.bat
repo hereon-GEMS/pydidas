@@ -55,16 +55,24 @@ git reset HEAD
 echo checkout out required files from %USE_BRANCH%
 echo Currently in directory %cd%.
 ./make.bat html
+echo Finished creating html docs
 move build/html/* ../ -force
+echo moved Paged to root dir
 del ../logs -r -force
 del ../pydidas -r -force
-del build /r /force
+del build -r -force
 del source -r -force
+echo deleted local files
 git checkout %USE_BRANCH% make.bat
+echo Updated make.bat file
 git add -A
+echo Added all files to staging
 git commit -m "Generated gh-pages for %USE_BRANCH%"
+echo Commited to git
 git push origin gh-pages
+echo Pushed to origin
 git checkout %USE_BRANCH%
+echo Changed back to %USE_BRANCH% branch.
 goto end
 
 :help
@@ -72,3 +80,4 @@ goto end
 
 :end
 popd
+

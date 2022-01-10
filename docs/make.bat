@@ -4,12 +4,23 @@ pushd %~dp0
 
 REM Command file for Sphinx documentation
 
+set "CUR_LOC=%CD%"
+if %CUR_LOC:~-4% == "docs" (
+	cd ..
+	set GH_PAGES_SOURCES=../pydidas source make.bat
+)
+
+if %CUR_LOC:~-7% == "pydidas" (
+	set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
+)
+
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
+
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=pydidas docs/source docs/make.bat
+
 if "%1" == "" goto help
 if "%1" == "gh-pages" (
 	set %USE_BRANCH%=master
@@ -55,7 +66,7 @@ git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages
 git checkout %USE_BRANCH%
-
+goto end
 
 :help
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%

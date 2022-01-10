@@ -44,9 +44,9 @@ echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (
-	if %%a NEQ 'docs' (
+	if %%a NEQ docs (
 		echo deleting object %%a
-		rmdir "%%i" /s/q 2>NUL || del "%%i" /s/q >NUL
+		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
 rem old:		del %%a -r -force -s -q
 	)
 )

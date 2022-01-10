@@ -49,7 +49,6 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
-cd ..
 git checkout gh-pages
 del build -r -force
 del _sources -r -force

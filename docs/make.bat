@@ -46,7 +46,8 @@ echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (
 	if %%a NEQ 'docs' (
 		echo deleting object %%a
-		del %%a -r -force -s -q
+		rmdir "%%i" /s/q 2>NUL || del "%%i" /s/q >NUL
+rem old:		del %%a -r -force -s -q
 	)
 )
 echo Deleted local files

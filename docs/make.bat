@@ -1,8 +1,8 @@
 @ECHO OFF
+REM Command file for Sphinx documentation
 
 pushd %~dp0
-
-REM Command file for Sphinx documentation
+set CUR_LOC=%CD%
 
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
@@ -38,7 +38,6 @@ if errorlevel 9009 (
 goto end
 
 :gh-pages
-set "CUR_LOC=%CD%"
 echo The current locaction is %CUR_LOC%
 if %CUR_LOC:~-4% == "docs" (
 	cd ..

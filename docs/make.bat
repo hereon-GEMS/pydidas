@@ -40,6 +40,7 @@ goto end
 
 :gh-pages
 git fetch origin gh-pages
+echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (	

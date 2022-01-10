@@ -44,7 +44,9 @@ echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
 for /f %%a in ('dir /b') do (	
-	del %%a -r -force
+	if (%%a NEQ 'docs') (
+		del %%a -r -force
+	)
 )
 echo Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
@@ -56,6 +58,7 @@ move docs/build/html/* ../ -force
 del logs -r -force
 del pydidas -r -force
 del docs/* -r -force
+git checkout %USE_BRANCH% docs/make.bat
 git add -A
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 git push origin gh-pages

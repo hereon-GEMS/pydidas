@@ -5,6 +5,7 @@ pushd %~dp0
 REM Command file for Sphinx documentation
 
 set "CUR_LOC=%CD%"
+echo The current locaction is %CUR_LOC%
 if %CUR_LOC:~-4% == "docs" (
 	cd ..
 	set GH_PAGES_SOURCES=../pydidas source make.bat

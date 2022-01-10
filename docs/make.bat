@@ -42,14 +42,13 @@ git fetch origin gh-pages
 echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
-cd ..
-for /f %%a in ('dir /b') do (
+for /f %%a in ('dir .. /b') do (
 	if %%a NEQ docs (
 		echo deleting object %%a
-		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
+		del ../%%a -r -force
+rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
 	)
 )
-cd docs
 echo Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
@@ -59,10 +58,10 @@ echo Currently in directory %cd%.
 echo Finished creating html docs
 move build/html/* ../ -force
 echo moved Paged to root dir
-rmdir ../logs /s/q 2>NUL 
-rmdir ../pydidas /s/q 2>NUL 
-rmdir build /s/q 2>NUL 
-rmdir source /s/q 2>NUL 
+del ../logs -r -force
+del ../pydidas -r -force
+del build -r -force
+del source /-r -force
 echo deleted local files
 git checkout %USE_BRANCH% make.bat
 echo Updated make.bat file

@@ -3,7 +3,7 @@ REM Command file for Sphinx documentation
 
 pushd %~dp0
 
-if "%SPHINXBUILD%" == "" (
+IF "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
 
@@ -11,18 +11,18 @@ set SOURCEDIR=source
 set BUILDDIR=build
 set GH_PAGES_SOURCES=../pydidas source make.bat
 
-if "%1" == "" goto help
-if "%1" == "gh-pages" (
+IF "%1" == "" goto help
+IF "%1" == "gh-pages" (
 	set USE_BRANCH=master
 	goto gh-pages
 )
-if "%1" == "gh-pages-dev" (
+IF "%1" == "gh-pages-dev" (
 	set USE_BRANCH=develop
 	goto gh-pages
 )
 
 %SPHINXBUILD% >NUL 2>NUL
-if errorlevel 9009 (
+IF errorlevel 9009 (
 	echo.
 	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
 	echo.installed, then set the SPHINXBUILD environment variable to point
@@ -44,14 +44,14 @@ git checkout gh-pages
 echo Checkout out gh-pages branch
 rem Powershell		del ../%%a -r -force
 rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
-for /f %%a in ('dir .. /b') do (
-	if %%a NEQ docs (
+for /f %%a in ('dir .. /b') DO (
+	IF %%a NEQ docs (
 		echo deleting object %%a
 		IF EXIST %%a\NUL (
-			rmdir "%%a" /s/q 2>NUL 
+			rmdir "../%%a" /s/q 2>NUL 
 		)
 		IF EXIST %%a (
-			del "%%a" /s/q >NUL
+			del "../%%a" /s/q >NUL
 		)	
 	)
 )

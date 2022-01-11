@@ -50,7 +50,7 @@ for /f %%a in ('dir .. /b') do (
 		IF EXIST %%a\NUL (
 			rmdir "%%a" /s/q 2>NUL 
 		)
-		ELSE (
+		IF EXIST %%a (
 			del "%%a" /s/q >NUL
 		)	
 	)

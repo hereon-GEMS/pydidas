@@ -42,27 +42,37 @@ git fetch origin gh-pages
 echo Fetched remote gh-pages branch
 git checkout gh-pages
 echo Checkout out gh-pages branch
+rem Powershell		del ../%%a -r -force
+rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
 for /f %%a in ('dir .. /b') do (
 	if %%a NEQ docs (
 		echo deleting object %%a
-		del ../%%a -r -force
-rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
+		if EXIST %%a\NUL (
+			rmdir "%%a" /s/q 2>NUL 
+		)
+		else (
+			del "%%a" /s/q >NUL
+		)	
 	)
 )
 echo Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-echo checkout out required files from %USE_BRANCH%
+echo Checked out required files from %USE_BRANCH%.
 echo Currently in directory %cd%.
 %SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
-echo Finished creating html docs
-move ./build/html/* ../ -force
-echo moved Paged to root dir
-del ../logs -r -force
-del ../pydidas -r -force
-del ./build -r -force
-del ./source /-r -force
-echo deleted local files
+echo Finished creating html docs.
+move build/html/* ../ -force
+echo Moved pages to root dir.
+rmdir ../logs /s /q
+rmdir ../pydidas /s /q
+rmdir build /s /q
+rmdir source /s /q
+rem del ../logs -r -force
+rem del ../pydidas -r -force
+rem del ./build -r -force
+rem del ./source /-r -force
+echo Deleted local files
 git checkout %USE_BRANCH% make.bat
 echo Updated make.bat file
 git add -A

@@ -47,10 +47,10 @@ rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
 for /f %%a in ('dir .. /b') do (
 	if %%a NEQ docs (
 		echo deleting object %%a
-		if EXIST %%a\NUL (
+		IF EXIST %%a\NUL (
 			rmdir "%%a" /s/q 2>NUL 
 		)
-		else (
+		ELSE (
 			del "%%a" /s/q >NUL
 		)	
 	)
@@ -64,8 +64,8 @@ echo Currently in directory %cd%.
 echo Finished creating html docs.
 move build/html/* ../ -force
 echo Moved pages to root dir.
-rmdir ../logs /s /q
-rmdir ../pydidas /s /q
+rmdir "../logs" /s /q
+rmdir "../pydidas" /s /q
 rmdir build /s /q
 rmdir source /s /q
 rem del ../logs -r -force

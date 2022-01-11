@@ -23,14 +23,14 @@ IF "%1" == "gh-pages-dev" (
 
 %SPHINXBUILD% >NUL 2>NUL
 IF errorlevel 9009 (
-	echo.
-	echo.The 'sphinx-build' command was not found. Make sure you have Sphinx
-	echo.installed, then set the SPHINXBUILD environment variable to point
-	echo.to the full path of the 'sphinx-build' executable. Alternatively you
-	echo.may add the Sphinx directory to PATH.
-	echo.
-	echo.If you don't have Sphinx installed, grab it from
-	echo.http://sphinx-doc.org/
+	ECHO.
+	ECHO.The 'sphinx-build' command was not found. Make sure you have Sphinx
+	ECHO.installed, then set the SPHINXBUILD environment variable to point
+	ECHO.to the full path of the 'sphinx-build' executable. Alternatively you
+	ECHO.may add the Sphinx directory to PATH.
+	ECHO.
+	ECHO.If you don't have Sphinx installed, grab it from
+	ECHO.http://sphinx-doc.org/
 	exit /b 1
 )
 
@@ -39,50 +39,52 @@ goto end
 
 :gh-pages
 git fetch origin gh-pages
-echo Fetched remote gh-pages branch
+ECHO Fetched remote gh-pages branch
 git checkout gh-pages
-echo Checkout out gh-pages branch
+ECHO Checkout out gh-pages branch
 rem Powershell		del ../%%a -r -force
 rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
-for /f %%a in ('dir .. /b') DO (
+FOR /f %%a in ('dir .. /b') DO (
 	IF %%a NEQ docs (
-		echo deleting object %%a
+		ECHO Deleting object %%a
 		IF EXIST %%a\NUL (
-			rmdir "../%%a" /s/q 2>NUL 
+			rmdir "..\%%a" /s/q 2>NUL 
 		)
 		IF EXIST %%a (
-			del "../%%a" /s/q >NUL
+			del "..\%%a" /s/q >NUL
 		)	
 	)
 )
-echo Deleted local files
+ECHO Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
-echo Checked out required files from %USE_BRANCH%.
-echo Currently in directory %cd%.
+ECHO Checked out required files from %USE_BRANCH%.
+ECHO Currently in directory %cd%.
 %SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
-echo Finished creating html docs.
-move "build/html/*" "../" /y
-echo Moved pages to root dir.
-rmdir "../logs" /s /q
-rmdir "../pydidas" /s /q
+ECHO Finished creating html docs.
+REM Need to handle every item separately because directories cannot
+REM be moved with wildcards:
+FOR /f %%a in ('dir build\html /b') DO (move /y build\html\%%a "..\")
+ECHO Moved pages to root dir.
+rmdir "..\logs" /s /q
+rmdir "..\pydidas" /s /q
 rmdir build /s /q
 rmdir source /s /q
 rem del ../logs -r -force
 rem del ../pydidas -r -force
 rem del ./build -r -force
 rem del ./source /-r -force
-echo Deleted local files
+ECHO Deleted local files
 git checkout %USE_BRANCH% make.bat
-echo Updated make.bat file
+ECHO Updated make.bat file
 git add -A
-echo Added all files to staging
+ECHO Added all files to staging
 git commit -m "Generated gh-pages for %USE_BRANCH%"
-echo Commited to git
+ECHO Commited to git
 git push origin gh-pages
-echo Pushed to origin
+ECHO Pushed to origin
 git checkout %USE_BRANCH%
-echo Changed back to %USE_BRANCH% branch.
+ECHO Changed back to %USE_BRANCH% branch.
 goto end
 
 :help

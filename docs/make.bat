@@ -62,7 +62,7 @@ echo Checked out required files from %USE_BRANCH%.
 echo Currently in directory %cd%.
 %SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 echo Finished creating html docs.
-move "build/html/*" "../" -force
+move "build/html/*" "../" /y
 echo Moved pages to root dir.
 rmdir "../logs" /s /q
 rmdir "../pydidas" /s /q

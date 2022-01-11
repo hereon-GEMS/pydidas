@@ -28,7 +28,7 @@ __all__ = ['ExperimentalSetup']
 
 import pyFAI
 
-from ...core.constants import LAMBDA_TO_E
+from ...core.constants import LAMBDA_IN_A_TO_E
 from ...core import (SingletonFactory, get_generic_param_collection, #
                      ObjectWithParameterCollection)
 from .experimental_setup_io_meta import ExperimentalSetupIoMeta
@@ -77,11 +77,11 @@ class _ExpSetup(ObjectWithParameterCollection):
         self._check_key(param_key)
         if param_key == 'xray_energy':
             self.params['xray_wavelength'].value = (
-                LAMBDA_TO_E / (value * 1e-10))
+                LAMBDA_IN_A_TO_E / value)
             self.params['xray_energy'].value = value
         elif param_key == 'xray_wavelength':
             self.params['xray_wavelength'].value = value
-            self.params['xray_energy'].value = LAMBDA_TO_E / (value * 1e-10)
+            self.params['xray_energy'].value = LAMBDA_IN_A_TO_E / value
         else:
             self.params.set_value(param_key, value)
 
@@ -126,7 +126,7 @@ class _ExpSetup(ObjectWithParameterCollection):
         ExperimentalSetupIoMeta.import_from_file(filename)
 
     @staticmethod
-    def export_to_file(filename):
+    def export_to_file(filename, overwrite=False):
         """
         Import ExperimentalSetup from a file.
 
@@ -134,8 +134,10 @@ class _ExpSetup(ObjectWithParameterCollection):
         ----------
         filename : Union[str, pathlib.Path]
             The full filename.
+        overwrite : bool, optional
+            Keyword to allow overwriting of existing files.
         """
-        ExperimentalSetupIoMeta.export_to_file(filename)
+        ExperimentalSetupIoMeta.export_to_file(filename, overwrite=overwrite)
 
     def __copy__(self):
         """

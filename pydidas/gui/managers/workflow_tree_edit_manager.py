@@ -38,7 +38,6 @@ from ...plugins import PluginCollection
 from ...widgets.workflow_edit import PluginInWorkflowBox
 from ...workflow import WorkflowTree, PluginPositionNode
 
-
 PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
 
@@ -235,11 +234,11 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         widget_conns = []
         for node0, node1 in node_conns:
             x0 = (self._node_positions[node0][0]
-                  + self._nodes[node1].generic_width // 2)
+                  + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2)
             y0 = (self._node_positions[node0][1]
-                  + self._nodes[node1].generic_height)
+                  + gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT)
             x1 = (self._node_positions[node1][0]
-                  + self._nodes[node1].generic_width // 2)
+                  + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2)
             y1 = self._node_positions[node1][1]
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)

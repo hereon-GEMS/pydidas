@@ -29,7 +29,7 @@ __all__ = ['ExperimentalSetupIoYaml']
 import yaml
 import numpy as np
 
-from ...core.constants import YAML_EXTENSIONS, LAMBDA_TO_E
+from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
 from .experimental_setup_io_base import ExperimentalSetupIoBase
 from .experimental_setup import ExperimentalSetup
 
@@ -78,6 +78,7 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
                 raise yaml.YAMLError from yerr
         assert isinstance(cls.imported_params, dict)
         cls.imported_params['xray_energy'] = (
-            LAMBDA_TO_E / cls.imported_params.get('xray_wavelength', np.nan))
+            LAMBDA_IN_A_TO_E
+            / cls.imported_params.get('xray_wavelength', np.nan))
         cls._verify_all_entries_present()
         cls._write_to_exp_settings()

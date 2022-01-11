@@ -344,11 +344,12 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             _ax_labels[0] = 'chronological frame number'
             _ax_units[0] = ''
             _ax_ranges[0] = f'0 ... {SCAN.n_total - 1}'
+            _ax_points[0] = SCAN.n_total
             if _scandim > 1:
                 _dims_to_edit = RESULTS.ndims[self._active_node] - _scandim
                 for _index in range(_dims_to_edit):
                     for _item in [_ax_labels, _ax_units, _ax_ranges,
-                                  _ax_types]:
+                                  _ax_types, _ax_points]:
                         _item[_index + 1] = _item[_index + _scandim]
                         del _item[_index + _scandim]
         return ''.join([(f'Axis #{_axis:02d} {_ax_types[_axis]}:\n'

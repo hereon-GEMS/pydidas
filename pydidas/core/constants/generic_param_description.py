@@ -37,7 +37,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'type': int,
         'default': 0,
         'name': 'Live processing',
-        'choices': None,
+        'choices': [True, False],
         'unit': '',
         'allow_None': False,
         'tooltip': ('Set live processing to True if the files do not yet '
@@ -226,7 +226,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'default': 0,
         'name': 'ROI lower x limit',
         'choices': None,
-        'unit': 'p',
+        'unit': 'px',
         'allow_None': False,
         'tooltip': ('The lower boundary (in pixel) for cropping images in x, '
                     'if use_roi is enabled. Negative values will be modulated '

@@ -36,7 +36,7 @@ from pydidas.gui import (
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
     CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow)
 from pydidas.widgets import BaseFrame
-
+from pydidas.core.utils import Timer
 
 class ProcessingSetupFrame(BaseFrame):
     show_frame = False
@@ -63,8 +63,8 @@ def run_gui(qtapp):
     """
     gui = MainWindow()
     gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
-    gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
-                       'qta::mdi.image-search-outline')
+    # gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
+    #                     'qta::mdi.image-search-outline')
     gui.register_frame(ToolsFrame, 'Tools', 'Tools' , 'qta::mdi.tools')
     gui.register_frame(PyfaiCalibFrame, 'pyFAI calibration',
                        'Tools/pyFAI calibration', get_pyfai_calib_icon())
@@ -81,7 +81,7 @@ def run_gui(qtapp):
                        'Processing setup/Workflow editing',
                        'qta::mdi.clipboard-flow-outline')
     gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
-                       'Run full procesing', 'qta::mdi.sync')
+                   'Run full procesing', 'qta::mdi.sync')
     # gui.register_frame(ResultVisualizationFrame, 'Result visualization',
     #                    'Result visualization', 'qta::mdi.monitor-eye')
     gui.show()
@@ -98,28 +98,28 @@ if __name__ == '__main__':
     from pydidas.experiment import ExperimentalSetup, ScanSetup
     from pydidas.workflow import WorkflowResults, WorkflowTree
 
+    _path = 'H:/myPython/__pydidas_test_data/'
+
     EXP = ExperimentalSetup()
-    EXP.import_from_file('H:/myPython/pydidas/tests_of_workflow/__calib.poni')
+    EXP.import_from_file(f'{_path}__exp_settings.yaml')
 
     SCAN = ScanSetup()
-    SCAN.import_from_file(
-        'H:/myPython/pydidas/tests_of_workflow/__scan_settings.yaml')
+    SCAN.import_from_file(f'{_path}__scan_settings.yaml')
 
     TREE = WorkflowTree()
-    TREE.import_from_file(
-        'H:/myPython/pydidas/tests_of_workflow/__workflow_new.yaml')
+    TREE.import_from_file(f'{_path}__workflow.yaml')
 
     RESULTS = WorkflowResults()
-    RESULTS.__dict__ = pickle.load(
-        open('d:/tmp/saved_results/results.pickle', 'rb'))
-    for _i in [1, 2]:
-        _data = Dataset(np.load(f'd:/tmp/saved_results/node_{_i:02d}.npy'))
-        _meta = pickle.load(
-            open(f'd:/tmp/saved_results/node_{_i:02d}.pickle', 'rb'))
+    RESULTS.__dict__ = pickle.loads(
+        open(f'{_path}_results_dict.pickle', 'rb').read())
+    for _node in [1, 2]:
+        _data = Dataset(np.load(f'{_path}_results_node{_node:02d}.npy'))
+        _meta = pickle.loads(
+            open(f'{_path}_node{_node:02d}meta.pickle', 'rb').read())
         _data.axis_labels = _meta['axis_labels']
         _data.axis_units = _meta['axis_units']
         _data.axis_ranges = _meta['axis_ranges']
-        RESULTS._WorkflowResults__composites[_i] = _data
+        RESULTS._WorkflowResults__composites[_node] = _data
     #### end insert
 
     app = QtWidgets.QApplication(sys.argv)

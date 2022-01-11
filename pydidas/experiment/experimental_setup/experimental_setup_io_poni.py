@@ -28,7 +28,7 @@ __all__ = ['ExperimentalSetupIoPoni']
 
 import pyFAI
 
-from ...core.constants import LAMBDA_TO_E
+from ...core.constants import LAMBDA_IN_M_TO_E
 from .experimental_setup_io_base import ExperimentalSetupIoBase
 from .experimental_setup import ExperimentalSetup
 
@@ -116,7 +116,8 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
             raise TypeError(f'Object "{geo} (type {type(geo)} is not a '
                             'pyFAI.geometry.Geometry instance.')
         cls.imported_params['xray_wavelength'] = geo.wavelength * 1e10
-        cls.imported_params['xray_energy'] = (LAMBDA_TO_E / geo.wavelength)
+        cls.imported_params['xray_energy'] = (LAMBDA_IN_M_TO_E
+                                              / geo.wavelength)
         _geodict = geo.getPyFAI()
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:

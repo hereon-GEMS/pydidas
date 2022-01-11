@@ -23,13 +23,28 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['LAMBDA_TO_E', 'BASE_PLUGIN', 'INPUT_PLUGIN', 'PROC_PLUGIN',
+__all__ = ['LAMBDA_IN_A_TO_E', 'LAMBDA_IN_M_TO_E',
+           'BASE_PLUGIN', 'INPUT_PLUGIN', 'PROC_PLUGIN',
            'OUTPUT_PLUGIN', 'pyFAI_UNITS', 'pyFAI_METHOD']
 
 import scipy.constants
 
 
-LAMBDA_TO_E = scipy.constants.h * scipy.constants.c / scipy.constants.e * 1e-3
+LAMBDA_IN_A_TO_E = 1e10 * (scipy.constants.h * scipy.constants.c
+                    / ( scipy.constants.e * 1e3))
+"""
+float :
+    The conversion factor to change a wavelength in Angstrom to an energy in
+    keV.
+"""
+
+LAMBDA_IN_M_TO_E = (scipy.constants.h * scipy.constants.c
+                    / ( scipy.constants.e * 1e3))
+"""
+float :
+    The conversion factor to change a wavelength in meter to an energy in
+    keV.
+"""
 
 BASE_PLUGIN = -1
 INPUT_PLUGIN = 0

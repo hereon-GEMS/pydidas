@@ -78,7 +78,6 @@ class HomeFrame(BaseFrame):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
 
-
         self.create_label('label_welcome', 'Welcome to pyDIDAS',
                           fontsize=14, bold=True, fixedWidth=400)
         self.create_label('label_full_name',

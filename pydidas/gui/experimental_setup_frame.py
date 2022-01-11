@@ -260,4 +260,4 @@ class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
         fname =  QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None, _formats)[0]
         if fname != '':
-            EXP_SETTINGS.export_to_file(fname)
+            EXP_SETTINGS.export_to_file(fname, overwrite=True)

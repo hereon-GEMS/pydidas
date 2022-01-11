@@ -174,7 +174,8 @@ def excepthook(exc_type, exception, trace):
     traceback.print_tb(trace, None, _traceback_info)
     _traceback_info.seek(0)
     _trace = _traceback_info.read()
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+    _logpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
+        __file__))), 'logs')
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
     _logfile = os.path.join(_logpath, 'pydidas_error.log')

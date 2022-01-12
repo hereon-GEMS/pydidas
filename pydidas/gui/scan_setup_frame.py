@@ -127,7 +127,7 @@ class ScanSetupFrame(BaseFrame, ScanSetup_FrameBuilder):
         fname =  QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None, _formats)[0]
         if fname != '':
-            SCAN_SETTINGS.export_to_file(fname)
+            SCAN_SETTINGS.export_to_file(fname, overwrite=True)
 
     def reset_entries(self):
         """

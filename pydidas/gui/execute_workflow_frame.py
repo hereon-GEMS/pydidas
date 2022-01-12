@@ -255,14 +255,18 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._widgets['plot_stack'].setCurrentIndex(_dim - 1)
         _plot = self._widgets[f'plot{_dim}d']
         _plot.setGraphTitle(RESULTS.labels[_node] + f'(node #{_node:03d}')
-        _label = lambda i: (_data.axis_labels[i]
-                            + (' / ' + _data.axis_units[i]
-                               if len(_data.axis_units[i]) > 0 else ''))
+        _units = [(_val if _val is not None else '')
+                  for _val in _data.axis_units.values()]
+        _labels = [(_val if _val is not None else '')
+                   for _val in _data.axis_labels.values()]
+        _ax_label = lambda i: (
+            _labels[i]
+            + (' / ' + _units[i] if len(_units[i]) > 0 else ''))
         if _dim == 1:
             _plot.addCurve(_data.axis_ranges[0], _data.array, replace=True,
                            linewidth=1.5)
             _plot.setGraphYLabel(RESULTS.labels[_node])
-            _plot.setGraphXLabel(_label(0))
+            _plot.setGraphXLabel(_ax_label(0))
         elif _dim == 2:
             if not isinstance(_data.axis_ranges[1], np.ndarray):
                 _data.axis_ranges[1] = np.arange(_data.shape[1])
@@ -273,8 +277,8 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
                         / _data.axis_ranges[1].size)
             _plot.addImage(_data, replace=True, copy=False, origin=_origin,
                            scale=(_scale_x, _scale_y))
-            _plot.setGraphYLabel(_label(0))
-            _plot.setGraphXLabel(_label(1))
+            _plot.setGraphYLabel(_ax_label(0))
+            _plot.setGraphXLabel(_ax_label(1))
 
     @QtCore.pyqtSlot(int)
     def frame_activated(self, index):

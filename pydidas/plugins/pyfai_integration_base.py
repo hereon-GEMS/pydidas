@@ -35,14 +35,13 @@ import pyFAI.azimuthalIntegrator
 
 from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
-from ..core.utils import pydidas_logger, LOGGING_LEVEL
+from ..core.utils import pydidas_logger
 from ..image_io import read_image, rebin2d
 from ..experiment import ExperimentalSetup
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
-logger.setLevel(LOGGING_LEVEL)
 
 EXP_SETTINGS = ExperimentalSetup()
 
@@ -137,23 +136,6 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         raise NotImplementedError('Must be implemented by the concrete '
                                   'pyFAI integration plugin')
-        # if self.output_data_dim == 2:
-        #     self._config['result_shape'] = (
-        #         self.get_param_value('int_rad_npoint'),
-        #         self.get_param_value('int_azi_npoint'))
-        # elif (self.get_param_value('int_rad_npoint', 1) == 1 and
-        #         self.get_param_value('int_azi_npoint', 1) > 1):
-        #     self._config['result_shape'] = (
-        #         self.get_param_value('int_azi_npoint'), )
-        # elif (self.get_param_value('int_rad_npoint', 1) > 1 and
-        #         self.get_param_value('int_azi_npoint', 1) == 1):
-        #     self._config['result_shape'] = (
-        #         self.get_param_value('int_rad_npoint'), )
-        # else:
-        #     print('Shapes (rad/azi): ', self.get_param_value('int_rad_npoint'),
-        #           self.get_param_value('int_rad_npoint'))
-        #     raise ValueError('Could not determine the new shape from the '
-        #                      'defined number of points')
 
     def get_radial_range(self):
         """

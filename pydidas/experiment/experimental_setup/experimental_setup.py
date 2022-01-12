@@ -76,9 +76,9 @@ class _ExpSetup(ObjectWithParameterCollection):
         """
         self._check_key(param_key)
         if param_key == 'xray_energy':
+            self.params['xray_energy'].value = value
             self.params['xray_wavelength'].value = (
                 LAMBDA_IN_A_TO_E / value)
-            self.params['xray_energy'].value = value
         elif param_key == 'xray_wavelength':
             self.params['xray_wavelength'].value = value
             self.params['xray_energy'].value = LAMBDA_IN_A_TO_E / value

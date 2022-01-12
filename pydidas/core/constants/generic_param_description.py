@@ -248,7 +248,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'default': 0,
         'name': 'ROI lower y limit',
         'choices': None,
-        'unit': 'p',
+        'unit': 'px',
         'allow_None': False,
         'tooltip': ('The lower boundary (in pixel) for cropping images in y, '
                     'if use_roi is enabled. Negative values will be modulated '

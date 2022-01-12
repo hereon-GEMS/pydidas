@@ -61,6 +61,7 @@ Package documentation
 	code_docs/experiment
 	code_docs/managers
 	code_docs/plugins
+	code_docs/workflow
 	code_docs/apps
 	code_docs/widgets
 	

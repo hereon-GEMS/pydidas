@@ -27,14 +27,15 @@ __status__ = "Development"
 __all__ = ['ExecuteWorkflowApp']
 
 import time
+import warnings
 import multiprocessing as mp
 
 import numpy as np
 from PyQt5 import QtCore
 
 from ..core import (get_generic_param_collection, Dataset, BaseApp,
-                    AppConfigError)
-from ..experiment import ScanSetup
+                    AppConfigError, utils)
+from ..experiment import ScanSetup, ExperimentalSetup
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
 from .app_parsers import parse_execute_workflow_cmdline_arguments
@@ -42,6 +43,7 @@ from .app_parsers import parse_execute_workflow_cmdline_arguments
 
 TREE = WorkflowTree()
 SCAN = ScanSetup()
+EXP = ExperimentalSetup()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultSaverMeta
 
@@ -147,9 +149,12 @@ class ExecuteWorkflowApp(BaseApp):
             TREE.restore_from_string(self._config['tree_str_rep'])
             for _key, _val in self._config['scan_vals'].items():
                 SCAN.set_param_value(_key, _val)
+            for _key, _val in self._config['exp_vals'].items():
+                EXP.set_param_value(_key, _val)
         if not self.slave_mode:
             self._config['tree_str_rep'] = TREE.export_to_string()
             self._config['scan_vals'] = SCAN.get_param_values_as_dict()
+            self._config['exp_vals'] = EXP.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
@@ -308,7 +313,9 @@ class ExecuteWorkflowApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        TREE.execute_process(index)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            TREE.execute_process(index)
         self.__write_results_to_shared_arrays()
         if self._config['result_metadata_set']:
             return self._config['buffer_pos']
@@ -371,7 +378,7 @@ class ExecuteWorkflowApp(BaseApp):
         ----------
         index : int
             The index in the composite image.
-        result : Union[tuple, int]
+        data : Union[tuple, int]
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.
         """
@@ -379,7 +386,7 @@ class ExecuteWorkflowApp(BaseApp):
             return
         if isinstance(data, tuple):
             buffer_pos = data[0]
-            if not self._config['result_metadata_set']:
+            if not RESULTS._config['metadata_complete']:
                 RESULTS.update_frame_metadata(data[1])
                 self._store_frame_metadata(data[1])
         else:

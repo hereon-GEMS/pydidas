@@ -40,7 +40,7 @@ class SignalBlocker:
     Example
     -------
     >>> obj = QtWidgets.QComboBox()
-    >>>> with SignalBlocker(obj):
+    >>> with SignalBlocker(obj):
     >>>     obj.setCurrentText('Test')
     """
     def __init__(self, obj):

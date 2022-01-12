@@ -38,7 +38,7 @@ class GenericIoBase:
     imported_params = {}
 
     @classmethod
-    def export_to_file(cls, filename):
+    def export_to_file(cls, filename, **kwargs):
         """
         Write the content to a file.
 
@@ -48,6 +48,9 @@ class GenericIoBase:
         ----------
         filename : str
             The filename of the file to be written.
+        **kwargs : dict
+            Any keyword arguments. Supported keywords must be specified by
+            the specific implementation.
         """
         raise NotImplementedError
 
@@ -76,7 +79,9 @@ class GenericIoBase:
         filename : str
             The full filename and path.
         **kwargs : dict
-            Any keyword arguments
+            Any keyword arguments. Supported are:
+        **overwrite : bool, optional
+            Flag to allow overwriting of existing files.
 
         Raises
         ------

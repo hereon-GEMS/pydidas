@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-Module with the GlobalConfigWindow class which is a QMainWindow widget
-to view and modify the global settings in a dedicatd window.
-"""
+"""Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -24,28 +21,43 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_doc_qurl']
 
 
+import unittest
 import os
+
 
 from PyQt5 import QtCore
 
+from pydidas.core.utils import (
+    get_doc_make_directory, get_doc_home_filename, get_doc_home_address,
+    get_doc_home_qurl)
 
-def get_doc_qurl():
-    """
-    Get the full filepath & -name of the index.html for the pydidas
-    documentation.
 
-    Returns
-    -------
-    url : QtCore.QUrl
-        The QUrl object with the path to the index.html file.
-    """
-    _name = __file__
-    for _ in range(4):
-        _name = os.path.dirname(_name)
-    _docdir = os.path.join(_name, 'docs', 'build', 'html')
-    _docfile = 'file:///' + os.path.join(_docdir, 'index.html')
-    _docfile = _docfile.replace('\\', '/')
-    return QtCore.QUrl(_docfile)
+class TestGetDocQUrl(unittest.TestCase):
+
+    def setUp(self):
+        ...
+
+    def tearDown(self):
+        ...
+
+    def test_get_doc_make_directory(self):
+        _dir = get_doc_make_directory()
+        self.assertIn('Makefile', os.listdir(_dir))
+
+    def test_get_doc_home_filename(self):
+        _fname = get_doc_home_filename()
+        self.assertTrue(os.path.exists(_fname))
+
+    def test_get_doc_home_address(self):
+        _address = get_doc_home_address()
+        self.assertTrue(_address.startswith( 'file:///' ))
+
+    def test_get_doc_qurl(self):
+        _url = get_doc_home_qurl()
+        self.assertIsInstance(_url, QtCore.QUrl)
+
+
+if __name__ == "__main__":
+    unittest.main()

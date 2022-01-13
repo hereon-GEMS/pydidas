@@ -32,11 +32,12 @@ from .file_checks import *
 from .file_utils import *
 from .flatten_list_ import *
 from .format_arguments_ import *
-from .get_doc_qurl_ import *
+from .get_documentation_targets import *
 from .get_module_dir import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
 from .signal_blocker import *
+from .sphinx_html import *
 from .str_utils import *
 from .timer import *
 
@@ -62,9 +63,9 @@ from . import format_arguments_
 __all__.extend(format_arguments_.__all__)
 del format_arguments_
 
-from . import get_doc_qurl_
-__all__.extend(get_doc_qurl_.__all__)
-del get_doc_qurl_
+from . import get_documentation_targets
+__all__.extend(get_documentation_targets.__all__)
+del get_documentation_targets
 
 from . import get_module_dir
 __all__.extend(get_module_dir.__all__)
@@ -81,6 +82,10 @@ del logger_
 from . import signal_blocker
 __all__.extend(signal_blocker.__all__)
 del signal_blocker
+
+from . import sphinx_html
+__all__.extend(sphinx_html.__all__)
+del sphinx_html
 
 from . import str_utils
 __all__.extend(str_utils.__all__)

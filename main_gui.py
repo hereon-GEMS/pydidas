@@ -26,17 +26,21 @@ __status__ = "Development"
 __all__ = []
 
 import sys
+import logging
 
 from PyQt5 import QtWidgets
 import numpy as np
-
 
 from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame, PyfaiCalibFrame, HomeFrame,
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
     CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow)
 from pydidas.widgets import BaseFrame
-from pydidas.core.utils import Timer
+
+
+logger = logging.getLogger('pyFAI.azimuthalIntegrator')
+logger.setLevel(logging.ERROR)
+
 
 class ProcessingSetupFrame(BaseFrame):
     show_frame = False

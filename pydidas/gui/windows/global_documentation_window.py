@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the GlobalConfigWindow class which is a QMainWindow widget
-to view and modify the global settings in a dedicatd window.
+Module with the GlobalDocumentationWindow class which is a QMainWindow widget
+to view the pydidas html documentation.
 """
 
 __author__ = "Malte Storm"
@@ -28,49 +28,8 @@ __all__ = ['GlobalDocumentationWindow']
 
 from PyQt5 import QtWebEngineWidgets, QtWidgets, QtCore
 
-from ...widgets import ScrollArea, factory, get_pyqt_icon_from_str_reference
-from ...core.utils import get_doc_qurl
-
-
-
-class PydidasWebView(QtWebEngineWidgets.QWebEngineView):
-    """
-    Subclass of QWebEngineView with an updated size hint and fixed URL for
-    the pydidas documentation.
-    """
-    def __init__(self):
-        super().__init__()
-        self.load_main_doc()
-
-    def load_main_doc(self):
-        """
-        Load the main window of the documentation.
-        """
-        self.load(get_doc_qurl())
-
-    def sizeHint(self):
-        """
-        Reimplement the generic sizeHint to return a larger window.
-
-        Returns
-        -------
-        QtCore.QSize
-            The desired size for the documentation html content.
-        """
-        return QtCore.QSize(900, 600)
-
-    def closeEvent(self, event):
-        """
-        If the widget is to be closed, mark the webpage for deletion.
-
-        Parameters
-        ----------
-        event : QtCore.QEvent
-            The calling event.
-        """
-        _page = self.page()
-        _page.deleteLater()
-        event.accept()
+from ...widgets import (PydidasWebView, ScrollArea,
+                        get_pyqt_icon_from_str_reference)
 
 
 class GlobalDocumentationWindow(QtWidgets.QMainWindow):

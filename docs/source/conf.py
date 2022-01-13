@@ -23,8 +23,8 @@ copyright = '2021, Malte Storm, Helmholtz-Zentrum Hereon'
 author = 'Malte Storm'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
-version = 'alpha'
+release = 'alpha'
+version = '0.0.1'
 
 # -- General configuration ---------------------------------------------------
 

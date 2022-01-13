@@ -35,7 +35,7 @@ from functools import partial
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 from ..core import FrameConfigError
-from ..core.utils import format_input_to_multiline_str, get_doc_qurl
+from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
 from ..core.constants import STANDARD_FONT_SIZE
 from ..widgets import (CentralWidgetStack, InfoWidget, excepthook,
                        get_pyqt_icon_from_str_reference)
@@ -298,7 +298,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Open the link to the documentation in the system web browser.
         """
-        QtGui.QDesktopServices.openUrl(get_doc_qurl())
+        QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
 
     def __create_logging_info_box(self):
         """

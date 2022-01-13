@@ -49,27 +49,7 @@ __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
                 'multiprocessing', 'plugins', 'unittest_objects', 'utils',
                 'widgets', 'workflow'])
 
-
-import subprocess
-import sys
-import os
-_doc_path = os.path.join(os.path.dirname(os.path.dirname((__file__))), 'docs')
-_sphinx_running = 'sphinx-build' in sys.argv[0]
-if (not os.path.exists(os.path.join(_doc_path, 'build', 'html', 'index.html'))
-    and not _sphinx_running):
-    print('=' * 60)
-    print('-' * 60)
-    print('----- The html documentation has not yet been created! -----')
-    print('----- Running sphinx-build. This may take a bit.       -----')
-    print('----- pydidas will automatically load once building of -----')
-    print('----- the documentation has been finished.             -----')
-    print('-' * 60)
-    print('=' * 60)
-    if sys.platform in ['win32', 'win64']:
-        subprocess.call([os.path.join(_doc_path, 'make.bat'), 'html'])
-    else:
-        subprocess.call(['make', '-C',  _doc_path, 'html'])
-
-del subprocess
-del sys
-del os
+# Check whether the sphinx documentation has been built and build it if
+# has not:
+if not core.utils.check_sphinx_html_docs():
+    core.utils.run_sphinx_html_build()

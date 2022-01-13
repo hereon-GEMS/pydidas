@@ -29,6 +29,7 @@ __all__ = ['HomeFrame']
 import os
 from PyQt5 import QtGui, QtCore
 
+from ..core.utils import get_doc_home_address
 from ..widgets import BaseFrame
 
 
@@ -44,7 +45,7 @@ _help_text = (
     'Documentation is available in the html format. You can open the '
     'documentation from any frame using the "Help" menu entry to either open '
     'it in the system\'s web browser or a window.\nOr follow this link to '
-    f'<a href="file:///{_doc_address}">open the documentation in a browser'
+    f'<a href="{get_doc_home_address()}">open the documentation in a browser'
     '</a>.')
 
 _proc_setup_text = (
@@ -58,9 +59,6 @@ _proc_setup_text = (
     '\n\nEach object has its own dedicated setup frame with importers and '
     'exporters for the various supported formats.')
 
-_proc_doc_address = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-    'docs', 'build', 'html', 'index.html').replace('\\', '/')
 _proc_text = (
     'The processing can be started and visualized in the '
     '"Run Full Processing" frame.\n'
@@ -69,7 +67,7 @@ _proc_text = (
     'Results can be visualized on the fly while the processing is '
     'running by selecting the desired node and axes.\n'
     'For a full tutorial, please visit the corresponding help page: '
-    f'<a href="file:///{_proc_doc_address}">open the processing documentation'
+    f'<a href="{get_doc_home_address()}">open the processing documentation'
     ' in a browser</a>.')
 
 

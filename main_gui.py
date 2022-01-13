@@ -26,7 +26,6 @@ __status__ = "Development"
 __all__ = []
 
 import sys
-import logging
 
 from PyQt5 import QtWidgets
 import numpy as np
@@ -36,10 +35,6 @@ from pydidas.gui import (
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
     CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow)
 from pydidas.widgets import BaseFrame
-
-
-logger = logging.getLogger('pyFAI.azimuthalIntegrator')
-logger.setLevel(logging.ERROR)
 
 
 class ProcessingSetupFrame(BaseFrame):

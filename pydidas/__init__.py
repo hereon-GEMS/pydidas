@@ -53,3 +53,15 @@ __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
 # has not:
 if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
+
+
+# Disable the pyFAI logging to console
+import os
+os.environ['PYFAI_NO_LOGGING'] = '1'
+
+# Change the pyFAI logging level to ERROR and above
+import logging
+pyFAI_azi_logger = logging.getLogger('pyFAI.azimuthalIntegrator')
+pyFAI_azi_logger.setLevel(logging.ERROR)
+silx_opencl_logger = logging.getLogger('silx.opencl.processing')
+silx_opencl_logger.setLevel(logging.ERROR)

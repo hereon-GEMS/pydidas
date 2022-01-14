@@ -248,7 +248,9 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
-        if not issubclass(class_, BasePlugin):
+        _class_bases = [".".join([_cls.__module__, _cls.__name__])
+                        for _cls in inspect.getmro(class_)]
+        if 'pydidas.plugins.base_plugin.BasePlugin' not in _class_bases:
             return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)
@@ -417,6 +419,9 @@ class _PluginCollection(PydidasQsettingsMixin):
             self.__plugin_types = {}
             self.__plugin_names = {}
             self.__plugin_paths = []
+        else:
+            print('The confirmation flag was not given. The PluginCollection '
+                  'has not been reset.')
 
 
 PluginCollection = SingletonFactory(_PluginCollection)

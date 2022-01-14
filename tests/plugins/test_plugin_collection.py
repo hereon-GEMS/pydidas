@@ -30,6 +30,8 @@ import shutil
 import os
 import copy
 import sys
+import io
+from contextlib import redirect_stdout
 
 from PyQt5 import QtCore
 
@@ -55,7 +57,8 @@ class TestPluginCollection(unittest.TestCase):
                                'another_test.pyc', 'compiled.py~']
         self._syspath = copy.copy(sys.path)
         self._qsettings = QtCore.QSettings('Hereon', 'pydidas')
-        self._qsettings_plugin_path = self._qsettings.value('global/plugin_path')
+        self._qsettings_plugin_path = self._qsettings.value(
+            'global/plugin_path')
         self._qsettings.setValue('global/plugin_path', '')
 
     def tearDown(self):
@@ -137,7 +140,8 @@ class TestPluginCollection(unittest.TestCase):
     def test_clear_collection__no_confirmation(self):
         PC = DummyPluginCollection(n_plugins=self.n_plugin,
                                     plugin_path=self._pluginpath)
-        PC.clear_collection()
+        with io.StringIO() as buf, redirect_stdout(buf):
+            PC.clear_collection()
         self.assertEqual(len(PC.get_all_plugins()), self.n_plugin)
 
     def test_clear_collection__with_confirmation(self):

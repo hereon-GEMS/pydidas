@@ -13,6 +13,7 @@ pydidas
    
    manuals
    code_documentation
+   developer_guide
 
 
 Indices and tables

@@ -176,16 +176,18 @@ class TestWorkflowTree(unittest.TestCase):
             self.tree.create_and_add_node(12)
 
     def test_create_and_add_node__empty_tree(self):
-        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        _node = self.tree.create_and_add_node(unittest_objects.DummyLoader())
         self.assertEqual(len(self.tree.nodes), 1)
         self.assertIsInstance(self.tree.nodes[0], GenericNode)
+        self.assertEqual(_node, 0)
 
     def test_create_and_add_node__in_tree_no_parent(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
-        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        _node = self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.assertEqual(len(self.tree.nodes), 2)
         self.assertIsInstance(self.tree.nodes[1], GenericNode)
         self.assertEqual(self.tree.nodes[0].n_children, 1)
+        self.assertEqual(_node, 1)
 
     def test_create_and_add_node__in_tree_with_parent(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())
@@ -195,6 +197,15 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[2], GenericNode)
         self.assertEqual(self.tree.nodes[0].n_children, 2)
+
+    def test_create_and_add_node__with_int_parent(self):
+        _node = self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        _node2 = self.tree.create_and_add_node(unittest_objects.DummyProc(),
+                                      parent=_node)
+        self.assertIsInstance(self.tree.nodes[1], GenericNode)
+        self.assertEqual(self.tree.nodes[0].n_children, 1)
+        self.assertEqual(_node, 0)
+        self.assertEqual(_node2, 1)
 
     def test_create_and_add_node__in_tree_with_node_id(self):
         _id = 42

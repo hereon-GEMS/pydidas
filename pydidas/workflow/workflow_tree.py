@@ -27,6 +27,7 @@ __status__ = "Development"
 __all__ = ['WorkflowTree']
 
 import ast
+from numbers import Integral
 
 from ..core import SingletonFactory, AppConfigError
 from ..plugins import PluginCollection
@@ -64,23 +65,32 @@ class _WorkflowTree(GenericTree):
         ----------
         plugin : pydidas.Plugin
             The plugin to be added to the tree.
-        parent : Union[WorkflowNode, None], optional
-            The parent node of the newly created node. If None, this will
-            select the latest node in the tree. The default is None.
+        parent : Union[WorkflowNode, int, None], optional
+            The parent node of the newly created node. If an integer, this will
+            be interpreted as the node_id of the parent and the respective
+            parent will be selected. If None, this will select the latest node
+            in the tree. The default is None.
         node_id : Union[int, None], optional
             The node ID of the newly created node, used for referencing the
             node in the WorkflowTree. If not specified(ie. None), the
             WorkflowTree will create a new node ID. The default is None.
+
+        Returns
+        -------
+        node_id : int
+            The node ID of the added node.
         """
-        _node = WorkflowNode(plugin=plugin, parent=parent,
-                             node_id=node_id)
+        if isinstance(parent, Integral):
+            parent = self.nodes[parent]
+        _node = WorkflowNode(plugin=plugin, parent=parent, node_id=node_id)
         if len(self.node_ids) == 0:
             self.set_root(_node)
-            return
+            return 0
         if not parent:
             _prospective_parent = self.nodes[self.node_ids[-1]]
             _prospective_parent.add_child(_node)
         self.register_node(_node, node_id)
+        return self.node_ids[-1]
 
     def execute_process_and_get_results(self, arg, **kwargs):
         """
@@ -107,16 +117,6 @@ class _WorkflowTree(GenericTree):
                 _results[_leaf.node_id] = _leaf.results
         return _results
 
-    def prepare_execution(self):
-        """
-        Prepare the execution of the WorkflowTree by running all the nodes'
-        prepare_execution methods.
-        """
-        self.root.propagate_shapes_and_global_config()
-        self.root.prepare_execution()
-        self._preexecuted = True
-        self.reset_tree_changed_flag()
-
     def execute_process(self, arg, **kwargs):
         """
         Execute the process defined in the WorkflowTree for data analysis.
@@ -131,6 +131,16 @@ class _WorkflowTree(GenericTree):
         if not self._preexecuted:
             self.prepare_execution()
         self.root.execute_plugin_chain(arg, **kwargs)
+
+    def prepare_execution(self):
+        """
+        Prepare the execution of the WorkflowTree by running all the nodes'
+        prepare_execution methods.
+        """
+        self.root.propagate_shapes_and_global_config()
+        self.root.prepare_execution()
+        self._preexecuted = True
+        self.reset_tree_changed_flag()
 
     def execute_single_plugin(self, node_id, arg, **kwargs):
         """
@@ -228,7 +238,8 @@ class _WorkflowTree(GenericTree):
         ----------
         list_of_nodes : list
             A list of nodes with a dictionary entry for each node holding all
-            the required information.
+            the required information (plugin_class, node_id and plugin
+            Parameters).
         """
         if not isinstance(list_of_nodes, (list, tuple)):
             raise TypeError('Nodes must be supplied as a list.')

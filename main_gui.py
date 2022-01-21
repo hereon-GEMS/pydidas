@@ -62,8 +62,8 @@ def run_gui(qtapp):
     """
     gui = MainWindow()
     gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
-    # gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
-    #                     'qta::mdi.image-search-outline')
+    gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
+                        'qta::mdi.image-search-outline')
     gui.register_frame(ToolsFrame, 'Tools', 'Tools' , 'qta::mdi.tools')
     gui.register_frame(PyfaiCalibFrame, 'pyFAI calibration',
                        'Tools/pyFAI calibration', get_pyfai_calib_icon())

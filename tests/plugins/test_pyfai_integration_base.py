@@ -59,16 +59,16 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
                                  self._qsettings_det_mask)
 
     def initialize_base_plugin(self, **kwargs):
-        for key, value in [['int_rad_npoint', 900],
-                           ['int_rad_unit', '2theta / deg'],
-                           ['int_rad_use_range', False],
-                           ['int_rad_range_lower', -1],
-                           ['int_rad_range_upper', 1],
-                           ['int_azi_npoint', 1],
-                           ['int_azi_unit', 'chi / deg'],
-                           ['int_azi_use_range', False],
-                           ['int_azi_range_lower', -1],
-                           ['int_azi_range_upper', 1],
+        for key, value in [['rad_npoint', 900],
+                           ['rad_unit', '2theta / deg'],
+                           ['rad_use_range', False],
+                           ['rad_range_lower', -1],
+                           ['rad_range_upper', 1],
+                           ['azi_npoint', 1],
+                           ['azi_unit', 'chi / deg'],
+                           ['azi_use_range', False],
+                           ['azi_range_lower', -1],
+                           ['azi_range_upper', 1],
                            ['int_method', 'CSR OpenCL']]:
             kwargs[key] = kwargs.get(key, value)
         plugin = pyFAIintegrationBase(**kwargs)
@@ -87,155 +87,155 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def test_init__with_kwargs(self):
         _npoints = 7215421
-        plugin = pyFAIintegrationBase(int_rad_npoint=_npoints)
-        self.assertEqual(plugin.get_param_value('int_rad_npoint'), _npoints)
+        plugin = pyFAIintegrationBase(rad_npoint=_npoints)
+        self.assertEqual(plugin.get_param_value('rad_npoint'), _npoints)
 
     def test_init__with_params(self):
         _npoints = 7215421
-        _param = get_generic_parameter('int_rad_npoint')
+        _param = get_generic_parameter('rad_npoint')
         _param.value = _npoints
         plugin = pyFAIintegrationBase(_param)
-        self.assertEqual(plugin.get_param_value('int_rad_npoint'), _npoints)
+        self.assertEqual(plugin.get_param_value('rad_npoint'), _npoints)
 
     def test_get_pyFAI_unit_from_param__plain(self):
-        plugin = pyFAIintegrationBase(int_rad_unit='Q / nm^-1')
-        self.assertEqual(plugin.get_pyFAI_unit_from_param('int_rad_unit'),
+        plugin = pyFAIintegrationBase(rad_unit='Q / nm^-1')
+        self.assertEqual(plugin.get_pyFAI_unit_from_param('rad_unit'),
                          'q_nm^-1')
 
     def test_get_azimuthal_range_native__no_range(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=False)
+        plugin = pyFAIintegrationBase(azi_use_range=False)
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
     def test_get_azimuthal_range_native__lower_range_too_small(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=-1,
-                                      int_azi_range_upper=1)
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=-1,
+                                      azi_range_upper=1)
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
     def test_get_azimuthal_range_native__upper_range_too_small(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=0,
-                                      int_azi_range_upper=0)
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=0,
+                                      azi_range_upper=0)
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
     def test_get_azimuthal_range_native__equal_boundaries(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=12,
-                                      int_azi_range_upper=12)
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=12,
+                                      azi_range_upper=12)
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
     def test_get_azimuthal_range_native__upper_bound_lower(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=15,
-                                      int_azi_range_upper=12)
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=15,
+                                      azi_range_upper=12)
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
     def test_get_azimuthal_range_native__correct(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=_range[0],
-                                      int_azi_range_upper=_range[1])
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=_range[0],
+                                      azi_range_upper=_range[1])
         _newrange = plugin.get_azimuthal_range_native()
         self.assertEqual(_range, _newrange)
 
     def test_get_azimuthal_range_in_deg__empty(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=False)
+        plugin = pyFAIintegrationBase(azi_use_range=False)
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertIsNone(_newrange)
 
     def test_get_azimuthal_range_in_deg__degree_input(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=_range[0],
-                                      int_azi_range_upper=_range[1],
-                                      int_azi_unit='chi / deg')
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=_range[0],
+                                      azi_range_upper=_range[1],
+                                      azi_unit='chi / deg')
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertEqual(_range, _newrange)
 
     def test_get_azimuthal_range_in_deg__rad_input(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=_range[0],
-                                      int_azi_range_upper=_range[1],
-                                      int_azi_unit='chi / rad')
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=_range[0],
+                                      azi_range_upper=_range[1],
+                                      azi_unit='chi / rad')
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertAlmostEqual(_newrange[0], _range[0] * 180 / np.pi)
         self.assertAlmostEqual(_newrange[1], _range[1] * 180 / np.pi)
 
     def test_get_azimuthal_range_in_rad__empty(self):
-        plugin = pyFAIintegrationBase(int_azi_use_range=False)
+        plugin = pyFAIintegrationBase(azi_use_range=False)
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertIsNone(_newrange)
 
     def test_get_azimuthal_range_in_rad__degree_input(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=_range[0],
-                                      int_azi_range_upper=_range[1],
-                                      int_azi_unit='chi / deg')
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=_range[0],
+                                      azi_range_upper=_range[1],
+                                      azi_unit='chi / deg')
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertAlmostEqual(_newrange[0] * 180 / np.pi, _range[0])
         self.assertAlmostEqual(_newrange[1] * 180 / np.pi, _range[1])
 
     def test_get_azimuthal_range_in_rad__rad_input(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_azi_use_range=True,
-                                      int_azi_range_lower=_range[0],
-                                      int_azi_range_upper=_range[1],
-                                      int_azi_unit='chi / rad')
+        plugin = pyFAIintegrationBase(azi_use_range=True,
+                                      azi_range_lower=_range[0],
+                                      azi_range_upper=_range[1],
+                                      azi_unit='chi / rad')
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertEqual(_range, _newrange)
 
     def test_get_radial_range__no_range(self):
-        plugin = pyFAIintegrationBase(int_rad_use_range=False)
+        plugin = pyFAIintegrationBase(rad_use_range=False)
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
     def test_get_radial_range__lower_range_too_small(self):
-        plugin = pyFAIintegrationBase(int_rad_use_range=True,
-                                      int_rad_range_lower=-1,
-                                      int_rad_range_upper=1)
+        plugin = pyFAIintegrationBase(rad_use_range=True,
+                                      rad_range_lower=-1,
+                                      rad_range_upper=1)
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
     def test_get_radial_range__upper_range_too_small(self):
-        plugin = pyFAIintegrationBase(int_rad_use_range=True,
-                                      int_rad_range_lower=0,
-                                      int_rad_range_upper=0)
+        plugin = pyFAIintegrationBase(rad_use_range=True,
+                                      rad_range_lower=0,
+                                      rad_range_upper=0)
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
     def test_get_radial_range__equal_boundaries(self):
-        plugin = pyFAIintegrationBase(int_rad_use_range=True,
-                                      int_rad_range_lower=12,
-                                      int_rad_range_upper=12)
+        plugin = pyFAIintegrationBase(rad_use_range=True,
+                                      rad_range_lower=12,
+                                      rad_range_upper=12)
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
     def test_get_radial_range__upper_bound_lower(self):
-        plugin = pyFAIintegrationBase(int_rad_use_range=True,
-                                      int_rad_range_lower=15,
-                                      int_rad_range_upper=12)
+        plugin = pyFAIintegrationBase(rad_use_range=True,
+                                      rad_range_lower=15,
+                                      rad_range_upper=12)
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 
     def test_get_radial_range__correct(self):
         _range = (12, 37)
-        plugin = pyFAIintegrationBase(int_rad_use_range=True,
-                                      int_rad_range_lower=_range[0],
-                                      int_rad_range_upper=_range[1])
+        plugin = pyFAIintegrationBase(rad_use_range=True,
+                                      rad_range_lower=_range[0],
+                                      rad_range_upper=_range[1])
         _newrange = plugin.get_radial_range()
         self.assertEqual(_range, _newrange)
 
     def test_calculate_result_shape(self):
         _range = (1234, 789)
-        plugin = pyFAIintegrationBase(int_rad_npoint=_range[0],
-                                      int_azi_npoint=_range[1])
+        plugin = pyFAIintegrationBase(rad_npoint=_range[0],
+                                      azi_npoint=_range[1])
         plugin.output_data_dim = 1
         with self.assertRaises(NotImplementedError):
             plugin.calculate_result_shape()

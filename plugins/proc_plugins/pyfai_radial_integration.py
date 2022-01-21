@@ -46,7 +46,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self.set_param_value('int_rad_npoint', 1000)
+        self.set_param_value('rad_npoint', 1000)
 
     def execute(self, data, **kwargs):
         """
@@ -67,16 +67,16 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             Any calling kwargs, appended by any changes in the function.
         """
         _newdata = self._ai.integrate_radial(
-            data, self.get_param_value('int_azi_npoint'),
-            npt_rad=self.get_param_value('int_rad_npoint'),
+            data, self.get_param_value('azi_npoint'),
+            npt_rad=self.get_param_value('rad_npoint'),
             polarization_factor=1, mask=self._mask,
-            unit=self.get_pyFAI_unit_from_param('int_azi_unit'),
-            radial_unit=self.get_pyFAI_unit_from_param('int_rad_unit'),
+            unit=self.get_pyFAI_unit_from_param('azi_unit'),
+            radial_unit=self.get_pyFAI_unit_from_param('rad_unit'),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
             method=pyFAI_METHOD[self.get_param_value('int_method')])
 
-        _label, _unit = self.params['int_azi_unit'].value.split('/')
+        _label, _unit = self.params['azi_unit'].value.split('/')
         _label = _label.strip()
         _unit = _unit.strip()
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
@@ -93,4 +93,4 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             The new shape. This is a tuple with a single integer value.
         """
         self._config['result_shape'] = (
-            self.get_param_value('int_azi_npoint'), )
+            self.get_param_value('azi_npoint'), )

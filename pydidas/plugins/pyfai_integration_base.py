@@ -67,10 +67,10 @@ class pyFAIintegrationBase(ProcPlugin):
     basic_plugin = True
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        'int_rad_npoint', 'int_rad_unit', 'int_rad_use_range',
-        'int_rad_range_lower', 'int_rad_range_upper', 'int_azi_npoint',
-        'int_azi_unit', 'int_azi_use_range', 'int_azi_range_lower',
-        'int_azi_range_upper', 'int_method', 'det_mask')
+        'rad_npoint', 'rad_unit', 'rad_use_range',
+        'rad_range_lower', 'rad_range_upper', 'azi_npoint',
+        'azi_unit', 'azi_use_range', 'azi_range_lower',
+        'azi_range_upper', 'int_method', 'det_mask')
     input_data_dim = 2
     output_data_dim = 2
     new_dataset = True
@@ -150,9 +150,9 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The radial range for the pyFAI integration.
         """
-        if self.get_param_value('int_rad_use_range'):
-            _lower = self.get_param_value('int_rad_range_lower')
-            _upper = self.get_param_value('int_rad_range_upper')
+        if self.get_param_value('rad_use_range'):
+            _lower = self.get_param_value('rad_range_lower')
+            _upper = self.get_param_value('rad_range_upper')
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
             logger.warning('Warning: Radial range was not correct and'
@@ -174,7 +174,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _range = self.get_azimuthal_range_native()
         if _range is not None:
-            if 'deg' in self.get_param_value('int_azi_unit'):
+            if 'deg' in self.get_param_value('azi_unit'):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
         return _range
 
@@ -193,7 +193,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _range = self.get_azimuthal_range_native()
         if _range is not None:
-            if 'rad' in self.get_param_value('int_azi_unit'):
+            if 'rad' in self.get_param_value('azi_unit'):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
         return _range
 
@@ -210,9 +210,9 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The azimuthal range for the pyFAI integration.
         """
-        if self.get_param_value('int_azi_use_range'):
-            _lower = self.get_param_value('int_azi_range_lower')
-            _upper = self.get_param_value('int_azi_range_upper')
+        if self.get_param_value('azi_use_range'):
+            _lower = self.get_param_value('azi_range_lower')
+            _upper = self.get_param_value('azi_range_upper')
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
             logger.warning('Warning: Azimuthal range was not correct and'

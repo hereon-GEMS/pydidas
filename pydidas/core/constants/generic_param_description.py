@@ -835,7 +835,7 @@ GENERIC_PARAM_DESCRIPTION = {
     ############################
     ## pyFAI settings parameters
     ############################
-    'int_rad_npoint': {
+    'rad_npoint': {
         'type': int,
         'default': 1000,
         'name': 'Num points radial integration',
@@ -844,7 +844,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The number of bins in radial direction for the pyFAI '
                     'integration.')},
-    'int_rad_unit': {
+    'rad_unit': {
         'type': str,
         'default': '2theta / deg',
         'name': 'Radial unit',
@@ -852,7 +852,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The unit and type of the azimuthal profile.'},
-    'int_rad_use_range': {
+    'rad_use_range': {
         'type': int,
         'default': 0,
         'name': 'Use radial range',
@@ -862,7 +862,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('Toggle to limit the radial integration range or use the '
                     'full data range. If True, boundaries need to be defined '
                     'in the lower and upper radial range Parameters.')},
-    'int_rad_range_lower': {
+    'rad_range_lower': {
         'type': float,
         'default': 0,
         'name': 'Radial lower range',
@@ -873,7 +873,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     'setting is only used if "Use radial range" is  True. '
                     'This value needs to be given in the unit selected as '
                     'radial unit.')},
-    'int_rad_range_upper': {
+    'rad_range_upper': {
         'type': float,
         'default': -1,
         'name': 'Radial upper range',
@@ -884,7 +884,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     ' setting is only used if "Use radial range" is  True. '
                     'This value needs to be given in the unit selected as '
                     'radial unit.')},
-    'int_azi_npoint': {
+    'azi_npoint': {
         'type': int,
         'default': 1000,
         'name': 'Num points azimuthal integration',
@@ -893,7 +893,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The number of bins in azimuthal direction for the '
                     'pyFAI integration.')},
-    'int_azi_unit': {
+    'azi_unit': {
         'type': str,
         'default': 'chi / deg',
         'name': 'Azimuthal unit',
@@ -901,7 +901,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The unit and type of the azimuthal profile.'},
-    'int_azi_use_range': {
+    'azi_use_range': {
         'type': int,
         'default': 0,
         'name': 'Use azimuthal range',
@@ -912,7 +912,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     'the full data range. If True, boundaries need to be '
                     'defined in the lower and upper azimuthal range '
                     'Parameters.')},
-    'int_azi_range_lower': {
+    'azi_range_lower': {
         'type': float,
         'default': 0,
         'name': 'Azimuthal lower range',
@@ -923,7 +923,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     'This setting is only used if "Use azimuthal range" is '
                     'True. This value needs to be given in the unit selected'
                     ' as azimuthal unit.')},
-    'int_azi_range_upper': {
+    'azi_range_upper': {
         'type': float,
         'default': -1,
         'name': 'Azimuthal upper range',

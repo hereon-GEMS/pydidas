@@ -44,9 +44,9 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.params['int_rad_unit'].choices = [
+        self.params['rad_unit'].choices = [
             'Q / nm^-1', '2theta / deg', 'r / mm']
-        del self.params['int_azi_npoint']
+        del self.params['azi_npoint']
 
     def execute(self, data, **kwargs):
         """
@@ -60,13 +60,13 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             Any keyword arguments from the ProcessingTree.
         """
         _newdata = self._ai.integrate1d(
-            data, self.get_param_value('int_rad_npoint'),
-            unit=self.get_pyFAI_unit_from_param('int_rad_unit'),
+            data, self.get_param_value('rad_npoint'),
+            unit=self.get_pyFAI_unit_from_param('rad_unit'),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
             mask=self._mask, polarization_factor=1,
             method=pyFAI_METHOD[self.get_param_value('int_method')])
-        _label, _unit = self.params['int_rad_unit'].value.split('/')
+        _label, _unit = self.params['rad_unit'].value.split('/')
         _label = _label.strip()
         _unit = _unit.strip()
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
@@ -83,4 +83,4 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             The new shape. This is a tuple with a single integer value.
         """
         self._config['result_shape'] = (
-               self.get_param_value('int_rad_npoint'), )
+               self.get_param_value('rad_npoint'), )

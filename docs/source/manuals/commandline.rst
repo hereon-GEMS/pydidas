@@ -26,7 +26,7 @@ The following manuals are available:
 	:maxdepth: 1
 	
 	cmd_global
-	cmd_generate_workflow_tree
+	cmd_workflow_tree
 	cmd_composite_creator_app
 	cmd_execute_workflow_app
 	

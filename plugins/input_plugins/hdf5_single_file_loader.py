@@ -46,7 +46,8 @@ class Hdf5singleFileLoader(InputPlugin):
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
         get_generic_parameter('filename'),
-        get_generic_parameter('hdf5_key'))
+        get_generic_parameter('hdf5_key'),
+        get_generic_parameter('images_per_file'))
     input_data_dim = None
     output_data_dim = 2
 
@@ -69,7 +70,7 @@ class Hdf5singleFileLoader(InputPlugin):
         of frames in this dataset and stores the information.
         """
         _n_per_file = get_hdf5_metadata(
-            self.get_param_value('first_file'), 'shape',
+            self.get_param_value('filename'), 'shape',
             dset=self.get_param_value('hdf5_key'))[0]
         self.set_param_value('images_per_file', _n_per_file)
 

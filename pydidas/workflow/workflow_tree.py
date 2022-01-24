@@ -170,6 +170,7 @@ class _WorkflowTree(GenericTree):
         """
         if not node_id in self.nodes:
             raise KeyError(f'The node ID "{node_id}" is not in use.')
+        self.root.propagate_shapes_and_global_config()
         self.nodes[node_id].prepare_execution()
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs

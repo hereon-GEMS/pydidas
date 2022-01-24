@@ -16,7 +16,7 @@ Useful methods
 
 Users will probably manage with a handful of methods. For the full method documentation,
 please refer to the class documentation: 
-(:py:class:`ParameterCollections <pydidas.core.ParameterCollection>`).
+:py:class:`ParameterCollections <pydidas.core.ParameterCollection>`.
 
 	**get_param_keys**()
 		Get all the reference keys to access the respective parameters.
@@ -177,7 +177,7 @@ PluginCollection object can be obtained using:
 	For the full documentation of all available methods, please refer to the class
 	documentation:
 	:py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
-	This section handles the most common use cases.
+	This section handles only the most common use cases.
 
 Management of stores paths
 """"""""""""""""""""""""""
@@ -328,4 +328,4 @@ A list of all available plugin class names can be obtained with the
 	
 Once the plugins have been created, their Parameters can be modified as described
 in the `Accessing Parameters`_ section. The organization of plugins into a WorkflowTree
-are covered in the section :ref:`generate_workflow_tree`.
+are covered in the section :ref:`workflow_tree`.

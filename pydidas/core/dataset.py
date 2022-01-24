@@ -27,6 +27,7 @@ __status__ = "Development"
 __all__ = ['Dataset']
 
 import warnings
+import textwrap
 from numbers import Integral
 from collections.abc import Iterable
 from copy import copy
@@ -508,15 +509,78 @@ class EmptyDataset(np.ndarray):
         str
             The representation of the Dataset class.
         """
-        _info = {'axis_labels': self.axis_labels,
-                 'axis_ranges': self.axis_ranges,
-                 'axis_units': self.axis_units,
-                 'metadata': self.metadata,
-                 'array': self.__array__()}
-        return (self.__class__.__name__
-                + '(\n'
-                + ', '.join(f'{i}: {_info[i]}\n' for i in _info)
-                + ')')
+        _thresh = np.get_printoptions()['threshold']
+        np.set_printoptions(threshold=20)
+        _meta_repr = '\n'.join(
+            self.__get_item_representation('metadata', self.metadata))
+        _info = {
+            'axis_labels': self.__get_axis_item_repr('axis_labels'),
+            'axis_ranges': self.__get_axis_item_repr('axis_ranges'),
+            'axis_units': self.__get_axis_item_repr('axis_units'),
+            'metadata': _meta_repr,
+            'array': self.__array__().__repr__()}
+        _repr = (self.__class__.__name__ + '(\n'
+                 + ',\n'.join(_str for _str in _info.values())
+                 + '\n)')
+        np.set_printoptions(threshold=_thresh)
+        return _repr
+
+    def __get_axis_item_repr(self, obj_name):
+        """
+        Get a string representation for a dictionary item of 'axis_labels',
+        'axis_ranges' or 'axis_units'
+
+        Parameters
+        ----------
+        obj_name : str
+            The name of the dictionary to be represented as a string.
+
+        Returns
+        -------
+        str
+            The representation.
+        """
+        _obj = getattr(self, obj_name)
+        _str_entries = []
+        for _key, _item in _obj.items():
+            _lines = self.__get_item_representation(_key, _item)
+            _str_entries.extend([' ' * 4 + _line for _line in _lines])
+        _str = f'{obj_name}:' + ' {\n' +  '\n'.join(_str_entries) + '}'
+        return _str
+
+    def __get_item_representation(self, key, item, use_key=True):
+        """
+        Get a string representation for a dictionary item of 'axis_labels',
+        'axis_ranges' or 'axis_units'
+
+        Parameters
+        ----------
+        key : str
+            The key (i.e. reference name) for the item.
+        item : object
+            The item to be represented as a string.
+        use_key : bool, optional
+            Keyword to print the key name in front of the values. The default
+            is True.
+
+        Returns
+        -------
+        list
+            A list with a representation for each line.
+        """
+        _repr = (f'{key}: ' if use_key else '') + item.__repr__()
+        if isinstance(item, np.ndarray):
+            _repr = _repr.replace('\n      ', '')
+            _lines = textwrap.wrap(_repr, initial_indent='', width=60,
+                                   subsequent_indent=' ' * 10)
+            _i0 = _lines[0].find(',')
+            for _index in range(1, len(_lines)):
+                _ii = _lines[_index].find(',')
+                _lines[_index] = ' ' * (_i0 - _ii) + _lines[_index]
+        else:
+            _lines = textwrap.wrap(_repr, initial_indent='', width=60,
+                                   subsequent_indent=' ' * 3)
+        return _lines
 
     def __str__(self):
         """

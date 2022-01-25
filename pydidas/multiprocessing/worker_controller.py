@@ -51,9 +51,9 @@ class WorkerController(QtCore.QThread):
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     """
-    progress = QtCore.pyqtSignal(float)
-    results = QtCore.pyqtSignal(int, object)
-    finished = QtCore.pyqtSignal()
+    sig_progress = QtCore.pyqtSignal(float)
+    sig_results = QtCore.pyqtSignal(int, object)
+    sig_finished = QtCore.pyqtSignal()
 
     def __init__(self, n_workers=None):
         super().__init__()
@@ -74,8 +74,8 @@ class WorkerController(QtCore.QThread):
         _worker_args = (self._queues['send'], self._queues['recv'],
                         self._queues['stop'], self._queues['finished'], None)
         self._processor = dict(func=processor, args=_worker_args, kwargs={})
-        self.__progress_done = 0
-        self.__progress_target = 0
+        self._progress_done = 0
+        self._progress_target = 0
 
     @property
     def n_workers(self):
@@ -111,6 +111,21 @@ class WorkerController(QtCore.QThread):
             raise ValueError('The number of workers must be an integer '
                              'number.')
         self._n_workers = number
+
+    @property
+    def progress(self):
+        """
+        Get the progress level of the current computations.
+
+        Returns
+        -------
+        float
+            The progress, normalized to the range [0, 1]. A value of -1
+            means that no tasks have been defined.
+        """
+        if self._progress_target == 0:
+            return -1
+        return self._progress_done / self._progress_target
 
     def stop(self):
         """
@@ -226,7 +241,7 @@ class WorkerController(QtCore.QThread):
         self._write_lock.lockForWrite()
         self._to_process.append(task_arg)
         self._write_lock.unlock()
-        self.__progress_target += 1
+        self._progress_target += 1
 
     def add_tasks(self, task_args):
         """
@@ -246,7 +261,7 @@ class WorkerController(QtCore.QThread):
         for task in task_args:
             self._to_process.append(task)
         self._write_lock.unlock()
-        self.__progress_target = len(task_args)
+        self._progress_target = len(task_args)
 
     def send_stop_signal(self):
         """
@@ -298,7 +313,7 @@ class WorkerController(QtCore.QThread):
             if self._flag_active:
                 self._cycle_post_run()
             time.sleep(0.005)
-        self.finished.emit()
+        self.sig_finished.emit()
 
     def _cycle_pre_run(self):
         """
@@ -318,7 +333,7 @@ class WorkerController(QtCore.QThread):
         for _worker in self._workers:
             _worker.start()
         self._flag_active = True
-        self.__progress_done = 0
+        self._progress_done = 0
 
     def _put_next_task_in_queue(self):
         """
@@ -336,10 +351,10 @@ class WorkerController(QtCore.QThread):
         while True:
             try:
                 _task, _results = self._queues['recv'].get_nowait()
-                self.results.emit(_task, _results)
-                self.__progress_done += 1
-                self.progress.emit(self.__progress_done
-                                   / self.__progress_target)
+                self.sig_results.emit(_task, _results)
+                self._progress_done += 1
+                self.sig_progress.emit(self._progress_done
+                                       / self._progress_target)
             except Empty:
                 break
             time.sleep(0.001)

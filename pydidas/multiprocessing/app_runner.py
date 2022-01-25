@@ -78,10 +78,10 @@ class AppRunner(WorkerController):
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     """
-    progress = QtCore.pyqtSignal(float)
-    results = QtCore.pyqtSignal(int, object)
-    finished = QtCore.pyqtSignal()
-    final_app_state = QtCore.pyqtSignal(object)
+    sig_progress = QtCore.pyqtSignal(float)
+    sig_results = QtCore.pyqtSignal(int, object)
+    sig_finished = QtCore.pyqtSignal()
+    sig_final_app_state = QtCore.pyqtSignal(object)
 
     def __init__(self, app, n_workers=None):
         logger.debug('Starting AppRunner')
@@ -134,6 +134,22 @@ class AppRunner(WorkerController):
         self.__check_app_is_set()
         self.__app.set_param_value(param_name, value)
 
+    def get_app(self):
+        """
+        Get the reference to the interally stored app.
+
+        Note
+        ----
+        This method will only provide a copy of the app and keep the internal
+        instance for further use.
+
+        Returns
+        -------
+        pydidas.core.BaseApp
+            The application instance.
+        """
+        return self.__app.get_copy()
+
     def _cycle_pre_run(self):
         """
         Perform pre-multiprocessing operations.
@@ -151,8 +167,8 @@ class AppRunner(WorkerController):
         _tasks = self.__app.multiprocessing_get_tasks()
         self.add_tasks(_tasks)
         self.finalize_tasks()
-        self.results.connect(self.__app.multiprocessing_store_results)
-        self.progress.connect(self.__check_progress)
+        self.sig_results.connect(self.__app.multiprocessing_store_results)
+        self.sig_progress.connect(self.__check_progress)
         self._create_and_start_workers()
 
     def _create_and_start_workers(self):
@@ -166,7 +182,7 @@ class AppRunner(WorkerController):
             logger.debug('Starting Worker')
             _worker.start()
         self._flag_active = True
-        self.__progress_done = 0
+        self._progress_done = 0
 
     def _cycle_post_run(self, timeout=10):
         """
@@ -176,7 +192,7 @@ class AppRunner(WorkerController):
         self._join_workers()
         self._wait_for_worker_finished_signals(timeout)
         self.__app.multiprocessing_post_run()
-        self.final_app_state.emit(self.__app.get_copy())
+        self.sig_final_app_state.emit(self.__app.get_copy())
 
     @QtCore.pyqtSlot(float)
     def __check_progress(self, progress):
@@ -192,7 +208,6 @@ class AppRunner(WorkerController):
         if progress >= 1:
             self.send_stop_signal()
             self.suspend()
-            # self._wait_for_processes_to_finish()
             self.stop()
 
     def __check_is_running(self):

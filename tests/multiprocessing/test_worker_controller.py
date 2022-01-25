@@ -81,22 +81,39 @@ class TestWorkerController(unittest.TestCase):
         wc = WorkerController()
         self.assertIsInstance(wc, QtCore.QThread)
 
-    def test_n_workers_get(self):
+    def test_n_workers__get(self):
         num_workers = 5
         wc = WorkerController(num_workers)
         self.assertEqual(wc.n_workers, num_workers)
 
-    def test_n_workers_set(self):
+    def test_n_workers__set(self):
         wc = WorkerController()
         num_workers = 5
         wc.n_workers = num_workers
         self.assertEqual(wc.n_workers, num_workers)
 
-    def test_n_workers_set_wrong(self):
+    def test_n_workers__set_wrong(self):
         wc = WorkerController()
         num_workers = 5.5
         with self.assertRaises(ValueError):
             wc.n_workers = num_workers
+
+    def test_progress__no_target(self):
+        wc = WorkerController()
+        self.assertEqual(wc.progress, -1)
+
+    def test_progress__no_computations(self):
+        wc = WorkerController()
+        wc._progress_target = 12
+        self.assertEqual(wc.progress, 0)
+
+    def test_progress__in_run(self):
+        _target = 12
+        _current = 7
+        wc = WorkerController()
+        wc._progress_target = _target
+        wc._progress_done = _current
+        self.assertAlmostEqual(wc.progress, _current / _target)
 
     def test_stop(self):
         wc = WorkerController()
@@ -114,7 +131,7 @@ class TestWorkerController(unittest.TestCase):
         wc.change_function(local_test_func, *(0, 0))
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
-        _spy = QtTest.QSignalSpy(wc.finished)
+        _spy = QtTest.QSignalSpy(wc.sig_finished)
         wc.start()
         # wc.stop()
         logger.debug(get_time_string() + ' Waiting on finish signal')
@@ -140,7 +157,7 @@ class TestWorkerController(unittest.TestCase):
         wc = WorkerController()
         wc._cycle_pre_run()
         wc._cycle_post_run()
-        self.assertEqual(wc._WorkerController__progress_done, 0)
+        self.assertEqual(wc._progress_done, 0)
 
     def test_cycle_post_run__no_stop_signal(self):
         wc = WorkerController()
@@ -196,8 +213,8 @@ class TestWorkerController(unittest.TestCase):
         wc = WorkerController()
         wc._queues['recv'].put([0, _res1])
         wc._queues['recv'].put([0, _res2])
-        wc._WorkerController__progress_target = 2
-        _spy = QtTest.QSignalSpy(wc.results)
+        wc._progress_target = 2
+        _spy = QtTest.QSignalSpy(wc.sig_results)
         time.sleep(0.005)
         wc._get_and_emit_all_queue_items()
         self.assertEqual(len(_spy), 2)
@@ -209,8 +226,8 @@ class TestWorkerController(unittest.TestCase):
         _target = {local_test_func(item, 0, 0) for item in _tasks}
         wc = WorkerController(n_workers=4)
         wc.change_function(local_test_func, *(0, 0))
-        result_spy = QtTest.QSignalSpy(wc.results)
-        progress_spy = QtTest.QSignalSpy(wc.progress)
+        result_spy = QtTest.QSignalSpy(wc.sig_results)
+        progress_spy = QtTest.QSignalSpy(wc.sig_progress)
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
         wc.start()

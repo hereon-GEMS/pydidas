@@ -155,11 +155,11 @@ class CompositeCreatorApp(BaseApp):
         'bg_hdf5_frame', 'composite_nx', 'composite_ny', 'composite_dir',
         'use_roi', 'roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh',
         'use_thresholds', 'threshold_low', 'threshold_high', 'binning')
-    mp_func_results = QtCore.pyqtSignal(object)
-    updated_composite = QtCore.pyqtSignal()
     parse_func = parse_composite_creator_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
                                            '_bg_image']
+    mp_func_results = QtCore.pyqtSignal(object)
+    updated_composite = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

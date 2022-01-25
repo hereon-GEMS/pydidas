@@ -27,6 +27,7 @@ __all__ = ['BaseApp']
 
 from copy import copy
 
+from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
 
 
@@ -34,7 +35,8 @@ class BaseApp(ObjectWithParameterCollection):
     """
     The BaseApp is the base class for all pydidas applications. It includes
     core functionalities and pre-defines the template of required methods
-    for Apps to allow running the multiprocessing :py:class:`AppRunner`.
+    for Apps to allow running the multiprocessing
+    :py:class:`pydidas.multiprocessing.AppRunner`.
 
     Parameters
     ----------
@@ -45,6 +47,7 @@ class BaseApp(ObjectWithParameterCollection):
         A dictionary of keyword arguments. Defined by the concrete
         implementation of the app.
     """
+    default_params = ParameterCollection()
     parse_func = None
     attributes_not_to_copy_to_slave_app = []
 

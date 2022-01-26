@@ -62,6 +62,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
         self._config = self._app._config
         self._config['input_configured'] = False
         self._config['bg_configured'] = False
+        self._config['frame_active'] = False
         self._update_timer = 0
         self._create_param_collection()
 
@@ -83,6 +84,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
             if param.refkey == 'hdf5_stepping':
                 self.add_param(get_generic_parameter('raw_image_shape'))
                 self.add_param(get_generic_parameter('images_per_file'))
+            if param.refkey == 'binning':
                 self.add_param(
                     Parameter('n_total', int, 0,
                               name='Total number of images',
@@ -137,7 +139,8 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
         """
         Slot to be called on an update signal from the Composite.
         """
-        if time.time() - self._config['last_update'] >= 2:
+        if (time.time() - self._config['last_update'] >= 2 and
+                self._config['frame_active']):
             self.__show_composite()
             self._config['last_update'] = time.time()
 
@@ -164,6 +167,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
         index : int
             The frame index.
         """
+        self._config['frame_active'] = index == self.frame_index
 
     def _run_app_serial(self):
         """

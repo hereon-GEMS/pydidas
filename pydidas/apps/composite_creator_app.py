@@ -66,17 +66,18 @@ class CompositeCreatorApp(BaseApp):
         checks will be disabled in the setup process and the file processing
         will wait for files to be created (indefinitely). The default is
         False.
-    first_file : pathlib.Path
+    first_file : Union[str, pathlib.Path]
         The name of the first file for a file series or of the hdf5 file in
         case of hdf5 file input.
-    last_file : pathlib.Path, optional
+    last_file : Union[str, pathlib.Path], optional
         Used only for file series: The name of the last file to be added to
-        the composite image.
+        the composite image. The default is an empty Path.
     file_stepping : int, optional
         The step width (in files). A value n > 1 will only process every n-th
         image for the composite. The default is 1.
     hdf5_key : Hdf5key, optional
-        Used only for hdf5 files: The dataset key.
+        Used only for hdf5 files: The dataset key. The default is
+        entry/data/data.
     hdf5_first_image_num : int, optional
         The first image in the hdf5-dataset to be used. The default is 0.
     hdf5_last_image_num : int, optional
@@ -88,24 +89,18 @@ class CompositeCreatorApp(BaseApp):
     use_bg_file : bool, optional
         Keyword to toggle usage of background subtraction. The default is
         False.
-    bg_file : pathlib.Path, optional
-        The name of the file used for background correction.
+    bg_file : Union[str, pathlib.Path], optional
+        The name of the file used for background correction. The default is
+        an empty Path.
     bg_hdf5_key : Hdf5key, optional
         Required for hdf5 background image files: The dataset key with the
-        image for the background file.
+        image for the background file. The default is entry/data/data
     bg_hdf5_frame : int, optional
         Required for hdf5 background image files: The image number of the
         background image in the  dataset. The default is 0.
-    composite_nx : int, optional
-        The number of original images combined in the composite image in
-        x direction. A value of -1 will determine the number of images in
-        x direction automatically based on the number of images in y
-        direction. The default is 1.
-    composite_ny : int, optional
-        The number of original images combined in the composite image in
-        y direction. A value of -1 will determine the number of images in
-        y direction automatically based on the number of images in x
-        direction. The default is -1.
+    use_global_det_mask : bool, optional
+        Keyword to enable or disable using the global detector mask as
+        defined by the global mask file and mask value. The default is True.
     use_roi : bool, optional
         Keyword to toggle use of the ROI for cropping the original images
         before combining them. The default is False.
@@ -116,7 +111,8 @@ class CompositeCreatorApp(BaseApp):
     roi_xhigh : int, optional
         The upper boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size. The default is None.
+        -1 is equivalent with the full image size minus one. The default is
+        None.
     roi_ylow : int, optional
         The lower boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width.
@@ -124,7 +120,8 @@ class CompositeCreatorApp(BaseApp):
     roi_yhigh : int, optional
         THe upper boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size. The default is None.
+        -1 is equivalent with the full image size minus one. Use None to
+        select the full range. The default is None.
     threshold_low : int, optional
         The lower threshold of the composite image. If a value  other than -1
         is used, any pixels with a value below the threshold will be replaced
@@ -138,6 +135,16 @@ class CompositeCreatorApp(BaseApp):
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
+    composite_nx : int, optional
+        The number of original images combined in the composite image in
+        x direction. A value of -1 will determine the number of images in
+        x direction automatically based on the number of images in y
+        direction. The default is 1.
+    composite_ny : int, optional
+        The number of original images combined in the composite image in
+        y direction. A value of -1 will determine the number of images in
+        y direction automatically based on the number of images in x
+        direction. The default is -1.
 
     Parameters
     ----------
@@ -152,9 +159,10 @@ class CompositeCreatorApp(BaseApp):
         'live_processing', 'first_file', 'last_file', 'file_stepping',
         'hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
         'hdf5_stepping', 'use_bg_file', 'bg_file', 'bg_hdf5_key',
-        'bg_hdf5_frame', 'composite_nx', 'composite_ny', 'composite_dir',
-        'use_roi', 'roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh',
-        'use_thresholds', 'threshold_low', 'threshold_high', 'binning')
+        'bg_hdf5_frame', 'use_global_det_mask', 'use_roi', 'roi_xlow',
+        'roi_xhigh', 'roi_ylow', 'roi_yhigh', 'use_thresholds',
+        'threshold_low', 'threshold_high', 'binning', 'composite_nx',
+        'composite_ny', 'composite_dir', )
     parse_func = parse_composite_creator_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
                                            '_bg_image']
@@ -234,13 +242,14 @@ class CompositeCreatorApp(BaseApp):
             If the mask could be loaded from a numpy file, return the mask.
             Else, None is returned.
         """
+        if not self.get_param_value('use_global_det_mask'):
+            return None
         _maskfile = self.q_settings_get_global_value('det_mask')
         try:
             _mask = np.load(_maskfile)
         except (FileNotFoundError, ValueError):
             return None
-        _roi = self._image_metadata.roi
-        if _roi is not None:
+        if self._image_metadata.roi is not None:
             _mask = _mask[self._image_metadata.roi]
         _bin = self.get_param_value('binning')
         if _bin > 1:
@@ -311,7 +320,7 @@ class CompositeCreatorApp(BaseApp):
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not have the same image dimensions '
                                  'as the selected files.')
-        self._bg_image = _bg_image
+        self._bg_image = self.__apply_mask(_bg_image)
 
     def __check_and_update_composite_image(self):
         """

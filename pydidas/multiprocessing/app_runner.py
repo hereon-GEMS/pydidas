@@ -98,9 +98,9 @@ class AppRunner(WorkerController):
         Parameters
         ----------
         method_name : str
-            The name of the Application.method.
+            The name of the Application method.
         *args : tuple
-            Any arguments which need to be passed to the method..
+            Any arguments which need to be passed to the method.
         **kwargs : kwargs
             Any keyword arguments which need to be passed to the method.
 
@@ -112,7 +112,7 @@ class AppRunner(WorkerController):
         Returns
         -------
         result : type
-            The return object(s) from the App.method call.
+            The return object(s) from the App method call.
         """
         self.__check_is_running()
         self.__check_app_method_name(method_name)

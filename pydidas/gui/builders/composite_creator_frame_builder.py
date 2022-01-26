@@ -96,9 +96,10 @@ class CompositeCreator_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn,
             self.create_param_widget(self.params[_key], **_options)
 
             # add spacers between groups:
-            if _key in ['n_files', 'images_per_file', 'bg_hdf5_self',
-                        'composite_dir', 'roi_yhigh', 'threshold_high',
-                        'binning', 'output_fname', 'n_total']:
+            if _key in ['n_files', 'images_per_file', 'bg_hdf5_frame',
+                        'use_global_det_mask', 'roi_yhigh',
+                        'threshold_high', 'binning', 'output_fname',
+                        'n_total', 'composite_dir']:
                 self.create_line(f'line_{_key}',
                     parent_widget=self._widgets['config'],
                     fixedWidth=CONFIG_WIDGET_WIDTH)

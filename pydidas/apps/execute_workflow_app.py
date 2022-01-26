@@ -34,7 +34,7 @@ import numpy as np
 from PyQt5 import QtCore
 
 from ..core import (get_generic_param_collection, Dataset, BaseApp,
-                    AppConfigError, utils)
+                    AppConfigError)
 from ..experiment import ScanSetup, ExperimentalSetup
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
@@ -82,6 +82,9 @@ class ExecuteWorkflowApp(BaseApp):
         Flag to enable live processing. This will implement checks on file
         existance before processing starts. The default is False.
 
+    The "sig_results_updated" signal will be emitted upon a new update of the
+    stored result and can be used
+
     Parameters
     ----------
     *args : tuple
@@ -97,9 +100,7 @@ class ExecuteWorkflowApp(BaseApp):
     parse_func = parse_execute_workflow_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
                                            '_result_metadata', '_mp_tasks']
-
-    mp_func_results = QtCore.pyqtSignal(object)
-    updated_composite = QtCore.pyqtSignal()
+    sig_results_updated = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -401,6 +402,7 @@ class ExecuteWorkflowApp(BaseApp):
         RESULTS.store_results(index, _new_results)
         if self.get_param_value('autosave_results'):
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
+        self.sig_results_updated.emit()
 
     def _store_frame_metadata(self, metadata):
         """

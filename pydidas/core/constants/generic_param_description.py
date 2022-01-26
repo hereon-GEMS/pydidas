@@ -241,7 +241,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The upper boundary (in pixel) for cropping images in x, '
                     'if use_roi is enabled. Negative values will be modulated '
                     'with the image width, i.e. -1 is equivalent with the full'
-                    'image size minus 1. To take the full image, use "None" '
+                    ' image size minus 1. To take the full image, use "None" '
                     'as value for the upper ROI limit.')},
     'roi_ylow': {
         'type': int,
@@ -263,7 +263,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The upper boundary (in pixel) for cropping images in y, '
                     'if use_roi is enabled. Negative values will be modulated '
                     'with the image width, i.e. -1 is equivalent with the full'
-                    'image size minus 1. To take the full image, use "None" '
+                    ' image size minus 1. To take the full image, use "None" '
                     'as value for the upper ROI limit.')},
     'use_thresholds': {
         'type': int,
@@ -747,6 +747,15 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The maximum number of datasets in the buffer. A dataset '
                     'consists of all results for one frame. For performance '
                     'reasons, the buffer should not be too large.')},
+    'use_global_det_mask': {
+        'type': bool,
+        'default': True,
+        'name': 'Use global detector mask',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Flag to use the global detector mask file and value. If '
+                    'False, no detector mask will be used.')},
     'det_mask': {
         'type': 'Path',
         'default': '',

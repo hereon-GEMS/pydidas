@@ -1,6 +1,8 @@
 pydidas general command line tutorial
 =====================================
 
+.. _accessing_parameters:
+
 Accessing Parameters
 --------------------
 
@@ -14,8 +16,8 @@ manage Parameters but only modify their values.
 Useful methods
 ^^^^^^^^^^^^^^
 
-Users will probably manage with a handful of methods. For the full method documentation,
-please refer to the class documentation: 
+Users will probably manage with a handful of methods. For the full method 
+documentation, please refer to the class documentation: 
 :py:class:`ParameterCollections <pydidas.core.ParameterCollection>`.
 
 	**get_param_keys**()
@@ -24,18 +26,21 @@ please refer to the class documentation:
 		Get the value of the Parameter referenced by *key*.
 	**get_param_values_as_dict**()
 		Get the value of all stored Parameters in form of a dictionary with the 
-		Parameter reference keys as dict keys and the Parameter values as dict values.
+		Parameter reference keys as dict keys and the Parameter values as dict 
+		values.
 	**set_param_value**(*key*, *value*)
 		Set the value of the Parameter referenced by *key* to the given *value*.
 
 .. tip:: 
-	The described methods are universal and apply to all pydidas objects with Parameters.
+	The described methods are universal and apply to all pydidas objects with 
+	Parameters.
 
 Examples
 ^^^^^^^^
 
-All examples will use the ExperimentalSetup object (please see below for a description
-of the object) and the examples will only cover the code bases, not the use case. 
+All examples will use the ExperimentalSetup object (please see below for a 
+description of the object) and the examples will only cover the code bases, not 
+the use case. 
 
 First, let us create the object called ``exp``
 
@@ -93,8 +98,8 @@ The object ``exp`` will be used in all examples below.
 			 'detector_rot3': 5.799041608456517e-08}
 			
 	4. Set the value of the *xray_energy* Parameter. This is a float value,
-	for demonstration purposes, let us set it with a string first. This will raise
-	a ValueError and the Parameter will not be updated.
+	for demonstration purposes, let us set it with a string first. This will 
+	raise a ``ValueError`` and the Parameter will not be updated.
 
 		.. code-block::
 
@@ -124,14 +129,15 @@ main objects are:
 	ScanSetup
 		The details about the scan. This includes crucial information like the
 		number of scan dimensions and the number of points in each dimension but
-		also metadata like dimension names, units, offsets and step width. The latter
-		information can be used to create the correct axis labels in plots.
+		also metadata like dimension names, units, offsets and step width. The 
+		latter information can be used to create the correct axis labels in 
+		plots.
 	ExperimentalSetup
-		This object includes information about the global experimental setup like
-		X-ray energy, detector type, position and geometry.
+		This object includes information about the global experimental setup 
+		like X-ray energy, detector type, position and geometry.
 	WorkflowTree
-		The WorkflowTree holds information about which plugins are used and about
-		the order of plugins to be processed. 
+		The WorkflowTree holds information about which plugins are used and 
+		about the order of plugins to be processed. 
 
 These objects can be accesses by calling their respective factories:
 
@@ -142,8 +148,8 @@ These objects can be accesses by calling their respective factories:
 	>>> EXPERIMENT = pydidas.experiment.ExperimentalSetup()
 	>>> TREE= pydidas.workflow.WorkflowTree()
 
-Note that the factories return a link to the unique instance and multiple calls yield 
-the same object:
+Note that the factories return a link to the unique instance and multiple calls 
+yield the same object:
 
 .. code-block::
 
@@ -163,10 +169,10 @@ PluginCollection
 
 pydidas uses a global 
 :py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
-to manage all known plugins. Plugins will be discovered based on known plugin paths 
-which are managed persistently in the PluginCollection using Qt's QSettings which use 
-the systems registry and are platform-independant. A reference to the persistent 
-PluginCollection object can be obtained using:
+to manage all known plugins. Plugins will be discovered based on known plugin 
+paths which are managed persistently in the PluginCollection using Qt's 
+QSettings which use the systems registry and are platform-independant. A 
+reference to the persistent PluginCollection object can be obtained using:
 
 .. code-block::
 
@@ -174,8 +180,8 @@ PluginCollection object can be obtained using:
 	>>> COLLECTION = pydidas.plugins.PluginCollection()
 
 .. note::
-	For the full documentation of all available methods, please refer to the class
-	documentation:
+	For the full documentation of all available methods, please refer to the 
+	class documentation:
 	:py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
 	This section handles only the most common use cases.
 
@@ -195,7 +201,8 @@ to take effect and is ignored otherwise.
 	been registered and the user is responsible to add all new paths again.
 	
 	Also, calling this method will **not** remove known plugins from the current
-	instance. If desired, this must be done using the ``clear_collection`` method.
+	instance. If desired, this must be done using the ``clear_collection`` 
+	method.
 
 An example of the use of stored paths is given below.
 
@@ -266,16 +273,17 @@ Plugin references
 """""""""""""""""
 
 Iternally, plugins are referenced by their class name and there can only be one
-plugin registered with the same class name. This behaviour is deliberate to allow
-overwriting generic plugins with modified private versions. By default, plugin
-references are overridden with a new class if such a class is encountered.
-In addition to the class name, each plugin has a ``plugin_name`` attribute which
-allows to set a more readable reference name for the Plugin.
+plugin registered with the same class name. This behaviour is deliberate to 
+allow overwriting generic plugins with modified private versions. By default, 
+plugin references are overridden with a new class if such a class is 
+encountered. In addition to the class name, each plugin has a ``plugin_name`` 
+attribute which allows to set a more readable reference name for the Plugin.
 
 .. tip::
 	The loading of Plugins occurs in the order of the stored paths. Therefore,
 	a path further down in the list will take precedence over an earlier path. 
-	The loading of Plugins can be controlled by organizing the sequence of paths.
+	The loading of Plugins can be controlled by organizing the sequence 
+	of paths.
 
 .. warning::
 	Trying to register a second class with a different class name but the same
@@ -326,6 +334,43 @@ A list of all available plugin class names can be obtained with the
 	>>> _azi_int
 	<proc_plugins.pyfai_azimuthal_integration.PyFAIazimuthalIntegration at 0x2132e9b6ee0>
 	
-Once the plugins have been created, their Parameters can be modified as described
-in the `Accessing Parameters`_ section. The organization of plugins into a WorkflowTree
-are covered in the section :ref:`workflow_tree`.
+Once the plugins have been created, their Parameters can be modified as 
+described in the `Accessing Parameters`_ section. The organization of plugins 
+into a WorkflowTree are covered in the section :ref:`workflow_tree`.
+
+.. _pydidas_qsettings:
+
+pydidas QSettings
+-----------------
+
+pydidas uses Qt's QSettings to store persistent information in the system's
+registry. The :py:class:`pydidas.core.PydidasQsettings` class can be used to
+display and modify global parameters.
+The most useful methods for general users are 
+:py:meth:`show_all_stored_q_settings <pydidas.core.PydidasQsettings.show_all_stored_q_settings` 
+to print the names and values of all stored settings and 
+:py:meth:`set_value <pydidas.core.PydidasQsettings.set_value` to modify a key.
+
+.. code-block::
+
+	>>> import pydidas
+	>>> config = pydidas.core.PydidasQsettings()
+	global/mp_n_workers: 4
+	global/plot_update_time: 1
+	global/shared_buffer_max_n: 20
+	global/shared_buffer_size: 100
+	>>> config.set_value('global/shared_buffer_size', 50)
+	>>> config = pydidas.core.PydidasQsettings()
+	global/mp_n_workers: 4
+	global/plot_update_time: 1
+	global/shared_buffer_max_n: 20
+	global/shared_buffer_size: 50
+	
+Note that the full list of global keys is longer and only a subset is presented
+here for demonstration purposes.
+
+.. note::
+
+	The Qsettings are persistent on the system for every user account, i.e.
+	any changes you make will persist if you start a new pydidas instance or
+	process.

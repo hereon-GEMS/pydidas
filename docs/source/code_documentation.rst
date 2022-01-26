@@ -64,4 +64,5 @@ Package documentation
 	code_docs/workflow
 	code_docs/apps
 	code_docs/widgets
+	code_docs/gui
 	

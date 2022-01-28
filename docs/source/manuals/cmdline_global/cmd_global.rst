@@ -131,13 +131,15 @@ main objects are:
 		number of scan dimensions and the number of points in each dimension but
 		also metadata like dimension names, units, offsets and step width. The 
 		latter information can be used to create the correct axis labels in 
-		plots.
+		plots. For the full documentation please visit :ref:`scan_setup`.
 	ExperimentalSetup
 		This object includes information about the global experimental setup 
-		like X-ray energy, detector type, position and geometry.
+		like X-ray energy, detector type, position and geometry. For the full 
+		documentation please visit :ref:`experimental_setup`.
 	WorkflowTree
 		The WorkflowTree holds information about which plugins are used and 
-		about the order of plugins to be processed. 
+		about the order of plugins to be processed. For the full documentation 
+		please visit :ref:`workflow_tree`.
 
 These objects can be accesses by calling their respective factories:
 

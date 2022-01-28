@@ -21,9 +21,9 @@ The following manuals are available:
 .. toctree::
 	:maxdepth: 1
 	
-	cmdline_apps/running_apps
-	cmdline_apps/cmd_composite_creator_app
-	cmdline_apps/cmd_execute_workflow_app
+	running_apps
+	cmd_composite_creator_app
+	cmd_execute_workflow_app
 	
 	
 

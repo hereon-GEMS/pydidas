@@ -1,12 +1,12 @@
-.. _workflow_tree:
+.. _scan_setup:
 
-The WorkflowTree
-================
+The ScanSetup class
+===================
 
 Introduction to the WorkflowTree
 --------------------------------
 
-The tree consists of py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`
+The tree consists of :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`
 which store information about their position in the tree and their parents and
 children as well as their associated processing plugin but the nodes are
 agnostic to any meta-information.

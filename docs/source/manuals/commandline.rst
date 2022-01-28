@@ -10,9 +10,11 @@ The following manuals are available:
 .. toctree::
 	:maxdepth: 1
 	
-	cmd_global
-	cmd_workflow_tree
-	cmd_apps
+	cmdline_global/cmd_global
+	cmdline_global/cmd_experimental_setup
+	cmdline_global/cmd_scan_setup
+	cmdline_global/cmd_workflow_tree
+	cmdline_apps/cmd_apps
 	
 	
 

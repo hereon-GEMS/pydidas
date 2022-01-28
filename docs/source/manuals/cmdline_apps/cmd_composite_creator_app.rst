@@ -17,12 +17,19 @@ Global offsets in the image data can be handled with a mask and background file.
 Globally controlled settings
 ----------------------------
 
-Some settings for the CompositeCreatorApp are controlled globally. These are
+Some settings used by the CompositeCreatorApp are controlled globally by pydidas. 
+These are:
 
 - The width of the border between images in pixels 
   (`global/mosaic_border_width`)
 - The value of the border pixels (`global/mosaic_border_value`)
-- The maximum image size in megapixels (`global/mosaic_max_size`)
+- The maximum image size in megapixels (`global/mosaic_max_size)
+- The path for the detector mask file (`global/det_mask`)
+- The pixel value for masked pixels (`global/det_mask_val`)
+
+and for parallel processing additionally:
+
+- The number of parallel worker processes (`global/mp_n_workers`)
 
 Because these settings will typically be reused quite often, they have been
 implemented as global :ref:`pydidas_qsettings`. The default is a border width 
@@ -317,7 +324,7 @@ CompositeCreatorApp Parameters
     - roi_xhigh (type: Union[int, None], default: None)
         The upper boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        - 1 is equivalent with the full image size minus one. None corresponds
+        -1 is equivalent to the full image size minus one. None corresponds
         to the full image width (with respect to the upper boundary).
     - roi_ylow (type: int, default: 0)
         The lower boundary (in pixel) for cropping images in y, if use_roi is
@@ -325,7 +332,7 @@ CompositeCreatorApp Parameters
     - roi_yhigh (type: Union[int, None], default: None)
         The upper boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        - 1 is equivalent with the full image size minus one. Use None to
+        -1 is equivalent to the full image size minus one. Use None to
         select the full range. 
     - use_thresholds (type: bool, default: False)
         Keyword to enable or disable the use of thresholds. If True,

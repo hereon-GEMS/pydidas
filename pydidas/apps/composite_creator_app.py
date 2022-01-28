@@ -97,7 +97,7 @@ class CompositeCreatorApp(BaseApp):
         image for the background file. The default is entry/data/data
     bg_hdf5_frame : int, optional
         Required for hdf5 background image files: The image number of the
-        background image in the  dataset. The default is 0.
+        background image in the dataset. The default is 0.
     use_global_det_mask : bool, optional
         Keyword to enable or disable using the global detector mask as
         defined by the global mask file and mask value. The default is True.
@@ -108,30 +108,36 @@ class CompositeCreatorApp(BaseApp):
         The lower boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width.
         The default is 0.
-    roi_xhigh : int, optional
+    roi_xhigh : Union[int, None], optional
         The upper boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size minus one. The default is
-        None.
+        -1 is equivalent with the full image size minus one. None corresponds
+		to the full image width (with respect to the upper boundary).The
+        default is None.
     roi_ylow : int, optional
         The lower boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width.
         The default is 0.
-    roi_yhigh : int, optional
-        THe upper boundary (in pixel) for cropping images in y, if use_roi is
+    roi_yhigh : Union[int, None], optional
+        The upper boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size minus one. Use None to
-        select the full range. The default is None.
+        -1 is equivalent with the full image size minus one. None corresponds
+		to the full image width (with respect to the upper boundary). The
+        default is None.
+    use_thresholds : bool, optional
+        Keyword to enable or disable the use of thresholds. If True,
+        threshold use is enabled and both threshold values will be used. The
+        default is False.
     threshold_low : int, optional
-        The lower threshold of the composite image. If a value  other than -1
-        is used, any pixels with a value below the threshold will be replaced
-        by the threshold. A value of -1 will ignore the threshold. The
-        default is 0.
+        The lower threshold of the composite image. If any finite value
+        (i.e. not np.nan or None) is used, the value of any pixels with a value
+        below the threshold will be replaced by the threshold value. A value
+        of np.nan or None will ignore the threshold. The default is None.
     threshold_high : int, optional
-        The upper threshold of the composite image. If a value other than -1
-        is used, any pixels with a value above the threshold will be replaced
-        by the threshold. A value of -1 will ignore the threshold. The default
-        is -1.
+        The upper threshold of the composite image. If any finite value
+        (i.e. not np.nan or None) is used, the value of any pixels with a value
+        above the threshold will be replaced by the threshold value. A value
+        of np.nan or None will ignore the threshold. The default is None.
     binning : int, optional
         The re-binning factor for the images in the composite. The binning
         will be applied to the cropped images. The default is 1.
@@ -336,18 +342,13 @@ class CompositeCreatorApp(BaseApp):
                 datatype=self._image_metadata.datatype)
             return
         _update_required = False
-        _image_shape = self._image_metadata.final_shape
-        if _image_shape != self._composite.get_param_value('image_shape'):
-            self._composite.set_param_value('image_shape', _image_shape)
-            _update_required = True
-        _nx = self.get_param_value('composite_nx')
-        if _nx != self._composite.get_param_value('composite_nx'):
-            self._composite.set_param_value('composite_nx', _nx)
-            _update_required = True
-        _ny = self.get_param_value('composite_ny')
-        if _ny != self._composite.get_param_value('composite_ny'):
-            self._composite.set_param_value('composite_ny', _ny)
-            _update_required = True
+        for _key, _value in [
+                ['image_shape', self._image_metadata.final_shape],
+                ['composite_nx', self.get_param_value('composite_nx')],
+                ['composite_ny', self.get_param_value('composite_ny')]]:
+            if _value != self._composite.get_param_value(_key):
+                self._composite.set_param_value(_key, _value)
+                _update_required = True
         if _update_required:
             self._composite.create_new_image()
 

@@ -48,10 +48,10 @@ class TestCompositeImage(unittest.TestCase):
         shutil.rmtree(self._path)
         del self._path
 
-    def get_default_object(self):
+    def get_default_object(self, low_limit=None, high_limit=1):
         obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
                      composite_ny=5, datatype=float,
-                     threshold_low=np.nan, threshold_high=1)
+                     threshold_low=low_limit, threshold_high=high_limit)
         return obj
 
     def test_creation(self):
@@ -63,13 +63,13 @@ class TestCompositeImage(unittest.TestCase):
         self.assertIsInstance(obj, CompositeImage)
         self.assertIsInstance(obj.image, np.ndarray)
 
-    def test_check_config_wrong_params(self):
+    def test_check_config__wrong_params(self):
         obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
                              composite_ny=-2, datatype=float,
                              threshold_low=np.nan, threshold_high=1)
         self.assertFalse(obj._CompositeImage__check_config())
 
-    def test_verify_config_wrong_params(self):
+    def test_verify_config__wrong_params(self):
         obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
                              composite_ny=-2, datatype=float,
                              threshold_low=np.nan, threshold_high=1)
@@ -93,37 +93,47 @@ class TestCompositeImage(unittest.TestCase):
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
 
-    def test_insert_image_into_empty_array(self):
+    def test_insert_image__into_empty_array(self):
         obj = self.get_default_object()
         obj._CompositeImage__image = None
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
 
-    def test_insert_image_comp_dir_y(self):
+    def test_insert_image__comp_dir_y(self):
         obj = self.get_default_object()
         obj.set_param_value('composite_dir', 'y')
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
 
-    def test_apply_threshold_no_limits(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+    def test_apply_threshold__no_limits(self):
+        obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds()
         self.assertTrue((obj.image[:20, :20] == img).all())
 
-    def test_apply_threshold_low_limit_only(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+    def test_apply_threshold__low_limit_only(self):
+        obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
-        obj.apply_thresholds(low = 0)
+        obj.apply_thresholds(low=0)
         self.assertTrue(np.amin(obj.image[:20, :20]) >= 0.)
+
+    def test_apply_threshold__inf_low_limit(self):
+        obj = self.get_default_object(None, None)
+        img = (np.random.random((20, 20)) - 0.5) * 100
+        obj.insert_image(img, 0)
+        obj.apply_thresholds(low=np.nan)
+        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.)
+
+    def test_apply_threshold__None_low_limit(self):
+        obj = self.get_default_object(None, None)
+        img = (np.random.random((20, 20)) - 0.5) * 100
+        obj.insert_image(img, 0)
+        obj.apply_thresholds(low=None)
+        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.)
 
     def test_apply_threshold_high_limit_only(self):
         obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
@@ -133,6 +143,20 @@ class TestCompositeImage(unittest.TestCase):
         obj.insert_image(img, 0)
         obj.apply_thresholds(high=5)
         self.assertTrue(np.amax(obj.image[:20, :20]) <= 5.)
+
+    def test_apply_threshold__inf_high_limit(self):
+        obj = self.get_default_object(None, None)
+        img = (np.random.random((20, 20)) - 0.5) * 100
+        obj.insert_image(img, 0)
+        obj.apply_thresholds(high=np.nan)
+        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.)
+
+    def test_apply_threshold__None_high_limit(self):
+        obj = self.get_default_object(None, None)
+        img = (np.random.random((20, 20)) - 0.5) * 100
+        obj.insert_image(img, 0)
+        obj.apply_thresholds(low=None)
+        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.)
 
     def test_save(self):
         obj = self.get_default_object()

@@ -1,3 +1,5 @@
+.. _running_pydidas_applications: 
+
 Running pydidas applications
 ============================
 

@@ -347,20 +347,21 @@ pydidas uses Qt's QSettings to store persistent information in the system's
 registry. The :py:class:`pydidas.core.PydidasQsettings` class can be used to
 display and modify global parameters.
 The most useful methods for general users are 
-:py:meth:`show_all_stored_q_settings <pydidas.core.PydidasQsettings.show_all_stored_q_settings` 
+:py:meth:`show_all_stored_q_settings <pydidas.core.PydidasQsettings.show_all_stored_q_settings>` 
 to print the names and values of all stored settings and 
-:py:meth:`set_value <pydidas.core.PydidasQsettings.set_value` to modify a key.
+:py:meth:`set_value <pydidas.core.PydidasQsettings.set_value>` to modify a key.
 
 .. code-block::
 
 	>>> import pydidas
 	>>> config = pydidas.core.PydidasQsettings()
+	>>> config.show_all_stored_q_settings()
 	global/mp_n_workers: 4
 	global/plot_update_time: 1
 	global/shared_buffer_max_n: 20
 	global/shared_buffer_size: 100
 	>>> config.set_value('global/shared_buffer_size', 50)
-	>>> config = pydidas.core.PydidasQsettings()
+	>>> config.show_all_stored_q_settings()
 	global/mp_n_workers: 4
 	global/plot_update_time: 1
 	global/shared_buffer_max_n: 20

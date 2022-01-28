@@ -176,25 +176,43 @@ class CompositeImage(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        low : float, optional
+        low : Union[float, None], optional
             The lower threshold. If not specified, the stored lower threshold
-            from the ParameterCollection will be used. By default, that is
-            np.nan which will be ignored.
+            from the ParameterCollection will be used. A value of np.nan or
+            None will be ignored.
         high : Union[float, None], optional
             The upper threshold. If not specified, the stored upper threshold
-            from the ParameterCollection will be used. By default, that is
-            np.nan which will be ignored.
+            from the ParameterCollection will be used. A value of np.nan or
+            None will be ignored.
         """
-        if 'low' in kwargs:
-            self.set_param_value('threshold_low', kwargs.get('low'))
-        if 'high' in kwargs:
-            self.set_param_value('threshold_high', kwargs.get('high'))
+        self.__update_threshold('low', **kwargs)
+        self.__update_threshold('high', **kwargs)
         _thresh_low = self.get_param_value('threshold_low')
-        if np.isfinite(_thresh_low):
+        if _thresh_low is not None:
             self.__image[self.__image < _thresh_low] = _thresh_low
         _thresh_high = self.get_param_value('threshold_high')
-        if np.isfinite(_thresh_high):
+        if _thresh_high is not None:
             self.__image[self.__image > _thresh_high] = _thresh_high
+
+    def __update_threshold(self, key, **kwargs):
+        """
+        Update the threshold from the kwargs, if the key in included and
+        change non-finite numbers to None.
+
+        Parameters
+        ----------
+        key : str
+            The threshold key. Must be either "low" or "high"
+        **kwargs : dict
+            The kwargs passed on from the apply thresholds method.
+        """
+        _thresh = self.get_param_value(f'threshold_{key}')
+        if key in kwargs:
+            _thresh = kwargs.get(key)
+        # check for non-finite values and convert them to None:
+        if _thresh is not None and not np.isfinite(_thresh):
+            _thresh = None
+        self.set_param_value(f'threshold_{key}', _thresh)
 
     def create_new_image(self):
         """

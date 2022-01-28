@@ -82,7 +82,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': ('Used only for file series: The name of the last file '
-                    'to be added to the composite image.')},
+                    'to be used for this app or tool.')},
     'file_stepping': {
         'type': int,
         'default': 1,
@@ -90,7 +90,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'allow_None': False,
         'tooltip': ('The step width (in files), A value n > 1 will only '
-                    'process every n-th file for the composite.')},
+                    'process every n-th file.')},
     'hdf5_key': {
         'type': 'Hdf5key',
         'default': '/entry/data/data',
@@ -171,7 +171,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'name': 'Total number of images',
         'choices': None,
         'unit': '',
-   'tooltip': 'The toal number of images in the composite images.'},
+        'tooltip': 'The toal number of images in the composite images.'},
     'n_files': {
         'type': int,
         'default': 0,
@@ -283,10 +283,10 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': True,
         'tooltip': ('The lower threshold of the composite image. If any '
-                    'finite value (i.e. not np.nan or None) is used, any '
-                    'pixels with a value below the threshold will be replaced'
-                    ' by the threshold. A value of np.nan or None will ignore'
-                    ' the threshold.')},
+                    'finite value (i.e. not np.nan or None) is used, the value'
+                    ' of any pixels with a value below the threshold will be '
+                    'replaced by the threshold value. A value of np.nan or '
+                    'None will ignore the threshold.')},
     'threshold_high': {
         'type': float,
         'default': None,
@@ -295,10 +295,10 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': True,
         'tooltip': ('The upper threshold of the composite image. If any '
-                    'finite value (i.e. not np.nan or None) is used, any '
-                    'pixels with a value above the threshold will be replaced'
-                    ' by the threshold. A value of np.nan or None will ignore'
-                    ' the threshold.')},
+                    'finite value (i.e. not np.nan or None) is used, the value'
+                    ' of any pixels with a value above the threshold will be '
+                    'replaced by the threshold value. A value of np.nan or '
+                    'None will ignore the threshold.')},
     'binning': {
         'type': int,
         'default': 1,
@@ -729,7 +729,7 @@ GENERIC_PARAM_DESCRIPTION = {
     'shared_buffer_size': {
         'type': float,
         'default': 100,
-        'name': 'Shared buffer size',
+        'name': 'Shared buffer size limit',
         'choices': None,
         'unit': 'MB',
         'allow_None': False,

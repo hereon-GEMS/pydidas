@@ -9,6 +9,6 @@
 -----------------------------------
 
 .. autoclass:: pydidas.apps.ExecuteWorkflowApp
-	:members:
-	:show-inheritance:
-	:inherited-members: QObject
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject

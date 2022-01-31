@@ -2,6 +2,6 @@ The widgets.factory sub-package
 -------------------------------
 
 .. automodule:: pydidas.widgets.factory
-	:members:
-	:show-inheritance:
+    :members:
+    :show-inheritance:
 

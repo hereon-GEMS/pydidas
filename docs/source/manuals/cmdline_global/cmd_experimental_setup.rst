@@ -3,189 +3,327 @@
 The ExperimentalSetup class
 ===========================
 
-Introduction to the WorkflowTree
---------------------------------
+Introduction to the ExperimentalSetup
+-------------------------------------
 
-The tree consists of :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`
-which store information about their position in the tree and their parents and
-children as well as their associated processing plugin but the nodes are
-agnostic to any meta-information.
+The :py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>`
+is the pydidas Singleton instance of the ``_ExpSetup`` class. It is
+used for storing and accessing global information about the experimental setup.
+Stored information include
 
-The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
-is a pydidas object with only a single running instance. It manages the 
-interactions between the user and the individual nodes.
+- X-ray energy
+- detector model (pixel numbers and sizes)
+- detector geometry.
 
-Its instance can be obtained by calling the following code:
+All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
+can be accesses as described in the basic tutorial. A full list of Parameters is
+given in :ref:`experimental_setup_parameters`\ .
 
-.. code-block::
-
-    >>> import pydidas
-    >>> TREE = pydidas.workflow.WorkflowTree()
-    
-Processing with the WorkflowTree is separated in two steps. First, any 
-operations which need to be performed only once (i.e. initializations) are 
-executed. Second, processing is performed for each data frame at a time. This 
-allows to easily run the WorkflowTree in serial or parallel processing. 
-
-Assembling a WorkflowTree
--------------------------
-
-To assemble a ``WorkflowTree``, users need to know which Plugins they want to 
-use and they need to configure these plugins. Then, they can add these plugins 
-to the tree. If the plugins are passed to the WorkflowTree without any further 
-information, they will be connected in a linear manner, with every plugin 
-appended to the last one.
-
-Plugins can be configured either in the ``WorkflowTree`` or before adding them 
-to the tree. Access to the individual plugins in the tree is somewhat hidded,
-though, and it is recommended to configure each ``Plugin`` before adding it to 
-the ``WorkflowTree``.
-
-To create a new node with a plugin and add it to the ``WorkflowTree``, use the
-``create_and_add_node`` method:
-
-.. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.create_and_add_node
-
-The following example will create a WorkflowTree which loads data from a single
-Hdf5 file and performs two separate integrations in different angular ranges:
+Its instance can be obtained by running the following code:
 
 .. code-block::
 
     >>> import pydidas
-    >>> TREE = pydidas.workflow.WorkflowTree()
-    >>> COLLECTION = pydidas.plugins.PluginCollection()
-    
-    # Create a loader plugin and set the file path
-    >>> loader = COLLECTION.get_plugin_by_name('Hdf5singleFileLoader')()
-    >>> loader.set_param_value('filename', '/home/someuser/test/file.h5')
-    
-    # Create an integrator plugin for a specific radial range
-    >>> integrator1 = COLLECTION.get_plugin_by_name('PyFAIazimuthalIntegration')()
-    >>> integrator1.set_param_value('rad_use_range', True)
-    >>> integrator1.set_param_value('rad_npoint', 200)
-    >>> integrator1.set_param_value('rad_range_lower', 5.5)
-    >>> integrator1.set_param_value('rad_range_upper', 7.5)
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
 
-    # Create an integrator plugin for a second radial range
-    >>> integrator2 = COLLECTION.get_plugin_by_name('PyFAIazimuthalIntegration')()
-    >>> integrator2.set_param_value('rad_use_range', True)
-    >>> integrator2.set_param_value('rad_npoint', 400)
-    >>> integrator2.set_param_value('rad_range_lower', 12.1)
-    >>> integrator2.set_param_value('rad_range_upper', 16.1)
-    
-    # Add the plugins to the WorkflowTree. The return value of the node ID of 
-    # the newly added plugin.
-    >>> TREE.create_and_add_node(loader)
-    0
-    >>> TREE.create_and_add_node(integrator1)
+Configuring the ExperimentalSetup
+---------------------------------
+
+X-ray energy and wavelength
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The X-ray energy and wavelength are two coupled Parameters and any changes to 
+one will cause the other Parameter to be updated as well. They can be accessed
+through the keys ``xray_energy`` and ``xray_wavelength``, respectively. 
+
+Please see also the example below:
+
+.. code-block::
+
+    >>> import pydidas
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP.get_param_value('xray_wavelength')
     1
-    # because plugins will always be attached to the last node, the first 
-    # integrator plugin did not need to specify a parent, but the second one 
-    # will have to do just that:
-    >>> TREE.create_and_add_node(integrator2, parent=0)
-    2
+    >>> EXP.get_param_value('xray_energy')
+    12.398
+    
+    # Now, set the wavelength and check the energy:
+    >>> EXP.set_param_value('xray_wavelength', 2)
+    >>> EXP.get_param_value('xray_energy')
+    6.199209921660013
 
+    # Or change the X-ray energy:
+    >>> EXP.set_param_value('xray_energy', 12)
+    >>> EXP.get_param_value('xray_wavelength')
+    1.0332016536100022
 
-Running workflows
+The detector
+^^^^^^^^^^^^
+
+The detector is defined by the following Parameters:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Parameter
+      - type
+      - unit
+      - description
+    * - detector_name
+      - str
+      - n/a
+      - The detector name in pyFAI nomenclature.
+    * - detector_npixx
+      - int
+      - pixel
+      - The number of detector pixels in x direction (horizontal).
+    * - detector_npixy
+      - int
+      - pixel
+      - The number of detector pixels in y direction (vertical).
+    * - detector_pxsizex
+      - float
+      - um
+      - The detector pixel size in X-direction.
+    * - detector_pxsizey
+      - float
+      - um
+      - The detector pixel size in Y-direction.
+
+The ``detector_name`` is only relevant for referencing any pyFAI object but 
+is included in the metainformation and should be set correctly. The Parameters
+for numbers of pixels and pixelsize exactly what the name suggests.
+
+Defining the detector manually
+""""""""""""""""""""""""""""""
+
+The detector can be defined manually if required, for example for a prototype
+detector which is not inclued in pyFAI, by setting all Parameters values:
+
+.. code-block::
+
+    >>> import pydidas
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP.set_param_value('detector_name', 'A detector with very small asymmetric pixels')
+    >>> EXP.set_param_value('detector_npixx', 1024)
+    >>> EXP.set_param_value('detector_npixy', 2048)
+    >>> EXP.set_param_value('detector_pxsizex', 25)
+    >>> EXP.set_param_value('detector_pxsizey', 12.5)
+
+Using a pyFAI detector
+""""""""""""""""""""""
+
+If the detector is defined in pyFAI, this library can be used to update the 
+detector settings automatically by giving the detector name in the 
+:py:meth:`set_detector_params_from_name <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.set_detector_params_from_name>`
+method:
+
+.. code-block::
+
+    >>> import pydidas
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP.set_detector_params_from_name('Eiger 9M')
+    >>> EXP.get_param_value('detector_name')
+    'Eiger 9M'
+    >>> EXP.get_param_value('detector_npixx')
+    3110
+    >>> EXP.get_param_value('detector_npixy')
+    3269
+    >>> EXP.get_param_value('detector_pxsizex')
+    75.0
+    >>> EXP.get_param_value('detector_pxsizey')
+    75.0
+    
+The geometry
+^^^^^^^^^^^^
+
+pydidas uses the pyFAI geometry. In short, it uses the point of normal 
+incidence (PONI), the orthogonal projection of the origin (i.e. the sample) on 
+the detector. 
+
+.. tip::
+
+    The pyFAI geometry is described in detail in this pyFAI document:
+    `Default geometry in pyFAI <https://pyfai.readthedocs.io/en/master/geometry.html#default-geometry-in-pyfai>`_\ .
+
+The pyFAI coordinate system used the :math:`x_1` (up), :math:`x_2` and 
+:math:`x_3` (along the beam direction) coordinates. The :math:`x_2` axis is 
+defined to create a right-handed coordinate system with the :math:`x_1` and 
+:math:`x_3` axes.
+
+The PONI defines the :math:`x_1` and :math:`x_2` coordinates of the detector 
+(measured from the origin at the top left corner) and the distance in beam 
+direction defines the :math:`x_3` coordinate (detector distance).
+
+Three rotations (:math:`rot_1`: mathmatically negative around the axis pointing 
+up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis; 
+:math:`rot_3`: mathematically negative around the X-ray beam direction) are 
+used to move the detector with respect to the origin (sample) are applied to 
+the detector to transform the detector geometry into the experimental geometry.
+
+The correspondence between pyFAI geometry and pydidas ExperimentalSetup
+Parameter names is given below:
+
+.. list-table::
+    :header-rows: 1
+
+    * - pyFAI parameter name
+      - corresponding pydidas Parameter
+      - unit
+    * - :math:`poni_1`
+      - detector_poni1
+      - m
+    * - :math:`poni_2`
+      - detector_poni2
+      - m
+    * - :math:`dist`
+      - detector_dist
+      - m
+    * - :math:`rot_1`
+      - detector_rot1  
+      - rad
+    * - :math:`rot_2`
+      - detector_rot2
+      - rad
+    * - :math:`rot_3`
+      - detector_rot3
+      - rad
+
+Defining the geometry
+"""""""""""""""""""""
+
+These Parameters can be accessed and updated by the pydidas Parameter names as
+given in the table above. For an example, see below:
+
+.. code-block::
+
+    >>> import pydidas
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP.set_param_value('detector_poni1', 0.114731)
+    >>> EXP.set_param_value('detector_poni2', 0.123635)
+    >>> EXP.set_param_value('detector_dist', 0.235885)
+    >>> EXP.set_param_value('detector_rot1', -0.011062669)
+    >>> EXP.set_param_value('detector_rot2', -0.002172149)
+    >>> EXP.set_param_value('detector_rot3', 0.0)
+    
+
+Import and Export
 -----------------
 
-The ``WorkflowTree`` includes several methods to run either the full Workflow
-or just individual plugins for testing.
+The ExperimentalSetup settings can be imported and exported to files, based on
+the available im-/exporters. The standard distribution ships with support for
+YAML files and pyFAI .poni files. Both types are supported for import and 
+export. The format will be determined automatically based on the file extension.
 
-Test individual plugins
-"""""""""""""""""""""""
+Imports and exports are started by calling the 
+:py:meth:`import_from_file(filename) <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.import_from_file>`
+and 
+:py:meth:`export_to_file(filename) <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.export_to_file>`,
+respectively. The filename must include the absolute path to the file. 
 
-To test individual plugins, users can use the ``execute_single_plugin`` method. 
+.. warning::
 
-.. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_single_plugin
+    Importing the ``ExperimentalSetup`` from file will overwrite all current 
+    values without confirmation asked.
 
-This method will execute a single plugin only. This method can be used to check
-intermediate results and make sure that a workflow works as intended.
-
-The following example shows how to use this method to read a frame from an hdf5
-file and store it for further processing. (This example assumes that the objects
-from the previous example are still existing).
-
-.. code-block::
-
-    >>> res, kws = TREE.execute_single_plugin(0, 0)
-    >>> kws
-    {}
-    >>> res
-    Dataset(
-    axis_labels: {
-        0: None
-        1: None},
-    axis_ranges: {
-        0: None
-        1: None},
-    axis_units: {
-        0: None
-        1: None},
-    metadata: {'axis': 0, 'frame': 0, 'dataset':
-       '/entry/data/data'},
-    array([[0, 1, 0, ..., 1, 0, 1],
-           [0, 0, 1, ..., 2, 0, 0],
-           [0, 0, 0, ..., 0, 3, 0],
-           ...,
-           [0, 0, 0, ..., 0, 0, 0],
-           [0, 0, 0, ..., 0, 0, 0],
-           [0, 0, 0, ..., 0, 1, 1]], dtype=uint32)
-    )
-
-
-Run the full WorkflowTree
-"""""""""""""""""""""""""
-
-Two different methods are available to run the full ``WorkflowTree``. First,
-there is the ``execute_process`` method which will run the full workflow for a 
-single frame but will not gather any results from the nodes nor return any 
-values. Secondly, the ``execute_process_and_get_results`` method will do the 
-same calculations but also gathers the results from the individual plugins and
-returns them to the user. The documentation for the 
-``execute_process_and_get_results`` method is given below. 
-
-.. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_process_and_get_results
-
-Using the ``WorkflowTree`` from the example above, the following example 
-demonstrates the usage.
+An example to demonstrate these methods is given below:
 
 .. code-block::
 
-    # This method will not return any results:
-    >>> res = TREE.execute_process(0)
-    >>> res is None
-    True
+    >>> import pydidas
+    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP.get_param_values_as_dict()
+    {'xray_wavelength': 1,
+     'xray_energy': 12.398,
+     'detector_name': 'detector',
+     'detector_npixx': 0,
+     'detector_npixy': 0,
+     'detector_pxsizex': -1,
+     'detector_pxsizey': -1,
+     'detector_dist': 1,
+     'detector_poni1': 0,
+     'detector_poni2': 0,
+     'detector_rot1': 0,
+     'detector_rot2': 0,
+     'detector_rot3': 0}
+    >>> EXP.export_to_file('/scratch/exp_settings_test.yaml')
+
+    # now, we update the local settings:
+    >>> EXP.set_detector_params_from_name('Eiger 9M')
+    >>> EXP.get_param_values_as_dict()
+    {'xray_wavelength': 1,
+     'xray_energy': 12.398,
+     'detector_name': 'Eiger 9M',
+     'detector_npixx': 3110,
+     'detector_npixy': 3269,
+     'detector_pxsizex': 75.0,
+     'detector_pxsizey': 75.0,
+     'detector_dist': 1,
+     'detector_poni1': 0,
+     'detector_poni2': 0,
+     'detector_rot1': 0,
+     'detector_rot2': 0,
+     'detector_rot3': 0}
     
-    # This method will return results:
-    >>> res = TREE.execute_process_and_get_results(0)
-    >>> res
-    {1: Dataset(
-     axis_labels: {
-         0: '2theta'},
-     axis_ranges: {
-         0: array([5.505     , 5.51500001, 5.52500001, ...,
-                   7.47500088, 7.48500089, 7.49500089])},
-     axis_units: {
-         0: 'deg'},
-     metadata: {},
-     array([2.357937 , 2.29853  , 2.3073444, ..., 2.0363004, 2.039918 ,
-            2.0199535], dtype=float32)
-     ),
-     2: Dataset(
-     axis_labels: {
-         0: '2theta'},
-     axis_ranges: {
-         0: array([12.105     , 12.11500001, 12.12500001, ...,
-                   16.07500191, 16.08500191, 16.09500192])},
-     axis_units: {
-         0: 'deg'},
-     metadata: {},
-     array([ 1.4057364,  1.4105228,  1.4086472, ...,  8.046747 , 17.791353 ,
-            22.341616 ], dtype=float32)
-     )}
+    # If we load the settings from the stored file, these settings will be lost
+    # and the saved state will be restored:
+    >>> EXP.import_from_file('/scratch/exp_settings_test.yaml')
+    >>> EXP.get_param_values_as_dict()
+    {'xray_wavelength': 1,
+     'xray_energy': 12.398,
+     'detector_name': 'detector',
+     'detector_npixx': 0,
+     'detector_npixy': 0,
+     'detector_pxsizex': -1,
+     'detector_pxsizey': -1,
+     'detector_dist': 1,
+     'detector_poni1': 0,
+     'detector_poni2': 0,
+     'detector_rot1': 0,
+     'detector_rot2': 0,
+     'detector_rot3': 0}
 
-To run the workflow for multiple data frames, please use the 
-:py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>`. A tutorial
-for this application can be found :ref:`execute_workflow_app`.
+.. _experimental_setup_parameters:
 
+Full list of Parameters for ExperimentalSetup 
+---------------------------------------------
+
+    - live_processing (bool, default: False)
+        Keyword to toggle live processing which means file existance and size 
+        checks will be disabled in the setup process and the file processing 
+        will wait for files to be created (indefinitely). 
+ 
+    - xray_wavelength (float, unit: Angstrom, default: 1.0)
+        The X-ray wavelength. Any changes to the wavelength will also update 
+        the X-ray energy setting.   
+    - xray_energy (float, unit: keV, default: 12.398)
+        The X-ray energy. Changing this parameter will also update the X-ray 
+        wavelength setting.
+    - detector_name (str, default: 'detector')
+        The detector name (in pyFAI nomenclature if used for automatic 
+        configuration).
+    - detector_npixx (int, default: 0)
+        The number of detector pixels in x direction (horizontal).
+    - detector_npixy (int, default: 0)
+        The number of detector pixels in x direction (vertical).
+    - detector_pxsizex (float, unit: um, default: -1)
+        The detector pixel size in X-direction.
+    - detector_pxsizey (float, unit: um, default: -1)
+        The detector pixel size in Y-direction.
+    - detector_dist (float, unit: m, default: 1.0)
+        The sample-detector distance.
+    - detector_poni1 (float, unit: m, default: 0.0)
+        The detector PONI1 (point of normal incidence; in y direction). This is 
+        measured in meters from the detector origin.
+    - detector_poni2 (float, unit: m, default: 0.0)
+        The detector PONI2 (point of normal incidence; in x direction). This is 
+        measured in meters from the detector origin.
+    - detector_rot1 (float, unit: rad, default: 0.0)
+        The detector rotation 1 (yaw; lefthanded around the "up"-axis)
+    - detector_rot2 (float, unit: rad, default: 0.0)
+        The detector rotation 2 (pitching the detector; positive direction is 
+        tilting the detector top upstream while keeping the bottom of the 
+        detector stationary.
+    - detector_rot3 (float, unit: rad, default: 0.0)
+        The detector rotation 3 (roll; around the beam axis; right-handed when 
+        looking downstream with the beam.)

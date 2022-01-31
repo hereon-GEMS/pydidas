@@ -2,9 +2,9 @@ The plugins sub-package
 -----------------------
 
 .. autoclass:: pydidas.plugins.plugin_collection._PluginCollection
-	:members:
+    :members:
 
 .. automodule:: pydidas.plugins
-	:members:
-	
-	
+    :members:
+    
+    

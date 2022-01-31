@@ -12,7 +12,7 @@
 ----------------------------------
 
 .. autoclass:: pydidas.gui.WorkflowEditFrame
-	:members:
+    :members:
 
 .. _all_methods_WorkflowEditFrame:
 
@@ -20,7 +20,7 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.gui.WorkflowEditFrame
-	:members:
-	:inherited-members: QFrame
-	
+    :members:
+    :inherited-members: QFrame
+    
 

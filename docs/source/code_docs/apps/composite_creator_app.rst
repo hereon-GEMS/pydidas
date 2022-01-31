@@ -9,6 +9,6 @@
 -----------------------------------
 
 .. autoclass:: pydidas.apps.CompositeCreatorApp
-	:members:
-	:show-inheritance:
-	:inherited-members: QObject
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject

@@ -14,16 +14,16 @@ The basic functions in Apps are used as follows:
 
 #. Run a loop \<for index in tasks\>:
 
-	#. Check app.multiprocessing_carryon value. If False, wait and
+    #. Check app.multiprocessing_carryon value. If False, wait and
        repeat the check. If True, continue with processing.
     
-	#. Call app.multiprocessing_func(index) to perform the main
+    #. Call app.multiprocessing_func(index) to perform the main
        calculation task and put the results in a queue or transfer
        via a signal.
     
     #. Call app.multiprocessing_store_results (optionally). If the apps
        are running in parallel, they will skip this step and instead,
-	   they will send the results via queue to the AppRunner.
+       they will send the results via queue to the AppRunner.
 
 #. Call app.multiprocessing_post_run to perform cleanup steps.
 
@@ -36,8 +36,8 @@ The basic functions in Apps are used as follows:
 ----------------------------------
 
 .. autoclass:: pydidas.core.BaseApp
-	:members:
-	:show-inheritance:
+    :members:
+    :show-inheritance:
 
 .. _all_methods_BaseApp:
 
@@ -45,8 +45,8 @@ The basic functions in Apps are used as follows:
 ---------------------------------------
 
 .. autoclass:: pydidas.core.BaseApp
-	:members:
-	:show-inheritance:
-	:inherited-members: QObject
-	
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject
+    
 

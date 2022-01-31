@@ -55,5 +55,5 @@ using the PyQt5 signal/slot mechanism.
 
 
 .. [*] Some functionality like image browsing and viewing inherently requires a graphical
-	   interface and is not available from the command line.
-	   
+       interface and is not available from the command line.
+       

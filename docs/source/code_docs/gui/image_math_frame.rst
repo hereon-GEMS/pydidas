@@ -12,7 +12,7 @@
 ----------------------------------
 
 .. autoclass:: pydidas.gui.ImageMathFrame
-	:members:
+    :members:
 
 .. _all_methods_ImageMathFrame:
 
@@ -20,7 +20,7 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.gui.ImageMathFrame
-	:members:
-	:inherited-members: QFrame
-	
+    :members:
+    :inherited-members: QFrame
+    
 

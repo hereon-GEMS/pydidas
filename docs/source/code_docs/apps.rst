@@ -9,7 +9,7 @@ For the command line, arguments can be either passed aa keywords during initiali
 line arguments or by updating the Parameter values of the app class in scripts.
 
 .. toctree::
-	:maxdepth: 4
-	
-	apps/composite_creator_app
-	apps/execute_workflow_app
+    :maxdepth: 4
+    
+    apps/composite_creator_app
+    apps/execute_workflow_app

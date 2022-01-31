@@ -10,19 +10,19 @@ Further sub-packages
 
 The ``workflow`` package includes two additional sub-packages:
 
-	1. ``result_savers`` includes the required code to save the results of the workflow
-	on the fly during processing with various formats.
-	
-	2. ``workflow_tree_io`` includes the required code to import and export the 
-	WorkflowTree in different file formats.
+    1. ``result_savers`` includes the required code to save the results of the workflow
+    on the fly during processing with various formats.
+    
+    2. ``workflow_tree_io`` includes the required code to import and export the 
+    WorkflowTree in different file formats.
 
 Full code documentation
 -----------------------
 
 .. toctree::
-	:maxdepth: 1
-	
-	workflow/workflow
-	workflow/result_savers
-	workflow/workflow_tree_io
+    :maxdepth: 1
+    
+    workflow/workflow
+    workflow/result_savers
+    workflow/workflow_tree_io
 

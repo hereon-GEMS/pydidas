@@ -41,10 +41,10 @@ Further code documentation
 --------------------------
 
 .. toctree::
-	:maxdepth: 1
-	
-	code_docs/concepts
-	code_docs/package_structure
+    :maxdepth: 1
+    
+    code_docs/concepts
+    code_docs/package_structure
 
 
   
@@ -53,16 +53,16 @@ Package documentation
 ---------------------
 
 .. toctree::
-	:maxdepth: 1
-	
-	code_docs/core
-	code_docs/multiprocessing
-	code_docs/image_io
-	code_docs/experiment
-	code_docs/managers
-	code_docs/plugins
-	code_docs/workflow
-	code_docs/apps
-	code_docs/widgets
-	code_docs/gui
-	
+    :maxdepth: 1
+    
+    code_docs/core
+    code_docs/multiprocessing
+    code_docs/image_io
+    code_docs/experiment
+    code_docs/managers
+    code_docs/plugins
+    code_docs/workflow
+    code_docs/apps
+    code_docs/widgets
+    code_docs/gui
+    

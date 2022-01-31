@@ -12,7 +12,7 @@
 ----------------------------------
 
 .. autoclass:: pydidas.gui.MainWindow
-	:members:
+    :members:
 
 .. _all_methods_MainWindow:
 
@@ -20,7 +20,7 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.gui.MainWindow
-	:members:
-	:inherited-members: QMainWindow
-	
+    :members:
+    :inherited-members: QMainWindow
+    
 

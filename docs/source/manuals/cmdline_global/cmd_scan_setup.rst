@@ -188,4 +188,3 @@ demonstrates the usage.
 To run the workflow for multiple data frames, please use the 
 :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>`. A tutorial
 for this application can be found :ref:`execute_workflow_app`.
-

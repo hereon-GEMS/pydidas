@@ -12,7 +12,7 @@
 ----------------------------------
 
 .. autoclass:: pydidas.gui.ScanSetupFrame
-	:members:
+    :members:
 
 .. _all_methods_ScanSetupFrame:
 
@@ -20,7 +20,7 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.gui.ScanSetupFrame
-	:members:
-	:inherited-members: QFrame
-	
+    :members:
+    :inherited-members: QFrame
+    
 

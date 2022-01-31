@@ -12,7 +12,7 @@
 ----------------------------------
 
 .. autoclass:: pydidas.gui.CompositeCreatorFrame
-	:members:
+    :members:
 
 .. _all_methods_CompositeCreatorFrame:
 
@@ -20,7 +20,7 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.gui.CompositeCreatorFrame
-	:members:
-	:inherited-members: QFrame
-	
+    :members:
+    :inherited-members: QFrame
+    
 

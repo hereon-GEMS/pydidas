@@ -41,7 +41,7 @@ PLUGINS = PluginCollection()
 
 class _WorkflowTree(GenericTree):
     """
-    The :py:class:`_WorkflowTree is a subclassed GenericTree with support for
+    The _WorkflowTree is a subclassed GenericTree with support for
     running a plugin chain.
 
     Access within pydidas should not be direct but through the WorkflowTree

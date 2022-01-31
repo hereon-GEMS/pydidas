@@ -12,8 +12,8 @@
 ----------------------------------
 
 .. autoclass:: pydidas.core.ParameterCollection
-	:members:
-	:show-inheritance:
+    :members:
+    :show-inheritance:
 
 .. _all_methods_ParameterCollection:
 
@@ -21,8 +21,8 @@
 ---------------------------------------
 
 .. autoclass:: pydidas.core.ParameterCollection
-	:members:
-	:show-inheritance:
-	:inherited-members: QObject
-	
+    :members:
+    :show-inheritance:
+    :inherited-members: QObject
+    
 

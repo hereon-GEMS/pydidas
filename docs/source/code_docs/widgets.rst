@@ -28,11 +28,11 @@ widgets are located in the respective sub-packages.
 
 
 .. toctree::
-	:maxdepth: 1
+    :maxdepth: 1
 
-	widgets/base
-	widgets/dialogues
-	widgets/factory
-	widgets/parameter_config
-	widgets/selection
-	widgets/workflow_edit
+    widgets/base
+    widgets/dialogues
+    widgets/factory
+    widgets/parameter_config
+    widgets/selection
+    widgets/workflow_edit

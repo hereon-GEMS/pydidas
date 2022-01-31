@@ -10,7 +10,7 @@ command line and GUI interfaces. While the underlying operations are
 the same for both interfaces, the setup typically is very different.
 
 .. toctree::
-	:maxdepth: 2
+    :maxdepth: 2
 
-	manuals/commandline
-	manuals/graphical_user_interface
+    manuals/commandline
+    manuals/graphical_user_interface

@@ -9,7 +9,7 @@ below.
 
 .. note::
     For a detailed description of the internal workings of applications
-	please refer to the :ref:`developer_guide_to_apps` section.
+    please refer to the :ref:`developer_guide_to_apps` section.
 
 Configuring an application
 --------------------------
@@ -27,17 +27,17 @@ number of strings.
 
 .. note::
 
-	The DummyApp is not a real object in pydidas. This example cannot be 
-	run in a real python console.
+    The DummyApp is not a real object in pydidas. This example cannot be 
+    run in a real python console.
 
 .. code-block::
 
-	>>> import pydidas
-	>>> app = pydidas.apps.DummyApp()
-	>>> app.get_param_keys()
-	['number_of_strings', 'length_of_string']
-	>>> app.set_param_value('number_of_strings', 10)
-	>>> app.set_param_value('length_of_string', 10)
+    >>> import pydidas
+    >>> app = pydidas.apps.DummyApp()
+    >>> app.get_param_keys()
+    ['number_of_strings', 'length_of_string']
+    >>> app.set_param_value('number_of_strings', 10)
+    >>> app.set_param_value('length_of_string', 10)
 
 Running an application serially
 -------------------------------
@@ -48,22 +48,22 @@ processing.
 
 .. code-block::
 
-	>>> import pydidas
-	>>> app = pydidas.apps.DummyApp()
-	>>> app.set_param_value('number_of_strings', 10)
-	>>> app.set_param_value('length_of_string', 10)
-	>>> app.run()
-	>>> app.get_results()
-	['yeOhsEodCq',
-	 'gnqZKRxHcK',
-	 'SbEbVlyjgx',
-	 'gcrNYzGUQY',
-	 'NnfLeTcXbS',
-	 'xoweEcFgqs',
-	 'ujHXTPsWyh',
-	 'XoOkaRqvIv',
-	 'ewrMXWBpdG',
-	 'TurPkkywwJ']
+    >>> import pydidas
+    >>> app = pydidas.apps.DummyApp()
+    >>> app.set_param_value('number_of_strings', 10)
+    >>> app.set_param_value('length_of_string', 10)
+    >>> app.run()
+    >>> app.get_results()
+    ['yeOhsEodCq',
+     'gnqZKRxHcK',
+     'SbEbVlyjgx',
+     'gcrNYzGUQY',
+     'NnfLeTcXbS',
+     'xoweEcFgqs',
+     'ujHXTPsWyh',
+     'XoOkaRqvIv',
+     'ewrMXWBpdG',
+     'TurPkkywwJ']
 
 Running an application using parallelization
 --------------------------------------------
@@ -79,7 +79,7 @@ processes and can run in the background.
 
     For a detailed description of how the pydidas multiprocessing works,
     please refer to the :ref:`multiprocessing_package` or to the 
-	:ref:`developer_guide_to_multiprocessing`.
+    :ref:`developer_guide_to_multiprocessing`.
 
 To run an application, first configure the application as usually. Then,
 create an :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` instance
@@ -92,71 +92,71 @@ method to call a method of the app or the
 method to modify one of the application's parameters.
 
 .. warning::
-	
-	Starting the :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` will
-	create a new instance of the application and any changes made to the local
-	instance will not be mirrored in the 
-	:py:class:`AppRunner <pydidas.multiprocessing.AppRunner>`'s app instance.
+    
+    Starting the :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` will
+    create a new instance of the application and any changes made to the local
+    instance will not be mirrored in the 
+    :py:class:`AppRunner <pydidas.multiprocessing.AppRunner>`'s app instance.
 
 .. code-block::
-	
-	# Set up the app:
-	>>> import pydidas
-	>>> app = pydidas.apps.DummyApp()
-	>>> app
-	<pydidas.apps.dummy_app.DummyApp at 0x1c23aed0ee0>
-	>>> app.set_param_value('number_of_strings', 10)
-	>>> app.set_param_value('length_of_string', 10)
-	
-	# Define the AppRunner
-	>>> runner = pydidas.multiprocessing.AppRunner(app)
-	
-	# Checking the progress now will yield a -1 because the AppRunner has not 
-	# yet queried the app for the tasks
-	>>> runner.progress
-	-1
-	
-	# If we change an app parameter in the runner, the local instance will not
-	# be modified:
-	>>> runner.set_app_param('length_of_string', 20)
-	>>> app.get_param('length_of_string')
-	Parameter <length_of_string (type: Integral): 10 (default: 5)>
-	
-	# If we start the runner and query the progress immediately, it will yield
-	# zero:
-	>>> runner.start()
-	>>> runner.progress
-	0
-	
-	# To check, whether the runner is finished, check that progress is equal
-	# to one:
-	>>> runner.progress
-	1
-	
-	# Now, we need to get the runner's update app back into the local namespace
-	# to access it directly. 
-	>>> app = runner.get_app()
-	>>> app
-	<pydidas.apps.dummy_app.DummyApp at 0x1c246465e50>
-	app.get_param_values_as_dict()
-	{'number_of_strings': 10,
-	 'length_of_string': 20}
-	>>> app.get_results()
-	['HynGtTMzELIGpxKUjsmv',
-	 'vHpcpwnqbVbpbnDKIOnf',
-	 'RFQvZvqotYCMpityIHGk',
-	 'MIXWNdsbLbFDxNDRQnjA',
-	 'sKbWVcxyRbTrEAvSNyfp',
-	 'PUaRVxJiCEjfeiCozoHN',
-	 'zByPTNALcybfXkDTyXPL',
-	 'LaBUIxLkWBTBdcSkDrct',
-	 'nWUnyMWHxHEXJxalOjcX',
-	 'tpAYNIMIUhymdzyDOmLJ']
-	
+    
+    # Set up the app:
+    >>> import pydidas
+    >>> app = pydidas.apps.DummyApp()
+    >>> app
+    <pydidas.apps.dummy_app.DummyApp at 0x1c23aed0ee0>
+    >>> app.set_param_value('number_of_strings', 10)
+    >>> app.set_param_value('length_of_string', 10)
+    
+    # Define the AppRunner
+    >>> runner = pydidas.multiprocessing.AppRunner(app)
+    
+    # Checking the progress now will yield a -1 because the AppRunner has not 
+    # yet queried the app for the tasks
+    >>> runner.progress
+    -1
+    
+    # If we change an app parameter in the runner, the local instance will not
+    # be modified:
+    >>> runner.set_app_param('length_of_string', 20)
+    >>> app.get_param('length_of_string')
+    Parameter <length_of_string (type: Integral): 10 (default: 5)>
+    
+    # If we start the runner and query the progress immediately, it will yield
+    # zero:
+    >>> runner.start()
+    >>> runner.progress
+    0
+    
+    # To check, whether the runner is finished, check that progress is equal
+    # to one:
+    >>> runner.progress
+    1
+    
+    # Now, we need to get the runner's update app back into the local namespace
+    # to access it directly. 
+    >>> app = runner.get_app()
+    >>> app
+    <pydidas.apps.dummy_app.DummyApp at 0x1c246465e50>
+    app.get_param_values_as_dict()
+    {'number_of_strings': 10,
+     'length_of_string': 20}
+    >>> app.get_results()
+    ['HynGtTMzELIGpxKUjsmv',
+     'vHpcpwnqbVbpbnDKIOnf',
+     'RFQvZvqotYCMpityIHGk',
+     'MIXWNdsbLbFDxNDRQnjA',
+     'sKbWVcxyRbTrEAvSNyfp',
+     'PUaRVxJiCEjfeiCozoHN',
+     'zByPTNALcybfXkDTyXPL',
+     'LaBUIxLkWBTBdcSkDrct',
+     'nWUnyMWHxHEXJxalOjcX',
+     'tpAYNIMIUhymdzyDOmLJ']
+    
 .. note::
-	
-	This is a very basic example and multiprocessing can be performed more
-	elegantly by using Qt's signal and slot system which is used by pydidas.
-	For a full description of the signals, please refer to the 
-	:ref:`developer_guide_to_signals`.
+    
+    This is a very basic example and multiprocessing can be performed more
+    elegantly by using Qt's signal and slot system which is used by pydidas.
+    For a full description of the signals, please refer to the 
+    :ref:`developer_guide_to_signals`.
 

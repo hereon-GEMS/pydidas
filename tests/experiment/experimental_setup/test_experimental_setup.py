@@ -101,6 +101,24 @@ class TestExperimentalSetup(unittest.TestCase):
         obj2 = copy.copy(obj)
         self.assertEqual(obj, obj2)
 
+    def test_set_detector_params_from_name__wrong_name(self):
+        obj = ExperimentalSetup()
+        with self.assertRaises(NameError):
+            obj.set_detector_params_from_name('no such detector')
+
+    def test_set_detector_params_from_name(self):
+        _det = {'name': 'Pilatus 300k', 'pixsize': 172, 'npixx' : 487,
+                'npixy': 619}
+        obj = ExperimentalSetup()
+        obj.set_detector_params_from_name(_det['name'])
+        self.assertEqual(obj.get_param_value('detector_name'), _det['name'])
+        self.assertEqual(obj.get_param_value('detector_sizex'),
+                         _det['pixsize'])
+        self.assertEqual(obj.get_param_value('detector_sizey'),
+                         _det['pixsize'])
+        self.assertEqual(obj.get_param_value('detector_npixy'), _det['npixy'])
+        self.assertEqual(obj.get_param_value('detector_npixx'), _det['npixx'])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -109,9 +109,36 @@ class _ExpSetup(ObjectWithParameterCollection):
                 ['max_shape', (self.get_param_value('detector_npixy'),
                                self.get_param_value('detector_npixx'))]
                 ]:
-            if getattr(_det, key) != value:
-                setattr(_det, key, value)
+            setattr(_det, key, value)
         return _det
+
+    def set_detector_params_from_name(self, det_name):
+        """
+        Set the detector parameters based on a detector name.
+
+        This method will query the pyFAI library for the detector parameters
+        and update the internal Parameters.
+
+        Parameters
+        ----------
+        det_name : str
+            The pyFAI name for the detector.
+
+        Raises
+        ------
+        NameError
+            If the specified detector name is unknown by pyFAI.
+        """
+        try:
+            _det = pyFAI.detector_factory(det_name)
+        except RuntimeError:
+            raise NameError(f'The detector name "{det_name}"is unknown to '
+                            'pyFAI.')
+        self.set_param_value('detector_sizey', _det.pixel1 * 1e6)
+        self.set_param_value('detector_sizex', _det.pixel2 * 1e6)
+        self.set_param_value('detector_npixy', _det.max_shape[0]),
+        self.set_param_value('detector_npixx', _det.max_shape[1])
+        self.set_param_value('detector_name', _det.name)
 
     @staticmethod
     def import_from_file(filename):

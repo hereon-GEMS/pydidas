@@ -45,7 +45,7 @@ class _ExpSetup(ObjectWithParameterCollection):
     """
     default_params = get_generic_param_collection(
         'xray_wavelength', 'xray_energy', 'detector_name', 'detector_npixx',
-        'detector_npixy', 'detector_sizex', 'detector_sizey', 'detector_dist',
+        'detector_npixy', 'detector_pxsizex', 'detector_pxsizey', 'detector_dist',
         'detector_poni1', 'detector_poni2', 'detector_rot1', 'detector_rot2',
         'detector_rot3')
 
@@ -104,8 +104,8 @@ class _ExpSetup(ObjectWithParameterCollection):
         except RuntimeError:
             _det = pyFAI.detectors.Detector()
         for key, value in [
-                ['pixel1', self.get_param_value('detector_sizey')],
-                ['pixel2', self.get_param_value('detector_sizex')],
+                ['pixel1', self.get_param_value('detector_pxsizey') * 1e-6],
+                ['pixel2', self.get_param_value('detector_pxsizex') * 1e-6],
                 ['max_shape', (self.get_param_value('detector_npixy'),
                                self.get_param_value('detector_npixx'))]
                 ]:
@@ -134,8 +134,8 @@ class _ExpSetup(ObjectWithParameterCollection):
         except RuntimeError:
             raise NameError(f'The detector name "{det_name}"is unknown to '
                             'pyFAI.')
-        self.set_param_value('detector_sizey', _det.pixel1 * 1e6)
-        self.set_param_value('detector_sizex', _det.pixel2 * 1e6)
+        self.set_param_value('detector_pxsizey', _det.pixel1 * 1e6)
+        self.set_param_value('detector_pxsizex', _det.pixel2 * 1e6)
         self.set_param_value('detector_npixy', _det.max_shape[0]),
         self.set_param_value('detector_npixx', _det.max_shape[1])
         self.set_param_value('detector_name', _det.name)

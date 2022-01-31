@@ -232,7 +232,7 @@ class PyfaiCalibFrame(BaseFrame):
                                      det.shape[1])
         EXP_SETTINGS.set_param_value('detector_npixy',
                                      det.shape[0])
-        EXP_SETTINGS.set_param_value('detector_sizex',
+        EXP_SETTINGS.set_param_value('detector_pxsizex',
                                      det.pixel2)
-        EXP_SETTINGS.set_param_value('detector_sizey',
+        EXP_SETTINGS.set_param_value('detector_pxsizey',
                                      det.pixel1)

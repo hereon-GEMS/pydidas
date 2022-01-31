@@ -1,8 +1,8 @@
 detector_name : Eiger 9M
 detector_npixx : 3110
 detector_npixy : 3269
-detector_sizex : 7.5e-05
-detector_sizey : 7.5e-05
+detector_pxsizex : 75.0
+detector_pxsizey : 75.0
 detector_dist : 0.23588534101905964
 detector_poni1 : 0.11473092977205102
 detector_poni2 : 0.12363511743155756

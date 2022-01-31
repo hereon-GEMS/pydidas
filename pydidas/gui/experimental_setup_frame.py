@@ -176,8 +176,8 @@ class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
             for key, value in [['detector_name', det.name],
                                ['detector_npixx', det.shape[1]],
                                ['detector_npixy', det.shape[0]],
-                               ['detector_sizex', det.pixel2],
-                               ['detector_sizey', det.pixel1]]:
+                               ['detector_pxsizex', det.pixel2],
+                               ['detector_pxsizey', det.pixel1]]:
                 self.update_param_value(key, value)
         elif show_warning:
             critical_warning('No pyFAI Detector',

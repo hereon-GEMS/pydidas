@@ -390,7 +390,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The number of detector pixels in x direction (vertical).'
         },
-    'detector_sizex': {
+    'detector_pxsizex': {
         'type': float,
         'default': -1,
         'name': 'Detector pixel size X',
@@ -398,7 +398,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': 'um',
         'allow_None': False,
         'tooltip': 'The detector pixel size in X-direction.'},
-    'detector_sizey': {
+    'detector_pxsizey': {
         'type': float,
         'default': -1,
         'name': 'Detector pixel size Y',

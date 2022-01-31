@@ -64,8 +64,10 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
             _pdata['detector_config'] = {}
         else:
             _pdata['detector_config'] = dict(
-                pixel1=EXP_SETTINGS.get_param_value('detector_sizey'),
-                pixel2=EXP_SETTINGS.get_param_value('detector_sizex'),
+                pixel1= (1e-6
+                         * EXP_SETTINGS.get_param_value('detector_pxsizey')),
+                pixel2=(1e-6
+                        * EXP_SETTINGS.get_param_value('detector_pxsizex')),
                 max_shape=(EXP_SETTINGS.get_param_value('detector_npixy'),
                            EXP_SETTINGS.get_param_value('detector_npixx')))
         _pdata['wavelength'] = (EXP_SETTINGS.get_param_value('xray_wavelength')
@@ -103,8 +105,8 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
         for key, value in [['detector_name', det.name],
                            ['detector_npixx', det.shape[1]],
                            ['detector_npixy', det.shape[0]],
-                           ['detector_sizex', det.pixel2],
-                           ['detector_sizey', det.pixel1]]:
+                           ['detector_pxsizex', 1e6 * det.pixel2],
+                           ['detector_pxsizey', 1e6 * det.pixel1]]:
             cls.imported_params[key] = value
 
     @classmethod

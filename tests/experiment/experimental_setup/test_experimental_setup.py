@@ -83,18 +83,18 @@ class TestExperimentalSetup(unittest.TestCase):
 
     def test_get_detector__new_name(self):
         _shape = (1000, 1000)
-        _pixelsize = 100e-6
+        _pixelsize = 100
         obj = ExperimentalSetup()
         obj.set_param_value('detector_name', 'No Eiger')
         obj.set_param_value('detector_npixy', _shape[0])
         obj.set_param_value('detector_npixx', _shape[1])
-        obj.set_param_value('detector_sizey', _pixelsize)
-        obj.set_param_value('detector_sizex', _pixelsize)
+        obj.set_param_value('detector_pxsizey', _pixelsize)
+        obj.set_param_value('detector_pxsizex', _pixelsize)
         _det = obj.get_detector()
         self.assertIsInstance(_det, pyFAI.detectors.Detector)
         self.assertEqual(_det.max_shape, _shape)
-        self.assertEqual(_det.pixel1, _pixelsize)
-        self.assertEqual(_det.pixel2, _pixelsize)
+        self.assertEqual(_det.pixel1, 1e-6 * _pixelsize)
+        self.assertEqual(_det.pixel2, 1e-6 * _pixelsize)
 
     def test_copy(self):
         obj = ExperimentalSetup()
@@ -112,9 +112,9 @@ class TestExperimentalSetup(unittest.TestCase):
         obj = ExperimentalSetup()
         obj.set_detector_params_from_name(_det['name'])
         self.assertEqual(obj.get_param_value('detector_name'), _det['name'])
-        self.assertEqual(obj.get_param_value('detector_sizex'),
+        self.assertEqual(obj.get_param_value('detector_pxsizex'),
                          _det['pixsize'])
-        self.assertEqual(obj.get_param_value('detector_sizey'),
+        self.assertEqual(obj.get_param_value('detector_pxsizey'),
                          _det['pixsize'])
         self.assertEqual(obj.get_param_value('detector_npixy'), _det['npixy'])
         self.assertEqual(obj.get_param_value('detector_npixx'), _det['npixx'])

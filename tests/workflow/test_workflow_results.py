@@ -128,6 +128,15 @@ class TestWorkflowResults(unittest.TestCase):
         _res = RES.get_results(0)
         self.assertTrue(np.equal(_res, _tmpres).all())
 
+    def test_get_results_for_flattened_scan(self):
+        _node = 1
+        RES.update_shapes_from_scan_and_workflow()
+        _ndim = RES.ndims[_node] - SCAN.get_param_value('scan_dim') + 1
+        _data = RES.get_results_for_flattened_scan(_node)
+        self.assertEqual(_data.ndim, _ndim)
+        self.assertEqual(_data.shape,
+                         (SCAN.n_total, ) + TREE.nodes[_node]._result_shape)
+
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))
         RES._WorkflowResults__composites[0] = Dataset(_tmpres)

@@ -53,11 +53,7 @@ class _WorkflowResults(QtCore.QObject):
 
     def __init__(self):
         super().__init__()
-        self.__composites = {}
-        self.__source_hash = hash((hash(SCAN), hash(TREE)))
-        self._config = {'shapes': {},
-                        'labels': {},
-                        'metadata_complete': False}
+        self.clear_all_results()
 
     def update_shapes_from_scan_and_workflow(self):
         """
@@ -87,7 +83,11 @@ class _WorkflowResults(QtCore.QObject):
         """
         Clear all interally stored results and reset the instance attributes.
         """
-        self.__init__()
+        self.__composites = {}
+        self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        self._config = {'shapes': {},
+                        'labels': {},
+                        'metadata_complete': False}
 
     def update_frame_metadata(self, metadata):
         """
@@ -214,10 +214,30 @@ class _WorkflowResults(QtCore.QObject):
 
         Returns
         -------
-        np.ndarray
+        pydidas.core.Dataset
             The combined results of all frames for a specific node.
         """
         return self.__composites[node_id]
+
+    def get_results_for_flattened_scan(self, node_id):
+        """
+        Get the combined results for the requested node_id with all scan
+        dimensions flatted into a timeline
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which results should be retured.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The combined results of all frames for a specific node.
+        """
+        _data = self.__composites[node_id].copy()
+        _data.flatten_dims(*range(SCAN.ndim), new_dim_label='Scan timeline',
+                           new_dim_range=np.arange(SCAN.n_total))
+        return _data
 
     def get_result_subset(self, node_id, slices, flattened_scan_dim=False):
         """
@@ -237,13 +257,13 @@ class _WorkflowResults(QtCore.QObject):
 
         Returns
         -------
-        np.ndarray
+        pydidas.core.Dataset
             The subset of the results.
         """
         if flattened_scan_dim:
-            _tmpslices = (tuple(slice(0, SCAN.shape[_i], 1)
-                                for _i in range(SCAN.ndim))
-                          + slices[1:])
+            _tmpslices = (
+                tuple(slice(0, SCAN.shape[_i], 1) for _i in range(SCAN.ndim))
+                + slices[1:])
             _data = self.__composites[node_id][_tmpslices].copy()
             _data.flatten_dims(*range(SCAN.ndim),
                                new_dim_label='Scan timeline',
@@ -272,7 +292,7 @@ class _WorkflowResults(QtCore.QObject):
                  'axis_ranges': self.__composites[node_id].axis_ranges,
                  'metadata': self.__composites[node_id].metadata}
 
-    def save_results_to_disk(self, save_dir, save_formats, overwrite=False):
+    def save_results_to_disk(self, save_dir, *save_formats, overwrite=False):
         """
         Save all results to disk.
 
@@ -286,13 +306,14 @@ class _WorkflowResults(QtCore.QObject):
         save_dir : Union[str, pathlib.Path]
             The basepath for all saved data.
         save_formats : str
-            A string of all formats to be written. Individual formats can be
-            separated by comma (","), ampersand ("&") or slash ("/")
-            characters.
+            Strings of all formats to be written. Individual formats can be
+            also be given in a single string if they are separated by comma
+            (","), ampersand ("&") or slash ("/") characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
         """
-        self.prepare_files_for_saving(save_dir, save_formats, overwrite)
+        self.prepare_files_for_saving(save_dir, ','.join(save_formats),
+                                      overwrite)
         RESULT_SAVER.export_full_data_to_active_savers(self.__composites)
 
     def prepare_files_for_saving(self, save_dir, save_formats,

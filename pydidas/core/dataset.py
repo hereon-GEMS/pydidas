@@ -571,14 +571,14 @@ class EmptyDataset(np.ndarray):
         _repr = (f'{key}: ' if use_key else '') + item.__repr__()
         if isinstance(item, np.ndarray):
             _repr = _repr.replace('\n      ', '')
-            _lines = textwrap.wrap(_repr, initial_indent='', width=60,
+            _lines = textwrap.wrap(_repr, initial_indent='', width=75,
                                    subsequent_indent=' ' * 10)
             _i0 = _lines[0].find(',')
             for _index in range(1, len(_lines)):
                 _ii = _lines[_index].find(',')
                 _lines[_index] = ' ' * (_i0 - _ii) + _lines[_index]
         else:
-            _lines = textwrap.wrap(_repr, initial_indent='', width=60,
+            _lines = textwrap.wrap(_repr, initial_indent='', width=75,
                                    subsequent_indent=' ' * 3)
         return _lines
 

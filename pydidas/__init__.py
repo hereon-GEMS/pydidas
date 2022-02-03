@@ -29,8 +29,8 @@ __status__ = "Development"
 __all__ = []
 
 # import QtWebEngineWidgets first before creating any QApplication because
-# of problem with binding (cannot import engine after application has been
-# created)
+# of problem with python Qt binding (cannot import engine after application
+# has been created)
 from PyQt5 import QtCore, QtWebEngineWidgets
 
 # import sub-packages:
@@ -49,6 +49,7 @@ __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
                 'multiprocessing', 'plugins', 'unittest_objects', 'utils',
                 'widgets', 'workflow'])
 
+
 # Check whether the sphinx documentation has been built and build it if
 # has not:
 if not core.utils.check_sphinx_html_docs():
@@ -58,7 +59,6 @@ if not core.utils.check_sphinx_html_docs():
 # Disable the pyFAI logging to console
 import os
 os.environ['PYFAI_NO_LOGGING'] = '1'
-
 # Change the pyFAI logging level to ERROR and above
 import logging
 pyFAI_azi_logger = logging.getLogger('pyFAI.azimuthalIntegrator')

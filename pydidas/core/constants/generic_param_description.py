@@ -353,8 +353,8 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'unit': 'A',
         'allow_None': False,
-        'tooltip': ('The X-ray wavelength (in Angstrom). Any changes to the '
-                    'wavelength will also update the X-ray energy setting.')},
+        'tooltip': ('The X-ray wavelength. Any changes to the wavelength will'
+                    ' also update the X-ray energy setting.')},
     'xray_energy': {
         'type': float,
         'default': 12.398,
@@ -362,8 +362,8 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'unit': 'keV',
         'allow_None': False,
-        'tooltip': ('The X-ray energy (in keV). Changing this parameter '
-                    'will also update the X-ray wavelength setting.')},
+        'tooltip': ('The X-ray energy. Changing this parameter will also '
+                    'update the X-ray wavelength setting.')},
     'detector_name': {
         'type': str,
         'default': 'detector',
@@ -433,7 +433,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The detector PONI2 (point of normal incidence; in x '
                     'direction). This is measured in meters from the detector'
-                       'origin.')},
+                    'origin.')},
     'detector_rot1': {
         'type': float,
         'default': 0,

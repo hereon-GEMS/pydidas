@@ -173,16 +173,15 @@ class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
             to ignore. True will show the warning. The default is True.
         """
         if det is not None:
-            for key, value in [['detector_name', det.name],
-                               ['detector_npixx', det.shape[1]],
-                               ['detector_npixy', det.shape[0]],
-                               ['detector_pxsizex', det.pixel2],
-                               ['detector_pxsizey', det.pixel1]]:
-                self.update_param_value(key, value)
+            self.update_param_value('detector_name', det.name)
+            self.update_param_value('detector_npixx', det.shape[1])
+            self.update_param_value('detector_npixy', det.shape[0])
+            self.update_param_value('detector_pxsizex', det.pixel2)
+            self.update_param_value('detector_pxsizey', det.pixel1)
         elif show_warning:
             critical_warning('No pyFAI Detector',
-                            'No detector selected in pyFAI. Cannot copy '
-                            'information.')
+                             'No detector selected in pyFAI. Cannot copy '
+                             'information.')
 
     def copy_geometry_from_pyFAI(self, show_warning=True):
         """

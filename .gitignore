@@ -7,5 +7,6 @@ docs/build
 .coverage
 htmlcov
 *.html
+*.svg
 __*
 !__init__.py

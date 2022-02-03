@@ -45,8 +45,8 @@ these values, if required:
     >>> config.set_value('global/mosaic_border_value', 1)
     >>> config.set_value('global/mosaic_max_size', 250)
 
-Set-up of the CompositeCreatorApp parameters
---------------------------------------------
+Setup of the CompositeCreatorApp
+--------------------------------
 
 This section describes the different input Parameters that can be used and gives
 an overview of the :ref:`composite_creator_app_params` at the end of the 

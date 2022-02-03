@@ -3,8 +3,8 @@
 The ExperimentalSetup class
 ===========================
 
-Introduction to the ExperimentalSetup
--------------------------------------
+Introduction
+------------
 
 The :py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>`
 is the pydidas Singleton instance of the ``_ExpSetup`` class. It is

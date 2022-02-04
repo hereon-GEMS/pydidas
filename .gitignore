@@ -8,5 +8,6 @@ docs/build
 htmlcov
 *.html
 *.svg
+!pydidas_logo*.svg
 __*
 !__init__.py

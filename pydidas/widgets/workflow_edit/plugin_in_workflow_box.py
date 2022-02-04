@@ -62,13 +62,13 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.setAutoFillBackground(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
 
-        self.qtw_del_button = QtWidgets.QPushButton(self)
-        self.qtw_del_button.setIcon(self.style().standardIcon(40))
-        self.qtw_del_button.setGeometry(self.widget_width - 20, 2, 18, 18)
-        for item in [self, self.qtw_del_button]:
+        self.del_button = QtWidgets.QPushButton(self)
+        self.del_button.setIcon(self.style().standardIcon(40))
+        self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
+        for item in [self, self.del_button]:
             item.setStyleSheet(
                 qt_presets.QT_STYLES['workflow_plugin_inactive'])
-        self.qtw_del_button.clicked.connect(self.delete)
+        self.del_button.clicked.connect(self.delete)
 
     def mousePressEvent(self, event):
         """

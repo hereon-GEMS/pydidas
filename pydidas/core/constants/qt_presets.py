@@ -44,7 +44,7 @@ for _key, _colors in {'clean_bg': (255, 255, 255),
 
 QT_STYLES = {}
 QT_STYLES['workflow_plugin_active'] = """
-    QLabel{font-size: 12px;
+    QLabel{font-size: 11px;
            font: bold;
            color: rgb(0, 0, 0);
            border: 0px;
@@ -56,7 +56,7 @@ QT_STYLES['workflow_plugin_active'] = """
 QT_STYLES['workflow_plugin_inactive'] = """
     QPushButton{font-size: 11px;
                 color: rgb(65, 65, 65);
-                border: 1px solid rgb(205, 205, 205);}
+                border: 0px solid rgb(205, 205, 205);}
     QLabel{font-size: 11px;
            font: bold;
            color: rgb(60, 60, 60);
@@ -68,8 +68,6 @@ QT_STYLES['workflow_plugin_inactive'] = """
            background: rgb(225, 225, 225);}"""
 QT_STYLES['title'] = """QWidget {font: bold; font-size: 14pt}"""
 QT_STYLES['subtitle'] = """QWidget {font: bold; font-size: 11pt}"""
-QT_STYLES['workflow_plugin_del_button'] = (
-    "QPushButton{font-size: 10px; color: rgb(65, 65, 65);}")
 QT_STYLES['workflow_plugin_title'] = (
     "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}")
 

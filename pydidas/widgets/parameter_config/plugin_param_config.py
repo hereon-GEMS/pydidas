@@ -112,11 +112,11 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
         self.create_label('plugin_name', f'Plugin: {self.plugin.plugin_name}',
                           fontsize=12, fixedWidth=self.FIXED_WIDTH,
                           gridPos=(0, 0, 1, 2))
-        self.create_label('node_id', f'Node id: {self.node_id}', fontsize=12,
+        self.create_label('node_id', f'Node ID: {self.node_id}', fontsize=12,
                           gridPos=(1, 0, 1, 2))
-        self.create_spacer('spacer', gridPos=(-1, 0, 1, 2))
+        self.create_spacer('spacer', gridPos=(2, 0, 1, 2))
         self.create_label('params', 'Parameters:', fontsize=12,
-                          gridPos=(2, 0, 1, 1))
+                          gridPos=(3, 0, 1, 1))
         if self.plugin.has_unique_parameter_config_widget:
             self.layout().add(self.plugin.get_parameter_config_widget())
         else:
@@ -132,14 +132,20 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
         This method will create a button to restore the defaults and connect
         the required slot.
         """
-        but = QtWidgets.QPushButton(self.style().standardIcon(59),
-                                    'Restore default parameters')
-        but.clicked.connect(partial(self.plugin.restore_all_defaults,
-                                    confirm=True))
-        but.clicked.connect(self.update_edits)
-        but.setFixedHeight(25)
-        self.layout().addWidget(but, 2, 1, 1, 1,
-                                QtCore.Qt.AlignRight)
+        self.create_button('restore_defaults', 'Restore default parameters',
+                           icon=self.style().standardIcon(59), fixedHeight=25,
+                           layout_kwargs={'gridPos': (2, 1, 1, 1),
+                                          'alignment': QtCore.Qt.AlignRight})
+        self._widgets['restore_defaults'].clicked.connect(
+            self.__restore_defaults)
+
+    @QtCore.Slot()
+    def __restore_defaults(self):
+        """
+        Restore the default values to all Plugin Parameters.
+        """
+        self.plugin.restore_all_defaults(confirm=True)
+        self.update_edits()
 
     def __get_param_creation_kwargs(self, param):
         """

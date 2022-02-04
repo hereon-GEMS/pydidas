@@ -53,7 +53,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
     **kwargs : dict
         Additional keyword arguments
     """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, param, parent=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
@@ -209,7 +209,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
                      self.config['valign_text'] | self.config['halign_text'])
         return _txtargs, _ioargs, _unitargs
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def __emit_io_changed(self, value):
         """
         Forward the io_changed signal from the IO widget.

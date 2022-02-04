@@ -54,7 +54,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         the user. If None, this defaults to the generic plugin collection.
         The default is None.
     """
-    selection_confirmed = QtCore.pyqtSignal(str)
+    selection_confirmed = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
@@ -79,7 +79,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         self._widgets['plugin_treeview'].selection_confirmed.connect(
             self.__confirm_selection)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def __confirm_selection(self, name):
         """
         Confirm the selection of the plugin to add it to the workflow tree.
@@ -93,7 +93,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
             return
         self.selection_confirmed.emit(name)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def __display_plugin_description(self, name):
         """
         display the plugin description of the selected plugin.

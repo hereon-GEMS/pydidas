@@ -172,8 +172,8 @@ class CompositeCreatorApp(BaseApp):
     parse_func = parse_composite_creator_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
                                            '_bg_image']
-    mp_func_results = QtCore.pyqtSignal(object)
-    updated_composite = QtCore.pyqtSignal()
+    mp_func_results = QtCore.Signal(object)
+    updated_composite = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -514,7 +514,7 @@ class CompositeCreatorApp(BaseApp):
                 low=self.get_param_value('threshold_low'),
                 high=self.get_param_value('threshold_high'))
 
-    @QtCore.pyqtSlot(int, object)
+    @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, image):
         """
         Store the results of the multiprocessing operation.

@@ -100,7 +100,7 @@ class ExecuteWorkflowApp(BaseApp):
     parse_func = parse_execute_workflow_cmdline_arguments
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
                                            '_result_metadata', '_mp_tasks']
-    sig_results_updated = QtCore.pyqtSignal()
+    sig_results_updated = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -370,7 +370,7 @@ class ExecuteWorkflowApp(BaseApp):
         Perform operations after running main parallel processing function.
         """
 
-    @QtCore.pyqtSlot(int, object)
+    @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, data):
         """
         Store the results of the multiprocessing operation.

@@ -102,9 +102,9 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         """
         # need to process True and False explicitly because bool is a subtype
         # of int but the strings 'True' and 'False' cannot be converted to int
-        if text == 'True':
+        if text.upper() == 'TRUE':
             return True
-        if text == 'False':
+        if text.upper() == 'FALSE':
             return False
         if text.upper() == 'NAN':
             return nan

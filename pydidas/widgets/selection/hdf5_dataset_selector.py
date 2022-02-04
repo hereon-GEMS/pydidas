@@ -70,7 +70,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Qt attribute name with a lowercase first character. Examples are
         ``fixedWidth``, ``fixedHeight``.
     """
-    new_frame_signal = QtCore.pyqtSignal(object)
+    new_frame_signal = QtCore.Signal(object)
 
     def __init__(self, parent=None, viewWidget=None, datasetKeyFilters=None,
                  **kwargs):

@@ -99,7 +99,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.set_status('Aborted processing of full workflow.')
         self.__finish_processing()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
@@ -179,7 +179,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.
@@ -191,7 +191,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.__finish_processing()
         self.__update_plot()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __update_result_node_information(self):
         """
         Update the information about the nodes' results after the AppRunner
@@ -204,7 +204,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         except AttributeError:
             pass
 
-    @QtCore.pyqtSlot(bool, int, int, object)
+    @QtCore.Slot(bool, int, int, object)
     def __update_result_selection(self, use_timeline, plot_dim, node_id,
                                   slices):
         """
@@ -229,7 +229,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._config['data_slices'] = slices
         self.__update_plot()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __check_for_plot_update(self):
         _dt = time.time() - self._config['plot_last_update']
         if (_dt > self._config['plot_update_time']
@@ -280,7 +280,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             _plot.setGraphYLabel(_ax_label(0))
             _plot.setGraphXLabel(_ax_label(1))
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def frame_activated(self, index):
         """
         Received a signal that a new frame has been selected.

@@ -58,7 +58,7 @@ class BaseFrame(QtWidgets.QFrame,
     """
     show_frame = True
     menuicon = 'qt-std::7'
-    status_msg = QtCore.pyqtSignal(str)
+    status_msg = QtCore.Signal(str)
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
@@ -78,7 +78,7 @@ class BaseFrame(QtWidgets.QFrame,
         self.ref_name = ''
         self.title = ''
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def frame_activated(self, index):
         """
         Received signal that frame has been activated.

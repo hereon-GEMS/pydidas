@@ -35,8 +35,8 @@ class RadioButtonGroup(QtWidgets.QWidget):
     The RadioButtonGroup is a Widget which can hold a number of QRadioButtons
     in a QButtonGroup. Creation is automated based on the entries.
     """
-    new_button_index = QtCore.pyqtSignal(int)
-    new_button_label = QtCore.pyqtSignal(str)
+    new_button_index = QtCore.Signal(int)
+    new_button_label = QtCore.Signal(str)
 
     def __init__(self, parent=None, entries=None, **kwargs):
         """
@@ -142,7 +142,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
             self._emit_signal = False
         raise ValueError('The new value must be boolean.')
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __toggled(self):
         """
         Perform action after a button was toggled.

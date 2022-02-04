@@ -50,7 +50,7 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         PARAM_INPUT_WIDGET_WIDTH value in the
         pydidas.core.constants.gui_constants module.
     """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_WIDGET_WIDTH):
         super().__init__(parent, param, width)

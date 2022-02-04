@@ -52,7 +52,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         The icon for the button. If None, the standard "file open" icon
         will be used.
     """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=255, button_icon=None):
         super().__init__(parent, param, width)

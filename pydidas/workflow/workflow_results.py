@@ -49,7 +49,7 @@ class _WorkflowResults(QtCore.QObject):
     multiple datasets with multiple dimensions each. Results are referenced
     by the node ID of the data's producer.
     """
-    new_results = QtCore.pyqtSignal()
+    new_results = QtCore.Signal()
 
     def __init__(self):
         super().__init__()

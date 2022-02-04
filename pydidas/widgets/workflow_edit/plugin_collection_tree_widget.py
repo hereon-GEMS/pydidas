@@ -54,8 +54,8 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
     **kwargs : dict
         Additional keyword arguments for widget modifications.
     """
-    selection_changed = QtCore.pyqtSignal(str)
-    selection_confirmed = QtCore.pyqtSignal(str)
+    selection_changed = QtCore.Signal(str)
+    selection_confirmed = QtCore.Signal(str)
 
     def __init__(self, parent=None, collection=None, **kwargs):
         super().__init__(parent)

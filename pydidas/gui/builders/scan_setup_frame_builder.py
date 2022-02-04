@@ -67,10 +67,8 @@ class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
         self.create_button('but_reset', 'Reset all scan settings',
                            gridPos=(-1, 0, 1, 1), alignment=None,
                            icon=self.style().standardIcon(59))
-        self.create_label('scan_dim', '\nScan dimensionality:', fontsize=11,
+        self.create_label('scan_global', '\nGlobal scan parameters:', fontsize=11,
                          bold=True, gridPos=(self.next_row(), 0, 1, 1))
-        self.create_label('scan_name', 'Scan name:', fontsize=11, bold=True,
-                         gridPos=(-1, 0, 1, 1))
 
         self.create_param_widget(
             SCAN_SETTINGS.get_param('scan_dim'), width_text = self.TEXT_WIDTH,

@@ -30,6 +30,7 @@ import pathlib
 
 from PyQt5 import QtWidgets, QtCore
 
+from ...core.constants import HDF5_EXTENSIONS
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 
@@ -38,7 +39,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
      """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=255):
         """
@@ -60,7 +61,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         self._flag_is_output = param.refkey.startswith('output')
         self._flag_is_dir = 'directory' in param.name
         self._file_selection = (
-            'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
+            f'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
             'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'
             )
 

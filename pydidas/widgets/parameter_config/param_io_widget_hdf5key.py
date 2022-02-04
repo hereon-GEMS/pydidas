@@ -40,7 +40,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     (Includes a small button to select a filepath from a dialogue.)
      """
     #for some reason, inhering the signal from the base class does not work
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=255):
         """

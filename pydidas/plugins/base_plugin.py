@@ -107,17 +107,17 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         _doc = (cls.__doc__.strip() if cls.__doc__ is not None
                 else 'No docstring available')
-        _desc = (f'Plugin name: {cls.plugin_name}\n'
-                 f'Class name: {cls.__name__}\n'
-                 f'Plugin type: {ptype[cls.plugin_type]}\n\n'
-                 f'Input data dimension: {_data_dim(cls.input_data_dim)}\n\n'
-                 f'Output data dimension: {_data_dim(cls.output_data_dim)}\n\n'
+        _desc = (f'Plugin name: {cls.plugin_name}\n\n'
                  f'Plugin description:\n{_doc}\n\n'
                  'Parameters:')
         for param in cls.generic_params.values():
             _desc += f'\n{param}'
         for param in cls.default_params.values():
             _desc += f'\n{param}'
+        _desc += (f'Class name: {cls.__name__}\n\n'
+                  f'Plugin type: {ptype[cls.plugin_type]}\n\n'
+                  f'Input data dimension: {_data_dim(cls.input_data_dim)}\n\n'
+                  f'Output data dimension: {_data_dim(cls.output_data_dim)}\n')
         return _desc
 
     @classmethod
@@ -137,14 +137,14 @@ class BasePlugin(ObjectWithParameterCollection):
         _doc = (cls.__doc__.strip() if cls.__doc__ is not None
                 else 'No docstring available')
         return {'Name': cls.plugin_name,
-                'Class name': cls.__name__,
-                'Plugin type': ptype[cls.plugin_type],
-                'Input data dimension': _data_dim(cls.input_data_dim),
-                'Output data dimension': _data_dim(cls.output_data_dim),
                 'Plugin description': _doc,
                 'Parameters': '\n'.join(
                     [str(param) for param in cls.generic_params.values()]
-                    + [str(param) for param in cls.default_params.values()])}
+                    + [str(param) for param in cls.default_params.values()]),
+                'Class name': cls.__name__,
+                'Plugin type': ptype[cls.plugin_type],
+                'Input data dimension': _data_dim(cls.input_data_dim),
+                'Output data dimension': _data_dim(cls.output_data_dim)}
 
     def __init__(self, *args, **kwargs):
         super().__init__()

@@ -121,6 +121,11 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             has not been defined yet.
         """
         _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(name)()
+        # Check if no node is active but the TREE already has nodes.
+        # If True, we will select the last node as active to append the new
+        # node.
+        if self.active_node_id is None and len(TREE.node_ids) > 0:
+            self.active_node_id = TREE.node_ids[-1]
         _parent = TREE.nodes.get(self.active_node_id, None)
         TREE.create_and_add_node(_plugin, parent=_parent)
         _node_id = TREE.node_ids[-1]

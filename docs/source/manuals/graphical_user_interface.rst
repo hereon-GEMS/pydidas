@@ -19,13 +19,21 @@ below:
    area is dockable and can be dragged around and undocked into a floating 
    window.
 
-.. image:: ../../../media/frames/home_01.png
+.. image:: ../images/frames/home_01.png
     :width: 600px
     :align: center
 
 After starting the GUI, the home frame gives links to the documentation and a 
 very brief reminder how to set up the processing pipeline. Different frames can
 be selected by clicking on the corresponding toolbar icons on the left.
+
+Generic GUI tutorials
+---------------------
+
+.. toctree::
+    :maxdepth: 1
+    
+    gui/editing_parameters
 
 .. _gui_frames:
 
@@ -38,6 +46,9 @@ Frames
     frames/data_browsing
     frames/pyfai_calibration
     frames/composite_image_creator
+    frames/experimental_settings
+    frames/scan_settings
+    frames/workflow_edit
 
 .. _gui_recipes:
 

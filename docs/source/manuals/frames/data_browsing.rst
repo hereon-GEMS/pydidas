@@ -7,7 +7,7 @@ to browse the full file system and select files. The right side (2) is used by
 a visualization widget. The implementation is a `silx ImageView widget 
 <http://www.silx.org/doc/silx/latest/modules/gui/plot/imageview.html#module-silx.gui.plot.ImageView>`_\ .
 
-.. image:: ../../../../media/frames/data_browsing_01_overview.png
+.. image::  ../../images/frames/data_browsing_01_overview.png
     :width: 600px
     :align: center
     
@@ -43,7 +43,7 @@ The hdf5 data selection widget
 
 The hdf5 data selection widget is shown below.
 
-.. image:: ../../../../media/frames/data_browsing_02_hdf5.png
+.. image::  ../../images/frames/data_browsing_02_hdf5.png
     :width: 600px
     :align: center
 
@@ -81,7 +81,7 @@ The `ImageView <http://www.silx.org/doc/silx/latest/modules/gui/plot/imageview.h
 widget is part of the ESRF `silx <https://github.com/silx-kit/silx>`_ library.
 It has 5 main parts which are shown in the screenshot below.
 
- .. image:: ../../../../media/frames/data_browsing_03_imageview.png
+ .. image::  ../../images/frames/data_browsing_03_imageview.png
     :width: 600px
     :align: center
 

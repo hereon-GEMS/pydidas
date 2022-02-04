@@ -1,3 +1,5 @@
+.. _pyfai_calib_frame:
+
 pyFAI calibration frame
 =======================
 

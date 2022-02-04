@@ -165,6 +165,7 @@ yield the same object:
     >>> SCAN == SCAN2
     True
     
+.. _global_plugincollection:
 
 PluginCollection
 ^^^^^^^^^^^^^^^^
@@ -187,7 +188,7 @@ reference to the persistent PluginCollection object can be obtained using:
     :py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
     This section handles only the most common use cases.
 
-Management of stores paths
+Management of stored paths
 """"""""""""""""""""""""""
 
 Paths can be managed by three methods. New paths can be added using the 

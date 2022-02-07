@@ -24,19 +24,25 @@ __status__ = "Development"
 
 
 import unittest
+import os
+import shutil
+import tempfile
 from numbers import Real
 
 import numpy as np
+import h5py
 
 from pydidas.core import Dataset, get_generic_parameter, Parameter
 from pydidas.experiment import ScanSetup
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 
 
 SCAN = ScanSetup()
 TREE = WorkflowTree()
 RES = WorkflowResults()
+SAVER = WorkflowResultSaverMeta
 
 
 class TestWorkflowResults(unittest.TestCase):
@@ -45,10 +51,10 @@ class TestWorkflowResults(unittest.TestCase):
         self.set_up_scan()
         self.set_up_tree()
         RES.clear_all_results()
+        self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
-        # RES.clear_all_results()
-        ...
+        shutil.rmtree(self._tmpdir)
 
     def set_up_scan(self):
         self._scan_n = (21, 3, 7)
@@ -92,11 +98,13 @@ class TestWorkflowResults(unittest.TestCase):
                         axis_labels=['dim1', '2nd dim', 'dim #3'],
                         axis_ranges=[12 + np.arange(_shape2[0]), None, None])
         _results = {1: _res1, 2: _res2}
-        RES._WorkflowResults__composites[1] = (
-            Dataset(np.zeros(self._scan_n + _shape1)))
-        RES._WorkflowResults__composites[2] = (
-            Dataset(np.zeros(self._scan_n + _shape2)))
         return _shape1, _shape2, _results
+
+    def create_composites(self):
+        RES._WorkflowResults__composites[1] = (
+            Dataset(np.zeros(self._scan_n + self._input_shape)))
+        RES._WorkflowResults__composites[2] = (
+            Dataset(np.zeros(self._scan_n + self._result2_shape)))
 
     def generate_test_metadata(self):
         _shape1 = self._input_shape
@@ -122,6 +130,71 @@ class TestWorkflowResults(unittest.TestCase):
     def test_init(self):
         ...
 
+    def test_prepare_files_for_saving__simple(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        RES.prepare_files_for_saving(self._tmpdir, 'HDF5')
+        _files = os.listdir(self._tmpdir)
+        self.assertIn('node_01.h5', _files)
+        self.assertIn('node_02.h5', _files)
+
+    def test_prepare_files_for_saving__single_node(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        RES.prepare_files_for_saving(self._tmpdir, 'HDF5', single_node=1)
+        _files = os.listdir(self._tmpdir)
+        self.assertIn('node_01.h5', _files)
+        self.assertNotIn('node_02.h5', _files)
+
+    def test_prepare_files_for_saving__w_existing_file_no_overwrite(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        with open(os.path.join(self._tmpdir, 'test.txt'), 'w') as _file:
+            _file.write('test')
+        with self.assertRaises(FileExistsError):
+            RES.prepare_files_for_saving(self._tmpdir, 'HDF5')
+
+    def test_prepare_files_for_saving__w_existing_file_w_overwrite(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        with open(os.path.join(self._tmpdir, 'test.txt'), 'w') as _file:
+            _file.write('test')
+        RES.prepare_files_for_saving(self._tmpdir, 'HDF5', overwrite=True)
+        _files = os.listdir(self._tmpdir)
+        self.assertIn('node_01.h5', _files)
+        self.assertIn('node_02.h5', _files)
+
+    def test_prepare_files_for_saving__w_nonexisting_dir(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        shutil.rmtree(self._tmpdir)
+        RES.prepare_files_for_saving(self._tmpdir, 'HDF5')
+        _files = os.listdir(self._tmpdir)
+        self.assertIn('node_01.h5', _files)
+        self.assertIn('node_02.h5', _files)
+
+
+    def test_save_results_to_disk__simple(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        RES.save_results_to_disk(self._tmpdir, 'HDF5')
+        with h5py.File(os.path.join(self._tmpdir, 'node_01.h5'), 'r') as f:
+            _shape1 = f['entry/data/data'].shape
+        with h5py.File(os.path.join(self._tmpdir, 'node_02.h5'), 'r') as f:
+            _shape2 = f['entry/data/data'].shape
+        self.assertEqual(_shape1, RES.shapes[1])
+        self.assertEqual(_shape2, RES.shapes[2])
+
+    def test_save_results_to_disk__single_node(self):
+        RES.update_shapes_from_scan_and_workflow()
+        self.create_composites()
+        RES.save_results_to_disk(self._tmpdir, 'HDF5', node_id=1)
+        with h5py.File(os.path.join(self._tmpdir, 'node_01.h5'), 'r') as f:
+            _shape1 = f['entry/data/data'].shape
+        self.assertEqual(_shape1, RES.shapes[1])
+        self.assertFalse(
+            os.path.exists(os.path.join(self._tmpdir, 'node_02.h5')))
+
     def test_get_results(self):
         _tmpres = np.random.random((50, 50))
         RES._WorkflowResults__composites[0] = _tmpres
@@ -135,7 +208,7 @@ class TestWorkflowResults(unittest.TestCase):
         _data = RES.get_results_for_flattened_scan(_node)
         self.assertEqual(_data.ndim, _ndim)
         self.assertEqual(_data.shape,
-                         (SCAN.n_total, ) + TREE.nodes[_node]._result_shape)
+                          (SCAN.n_total, ) + TREE.nodes[_node]._result_shape)
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))
@@ -184,8 +257,8 @@ class TestWorkflowResults(unittest.TestCase):
         _res = RES.get_result_subset(_node_id, _slice, flattened_scan_dim=True)
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape,
-                         (self._scan_n[0] - 3, self._result2_shape[1] - 1,
-                         self._result2_shape[2]))
+                          (self._scan_n[0] - 3, self._result2_shape[1] - 1,
+                          self._result2_shape[2]))
 
     def test_shapes__empty(self):
         self.assertEqual(RES.shapes, {})
@@ -204,10 +277,11 @@ class TestWorkflowResults(unittest.TestCase):
         _ndims = RES.ndims
         self.assertEqual(_ndims[1], len(self._input_shape) + len(self._scan_n))
         self.assertEqual(_ndims[2],
-                         len(self._result2_shape) + len(self._scan_n))
+                          len(self._result2_shape) + len(self._scan_n))
 
     def test_update_composite_metadata(self):
         _shape1, _shape2, _results = self.generate_test_datasets()
+        self.create_composites()
         RES._WorkflowResults__update_composite_metadata(_results)
         for j in [1, 2]:
             for i in range(0, _results[j].ndim):
@@ -223,20 +297,17 @@ class TestWorkflowResults(unittest.TestCase):
         RES._config['metadata_complete'] = True
         _index = 247
         _shape1, _shape2, _results = self.generate_test_datasets()
-        RES._WorkflowResults__composites[1] = (
-            Dataset(np.zeros(self._scan_n + _shape1)))
-        RES._WorkflowResults__composites[2] = (
-            Dataset(np.zeros(self._scan_n + _shape2)))
+        self.create_composites()
         RES._WorkflowResults__update_composite_metadata(_results)
 
         RES.store_results(_index, _results)
         _scan_indices = SCAN.get_frame_position_in_scan(_index)
         self.assertTrue(
             np.equal(_results[1],
-                     RES._WorkflowResults__composites[1][_scan_indices]).all())
+                      RES._WorkflowResults__composites[1][_scan_indices]).all())
         self.assertTrue(
             np.equal(_results[2],
-                     RES._WorkflowResults__composites[2][_scan_indices]).all())
+                      RES._WorkflowResults__composites[2][_scan_indices]).all())
 
     def test_store_results__no_previous_metadata(self):
         _index = 247
@@ -250,10 +321,10 @@ class TestWorkflowResults(unittest.TestCase):
         _scan_indices = SCAN.get_frame_position_in_scan(_index)
         self.assertTrue(
             np.equal(_results[1],
-                     RES._WorkflowResults__composites[1][_scan_indices]).all())
+                      RES._WorkflowResults__composites[1][_scan_indices]).all())
         self.assertTrue(
             np.equal(_results[2],
-                     RES._WorkflowResults__composites[2][_scan_indices]).all())
+                      RES._WorkflowResults__composites[2][_scan_indices]).all())
         self.assertTrue(RES._config['metadata_complete'])
 
     def test_update_frame_metadata(self):

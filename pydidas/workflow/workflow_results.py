@@ -49,7 +49,7 @@ class _WorkflowResults(QtCore.QObject):
     multiple datasets with multiple dimensions each. Results are referenced
     by the node ID of the data's producer.
     """
-    new_results = QtCore.Signal()
+    new_results = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -292,14 +292,18 @@ class _WorkflowResults(QtCore.QObject):
                  'axis_ranges': self.__composites[node_id].axis_ranges,
                  'metadata': self.__composites[node_id].metadata}
 
-    def save_results_to_disk(self, save_dir, *save_formats, overwrite=False):
+    def save_results_to_disk(self, save_dir, *save_formats, overwrite=False,
+                             node_id=None):
         """
-        Save all results to disk.
+        Save results to disk.
 
-        This method saves all results to disk using the specified formats and
-        directory.
+        By default, this method saves all results to disk using the specified
+        formats and directory.
         Note that the directory needs to be empty (or non-existing) if
         the overwrite keyword is not set.
+
+        Results from a single node can be saved by passing a value for the
+        node_id keyword.
 
         Parameters
         ----------
@@ -311,13 +315,20 @@ class _WorkflowResults(QtCore.QObject):
             (","), ampersand ("&") or slash ("/") characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
+        node_id : Union[None, int], optional
+            The node ID for which data shall be saved. If None, this defaults
+            to all nodes. The default is None.
         """
         self.prepare_files_for_saving(save_dir, ','.join(save_formats),
-                                      overwrite)
-        RESULT_SAVER.export_full_data_to_active_savers(self.__composites)
+                                      overwrite, single_node=node_id)
+        if node_id is None:
+            _res = self.__composites
+        else:
+            _res = {node_id: self.__composites[node_id]}
+        RESULT_SAVER.export_full_data_to_active_savers(_res)
 
     def prepare_files_for_saving(self, save_dir, save_formats,
-                                 overwrite=False):
+                                 overwrite=False, single_node=None):
         """
         Prepare the required files and directories for saving.
 
@@ -334,6 +345,9 @@ class _WorkflowResults(QtCore.QObject):
             characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
+        single_node: Union[None, int]
+            Keyword to select a single node. If None, all nodes will be
+            selected. The default is None.
 
         Raises
         ------
@@ -341,19 +355,25 @@ class _WorkflowResults(QtCore.QObject):
             If the directory exists and is not empty and overwrite is not
             enabled.
         """
-        _name = SCAN.get_param_value('scan_name')
         if (os.path.exists(save_dir) and len(os.listdir(save_dir)) > 0
                 and not overwrite):
             raise FileExistsError(f'The specified directory "{save_dir}" '
                                   'exists and is not empty. Please select'
                                   ' a different directory.')
-        self._config['save_dir'] = save_dir
+        if single_node is None:
+            _shapes = self.shapes
+            _labels = self.labels
+        else:
+            _shapes = {single_node: self.shapes[single_node]}
+            _labels = {single_node: self.labels[single_node]}
+        # TODO  : check if the commented line can be deleted
+        # self._config['save_dir'] = save_dir
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         save_formats = [s.strip() for s in re.split('&|/|,', save_formats)]
+        _name = SCAN.get_param_value('scan_name')
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
-        RESULT_SAVER.prepare_active_savers(save_dir, self.shapes,
-                                           self.labels)
+        RESULT_SAVER.prepare_active_savers(save_dir, _shapes, _labels)
 
     def update_param_choices_from_labels(self, param,
                                          add_no_selection_entry=True):

@@ -62,10 +62,12 @@ def update_frame_metadata(saver, metadata):
 class TestWorkflowResultsSaverMeta(unittest.TestCase):
 
     def setUp(self):
+        self._meta_registry = META.registry.copy()
         META.reset()
 
     def tearDown(self):
         META.reset()
+        META.registry = self._meta_registry
 
     def create_saver_class(self, title, ext):
         _cls = META(title.upper(), (WorkflowResultSaverBase, ),

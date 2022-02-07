@@ -40,6 +40,7 @@ META = WorkflowResultSaverMeta
 class TestWorkflowResultSaverBase(unittest.TestCase):
 
     def setUp(self):
+        self._meta_registry = META.registry.copy()
         META.reset()
         class SAVER(WorkflowResultSaverBase):
             extensions = ['TEST']
@@ -48,6 +49,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
 
     def tearDown(self):
         META.reset()
+        META.registry = self._meta_registry.copy()
 
     def test_class_existance(self):
         self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)

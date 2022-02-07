@@ -44,17 +44,20 @@ git checkout gh-pages
 ECHO Checkout out gh-pages branch
 rem Powershell		del ../%%a -r -force
 rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
-FOR /f %%a in ('dir .. /b') DO (
-	IF %%a NEQ docs (
-		ECHO Deleting object %%a
+CD ..
+FOR /f %%a in ('dir /b') DO (
+	IF %%a NEQ docs (	
 		IF EXIST %%a\NUL (
-			rmdir "..\%%a" /s/q 2>NUL 
+            ECHO Deleting directory %%a
+			rmdir %%a /s /q 
 		)
 		IF EXIST %%a (
-			del "..\%%a" /s/q >NUL
+            ECHO Deleting file %%a
+			del %%a /s /q
 		)	
 	)
 )
+CD docs
 ECHO Deleted local files
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD

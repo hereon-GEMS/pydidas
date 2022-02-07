@@ -91,7 +91,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     The ResultSelectorForOutput offers the following signal which can be
     used:
 
-        new_selection : QtCore.Signal(use_timeline : int, scan_dim : int,\
+        new_selection : QtCore.pyqtSignal(use_timeline : int, scan_dim : int,\
                                           active_node : int, selection : tuple)
             The signal signature is: flag to use timeline or scan shape,
             plot dimension, node ID of the active node, the selection in form
@@ -106,7 +106,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         The select_results Parameter instance. This instance should be
         shared between the ResultSelectorForOutput and the parent.
     """
-    new_selection = QtCore.Signal(bool, int, int, object)
+    new_selection = QtCore.pyqtSignal(bool, int, int, object)
 
     default_params = ParameterCollection(
         Parameter('n_dim', int, -1, name='Total result dimensionality'),
@@ -207,7 +207,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self._widgets['radio_arrangement'].select_by_index(0)
         self.__set_derived_widget_visibility(False)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def get_and_store_result_node_labels(self):
         """
         Get and store the labels of the current nodes in the WorkflowResults.
@@ -224,7 +224,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self.param_widgets['selected_results'].setCurrentText(
                 _param.value)
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def __new_selection_of_plot_dimension(self, index):
         """
         Update the selection
@@ -259,7 +259,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                      and _dim not in _frozendims))
             self.param_composite_widgets[_refkey].setVisible(_vis)
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def __selected_new_node(self, index):
         """
         Received signal that the selection in the results Parameter has
@@ -358,7 +358,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                          f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n')
                         for _axis in _ax_labels])
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def __new_selection_of_scan_result_arrangement(self, index):
         """
         Get and store the current selection for the organization of the
@@ -378,7 +378,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         self.__update_dim_choices_for_plot_selection()
         self.__change_slice_param_widget_visibility()
 
-    @QtCore.Slot(int, str)
+    @QtCore.pyqtSlot(int, str)
     def __selected_new_plot_axis(self, plot_axis, new_dim):
         """
         Perform operations after a new plot axis has been selected.
@@ -408,7 +408,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                 _other_param.value)
         self.__change_slice_param_widget_visibility()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __confirm_selection(self):
         """
         Confirm the selection of axes for the plot and sends a signal.

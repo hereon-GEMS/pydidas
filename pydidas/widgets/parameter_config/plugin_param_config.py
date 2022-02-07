@@ -139,7 +139,7 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
         self._widgets['restore_defaults'].clicked.connect(
             self.__restore_defaults)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __restore_defaults(self):
         """
         Restore the default values to all Plugin Parameters.

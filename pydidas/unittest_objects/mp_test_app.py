@@ -148,7 +148,7 @@ class MpTestApp(BaseApp):
         _image = get_test_image(_fname, **_kwargs)
         return _image
 
-    @QtCore.Slot(int, object)
+    @QtCore.pyqtSlot(int, object)
     def multiprocessing_store_results(self, index, image):
         """
         Store the result of the multiprocessing function call.

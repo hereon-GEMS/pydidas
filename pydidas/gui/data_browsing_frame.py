@@ -66,7 +66,7 @@ class DataBrowsingFrame(BaseFrame, DataBrowsingFrame_BuilderMixin):
             partial(self.change_splitter_pos, True))
         self.__selection_width = self._widgets['selection'].width()
 
-    @QtCore.Slot(bool)
+    @QtCore.pyqtSlot(bool)
     def change_splitter_pos(self, enlarge_dir=True):
         """
         Change the position of the window splitter to one of two predefined
@@ -85,7 +85,7 @@ class DataBrowsingFrame(BaseFrame, DataBrowsingFrame_BuilderMixin):
         else:
             self._widgets['splitter'].moveSplitter(300, 1)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __file_highlighted(self):
         """
         Perform actions after a file has been highlighted in the
@@ -97,7 +97,7 @@ class DataBrowsingFrame(BaseFrame, DataBrowsingFrame_BuilderMixin):
             _name = os.path.dirname(_name)
         self.q_settings.setValue('directory_explorer/path', _name)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __file_selected(self):
         """
         Open a file after sit has been selected in the DirectoryExplorer.

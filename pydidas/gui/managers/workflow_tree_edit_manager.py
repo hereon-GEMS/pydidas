@@ -53,8 +53,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     similar methods in WorkflowTreeEditManager class. This class should only
     be used by the WorkflowTreeEditManager to manage the widget aspect.
     """
-    plugin_to_edit = QtCore.Signal(int)
-    plugin_to_delete = QtCore.Signal(int)
+    plugin_to_edit = QtCore.pyqtSignal(int)
+    plugin_to_delete = QtCore.pyqtSignal(int)
     pos_x_min = 5
     pos_y_min = 5
 
@@ -171,7 +171,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _widget.setVisible(True)
         self._node_widgets[node_id] = _widget
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def set_active_node(self, node_id, force_update=False):
         """
         Set the node with node_id to be the active node.

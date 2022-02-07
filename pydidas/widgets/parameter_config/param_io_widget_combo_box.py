@@ -39,7 +39,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
     choices.
     """
     #because of the double inheritance, inhering the signal does not work
-    io_edited = QtCore.Signal(str)
+    io_edited = QtCore.pyqtSignal(str)
 
     def __init__(self, parent, param, width=255):
         """

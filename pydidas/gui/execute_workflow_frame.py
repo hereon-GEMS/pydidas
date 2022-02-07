@@ -87,6 +87,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             self.__update_autosave_widget_visibility)
         self._widgets['but_exec'].clicked.connect(self.__execute)
         self._widgets['but_abort'].clicked.connect(self.__abort_execution)
+        self._widgets['but_export_current'].clicked.connect(
+            self.__export_current)
+        self._widgets['but_export_all'].clicked.connect(
+            self.__export_all)
         self._widgets['result_selector'].new_selection.connect(
             self.__update_result_selection)
 
@@ -99,7 +103,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.set_status('Aborted processing of full workflow.')
         self.__finish_processing()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
@@ -179,7 +183,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.
@@ -191,7 +195,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.__finish_processing()
         self.__update_plot()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __update_result_node_information(self):
         """
         Update the information about the nodes' results after the AppRunner
@@ -204,7 +208,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         except AttributeError:
             pass
 
-    @QtCore.Slot(bool, int, int, object)
+    @QtCore.pyqtSlot(bool, int, int, object)
     def __update_result_selection(self, use_timeline, plot_dim, node_id,
                                   slices):
         """
@@ -229,7 +233,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._config['data_slices'] = slices
         self.__update_plot()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def __check_for_plot_update(self):
         _dt = time.time() - self._config['plot_last_update']
         if (_dt > self._config['plot_update_time']
@@ -270,17 +274,42 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         elif _dim == 2:
             if not isinstance(_data.axis_ranges[1], np.ndarray):
                 _data.axis_ranges[1] = np.arange(_data.shape[1])
-            _origin = (_data.axis_ranges[1][0], _data.axis_ranges[0][0])
-            _scale_y = ((_data.axis_ranges[0][-1] - _data.axis_ranges[0][0])
-                        / _data.axis_ranges[0].size)
-            _scale_x = ((_data.axis_ranges[1][-1] - _data.axis_ranges[1][0])
-                        / _data.axis_ranges[1].size)
-            _plot.addImage(_data, replace=True, copy=False, origin=_origin,
-                           scale=(_scale_x, _scale_y))
+
+            _originx, _scalex = self.__get_2d_plot_ax_settings(
+                _data.axis_ranges[1])
+            _originy, _scaley = self.__get_2d_plot_ax_settings(
+                _data.axis_ranges[0])
+            _plot.addImage(_data, replace=True, copy=False,
+                           origin=(_originx, _originy),
+                           scale=(_scalex, _scaley))
             _plot.setGraphYLabel(_ax_label(0))
             _plot.setGraphXLabel(_ax_label(1))
 
-    @QtCore.Slot(int)
+    @staticmethod
+    def __get_2d_plot_ax_settings(axis):
+        """
+        Get the
+
+        Parameters
+        ----------
+        axis : np.ndarray
+            The numpy array with the axis positions.
+
+        Returns
+        -------
+        _origin : float
+            The value for the axis origin.
+        _scale : float
+            The value for the axis scale to squeeze it into the correct
+            dimensions for silx ImageView.
+        """
+        _delta = axis[1] - axis[0]
+        _scale = (axis[-1] - axis[0] + _delta) / axis.size
+        _origin = axis[0] - _delta / 2
+        return _origin, _scale
+
+
+    @QtCore.pyqtSlot(int)
     def frame_activated(self, index):
         """
         Received a signal that a new frame has been selected.
@@ -320,7 +349,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._widgets['but_exec'].setEnabled(not running)
         self._widgets['but_abort'].setVisible(running)
         self._widgets['progress'].setVisible(running)
-        self._widgets['but_save'].setEnabled(not running)
+        self._widgets['but_save_image'].setEnabled(not running)
 
     def __run_cmd_process(self):
         """
@@ -344,3 +373,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         _vis = self.get_param_value('autosave_results')
         for _key in ['autosave_dir', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)
+
+    def __export_current(self):
+
+        _node = self._config['active_node']

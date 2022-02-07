@@ -277,23 +277,23 @@ class MainWindow(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions['open_documentation_browser'])
         _menu.addMenu(_help_menu)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_new_workflow(self):
         print('New workflow')
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_load_workflow_tree(self):
         print('load workflow')
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_load_exp_setup(self):
         print('load exp setup')
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_load_scan_setup(self):
         print('load scan setup')
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_open_doc_in_browser(self):
         """
         Open the link to the documentation in the system web browser.
@@ -449,7 +449,7 @@ class MainWindow(QtWidgets.QMainWindow):
             index=frame.frame_index,
             menus=_new_menus)
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def select_item(self, label):
         """
         Select an item from the left toolbar and select the corresponding
@@ -492,7 +492,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._child_windows[window].close()
         event.accept()
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def update_status(self, text):
         """
         Get a text message and show it in the global status widget.
@@ -511,7 +511,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.__info_widget.add_status(text)
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def show_window(self, name):
         """
         Show a separate window.

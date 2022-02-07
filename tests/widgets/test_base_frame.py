@@ -31,7 +31,7 @@ from pydidas.widgets.base_frame import BaseFrame
 
 
 class TestClass(QtCore.QObject):
-    signal = QtCore.Signal(int)
+    signal = QtCore.pyqtSignal(int)
 
     def __init__(self):
         super().__init__()

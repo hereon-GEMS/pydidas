@@ -71,19 +71,19 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
         self._actions['undo'].triggered.connect(self._action_undo)
         self._actions['redo'].triggered.connect(self._action_redo)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_home(self):
         """
         Goto the documentation homepage.
         """
         self._webview.load_main_doc()
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_undo(self):
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Back)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _action_redo(self):
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Forward)

@@ -53,7 +53,7 @@ class BaseFrameWithApp(BaseFrame):
         If False, no layout will be initialized and the subclass is
         responsible for setting up the layout. The default is True.
     """
-    status_msg = QtCore.Signal(str)
+    status_msg = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None, **kwargs):
         init_layout = kwargs.get('init_layout', True)
@@ -62,7 +62,7 @@ class BaseFrameWithApp(BaseFrame):
         self._runner = None
         self._app_attributes_to_update = []
 
-    @QtCore.Slot(object)
+    @QtCore.pyqtSlot(object)
     def _set_app(self, app):
         """
         Update the local copy of the App after the AppRunner computations.
@@ -86,7 +86,7 @@ class BaseFrameWithApp(BaseFrame):
             _att_val = getattr(app, att)
             setattr(self._app, att, _att_val)
 
-    @QtCore.Slot(float)
+    @QtCore.pyqtSlot(float)
     def _apprunner_update_progress(self, progress):
         """
         Update the progress of the AppRunner.
@@ -100,7 +100,7 @@ class BaseFrameWithApp(BaseFrame):
             _progress = round(progress * 100)
             self._widgets['progress'].setValue(_progress)
 
-    @QtCore.Slot()
+    @QtCore.pyqtSlot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.

@@ -51,9 +51,9 @@ class WorkerController(QtCore.QThread):
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     """
-    sig_progress = QtCore.Signal(float)
-    sig_results = QtCore.Signal(int, object)
-    sig_finished = QtCore.Signal()
+    sig_progress = QtCore.pyqtSignal(float)
+    sig_results = QtCore.pyqtSignal(int, object)
+    sig_finished = QtCore.pyqtSignal()
 
     def __init__(self, n_workers=None):
         super().__init__()

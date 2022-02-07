@@ -33,8 +33,8 @@ from pydidas.widgets.base_frame_with_app import BaseFrameWithApp
 
 
 class TestClass(QtCore.QObject):
-    signal = QtCore.Signal(float)
-    simple_signal = QtCore.Signal()
+    signal = QtCore.pyqtSignal(float)
+    simple_signal = QtCore.pyqtSignal()
 
     def __init__(self):
         super().__init__()

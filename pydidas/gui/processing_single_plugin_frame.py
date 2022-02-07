@@ -103,7 +103,7 @@ class ProcessingSinglePluginFrame(BaseFrame,
                       "dim1: -10 to 5 (150 samples)",
                       "dim2: -5 to 10 (120 samples)"])
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def __use_scan_pos_for_selection(self, use_scan_pos):
         """
         Get the signal to use scan position or image number for selection
@@ -128,7 +128,7 @@ class ProcessingSinglePluginFrame(BaseFrame,
     def click_execute_plugin(self):
         ...
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def selected_plugin(self, text):
         """
         Perform all required steps after a new plugin has been selected-
@@ -143,7 +143,7 @@ class ProcessingSinglePluginFrame(BaseFrame,
         self._widgets['plugin_info'].setText(text)
         ...
 
-    @QtCore.Slot(int)
+    @QtCore.pyqtSlot(int)
     def frame_activated(self, index):
         """
         Received a signal that a new frame has been selected.

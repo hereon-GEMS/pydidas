@@ -56,17 +56,17 @@ class AppRunner(WorkerController):
 
     The AppRunner has the following signals which can be connected to:
 
-    progress : QtCore.Signal(float)
+    progress : QtCore.pyqtSignal(float)
         This singal emits the current relative progress in the interval (0..1)
         in the computations, based on the number of returned results relative
         to the total tasks.
-    results : QtCore.Signal(int, object)
+    results : QtCore.pyqtSignal(int, object)
         The results as returned from the multiprocessing Processes.
-    finished : QtCore.Signal()
+    finished : QtCore.pyqtSignal()
         This signal is emitted when the computations are finished. If the
         AppRunner is running headless, it needs to be connected to the
         app.exit slot to finish the event loop.
-    final_app_state : QtCore.Signal(object)
+    final_app_state : QtCore.pyqtSignal(object)
         This signal emits a copy of the App after all the calculations have
         been performed if it needs to be used in another context.
 
@@ -78,10 +78,10 @@ class AppRunner(WorkerController):
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
     """
-    sig_progress = QtCore.Signal(float)
-    sig_results = QtCore.Signal(int, object)
-    sig_finished = QtCore.Signal()
-    sig_final_app_state = QtCore.Signal(object)
+    sig_progress = QtCore.pyqtSignal(float)
+    sig_results = QtCore.pyqtSignal(int, object)
+    sig_finished = QtCore.pyqtSignal()
+    sig_final_app_state = QtCore.pyqtSignal(object)
 
     def __init__(self, app, n_workers=None):
         logger.debug('Starting AppRunner')
@@ -194,7 +194,7 @@ class AppRunner(WorkerController):
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.get_copy())
 
-    @QtCore.Slot(float)
+    @QtCore.pyqtSlot(float)
     def __check_progress(self, progress):
         """
         Check the progress and send the signal to stop the loop if all

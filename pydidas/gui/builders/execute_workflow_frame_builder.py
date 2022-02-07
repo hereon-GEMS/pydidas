@@ -138,17 +138,24 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
             parent_widget=self._widgets['config'], gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param('selected_results'))
 
-        self.create_button('but_save', 'Save composite image', enabled=False,
-                            gridPos=(-1, 0, 1, 1),
-                            fixedWidth=CONFIG_WIDGET_WIDTH,
-                            parent_widget=self._widgets['config'])
+        self.create_button('but_export_current', 'Export current node results',
+                            # TODO : change enabled to false
+                           enabled=True, gridPos=(-1, 0, 1, 1),
+                           fixedWidth=CONFIG_WIDGET_WIDTH,
+                           parent_widget=self._widgets['config'])
+
+        self.create_button('but_export_all', 'Export all results',
+                            # TODO : change enabled to false
+                           enabled=True, gridPos=(-1, 0, 1, 1),
+                           fixedWidth=CONFIG_WIDGET_WIDTH,
+                           parent_widget=self._widgets['config'])
 
         self.create_spacer('config_terminal_spacer', height=20,
-                            gridPos=(-1, 0, 1, 1),
-                            parent_widget=self._widgets['config'])
+                           gridPos=(-1, 0, 1, 1),
+                           parent_widget=self._widgets['config'])
 
         self.create_spacer('menu_bottom_spacer', height=20,
-                            gridPos=(-1, 0, 1, 1))
+                           gridPos=(-1, 0, 1, 1))
 
         self._widgets['plot1d'] = Plot1D()
         self._widgets['plot2d'] = Plot2D()

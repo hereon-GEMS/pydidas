@@ -39,7 +39,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
      """
-    io_edited = QtCore.Signal(str)
+    io_edited = QtCore.pyqtSignal(str)
 
     def __init__(self, parent, param, width=255):
         """

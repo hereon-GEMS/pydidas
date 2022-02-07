@@ -112,7 +112,7 @@ class HomeFrame(BaseFrame):
             openExternalLinks=True, textFormat=QtCore.Qt.RichText,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse)
 
-    @QtCore.Slot(str)
+    @QtCore.pyqtSlot(str)
     def open_link(self, link_str):
         """
         Open a link in the system's default browser.

@@ -31,7 +31,7 @@ from pydidas.core.utils import SignalBlocker
 
 
 class Tester(QtCore.QObject):
-    sig = QtCore.Signal(object)
+    sig = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super().__init__()

@@ -35,6 +35,7 @@ class WorkflowResultSaverBase(GenericIoBase,
     Base class for WorkflowTree exporters.
     """
     extensions = []
+    default_extension = ''
     format_name = 'unknown'
     scan_title = ''
 
@@ -56,7 +57,7 @@ class WorkflowResultSaverBase(GenericIoBase,
         """
 
     @classmethod
-    def get_directory_names_from_labels(cls, labels):
+    def get_filenames_from_labels(cls, labels):
         """
         Get the directory names from labels.
 
@@ -75,14 +76,14 @@ class WorkflowResultSaverBase(GenericIoBase,
             The dictionary of possible directory names.
         """
         _names = {}
-        for _node_id, _label in labels.items():
-            if _label is None:
-                _names[_node_id] = f'node_{_node_id:02d}_{cls.format_name}'
+        for _id, _label in labels.items():
+            if _label is None or _label == '':
+                _names[_id] = (f'node_{_id:02d}.{cls.default_extension}')
             else:
                 for _key in [' ', '\n', '\t', '\r']:
                     _label = _label.replace(_key, '_')
-                _names[_node_id] = (f'node_{_node_id:02d}_{_label}_'
-                                    f'{cls.format_name}').replace('__', '_')
+                _names[_id] = (f'node_{_id:02d}_{_label}.'
+                               f'{cls.default_extension}').replace('__', '_')
         return _names
 
     @classmethod

@@ -42,8 +42,9 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
     """
     Base class for WorkflowTree exporters.
     """
-    extensions = ['HDF5']
+    extensions = ['HDF5', 'nxs', 'h5']
     format_name = 'HDF5'
+    default_extension = 'h5'
     _shapes = []
     _filenames = []
     _save_dir = None
@@ -70,8 +71,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         cls._save_dir = save_dir
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        cls._filenames = {_i: _s.removesuffix('_HDF5') + '.h5' for _i, _s in
-                          cls.get_directory_names_from_labels(labels).items()}
+        cls._filenames = cls.get_filenames_from_labels(labels)
         cls._shapes = shapes
         cls._labels = labels
         cls._metadata_written = False

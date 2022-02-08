@@ -355,24 +355,24 @@ class _WorkflowResults(QtCore.QObject):
             If the directory exists and is not empty and overwrite is not
             enabled.
         """
-        if (os.path.exists(save_dir) and len(os.listdir(save_dir)) > 0
-                and not overwrite):
-            raise FileExistsError(f'The specified directory "{save_dir}" '
-                                  'exists and is not empty. Please select'
-                                  ' a different directory.')
+        save_formats = [s.strip() for s in re.split('&|/|,', save_formats)]
+        _name = SCAN.get_param_value('scan_name')
+        RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _shapes = self.shapes
             _labels = self.labels
         else:
             _shapes = {single_node: self.shapes[single_node]}
             _labels = {single_node: self.labels[single_node]}
-        # TODO  : check if the commented line can be deleted
-        # self._config['save_dir'] = save_dir
+        _names = RESULT_SAVER.get_filenames_from_active_savers(_labels)
+        _existcheck = [os.path.exists(os.path.join(save_dir, _name))
+                       for _name in _names]
+        if True in _existcheck and not overwrite:
+            raise FileExistsError(f'The specified directory "{save_dir}" '
+                                  'exists and is not empty. Please select'
+                                  ' a different directory.')
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        save_formats = [s.strip() for s in re.split('&|/|,', save_formats)]
-        _name = SCAN.get_param_value('scan_name')
-        RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         RESULT_SAVER.prepare_active_savers(save_dir, _shapes, _labels)
 
     def update_param_choices_from_labels(self, param,

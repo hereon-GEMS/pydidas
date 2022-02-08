@@ -248,6 +248,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
         """
         Save the composite image.
         """
+        # TODO : Change names based on image_io
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None,
             'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png);;NUMPY (*.npy *.npz)')[0]

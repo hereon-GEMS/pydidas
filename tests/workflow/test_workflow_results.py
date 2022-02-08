@@ -149,7 +149,7 @@ class TestWorkflowResults(unittest.TestCase):
     def test_prepare_files_for_saving__w_existing_file_no_overwrite(self):
         RES.update_shapes_from_scan_and_workflow()
         self.create_composites()
-        with open(os.path.join(self._tmpdir, 'test.txt'), 'w') as _file:
+        with open(os.path.join(self._tmpdir, 'node_01.h5'), 'w') as _file:
             _file.write('test')
         with self.assertRaises(FileExistsError):
             RES.prepare_files_for_saving(self._tmpdir, 'HDF5')

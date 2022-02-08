@@ -27,6 +27,7 @@ __status__ = "Development"
 __all__ = ['ExecuteWorkflowFrame']
 
 import time
+import os
 
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
@@ -36,6 +37,7 @@ from ..core import get_generic_param_collection
 from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
 from ..widgets import BaseFrameWithApp
+from ..widgets.dialogues import critical_warning
 from ..workflow import WorkflowTree, WorkflowResults
 from .builders.execute_workflow_frame_builder import (
     ExecuteWorkflowFrame_BuilderMixin)
@@ -53,8 +55,8 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
     The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
     and visualize the results.
     """
-    default_params = get_generic_param_collection('run_type',
-                                                  'selected_results')
+    default_params = get_generic_param_collection(
+        'selected_results', 'saving_format', 'enable_overwrite')
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
@@ -108,11 +110,8 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         """
         Execute the Application in the chosen type (GUI or command line).
         """
-        if self.get_param_value('run_type') == 'Process in GUI':
-            self._verify_result_shapes_uptodate()
-            self._run_app()
-        elif self.get_param_value('run_type') == 'Command line':
-            self.__run_cmd_process()
+        self._verify_result_shapes_uptodate()
+        self._run_app()
 
     def _verify_result_shapes_uptodate(self):
         """
@@ -349,17 +348,8 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._widgets['but_exec'].setEnabled(not running)
         self._widgets['but_abort'].setVisible(running)
         self._widgets['progress'].setVisible(running)
-        self._widgets['but_save_image'].setEnabled(not running)
-
-    def __run_cmd_process(self):
-        """
-        Run the processing in a separate command line process.
-        """
-        # TODO : implement
-        # subprocess.Popen(executable,
-        # creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
-        # | subprocess.DETACHED_PROCESS, close_fds=True)
-        ...
+        self._widgets['but_export_all'].setEnabled(not running)
+        self._widgets['but_export_current'].setEnabled(not running)
 
     def __update_choices_of_selected_results(self):
         """
@@ -374,6 +364,53 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         for _key in ['autosave_dir', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)
 
+    @QtCore.pyqtSlot()
     def __export_current(self):
+        """
+        Export the current node's data to a WorkflowResults saver.
+        """
+        _node = self._widgets['result_selector']._active_node
 
-        _node = self._config['active_node']
+        if _node == -1:
+             critical_warning('No node selected',
+                              ('No node has been selected. Please select a '
+                               'node and try again.'))
+             return
+        self.__export(_node)
+
+    @QtCore.pyqtSlot()
+    def __export_all(self):
+        """
+        Export all datasets to a WorkflowResults saver.
+        """
+        self.__export(None)
+
+    def __export(self, node):
+        """
+        Export data of
+
+        Parameters
+        ----------
+        node : Union[None, int]
+            The single node to be exported. If None, all nodes will be
+            exported. The default is None.
+        """
+        _formats = self.get_param_value('saving_format')
+        if _formats is None:
+             critical_warning('No format selected',
+                              ('No saving format node has been selected. '
+                               'Please select a format and try again.'))
+             return
+        _overwrite = self.get_param_value('enable_overwrite')
+        while True:
+            _dirname = QtWidgets.QFileDialog.getExistingDirectory(
+                self, 'Name of directory', None)
+            if _dirname == '' or len(os.listdir(_dirname)) == 0 or _overwrite:
+                break
+            critical_warning('Directory not empty',
+                             'The selected directory is not empty. Please '
+                             'select an empty directory or cancel.')
+        if _dirname == '':
+            return
+        RESULTS.save_results_to_disk(_dirname, _formats, overwrite=_overwrite,
+                                     node_id=node)

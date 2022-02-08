@@ -979,9 +979,9 @@ GENERIC_PARAM_DESCRIPTION = {
         'type': str,
         'default': 'HDF5',
         'name': 'Autosave formats',
-        'choices': ['None', 'HDF5'],
+        'choices': [None, 'HDF5'],
         'unit': '',
-        'allow_None': False,
+        'allow_None': True,
         'tooltip': ('The file format(s) for the data to be saved after the '
                     'workflow has been excuted. All data will be saved in a '
                     'single folder for each run with one file for each '
@@ -999,6 +999,27 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The selected node of the WorkflowTree to display '
                     'the corresponding results.')},
+    'saving_format': {
+        'type': str,
+        'default': 'HDF5',
+        'name': 'Save to format',
+        'choices': [None, 'HDF5'],
+        'unit': '',
+        'allow_None': True,
+        'tooltip': ('The file format(s) for saving the data. All data will '
+                    'be saved in a single folder for each run.')},
+    'enable_overwrite': {
+        'type': int,
+        'default': False,
+        'name': 'Enable overwriting',
+        'choices': [False, True],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Allow overwriting of existing files and writing in '
+                    'existing folders. If this Parameter is True, no further '
+                    'confirmation will be asked and no further warning will '
+                    'be displayed.')},
+    #     'tooltip': },
     # '': {
     #     'type': int,
     #     'default': ,

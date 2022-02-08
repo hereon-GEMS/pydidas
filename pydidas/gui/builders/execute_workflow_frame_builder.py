@@ -64,7 +64,7 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ['autosave_dir', 'run_type', 'selected_results']:
+        if param_key in ['autosave_dir', 'selected_results']:
             _dict = dict(linebreak=True,
                          parent_widget=self._widgets['config'],
                          halign_text=QtCore.Qt.AlignLeft,
@@ -109,10 +109,12 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
             gridPos=(-1, 0, 1, 1), stretch=(1, 0),
             layout_kwargs={'alignment': None})
 
-        for _param in ['autosave_results', 'autosave_dir', 'autosave_format',
-                       'run_type']:
+        for _param in ['autosave_results', 'autosave_dir', 'autosave_format']:
             self.create_param_widget(self.get_param(_param),
                                      **self.__param_widget_config(_param))
+
+        self.create_line('line_autosave', gridPos=(-1, 0, 1, 1),
+                         parent_widget=self._widgets['config'])
 
         self.create_button(
             'but_exec', 'Start processing', gridPos=(-1, 0, 1, 1),
@@ -129,26 +131,38 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
             enabled=True, visible=False, fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets['config'])
 
-        self.create_spacer(
-            'result_sec_spacer', height=20, gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets['config'])
+        self.create_line('line_results', gridPos=(-1, 0, 1, 1),
+                         parent_widget=self._widgets['config'])
 
         self.create_any_widget(
             'result_selector', ResultSelectorForOutput,
             parent_widget=self._widgets['config'], gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param('selected_results'))
 
-        self.create_button('but_export_current', 'Export current node results',
-                            # TODO : change enabled to false
-                           enabled=True, gridPos=(-1, 0, 1, 1),
-                           fixedWidth=CONFIG_WIDGET_WIDTH,
-                           parent_widget=self._widgets['config'])
+        self.create_line('line_export', gridPos=(-1, 0, 1, 1),
+                         parent_widget=self._widgets['config'])
 
-        self.create_button('but_export_all', 'Export all results',
-                            # TODO : change enabled to false
-                           enabled=True, gridPos=(-1, 0, 1, 1),
-                           fixedWidth=CONFIG_WIDGET_WIDTH,
-                           parent_widget=self._widgets['config'])
+        self.create_param_widget(self.get_param('saving_format'),
+                                 **self.__param_widget_config('saving_format'))
+        self.create_param_widget(
+            self.get_param('enable_overwrite'),
+            **self.__param_widget_config('enable_overwrite'))
+        self.create_button(
+            'but_export_current', 'Export current node results',
+            # TODO : change enabled to false
+            gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'], enabled=True,
+            toolTip=("Export the current node's results to file. Note that "
+                     "the filenames are pre-determined based on node ID "
+                     "and node label."))
+
+        self.create_button(
+            'but_export_all', 'Export all results', enabled=True,
+            # TODO : change enabled to false
+            gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'],
+            tooltip=('Export all results. Note that the directory must be '
+                     'empty.'))
 
         self.create_spacer('config_terminal_spacer', height=20,
                            gridPos=(-1, 0, 1, 1),

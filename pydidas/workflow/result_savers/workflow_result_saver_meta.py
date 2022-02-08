@@ -76,6 +76,30 @@ class WorkflowResultSaverMeta(GenericIoMeta):
                     cls.active_savers.append(_saver)
 
     @classmethod
+    def get_filenames_from_active_savers(cls, labels):
+        """
+        Get the filenames from all active savers based on the supplied labels.
+
+        Parameters
+        ----------
+        labels : dict
+            The labels of the results in form of a dictionary with nodeID
+            keys and label values.
+
+        Returns
+        -------
+        list
+            A list will all filenames for all selected nodes and exporters.
+        """
+        _names = []
+        for _ext in cls.active_savers:
+            _saver = cls.registry[_ext]
+            _fnames = _saver.get_filenames_from_labels(labels)
+            for _name in _fnames.values():
+                _names.append(_name)
+        return _names
+
+    @classmethod
     def prepare_active_savers(cls, save_dir, shapes, labels):
         """
         Prepare the active savers for storing data by creating the required

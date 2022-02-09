@@ -21,7 +21,6 @@ Clear all entries
 ^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/composite_image_creator_02_button_clear.png
-    :width: 300px
     :align: left
 
 The "Clear all entries" button at the top will reset all inputs to their default
@@ -31,7 +30,6 @@ Generate composite
 ^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/composite_image_creator_03_button_generate.png
-    :width: 300px
     :align: left
 
 Once the bare minimum Parameters have been selected (this is the first file name
@@ -43,7 +41,6 @@ Once clicked, the "Generate composite" button will be disabled and a
 progress bar as well as an "Abort" button will appear:
 
 .. image:: ../../images/frames/composite_image_creator_04_button_abort.png
-    :width: 300px
     :align: left
 
 The progress bar will update with each received image and it shows the global
@@ -61,7 +58,6 @@ Show composite
 ^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/composite_image_creator_05_button_show.png
-    :width: 300px
     :align: left
 
 During processing, the composite image is automatically updated. If the uses
@@ -72,7 +68,6 @@ Save composite image
 ^^^^^^^^^^^^^^^^^^^^ 
 
 .. image:: ../../images/frames/composite_image_creator_06_button_save.png
-    :width: 300px
     :align: left
 
 The "Save composite image" button opens a dialogue to select a file name. The 
@@ -87,7 +82,8 @@ Result visualization
     :width: 600px
     :align: center
 
-Results are visualized in a `silx PlotWindow <http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#module-silx.gui.plot.PlotWindow>`_.
+Results are visualized in a `silx PlotWindow 
+<http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#module-silx.gui.plot.PlotWindow>`_.
 
 The PlotWindow can be controlled by the menu bar at the top of the plot canvas.
 

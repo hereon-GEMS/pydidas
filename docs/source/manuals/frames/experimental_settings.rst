@@ -9,7 +9,7 @@ The frame only holds the configuration widgets:
 
 .. image:: ../../images/frames/experimental_settings_01_full.png
     :width:  182px
-    :align: right
+    :align: center
 
 Detailed description of frame items
 -----------------------------------
@@ -18,7 +18,6 @@ Load settings
 ^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_02_button_load.png
-    :width:  360px
     :align: left
 
 Experimental settings can be loaded from file. Clicking the corresponding 
@@ -29,7 +28,6 @@ Copy Parameters from calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_03_button_copyall.png
-    :width:  360px
     :align: left
 
 If a calibration using the :ref:`pyfai_calib_frame` has been performed during
@@ -40,7 +38,6 @@ Beamline energy
 ^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_04_energy.png
-    :width: 360px
     :align: left
 
 The beamline energy can either be copied from the pyFAI calibration tool (a 
@@ -53,7 +50,6 @@ Detector model
 ^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_05_detector.png
-    :width: 360px
     :align: left
 
 To select a detector and automatically update all detector Parameters, the 
@@ -76,7 +72,6 @@ Detector geometry
 ^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_07_detector_geometry.png
-    :width: 360px
     :align: left
     
 pydidas uses the `Default geometry in pyFAI 
@@ -95,7 +90,6 @@ Saving
 ^^^^^^
 
 .. image:: ../../images/frames/experimental_settings_08_save.png
-    :width: 360px
     :align: left
     
 All settings can be exported to file using the saving button. Clicking the 

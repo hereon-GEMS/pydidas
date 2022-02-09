@@ -172,6 +172,8 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
                            gridPos=(-1, 0, 1, 1))
 
         self._widgets['plot1d'] = Plot1D()
+        self._widgets['plot1d'].getRoiAction().setVisible(False)
+        self._widgets['plot1d'].getFitAction().setVisible(False)
         self._widgets['plot2d'] = Plot2D()
         self.add_any_widget(
             'plot_stack', QtWidgets.QStackedWidget(), alignment=None,

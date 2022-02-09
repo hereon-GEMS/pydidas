@@ -257,7 +257,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             _data.axis_ranges[0] = np.arange(_data.shape[0])
         self._widgets['plot_stack'].setCurrentIndex(_dim - 1)
         _plot = self._widgets[f'plot{_dim}d']
-        _plot.setGraphTitle(RESULTS.labels[_node] + f'(node #{_node:03d}')
+        _plot.setGraphTitle(RESULTS.labels[_node] + f' (node #{_node:03d})')
         _units = [(_val if _val is not None else '')
                   for _val in _data.axis_units.values()]
         _labels = [(_val if _val is not None else '')

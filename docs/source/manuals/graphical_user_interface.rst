@@ -50,6 +50,7 @@ Frames
     frames/scan_settings
     frames/workflow_edit
     frames/execute_workflow
+    frames/global_settings
 
 .. _gui_recipes:
 

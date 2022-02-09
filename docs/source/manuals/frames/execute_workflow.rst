@@ -26,7 +26,6 @@ Configuring the automatic saving
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/execute_workflow_02_autosave_inactive.png
-    :width:  300px
     :align: left
     
 The configuration of the automatic saving is the topmost item on the left of the
@@ -36,7 +35,6 @@ additional Parameter configuration widgets to select the saving directory and
 the type of files. 
 
 .. image:: ../../images/frames/execute_workflow_03_autosave_active.png
-    :width:  300px
     :align: left
 
 Files will be automatically created based on different autosave formats selected
@@ -52,14 +50,12 @@ Running the processing
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/execute_workflow_04_processing_to_start.png
-    :width:  300px
     :align: left
 
 The processing can be started with a click on the corresponding button. This 
 will show a progress bar and an "Abort" button. 
 
 .. image:: ../../images/frames/execute_workflow_05_processing_active.png
-    :width:  300px
     :align: left
     
 The "Abort" button will let the user send termination signals to the worker 
@@ -71,7 +67,6 @@ Selection of results
 ^^^^^^^^^^^^^^^^^^^^ 
 
 .. image:: ../../images/frames/execute_workflow_06_results_no_selection.png
-    :width:  300px
     :align: left
 
 Results from individual nodes can be selected from the drop-down menu. Opening
@@ -79,14 +74,12 @@ it will show a list of all nodes in the WorkflowTree with stored results (see
 image below).
 
 .. image:: ../../images/frames/execute_workflow_07_results_dropdown.png
-    :width:  300px
     :align: right
 
 Once a node has been selected, additional information for these node's results 
 will be displayed, see the image to the left.
 
 .. image:: ../../images/frames/execute_workflow_08_results_full_selector.png
-    :width:  305px
     :align: left
 
 Arrangement
@@ -99,11 +92,11 @@ corrsponding radio button item. This will also trigger an update of the results
 metadata, as seen on the image to the right.
 
 .. image:: ../../images/frames/execute_workflow_09_results_timeline.png
-    :width:  303px
     :align: right
 
-Data description
-""""""""""""""""
+
+Description of metadata
+"""""""""""""""""""""""
 
 The different data axes are described in detail in the text field. The axes are
 labelled with *scan* or *data*, depending on whether the respective data axis
@@ -134,7 +127,6 @@ Data export
 ^^^^^^^^^^^
 
 .. image:: ../../images/frames/execute_workflow_10_export.png
-    :width:  303px
     :align: left
 
 The data export section allows users to export results either for the current
@@ -161,4 +153,44 @@ button will open a dialogue to select the folder.
 Presentation of 1D plots
 ^^^^^^^^^^^^^^^^^^^^^^^^ 
 
+.. image:: ../../images/frames/execute_workflow_11_1dplot_overview.png
+    :width:  506px
+    :align: left
 
+One-dimensional plots are presented in a `silx Plot1D widget 
+<http://www.silx.org/doc/silx/0.5.0/modules/gui/plot/plotwindow.html#plot1d-plot-curves>`_\ .
+
+A toolbar at the top of the widget allows to access various plot controls which
+are  explained in detail below. In addition to the main plot, an "Options" 
+button at the bottom allows additional options for expert users which will not
+be discussed here. Please refer to the *silx* documentation.
+
+Toolbar menu entries
+""""""""""""""""""""
+
+.. include:: ../silx/plot1d.rst
+
+Presentation of 2D plots
+^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+.. image:: ../../images/frames/execute_workflow_12_2dplot_overview.png
+    :width:  506px
+    :align: left
+    
+Two-dimensional plots are presented in a `silx Plot2D widget 
+<http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D>`_\ .
+The toolbar options will be explained in detail below. Moving the mouse over the
+canvas will update the labels for x/y position and data value at the bottom of 
+the canvas. Note that the x and y axis positions for each pixel are defined at
+the pixel center and the given values must be treated carefully with respect to
+the pixel shape, especially for coarse pixels.
+
+.. tip::
+
+    The scaling of the results can be achieved by modifying the colormap 
+    settings.
+
+Toolbar menu entries
+""""""""""""""""""""
+
+.. include:: ../silx/plot2d.rst

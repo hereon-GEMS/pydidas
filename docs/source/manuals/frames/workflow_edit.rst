@@ -70,7 +70,6 @@ Plugin Parameter editing
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/workflow_edit_04_plugin_param_edit.png
-    :width:  396px
     :align: left
 
 After selecting a Plugin in the :ref:`workflow_tree_vis`, the Plugin Parameter
@@ -101,7 +100,6 @@ Import and Export
 ^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/workflow_edit_05_import_export.png
-    :width:  399px
     :align: left
 
 Workflows can be imported and exported using the respective buttons in the 

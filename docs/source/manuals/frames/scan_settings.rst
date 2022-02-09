@@ -18,7 +18,6 @@ Load settings
 ^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/scan_settings_02_load.png
-    :width:  300px
     :align: left
 
 The Scan settings can be loaded from file. Clicking the corresponding 
@@ -29,7 +28,6 @@ Import dialogue
 ^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/scan_settings_03_import.png
-    :width:  300px
     :align: left
 
 This button allows to access import functionality from beamline metadata. While
@@ -45,7 +43,6 @@ Reset Parameters
 ^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/scan_settings_04_reset.png
-    :width:  300px
     :align: left
 
 The "Reset all scan settings" button allows the user to change all Parameters
@@ -55,7 +52,6 @@ Global Parameters
 ^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/scan_settings_05_globals.png
-    :width:  306px
     :align: left
 
 Here, *global* refers to general scan Parameters in contrast to Parameters for 
@@ -70,7 +66,6 @@ Configuring a scan dimension
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../../images/frames/scan_settings_06_dimension.png
-    :width:  306px
     :align: left
 
 The configuration for each scan dimension is the same, and dimension #3 is shown
@@ -98,7 +93,7 @@ The :py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>`
 is not used directly but the information is required in applications, e.g. to
 run processing workflows.
    
-.. _composite_image_creator_params:
+.. _scan_setup_params:
 
 Full list of Scan settings Parameters
 -------------------------------------

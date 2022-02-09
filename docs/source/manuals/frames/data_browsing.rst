@@ -44,7 +44,6 @@ The hdf5 data selection widget
 The hdf5 data selection widget is shown below.
 
 .. image::  ../../images/frames/data_browsing_02_hdf5.png
-    :width: 600px
     :align: center
 
 The first row allows the user to select dataset filters for specific names.

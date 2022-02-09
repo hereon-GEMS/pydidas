@@ -22,7 +22,7 @@ generate the Sphinx html documentation.
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['run_sphinx_html_build']

@@ -176,8 +176,8 @@ class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
             self.update_param_value('detector_name', det.name)
             self.update_param_value('detector_npixx', det.shape[1])
             self.update_param_value('detector_npixy', det.shape[0])
-            self.update_param_value('detector_pxsizex', det.pixel2)
-            self.update_param_value('detector_pxsizey', det.pixel1)
+            self.update_param_value('detector_pxsizex', 1e6 * det.pixel2)
+            self.update_param_value('detector_pxsizey', 1e6 * det.pixel1)
         elif show_warning:
             critical_warning('No pyFAI Detector',
                              'No detector selected in pyFAI. Cannot copy '

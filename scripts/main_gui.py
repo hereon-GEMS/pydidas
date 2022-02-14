@@ -90,37 +90,6 @@ def run_gui(qtapp):
 
 
 if __name__ == '__main__':
-    #### temporary insert to speed up opening and testing
-    import pickle
-
-    from pydidas.core import Dataset
-    from pydidas.experiment import ExperimentalSetup, ScanSetup
-    from pydidas.workflow import WorkflowResults, WorkflowTree
-
-    _path = 'H:/myPython/__pydidas_test_data/'
-
-    EXP = ExperimentalSetup()
-    EXP.import_from_file(f'{_path}__exp_settings.yaml')
-
-    SCAN = ScanSetup()
-    SCAN.import_from_file(f'{_path}__scan_settings.yaml')
-
-    TREE = WorkflowTree()
-    TREE.import_from_file(f'{_path}__workflow.yaml')
-
-    RESULTS = WorkflowResults()
-    RESULTS.__dict__ = pickle.loads(
-        open(f'{_path}_results_dict.pickle', 'rb').read())
-    for _node in [1, 2]:
-        _data = Dataset(np.load(f'{_path}_results_node{_node:02d}.npy'))
-        _meta = pickle.loads(
-            open(f'{_path}_node{_node:02d}meta.pickle', 'rb').read())
-        _data.axis_labels = _meta['axis_labels']
-        _data.axis_units = _meta['axis_units']
-        _data.axis_ranges = _meta['axis_ranges']
-        RESULTS._WorkflowResults__composites[_node] = _data
-    #### end insert
-
     app = QtWidgets.QApplication(sys.argv)
     run_gui(app)
     app.deleteLater()

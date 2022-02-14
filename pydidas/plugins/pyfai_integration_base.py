@@ -53,10 +53,14 @@ pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
                'chi / deg': 'chi_deg',
                'chi / rad': 'chi_rad'}
 
-pyFAI_METHOD = {'CSR': 'csr',
-                'CSR OpenCL': 'csr ocl',
-                'LUT': 'lut',
-                'LUT OpenCL': 'lut ocl'}
+pyFAI_METHOD = {'CSR': ('bbox', 'csr', 'cython'),
+                'CSR OpenCL': ('bbox', 'csr', 'opencl'),
+                'CSR full': ('full', 'csr', 'cython'),
+                'CSR full OpenCL': ('full', 'csr', 'opencl'),
+                'LUT': ('bbox', 'lut', 'cython'),
+                'LUT OpenCL': ('bbox', 'lut', 'opencl'),
+                'LUT full': ('full', 'lut', 'cython'),
+                'LUT full OpenCL': ('full', 'lut', 'opencl')}
 
 
 class pyFAIintegrationBase(ProcPlugin):

@@ -42,5 +42,5 @@ the overloaded methods with the same name as in parent classes.
 License
 -------
 
-pyDIDAS is released under the GNU GENERAL PUBLIC LICENSE Version 3. A copy
-of the full license is provided with the pyDIDAS.
+pydidas is released under the GNU GENERAL PUBLIC LICENSE Version 3. A copy
+of the full license is provided with the pydidas.

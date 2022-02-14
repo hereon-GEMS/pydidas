@@ -947,7 +947,8 @@ GENERIC_PARAM_DESCRIPTION = {
         'type': str,
         'default': 'CSR',
         'name': 'PyFAI integration method',
-        'choices': ['CSR', 'CSR OpenCL', 'LUT', 'LUT OpenCL'],
+        'choices': ['CSR', 'CSR OpenCL', 'CSR full', 'CSR full OpenCL',
+                    'LUT', 'LUT OpenCL', 'LUT full', 'LUT full OpenCL'],
         'unit': '',
         'allow_None': False,
         'tooltip': ('The integration method. For a full reference, please'

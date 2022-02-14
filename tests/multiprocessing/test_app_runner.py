@@ -33,14 +33,7 @@ from pydidas.multiprocessing import AppRunner
 from pydidas.unittest_objects.mp_test_app import MpTestApp
 
 
-def quit_app():
-    """Terminate the headless app."""
-    _qtapp = QtCore.QCoreApplication.instance()
-    _qtapp.deleteLater()
-    _qtapp.exit()
-
-
-class TestAppRunnerner(unittest.TestCase):
+class TestAppRunner(unittest.TestCase):
 
     def setUp(self):
         self.qt_app = QtCore.QCoreApplication(sys.argv)
@@ -71,7 +64,7 @@ class TestAppRunnerner(unittest.TestCase):
     def test_run(self):
         runner = AppRunner(self.app)
         _spy = QtTest.QSignalSpy(runner.sig_finished)
-        runner.sig_finished.connect(quit_app)
+        runner.sig_finished.connect(self.qt_app.quit)
         runner.start()
         self.qt_app.exec_()
         self.assertEqual(len(_spy), 1)
@@ -79,7 +72,7 @@ class TestAppRunnerner(unittest.TestCase):
     def test_final_app_state(self):
         runner = AppRunner(self.app)
         runner.sig_final_app_state.connect(self.store_app)
-        runner.sig_finished.connect(quit_app)
+        runner.sig_finished.connect(self.qt_app.quit)
         runner.start()
         self.qt_app.exec_()
         _image = self.new_app._composite.image

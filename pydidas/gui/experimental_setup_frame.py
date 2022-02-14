@@ -28,6 +28,7 @@ __all__ = ['ExperimentalSetupFrame']
 
 from functools import partial
 
+import numpy as np
 from PyQt5 import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
@@ -202,7 +203,7 @@ class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
                                ['detector_rot1', _geo.rotation1().value()],
                                ['detector_rot2', _geo.rotation2().value()],
                                ['detector_rot3', _geo.rotation3().value()]]:
-                self.update_param_value(key, value)
+                self.update_param_value(key, np.float32(value))
         elif show_warning:
             critical_warning('pyFAI geometry invalid',
                             'The pyFAI geometry is not valid and cannot be '

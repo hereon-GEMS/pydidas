@@ -57,13 +57,13 @@ class CompositeImage(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.__image = None
         self.set_default_params()
-        self.__set_default_qsettings()
+        self.__get_default_qsettings()
         for _key in kwargs:
             self.set_param_value(_key, kwargs[_key])
         if self.__check_config():
             self.__create_image_array()
 
-    def __set_default_qsettings(self):
+    def __get_default_qsettings(self):
         """
         Update local Parameters with the global QSetting values.
         """
@@ -220,6 +220,7 @@ class CompositeImage(ObjectWithParameterCollection):
 
         The new image array is accessible through the .image property.
         """
+        self.__get_default_qsettings()
         self.__create_image_array()
 
     def insert_image(self, image, index):

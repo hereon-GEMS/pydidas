@@ -342,10 +342,14 @@ class CompositeCreatorApp(BaseApp):
                 datatype=self._image_metadata.datatype)
             return
         _update_required = False
+        _bwidth = self.q_settings_get_global_value('mosaic_border_width', int)
+        _bval = self.q_settings_get_global_value('mosaic_border_value', float)
         for _key, _value in [
                 ['image_shape', self._image_metadata.final_shape],
                 ['composite_nx', self.get_param_value('composite_nx')],
-                ['composite_ny', self.get_param_value('composite_ny')]]:
+                ['composite_ny', self.get_param_value('composite_ny')],
+                ['mosaic_border_width', _bwidth],
+                ['mosaic_border_value', _bval]]:
             if _value != self._composite.get_param_value(_key):
                 self._composite.set_param_value(_key, _value)
                 _update_required = True

@@ -30,7 +30,7 @@ import pathlib
 
 from PyQt5 import QtWidgets, QtCore
 
-from ...core.constants import HDF5_EXTENSIONS
+from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 
@@ -41,7 +41,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
      """
     io_edited = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent, param, width=255):
+    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
         """
         Setup the widget.
 

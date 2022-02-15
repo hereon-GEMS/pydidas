@@ -31,7 +31,7 @@ from PyQt5 import QtWidgets
 from ...widgets import ScrollArea
 from ...widgets.factory import CreateWidgetsMixIn
 from ...widgets.parameter_config import (
-    PluginParameterConfigWidget, ParameterWidgetsMixIn)
+    PluginParameterEditWidget, ParameterWidgetsMixIn)
 from ...widgets.workflow_edit import (WorkflowTreeCanvas,
                                       PluginCollectionBrowser)
 
@@ -53,7 +53,7 @@ class WorkflowEditFrame_BuilderMixin(CreateWidgetsMixIn,
         Create all widgets and initialize their state.
         """
         self._widgets['workflow_canvas'] = WorkflowTreeCanvas(self)
-        self._widgets['plugin_edit_canvas'] = PluginParameterConfigWidget(
+        self._widgets['plugin_edit_canvas'] = PluginParameterEditWidget(
             self)
         self.create_any_widget(
             'workflow_area', ScrollArea, minimumHeight=500,

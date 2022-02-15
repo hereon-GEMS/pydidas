@@ -26,6 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ScanSetup_FrameBuilder']
 
+from PyQt5 import QtCore
+
 from ...experiment import ScanSetup
 from ...widgets.factory import CreateWidgetsMixIn
 from ...widgets.parameter_config import ParameterWidgetsMixIn
@@ -43,7 +45,7 @@ class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
     self : pydidas.gui.ScanSetupFrame
         The ScanSetupFrame instance.
     """
-    TEXT_WIDTH = 180
+    TEXT_WIDTH = 200
     PARAM_INPUT_WIDTH = 120
 
     def __init__(self):
@@ -60,15 +62,19 @@ class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
                           bold=True, underline=True, gridPos=(0, 0, 1, 1))
         self.create_button('but_load', 'Load scan settings from file',
                            gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(42))
+                           icon=self.style().standardIcon(42),
+                           fixedWidth=_width_total)
         self.create_button('but_import', 'Open scan parameter import dialogue',
                            gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(42))
+                           icon=self.style().standardIcon(42),
+                           fixedWidth=_width_total)
         self.create_button('but_reset', 'Reset all scan settings',
                            gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(59))
-        self.create_label('scan_global', '\nGlobal scan parameters:', fontsize=11,
-                         bold=True, gridPos=(self.next_row(), 0, 1, 1))
+                           icon=self.style().standardIcon(59),
+                           fixedWidth=_width_total)
+        self.create_label('scan_global', '\nGlobal scan parameters:',
+                          fontsize=11, bold=True,
+                          gridPos=(self.next_row(), 0, 1, 1))
 
         self.create_param_widget(
             SCAN_SETTINGS.get_param('scan_dim'), width_text = self.TEXT_WIDTH,
@@ -93,13 +99,12 @@ class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
                 param = SCAN_SETTINGS.get_param(pname)
                 self.create_param_widget(
                     param, row=_row, column=_column,
-                                         width_text=self.TEXT_WIDTH,
-                                         width_io=self.PARAM_INPUT_WIDTH,
-                                         width_unit=0,
-                                         width_total=_width_total)
+                    width_text=self.TEXT_WIDTH + 5, width_unit=0,
+                    width_io=self.PARAM_INPUT_WIDTH, width_total=_width_total,
+                    halign=QtCore.Qt.AlignCenter)
 
         self.create_button('but_save', 'Save scan settings',
-                            gridPos=(-1, 0, 1, 1),
+                            gridPos=(-1, 0, 1, 1), fixedWidth=_width_total,
                             icon=self.style().standardIcon(43))
 
         self.create_spacer('final_spacer', gridPos=(_rowoffset + 1, 2, 1, 1))

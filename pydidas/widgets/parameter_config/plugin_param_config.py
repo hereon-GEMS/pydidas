@@ -163,17 +163,18 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         _kwargs : dict
             The kwargs to be used for widget creation.
         """
+        # The total width is reduced by 10 because of the margins
         if param.type in [Hdf5key, Path]:
             _kwargs = {'width_text': self.FIXED_WIDTH - 50,
-                       'width_io': self.FIXED_WIDTH - 80,
+                       'width_io': self.FIXED_WIDTH - 50,
                        'width_unit': 0,
-                       'width_total': self.FIXED_WIDTH,
+                       'width_total': self.FIXED_WIDTH - 10,
                        'linebreak': True}
                        #'halign_text': QtCore.Qt.AlignLeft}
         else:
             _kwargs = {'width_text': 200,
                        'width_io': self.FIXED_WIDTH - 240,
-                       'width_total': self.FIXED_WIDTH}
+                       'width_total': self.FIXED_WIDTH - 10}
         return _kwargs
 
     def update_edits(self):

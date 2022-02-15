@@ -58,7 +58,7 @@ class ParameterEditFrame(QtWidgets.QFrame, ParameterWidgetsMixIn):
         apply_widget_properties(self, **kwargs)
         if init_layout:
             _layout = QtWidgets.QGridLayout()
-            _layout.setContentsMargins(5, 5, 0, 0)
+            _layout.setContentsMargins(5, 5, 5, 5)
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
 

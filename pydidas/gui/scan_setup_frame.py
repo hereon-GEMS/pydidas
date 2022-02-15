@@ -42,8 +42,6 @@ class ScanSetupFrame(BaseFrame, ScanSetup_FrameBuilder):
     """
     Frame for managing the global scan settings.
     """
-    TEXT_WIDTH = 180
-    PARAM_INPUT_WIDTH = 120
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)

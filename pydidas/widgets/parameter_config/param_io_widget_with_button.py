@@ -31,7 +31,7 @@ from functools import partial
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from .base_param_io_widget import BaseParamIoWidget
-from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT
+from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_EDIT_WIDTH
 
 
 class ParamIoWidgetWithButton(BaseParamIoWidget):
@@ -54,7 +54,8 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
     """
     io_edited = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent, param, width=255, button_icon=None):
+    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH,
+                 button_icon=None):
         super().__init__(parent, param, width)
         self.ledit = QtWidgets.QLineEdit()
         self.ledit.setFixedWidth(width - PARAM_INPUT_WIDGET_HEIGHT - 2)
@@ -68,6 +69,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         self._button.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.setSpacing(2)
         _layout.addWidget(self.ledit)
         _layout.addWidget(self._button)
         self.setLayout(_layout)

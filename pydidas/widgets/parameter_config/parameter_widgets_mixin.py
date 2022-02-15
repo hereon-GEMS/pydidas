@@ -70,7 +70,7 @@ class ParameterWidgetsMixIn:
         width_unit : int, optional
             The width of the text field for the Parameter unit. The default
             is 30.
-        width : int, optional
+        width_io : int, optional
             The width of the input widget. The default is 255 pixel.
         n_columns : int, optional
             The number of grid columns for the i/o widget. The default is 1.

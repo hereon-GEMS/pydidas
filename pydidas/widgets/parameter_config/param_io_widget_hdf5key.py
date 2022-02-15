@@ -29,7 +29,7 @@ __all__ = ['ParamIoWidgetHdf5Key']
 
 from PyQt5 import QtWidgets, QtCore
 
-from ...core.constants import HDF5_EXTENSIONS
+from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
 from ..dialogues import Hdf5DatasetSelectionPopup
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
@@ -42,7 +42,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     #for some reason, inhering the signal from the base class does not work
     io_edited = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent, param, width=255):
+    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
         """
         Setup the widget.
 

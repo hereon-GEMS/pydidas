@@ -35,16 +35,6 @@ from ...widgets.parameter_config import ParameterWidgetsMixIn
 from ...widgets.selection import (DirectoryExplorer, Hdf5DatasetSelector)
 
 
-class ImageViewSmallHist(ImageView):
-    """
-    Subclass silx ImageView with a smaller historgram.
-    """
-    HISTOGRAMS_HEIGHT = 120
-
-    def __init__(self):
-        super().__init__()
-
-
 class DataBrowsingFrame_BuilderMixin(CreateWidgetsMixIn,
                                      ParameterWidgetsMixIn):
     """
@@ -85,7 +75,7 @@ class DataBrowsingFrame_BuilderMixin(CreateWidgetsMixIn,
             fixedWidth=_bsize,gridPos=(2, 1, 1, 1),
             parent_widget=self._widgets['selection'])
 
-        self._widgets['viewer'] = ImageViewSmallHist()
+        self._widgets['viewer'] = ImageView()
         self._widgets['viewer'].setData = self._widgets['viewer'].setImage
         self._widgets['viewer'].setAttribute(QtCore.Qt.WA_DeleteOnClose)
 

@@ -70,17 +70,20 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         self.param = param
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
+        _layout.setSpacing(5)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         _layout.setColumnStretch(1, 1)
         self.name_widget = self.__get_name_widget()
-        self.unit_widget = self.__get_unit_widget()
+        if self.config['width_unit'] > 0:
+            self.unit_widget = self.__get_unit_widget()
         self.io_widget = create_param_widget(param, self.config['width_io'])
 
         _text_widget_args, _input_widget_args, _unit_widget_args = \
             self.__get_layout_args_for_widgets()
         _layout.addWidget(self.name_widget, *_text_widget_args)
         _layout.addWidget(self.io_widget, *_input_widget_args)
-        _layout.addWidget(self.unit_widget, *_unit_widget_args)
+        if self.config['width_unit'] > 0:
+            _layout.addWidget(self.unit_widget, *_unit_widget_args)
 
         self.io_widget.io_edited.connect(self.__emit_io_changed)
         self.io_widget.io_edited.connect(
@@ -141,9 +144,9 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             config['width_io'] = kwargs.get('width_io',
                                             PARAM_INPUT_EDIT_WIDTH)
             config['halign_text'] = kwargs.get('halign_text',
-                                               QtCore.Qt.AlignRight)
+                                               QtCore.Qt.AlignLeft)
             config['halign_io'] = kwargs.get('halign_io',
-                                             QtCore.Qt.AlignLeft)
+                                             QtCore.Qt.AlignRight)
         config['width_unit'] = _width_unit
         config['width_total'] = _width
         config['halign_unit'] = kwargs.get('halign_unit', QtCore.Qt.AlignLeft)
@@ -208,12 +211,19 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             The tuple with the layout formatting args for the unit widget.
         """
         _iline = int(self.config['linebreak'])
-        _txtargs = (0, 0, 1, 1 + 3 * _iline,
+        _iunit = int(self.config['width_unit'] > 0)
+        _txtargs = (0, 0, 1, 1 + 2 * _iline,
                     self.config['valign_text'] | self.config['halign_text'])
-        _ioargs = (_iline, 1, 1, 1 + _iline,
+        _ioargs = (_iline, 1, 1, 2 - _iunit,
                    self.config['valign_io'] | self.config['halign_io'])
-        _unitargs = (_iline, 2 + _iline, 1, 1,
+        _unitargs = (_iline, 2, 1, 1,
                      self.config['valign_text'] | self.config['halign_text'])
+        # _txtargs = (0, 0, 1, 1 + 3 * _iline,
+        #             self.config['valign_text'] | self.config['halign_text'])
+        # _ioargs = (_iline, 1, 1, 1 + _iline,
+        #            self.config['valign_io'] | self.config['halign_io'])
+        # _unitargs = (_iline, 2 + _iline, 1, 1,
+        #              self.config['valign_text'] | self.config['halign_text'])
         return _txtargs, _ioargs, _unitargs
 
     @QtCore.pyqtSlot(str)

@@ -180,7 +180,7 @@ class _ScanSetup(ObjectWithParameterCollection):
         ScanSetupIoMeta.import_from_file(filename)
 
     @staticmethod
-    def export_to_file(filename):
+    def export_to_file(filename, overwrite=False):
         """
         Import ScanSetup from a file.
 
@@ -188,8 +188,11 @@ class _ScanSetup(ObjectWithParameterCollection):
         ----------
         filename : Union[str, pathlib.Path]
             The full filename.
+        overwrite : bool
+            Keyword to allow overwriting of existing files. The default is
+            False.
         """
-        ScanSetupIoMeta.export_to_file(filename)
+        ScanSetupIoMeta.export_to_file(filename, overwrite=overwrite)
 
 
 ScanSetup = SingletonFactory(_ScanSetup)

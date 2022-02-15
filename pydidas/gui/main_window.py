@@ -189,34 +189,34 @@ class MainWindow(QtWidgets.QMainWindow):
         Create all required actions for the menu entries and store them in the
         internal _actions dictionary.
         """
-        new_workflow_action = QtWidgets.QAction(
-            QtGui.QIcon('new.png'), '&New processing workflow', self)
-        new_workflow_action.setStatusTip(
-            'Create a new processing workflow and discard the current '
-            'workflow.')
-        # new_workflow_action.setShortcut('Ctrl+N')
-        self._actions['new_workflow'] = new_workflow_action
+        # new_workflow_action = QtWidgets.QAction(
+        #     QtGui.QIcon('new.png'), '&New processing workflow', self)
+        # new_workflow_action.setStatusTip(
+        #     'Create a new processing workflow and discard the current '
+        #     'workflow.')
+        # # new_workflow_action.setShortcut('Ctrl+N')
+        # self._actions['new_workflow'] = new_workflow_action
 
-        load_exp_setup_action = QtWidgets.QAction(
-            QtGui.QIcon('open.png'), 'Load &experimental configuration', self)
-        load_exp_setup_action.setStatusTip(
-            'Discard the current experimental setup and open a configuration '
-            'from file.')
-        self._actions['load_exp_setup'] = load_exp_setup_action
+        # load_exp_setup_action = QtWidgets.QAction(
+        #     QtGui.QIcon('open.png'), 'Load &experimental configuration', self)
+        # load_exp_setup_action.setStatusTip(
+        #     'Discard the current experimental setup and open a configuration '
+        #     'from file.')
+        # self._actions['load_exp_setup'] = load_exp_setup_action
 
-        load_scan_setup_action = QtWidgets.QAction(
-            QtGui.QIcon('open.png'), 'Load &scan configuration', self)
-        load_scan_setup_action.setStatusTip(
-            'Discard the current scan setup and open a scan configuration '
-            'from file.')
-        self._actions['load_scan_setup'] = load_scan_setup_action
+        # load_scan_setup_action = QtWidgets.QAction(
+        #     QtGui.QIcon('open.png'), 'Load &scan configuration', self)
+        # load_scan_setup_action.setStatusTip(
+        #     'Discard the current scan setup and open a scan configuration '
+        #     'from file.')
+        # self._actions['load_scan_setup'] = load_scan_setup_action
 
-        load_workflow_tree_action = QtWidgets.QAction(
-            QtGui.QIcon('open.png'), 'Load &workflow tree', self)
-        load_workflow_tree_action.setStatusTip(
-            'Discard the current workflow tree and open a workflow tree '
-            'from file.')
-        self._actions['load_workflow_tree'] = load_workflow_tree_action
+        # load_workflow_tree_action = QtWidgets.QAction(
+        #     QtGui.QIcon('open.png'), 'Load &workflow tree', self)
+        # load_workflow_tree_action.setStatusTip(
+        #     'Discard the current workflow tree and open a workflow tree '
+        #     'from file.')
+        # self._actions['load_workflow_tree'] = load_workflow_tree_action
 
         exit_action = QtWidgets.QAction(QtGui.QIcon('exit.png'), '&Exit', self)
         exit_action.setShortcut('Ctrl+Q')
@@ -235,14 +235,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Connect all menu actions to their respective slots.
         """
-        self._actions['new_workflow'].triggered.connect(
-            self._action_new_workflow)
-        self._actions['load_workflow_tree'].triggered.connect(
-            self._action_load_workflow_tree)
-        self._actions['load_exp_setup'].triggered.connect(
-            self._action_load_exp_setup)
-        self._actions['load_scan_setup'].triggered.connect(
-            self._action_load_scan_setup)
+        # self._actions['new_workflow'].triggered.connect(
+        #     self._action_new_workflow)
+        # self._actions['load_workflow_tree'].triggered.connect(
+        #     self._action_load_workflow_tree)
+        # self._actions['load_exp_setup'].triggered.connect(
+        #     self._action_load_exp_setup)
+        # self._actions['load_scan_setup'].triggered.connect(
+        #     self._action_load_scan_setup)
         self._actions['exit'].triggered.connect(self.close)
         self._actions['open_settings'].triggered.connect(
             partial(self.show_window, 'global_config'))
@@ -257,14 +257,14 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         _menu = self.menuBar()
 
-        _open_menu = QtWidgets.QMenu('&Open', self)
-        _open_menu.addAction(self._actions['load_exp_setup'])
-        _open_menu.addAction(self._actions['load_scan_setup'])
-        _open_menu.addAction(self._actions['load_workflow_tree'])
+        # _open_menu = QtWidgets.QMenu('&Open', self)
+        # _open_menu.addAction(self._actions['load_exp_setup'])
+        # _open_menu.addAction(self._actions['load_scan_setup'])
+        # _open_menu.addAction(self._actions['load_workflow_tree'])
 
         _file_menu = _menu.addMenu('&File')
-        _file_menu.addAction(self._actions['new_workflow'])
-        _file_menu.addMenu(_open_menu)
+        # _file_menu.addAction(self._actions['new_workflow'])
+        # _file_menu.addMenu(_open_menu)
         _file_menu.addAction(self._actions['exit'])
         _menu.addMenu(_file_menu)
 

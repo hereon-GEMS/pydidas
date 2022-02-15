@@ -27,8 +27,7 @@ __all__ = []
 
 import sys
 
-from PyQt5 import QtWidgets
-import numpy as np
+from qtpy import QtWidgets
 
 from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame, PyfaiCalibFrame, HomeFrame,

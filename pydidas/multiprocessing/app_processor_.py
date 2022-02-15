@@ -95,10 +95,13 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
             except queue.Empty:
                 _arg = NO_ITEM
         if _arg is not NO_ITEM:
+            logger.debug('Received item "%s" from queue' % _arg)
             _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
+                logger.debug('Starting computation')
                 _results = _app.multiprocessing_func(_arg)
+                logger.debug('Finished computation')
                 output_queue.put([_arg, _results])
         time.sleep(0.01)
     finished_queue.put(1)

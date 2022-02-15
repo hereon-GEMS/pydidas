@@ -132,7 +132,7 @@ class WorkerController(QtCore.QThread):
         Stop the thread from running and clean up.
         """
         self.suspend()
-        self.add_tasks([None] * self.n_workers)
+        self.add_tasks([None] * self.n_workers, stop_tasks=True)
         self.send_stop_signal()
         self._flag_thread_alive = False
 
@@ -243,7 +243,7 @@ class WorkerController(QtCore.QThread):
         self._write_lock.unlock()
         self._progress_target += 1
 
-    def add_tasks(self, task_args):
+    def add_tasks(self, task_args, stop_tasks=False):
         """
         Add tasks to the worker pool.
 
@@ -256,12 +256,16 @@ class WorkerController(QtCore.QThread):
         ----------
         task_args : Union[list, tuple, set]
             An iterable of the first argument for the processing function.
+        stop_tasks : bool
+            Keyword to signal adding stop tasks. This flag will disable
+            updating the task target number.
         """
         self._write_lock.lockForWrite()
         for task in task_args:
             self._to_process.append(task)
         self._write_lock.unlock()
-        self._progress_target = len(task_args)
+        if not stop_tasks:
+            self._progress_target = len(task_args)
 
     def send_stop_signal(self):
         """

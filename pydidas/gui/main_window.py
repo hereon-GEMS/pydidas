@@ -120,7 +120,7 @@ def _update_qtapp_font_size():
 
 class MainWindow(QtWidgets.QMainWindow):
     """
-    Inherits from :py:class:`PyQt5.QtWidgets.QMainWindow`.
+    Inherits from :py:class:`qtpy.QtWidgets.QMainWindow`.
 
     The MainWindow is used to organize frames and for managing the menu
     and global application parameters.

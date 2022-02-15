@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WarningBox']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 
 class WarningBox(QtWidgets.QMessageBox):

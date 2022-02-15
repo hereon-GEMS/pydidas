@@ -29,7 +29,7 @@ __all__ = ['ExperimentalSetupFrame']
 from functools import partial
 
 import numpy as np
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 

@@ -30,7 +30,7 @@ import os
 import re
 
 import numpy as np
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from ..core import Dataset, SingletonFactory
 from ..experiment import ScanSetup
@@ -49,7 +49,7 @@ class _WorkflowResults(QtCore.QObject):
     multiple datasets with multiple dimensions each. Results are referenced
     by the node ID of the data's producer.
     """
-    new_results = QtCore.pyqtSignal()
+    new_results = QtCore.Signal()
 
     def __init__(self):
         super().__init__()

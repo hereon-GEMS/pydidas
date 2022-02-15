@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_line']
 
-from PyQt5.QtWidgets import QFrame
+from qtpy.QtWidgets import QFrame
 
 from ..utilities import apply_widget_properties
 

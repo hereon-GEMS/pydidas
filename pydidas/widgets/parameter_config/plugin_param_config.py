@@ -26,10 +26,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PluginParameterEditWidget']
 
-from functools import partial
 from pathlib import Path
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ...core import Hdf5key
 from ..factory import CreateWidgetsMixIn
@@ -140,7 +139,7 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         self._widgets['restore_defaults'].clicked.connect(
             self.__restore_defaults)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __restore_defaults(self):
         """
         Restore the default values to all Plugin Parameters.

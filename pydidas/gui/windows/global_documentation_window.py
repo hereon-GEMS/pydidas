@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GlobalDocumentationWindow']
 
-from PyQt5 import QtWebEngineWidgets, QtWidgets, QtCore
+from qtpy import QtWebEngineWidgets, QtWidgets, QtCore
 
 from ...widgets import (PydidasWebView, ScrollArea,
                         get_pyqt_icon_from_str_reference)
@@ -71,19 +71,19 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
         self._actions['undo'].triggered.connect(self._action_undo)
         self._actions['redo'].triggered.connect(self._action_redo)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_home(self):
         """
         Goto the documentation homepage.
         """
         self._webview.load_main_doc()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_undo(self):
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Back)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_redo(self):
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Forward)

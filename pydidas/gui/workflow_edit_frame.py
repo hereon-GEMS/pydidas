@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowEditFrame']
 
-from PyQt5 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ..widgets import BaseFrame
 from ..workflow import WorkflowTree
@@ -65,7 +65,7 @@ class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
         self._widgets['but_save'].clicked.connect(self.save_tree_to_file)
         self._widgets['but_load'].clicked.connect(self.load_tree_from_file)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def workflow_add_plugin(self, name):
         """
         Get the signal that a new Plugin has been selected and must be added
@@ -78,7 +78,7 @@ class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
         """
         WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def configure_plugin(self, node_id):
         """
         Get the signal that a new Plugin has been selected to be edited and
@@ -120,7 +120,7 @@ class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
         TREE.import_from_file(fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def frame_activated(self, index):
         """
         Received a signal that a new frame has been selected.

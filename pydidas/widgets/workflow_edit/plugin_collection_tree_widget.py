@@ -28,7 +28,8 @@ __all__ = ['PluginCollectionTreeWidget']
 
 from functools import partial
 
-from PyQt5 import QtWidgets, Qt, QtGui, QtCore
+from qtpy import QtWidgets, QtGui, QtCore
+from qtpy.QtCore import Qt
 
 from ...core.constants import QT_STYLES
 from ...plugins import PluginCollection
@@ -54,8 +55,8 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
     **kwargs : dict
         Additional keyword arguments for widget modifications.
     """
-    selection_changed = QtCore.pyqtSignal(str)
-    selection_confirmed = QtCore.pyqtSignal(str)
+    selection_changed = QtCore.Signal(str)
+    selection_confirmed = QtCore.Signal(str)
 
     def __init__(self, parent=None, collection=None, **kwargs):
         super().__init__(parent)
@@ -63,11 +64,11 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.collection = (collection if collection is not None
                            else PLUGIN_COLLECTION)
 
-        self.setEditTriggers(Qt.QAbstractItemView.NoEditTriggers)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.setFixedWidth(493)
         self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
-        self.setSelectionMode(Qt.QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.header().setStyleSheet(QT_STYLES['title'])
 
         _root, _model = self.__create_tree_model()
@@ -86,25 +87,25 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
         Returns
         -------
-        root_node : QStandardItem
+        root_node : QtGui.QStandardItem
             The root node item.
-        tree_model : QStandardItemModel
+        tree_model : QtGui.QStandardItemModel
             The tree view model.
         """
-        tree_model = Qt.QStandardItemModel()
+        tree_model = QtGui.QStandardItemModel()
         tree_model.setHorizontalHeaderLabels(['Available plugins'])
 
         root_node = tree_model.invisibleRootItem()
-        input_plugins = Qt.QStandardItem('Input plugins')
-        proc_plugins = Qt.QStandardItem('Processing plugins')
-        output_plugins = Qt.QStandardItem('Output plugins')
+        input_plugins = QtGui.QStandardItem('Input plugins')
+        proc_plugins = QtGui.QStandardItem('Processing plugins')
+        output_plugins = QtGui.QStandardItem('Output plugins')
 
         for _plugin in self.collection.get_all_plugins_of_type('input'):
-            input_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+            input_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type('proc'):
-            proc_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+            proc_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type('output'):
-            output_plugins.appendRow(Qt.QStandardItem(_plugin.plugin_name))
+            output_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
 
         root_node.appendRow(input_plugins)
         root_node.appendRow(proc_plugins)

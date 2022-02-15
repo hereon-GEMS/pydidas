@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GlobalConfiguration_FrameBuilder']
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from ...core.constants import CONFIG_WIDGET_WIDTH
 from ...widgets.factory import CreateWidgetsMixIn

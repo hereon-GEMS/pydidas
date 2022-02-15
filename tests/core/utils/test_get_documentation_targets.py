@@ -27,7 +27,7 @@ import unittest
 import os
 
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.core.utils import (
     get_doc_make_directory, get_doc_home_filename, get_doc_home_address,

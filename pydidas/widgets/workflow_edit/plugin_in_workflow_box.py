@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PluginInWorkflowBox']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ...core.constants import gui_constants, qt_presets
 from ..utilities import apply_widget_properties
@@ -48,8 +48,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     """
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
-    widget_activated = QtCore.pyqtSignal(int)
-    widget_delete_request = QtCore.pyqtSignal(int)
+    widget_activated = QtCore.Signal(int)
+    widget_delete_request = QtCore.Signal(int)
 
     def __init__(self, title, widget_id, parent=None, **kwargs):
         super().__init__(parent)

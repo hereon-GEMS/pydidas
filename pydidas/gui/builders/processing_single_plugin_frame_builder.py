@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ProcessingSinglePlugin_FrameBuilder']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 from silx.gui.plot.StackView import StackView
 
 from ...experiment import ScanSetup

@@ -31,7 +31,7 @@ import shutil
 import copy
 
 import numpy as np
-from PyQt5 import QtWidgets, QtCore, QtTest, QtGui
+from qtpy import QtWidgets, QtCore, QtTest, QtGui
 
 from pydidas.widgets.workflow_edit import (
     PluginCollectionBrowser, PluginCollectionTreeWidget)

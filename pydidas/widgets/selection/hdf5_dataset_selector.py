@@ -30,7 +30,7 @@ from functools import partial
 
 import h5py
 import hdf5plugin
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from ...core import FrameConfigError
@@ -70,7 +70,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         Qt attribute name with a lowercase first character. Examples are
         ``fixedWidth``, ``fixedHeight``.
     """
-    new_frame_signal = QtCore.pyqtSignal(object)
+    new_frame_signal = QtCore.Signal(object)
 
     def __init__(self, parent=None, viewWidget=None, datasetKeyFilters=None,
                  **kwargs):

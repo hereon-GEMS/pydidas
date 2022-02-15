@@ -28,7 +28,7 @@ __all__ = ['ParamIoWidgetFile']
 
 import pathlib
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
 from .param_io_widget_with_button import ParamIoWidgetWithButton
@@ -39,7 +39,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
      """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
         """

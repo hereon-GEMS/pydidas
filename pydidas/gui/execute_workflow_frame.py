@@ -30,7 +30,7 @@ import time
 import os
 
 import numpy as np
-from PyQt5 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ..apps import ExecuteWorkflowApp
 from ..core import get_generic_param_collection
@@ -105,7 +105,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.set_status('Aborted processing of full workflow.')
         self.__finish_processing()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __execute(self):
         """
         Execute the Application in the chosen type (GUI or command line).
@@ -182,7 +182,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.
@@ -194,7 +194,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self.__finish_processing()
         self.__update_plot()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __update_result_node_information(self):
         """
         Update the information about the nodes' results after the AppRunner
@@ -207,7 +207,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         except AttributeError:
             pass
 
-    @QtCore.pyqtSlot(bool, int, int, object)
+    @QtCore.Slot(bool, int, int, object)
     def __update_result_selection(self, use_timeline, plot_dim, node_id,
                                   slices):
         """
@@ -232,7 +232,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         self._config['data_slices'] = slices
         self.__update_plot()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __check_for_plot_update(self):
         _dt = time.time() - self._config['plot_last_update']
         if (_dt > self._config['plot_update_time']
@@ -308,7 +308,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         return _origin, _scale
 
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def frame_activated(self, index):
         """
         Received a signal that a new frame has been selected.
@@ -364,7 +364,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         for _key in ['autosave_dir', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __export_current(self):
         """
         Export the current node's data to a WorkflowResults saver.
@@ -378,7 +378,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
              return
         self.__export(_node)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __export_all(self):
         """
         Export all datasets to a WorkflowResults saver.

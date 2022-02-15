@@ -32,7 +32,7 @@ import sys
 from pathlib import Path
 from functools import partial
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import FrameConfigError
 from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
@@ -277,23 +277,23 @@ class MainWindow(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions['open_documentation_browser'])
         _menu.addMenu(_help_menu)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_new_workflow(self):
         print('New workflow')
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_load_workflow_tree(self):
         print('load workflow')
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_load_exp_setup(self):
         print('load exp setup')
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_load_scan_setup(self):
         print('load scan setup')
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _action_open_doc_in_browser(self):
         """
         Open the link to the documentation in the system web browser.
@@ -449,7 +449,7 @@ class MainWindow(QtWidgets.QMainWindow):
             index=frame.frame_index,
             menus=_new_menus)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def select_item(self, label):
         """
         Select an item from the left toolbar and select the corresponding
@@ -492,7 +492,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self._child_windows[window].close()
         event.accept()
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def update_status(self, text):
         """
         Get a text message and show it in the global status widget.
@@ -511,7 +511,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.__info_widget.add_status(text)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def show_window(self, name):
         """
         Show a separate window.

@@ -28,7 +28,7 @@ __all__ = ['QT_PALETTES', 'QT_STYLES', 'STANDARD_FONT_SIZE',
            'QT_DEFAULT_ALIGNMENT', 'QT_COMBO_BOX_SIZE_POLICY',
            'QT_REG_EXP_FLOAT_VALIDATOR', 'QT_REG_EXP_INT_VALIDATOR']
 
-from PyQt5 import QtGui, QtCore, QtWidgets
+from qtpy import QtGui, QtCore, QtWidgets
 
 
 STANDARD_FONT_SIZE = 10

@@ -27,7 +27,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PluginPositionNode']
 
-
 import numpy as np
 
 from .generic_node import GenericNode

@@ -28,7 +28,7 @@ __all__ = ['PydidasQsettingsMixin', 'CopyableQSettings']
 
 from numbers import Integral, Real
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 
 class CopyableQSettings(QtCore.QSettings):

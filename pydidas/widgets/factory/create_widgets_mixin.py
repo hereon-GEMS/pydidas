@@ -26,8 +26,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CreateWidgetsMixIn']
 
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
+from qtpy import QtWidgets
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from ...core import WidgetLayoutError
 from ...core.utils import copy_docstring

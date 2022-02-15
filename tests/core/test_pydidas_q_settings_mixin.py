@@ -27,7 +27,7 @@ import unittest
 import copy
 import pickle
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.core import (PydidasQsettingsMixin, ParameterCollection,
                           Parameter, CopyableQSettings)

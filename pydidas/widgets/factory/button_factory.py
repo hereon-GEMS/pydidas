@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_button']
 
-from PyQt5.QtWidgets import QPushButton
+from qtpy.QtWidgets import QPushButton
 
 from ..utilities import (apply_widget_properties,
                          get_pyqt_icon_from_str_reference)

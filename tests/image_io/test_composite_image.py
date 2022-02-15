@@ -30,7 +30,7 @@ import unittest
 import copy
 
 import numpy as np
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.image_io import CompositeImage
 from pydidas.core import AppConfigError

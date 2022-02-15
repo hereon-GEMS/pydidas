@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_combo_box']
 
-from PyQt5.QtWidgets import QComboBox
+from qtpy.QtWidgets import QComboBox
 
 from ..utilities import apply_widget_properties
 

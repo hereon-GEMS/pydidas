@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_check_box']
 
-from PyQt5.QtWidgets import QCheckBox
+from qtpy.QtWidgets import QCheckBox
 
 from ..utilities import apply_widget_properties
 

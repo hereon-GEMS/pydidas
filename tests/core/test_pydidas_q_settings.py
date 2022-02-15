@@ -30,7 +30,7 @@ import shutil
 from contextlib import redirect_stdout
 
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.core import (PydidasQsettings, ParameterCollection,
                           Parameter, CopyableQSettings)

@@ -30,7 +30,7 @@ import shutil
 
 import h5py
 import numpy as np
-from PyQt5 import QtWidgets, QtTest
+from qtpy import QtWidgets, QtTest
 
 from pydidas.core import FrameConfigError
 from pydidas.widgets.selection import Hdf5DatasetSelector

@@ -25,13 +25,13 @@ __all__ = ['ConfirmationBar']
 
 from functools import partial
 
-from PyQt5 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ...core.constants import QT_STYLES
 
 class _Metadata(QtCore.QObject):
     """Metadata class to connect signals between different widgets."""
-    checked_state = QtCore.pyqtSignal(bool, bool, bool)
+    checked_state = QtCore.Signal(bool, bool, bool)
 
     def __init__(self):
         """
@@ -165,7 +165,7 @@ class ConfirmationBar(QtWidgets.QFrame):
             self.setParent(parent)
 
 
-    @QtCore.pyqtSlot(bool, bool, bool)
+    @QtCore.Slot(bool, bool, bool)
     def set_buttons(self, state0, state1, state2):
         """
         Set the button ticks with new information from the metadata class.

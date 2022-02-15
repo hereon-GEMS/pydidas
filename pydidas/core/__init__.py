@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 # import sub-packages:
 from . import constants

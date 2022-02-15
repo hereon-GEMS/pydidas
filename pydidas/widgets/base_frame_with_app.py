@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['BaseFrameWithApp']
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from ..core import BaseApp
 from .base_frame import BaseFrame
@@ -53,7 +53,7 @@ class BaseFrameWithApp(BaseFrame):
         If False, no layout will be initialized and the subclass is
         responsible for setting up the layout. The default is True.
     """
-    status_msg = QtCore.pyqtSignal(str)
+    status_msg = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
         init_layout = kwargs.get('init_layout', True)
@@ -62,7 +62,7 @@ class BaseFrameWithApp(BaseFrame):
         self._runner = None
         self._app_attributes_to_update = []
 
-    @QtCore.pyqtSlot(object)
+    @QtCore.Slot(object)
     def _set_app(self, app):
         """
         Update the local copy of the App after the AppRunner computations.
@@ -86,7 +86,7 @@ class BaseFrameWithApp(BaseFrame):
             _att_val = getattr(app, att)
             setattr(self._app, att, _att_val)
 
-    @QtCore.pyqtSlot(float)
+    @QtCore.Slot(float)
     def _apprunner_update_progress(self, progress):
         """
         Update the progress of the AppRunner.
@@ -100,7 +100,7 @@ class BaseFrameWithApp(BaseFrame):
             _progress = round(progress * 100)
             self._widgets['progress'].setValue(_progress)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.

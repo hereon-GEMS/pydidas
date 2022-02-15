@@ -26,15 +26,15 @@ __status__ = "Development"
 import unittest
 from pathlib import Path
 
-from PyQt5 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from pydidas.core import get_generic_parameter, BaseApp
 from pydidas.widgets.base_frame_with_app import BaseFrameWithApp
 
 
 class TestClass(QtCore.QObject):
-    signal = QtCore.pyqtSignal(float)
-    simple_signal = QtCore.pyqtSignal()
+    signal = QtCore.Signal(float)
+    simple_signal = QtCore.Signal()
 
     def __init__(self):
         super().__init__()

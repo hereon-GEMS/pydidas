@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['DataBrowsingFrame_BuilderMixin']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 import qtawesome as qta
 from silx.gui.plot.ImageView import ImageView
 

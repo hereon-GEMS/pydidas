@@ -29,7 +29,7 @@ import random
 import sys
 
 import numpy as np
-from PyQt5 import  QtWidgets
+from qtpy import  QtWidgets
 
 from pydidas.widgets.central_widget_stack import CentralWidgetStack
 

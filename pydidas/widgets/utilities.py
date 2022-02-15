@@ -32,7 +32,7 @@ import time
 import traceback
 from io import StringIO
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore, QtGui
 import qtawesome
 
 from ..core.constants import STANDARD_FONT_SIZE

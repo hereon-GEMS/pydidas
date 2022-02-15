@@ -26,7 +26,7 @@ __status__ = "Development"
 import unittest
 import sys
 
-from PyQt5 import QtCore, QtTest
+from qtpy import QtCore, QtTest
 
 from pydidas.core import BaseApp
 from pydidas.multiprocessing import AppRunner

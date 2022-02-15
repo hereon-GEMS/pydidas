@@ -31,7 +31,7 @@ import logging
 
 import pyFAI
 import numpy as np
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 from pydidas.core import get_generic_parameter

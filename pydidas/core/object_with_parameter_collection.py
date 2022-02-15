@@ -29,7 +29,7 @@ __all__ = ['ObjectWithParameterCollection']
 import warnings
 from copy import copy
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from .parameter_collection import ParameterCollection
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin

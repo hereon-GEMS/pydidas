@@ -33,7 +33,7 @@ import sys
 import io
 from contextlib import redirect_stdout
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas.core.utils import get_random_string
 from pydidas.unittest_objects import DummyPluginCollection, create_plugin_class

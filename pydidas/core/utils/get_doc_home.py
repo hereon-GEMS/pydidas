@@ -30,7 +30,7 @@ __all__ = ['get_doc_home_filename', 'get_doc_home_address',
 
 import os
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 
 def get_doc_home_filename():

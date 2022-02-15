@@ -31,7 +31,7 @@ import importlib
 import os
 import inspect
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..core.utils import find_valid_python_files

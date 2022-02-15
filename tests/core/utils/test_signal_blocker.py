@@ -25,13 +25,13 @@ __status__ = "Development"
 
 import unittest
 
-from PyQt5 import QtCore, QtTest
+from qtpy import QtCore, QtTest
 
 from pydidas.core.utils import SignalBlocker
 
 
 class Tester(QtCore.QObject):
-    sig = QtCore.pyqtSignal(object)
+    sig = QtCore.Signal(object)
 
     def __init__(self):
         super().__init__()

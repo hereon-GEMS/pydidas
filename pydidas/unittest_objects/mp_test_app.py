@@ -29,7 +29,7 @@ __all__ = ['MpTestApp']
 import time
 
 import numpy as np
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
@@ -148,7 +148,7 @@ class MpTestApp(BaseApp):
         _image = get_test_image(_fname, **_kwargs)
         return _image
 
-    @QtCore.pyqtSlot(int, object)
+    @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, image):
         """
         Store the result of the multiprocessing function call.

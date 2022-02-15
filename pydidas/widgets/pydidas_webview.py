@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PydidasWebView']
 
-from PyQt5 import QtWebEngineWidgets, QtCore
+from qtpy import QtWebEngineWidgets, QtCore
 
 from ..core.utils import get_doc_home_qurl
 

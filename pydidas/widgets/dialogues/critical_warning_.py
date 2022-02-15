@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['critical_warning']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 
 def critical_warning(title, text):

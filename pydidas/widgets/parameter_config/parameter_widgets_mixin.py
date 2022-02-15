@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterWidgetsMixIn']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from .parameter_config_widget import ParameterConfigWidget
 from ...core import WidgetLayoutError

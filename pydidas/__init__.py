@@ -31,7 +31,7 @@ __all__ = []
 # import QtWebEngineWidgets first before creating any QApplication because
 # of problem with python Qt binding (cannot import engine after application
 # has been created)
-from PyQt5 import QtCore, QtWebEngineWidgets
+from qtpy import QtCore, QtWebEngineWidgets
 
 # import sub-packages:
 from . import apps

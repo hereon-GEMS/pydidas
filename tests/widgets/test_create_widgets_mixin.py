@@ -27,7 +27,7 @@ import unittest
 import string
 import random
 
-from PyQt5 import  QtWidgets
+from qtpy import  QtWidgets
 
 from pydidas.core import WidgetLayoutError
 from pydidas.widgets.factory.create_widgets_mixin import (

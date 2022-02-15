@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowEditFrame_BuilderMixin']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 from ...widgets import ScrollArea
 from ...widgets.factory import CreateWidgetsMixIn

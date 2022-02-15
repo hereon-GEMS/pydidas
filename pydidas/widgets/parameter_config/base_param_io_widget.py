@@ -29,7 +29,7 @@ __all__ = ['BaseParamIoWidget']
 import numbers
 import pathlib
 
-from PyQt5 import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui
 from numpy import nan
 
 from ...core import Hdf5key

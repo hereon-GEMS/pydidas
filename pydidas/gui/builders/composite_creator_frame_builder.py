@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CompositeCreator_FrameBuilder']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 from silx.gui.plot import PlotWindow
 
 from ...core.constants import CONFIG_WIDGET_WIDTH

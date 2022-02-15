@@ -28,7 +28,7 @@ __all__ = ['ParamIoWidgetWithButton']
 
 from functools import partial
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore, QtGui
 
 from .base_param_io_widget import BaseParamIoWidget
 from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_EDIT_WIDTH
@@ -52,7 +52,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         The icon for the button. If None, the standard "file open" icon
         will be used.
     """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH,
                  button_icon=None):

@@ -27,7 +27,7 @@ __status__ = "Development"
 __all__ = ['SignalBlocker']
 
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 
 class SignalBlocker:

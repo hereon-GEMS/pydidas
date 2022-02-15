@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParamIoWidgetLineEdit']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from .base_param_io_widget import BaseParamIoWidget
 from ...core.constants import (PARAM_INPUT_WIDGET_HEIGHT,
@@ -50,7 +50,7 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         PARAM_INPUT_WIDGET_WIDTH value in the
         pydidas.core.constants.gui_constants module.
     """
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_WIDGET_WIDTH):
         super().__init__(parent, param, width)

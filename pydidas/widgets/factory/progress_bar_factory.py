@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_progress_bar']
 
-from PyQt5.QtWidgets import QProgressBar
+from qtpy.QtWidgets import QProgressBar
 
 from ..utilities import apply_widget_properties
 

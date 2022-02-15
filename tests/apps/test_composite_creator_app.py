@@ -31,7 +31,7 @@ from pathlib import Path
 
 import numpy as np
 import h5py
-from PyQt5 import QtCore, QtTest
+from qtpy import QtCore, QtTest
 
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollection, Dataset, AppConfigError,

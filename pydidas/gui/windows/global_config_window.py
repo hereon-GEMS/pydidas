@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GlobalConfigWindow']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 from ..global_configuration_frame import GlobalConfigurationFrame
 

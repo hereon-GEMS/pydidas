@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['WorkflowTreeCanvas']
 
-from PyQt5 import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui
 
 from ...core.constants import QT_STYLES
 

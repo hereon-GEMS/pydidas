@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ExecuteWorkflowFrame_BuilderMixin']
 
-from PyQt5 import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D, Plot2D
 
 from ...core.constants import CONFIG_WIDGET_WIDTH

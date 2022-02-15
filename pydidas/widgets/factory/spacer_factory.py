@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_spacer']
 
-from PyQt5.QtWidgets import QSpacerItem, QSizePolicy
+from qtpy.QtWidgets import QSpacerItem, QSizePolicy
 
 from ..utilities import apply_widget_properties
 

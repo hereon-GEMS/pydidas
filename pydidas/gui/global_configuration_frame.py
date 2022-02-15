@@ -28,7 +28,7 @@ __all__ = ['GlobalConfigurationFrame']
 
 from functools import partial
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ..core import get_generic_param_collection
 from ..widgets import BaseFrame
@@ -45,7 +45,7 @@ class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
         'det_mask', 'det_mask_val', 'mosaic_border_width',
         'mosaic_border_value', 'mosaic_max_size', 'plot_update_time')
 
-    value_changed_signal = QtCore.pyqtSignal(str, object)
+    value_changed_signal = QtCore.Signal(str, object)
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
@@ -81,7 +81,7 @@ class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
         self.q_settings.setValue(f'global/{param_key}', value)
         self.value_changed_signal.emit(param_key, value)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def frame_activated(self, index):
         """
         Update the frame.
@@ -112,7 +112,7 @@ class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
                 self.update_widget_value(_param_key, _value)
                 self.value_changed_signal.emit(_param_key, _value)
 
-    @QtCore.pyqtSlot(str, object)
+    @QtCore.Slot(str, object)
     def external_update(self, param_key, value):
         """
         Perform an update after a Parameter has changed externally.

@@ -27,7 +27,7 @@ __status__ = "Development"
 __all__ = ['HomeFrame']
 
 import os
-from PyQt5 import QtGui, QtCore
+from qtpy import QtGui, QtCore
 
 from ..core.utils import get_doc_home_address
 from ..widgets import BaseFrame
@@ -112,7 +112,7 @@ class HomeFrame(BaseFrame):
             openExternalLinks=True, textFormat=QtCore.Qt.RichText,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def open_link(self, link_str):
         """
         Open a link in the system's default browser.

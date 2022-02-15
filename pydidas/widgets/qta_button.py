@@ -28,7 +28,7 @@ __all__ = ['QtaIconButton']
 
 import numbers
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 import qtawesome
 
 

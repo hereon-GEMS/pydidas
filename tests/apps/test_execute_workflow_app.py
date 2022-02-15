@@ -33,7 +33,7 @@ import time
 import multiprocessing as mp
 
 import numpy as np
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from pydidas import unittest_objects
 from pydidas.core import get_generic_parameter, AppConfigError, utils

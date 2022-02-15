@@ -27,7 +27,7 @@ __status__ = "Development"
 __all__ = ['ImageMath_FrameBuilder']
 
 import qtawesome as qta
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 from silx.gui.plot.ImageView import ImageView
 
 from ...widgets.factory import CreateWidgetsMixIn

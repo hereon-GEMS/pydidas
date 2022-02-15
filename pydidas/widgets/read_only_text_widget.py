@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ReadOnlyTextWidget']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 from .utilities import apply_widget_properties
 

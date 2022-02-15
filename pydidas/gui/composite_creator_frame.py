@@ -31,7 +31,7 @@ import time
 from functools import partial
 
 import numpy as np
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ..apps import CompositeCreatorApp
 from ..core import Parameter, get_generic_parameter, AppConfigError
@@ -134,7 +134,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
             partial(self.__update_composite_dim, 'y'))
         self._app.updated_composite.connect(self.__received_composite_update)
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def __received_composite_update(self):
         """
         Slot to be called on an update signal from the Composite.
@@ -226,7 +226,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
         logger.debug('Starting AppRunner')
         self._runner.start()
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def _apprunner_finished(self):
         """
         Clean up after AppRunner is done.
@@ -254,7 +254,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
             'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png);;NUMPY (*.npy *.npz)')[0]
         self._app.export_image(fname)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def __selected_first_file(self, fname):
         """
         Perform required actions after selecting the first image file.

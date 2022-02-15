@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParamIoWidgetHdf5Key']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
 from ..dialogues import Hdf5DatasetSelectionPopup
@@ -40,7 +40,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     (Includes a small button to select a filepath from a dialogue.)
      """
     #for some reason, inhering the signal from the base class does not work
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
         """

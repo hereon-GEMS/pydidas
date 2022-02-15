@@ -28,7 +28,7 @@ __all__ = ['ScanSetupFrame']
 
 import sys
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 from ..experiment import ScanSetup, ScanSetupIoMeta
 from ..widgets import excepthook, BaseFrame

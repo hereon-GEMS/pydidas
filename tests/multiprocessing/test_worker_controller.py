@@ -29,7 +29,7 @@ import sys
 import multiprocessing as mp
 
 import numpy as np
-from PyQt5 import QtCore, QtWidgets, QtTest
+from qtpy import QtCore, QtWidgets, QtTest
 
 from pydidas.multiprocessing import WorkerController
 from pydidas.core.utils import pydidas_logger, get_time_string

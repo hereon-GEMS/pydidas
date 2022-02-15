@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_label']
 
-from PyQt5.QtWidgets import QLabel, QApplication
+from qtpy.QtWidgets import QLabel, QApplication
 
 from ...core.constants import STANDARD_FONT_SIZE
 from ..utilities import apply_widget_properties, apply_font_properties

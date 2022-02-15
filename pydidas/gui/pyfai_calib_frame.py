@@ -29,7 +29,7 @@ __all__ = ['PyfaiCalibFrame', 'get_pyfai_calib_icon']
 import os
 import functools
 
-from PyQt5 import QtWidgets, QtGui, QtCore
+from qtpy import QtWidgets, QtGui, QtCore
 import pyFAI
 from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.utils import projecturl

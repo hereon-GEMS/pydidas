@@ -26,7 +26,7 @@ __status__ = "Development"
 import unittest
 import sys
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from pydidas.widgets.info_widget import InfoWidget
 

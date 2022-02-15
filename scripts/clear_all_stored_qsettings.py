@@ -29,7 +29,7 @@ __all__ = []
 import sys
 import os
 
-from PyQt5.QtCore import QSettings
+from qtpy.QtCore import QSettings
 
 _path = os.path.dirname(__file__)
 sys.path.insert(0, _path)

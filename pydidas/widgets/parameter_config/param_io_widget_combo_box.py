@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParamIoWidgetComboBox']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from .base_param_io_widget import BaseParamIoWidget
 from ...core.utils import (convert_unicode_to_ascii, SignalBlocker,
@@ -39,7 +39,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
     choices.
     """
     #because of the double inheritance, inhering the signal does not work
-    io_edited = QtCore.pyqtSignal(str)
+    io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=255):
         """

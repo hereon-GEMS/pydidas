@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['CentralWidgetStack']
 
-from PyQt5 import QtWidgets
+from qtpy import QtWidgets
 
 from ..core import SingletonFactory
 

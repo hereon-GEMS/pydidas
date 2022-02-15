@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ParameterEditFrame']
 
-from PyQt5 import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore
 
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 from ..utilities import apply_widget_properties

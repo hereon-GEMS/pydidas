@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Hdf5DatasetSelectionPopup']
 
-from PyQt5 import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui
 
 from ...core import Hdf5key
 from ...core.utils import get_hdf5_populated_dataset_keys

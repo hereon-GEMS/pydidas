@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ScanSetup_FrameBuilder']
 
-from PyQt5 import QtCore
+from qtpy import QtCore
 
 from ...experiment import ScanSetup
 from ...widgets.factory import CreateWidgetsMixIn

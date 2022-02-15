@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['create_spin_box']
 
-from PyQt5.QtWidgets import QSpinBox
+from qtpy.QtWidgets import QSpinBox
 
 from ..utilities import apply_widget_properties
 

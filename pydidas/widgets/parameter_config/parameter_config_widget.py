@@ -41,8 +41,15 @@ from ..factory import create_param_widget, create_label
 
 class ParameterConfigWidget(QtWidgets.QWidget):
     """
-    The ParameterConfigWidget is a generic QWidget with a instantiated
-    QGridLayout to add label, I/O and unit widgets for a Parameter.
+    The ParameterConfigWidget is a combined widget to display and modify a
+    Parameter with name, value and unit.
+
+    This widget is a wrapper and includes labels for name and unit and the
+    respective Parameter edit widget which is selected based on the Parameter
+    type and choices.
+
+    This is the public widget should be added to the GUI to display and modify
+    Parameters.
 
     Parameters
     ----------

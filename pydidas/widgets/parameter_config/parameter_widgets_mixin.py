@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginParameterConfigWidget class used to edit plugin
+Module with the PluginParameterEditWidget class used to edit plugin
 Parameters.
 """
 

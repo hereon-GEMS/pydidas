@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginParameterConfigWidget class used to edit plugin
+Module with the PluginParameterEditWidget class used to edit plugin
 Parameters.
 """
 
@@ -24,7 +24,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginParameterConfigWidget']
+__all__ = ['PluginParameterEditWidget']
 
 from functools import partial
 from pathlib import Path
@@ -37,9 +37,9 @@ from ..utilities import delete_all_items_in_layout
 from .parameter_edit_frame import ParameterEditFrame
 
 
-class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
+class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
     """
-    The PluginParameterConfigWidget widget creates the composite widget for
+    The PluginParameterEditWidget widget creates the composite widget for
     updating and changing values of all Parameters in a Plugin.
 
     Depending on the Parameter types, automatic typechecks are implemented.
@@ -50,7 +50,7 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         Setup method.
 
-        Create an instance on the PluginParameterConfigWidget class.
+        Create an instance on the PluginParameterEditWidget class.
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
     def clear_layout(self):
         """
         Delete all widgets and items which currently populate the
-        PluginParameterConfigWidget.
+        PluginParameterEditWidget.
         """
         #delete current widgets
         _layout = self.layout()
@@ -134,7 +134,8 @@ class PluginParameterConfigWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         self.create_button('restore_defaults', 'Restore default parameters',
                            icon=self.style().standardIcon(59), fixedHeight=25,
-                           layout_kwargs={'gridPos': (2, 1, 1, 1),
+                           fixedWidth=225,
+                           layout_kwargs={'gridPos': (2, 0, 1, 2),
                                           'alignment': QtCore.Qt.AlignRight})
         self._widgets['restore_defaults'].clicked.connect(
             self.__restore_defaults)

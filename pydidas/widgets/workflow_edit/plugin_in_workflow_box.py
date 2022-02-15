@@ -63,7 +63,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
 
         self.del_button = QtWidgets.QPushButton(self)
-        self.del_button.setIcon(self.style().standardIcon(40))
+        self.del_button.setIcon(self.style().standardIcon(3))
         self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
         for item in [self, self.del_button]:
             item.setStyleSheet(

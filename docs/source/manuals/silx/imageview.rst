@@ -36,21 +36,28 @@
       - Mask tools: This button opens an additional widget at the bottom of the
         canvas with tools for importing or setting a mask to mask certain 
         data regions. 
-    * -  .. image:: ../../images/imageview/imageview_08_menu_copy_to_clipboard.png
+    * -  .. image:: ../../images/imageview/imageview_08_menu_histogram.png
+            :align: center
+      - Show/hide the histograms at the side.
+    * -  .. image:: ../../images/imageview/imageview_09_menu_filter.png
+            :align: center
+      - Filter tools: This button allows the user to select simple filters to
+        apply to the image data.
+    * -  .. image:: ../../images/imageview/imageview_10_menu_copy_to_clipboard.png
             :align: center
       - Copy the currently visible figure to the clipboard. This will only copy
         the main figure and not the histograms.
-    * -  .. image:: ../../images/imageview/imageview_09_menu_save_to_file.png
+    * -  .. image:: ../../images/imageview/imageview_11_menu_save_to_file.png
             :align: center
       - Save the currently loaded full data to file, ignoring any zooming. This 
         function will open a dialogue to select the file type and filename. 
         Depending on the selected file type, the colormap and scaling will be 
         retained (e.g. for png export) or ignored (e.g. tiff export).
-    * -  .. image:: ../../images/imageview/imageview_10_menu_print.png
+    * -  .. image:: ../../images/imageview/imageview_12_menu_print.png
             :align: center
       - Print the currently visible figure. This will print only the data 
         visible on the canvas and it will retain colormap and scaling settings.
-    * -  .. image:: ../../images/imageview/imageview_11_menu_profile.png
+    * -  .. image:: ../../images/imageview/imageview_13_menu_profile.png
             :align: center
       - Create and delete line profiles. This function allows the selection and
         editing of line profiles. The line profiles are shown in the histograms

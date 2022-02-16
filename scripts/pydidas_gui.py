@@ -36,7 +36,7 @@ from pydidas.gui import (
 from pydidas.widgets import BaseFrame
 
 
-class ProcessingSetupFrame(BaseFrame):
+class ProcessingFrame(BaseFrame):
     show_frame = False
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
@@ -63,23 +63,22 @@ def run_gui(qtapp):
     gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
     gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
                         'qta::mdi.image-search-outline')
-    gui.register_frame(ToolsFrame, 'Tools', 'Tools' , 'qta::mdi.tools')
     gui.register_frame(PyfaiCalibFrame, 'pyFAI calibration',
-                       'Tools/pyFAI calibration', get_pyfai_calib_icon())
+                       'pyFAI calibration', get_pyfai_calib_icon())
     gui.register_frame(CompositeCreatorFrame, 'Composite image creator',
-                       'Tools/Composite image creator', 'qta::mdi.view-comfy')
-    gui.register_frame(ProcessingSetupFrame, 'Processing setup',
-                       'Processing setup', 'qta::mdi.cogs')
+                       'Composite image creator', 'qta::mdi.view-comfy')
+    gui.register_frame(ProcessingFrame, 'Workflow processing',
+                       'Workflow processing', 'qta::mdi.cogs')
     gui.register_frame(ExperimentalSetupFrame, 'Experimental settings',
-                       'Processing setup/Experimental settings',
+                       'Workflow processing/Experimental settings',
                        'qta::mdi.card-bulleted-settings-outline')
     gui.register_frame(ScanSetupFrame, 'Scan settings',
-                       'Processing setup/Scan settings', 'qta::ei.move')
+                       'Workflow processing/Scan settings', 'qta::ei.move')
     gui.register_frame(WorkflowEditFrame, 'Workflow editing',
-                       'Processing setup/Workflow editing',
+                       'Workflow processing/Workflow editing',
                        'qta::mdi.clipboard-flow-outline')
     gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
-                   'Run full procesing', 'qta::mdi.sync')
+                   'Workflow processing/Run full procesing', 'qta::mdi.sync')
     # gui.register_frame(ResultVisualizationFrame, 'Result visualization',
     #                    'Result visualization', 'qta::mdi.monitor-eye')
     gui.show()

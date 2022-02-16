@@ -34,17 +34,17 @@ __all__ = []
 from qtpy import QtCore, QtWebEngineWidgets
 
 # import sub-packages:
-from . import apps
 from . import core
-from . import experiment
-from . import gui
 from . import image_io
-from . import managers
 from . import multiprocessing
+from . import managers
+from . import experiment
 from . import plugins
+from . import workflow
+from . import apps
 from . import unittest_objects
 from . import widgets
-from . import workflow
+from . import gui
 __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
                 'multiprocessing', 'plugins', 'unittest_objects', 'utils',
                 'widgets', 'workflow'])
@@ -54,7 +54,6 @@ __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
 # has not:
 if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
-
 
 # Disable the pyFAI logging to console
 import os

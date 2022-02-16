@@ -34,6 +34,7 @@ from qtpy import QtCore, QtWidgets
 
 from ..apps import ExecuteWorkflowApp
 from ..core import get_generic_param_collection
+from ..core.utils import pydidas_logger
 from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
 from ..widgets import BaseFrameWithApp
@@ -47,6 +48,7 @@ EXP = ExperimentalSetup()
 SCAN = ScanSetup()
 RESULTS = WorkflowResults()
 TREE = WorkflowTree()
+logger = pydidas_logger()
 
 
 class ExecuteWorkflowFrame(BaseFrameWithApp,
@@ -138,10 +140,12 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         """
         Parallel implementation of the execution method.
         """
+        logger.debug('Starting workflow')
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
         self._config['last_update'] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
+        logger.debug('Starting AppRunner')
         self._runner = AppRunner(self._app)
         self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
@@ -150,6 +154,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
             self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
+        logger.debug('Running AppRunner')
         self._runner.start()
 
     def _prepare_app_run(self):
@@ -188,8 +193,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         Clean up after AppRunner is done.
         """
         self.set_status('Cleaning up Apprunner')
+        logger.debug('Telling AppRunner to exit.')
         self._runner.exit()
         self._runner = None
+        logger.debug('AppRunner successfully shut down.')
         self.set_status('Finished processing of full workflow.')
         self.__finish_processing()
         self.__update_plot()

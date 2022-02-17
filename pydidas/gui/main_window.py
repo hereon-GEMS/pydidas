@@ -35,7 +35,8 @@ from functools import partial
 from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import FrameConfigError
-from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
+from ..core.utils import (format_input_to_multiline_str, get_doc_home_qurl,
+                          QTooltipEventFilter)
 from ..core.constants import STANDARD_FONT_SIZE
 from ..widgets import (CentralWidgetStack, InfoWidget, excepthook,
                        get_pyqt_icon_from_str_reference)
@@ -118,6 +119,15 @@ def _update_qtapp_font_size():
     _app.setFont(_font)
 
 
+def _apply_tooltop_event_filter():
+    """
+    Apply the pydidas.core.utils.QTooltipEventFilter to the QApplication
+    to force the desired handling of tooltip.
+    """
+    _app = QtWidgets.QApplication.instance()
+    _app.installEventFilter(QTooltipEventFilter(_app))
+
+
 class MainWindow(QtWidgets.QMainWindow):
     """
     Inherits from :py:class:`qtpy.QtWidgets.QMainWindow`.
@@ -139,6 +149,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__(parent)
         _configure_qtapp_namespace()
         _update_qtapp_font_size()
+        _apply_tooltop_event_filter()
         sys.excepthook = excepthook
 
         self._frame_menuentries = []

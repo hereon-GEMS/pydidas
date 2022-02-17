@@ -36,6 +36,7 @@ from .get_documentation_targets import *
 from .get_module_dir import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
+from .qtooltip_event_handler import *
 from .signal_blocker import *
 from .sphinx_html import *
 from .str_utils import *
@@ -78,6 +79,10 @@ del hdf5_dataset_utils
 from . import logger_
 __all__.extend(logger_.__all__)
 del logger_
+
+from . import qtooltip_event_handler
+__all__.extend(qtooltip_event_handler.__all__)
+del qtooltip_event_handler
 
 from . import signal_blocker
 __all__.extend(signal_blocker.__all__)

@@ -879,7 +879,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': ('The lower boundary of the radial integration range. This'
-                    'setting is only used if "Use radial range" is  True. '
+                    ' setting is only used if "Use radial range" is  True. '
                     'This value needs to be given in the unit selected as '
                     'radial unit.')},
     'rad_range_upper': {

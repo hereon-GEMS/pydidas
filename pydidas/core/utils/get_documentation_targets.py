@@ -42,7 +42,7 @@ def get_doc_make_directory():
         The directory name of the directory with the make files.
     """
     _name = __file__
-    for _ in range(4):
+    for _ in range(3):
         _name = os.path.dirname(_name)
     return os.path.join(_name, 'docs')
 

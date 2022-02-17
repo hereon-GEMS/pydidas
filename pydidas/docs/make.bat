@@ -9,7 +9,7 @@ IF "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=../pydidas source make.bat
+set GH_PAGES_SOURCES=../ source make.bat
 
 IF "%1" == "" goto help
 IF "%1" == "gh-pages" (

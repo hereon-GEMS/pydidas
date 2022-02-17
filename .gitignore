@@ -3,7 +3,7 @@
 __pycache__
 *.pyc
 *.log
-docs/build
+pydidas/docs/build
 .coverage
 htmlcov
 *.html

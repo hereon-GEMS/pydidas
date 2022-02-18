@@ -1,0 +1,15 @@
+[build-system]
+requires = [
+    "wheel",
+    "setuptools",
+    "build",
+    "pyFAI>0.21.2",
+    "pyyaml>=6.0",
+    "scikit-image>=0.18.3",
+    "qtawesome>=1.0.3",
+    "sphinx>=4.4.0",
+    "sphinx_rtd_theme>=1.0.0",
+    "pyopencl>=2022.1",
+    "fftw>=3.3.9"
+]
+build-backend = "setuptools.build_meta"

@@ -35,7 +35,7 @@ _path = os.path.dirname(__file__)
 sys.path.insert(0, _path)
 
 
-def clear_all_stored_QSettings():
+def clear_pydidas_QSettings():
     """
     Clear all stored pydidas QSetting values and write None.
     """
@@ -45,4 +45,4 @@ def clear_all_stored_QSettings():
 
 
 if __name__ == '__main__':
-    clear_all_stored_QSettings()
+    clear_pydidas_QSettings()

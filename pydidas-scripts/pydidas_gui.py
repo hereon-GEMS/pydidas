@@ -50,15 +50,11 @@ class ToolsFrame(BaseFrame):
         super().__init__(parent)
 
 
-def run_gui(qtapp):
+def run_gui():
     """
     Run the GUI application with the generic pydidas layout.
-
-    Parameters
-    ----------
-    qtapp : QtWidgets.QApplication
-        The QApplication instance.
     """
+    app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
     gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
     gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
@@ -83,11 +79,11 @@ def run_gui(qtapp):
     #                    'Result visualization', 'qta::mdi.monitor-eye')
     gui.show()
     gui.raise_()
-    sys.exit(app.exec_())
+    _ = app.exec_()
     gui.deleteLater()
+    app.deleteLater()
+    sys.exit()
 
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    run_gui(app)
-    app.deleteLater()
+    run_gui()

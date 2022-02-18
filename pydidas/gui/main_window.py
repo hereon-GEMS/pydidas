@@ -35,13 +35,13 @@ from functools import partial
 from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import FrameConfigError
-from ..core.utils import (format_input_to_multiline_str, get_doc_home_qurl,
-                          QTooltipEventFilter)
+from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
 from ..core.constants import STANDARD_FONT_SIZE
 from ..widgets import (CentralWidgetStack, InfoWidget, excepthook,
                        get_pyqt_icon_from_str_reference)
 from .global_configuration_frame import GlobalConfigurationFrame
 from .windows import GlobalDocumentationWindow, GlobalConfigWindow
+from .utils import QTooltipEventFilter
 
 
 def _configure_qtapp_namespace():

@@ -1,0 +1,19 @@
+# Patterns to exclude from any directory
+global-exclude *~
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+
+recursive-include pydidas *.py
+recursive-include pydidas/docs  *.png
+
+recursive-exclude tests *
+recursive-exclude pydidas/docs/build *
+include version.py
+include setup.py
+include MANIFEST.in
+include README.rst
+include LICENSE.md
+include requirements.txt
+include pyproject.toml
+include pydidas/pydidas_logo.svg

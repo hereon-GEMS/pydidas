@@ -1,7 +1,7 @@
-pyDIDAS
+pydidas
 =======
 
-pyDIDAS (the Python DIffraction Data Analysis Suite) is a toolkit for
+pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
 the analysis of diffraction datasets, both live at the beamline and
 offline for in-depth analysis.
 

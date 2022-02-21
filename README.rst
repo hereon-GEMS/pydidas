@@ -20,7 +20,26 @@ There are several subfolders included in the distribution
 Installation
 ------------
 
-To be added.
+For now, the pydidas package is not yet available through Anaconda. To install 
+it, navigate to the directory with the source files and run the following
+command:
+
+.. code-block::
+
+    python -m pip install .
+
+Then, install the required dependencies using anaconda by running this command
+in the same directory:
+
+.. code-block::
+
+    conda install --file requirements.txt
+
+.. note::
+
+    If you do not want to use Anaconda for dependency management, you can also
+    install pydidas and all required modules using 
+    `python -m pip install -r requirements.txt .`
 
 Documentation
 -------------

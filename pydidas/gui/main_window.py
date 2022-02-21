@@ -538,7 +538,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Add deleteLater entries for the associated windows.
         """
-        for _window in self._child_windows:
+        for _window in self._child_windows.values():
             _window.deleteLater()
         self.centralWidget().deleteLater()
         super().deleteLater()

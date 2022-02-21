@@ -27,3 +27,5 @@ __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
+from . import pydidas_gui
+from . import clear_pydidas_qsettings

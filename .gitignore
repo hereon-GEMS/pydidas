@@ -4,6 +4,8 @@ __pycache__
 *.pyc
 *.log
 pydidas/docs/build
+dist/*
+build/*
 .coverage
 htmlcov
 *.html
@@ -11,3 +13,4 @@ htmlcov
 !pydidas_logo*.svg
 __*
 !__init__.py
+*egg*

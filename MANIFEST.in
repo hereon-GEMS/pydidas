@@ -5,15 +5,19 @@ global-exclude *.pyo
 global-exclude .git
 
 recursive-include pydidas *.py
-recursive-include pydidas/docs  *.png
+recursive-include plugins/*.py
+recursive-include pydidas/docs *.png
+recursive-include pydidas/docs *.rst
 
 recursive-exclude tests *
 recursive-exclude pydidas/docs/build *
-include version.py
-include setup.py
+
+include setup.cfg
 include MANIFEST.in
 include README.rst
 include LICENSE.md
 include requirements.txt
 include pyproject.toml
 include pydidas/pydidas_logo.svg
+include pydidas/docs/make.bat
+include pydidas/docs/Makefile

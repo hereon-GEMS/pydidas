@@ -96,9 +96,6 @@ class ParameterWidgetsMixIn:
             to the calling widget, ie. "self". The default is None.
         """
         _parent = kwargs.get('parent_widget', self)
-        kwargs['row'] = (kwargs.get('row', _parent.layout().rowCount() + 1)
-                         if isinstance(_parent.layout(), QtWidgets.QGridLayout)
-                         else -1)
         _widget = ParameterConfigWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget
@@ -124,9 +121,11 @@ class ParameterWidgetsMixIn:
             The formatting arguments for adding the widget to the parent's
             layout.
         """
-        _row = (kwargs.get('row', parent.layout().rowCount() + 1) if
-                isinstance(parent.layout(), QtWidgets.QGridLayout) else -1)
-        config = {'row': _row,
+        _nrows =  parent.layout().rowCount()
+        _next_row = (_nrows - int(parent.layout().count() == 0)
+                     if isinstance(parent.layout(), QtWidgets.QGridLayout)
+                     else -1)
+        config = {'row': kwargs.get('row', _next_row),
                   'column': kwargs.get('column', 0),
                   'n_columns': kwargs.get('n_columns', 1),
                   'n_rows': kwargs.get('n_rows', 1),
@@ -190,7 +189,7 @@ class ParameterWidgetsMixIn:
 
     def update_widget_value(self, param_key, value):
         """
-        Update the value stored in a widget.
+        Update the value stored in a widget without changing the Parameter.
 
         Parameters
         ----------

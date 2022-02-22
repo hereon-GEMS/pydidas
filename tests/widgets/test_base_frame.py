@@ -61,6 +61,7 @@ class TestBaseFrame(unittest.TestCase):
         _frame = BaseFrame(**kwargs)
         _frame.add_param(Parameter('test_int', int, 24))
         _frame.add_param(Parameter('test_str', str, get_random_string(30)))
+        _frame.create_param_widget(_frame.get_param('test_int'))
         return _frame
 
     def create_widgets_in_frame(self, frame, n=6, vis=None):
@@ -69,7 +70,6 @@ class TestBaseFrame(unittest.TestCase):
         for _index in range(n):
             frame.create_label(f'label_{_index}', get_random_string(120),
                                visible=vis[_index])
-
 
     def test_init(self):
         obj = self.get_base_frame()
@@ -90,7 +90,7 @@ class TestBaseFrame(unittest.TestCase):
         self.assertEqual(self.tester.reveived_signals.pop(), _test)
 
     def test_next_row_empty(self):
-        obj = self.get_base_frame()
+        obj = BaseFrame()
         _row = obj.next_row()
         self.assertEqual(_row, 0)
 
@@ -110,9 +110,25 @@ class TestBaseFrame(unittest.TestCase):
         self.create_widgets_in_frame(obj, _n, _vis)
         QtCore.QTimer.singleShot(100, self.q_app.quit)
         obj.show()
-        _index, _state = obj.export_state()
-        self.assertEqual(_vis, _state['visibility'])
+        _, _state = obj.export_state()
+        self.assertEqual([True] * 4 + _vis, _state['visibility'])
         self.assertEqual(obj.get_param_values_as_dict(), _state['params'])
+
+    def test_restore_state(self):
+        _n = 10
+        obj = self.get_base_frame()
+        self.create_widgets_in_frame(obj, _n)
+        _vis = [True] * 4 + [random.choice([True, False]) for _ in range(_n)]
+        _params = {'test_int': 42, 'test_str': get_random_string(10)}
+        _state = {'params': _params, 'visibility': _vis}
+        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        obj.show()
+        obj.restore_state(_state)
+        _, _state = obj.export_state()
+        self.assertEqual(_vis, _state['visibility'])
+        self.assertEqual(_params, _state['params'])
+
+
 
 
 if __name__ == "__main__":

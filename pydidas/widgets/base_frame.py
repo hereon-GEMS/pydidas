@@ -64,9 +64,10 @@ class BaseFrame(QtWidgets.QFrame,
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        CreateWidgetsMixIn.__init__(self)
         QtWidgets.QFrame.__init__(self, parent=parent)
+        CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
+        ParameterWidgetsMixIn.__init__(self)
 
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
@@ -117,7 +118,7 @@ class BaseFrame(QtWidgets.QFrame,
         int
             The next empty row.
         """
-        if self .layout().count() == 0:
+        if self.layout().count() == 0:
             return 0
         return self.layout().rowCount()
 
@@ -141,5 +142,24 @@ class BaseFrame(QtWidgets.QFrame,
                 {'params': _params, 'visibility': _visibility_keys})
 
     def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        The default implementation in the BaseFrame will update all Parameters
+        (and associated widgets) and restore the visibility of all widgets.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params' and 'visibility' keys and the respective
+            information for both.
+        """
         for _key, _val in state['params'].items():
-            self.set_param_value(_key, _val)
+            if _key in self.param_widgets:
+                self.update_param_value(_key, _val)
+            else:
+                self.set_param_value(_key, _val)
+        _widgets = self.findChildren(QtWidgets.QWidget, '',
+                                     QtCore.Qt.FindChildrenRecursively)
+        for _widget, _vis in zip(_widgets, state['visibility']):
+            _widget.setVisible(_vis)

@@ -28,15 +28,17 @@ __all__ = ['BaseFrame']
 
 from qtpy import QtWidgets, QtCore
 
-from .factory import CreateWidgetsMixIn
 from ..core import (ParameterCollection, PydidasQsettingsMixin,
                     ParameterCollectionMixIn)
+from .factory import CreateWidgetsMixIn
+from .parameter_config import ParameterWidgetsMixIn
 
 
 class BaseFrame(QtWidgets.QFrame,
                 ParameterCollectionMixIn,
                 PydidasQsettingsMixin,
-                CreateWidgetsMixIn):
+                CreateWidgetsMixIn,
+                ParameterWidgetsMixIn):
     """
     The BaseFrame is a subclassed QFrame and should be used as the
     base class for all Frames in pydidas.
@@ -77,6 +79,7 @@ class BaseFrame(QtWidgets.QFrame,
         self.frame_index = -1
         self.ref_name = ''
         self.title = ''
+        self._config = {}
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -117,3 +120,26 @@ class BaseFrame(QtWidgets.QFrame,
         if self .layout().count() == 0:
             return 0
         return self.layout().rowCount()
+
+    def export_state(self):
+        """
+        Export the state of the Frame for saving.
+
+        Returns
+        -------
+        frame_index : int
+            The frame index which can be used as key for referencing the state.
+        information : dict
+            A dictionary with all the information required to export the
+            frame's state.
+        """
+        _args = (QtWidgets.QWidget, '',  QtCore.Qt.FindChildrenRecursively)
+        _visibility_keys = [_widget.isVisible()
+                            for _widget in self.findChildren(*_args)]
+        _params = self.get_param_values_as_dict()
+        return (self.frame_index,
+                {'params': _params, 'visibility': _visibility_keys})
+
+    def restore_state(self, state):
+        for _key, _val in state['params'].items():
+            self.set_param_value(_key, _val)

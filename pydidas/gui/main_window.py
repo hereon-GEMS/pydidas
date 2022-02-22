@@ -36,96 +36,11 @@ from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import FrameConfigError
 from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
-from ..core.constants import STANDARD_FONT_SIZE
 from ..widgets import (CentralWidgetStack, InfoWidget, excepthook,
                        get_pyqt_icon_from_str_reference)
 from .global_configuration_frame import GlobalConfigurationFrame
 from .windows import GlobalDocumentationWindow, GlobalConfigWindow
-from .utils import QTooltipEventFilter
-
-
-def _configure_qtapp_namespace():
-    """
-    Set the QApplication organization and application names.
-    """
-    app = QtWidgets.QApplication.instance()
-    app.setOrganizationName("Hereon")
-    app.setOrganizationDomain("Hereon/WPI")
-    app.setApplicationName("pydidas")
-
-
-def _get_pydidas_icon():
-    """
-    Get the pydidas icon.
-
-    Returns
-    -------
-    _icon : QtGui.QIcon
-        The instantiated pydidas icon.
-    """
-    _path = __file__
-    for _ in range(2):
-        _path = os.path.dirname(_path)
-    _logopath = os.path.join(_path, 'pydidas_logo.svg')
-    _icon= QtGui.QIcon(_logopath)
-    return _icon
-
-
-def _find_toolbar_bases(items):
-    """
-    Find the bases of all toolbar items which are not included in the items
-    itself.
-
-    Base levels in items are separated by forward slashes.
-
-    Parameters
-    ----------
-    items : Union[list, tuple]
-        An iterable of string items.
-
-    Example
-    -------
-    >>> items = ['a', 'a/b', 'a/c', 'b', 'd/e']
-    >>> _find_toolbar_bases(items)
-    ['', 'a', 'd']
-
-    The '' entry is the root for all top-level items. Even though 'a' is an
-    item itself, it is also a parent for 'a/b' and 'a/c' and it is therefore
-    also included in the list, similar to 'd'.
-
-    Returns
-    -------
-    itembases : list
-        A list with string entries of all the items' parents.
-    """
-    _itembases = []
-    for _item in items:
-        _parent = os.path.dirname(_item)
-        if _parent not in _itembases:
-            _itembases.append(_parent)
-        _item = _parent
-    _itembases.sort()
-    return _itembases
-
-
-def _update_qtapp_font_size():
-    """
-    Update the standard fonz size in the QApplication with the font size
-    defined in pydidas.
-    """
-    _app = QtWidgets.QApplication.instance()
-    _font = _app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    _app.setFont(_font)
-
-
-def _apply_tooltop_event_filter():
-    """
-    Apply the pydidas.core.utils.QTooltipEventFilter to the QApplication
-    to force the desired handling of tooltip.
-    """
-    _app = QtWidgets.QApplication.instance()
-    _app.installEventFilter(QTooltipEventFilter(_app))
+from . import utils
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -147,9 +62,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
-        _configure_qtapp_namespace()
-        _update_qtapp_font_size()
-        _apply_tooltop_event_filter()
+        utils.configure_qtapp_namespace()
+        utils.update_qtapp_font_size()
+        utils.apply_tooltop_event_filter()
         sys.excepthook = excepthook
 
         self._frame_menuentries = []
@@ -184,7 +99,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(CentralWidgetStack())
         self.statusBar().showMessage('pydidas started')
         self.setWindowTitle('pydidas GUI (alpha)')
-        self.setWindowIcon(_get_pydidas_icon())
+        self.setWindowIcon(utils.get_pydidas_icon())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
     def __create_menu(self):
@@ -337,7 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         self.__add_global_config_window()
         self._toolbars = {}
-        for tb in _find_toolbar_bases(self._frame_menuentries):
+        for tb in utils.find_toolbar_bases(self._frame_menuentries):
             tb_title = tb if tb else 'Main toolbar'
             self._toolbars[tb] = QtWidgets.QToolBar(tb_title, self)
             self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}")
@@ -519,7 +434,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(text)
         if text[-1] != '\n':
             text += '\n'
-
         self.__info_widget.add_status(text)
 
     @QtCore.Slot(str)
@@ -539,6 +453,9 @@ class MainWindow(QtWidgets.QMainWindow):
         Add deleteLater entries for the associated windows.
         """
         for _window in self._child_windows.values():
-            _window.deleteLater()
+            try:
+                _window.deleteLater()
+            except RuntimeError:
+                pass
         self.centralWidget().deleteLater()
         super().deleteLater()

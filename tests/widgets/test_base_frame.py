@@ -23,14 +23,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
+import random
 import unittest
 
 from qtpy import QtCore, QtWidgets
+from qtpy.QtTest import QTest
 
 from pydidas.widgets.base_frame import BaseFrame
+from pydidas.core import Parameter
+from pydidas.core.utils import get_random_string
 
-
-class TestClass(QtCore.QObject):
+class SignalTestClass(QtCore.QObject):
     signal = QtCore.Signal(int)
 
     def __init__(self):
@@ -48,14 +51,25 @@ class TestBaseFrame(unittest.TestCase):
 
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
-        self.tester = TestClass()
+        self.tester = SignalTestClass()
 
     def tearDown(self):
         self.q_app.deleteLater()
         self.q_app.quit()
 
     def get_base_frame(self, **kwargs):
-        return BaseFrame(**kwargs)
+        _frame = BaseFrame(**kwargs)
+        _frame.add_param(Parameter('test_int', int, 24))
+        _frame.add_param(Parameter('test_str', str, get_random_string(30)))
+        return _frame
+
+    def create_widgets_in_frame(self, frame, n=6, vis=None):
+        if vis is None:
+            vis = [True] * n
+        for _index in range(n):
+            frame.create_label(f'label_{_index}', get_random_string(120),
+                               visible=vis[_index])
+
 
     def test_init(self):
         obj = self.get_base_frame()
@@ -88,6 +102,17 @@ class TestBaseFrame(unittest.TestCase):
         obj.layout().addWidget(w2, 1, 0, 1, 1)
         _row = obj.next_row()
         self.assertEqual(_row, 2)
+
+    def test_export_state(self):
+        _n = 10
+        _vis = [random.choice([True, False]) for _ in range(_n)]
+        obj = self.get_base_frame()
+        self.create_widgets_in_frame(obj, _n, _vis)
+        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        obj.show()
+        _index, _state = obj.export_state()
+        self.assertEqual(_vis, _state['visibility'])
+        self.assertEqual(obj.get_param_values_as_dict(), _state['params'])
 
 
 if __name__ == "__main__":

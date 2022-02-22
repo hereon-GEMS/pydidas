@@ -27,10 +27,15 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .qtooltip_event_handler import *
+from .gui_setup import *
+from .menu_utils import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import qtooltip_event_handler
-__all__.extend(qtooltip_event_handler.__all__)
-del qtooltip_event_handler
+from . import gui_setup
+__all__.extend(gui_setup.__all__)
+del gui_setup
+
+from . import menu_utils
+__all__.extend(menu_utils.__all__)
+del menu_utils

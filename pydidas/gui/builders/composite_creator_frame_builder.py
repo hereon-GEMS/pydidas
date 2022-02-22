@@ -24,36 +24,33 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CompositeCreator_FrameBuilder']
+__all__ = ['CompositeCreatorFrameBuilder']
 
 from qtpy import QtWidgets, QtCore
 from silx.gui.plot import PlotWindow
 
 from ...core.constants import CONFIG_WIDGET_WIDTH
-from ...widgets import ScrollArea
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import (ParameterWidgetsMixIn,
-                                         ParameterEditFrame)
+from ...widgets import ScrollArea, BaseFrameWithApp
+from ...widgets.parameter_config import ParameterEditFrame
 from ..mixins import SilxPlotWindowMixIn
 
 
-class CompositeCreator_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn,
-                                    SilxPlotWindowMixIn):
+class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
     """
     Create the layout and add all widgets required for the
     CompositeCreatorFrame.
     """
-    def __init__(self):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+    def __init__(self, parent=None):
+        BaseFrameWithApp.__init__(self, parent)
         SilxPlotWindowMixIn.__init__(self)
-        self.layout().setContentsMargins(0, 0, 0, 0)
 
     def build_frame(self):
         """
         Create all widgets for the CompositeCreatorFrame and initialize their
         state.
         """
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
         self._widgets['config'] = ParameterEditFrame(
             self, lineWidth=5,
             sizePolicy= (QtWidgets.QSizePolicy.Fixed,

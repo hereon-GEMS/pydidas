@@ -24,22 +24,18 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetup_BuilderMixin']
+__all__ = ['ExperimentalSetupFrameBuilder']
 
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import ParameterWidgetsMixIn
+from ...widgets import BaseFrame
 
 
-class ExperimentalSetup_BuilderMixin(CreateWidgetsMixIn,
-                                     ParameterWidgetsMixIn):
+class ExperimentalSetupFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_self method to populate the
     base class's UI and initialize all widgets.
     """
-    def __init__(self):
-        ParameterWidgetsMixIn.__init__(self)
-        CreateWidgetsMixIn.__init__(self)
-        self._widgets = {}
+    def __init__(self, parent=None):
+        BaseFrame.__init__(self, parent)
         self.layout().setContentsMargins(5, 5, 0, 0)
 
     def build_frame(self):

@@ -38,23 +38,22 @@ from ..core import Parameter, get_generic_parameter, AppConfigError
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                            LOGGING_LEVEL)
-from ..widgets import BaseFrameWithApp, dialogues
+from ..widgets import dialogues
 from ..multiprocessing import AppRunner
-from .builders import CompositeCreator_FrameBuilder
+from .builders import CompositeCreatorFrameBuilder
 
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
 
-class CompositeCreatorFrame(BaseFrameWithApp, CompositeCreator_FrameBuilder):
+class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
     visualization.
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrameWithApp.__init__(self, parent)
-        CompositeCreator_FrameBuilder.__init__(self)
+        CompositeCreatorFrameBuilder.__init__(self, parent)
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist

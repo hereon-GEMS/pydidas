@@ -33,23 +33,21 @@ from qtpy import QtCore
 
 from ..image_io import ImageReaderCollection, read_image
 from ..core.constants import HDF5_EXTENSIONS
-from ..widgets import BaseFrame
-from .builders import DataBrowsingFrame_BuilderMixin
+from .builders import DataBrowsingFrameBuilder
 
 
 IMAGE_READER = ImageReaderCollection()
 
 
-class DataBrowsingFrame(BaseFrame, DataBrowsingFrame_BuilderMixin):
+class DataBrowsingFrame(DataBrowsingFrameBuilder):
     """
-    The DataBrowsingFrame is frame with a directory exporer
+    The DataBrowsingFrame is frame with a directory explorer
     and a main data visualization window. Its main purpose is to browse
     through datasets.
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
-        DataBrowsingFrame_BuilderMixin.__init__(self)
+        DataBrowsingFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
 

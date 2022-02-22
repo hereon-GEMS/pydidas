@@ -24,28 +24,23 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExecuteWorkflowFrame_BuilderMixin']
+__all__ = ['ExecuteWorkflowFrameBuilder']
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D, Plot2D
 
 from ...core.constants import CONFIG_WIDGET_WIDTH
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets import ScrollArea
+from ...widgets import ScrollArea, BaseFrameWithApp
 from ...widgets.selection import ResultSelectorForOutput
-from ...widgets.parameter_config import (ParameterEditFrame,
-                                         ParameterWidgetsMixIn)
+from ...widgets.parameter_config import ParameterEditFrame
 
-
-class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
-                                        ParameterWidgetsMixIn):
+class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
     """
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
-    def __init__(self):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+    def __init__(self, parent=None):
+        BaseFrameWithApp.__init__(self, parent)
         _layout = self.layout()
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
@@ -149,16 +144,14 @@ class ExecuteWorkflowFrame_BuilderMixin(CreateWidgetsMixIn,
             **self.__param_widget_config('enable_overwrite'))
         self.create_button(
             'but_export_current', 'Export current node results',
-            # TODO : change enabled to false
             gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets['config'], enabled=True,
+            parent_widget=self._widgets['config'], enabled=False,
             toolTip=("Export the current node's results to file. Note that "
                      "the filenames are pre-determined based on node ID "
                      "and node label."))
 
         self.create_button(
-            'but_export_all', 'Export all results', enabled=True,
-            # TODO : change enabled to false
+            'but_export_all', 'Export all results', enabled=False,
             gridPos=(-1, 0, 1, 1), fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets['config'],
             tooltip=('Export all results. Note that the directory must be '

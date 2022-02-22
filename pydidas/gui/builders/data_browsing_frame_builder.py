@@ -24,26 +24,23 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DataBrowsingFrame_BuilderMixin']
+__all__ = ['DataBrowsingFrameBuilder']
 
 from qtpy import QtWidgets, QtCore
 import qtawesome as qta
 from silx.gui.plot.ImageView import ImageView
 
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import ParameterWidgetsMixIn
+from ...widgets import BaseFrame
 from ...widgets.selection import (DirectoryExplorer, Hdf5DatasetSelector)
 
 
-class DataBrowsingFrame_BuilderMixin(CreateWidgetsMixIn,
-                                     ParameterWidgetsMixIn):
+class DataBrowsingFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
     def __init__(self, parent=None):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+        BaseFrame.__init__(self, parent)
 
     def build_frame(self):
         """

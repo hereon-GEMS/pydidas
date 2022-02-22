@@ -37,11 +37,10 @@ from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger
 from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
-from ..widgets import BaseFrameWithApp
 from ..widgets.dialogues import critical_warning
 from ..workflow import WorkflowTree, WorkflowResults
 from .builders.execute_workflow_frame_builder import (
-    ExecuteWorkflowFrame_BuilderMixin)
+    ExecuteWorkflowFrameBuilder)
 
 
 EXP = ExperimentalSetup()
@@ -51,8 +50,7 @@ TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class ExecuteWorkflowFrame(BaseFrameWithApp,
-                           ExecuteWorkflowFrame_BuilderMixin):
+class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
     """
     The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
     and visualize the results.
@@ -62,8 +60,7 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrameWithApp.__init__(self, parent)
-        ExecuteWorkflowFrame_BuilderMixin.__init__(self)
+        ExecuteWorkflowFrameBuilder.__init__(self, parent)
         _global_plot_update_time = self.q_settings_get_global_value(
             'plot_update_time', argtype=float)
         self._config = {'data_use_timeline': False,
@@ -379,10 +376,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         _node = self._widgets['result_selector']._active_node
 
         if _node == -1:
-             critical_warning('No node selected',
-                              ('No node has been selected. Please select a '
-                               'node and try again.'))
-             return
+            critical_warning('No node selected',
+                             ('No node has been selected. Please select a '
+                              'node and try again.'))
+            return
         self.__export(_node)
 
     @QtCore.Slot()
@@ -404,10 +401,10 @@ class ExecuteWorkflowFrame(BaseFrameWithApp,
         """
         _formats = self.get_param_value('saving_format')
         if _formats is None:
-             critical_warning('No format selected',
-                              ('No saving format node has been selected. '
-                               'Please select a format and try again.'))
-             return
+            critical_warning('No format selected',
+                             ('No saving format node has been selected. '
+                              'Please select a format and try again.'))
+            return
         _overwrite = self.get_param_value('enable_overwrite')
         while True:
             _dirname = QtWidgets.QFileDialog.getExistingDirectory(

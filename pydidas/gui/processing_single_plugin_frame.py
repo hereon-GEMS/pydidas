@@ -32,8 +32,7 @@ from ..core import (Parameter, ParameterCollection,
                           get_generic_param_collection)
 from ..experiment import ScanSetup
 from ..workflow import WorkflowTree
-from ..widgets import BaseFrame
-from ..gui.builders import ProcessingSinglePlugin_FrameBuilder
+from ..gui.builders import ProcessingSinglePluginFrameBuilder
 
 
 SCAN_SETTINGS = ScanSetup()
@@ -45,8 +44,7 @@ _plugin_param = Parameter(
              'AzimuthalIntegration (node 2)'])
 
 
-class ProcessingSinglePluginFrame(BaseFrame,
-                                  ProcessingSinglePlugin_FrameBuilder):
+class ProcessingSinglePluginFrame(ProcessingSinglePluginFrameBuilder):
     """
     The ProcessingSinglePluginFrame allows to run / test single plugins on a
     single datapoint.
@@ -58,8 +56,7 @@ class ProcessingSinglePluginFrame(BaseFrame,
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
-        ProcessingSinglePlugin_FrameBuilder.__init__(self)
+        ProcessingSinglePluginFrameBuilder.__init__(self, parent)
         self.set_default_params()
         self._plugin = None
         self.scan_dim = 4

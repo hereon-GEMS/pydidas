@@ -31,12 +31,10 @@ from functools import partial
 from qtpy import QtWidgets, QtCore
 
 from ..core import get_generic_param_collection
-from ..widgets import BaseFrame
-from ..widgets.parameter_config import ParameterWidgetsMixIn
-from .builders import GlobalConfiguration_FrameBuilder
+from .builders import GlobalConfigurationFrameBuilder
 
 
-class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
+class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     """
     Frame which manages global configuration items.
     """
@@ -49,9 +47,7 @@ class GlobalConfigurationFrame(BaseFrame, GlobalConfiguration_FrameBuilder):
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('name', None)
-        BaseFrame.__init__(self, parent, name=name)
-        ParameterWidgetsMixIn.__init__(self)
+        GlobalConfigurationFrameBuilder.__init__(self, parent)
         self.set_default_params()
         self.build_frame()
         self.connect_signals()

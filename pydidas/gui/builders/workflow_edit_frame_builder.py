@@ -24,28 +24,23 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowEditFrame_BuilderMixin']
+__all__ = ['WorkflowEditFrameBuilder']
 
 from qtpy import QtWidgets
 
-from ...widgets import ScrollArea
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import (
-    PluginParameterEditWidget, ParameterWidgetsMixIn)
+from ...widgets import ScrollArea, BaseFrame
+from ...widgets.parameter_config import PluginParameterEditWidget
 from ...widgets.workflow_edit import (WorkflowTreeCanvas,
                                       PluginCollectionBrowser)
 
 
-class WorkflowEditFrame_BuilderMixin(CreateWidgetsMixIn,
-                                     ParameterWidgetsMixIn):
+class WorkflowEditFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_self method to populate the
     base class's UI and initialize all widgets.
     """
-    def __init__(self):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
-        self._widgets = {}
+    def __init__(self, parent=None):
+        BaseFrame.__init__(self, parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
 
     def build_frame(self):

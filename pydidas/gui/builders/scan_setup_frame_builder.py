@@ -24,19 +24,18 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetup_FrameBuilder']
+__all__ = ['ScanSetupFrameBuilder']
 
 from qtpy import QtCore
 
 from ...experiment import ScanSetup
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import ParameterWidgetsMixIn
+from ...widgets import BaseFrame
 
 
 SCAN_SETTINGS = ScanSetup()
 
 
-class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
+class ScanSetupFrameBuilder(BaseFrame):
     """
     Create all widgets and initialize their state.
 
@@ -48,9 +47,8 @@ class ScanSetup_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
     TEXT_WIDTH = 200
     PARAM_INPUT_WIDTH = 120
 
-    def __init__(self):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+    def __init__(self, parent=None):
+        BaseFrame.__init__(self, parent)
 
     def build_frame(self):
         """

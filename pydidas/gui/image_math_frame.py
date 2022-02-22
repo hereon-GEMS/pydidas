@@ -32,7 +32,7 @@ from ..core import (Parameter, ParameterCollection,
 from ..experiment import ScanSetup
 from ..workflow import WorkflowTree
 from ..widgets import BaseFrame
-from .builders import ImageMath_FrameBuilder
+from .builders import ImageMathFrameBuilder
 
 
 SCAN_SETTINGS = ScanSetup()
@@ -44,7 +44,7 @@ _buffer_param = Parameter(
     choices=['Image #1', 'Image #2', 'Image #3', 'Image #4', 'Image #5'])
 
 
-class ImageMathFrame(BaseFrame, ImageMath_FrameBuilder):
+class ImageMathFrame(ImageMathFrameBuilder):
     """
     The ImageMathFrame allows to perform mathematical operations on single
     frames or to combine multiple frames.
@@ -56,7 +56,7 @@ class ImageMathFrame(BaseFrame, ImageMath_FrameBuilder):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         BaseFrame.__init__(self, parent)
-        ImageMath_FrameBuilder.__init__(self)
+        ImageMathFrameBuilder.__init__(self)
         self.set_default_params()
         self.build_frame()
 

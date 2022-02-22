@@ -31,22 +31,21 @@ import sys
 from qtpy import QtWidgets
 
 from ..experiment import ScanSetup, ScanSetupIoMeta
-from ..widgets import excepthook, BaseFrame
-from .builders import ScanSetup_FrameBuilder
+from ..widgets import excepthook
+from .builders import ScanSetupFrameBuilder
 
 
 SCAN_SETTINGS = ScanSetup()
 
 
-class ScanSetupFrame(BaseFrame, ScanSetup_FrameBuilder):
+class ScanSetupFrame(ScanSetupFrameBuilder):
     """
     Frame for managing the global scan settings.
     """
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
-        ScanSetup_FrameBuilder.__init__(self)
+        ScanSetupFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
         self.update_dim_visibility()
@@ -70,7 +69,7 @@ class ScanSetupFrame(BaseFrame, ScanSetup_FrameBuilder):
                      'unit_{n}', 'offset_{n}']
         _dim = int(self.param_widgets['scan_dim'].currentText())
         for i in range(1, 5):
-            _toggle = True if i <= _dim else False
+            _toggle = i <= _dim
             self._widgets[f'title_{i}'].setVisible(_toggle)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)

@@ -27,17 +27,16 @@ __all__ = ['WorkflowEditFrame']
 
 from qtpy import QtCore, QtWidgets
 
-from ..widgets import BaseFrame
 from ..workflow import WorkflowTree
 from ..workflow.workflow_tree_io import WorkflowTreeIoMeta
 from .managers import WorkflowTreeEditManager
-from .builders import WorkflowEditFrame_BuilderMixin
+from .builders import WorkflowEditFrameBuilder
 
 TREE = WorkflowTree()
 WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
-class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
+class WorkflowEditFrame(WorkflowEditFrameBuilder):
     """
     The WorkflowEditFrame includes three major objects:
         a. The editing canvas which shows the WorkflowTree structure.
@@ -48,8 +47,7 @@ class WorkflowEditFrame(BaseFrame, WorkflowEditFrame_BuilderMixin):
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        BaseFrame.__init__(self, parent)
-        WorkflowEditFrame_BuilderMixin.__init__(self)
+        WorkflowEditFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
 

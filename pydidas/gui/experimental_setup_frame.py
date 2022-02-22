@@ -34,26 +34,21 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
 from ..experiment import ExperimentalSetup, ExperimentalSetupIoMeta
-from ..widgets import BaseFrame
-from ..widgets.parameter_config import ParameterWidgetsMixIn
 from ..widgets.dialogues import critical_warning
-from .builders import ExperimentalSetup_BuilderMixin
+from .builders import ExperimentalSetupFrameBuilder
 
 
 EXP_SETTINGS = ExperimentalSetup()
 
 
-class ExperimentalSetupFrame(BaseFrame, ExperimentalSetup_BuilderMixin):
+class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     """
     The ExperimentalSetupFrame is the main frame for reading, editing and
     saving the ExperimentalSettings in the GUI.
     """
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
-        name = kwargs.get('name', None)
-        BaseFrame.__init__(self, parent, name=name)
-        ParameterWidgetsMixIn.__init__(self)
-        ExperimentalSetup_BuilderMixin.__init__(self)
+        ExperimentalSetupFrameBuilder.__init__(self, parent)
         self.params = EXP_SETTINGS.params
         self.build_frame()
         self.connect_signals()

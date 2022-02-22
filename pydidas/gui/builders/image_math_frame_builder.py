@@ -24,17 +24,16 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ImageMath_FrameBuilder']
+__all__ = ['ImageMathFrameBuilder']
 
 import qtawesome as qta
 from qtpy import QtWidgets
 from silx.gui.plot.ImageView import ImageView
 
-from ...widgets.factory import CreateWidgetsMixIn
-from ...widgets.parameter_config import ParameterWidgetsMixIn
+from ...widgets import BaseFrame
 
 
-class ImageMath_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
+class ImageMathFrameBuilder(BaseFrame):
     """
     Create all widgets and initialize their state.
 
@@ -43,9 +42,8 @@ class ImageMath_FrameBuilder(CreateWidgetsMixIn, ParameterWidgetsMixIn):
     self : pydidas.gui.ImageMathFrame
         The ImageMathFrame instance.
     """
-    def __init__(self):
-        CreateWidgetsMixIn.__init__(self)
-        ParameterWidgetsMixIn.__init__(self)
+    def __init__(self, parent=None):
+        BaseFrame.__init__(self, parent)
         _layout = self.layout()
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)

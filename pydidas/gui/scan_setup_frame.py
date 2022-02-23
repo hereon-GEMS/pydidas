@@ -133,3 +133,19 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         SCAN_SETTINGS.restore_all_defaults(True)
         for param in SCAN_SETTINGS.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
+
+    def restore_state(self, state):
+        """
+        Restore the frame's state from saved information.
+
+        This method overloads the generic base_frame's method and additionally
+        queries the ScanSettings because the frame has no own Parameters.
+
+        Parameters
+        ----------
+        state : dict
+            The state dictionary for this frame.
+        """
+        super().restore_state(state)
+        for param in SCAN_SETTINGS.params.values():
+            self.param_widgets[param.refkey].set_value(param.value)

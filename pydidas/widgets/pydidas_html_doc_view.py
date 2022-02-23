@@ -24,14 +24,14 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasWebView']
+__all__ = ['PydidasHtmlDocView']
 
-from qtpy import QtWebEngineWidgets, QtCore
+from qtpy import QtCore, QtWebEngineWidgets
 
 from ..core.utils import get_doc_home_qurl
 
 
-class PydidasWebView(QtWebEngineWidgets.QWebEngineView):
+class PydidasHtmlDocView(QtWebEngineWidgets.QWebEngineView):
     """
     Subclass of QWebEngineView with an updated size hint and fixed URL for
     the pydidas documentation.
@@ -56,16 +56,3 @@ class PydidasWebView(QtWebEngineWidgets.QWebEngineView):
             The desired size for the documentation html content.
         """
         return QtCore.QSize(900, 600)
-
-    def closeEvent(self, event):
-        """
-        If the widget is to be closed, mark the webpage for deletion.
-
-        Parameters
-        ----------
-        event : QtCore.QEvent
-            The calling event.
-        """
-        _page = self.page()
-        _page.deleteLater()
-        event.accept()

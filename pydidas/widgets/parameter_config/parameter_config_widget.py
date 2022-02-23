@@ -218,12 +218,6 @@ class ParameterConfigWidget(QtWidgets.QWidget):
                    self.config['valign_io'] | self.config['halign_io'])
         _unitargs = (_iline, 2, 1, 1,
                      self.config['valign_text'] | self.config['halign_text'])
-        # _txtargs = (0, 0, 1, 1 + 3 * _iline,
-        #             self.config['valign_text'] | self.config['halign_text'])
-        # _ioargs = (_iline, 1, 1, 1 + _iline,
-        #            self.config['valign_io'] | self.config['halign_io'])
-        # _unitargs = (_iline, 2 + _iline, 1, 1,
-        #              self.config['valign_text'] | self.config['halign_text'])
         return _txtargs, _ioargs, _unitargs
 
     @QtCore.Slot(str)

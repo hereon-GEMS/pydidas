@@ -26,13 +26,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['GlobalDocumentationWindow']
 
-from qtpy import QtWebEngineWidgets, QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtWebEngineWidgets
 
-from ...widgets import (PydidasWebView, ScrollArea,
+from ...widgets import (PydidasHtmlDocView, ScrollArea,
                         get_pyqt_icon_from_str_reference)
+from .pydidas_window import PydidasWindow
 
-
-class GlobalDocumentationWindow(QtWidgets.QMainWindow):
+class GlobalDocumentationWindow(PydidasWindow):
     """
     Window with a webbrowser which shows the global documentation in html
     format.
@@ -43,7 +43,7 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(get_pyqt_icon_from_str_reference(
             'qta::mdi.text-box-multiple-outline'))
 
-        self._webview = PydidasWebView()
+        self._webview = PydidasHtmlDocView()
         self._actions = {}
         self._actions['home'] = QtWidgets.QAction(
             get_pyqt_icon_from_str_reference('qta::mdi.home'), '')
@@ -56,7 +56,6 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
                                        widget=self._webview)
 
         self.setCentralWidget(self._scroll_area)
-        self.setVisible(False)
 
         self._toolbar = QtWidgets.QToolBar()
         self._toolbar.setFixedHeight(30)
@@ -80,10 +79,25 @@ class GlobalDocumentationWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def _action_undo(self):
+        """
+        Implement a "go back" action for the documentation browser.
+        """
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Back)
 
     @QtCore.Slot()
     def _action_redo(self):
+        """
+        Implement a "go forward" action for the documentation browser.
+        """
         self._webview.page().triggerAction(
             QtWebEngineWidgets.QWebEnginePage.Forward)
+
+    def deleteLater(self):
+        """
+        Reimplement the deleteLater method to explicitly destroy the QWebView.
+        """
+        if self._webview is not None:
+            self._webview.deleteLater()
+        self._webview = None
+        super().deleteLater()

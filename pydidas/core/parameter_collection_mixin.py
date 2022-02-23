@@ -188,7 +188,7 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         self.params.set_value(param_key, value)
 
-    def get_param_values_as_dict(self):
+    def get_param_values_as_dict(self, filter_types_for_export=False):
         """
         Get a dictionary with Parameter names and values only.
 
@@ -196,10 +196,12 @@ class ParameterCollectionMixIn:
         -------
         name_val_pairs : dict
             The dictionary with Parameter <name>: <value> pairs.
+        filter_types_for_export : bool
+            Flag to return objects in
         """
-        name_val_pairs = {}
-        for _key in self.params:
-            name_val_pairs[self.params[_key].refkey] = self.params[_key].value
+        name_val_pairs = {_key: (_param.value_for_export
+                                 if filter_types_for_export else _param.value)
+                          for _key, _param in self.params.items()}
         return name_val_pairs
 
     def get_param_keys(self):

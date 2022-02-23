@@ -74,6 +74,12 @@ class SingletonFactory:
         """
         self.__instance = self.__class(**kwargs)
 
+    def _clear_instance(self):
+        """
+        Clear the instance and reset it with None.
+        """
+        self.__instance = None
+
     def instance(self, **kwargs):
         """
         Get the instance. A wrapper for __call__

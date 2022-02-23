@@ -64,12 +64,9 @@ class TestBaseFrame(unittest.TestCase):
         _frame.create_param_widget(_frame.get_param('test_int'))
         return _frame
 
-    def create_widgets_in_frame(self, frame, n=6, vis=None):
-        if vis is None:
-            vis = [True] * n
+    def create_widgets_in_frame(self, frame, n=6):
         for _index in range(n):
-            frame.create_label(f'label_{_index}', get_random_string(120),
-                               visible=vis[_index])
+            frame.create_label(f'label_{_index}', get_random_string(120))
 
     def test_init(self):
         obj = self.get_base_frame()
@@ -105,27 +102,23 @@ class TestBaseFrame(unittest.TestCase):
 
     def test_export_state(self):
         _n = 10
-        _vis = [random.choice([True, False]) for _ in range(_n)]
         obj = self.get_base_frame()
-        self.create_widgets_in_frame(obj, _n, _vis)
+        self.create_widgets_in_frame(obj, _n)
         QtCore.QTimer.singleShot(100, self.q_app.quit)
         obj.show()
         _, _state = obj.export_state()
-        self.assertEqual([True] * 4 + _vis, _state['visibility'])
         self.assertEqual(obj.get_param_values_as_dict(), _state['params'])
 
     def test_restore_state(self):
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
-        _vis = [True] * 4 + [random.choice([True, False]) for _ in range(_n)]
         _params = {'test_int': 42, 'test_str': get_random_string(10)}
-        _state = {'params': _params, 'visibility': _vis}
+        _state = {'params': _params}
         QtCore.QTimer.singleShot(100, self.q_app.quit)
         obj.show()
         obj.restore_state(_state)
         _, _state = obj.export_state()
-        self.assertEqual(_vis, _state['visibility'])
         self.assertEqual(_params, _state['params'])
 
 

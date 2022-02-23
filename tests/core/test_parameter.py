@@ -267,33 +267,43 @@ class TestParameter(unittest.TestCase):
 
     def test_get_value_for_export__with_Path(self):
         obj = Parameter('Test0', Path, Path())
-        _val = obj._Parameter__get_value_for_export()
+        _val = obj.value_for_export
         self.assertIsInstance(_val, str)
 
     def test_get_value_for_export__with_Hdf5key(self):
         obj = Parameter('Test0', Hdf5key, Hdf5key('/test'))
-        _val = obj._Parameter__get_value_for_export()
+        _val = obj.value_for_export
         self.assertIsInstance(_val, str)
 
     def test_get_value_for_export__with_str(self):
         obj = Parameter('Test0', str, '/test')
-        _val = obj._Parameter__get_value_for_export()
+        _val = obj.value_for_export
         self.assertIsInstance(_val, str)
 
     def test_get_value_for_export__with_float(self):
         obj = Parameter('Test0', float, 12.34)
-        _val = obj._Parameter__get_value_for_export()
+        _val = obj.value_for_export
         self.assertIsInstance(_val, Real)
 
     def test_get_value_for_export__with_int(self):
         obj = Parameter('Test0', int, 27)
-        _val = obj._Parameter__get_value_for_export()
+        _val = obj.value_for_export
         self.assertIsInstance(_val, Integral)
+
+    def test_get_value_for_export__with_list(self):
+        obj = Parameter('Test0', list, [27])
+        _val = obj.value_for_export
+        self.assertIsInstance(_val, list)
+
+    def test_get_value_for_export__with_tuple(self):
+        obj = Parameter('Test0', tuple, (27,))
+        _val = obj.value_for_export
+        self.assertIsInstance(_val, tuple)
 
     def test_get_value_for_export__with_NoneType(self):
         obj = Parameter('Test0', None, 27.7)
         with self.assertRaises(TypeError):
-            obj._Parameter__get_value_for_export()
+            obj.value_for_export
 
     def test_dump(self):
         obj = Parameter('Test0', int, 12)
@@ -338,6 +348,18 @@ class TestParameter(unittest.TestCase):
         obj = Parameter('Test0', Path, '')
         _newval = obj._Parameter__convenience_type_conversion(_val)
         self.assertIsInstance(_newval, Path)
+
+    def test_convenience_type_conversion_list(self):
+        _val = [1, 2, 3]
+        obj = Parameter('Test0', tuple, (1, 2))
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_newval, tuple)
+
+    def test_convenience_type_conversion_tuple(self):
+        _val = (1, 2, 3)
+        obj = Parameter('Test0', list, [1])
+        _newval = obj._Parameter__convenience_type_conversion(_val)
+        self.assertIsInstance(_newval, list)
 
     def test_convenience_type_conversion_Hdf5key(self):
         _val = '/new/test'

@@ -28,22 +28,21 @@ __status__ = "Development"
 __all__ = ['MainWindow']
 
 import os
-import sys
 from pathlib import Path
 from functools import partial
 
-from qtpy import QtWidgets, QtGui, QtCore
+from qtpy import QtWidgets, QtCore
 
 from ..core import FrameConfigError
-from ..core.utils import format_input_to_multiline_str, get_doc_home_qurl
-from ..widgets import (CentralWidgetStack, InfoWidget, excepthook,
+from ..core.utils import format_input_to_multiline_str
+from ..widgets import (CentralWidgetStack, InfoWidget,
                        get_pyqt_icon_from_str_reference)
 from .global_configuration_frame import GlobalConfigurationFrame
-from .windows import GlobalDocumentationWindow, GlobalConfigWindow
 from . import utils
+from .main_menu import MainMenu
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class MainWindow(MainMenu):
     """
     Inherits from :py:class:`qtpy.QtWidgets.QMainWindow`.
 
@@ -62,169 +61,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
-        utils.configure_qtapp_namespace()
-        utils.update_qtapp_font_size()
-        utils.apply_tooltop_event_filter()
-        sys.excepthook = excepthook
 
         self._frame_menuentries = []
         self._frame_meta = {}
-        self._child_windows = {}
-        self._actions = {}
+
         self._toolbars = {}
         self._toolbar_actions = {}
         self._toolbars_created = False
-
-        self.__setup_mainwindow_widget(geometry)
-
-        self.__create_menu()
         self.__create_logging_info_box()
-        self.__add_documentation_window()
 
-    def __setup_mainwindow_widget(self, geometry):
-        """
-        Setup the user interface.
-
-        Parameters
-        ----------
-        geometry : Union[tuple, list, None], optional
-            The geometry as a 4-tuple or list. The entries are the top left
-            corner coordinates (x0, y0) and width and height. If None, the
-            default values will be used. The default is None.
-        """
-        if isinstance(geometry, (tuple, list)) and len(geometry) == 4:
-            self.setGeometry(*geometry)
-        else:
-            self.setGeometry(40, 60, 1400, 1000)
-        self.setCentralWidget(CentralWidgetStack())
-        self.statusBar().showMessage('pydidas started')
-        self.setWindowTitle('pydidas GUI (alpha)')
-        self.setWindowIcon(utils.get_pydidas_icon())
-        self.setFocus(QtCore.Qt.OtherFocusReason)
-
-    def __create_menu(self):
-        """
-        Create the application's main menu.
-        """
-        self.__create_menu_actions()
-        self.__connect_menu_actions()
-        self.__add_actions_to_menu()
-
-    def __create_menu_actions(self):
-        """
-        Create all required actions for the menu entries and store them in the
-        internal _actions dictionary.
-        """
-        # new_workflow_action = QtWidgets.QAction(
-        #     QtGui.QIcon('new.png'), '&New processing workflow', self)
-        # new_workflow_action.setStatusTip(
-        #     'Create a new processing workflow and discard the current '
-        #     'workflow.')
-        # # new_workflow_action.setShortcut('Ctrl+N')
-        # self._actions['new_workflow'] = new_workflow_action
-
-        # load_exp_setup_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &experimental configuration', self)
-        # load_exp_setup_action.setStatusTip(
-        #     'Discard the current experimental setup and open a configuration '
-        #     'from file.')
-        # self._actions['load_exp_setup'] = load_exp_setup_action
-
-        # load_scan_setup_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &scan configuration', self)
-        # load_scan_setup_action.setStatusTip(
-        #     'Discard the current scan setup and open a scan configuration '
-        #     'from file.')
-        # self._actions['load_scan_setup'] = load_scan_setup_action
-
-        # load_workflow_tree_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &workflow tree', self)
-        # load_workflow_tree_action.setStatusTip(
-        #     'Discard the current workflow tree and open a workflow tree '
-        #     'from file.')
-        # self._actions['load_workflow_tree'] = load_workflow_tree_action
-
-        exit_action = QtWidgets.QAction(QtGui.QIcon('exit.png'), '&Exit', self)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.setStatusTip('Exit application')
-        self._actions['exit'] = exit_action
-
-        self._actions['open_settings'] = QtWidgets.QAction('&Settings', self)
-
-        self._actions['open_documentation_window'] = QtWidgets.QAction(
-            'Open documentation in separate window', self)
-
-        self._actions['open_documentation_browser'] = QtWidgets.QAction(
-            'Open documentation in default web browser', self)
-
-    def __connect_menu_actions(self):
-        """
-        Connect all menu actions to their respective slots.
-        """
-        # self._actions['new_workflow'].triggered.connect(
-        #     self._action_new_workflow)
-        # self._actions['load_workflow_tree'].triggered.connect(
-        #     self._action_load_workflow_tree)
-        # self._actions['load_exp_setup'].triggered.connect(
-        #     self._action_load_exp_setup)
-        # self._actions['load_scan_setup'].triggered.connect(
-        #     self._action_load_scan_setup)
-        self._actions['exit'].triggered.connect(self.close)
-        self._actions['open_settings'].triggered.connect(
-            partial(self.show_window, 'global_config'))
-        self._actions['open_documentation_window'].triggered.connect(
-            partial(self.show_window, 'documentation'))
-        self._actions['open_documentation_browser'].triggered.connect(
-            self._action_open_doc_in_browser)
-
-    def __add_actions_to_menu(self):
-        """
-        Add the defined actions to the menu bar.
-        """
-        _menu = self.menuBar()
-
-        # _open_menu = QtWidgets.QMenu('&Open', self)
-        # _open_menu.addAction(self._actions['load_exp_setup'])
-        # _open_menu.addAction(self._actions['load_scan_setup'])
-        # _open_menu.addAction(self._actions['load_workflow_tree'])
-
-        _file_menu = _menu.addMenu('&File')
-        # _file_menu.addAction(self._actions['new_workflow'])
-        # _file_menu.addMenu(_open_menu)
-        _file_menu.addAction(self._actions['exit'])
-        _menu.addMenu(_file_menu)
-
-        _extras_menu = _menu.addMenu('&Extras')
-        _extras_menu.addAction(self._actions['open_settings'])
-        _menu.addMenu(_extras_menu)
-
-        _help_menu = _menu.addMenu('&Help')
-        _help_menu.addAction(self._actions['open_documentation_window'])
-        _help_menu.addAction(self._actions['open_documentation_browser'])
-        _menu.addMenu(_help_menu)
-
-    @QtCore.Slot()
-    def _action_new_workflow(self):
-        print('New workflow')
-
-    @QtCore.Slot()
-    def _action_load_workflow_tree(self):
-        print('load workflow')
-
-    @QtCore.Slot()
-    def _action_load_exp_setup(self):
-        print('load exp setup')
-
-    @QtCore.Slot()
-    def _action_load_scan_setup(self):
-        print('load scan setup')
-
-    @QtCore.Slot()
-    def _action_open_doc_in_browser(self):
-        """
-        Open the link to the documentation in the system web browser.
-        """
-        QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
 
     def __create_logging_info_box(self):
         """
@@ -239,18 +84,12 @@ class MainWindow(QtWidgets.QMainWindow):
         _dock_widget.setBaseSize(500, 50)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
-    def __add_documentation_window(self):
-        """
-        Add the floating documentation window to the main window.
-        """
-        self._child_windows['documentation'] = GlobalDocumentationWindow(self)
-
     def create_toolbars(self):
         """
         Create the toolbars to select between different widgets in the
         centralWidget.
         """
-        self.__add_global_config_window()
+        self.__add_global_config_frame()
         self._toolbars = {}
         for tb in utils.find_toolbar_bases(self._frame_menuentries):
             tb_title = tb if tb else 'Main toolbar'
@@ -283,7 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.select_item(self._frame_menuentries[0])
         self._toolbars_created = True
 
-    def __add_global_config_window(self):
+    def __add_global_config_frame(self):
         """
         Add the required widgets and signals for the global configuration
         window and create it.
@@ -291,7 +130,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.register_frame(GlobalConfigurationFrame, 'Global configuration',
                             'Global configuration', 'qta::mdi.application-cog')
         _w = CentralWidgetStack().get_widget_by_name('Global configuration')
-        self._child_windows['global_config'] = GlobalConfigWindow(self)
         _w2 = self._child_windows['global_config'].centralWidget()
         _w.value_changed_signal.connect(_w2.external_update)
         _w2.value_changed_signal.connect(_w.external_update)
@@ -402,21 +240,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setUpdatesEnabled(True)
         self.centralWidget().setUpdatesEnabled(True)
 
-    def closeEvent(self, event):
+    def restore_gui_state(self, filename=None):
         """
-        Handle the Qt closeEvent.
+        Restore the window states from saved information.
 
-        This method adds calls to the child windows to close themselves.
+        If the filename is not specified, the internally used file for storing
+        the state will be opened.
 
         Parameters
         ----------
-        event : QtCore.QEvent
-            The closing event.
+        filename : Union[None, str], optional
+            The filename to be used to restore the state. Pydidas will use the
+            internal default if the filename is None. The default is None.
         """
-        for window in self._child_windows:
-            self._child_windows[window].deleteLater()
-            self._child_windows[window].close()
-        event.accept()
+        super().restore_gui_state()
+        _current_index = self.centralWidget().currentIndex()
+        self.select_item(self._frame_menuentries[_current_index])
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -452,10 +291,5 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Add deleteLater entries for the associated windows.
         """
-        for _window in self._child_windows.values():
-            try:
-                _window.deleteLater()
-            except RuntimeError:
-                pass
         self.centralWidget().deleteLater()
         super().deleteLater()

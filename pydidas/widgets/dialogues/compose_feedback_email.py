@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the GlobalConfigWindow class which is a QMainWindow widget
-to view and modify the global settings in a seperate Window.
+Module with a dialogue to compose an email with feedback or a bug report in 
+pydidas.
 """
 
 __author__ = "Malte Storm"
@@ -24,19 +24,8 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GlobalConfigWindow']
-
-from ..global_configuration_frame import GlobalConfigurationFrame
-from .pydidas_window import PydidasWindow
+__all__ = ['SMTP']
 
 
-class GlobalConfigWindow(PydidasWindow):
-    """
-    The GlobalConfigWindow is a standalone QMainWindow with the
-    GlobalConfigurationFrame as sole content.
-    """
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        _frame = GlobalConfigurationFrame()
-        _frame.frame_index = 0
-        self.setCentralWidget(_frame)
+# TO DO: Implement using QDesktopServices
+#QDesktopServices::openUrl(QUrl("mailto:" + to + "?subject=" + subject + "&body=" + body, QUrl::TolerantMode));

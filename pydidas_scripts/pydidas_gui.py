@@ -50,11 +50,15 @@ class ToolsFrame(BaseFrame):
         super().__init__(parent)
 
 
-def run_gui():
+def run_gui(app):
     """
     Run the GUI application with the generic pydidas layout.
+
+    Parameters
+    ----------
+    app : QtCore.QApplication
+        The main Qt application.
     """
-    app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
     gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
     gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
@@ -81,9 +85,10 @@ def run_gui():
     gui.raise_()
     _ = app.exec_()
     gui.deleteLater()
-    app.deleteLater()
+    app.quit()
     sys.exit()
 
 
 if __name__ == '__main__':
-    run_gui()
+    app = QtWidgets.QApplication(sys.argv)
+    run_gui(app)

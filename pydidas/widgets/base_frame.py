@@ -134,12 +134,8 @@ class BaseFrame(QtWidgets.QFrame,
             A dictionary with all the information required to export the
             frame's state.
         """
-        _args = (QtWidgets.QWidget, '',  QtCore.Qt.FindChildrenRecursively)
-        _visibility_keys = [_widget.isVisible()
-                            for _widget in self.findChildren(*_args)]
-        _params = self.get_param_values_as_dict()
-        return (self.frame_index,
-                {'params': _params, 'visibility': _visibility_keys})
+        _params = self.get_param_values_as_dict(filter_types_for_export=True)
+        return (self.frame_index, {'params': _params})
 
     def restore_state(self, state):
         """
@@ -159,7 +155,3 @@ class BaseFrame(QtWidgets.QFrame,
                 self.update_param_value(_key, _val)
             else:
                 self.set_param_value(_key, _val)
-        _widgets = self.findChildren(QtWidgets.QWidget, '',
-                                     QtCore.Qt.FindChildrenRecursively)
-        for _widget, _vis in zip(_widgets, state['visibility']):
-            _widget.setVisible(_vis)

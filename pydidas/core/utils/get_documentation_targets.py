@@ -32,33 +32,17 @@ import os
 from qtpy import QtCore
 
 
-def get_doc_make_directory():
+def get_doc_home_qurl():
     """
-    Get the directory with the documentation make files.
+    Get the full filepath & -name of the index.html for the pydidas
+    documentation.
 
     Returns
     -------
-    str
-        The directory name of the directory with the make files.
+    url : QtCore.QUrl
+        The QUrl object with the path to the index.html file.
     """
-    _name = __file__
-    for _ in range(3):
-        _name = os.path.dirname(_name)
-    return os.path.join(_name, 'docs')
-
-
-def get_doc_home_filename():
-    """
-    Get the filename of the pydidas documentation homepage.
-
-    Returns
-    -------
-    _docfile : str
-        The full path and filename of the index.html file.
-    """
-    _docfile = os.path.join(get_doc_make_directory(), 'build', 'html',
-                            'index.html')
-    return _docfile
+    return QtCore.QUrl(get_doc_home_address())
 
 
 def get_doc_home_address():
@@ -75,14 +59,30 @@ def get_doc_home_address():
     return _address
 
 
-def get_doc_home_qurl():
+def get_doc_home_filename():
     """
-    Get the full filepath & -name of the index.html for the pydidas
-    documentation.
+    Get the filename of the pydidas documentation homepage.
 
     Returns
     -------
-    url : QtCore.QUrl
-        The QUrl object with the path to the index.html file.
+    _docfile : str
+        The full path and filename of the index.html file.
     """
-    return QtCore.QUrl(get_doc_home_address())
+    _docfile = os.path.join(get_doc_make_directory(), 'build', 'html',
+                            'index.html')
+    return _docfile
+
+
+def get_doc_make_directory():
+    """
+    Get the directory with the documentation make files.
+
+    Returns
+    -------
+    str
+        The directory name of the directory with the make files.
+    """
+    _name = __file__
+    for _ in range(3):
+        _name = os.path.dirname(_name)
+    return os.path.join(_name, 'docs')

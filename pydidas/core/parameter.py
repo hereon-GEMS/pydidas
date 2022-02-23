@@ -239,6 +239,8 @@ class Parameter:
 
             - str input and Path type
             - str input and Hdf5key type
+            - list to tuple
+            - tuple to list
 
         Parameters
         ----------
@@ -255,6 +257,10 @@ class Parameter:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
+        if isinstance(value, list) and self.__type == tuple:
+            return tuple(value)
+        if isinstance(value, tuple) and self.__type == list:
+            return list(value)
         return value
 
     @property
@@ -452,8 +458,29 @@ class Parameter:
             raise ValueError(
                 f'Cannot set Parameter (object ID:{id(self)}, refkey: '
                 f'"{self.__refkey}", name: "{self.__meta["name"]}")'
-                ' because it is of the wrong data type.')
+                ' because it is of the wrong data type. (expected: '
+                f'{self.__type}, input type: {type(val)}')
         self.__value = val
+
+    @property
+    def value_for_export(self):
+        """
+        Get the value in a pickleable format for exporting.
+
+        Note that this method does not work with Parameters without a defined
+        data type.
+
+        Returns
+        -------
+        Union[str, float, int]
+            The Parameter value in a pickleable format.
+        """
+        if self.__type in (str, Hdf5key, Path):
+            return str(self.value)
+        if self.__type in (numbers.Integral, numbers.Real, list, tuple):
+            return self.value
+        raise TypeError(f'No export format for type {self.__type} has been'
+                        ' defined.')
 
     def restore_default(self):
         """
@@ -501,23 +528,7 @@ class Parameter:
         tuple
             The tuple of (refkey, value as pickleable format)
         """
-        return (self.__refkey, self.__get_value_for_export())
-
-    def __get_value_for_export(self):
-        """
-        Get the value in a pickleable format for exporting.
-
-        Returns
-        -------
-        Union[str, float, int]
-            The Parameter value in a pickleable format.
-        """
-        if self.__type in (str, Hdf5key, Path):
-            return str(self.value)
-        if self.__type in (numbers.Integral, numbers.Real):
-            return self.value
-        raise TypeError(f'No export format for type {self.__type} has been'
-                        'defined.')
+        return (self.__refkey, self.value_for_export)
 
     def __str__(self):
         """
@@ -544,6 +555,14 @@ class Parameter:
                 f'default: {_def} {self.__meta["unit"]})')
 
     def __repr__(self):
+        """
+        Get the representation of the Parameter instance.
+
+        Returns
+        -------
+        str
+            The representation.
+        """
         _type =( f'{self.__type.__name__}' if self.__type is not None else
                 'None')
         _unit= (f'{self.__meta["unit"]} ' if self.__meta['unit'] !=''

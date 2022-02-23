@@ -107,3 +107,43 @@ class BaseFrameWithApp(BaseFrame):
         """
         if self._runner is not None:
             self._runner = None
+
+    def export_state(self):
+        """
+        Export the state of the Frame for saving.
+
+        This method adds an export for the frame's app.
+
+        Returns
+        -------
+        frame_index : int
+            The frame index which can be used as key for referencing the state.
+        information : dict
+            A dictionary with all the information required to export the
+            frame's state.
+        """
+        _index, _state = super().export_state()
+        _app_params = self._app.get_param_values_as_dict(
+            filter_types_for_export=True)
+        _app_state = {'params': _app_params,
+                      'config': self._app._config.copy()}
+        _state['app'] = _app_state
+        return _index, _state
+
+    def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        The BaseFrameWithApp implementation will update the associated App
+        and then call the BaseFrame's method.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params', 'app' and 'visibility' keys and the
+            respective information for all.
+        """
+        for _key, _val in state['app']['params'].items():
+            self._app.set_param_value(_key, _val)
+        self._app._config = state['app']['config'].copy()
+        super().restore_state(state)

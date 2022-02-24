@@ -345,7 +345,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
 
         This method is connected to the clicked event of the View button.
         """
-        if not self.flags['autoUpdate']:
+        if self._frame is None or not self.flags['autoUpdate']:
             self.__get_frame()
         if not isinstance(self._widgets['viewer'], QtWidgets.QWidget):
             raise FrameConfigError('The reference is not a widget')

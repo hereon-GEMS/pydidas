@@ -1020,7 +1020,44 @@ GENERIC_PARAM_DESCRIPTION = {
                     'existing folders. If this Parameter is True, no further '
                     'confirmation will be asked and no further warning will '
                     'be displayed.')},
+    ############################
+    ## Result selection settings
+    ############################
+    'scan_for_all': {
+        'type': int,
+        'default': False,
+        'name': 'Scan for all new files',
+        'choices': [False, True],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Scan for all new files and not only files matching the '
+                    'input pattern.')},
+    'filename_pattern': {
+        'type': 'Path',
+        'default': '',
+        'name': 'The filename pattern',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The pattern of the filename. Use hashes "#" for '
+                    'wildcards which will be filled in with numbers.')},
+    # '': {
+    #     'type': int,
+    #     'default': ,
+    #     'name': '',
+    #     'choices': None,
+    #     'unit': '',
+    #     'allow_None': False,
     #     'tooltip': },
+    # '': {
+    #     'type': int,
+    #     'default': ,
+    #     'name': '',
+    #     'choices': None,
+    #     'unit': '',
+    #     'allow_None': False,
+    #     'tooltip': },
+
     # '': {
     #     'type': int,
     #     'default': ,

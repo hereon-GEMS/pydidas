@@ -28,6 +28,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .app_processor_ import *
+from .app_processor_without_tasks_ import *
 from .processor_ import *
 from .app_runner import *
 from .worker_controller import *
@@ -37,6 +38,10 @@ from .worker_controller import *
 from . import app_processor_
 __all__.extend(app_processor_.__all__)
 del app_processor_
+
+from . import app_processor_without_tasks_
+__all__.extend(app_processor_without_tasks_.__all__)
+del app_processor_without_tasks_
 
 from . import processor_
 __all__.extend(processor_.__all__)

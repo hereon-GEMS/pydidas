@@ -77,18 +77,24 @@ class AppRunner(WorkerController):
     n_workers : int, optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
+    processor : Union[pydidas.multiprocessing.app_processor,
+                      pydidas.multiprocessing.app_processor_without_tasks]
+        The processor to be used. The generic 'app_processor' requires input
+        tasks whereas the 'app_processor_without_tasks' can run indefinite
+        without any defined tasks. The app itself is responsible for managing
+        tasks on the fly. The default is app_processor.
     """
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(int, object)
     sig_finished = QtCore.Signal()
     sig_final_app_state = QtCore.Signal(object)
 
-    def __init__(self, app, n_workers=None):
+    def __init__(self, app, n_workers=None, processor=app_processor):
         logger.debug('Starting AppRunner')
         super().__init__(n_workers)
         self.__app = app.get_copy(slave_mode=True)
         self.__check_app_is_set()
-        self._processor['func'] = app_processor
+        self._processor['func'] = processor
         logger.debug('Finished init')
 
     def call_app_method(self, method_name, *args, **kwargs):
@@ -175,7 +181,7 @@ class AppRunner(WorkerController):
         """
         Create and start worker processes.
         """
-        self._workers = [mp.Process(target=app_processor,
+        self._workers = [mp.Process(target=self._processor['func'],
                                     args=self._processor['args'], daemon=True)
                           for i in range(self._n_workers)]
         for _worker in self._workers:

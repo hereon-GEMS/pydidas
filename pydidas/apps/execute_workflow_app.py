@@ -107,7 +107,6 @@ class ExecuteWorkflowApp(BaseApp):
         self._config.update({'result_shapes': {},
                              'shared_memory': {},
                              'tree_str_rep': '[]'})
-        self._mp_tasks = np.array(())
         self._index = -1
         self.reset_runtime_vars()
 

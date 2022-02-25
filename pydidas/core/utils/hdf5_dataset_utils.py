@@ -125,7 +125,6 @@ def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
     and if it fulfills the defined filtering criteria for minimum data size,
     minimum data dimensionality and and filtered keys.
 
-
     Parameters
     ----------
     item : object
@@ -153,6 +152,7 @@ def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
             and not item.name.startswith(tuple(to_ignore))):
         return True
     return False
+
 
 def _get_hdf5_file_and_dataset_names(fname, dset=None):
     """

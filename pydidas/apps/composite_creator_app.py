@@ -483,7 +483,7 @@ class CompositeCreatorApp(BaseApp):
 
         Returns
         -------
-        image : np.ndarray
+        image : pydidas.core.Dataset
             The masked image data.
         """
         if self._det_mask is None:

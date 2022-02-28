@@ -38,7 +38,7 @@ from qtpy import QtCore
 from pydidas import unittest_objects
 from pydidas.core import get_generic_parameter, AppConfigError, utils
 from pydidas.apps import ExecuteWorkflowApp
-from pydidas.apps.app_parsers import parse_execute_workflow_cmdline_arguments
+from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.experiment import ScanSetup
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
@@ -98,7 +98,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.q_settings.setValue('global/shared_buffer_size', self._buf_size)
         self.q_settings.setValue('global/mp_n_workers', self._n_workers)
         ExecuteWorkflowApp.parse_func = (
-            parse_execute_workflow_cmdline_arguments)
+            execute_workflow_app_parser)
         COLL.clear_collection(True)
         COLL.find_and_register_plugins(*_PLUGIN_PATHS)
 

@@ -1041,14 +1041,14 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The pattern of the filename. Use hashes "#" for '
                     'wildcards which will be filled in with numbers.')},
-    # '': {
-    #     'type': int,
-    #     'default': ,
-    #     'name': '',
-    #     'choices': None,
-    #     'unit': '',
-    #     'allow_None': False,
-    #     'tooltip': },
+    'directory_path': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Directory path',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The absolute path of the directory to be used.'},
     # '': {
     #     'type': int,
     #     'default': ,

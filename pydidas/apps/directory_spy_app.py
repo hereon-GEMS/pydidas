@@ -36,7 +36,7 @@ from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
                           get_hdf5_metadata)
 from ..core.constants import HDF5_EXTENSIONS
 from ..image_io import read_image
-
+from .parsers import directory_spy_app_parser
 
 class DirectorySpyApp(BaseApp):
     """
@@ -54,13 +54,15 @@ class DirectorySpyApp(BaseApp):
         Parameter itself as value.
     """
     default_params = get_generic_param_collection(
-        'scan_for_all', 'filename_pattern', 'hdf5_key', 'use_global_det_mask',
-        'use_bg_file', 'bg_file', 'bg_hdf5_key', 'bg_hdf5_frame')
-    parse_func = None
-    attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index']
+        'scan_for_all', 'filename_pattern', 'directory_path',  'hdf5_key',
+        'use_global_det_mask', 'use_bg_file', 'bg_file', 'bg_hdf5_key',
+        'bg_hdf5_frame')
+    parse_func = directory_spy_app_parser
+    attributes_not_to_copy_to_slave_app = ['_shared_array', '_index',
+                                           'multiprocessing_carryon']
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self._index = -1
         self._bg_image = None
         self._fname = lambda x: None
@@ -70,6 +72,9 @@ class DirectorySpyApp(BaseApp):
         self.reset_runtime_vars()
         self._det_mask = self._get_detector_mask()
         self._config['shared_memory'] = {}
+        self._config['latest_file'] = None
+        self._config['2nd_latest_file'] = None
+
 
     def reset_runtime_vars(self):
         """
@@ -148,9 +153,10 @@ class DirectorySpyApp(BaseApp):
             self._load_bg_file()
         if not self.slave_mode:
             self.__initialize_shared_memory()
-        self.__initialize_arrays_from_shared_memory()
+        self.__initialize_array_from_shared_memory()
         self.__redefine_mp_carryon()
-        self.__find_current_index()
+        if not self.get_param_value('scan_for_all'):
+            self.__find_current_index()
 
     def define_path_and_name(self):
         """
@@ -161,10 +167,12 @@ class DirectorySpyApp(BaseApp):
         AppConfigError
             If the naming pattern could not be interpreted.
         """
-        self._path = os.path.dirname(self.get_param_value('filename_pattern'))
         if self.get_param_value('scan_for_all'):
+            self._path = str(self.get_param_value('directory_path'))
             return
-        _strs = self.get_param_value('filename_pattern').split('#')
+        _pattern_str = str(self.get_param_value('filename_pattern'))
+        self._path = os.path.dirname(_pattern_str)
+        _strs = _pattern_str.split('#')
         _lens = [len(_s) for _s in _strs]
         if len(_strs) == 1:
             raise AppConfigError(
@@ -174,14 +182,12 @@ class DirectorySpyApp(BaseApp):
             raise AppConfigError(
                 'Multiple patterns detected. Cannot process the filename '
                 'pattern.')
-        _prefix = _strs[0]
-        _suffix = _strs[-1]
-        _npattern = len(_strs) - 1
-        _raw_str = (self._path + os.sep + _prefix
-                    + '{index:0' + f'{_npattern}' + 'd}' + _suffix)
-        self._config['glob_pattern'] = (self._path + os.sep + _prefix
-                                        + '*' + _suffix)
-        self._fname = lambda index: _raw_str.format(index=index)
+        _len_pattern =_pattern_str.count('#')
+        self._config['glob_pattern'] = _pattern_str.replace('#' * _len_pattern,
+                                                            '*')
+        _pattern_str = _pattern_str.replace('#' * _len_pattern,
+                                            '{:0' + str(_len_pattern) + 'd}')
+        self._fname = lambda index: _pattern_str.format(index)
 
     def _load_bg_file(self):
         """
@@ -189,27 +195,17 @@ class DirectorySpyApp(BaseApp):
 
         The background image file is checked and if all checks pass, the
         background image is stored.
-
-        Raises
-        ------
-        AppConfigError
-            - If the selected background file does not exist
-            - If the selected dataset key does not exist (in case of hdf5
-              files)
-            - If the  selected dataset number does not exist (in case of
-              hdf5 files)
-            - If the image dimensions for the background file differ from the
-              image files.
         """
         _bg_file = self.get_param_value('bg_file')
         check_file_exists(_bg_file)
+        _params = {}
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(
                 _bg_file, self.get_param_value('bg_hdf5_key'))
             _params = {'hdf5_dataset': self.get_param_value('bg_hdf5_key'),
                        'frame': self.get_param_value('bg_hdf5_frame')}
         _bg_image = read_image(_bg_file, **_params)
-        self._bg_image = self.__apply_mask(_bg_image)
+        self._bg_image = self._apply_mask(_bg_image)
 
     def __initialize_shared_memory(self):
         """
@@ -271,15 +267,18 @@ class DirectorySpyApp(BaseApp):
         """
         _files = glob.glob(self._config['glob_pattern'])
         _index = self._config['glob_pattern'].find('*')
-        _prefix = self.get_param_value('filename_pattern')[:_index]
-        _suffix = self.get_param_value('filename_pattern')[_index + 1:]
+        _prefix = self._config['glob_pattern'][:_index]
+        _suffix = self._config['glob_pattern'][_index + 1:]
         _files = [_f for _f in _files
                   if (os.path.isfile(_f) and _f.startswith(_prefix)
                       and _f.endswith(_suffix))]
+        if len(_files) == 0:
+            self._index = -1
+            return
         _files.sort()
         if len(_files) > 0:
             _index = _files[-1].removeprefix(_prefix).removesuffix(_suffix)
-            self._index = _index
+            self._index = int(_index)
 
     def multiprocessing_post_run(self):
         """
@@ -314,11 +313,11 @@ class DirectorySpyApp(BaseApp):
         try:
             _fname = self._config['latest_file']
             _image = self.get_image(_fname)
-        except FileNotFoundError:
+        except (ValueError, KeyError, FileNotFoundError):
             try:
                 _fname = self._config['2nd_latest_file']
                 _image = self.get_image(_fname)
-            except FileNotFoundError:
+            except (ValueError, KeyError, FileNotFoundError):
                 raise RuntimeError('Cannot read either of the last to files.')
         _image = self._apply_mask(_image)
         self.__store_image_in_shared_memory(_image)
@@ -332,7 +331,7 @@ class DirectorySpyApp(BaseApp):
 
         Parameters
         ----------
-        fname : str
+        fname : Union[pathlib.Path, str]
             The filename (including full path) to the image file.
 
         Returns
@@ -341,6 +340,8 @@ class DirectorySpyApp(BaseApp):
             The image.
         """
         _params = {}
+        if not isinstance(fname, str):
+            fname = str(fname)
         if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
             _params.update(self.__get_hdf5_params(fname))
         return read_image(fname, **_params)
@@ -378,7 +379,7 @@ class DirectorySpyApp(BaseApp):
             _height = image.shape[0]
             self._config['shared_memory']['width'].value = _width
             self._config['shared_memory']['height'].value = _height
-            self._shared_array[:_width, :_height] = image
+            self._shared_array[:_height, :_width] = image
 
     def multiprocessing_carryon(self):
         """

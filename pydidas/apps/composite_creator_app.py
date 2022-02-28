@@ -39,7 +39,7 @@ from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
                           copy_docstring)
 from ..image_io import CompositeImage, read_image, rebin2d
 from ..managers import FilelistManager, ImageMetadataManager
-from .app_parsers import parse_composite_creator_cmdline_arguments
+from .parsers import composite_creator_app_parser
 
 
 class CompositeCreatorApp(BaseApp):
@@ -169,7 +169,7 @@ class CompositeCreatorApp(BaseApp):
         'roi_xhigh', 'roi_ylow', 'roi_yhigh', 'use_thresholds',
         'threshold_low', 'threshold_high', 'binning', 'composite_nx',
         'composite_ny', 'composite_dir', )
-    parse_func = parse_composite_creator_cmdline_arguments
+    parse_func = composite_creator_app_parser
     attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
                                            '_bg_image']
     mp_func_results = QtCore.Signal(object)

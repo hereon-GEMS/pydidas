@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with parsers to parse command line arguments for apps.
+Module with parsers to parse command line arguments for the
+CompositeCreatorApp.
 """
 
 __author__ = "Malte Storm"
@@ -23,15 +24,14 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['parse_composite_creator_cmdline_arguments',
-           'parse_execute_workflow_cmdline_arguments']
+__all__ = ['composite_creator_app_parser']
 
 import argparse
 
-from ..core.constants import GENERIC_PARAM_DESCRIPTION as PARAMS
+from ...core.constants import GENERIC_PARAM_DESCRIPTION as PARAMS
 
 
-def parse_composite_creator_cmdline_arguments(caller=None):
+def composite_creator_app_parser(caller=None):
     """
     Parse the command line arguments for the CompositeCreatorApp.
 
@@ -74,6 +74,8 @@ def parse_composite_creator_cmdline_arguments(caller=None):
                         help=PARAMS['composite_nx']['tooltip'])
     parser.add_argument('-composite_ny', type=int,
                         help=PARAMS['composite_ny']['tooltip'])
+    parser.add_argument('--do_not_use_detmask', action='store_true',
+                        help='Do not use the global detector mask.')
     parser.add_argument('--use_roi', action='store_true',
                         help=PARAMS['use_roi']['tooltip'])
     parser.add_argument('-roi_xlow', type=int,
@@ -100,35 +102,8 @@ def parse_composite_creator_cmdline_arguments(caller=None):
     _args = dict(vars(parser.parse_args()))
     # store None for keyword arguments which were not selected:
     for _key in ['use_roi', 'use_thresholds', 'use_bg_file']:
-        _args[_key] = _args[_key] if _args[_key] else None
-    return _args
-
-
-def parse_execute_workflow_cmdline_arguments(caller=None):
-    """
-    Parse the command line arguments for the ExecuteWorkflowApp.
-
-    Parameters
-    ----------
-    caller : object, optional
-        If this function is called by a class as method, it requires a single
-        argument which corresponds to the instance.
-
-    Returns
-    -------
-    dict
-        A dictionary with the parsed arugments which holds all the entries
-        and entered values or  - if missing - the default values.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--autosave', action='store_true',
-                        help=PARAMS['autosave_results']['tooltip'])
-    parser.add_argument('-autosave_dir', '-d',
-                        help=PARAMS['autosave_dir']['tooltip'])
-    parser.add_argument('-autosave_format', '-f',
-                        help=PARAMS['autosave_format']['tooltip'])
-    _args = dict(vars(parser.parse_args()))
-    # store False for keyword arguments which were not selected:
-    for _key in ['autosave']:
-        _args[_key] = bool(_args[_key])
+        _val = _args[_key]
+        _args[_key] = True if _val else None
+    _args['use_global_det_mask'] = (False if _args.pop('do_not_use_detmask')
+                                    else None)
     return _args

@@ -38,7 +38,7 @@ from ..core import (get_generic_param_collection, Dataset, BaseApp,
 from ..experiment import ScanSetup, ExperimentalSetup
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
-from .app_parsers import parse_execute_workflow_cmdline_arguments
+from .parsers import execute_workflow_app_parser
 
 
 TREE = WorkflowTree()
@@ -97,7 +97,7 @@ class ExecuteWorkflowApp(BaseApp):
     default_params = get_generic_param_collection(
         'autosave_results', 'autosave_dir', 'autosave_format',
         'live_processing')
-    parse_func = parse_execute_workflow_cmdline_arguments
+    parse_func = execute_workflow_app_parser
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
                                            '_result_metadata', '_mp_tasks']
     sig_results_updated = QtCore.Signal()

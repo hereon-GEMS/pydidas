@@ -13,11 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""
-The apps package includes stand-alone applications which can be run from
-the command line to perform specific tasks. Integration of apps in the
-GUI is included in the gui module.
-"""
+"""Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -25,27 +21,30 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
 
 
-# import sub-packages:
-from . import parsers
+import copy
+import unittest
+import sys
 
-# import __all__ items from modules:
-from .composite_creator_app import *
-from .directory_spy_app import *
-from .execute_workflow_app import *
+from pydidas.apps.parsers import composite_creator_app_parser
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import composite_creator_app
-__all__.extend(composite_creator_app.__all__)
-del composite_creator_app
+class TestAppParsers(unittest.TestCase):
 
-from . import directory_spy_app
-__all__.extend(directory_spy_app.__all__)
-del directory_spy_app
+    def setUp(self):
+        self._argv = copy.copy(sys.argv)
 
-from . import execute_workflow_app
-__all__.extend(execute_workflow_app.__all__)
-del execute_workflow_app
+    def tearDown(self):
+        sys.argv = self._argv
+
+    def test_composite_creator_app_parser(self):
+        sys.argv = ['test', '-file_stepping', '5', '-binning', '2',
+                    '-first_file', 'testname']
+        parsed = composite_creator_app_parser()
+        self.assertEqual(parsed['file_stepping'], 5)
+        self.assertEqual(parsed['binning'], 2)
+        self.assertEqual(parsed['first_file'], 'testname')
+
+
+if __name__ == "__main__":
+    unittest.main()

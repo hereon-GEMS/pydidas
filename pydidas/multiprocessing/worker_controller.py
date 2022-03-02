@@ -34,6 +34,9 @@ from queue import Empty
 from qtpy import QtCore
 
 from .processor_ import processor
+from ..core.utils import pydidas_logger
+
+logger = pydidas_logger()
 
 
 class WorkerController(QtCore.QThread):
@@ -315,8 +318,10 @@ class WorkerController(QtCore.QThread):
                 self._get_and_emit_all_queue_items()
                 self._check_if_workers_done()
             if self._flag_active:
+                logger.debug('Starting post run')
                 self._cycle_post_run()
             time.sleep(0.005)
+        logger.debug('finished worker_controller loop')
         self.sig_finished.emit()
 
     def _cycle_pre_run(self):
@@ -356,9 +361,9 @@ class WorkerController(QtCore.QThread):
             try:
                 _task, _results = self._queues['recv'].get_nowait()
                 self.sig_results.emit(_task, _results)
+                logger.debug('Emitted results')
                 self._progress_done += 1
-                self.sig_progress.emit(self._progress_done
-                                       / self._progress_target)
+                self.sig_progress.emit(self.progress)
             except Empty:
                 break
             time.sleep(0.001)
@@ -371,10 +376,12 @@ class WorkerController(QtCore.QThread):
             try:
                 self._queues['finished'].get_nowait()
                 self._workers_done += 1
+                logger.debug('Worker done')
             except Empty:
                 pass
         if self._workers_done >= len(self._workers):
             self._flag_running = False
+            logger.debug('Stopped running')
 
     def _cycle_post_run(self, timeout=10):
         """
@@ -386,10 +393,14 @@ class WorkerController(QtCore.QThread):
             The waiting time to wait on the workers to send the finished
             signal before raising a TimeoutError.
         """
+        logger.debug('Calling join on workers')
         self._join_workers()
+        logger.debug('Joined on workers')
         if self._flag_stop_after_run:
             self._flag_thread_alive = False
+        logger.debug('Waiting for finished signals from workers')
         self._wait_for_worker_finished_signals(timeout)
+        logger.debug('finished cycle post run')
 
     def _join_workers(self):
         """

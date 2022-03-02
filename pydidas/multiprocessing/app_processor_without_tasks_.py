@@ -85,15 +85,16 @@ def app_processor_without_tasks(input_queue, output_queue, stop_queue,
         # check for stop signal
         try:
             stop_queue.get_nowait()
+            logger.debug('Received stop queue signal')
             break
         except queue.Empty:
             pass
-        _app.multiprocessing_pre_cycle(None)
+        _app.multiprocessing_pre_cycle(-1)
         _app_carryon = _app.multiprocessing_carryon()
         if _app_carryon:
             logger.debug('Starting computation')
-            _index, _results = _app.multiprocessing_func(None)
-            logger.debug('Finished computation')
+            _index, _results = _app.multiprocessing_func(-1)
             output_queue.put([_index, _results])
         time.sleep(0.01)
     finished_queue.put(1)
+    logger.debug('Emitted finished signal')

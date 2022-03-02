@@ -36,6 +36,7 @@ __all__.extend(['builders', 'managers', 'mixins', 'windows'])
 # import __all__ items from modules:
 from .composite_creator_frame import *
 from .data_browsing_frame import *
+from .directory_spy_frame import *
 from .execute_workflow_frame import *
 from .experimental_setup_frame import *
 from .global_configuration_frame import *
@@ -56,6 +57,10 @@ del composite_creator_frame
 from . import data_browsing_frame
 __all__.extend(data_browsing_frame.__all__)
 del data_browsing_frame
+
+from . import directory_spy_frame
+__all__.extend(directory_spy_frame.__all__)
+del directory_spy_frame
 
 from . import execute_workflow_frame
 __all__.extend(execute_workflow_frame.__all__)

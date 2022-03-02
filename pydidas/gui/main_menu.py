@@ -73,6 +73,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
         self._child_windows = {}
         self._actions = {}
+        self._menus = {}
 
         self.__setup_mainwindow_widget(geometry)
         self.__add_documentation_window()
@@ -239,7 +240,7 @@ class MainMenu(QtWidgets.QMainWindow):
         # _open_menu.addAction(self._actions['load_scan_setup'])
         # _open_menu.addAction(self._actions['load_workflow_tree'])
 
-        _state_menu = QtWidgets.QMenu('&GUI states', self)
+        _state_menu = QtWidgets.QMenu('&GUI state', self)
         _state_menu.addAction(self._actions['store_state'])
         _state_menu.addAction(self._actions['export_state'])
         _state_menu.addSeparator()
@@ -260,6 +261,12 @@ class MainMenu(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions['open_documentation_window'])
         _help_menu.addAction(self._actions['open_documentation_browser'])
         _menu.addMenu(_help_menu)
+
+        self._menus['file'] = _file_menu
+        self._menus['state'] = _state_menu
+        self._menus['extras'] = _extras_menu
+        self._menus['help'] = _help_menu
+
 
     @QtCore.Slot()
     def _action_new_workflow(self):
@@ -546,7 +553,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication([])
-    gui = MainWindowMenu()
+    gui = MainMenu()
     gui.show()
     app.exec_()
     gui.deleteLater()

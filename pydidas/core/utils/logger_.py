@@ -32,7 +32,7 @@ import time
 import multiprocessing as mp
 
 
-LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = logging.WARNING
 
 
 def pydidas_logger(level=logging.DEBUG):

@@ -59,7 +59,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         super().__init__(parent, param, width)
         self._flag_is_output = param.refkey.startswith('output')
-        self._flag_is_dir = 'directory' in param.name
+        self._flag_is_dir = 'directory' in param.refkey
         self._file_selection = (
             f'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
             'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'

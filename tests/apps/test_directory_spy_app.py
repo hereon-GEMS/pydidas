@@ -168,7 +168,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value('directory_path', self._path)
         app.define_path_and_name()
         self.assertEqual(self._path, app._path)
-        self.assertIsNone(app._fname(0))
+        self.assertEqual(app._fname(0), '')
 
     def test_find_current_index__missing_inbetween(self):
         _num = 21
@@ -198,25 +198,50 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file_of_pattern__empty(self):
         app = DirectorySpyApp()
         app._fname = lambda x: self._glob_str.replace('*', '{:05d}').format(x)
-        app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
         self.assertIsNone(app._config['latest_file'])
         self.assertIsNone(app._config['2nd_latest_file'])
+        self.assertFalse(_ret)
 
     def test_find_latest_file_of_pattern__single_file(self):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
         app._fname = lambda x: self._glob_str.replace('*', '{:05d}').format(x)
-        app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
         self.assertEqual(app._config['latest_file'], _names[0])
         self.assertIsNone(app._config['2nd_latest_file'])
+        self.assertTrue(_ret)
 
     def test_find_latest_file_of_pattern__multiple_files(self):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._fname = lambda x: self._glob_str.replace('*', '{:05d}').format(x)
-        app._DirectorySpyApp__find_latest_file_of_pattern()
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
         self.assertEqual(app._config['latest_file'], _names[-1])
         self.assertEqual(app._config['2nd_latest_file'], _names[-2])
+        self.assertTrue(_ret)
+
+    def test_find_latest_file_of_pattern__same_files_again(self):
+        _ = self.create_pattern_files(n=32)
+        app = DirectorySpyApp()
+        app._fname = lambda x: self._glob_str.replace('*', '{:05d}').format(x)
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        self.assertTrue(_ret)
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        self.assertFalse(_ret)
+
+    def test_find_latest_file_of_pattern__same_files_with_changed_size(self):
+        _names = self.create_pattern_files(n=32)
+        app = DirectorySpyApp()
+        app._fname = lambda x: self._glob_str.replace('*', '{:05d}').format(x)
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        self.assertTrue(_ret)
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        self.assertFalse(_ret)
+        with open(_names[-1], 'w') as f:
+            f.write('other content')
+        _ret = app._DirectorySpyApp__find_latest_file_of_pattern()
+        self.assertTrue(_ret)
 
     def test_find_latest_file_of_pattern__missing_files(self):
         _index = 12
@@ -231,48 +256,47 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file__empty(self):
         app = DirectorySpyApp()
         app._path = self._path
-        app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__find_latest_file()
         self.assertIsNone(app._config['latest_file'])
         self.assertIsNone(app._config['2nd_latest_file'])
+        self.assertFalse(_ret)
 
     def test_find_latest_file__no_files_but_dirs(self):
         os.makedirs(os.path.join(self._path, 'dir1'))
         os.makedirs(os.path.join(self._path, 'dir2'))
         app = DirectorySpyApp()
         app._path = self._path
-        app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__find_latest_file()
         self.assertIsNone(app._config['latest_file'])
         self.assertIsNone(app._config['2nd_latest_file'])
+        self.assertFalse(_ret)
 
     def test_find_latest_file_single_file(self):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
         app._path = self._path
-        app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__find_latest_file()
         self.assertEqual(app._config['latest_file'], _names[0])
         self.assertIsNone(app._config['2nd_latest_file'])
+        self.assertTrue(_ret)
 
     def test_find_latest_file__multiple_files(self):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
         app._path = self._path
-        app._DirectorySpyApp__find_latest_file()
+        _ret = app._DirectorySpyApp__find_latest_file()
         self.assertEqual(app._config['latest_file'], _names[-1])
         self.assertEqual(app._config['2nd_latest_file'], _names[-2])
+        self.assertTrue(_ret)
 
-    def test_redefine_mp_carryon__with_scanforall(self):
+    def test_find_latest_file__same_files_again(self):
+        _ = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app.set_param_value('scan_for_all', True)
-        app._DirectorySpyApp__redefine_mp_carryon()
-        self.assertEqual(app._DirectorySpyApp__find_latest_file,
-                         app.multiprocessing_carryon)
-
-    def test_redefine_mp_carryon__without_scanforall(self):
-        app = DirectorySpyApp()
-        app.set_param_value('scan_for_all', False)
-        app._DirectorySpyApp__redefine_mp_carryon()
-        self.assertEqual(app._DirectorySpyApp__find_latest_file_of_pattern,
-                         app.multiprocessing_carryon)
+        app._path = self._path
+        _ret = app._DirectorySpyApp__find_latest_file()
+        self.assertTrue(_ret)
+        _ret = app._DirectorySpyApp__find_latest_file()
+        self.assertFalse(_ret)
 
     def test_initialize_shared_memory(self):
         app = DirectorySpyApp()
@@ -353,31 +377,19 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertEqual(app._path, self._path)
 
     def test_multiprocessing_carryon(self):
-        app = DirectorySpyApp()
-        self.assertTrue(app.multiprocessing_carryon())
+        app = self.create_default_app()
+        app.prepare_run()
+        self.assertFalse(app.multiprocessing_carryon())
 
-    def test_prepare_run__master_with_pattern(self):
+    def test_prepare_run__master(self):
         app = self.create_default_app()
         app.prepare_run()
         self.assertIsNotNone(app._fname(42))
         self.assertEqual(app._path, self._path)
-        self.assertEqual(app._DirectorySpyApp__find_latest_file_of_pattern,
-                         app.multiprocessing_carryon)
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))
 
-    def test_prepare_run__master_without_pattern(self):
-        app = DirectorySpyApp()
-        app.set_param_value('scan_for_all', True)
-        app.set_param_value('directory_path', self._path)
-        app.prepare_run()
-        self.assertEqual(app._path, self._path)
-        self.assertEqual(app._DirectorySpyApp__find_latest_file,
-                         app.multiprocessing_carryon)
-        self.assertIsInstance(app._shared_array, np.ndarray)
-        self.assertEqual(app._shared_array.shape, (10000, 10000))
-
-    def test_prepare_run__slave_with_pattern(self):
+    def test_prepare_run__slave(self):
         app = self.create_default_app()
         app.prepare_run()
         slave_app = app.get_copy(slave_mode=True)
@@ -392,8 +404,6 @@ class TestDirectorySpyApp(unittest.TestCase):
         # these tests are the same as for the prepare_run method:
         self.assertIsNotNone(app._fname(42))
         self.assertEqual(app._path, self._path)
-        self.assertEqual(app._DirectorySpyApp__find_latest_file_of_pattern,
-                         app.multiprocessing_carryon)
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))
 
@@ -411,13 +421,14 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.multiprocessing_pre_cycle(0)
         # assert does not raise an Exception
 
-    def test_get_hdf5_params(self):
+    def test_update_hdf5_metadata(self):
         _fname, _dset, _shape = self.create_hdf5_image()
         app = self.create_default_app()
         app.set_param_value('hdf5_key', _dset)
-        _params = app._DirectorySpyApp__get_hdf5_params(_fname)
-        self.assertEqual(_params['frame'], _shape[0]- 1)
-        self.assertEqual(_params['hdf5_dataset'], _dset)
+        app._DirectorySpyApp__update_hdf5_metadata(_fname)
+        _meta = app._DirectorySpyApp__read_image_meta
+        self.assertEqual(_meta['frame'], _shape[0]- 1)
+        self.assertEqual(_meta['hdf5_dataset'] ,_dset)
 
     def test_get_image__simple_image(self):
         app = self.create_default_app()

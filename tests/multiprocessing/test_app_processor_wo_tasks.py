@@ -53,7 +53,7 @@ class _ProcThread(threading.Thread):
            self.finished_queue, self.app, self.app_params, self.app_config)
 
 
-class Test_app_processor(unittest.TestCase):
+class Test_app_processor_without_tasks(unittest.TestCase):
 
     def setUp(self):
         self.input_queue = mp.Queue()

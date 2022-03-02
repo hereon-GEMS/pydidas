@@ -364,6 +364,10 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         RESULTS.update_param_choices_from_labels(_param)
 
     def __update_autosave_widget_visibility(self):
+        """
+        Update the visibility of the autosave widgets based on the selection
+        of the autosae_results Parameter.
+        """
         _vis = self.get_param_value('autosave_results')
         for _key in ['autosave_dir', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)

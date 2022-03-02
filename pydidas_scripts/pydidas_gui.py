@@ -32,7 +32,7 @@ from qtpy import QtWidgets
 from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame, PyfaiCalibFrame, HomeFrame,
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
-    CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow)
+    CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow, DirectorySpyFrame)
 from pydidas.widgets import BaseFrame
 
 
@@ -67,6 +67,8 @@ def run_gui(app):
                        'pyFAI calibration', get_pyfai_calib_icon())
     gui.register_frame(CompositeCreatorFrame, 'Composite image creator',
                        'Composite image creator', 'qta::mdi.view-comfy')
+    gui.register_frame(DirectorySpyFrame, 'Directory spy',
+                       'Directory spy', 'qta::mdi.magnify-scan')
     gui.register_frame(ProcessingFrame, 'Workflow processing',
                        'Workflow processing', 'qta::mdi.cogs')
     gui.register_frame(ExperimentalSetupFrame, 'Experimental settings',

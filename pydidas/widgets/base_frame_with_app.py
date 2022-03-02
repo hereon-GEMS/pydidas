@@ -126,9 +126,30 @@ class BaseFrameWithApp(BaseFrame):
         _app_params = self._app.get_param_values_as_dict(
             filter_types_for_export=True)
         _app_state = {'params': _app_params,
-                      'config': self._app._config.copy()}
+                      'config': self.__get_app_config_for_saving()}
         _state['app'] = _app_state
         return _index, _state
+
+    def __get_app_config_for_saving(self):
+        """
+        Get the Application config for saving.
+
+        This method sanitized the config for saving and is responsible for
+        conversions to yaml-dumpable formats.
+
+        Returns
+        -------
+        dict
+            The Application config in processed form.
+        """
+        _cfg = self._app._config.copy()
+        _newcfg = {}
+        for _key, _item in _cfg.items():
+            if isinstance(_item, range):
+                _newcfg[_key] = (f'::range::{_item.start}::{_item.stop}'
+                                 f'::{_item.step}')
+        _cfg.update(_newcfg)
+        return _cfg
 
     def restore_state(self, state):
         """
@@ -145,5 +166,32 @@ class BaseFrameWithApp(BaseFrame):
         """
         for _key, _val in state['app']['params'].items():
             self._app.set_param_value(_key, _val)
-        self._app._config = state['app']['config'].copy()
+        self._app._config = self.__process_app_config_from_import(
+            state['app']['config'].copy())
         super().restore_state(state)
+
+    def __process_app_config_from_import(self, config):
+        """
+        Process settings which have been modified for export and restore
+        the original values.
+
+        Parameters
+        ----------
+        config : dict
+            The input config dictionary.
+
+        Returns
+        -------
+        config : dict
+            The updated config dictionary
+        """
+        _newcfg = {}
+        for _key, _item in config.items():
+            if isinstance(_item, str) and _item.startswith('::range::'):
+                _, _, _start, _stop, _step = _item.split('::')
+                _start = None if _start == 'None' else int(_start)
+                _stop = None if _stop == 'None' else int(_stop)
+                _step = None if _step == 'None' else int(_step)
+                _newcfg[_key] = range(_start, _stop, _step)
+        config.update(_newcfg)
+        return config

@@ -329,7 +329,7 @@ GENERIC_PARAM_DESCRIPTION = {
     'raw_image_shape': {
         'type': tuple,
         'default': (0, 0),
-        'name': '',
+        'name': 'Raw image shape',
         'choices': None,
         'unit': 'px',
         'allow_None': False,

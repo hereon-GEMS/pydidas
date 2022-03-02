@@ -97,7 +97,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
                         'numbers': None,
                         'final_shape': None,
                         'roi': None,
-                        'images_per_file': None,
+                        'images_per_file': -1,
                         'hdf5_dset_shape': None
                         }
 

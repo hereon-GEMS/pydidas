@@ -475,9 +475,15 @@ class Parameter:
         Union[str, float, int]
             The Parameter value in a pickleable format.
         """
+        if self.value is None:
+            return None
         if self.__type in (str, Hdf5key, Path):
             return str(self.value)
-        if self.__type in (numbers.Integral, numbers.Real, list, tuple):
+        if self.__type == numbers.Integral:
+            return int(self.value)
+        if self.__type == numbers.Real:
+            return float(self.value)
+        if self.__type in (list, tuple):
             return self.value
         raise TypeError(f'No export format for type {self.__type} has been'
                         ' defined.')

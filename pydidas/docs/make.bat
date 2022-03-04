@@ -67,6 +67,7 @@ git add --all
 git stash
 git checkout %USE_BRANCH%
 git stash clear
+git clean -xfdgq
 ECHO Changed back to %USE_BRANCH% branch.
 goto end
 
@@ -75,3 +76,4 @@ goto end
 
 :end
 popd
+

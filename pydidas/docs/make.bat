@@ -40,7 +40,7 @@ goto end
 :gh-pages
 git fetch origin gh-pages
 ECHO Fetched remote gh-pages branch
-git checkout gh-pages
+git checkout --no-overlay gh-pages
 ECHO Checkout out gh-pages branch
 rem Powershell		del ../%%a -r -force
 rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL

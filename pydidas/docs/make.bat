@@ -9,7 +9,7 @@ IF "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=../../ source make.bat
+set GH_PAGES_SOURCES=../../pydidas %SOURCEDIR% make.bat
 
 IF "%1" == "" goto help
 IF "%1" == "gh-pages" (
@@ -39,55 +39,34 @@ goto end
 
 :gh-pages
 git fetch origin gh-pages
-ECHO Fetched remote gh-pages branch
-git checkout --no-overlay gh-pages
-ECHO Checkout out gh-pages branch
-rem Powershell		del ../%%a -r -force
-rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
-CD ..
-CD ..
-FOR /f %%a in ('dir /b') DO (
-	IF %%a NEQ pydidas (	
-		IF EXIST %%a\NUL (
-            ECHO Deleting directory %%a
-			rmdir %%a /s /q 
-		)
-		IF EXIST %%a (
-            ECHO Deleting file %%a
-			del %%a /s /q
-		)	
-	)
-)
-CD docs
-ECHO Deleted local files
+git checkout gh-pages
+git clean -xfdg
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ECHO Checked out required files from %USE_BRANCH%.
-ECHO Currently in directory %cd%.
 %SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 ECHO Finished creating html docs.
 REM Need to handle every item separately because directories cannot
 REM be moved with wildcards:
-FOR /f %%a in ('dir build\html /b') DO (move /y build\html\%%a "..\..\")
-ECHO Moved pages to root dir.
-rmdir "..\..\logs" /s /q
-rmdir "..\..\pydidas" /s /q
-rmdir build /s /q
-rmdir source /s /q
-rem del ../logs -r -force
-rem del ../pydidas -r -force
-rem del ./build -r -force
-rem del ./source /-r -force
+FOR /f %%a in ('dir %BUILDDIR%\html /b') DO (move /y %BUILDDIR%\html\%%a "..\..\")
+CD ../..
+rmdir logs /s /q
+rmdir pydidas /s /q
+
 ECHO Deleted local files
 git checkout %USE_BRANCH% make.bat
 ECHO Updated make.bat file
-git add -A
+git add --all ':!pydidas' ':!logs'
+git add pydidas/docs/make.bat
 ECHO Added all files to staging
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 ECHO Commited to git
 git push origin gh-pages
 ECHO Pushed to origin
+git add --all
+git stash
 git checkout %USE_BRANCH%
+git stash clear
 ECHO Changed back to %USE_BRANCH% branch.
 goto end
 
@@ -96,4 +75,3 @@ goto end
 
 :end
 popd
-

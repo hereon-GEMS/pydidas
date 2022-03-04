@@ -49,6 +49,42 @@ class DirectorySpyApp(BaseApp):
     and keep it in shared memory. To run the app in the background, please
     refer to the :py:class:`pydidas.multiprocessing.AppRunner`.
 
+    Notes
+    -----
+
+    The full list of Parameters used by the DirectorySpyApp:
+
+    scan_for_all : bool, optional
+        Flag to toggle scanning for all new files or only for files matching
+        the input pattern (defined with the Paramteter `filename_pattern`).
+        The default is False.
+    filename_pattern : pathlib.Path, optional
+        The pattern of the filename. Use hashes "#" for wildcards which will
+        be filled in with numbers. This Parameter must be set if `scan_for_all`
+        is False. The default is an empty Path().
+    directory_path : pathlib.Path, optional
+        The absolute path of the directory to be used. This Parameter is only
+        used when `scan_for_all` is True but it is mandatory then. The default
+        is an empty Path().
+    hdf5_key : Hdf5key, optional
+        Used only for hdf5 files: The dataset key. The default is
+        entry/data/data.
+    use_global_det_mask : bool, optional
+        Keyword to enable or disable using the global detector mask as
+        defined by the global mask file and mask value. The default is True.
+    use_bg_file : bool, optional
+        Keyword to toggle usage of background subtraction. The default is
+        False.
+    bg_file : Union[str, pathlib.Path], optional
+        The name of the file used for background correction. The default is
+        an empty Path.
+    bg_hdf5_key : Hdf5key, optional
+        Required for hdf5 background image files: The dataset key with the
+        image for the background file. The default is entry/data/data
+    bg_hdf5_frame : int, optional
+        Required for hdf5 background image files: The image number of the
+        background image in the dataset. The default is 0.
+
     Parameters
     ----------
     *args : tuple
@@ -364,6 +400,8 @@ class DirectorySpyApp(BaseApp):
             except (ValueError, KeyError, FileNotFoundError):
                 raise RuntimeError('Cannot read either of the last to files.')
         _image = self._apply_mask(_image)
+        if self.get_param_value('use_bg_file'):
+            _image -= self._bg_image
         self.__store_image_in_shared_memory(_image)
         return index, _fname
 

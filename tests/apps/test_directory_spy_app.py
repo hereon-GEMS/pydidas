@@ -509,6 +509,44 @@ class TestDirectorySpyApp(unittest.TestCase):
             np.allclose(app._shared_array[:self._shape[0], :self._shape[1]],
                         np.load(_names[1])))
 
+    def test_multiprocessing_func__with_mask(self):
+        _names = self.create_pattern_files(n=2)
+        self.create_temp_mask_file()
+        app = self.create_default_app()
+        app._det_mask = self._mask
+        app.prepare_run()
+        app._config['latest_file'] = _names[1]
+        _index, _fname = app.multiprocessing_func(None)
+        _arr = app._shared_array[:self._shape[0], :self._shape[1]]
+        self.assertTrue((_arr[self._mask] == 0).all())
+
+    def test_multiprocessing_func__with_bg_file(self):
+        _bg = np.ones(self._shape)
+        _bg_fname = os.path.join(self._path, 'bg.npy')
+        np.save(_bg_fname, _bg)
+        _names = self.create_pattern_files(n=2)
+        app = self.create_default_app()
+        app.set_param_value('use_bg_file', True)
+        app.set_param_value('bg_file', _bg_fname)
+        app.prepare_run()
+        app._config['latest_file'] = _names[1]
+        _index, _fname = app.multiprocessing_func(None)
+        _arr = app._shared_array[:self._shape[0], :self._shape[1]]
+        self.assertTrue((_arr[self._mask] <= 0).all())
+
+    def test_multiprocessing_func__with_disabled_bg_file(self):
+        _bg = np.ones(self._shape)
+        _bg_fname = os.path.join(self._path, 'bg.npy')
+        np.save(_bg_fname, _bg)
+        _names = self.create_pattern_files(n=2)
+        app = self.create_default_app()
+        app.set_param_value('bg_file', _bg_fname)
+        app.prepare_run()
+        app._config['latest_file'] = _names[1]
+        _index, _fname = app.multiprocessing_func(None)
+        _arr = app._shared_array[:self._shape[0], :self._shape[1]]
+        self.assertTrue((_arr[self._mask] >= 0).all())
+
     def test_multiprocessing_store_results(self):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()

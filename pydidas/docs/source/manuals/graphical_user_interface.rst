@@ -34,6 +34,7 @@ Generic GUI tutorials
     :maxdepth: 1
     
     gui/editing_parameters
+    gui/menu
 
 .. _gui_frames:
 
@@ -44,15 +45,18 @@ Frames
     :maxdepth: 1
     
     frames/data_browsing
+    frames/directory_spy
     frames/pyfai_calibration
     frames/composite_image_creator
     frames/experimental_settings
     frames/scan_settings
     frames/workflow_edit
-    frames/execute_workflow
+    frames/execute_workflow   
     frames/global_settings
+    
 
 .. _gui_recipes:
 
 Recipes
 -------
+to be added

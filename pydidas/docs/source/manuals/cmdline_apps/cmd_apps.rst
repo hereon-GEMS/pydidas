@@ -15,6 +15,11 @@ These apps are available from the command line:
         needs to be updated (i.e. the filenames and/or directories).
         Workflows themselves are organized as plugins 
         
+    DirectorySpyApp
+        An application which allows to scan a directory for new files - either
+        all new files or files which match a filename pattern. This app keeps
+        the latest filename and image data available for the user to process
+        further.
 
 The following manuals are available:
 
@@ -24,7 +29,4 @@ The following manuals are available:
     running_apps
     cmd_composite_creator_app
     cmd_execute_workflow_app
-    
-    
-
-
+    cmd_directory_spy_app

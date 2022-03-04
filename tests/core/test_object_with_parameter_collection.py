@@ -142,6 +142,12 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         _default = 124.434
         self.assertEqual(obj.get_param_value('Test5', _default), _default)
 
+    def test_get_param_value__with_type_conversion(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        _val = obj.get_param_value('Test0', dtype=float)
+        self.assertIsInstance(_val, float)
+
     def test_print_param_values(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)

@@ -60,7 +60,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
             The dictionary with the formatting options.
         """
         if param_key in ['filename_pattern', 'directory_path',
-                         'bg_file']:
+                         'bg_file', 'hdf5_key', 'bg_hdf5_key']:
             _dict = dict(linebreak=True,
                          parent_widget=self._widgets['config'],
                          halign_text=QtCore.Qt.AlignLeft,
@@ -117,6 +117,11 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
 
         self.create_button(
             'but_once', 'Show latest image', gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets['config'])
+
+        self.create_button(
+            'but_show', 'Force plot update', gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets['config'])
 

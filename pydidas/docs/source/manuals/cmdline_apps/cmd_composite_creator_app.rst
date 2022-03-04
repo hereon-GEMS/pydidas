@@ -246,8 +246,6 @@ threshold.
     >>> app.get_param_value('threshold_low') is None
     True
 
-.. _composite_creator_app_params:
-
 Composite layout
 ^^^^^^^^^^^^^^^^
 
@@ -275,6 +273,8 @@ and we want to adjust x automatically.
     >>> app = pydidas.apps.CompositeCreatorApp()
     >>> app.set_param_value('composite_nx', -1)
     >>> app.set_param_value('composite_ny', 20) 
+
+.. _composite_creator_app_params:
 
 CompositeCreatorApp Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

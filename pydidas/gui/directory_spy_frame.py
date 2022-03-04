@@ -78,11 +78,14 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         self.param_widgets['scan_for_all'].io_edited.connect(
             self.__update_file_widget_visibility)
+        self.param_widgets['filename_pattern'].io_edited.connect(
+            self.__update_file_widget_visibility)
         self.param_widgets['use_bg_file'].io_edited.connect(
             self.__update_bg_widget_visibility)
         self.param_widgets['bg_file'].io_edited.connect(
             self.__update_bg_widget_visibility)
         self._widgets['but_once'].clicked.connect(self.__scan_once)
+        self._widgets['but_show'].clicked.connect(self.__force_show)
         self._widgets['but_exec'].clicked.connect(self.__execute)
         self._widgets['but_stop'].clicked.connect(self.__stop_execution)
 
@@ -93,11 +96,18 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         on the 'scan_for_all' Parameter.
         """
         _vis = self.get_param_value('scan_for_all')
+        _hdf5_pattern = (os.path.splitext(
+            self.get_param_value('filename_pattern', dtype=str))[1]
+            in HDF5_EXTENSIONS)
         self.toggle_param_widget_visibility('filename_pattern', not _vis)
         self.toggle_param_widget_visibility('directory_path', _vis)
+        self.toggle_param_widget_visibility('hdf5_key', _vis or _hdf5_pattern)
 
     @QtCore.Slot()
     def __update_bg_widget_visibility(self):
+        """
+        Update the visibility of the background-file related widgets.
+        """
         _vis = self.get_param_value('use_bg_file')
         self.toggle_param_widget_visibility('bg_file', _vis)
         _hdf5_bgfile = (os.path.splitext(self.get_param_value('bg_file'))[1]
@@ -118,6 +128,16 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         _, _fname = self._app.multiprocessing_func()
         self._app.multiprocessing_store_results(-1, _fname)
         self.__update_plot()
+
+    @QtCore.Slot()
+    def __force_show(self):
+        """
+        Force an update of the plot.
+        """
+        _active = self._config['plot_active']
+        self._config['plot_active'] = True
+        self.__update_plot()
+        self._config['plot_active'] = _active
 
     @QtCore.Slot()
     def __execute(self):

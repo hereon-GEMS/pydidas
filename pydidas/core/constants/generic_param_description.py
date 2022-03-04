@@ -1040,7 +1040,8 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': ('The pattern of the filename. Use hashes "#" for '
-                    'wildcards which will be filled in with numbers.')},
+                    'wildcards which will be filled in with numbers.'
+                    'This Parameter must be set if scan_for_all is False.')},
     'directory_path': {
         'type': 'Path',
         'default': '',

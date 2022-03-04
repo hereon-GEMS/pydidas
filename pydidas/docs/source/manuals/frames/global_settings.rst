@@ -1,3 +1,5 @@
+.. _global_settings_frame:
+
 Global settings frame
 =====================
 

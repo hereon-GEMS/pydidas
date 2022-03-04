@@ -13,3 +13,4 @@ line arguments or by updating the Parameter values of the app class in scripts.
     
     apps/composite_creator_app
     apps/execute_workflow_app
+    apps/directory_spy_app

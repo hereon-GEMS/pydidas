@@ -109,7 +109,7 @@ class ParameterCollectionMixIn:
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
 
-    def get_param_value(self, param_key, *default):
+    def get_param_value(self, param_key, *default, dtype=None):
         """
         Get a parameter value.
 
@@ -119,6 +119,9 @@ class ParameterCollectionMixIn:
             The key name of the Parameter.
         default : object
             The default value if the param_key does not exist.
+        dtype : type, optional
+            A datatype to convert the value into. If None, the native
+            datatype is returned. The default is None.
 
         Returns
         -------
@@ -131,7 +134,10 @@ class ParameterCollectionMixIn:
                                'has been registered.')
             if len(default) >= 1:
                 return default[0]
-        return self.params.get_value(param_key)
+        _val = self.params.get_value(param_key)
+        if dtype is not None:
+            _val = dtype(_val)
+        return _val
 
     def get_param(self, param_key):
         """

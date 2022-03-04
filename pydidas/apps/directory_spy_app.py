@@ -113,7 +113,6 @@ class DirectorySpyApp(BaseApp):
         self.__current_metadata = ''
         self.__read_image_meta = {}
         self.reset_runtime_vars()
-        self._det_mask = self._get_detector_mask()
         self._config['shared_memory'] = {}
         self._config['latest_file'] = None
         self._config['2nd_latest_file'] = None
@@ -191,6 +190,7 @@ class DirectorySpyApp(BaseApp):
         Both the slaved and the main applications then initialize local numpy
         arrays from the shared memory.
         """
+        self._det_mask = self._get_detector_mask()
         self.define_path_and_name()
         self.reset_runtime_vars()
         if self.get_param_value('use_bg_file'):

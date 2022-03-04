@@ -19,7 +19,7 @@ class is used for all Parameters with predefined choices.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __version__ = "0.1.0"
 __maintainer__ = "Malte Storm"

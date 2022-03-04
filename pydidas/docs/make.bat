@@ -40,7 +40,7 @@ goto end
 :gh-pages
 git fetch origin gh-pages
 git checkout gh-pages
-git clean -xfdg
+git clean -xfdgq
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ECHO Checked out required files from %USE_BRANCH%.

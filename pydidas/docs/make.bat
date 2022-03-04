@@ -9,7 +9,7 @@ IF "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=../ source make.bat
+set GH_PAGES_SOURCES=../../ source make.bat
 
 IF "%1" == "" goto help
 IF "%1" == "gh-pages" (
@@ -45,8 +45,9 @@ ECHO Checkout out gh-pages branch
 rem Powershell		del ../%%a -r -force
 rem for old-style shell:		rmdir "%%a" /s/q 2>NUL || del "%%a" /s/q >NUL
 CD ..
+CD ..
 FOR /f %%a in ('dir /b') DO (
-	IF %%a NEQ docs (	
+	IF %%a NEQ pydidas (	
 		IF EXIST %%a\NUL (
             ECHO Deleting directory %%a
 			rmdir %%a /s /q 
@@ -67,10 +68,10 @@ ECHO Currently in directory %cd%.
 ECHO Finished creating html docs.
 REM Need to handle every item separately because directories cannot
 REM be moved with wildcards:
-FOR /f %%a in ('dir build\html /b') DO (move /y build\html\%%a "..\")
+FOR /f %%a in ('dir build\html /b') DO (move /y build\html\%%a "..\..\")
 ECHO Moved pages to root dir.
-rmdir "..\logs" /s /q
-rmdir "..\pydidas" /s /q
+rmdir "..\..\logs" /s /q
+rmdir "..\..\pydidas" /s /q
 rmdir build /s /q
 rmdir source /s /q
 rem del ../logs -r -force

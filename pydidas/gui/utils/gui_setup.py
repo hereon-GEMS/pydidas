@@ -56,9 +56,9 @@ def get_pydidas_icon():
         The instantiated pydidas icon.
     """
     _path = __file__
-    for _ in range(3):
+    for _ in range(2):
         _path = os.path.dirname(_path)
-    _logopath = os.path.join(_path, 'pydidas_logo.svg')
+    _logopath = os.path.join(_path, 'icons', 'pydidas_logo.svg')
     _icon= QtGui.QIcon(_logopath)
     return _icon
 

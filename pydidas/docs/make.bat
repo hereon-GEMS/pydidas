@@ -44,7 +44,7 @@ git clean -xfdq
 git checkout %USE_BRANCH% pydidas
 git reset HEAD
 ECHO Checked out required files from %USE_BRANCH%.
-%SPHINXBUILD% -M html %DOCSDIR%/%SOURCEDIR% . %SPHINXOPTS% %O%
+%SPHINXBUILD% -M html %DOCSDIR%/%SOURCEDIR% %DOCSDIR%\%BUILDDIR% %SPHINXOPTS% %O%
 ECHO Finished creating html docs.
 REM Need to handle every item separately because directories cannot
 REM be moved with wildcards:

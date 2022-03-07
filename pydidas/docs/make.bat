@@ -50,7 +50,7 @@ REM Need to handle every item separately because directories cannot
 REM be moved with wildcards:
 ROBOCOPY %DOCSDIR%\%BUILDDIR%\html . *.* /S /MOVE /NFL /NDL
 FOR /d %%a IN ("%CD%\pydidas\*") DO IF /i NOT "%%a"=="%CD%\pydidas\docs" RMDIR /S /Q "%%a"
-FOR /r %%a IN ("%CD%\pydidas\*") DO IF DEL /F /Q "%%a"
+FOR /r %%a IN ("%CD%\pydidas\*") DO DEL /F /Q "%%a"
 RMDIR /S /Q pydidas\docs\source 
 RMDIR /S /Q pydidas\docs\build
 ECHO Deleted local files

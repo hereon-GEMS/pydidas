@@ -40,7 +40,7 @@ goto end
 :gh-pages
 git fetch origin gh-pages
 git checkout gh-pages
-git clean -xfdgq
+git clean -xfdq
 git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
 git reset HEAD
 ECHO Checked out required files from %USE_BRANCH%.
@@ -54,7 +54,7 @@ rmdir logs /s /q
 rmdir pydidas /s /q
 
 ECHO Deleted local files
-git checkout %USE_BRANCH% make.bat
+git checkout %USE_BRANCH% pydidas/docs/make.bat
 ECHO Updated make.bat file
 git add --all ':!pydidas' ':!logs'
 git add pydidas/docs/make.bat
@@ -67,7 +67,7 @@ git add --all
 git stash
 git checkout %USE_BRANCH%
 git stash clear
-git clean -xfdgq
+git clean -xfdq
 ECHO Changed back to %USE_BRANCH% branch.
 goto end
 

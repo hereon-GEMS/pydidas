@@ -9,8 +9,7 @@ IF "%SPHINXBUILD%" == "" (
 
 set SOURCEDIR=source
 set BUILDDIR=build
-set GH_PAGES_SOURCES=../../pydidas %SOURCEDIR% make.bat
-
+set DOCSDIR=pydidas/docs
 IF "%1" == "" goto help
 IF "%1" == "gh-pages" (
 	set USE_BRANCH=master
@@ -38,26 +37,24 @@ IF errorlevel 9009 (
 goto end
 
 :gh-pages
+CD ../..
 git fetch origin gh-pages
 git checkout gh-pages
 git clean -xfdq
-git checkout %USE_BRANCH% %GH_PAGES_SOURCES%
+git checkout %USE_BRANCH% pydidas
 git reset HEAD
 ECHO Checked out required files from %USE_BRANCH%.
-%SPHINXBUILD% -M html %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+%SPHINXBUILD% -M html %DOCSDIR%/%SOURCEDIR% . %SPHINXOPTS% %O%
 ECHO Finished creating html docs.
 REM Need to handle every item separately because directories cannot
 REM be moved with wildcards:
-FOR /f %%a in ('dir %BUILDDIR%\html /b') DO (move /y %BUILDDIR%\html\%%a "..\..\")
-CD ../..
-rmdir logs /s /q
-rmdir pydidas /s /q
-
+ROBOCOPY %DOCSDIR%\%BUILDDIR%\html . *.* /S /MOVE /NFL /NDL
+FOR /d %%a IN ("%CD%\pydidas\*") DO IF /i NOT "%%a"=="%CD%\pydidas\docs" RMDIR /S /Q "%%a"
+FOR /r %%a IN ("%CD%\pydidas\*") DO IF DEL /F /Q "%%a"
+RMDIR /S /Q pydidas\docs\source 
+RMDIR /S /Q pydidas\docs\build
 ECHO Deleted local files
-git checkout %USE_BRANCH% pydidas/docs/make.bat
-ECHO Updated make.bat file
-git add --all ':!pydidas' ':!logs'
-git add pydidas/docs/make.bat
+git add --all
 ECHO Added all files to staging
 git commit -m "Generated gh-pages for %USE_BRANCH%"
 ECHO Commited to git

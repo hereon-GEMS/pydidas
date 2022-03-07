@@ -130,7 +130,7 @@ class _WorkflowTree(GenericTree):
         """
         if not self._preexecuted:
             self.prepare_execution()
-        self.root.execute_plugin_chain(arg, **kwargs)
+        self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
     def prepare_execution(self):
         """

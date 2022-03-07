@@ -653,6 +653,7 @@ class Dataset(EmptyDataset):
     **metadata : Union[dict, None], optional
         A dictionary with metadata. The default is None.
     """
+
     def __new__(cls, array, *args, **kwargs):
         """
         Create a new Dataset.

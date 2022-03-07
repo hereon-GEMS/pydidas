@@ -88,6 +88,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value('scan_for_all', False)
         _pattern = os.path.join(self._path, 'names_with_###_patterns.tif')
         app.set_param_value('filename_pattern', _pattern)
+        app.prepare_run()
         app._det_mask = np.zeros((self._shape))
         return app
 
@@ -138,6 +139,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _param.value = False
         _image = self.get_test_image()
         app = DirectorySpyApp(_param)
+        app._det_mask = None
         _newimage = app._apply_mask(_image)
         self.assertTrue(np.allclose(_image, _newimage))
 
@@ -153,7 +155,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         _param = get_generic_parameter('use_global_det_mask')
         _param.value = False
         app = DirectorySpyApp(_param)
-        self.assertIsNone(app._det_mask)
+        _mask = app._get_detector_mask()
+        self.assertIsNone(_mask)
 
     def test_get_detector_mask__with_mask(self):
         self.create_temp_mask_file()
@@ -466,7 +469,6 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_multiprocessing_func__last_file_not_readable(self):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         app._config['2nd_latest_file'] = _names[0]
         with open(_names[1], 'w') as f:
@@ -484,7 +486,6 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_multiprocessing_func__both_files_not_readable(self):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         app._config['2nd_latest_file'] = _names[0]
         for _name in _names:
@@ -496,7 +497,6 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_multiprocessing_func__both_files_readable(self):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         app._config['2nd_latest_file'] = _names[0]
         _index, _fname = app.multiprocessing_func(None)
@@ -514,7 +514,6 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.create_temp_mask_file()
         app = self.create_default_app()
         app._det_mask = self._mask
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         _index, _fname = app.multiprocessing_func(None)
         _arr = app._shared_array[:self._shape[0], :self._shape[1]]
@@ -527,9 +526,11 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
         app.set_param_value('use_bg_file', True)
+        app.set_param_value('use_global_det_mask', False)
         app.set_param_value('bg_file', _bg_fname)
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
+        app.prepare_run()
+        app._det_mask = self._mask
         _index, _fname = app.multiprocessing_func(None)
         _arr = app._shared_array[:self._shape[0], :self._shape[1]]
         self.assertTrue((_arr[self._mask] <= 0).all())
@@ -541,7 +542,6 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
         app.set_param_value('bg_file', _bg_fname)
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         _index, _fname = app.multiprocessing_func(None)
         _arr = app._shared_array[:self._shape[0], :self._shape[1]]
@@ -550,7 +550,6 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_multiprocessing_store_results(self):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
-        app.prepare_run()
         app._config['latest_file'] = _names[1]
         app._config['2nd_latest_file'] = _names[0]
         _index, _fname = app.multiprocessing_func(None)

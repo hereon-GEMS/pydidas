@@ -55,8 +55,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.setValue('global/det_mask',
-                                 self._qsettings_det_mask)
+        self._qsettings.setValue('global/det_mask', self._qsettings_det_mask)
 
     def initialize_base_plugin(self, **kwargs):
         for key, value in [['rad_npoint', 900],

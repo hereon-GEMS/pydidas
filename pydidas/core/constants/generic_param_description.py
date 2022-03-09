@@ -282,9 +282,9 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'unit': '',
         'allow_None': True,
-        'tooltip': ('The lower threshold of the composite image. If any '
-                    'finite value (i.e. not np.nan or None) is used, the value'
-                    ' of any pixels with a value below the threshold will be '
+        'tooltip': ('The lower threshold of the image. If any  finite value '
+                    '(i.e. not np.nan or None) is used, the value of any '
+                    'pixels with a value below the threshold will be '
                     'replaced by the threshold value. A value of np.nan or '
                     'None will ignore the threshold.')},
     'threshold_high': {
@@ -294,9 +294,9 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'unit': '',
         'allow_None': True,
-        'tooltip': ('The upper threshold of the composite image. If any '
-                    'finite value (i.e. not np.nan or None) is used, the value'
-                    ' of any pixels with a value above the threshold will be '
+        'tooltip': ('The upper threshold of the image. If any finite value '
+                    '(i.e. not np.nan or None) is used, the value of any '
+                    'pixels with a value above the threshold will be '
                     'replaced by the threshold value. A value of np.nan or '
                     'None will ignore the threshold.')},
     'binning': {
@@ -1050,6 +1050,43 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The absolute path of the directory to be used.'},
+    ############################
+    ## Fitting Parameters
+    ############################
+    'fit_func': {
+        'type': str,
+        'default': 'Gaussian',
+        'name': 'Fit function',
+        'choices': ['Gaussian', 'Lorentzian', 'Pseudo-Voigt'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Select the type of fit function to be used in the '
+                    'single peak fit.')},
+    'fit_bg_order': {
+        'type': int,
+        'default': 0,
+        'name': 'Fit background order',
+        'choices': [None, 0, 1],
+        'unit': '',
+        'allow_None': True,
+        'tooltip': ('The order of the background. None corresponds to no '
+                    'background.')},
+    'fit_upper_limit': {
+        'type': float,
+        'default': 0,
+        'name': 'Peak fit upper limit',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The upper limit (in the x-axis´ unit) to the fit region.'},
+    'fit_lower_limit': {
+        'type': float,
+        'default': 0,
+        'name': 'Peak fit lower limit',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The lower limit (in the x-axis´ unit) to the fit region.'},
     # '': {
     #     'type': int,
     #     'default': ,
@@ -1058,7 +1095,14 @@ GENERIC_PARAM_DESCRIPTION = {
     #     'unit': '',
     #     'allow_None': False,
     #     'tooltip': },
-
+    # '': {
+    #     'type': int,
+    #     'default': ,
+    #     'name': '',
+    #     'choices': None,
+    #     'unit': '',
+    #     'allow_None': False,
+    #     'tooltip': },
     # '': {
     #     'type': int,
     #     'default': ,

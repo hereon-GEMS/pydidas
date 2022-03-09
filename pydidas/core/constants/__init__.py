@@ -30,6 +30,7 @@ __all__ = []
 # import __all__ items from modules:
 from .constants import *
 from .file_extensions import *
+from .fit_funcs import *
 from .generic_param_description import *
 from .gui_constants import *
 from .q_settings import *
@@ -46,6 +47,10 @@ del constants
 from . import file_extensions
 __all__.extend(file_extensions.__all__)
 del file_extensions
+
+from . import fit_funcs
+__all__.extend(fit_funcs.__all__)
+del fit_funcs
 
 from . import generic_param_description
 __all__.extend(generic_param_description.__all__)

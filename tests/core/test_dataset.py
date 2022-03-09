@@ -26,6 +26,7 @@ __status__ = "Development"
 import copy
 import warnings
 import unittest
+from numbers import Real
 
 import numpy as np
 
@@ -111,7 +112,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = obj[:, 7, 6]
         self.assertEqual(tuple(np.arange(_new.ndim)),
-                         tuple(_new.axis_labels.keys()))
+                          tuple(_new.axis_labels.keys()))
         self.assertEqual(tuple(_new.axis_labels.values()),
                           (self._dset['labels'][0], self._dset['labels'][3]))
         for _new_range, _original_range in zip(
@@ -463,6 +464,27 @@ class TestDataset(unittest.TestCase):
         for key in obj.__dict__:
             self.assertEqual(obj.__dict__[key], new_obj.__dict__[key])
         self.assertTrue((new_obj.array == obj.array).all())
+
+    def test_np_amax__simple(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        _max = np.amax(obj)
+        self.assertIsInstance(_max, Real)
+
+    def test_np_amax__with_metadata(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        obj.metadata = {'test': 'something'}
+        _max = np.amax(obj)
+        self.assertIsInstance(_max, Real)
+
+    def test_np_amax__with_axis_with_metadata(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array)
+        obj.metadata = {'test': 'something'}
+        _max = np.amax(obj, axis=0)
+        self.assertIsInstance(_max, Dataset)
+        self.assertEqual(_max.shape, obj.shape[1:])
 
 
 if __name__ == "__main__":

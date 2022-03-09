@@ -79,7 +79,7 @@ class EmptyDataset(np.ndarray):
 
     def __getitem__(self, key):
         """
-        Overwrite the generic __getitem__ method to catch the the slicing
+        Overwrite the generic __getitem__ method to catch the slicing
         keys.
 
         Parameters
@@ -510,9 +510,10 @@ class EmptyDataset(np.ndarray):
             The representation of the Dataset class.
         """
         _thresh = np.get_printoptions()['threshold']
-        np.set_printoptions(threshold=20)
+        _edgeitems = 2 if self.ndim > 1 else 3
+        np.set_printoptions(threshold=20, edgeitems=_edgeitems)
         _meta_repr = '\n'.join(
-            self.__get_item_representation('metadata', self.metadata))
+            self.__get_item_representation('metadata', self.__metadata))
         _info = {
             'axis_labels': self.__get_axis_item_repr('axis_labels'),
             'axis_ranges': self.__get_axis_item_repr('axis_ranges'),
@@ -522,7 +523,7 @@ class EmptyDataset(np.ndarray):
         _repr = (self.__class__.__name__ + '(\n'
                  + ',\n'.join(_str for _str in _info.values())
                  + '\n)')
-        np.set_printoptions(threshold=_thresh)
+        np.set_printoptions(threshold=_thresh, edgeitems=3)
         return _repr
 
     def __get_axis_item_repr(self, obj_name):
@@ -568,6 +569,7 @@ class EmptyDataset(np.ndarray):
         list
             A list with a representation for each line.
         """
+        # print('item rep:', key, item)
         _repr = (f'{key}: ' if use_key else '') + item.__repr__()
         if isinstance(item, np.ndarray):
             _repr = _repr.replace('\n      ', '')
@@ -629,6 +631,28 @@ class EmptyDataset(np.ndarray):
         """
         self.__dict__ = state[-1]
         np.ndarray.__setstate__(self, state[0:-1])
+
+    def __array_wrap__(self, out_arr, context=None):
+        """
+        Overload the generic __array_wrap__ to return 0-d results from ufuncs
+        as single values and not empty Dataset arrays.
+
+        Parameters
+        ----------
+        out_arr : Union[np.ndarray, pydidas.core.Dataset]
+            The output array from the ufunc call.
+        context : Union[None, type], optional
+            The calling context. The default is None.
+
+        Returns
+        -------
+        Union[pydidas.core.Dataset, type]
+            The output will be be a new Dataset if the output has a dimension
+            greater zero or of the basic datatype for 0-d return values.
+        """
+        if out_arr.shape == ():
+            return np.atleast_1d(out_arr)[0]
+        return super().__array_wrap__(out_arr, context)
 
 
 class Dataset(EmptyDataset):

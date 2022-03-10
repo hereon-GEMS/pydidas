@@ -63,6 +63,7 @@ class MainMenu(QtWidgets.QMainWindow):
         corner coordinates (x0, y0) and width and height. If None, the
         default values will be used. The default is None.
     """
+    STATE_FILENAME = 'pydidas_gui_state.yaml'
 
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
@@ -75,12 +76,12 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions = {}
         self._menus = {}
 
-        self.__setup_mainwindow_widget(geometry)
-        self.__add_documentation_window()
-        self.__add_global_config_window()
-        self.__create_menu()
+        self._setup_mainwindow_widget(geometry)
+        self._add_documentation_window()
+        self._add_global_config_window()
+        self._create_menu()
 
-    def __setup_mainwindow_widget(self, geometry):
+    def _setup_mainwindow_widget(self, geometry):
         """
         Setup the user interface.
 
@@ -101,13 +102,13 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setWindowIcon(utils.get_pydidas_icon())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
-    def __add_documentation_window(self):
+    def _add_documentation_window(self):
         """
         Add the floating documentation window to the main window.
         """
         self._child_windows['documentation'] = GlobalDocumentationWindow(self)
 
-    def __add_global_config_window(self):
+    def _add_global_config_window(self):
         """
         Add the required widgets and signals for the global configuration
         window and create it.
@@ -116,15 +117,15 @@ class MainMenu(QtWidgets.QMainWindow):
 
 
 
-    def __create_menu(self):
+    def _create_menu(self):
         """
         Create the application's main menu.
         """
-        self.__create_menu_actions()
-        self.__connect_menu_actions()
-        self.__add_actions_to_menu()
+        self._create_menu_actions()
+        self._connect_menu_actions()
+        self._add_actions_to_menu()
 
-    def __create_menu_actions(self):
+    def _create_menu_actions(self):
         """
         Create all required actions for the menu entries and store them in the
         internal _actions dictionary.
@@ -160,35 +161,6 @@ class MainMenu(QtWidgets.QMainWindow):
             'user-defined file.')
         self._actions['import_state'] = import_state_action
 
-        # new_workflow_action = QtWidgets.QAction(
-        #     QtGui.QIcon('new.png'), '&New processing workflow', self)
-        # new_workflow_action.setStatusTip(
-        #     'Create a new processing workflow and discard the current '
-        #     'workflow.')
-        # # new_workflow_action.setShortcut('Ctrl+N')
-        # self._actions['new_workflow'] = new_workflow_action
-
-        # load_exp_setup_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &experimental configuration', self)
-        # load_exp_setup_action.setStatusTip(
-        #     'Discard the current experimental setup and open a configuration '
-        #     'from file.')
-        # self._actions['load_exp_setup'] = load_exp_setup_action
-
-        # load_scan_setup_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &scan configuration', self)
-        # load_scan_setup_action.setStatusTip(
-        #     'Discard the current scan setup and open a scan configuration '
-        #     'from file.')
-        # self._actions['load_scan_setup'] = load_scan_setup_action
-
-        # load_workflow_tree_action = QtWidgets.QAction(
-        #     QtGui.QIcon('open.png'), 'Load &workflow tree', self)
-        # load_workflow_tree_action.setStatusTip(
-        #     'Discard the current workflow tree and open a workflow tree '
-        #     'from file.')
-        # self._actions['load_workflow_tree'] = load_workflow_tree_action
-
         exit_action = QtWidgets.QAction(QtGui.QIcon('exit.png'), 'E&xit', self)
         exit_action.setStatusTip('Exit application')
         self._actions['exit'] = exit_action
@@ -201,7 +173,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['open_documentation_browser'] = QtWidgets.QAction(
             'Open documentation in default web browser', self)
 
-    def __connect_menu_actions(self):
+    def _connect_menu_actions(self):
         """
         Connect all menu actions to their respective slots.
         """
@@ -213,14 +185,6 @@ class MainMenu(QtWidgets.QMainWindow):
             self._action_restore_state)
         self._actions['import_state'].triggered.connect(
             self._action_import_state)
-        # self._actions['new_workflow'].triggered.connect(
-        #     self._action_new_workflow)
-        # self._actions['load_workflow_tree'].triggered.connect(
-        #     self._action_load_workflow_tree)
-        # self._actions['load_exp_setup'].triggered.connect(
-        #     self._action_load_exp_setup)
-        # self._actions['load_scan_setup'].triggered.connect(
-        #     self._action_load_scan_setup)
         self._actions['exit'].triggered.connect(self.close)
         self._actions['open_settings'].triggered.connect(
             partial(self.show_window, 'global_config'))
@@ -229,16 +193,11 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['open_documentation_browser'].triggered.connect(
             self._action_open_doc_in_browser)
 
-    def __add_actions_to_menu(self):
+    def _add_actions_to_menu(self):
         """
         Add the defined actions to the menu bar.
         """
         _menu = self.menuBar()
-
-        # _open_menu = QtWidgets.QMenu('&Open', self)
-        # _open_menu.addAction(self._actions['load_exp_setup'])
-        # _open_menu.addAction(self._actions['load_scan_setup'])
-        # _open_menu.addAction(self._actions['load_workflow_tree'])
 
         _state_menu = QtWidgets.QMenu('&GUI state', self)
         _state_menu.addAction(self._actions['store_state'])
@@ -248,7 +207,6 @@ class MainMenu(QtWidgets.QMainWindow):
         _state_menu.addAction(self._actions['import_state'])
 
         _file_menu = _menu.addMenu('&File')
-        # _file_menu.addAction(self._actions['new_workflow'])
         _file_menu.addMenu(_state_menu)
         _file_menu.addAction(self._actions['exit'])
         _menu.addMenu(_file_menu)
@@ -266,11 +224,6 @@ class MainMenu(QtWidgets.QMainWindow):
         self._menus['state'] = _state_menu
         self._menus['extras'] = _extras_menu
         self._menus['help'] = _help_menu
-
-
-    @QtCore.Slot()
-    def _action_new_workflow(self):
-        print('New workflow')
 
     @QtCore.Slot()
     def _action_store_state(self):
@@ -314,18 +267,6 @@ class MainMenu(QtWidgets.QMainWindow):
             self, 'Name of file', None, 'YAML (*.yaml *.yml)')[0]
         if fname != '':
             self.restore_gui_state(fname)
-
-    @QtCore.Slot()
-    def _action_load_workflow_tree(self):
-        print('load workflow')
-
-    @QtCore.Slot()
-    def _action_load_exp_setup(self):
-        print('load exp setup')
-
-    @QtCore.Slot()
-    def _action_load_scan_setup(self):
-        print('load scan setup')
 
     @QtCore.Slot()
     def _action_open_doc_in_browser(self):
@@ -389,7 +330,7 @@ class MainMenu(QtWidgets.QMainWindow):
         if filename is None:
             _config_path = QtCore.QStandardPaths.standardLocations(
                 QtCore.QStandardPaths.ConfigLocation)[0]
-            filename = os.path.join(_config_path, 'pydidas_gui_state.yaml')
+            filename = os.path.join(_config_path, self.STATE_FILENAME)
         _state = self.__get_window_states()
         for _index, _widget in enumerate(self.centralWidget().widgets):
             _frameindex, _widget_state = _widget.export_state()
@@ -445,14 +386,14 @@ class MainMenu(QtWidgets.QMainWindow):
             internal default if the filename is None. The default is None.
         """
         if filename is None:
-            filename = self.__get_standard_state_filename()
+            filename = self._get_standard_state_filename()
         with open(filename, 'r') as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
-        self.__restore_global_objects(_state)
-        self.__restore_window_states(_state)
-        self.__restore_frame_states(_state)
+        self._restore_global_objects(_state)
+        self._restore_window_states(_state)
+        self._restore_frame_states(_state)
 
-    def __get_standard_state_filename(self):
+    def _get_standard_state_filename(self):
         """
         Get the standard filename for the stored state.
 
@@ -467,12 +408,12 @@ class MainMenu(QtWidgets.QMainWindow):
         _paths = QtCore.QStandardPaths.standardLocations(
             QtCore.QStandardPaths.ConfigLocation)
         for _path in _paths:
-            _fname = os.path.join(_path, 'pydidas_gui_state.yaml')
+            _fname = os.path.join(_path, self.STATE_FILENAME)
             if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
                 return _fname
         raise FileNotFoundError('No state config file found.')
 
-    def __restore_global_objects(self, state):
+    def _restore_global_objects(self, state):
         """
         Get the states of pydidas' global objects (ScanSetup,
         ExperimentalSetup, WorkflowTree)
@@ -490,7 +431,7 @@ class MainMenu(QtWidgets.QMainWindow):
             EXP.set_param_value(_key, _val)
 
 
-    def __restore_window_states(self, state):
+    def _restore_window_states(self, state):
         """
         Get the states of the main window and all child windows for exporting.
 
@@ -518,7 +459,7 @@ class MainMenu(QtWidgets.QMainWindow):
         if _frame_index >= 0:
             self.centralWidget().setCurrentIndex(_frame_index)
 
-    def __restore_frame_states(self, state):
+    def _restore_frame_states(self, state):
         """
         Restore the states of all the frames in the CentralWidgetStack.
 
@@ -549,11 +490,3 @@ class MainMenu(QtWidgets.QMainWindow):
             self._child_windows[window].deleteLater()
             self._child_windows[window].close()
         event.accept()
-
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication([])
-    gui = MainMenu()
-    gui.show()
-    app.exec_()
-    gui.deleteLater()

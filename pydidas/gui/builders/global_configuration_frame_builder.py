@@ -98,3 +98,9 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
                           **_section_options)
         self.create_param_widget(self.get_param('plot_update_time'),
                                   **_options)
+        self.create_spacer('spacer_4')
+
+        self.create_label('section_plugins', 'Plugin paths',
+                          **_section_options)
+        self.create_param_widget(self.get_param('plugin_paths'),
+                                  **_options)

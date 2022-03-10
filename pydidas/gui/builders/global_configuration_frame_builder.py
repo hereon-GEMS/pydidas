@@ -102,5 +102,5 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
 
         self.create_label('section_plugins', 'Plugin paths',
                           **_section_options)
-        self.create_param_widget(self.get_param('plugin_paths'),
-                                  **_options)
+        self.create_param_widget(self.get_param('plugin_path'),
+                                  **_twoline_options)

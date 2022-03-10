@@ -31,6 +31,7 @@ from functools import partial
 from qtpy import QtWidgets, QtCore
 
 from ..core import get_generic_param_collection
+from ..core.constants import QSETTINGS_GLOBAL_KEYS
 from .builders import GlobalConfigurationFrameBuilder
 
 
@@ -38,10 +39,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     """
     Frame which manages global configuration items.
     """
-    default_params = get_generic_param_collection(
-        'mp_n_workers', 'shared_buffer_size', 'shared_buffer_max_n',
-        'det_mask', 'det_mask_val', 'mosaic_border_width',
-        'mosaic_border_value', 'mosaic_max_size', 'plot_update_time')
+    default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
     value_changed_signal = QtCore.Signal(str, object)
 

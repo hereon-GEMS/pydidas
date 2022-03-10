@@ -20,7 +20,7 @@ The constants module holds constant nmumber defitions needed in pydidas.
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['LAMBDA_IN_A_TO_E', 'LAMBDA_IN_M_TO_E',

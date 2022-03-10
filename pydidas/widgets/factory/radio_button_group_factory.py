@@ -29,7 +29,7 @@ __all__ = ['create_radio_button_group']
 from ..utilities import apply_widget_properties
 
 
-def create_radio_button_group(entries, vertical=True, title=None, **kwargs):
+def create_radio_button_group(entries, title=None, **kwargs):
     """
     Create a RadioButtonGroup widget and set properties.
 
@@ -37,12 +37,17 @@ def create_radio_button_group(entries, vertical=True, title=None, **kwargs):
     ----------
     entries : list
         The list of labels for the RadioButtons.
-    vertical : bool
-        Keyword to arrange the RadioButtons vertically. If False, a horizontal
-        alignment is used. The default is True.
     title : Union[str, None]
         The title/label of the RadioButtonGroup. If None, no title is used.
         The default is None.
+    rows : int, optional
+        The number of button rows (i.e. vertical alignment) of the
+        QRadioButtons. -1 will toggle automatic determination of the number
+        of rows. The default is 1.
+    columns: int, optional
+        The number of button columns (i.e. horizontal alignment) of the
+        QRadioButtons. -1 will toggle automatic determination of the number
+        of columns. The default is -1.
     **kwargs : dict
         Any additional keyword arguments. See below for supported arguments.
     **QtAttribute : depends on the attribute
@@ -60,6 +65,6 @@ def create_radio_button_group(entries, vertical=True, title=None, **kwargs):
     # structure.
     from ..selection import RadioButtonGroup
 
-    _box = RadioButtonGroup(None, entries, vertical=vertical, title=title)
+    _box = RadioButtonGroup(None, entries, title=title, **kwargs)
     apply_widget_properties(_box, **kwargs)
     return _box

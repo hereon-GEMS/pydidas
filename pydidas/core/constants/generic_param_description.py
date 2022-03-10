@@ -1020,6 +1020,15 @@ GENERIC_PARAM_DESCRIPTION = {
                     'existing folders. If this Parameter is True, no further '
                     'confirmation will be asked and no further warning will '
                     'be displayed.')},
+    'use_scan_timeline': {
+        'type': int,
+        'default': False,
+        'name': 'Use scan timeline',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Keyword to toggle using a scan timeline with only one '
+                    'dimension instead of all scan dimensions.')},
     ############################
     ## Result selection settings
     ############################
@@ -1050,6 +1059,22 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The absolute path of the directory to be used.'},
+    'result_n_dim': {
+        'type': int,
+        'default': -1,
+        'name': 'Result dimensionality',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The total number of dimensions in the result dataset.'},
+    'active_node': {
+        'type': int,
+        'default': 0,
+        'name': 'The ative node',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The node ID of the currently selected node.'},
     ############################
     ## Fitting Parameters
     ############################
@@ -1087,14 +1112,27 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The lower limit (in the x-axis´ unit) to the fit region.'},
-    # '': {
-    #     'type': int,
-    #     'default': ,
-    #     'name': '',
-    #     'choices': None,
-    #     'unit': '',
-    #     'allow_None': False,
-    #     'tooltip': },
+    ############################
+    ## Fitting Parameters
+    ############################
+    'plot_ax1': {
+        'type': int,
+        'default': 0,
+        'name': 'Data axis no. 1 for plot',
+        'choices': [0],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis which is to be used as the first axis in the '
+                    'plot of the results.')},
+    'plot_ax2': {
+        'type': int,
+        'default': 1,
+        'name': 'Data axis no. 2 for plot',
+        'choices': [0, 1],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The axis which is to be used as the second axis in the '
+                    'plot of the results.')},
     # '': {
     #     'type': int,
     #     'default': ,

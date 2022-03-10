@@ -34,7 +34,7 @@ import numpy as np
 from qtpy import QtWidgets, QtCore
 
 from ...core import (Parameter, ParameterCollection, ParameterCollectionMixIn)
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import CONFIG_WIDGET_WIDTH, QT_REG_EXP_SLICE_VALIDATOR
 from ...core.utils import SignalBlocker, get_range_as_formatted_string
 from ...experiment import ScanSetup
 from ...workflow import WorkflowResults
@@ -57,13 +57,13 @@ def _param_widget_config(param_key):
         return  dict(linebreak=True,
                      halign_text=QtCore.Qt.AlignLeft,
                      valign_text=QtCore.Qt.AlignBottom,
-                     width_total=CONFIG_WIDGET_WIDTH,
+                     width_total=CONFIG_WIDGET_WIDTH - 10,
                      width_io=CONFIG_WIDGET_WIDTH - 50,
                      width_text=CONFIG_WIDGET_WIDTH - 20,
                      width_unit=0)
     return dict(width_io=100, width_unit=0,
                 width_text=CONFIG_WIDGET_WIDTH - 100,
-                width_total=CONFIG_WIDGET_WIDTH,
+                width_total=CONFIG_WIDGET_WIDTH - 10,
                 visible=False)
 
 
@@ -155,8 +155,10 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             fixedWidth=CONFIG_WIDGET_WIDTH,fixedHeight=200,
             alignment=QtCore.Qt.AlignTop, visible=False)
         self.create_radio_button_group(
-            'radio_datashape', ['1D plot', '2D image'], vertical=False,
-            gridPos=(-1, 0, 1, 1), visible=False, title='Result plot type:')
+            'radio_datashape',
+            ['1D plot', 'group of 1D plots', '2D full axes', '2D data subset'],
+            rows=2, columns=2, gridPos=(-1, 0, 1, 1), visible=False,
+            title='Result plot type:', fixedWidth=CONFIG_WIDGET_WIDTH - 10)
         _w = QtWidgets.QFrame()
         _w.setLayout(QtWidgets.QGridLayout())
         self.add_any_widget('plot_ax_group', _w)
@@ -190,12 +192,9 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         Reset the instance to its default selection, for example when a new
         processing has been started and the old information is no longer valid.
         """
-        self._config = {'widget_visibility': False,
-                        'scan_use_timeline': False,
-                        'result_ndim': -1,
-                        '2d_plot': False,
-                        'n_slice_params': self._config['n_slice_params'],
-                        }
+        self._config.update(
+            {'widget_visibility': False, 'scan_use_timeline': False,
+             'result_ndim': -1, '2d_plot': False})
         self._active_node = -1
         with SignalBlocker(self.param_widgets['selected_results']):
             self.param_widgets['selected_results'].update_choices(
@@ -227,7 +226,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     @QtCore.Slot(int)
     def __new_selection_of_plot_dimension(self, index):
         """
-        Update the selection
+        Update the selection of plot dimensions.
 
         Parameters
         ----------

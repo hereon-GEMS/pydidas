@@ -103,7 +103,6 @@ class RadioButtonGroup(QtWidgets.QWidget):
         for _index, _entry in enumerate(entries):
             _currx = _index % self._columns
             _curry = _index // self._columns
-            print(_index, _currx, _curry)
             _button = QtWidgets.QRadioButton(_entry, self)
             _button.toggled.connect(self.__toggled)
             _button.setFixedHeight(20)

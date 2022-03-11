@@ -130,6 +130,12 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue('_npoints' in obj.__dict__)
         self.assertTrue('_active_node' in obj.__dict__)
 
+    def test_init__with_param(self):
+        _param = Parameter('result_n_dim', int, 124)
+        obj = WorkflowResultsSelector(_param)
+        self.assertIsInstance(obj, WorkflowResultsSelector)
+        self.assertEqual(_param, obj.get_param('result_n_dim'))
+
     def test_reset(self):
         obj = WorkflowResultsSelector()
         obj._active_node = 12

@@ -59,8 +59,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
     default_params = get_generic_param_collection(
         'use_scan_timeline', 'result_n_dim')
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
+        self.add_params(*args)
         self.set_default_params()
         self._selection = None
         self._active_node = -1

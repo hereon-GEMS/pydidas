@@ -28,16 +28,16 @@ __status__ = "Development"
 __all__ = ['ResultSelectorForOutput']
 
 from functools import partial
-from copy import copy
 
 import numpy as np
 from qtpy import QtWidgets, QtCore
 
-from ...core import (Parameter, ParameterCollection, ParameterCollectionMixIn)
+from ...core import (Parameter, ParameterCollection, ParameterCollectionMixIn,
+                     get_generic_parameter)
 from ...core.constants import CONFIG_WIDGET_WIDTH, QT_REG_EXP_SLICE_VALIDATOR
-from ...core.utils import SignalBlocker, get_range_as_formatted_string
+from ...core.utils import SignalBlocker
 from ...experiment import ScanSetup
-from ...workflow import WorkflowResults
+from ...workflow import WorkflowResults, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config.parameter_widgets_mixin import (
     ParameterWidgetsMixIn)
@@ -109,11 +109,11 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     new_selection = QtCore.Signal(bool, int, int, object)
 
     default_params = ParameterCollection(
-        Parameter('n_dim', int, -1, name='Total result dimensionality'),
         Parameter('plot_ax1', int, 0, name='Data axis no. 1 for plot',
                   choices=[0]),
         Parameter('plot_ax2', int, 1, name='Data axis no. 2 for plot',
-                  choices=[0, 1]),)
+                  choices=[0, 1]),
+        get_generic_parameter('use_scan_timeline'))
 
     def __init__(self, parent=None, select_results_param=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
@@ -122,16 +122,16 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         apply_widget_properties(self, **kwargs)
         self.params = ParameterCollection()
         self._config = {'widget_visibility': False,
-                        'scan_use_timeline': False,
                         'result_ndim': -1,
-                        '2d_plot': False,
+                        'plot_type': '1D plot',
                         'n_slice_params': 0}
         self._active_node = -1
         self.add_param(select_results_param)
         self.set_default_params()
+        self._selector = WorkflowResultsSelector(
+            self.get_param('use_scan_timeline'))
         self.__create_widgets()
         self.__connect_signals()
-        self.get_and_store_result_node_labels()
 
     def __create_widgets(self):
         """
@@ -155,7 +155,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             fixedWidth=CONFIG_WIDGET_WIDTH,fixedHeight=200,
             alignment=QtCore.Qt.AlignTop, visible=False)
         self.create_radio_button_group(
-            'radio_datashape',
+            'radio_plot_type',
             ['1D plot', 'group of 1D plots', '2D full axes', '2D data subset'],
             rows=2, columns=2, gridPos=(-1, 0, 1, 1), visible=False,
             title='Result plot type:', fixedWidth=CONFIG_WIDGET_WIDTH - 10)
@@ -177,10 +177,10 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         """
         self.param_widgets['selected_results'].currentIndexChanged.connect(
             self.__selected_new_node)
-        self._widgets['radio_datashape'].new_button_index.connect(
-            self.__new_selection_of_plot_dimension)
+        self._widgets['radio_plot_type'].new_button_label.connect(
+            self.__select_type_of_plot)
         self._widgets['radio_arrangement'].new_button_index.connect(
-            self.__new_selection_of_scan_result_arrangement)
+            self.__arrange_results_in_timeline_or_scan_shape)
         self.param_widgets['plot_ax1'].currentIndexChanged.connect(
             partial(self.__selected_new_plot_axis, 1))
         self.param_widgets['plot_ax2'].currentIndexChanged.connect(
@@ -193,15 +193,15 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         processing has been started and the old information is no longer valid.
         """
         self._config.update(
-            {'widget_visibility': False, 'scan_use_timeline': False,
-             'result_ndim': -1, '2d_plot': False})
+            {'widget_visibility': False, 'result_ndim': -1,
+             'plot_type': '1D plot'})
         self._active_node = -1
         with SignalBlocker(self.param_widgets['selected_results']):
             self.param_widgets['selected_results'].update_choices(
                 ['No selection'])
         self.param_widgets['selected_results'].setCurrentText('No selection')
-        with SignalBlocker(self._widgets['radio_datashape']):
-            self._widgets['radio_datashape'].select_by_index(0)
+        with SignalBlocker(self._widgets['radio_plot_type']):
+            self._widgets['radio_plot_type'].select_by_index(0)
         with SignalBlocker(self._widgets['radio_arrangement']):
             self._widgets['radio_arrangement'].select_by_index(0)
         self.__set_derived_widget_visibility(False)
@@ -223,19 +223,17 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self.param_widgets['selected_results'].setCurrentText(
                 _param.value)
 
-    @QtCore.Slot(int)
-    def __new_selection_of_plot_dimension(self, index):
+    @QtCore.Slot(str)
+    def __select_type_of_plot(self, label):
         """
         Update the selection of plot dimensions.
 
         Parameters
         ----------
-        index : int
+        label : str
             The index of the dimension selection.
         """
-        self._config['2d_plot'] = bool(index)
-        self.param_composite_widgets['plot_ax2'].setVisible(
-            index and self._config['widget_visibility'])
+        self._config['plot_type'] = label
         self.__change_slice_param_widget_visibility()
 
     def __change_slice_param_widget_visibility(self, hide_all=False):
@@ -248,8 +246,17 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         hide_all : bool, optional
             Keyword to force hiding of all Parameter slice dimension widgets.
         """
-        _frozendims = [self.get_param_value('plot_ax1')]
-        if self._config['2d_plot']:
+        _ax1_used = (self._config['plot_type']
+                     in ['1D plot', 'group of 1D plots', '2D full axes'])
+        _ax2_used = (self._config['plot_type'] =='2D full axes')
+        self.param_composite_widgets['plot_ax1'].setVisible(
+            _ax1_used and not hide_all)
+        self.param_composite_widgets['plot_ax2'].setVisible(
+            _ax2_used and not hide_all)
+        _frozendims = []
+        if _ax1_used:
+            _frozendims.append(self.get_param_value('plot_ax1'))
+        if _ax2_used:
             _frozendims.append(self.get_param_value('plot_ax2'))
         for _dim in range(self._config['n_slice_params']):
             _refkey = f'plot_slice_{_dim}'
@@ -257,6 +264,13 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                     (_dim < self._config['result_ndim']
                      and _dim not in _frozendims))
             self.param_composite_widgets[_refkey].setVisible(_vis)
+
+    def __are_axes_used(self):
+
+        _ax1_used = (self._config['plot_type']
+                     in ['1D plot', 'group of 1D plots', '2D full axes'])
+        _ax2_used = (self._config['plot_type'] =='2D full axes')
+
 
     @QtCore.Slot(int)
     def __selected_new_node(self, index):
@@ -275,6 +289,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         elif index > 0:
             self._active_node = int(
                 self.param_widgets["selected_results"].currentText()[-4:-1])
+            self._selector.select_active_node(self._active_node)
             self.__calc_and_store_ndim_of_results()
             self.__update_text_description_of_node_results()
             self.__update_dim_choices_for_plot_selection()
@@ -294,11 +309,11 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         """
         self._config['widget_visibility'] = visible
         self._widgets['result_info'].setVisible(visible)
-        self._widgets['radio_datashape'].setVisible(visible)
+        self._widgets['radio_plot_type'].setVisible(visible)
         self._widgets['radio_arrangement'].setVisible(visible)
         self.param_composite_widgets['plot_ax1'].setVisible(visible)
         self.param_composite_widgets['plot_ax2'].setVisible(
-            visible and self._config['2d_plot'])
+            visible and (self._config['plot_type'] == 2))
         self._widgets['but_confirm'].setVisible(visible)
         self.__change_slice_param_widget_visibility(hide_all=not visible)
 
@@ -308,7 +323,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         new number.
         """
         _ndim = RESULTS.ndims[self._active_node]
-        if self._config['scan_use_timeline']:
+        if self.get_param_value('use_scan_timeline'):
             _ndim -= SCAN.ndim - 1
         self._config['result_ndim'] = _ndim
 
@@ -317,48 +332,13 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         Update the text in the "result_info" ReadOnlyTextWidget based on the
         selection of the "selected_results" Parameter.
         """
-        _txt = self.__get_edited_result_metadata_string()
-        self._widgets['result_info'].setText(_txt)
+        self._widgets['result_info'].setText(
+            RESULTS.get_node_result_metadata_string(
+                self._active_node, self.get_param_value('use_scan_timeline')))
         self.__set_derived_widget_visibility(True)
 
-    def __get_edited_result_metadata_string(self):
-        """
-        Get the edited metadata from WorkflowResults as a formatted string.
-
-        Returns
-        -------
-        str :
-            The formatted string with a representation of all the metadata.
-        """
-        _meta = RESULTS.get_result_metadata(self._active_node)
-        _scandim = SCAN.get_param_value('scan_dim')
-        _ax_labels = copy(_meta['axis_labels'])
-        _ax_units= copy(_meta['axis_units'])
-        _ax_ranges = {_key: get_range_as_formatted_string(_range)
-                         for _key, _range in _meta['axis_ranges'].items()}
-        _ax_types = {_key: ('(scan)' if _key < _scandim else '(data)')
-                     for _key in _meta['axis_labels'].keys()}
-        _ax_points = dict(enumerate(RESULTS.shapes[self._active_node]))
-        if self._config['scan_use_timeline']:
-            _ax_labels[0] = 'chronological frame number'
-            _ax_units[0] = ''
-            _ax_ranges[0] = f'0 ... {SCAN.n_total - 1}'
-            _ax_points[0] = SCAN.n_total
-            if _scandim > 1:
-                _dims_to_edit = RESULTS.ndims[self._active_node] - _scandim
-                for _index in range(_dims_to_edit):
-                    for _item in [_ax_labels, _ax_units, _ax_ranges,
-                                  _ax_types, _ax_points]:
-                        _item[_index + 1] = _item[_index + _scandim]
-                        del _item[_index + _scandim]
-        return ''.join([(f'Axis #{_axis:02d} {_ax_types[_axis]}:\n'
-                         f'  Label: {_ax_labels[_axis]}\n'
-                         f'  N points: {_ax_points[_axis]}\n'
-                         f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n')
-                        for _axis in _ax_labels])
-
     @QtCore.Slot(int)
-    def __new_selection_of_scan_result_arrangement(self, index):
+    def __arrange_results_in_timeline_or_scan_shape(self, index):
         """
         Get and store the current selection for the organization of the
         scan results in a timeline or using the ScanSetup shape.
@@ -371,7 +351,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         index : int
             The index of the newly activated button.
         """
-        self._config['scan_use_timeline'] = bool(index)
+        self.set_param_value('use_scan_timeline', bool(index))
         self.__calc_and_store_ndim_of_results()
         self.__update_text_description_of_node_results()
         self.__update_dim_choices_for_plot_selection()
@@ -390,6 +370,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             The string representation of the new dimension for the selected
             plot axis.
         """
+        # get the other axis (1, 2) from the input axis:
         _other_ax = 3 - plot_axis % 3
         new_dim = int(new_dim)
         _selected_param = self.params[f'plot_ax{plot_axis}']
@@ -421,12 +402,18 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         slice object required to access the selected subset of data from the
         full array.
         """
-        _flag = self._config['scan_use_timeline']
+        self._selector.select_active_node(self._active_node)
+        _flag = self.get_param_value('use_scan_timeline')
         _npoints = list(RESULTS.shapes[self._active_node])
+        for _dim in range(self._config['result_ndim']):
+            self._selector.set_param_value(
+                f'data_slice_{_dim}',
+                self.get_param_value(f'plot_slice_{_dim}'))
+
         if _flag:
             del _npoints[:SCAN.ndim]
             _npoints.insert(0, SCAN.n_total)
-        _plot_dim = self._config['2d_plot'] + 1
+        _plot_dim = self._config['plot_type'] // 2 + 1
         _selection = [np.mod(self.get_param_value(f'plot_slice_{_dim}'),
                              _npoints[_dim])
                       for _dim in range(self._config['result_ndim'])]
@@ -471,7 +458,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         for _dim in range(RESULTS.ndims[self._active_node]):
             _refkey = f'plot_slice_{_dim}'
             _param = Parameter(
-                _refkey, int, 0, name=f'Slice of data dim #{_dim}',
+                _refkey, str, '0', name=f'Slice of data dim #{_dim}',
                 tooltip=('The scan/data position index to be displayed. Note: '
                          'The selection will be modulated to match the number '
                              'of datapoints.'))
@@ -480,6 +467,8 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                 self.create_param_widget(
                     _param, parent_widget=self._widgets['plot_ax_group'],
                     **_param_widget_config(_refkey))
+                self.param_widgets[_refkey].setValidator(
+                    QT_REG_EXP_SLICE_VALIDATOR)
         self._config['n_slice_params'] = max(self._config['n_slice_params'],
                                              RESULTS.ndims[self._active_node])
         self.__change_slice_param_widget_visibility()

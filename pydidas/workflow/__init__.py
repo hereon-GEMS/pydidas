@@ -37,6 +37,7 @@ from .generic_tree import *
 from .plugin_position_node import *
 from .workflow_node import *
 from .workflow_results import *
+from .workflow_results_selector import *
 from .workflow_tree import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -60,6 +61,10 @@ del workflow_node
 from . import workflow_results
 __all__.extend(workflow_results.__all__)
 del workflow_results
+
+from . import workflow_results_selector
+__all__.extend(workflow_results_selector.__all__)
+del workflow_results_selector
 
 from . import workflow_tree
 __all__.extend(workflow_tree.__all__)

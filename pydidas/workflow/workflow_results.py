@@ -28,11 +28,12 @@ __all__ = ['WorkflowResults']
 
 import os
 import re
+from copy import copy
 
 import numpy as np
 from qtpy import QtCore
 
-from ..core import Dataset, SingletonFactory
+from ..core import utils, Dataset, SingletonFactory
 from ..experiment import ScanSetup
 from .workflow_tree import WorkflowTree
 from .result_savers import WorkflowResultSaverMeta
@@ -404,6 +405,50 @@ class _WorkflowResults(QtCore.QObject):
             param.choices = _new_choices
             param.value = _new_choices[0]
             param.choices = _new_choices[:-1]
+
+    def get_node_result_metadata_string(self, node_id, use_scan_timeline):
+        """
+        Get the edited metadata from WorkflowResults as a formatted string.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID of the active node.
+        use_scan_timeline : bool
+            The flag whether to reduce the scan dimensions to a single timeline.
+
+        Returns
+        -------
+        str :
+            The formatted string with a representation of all the metadata.
+        """
+        _meta = self.get_result_metadata(node_id)
+        _scandim = SCAN.get_param_value('scan_dim')
+        _ax_labels = copy(_meta['axis_labels'])
+        _ax_units= copy(_meta['axis_units'])
+        _ax_ranges = {_key: utils.get_range_as_formatted_string(_range)
+                         for _key, _range in _meta['axis_ranges'].items()}
+        _ax_types = {_key: ('(scan)' if _key < _scandim else '(data)')
+                     for _key in _meta['axis_labels'].keys()}
+        _ax_points = dict(enumerate(self.shapes[node_id]))
+        if use_scan_timeline:
+            _ax_labels[0] = 'chronological frame number'
+            _ax_units[0] = ''
+            _ax_ranges[0] = f'0 ... {SCAN.n_total - 1}'
+            _ax_points[0] = SCAN.n_total
+            if _scandim > 1:
+                _dims_to_edit = self.ndims[node_id] - _scandim
+                for _index in range(_dims_to_edit):
+                    for _item in [_ax_labels, _ax_units, _ax_ranges,
+                                  _ax_types, _ax_points]:
+                        _item[_index + 1] = _item[_index + _scandim]
+                        del _item[_index + _scandim]
+        return ''.join([(f'Axis #{_axis:02d} {_ax_types[_axis]}:\n'
+                         f'  Label: {_ax_labels[_axis]}\n'
+                         f'  N points: {_ax_points[_axis]}\n'
+                         f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n')
+                        for _axis in _ax_labels])
+
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

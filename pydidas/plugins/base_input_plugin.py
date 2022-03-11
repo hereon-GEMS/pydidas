@@ -55,15 +55,21 @@ class InputPlugin(BasePlugin):
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
-        self.__setup_image_magedata_manager()
+        use_filename_pattern = kwargs.get('use_filename_pattern', False)
+        self.__setup_image_magedata_manager(use_filename_pattern)
 
-    def __setup_image_magedata_manager(self):
+    def __setup_image_magedata_manager(self, use_filename_pattern=False):
         """
         Setup the ImageMetadataManager to determine the shape of the final
         image.
 
         The shape of the final image is required to determine the shape of
         the processed data in the WorkflowTree.
+
+        Parameters
+        ----------
+        use_filename_pattern : bool, optional
+            Keyword to use a filename pattern. The default is False.
 
         Raises
         ------
@@ -84,7 +90,7 @@ class InputPlugin(BasePlugin):
         elif _has_filename and not _has_first_file:
             _metadata_params.append(self.get_param('filename'))
             _use_filename = True
-        elif self.basic_plugin:
+        elif self.basic_plugin or use_filename_pattern:
             # create some dummy value
             _use_filename = True
         else:

@@ -343,6 +343,40 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': 'The datatype.'},
+    'first_index': {
+        'type': int,
+        'default': 0,
+        'name': 'First index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The first index to be used for the file series.'},
+    'last_index': {
+        'type': int,
+        'default': 0,
+        'name': 'Last index',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The last index to be used for the file series.')},
+    'eiger_key': {
+        'type': str,
+        'default': 'eiger9m',
+        'name': 'Eiger directory key',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('The name of the sub-directory for each scan in which the'
+                    ' Eiger detector writes its data files.')},
+     'filename_suffix': {
+         'type': str,
+         'default': '_data_00001.h5',
+         'name': 'Eiger filename suffix',
+         'choices': None,
+         'unit': '',
+         'allow_None': False,
+         'tooltip': ('The suffix to be appended to the filename pattern to get'
+                     ' the full filename for the data file.')},
     #################################
     ## Parameters for global geometry
     #################################

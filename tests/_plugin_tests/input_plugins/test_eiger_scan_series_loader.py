@@ -161,6 +161,15 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
             self.assertEqual(plugin.get_param_value(_key),
                              plugin2.get_param_value(_key))
 
+    def test_calculate_result_shape(self):
+        plugin = self.create_plugin_with_filelist()
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._original_image_shape, self._img_shape)
+
+    def test_get_first_file_size(self):
+        plugin = self.create_plugin_with_filelist()
+        self.assertEqual(plugin.get_first_file_size(),
+                         os.stat(self._hdf5_fnames[0]).st_size)
 
 if __name__ == "__main__":
     unittest.main()

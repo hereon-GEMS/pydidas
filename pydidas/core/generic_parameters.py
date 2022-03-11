@@ -58,7 +58,7 @@ def get_generic_parameter(refkey):
     try:
         _config = GENERIC_PARAM_DESCRIPTION[refkey].copy()
     except KeyError as _ke:
-        raise KeyError(f'No Parameter with the reference key "{refkey}"'
+        raise KeyError(f'No Parameter with the reference key "{refkey}" '
                        'in the GENERIC_PARAM_DESCRIPTION collection.') from _ke
     if _config['type'] == 'Path':
         _config['type'] = Path

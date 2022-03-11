@@ -370,7 +370,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     ' Eiger detector writes its data files.')},
      'filename_suffix': {
          'type': str,
-         'default': '_data_00001.h5',
+         'default': '_data_000001.h5',
          'name': 'Eiger filename suffix',
          'choices': None,
          'unit': '',

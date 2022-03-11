@@ -109,10 +109,7 @@ class EigerScanSeriesLoader(InputPlugin):
         Prepare loading images from a file series.
         """
         self.__create_filename_generator()
-        _start_fname = self._filename_generator(
-            self.get_param_value('first_index'))
-        self._image_metadata.set_param_value('filename', _start_fname)
-        self._image_metadata.update()
+        self.__update_image_metadata()
         if self.get_param_value('images_per_file') == -1:
             self.__update_images_per_file()
 
@@ -133,6 +130,18 @@ class EigerScanSeriesLoader(InputPlugin):
         _fname = _name.replace('#' * _len_pattern,
                                '{:0' + str(_len_pattern) + 'd}')
         self._filename_generator = lambda index: _fname.format(index, index)
+
+    def __update_image_metadata(self):
+        """
+        Update the image metadata, including updating the filename based on the
+        input Parameters.
+        """
+        self.__create_filename_generator()
+        _start_fname = self._filename_generator(
+            self.get_param_value('first_index'))
+        self._image_metadata.set_param_value('filename', _start_fname)
+        self._image_metadata.update()
+
 
     def __update_images_per_file(self):
         """
@@ -185,3 +194,28 @@ class EigerScanSeriesLoader(InputPlugin):
         _i_file = (index // _images_per_file
                    + self.get_param_value('first_index'))
         return self._filename_generator(_i_file)
+
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin's results.
+        """
+        self.__update_image_metadata()
+        self._config['result_shape'] = self._image_metadata.final_shape
+        self._original_image_shape = (self._image_metadata.raw_size_y,
+                                      self._image_metadata.raw_size_x)
+
+    def get_first_file_size(self):
+        """
+        Get the size of the first file to be processed.
+
+        Returns
+        -------
+        int
+            The file size in bytes.
+        """
+        if self._filename_generator is None:
+            self.__create_filename_generator()
+        _fname = self._filename_generator(
+            self.get_param_value('first_index'))
+        self._config['file_size'] = os.stat(_fname).st_size
+        return self._config['file_size']

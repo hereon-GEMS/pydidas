@@ -279,6 +279,29 @@ class EmptyDataset(np.ndarray):
         self.axis_units = _axis_units
         self.axis_ranges = _axis_ranges
 
+    def transpose(self, *axes):
+        """
+        Overload the generic transpose method to transpose the metadata as
+        well.
+
+        Parameters
+        ----------
+        *axes : tuple
+            The axes to be transposed. If not given, the generic order is used.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The transposed Dataset.
+        """
+        _new = copy(self)
+        if axes is tuple():
+            axes = tuple(np.arange(self.ndim)[::-1])
+        _new.axis_labels = [self.axis_labels[_index] for _index in axes]
+        _new.axis_units = [self.axis_units[_index] for _index in axes]
+        _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
+        return np.ndarray.transpose(_new, axes)
+
     def get_rebinned_copy(self, binning):
         """
         Get a binned copy of the Dataset.

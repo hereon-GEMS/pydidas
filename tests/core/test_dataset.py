@@ -307,6 +307,72 @@ class TestDataset(unittest.TestCase):
         _new = rebin2d(obj, 2)
         self.assertEqual(_new.shape, (5, 5))
 
+    def test_transpose__1d(self):
+        obj = Dataset(np.random.random((12)), axis_labels=[0],
+                      axis_units=['a'])
+        _new = obj.transpose()
+        self.assertEqual(obj.axis_labels[0], _new.axis_labels[0])
+        self.assertEqual(obj.axis_units[0], _new.axis_units[0])
+        self.assertEqual(obj.axis_ranges[0], _new.axis_ranges[0])
+
+    def test_transpose__2d(self):
+        obj = Dataset(np.random.random((12, 12)), axis_labels=[0, 1],
+                      axis_units=['a', 'b'],
+                      axis_ranges=[np.arange(12), 20 - np.arange(12)])
+        _new = obj.transpose()
+        for _i1, _i2 in [[0, 1], [1, 0]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0], _new[:, 0]))
+        self.assertTrue(np.allclose(obj[:, 0], _new[0]))
+
+    def test_transpose__3d(self):
+        obj = Dataset(np.random.random((6, 7, 8)), axis_labels=[0, 1, 2],
+                      axis_units=['a', 'b', 'c'],
+                      axis_ranges=[np.arange(6), 20 - np.arange(7),
+                                   3 * np.arange(8)])
+        _new = obj.transpose()
+        for _i1, _i2 in [[0, 2], [2, 0], [1, 1]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0], _new[:, 0, 0]))
+        self.assertTrue(np.allclose(obj[:, 0, 0], _new[0, 0]))
+        self.assertTrue(np.allclose(obj[0, :, 0], _new[0, :, 0]))
+
+    def test_transpose__4d(self):
+        obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
+                      axis_units=['a', 'b', 'c', 'd'],
+                      axis_ranges=[np.arange(6), 20 - np.arange(7),
+                                   3 * np.arange(8), -1 * np.arange(9)])
+        _new = obj.transpose()
+        for _i1, _i2 in [[0, 3], [3, 0], [1, 2], [2, 1]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0, 0], _new[:, 0, 0, 0]))
+        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, 0]))
+        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, 0, :, 0]))
+
+    def test_transpose__4d_with_axes(self):
+        obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
+                      axis_units=['a', 'b', 'c', 'd'],
+                      axis_ranges=[np.arange(6), 20 - np.arange(7),
+                                   3 * np.arange(8), -1 * np.arange(9)])
+        _new = obj.transpose(2, 1, 0, 3)
+        for _i1, _i2 in [[0, 2], [2, 0]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0, :, 0], _new[:, 0, 0, 0]))
+        self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
+        self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
+
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
         _new = obj.__getitem__((0,0))

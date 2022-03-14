@@ -523,6 +523,35 @@ class EmptyDataset(np.ndarray):
         """
         return self.__array__()
 
+    def squeeze(self, axis=None):
+        """
+        Squeeze the array and remove dimensions of length one.
+
+        Parameters
+        ----------
+        axis : Union[None, int], optional
+            The axis to be squeezed. If None, all axes of length one will be
+            squeezed. The default is None.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The squeezed Dataset.
+        """
+        _axes = None
+        if axis is None:
+            _axes = [_index  for _index, _shape in enumerate(self.shape)
+                     if _shape != 1]
+        else:
+            _axes = [_index  for _index, _ in enumerate(self.shape)
+                     if _index != axis]
+        _new = np.ndarray.squeeze(self, axis)
+        for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
+            _entry = [_v for _k, _v in getattr(self, _key).items()
+                      if _k in _axes]
+            setattr(_new, _key, _entry)
+        return _new
+
     def __repr__(self):
         """
         Reimplementation of the numpy.ndarray.__repr__ method

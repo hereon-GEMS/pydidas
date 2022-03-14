@@ -373,6 +373,47 @@ class TestDataset(unittest.TestCase):
         self.assertTrue(np.allclose(obj[:, 0, 0, 0], _new[0, 0, :, 0]))
         self.assertTrue(np.allclose(obj[0, :, 0, 0], _new[0, :, 0, 0]))
 
+    def test_squeeze__single_dim(self):
+        obj = Dataset(np.random.random((6, 7, 1, 9)), axis_labels=[0, 1, 2, 3],
+                      axis_units=['a', 'b', 'c', 'd'],
+                      axis_ranges=[np.arange(6), 20 - np.arange(7),
+                                   3 * np.arange(8), -1 * np.arange(9)])
+        _new = np.squeeze(obj)
+        for _i1, _i2 in [[0, 0], [1, 1], [3, 2]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0, 0], _new[0, 0]))
+
+    def test_squeeze__multi_dim(self):
+        obj = Dataset(np.random.random((6, 1, 7, 1, 9)),
+                      axis_labels=[0, 1, 2, 3, 4],
+                      axis_units=['a', 'b', 'c', 'd', 'e'],
+                      axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
+                                   [6], -1 * np.arange(9)])
+        _new = np.squeeze(obj)
+        for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
+
+    def test_squeeze__no_dim(self):
+        obj = Dataset(np.random.random((6, 4, 7, 2, 9)),
+                      axis_labels=[0, 1, 2, 3, 4],
+                      axis_units=['a', 'b', 'c', 'd', 'e'],
+                      axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
+                                   [6], -1 * np.arange(9)])
+        _new = np.squeeze(obj)
+        for _i1, _i2 in [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1],
+                                        _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj, _new))
+
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
         _new = obj.__getitem__((0,0))

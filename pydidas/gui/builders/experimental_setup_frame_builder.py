@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentalSetupself_BuilderMixin class which is used to
+Module with the ExperimentalSetupFrameBuilder class which is used to
 populate the ExperimentSettingsself with widgets.
 """
 

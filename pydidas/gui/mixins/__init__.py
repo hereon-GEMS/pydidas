@@ -28,9 +28,14 @@ __all__ = []
 
 # import __all__ items from modules:
 from .silx_plotwindow_mixin import *
+from .view_results_mixin import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import silx_plotwindow_mixin
 __all__.extend(silx_plotwindow_mixin.__all__)
 del silx_plotwindow_mixin
+
+from . import view_results_mixin
+__all__.extend(view_results_mixin.__all__)
+del view_results_mixin

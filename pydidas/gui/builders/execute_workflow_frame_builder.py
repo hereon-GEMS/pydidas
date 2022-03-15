@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExecuteWorkflowFrame_BuilderMixin class which is used to
+Module with the ExecuteWorkflowFrameBuilder class which is used to
 populate the ExecuteWorkflowFrame with widgets.
 """
 
@@ -31,7 +31,7 @@ from silx.gui.plot import Plot1D, Plot2D
 
 from ...core.constants import CONFIG_WIDGET_WIDTH
 from ...widgets import ScrollArea, BaseFrameWithApp
-from ...widgets.selection import ResultSelectorForOutput
+from ...widgets.selection import ResultSelectionWidget
 from ...widgets.parameter_config import ParameterEditFrame
 
 class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
@@ -130,7 +130,7 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
                          parent_widget=self._widgets['config'])
 
         self.create_any_widget(
-            'result_selector', ResultSelectorForOutput,
+            'result_selector', ResultSelectionWidget,
             parent_widget=self._widgets['config'], gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param('selected_results'))
 

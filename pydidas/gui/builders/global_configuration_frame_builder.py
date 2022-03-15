@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the GlobalConfiguration_FrameBuilder class which is a mixin used
+Module with the GlobalConfigurationFrameBuilder class which is used
 to populate the GlobalConfigurationFrame with widgets.
 """
 

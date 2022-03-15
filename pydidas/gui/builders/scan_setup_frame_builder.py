@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetup_FrameBuilder mix-in class which is used to populate
+Module with the ScanSetupFrameBuilder class which is used to populate
 the ScanSetupFrame with widgets.
 """
 

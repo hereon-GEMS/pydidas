@@ -29,7 +29,7 @@ __all__ = []
 from .directory_explorer import *
 from .hdf5_dataset_selector import *
 from .radio_button_group import *
-from .result_selector_for_output import *
+from .result_selection_widget import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -45,6 +45,6 @@ from . import radio_button_group
 __all__.extend(radio_button_group.__all__)
 del radio_button_group
 
-from . import result_selector_for_output
-__all__.extend(result_selector_for_output.__all__)
-del result_selector_for_output
+from . import result_selection_widget
+__all__.extend(result_selection_widget.__all__)
+del result_selection_widget

@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the builder mixin class for the ProcessingSinglePluginFrame.
+Module with the ProcessingSinglePluginFrameBuilder class used to populate the
+the ProcessingSinglePluginFrame with widgets.
 """
 
 __author__ = "Malte Storm"

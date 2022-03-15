@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DataBrowsingFrame_BuilderMixin class which is used to populate
+Module with the DataBrowsingFrameBuilder class which is used to populate
 the DataBrowsingFrame with widgets.
 """
 

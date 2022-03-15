@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CompositeCreator_FrameBuilder mix-in class which is used to
+Module with the CompositeCreatorFrameBuilder class which is used to
 populate the CompositeCreatorFrame with widgets.
 """
 

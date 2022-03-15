@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ResultSelectorForOutput widget which can handle the selection
+Module with the ResultSelectionWidget widget which can handle the selection
 of a node with results from the WorkflowResults and returns a signal with
 information on how to access the new data selection.
 """
@@ -25,7 +25,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ResultSelectorForOutput']
+__all__ = ['ResultSelectionWidget']
 
 from functools import partial
 
@@ -67,12 +67,12 @@ def _param_widget_config(param_key):
                 visible=False)
 
 
-class ResultSelectorForOutput(QtWidgets.QWidget,
+class ResultSelectionWidget(QtWidgets.QWidget,
                               CreateWidgetsMixIn,
                               ParameterWidgetsMixIn,
                               ParameterCollectionMixIn):
     """
-    The ResultSelectorForOutput widget allows to select data slices for
+    The ResultSelectionWidget widget allows to select data slices for
     plotting using meta information from the
     :py:class:`ScanSetup <pydidas.core.ScanSetup<` and
     :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
@@ -88,7 +88,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
 
     Notes
     -----
-    The ResultSelectorForOutput offers the following signal which can be
+    The ResultSelectionWidget offers the following signal which can be
     used:
 
         new_selection : QtCore.Signal(use_timeline : int, active_dims : list,\
@@ -105,7 +105,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         The parent widget.
     select_results_param : pydidas.core.Parameter
         The select_results Parameter instance. This instance should be
-        shared between the ResultSelectorForOutput and the parent.
+        shared between the ResultSelectionWidget and the parent.
     """
     new_selection = QtCore.Signal(bool, object, int, object, str)
 
@@ -417,20 +417,36 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
                 self.get_param_value(f'plot_slice_{_dim}'))
         _target_dim = 1 if self._config['plot_type'] == '1D plot' else 2
         self._selector.set_param_value('result_n_dim', _target_dim)
-        _ax1_used, _ax2_used = self.__are_axes_used()
-        _active_dims = []
-        if _ax1_used:
-            _active_dim = self.get_param_value('plot_ax1')
-            self._selector.set_param_value(f'data_slice_{_active_dim}', ':')
-            _active_dims.append(_active_dim)
-        if _ax2_used:
-            _active_dim = self.get_param_value('plot_ax2')
-            self._selector.set_param_value(f'data_slice_{_active_dim}', ':')
-            _active_dims.append(_active_dim)
+        _active_dims = self.__process_active_dims()
         _selection = self._selector.selection
         self.new_selection.emit(self.get_param_value('use_scan_timeline'),
                                 _active_dims, self._active_node, _selection,
                                 self._config['plot_type'])
+
+    def __process_active_dims(self):
+        """
+        Process the active dimensions for the plot.
+
+        This method will update the necessary values in the
+        WorkflowResultSelector and return the active dimensions.
+
+        Returns
+        -------
+        list
+            The active dimensions in form of integer entries.
+        """
+        if self._config['plot_type'] in ['1D plot', 'group of 1D plots']:
+            _active_dim = self.get_param_value('plot_ax1')
+            self._selector.set_param_value(f'data_slice_{_active_dim}', ':')
+            return [_active_dim]
+        elif self._config['plot_type'] == '2D full axes':
+            _active_dim1 = self.get_param_value('plot_ax1')
+            self._selector.set_param_value(f'data_slice_{_active_dim1}', ':')
+            _active_dim2 = self.get_param_value('plot_ax2')
+            self._selector.set_param_value(f'data_slice_{_active_dim2}', ':')
+            return [_active_dim1, _active_dim2]
+        elif self._config['plot_type'] == '2D data subset':
+            return self._selector.active_dims
 
     def __update_dim_choices_for_plot_selection(self):
         """

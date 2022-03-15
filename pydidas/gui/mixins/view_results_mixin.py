@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExecuteWorkflowFrame which allows to run the full
-processing workflow and visualize the results.
+Module with the ViewResultsFrame which allows to visualize results from
+running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
@@ -24,7 +24,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExecuteWorkflowFrame']
+__all__ = ['ViewResultsMixin']
 
 import time
 import os
@@ -32,83 +32,62 @@ import os
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ..apps import ExecuteWorkflowApp
-from ..core import get_generic_param_collection
-from ..core.utils import pydidas_logger
-from ..experiment import ExperimentalSetup, ScanSetup
-from ..multiprocessing import AppRunner
-from ..widgets.dialogues import critical_warning
-from ..workflow import WorkflowTree, WorkflowResults
-from .builders.execute_workflow_frame_builder import (
-    ExecuteWorkflowFrameBuilder)
+from ...core import get_generic_param_collection
+from ...core.utils import pydidas_logger
+from ...widgets.dialogues import critical_warning
+from ...workflow import WorkflowTree, WorkflowResults
 
 
 RESULTS = WorkflowResults()
-logger = pydidas_logger()
 
 
-class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
+class ViewResultsMixin:
     """
-    The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
-    and visualize the results.
-    """
-    default_params = get_generic_param_collection(
-        'selected_results', 'saving_format', 'enable_overwrite')
+    The ViewResultsMixin has all the necessary functionality to show and
+    export results.
 
+    It requires the following widgets which need to be created by the
+    parent frame:
+
+    - ResultSelectionWidget (referenced as self._widgets['result_selector'])
+    - QStackedWidget with plots (referenced as self._widgets['plot_stack'])
+    - silx Plot1D canvas (referenced as self._widgets['plot1d'])
+    - silx Plot2D canvas (referenced as self._widgets['plot2d'])
+    - ParameterWidget for the 'enable_overwrite' Parameter
+    - ParameterWidget for the 'saving_format' Parameter
+    - Button to export current node results
+      (referenced as self._widgets['but_export_current'])
+    - Button to export all node results
+      (referenced as self._widgets['but_export_all'])
+
+     It also requires the following Parameters which need to be created by
+     the main class:
+      - selected_results
+      - saving_format
+      - enable_overwrite
+    """
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
-        ExecuteWorkflowFrameBuilder.__init__(self, parent)
-        _global_plot_update_time = self.q_settings_get_global_value(
-            'plot_update_time', argtype=float)
         self._config = {'data_use_timeline': False,
                         'plot_dim': 2,
                         'plot_active': False,
                         'active_node': None,
                         'data_slices': (),
-                        'plot_last_update': 0,
-                        'plot_update_time': _global_plot_update_time,
                         'frame_active': True,
                         'source_hash': RESULTS.source_hash}
         self._axlabels = lambda i: ''
-        self._app = ExecuteWorkflowApp()
-        self.set_default_params()
-        self.add_params(self._app.params)
-        self.build_frame()
-        self.connect_signals()
-        self.__update_choices_of_selected_results()
-        self.__update_result_node_information()
+        self.connect_view_results_mixin_signals()
+        self._update_choices_of_selected_results()
 
-    def connect_signals(self):
+    def connect_view_results_mixin_signals(self):
         """
         Connect all required Qt slots and signals.
         """
-        self.param_widgets['autosave_results'].io_edited.connect(
-            self.__update_autosave_widget_visibility)
-        self._widgets['but_exec'].clicked.connect(self.__execute)
-        self._widgets['but_abort'].clicked.connect(self.__abort_execution)
         self._widgets['but_export_current'].clicked.connect(
             self._export_current)
         self._widgets['but_export_all'].clicked.connect(
             self._export_all)
         self._widgets['result_selector'].new_selection.connect(
             self.__update_result_selection)
-
-    def __abort_execution(self):
-        """
-        Abort the execution of the AppRunner.
-        """
-        if self._runner is not None:
-            self._runner.send_stop_signal()
-        self.set_status('Aborted processing of full workflow.')
-        self.__finish_processing()
-
-    @QtCore.Slot()
-    def __execute(self):
-        """
-        Execute the Application in the chosen type (GUI or command line).
-        """
-        self._verify_result_shapes_uptodate()
-        self._run_app()
 
     def _verify_result_shapes_uptodate(self):
         """
@@ -119,52 +98,11 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         if _hash != self._config['source_hash']:
             RESULTS.update_shapes_from_scan_and_workflow()
             self._config['source_hash'] = RESULTS.source_hash
-            self.__clear_selected_results_entries()
-            self.__clear_plot()
-            self.__update_choices_of_selected_results()
-            QtWidgets.QMessageBox.information(
-                self, 'Results need to be updated',
-                ('Underlying information for the WorkflowResults has changed '
-                 'and the WorkflowResults must be updated. This will clear '
-                 'all present results.\n'
-                 'Either the WorkflowTree or the ScanSetup has been modified '
-                 'and the consistency of the results cannot be guaranteed '
-                 'without calculating them from scratch.'))
+            self._clear_selected_results_entries()
+            self._clear_plot()
+            self._update_choices_of_selected_results()
 
-    def _run_app(self):
-        """
-        Parallel implementation of the execution method.
-        """
-        logger.debug('Starting workflow')
-        self._prepare_app_run()
-        self._app.multiprocessing_pre_run()
-        self._config['last_update'] = time.time()
-        self.__set_proc_widget_visibility_for_running(True)
-        logger.debug('Starting AppRunner')
-        self._runner = AppRunner(self._app)
-        self._runner.sig_final_app_state.connect(self._set_app)
-        self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_finished.connect(self._apprunner_finished)
-        self._runner.sig_results.connect(
-            self._app.multiprocessing_store_results)
-        self._runner.sig_results.connect(self.__update_result_node_information)
-        self._runner.sig_results.connect(self.__check_for_plot_update)
-        logger.debug('Running AppRunner')
-        self._runner.start()
-
-    def _prepare_app_run(self):
-        """
-        Do preparations for running the ExecuteWorkflowApp.
-
-        This methods sets the required attributes both for serial and
-        parallel running of the app.
-        """
-        self.set_status('Started processing of full workflow.')
-        self._widgets['progress'].setValue(0)
-        self.__clear_selected_results_entries()
-        self.__clear_plot()
-
-    def __clear_selected_results_entries(self):
+    def _clear_selected_results_entries(self):
         """
         Clear the selection of the results and reset the view. This method
         will hide the data selection widgets.
@@ -173,7 +111,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         self.params['selected_results'].choices = ['No selection']
         self._widgets['result_selector'].reset()
 
-    def __clear_plot(self):
+    def _clear_plot(self):
         """
         Clear all curves / images from the plot and disable any new updates.
         """
@@ -181,20 +119,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         for _plot in [self._widgets['plot1d'], self._widgets['plot2d']]:
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
-
-    @QtCore.Slot()
-    def _apprunner_finished(self):
-        """
-        Clean up after AppRunner is done.
-        """
-        self.set_status('Cleaning up Apprunner')
-        logger.debug('Telling AppRunner to exit.')
-        self._runner.exit()
-        self._runner = None
-        logger.debug('AppRunner successfully shut down.')
-        self.set_status('Finished processing of full workflow.')
-        self.__finish_processing()
-        self._update_plot()
 
     @QtCore.Slot()
     def __update_result_node_information(self):
@@ -239,14 +163,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         self._config['local_dims'] = {_val: _index for _index, _val in
                                       enumerate(np.where(_datalength > 1)[0])}
         self._update_plot()
-
-    @QtCore.Slot()
-    def __check_for_plot_update(self):
-        _dt = time.time() - self._config['plot_last_update']
-        if (_dt > self._config['plot_update_time']
-                and self._config['frame_active']):
-            self._config['plot_last_update'] = time.time()
-            self._update_plot()
 
     def _update_plot(self):
         """
@@ -344,7 +260,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         _dim0, _dim1  = self._config['active_dims']
         if _dim0 > _dim1:
             data = data.transpose()
-
         _ax_label = lambda i: (
             data.axis_labels[i]
             + (' / ' + data.axis_units[i]
@@ -397,50 +312,28 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         """
         if index == self.frame_index:
             self._verify_result_shapes_uptodate()
-            self.__update_choices_of_selected_results()
-            self.__check_for_plot_update()
+            self._update_choices_of_selected_results()
+            self._update_export_button_activation()
         self._config['frame_active'] = (index == self.frame_index)
 
-    def __finish_processing(self):
-        """
-        Perform finishing touches after the processing has terminated.
-        """
-        self.__set_proc_widget_visibility_for_running(False)
-        self.__update_choices_of_selected_results()
 
-    def __set_proc_widget_visibility_for_running(self, running):
-        """
-        Set the visibility of all widgets which need to be updated for/after
-        procesing
-
-        Parameters
-        ----------
-        running : bool
-            Flag whether the AppRunner is running and widgets shall be shown
-            accordingly or not.
-        """
-        self._widgets['but_exec'].setEnabled(not running)
-        self._widgets['but_abort'].setVisible(running)
-        self._widgets['progress'].setVisible(running)
-        self._widgets['but_export_all'].setEnabled(not running)
-        self._widgets['but_export_current'].setEnabled(not running)
-
-    def __update_choices_of_selected_results(self):
+    def _update_choices_of_selected_results(self):
         """
         Update the choices of the "selected_results" Parameter based on the
         latest WorkflowResults.
         """
         _param = self.get_param('selected_results')
         RESULTS.update_param_choices_from_labels(_param)
+        self._widgets['result_selector'].get_and_store_result_node_labels()
 
-    def __update_autosave_widget_visibility(self):
+    def _update_export_button_activation(self):
         """
-        Update the visibility of the autosave widgets based on the selection
-        of the autosae_results Parameter.
+        Update the enabled state of the export buttons based on available
+        results.
         """
-        _vis = self.get_param_value('autosave_results')
-        for _key in ['autosave_dir', 'autosave_format']:
-            self.toggle_param_widget_visibility(_key, _vis)
+        _active = (RESULTS.shapes != {})
+        self._widgets['but_export_current'].setEnabled(_active)
+        self._widgets['but_export_all'].setEnabled(_active)
 
     @QtCore.Slot()
     def _export_current(self):

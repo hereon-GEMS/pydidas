@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the builder mixin class which is used to populate the
+Module with the WorkflowEditFrameBuilder class which is used to populate the
 WorkflowEditFrame with widgets.
 """
 

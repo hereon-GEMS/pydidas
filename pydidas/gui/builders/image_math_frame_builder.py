@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ImageMath_FrameBuilder class which is a mix-in to populate
+Module with the ImageMathFrameBuilder class which is used to populate
 the ImageMathFrame with widgets.
 """
 

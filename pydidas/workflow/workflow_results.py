@@ -79,7 +79,7 @@ class _WorkflowResults(QtCore.QObject):
             self._config['labels'][_node_id] = (
                 TREE.nodes[_node_id].plugin.get_param_value('label'))
             self._config['data_labels'][_node_id] = (
-                TREE.nodes[_node_id].plugin.data_label)
+                TREE.nodes[_node_id].plugin.get_param_value('data_label'))
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     def clear_all_results(self):
@@ -394,9 +394,11 @@ class _WorkflowResults(QtCore.QObject):
         if single_node is None:
             _shapes = self.shapes
             _labels = self.labels
+            _data_labels = self.data_labels
         else:
             _shapes = {single_node: self.shapes[single_node]}
             _labels = {single_node: self.labels[single_node]}
+            _data_labels = {single_node: self.data_labels[single_node]}
         _names = RESULT_SAVER.get_filenames_from_active_savers(_labels)
         _existcheck = [os.path.exists(os.path.join(save_dir, _name))
                        for _name in _names]
@@ -406,7 +408,8 @@ class _WorkflowResults(QtCore.QObject):
                                   ' a different directory.')
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        RESULT_SAVER.prepare_active_savers(save_dir, _shapes, _labels)
+        RESULT_SAVER.prepare_active_savers(save_dir, _shapes, _labels,
+                                           _data_labels)
 
     def update_param_choices_from_labels(self, param,
                                          add_no_selection_entry=True):

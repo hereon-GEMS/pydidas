@@ -64,7 +64,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         # assert does not raise an Exception
 
     def test_prepare_files_and_directories(self):
-        self.SAVER.prepare_files_and_directories('Dir', {}, {})
+        self.SAVER.prepare_files_and_directories('Dir', {}, {}, {})
         # assert does not raise an Exception
 
     def test_get_filenames_from_labels(self):

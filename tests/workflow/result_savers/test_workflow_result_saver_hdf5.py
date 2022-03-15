@@ -69,11 +69,12 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         self._shapes = {1: _scan_shape + (12, 7), 2: _scan_shape + (23,),
                    3: _scan_shape + (1, 3, 7)}
         self._labels = {1: 'Test', 2: 'not again', 3: 'another'}
+        self._datalabels = {1: 'Intensity', 2: 'Peak height', 3: 'Area'}
         self._filenames = {1: 'node_01_Test.h5', 2: 'node_02_not_again.h5',
                       3: 'node_03_another.h5'}
         self._resdir = os.path.join(self._dir, get_random_string(8))
         H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
-                                              self._labels)
+                                              self._labels, self._datalabels)
 
     def get_datasets(self, start_dim=3):
         return {_key: Dataset(np.random.random(_shape[start_dim:]))

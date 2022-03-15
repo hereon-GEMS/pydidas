@@ -40,7 +40,8 @@ class WorkflowResultSaverBase(GenericIoBase,
     scan_title = ''
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, shapes, labels):
+    def prepare_files_and_directories(cls, save_dir, shapes, labels,
+                                      data_labels):
         """
         Prepare the required files and directories to write the data to disk.
 
@@ -52,8 +53,11 @@ class WorkflowResultSaverBase(GenericIoBase,
             The shapes of the results in form of a dictionary with nodeID
             keys and result values.
         labels : dict
-            The labels of the results in form of a dictionary with nodeID
-            keys and label values.
+            The labels of the result Datasets in form of a dictionary with
+            nodeID keys and label values.
+        data_labels : dict
+            The labels of the data values in the results in form of a
+            dictionary with nodeID keys and label values.
         """
 
     @classmethod

@@ -52,7 +52,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         The parent widget.
     select_results_param : pydidas.core.Parameter
         The select_results Parameter instance. This instance should be
-        shared between the ResultSelectorForOutput and the parent.
+        shared between the ResultSelectionWidget and the parent.
     """
     new_selection = QtCore.Signal(bool, int, int, object)
 
@@ -125,6 +125,20 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         """
         self._update_selection()
         return self._selection
+
+    @property
+    def active_dims(self):
+        """
+        Get the active dimensions (i.e. dimensions with more than one entry)
+
+        Returns
+        -------
+        list
+            The active dimensions.
+        """
+        self._update_selection()
+        return [_index for _index, _items in enumerate(self._selection)
+                if _items.size > 1]
 
     def _update_selection(self):
         """

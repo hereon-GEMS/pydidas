@@ -31,7 +31,7 @@ import copy
 from numbers import Integral
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
-                          get_generic_parameter)
+                          get_generic_param_collection)
 from pydidas.image_io import rebin2d, RoiController
 from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                OUTPUT_PLUGIN)
@@ -86,11 +86,10 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type = BASE_PLUGIN
     plugin_name = 'Base plugin'
     default_params = ParameterCollection()
-    generic_params = ParameterCollection(get_generic_parameter('label'))
+    generic_params = get_generic_param_collection('label', 'data_label')
     input_data_dim = -1
     output_data_dim = -1
     new_dataset = False
-    data_label = 'Intensity / a.u.'
 
     @classmethod
     def get_class_description(cls):

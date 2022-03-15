@@ -100,7 +100,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         return _names
 
     @classmethod
-    def prepare_active_savers(cls, save_dir, shapes, labels):
+    def prepare_active_savers(cls, save_dir, shapes, labels, data_labels):
         """
         Prepare the active savers for storing data by creating the required
         files and directories.
@@ -115,14 +115,19 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         labels : dict
             The labels of the results in form of a dictionary with nodeID
             keys and label values.
+        data_labels : dict
+            The labels of the data values in the results in form of a
+            dictionary with nodeID keys and label values.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
             _saver.scan_title = cls.scan_title
-            _saver.prepare_files_and_directories(save_dir, shapes, labels)
+            _saver.prepare_files_and_directories(save_dir, shapes, labels,
+                                                 data_labels)
 
     @classmethod
-    def prepare_saver(cls, extension, save_dir, shapes, labels):
+    def prepare_saver(cls, extension, save_dir, shapes, labels,
+                      data_labels):
         """
         Call the concrete saver associated with the extension to prepare
         all requird files and directories.
@@ -139,10 +144,13 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         labels : dict
             The labels of the results in form of a dictionary with nodeID
             keys and label values.
-        """
+        data_labels : dict
+            The labels of the data values in the results in form of a
+            dictionary with nodeID keys and label values.          """
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
-        _saver.prepare_files_and_directories(save_dir, shapes, labels)
+        _saver.prepare_files_and_directories(save_dir, shapes, labels,
+                                             data_labels)
 
     @classmethod
     def push_frame_metadata_to_active_savers(cls, metadata):

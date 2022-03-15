@@ -24,15 +24,12 @@ __status__ = "Development"
 
 
 import unittest
-import os
 import shutil
 import tempfile
-from numbers import Real
 
 import numpy as np
-import h5py
 
-from pydidas.core import Dataset, get_generic_parameter, Parameter, AppConfigError
+from pydidas.core import Dataset, Parameter, AppConfigError
 from pydidas.experiment import ScanSetup
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
@@ -105,11 +102,6 @@ class TestWorkflowResultSelector(unittest.TestCase):
             np.random.random(self._scan_n + self._result1_shape) + 0.0001)
         RES._WorkflowResults__composites[2][:] = (
             np.random.random(self._scan_n + self._result2_shape) + 0.0001)
-
-    def generate_test_datasets(self):
-
-        return _results
-
 
     def test_unitttest_setUp(self):
         ...
@@ -382,6 +374,54 @@ class TestWorkflowResultSelector(unittest.TestCase):
        self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
        self.assertEqual(obj._selection[0].size,
                         self._scan_n[0] * self._scan_n[1] * self._scan_n[2] - 1)
+
+    def test_active_dims__no_active_dim(self):
+       self.populate_WorkflowResults()
+       _node = 1
+       obj = WorkflowResultsSelector()
+       obj.select_active_node(_node)
+       for _index in range(RES.ndims[_node]):
+           obj.set_param_value(f'data_slice_{_index}', '1')
+       self.assertEqual(obj.active_dims, [])
+
+    def test_active_dims__one_active_dim(self):
+       self.populate_WorkflowResults()
+       _node = 1
+       _dim = 2
+       obj = WorkflowResultsSelector()
+       obj.select_active_node(_node)
+       for _index in range(RES.ndims[_node]):
+           obj.set_param_value(f'data_slice_{_index}', '1')
+       obj.set_param_value(f'data_slice_{_dim}', '1:')
+       self.assertEqual(obj.active_dims, [_dim])
+
+    def test_active_dims__two_active_dim(self):
+       self.populate_WorkflowResults()
+       _node = 1
+       _dim1 = 2
+       _dim2 = 0
+       _res = [_dim1, _dim2]
+       _res.sort()
+       obj = WorkflowResultsSelector()
+       obj.select_active_node(_node)
+       for _index in range(RES.ndims[_node]):
+           obj.set_param_value(f'data_slice_{_index}', '1')
+       obj.set_param_value(f'data_slice_{_dim1}', '1:')
+       obj.set_param_value(f'data_slice_{_dim2}', ':')
+       self.assertEqual(obj.active_dims, _res)
+
+    def test_active_dims__three_active_dim(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _res = [0, 2, 3]
+        _res.sort()
+        obj = WorkflowResultsSelector()
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        for _dim in _res:
+            obj.set_param_value(f'data_slice_{_dim}', '1:')
+        self.assertEqual(obj.active_dims, _res)
 
     def test_selection_property(self):
        self.populate_WorkflowResults()

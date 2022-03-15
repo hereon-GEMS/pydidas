@@ -50,10 +50,11 @@ def export_full_data_to_file(saver, full_data):
     saver._exported = {'full_data': full_data}
 
 
-def prepare_files_and_directories(saver, save_dir, shapes, labels):
+def prepare_files_and_directories(saver, save_dir, shapes, labels, data_labels):
     saver._prepared = {'save_dir': save_dir,
                        'shapes': shapes,
-                       'labels': labels}
+                       'labels': labels,
+                       'data_labels': data_labels}
 
 def update_frame_metadata(saver, metadata):
     saver._metadata = metadata
@@ -78,10 +79,11 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
         _save_dir = 'dummy/directory/to/nowhere'
         _shapes = {1: (10, 10), 2: (11, 27)}
         _labels = {1: 'unknown', 2: 'result no 2'}
-        return _save_dir, _shapes, _labels
+        _data_labels = {1: 'Intensity', 2: 'Area'}
+        return _save_dir, _shapes, _labels, _data_labels
 
     def generate_test_metadata(self):
-        _, _shapes, _  = self.get_save_dir_label_and_shapes()
+        _, _shapes, _ , _ = self.get_save_dir_label_and_shapes()
         _res1 = Dataset(np.random.random(_shapes[1]), axis_units=['m', 'mm'],
                         axis_labels=['dim1', 'dim 2'],
                         axis_ranges=[np.arange(_shapes[1][0]),
@@ -177,30 +179,35 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
                                   _frame_results[2]).all())
 
     def test_prepare_active_savers(self):
-        _save_dir, _shapes, _labels = self.get_save_dir_label_and_shapes()
+        _save_dir, _shapes, _labels, _data_labels = (
+            self.get_save_dir_label_and_shapes())
         _Saver = self.create_saver_class('SAVER', 'Test')
         _Saver.prepare_files_and_directories = classmethod(
             prepare_files_and_directories)
         META.set_active_savers_and_title(['TEST'])
-        META.prepare_active_savers(_save_dir, _shapes, _labels)
+        META.prepare_active_savers(_save_dir, _shapes, _labels, _data_labels)
         self.assertEqual(_Saver._prepared['save_dir'], _save_dir)
         self.assertEqual(_Saver._prepared['shapes'], _shapes)
         self.assertEqual(_Saver._prepared['labels'], _labels)
+        self.assertEqual(_Saver._prepared['data_labels'], _data_labels)
 
     def test_prepare_saver(self):
-        _save_dir, _shapes, _labels = self.get_save_dir_label_and_shapes()
+        _save_dir, _shapes, _labels, _data_labels = (
+            self.get_save_dir_label_and_shapes())
         _Saver = self.create_saver_class('SAVER', 'Test')
         _Saver.prepare_files_and_directories = classmethod(
             prepare_files_and_directories)
-        META.prepare_saver('TEST', _save_dir, _shapes, _labels)
+        META.prepare_saver('TEST', _save_dir, _shapes, _labels, _data_labels)
         self.assertEqual(_Saver._prepared['save_dir'], _save_dir)
         self.assertEqual(_Saver._prepared['shapes'], _shapes)
         self.assertEqual(_Saver._prepared['labels'], _labels)
+        self.assertEqual(_Saver._prepared['data_labels'], _data_labels)
 
     def test_prepare_saver__no_such_saver(self):
-        _save_dir, _shapes, _labels = self.get_save_dir_label_and_shapes()
+        _save_dir, _shapes, _labels, _data_labels = (
+            self.get_save_dir_label_and_shapes())
         with self.assertRaises(KeyError):
-            META.prepare_saver('TEST', _save_dir, _shapes, _labels)
+            META.prepare_saver('TEST', _save_dir, _shapes, _labels, _data_labels)
 
 
 if __name__ == '__main__':

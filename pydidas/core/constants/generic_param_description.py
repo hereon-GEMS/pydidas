@@ -46,14 +46,24 @@ GENERIC_PARAM_DESCRIPTION = {
     'label': {
         'type': str,
         'default': '',
-        'name': 'Label',
+        'name': 'Node label',
         'choices': None,
         'unit': '',
         'allow_None': False,
-        'tooltip': ('A label for identifying the Plugin in the results. '
+        'tooltip': ('A label for identifying the Plugin node in the results. '
                     'Internally, all Plugins are identified by their node '
                     'IDs, this additional label is merely a handle for easier'
                     ' human identification.')},
+    'data_label': {
+        'type': str,
+        'default': 'Intensity / a.u.',
+        'name': 'Data label',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('A label to define the axis label for the data dimension. '
+                    'This value only needs to be set for output plugins or '
+                    'final processing plugins in the list.')},
     ###################################
     ## Parameters for CompositeCreation
     ###################################

@@ -51,7 +51,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
     _metadata_written = False
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, shapes, labels):
+    def prepare_files_and_directories(cls, save_dir, shapes, labels,
+                                      data_labels):
         """
         Prepare the hdf5 files with the metadata.
 
@@ -67,6 +68,9 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         labels : dict
             The labels of the results in form of a dictionary with nodeID
             keys and label values.
+        data_labels : dict
+            The labels of the data values in the results in form of a
+            dictionary with nodeID keys and label values.
         """
         cls._save_dir = save_dir
         if not os.path.exists(save_dir):
@@ -74,6 +78,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         cls._filenames = cls.get_filenames_from_labels(labels)
         cls._shapes = shapes
         cls._labels = labels
+        cls._data_labels = data_labels
         cls._metadata_written = False
         for _index in cls._shapes:
             cls._create_file_and_populate_metadata(_index)
@@ -92,6 +97,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         _dsets = [
             ['entry', 'title', {'data': cls.scan_title}],
             ['entry', 'label', {'data': cls._labels[node_id]}],
+            ['entry', 'data_label', {'data': cls._data_labels[node_id]}],
             ['entry', 'definition', {'data': 'custom (NXxbase-aligned)'}],
             ['entry/instrument/source', 'probe', {'data': 'x-ray'}],
             ['entry/instrument/source', 'type', {'data': 'synchrotron'}],
@@ -139,9 +145,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         if not cls._metadata_written:
             cls.write_metadata_to_files(frame_result_dict)
         for _node_id, _data in frame_result_dict.items():
-            with h5py.File(os.path.join(cls._save_dir,
-                                        cls._filenames[_node_id]),
-                           'r+') as _file:
+            _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
+            with h5py.File(_fname, 'r+') as _file:
                 _file['entry/data/data'][_indices] = _data
 
     @classmethod
@@ -156,12 +161,11 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         """
         if not cls._metadata_written:
             _indices = SCAN.get_frame_position_in_scan(0)
-            cls.write_metadata_to_files({_id: _data[_indices] for _id, _data
-                                         in full_data.items()})
+            cls.write_metadata_to_files(
+                {_id: _data[_indices] for _id, _data in full_data.items()})
         for _node_id, _data in full_data.items():
-            with h5py.File(os.path.join(cls._save_dir,
-                                        cls._filenames[_node_id]),
-                           'r+') as _file:
+            _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
+            with h5py.File(_fname, 'r+') as _file:
                 _file['entry/data/data'][()] = _data.array
 
     @classmethod

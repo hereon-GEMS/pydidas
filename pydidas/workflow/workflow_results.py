@@ -78,6 +78,8 @@ class _WorkflowResults(QtCore.QObject):
             self._config['shapes'] = _shapes
             self._config['labels'][_node_id] = (
                 TREE.nodes[_node_id].plugin.get_param_value('label'))
+            self._config['data_labels'][_node_id] = (
+                TREE.nodes[_node_id].plugin.data_label)
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     def clear_all_results(self):
@@ -88,6 +90,7 @@ class _WorkflowResults(QtCore.QObject):
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
         self._config = {'shapes': {},
                         'labels': {},
+                        'data_labels': {},
                         'metadata_complete': False}
 
     def update_frame_metadata(self, metadata):
@@ -179,6 +182,19 @@ class _WorkflowResults(QtCore.QObject):
         return self._config['labels'].copy()
 
     @property
+    def data_labels(self):
+        """
+        Return the data labels of the different Plugins to in form of a
+        dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with entries of the form <node_id: label>
+        """
+        return self._config['data_labels'].copy()
+
+    @property
     def ndims(self):
         """
         Return the number of dimensions of the results in form of a dictionary.
@@ -240,7 +256,8 @@ class _WorkflowResults(QtCore.QObject):
                            new_dim_range=np.arange(SCAN.n_total))
         return _data
 
-    def get_result_subset(self, node_id, slices, flattened_scan_dim=False):
+    def get_result_subset(self, node_id, slices, flattened_scan_dim=False,
+                          force_string_metadata=False):
         """
         Get a slices subset of a node_id result.
 
@@ -255,6 +272,9 @@ class _WorkflowResults(QtCore.QObject):
             is assumed to be 1-d only and the first slice item will be used
             for the Scan whereas the remaining slice items will be used for
             the resulting data. The default is False.
+        force_string_metadata : bool, optional
+            Keyword to force all metadata to be converted to strings. This will
+            replace any None entries with empty strings. The default is False.
 
         Returns
         -------
@@ -262,16 +282,28 @@ class _WorkflowResults(QtCore.QObject):
             The subset of the results.
         """
         if flattened_scan_dim:
-            _tmpslices = (
-                tuple(slice(0, SCAN.shape[_i], 1) for _i in range(SCAN.ndim))
-                + slices[1:])
-            _data = self.__composites[node_id][_tmpslices].copy()
+            _data = self.__composites[node_id].copy()
+            _DIM = lambda i: len(slices) + (SCAN.ndim - 1) - (i + 1)
+            for _dim, _slice in enumerate(slices[1:][::-1]):
+                if isinstance(_slice, slice):
+                    _slice = np.r_[_slice]
+                _data = np.take(_data, _slice, _DIM(_dim))
             _data.flatten_dims(*range(SCAN.ndim),
                                new_dim_label='Scan timeline',
                                new_dim_range=np.arange(SCAN.n_total))
-            return _data[slices[0]]
+            return np.squeeze(_data[slices[0]])
         _data = self.__composites[node_id].copy()
-        return _data[slices]
+        _DIM = lambda i: len(slices) - (i + 1)
+        for _dim, _slice in enumerate(slices[::-1]):
+            if isinstance(_slice, slice):
+                _slice = np.r_[_slice]
+            _data = np.take(_data, _slice, _DIM(_dim))
+        if force_string_metadata:
+            _data.axis_units = [(_val if _val is not None else '')
+                                for _val in _data.axis_units.values()]
+            _data.axis_labels = [(_val if _val is not None else '')
+                                 for _val in _data.axis_labels.values()]
+        return np.squeeze(_data)
 
     def get_result_metadata(self, node_id):
         """
@@ -448,7 +480,6 @@ class _WorkflowResults(QtCore.QObject):
                          f'  N points: {_ax_points[_axis]}\n'
                          f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n')
                         for _axis in _ax_labels])
-
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

@@ -90,6 +90,7 @@ class BasePlugin(ObjectWithParameterCollection):
     input_data_dim = -1
     output_data_dim = -1
     new_dataset = False
+    data_label = 'Intensity / a.u.'
 
     @classmethod
     def get_class_description(cls):

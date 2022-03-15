@@ -72,6 +72,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
                         'plot_update_time': _global_plot_update_time,
                         'frame_active': True,
                         'source_hash': RESULTS.source_hash}
+        self._axlabels = lambda i: ''
         self._app = ExecuteWorkflowApp()
         self.set_default_params()
         self.add_params(self._app.params)
@@ -196,7 +197,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         logger.debug('AppRunner successfully shut down.')
         self.set_status('Finished processing of full workflow.')
         self.__finish_processing()
-        self.__update_plot()
+        self._update_plot()
 
     @QtCore.Slot()
     def __update_result_node_information(self):
@@ -211,9 +212,9 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         except AttributeError:
             pass
 
-    @QtCore.Slot(bool, int, int, object)
-    def __update_result_selection(self, use_timeline, plot_dim, node_id,
-                                  slices):
+    @QtCore.Slot(bool, object, int, object, str)
+    def __update_result_selection(self, use_timeline, active_plot_dims,
+                                  node_id, slices, plot_type):
         """
         Update the selection of results to show in the plot.
 
@@ -222,19 +223,25 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         use_timeline : bool
             Flag whether to use a timeline and collapse all scan dimensions
             or not.
-        plot_dim : int
-            The dimension of the plot results.
+        active_plot_dims : list
+            The dimensions of the plot results.
         node_id : int
             The result node ID.
         slices : tuple
             The tuple with the slices which select the data for plotting.
+        plot_type : str
+            The type of plot to be shown.
         """
         self._config['plot_active'] = True
         self._config['data_use_timeline'] = use_timeline
-        self._config['plot_dim'] = plot_dim
+        self._config['active_dims'] = active_plot_dims
         self._config['active_node'] = node_id
         self._config['data_slices'] = slices
-        self.__update_plot()
+        self._config['plot_type'] = plot_type
+        _datalength = np.asarray([_n.size for _n in slices])
+        self._config['local_dims'] = {_val: _index for _index, _val in
+                                      enumerate(np.where(_datalength > 1)[0])}
+        self._update_plot()
 
     @QtCore.Slot()
     def __check_for_plot_update(self):
@@ -242,9 +249,9 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         if (_dt > self._config['plot_update_time']
                 and self._config['frame_active']):
             self._config['plot_last_update'] = time.time()
-            self.__update_plot()
+            self._update_plot()
 
-    def __update_plot(self):
+    def _update_plot(self):
         """
         Update the plot.
 
@@ -253,40 +260,103 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         """
         if not self._config['plot_active']:
             return
-        _dim = self._config['plot_dim']
+        _dim = (1 if self._config['plot_type']
+                in ['1D plot', 'roup of 1D plots'] else 2)
         _node = self._config['active_node']
-        _data = RESULTS.get_result_subset(_node, self._config['data_slices'],
-                                          self._config['data_use_timeline'])
-        if not isinstance(_data.axis_ranges[0], np.ndarray):
-            _data.axis_ranges[0] = np.arange(_data.shape[0])
-        self._widgets['plot_stack'].setCurrentIndex(_dim - 1)
+        _data = RESULTS.get_result_subset(
+            _node, self._config['data_slices'],
+            flattened_scan_dim=self._config['data_use_timeline'],
+            force_string_metadata=True)
+        self._axlabels = lambda i: (
+            _data.axis_labels.copy()[i]
+            + (' / ' + _data.axis_units.copy()[i]
+               if len(_data.axis_units.copy()) > 0 else ''))
+        if self._config['plot_type'] == 'group of 1D plots':
+            self._widgets['plot_stack'].setCurrentIndex(0)
+            self._plot_group_of_curves(_data)
+        elif self._config['plot_type'] == '1D plot':
+            self._widgets['plot_stack'].setCurrentIndex(0)
+            self._plot1d(_data, replace=True)
+        elif self._config['plot_type'] in ['2D full axes', '2D data subset']:
+            self._widgets['plot_stack'].setCurrentIndex(1)
+            self._plot_2d(_data)
+
         _plot = self._widgets[f'plot{_dim}d']
         _plot.setGraphTitle(RESULTS.labels[_node] + f' (node #{_node:03d})')
-        _units = [(_val if _val is not None else '')
-                  for _val in _data.axis_units.values()]
-        _labels = [(_val if _val is not None else '')
-                   for _val in _data.axis_labels.values()]
-        _ax_label = lambda i: (
-            _labels[i]
-            + (' / ' + _units[i] if len(_units[i]) > 0 else ''))
-        if _dim == 1:
-            _plot.addCurve(_data.axis_ranges[0], _data.array, replace=True,
-                           linewidth=1.5)
-            _plot.setGraphYLabel(RESULTS.labels[_node])
-            _plot.setGraphXLabel(_ax_label(0))
-        elif _dim == 2:
-            if not isinstance(_data.axis_ranges[1], np.ndarray):
-                _data.axis_ranges[1] = np.arange(_data.shape[1])
 
-            _originx, _scalex = self.__get_2d_plot_ax_settings(
-                _data.axis_ranges[1])
-            _originy, _scaley = self.__get_2d_plot_ax_settings(
-                _data.axis_ranges[0])
-            _plot.addImage(_data, replace=True, copy=False,
-                           origin=(_originx, _originy),
-                           scale=(_scalex, _scaley))
-            _plot.setGraphYLabel(_ax_label(0))
-            _plot.setGraphXLabel(_ax_label(1))
+    def _plot_group_of_curves(self, data):
+        """
+        Plot a group of 1D curves.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The dataset with the data to be plotted.
+        """
+        _active_dim = self._config['active_dims'][0]
+        _local_dim = self._config['local_dims'][_active_dim]
+        if _local_dim == 0:
+            data = data.transpose()
+        _legend = lambda i: (data.axis_labels[0] + '='
+                             + f'{data.axis_ranges[0][i]:.4f}'
+                             + data.axis_units[0])
+        self._plot1d(data[0], replace=True, legend=_legend(0))
+        for _index in range(1, data.shape[0]):
+            self._plot1d(data[_index], replace=False, legend=_legend(_index))
+
+    def _plot1d(self, data, replace=True, legend=None):
+        """
+        Plot a 1D-dataset in the 1D plot widget.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The data object.
+        replace : bool, optional
+            Keyword to toggle replacing the currently plotted lines or keep
+            them and only add the new line. The default is True.
+        legend : Union[None, str], optional
+            If desired, a legend entry for this curve. If None, no legend
+            entry will be added. The default is None.
+        """
+        _plot = self._widgets['plot1d']
+        if not isinstance(data.axis_ranges[0], np.ndarray):
+            data.axis_ranges[0] = np.arange(data.size)
+        _plot.addCurve(data.axis_ranges[0], data.array, replace=replace,
+                       linewidth=1.5, legend=legend)#, info=legend)
+        _plot.setGraphYLabel(RESULTS.data_labels[self._config['active_node']])
+        _plot.setGraphXLabel(self._axlabels(1))
+
+    def _plot_2d(self, data):
+        """
+        Plot a 2D dataset as an image.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The data.
+        """
+        _plot = self._widgets['plot2d']
+        for _dim in [0, 1]:
+            if not isinstance(data.axis_ranges[_dim], np.ndarray):
+                data.axis_ranges[_dim] = np.arange(data.shape[_dim])
+        _dim0, _dim1  = self._config['active_dims']
+        if _dim0 > _dim1:
+            data = data.transpose()
+
+        _ax_label = lambda i: (
+            data.axis_labels[i]
+            + (' / ' + data.axis_units[i]
+               if len(data.axis_units[i]) > 0 else ''))
+        _originx, _scalex = self.__get_2d_plot_ax_settings(
+            data.axis_ranges[1])
+        _originy, _scaley = self.__get_2d_plot_ax_settings(
+            data.axis_ranges[0])
+        _plot.addImage(data, replace=True, copy=False,
+                       origin=(_originx, _originy),
+                       scale=(_scalex, _scaley))
+        _plot.setGraphYLabel(_ax_label(0))
+        _plot.setGraphXLabel(_ax_label(1))
 
     @staticmethod
     def __get_2d_plot_ax_settings(axis):
@@ -310,7 +380,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder):
         _scale = (axis[-1] - axis[0] + _delta) / axis.size
         _origin = axis[0] - _delta / 2
         return _origin, _scale
-
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

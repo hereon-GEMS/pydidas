@@ -91,12 +91,13 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
     The ResultSelectorForOutput offers the following signal which can be
     used:
 
-        new_selection : QtCore.Signal(use_timeline : int, scan_dim : int,\
-                                          active_node : int, selection : tuple)
+        new_selection : QtCore.Signal(use_timeline : int, active_dims : list,\
+                                      active_node : int, selection : tuple, \
+                                      plot_type : str)
             The signal signature is: flag to use timeline or scan shape,
-            plot dimension, node ID of the active node, the selection in form
-            of a tuple with one entry for every dimension (either an integer
-            or a slice).
+            active scan dimensions, node ID of the active node,
+            the selection in form of a tuple with entries for every dimension
+            (in form of a numpy array), the type of plot in form of a string.
 
     Parameters
     ----------
@@ -106,7 +107,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         The select_results Parameter instance. This instance should be
         shared between the ResultSelectorForOutput and the parent.
     """
-    new_selection = QtCore.Signal(bool, int, int, object)
+    new_selection = QtCore.Signal(bool, object, int, object, str)
 
     default_params = ParameterCollection(
         Parameter('plot_ax1', int, 0, name='Data axis no. 1 for plot',
@@ -246,9 +247,7 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         hide_all : bool, optional
             Keyword to force hiding of all Parameter slice dimension widgets.
         """
-        _ax1_used = (self._config['plot_type']
-                     in ['1D plot', 'group of 1D plots', '2D full axes'])
-        _ax2_used = (self._config['plot_type'] =='2D full axes')
+        _ax1_used, _ax2_used = self.__are_axes_used()
         self.param_composite_widgets['plot_ax1'].setVisible(
             _ax1_used and not hide_all)
         self.param_composite_widgets['plot_ax2'].setVisible(
@@ -266,11 +265,20 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
             self.param_composite_widgets[_refkey].setVisible(_vis)
 
     def __are_axes_used(self):
+        """
+        Check whether the axes are in use and return the flags.
 
+        Returns
+        -------
+        bool
+            Flag whether axis 1 is in use.
+        bool
+            Flag whether axis 2 is in use.
+        """
         _ax1_used = (self._config['plot_type']
                      in ['1D plot', 'group of 1D plots', '2D full axes'])
         _ax2_used = (self._config['plot_type'] =='2D full axes')
-
+        return _ax1_used, _ax2_used
 
     @QtCore.Slot(int)
     def __selected_new_node(self, index):
@@ -403,27 +411,26 @@ class ResultSelectorForOutput(QtWidgets.QWidget,
         full array.
         """
         self._selector.select_active_node(self._active_node)
-        _flag = self.get_param_value('use_scan_timeline')
-        _npoints = list(RESULTS.shapes[self._active_node])
         for _dim in range(self._config['result_ndim']):
             self._selector.set_param_value(
                 f'data_slice_{_dim}',
                 self.get_param_value(f'plot_slice_{_dim}'))
-
-        if _flag:
-            del _npoints[:SCAN.ndim]
-            _npoints.insert(0, SCAN.n_total)
-        _plot_dim = self._config['plot_type'] // 2 + 1
-        _selection = [np.mod(self.get_param_value(f'plot_slice_{_dim}'),
-                             _npoints[_dim])
-                      for _dim in range(self._config['result_ndim'])]
-        _plotax1 = self.get_param_value('plot_ax1')
-        _selection[_plotax1] = slice(0, _npoints[_plotax1], 1)
-        if _plot_dim == 2:
-            _plotax2 = self.get_param_value('plot_ax2')
-            _selection[_plotax2] = slice(0, _npoints[_plotax2], 1)
-        self.new_selection.emit(_flag, _plot_dim, self._active_node,
-                                tuple(_selection))
+        _target_dim = 1 if self._config['plot_type'] == '1D plot' else 2
+        self._selector.set_param_value('result_n_dim', _target_dim)
+        _ax1_used, _ax2_used = self.__are_axes_used()
+        _active_dims = []
+        if _ax1_used:
+            _active_dim = self.get_param_value('plot_ax1')
+            self._selector.set_param_value(f'data_slice_{_active_dim}', ':')
+            _active_dims.append(_active_dim)
+        if _ax2_used:
+            _active_dim = self.get_param_value('plot_ax2')
+            self._selector.set_param_value(f'data_slice_{_active_dim}', ':')
+            _active_dims.append(_active_dim)
+        _selection = self._selector.selection
+        self.new_selection.emit(self.get_param_value('use_scan_timeline'),
+                                _active_dims, self._active_node, _selection,
+                                self._config['plot_type'])
 
     def __update_dim_choices_for_plot_selection(self):
         """

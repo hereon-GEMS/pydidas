@@ -67,13 +67,13 @@ class ViewResultsMixin:
       - enable_overwrite
     """
     def __init__(self, **kwargs):
-        self._config = {'data_use_timeline': False,
-                        'plot_dim': 2,
-                        'plot_active': False,
-                        'active_node': None,
-                        'data_slices': (),
-                        'frame_active': True,
-                        'source_hash': RESULTS.source_hash}
+        self._config.update({'data_use_timeline': False,
+                             'plot_dim': 2,
+                             'plot_active': False,
+                             'active_node': None,
+                             'data_slices': (),
+                             'frame_active': True,
+                             'source_hash': RESULTS.source_hash})
         self._axlabels = lambda i: ''
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
@@ -87,7 +87,7 @@ class ViewResultsMixin:
         self._widgets['but_export_all'].clicked.connect(
             self._export_all)
         self._widgets['result_selector'].new_selection.connect(
-            self.__update_result_selection)
+            self.update_result_selection)
 
     def _verify_result_shapes_uptodate(self):
         """
@@ -120,21 +120,8 @@ class ViewResultsMixin:
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
 
-    @QtCore.Slot()
-    def __update_result_node_information(self):
-        """
-        Update the information about the nodes' results after the AppRunner
-        has sent the first results.
-        """
-        self._widgets['result_selector'].get_and_store_result_node_labels()
-        try:
-            self._runner.results.disconnect(
-                self.__update_result_node_information)
-        except AttributeError:
-            pass
-
     @QtCore.Slot(bool, object, int, object, str)
-    def __update_result_selection(self, use_timeline, active_plot_dims,
+    def update_result_selection(self, use_timeline, active_plot_dims,
                                   node_id, slices, plot_type):
         """
         Update the selection of results to show in the plot.
@@ -162,9 +149,9 @@ class ViewResultsMixin:
         _datalength = np.asarray([_n.size for _n in slices])
         self._config['local_dims'] = {_val: _index for _index, _val in
                                       enumerate(np.where(_datalength > 1)[0])}
-        self._update_plot()
+        self.update_plot()
 
-    def _update_plot(self):
+    def update_plot(self):
         """
         Update the plot.
 

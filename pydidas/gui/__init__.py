@@ -46,6 +46,7 @@ from .main_window import *
 from .processing_single_plugin_frame import *
 from .pyfai_calib_frame import *
 from .scan_setup_frame import *
+from .view_results_frame import *
 from .workflow_edit_frame import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -97,6 +98,10 @@ del pyfai_calib_frame
 from . import scan_setup_frame
 __all__.extend(scan_setup_frame.__all__)
 del scan_setup_frame
+
+from . import view_results_frame
+__all__.extend(view_results_frame.__all__)
+del view_results_frame
 
 from . import workflow_edit_frame
 __all__.extend(workflow_edit_frame.__all__)

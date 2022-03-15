@@ -32,7 +32,8 @@ from qtpy import QtWidgets
 from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame, PyfaiCalibFrame, HomeFrame,
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
-    CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow, DirectorySpyFrame)
+    CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow, DirectorySpyFrame,
+    ViewResultsFrame)
 from pydidas.widgets import BaseFrame
 
 
@@ -83,6 +84,8 @@ def run_gui(app=None):
                        'qta::mdi.clipboard-flow-outline')
     gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
                    'Workflow processing/Run full procesing', 'qta::mdi.sync')
+    gui.register_frame(ViewResultsFrame, 'View workflow results',
+                   'View workflow results', 'qta::mdi.monitor-eye')
     # gui.register_frame(ResultVisualizationFrame, 'Result visualization',
     #                    'Result visualization', 'qta::mdi.monitor-eye')
     gui.show()

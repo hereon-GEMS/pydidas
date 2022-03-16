@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CropData Plugin which can be used to reduce the range of data.
+Module with the Sum1dData Plugin which can be used to sum over 1D data.
 """
 
 __author__ = "Malte Storm"
@@ -23,46 +23,47 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Crop1dData']
+__all__ = ['Sum1dData']
 
 
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import (ParameterCollection, Parameter,
-                          get_generic_parameter)
+from pydidas.core import ParameterCollection, Parameter, get_generic_parameter
 from pydidas.plugins import ProcPlugin
 
 
-class Crop1dData(ProcPlugin):
+class Sum1dData(ProcPlugin):
     """
-    Crop a 1D dataset by specifying bounds, either indices or in the data
-    range.
+    Sum up datapoints in a 1D dataset.
     """
-    plugin_name = 'Crop 1D data'
+    plugin_name = 'Sum 1D data'
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(
         get_generic_parameter('type_selection'),
-        Parameter('crop_low', float, 0, name='Cropping lower boundary',
-                  tooltip='The lower boundary for cropping.'),
-        Parameter('crop_high', float, 0, name='Cropping upper boundary',
-                  tooltip='The upper boundary for cropping.'))
+        Parameter(
+            'lower_limit', float, 0, name='Lower limit',
+            tooltip=('The lower limit of data selection. This point is '
+                     'included in the data. Note that the selection is either '
+                     'in indices or data range, depending on the value of '
+                     '"type_selection".')),
+        Parameter(
+            'upper_limit', float, 0, name='Upper limit',
+            tooltip=('The upper limit of data selection. This point is'
+                     ' included in the data. Note that the selection is either '
+                     'in indices or data range, depending on the value of '
+                     '"type_selection".')))
     input_data_dim = 1
-    output_data_dim = 1
+    output_data_dim = 0
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
 
-    def pre_execute(self):
-        """
-        Set up the required functions and fit variable labels.
-        """
-
     def execute(self, data, **kwargs):
         """
-        Crop 1D data.
+        Sum data.
 
         Parameters
         ----------
@@ -73,15 +74,16 @@ class Crop1dData(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
+        sum : np.ndarray
+            The data sum in form of an array of shape (1,).
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        _bounds = self._get_index_range()
-        _new_data = data[_bounds]
-        return _new_data, kwargs
+        _selection = self._data[self._get_index_range()]
+        if _selection.size == 0:
+            return np.array([0]), kwargs
+        return np.array([np.sum(_selection)]), kwargs
 
     def _get_index_range(self):
         """
@@ -92,14 +94,14 @@ class Crop1dData(ProcPlugin):
         slice
             The slice object to select the range from the input data.
         """
-        _low = self.get_param_value('crop_low')
-        _high = self.get_param_value('crop_high')
+        _low = self.get_param_value('lower_limit')
+        _high = self.get_param_value('upper_limit')
         if self.get_param_value('type_selection') == 'Indices':
             return slice(int(_low), int(_high) + 1)
         _x = self._data.axis_ranges[0]
         assert isinstance(_x, np.ndarray), (
-            'The data does not have a correct range and cropping is only '
-            'available using the indices.')
+            'The data does not have a correct range and using the data range '
+            'for selection is only available using the indices.')
         _bounds = np.where((_x >= _low) & (_x <= _high))[0]
         if _bounds.size == 0:
             return slice(0, 0)

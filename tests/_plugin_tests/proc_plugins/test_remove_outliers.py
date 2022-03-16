@@ -23,18 +23,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import os
 import unittest
-import tempfile
-import shutil
-import random
 
 import numpy as np
-from qtpy import QtCore
 
-from pydidas.core import Dataset
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.image_io import rebin2d
 
 
 PLUGIN_COLLECTION = PluginCollection()

@@ -144,6 +144,29 @@ class TestScanSetup(unittest.TestCase):
         with self.assertRaises(ValueError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
 
+    def test_get_frame_number_from_scan_indices__zero(self):
+        SCAN = _ScanSetup()
+        self.set_scan_params(SCAN)
+        _index = SCAN.get_frame_number_from_scan_indices((0, 0, 0, 0))
+        self.assertEqual(_index, 0)
+
+    def test_get_frame_number_from_scan_indices__negative(self):
+        SCAN = _ScanSetup()
+        self.set_scan_params(SCAN)
+        with self.assertRaises(ValueError):
+            SCAN.get_frame_number_from_scan_indices((0, -1, 0, 0))
+
+    def test_get_frame_number_from_scan_indices__inscan(self):
+        _indices = (2, 1, 2, 1)
+        _frame = (_indices[3]
+                  + self._scan_shape[3] * _indices[2]
+                  + np.prod(self._scan_shape[2:]) * _indices[1]
+                  + np.prod(self._scan_shape[1:]) * _indices[0])
+        SCAN = _ScanSetup()
+        self.set_scan_params(SCAN)
+        _index = SCAN.get_frame_number_from_scan_indices(_indices)
+        self.assertEqual(_index, _frame)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the GlobalSettings class which is used to manage global
-information independant from the individual frames."""
+"""Module with the ScanSetup class which is used to manage global
+information about the scan."""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
@@ -73,6 +73,34 @@ class _ScanSetup(ObjectWithParameterCollection):
             _indices[_dim] = frame // np.prod(_N[_dim + 1:])
             frame -= _indices[_dim] * np.prod(_N[_dim + 1:])
         return tuple(_indices)
+
+    def get_frame_number_from_scan_indices(self, indices):
+        """
+        Get the frame number based on the scan indices.
+
+        Parameters
+        ----------
+        indices : Union[tuple, list, np.ndarray]
+            The iterable with the scan position indices.
+
+        Returns
+        -------
+        int
+            The frame index in the scan.
+        """
+        if not isinstance(indices, np.ndarray):
+            indices = np.asarray(indices)
+        _shapes = np.asarray(self.shape + (1,))
+        _indices_okay = [0 <= _index <= _shapes[_dim]
+                         for _dim, _index in enumerate(indices)]
+        if False in _indices_okay:
+            raise ValueError(
+                f'The given indices "{tuple(indices)}" are out of the scope '
+                f'of the scan range {self.shape}')
+        _factors = np.asarray([np.prod(_shapes[_i + 1:])
+                               for _i in range(self.ndim)])
+        _index = np.sum(_factors * indices)
+        return _index
 
     def get_metadata_for_dim(self, index):
         """

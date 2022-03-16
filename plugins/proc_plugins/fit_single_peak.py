@@ -24,7 +24,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SubtractBackgroundImage']
+__all__ = ['FitSinglePeak']
 
 
 import numpy as np
@@ -34,16 +34,11 @@ from pydidas.core.constants import (PROC_PLUGIN, GAUSSIAN, LORENTZIAN,
                                     PSEUDO_VOIGT)
 from pydidas.core import get_generic_param_collection, Dataset, AppConfigError
 from pydidas.plugins import ProcPlugin
-from pydidas.image_io import rebin2d
-
-
-
-
 
 
 class FitSinglePeak(ProcPlugin):
     """
-    Subtract a background image from the data.
+    Fit a single peak to a data
     """
     plugin_name = 'Fit single peak'
     basic_plugin = False
@@ -81,7 +76,9 @@ class FitSinglePeak(ProcPlugin):
         """
         Fit a peak to the data.
 
-        Note that a
+        Note that the results includes the original data, the fitted data and
+        the residual and that the fit Parameters are included in the kwarg
+        metadata.
 
         Parameters
         ----------

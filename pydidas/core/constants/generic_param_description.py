@@ -1157,7 +1157,19 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The lower limit (in the x-axis´ unit) to the fit region.'},
     ############################
-    ## Fitting Parameters
+    ## PLugin Parameters
+    ############################
+    'crop_type': {
+        'type': str,
+        'default': 'Data values',
+        'name': 'Type of cropping',
+        'choices': ['Data values', 'Indices'],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Select between using the axis values (in the respective.'
+                    'unit) and the axis indices.')},
+    ############################
+    ## Result visualization Parameters
     ############################
     'plot_ax1': {
         'type': int,

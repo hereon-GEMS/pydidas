@@ -116,6 +116,16 @@ class TestWorkflowNode(unittest.TestCase):
                 self.assertIsNone(_node.results)
                 self.assertIsNone(_node.result_kws)
 
+    def test_execute_plugin_chain__with_force_store(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.execute_plugin_chain(0, force_store_results=True)
+        for _d in range(_depth + 1):
+            for _node in nodes[_d]:
+                self.assertIsNotNone(_node.results)
+                self.assertIsNotNone(_node.result_kws)
+
     def test_execute_plugin__simple(self):
         obj = WorkflowNode(plugin=DummyLoader())
         _res = obj.execute_plugin(0)

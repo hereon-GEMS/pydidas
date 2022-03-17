@@ -20,7 +20,6 @@ Module with the Sum1dData Plugin which can be used to sum over 1D data.
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.1.1"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Sum1dData']

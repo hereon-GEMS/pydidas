@@ -127,45 +127,6 @@ class DirectorySpyApp(BaseApp):
         self._config['det_mask_val'] = float(self.q_settings_get_global_value(
             'det_mask_val'))
 
-    def _get_detector_mask(self):
-        """
-        Get the detector mask from the file specified in the global QSettings.
-
-        Returns
-        -------
-        _mask : Union[None, np.ndarray]
-            If the mask could be loaded from a numpy file, return the mask.
-            Else, None is returned.
-        """
-        if not self.get_param_value('use_global_det_mask'):
-            return None
-        _maskfile = self.q_settings_get_global_value('det_mask')
-        try:
-            _mask = np.load(_maskfile)
-            return _mask
-        except (FileNotFoundError, ValueError):
-            return None
-        raise AppConfigError('Unknown error when reading detector mask file.')
-
-    def _apply_mask(self, image):
-        """
-        Apply the detector mask to an image.
-
-        Parameters
-        ----------
-        image : np.ndarray
-            The image data.
-
-        Returns
-        -------
-        image : np.ndarray
-            The masked image data.
-        """
-        if self._det_mask is None:
-            return image
-        return np.where(self._det_mask,
-                        self._config['det_mask_val'], image)
-
     def multiprocessing_pre_run(self):
         """
         Perform operations prior to running main parallel processing function.
@@ -199,6 +160,26 @@ class DirectorySpyApp(BaseApp):
         self.__initialize_array_from_shared_memory()
         if not self.get_param_value('scan_for_all'):
             self.__find_current_index()
+
+    def _get_detector_mask(self):
+        """
+        Get the detector mask from the file specified in the global QSettings.
+
+        Returns
+        -------
+        _mask : Union[None, np.ndarray]
+            If the mask could be loaded from a numpy file, return the mask.
+            Else, None is returned.
+        """
+        if not self.get_param_value('use_global_det_mask'):
+            return None
+        _maskfile = self.q_settings_get_global_value('det_mask')
+        try:
+            _mask = np.load(_maskfile)
+            return _mask
+        except (FileNotFoundError, ValueError):
+            return None
+        raise AppConfigError('Unknown error when reading detector mask file.')
 
     def define_path_and_name(self):
         """
@@ -248,6 +229,25 @@ class DirectorySpyApp(BaseApp):
                        'frame': self.get_param_value('bg_hdf5_frame')}
         _bg_image = read_image(_bg_file, **_params)
         self._bg_image = self._apply_mask(_bg_image)
+
+    def _apply_mask(self, image):
+        """
+        Apply the detector mask to an image.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            The image data.
+
+        Returns
+        -------
+        image : np.ndarray
+            The masked image data.
+        """
+        if self._det_mask is None:
+            return image
+        return np.where(self._det_mask,
+                        self._config['det_mask_val'], image)
 
     def __initialize_shared_memory(self):
         """

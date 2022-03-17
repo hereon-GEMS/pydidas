@@ -39,7 +39,8 @@ from pydidas.workflow import WorkflowTree
 from pydidas.widgets import (CentralWidgetStack, excepthook)
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.gui import utils
-from pydidas.gui.windows import GlobalDocumentationWindow, GlobalConfigWindow
+from pydidas.gui.windows import (
+    GlobalDocumentationWindow, GlobalConfigWindow, ExportEigerPixelmaskWindow)
 
 
 SCAN = ScanSetup()
@@ -165,6 +166,8 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['exit'] = exit_action
 
         self._actions['open_settings'] = QtWidgets.QAction('&Settings', self)
+        self._actions['export_eiger_pixel_mask'] = (
+            QtWidgets.QAction('&Export Eiger Pixelmask', self))
 
         self._actions['open_documentation_window'] = QtWidgets.QAction(
             'Open documentation in separate window', self)
@@ -187,6 +190,8 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['exit'].triggered.connect(self.close)
         self._actions['open_settings'].triggered.connect(
             partial(self.show_window, 'global_config'))
+        self._actions['export_eiger_pixel_mask'].triggered.connect(
+            self._action_export_eiger_pixel_mask)
         self._actions['open_documentation_window'].triggered.connect(
             partial(self.show_window, 'documentation'))
         self._actions['open_documentation_browser'].triggered.connect(
@@ -212,6 +217,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
         _extras_menu = _menu.addMenu('&Extras')
         _extras_menu.addAction(self._actions['open_settings'])
+        _extras_menu.addAction(self._actions['export_eiger_pixel_mask'])
         _menu.addMenu(_extras_menu)
 
         _help_menu = _menu.addMenu('&Help')
@@ -266,6 +272,14 @@ class MainMenu(QtWidgets.QMainWindow):
             self, 'Name of file', None, 'YAML (*.yaml *.yml)')[0]
         if fname != '':
             self.restore_gui_state(fname)
+
+    @QtCore.Slot()
+    def _action_export_eiger_pixel_mask(self):
+        """
+        Open dialogues to export an Eiger pixelmask.
+        """
+        self._child_windows['tmp_export'] = ExportEigerPixelmaskWindow()
+        self._child_windows['tmp_export'].show()
 
     @QtCore.Slot()
     def _action_open_doc_in_browser(self):

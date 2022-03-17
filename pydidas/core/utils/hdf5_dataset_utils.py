@@ -28,8 +28,10 @@ __all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys',
 
 import os
 import pathlib
+
 import h5py
 import hdf5plugin
+
 from ..constants import HDF5_EXTENSIONS
 
 

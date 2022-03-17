@@ -28,6 +28,7 @@ __all__ = []
 # import __all__ items from modules:
 from .global_config_window import *
 from .global_documentation_window import *
+from .export_eiger_pixelmask import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -38,3 +39,7 @@ del global_config_window
 from . import global_documentation_window
 __all__.extend(global_documentation_window.__all__)
 del global_documentation_window
+
+from . import export_eiger_pixelmask
+__all__.extend(export_eiger_pixelmask.__all__)
+del export_eiger_pixelmask

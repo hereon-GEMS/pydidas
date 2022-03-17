@@ -1,3 +1,5 @@
+Toolbar menu entries
+""""""""""""""""""""
 
 .. list-table::
     :widths: 20 80

@@ -1,4 +1,22 @@
 
+Presentation of 1D plots
+^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+.. image:: ../../images/frames/execute_workflow_11_1dplot_overview.png
+    :width:  506px
+    :align: left
+
+One-dimensional plots are presented in a `silx Plot1D widget 
+<http://www.silx.org/doc/silx/0.5.0/modules/gui/plot/plotwindow.html#plot1d-plot-curves>`_\ .
+
+A toolbar at the top of the widget allows to access various plot controls which
+are  explained in detail below. In addition to the main plot, an "Options" 
+button at the bottom allows additional options for expert users which will not
+be discussed here. Please refer to the *silx* documentation.
+
+Toolbar menu entries
+""""""""""""""""""""
+
 .. list-table::
     :widths: 20 80
     :class: tight-table

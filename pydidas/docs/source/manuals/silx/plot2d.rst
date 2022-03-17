@@ -1,3 +1,25 @@
+Presentation of 2D plots
+^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+.. image:: ../../images/frames/execute_workflow_12_2dplot_overview.png
+    :width:  506px
+    :align: left
+    
+Two-dimensional plots are presented in a `silx Plot2D widget 
+<http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D>`_\ .
+The toolbar options will be explained in detail below. Moving the mouse over the
+canvas will update the labels for x/y position and data value at the bottom of 
+the canvas. Note that the x and y axis positions for each pixel are defined at
+the pixel center and the given values must be treated carefully with respect to
+the pixel shape, especially for coarse pixels.
+
+.. tip::
+
+    The scaling of the results can be achieved by modifying the colormap 
+    settings.
+
+Toolbar menu entries
+""""""""""""""""""""
 
 .. list-table::
     :widths: 20 80

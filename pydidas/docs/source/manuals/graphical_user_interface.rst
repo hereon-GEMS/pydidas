@@ -45,13 +45,15 @@ Frames
     :maxdepth: 1
     
     frames/data_browsing
-    frames/directory_spy
     frames/pyfai_calibration
     frames/composite_image_creator
+    frames/directory_spy
     frames/experimental_settings
     frames/scan_settings
     frames/workflow_edit
-    frames/execute_workflow   
+    frames/workflow_test
+    frames/execute_workflow
+    frames/view_workflow_results
     frames/global_settings
     
 

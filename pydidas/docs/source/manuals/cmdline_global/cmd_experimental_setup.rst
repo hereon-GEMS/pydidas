@@ -285,7 +285,4 @@ An example to demonstrate these methods is given below:
 
 .. _experimental_setup_parameters:
 
-Full list of Parameters for ExperimentalSetup 
----------------------------------------------
-
 .. include:: ./experimental_setup_params.rst

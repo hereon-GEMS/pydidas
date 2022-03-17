@@ -142,7 +142,4 @@ metadata available at the beamlines.
 
 .. _scan_setup_parameters:
 
-List of all ScanSetup Parameters
---------------------------------
-
 .. include:: ./scan_setup_params.rst

@@ -11,8 +11,8 @@ frame is shown below.
 
 The frame holds three main widgets (1-3) as well as control buttons (4). The 
 top left widget (1) :ref:`visualizes the WorkflowTree <workflow_tree_vis>` and 
-the Plugin collection is presented in the widget at the bottom (2). Widgets to edit a plugin are shown
-on the right (3).
+the Plugin collection is presented in the widget at the bottom (2). Widgets to 
+edit a plugin are shown on the right (3).
 
 Detailed description of frame items
 -----------------------------------

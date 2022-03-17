@@ -1,3 +1,6 @@
+Full list of Parameters for ExperimentalSetup 
+---------------------------------------------
+
 - xray_wavelength (float, unit: Angstrom, default: 1.0)
     The X-ray wavelength. Any changes to the wavelength will also update 
     the X-ray energy setting.   

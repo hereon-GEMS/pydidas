@@ -1,3 +1,7 @@
+List of all ScanSetup Parameters
+--------------------------------
+
+
 - scan_dim (type: int, default: 2, unit: '')
     The scan dimensionality. This defines the number of processed dimensions.
 - scan_name (type: str, default: '', unit: '')

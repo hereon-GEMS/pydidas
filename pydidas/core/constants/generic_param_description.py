@@ -292,7 +292,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'choices': None,
         'unit': '',
         'allow_None': True,
-        'tooltip': ('The lower threshold of the image. If any  finite value '
+        'tooltip': ('The lower threshold of the image. If any finite value '
                     '(i.e. not np.nan or None) is used, the value of any '
                     'pixels with a value below the threshold will be '
                     'replaced by the threshold value. A value of np.nan or '
@@ -1159,10 +1159,10 @@ GENERIC_PARAM_DESCRIPTION = {
     ############################
     ## PLugin Parameters
     ############################
-    'crop_type': {
+    'type_selection': {
         'type': str,
         'default': 'Data values',
-        'name': 'Type of cropping',
+        'name': 'Data selection',
         'choices': ['Data values', 'Indices'],
         'unit': '',
         'allow_None': False,

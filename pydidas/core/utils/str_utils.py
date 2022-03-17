@@ -27,7 +27,7 @@ __all__ = ['get_fixed_length_str', 'get_time_string', 'get_short_time_string',
            'timed_print', 'get_warning', 'convert_unicode_to_ascii',
            'convert_special_chars_to_unicode', 'get_range_as_formatted_string',
            'update_separators', 'format_input_to_multiline_str',
-           'get_random_string']
+           'get_random_string', 'get_simplified_array_representation']
 
 import re
 import sys
@@ -327,6 +327,41 @@ def get_range_as_formatted_string(obj):
         return _str_items[0] + ' ... ' + _str_items[1]
     except TypeError:
         return 'unknown range'
+
+
+def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
+    """
+    Get a simplified representation
+
+    Parameters
+    ----------
+    obj : np.ndarray
+        The input array
+    max_items : int, optional
+        The maximum number of data entries. The default is 6.
+    leading_indent : int, optional
+        The leading indent of each line.
+
+    Returns
+    -------
+    repr : str
+        The simplified string representation of the array values.
+    """
+    _repr = ''
+    if obj.ndim > 1:
+        _repr += (get_simplified_array_representation(obj[0])
+                  + '\n...\n'
+                  + get_simplified_array_representation(obj[-1]))
+    elif obj.ndim == 1:
+        if obj.size <= max_items:
+            _items = [np.round(o, 4) for o in obj]
+        else:
+            _items = [np.round(o, 4) for o in obj[np.r_[0, 1, -2, -1]]]
+            _items.insert(2, '...')
+        _repr += '[' + ', '.join(str(item) for item in _items) + ']'
+    _indent = ' ' * leading_indent
+    _repr = '\n'.join(_indent + _item.strip() for _item in _repr.split('\n'))
+    return _repr
 
 
 def update_separators(path):

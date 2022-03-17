@@ -33,7 +33,7 @@ from pydidas.gui import (
     DataBrowsingFrame,  WorkflowEditFrame, PyfaiCalibFrame, HomeFrame,
     ExperimentalSetupFrame, ScanSetupFrame, ExecuteWorkflowFrame,
     CompositeCreatorFrame, get_pyfai_calib_icon, MainWindow, DirectorySpyFrame,
-    ViewResultsFrame)
+    ViewResultsFrame, WorkflowTestFrame)
 from pydidas.widgets import BaseFrame
 
 
@@ -81,13 +81,16 @@ def run_gui(app=None):
                        'Workflow processing/Scan settings', 'qta::ei.move')
     gui.register_frame(WorkflowEditFrame, 'Workflow editing',
                        'Workflow processing/Workflow editing',
-                       'qta::mdi.clipboard-flow-outline')
+                       'qta::ph.share-network-fill')
+    gui.register_frame(WorkflowTestFrame, 'Test workflow',
+                   'Workflow processing/Test workflow',
+                   'qta::mdi.play-protected-content')
     gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
-                   'Workflow processing/Run full procesing', 'qta::mdi.sync')
+                   'Workflow processing/Run full processing',
+                   'qta::msc.run-all')
     gui.register_frame(ViewResultsFrame, 'View workflow results',
-                   'View workflow results', 'qta::mdi.monitor-eye')
-    # gui.register_frame(ResultVisualizationFrame, 'Result visualization',
-    #                    'Result visualization', 'qta::mdi.monitor-eye')
+                   'Workflow processing/View workflow results',
+                   'qta::mdi.monitor-eye')
     gui.show()
     gui.raise_()
     _ = app.exec_()

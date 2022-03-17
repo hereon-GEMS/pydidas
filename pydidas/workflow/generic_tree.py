@@ -292,7 +292,8 @@ class GenericTree:
         for key, val in self.__dict__.items():
             _copy.__dict__[key] = copy.deepcopy(val)
         _copy.clear()
-        _copy.register_node(copy.deepcopy(self.root))
+        if self.root is not None:
+            _copy.register_node(copy.deepcopy(self.root))
         return _copy
 
     def __deepcopy__(self):

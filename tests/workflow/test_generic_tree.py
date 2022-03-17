@@ -272,6 +272,13 @@ class TestGenericTree(unittest.TestCase):
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
 
+    def test_get_copy__no_nodes(self):
+        tree = GenericTree()
+        tree.dummy = 1234.522
+        _copy = tree.get_copy()
+        self.assertIsInstance(_copy, GenericTree)
+        self.assertEqual(tree.dummy, _copy.dummy)
+
     def test_hash___empty_tree(self):
         tree = GenericTree()
         self.assertIsInstance(hash(tree), int)

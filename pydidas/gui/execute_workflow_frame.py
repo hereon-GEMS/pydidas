@@ -76,6 +76,24 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         self._widgets['but_exec'].clicked.connect(self.__execute)
         self._widgets['but_abort'].clicked.connect(self.__abort_execution)
 
+    @QtCore.Slot(int)
+    def frame_activated(self, index):
+        """
+        Received a signal that a new frame has been selected.
+
+        This method checks whether the selected frame is the current class
+        and if yes, it will call some updates.
+
+        Parameters
+        ----------
+        index : int
+            The index of the newly activated frame.
+        """
+        if index == self.frame_index:
+            self._update_choices_of_selected_results()
+            self._update_export_button_activation()
+        self._config['frame_active'] = (index == self.frame_index)
+
     def __abort_execution(self):
         """
         Abort the execution of the AppRunner.
@@ -160,26 +178,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
                 and self._config['frame_active']):
             self._config['plot_last_update'] = time.time()
             self.update_plot()
-
-    @QtCore.Slot(int)
-    def frame_activated(self, index):
-        """
-        Received a signal that a new frame has been selected.
-
-        This method checks whether the selected frame is the current class
-        and if yes, it will call some updates.
-
-        Parameters
-        ----------
-        index : int
-            The index of the newly activated frame.
-        """
-        if index == self.frame_index:
-            self._verify_result_shapes_uptodate()
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
-            self.__check_for_plot_update()
-        self._config['frame_active'] = (index == self.frame_index)
 
     def _finish_processing(self):
         """

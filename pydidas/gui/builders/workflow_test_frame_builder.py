@@ -28,20 +28,18 @@ __all__ = ['WorkflowTestFrameBuilder']
 from qtpy import QtWidgets, QtCore
 from silx.gui.plot import Plot1D, Plot2D
 
-from ...widgets import BaseFrameWithApp, ReadOnlyTextWidget, ScrollArea
-from ...widgets.selection import RadioButtonGroup
+from ...widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
 from ...core.constants import CONFIG_WIDGET_WIDTH
 from ...widgets.parameter_config import ParameterEditFrame
-from ...widgets.selection import ResultSelectionWidget
 
 
-class WorkflowTestFrameBuilder(BaseFrameWithApp):
+class WorkflowTestFrameBuilder(BaseFrame):
     """
     Class which includes the build_self method to populate the
     base class's UI and initialize all widgets.
     """
     def __init__(self, parent=None):
-        BaseFrameWithApp.__init__(self, parent)
+        BaseFrame.__init__(self, parent)
         _layout = self.layout()
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)

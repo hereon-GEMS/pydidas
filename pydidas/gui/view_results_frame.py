@@ -25,10 +25,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ViewResultsFrame']
 
+from qtpy import QtCore
+
 from ..core import get_generic_param_collection
 from ..workflow import WorkflowResults
-from .builders.view_results_frame_builder import (
-    ViewResultsFrameBuilder)
+from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 from .mixins import ViewResultsMixin
 
 RESULTS = WorkflowResults()
@@ -48,3 +49,21 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         self.set_default_params()
         self.build_frame()
         ViewResultsMixin.__init__(self)
+
+    @QtCore.Slot(int)
+    def frame_activated(self, index):
+        """
+        Received a signal that a new frame has been selected.
+
+        This method checks whether the selected frame is the current class
+        and if yes, it will call some updates.
+
+        Parameters
+        ----------
+        index : int
+            The index of the newly activated frame.
+        """
+        if index == self.frame_index:
+            self._update_choices_of_selected_results()
+            self._update_export_button_activation()
+        self._config['frame_active'] = (index == self.frame_index)

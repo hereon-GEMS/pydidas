@@ -69,7 +69,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._active_node = -1
         self._results = {}
         self._config.update({'shapes': {}, 'labels': {}, 'data_labels': {},
-                             'plot_active': False})
+                             'plot_active': False, 'plot_dim': 1})
         self.build_frame()
         self.connect_signals()
         self.__check_tree_uptodate()
@@ -256,8 +256,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return
         _ndim = len(self._config['shapes'][self._active_node])
         if _ndim == 1:
+            self._config['plot_dim'] = 1
             self._plot1d()
         elif _ndim == 2:
+            self._config['plot_dim'] = 2
             self._plot_2d()
         else:
             self._clear_plot()
@@ -323,6 +325,13 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _scale = (axis[-1] - axis[0] + _delta) / axis.size
         _origin = axis[0] - _delta / 2
         return _origin, _scale
+
+    def _clear_plot(self):
+        """
+        Clear the current plot and remove all items.
+        """
+        _plot_dim = self._config["plot_dim"]
+        self._widgets[f'plot{_plot_dim }d'].remove()
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

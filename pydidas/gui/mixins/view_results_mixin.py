@@ -282,26 +282,6 @@ class ViewResultsMixin:
         _origin = axis[0] - _delta / 2
         return _origin, _scale
 
-    @QtCore.Slot(int)
-    def frame_activated(self, index):
-        """
-        Received a signal that a new frame has been selected.
-
-        This method checks whether the selected frame is the current class
-        and if yes, it will call some updates.
-
-        Parameters
-        ----------
-        index : int
-            The index of the newly activated frame.
-        """
-        if index == self.frame_index:
-            self._verify_result_shapes_uptodate()
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
-        self._config['frame_active'] = (index == self.frame_index)
-
-
     def _update_choices_of_selected_results(self):
         """
         Update the choices of the "selected_results" Parameter based on the

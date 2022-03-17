@@ -29,7 +29,8 @@ from qtpy import QtWidgets, QtCore
 from silx.gui.plot import Plot1D, Plot2D
 
 from ...widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import(
+    CONFIG_WIDGET_WIDTH, DEFAULT_TWO_LINE_PARAM_CONFIG)
 from ...widgets.parameter_config import ParameterEditFrame
 
 
@@ -68,14 +69,9 @@ class WorkflowTestFrameBuilder(BaseFrame):
                          width_unit=0,
                          row=self._widgets['config'].next_row())
         elif param_key in ['selected_results']:
-            _dict = dict(linebreak=True,
-                         parent_widget=self._widgets['config'],
-                         halign_text=QtCore.Qt.AlignLeft,
-                         valign_text=QtCore.Qt.AlignBottom,
-                         width_total=CONFIG_WIDGET_WIDTH - 10,
-                         width_io=CONFIG_WIDGET_WIDTH - 50,
-                         width_text=CONFIG_WIDGET_WIDTH - 20,
-                         width_unit=0)
+            _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
+            _dict.update({'parent_widget': self._widgets['config'],
+                          'row': self._widgets['config'].next_row()})
         else:
             _dict = dict(parent_widget=self._widgets['config'],
                          width_io=100, width_unit=0,

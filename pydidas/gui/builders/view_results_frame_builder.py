@@ -28,7 +28,8 @@ __all__ = ['ViewResultsFrameBuilder']
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D, Plot2D
 
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import (
+    CONFIG_WIDGET_WIDTH, DEFAULT_TWO_LINE_PARAM_CONFIG)
 from ...widgets import ScrollArea, BaseFrame
 from ...widgets.selection import ResultSelectionWidget
 from ...widgets.parameter_config import ParameterEditFrame
@@ -60,15 +61,9 @@ class ViewResultsFrameBuilder(BaseFrame):
             The dictionary with the formatting options.
         """
         if param_key in ['autosave_dir', 'selected_results']:
-            _dict = dict(linebreak=True,
-                         parent_widget=self._widgets['config'],
-                         halign_text=QtCore.Qt.AlignLeft,
-                         valign_text=QtCore.Qt.AlignBottom,
-                         width_total=CONFIG_WIDGET_WIDTH,
-                         width_io=CONFIG_WIDGET_WIDTH - 50,
-                         width_text=CONFIG_WIDGET_WIDTH - 20,
-                         width_unit=0,
-                         row=self._widgets['config'].next_row())
+            _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
+            _dict.update({'parent_widget': self._widgets['config'],
+                          'row': self._widgets['config'].next_row()})
         else:
             _dict = dict(parent_widget=self._widgets['config'],
                          width_io=100, width_unit=0,

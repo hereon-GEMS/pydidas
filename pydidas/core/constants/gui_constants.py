@@ -28,8 +28,11 @@ __all__ = ['GENERIC_PLUGIN_WIDGET_WIDTH', 'GENERIC_PLUGIN_WIDGET_HEIGHT',
            'WORKFLOW_EDIT_CANVAS_X', 'WORKFLOW_EDIT_CANVAS_Y',
            'PARAM_INPUT_WIDGET_HEIGHT', 'PARAM_INPUT_WIDGET_WIDTH',
            'PARAM_INPUT_EDIT_WIDTH', 'PARAM_INPUT_TEXT_WIDTH',
-           'PARAM_INPUT_UNIT_WIDTH', 'CONFIG_WIDGET_WIDTH']
+           'PARAM_INPUT_UNIT_WIDTH', 'CONFIG_WIDGET_WIDTH',
+           'DEFAULT_TWO_LINE_PARAM_CONFIG']
 
+
+from qtpy import QtCore
 
 GENERIC_PLUGIN_WIDGET_WIDTH = 165
 GENERIC_PLUGIN_WIDGET_HEIGHT = 40
@@ -47,3 +50,12 @@ PARAM_INPUT_UNIT_WIDTH = 25
 
 # The width of config widgets for the App Parameters
 CONFIG_WIDGET_WIDTH = 300
+
+DEFAULT_TWO_LINE_PARAM_CONFIG = dict(
+    linebreak=True,
+    halign_text=QtCore.Qt.AlignLeft,
+    valign_text=QtCore.Qt.AlignBottom,
+    width_total=CONFIG_WIDGET_WIDTH,
+    width_io=CONFIG_WIDGET_WIDTH - 50,
+    width_text=CONFIG_WIDGET_WIDTH - 20,
+    width_unit=0)

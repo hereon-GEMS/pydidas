@@ -43,11 +43,11 @@ from .global_configuration_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .main_window import *
-from .processing_single_plugin_frame import *
 from .pyfai_calib_frame import *
 from .scan_setup_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
+from .workflow_test_frame import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -87,10 +87,6 @@ from . import main_window
 __all__.extend(main_window.__all__)
 del main_window
 
-from . import processing_single_plugin_frame
-__all__.extend(processing_single_plugin_frame.__all__)
-del processing_single_plugin_frame
-
 from . import pyfai_calib_frame
 __all__.extend(pyfai_calib_frame.__all__)
 del pyfai_calib_frame
@@ -106,3 +102,7 @@ del view_results_frame
 from . import workflow_edit_frame
 __all__.extend(workflow_edit_frame.__all__)
 del workflow_edit_frame
+
+from . import workflow_test_frame
+__all__.extend(workflow_test_frame.__all__)
+del workflow_test_frame

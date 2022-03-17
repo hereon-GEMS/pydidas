@@ -57,7 +57,7 @@ class ScanSetupFrameBuilder(BaseFrame):
         _width_total = self.TEXT_WIDTH + self.PARAM_INPUT_WIDTH + 10
 
         self.create_label('label_title', 'Scan settings\n', fontsize=14,
-                          bold=True, underline=True, gridPos=(0, 0, 1, 1))
+                          bold=True, gridPos=(0, 0, 1, 1))
         self.create_button('but_load', 'Load scan settings from file',
                            gridPos=(-1, 0, 1, 1), alignment=None,
                            icon=self.style().standardIcon(42),

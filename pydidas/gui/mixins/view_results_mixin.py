@@ -180,7 +180,6 @@ class ViewResultsMixin:
         elif self._config['plot_type'] in ['2D full axes', '2D data subset']:
             self._widgets['plot_stack'].setCurrentIndex(1)
             self._plot_2d(_data)
-
         _plot = self._widgets[f'plot{_dim}d']
         _plot.setGraphTitle(RESULTS.labels[_node] + f' (node #{_node:03d})')
 
@@ -227,7 +226,7 @@ class ViewResultsMixin:
         if not isinstance(data.axis_ranges[0], np.ndarray):
             data.axis_ranges[0] = np.arange(data.size)
         _plot.addCurve(data.axis_ranges[0], data.array, replace=replace,
-                       linewidth=1.5, legend=legend)#, info=legend)
+                       linewidth=1.5, legend=legend)
         _plot.setGraphYLabel(RESULTS.data_labels[self._config['active_node']])
         _plot.setGraphXLabel(self._axlabels(label_dim))
 

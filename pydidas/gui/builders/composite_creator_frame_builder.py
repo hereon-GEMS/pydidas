@@ -57,7 +57,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                          QtWidgets.QSizePolicy.Expanding))
 
         self.create_label(
-            'title', 'Composite image creator', fontsize=14,
+            'title', 'Composite image creator', fontsize=14, bold=True,
             gridPos=(0, 0, 1, 2), parent_widget=self._widgets['config'],
             fixedWidth=CONFIG_WIDGET_WIDTH)
 

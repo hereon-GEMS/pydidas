@@ -35,9 +35,9 @@ from .execute_workflow_frame_builder import *
 from .experimental_setup_frame_builder import *
 from .global_configuration_frame_builder import *
 from .image_math_frame_builder import *
-from .processing_single_plugin_frame_builder import *
 from .scan_setup_frame_builder import *
 from .workflow_edit_frame_builder import *
+from .workflow_test_frame_builder import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -65,10 +65,6 @@ from . import image_math_frame_builder
 __all__.extend(image_math_frame_builder.__all__)
 del image_math_frame_builder
 
-from . import processing_single_plugin_frame_builder
-__all__.extend(processing_single_plugin_frame_builder.__all__)
-del processing_single_plugin_frame_builder
-
 from . import scan_setup_frame_builder
 __all__.extend(scan_setup_frame_builder.__all__)
 del scan_setup_frame_builder
@@ -76,3 +72,7 @@ del scan_setup_frame_builder
 from . import workflow_edit_frame_builder
 __all__.extend(workflow_edit_frame_builder.__all__)
 del workflow_edit_frame_builder
+
+from . import workflow_test_frame_builder
+__all__.extend(workflow_test_frame_builder.__all__)
+del workflow_test_frame_builder

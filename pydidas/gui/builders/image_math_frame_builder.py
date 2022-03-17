@@ -53,7 +53,7 @@ class ImageMathFrameBuilder(BaseFrame):
         Build the frame by creating all required widgets and placing them
         in the layout.
         """
-        self.create_label('title', 'Image mathematics', fontsize=14,
+        self.create_label('title', 'Image mathematics', fontsize=14, bold=True,
                           gridPos=(0, 0, 1, 5))
 
         self.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))

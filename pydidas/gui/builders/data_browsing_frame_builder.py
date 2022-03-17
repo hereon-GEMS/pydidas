@@ -46,7 +46,7 @@ class DataBrowsingFrameBuilder(BaseFrame):
         """
         Build the frame and create all required widgets.
         """
-        self.create_label(None, 'Data exploration view', fontsize=14)
+        self.create_label(None, 'Data browser', fontsize=14, bold=True)
 
         _bsize = 25
         self._widgets['selection'] = QtWidgets.QFrame()

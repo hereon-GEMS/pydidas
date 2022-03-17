@@ -27,18 +27,14 @@ __status__ = "Development"
 __all__ = ['ExecuteWorkflowFrame']
 
 import time
-import os
 
-import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ..apps import ExecuteWorkflowApp
 from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger
-from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner
-from ..widgets.dialogues import critical_warning
-from ..workflow import WorkflowTree, WorkflowResults
+from ..workflow import WorkflowResults
 from .builders.execute_workflow_frame_builder import (
     ExecuteWorkflowFrameBuilder)
 from .mixins import ViewResultsMixin

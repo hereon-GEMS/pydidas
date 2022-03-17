@@ -45,8 +45,8 @@ from ..read_only_text_widget import ReadOnlyTextWidget
 from ..utilities import apply_widget_properties
 
 
-RESULTS = WorkflowResults()
 SCAN = ScanSetup()
+RESULTS = WorkflowResults()
 
 
 def _param_widget_config(param_key):
@@ -68,9 +68,9 @@ def _param_widget_config(param_key):
 
 
 class ResultSelectionWidget(QtWidgets.QWidget,
-                              CreateWidgetsMixIn,
-                              ParameterWidgetsMixIn,
-                              ParameterCollectionMixIn):
+                            CreateWidgetsMixIn,
+                            ParameterWidgetsMixIn,
+                            ParameterCollectionMixIn):
     """
     The ResultSelectionWidget widget allows to select data slices for
     plotting using meta information from the
@@ -110,6 +110,7 @@ class ResultSelectionWidget(QtWidgets.QWidget,
     new_selection = QtCore.Signal(bool, object, int, object, str)
 
     default_params = ParameterCollection(
+        get_generic_parameter('selected_results'),
         Parameter('plot_ax1', int, 0, name='Data axis no. 1 for plot',
                   choices=[0]),
         Parameter('plot_ax2', int, 1, name='Data axis no. 2 for plot',
@@ -127,7 +128,8 @@ class ResultSelectionWidget(QtWidgets.QWidget,
                         'plot_type': '1D plot',
                         'n_slice_params': 0}
         self._active_node = -1
-        self.add_param(select_results_param)
+        if select_results_param is not None:
+            self.add_param(select_results_param)
         self.set_default_params()
         self._selector = WorkflowResultsSelector(
             self.get_param('use_scan_timeline'))

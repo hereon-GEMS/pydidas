@@ -84,7 +84,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         """
         Build the frame and create all widgets.
         """
-        self.create_label('title', 'View results', fontsize=14,
+        self.create_label('title', 'View results', fontsize=14, bold=True,
                            gridPos=(0, 0, 1, 5))
 
         self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))

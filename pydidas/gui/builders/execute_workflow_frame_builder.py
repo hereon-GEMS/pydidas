@@ -84,7 +84,7 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
         Build the frame and create all widgets.
         """
         self.create_label('title', 'Full workflow processing', fontsize=14,
-                           gridPos=(0, 0, 1, 5))
+                          bold=True, gridPos=(0, 0, 1, 5))
 
         self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
 

@@ -22,6 +22,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
+import time
 import unittest
 import tempfile
 import shutil
@@ -75,6 +76,7 @@ class TestDirectorySpyApp(unittest.TestCase):
             _data = np.random.random((self._shape))
             _fpath = os.path.join(self._path, pattern.format(_index))
             np.save(_fpath, _data)
+            time.sleep(0.001)
             _names.append(_fpath)
         return _names
 

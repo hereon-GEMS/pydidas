@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ['run_gui']
 
 import sys
+import multiprocessing as mp
 
 from qtpy import QtWidgets
 
@@ -99,5 +100,7 @@ def run_gui(app=None):
 
 
 if __name__ == '__main__':
+    if mp.get_start_method != 'spawn':
+        mp.set_start_method('spawn')
     app = QtWidgets.QApplication(sys.argv)
     run_gui(app)

@@ -53,11 +53,25 @@ if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
 
 # Disable the pyFAI logging to console
-import os
-os.environ['PYFAI_NO_LOGGING'] = '1'
+import os as __os
+import logging as __logging
+import warnings as __warnings
+import multiprocessing as __mp
+
+__os.environ['PYFAI_NO_LOGGING'] = '1'
 # Change the pyFAI logging level to ERROR and above
-import logging
-pyFAI_azi_logger = logging.getLogger('pyFAI.azimuthalIntegrator')
-pyFAI_azi_logger.setLevel(logging.ERROR)
-silx_opencl_logger = logging.getLogger('silx.opencl.processing')
-silx_opencl_logger.setLevel(logging.ERROR)
+pyFAI_azi_logger = __logging.getLogger('pyFAI.azimuthalIntegrator')
+pyFAI_azi_logger.setLevel(__logging.ERROR)
+silx_opencl_logger = __logging.getLogger('silx.opencl.processing')
+silx_opencl_logger.setLevel(__logging.ERROR)
+
+# Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
+if __mp.get_start_method() != 'spawn':
+    try:
+        __mp.set_start_method('spawn')
+    except RuntimeError:
+        __warnings.warn(
+            'Could not set the multiprocessing Process startup method to '
+            '"spawn". Multiprocessing with OpenGL will not work in Linux. To '
+            'solve this issue, restart the kernel and import pydidas before '
+            'starting any multiprocessing.')

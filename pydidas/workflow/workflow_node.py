@@ -251,8 +251,8 @@ class WorkflowNode(GenericNode):
             if not self.plugin.new_dataset:
                 _child_plugin._legacy_image_ops = (
                     self.plugin._legacy_image_ops[:])
-                _child_plugin._original_image_shape = (
-                    self.plugin._original_image_shape)
+                _child_plugin._original_input_shape = (
+                    self.plugin._original_input_shape)
             _child.propagate_shapes_and_global_config()
 
     @property

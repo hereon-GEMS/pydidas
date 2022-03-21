@@ -124,7 +124,7 @@ class TestSubtractBgImage(unittest.TestCase):
         plugin.pre_execute()
         plugin._legacy_image_ops = [
             ['roi', (1, self._shape[0], 3, self._shape[1])], ['binning', 2]]
-        plugin._original_image_shape = self._shape
+        plugin._original_input_shape = self._shape
         _data = rebin2d(self._data[1:, 3:], 2)
         _new_data, _new_kwargs = plugin.execute(_data, **_kwargs)
         self.assertEqual(_kwargs, _new_kwargs)

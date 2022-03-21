@@ -163,7 +163,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
     def test_calculate_result_shape(self):
         plugin = self.create_plugin_with_filelist()
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._original_image_shape, self._img_shape)
+        self.assertEqual(plugin._original_input_shape, self._img_shape)
 
     def test_get_first_file_size(self):
         plugin = self.create_plugin_with_filelist()

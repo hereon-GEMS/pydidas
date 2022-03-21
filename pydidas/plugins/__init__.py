@@ -28,6 +28,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .base_input_plugin import *
+from .base_input_plugin_1d import *
 from .base_output_plugin import *
 from .base_plugin import *
 from .base_proc_plugin import *
@@ -40,6 +41,10 @@ from .pyfai_integration_base import *
 from . import base_input_plugin
 __all__.extend(base_input_plugin.__all__)
 del base_input_plugin
+
+from . import base_input_plugin_1d
+__all__.extend(base_input_plugin_1d.__all__)
+del base_input_plugin_1d
 
 from . import base_output_plugin
 __all__.extend(base_output_plugin.__all__)

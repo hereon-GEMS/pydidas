@@ -56,6 +56,7 @@ class Sum1dData(ProcPlugin):
                      '"type_selection".')))
     input_data_dim = 1
     output_data_dim = 0
+    new_dataset = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -109,3 +110,9 @@ class Sum1dData(ProcPlugin):
         elif _bounds.size == 1:
             return slice(_bounds[0], _bounds[0] + 1)
         return slice(_bounds[0], _bounds[-1] + 1)
+
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin results.
+        """
+        self._config['result_shape'] = (1, )

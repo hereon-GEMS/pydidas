@@ -249,7 +249,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.setValue('global/det_mask', _maskfilename)
         plugin = pyFAIintegrationBase()
-        plugin._original_image_shape = (123, 50)
+        plugin._original_input_shape = (123, 50)
         plugin.load_and_store_mask()
         self.assertTrue(np.equal(plugin._mask, _mask).all())
 
@@ -257,7 +257,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.setValue('global/det_mask', _maskfilename)
         plugin = pyFAIintegrationBase()
-        plugin._original_image_shape = (123, 50)
+        plugin._original_input_shape = (123, 50)
         plugin.set_param_value('det_mask',
                                os.path.join(self._temppath, 'no_mask.npy'))
         plugin.load_and_store_mask()
@@ -265,13 +265,13 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def test_load_and_store_mask__no_mask(self):
         plugin = pyFAIintegrationBase()
-        plugin._original_image_shape = (123, 45)
+        plugin._original_input_shape = (123, 45)
         plugin.load_and_store_mask()
         self.assertIsNone(plugin._mask)
 
     def test_pre_execute(self):
         plugin = pyFAIintegrationBase()
-        plugin._original_image_shape = (123, 45)
+        plugin._original_input_shape = (123, 45)
         plugin.pre_execute()
         self.assertIsInstance(plugin._ai,
                               pyFAI.azimuthalIntegrator.AzimuthalIntegrator)

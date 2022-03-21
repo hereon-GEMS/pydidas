@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Hdf5singleFileLoader Plugin which can be used to load
-images from single Hdf5 files.
+Module with the StoreInternally Plugin which can be used to keep intermediate
+data available.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['AsciiSaver']
+__all__ = ['StoreInternally']
 
 import numpy as np
 
@@ -46,7 +46,7 @@ class StoreInternally(OutputPlugin):
     directory_path : Union[pathlib.Path, str]
         The output directory.
     """
-    plugin_name = 'Store data internally'
+    plugin_name = 'Store data'
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = -1

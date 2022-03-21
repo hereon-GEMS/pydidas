@@ -200,7 +200,7 @@ class EigerScanSeriesLoader(InputPlugin):
         """
         self.__update_image_metadata()
         self._config['result_shape'] = self._image_metadata.final_shape
-        self._original_image_shape = (self._image_metadata.raw_size_y,
+        self._original_input_shape = (self._image_metadata.raw_size_y,
                                       self._image_metadata.raw_size_x)
 
     def get_first_file_size(self):

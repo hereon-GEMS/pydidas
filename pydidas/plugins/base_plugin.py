@@ -160,7 +160,7 @@ class BasePlugin(ObjectWithParameterCollection):
                         'result_shape': None}
         self._legacy_image_ops_meta = {'num': 0, 'included': False}
         self._legacy_image_ops = []
-        self._original_image_shape = None
+        self._original_input_shape = None
         self.node_id = None
 
     def __copy__(self):
@@ -410,9 +410,9 @@ class BasePlugin(ObjectWithParameterCollection):
         binning : int
             The binning factor which needs to be applied to the original image.
         """
-        _roi = RoiController(roi=(0, self._original_image_shape[0],
-                               0, self._original_image_shape[1]),
-                          input_shape=self._original_image_shape)
+        _roi = RoiController(roi=(0, self._original_input_shape[0],
+                               0, self._original_input_shape[1]),
+                          input_shape=self._original_input_shape)
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:

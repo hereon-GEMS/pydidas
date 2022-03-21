@@ -102,7 +102,7 @@ class TestMaskImage(unittest.TestCase):
         plugin.set_param_value('det_mask_val', _maskval)
         plugin._legacy_image_ops = [
             ['roi', (1, self._shape[0], 3, self._shape[1])], ['binning', 2]]
-        plugin._original_image_shape = self._shape
+        plugin._original_input_shape = self._shape
         _data = rebin2d(self._data[1:, 3:], 2)
         _mask = np.where(rebin2d(self._mask[1:, 3:], 2) > 0, 1, 0)
         plugin.pre_execute()

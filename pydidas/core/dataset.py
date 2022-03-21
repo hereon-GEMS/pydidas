@@ -64,7 +64,8 @@ class EmptyDataset(np.ndarray):
         __new__ method for creation of new numpy.ndarray object.
         """
         local_kws = kwargs.copy()
-        for item in ['axis_labels', 'axis_ranges', 'axis_units', 'metadata']:
+        for item in ['axis_labels', 'axis_ranges', 'axis_units', 'metadata',
+                     'data_unit']:
             if item in kwargs:
                 del kwargs[item]
         obj = np.ndarray.__new__(cls, *args, **kwargs)
@@ -73,6 +74,7 @@ class EmptyDataset(np.ndarray):
             _labels = obj._get_dict(_data, '__new__')
             setattr(obj, key, _labels)
         obj.metadata = local_kws.get('metadata', {})
+        obj.data_unit = local_kws.get('data_unit', '')
         obj.getitem_key = None
         return obj
 
@@ -480,6 +482,37 @@ class EmptyDataset(np.ndarray):
         self._axis_units = self._get_dict(units, 'axis_units')
 
     @property
+    def data_unit(self):
+        """
+        Get the data unit.
+
+        Returns
+        -------
+        str
+            The data unit.
+        """
+        return self.__data_unit
+
+    @data_unit.setter
+    def data_unit(self, data_unit):
+        """
+        Set the data unit
+
+        Parameters
+        ----------
+        data_unit : str
+            The new data_unit.
+
+        Raises
+        ------
+        ValueError
+            If metadata is not str
+        """
+        if not isinstance(data_unit, str):
+            raise TypeError('Data unit must be a string.')
+        self.__data_unit = data_unit
+
+    @property
     def metadata(self):
         """
         Get the image ID.
@@ -570,6 +603,7 @@ class EmptyDataset(np.ndarray):
             'axis_ranges': self.__get_axis_item_repr('axis_ranges'),
             'axis_units': self.__get_axis_item_repr('axis_units'),
             'metadata': _meta_repr,
+            'data_unit': self.data_unit,
             'array': self.__array__().__repr__()}
         _repr = (self.__class__.__name__ + '(\n'
                  + ',\n'.join(_str for _str in _info.values())
@@ -727,6 +761,8 @@ class Dataset(EmptyDataset):
         dimensions. The default is None.
     **metadata : Union[dict, None], optional
         A dictionary with metadata. The default is None.
+    **data_unit : str, optional
+        The description of the data unit. The default is an empty string.
     """
 
     def __new__(cls, array, *args, **kwargs):
@@ -752,4 +788,5 @@ class Dataset(EmptyDataset):
         obj.axis_labels = kwargs.get('axis_labels', _default_vals(obj.ndim))
         obj.axis_ranges = kwargs.get('axis_ranges', _default_vals(obj.ndim))
         obj.metadata = kwargs.get('metadata', {})
+        obj.data_unit = kwargs.get('data_unit', '')
         return obj

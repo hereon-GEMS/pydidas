@@ -71,7 +71,7 @@ class ExecuteWorkflowApp(BaseApp):
     autosave_results : bool, optional
         Use this flag to control whether result data should be automatically
         saved to disk. The default is False.
-    autosave_dir : Union[pathlib.Path, str], optional
+    autosave_directory : Union[pathlib.Path, str], optional
         The directory for autosave_files. If autosave_results is True, the
         directory must be set.
     autosave_format : str
@@ -94,7 +94,7 @@ class ExecuteWorkflowApp(BaseApp):
         Parameter itself as value.
     """
     default_params = get_generic_param_collection(
-        'autosave_results', 'autosave_dir', 'autosave_format',
+        'autosave_results', 'autosave_directory', 'autosave_format',
         'live_processing')
     parse_func = execute_workflow_app_parser
     attributes_not_to_copy_to_slave_app = ['_shared_arrays', '_index',
@@ -160,7 +160,7 @@ class ExecuteWorkflowApp(BaseApp):
             RESULTS.update_shapes_from_scan_and_workflow()
             if self.get_param_value('autosave_results'):
                 RESULTS.prepare_files_for_saving(
-                    self.get_param_value('autosave_dir'),
+                    self.get_param_value('autosave_directory'),
                     self.get_param_value('autosave_format'))
         self.__initialize_arrays_from_shared_memory()
         self._redefine_multiprocessing_carryon()

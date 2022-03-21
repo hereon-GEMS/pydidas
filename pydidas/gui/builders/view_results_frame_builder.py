@@ -60,7 +60,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ['autosave_dir', 'selected_results']:
+        if param_key in ['selected_results']:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             _dict.update({'parent_widget': self._widgets['config'],
                           'row': self._widgets['config'].next_row()})
@@ -70,8 +70,6 @@ class ViewResultsFrameBuilder(BaseFrame):
                          width_text=CONFIG_WIDGET_WIDTH - 100,
                          width_total=CONFIG_WIDGET_WIDTH,
                          row=self._widgets['config'].next_row())
-        if param_key in ['autosave_dir', 'autosave_format']:
-            _dict['visible'] = False
         return _dict
 
     def build_frame(self):

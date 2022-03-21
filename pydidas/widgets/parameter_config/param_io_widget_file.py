@@ -74,7 +74,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         if self._flag_is_dir:
             _arg = QtWidgets.QFileDialog.ShowDirsOnly
             _func = QtWidgets.QFileDialog.getExistingDirectory
-            fname = _func(self, 'Name of file', None, _arg)
+            fname = _func(self, 'Name of directory', None, _arg)
         else:
             _arg = self._file_selection
             if self._flag_is_output:

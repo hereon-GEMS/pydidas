@@ -209,5 +209,5 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         of the autosae_results Parameter.
         """
         _vis = self.get_param_value('autosave_results')
-        for _key in ['autosave_dir', 'autosave_format']:
+        for _key in ['autosave_directory', 'autosave_format']:
             self.toggle_param_widget_visibility(_key, _vis)

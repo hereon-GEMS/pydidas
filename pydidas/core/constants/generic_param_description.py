@@ -1011,7 +1011,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     'processing. The results for each plugin will be saved '
                     'in a separete file (or files if multiple formats have '
                     'been selected).')},
-    'autosave_dir': {
+    'autosave_directory': {
         'type': 'Path',
         'default': '',
         'name': 'Autosave directory',

@@ -41,7 +41,7 @@ class TestAppParsers(unittest.TestCase):
         sys.argv = ['test']
         parsed = execute_workflow_app_parser()
         self.assertFalse(parsed['autosave_results'])
-        self.assertIsNone(parsed['autosave_dir'])
+        self.assertIsNone(parsed['autosave_directory'])
         self.assertIsNone(parsed['autosave_format'])
 
     def test_parse_execute_workflow_cmdline_arguments(self):
@@ -50,7 +50,7 @@ class TestAppParsers(unittest.TestCase):
         sys.argv = ['test', '--autosave', '-d', _dir, '-f', _format]
         parsed = execute_workflow_app_parser()
         self.assertTrue(parsed['autosave_results'])
-        self.assertEqual(parsed['autosave_dir'], _dir)
+        self.assertEqual(parsed['autosave_directory'], _dir)
         self.assertEqual(parsed['autosave_format'], _format)
 
 

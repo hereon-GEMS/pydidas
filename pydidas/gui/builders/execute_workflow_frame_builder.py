@@ -59,7 +59,7 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ['autosave_dir', 'selected_results']:
+        if param_key in ['autosave_directory', 'selected_results']:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             _dict.update({'parent_widget': self._widgets['config'],
                           'row': self._widgets['config'].next_row()})
@@ -69,7 +69,7 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
                          width_text=CONFIG_WIDGET_WIDTH - 100,
                          width_total=CONFIG_WIDGET_WIDTH,
                          row=self._widgets['config'].next_row())
-        if param_key in ['autosave_dir', 'autosave_format']:
+        if param_key in ['autosave_directory', 'autosave_format']:
             _dict['visible'] = False
         return _dict
 
@@ -98,7 +98,8 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             gridPos=(-1, 0, 1, 1), stretch=(1, 0),
             layout_kwargs={'alignment': None})
 
-        for _param in ['autosave_results', 'autosave_dir', 'autosave_format']:
+        for _param in ['autosave_results', 'autosave_directory',
+                       'autosave_format']:
             self.create_param_widget(self.get_param(_param),
                                      **self.__param_widget_config(_param))
 

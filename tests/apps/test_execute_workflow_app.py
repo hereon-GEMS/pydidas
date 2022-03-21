@@ -157,7 +157,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_prepare_run__master_not_live_w_autosave(self):
         app = ExecuteWorkflowApp()
         app.set_param_value('autosave_results', True)
-        app.set_param_value('autosave_dir', self._path)
+        app.set_param_value('autosave_directory', self._path)
         app.set_param_value('live_processing', False)
         app.prepare_run()
         self.assertTrue(os.path.exists(os.path.join(self._path, 'node_01.h5')))

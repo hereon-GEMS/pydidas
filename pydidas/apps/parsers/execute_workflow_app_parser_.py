@@ -49,8 +49,8 @@ def execute_workflow_app_parser(caller=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--autosave', action='store_true',
                         help=PARAMS['autosave_results']['tooltip'])
-    parser.add_argument('-autosave_dir', '-d',
-                        help=PARAMS['autosave_dir']['tooltip'])
+    parser.add_argument('-autosave_directory', '-d',
+                        help=PARAMS['autosave_directory']['tooltip'])
     parser.add_argument('-autosave_format', '-f',
                         help=PARAMS['autosave_format']['tooltip'])
     _args = dict(vars(parser.parse_args()))

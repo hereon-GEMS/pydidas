@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ['run_gui']
 
 import sys
+import warnings
 import multiprocessing as mp
 
 from qtpy import QtWidgets
@@ -100,7 +101,16 @@ def run_gui(app=None):
 
 
 if __name__ == '__main__':
+
     if mp.get_start_method() != 'spawn':
-        mp.set_start_method('spawn')
+        try:
+            mp.set_start_method('spawn', force=True)
+        except RuntimeError:
+            warnings.warn(
+                'Could not set the multiprocessing Process startup method to '
+                '"spawn". Multiprocessing with OpenGL will not work in Linux. To '
+                'solve this issue, restart the kernel and import pydidas before '
+                'starting any multiprocessing.')
+
     app = QtWidgets.QApplication(sys.argv)
     run_gui(app)

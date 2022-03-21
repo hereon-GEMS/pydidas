@@ -73,6 +73,15 @@ class FioMcaSeriesLoader(InputPlugin1d):
                   tooltip=('The number of files in each directory. A value of '
                            '"-1" will take the number of present files in the '
                            'first directory.')),
+        Parameter('use_absolute_energy', int, 0, choices=[True, False],
+                  name='use absolute energy scale', 
+                  tooltip=('Use an absolute energy scale for the results.')), 
+        Parameter('energy_offset', float, 0, name='Energy offset', unit='eV',
+                  tooltip=('The absolute offset in energy for the zeroth '
+                          'channel.')), 
+        Parameter('energy_delta', float, 1, name='Channel energy delta', 
+                  unit='eV',
+                  tooltip=('The width of each energy channels in eV.')), 
         )
     input_data_dim = None
     output_data_dim = 1
@@ -81,16 +90,9 @@ class FioMcaSeriesLoader(InputPlugin1d):
         super().__init__(*args, use_filename_pattern=True, **kwargs)
         self.set_param_value('live_processing', False)
         self._filepath_generator = None
+        self._filename_generator = None
+        self.__pattern = None
         self._config.update({'header_lines': 0})
-
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin's results.
-        """
-        self._image_metadata.update()
-        self._config['result_shape'] = self._image_metadata.final_shape
-        self._original_input_shape = (self._image_metadata.raw_size_y,
-                                      self._image_metadata.raw_size_x)
 
     def pre_execute(self):
         """
@@ -100,6 +102,7 @@ class FioMcaSeriesLoader(InputPlugin1d):
         self.__create_filepath_generator()
         self.__create_filename_generator()
         self.__determine_header_size()
+        self._config['energy_scale'] = None
 
     def __check_files_per_directory(self):
         """
@@ -124,31 +127,28 @@ class FioMcaSeriesLoader(InputPlugin1d):
         """
         _basepath = self.get_param_value('directory_path', dtype=str)
         _pattern = self.get_param_value('filename_pattern', dtype=str)
-        _offset = self.get_param_value('offset')
+        _offset = self.get_param_value('first_index')
         _len_pattern =_pattern.count('#')
         if _len_pattern < 1:
             raise AppConfigError('No pattern detected!')
-        _name = os.path.join(_basepath, _pattern)
-        _fpath = _name.replace('#' * _len_pattern,
-                               '{:' + str(_len_pattern) + 'd}')
-        self._filepath_generator = lambda index: _fpath.format(index + _offset)
+        _pattern = _pattern.replace('#' * _len_pattern,
+                                    '{:0' + str(_len_pattern) + 'd}')
+        self.__pattern = _pattern
+        _path = os.path.join(_basepath, _pattern)
+        self._filepath_generator = lambda index: _path.format(index + _offset)
 
     def __create_filename_generator(self):
         """
         Set up the generator that can create the file names to load
         MCA spectra.
         """
-        _pattern = self.get_param_value('filename_pattern', dtype=str)
         _suffix = self.get_param_value('filename_suffix', dtype=str)
-        _len_pattern =_pattern.count('#')
-        if _len_pattern < 1:
-            raise AppConfigError('No pattern detected!')
-        _pattern = _pattern.replace('#' * _len_pattern,
-                                    '{:' + str(_len_pattern) + 'd}')
-        _name = _pattern + '_mca_s' + '{:d}' + _suffix
+        _offset = self.get_param_value('first_index')
+        _name = self.__pattern + '_mca_s' + '{:d}' + _suffix
         self._filename_generator = (
-            lambda pathindex, fileindex: _name.format(pathindex, fileindex))
-
+            lambda pathindex, fileindex: _name.format(pathindex + _offset, 
+                                                      fileindex + 1))
+        
     def __determine_header_size(self):
         """
         Determine the size of the header in lines.
@@ -157,10 +157,10 @@ class FioMcaSeriesLoader(InputPlugin1d):
         with open(_fname, 'r') as _f:
             _lines = _f.readlines()
         _n = 0
-        while not _lines[0] == '! Data':
+        while not _lines[0].startswith('! Data'):
             _lines.pop(0)
             _n += 1
-        _n += 2
+        _n += 3
         self._config['header_lines'] = _n
 
     def execute(self, index, **kwargs):
@@ -184,10 +184,24 @@ class FioMcaSeriesLoader(InputPlugin1d):
         """
         _fname = self.get_filename(index)
         _data = np.loadtxt(_fname, skiprows=self._config['header_lines'])
+        if self._config['energy_scale'] is None:
+            self.__create_energy_scale(_data.size)
+                    
         _dataset = Dataset(_data, axis_labels=['energy'],
-                           axis_units=['channels'])
+                           axis_units=[self._config['energy_unit']],
+                           axis_ranges=[self._config['energy_scale']])
         return _dataset, kwargs
 
+    def __create_energy_scale(self, n):
+        if not self.get_param_value('use_absolute_energy'):
+            self._config['energy_unit'] = 'channels'
+            self._config['energy_scale'] = np.arange(n)
+            return
+        self._config['energy_unit'] = 'eV'
+        self._config['energy_scale'] = (
+            np.arange(n) * self.get_param_value('energy_delta')
+            + self.get_param_value('energy_offset'))
+            
     @copy_docstring(InputPlugin1d)
     def get_filename(self, index):
         """
@@ -212,7 +226,7 @@ class FioMcaSeriesLoader(InputPlugin1d):
             The number of bins in the input data.
         """
         self.pre_execute()
-        _data = self.execute(0)
+        _data, _ = self.execute(0)
         return _data.size
 
     def get_first_file_size(self):

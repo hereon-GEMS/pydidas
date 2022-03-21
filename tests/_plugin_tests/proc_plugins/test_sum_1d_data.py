@@ -112,7 +112,8 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value('lower_limit', _low)
         plugin.set_param_value('upper_limit', _high)
         plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
         self.assertEqual(_data[0], 0)
 
     def test_execute__sinlge_item_selection(self):
@@ -122,7 +123,8 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value('lower_limit', _low)
         plugin.set_param_value('upper_limit', _high)
         plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
         self.assertTrue(_data[0], self._data[_low])
 
     def test_execute__range(self):
@@ -132,7 +134,8 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value('lower_limit', _low)
         plugin.set_param_value('upper_limit', _high)
         plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
         self.assertTrue(_data[0], np.sum(self._data[_low:_high+1]))
 
 

@@ -28,7 +28,8 @@ __all__ = ['Sum1dData']
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import ParameterCollection, Parameter, get_generic_parameter
+from pydidas.core import (Dataset, ParameterCollection, Parameter,
+                          get_generic_parameter)
 from pydidas.plugins import ProcPlugin
 
 
@@ -80,9 +81,10 @@ class Sum1dData(ProcPlugin):
         """
         self._data = data
         _selection = self._data[self._get_index_range()]
-        if _selection.size == 0:
-            return np.array([0]), kwargs
-        return np.array([np.sum(_selection)]), kwargs
+        _sum = np.sum(_selection)
+        _new_data = Dataset([_sum], axis_labels=[''], axis_units=[''],
+                            metadata=data.metadata)
+        return _new_data, kwargs
 
     def _get_index_range(self):
         """

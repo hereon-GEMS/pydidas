@@ -25,6 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['RemoveOutliers']
 
+import warnings
 
 import numpy as np
 
@@ -83,15 +84,17 @@ class RemoveOutliers(ProcPlugin):
         _threshold = self.get_param_value('outlier_threshold')
         _data_p = np.roll(data, _width)
         _data_m = np.roll(data, - _width)
-        _data_low1 = ((data - _data_p) / data)[_width:-_width]
-        _data_low2 = ((data - _data_m) / data)[_width:-_width]
-        _low_outliers = np.where((_data_low1 <= - _threshold)
-                                 & (_data_low2 <= - _threshold))[0]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _data_low1 = ((data - _data_p) / data)[_width:-_width]
+            _data_low2 = ((data - _data_m) / data)[_width:-_width]
+            _low_outliers = np.where((_data_low1 <= - _threshold)
+                                     & (_data_low2 <= - _threshold))[0]
 
-        _data_high1 = ((data - _data_p) / _data_p)[_width:-_width]
-        _data_high2 = ((data - _data_m) / _data_m)[_width:-_width]
-        _high_outliers = np.where((_data_high1 >= _threshold)
-                                  & (_data_high2 >= _threshold))[0]
+            _data_high1 = ((data - _data_p) / _data_p)[_width:-_width]
+            _data_high2 = ((data - _data_m) / _data_m)[_width:-_width]
+            _high_outliers = np.where((_data_high1 >= _threshold)
+                                      & (_data_high2 >= _threshold))[0]
         _outliers = np.concatenate((_low_outliers, _high_outliers)) + _width
         data[_outliers] = (_data_p[_outliers] + _data_m[_outliers]) / 2
         return data, kwargs

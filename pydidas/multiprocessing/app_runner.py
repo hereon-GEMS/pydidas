@@ -181,7 +181,9 @@ class AppRunner(WorkerController):
         Create and start worker processes.
         """
         self._workers = [mp.Process(target=self._processor['func'],
-                                    args=self._processor['args'], daemon=True)
+                                    args=self._processor['args'], 
+                                    name=f'pydidas_worker-{i}',
+                                    daemon=True)
                           for i in range(self._n_workers)]
         for _worker in self._workers:
             logger.debug('Starting Worker')

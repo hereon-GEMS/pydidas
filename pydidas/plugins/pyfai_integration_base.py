@@ -27,10 +27,12 @@ __all__ = ['pyFAIintegrationBase', 'pyFAI_UNITS', 'pyFAI_METHOD']
 
 import os
 import pathlib
+import multiprocessing as mp
 
 import numpy as np
 import pyFAI
 import pyFAI.azimuthalIntegrator
+from silx.opencl.common import OpenCL
 
 from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
@@ -60,6 +62,8 @@ pyFAI_METHOD = {'CSR': ('bbox', 'csr', 'cython'),
                 'LUT OpenCL': ('bbox', 'lut', 'opencl'),
                 'LUT full': ('full', 'lut', 'cython'),
                 'LUT full OpenCL': ('full', 'lut', 'opencl')}
+
+OCL = OpenCL()
 
 
 class pyFAIintegrationBase(ProcPlugin):
@@ -100,6 +104,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 detector=EXP_SETTINGS.get_detector(),
                 wavelength=1e-10 * _lambda_in_A)
         self.load_and_store_mask()
+        self._prepare_pyfai_method()
 
     def load_and_store_mask(self):
         """
@@ -125,6 +130,25 @@ class pyFAIintegrationBase(ProcPlugin):
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
         else:
             self._mask = None
+
+    def _prepare_pyfai_method(self):
+        """
+        Prepare the method name and select OpenCL device if multiple devices
+        present.
+        """
+        _method = pyFAI_METHOD[self.get_param_value('int_method')]
+        self._config['method'] = _method
+        if _method[2] != 'opencl':
+            return
+        _name = mp.current_process().name
+        _platforms = [_platform.name for _platform in OCL.platforms]
+        if 'NVIDIA CUDA' in _platforms and _name.startswith('pydidas_worker-'):
+            _index = int(_name.strip('pydidas_worker-'))
+            _platform = OCL.get_platform('NVIDIA CUDA')
+            _n_device = len(_platform.devices)
+            _device = _index % _n_device
+            _method = _method + ((_platform.id, _device),)
+            self._config['method'] = _method
 
     def calculate_result_shape(self):
         """

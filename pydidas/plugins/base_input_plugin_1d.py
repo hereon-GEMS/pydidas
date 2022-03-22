@@ -165,7 +165,7 @@ class InputPlugin1d(BasePlugin):
                                     self.get_param_value('roi_xhigh')),
                                input_shape=self.input_shape)
         return _roi.roi
-    
+
     def get_single_ops_from_legacy(self):
         """
         Get the parameters for a single ROI and binning operation from
@@ -195,4 +195,3 @@ class InputPlugin1d(BasePlugin):
                                  for _r in RoiController1d(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
-        

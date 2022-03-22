@@ -95,7 +95,7 @@ class RoiController1d(RoiController):
             self._original_roi = self._roi
             self._original_input_shape = self._input_shape
             self._roi_key = roi2
-            self._input_shape = (self._roi[0].stop - self._roi[0].start)
+            self._input_shape = (self._roi[0].stop - self._roi[0].start, )
             self.create_roi_slices()
             self._merge_rois()
         except ValueError as _error:

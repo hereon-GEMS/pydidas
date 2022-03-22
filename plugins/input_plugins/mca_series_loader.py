@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['FioMcaSeriesLoader']
+__all__ = ['FioMcaLineScanSeriesLoader']
 
 import os
 
@@ -36,10 +36,12 @@ from pydidas.plugins import InputPlugin1d
 from pydidas.core.utils import copy_docstring
 
 
-class FioMcaSeriesLoader(InputPlugin1d):
+class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
     Load data frames from a series of Fio files with MCA data.
 
+    This plugin is designed to allow loading .fio files written by DESY's
+    SPOCK for a number of line scans.
 
     Parameters
     ----------
@@ -54,34 +56,48 @@ class FioMcaSeriesLoader(InputPlugin1d):
     file_stepping : int, optional
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
+    filename_suffix : str, optional
+        The end of the filename. The default is ".fio"
+    files_per_directory : int, optional
+        The number of files in each directory. This number determines when
+        pydidas will start looking in the next directory. A number of -1 will
+        automatically determine the number of files. The default is -1.
+    use_absolute_energy : bool, optional
+        Keyword to toggle an absolute energy scale for the channels. If False,
+        pydidas will simply use the channel number. The default is False.
+    energy_offset : float, optional
+        The offset for channel zero, if the absolute energy scale is used.
+        This value must be given in eV. The default is 0.
+    energy_delta : float, optional
+        The width of each energy channel. This value is given in eV and only
+        used when the absolute energy scale is enabled. The default is 1.
     """
-    plugin_name = 'Fio MCA series loader'
+    plugin_name = 'Fio MCA line scan series loader'
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
+        get_generic_parameter('live_processing'),
         get_generic_parameter('directory_path'),
         get_generic_parameter('filename_pattern'),
+        Parameter('filename_suffix', str, '.fio', name='The filename suffix',
+                  tooltip=('The suffix of the filename. This is anything after'
+                           ' the counter.')),
         get_generic_parameter('first_index'),
-        get_generic_parameter('live_processing'),
         get_generic_parameter('file_stepping'),
-        Parameter('filename_suffix', str, '.fio', name='The filename pattern',
-                  tooltip=('The pattern of the filename. Use a hash "#" for '
-                           'the wildcard which will be substituted with '
-                           'numbers.')),
         Parameter('files_per_directory', int, -1,
                   name='Files per directory',
                   tooltip=('The number of files in each directory. A value of '
                            '"-1" will take the number of present files in the '
                            'first directory.')),
         Parameter('use_absolute_energy', int, 0, choices=[True, False],
-                  name='use absolute energy scale', 
-                  tooltip=('Use an absolute energy scale for the results.')), 
+                  name='Use absolute energy scale',
+                  tooltip=('Use an absolute energy scale for the results.')),
         Parameter('energy_offset', float, 0, name='Energy offset', unit='eV',
                   tooltip=('The absolute offset in energy for the zeroth '
-                          'channel.')), 
-        Parameter('energy_delta', float, 1, name='Channel energy delta', 
+                          'channel.')),
+        Parameter('energy_delta', float, 1, name='Channel energy delta',
                   unit='eV',
-                  tooltip=('The width of each energy channels in eV.')), 
+                  tooltip=('The width of each energy channels in eV.')),
         )
     input_data_dim = None
     output_data_dim = 1
@@ -102,6 +118,7 @@ class FioMcaSeriesLoader(InputPlugin1d):
         self.__create_filepath_generator()
         self.__create_filename_generator()
         self.__determine_header_size()
+        self.__determine_roi()
         self._config['energy_scale'] = None
 
     def __check_files_per_directory(self):
@@ -146,9 +163,9 @@ class FioMcaSeriesLoader(InputPlugin1d):
         _offset = self.get_param_value('first_index')
         _name = self.__pattern + '_mca_s' + '{:d}' + _suffix
         self._filename_generator = (
-            lambda pathindex, fileindex: _name.format(pathindex + _offset, 
+            lambda pathindex, fileindex: _name.format(pathindex + _offset,
                                                       fileindex + 1))
-        
+
     def __determine_header_size(self):
         """
         Determine the size of the header in lines.
@@ -162,6 +179,16 @@ class FioMcaSeriesLoader(InputPlugin1d):
             _n += 1
         _n += 3
         self._config['header_lines'] = _n
+
+    def __determine_roi(self):
+        """
+        Determine the ROI based on the ROI Parameters.
+        """
+        if self.get_param_value('use_roi'):
+            self._config['roi'] = slice(self.get_param_value('roi_xlow'),
+                                        self.get_param_value('roi_xhigh'))           
+        else:
+            self._config['roi'] = None
 
     def execute(self, index, **kwargs):
         """
@@ -186,22 +213,31 @@ class FioMcaSeriesLoader(InputPlugin1d):
         _data = np.loadtxt(_fname, skiprows=self._config['header_lines'])
         if self._config['energy_scale'] is None:
             self.__create_energy_scale(_data.size)
-                    
         _dataset = Dataset(_data, axis_labels=['energy'],
                            axis_units=[self._config['energy_unit']],
                            axis_ranges=[self._config['energy_scale']])
+        if self._config['roi'] is not None:
+            _dataset = _dataset[self._config['roi']]
         return _dataset, kwargs
 
-    def __create_energy_scale(self, n):
+    def __create_energy_scale(self, num_bins):
+        """
+        Create the energy scale to be applied to the return Dataset.
+
+        Parameters
+        ----------
+        num_bins : int
+            The number of bins of the detector.
+        """
         if not self.get_param_value('use_absolute_energy'):
             self._config['energy_unit'] = 'channels'
-            self._config['energy_scale'] = np.arange(n)
+            self._config['energy_scale'] = np.arange(num_bins)
             return
         self._config['energy_unit'] = 'eV'
         self._config['energy_scale'] = (
-            np.arange(n) * self.get_param_value('energy_delta')
+            np.arange(num_bins) * self.get_param_value('energy_delta')
             + self.get_param_value('energy_offset'))
-            
+
     @copy_docstring(InputPlugin1d)
     def get_filename(self, index):
         """

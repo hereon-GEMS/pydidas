@@ -78,11 +78,11 @@ class RoiController:
 
     def __init__(self, **kwargs):
         """Initialization"""
-        self.__roi = None
-        self.__original_roi = None
-        self.__input_shape = kwargs.get('input_shape', None)
-        self.__original_input_shape = None
-        self.__roi_key = kwargs.get('roi', None)
+        self._roi = None
+        self._original_roi = None
+        self._input_shape = kwargs.get('input_shape', None)
+        self._original_input_shape = None
+        self._roi_key = kwargs.get('roi', None)
         self.create_roi_slices()
 
     @property
@@ -95,7 +95,7 @@ class RoiController:
         Union[None, tuple]
             The shape of the input image.
         """
-        return self.__input_shape
+        return self._input_shape
 
     @input_shape.setter
     def input_shape(self, shape):
@@ -109,7 +109,7 @@ class RoiController:
         """
         if not isinstance(shape, tuple):
             raise TypeError('The input shape must be a tuple.')
-        self.__input_shape = shape
+        self._input_shape = shape
 
     @property
     def roi(self):
@@ -121,7 +121,7 @@ class RoiController:
         tuple
             The tuple with the two slice objects to create the demanded ROI.
         """
-        return self.__roi
+        return self._roi
 
     @roi.setter
     def roi(self, _roi):
@@ -133,7 +133,7 @@ class RoiController:
         _roi : Union[tuple, list, str]
             ROI creation arguments.
         """
-        self.__roi_key = _roi
+        self._roi_key = _roi
         self.create_roi_slices()
 
     @property
@@ -148,10 +148,10 @@ class RoiController:
             If the ROI is not set, this property returns None. Else, it
             returns a tuple with (y_low, y_high, x_low, x_high) values.
         """
-        if self.__roi is None:
+        if self._roi is None:
             return None
-        return (self.__roi[0].start, self.__roi[0].stop,
-                self.__roi[1].start, self.__roi[1].stop)
+        return (self._roi[0].start, self._roi[0].stop,
+                self._roi[1].start, self._roi[1].stop)
 
     def apply_second_roi(self, roi2):
         """
@@ -169,20 +169,20 @@ class RoiController:
             If the ROI could not be added.
         """
         try:
-            self.__original_roi = self.__roi
-            self.__original_input_shape = self.__input_shape
-            self.__roi_key = roi2
-            self.__input_shape = (self.__roi[0].stop - self.__roi[0].start,
-                                  self.__roi[1].stop - self.__roi[1].start)
+            self._original_roi = self._roi
+            self._original_input_shape = self._input_shape
+            self._roi_key = roi2
+            self._input_shape = (self._roi[0].stop - self._roi[0].start,
+                                  self._roi[1].stop - self._roi[1].start)
             self.create_roi_slices()
-            self.__merge_rois()
+            self._merge_rois()
         except ValueError as _error:
-            self.__roi = self.__original_roi
+            self._roi = self._original_roi
             raise TypeError(f'Cannot add second ROI: {_error}')
         finally:
-            self.__input_shape = self.__original_input_shape
+            self._input_shape = self._original_input_shape
 
-    def __merge_rois(self):
+    def _merge_rois(self):
         """
         Merge two ROIs and store them as the new ROI.
 
@@ -197,8 +197,8 @@ class RoiController:
         # combining-two-slicing-operations
         _roi = []
         for _axis in [0, 1]:
-            _slice1 = self.__original_roi[_axis]
-            _slice2 = self.__roi[_axis]
+            _slice1 = self._original_roi[_axis]
+            _slice2 = self._roi[_axis]
             _step1 = _slice1.step if _slice1.step is not None else 1
             _step2 = _slice2.step if _slice2.step is not None else 1
             _step = _step1 * _step2
@@ -210,24 +210,24 @@ class RoiController:
                                  'Please change indices to positive numbers.')
             _stop = min(_slice1.start + _stop2 * _step1, _stop1)
             _roi.append(slice(_start, _stop, _step))
-        self.__roi = tuple(_roi)
+        self._roi = tuple(_roi)
 
     def create_roi_slices(self):
         """
         Create new ROI slice objects from the stored (keyword) arguments.
         """
-        if self.__roi_key is None:
-            self.__roi = None
+        if self._roi_key is None:
+            self._roi = None
             return
-        self.__check_types_roi_key()
-        self.__check_types_roi_key_entries()
-        self.__convert_str_roi_key_entries()
-        self.__check_length_of_roi_key_entries()
-        self.__convert_roi_key_to_slice_objects()
+        self._check_types_roi_key()
+        self._check_types_roi_key_entries()
+        self._convert_str_roi_key_entries()
+        self._check_length_of_roi_key_entries()
+        self._convert_roi_key_to_slice_objects()
         if self.input_shape is not None:
-            self.__modulate_roi_keys()
+            self._modulate_roi_keys()
 
-    def __check_types_roi_key(self):
+    def _check_types_roi_key(self):
         """
         Check the type of the ROI and convert if required.
 
@@ -236,30 +236,30 @@ class RoiController:
         ValueError
             If the ROI is not a list or tuple.
         """
-        if self.__roi_key is None:
+        if self._roi_key is None:
             return
-        if isinstance(self.__roi_key, str):
-            self.__convert_str_roi_key()
-        if isinstance(self.__roi_key, tuple):
-            self.__roi_key = list(self.__roi_key)
-        if not isinstance(self.__roi_key, list):
-            _msg = error_msg(self.__roi_key, 'Not of type (list, tuple).')
+        if isinstance(self._roi_key, str):
+            self._convert_str_roi_key()
+        if isinstance(self._roi_key, tuple):
+            self._roi_key = list(self._roi_key)
+        if not isinstance(self._roi_key, list):
+            _msg = error_msg(self._roi_key, 'Not of type (list, tuple).')
             raise ValueError(_msg)
 
-    def __convert_str_roi_key(self):
+    def _convert_str_roi_key(self):
         """
         Convert a string ROI key to a list of entries and strip any leading
         and trailing brackets and empty characters.
         """
-        self.__strip_string_roi_key()
-        self.__roi_key = [item.strip() for item in self.__roi_key.split(',')]
+        self._strip_string_roi_key()
+        self._roi_key = [item.strip() for item in self._roi_key.split(',')]
 
-    def __strip_string_roi_key(self):
+    def _strip_string_roi_key(self):
         """
         Strip a ROI key of type string of any leadind and trailing chars which
         do not belong (i.e. brackets, spaces etc.)
         """
-        _tmpstr = self.__roi_key
+        _tmpstr = self._roi_key
         _valid_chars = ['0', '1', '2', '3', '4', '5', '6',
                         '7', '8', '9', '-']
         # strip leading chars:
@@ -273,9 +273,9 @@ class RoiController:
                     and _tmpstr.count(')') == _tmpstr.count('slice(')):
                 break
             _tmpstr = _tmpstr[:-1]
-        self.__roi_key = _tmpstr
+        self._roi_key = _tmpstr
 
-    def __check_types_roi_key_entries(self):
+    def _check_types_roi_key_entries(self):
         """
         Check that only integer and slice objects are present in the roi_key.
 
@@ -286,17 +286,17 @@ class RoiController:
         ValueError
             If datatypes apart from integer and slice are encountered.
         """
-        roi_dtypes = {type(e) for e in self.__roi_key}
+        roi_dtypes = {type(e) for e in self._roi_key}
         roi_dtypes.discard(int)
         roi_dtypes.discard(slice)
         roi_dtypes.discard(str)
         roi_dtypes.discard(type(None))
         if roi_dtypes != set():
-            _msg = error_msg(self.__roi_key,
+            _msg = error_msg(self._roi_key,
                              'Non-integer, non-slice datatypes encountered.')
             raise ValueError(_msg)
 
-    def __convert_str_roi_key_entries(self):
+    def _convert_str_roi_key_entries(self):
         """
         Check the roi_key for string entries and parse these.
 
@@ -309,7 +309,7 @@ class RoiController:
             If the conversion of the string to a slice or interger object
             was not sucessful.
         """
-        _tmpkeys = copy.copy(self.__roi_key)
+        _tmpkeys = copy.copy(self._roi_key)
         _newkeys = []
         try:
             while len(_tmpkeys) > 0:
@@ -330,10 +330,10 @@ class RoiController:
                 else:
                     _newkeys.append(int(key))
         except ValueError as _ve:
-            raise ValueError(error_msg(self.__roi_key, _ve)) from _ve
-        self.__roi_key = _newkeys
+            raise ValueError(error_msg(self._roi_key, _ve)) from _ve
+        self._roi_key = _newkeys
 
-    def __check_length_of_roi_key_entries(self):
+    def _check_length_of_roi_key_entries(self):
         """
         Verify that the length of the entries is correct to create 2 slice
         objects.
@@ -345,17 +345,17 @@ class RoiController:
             slice objects.
         """
         _n = 0
-        for key in self.__roi_key:
+        for key in self._roi_key:
             if isinstance(key, (int, type(None))):
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
         if _n != 4:
-            _msg = error_msg(self.__roi_key, 'The input does not have the '
+            _msg = error_msg(self._roi_key, 'The input does not have the '
                              'correct length')
             raise ValueError(_msg)
 
-    def __convert_roi_key_to_slice_objects(self):
+    def _convert_roi_key_to_slice_objects(self):
         """
         Convert the roi_key to slice objects.
 
@@ -364,7 +364,7 @@ class RoiController:
         ValueError
             If the conversion does not succeed.
         """
-        _roi = copy.copy(self.__roi_key)
+        _roi = copy.copy(self._roi_key)
         _out = []
         for _dim in [1, 2]:
             try:
@@ -377,14 +377,14 @@ class RoiController:
                 elif isinstance(_roi[0], slice):
                     _out.append(_roi.pop(0))
                 else:
-                    _msg = error_msg(self.__roi_key, 'Cannot create the slice '
+                    _msg = error_msg(self._roi_key, 'Cannot create the slice '
                                       f'object for dimension {_dim}.')
                     raise ValueError(_msg)
             except ValueError as _ve:
-                raise ValueError(error_msg(self.__roi_key, _ve)) from _ve
-        self.__roi = tuple(_out)
+                raise ValueError(error_msg(self._roi_key, _ve)) from _ve
+        self._roi = tuple(_out)
 
-    def __modulate_roi_keys(self):
+    def _modulate_roi_keys(self):
         """
         Modulate the ROI keys by the input shape to remove negative
         indices and limit it to the image dimensions.
@@ -400,8 +400,8 @@ class RoiController:
         _new_roi = []
         for _axis in [0, 1]:
             _mod = self.input_shape[_axis]
-            _start = apply_neg_mod(self.__roi[_axis].start, _mod, True)
-            _step = self.__roi[_axis].step
-            _stop = apply_neg_mod(self.__roi[_axis].stop, _mod, False)
+            _start = apply_neg_mod(self._roi[_axis].start, _mod, True)
+            _step = self._roi[_axis].step
+            _stop = apply_neg_mod(self._roi[_axis].stop, _mod, False)
             _new_roi.append(slice(_start, _stop, _step))
-        self.__roi = tuple(_new_roi)
+        self._roi = tuple(_new_roi)

@@ -75,6 +75,8 @@ class ObjectWithParameterCollection(
         """
         _state = {'params': self.params.get_copy(),
                   '_config': copy(self._config)}
+        if 'shared_memory' in _state['_config']:
+            _state['_config']['shared_memory'] = {}
         return _state
 
     def __setstate__(self, state):

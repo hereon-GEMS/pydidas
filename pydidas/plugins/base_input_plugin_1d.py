@@ -26,9 +26,9 @@ __all__ = ['InputPlugin1d']
 
 import os
 
-from ..core import get_generic_parameter, AppConfigError
+from ..core import get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
-from ..managers import ImageMetadataManager
+from ..image_io import RoiController1d
 from .base_plugin import BasePlugin
 
 
@@ -129,11 +129,7 @@ class InputPlugin1d(BasePlugin):
         """
 
         _n = self.get_raw_input_size()
-        if self.get_param_value('use_roi'):
-            _n_result = self.get_roi_size()
-        else:
-            _n_result = _n
-        self._config['result_shape'] = (_n_result, )
+        self._config['result_shape'] = (_n, )
         self._original_input_shape = (_n, )
 
     def get_raw_input_size(self):
@@ -152,21 +148,51 @@ class InputPlugin1d(BasePlugin):
         """
         raise NotImplementedError
 
-    def get_roi_size(self):
+    def _get_own_roi(self):
         """
-        Get the size of the ROI in points.
+        Get the ROI defined within the plugin.
+
+        Note: This method will not check whether the Plugin has the required
+        Parameters to define a ROI. This check must be performed by the user
+        or calling method.
 
         Returns
         -------
-        int
-            The number of points in the ROI.
+        tuple
+            The tuple with two slice objects which define the image ROI.
         """
-        _low = self.get_param_value('roi_xlow')
-        if _low is None:
-            _low = 0
-        _low = np.mod(_low, _n)
-        _high = self.get_param_value('roi_xhigh')
-        if _high is None or _high > _n:
-            _high = _n
-        _high = max(0, _high)
-        return _high - _low + 1
+        _roi = RoiController1d(roi=(self.get_param_value('roi_xlow'),
+                                    self.get_param_value('roi_xhigh')),
+                               input_shape=self.input_shape)
+        return _roi.roi
+    
+    def get_single_ops_from_legacy(self):
+        """
+        Get the parameters for a single ROI and binning operation from
+        combining all legacy operations on the data.
+
+        Returns
+        -------
+        roi : tuple
+            The ROI which needs to be applied to the original image.
+        binning : int
+            The binning factor which needs to be applied to the original image.
+        """
+        _roi = RoiController1d(roi=(0, self._original_input_shape[0]),
+                               input_shape=self._original_input_shape)
+        _binning = 1
+        _all_ops = self._legacy_image_ops[:]
+        while len(_all_ops) > 0:
+            _op_name, _op = _all_ops.pop(0)
+            if _op_name == 'binning':
+                _x = int(_roi.roi[1].stop - _roi.roi[1].start)
+                _dx = int(((_x // _binning) % _op) * _binning)
+                _tmproi = (0, _x - _dx)
+                _roi.apply_second_roi(_tmproi)
+                _binning *= _op
+            if _op_name == 'roi':
+                _roi_unbinned = [_binning * _r
+                                 for _r in RoiController1d(roi=_op).roi_coords]
+                _roi.apply_second_roi(_roi_unbinned)
+        return _roi.roi, _binning
+        

@@ -422,7 +422,6 @@ class TestRoiController(unittest.TestCase):
         _x2 = (43, -4)
         obj = RoiController(roi=[slice(*_y1), slice(*_x1)])
         _roi2 = [slice(*_y2), slice(*_x2)]
-        print(obj.roi, _roi2)
         with self.assertRaises(TypeError):
             obj.apply_second_roi(_roi2)
         self.assertEqual(obj.roi, (slice(*_y1), slice(*_x1)))

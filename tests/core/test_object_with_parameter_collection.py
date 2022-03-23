@@ -28,6 +28,7 @@ import io
 import sys
 import copy
 import pickle
+import multiprocessing as mp
 
 from pydidas.core import (ObjectWithParameterCollection, Parameter,
                           ParameterCollection)
@@ -276,6 +277,21 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         for _key, _value in _state['_config'].items():
             self.assertEqual(_value, obj._config[_key])
 
+    def test_getstate__with_shared_memory(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config['test'] = 'Test'
+        obj._config['shared_memory'] = {'test': mp.Value('I'),
+                                        'test2': mp.Value('f')}
+        _state = obj.__getstate__()
+        for _key, _param in _state['params'].items():
+            self.assertEqual(_param.value, obj.get_param_value(_key))
+        for _key, _value in _state['_config'].items():
+            if _key == 'shared_memory':
+                self.assertEqual(_value, {})
+            else:
+                self.assertEqual(_value, obj._config[_key])
+
     def test_setstate(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
@@ -290,6 +306,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
     def test_pickle(self):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
+        obj._config['shared_memory'] = {'test': mp.Value('I')}
         new_obj = pickle.loads(pickle.dumps(obj))
         self.assertIsInstance(new_obj, ObjectWithParameterCollection)
         for _key, _param in obj.params.items():

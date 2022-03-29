@@ -33,7 +33,8 @@ from qtpy import QtWidgets, QtCore
 
 from ...core import (Parameter, ParameterCollection, ParameterCollectionMixIn,
                      get_generic_parameter)
-from ...core.constants import CONFIG_WIDGET_WIDTH, QT_REG_EXP_SLICE_VALIDATOR
+from ...core.constants import (CONFIG_WIDGET_WIDTH, QT_REG_EXP_SLICE_VALIDATOR,
+                               QT_REG_EXP_FLOAT_SLICE_VALIDATOR)
 from ...core.utils import SignalBlocker
 from ...experiment import ScanSetup
 from ...workflow import WorkflowResults, WorkflowResultsSelector
@@ -125,7 +126,9 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         self._config = {'widget_visibility': False,
                         'result_ndim': -1,
                         'plot_type': '1D plot',
-                        'n_slice_params': 0}
+                        'n_slice_params': 0,
+                        'selection_by_data_values': True,
+                        'validator': QT_REG_EXP_FLOAT_SLICE_VALIDATOR}
         self._active_node = -1
         if select_results_param is not None:
             self.add_param(select_results_param)
@@ -143,7 +146,6 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         _layout.setContentsMargins(0, 5, 0, 0)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.setLayout(_layout)
-
         self.create_label('label_results', 'Results:', fontsize=11,
                           underline=True)
         self.create_param_widget(self.get_param('selected_results'),
@@ -154,13 +156,18 @@ class ResultSelectionWidget(QtWidgets.QWidget,
             title='Arrangement of results:')
         self.create_any_widget(
             'result_info',  ReadOnlyTextWidget, gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,fixedHeight=200,
+            fixedWidth=CONFIG_WIDGET_WIDTH,fixedHeight=300,
             alignment=QtCore.Qt.AlignTop, visible=False)
         self.create_radio_button_group(
             'radio_plot_type',
             ['1D plot', 'group of 1D plots', '2D full axes', '2D data subset'],
             rows=2, columns=2, gridPos=(-1, 0, 1, 1), visible=False,
             title='Result plot type:', fixedWidth=CONFIG_WIDGET_WIDTH - 10)
+        self.create_radio_button_group(
+            'radio_data_selection',
+            ['Data values', 'Axis index'],
+            columns=2, gridPos=(-1, 0, 1, 1), visible=False,
+            title='Data selection:', fixedWidth=CONFIG_WIDGET_WIDTH - 10)
         _w = QtWidgets.QFrame()
         _w.setLayout(QtWidgets.QGridLayout())
         self.add_any_widget('plot_ax_group', _w)
@@ -183,6 +190,8 @@ class ResultSelectionWidget(QtWidgets.QWidget,
             self.__select_type_of_plot)
         self._widgets['radio_arrangement'].new_button_index.connect(
             self.__arrange_results_in_timeline_or_scan_shape)
+        self._widgets['radio_data_selection'].new_button_label.connect(
+            self.__modify_data_selection)
         self.param_widgets['plot_ax1'].currentIndexChanged.connect(
             partial(self.__selected_new_plot_axis, 1))
         self.param_widgets['plot_ax2'].currentIndexChanged.connect(
@@ -204,6 +213,8 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         self.param_widgets['selected_results'].setCurrentText('No selection')
         with SignalBlocker(self._widgets['radio_plot_type']):
             self._widgets['radio_plot_type'].select_by_index(0)
+        with SignalBlocker(self._widgets['radio_data_selection']):
+            self._widgets['radio_data_selection'].select_by_index(0)
         with SignalBlocker(self._widgets['radio_arrangement']):
             self._widgets['radio_arrangement'].select_by_index(0)
         self.__set_derived_widget_visibility(False)
@@ -281,6 +292,28 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         _ax2_used = (self._config['plot_type'] =='2D full axes')
         return _ax1_used, _ax2_used
 
+    @QtCore.Slot(str)
+    def __modify_data_selection(self, label):
+        """
+        Received the signal that the data selection modality (data values 
+        / indices) has been changed and update the internal reference.
+
+        Parameters
+        ----------
+        label : str
+            The label how to select the data.
+        """
+        self._config['selection_by_data_values'] = (label == 'Data values')
+        if label == 'Data values':
+            self._config['validator'] = QT_REG_EXP_FLOAT_SLICE_VALIDATOR
+        else:
+            self._config['validator'] = QT_REG_EXP_SLICE_VALIDATOR
+        for _dim in range(self._config['n_slice_params']):
+            _refkey = f'plot_slice_{_dim}'
+            self.param_widgets[_refkey].setValidator(
+                self._config['validator'])
+
+        
     @QtCore.Slot(int)
     def __selected_new_node(self, index):
         """
@@ -320,6 +353,7 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         self._widgets['result_info'].setVisible(visible)
         self._widgets['radio_plot_type'].setVisible(visible)
         self._widgets['radio_arrangement'].setVisible(visible)
+        self._widgets['radio_data_selection'].setVisible(visible)
         self.param_composite_widgets['plot_ax1'].setVisible(visible)
         self.param_composite_widgets['plot_ax2'].setVisible(
             visible and (self._config['plot_type'] == 2))
@@ -412,6 +446,8 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         full array.
         """
         self._selector.select_active_node(self._active_node)
+        self._selector.set_param_value(
+            'use_data_range', self._config['selection_by_data_values'])
         for _dim in range(self._config['result_ndim']):
             self._selector.set_param_value(
                 f'data_slice_{_dim}',
@@ -492,7 +528,7 @@ class ResultSelectionWidget(QtWidgets.QWidget,
                     _param, parent_widget=self._widgets['plot_ax_group'],
                     **_param_widget_config(_refkey))
                 self.param_widgets[_refkey].setValidator(
-                    QT_REG_EXP_SLICE_VALIDATOR)
+                    self._config['validator'])
         self._config['n_slice_params'] = max(self._config['n_slice_params'],
                                              RESULTS.ndims[self._active_node])
         self.__change_slice_param_widget_visibility()

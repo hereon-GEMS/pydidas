@@ -219,6 +219,23 @@ class _WorkflowResults(QtCore.QObject):
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
         return self.__source_hash
 
+    def get_result_ranges(self, node_id):
+        """
+        Get the data ranges for the requested node id.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID for which the result ranges should be returned.
+
+        Returns
+        -------
+        dict
+            The dictionary with the ranges with dimension keys and ranges 
+            values.
+        """
+        return self.__composites[node_id].axis_ranges.copy()
+
     def get_results(self, node_id):
         """
         Get the combined results for the requested node_id.

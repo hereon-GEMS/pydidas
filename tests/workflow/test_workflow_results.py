@@ -100,6 +100,7 @@ class TestWorkflowResults(unittest.TestCase):
         return _shape1, _shape2, _results
 
     def create_composites(self):
+        RES.update_shapes_from_scan_and_workflow()
         RES._WorkflowResults__composites[1] = (
             Dataset(np.zeros(self._scan_n + self._input_shape)))
         RES._WorkflowResults__composites[2] = (
@@ -193,6 +194,18 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertEqual(_shape1, RES.shapes[1])
         self.assertFalse(
             os.path.exists(os.path.join(self._tmpdir, 'node_02.h5')))
+
+    def test_get_result_ranges(self):
+        _, _, _data = self.generate_test_datasets()
+        for _key, _dset in _data.items():
+            RES._WorkflowResults__composites[_key] = _dset
+            _ranges = RES.get_result_ranges(_key)
+            for _dim, _range in _ranges.items():
+                if _range is None:
+                    self.assertEqual(_range, _dset.axis_ranges[_dim])
+                else:
+                    self.assertTrue(np.allclose(_range, 
+                                                _dset.axis_ranges[_dim]))
 
     def test_get_results(self):
         _tmpres = np.random.random((50, 50))

@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ['QT_PALETTES', 'QT_STYLES', 'STANDARD_FONT_SIZE',
            'QT_DEFAULT_ALIGNMENT', 'QT_COMBO_BOX_SIZE_POLICY',
            'QT_REG_EXP_FLOAT_VALIDATOR', 'QT_REG_EXP_INT_VALIDATOR',
-           'QT_REG_EXP_SLICE_VALIDATOR']
+           'QT_REG_EXP_SLICE_VALIDATOR', 'QT_REG_EXP_FLOAT_SLICE_VALIDATOR']
 
 from qtpy import QtGui, QtCore, QtWidgets
 
@@ -86,4 +86,7 @@ QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
         '-?\\d*|None|nan', QtCore.QRegularExpression.CaseInsensitiveOption))
 
 QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
-    QtCore.QRegularExpression('(-?\\d*,?:?){0,30}'))
+    QtCore.QRegularExpression('((-?\\d*:?){1,3},?)*'))
+
+QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
+    QtCore.QRegularExpression('((-?\\d*\\.?\\d*:?){1,3},?)*'))

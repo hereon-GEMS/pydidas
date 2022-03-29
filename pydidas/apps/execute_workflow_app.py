@@ -151,13 +151,14 @@ class ExecuteWorkflowApp(BaseApp):
             for _key, _val in self._config['exp_vals'].items():
                 EXP.set_param_value(_key, _val)
         if not self.slave_mode:
+            RESULTS.update_shapes_from_scan_and_workflow()
+            RESULT_SAVER.set_active_savers_and_title([])
             self._config['tree_str_rep'] = TREE.export_to_string()
             self._config['scan_vals'] = SCAN.get_param_values_as_dict()
             self._config['exp_vals'] = EXP.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_calc_buffer_size()
             self.__initialize_shared_memory()
-            RESULTS.update_shapes_from_scan_and_workflow()
             if self.get_param_value('autosave_results'):
                 RESULTS.prepare_files_for_saving(
                     self.get_param_value('autosave_directory'),

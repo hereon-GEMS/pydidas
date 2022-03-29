@@ -127,6 +127,16 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertIsInstance(obj, WorkflowResultsSelector)
         self.assertEqual(_param, obj.get_param('result_n_dim'))
 
+    def test_re_pattern__int_selection(self):
+        obj = WorkflowResultsSelector()
+        _str = '1, 4, 5:7, 5:5 : 8, 5, 9'
+        self.assertTrue(bool(obj._re_pattern.fullmatch(_str)))
+
+    def test_re_pattern__float_selection(self):
+        obj = WorkflowResultsSelector()
+        _str = '1.6, 4.5, 5.7:7.9, 5.9:5:8.2, 5.2, 9, 1:1.2:4.2'
+        self.assertTrue(bool(obj._re_pattern.fullmatch(_str)))
+
     def test_reset(self):
         obj = WorkflowResultsSelector()
         obj._active_node = 12
@@ -151,7 +161,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj._active_node = 2
         obj._calc_and_store_ndim_of_results()
         self.assertEqual(obj._config['result_ndim'],
-                         len(self._scan_n) + len(self._result2_shape))
+                          len(self._scan_n) + len(self._result2_shape))
 
     def test_calc_and_store_ndim_of_results__with_timeline(self):
         self.populate_WorkflowResults()
@@ -160,7 +170,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj.set_param_value('use_scan_timeline', True)
         obj._calc_and_store_ndim_of_results()
         self.assertEqual(obj._config['result_ndim'],
-                         1 + len(self._result2_shape))
+                          1 + len(self._result2_shape))
 
     def test_select_active_node(self):
         _node = 2
@@ -252,6 +262,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '1:-1')
@@ -263,6 +274,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '1, 3, 5, 6, 7')
@@ -274,6 +286,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '1, 3, 5, 1, 5')
@@ -285,6 +298,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '0:2, 4:6')
@@ -296,17 +310,19 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '1:4, 3, 4, 6:8')
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 6)
 
-    def test_get_single_slice_object__slic_ew_open_end(self):
+    def test_get_single_slice_object__slice_w_open_end(self):
         self.populate_WorkflowResults()
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', '1:')
@@ -318,6 +334,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _node = 1
         _index = 4
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         obj._npoints = list(RES.shapes[obj._active_node])
         obj.set_param_value(f'data_slice_{_index}', ':-1')
@@ -325,96 +342,168 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertEqual(_slice.size, RES.shapes[_node][_index] - 1)
 
     def test_get_single_slice_object__slice_w_stepping(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       _index = 4
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       obj._npoints = list(RES.shapes[obj._active_node])
-       obj.set_param_value(f'data_slice_{_index}', '0:12:2')
-       _slice = obj._get_single_slice_object(_index)
-       self.assertEqual(_slice.size, 6)
+        self.populate_WorkflowResults()
+        _node = 1
+        _index = 4
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        obj._npoints = list(RES.shapes[obj._active_node])
+        obj.set_param_value(f'data_slice_{_index}', '0:12:2')
+        _slice = obj._get_single_slice_object(_index)
+        self.assertEqual(_slice.size, 6)
 
     def test_get_single_slice_object__slice_w_stepping_only(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       _index = 4
-       _arrsize = RES.shapes[_node][_index]
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       obj._npoints = list(RES.shapes[obj._active_node])
-       obj.set_param_value(f'data_slice_{_index}', '::2')
-       _slice = obj._get_single_slice_object(_index)
-       self.assertEqual(_slice.size, _arrsize // 2 + _arrsize % 2)
+        self.populate_WorkflowResults()
+        _node = 1
+        _index = 4
+        _arrsize = RES.shapes[_node][_index]
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        obj._npoints = list(RES.shapes[obj._active_node])
+        obj.set_param_value(f'data_slice_{_index}', '::2')
+        _slice = obj._get_single_slice_object(_index)
+        self.assertEqual(_slice.size, _arrsize // 2 + _arrsize % 2)
 
     def test_update_selection__simple(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       for _index in range(RES.ndims[_node]):
-           obj.set_param_value(f'data_slice_{_index}', '1:')
-       obj._update_selection()
-       _delta = [RES.shapes[_node][_i] - obj._selection[_i].size
-                 for _i in range(RES.ndims[_node])]
-       self.assertEqual(_delta, [1] * RES.ndims[_node])
+        self.populate_WorkflowResults()
+        _node = 1
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1:')
+        obj._update_selection()
+        _delta = [RES.shapes[_node][_i] - obj._selection[_i].size
+                  for _i in range(RES.ndims[_node])]
+        self.assertEqual(_delta, [1] * RES.ndims[_node])
 
     def test_update_selection__with_use_scan_timeline(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       obj = WorkflowResultsSelector()
-       obj.set_param_value('use_scan_timeline', True)
-       obj.select_active_node(_node)
-       for _index in range(RES.ndims[_node] - 2):
-           obj.set_param_value(f'data_slice_{_index}', '1:')
-       obj._update_selection()
-       _delta = [RES.shapes[_node][_i + 2] - obj._selection[_i].size
-                 for _i in range(RES.ndims[_node] - 2)]
-       self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
-       self.assertEqual(obj._selection[0].size,
+        self.populate_WorkflowResults()
+        _node = 1
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_scan_timeline', True)
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node] - 2):
+            obj.set_param_value(f'data_slice_{_index}', '1:')
+        obj._update_selection()
+        _delta = [RES.shapes[_node][_i + 2] - obj._selection[_i].size
+                  for _i in range(RES.ndims[_node] - 2)]
+        self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
+        self.assertEqual(obj._selection[0].size,
                         self._scan_n[0] * self._scan_n[1] * self._scan_n[2] - 1)
 
+    def test_get_best_index_for_value__low_val(self):
+        _val = 42
+        _range = np.arange(45, 105)
+        obj = WorkflowResultsSelector()
+        _match = obj._get_best_index_for_value(_val, _range)
+        self.assertEqual(_match, 0)
+
+    def test_get_best_index_for_value__high_val(self):
+        _val = 42
+        _range = np.arange(0, 37)
+        obj = WorkflowResultsSelector()
+        _match = obj._get_best_index_for_value(_val, _range)
+        self.assertEqual(_match, _range.size - 1)
+
+    def test_get_best_index_for_value__middle_val(self):
+        _val = 42
+        _range = np.arange(12, 47, 0.5)
+        _target = (_val - _range[0]) / (_range[1] - _range[0])
+        obj = WorkflowResultsSelector()
+        _match = obj._get_best_index_for_value(_val, _range)
+        self.assertEqual(_match, _target)
+
+    def test_convert_values_to_indices(self):
+        _target_range = np.arange(12, 78)
+        _data = 12 - np.arange(0, 89, 0.5)
+        _start = _data[_target_range[0]]
+        _stop = _data[_target_range[-1]]
+        obj = WorkflowResultsSelector()        
+        obj._config['active_index'] = 0
+        obj._WorkflowResultsSelector__active_ranges = {0: _data}
+        obj._config['index_defaults'] = [0, _data.size, 1]
+        _str = [f'{_start}:{_stop}']
+        _res = obj._convert_values_to_indices(_str)
+        self.assertEqual(_res[0], [_target_range[0], _target_range[-1]])
+        
     def test_active_dims__no_active_dim(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       for _index in range(RES.ndims[_node]):
-           obj.set_param_value(f'data_slice_{_index}', '1')
-       self.assertEqual(obj.active_dims, [])
+        self.populate_WorkflowResults()
+        _node = 1
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        self.assertEqual(obj.active_dims, [])
 
-    def test_active_dims__one_active_dim(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       _dim = 2
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       for _index in range(RES.ndims[_node]):
-           obj.set_param_value(f'data_slice_{_index}', '1')
-       obj.set_param_value(f'data_slice_{_dim}', '1:')
-       self.assertEqual(obj.active_dims, [_dim])
+    def test_active_dims__one_active_dim__w_indices(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _dim = 2
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        obj.set_param_value(f'data_slice_{_dim}', '1:')
+        self.assertEqual(obj.active_dims, [_dim])
 
-    def test_active_dims__two_active_dim(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       _dim1 = 2
-       _dim2 = 0
-       _res = [_dim1, _dim2]
-       _res.sort()
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       for _index in range(RES.ndims[_node]):
-           obj.set_param_value(f'data_slice_{_index}', '1')
-       obj.set_param_value(f'data_slice_{_dim1}', '1:')
-       obj.set_param_value(f'data_slice_{_dim2}', ':')
-       self.assertEqual(obj.active_dims, _res)
+    def test_active_dims__one_active_dim__w_data_range(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _dim = 3
+        _value = RES.get_result_ranges(_node)[_dim][4]
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', True)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        obj.set_param_value(f'data_slice_{_dim}', f'{_value}:')
+        self.assertEqual(obj.active_dims, [_dim])
 
-    def test_active_dims__three_active_dim(self):
+    def test_active_dims__two_active_dim__w_indices(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _dim1 = 2
+        _dim2 = 0
+        _res = [_dim1, _dim2]
+        _res.sort()
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        obj.set_param_value(f'data_slice_{_dim1}', '1:')
+        obj.set_param_value(f'data_slice_{_dim2}', ':')
+        self.assertEqual(obj.active_dims, _res)
+
+    def test_active_dims__two_active_dim__w_data_range(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _dim1 = 2
+        _dim2 = 0
+        _res = [_dim1, _dim2]
+        _res.sort()
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', True)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        obj.set_param_value(f'data_slice_{_dim1}', ':')
+        obj.set_param_value(f'data_slice_{_dim2}', ':')
+        self.assertEqual(obj.active_dims, _res)
+
+    def test_active_dims__three_active_dim__w_indices(self):
         self.populate_WorkflowResults()
         _node = 1
         _res = [0, 2, 3]
         _res.sort()
         obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
         obj.select_active_node(_node)
         for _index in range(RES.ndims[_node]):
             obj.set_param_value(f'data_slice_{_index}', '1')
@@ -422,16 +511,30 @@ class TestWorkflowResultSelector(unittest.TestCase):
             obj.set_param_value(f'data_slice_{_dim}', '1:')
         self.assertEqual(obj.active_dims, _res)
 
-    def test_selection_property(self):
-       self.populate_WorkflowResults()
-       _node = 1
-       obj = WorkflowResultsSelector()
-       obj.select_active_node(_node)
-       _slices = obj.selection
-       self.assertIsInstance(_slices, tuple)
-       for _item in _slices:
-           self.assertIsInstance(_item, np.ndarray)
+    def test_active_dims__three_active_dim__w_data_range(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _res = [0, 2, 3]
+        _res.sort()
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', True)
+        obj.select_active_node(_node)
+        for _index in range(RES.ndims[_node]):
+            obj.set_param_value(f'data_slice_{_index}', '1')
+        for _dim in _res:
+            obj.set_param_value(f'data_slice_{_dim}', ':')
+        self.assertEqual(obj.active_dims, _res)
 
+    def test_selection_property(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        obj = WorkflowResultsSelector()
+        obj.set_param_value('use_data_range', False)
+        obj.select_active_node(_node)
+        _slices = obj.selection
+        self.assertIsInstance(_slices, tuple)
+        for _item in _slices:
+            self.assertIsInstance(_item, np.ndarray)
 
 
 if __name__ == '__main__':

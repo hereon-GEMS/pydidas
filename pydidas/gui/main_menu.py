@@ -459,7 +459,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self.__restore_mainwindow_state(state['main'])
 
     def __restore_mainwindow_state(self, state):
-        """
+        """     
         Restore the main window's state from saved information.
 
         Parameters

@@ -1072,6 +1072,15 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('Keyword to toggle using a scan timeline with only one '
                     'dimension instead of all scan dimensions.')},
+    'use_data_range': {
+        'type': int,
+        'default': True,
+        'name': 'Use data range',
+        'choices': [True, False],
+        'unit': '',
+        'allow_None': False,
+        'tooltip': ('Keyword to toggle using a the data range instead of  '
+                    'the indices for selecting data.')},
     ############################
     ## Result selection settings
     ############################

@@ -148,6 +148,8 @@ class BaseFrameWithApp(BaseFrame):
                 _newcfg[_key] = (f'::range::{_item.start}::{_item.stop}'
                                  f'::{_item.step}')
         _cfg.update(_newcfg)
+        if 'shared_memory' in _cfg:
+            _cfg['shared_memory'] = {}
         return _cfg
 
     def restore_state(self, state):
@@ -165,8 +167,11 @@ class BaseFrameWithApp(BaseFrame):
         """
         for _key, _val in state['app']['params'].items():
             self._app.set_param_value(_key, _val)
-        self._app._config = self.__process_app_config_from_import(
+        _restored_cfg = self.__process_app_config_from_import(
             state['app']['config'].copy())
+        self._app._config = _restored_cfg
+        if 'shared_memory' in _restored_cfg:
+            self._app.initialize_shared_memory()
         super().restore_state(state)
 
     def __process_app_config_from_import(self, config):

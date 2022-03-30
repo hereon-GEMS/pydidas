@@ -158,7 +158,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._config['exp_vals'] = EXP.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_calc_buffer_size()
-            self.__initialize_shared_memory()
+            self.initialize_shared_memory()
             if self.get_param_value('autosave_results'):
                 RESULTS.prepare_files_for_saving(
                     self.get_param_value('autosave_directory'),
@@ -218,7 +218,7 @@ class ExecuteWorkflowApp(BaseApp):
         self._config['buffer_n'] = min(_n_dataset_in_buffer, _n_data,
                                        self._mp_tasks.size)
 
-    def __initialize_shared_memory(self):
+    def initialize_shared_memory(self):
         """
         Initialize the shared memory arrays based on the buffer size and
         the result shapes.

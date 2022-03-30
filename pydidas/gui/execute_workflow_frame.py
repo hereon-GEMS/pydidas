@@ -122,13 +122,13 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         self.__set_proc_widget_visibility_for_running(True)
         logger.debug('Starting AppRunner')
         self._runner = AppRunner(self._app)
-        self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_finished.connect(self._apprunner_finished)
         self._runner.sig_results.connect(
             self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
+        self._runner.sig_finished.connect(self._apprunner_finished)
+        self._runner.sig_final_app_state.connect(self._set_app)
         logger.debug('Running AppRunner')
         self._runner.start()
 
@@ -153,10 +153,13 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         logger.debug('Telling AppRunner to exit.')
         self._runner.exit()
         self._runner = None
+        print('Runner exited successfully')
         logger.debug('AppRunner successfully shut down.')
         self.set_status('Finished processing of full workflow.')
         self._finish_processing()
+        print('Finshed processing')
         self.update_plot()
+        print('Updated plot')
 
     @QtCore.Slot()
     def __update_result_node_information(self):

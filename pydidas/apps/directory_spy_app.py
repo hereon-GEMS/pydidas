@@ -156,7 +156,7 @@ class DirectorySpyApp(BaseApp):
         if self.get_param_value('use_bg_file'):
             self._load_bg_file()
         if not self.slave_mode:
-            self.__initialize_shared_memory()
+            self.initialize_shared_memory()
         self.__initialize_array_from_shared_memory()
         if not self.get_param_value('scan_for_all'):
             self.__find_current_index()
@@ -249,7 +249,7 @@ class DirectorySpyApp(BaseApp):
         return np.where(self._det_mask,
                         self._config['det_mask_val'], image)
 
-    def __initialize_shared_memory(self):
+    def initialize_shared_memory(self):
         """
         Initialize the shared memory arrays based on the buffer size and
         the result shapes.

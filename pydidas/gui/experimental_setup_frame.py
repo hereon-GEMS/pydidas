@@ -78,11 +78,11 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
             _w.io_edited.disconnect()
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
 
-    def update_param_value(self, key, value):
+    def set_param_value_and_widget(self, key, value):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the ParameterConfigWidgetMixin.update_param_value
+        This method overloads the ParameterConfigWidgetMixin.set_param_value_and_widget
         method to process the linked energy / wavelength parameters.
 
         Parameters
@@ -168,11 +168,13 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
             to ignore. True will show the warning. The default is True.
         """
         if det is not None:
-            self.update_param_value('detector_name', det.name)
-            self.update_param_value('detector_npixx', det.shape[1])
-            self.update_param_value('detector_npixy', det.shape[0])
-            self.update_param_value('detector_pxsizex', 1e6 * det.pixel2)
-            self.update_param_value('detector_pxsizey', 1e6 * det.pixel1)
+            self.set_param_value_and_widget('detector_name', det.name)
+            self.set_param_value_and_widget('detector_npixx', det.shape[1])
+            self.set_param_value_and_widget('detector_npixy', det.shape[0])
+            self.set_param_value_and_widget('detector_pxsizex',
+                                            1e6 * det.pixel2)
+            self.set_param_value_and_widget('detector_pxsizey',
+                                            1e6 * det.pixel1)
         elif show_warning:
             critical_warning('No pyFAI Detector',
                              'No detector selected in pyFAI. Cannot copy '
@@ -197,7 +199,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
                                ['detector_rot1', _geo.rotation1().value()],
                                ['detector_rot2', _geo.rotation2().value()],
                                ['detector_rot3', _geo.rotation3().value()]]:
-                self.update_param_value(key, np.float32(value))
+                self.set_param_value_and_widget(key, np.float32(value))
         elif show_warning:
             critical_warning('pyFAI geometry invalid',
                             'The pyFAI geometry is not valid and cannot be '
@@ -221,7 +223,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         _geo = model.fittedGeometry()
         if _geo.isValid():
             _wavelength = _geo.wavelength().value() * 1e10
-            self.update_param_value('xray_wavelength', _wavelength)
+            self.set_param_value_and_widget('xray_wavelength', _wavelength)
         elif show_warning:
             critical_warning('pyFAI geometry invalid',
                             'The X-ray energy / wavelength cannot be set '

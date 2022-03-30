@@ -137,7 +137,7 @@ class ParameterWidgetsMixIn:
             _args = (0, config['valign'] | config['halign'])
         return _args
 
-    def update_param_value(self, key, value):
+    def set_param_value_and_widget(self, key, value):
         """
         Update a parameter value both in the Parameter and the widget.
 

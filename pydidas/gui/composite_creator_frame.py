@@ -285,8 +285,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             self._image_metadata.update()
             _shape = (self._image_metadata.raw_size_y,
                       self._image_metadata.raw_size_x)
-            self.update_param_value('raw_image_shape', _shape)
-            self.update_param_value('images_per_file', 1)
+            self.set_param_value_and_widget('raw_image_shape', _shape)
+            self.set_param_value_and_widget('images_per_file', 1)
             self._config['input_configured'] = True
         _finalize_flag = self._config['input_configured']
         self.__update_n_total()
@@ -339,12 +339,12 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
-            self.update_param_value('hdf5_key', dset)
+            self.set_param_value_and_widget('hdf5_key', dset)
             self.__selected_hdf5_key()
         else:
             self._config['input_configured'] = False
             self.__finalize_selection(False)
-            self.update_param_value('hdf5_key', '')
+            self.set_param_value_and_widget('hdf5_key', '')
             self.__clear_entries(['images_per_file', 'n_total',
                                   'hdf5_dataset_shape', 'hdf5_key',
                                   'hdf5_first_image_num',
@@ -371,7 +371,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         if hdf5_flag:
             dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
             if dset is not None:
-                self.update_param_value('bg_hdf5_key', dset)
+                self.set_param_value_and_widget('bg_hdf5_key', dset)
                 self._config['bg_configured'] = True
         self.toggle_param_widget_visibility('bg_hdf5_key', hdf5_flag)
         self.toggle_param_widget_visibility('bg_hdf5_frame', hdf5_flag)
@@ -383,9 +383,9 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         try:
             self._image_metadata.update()
-            self.update_param_value('hdf5_dataset_shape',
+            self.set_param_value_and_widget('hdf5_dataset_shape',
                                     self._image_metadata.hdf5_dset_shape)
-            self.update_param_value('images_per_file',
+            self.set_param_value_and_widget('images_per_file',
                                     self._image_metadata.images_per_file)
             self._config['input_configured'] = True
         except AppConfigError:
@@ -541,7 +541,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             return
         self._image_metadata.update_input_data()
         _n_per_file = self._image_metadata.images_per_file
-        self.update_param_value('images_per_file', _n_per_file)
+        self.set_param_value_and_widget('images_per_file', _n_per_file)
         self.__update_n_total()
 
     def __update_composite_dim(self, dim):
@@ -557,8 +557,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         num1 = self.param_widgets[f'composite_n{dim}'].get_value()
         num2 = int(np.ceil(_n_total / abs(num1)))
         dim2 = 'y' if dim == 'x' else 'x'
-        self.update_param_value(f'composite_n{dim2}', num2)
-        self.update_param_value(f'composite_n{dim}', abs(num1))
+        self.set_param_value_and_widget(f'composite_n{dim2}', num2)
+        self.set_param_value_and_widget(f'composite_n{dim}', abs(num1))
         if ((num1 - 1) * num2 >= _n_total
                 or num1 * (num2 - 1) >= _n_total):
             self.__update_composite_dim(dim2)
@@ -579,7 +579,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                                            'The list of fils is empty. Please'
                                            ' verify the selection.')
             return
-        self.update_param_value('n_files', self._filelist.n_files)
+        self.set_param_value_and_widget('n_files', self._filelist.n_files)
         self.__update_n_total()
 
     def __update_n_total(self):
@@ -590,7 +590,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             return
         _n_total = (self._image_metadata.images_per_file *
                     self._filelist.n_files)
-        self.update_param_value('n_total', _n_total)
+        self.set_param_value_and_widget('n_total', _n_total)
         self.__update_composite_dim(self.get_param_value('composite_dir'))
         self.__check_exec_enable()
 

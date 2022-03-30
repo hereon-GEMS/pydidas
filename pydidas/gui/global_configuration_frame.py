@@ -92,7 +92,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
             return
         for _param_key in self.params:
             _value = self.q_settings_get_global_value(_param_key)
-            self.update_param_value(_param_key, _value)
+            self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
         qm = QtWidgets.QMessageBox
@@ -118,4 +118,4 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
             The new value which was set externally.
         """
         value = self._qsettings_convert_value_type(param_key, value)
-        self.update_param_value(param_key, value)
+        self.set_param_value_and_widget(param_key, value)

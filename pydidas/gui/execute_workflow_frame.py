@@ -50,7 +50,8 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
     """
     default_params = get_generic_param_collection(
         'selected_results', 'saving_format', 'enable_overwrite')
-
+    params_not_to_restore = ['selected_results']
+    
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         ExecuteWorkflowFrameBuilder.__init__(self, parent)

@@ -43,7 +43,7 @@ class ObjectWithParameterCollection(
     This class can be inherited by any class which requires a
     ParameterCollection and access methods defined for it in the
     ParameterCollectionMixIn.
-    """
+    """  
     def __init__(self):
         PydidasQsettingsMixin.__init__(self)
         QtCore.QObject.__init__(self)

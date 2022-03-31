@@ -187,7 +187,6 @@ class BasePlugin(ObjectWithParameterCollection):
             A dictionary with Parameter refkeys and the associated values.
         """
         _state = self.__dict__.copy()
-        print(self.__class__, _state)
         return _state
 
     def __setstate__(self, state):

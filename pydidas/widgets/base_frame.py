@@ -59,6 +59,7 @@ class BaseFrame(QtWidgets.QFrame,
     """
     show_frame = True
     menuicon = 'qt-std::7'
+    params_not_to_restore = []
     status_msg = QtCore.Signal(str)
     default_params = ParameterCollection()
 
@@ -149,8 +150,10 @@ class BaseFrame(QtWidgets.QFrame,
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
+        print('do not restore:', self.__class__.__name__, self.params_not_to_restore)
         for _key, _val in state['params'].items():
-            if _key in self.param_widgets:
-                self.set_param_value_and_widget(_key, _val)
-            else:
-                self.set_param_value(_key, _val)
+            if _key not in self.params_not_to_restore:
+                if _key in self.param_widgets:
+                    self.set_param_value_and_widget(_key, _val)
+                else:
+                    self.set_param_value(_key, _val)

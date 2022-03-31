@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the AsciiSaver Plugin which can be used to save 1d data in ASCII
-format with a metadata header.
+Module with the ChiSaver Plugin which can be used to save 1d data in ASCII
+format with a Chi header.
 """
 
 __author__ = "Malte Storm"
@@ -32,9 +32,9 @@ from pydidas.core import Dataset
 from pydidas.plugins import OutputPlugin
 
 
-class AsciiSaver(OutputPlugin):
+class ChiSaver(OutputPlugin):
     """
-    An Ascii saver to export one-dimensional data.
+    An Ascii saver to export one-dimensional data with a chi file header.
 
     This class is designed to store data passed down from other processing
     plugins into Ascii data.
@@ -57,7 +57,7 @@ class AsciiSaver(OutputPlugin):
 
     def execute(self, data, **kwargs):
         """
-        Save data to file.
+        Save data to file
 
         Parameters
         ----------
@@ -77,22 +77,29 @@ class AsciiSaver(OutputPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if data.ndim > 1:
-            raise TypeError('Only 1-d data can be saved as ASCII')
+            raise TypeError('Only 1-d data can be saved as ASCII.')
         self._config['global_index'] = kwargs.get('global_index', None)
         _fname = self._get_output_filename()
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
             data.axis_ranges[0] = np.arange(data.size)
+            data.axis_labels[0] = 'index'
+        _title = os.path.basename(_fname) + '\n'
+        _unit = data.axis_units[0]
+        _axislabel = (str(data.axis_labels[0]) +
+                      (f' ({_unit})\n' if _unit is not None and len(_unit) > 0
+                      else '\n'))
+        _dataunit = data.data_unit
+        _datalabel = ('Intensity' +
+                      (f' ({_dataunit})\n' if _dataunit is not None
+                       and len(_dataunit) > 0 else '\n'))
+        _npoints = f'\t{data.size}\n'
         with open(_fname, 'w') as _file:
-            _file.write('# Metadata:\n')
-            for _key, _val in data.metadata:
-                _file.write(f'# {_key}: {_val}\n')
-            _file.write('#\n')
-            _file.write(f'# Axis label: {data.axis_labels[0]}\n')
-            _file.write(f'# Axis unit: {data.axis_units[0]}\n')
-            _file.write('# --- end of metadata ---\n')
-            _file.write('# axis\tvalue\n')
+            _file.write(_title)
+            _file.write(_axislabel)
+            _file.write(_datalabel)
+            _file.write(_npoints)
             for _x, _y in zip(data.axis_ranges[0], data.array):
-                _file.write(f'{_x}\t{_y}\n')
+                _file.write(f'{_x:e}\t{_y:e}\n')
         return data, kwargs

@@ -603,7 +603,7 @@ class EmptyDataset(np.ndarray):
             'axis_ranges': self.__get_axis_item_repr('axis_ranges'),
             'axis_units': self.__get_axis_item_repr('axis_units'),
             'metadata': _meta_repr,
-            'data_unit': self.data_unit,
+            'data_unit': 'data_unit: ' + self.data_unit,
             'array': self.__array__().__repr__()}
         _repr = (self.__class__.__name__ + '(\n'
                  + ',\n'.join(_str for _str in _info.values())

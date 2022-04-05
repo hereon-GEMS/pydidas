@@ -26,12 +26,17 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .average_images_window import *
 from .global_config_window import *
 from .global_documentation_window import *
 from .export_eiger_pixelmask import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import average_images_window
+__all__.extend(average_images_window.__all__)
+del average_images_window
+
 from . import global_config_window
 __all__.extend(global_config_window.__all__)
 del global_config_window

@@ -525,9 +525,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         keys = keys if keys != 'all' else list(self.params.keys())
         self.__reset_params(keys)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-                     'last_file', 'hdf5_first_image_num',
-                     'hdf5_last_image_num','bg_hdf5_key', 'bg_hdf5_frame',
-                     'bg_file']:
+                     'last_file', 'bg_hdf5_key', 'bg_hdf5_frame', 'bg_file']:
             if _key in keys:
                 self.toggle_param_widget_visibility(_key, not hide)
         self.__check_exec_enable()

@@ -1030,7 +1030,14 @@ GENERIC_PARAM_DESCRIPTION = {
                     'workflow has been excuted. All data will be saved in a '
                     'single folder for each run with one file for each '
                     'plugin.')},
-
+    'output_fname': {
+        'type': 'Path',
+        'default': '',
+        'name': 'Output filename',
+        'choices': None,
+        'unit': '',
+        'allow_None': False,
+        'tooltip': 'The output filename for the data export.'},
     ############################
     ## Result selection settings
     ############################

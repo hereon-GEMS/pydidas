@@ -40,7 +40,8 @@ from pydidas.widgets import (CentralWidgetStack, excepthook)
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.gui import utils
 from pydidas.gui.windows import (
-    GlobalDocumentationWindow, GlobalConfigWindow, ExportEigerPixelmaskWindow)
+    GlobalDocumentationWindow, GlobalConfigWindow, ExportEigerPixelmaskWindow,
+    AverageImagesWindow)
 
 
 SCAN = ScanSetup()
@@ -166,6 +167,8 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['open_settings'] = QtWidgets.QAction('&Settings', self)
         self._actions['export_eiger_pixel_mask'] = (
             QtWidgets.QAction('&Export Eiger Pixelmask', self))
+        self._actions['average_images'] = (
+            QtWidgets.QAction('&Average images', self))
 
         self._actions['open_documentation_window'] = QtWidgets.QAction(
             'Open documentation in separate window', self)
@@ -190,6 +193,8 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.show_window, 'global_config'))
         self._actions['export_eiger_pixel_mask'].triggered.connect(
             self._action_export_eiger_pixel_mask)
+        self._actions['average_images'].triggered.connect(
+            self._action_average_images)
         self._actions['open_documentation_window'].triggered.connect(
             partial(self.show_window, 'documentation'))
         self._actions['open_documentation_browser'].triggered.connect(
@@ -216,6 +221,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _extras_menu = _menu.addMenu('&Extras')
         _extras_menu.addAction(self._actions['open_settings'])
         _extras_menu.addAction(self._actions['export_eiger_pixel_mask'])
+        _extras_menu.addAction(self._actions['average_images'])
         _menu.addMenu(_extras_menu)
 
         _help_menu = _menu.addMenu('&Help')
@@ -276,8 +282,16 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Open dialogues to export an Eiger pixelmask.
         """
-        self._child_windows['tmp_export'] = ExportEigerPixelmaskWindow()
-        self._child_windows['tmp_export'].show()
+        self._child_windows['tmp'] = ExportEigerPixelmaskWindow()
+        self._child_windows['tmp'].show()
+
+    @QtCore.Slot()
+    def _action_average_images(self):
+        """
+        Open dialogue to average multiple frames and store them in a new file.
+        """
+        self._child_windows['tmp'] = AverageImagesWindow()
+        self._child_windows['tmp'].show()
 
     @QtCore.Slot()
     def _action_open_doc_in_browser(self):

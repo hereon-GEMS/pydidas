@@ -122,7 +122,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 return
             logger.warning(
                 ('The locally defined detector mask file "%s" does not exist.'
-                 ' Falling back  to the default defined in the global '
+                 ' Falling back to the default defined in the global '
                  'settings.'), _mask_param)
         if os.path.isfile(_mask_qsetting):
             self._mask = read_image(_mask_qsetting)

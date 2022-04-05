@@ -37,9 +37,6 @@ from ...widgets import BaseFrame
 from ...widgets.dialogues import critical_warning
 
 
-# class ExportEigerPixelmaskWindow(QtWidgets.QMainWindow):
-
-
 class ExportEigerPixelmaskWindow(BaseFrame):
     """
     Window with a simple dialogue to export the Pixelmask from an Eiger
@@ -95,7 +92,6 @@ class ExportEigerPixelmaskWindow(BaseFrame):
                              (f'The specified input file "{_master_fname}" '
                               'could not be found.'))
             return
-        _export_fname = self.get_param_value('output_filename', str)
         if not os.path.exists(_out_dir):
             critical_warning('Output directory not found',
                              (f'The specified output directory "{_out_dir}" '

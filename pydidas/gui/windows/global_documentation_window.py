@@ -31,6 +31,7 @@ from ...widgets import (PydidasHtmlDocView, ScrollArea,
                         get_pyqt_icon_from_str_reference)
 from .pydidas_window import PydidasWindow
 
+
 class GlobalDocumentationWindow(PydidasWindow):
     """
     Window with a webbrowser which shows the global documentation in html

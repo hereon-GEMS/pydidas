@@ -46,7 +46,7 @@ class ChiSaver(OutputPlugin):
     directory_path : Union[pathlib.Path, str]
         The output directory.
     """
-    plugin_name = 'ASCII Saver'
+    plugin_name = 'Chi Saver'
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = 1

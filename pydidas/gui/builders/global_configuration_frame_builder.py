@@ -56,14 +56,14 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
                                 valign_text=QtCore.Qt.AlignBottom)
         _options = dict(width_text=self.TEXT_WIDTH, width_io=80,
                         width_total=CONFIG_WIDGET_WIDTH)
-        _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 0))
+        _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 1))
 
         self.create_label('title', 'Global settings\n', fontsize=14,
-                          bold=True, gridPos=(0, 0, 1, 0))
+                          bold=True, gridPos=(0, 0, 1, 1))
 
         self.create_button('but_reset', 'Restore defaults',
                            icon=self.style().standardIcon(59),
-                           gridPos=(-1, 0, 1, 0), alignment=None)
+                           gridPos=(-1, 0, 1, 1), alignment=None)
 
         self.create_label('section_multiprocessing',
                           'Multiprocessing settings', **_section_options)

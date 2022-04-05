@@ -64,7 +64,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
     def test_get_grid_pos_default(self):
         obj = self.get_widget()
         _grid_pos = _get_grid_pos(obj)
-        self.assertEqual(_grid_pos, (0, 0, 1, 2))
+        self.assertEqual(_grid_pos, (0, 0, 1, 1))
 
     def test_get_grid_pos_gridPos(self):
         _gridPos = (2, 7, 5, 3)
@@ -136,7 +136,7 @@ class TestCreateWidgetsMixin(unittest.TestCase):
     def test_get_widget_layout_args(self):
         obj = self.get_widget()
         _grid_pos = _get_grid_pos(obj)
-        self.assertEqual(_grid_pos, (0, 0, 1, 2))
+        self.assertEqual(_grid_pos, (0, 0, 1, 1))
 
     def test_init(self):
         obj = TestWidget()

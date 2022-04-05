@@ -304,7 +304,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_initialize_shared_memory(self):
         app = DirectorySpyApp()
-        app._DirectorySpyApp__initialize_shared_memory()
+        app.initialize_shared_memory()
         for _key in ['flag', 'width', 'height']:
             self.assertIsInstance(app._config['shared_memory'][_key],
                                   mp.sharedctypes.Synchronized)
@@ -313,7 +313,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_initialize_arrays_from_shared_memory(self):
         app = DirectorySpyApp()
-        app._DirectorySpyApp__initialize_shared_memory()
+        app.initialize_shared_memory()
         app._DirectorySpyApp__initialize_array_from_shared_memory()
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))

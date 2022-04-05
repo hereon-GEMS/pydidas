@@ -220,7 +220,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
-        app._ExecuteWorkflowApp__initialize_shared_memory()
+        app.initialize_shared_memory()
         for key in app._config['shared_memory']:
             self.assertIsInstance(app._config['shared_memory'][key],
                                   mp.sharedctypes.SynchronizedArray)
@@ -230,7 +230,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
-        app._ExecuteWorkflowApp__initialize_shared_memory()
+        app.initialize_shared_memory()
         app._ExecuteWorkflowApp__initialize_arrays_from_shared_memory()
         _n = app._config['buffer_n']
         for key in app._shared_arrays:

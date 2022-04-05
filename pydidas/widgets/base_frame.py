@@ -150,7 +150,6 @@ class BaseFrame(QtWidgets.QFrame,
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        print('do not restore:', self.__class__.__name__, self.params_not_to_restore)
         for _key, _val in state['params'].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:

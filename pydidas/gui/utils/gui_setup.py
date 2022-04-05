@@ -25,7 +25,7 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['configure_qtapp_namespace', 'get_pydidas_icon',
-           'update_qtapp_font_size', 'apply_tooltop_event_filter']
+           'update_qtapp_font_size', 'apply_tooltip_event_filter']
 
 import os
 
@@ -110,10 +110,12 @@ def update_qtapp_font_size():
     _app.setFont(_font)
 
 
-def apply_tooltop_event_filter():
+def apply_tooltip_event_filter():
     """
     Apply the pydidas.core.utils.QTooltipEventFilter to the QApplication
     to force the desired handling of tooltip.
+
+    Without this filter
     """
     _app = QtWidgets.QApplication.instance()
     _app.installEventFilter(QTooltipEventFilter(_app))

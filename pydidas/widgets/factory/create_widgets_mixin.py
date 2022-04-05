@@ -275,7 +275,6 @@ def _get_widget_layout_args(parent, **kwargs):
         return [kwargs.get('stretch', 0), _alignment]
     if isinstance(parent.layout(), QtWidgets.QStackedLayout):
         return []
-
     _grid_pos = _get_grid_pos(parent, **kwargs)
     if _alignment is not None:
         return [*_grid_pos, _alignment]
@@ -309,18 +308,15 @@ def _get_grid_pos(parent, **kwargs):
     _grid_pos = kwargs.get('gridPos', None)
     _default_row = (0 if parent.layout().count() == 0
                     else parent.layout().rowCount())
-
     if _grid_pos is None:
         _grid_pos = (kwargs.get('row', _default_row),
                      kwargs.get('column', 0),
                      kwargs.get('n_rows', 1),
-                     kwargs.get('n_columns', 2))
-
+                     kwargs.get('n_columns', 1))
     if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
         raise WidgetLayoutError(
             'The passed value for "gridPos" is not of type tuple and/or not'
             ' of length 4.')
-
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row, ) + _grid_pos[1:4]
     return _grid_pos

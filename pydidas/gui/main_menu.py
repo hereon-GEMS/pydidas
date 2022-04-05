@@ -69,7 +69,7 @@ class MainMenu(QtWidgets.QMainWindow):
         super().__init__(parent)
         utils.configure_qtapp_namespace()
         utils.update_qtapp_font_size()
-        utils.apply_tooltop_event_filter()
+        utils.apply_tooltip_event_filter()
         sys.excepthook = excepthook
 
         self._child_windows = {}
@@ -114,8 +114,6 @@ class MainMenu(QtWidgets.QMainWindow):
         window and create it.
         """
         self._child_windows['global_config'] = GlobalConfigWindow(self)
-
-
 
     def _create_menu(self):
         """
@@ -459,7 +457,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self.__restore_mainwindow_state(state['main'])
 
     def __restore_mainwindow_state(self, state):
-        """     
+        """
         Restore the main window's state from saved information.
 
         Parameters

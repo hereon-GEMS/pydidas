@@ -331,7 +331,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8)), axis_labels=[0, 1, 2],
                       axis_units=['a', 'b', 'c'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                   3 * np.arange(8)])
+                                    3 * np.arange(8)])
         _new = obj.transpose()
         for _i1, _i2 in [[0, 2], [2, 0], [1, 1]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -346,7 +346,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                   3 * np.arange(8), -1 * np.arange(9)])
+                                    3 * np.arange(8), -1 * np.arange(9)])
         _new = obj.transpose()
         for _i1, _i2 in [[0, 3], [3, 0], [1, 2], [2, 1]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -361,7 +361,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                   3 * np.arange(8), -1 * np.arange(9)])
+                                    3 * np.arange(8), -1 * np.arange(9)])
         _new = obj.transpose(2, 1, 0, 3)
         for _i1, _i2 in [[0, 2], [2, 0]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -376,7 +376,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 1, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                   3 * np.arange(8), -1 * np.arange(9)])
+                                    3 * np.arange(8), -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [1, 1], [3, 2]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -390,7 +390,7 @@ class TestDataset(unittest.TestCase):
                       axis_labels=[0, 1, 2, 3, 4],
                       axis_units=['a', 'b', 'c', 'd', 'e'],
                       axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
-                                   [6], -1 * np.arange(9)])
+                                    [6], -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -404,7 +404,7 @@ class TestDataset(unittest.TestCase):
                       axis_labels=[0, 1, 2, 3, 4],
                       axis_units=['a', 'b', 'c', 'd', 'e'],
                       axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
-                                   [6], -1 * np.arange(9)])
+                                    [6], -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -591,6 +591,19 @@ class TestDataset(unittest.TestCase):
         _max = np.amax(obj, axis=0)
         self.assertIsInstance(_max, Dataset)
         self.assertEqual(_max.shape, obj.shape[1:])
+
+    def test_copy_dataset(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array, axis_ranges=[0, 1, 2])
+        obj.metadata = {'test': 'something'}
+        obj2 = copy.copy(obj)
+        for _key, _item in obj2.__dict__.items():
+            _target = getattr(obj, _key)
+            if isinstance(_item, dict):
+                for _local_key, _local_item in _item.items():
+                    self.assertEqual(_local_item, _target[_local_key])
+            else:
+                self.assertEqual(_item, _target)
 
 
 if __name__ == "__main__":

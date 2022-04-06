@@ -107,16 +107,14 @@ class EmptyDataset(np.ndarray):
         if obj is None or self.shape == tuple():
             return
         self.metadata = getattr(obj, 'metadata', {})
+        self.data_unit = getattr(obj, 'data_unit', '')
         self.getitem_key = getattr(obj, 'getitem_key', None)
-
         self.__check_and_set_default_axis_attributes()
         self._keys = {_key: copy(getattr(obj, _key, _default_vals(self.ndim)))
                       for _key in ['axis_labels', 'axis_ranges', 'axis_units']}
-
         if self.getitem_key is not None:
             self.__modify_axis_keys()
         self.__update_keys_for_flattened_array()
-
         for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
             setattr(self, f'_{_key}', self._keys[_key])
         if isinstance(obj, EmptyDataset):
@@ -491,7 +489,7 @@ class EmptyDataset(np.ndarray):
         str
             The data unit.
         """
-        return self.__data_unit
+        return self._data_unit
 
     @data_unit.setter
     def data_unit(self, data_unit):
@@ -510,7 +508,7 @@ class EmptyDataset(np.ndarray):
         """
         if not isinstance(data_unit, str):
             raise TypeError('Data unit must be a string.')
-        self.__data_unit = data_unit
+        self._data_unit = data_unit
 
     @property
     def metadata(self):
@@ -522,7 +520,7 @@ class EmptyDataset(np.ndarray):
         integer
             The image ID.
         """
-        return self.__metadata
+        return self._metadata
 
     @metadata.setter
     def metadata(self, metadata):
@@ -541,7 +539,7 @@ class EmptyDataset(np.ndarray):
         """
         if not (isinstance(metadata, dict) or metadata is None):
             raise TypeError('Metadata must be a dictionary or None.')
-        self.__metadata = metadata
+        self._metadata = metadata
 
     @property
     def array(self):
@@ -597,7 +595,7 @@ class EmptyDataset(np.ndarray):
         _edgeitems = 2 if self.ndim > 1 else 3
         np.set_printoptions(threshold=20, edgeitems=_edgeitems)
         _meta_repr = '\n'.join(
-            self.__get_item_representation('metadata', self.__metadata))
+            self.__get_item_representation('metadata', self._metadata))
         _info = {
             'axis_labels': self.__get_axis_item_repr('axis_labels'),
             'axis_ranges': self.__get_axis_item_repr('axis_ranges'),
@@ -654,7 +652,6 @@ class EmptyDataset(np.ndarray):
         list
             A list with a representation for each line.
         """
-        # print('item rep:', key, item)
         _repr = (f'{key}: ' if use_key else '') + item.__repr__()
         if isinstance(item, np.ndarray):
             _repr = _repr.replace('\n      ', '')
@@ -775,8 +772,8 @@ class Dataset(EmptyDataset):
             The data array.
         **kwargs : type
             Accepted keywords are axis_labels, axis_ranges, axis_units,
-            metadata. For information on the keywords please refer to the
-            class docstring.
+            metadata, data_unit. For information on the keywords please refer
+            to the class docstring.
 
         Returns
         -------
@@ -787,6 +784,9 @@ class Dataset(EmptyDataset):
         obj.axis_units = kwargs.get('axis_units', _default_vals(obj.ndim))
         obj.axis_labels = kwargs.get('axis_labels', _default_vals(obj.ndim))
         obj.axis_ranges = kwargs.get('axis_ranges', _default_vals(obj.ndim))
-        obj.metadata = kwargs.get('metadata', {})
-        obj.data_unit = kwargs.get('data_unit', '')
+        obj._metadata = kwargs.get('metadata', {})
+        obj._data_unit = kwargs.get('data_unit', '')
+        # need to call __array_finalize__ explicitly to force the new obj
+        # to update its stored keys:
+        obj.__array_finalize__(obj)
         return obj

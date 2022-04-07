@@ -25,6 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['AsciiSaver']
 
+import os
+
 import numpy as np
 
 from pydidas.core.constants import OUTPUT_PLUGIN
@@ -76,10 +78,11 @@ class ChiSaver(OutputPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        print('type: ', type(data))
         if data.ndim > 1:
             raise TypeError('Only 1-d data can be saved as ASCII.')
         self._config['global_index'] = kwargs.get('global_index', None)
-        _fname = self._get_output_filename()
+        _fname = self._get_base_output_filename() + '.chi'
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:

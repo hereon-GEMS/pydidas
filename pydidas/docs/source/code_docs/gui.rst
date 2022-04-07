@@ -17,7 +17,6 @@ It provides methods to register frames and create menus.
     gui/global_configuration_frame
     gui/image_math_frame
     gui/execute_workflow_frame
-    gui/processing_single_plugin_frame
     gui/pyfai_calib_frame
     gui/scan_setup_frame
     gui/workflow_edit_frame

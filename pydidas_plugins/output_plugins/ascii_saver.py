@@ -79,7 +79,7 @@ class AsciiSaver(OutputPlugin):
         if data.ndim > 1:
             raise TypeError('Only 1-d data can be saved as ASCII')
         self._config['global_index'] = kwargs.get('global_index', None)
-        _fname = self._get_output_filename()
+        _fname = self._get_base_output_filename() + '.txt'
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:

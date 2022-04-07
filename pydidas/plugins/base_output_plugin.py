@@ -50,7 +50,7 @@ class OutputPlugin(BasePlugin):
         if not os.path.exists(self._path):
             os.makedirs(self._path)
 
-    def _get_output_filename(self):
+    def _get_base_output_filename(self):
         """
         Get the output filename from the global frame index and the Plugin
         label.
@@ -65,8 +65,8 @@ class OutputPlugin(BasePlugin):
                            'The plugin does not know how to get the filename.')
         _label = self.get_param_value('label')
         if _label is None or _label == '':
-            _name = f'node_{self.node_id:02d}_' + '{:06d}.txt'
+            _name = f'node_{self.node_id:02d}_' + '{:06d}'
         else:
-            _name = f'{_label}_' + '{:06d}.txt'
+            _name = f'{_label}_' + '{:06d}'
         return os.path.join(self._path,
                             _name.format(self._config['global_index']))

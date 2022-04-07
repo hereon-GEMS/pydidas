@@ -8,9 +8,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="105mm"
-   height="105mm"
-   viewBox="0 0 105 105"
+   width="102.27237mm"
+   height="102.3906mm"
+   viewBox="0 0 102.27237 102.3906"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
@@ -1221,18 +1221,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="-370.24649"
-     inkscape:cy="328.8751"
+     inkscape:zoom="1.979899"
+     inkscape:cx="169.34301"
+     inkscape:cy="298.29919"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
-     inkscape:window-width="3440"
-     inkscape:window-height="1377"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1718"
+     inkscape:window-height="1368"
+     inkscape:window-x="25"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -1253,10 +1253,10 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(1.388028,2.8607903)">
+     transform="translate(0.495604,1.7363028)">
     <g
        id="g1598"
-       transform="translate(1.1650609,-0.59385568)">
+       transform="translate(0.63589423,-0.59385568)">
       <path
          style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#e50446;stroke-width:3.90003;stroke-miterlimit:14.9;stroke-dasharray:none;stroke-dashoffset:26.1939;stroke-opacity:1"
          id="path10-8"
@@ -1316,7 +1316,7 @@
        sodipodi:insensitive="true" />
     <g
        id="g1629"
-       transform="translate(-84.735386,86.254382)">
+       transform="matrix(1.0522874,0,0,1.0522874,-92.273417,89.017645)">
       <path
          style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#0391a0;stroke-width:3.96901;stroke-miterlimit:14.9;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
          id="path10-8-1-8"

@@ -59,6 +59,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         get_generic_param_collection(
             'image_num', 'scan_index1', 'scan_index2', 'scan_index3',
             'scan_index4', 'selected_results'))
+    params_not_to_restore = ['selected_results']
 
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)

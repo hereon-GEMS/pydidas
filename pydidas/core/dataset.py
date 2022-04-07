@@ -69,6 +69,7 @@ class EmptyDataset(np.ndarray):
             if item in kwargs:
                 del kwargs[item]
         obj = np.ndarray.__new__(cls, *args, **kwargs)
+        obj._keys  = {}
         for key in ['axis_labels', 'axis_ranges', 'axis_units']:
             _data = local_kws.get(key, _default_vals(obj.ndim))
             _labels = obj._get_dict(_data, '__new__')
@@ -114,7 +115,7 @@ class EmptyDataset(np.ndarray):
                       for _key in ['axis_labels', 'axis_ranges', 'axis_units']}
         if self.getitem_key is not None:
             self.__modify_axis_keys()
-        self.__update_keys_for_flattened_array()
+        self.__update_keys_in_flattened_array()
         for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
             setattr(self, f'_{_key}', self._keys[_key])
         if isinstance(obj, EmptyDataset):
@@ -198,9 +199,9 @@ class EmptyDataset(np.ndarray):
                     _copy[_key + 1] = _dict[_key]
             self._keys[_item] = _copy
 
-    def __update_keys_for_flattened_array(self):
+    def __update_keys_in_flattened_array(self):
         """
-        Update the keys for flattened arrays.
+        Update the keys in flattened arrays i.e. if the new dimension is one.
         """
         if self.ndim == 1 and (len(self._keys['axis_ranges']) > 1
                                or len(self._keys['axis_units']) > 1
@@ -423,6 +424,7 @@ class EmptyDataset(np.ndarray):
             accepted.
         """
         self._axis_labels = self._get_dict(labels, 'axis_labels')
+        self._keys['axis_labels'] = self._axis_labels.copy()
 
     @property
     def axis_ranges(self):
@@ -451,6 +453,7 @@ class EmptyDataset(np.ndarray):
             accepted.
         """
         self._axis_ranges = self._get_dict(scales, 'axis_ranges')
+        self._keys['axis_ranges'] = self._axis_ranges.copy()
 
     @property
     def axis_units(self):
@@ -478,6 +481,7 @@ class EmptyDataset(np.ndarray):
             accepted.
         """
         self._axis_units = self._get_dict(units, 'axis_units')
+        self._keys['axis_units'] = self._axis_units.copy()
 
     @property
     def data_unit(self):
@@ -781,12 +785,10 @@ class Dataset(EmptyDataset):
             The new dataset object.
         """
         obj = np.asarray(array).view(cls)
+        obj._keys = {}
         obj.axis_units = kwargs.get('axis_units', _default_vals(obj.ndim))
         obj.axis_labels = kwargs.get('axis_labels', _default_vals(obj.ndim))
         obj.axis_ranges = kwargs.get('axis_ranges', _default_vals(obj.ndim))
-        obj._metadata = kwargs.get('metadata', {})
-        obj._data_unit = kwargs.get('data_unit', '')
-        # need to call __array_finalize__ explicitly to force the new obj
-        # to update its stored keys:
-        obj.__array_finalize__(obj)
+        obj.metadata = kwargs.get('metadata', {})
+        obj.data_unit = kwargs.get('data_unit', '')
         return obj

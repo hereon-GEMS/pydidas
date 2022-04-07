@@ -51,7 +51,7 @@ def pydidas_logger(level=logging.DEBUG):
     formatter = logging.Formatter(\
         '[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
     _logpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.dirname(__file__)))), 'logs')
+        __file__))), 'logs')
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
     _time = time.localtime()

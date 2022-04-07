@@ -24,7 +24,7 @@ author = 'Malte Storm'
 
 # The full version, including alpha/beta/rc tags
 release = 'alpha'
-version = '0.1.3'
+version = '0.1.4'
 
 # -- General configuration ---------------------------------------------------
 
@@ -85,7 +85,7 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
-html_logo = './images/logo/rings.png'
+html_logo = './images/logo/pydidas_snakes_circ_bg.png'
 html_title = 'pydidas'
 
 def setup(app):

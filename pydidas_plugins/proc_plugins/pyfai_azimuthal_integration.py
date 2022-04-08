@@ -70,7 +70,6 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         _unit = _unit.strip()
         _dataset = Dataset(_newdata[1], axis_labels=[_label],
                            axis_units=[_unit], axis_ranges=[_newdata[0]])
-        print('Data:', _dataset, type(_dataset))
         return _dataset, kwargs
 
     def calculate_result_shape(self):

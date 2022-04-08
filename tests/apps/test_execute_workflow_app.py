@@ -79,27 +79,33 @@ class TestLock(threading.Thread):
 
 class TestExecuteWorkflowApp(unittest.TestCase):
 
-    def setUp(self):
-        RESULT_SAVER.set_active_savers_and_title([])
-        self._path = tempfile.mkdtemp()
-        self.generate_tree()
-        self.generate_scan()
-        self.q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        self._buf_size = float(
-            self.q_settings.value('global/shared_buffer_size'))
-        self._n_workers = int(self.q_settings.value('global/mp_n_workers'))
+    @classmethod
+    def setUpClass(cls):
+        cls.generate_scan(cls)
+        cls.q_settings = QtCore.QSettings('Hereon', 'pydidas')
+        cls._buf_size = float(
+            cls.q_settings.value('global/shared_buffer_size'))
+        cls._n_workers = int(cls.q_settings.value('global/mp_n_workers'))
         _path = os.path.dirname(unittest_objects.__file__)
         if _path not in _PLUGIN_PATHS:
             COLL.find_and_register_plugins(_path)
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
-        self.q_settings.setValue('global/shared_buffer_size', self._buf_size)
-        self.q_settings.setValue('global/mp_n_workers', self._n_workers)
-        ExecuteWorkflowApp.parse_func = (
-            execute_workflow_app_parser)
+    @classmethod
+    def tearDownClass(cls):
+        cls.q_settings.setValue('global/shared_buffer_size', cls._buf_size)
+        cls.q_settings.setValue('global/mp_n_workers', cls._n_workers)
         COLL.clear_collection(True)
         COLL.find_and_register_plugins(*_PLUGIN_PATHS)
+
+    def setUp(self):
+        RESULT_SAVER.set_active_savers_and_title([])
+        self._path = tempfile.mkdtemp()
+        self.generate_tree()
+
+    def tearDown(self):
+        shutil.rmtree(self._path)
+        ExecuteWorkflowApp.parse_func = (
+            execute_workflow_app_parser)
 
     def generate_tree(self):
         TREE.clear()
@@ -175,9 +181,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app2._shared_arrays[2], np.ndarray)
         self.assertEqual(app._config['shared_memory'][1],
-                         app2._config['shared_memory'][1])
+                          app2._config['shared_memory'][1])
         self.assertEqual(app._config['shared_memory'][2],
-                         app2._config['shared_memory'][2])
+                          app2._config['shared_memory'][2])
         self.assertTrue(app.multiprocessing_carryon())
 
     def test_prepare_run__master_live_no_autosave(self):
@@ -194,13 +200,13 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         self.assertEqual(app._config['result_shapes'],
-                         TREE.get_all_result_shapes())
+                          TREE.get_all_result_shapes())
 
     def test_get_and_store_tasks(self):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         self.assertTrue(np.equal(app._mp_tasks,
-                                 np.arange(np.prod(self._nscan))).all())
+                                  np.arange(np.prod(self._nscan))).all())
 
     def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
         app = ExecuteWorkflowApp()
@@ -253,6 +259,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._redefine_multiprocessing_carryon()
         app._index = utils.get_random_string(8)
         self.assertEqual(app.multiprocessing_carryon(), app._index)
+        self.generate_tree()
 
     def test_multiprocessing_get_tasks__normal(self):
         app = ExecuteWorkflowApp()
@@ -369,8 +376,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         TREE.execute_process(0)
         _locker = TestLock(app._config['shared_memory'],
-                           app._config['buffer_n'],
-                           app._config['result_shapes'])
+                            app._config['buffer_n'],
+                            app._config['result_shapes'])
         _locker.start()
         app._ExecuteWorkflowApp__write_results_to_shared_arrays()
 

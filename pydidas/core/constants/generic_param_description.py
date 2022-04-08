@@ -860,7 +860,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'unit': '',
         'allow_None': False,
         'tooltip': ('The paths to all plugin locations. Individual entries are'
-                    'separated by a semicolon.')},
+                    ' separated by a double semicolon ";;".')},
     'plot_update_time': {
         'type': float,
         'default': 1.0,

@@ -395,21 +395,21 @@ class TestPluginCollection(unittest.TestCase):
     def test_get_q_settings_plugin_path__no_path_set(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath,
                                    force_initialization=True)
-        _qplugin_path = PC._PluginCollection__get_q_settings_plugin_path()
+        _qplugin_path = PC.get_q_settings_plugin_path()
         self.assertEqual(_qplugin_path, [self._pluginpath])
 
     def test_get_q_settings_plugin_path__single_path(self):
         self._pluginpath
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._qsettings.setValue('global/plugin_path', self._pluginpath)
-        _qplugin_path = PC._PluginCollection__get_q_settings_plugin_path()
+        _qplugin_path = PC.get_q_settings_plugin_path()
         self.assertEqual([self._pluginpath], _qplugin_path)
 
     def test_get_q_settings_plugin_path__multiple_paths(self):
         _paths = ['test1', 'some/other/path', 'test_23.456']
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
         self._qsettings.setValue('global/plugin_path', ';;'.join(_paths))
-        _qplugin_path = PC._PluginCollection__get_q_settings_plugin_path()
+        _qplugin_path = PC.get_q_settings_plugin_path()
         self.assertEqual(_paths, _qplugin_path)
 
     def test_get_generic_plugin_path__no_q_path(self):

@@ -103,3 +103,4 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
                           **_section_options)
         self.create_param_widget(self.get_param('plugin_path'),
                                   **_twoline_options)
+        self.create_button('but_plugins', 'Update plugin collection')

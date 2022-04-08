@@ -34,15 +34,15 @@ from qtpy import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..core.utils import find_valid_python_files
-from .base_plugin import BasePlugin
 from .plugin_collection_util_funcs import (
     get_generic_plugin_path, plugin_type_check)
 
 
-class _PluginCollection(PydidasQsettingsMixin):
+class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
     """
     Class to hold references of all plugins
     """
+    sig_updated_plugins = QtCore.Signal()
 
     @classmethod
     def clear_qsettings(cls):
@@ -64,6 +64,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             separated by ";;" or as a list. None will call to the default
             paths. The default is None.
         """
+        QtCore.QObject.__init__(self)
         self.plugins = {}
         self.__plugin_types = {}
         self.__plugin_names = {}
@@ -106,12 +107,12 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin_path : list
             A list of plugin paths.
         """
-        plugin_path = self.__get_q_settings_plugin_path()
+        plugin_path = self.get_q_settings_plugin_path()
         if plugin_path == [''] or plugin_path is None:
             plugin_path = get_generic_plugin_path()
         return plugin_path
 
-    def __get_q_settings_plugin_path(self):
+    def get_q_settings_plugin_path(self):
         """
         Get the plugin path from the global QSettings
 
@@ -141,6 +142,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         for _path in plugin_paths:
             self._find_and_register_plugins_in_path(_path, reload)
+        self.sig_updated_plugins.emit()
 
     def _find_and_register_plugins_in_path(self, path, reload=True):
         """
@@ -418,6 +420,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             self.__plugin_types = {}
             self.__plugin_names = {}
             self.__plugin_paths = []
+            self.sig_updated_plugins.emit()
         else:
             print('The confirmation flag was not given. The PluginCollection '
                   'has not been reset.')

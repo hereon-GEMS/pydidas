@@ -51,6 +51,7 @@ class _WorkflowTree(GenericTree):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._preexecuted = False
+        PLUGINS.sig_updated_plugins.connect(self.clear)
 
     def create_and_add_node(self, plugin, parent=None, node_id=None):
         """

@@ -62,9 +62,9 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         self.collection = (_local_plugin_coll if _local_plugin_coll is not None
                            else PLUGIN_COLLECTION)
 
-        _treeview = PluginCollectionTreeWidget(self, self.collection)
-        self._widgets = dict(plugin_treeview=_treeview,
-                             plugin_description=ReadOnlyTextWidget(self))
+        self._widgets = dict(
+            plugin_treeview=PluginCollectionTreeWidget(self, self.collection),
+            plugin_description=ReadOnlyTextWidget(self))
 
         self.setMinimumHeight(300)
         _layout = QtWidgets.QHBoxLayout()
@@ -77,6 +77,8 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
             self.__display_plugin_description)
         self._widgets['plugin_treeview'].selection_confirmed.connect(
             self.__confirm_selection)
+        self.collection.sig_updated_plugins.connect(
+            self._widgets['plugin_treeview']._update_collection)
 
     @QtCore.Slot(str)
     def __confirm_selection(self, name):

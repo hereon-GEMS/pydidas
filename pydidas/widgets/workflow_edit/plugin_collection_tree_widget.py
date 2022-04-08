@@ -70,15 +70,22 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.header().setStyleSheet(QT_STYLES['title'])
 
-        _root, _model = self.__create_tree_model()
-        self.setModel(_model)
-        self.expandAll()
-        self.setItemDelegate(_TreeviewItemDelegate(_root))
-
+        self._update_collection()
         self.clicked.connect(
             partial(self.__confirm_selection, self.selection_changed))
         self.doubleClicked.connect(
             partial(self.__confirm_selection, self.selection_confirmed))
+
+    @QtCore.Slot()
+    def _update_collection(self):
+        """
+        Update the collection, for example after changing the available
+        plugins.
+        """
+        _root, _model = self.__create_tree_model()
+        self.setModel(_model)
+        self.expandAll()
+        self.setItemDelegate(_TreeviewItemDelegate(_root))
 
     def __create_tree_model(self):
         """

@@ -27,7 +27,7 @@ __status__ = "Development"
 __all__ = ['PyFAI2dIntegration']
 
 from pydidas.core import Dataset
-from pydidas.plugins import pyFAIintegrationBase, pyFAI_METHOD
+from pydidas.plugins import pyFAIintegrationBase
 
 
 class PyFAI2dIntegration(pyFAIintegrationBase):
@@ -73,7 +73,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             unit=self.get_pyFAI_unit_from_param('rad_unit'),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
-            method=pyFAI_METHOD[self.get_param_value('int_method')])
+            method=self._config['method'])
 
         _label, _unit = self.params['rad_unit'].value.split('/')
         _label = _label.strip()

@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PyFAIradialIntegration']
 
-from pydidas.plugins import pyFAIintegrationBase, pyFAI_METHOD
+from pydidas.plugins import pyFAIintegrationBase
 from pydidas.core import Dataset
 
 
@@ -73,7 +73,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             radial_unit=self.get_pyFAI_unit_from_param('rad_unit'),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
-            method=pyFAI_METHOD[self.get_param_value('int_method')])
+            method=self._config['method'])
 
         _label, _unit = self.params['azi_unit'].value.split('/')
         _label = _label.strip()

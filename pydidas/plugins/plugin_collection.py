@@ -208,7 +208,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
             _tmpmod = _file.removesuffix('.py').removeprefix(_path)
             _mod = _tmpmod.replace('/', '.')
             _modules[_mod] = _file
-        return  _modules
+        return _modules
 
     @staticmethod
     def __import_module_and_get_classes_in_module(modname, filepath):

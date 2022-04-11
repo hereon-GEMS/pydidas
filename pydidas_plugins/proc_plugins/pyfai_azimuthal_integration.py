@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['PyFAIazimuthalIntegration']
 
-from pydidas.plugins import pyFAIintegrationBase, pyFAI_METHOD
+from pydidas.plugins import pyFAIintegrationBase
 from pydidas.core import Dataset
 
 

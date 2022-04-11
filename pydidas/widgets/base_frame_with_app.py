@@ -172,6 +172,7 @@ class BaseFrameWithApp(BaseFrame):
         self._app._config = _restored_cfg
         if ('shared_memory' in _restored_cfg and
                 _restored_cfg['shared_memory'] == '::restore::True'):
+            self._app._config['shared_memory'] = {}
             self._app.initialize_shared_memory()
         super().restore_state(state)
 

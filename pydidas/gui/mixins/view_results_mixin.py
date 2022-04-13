@@ -171,7 +171,7 @@ class ViewResultsMixin:
         self._axlabels = lambda i: (
             _data.axis_labels.copy()[i]
             + (' / ' + _data.axis_units.copy()[i]
-               if len(_data.axis_units.copy()) > 0 else ''))
+               if len(str(_data.axis_units.copy())) > 0 else ''))
         if self._config['plot_type'] == 'group of 1D plots':
             self._widgets['plot_stack'].setCurrentIndex(0)
             self._plot_group_of_curves(_data)
@@ -250,7 +250,7 @@ class ViewResultsMixin:
         _ax_label = lambda i: (
             data.axis_labels[i]
             + (' / ' + data.axis_units[i]
-               if len(data.axis_units[i]) > 0 else ''))
+               if len(str(data.axis_units[i])) > 0 else ''))
         _originx, _scalex = self.__get_2d_plot_ax_settings(
             data.axis_ranges[1])
         _originy, _scaley = self.__get_2d_plot_ax_settings(

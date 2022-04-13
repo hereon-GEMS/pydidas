@@ -381,7 +381,8 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _window_states = {}
         for _key, _window in self._child_windows.items():
-            _window_states[_key] = _window.export_window_state()
+            if _key != 'tmp':
+                _window_states[_key] = _window.export_window_state()
         _window_states['main'] = self.__export_mainwindow_state()
         return _window_states
 
@@ -467,8 +468,9 @@ class MainMenu(QtWidgets.QMainWindow):
             window states.
         """
         for _key, _window in self._child_windows.items():
-            _window.restore_window_state(state[_key])
-            self.__restore_mainwindow_state(state['main'])
+            if _key != 'tmp':
+                _window.restore_window_state(state[_key])
+        self.__restore_mainwindow_state(state['main'])
 
     def __restore_mainwindow_state(self, state):
         """

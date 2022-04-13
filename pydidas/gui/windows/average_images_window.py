@@ -226,3 +226,31 @@ class AverageImagesWindow(BaseFrame):
             else:
                 _data += _tmp
         return _data, (_max_index - _start_index)
+
+    def export_window_state(self):
+        """
+        Get the state of the window for exporting.
+
+        The generic PydidasWindow method will return the geometry and
+        visibility. If windows need to export more information, they need
+        to reimplement this method.
+
+        Returns
+        -------
+        dict
+            The dictionary with the window state.
+        """
+        return {'geometry': self.geometry().getRect(),
+                'visible': self.isVisible()}
+
+    def restore_window_state(self, state):
+        """
+        Restore the window state from saved information.
+
+        Parameters
+        ----------
+        state : dict
+            The dictionary with the state information.
+        """
+        self.setGeometry(*state['geometry'])
+        self.setVisible(state['visible'])

@@ -141,6 +141,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         Store the WorkflowTree results in a local dictionary.
         """
+        self._config['shapes'] = {}
+        self._config['labels'] = {}
+        self._config['data_labels'] = {}
         for _node_id, _node in self._tree.nodes.items():
             self._config['shapes'][_node_id] = _node.results.shape
             self._config['labels'][_node_id] = (
@@ -177,6 +180,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             param.choices = _new_choices
             param.value = _new_choices[0]
             param.choices = _new_choices[:-1]
+            self._active_node = -1
+            self._config['plot_active'] = False
+        print('new choices', param.choices)
+        print('value', param.value)
         with utils.SignalBlocker(self.param_widgets['selected_results']):
             self.param_widgets['selected_results'].update_choices(
                 param.choices)

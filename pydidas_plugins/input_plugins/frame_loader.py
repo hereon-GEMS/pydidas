@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the TiffLoader Plugin which can be used to load
-images from single tiff files.
+Module with the FrameLoader Plugin which can be used to load files with
+single images in each, e.g. tiff files or numpy files.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['TiffLoader']
+__all__ = ['FrameLoader']
 
 
 from pydidas.core.constants import INPUT_PLUGIN
@@ -31,14 +31,14 @@ from pydidas.core import get_generic_param_collection
 from pydidas.managers import FilelistManager
 from pydidas.plugins import InputPlugin
 from pydidas.image_io import read_image
-from pydidas.core.utils import copy_docstring, get_hdf5_metadata
+from pydidas.core.utils import copy_docstring
 
 
-class TiffLoader(InputPlugin):
+class FrameLoader(InputPlugin):
     """
-    Load data frames tiff files with a single frame each.
+    Load data frames from files with a single image in each.
 
-    This class is designed to load data from a series of tiff file. The file
+    This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
     Filesystem checks can be enabled using the live_processing keyword but
     are disabled by default.
@@ -52,8 +52,6 @@ class TiffLoader(InputPlugin):
         The name of the first file in the file series.
     last_file : Union[str, pathlib.Path]
         The name of the last file in the file series.
-    hdf5_key : str
-        The key to access the hdf5 dataset in the file.
     images_per_file : int
         The number of images per file.
     live_processing : bool, optional
@@ -80,7 +78,7 @@ class TiffLoader(InputPlugin):
 
     def pre_execute(self):
         """
-        Prepare loading of images from a single hdf5 file.
+        Prepare loading of images from a series of files.
         """
         self._file_manager.update()
         self._image_metadata.update()

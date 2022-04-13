@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Remove1dPolynomialBackground Plugin which can be used to
-subtract a polynomial background from a 1-d dataset, e.g. integrated
+Module with the Subtract1dBackgroundProfile Plugin which can be used to
+subtract a given background profile from a 1-d dataset, e.g. integrated
 diffraction data.
 """
 
@@ -24,17 +24,20 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Remove1dPolynomialBackground']
+__all__ = ['Subtract1dBackgroundProfile']
+
+from pathlib import Path
 
 import numpy as np
 from numpy.polynomial import Polynomial
 
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, Parameter
+from pydidas.image_io import read_image
 from pydidas.plugins import ProcPlugin
 
 
-class Remove1dPolynomialBackground(ProcPlugin):
+class Subtract1dBackgroundProfile(ProcPlugin):
     """
     Subtract a polynomial background from a 1-dimensional profile.
 
@@ -43,43 +46,34 @@ class Remove1dPolynomialBackground(ProcPlugin):
     First, the data is smoothed by an averaging filter to remove noise.
     Second, local minima in the smoothed dataset are extracted and a
     polynomial background is fitted to these local minima. All local minima
-    which are higher by more than 20% with respect to a linear fit between
+    which are higher by more than 20% with pect to a linear fit between
     their neighboring local minima are discarded.
     Third, the residual between the background and the smoothed data is
     calculated and the x-positions of all local minima of the residual are
     used in conjunction with their data values to fit a final background.
     """
-    plugin_name = 'Remove 1D polynomial background'
+    plugin_name = 'Subtract 1D background profile'
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(
+        Parameter('kernel_width', int, 5, name='Averaging width',
+                  tooltip=('The width of the averaging kernel (which is only '
+                           'applied to the data for fitting).')),
         Parameter('threshold_low', float, None, allow_None=True,
                   name='Lower threshold',
                   tooltip=('The lower threhold. Any values in the corrected'
                            ' dataset smaller than the threshold will be set '
                            'to the threshold value.')),
-        Parameter('fit_order', int, 3, name='Polynomial fit order',
-                  tooltip=('The polynomial order for the fit. This value '
-                           'should typically not exceed3 or 4.')),
-        Parameter('include_limits', int, 0, choices=[True, False],
-                  name='Always include endpoints',
-                  tooltip=('Flag to force the inclusion of both endpoints '
-                           'in the initial points for the fit.')),
-        Parameter('kernel_width', int, 5, name='Averaging width',
-                  tooltip=('The width of the averaging kernel (which is only '
-                           'applied to the data for fitting).')))
+        Parameter('profile_file', Path, Path(),
+                  name='Filename of profile file',
+                  tooltip=('The filename of the file with the background '
+                           'profile.')))
     input_data_dim = 1
     output_data_dim = 1
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._thresh = None
-        self._fit_order = 3
-        self._include_limits = False
-        self._kernel = np.ones(5) / 5
-        self._klim_low = 2
-        self._klim_high = -2
-        self._local_minina_threshold = 1.2
 
     def pre_execute(self):
         """
@@ -88,33 +82,33 @@ class Remove1dPolynomialBackground(ProcPlugin):
         self._thresh = self.get_param_value('threshold_low')
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
-        self._fit_order = self.get_param_value('fit_order')
-        self._include_limits = self.get_param_value('include_limits')
+
+        _fname = self.get_param_value('profile_name')
+        _profile = read_image(_fname)
 
         _kernel = self.get_param_value('kernel_width')
         if _kernel > 0:
-            self._kernel = np.ones(_kernel) / _kernel
-            self._klim_low = _kernel // 2
-            self._klim_high = _kernel - 1 - _kernel // 2
-        else:
-            self._kernel = None
+            _kernel = np.ones(_kernel) / _kernel
+            _klim_low = _kernel // 2
+            _klim_high = _kernel - 1 - _kernel // 2
+
+
 
     def execute(self, data, **kwargs):
         """
-        Fit a polynomial background to the data and remove its contribution
-        from the data.
+        Apply a mask to an image (2d data-array).
 
         Parameters
         ----------
         data : Union[pydidas.core.Dataset, np.ndarray]
-            The 1-dimensional data.
+            The image / frame data .
         **kwargs : dict
             Any calling keyword arguments.
 
         Returns
         -------
         _data : pydidas.core.Dataset
-            The new
+            The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """

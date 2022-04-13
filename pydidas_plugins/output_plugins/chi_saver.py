@@ -78,7 +78,6 @@ class ChiSaver(OutputPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        print('type: ', type(data))
         if data.ndim > 1:
             raise TypeError('Only 1-d data can be saved as ASCII.')
         self._config['global_index'] = kwargs.get('global_index', None)

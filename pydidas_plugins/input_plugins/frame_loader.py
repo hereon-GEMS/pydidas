@@ -61,7 +61,7 @@ class FrameLoader(InputPlugin):
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
     """
-    plugin_name = 'Tiff file loader'
+    plugin_name = 'Single frame loader'
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(

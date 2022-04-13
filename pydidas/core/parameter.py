@@ -92,6 +92,9 @@ class Parameter:
     | optional   | False     | A flag whether the parameter is required  |
     |            |           | or optional.                              |
     +------------+-----------+-------------------------------------------+
+    | allow_None | False     | A flag whether "None" is accepted as      |
+    |            |           | Parameter value.                          |
+    +------------+-----------+-------------------------------------------+
     | tooltip    | False     | A readable tooltip.                       |
     +------------+-----------+-------------------------------------------+
     | default    | False     | The default value.                        |

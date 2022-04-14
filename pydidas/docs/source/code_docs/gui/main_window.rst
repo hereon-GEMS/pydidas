@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.MainWindow
     :members:
+    :noindex:
     :inherited-members: QMainWindow
     
 

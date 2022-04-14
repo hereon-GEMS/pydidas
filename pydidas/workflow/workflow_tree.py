@@ -265,8 +265,8 @@ class _WorkflowTree(GenericTree):
         """
         Get the shapes of all leaves in form of a dictionary.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         force_update : bool, optional
             Keyword to enforce a new calculation of the result shapes. The
             default is False.

@@ -37,6 +37,8 @@ class PydidasHtmlDocView(QtWebEngineWidgets.QWebEngineView):
     """
     def __init__(self):
         super().__init__()
+        _profile = self.page().profile()
+        _profile.setHttpCacheType(0)
         self.load_main_doc()
 
     def load_main_doc(self):

@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.CompositeCreatorFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

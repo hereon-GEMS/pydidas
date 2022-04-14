@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.DataBrowsingFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

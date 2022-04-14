@@ -47,6 +47,7 @@ The basic functions in Apps are used as follows:
 .. autoclass:: pydidas.core.BaseApp
     :members:
     :show-inheritance:
+    :noindex:
     :inherited-members: QObject
     
 

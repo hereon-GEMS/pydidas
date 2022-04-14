@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.ExperimentalSetupFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

@@ -20,15 +20,15 @@ Users will probably manage with a handful of methods. For the full method
 documentation, please refer to the class documentation: 
 :py:class:`ParameterCollections <pydidas.core.ParameterCollection>`.
 
-    **get_param_keys**()
+    **get_param_keys**\ ()
         Get all the reference keys to access the respective parameters.
-    **get_param_value**(*key*)
+    **get_param_value**\ (*key*)
         Get the value of the Parameter referenced by *key*.
-    **get_param_values_as_dict**()
+    **get_param_values_as_dict**\ ()
         Get the value of all stored Parameters in form of a dictionary with the 
         Parameter reference keys as dict keys and the Parameter values as dict 
         values.
-    **set_param_value**(*key*, *value*)
+    **set_param_value**\ (*key*, *value*)
         Set the value of the Parameter referenced by *key* to the given *value*.
 
 .. tip:: 

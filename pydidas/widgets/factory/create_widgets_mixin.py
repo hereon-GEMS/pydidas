@@ -161,7 +161,7 @@ class CreateWidgetsMixIn:
 
         Note
         ----
-        Widgets must support generic *args and **kwargs arguments. This means
+        Widgets must support generic args and kwargs arguments. This means
         that generic PyQt widgets cannot be created using this method. They
         can be added, however, using the ``add_any_widget`` method.
 

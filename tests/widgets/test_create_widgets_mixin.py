@@ -46,7 +46,7 @@ def get_test_widget(*args, **kwargs):
     return TestWidget()
 
 
-class TestCreateWidgetsMixin(unittest.TestCase):
+class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])

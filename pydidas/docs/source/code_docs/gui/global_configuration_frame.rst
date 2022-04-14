@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.GlobalConfigurationFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

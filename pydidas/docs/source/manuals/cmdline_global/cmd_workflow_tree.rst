@@ -45,6 +45,7 @@ To create a new node with a plugin and add it to the ``WorkflowTree``, use the
 ``create_and_add_node`` method:
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.create_and_add_node
+    :noindex:
 
 The following example will create a WorkflowTree which loads data from a single
 Hdf5 file and performs two separate integrations in different angular ranges:
@@ -98,6 +99,7 @@ Test individual plugins
 To test individual plugins, users can use the ``execute_single_plugin`` method. 
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_single_plugin
+    :noindex:
 
 This method will execute a single plugin only. This method can be used to check
 intermediate results and make sure that a workflow works as intended.
@@ -146,6 +148,7 @@ returns them to the user. The documentation for the
 ``execute_process_and_get_results`` method is given below. 
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_process_and_get_results
+    :noindex:
 
 Using the ``WorkflowTree`` from the example above, the following example 
 demonstrates the usage.

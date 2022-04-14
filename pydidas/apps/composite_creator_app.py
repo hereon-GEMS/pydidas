@@ -111,7 +111,7 @@ class CompositeCreatorApp(BaseApp):
         The upper boundary (in pixel) for cropping images in x, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
         -1 is equivalent with the full image size minus one. None corresponds
-		to the full image width (with respect to the upper boundary).The
+        to the full image width (with respect to the upper boundary). The
         default is None.
     roi_ylow : int, optional
         The lower boundary (in pixel) for cropping images in y, if use_roi is
@@ -121,7 +121,7 @@ class CompositeCreatorApp(BaseApp):
         The upper boundary (in pixel) for cropping images in y, if use_roi is
         enabled. Negative values will be modulated with the image width, i.e.
         -1 is equivalent with the full image size minus one. None corresponds
-		to the full image width (with respect to the upper boundary). The
+        to the full image width (with respect to the upper boundary). The
         default is None.
     use_thresholds : bool, optional
         Keyword to enable or disable the use of thresholds. If True,

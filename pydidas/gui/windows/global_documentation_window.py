@@ -48,7 +48,7 @@ class GlobalDocumentationWindow(PydidasWindow):
         self._actions['home'] = QtWidgets.QAction(
             get_pyqt_icon_from_str_reference('qta::mdi.home'), '')
         self._actions['undo'] = QtWidgets.QAction(
-           get_pyqt_icon_from_str_reference('qta::mdi.undo'), '')
+            get_pyqt_icon_from_str_reference('qta::mdi.undo'), '')
         self._actions['redo'] = QtWidgets.QAction(
             get_pyqt_icon_from_str_reference('qta::mdi.redo'), '')
 

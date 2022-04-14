@@ -83,6 +83,20 @@ The settings menu entry will open an independent window which allows to
 configure the pydidas global settings, similar to the :ref:`global_settings_frame`.
 Please refer to the documentation there for more information.
 
+Export Eiger Pixelmask
+^^^^^^^^^^^^^^^^^^^^^^
+
+This menu item will open a small window which allows the user to specify an
+Eiger-written *master* file which includes detector metadata, including the
+detector pixelmask and an output filename to write the exported mask.
+
+Average images
+^^^^^^^^^^^^^^
+
+The *Average images* menu entry allows users to select any number of frames from
+one or multiple files and average them all and store the result in a single new
+file. This functionality is designed for example for averaging calibration data.
+
 The Help menu
 -------------
 

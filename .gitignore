@@ -3,6 +3,7 @@
 __pycache__
 *.pyc
 *.log
+!change.log
 pydidas/docs/build
 dist/*
 build/*

@@ -1,0 +1,6 @@
+
+v0.1.5
+Major changes:
+- Removed dependency on QtWebEngineWidgets to fix startup problems.
+- Documentation only available in system's web browser, not in applications
+  own window.

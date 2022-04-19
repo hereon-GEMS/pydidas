@@ -57,3 +57,11 @@ class PydidasHtmlDocView(QtWebEngineWidgets.QWebEngineView):
             The desired size for the documentation html content.
         """
         return QtCore.QSize(900, 600)
+
+
+# class PydidasHtmlDocView:
+#     """
+#     Deprecated class because of issues with the QtWebEngine.
+#     """
+#     def __init__(self, *args):
+#         pass

@@ -40,8 +40,7 @@ from pydidas.widgets import (CentralWidgetStack, excepthook)
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.gui import utils
 from pydidas.gui.windows import (
-    GlobalDocumentationWindow, GlobalConfigWindow, ExportEigerPixelmaskWindow,
-    AverageImagesWindow)
+    GlobalConfigWindow, ExportEigerPixelmaskWindow, AverageImagesWindow)
 
 
 SCAN = ScanSetup()
@@ -78,7 +77,6 @@ class MainMenu(QtWidgets.QMainWindow):
         self._menus = {}
 
         self._setup_mainwindow_widget(geometry)
-        self._add_documentation_window()
         self._add_global_config_window()
         self._create_menu()
 
@@ -102,12 +100,6 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setWindowTitle('pydidas GUI (alpha)')
         self.setWindowIcon(utils.get_pydidas_icon())
         self.setFocus(QtCore.Qt.OtherFocusReason)
-
-    def _add_documentation_window(self):
-        """
-        Add the floating documentation window to the main window.
-        """
-        self._child_windows['documentation'] = GlobalDocumentationWindow(self)
 
     def _add_global_config_window(self):
         """
@@ -170,9 +162,6 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions['average_images'] = (
             QtWidgets.QAction('&Average images', self))
 
-        self._actions['open_documentation_window'] = QtWidgets.QAction(
-            'Open documentation in separate window', self)
-
         self._actions['open_documentation_browser'] = QtWidgets.QAction(
             'Open documentation in default web browser', self)
 
@@ -195,8 +184,6 @@ class MainMenu(QtWidgets.QMainWindow):
             self._action_export_eiger_pixel_mask)
         self._actions['average_images'].triggered.connect(
             self._action_average_images)
-        self._actions['open_documentation_window'].triggered.connect(
-            partial(self.show_window, 'documentation'))
         self._actions['open_documentation_browser'].triggered.connect(
             self._action_open_doc_in_browser)
 
@@ -225,7 +212,6 @@ class MainMenu(QtWidgets.QMainWindow):
         _menu.addMenu(_extras_menu)
 
         _help_menu = _menu.addMenu('&Help')
-        _help_menu.addAction(self._actions['open_documentation_window'])
         _help_menu.addAction(self._actions['open_documentation_browser'])
         _menu.addMenu(_help_menu)
 
@@ -298,7 +284,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Open the link to the documentation in the system web browser.
         """
-        QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
+        _ = QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
 
     @QtCore.Slot(str)
     def update_status(self, text):

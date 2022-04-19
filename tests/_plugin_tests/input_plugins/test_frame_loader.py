@@ -40,7 +40,7 @@ from pydidas.plugins import PluginCollection, BasePlugin
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class TestTiffLoader(unittest.TestCase):
+class TestFrameLoader(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
@@ -61,17 +61,17 @@ class TestTiffLoader(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def create_plugin_with_filelist(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('TiffLoader')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name('FrameLoader')()
         plugin.set_param_value('first_file', self._fnames(0))
         plugin.set_param_value('last_file', self._fnames(self._n - 1))
         return plugin
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('TiffLoader')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name('FrameLoader')()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('TiffLoader')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name('FrameLoader')()
         with self.assertRaises(AppConfigError):
             plugin.pre_execute()
 
@@ -83,7 +83,7 @@ class TestTiffLoader(unittest.TestCase):
 
 
     def test_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('TiffLoader')(
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name('FrameLoader')(
             images_per_file=1)
         with self.assertRaises(AppConfigError):
             plugin.execute(0)

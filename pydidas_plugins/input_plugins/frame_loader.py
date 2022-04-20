@@ -36,12 +36,13 @@ from pydidas.core.utils import copy_docstring
 
 class FrameLoader(InputPlugin):
     """
-    Load data frames from files with a single image in each.
+    Load data frames from files with a single image in each, for example tif
+    or cif files.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.
-    Filesystem checks can be enabled using the live_processing keyword but
-    are disabled by default.
+    Filesystem checks can be disabled using the live_processing keyword but
+    are enabled by default.
 
     A region of interest and image binning can be supplied to apply directly
     to the raw image.

@@ -166,8 +166,6 @@ class ViewResultsMixin:
             _node, self._config['data_slices'],
             flattened_scan_dim=self._config['data_use_timeline'],
             force_string_metadata=True)
-        _data.axis_units = ['' if _unit is None else _unit
-                            for _unit in _data.axis_units]
         self._axlabels = lambda i: (
             _data.axis_labels.copy()[i]
             + (' / ' + _data.axis_units.copy()[i]

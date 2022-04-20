@@ -150,17 +150,13 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         Clean up after AppRunner is done.
         """
-        self.set_status('Cleaning up Apprunner')
         logger.debug('Telling AppRunner to exit.')
         self._runner.exit()
         self._runner = None
-        print('Runner exited successfully')
         logger.debug('AppRunner successfully shut down.')
         self.set_status('Finished processing of full workflow.')
         self._finish_processing()
-        print('Finshed processing')
         self.update_plot()
-        print('Updated plot')
 
     @QtCore.Slot()
     def __update_result_node_information(self):

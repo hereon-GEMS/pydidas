@@ -315,9 +315,9 @@ class _WorkflowResults(QtCore.QObject):
                 _slice = np.r_[_slice]
             _data = np.take(_data, _slice, _DIM(_dim))
         if force_string_metadata:
-            _data.axis_units = [(_val if _val is not None else '')
+            _data.axis_units = [(str(_val) if _val is not None else '')
                                 for _val in _data.axis_units.values()]
-            _data.axis_labels = [(_val if _val is not None else '')
+            _data.axis_labels = [(str(_val) if _val is not None else '')
                                  for _val in _data.axis_labels.values()]
         return np.squeeze(_data)
 

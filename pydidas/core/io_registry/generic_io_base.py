@@ -27,13 +27,15 @@ __all__ = ['GenericIoBase']
 
 import os
 
+from .generic_io_meta import GenericIoMeta
 
-class GenericIoBase:
+
+class GenericIoBase(metaclass=GenericIoMeta):
     """
     Base class for Metaclass-based importer/exporters.
     """
     extensions = []
-    format_name = 'unknown'
+    format_name = ''
     imported_params = {}
 
     @classmethod
@@ -63,7 +65,7 @@ class GenericIoBase:
         Parameters
         ----------
         filename : str
-            The filename of the file to be written.
+            The filename of the file to be imported.
         """
         raise NotImplementedError
 

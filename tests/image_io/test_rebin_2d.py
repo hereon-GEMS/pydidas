@@ -81,6 +81,20 @@ class TestRebin2d(unittest.TestCase):
         _target = np.array([max(s // 7, 1) for s in self._shape])
         self.assertTrue((_shape  == _target).all())
 
+    def test_rebin__2d_data_bin1(self):
+        data = rebin(self._2dimage, 1)
+        self.assertTrue((data == self._2dimage).all())
+
+    def test_rebin_2d_data_bin2(self):
+        data = rebin(self._2dimage, 2)
+        _shape = np.array(data.shape)
+        self.assertTrue((_shape  == self._2dshape // 2).all())
+
+    def test_rebin_2d_data_bin3(self):
+        data = rebin(self._2dimage, 3)
+        _shape = np.array(data.shape)
+        self.assertTrue((_shape  == self._2dshape // 3).all())
+
 
 if __name__ == "__main__":
     unittest.main()

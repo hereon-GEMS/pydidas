@@ -40,6 +40,7 @@ from pydidas.widgets import BaseFrame
 
 class ProcessingFrame(BaseFrame):
     show_frame = False
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
@@ -47,6 +48,7 @@ class ProcessingFrame(BaseFrame):
 
 class ToolsFrame(BaseFrame):
     show_frame = False
+
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         super().__init__(parent)
@@ -64,9 +66,9 @@ def run_gui(app=None):
     if app is None:
         app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
-    gui.register_frame(HomeFrame, 'Home','Home', 'qta::mdi.home')
+    gui.register_frame(HomeFrame, 'Home', 'Home', 'qta::mdi.home')
     gui.register_frame(DataBrowsingFrame, 'Data browsing', 'Data browsing',
-                        'qta::mdi.image-search-outline')
+                       'qta::mdi.image-search-outline')
     gui.register_frame(PyfaiCalibFrame, 'pyFAI calibration',
                        'pyFAI calibration', get_pyfai_calib_icon())
     gui.register_frame(CompositeCreatorFrame, 'Composite image creator',
@@ -84,14 +86,14 @@ def run_gui(app=None):
                        'Workflow processing/Workflow editing',
                        'qta::ph.share-network-fill')
     gui.register_frame(WorkflowTestFrame, 'Test workflow',
-                   'Workflow processing/Test workflow',
-                   'qta::mdi.play-protected-content')
+                       'Workflow processing/Test workflow',
+                       'qta::mdi.play-protected-content')
     gui.register_frame(ExecuteWorkflowFrame, 'Run full processing',
-                   'Workflow processing/Run full processing',
-                   'qta::msc.run-all')
+                       'Workflow processing/Run full processing',
+                       'qta::msc.run-all')
     gui.register_frame(ViewResultsFrame, 'View workflow results',
-                   'Workflow processing/View workflow results',
-                   'qta::mdi.monitor-eye')
+                       'Workflow processing/View workflow results',
+                       'qta::mdi.monitor-eye')
     gui.show()
     gui.raise_()
     _ = app.exec_()
@@ -108,9 +110,9 @@ if __name__ == '__main__':
         except RuntimeError:
             warnings.warn(
                 'Could not set the multiprocessing Process startup method to '
-                '"spawn". Multiprocessing with OpenGL will not work in Linux. To '
-                'solve this issue, restart the kernel and import pydidas before '
-                'starting any multiprocessing.')
+                '"spawn". Multiprocessing with OpenGL will not work in Linux. '
+                'To solve this issue, restart the kernel and import pydidas '
+                'before starting any multiprocessing.')
 
     app = QtWidgets.QApplication(sys.argv)
     run_gui(app)

@@ -5,3 +5,6 @@ requires = [
     "build",
 ]
 build-backend = "setuptools.build_meta"
+
+[tools.coverage.report]
+omit = ['*/tests/*']

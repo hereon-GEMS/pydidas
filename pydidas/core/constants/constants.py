@@ -30,7 +30,7 @@ import scipy.constants
 
 
 LAMBDA_IN_A_TO_E = 1e10 * (scipy.constants.h * scipy.constants.c
-                    / ( scipy.constants.e * 1e3))
+                           / (scipy.constants.e * 1e3))
 """
 float :
     The conversion factor to change a wavelength in Angstrom to an energy in
@@ -38,7 +38,7 @@ float :
 """
 
 LAMBDA_IN_M_TO_E = (scipy.constants.h * scipy.constants.c
-                    / ( scipy.constants.e * 1e3))
+                    / (scipy.constants.e * 1e3))
 """
 float :
     The conversion factor to change a wavelength in meter to an energy in

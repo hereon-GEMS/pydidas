@@ -26,7 +26,8 @@ __status__ = "Development"
 __all__ = ['QT_PALETTES', 'QT_STYLES', 'STANDARD_FONT_SIZE',
            'QT_DEFAULT_ALIGNMENT', 'QT_COMBO_BOX_SIZE_POLICY',
            'QT_REG_EXP_FLOAT_VALIDATOR', 'QT_REG_EXP_INT_VALIDATOR',
-           'QT_REG_EXP_SLICE_VALIDATOR', 'QT_REG_EXP_FLOAT_SLICE_VALIDATOR']
+           'QT_REG_EXP_SLICE_VALIDATOR', 'QT_REG_EXP_FLOAT_SLICE_VALIDATOR',
+           'FIX_EXP_POLICY', 'EXP_EXP_POLICY']
 
 from qtpy import QtGui, QtCore, QtWidgets
 
@@ -78,8 +79,8 @@ QT_COMBO_BOX_SIZE_POLICY = (
 
 QT_REG_EXP_FLOAT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-    '-?\\d*\.?\d*|None|nan',
-    QtCore.QRegularExpression.CaseInsensitiveOption))
+        '-?\\d*\.?\d*|None|nan',
+        QtCore.QRegularExpression.CaseInsensitiveOption))
 
 QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
@@ -90,3 +91,9 @@ QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
 
 QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression('((-?\\d*\\.?\\d*:?){1,3},?)*'))
+
+FIX_EXP_POLICY = (QtWidgets.QSizePolicy.Fixed,
+                  QtWidgets.QSizePolicy.Expanding)
+
+EXP_EXP_POLICY = (QtWidgets.QSizePolicy.Expanding,
+                  QtWidgets.QSizePolicy.Expanding)

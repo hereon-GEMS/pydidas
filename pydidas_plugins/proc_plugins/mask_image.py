@@ -85,7 +85,7 @@ class MaskImage(ProcPlugin):
         """
         if data.shape != self._mask.shape:
             _roi, _binning = self.get_single_ops_from_legacy()
-            self._mask  = np.where(
+            self._mask = np.where(
                 rebin2d(self._mask[_roi], _binning) > 0, 1, 0)
         _maskeddata = np.where(self._mask, self._maskval, data)
         return _maskeddata, kwargs

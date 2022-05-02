@@ -45,14 +45,14 @@ class Sum1dData(ProcPlugin):
         Parameter(
             'lower_limit', float, 0, name='Lower limit',
             tooltip=('The lower limit of data selection. This point is '
-                     'included in the data. Note that the selection is either '
-                     'in indices or data range, depending on the value of '
+                     'included in the data. Note that the selection is either'
+                     ' in indices or data range, depending on the value of '
                      '"type_selection".')),
         Parameter(
             'upper_limit', float, 0, name='Upper limit',
-            tooltip=('The upper limit of data selection. This point is'
-                     ' included in the data. Note that the selection is either '
-                     'in indices or data range, depending on the value of '
+            tooltip=('The upper limit of data selection. This point is '
+                     'included in the data. Note that the selection is either'
+                     ' in indices or data range, depending on the value of '
                      '"type_selection".')))
     input_data_dim = 1
     output_data_dim = 0

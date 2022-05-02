@@ -29,7 +29,6 @@ __all__ = ['Subtract1dBackgroundProfile']
 from pathlib import Path
 
 import numpy as np
-from numpy.polynomial import Polynomial
 
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, Parameter
@@ -39,18 +38,10 @@ from pydidas.plugins import ProcPlugin
 
 class Subtract1dBackgroundProfile(ProcPlugin):
     """
-    Subtract a polynomial background from a 1-dimensional profile.
+    Subtract a given background profile from 1-d data.
 
-    This plugin uses a multi-tiered approach to remove the background.
-    The background is calculated using the following approach:
-    First, the data is smoothed by an averaging filter to remove noise.
-    Second, local minima in the smoothed dataset are extracted and a
-    polynomial background is fitted to these local minima. All local minima
-    which are higher by more than 20% with pect to a linear fit between
-    their neighboring local minima are discarded.
-    Third, the residual between the background and the smoothed data is
-    calculated and the x-positions of all local minima of the residual are
-    used in conjunction with their data values to fit a final background.
+    This plugin simple substracts the given profile from all datasets. A
+    lower threshold can be given, for example to prevent negative values.
     """
     plugin_name = 'Subtract 1D background profile'
     basic_plugin = False
@@ -92,7 +83,9 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             _klim_low = _kernel // 2
             _klim_high = _kernel - 1 - _kernel // 2
 
-
+        _profile[_klim_low:-_klim_high] = np.convolve(
+            _profile, _kernel, mode='valid')
+        self._profile = _profile
 
     def execute(self, data, **kwargs):
         """
@@ -112,67 +105,10 @@ class Subtract1dBackgroundProfile(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        if self._kernel is not None:
-            data[self._klim_low:-self._klim_high] = np.convolve(
-                data, self._kernel, mode='valid')
+        data = data - self._profile
 
-        _x = np.arange(data.size)
-
-        # find and fit the local minima
-        local_min = np.where((data[1:-1] < np.roll(data, 1)[1:-1])
-                             & (data[1:-1] < np.roll(data, -1)[1:-1]))[0] + 1
-        local_min = self.__filter_local_minima_by_offset(local_min, data, 1.2)
-
-        if self._include_limits:
-            local_min = np.insert(local_min, 0, 0)
-            local_min = np.insert(local_min, data.size, data.size -1)
-
-        _p_prelim = Polynomial.fit(local_min, data[local_min], self._fit_order)
-
-        # calculate the residual and fit residual's local minima
-        _res = (data - _p_prelim(_x)) / data
-        _local_res_min = (np.where((_res[1:-1] < np.roll(_res, 1)[1:-1])
-                                   & (_res[1:-1] < np.roll(_res, -1)[1:-1]))[0]
-                          + 1)
-        _tmpindices = np.where(_res[_local_res_min] <= 0.002)[0]
-        _local_res_min = _local_res_min[_tmpindices]
-
-        _p_final = Polynomial.fit(_local_res_min, data[_local_res_min], 3)
-
-        data = data - _p_final(_x)
         if self._thresh is not None:
-            data = np.where(data < self._thresh, self._thresh, data)
+            _indices = np.where(data < self._thresh)[0]
+            data[_indices] = self._thresh
 
         return data, kwargs
-
-    @staticmethod
-    def __filter_local_minima_by_offset(xpos, data, offset):
-        """
-        Filter local minima from a list of positions by evaluating their offset
-        from the linear connection between neighbouring local minima.
-
-        Parameters
-        ----------
-        xpos : np.ndarray
-            The x positions of the datapoints
-        data : np.ndarray
-            The data values for the points.
-        offset : float
-            The threshold value offset at which to discard local minima.
-
-        Returns
-        -------
-        xpos : np.ndarray
-            The updated and filtered x positions.
-        """
-        _index = 1
-        while _index < xpos.size - 1:
-            _dx = xpos[_index + 1] - xpos[_index - 1]
-            _dy = data[xpos[_index + 1]] - data[xpos[_index - 1]]
-            _ypos = ((xpos[_index] - xpos[_index - 1]) / _dx
-                     * _dy + data[xpos[_index - 1]])
-            if data[xpos[_index]] >= offset * _ypos:
-                xpos = np.delete(xpos, _index, 0)
-            else:
-                _index += 1
-        return xpos

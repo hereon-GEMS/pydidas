@@ -131,7 +131,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
 
         if self._include_limits:
             local_min = np.insert(local_min, 0, 0)
-            local_min = np.insert(local_min, data.size, data.size -1)
+            local_min = np.insert(local_min, data.size, data.size - 1)
 
         _p_prelim = Polynomial.fit(local_min, data[local_min], self._fit_order)
 

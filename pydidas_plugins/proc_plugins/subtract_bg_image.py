@@ -83,7 +83,7 @@ class SubtractBackgroundImage(ProcPlugin):
         """
         if data.shape != self._bg_image.shape:
             _roi, _binning = self.get_single_ops_from_legacy()
-            self._bg_image  = rebin2d(self._bg_image[_roi], _binning)
+            self._bg_image = rebin2d(self._bg_image[_roi], _binning)
         _corrected_data = data - self._bg_image
         if self._thresh is not None:
             _corrected_data[_corrected_data < self._thresh] = self._thresh

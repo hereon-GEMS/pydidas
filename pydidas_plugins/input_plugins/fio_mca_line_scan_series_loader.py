@@ -94,7 +94,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
                   tooltip=('Use an absolute energy scale for the results.')),
         Parameter('energy_offset', float, 0, name='Energy offset', unit='eV',
                   tooltip=('The absolute offset in energy for the zeroth '
-                          'channel.')),
+                           'channel.')),
         Parameter('energy_delta', float, 1, name='Channel energy delta',
                   unit='eV',
                   tooltip=('The width of each energy channels in eV.')),
@@ -129,7 +129,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         if self.get_param_value('files_per_directory') == -1:
             _path = self.get_param_value('directory_path', dtype=str)
             _pattern = self.get_param_value('filename_pattern', dtype=str)
-            _len_pattern =_pattern.count('#')
+            _len_pattern = _pattern.count('#')
             _name = os.path.join(_path, _pattern).replace(
                 '#' * _len_pattern, '{:0' + str(_len_pattern) + 'd}')
             _dirname = _name.format(self.get_param_value('first_index'))
@@ -145,7 +145,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         _basepath = self.get_param_value('directory_path', dtype=str)
         _pattern = self.get_param_value('filename_pattern', dtype=str)
         _offset = self.get_param_value('first_index')
-        _len_pattern =_pattern.count('#')
+        _len_pattern = _pattern.count('#')
         if _len_pattern < 1:
             raise AppConfigError('No pattern detected!')
         _pattern = _pattern.replace('#' * _len_pattern,
@@ -186,7 +186,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         """
         if self.get_param_value('use_roi'):
             self._config['roi'] = slice(self.get_param_value('roi_xlow'),
-                                        self.get_param_value('roi_xhigh'))           
+                                        self.get_param_value('roi_xhigh'))
         else:
             self._config['roi'] = None
 

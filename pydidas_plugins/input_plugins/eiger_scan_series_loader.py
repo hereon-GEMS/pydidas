@@ -121,7 +121,7 @@ class EigerScanSeriesLoader(InputPlugin):
         _pattern = self.get_param_value('filename_pattern', dtype=str)
         _eigerkey = self.get_param_value('eiger_key')
         _suffix = self.get_param_value('filename_suffix', dtype=str)
-        _len_pattern =_pattern.count('#')
+        _len_pattern = _pattern.count('#')
         if _len_pattern < 1:
             raise AppConfigError('No pattern detected!')
         _name = os.path.join(_basepath, _pattern, _eigerkey,
@@ -140,7 +140,6 @@ class EigerScanSeriesLoader(InputPlugin):
             self.get_param_value('first_index'))
         self._image_metadata.set_param_value('filename', _start_fname)
         self._image_metadata.update()
-
 
     def __update_images_per_file(self):
         """

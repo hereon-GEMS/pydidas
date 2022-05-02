@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['AsciiSaver']
+__all__ = ['ChiSaver']
 
 import os
 
@@ -53,9 +53,6 @@ class ChiSaver(OutputPlugin):
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = 1
     output_data_dim = None
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def execute(self, data, **kwargs):
         """

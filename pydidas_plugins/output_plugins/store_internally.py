@@ -25,10 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['StoreInternally']
 
-import numpy as np
-
 from pydidas.core.constants import OUTPUT_PLUGIN
-from pydidas.core import Dataset
 from pydidas.plugins import OutputPlugin, BasePlugin
 
 

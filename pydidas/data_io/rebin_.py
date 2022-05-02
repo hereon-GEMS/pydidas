@@ -85,7 +85,7 @@ def rebin(data, binning):
     if binning == 1:
         return data
     if isinstance(data, Dataset):
-        return data.get_rebinned_copy(binning)       
+        return data.get_rebinned_copy(binning)
     _shape = np.asarray(data.shape)
     _lowlim = (_shape % binning) // 2
     _highlim = _shape - (_shape % binning) + _lowlim

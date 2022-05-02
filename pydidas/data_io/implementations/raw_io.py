@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Hdf5Io class for importing and exporting Hdf5 data.
+Module with the Tiff class for importing and exporting raw binary data without
+a header.
 """
 
 __author__ = "Malte Storm"
@@ -24,45 +25,36 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-import os
-from copy import copy
+import numpy as np
 
-from numpy import amax, squeeze
-import h5py
-import hdf5plugin
-
-from ...core.constants import HDF5_EXTENSIONS
+from ...core.constants import BINARY_EXTENSIONS
 from ...core import Dataset
-from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
 from .io_base import IoBase
 
 
-class Hdf5Io(IoBase):
-    """IObase implementation for Hdf5 files."""
-    extensions_export = HDF5_EXTENSIONS
-    extensions_import = HDF5_EXTENSIONS
-    format_name = 'Hdf5'
+class RawIo(IoBase):
+    """IObase implementation for raw binary files."""
+    extensions_export = BINARY_EXTENSIONS
+    extensions_import = BINARY_EXTENSIONS
+    format_name = 'Raw binary'
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename, datatype=None, shape=(), **kwargs):
         """
-        Read data from a Hdf5 file.
+        Read data from a raw binary data without a header.
 
         Parameters
         ----------
         filename : Union[pathlib.Path, str]
             The filename of the file with the data to be imported.
-        dataset : str, optional
-            The full path to the hdf dataset within the file. The default is
-            "entry/data/data".
-        slicing_axes : list, optional
-            The axes to be slices by the specified frame indices. The default
-            is [0].
-        frame : Union[int, list], optional
-            The indices of the unused axes to identify the selected dataset.
-            Integer values will be interpreted as values for axis 0.
-            The default is 0.
+        datatype : object
+            The python datatype used for decoding the bit-information of the
+            binary file. The default is None which will raise an exception.
+        shape : Union[tuple, list]
+            The shape of the raw data to be imported. This keyword must be
+            used to allow a correct shaping of the raw data. If the shape is
+            empty, an Exception will be raised. The default is [].
         roi : Union[tuple, None], optional
             A region of interest for cropping. Acceptable are both 4-tuples
             of integers in the format (y_low, y_high, x_low, x_high) as well
@@ -81,33 +73,20 @@ class Hdf5Io(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        frame = kwargs.get('frame', 0)
-        if isinstance(frame, int):
-            frame = [frame]
-        dataset = kwargs.get('dataset', 'entry/data/data')
-        slicing_axes = kwargs.get('slicing_axes', [0])
+        if datatype is None:
+            raise KeyError('The datatype has not been specified.')
 
-        if len(frame) < len(slicing_axes):
-            raise ValueError('The number of frames must not be shorter than '
-                             'the number of slicing indices.')
-
-        if len(slicing_axes) == 0:
-            _slicer = []
-        else:
-            _tmpframe = copy(frame)
-            _slicer = [(_tmpframe.pop(0) if _i in slicing_axes else None)
-                       for _i in range(amax(slicing_axes) + 1)]
-
-        _data = squeeze(read_hdf5_slice(filename, dataset, _slicer))
-        cls._data = Dataset(_data, metadata={'slicing_axes': slicing_axes,
-                                             'frame': frame,
-                                             'dataset': dataset})
+        _data = np.fromfile(filename, dtype=datatype)
+        if _data.size != np.prod(shape):
+            print(_data.size, np.prod(shape))
+            raise ValueError('The given shape does not match the data size.')
+        cls._data = Dataset(_data.reshape(shape))
         return cls.return_data(**kwargs)
 
     @classmethod
     def export_to_file(cls, filename, data, **kwargs):
         """
-        Export data to an Hdf5 file.
+        Export data to raw binary file without a header.
 
         Parameters
         ----------
@@ -115,17 +94,10 @@ class Hdf5Io(IoBase):
             The filename
         data : np.ndarray
             The data to be written to file.
-        dataset : str, optional
-            The full path to the hdf dataset within the file. The default is
-            "entry/data/data".
         overwrite : bool, optional
             Flag to allow overwriting of existing files. The default is False.
 
         """
         cls.check_for_existing_file(filename, **kwargs)
-        dataset = kwargs.get('dataset', 'entry/data/data')
-        _groupname = os.path.dirname(dataset)
-        _key = os.path.basename(dataset)
-        with h5py.File(filename, 'w') as _file:
-            _group = _file.create_group(_groupname)
-            _group.create_dataset(_key, data=data)
+        with open(filename, 'wb') as _file:
+            data.tofile(_file)

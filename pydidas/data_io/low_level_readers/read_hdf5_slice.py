@@ -77,7 +77,7 @@ def read_hdf5_slice(h5filename, hdf5_dataset, axes=None):
             roi = tuple(slice(*limits[i1]) for i1 in range(limits.shape[0]))
             return _ds[roi]
 
-        data = np.empty(np.diff(limits, axis=1)[:,0], dtype=_ds.dtype)
+        data = np.empty(np.diff(limits, axis=1)[:, 0], dtype=_ds.dtype)
 
         slices_original = np.empty(_ds.ndim, dtype=object)
         slices_target = np.empty(_ds.ndim, dtype=object)
@@ -153,6 +153,6 @@ def get_slices(limits, chunks):
                    min((j + 1 + index_offset) * chunks, limits[1]) - offset)
     _ori = [slice(_limit_low(j, 0), _limit_high(j, 0))
             for j in range(num_slices)]
-    _target  = [slice(_limit_low(j, limits[0]), _limit_high(j, limits[0]))
-                for j in range(num_slices)]
+    _target = [slice(_limit_low(j, limits[0]), _limit_high(j, limits[0]))
+               for j in range(num_slices)]
     return _ori, _target

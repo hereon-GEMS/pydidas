@@ -102,6 +102,6 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         if selection:
             _style = qt_presets.QT_STYLES['workflow_plugin_active']
         else:
-            _style= qt_presets.QT_STYLES['workflow_plugin_inactive']
+            _style = qt_presets.QT_STYLES['workflow_plugin_inactive']
         self.setStyleSheet(_style)
         self.active = selection

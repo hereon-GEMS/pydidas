@@ -77,15 +77,12 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
         apply_widget_properties(self, **kwargs)
 
-        self._config = dict(activeDsetFilters = [],
-                            currentDset = None,
-                            currentFname = None,
-                            currentIndex = None,
-                            dsetFilters = (datasetKeyFilters
-                                           if datasetKeyFilters is not None
-                                           else DEFAULT_FILTERS))
-        self.flags = dict(slotActive = False,
-                          autoUpdate = 0)
+        self._config = dict(
+            activeDsetFilters=[], urrentDset=None, currentFname=None,
+            currentIndex=None,
+            dsetFilters=(datasetKeyFilters if datasetKeyFilters is not None
+                         else DEFAULT_FILTERS))
+        self.flags = dict(slotActive=False, autoUpdate=0)
         self._widgets['viewer'] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()

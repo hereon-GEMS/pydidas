@@ -54,13 +54,13 @@ def _param_widget_config(param_key):
     Get Formatting options for create_param_widget instances.
     """
     if param_key in ['selected_results']:
-        return  dict(linebreak=True,
-                     halign_text=QtCore.Qt.AlignLeft,
-                     valign_text=QtCore.Qt.AlignBottom,
-                     width_total=CONFIG_WIDGET_WIDTH - 10,
-                     width_io=CONFIG_WIDGET_WIDTH - 50,
-                     width_text=CONFIG_WIDGET_WIDTH - 20,
-                     width_unit=0)
+        return dict(linebreak=True,
+                    halign_text=QtCore.Qt.AlignLeft,
+                    valign_text=QtCore.Qt.AlignBottom,
+                    width_total=CONFIG_WIDGET_WIDTH - 10,
+                    width_io=CONFIG_WIDGET_WIDTH - 50,
+                    width_text=CONFIG_WIDGET_WIDTH - 20,
+                    width_unit=0)
     return dict(width_io=100, width_unit=0,
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH - 10,
@@ -155,8 +155,8 @@ class ResultSelectionWidget(QtWidgets.QWidget,
             vertical=False, gridPos=(-1, 0, 1, 1), visible=False,
             title='Arrangement of results:')
         self.create_any_widget(
-            'result_info',  ReadOnlyTextWidget, gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,fixedHeight=300,
+            'result_info', ReadOnlyTextWidget, gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH, fixedHeight=300,
             alignment=QtCore.Qt.AlignTop, visible=False)
         self.create_radio_button_group(
             'radio_plot_type',
@@ -289,13 +289,13 @@ class ResultSelectionWidget(QtWidgets.QWidget,
         """
         _ax1_used = (self._config['plot_type']
                      in ['1D plot', 'group of 1D plots', '2D full axes'])
-        _ax2_used = (self._config['plot_type'] =='2D full axes')
+        _ax2_used = (self._config['plot_type'] == '2D full axes')
         return _ax1_used, _ax2_used
 
     @QtCore.Slot(str)
     def __modify_data_selection(self, label):
         """
-        Received the signal that the data selection modality (data values 
+        Received the signal that the data selection modality (data values
         / indices) has been changed and update the internal reference.
 
         Parameters
@@ -313,7 +313,6 @@ class ResultSelectionWidget(QtWidgets.QWidget,
             self.param_widgets[_refkey].setValidator(
                 self._config['validator'])
 
-        
     @QtCore.Slot(int)
     def __selected_new_node(self, index):
         """
@@ -521,7 +520,7 @@ class ResultSelectionWidget(QtWidgets.QWidget,
                 _refkey, str, '0', name=f'Slice of data dim #{_dim}',
                 tooltip=('The scan/data position index to be displayed. Note: '
                          'The selection will be modulated to match the number '
-                             'of datapoints.'))
+                         'of datapoints.'))
             if _refkey not in self.params:
                 self.add_param(_param)
                 self.create_param_widget(

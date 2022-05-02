@@ -120,7 +120,7 @@ class ParameterWidgetsMixIn:
             The formatting arguments for adding the widget to the parent's
             layout.
         """
-        _nrows =  parent.layout().rowCount()
+        _nrows = parent.layout().rowCount()
         _next_row = (_nrows - int(parent.layout().count() == 0)
                      if isinstance(parent.layout(), QtWidgets.QGridLayout)
                      else -1)

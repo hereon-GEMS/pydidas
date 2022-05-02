@@ -85,7 +85,6 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         Delete all widgets and items which currently populate the
         PluginParameterEditWidget.
         """
-        #delete current widgets
         _layout = self.layout()
         for i in reversed(range(_layout.count())):
             item = _layout.itemAt(i)
@@ -168,7 +167,6 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
                        'width_unit': 0,
                        'width_total': self.FIXED_WIDTH - 10,
                        'linebreak': True}
-                       #'halign_text': QtCore.Qt.AlignLeft}
         else:
             _kwargs = {'width_text': 200,
                        'width_io': self.FIXED_WIDTH - 240,

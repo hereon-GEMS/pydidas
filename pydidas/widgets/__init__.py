@@ -31,7 +31,8 @@ from . import factory
 from . import parameter_config
 from . import selection
 from . import workflow_edit
-__all__.extend(['dialogues', 'factory', 'parameter_config', 'selection', 'workflow_edit'])
+__all__.extend(['dialogues', 'factory', 'parameter_config', 'selection',
+                'workflow_edit'])
 
 # explicitly import items from subpackages into the module:
 from .factory import CreateWidgetsMixIn

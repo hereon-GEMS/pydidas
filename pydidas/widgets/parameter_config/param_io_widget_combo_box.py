@@ -37,7 +37,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
     Widgets for I/O during plugin parameter editing with predefined
     choices.
     """
-    #because of the double inheritance, inhering the signal does not work
+    # because of the double inheritance, inhering the signal does not work
     io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=255):

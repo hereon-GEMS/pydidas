@@ -85,7 +85,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         """
         _yoffset = 0
         _rowheight = 20
-        _height =  _rowheight * self._rows + (self._rows - 1) * 5
+        _height = _rowheight * self._rows + (self._rows - 1) * 5
 
         self.q_button_group = QtWidgets.QButtonGroup(self)
         _layout = QtWidgets.QGridLayout()

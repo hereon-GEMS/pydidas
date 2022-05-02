@@ -47,7 +47,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.title.setStyleSheet(QT_STYLES['title'])
         self.title.setText('Workflow tree editor')
         self.title.move(10, 10)
-        self.painter =  QtGui.QPainter()
+        self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
 
         self.setLineWidth(2)

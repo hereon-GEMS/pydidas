@@ -263,7 +263,7 @@ def _get_widget_layout_args(parent, **kwargs):
         the layout of the parent widget.
     """
     if not isinstance(
-            parent.layout(),(QBoxLayout, QStackedLayout, QGridLayout)):
+            parent.layout(), (QBoxLayout, QStackedLayout, QGridLayout)):
         raise WidgetLayoutError(
             f'Layout of parent widget "{parent}" is not of type '
             'QBoxLayout, QStackedLayout or QGridLayout.')

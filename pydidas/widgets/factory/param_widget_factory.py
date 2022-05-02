@@ -72,10 +72,10 @@ def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
         _widget = ParamIoWidgetComboBox(None, param, widget_width)
     else:
         if param.type == pathlib.Path:
-            _widget =  ParamIoWidgetFile(None, param, widget_width)
+            _widget = ParamIoWidgetFile(None, param, widget_width)
         elif param.type == Hdf5key:
-            _widget =  ParamIoWidgetHdf5Key(None, param, widget_width)
+            _widget = ParamIoWidgetHdf5Key(None, param, widget_width)
         else:
-            _widget =  ParamIoWidgetLineEdit(None, param, widget_width)
+            _widget = ParamIoWidgetLineEdit(None, param, widget_width)
     _widget.set_value(param.value)
     return _widget

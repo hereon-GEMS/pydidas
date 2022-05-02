@@ -193,7 +193,6 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
         _widget = self.widgets[self.widget_indices[ref_name]]
         self.removeWidget(_widget)
 
-
     def addWidget(self, widget=None, name=None):
         """
         Overload the QStackedWidget.addWidget method to deactivate it.

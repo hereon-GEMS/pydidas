@@ -28,7 +28,6 @@ __all__ = ['PluginCollectionTreeWidget']
 from functools import partial
 
 from qtpy import QtWidgets, QtGui, QtCore
-from qtpy.QtCore import Qt
 
 from ...core.constants import QT_STYLES
 from ...plugins import PluginCollection

@@ -136,7 +136,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             config['halign_text'] = kwargs.get('halign_text',
                                                QtCore.Qt.AlignLeft)
             config['halign_io'] = kwargs.get('halign_io',
-                                              QtCore.Qt.AlignRight)
+                                             QtCore.Qt.AlignRight)
         else:
             config['width_text'] = kwargs.get('width_text',
                                               PARAM_INPUT_TEXT_WIDTH)

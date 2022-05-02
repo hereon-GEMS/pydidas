@@ -184,7 +184,7 @@ def excepthook(exc_type, exception, trace):
              f'\n\nA log has been written to:\n\t{_logfile}.'
              '\n\nError information:\n')
     _time = time.strftime('%Y-%m-%d %H:%M:%S')
-    _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace ])
+    _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace])
     try:
         with open(_logfile, 'w') as _file:
             _file.write(_msg)

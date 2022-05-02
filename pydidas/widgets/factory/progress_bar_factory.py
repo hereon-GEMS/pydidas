@@ -28,6 +28,7 @@ from qtpy.QtWidgets import QProgressBar
 
 from ..utilities import apply_widget_properties
 
+
 def create_progress_bar(**kwargs):
     """
     Create a QSpinBox widget and set properties.

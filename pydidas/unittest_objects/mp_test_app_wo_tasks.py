@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the MpTestApp class which allows to test a dummy application in
-real multiprocessing.
+Module with the MpTestAppWoTasks class which allows to test a dummy
+application without tasks in real multiprocessing.
 """
 
 __author__ = "Malte Storm"
@@ -23,15 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['MpTestApp']
+__all__ = ['MpTestAppWoTasks']
 
 import time
 
 import numpy as np
 from qtpy import QtCore
 
-# because these Plugins will be loaded directly by importlib, absolute imports
-# are required:
 from pydidas.core import get_generic_param_collection, BaseApp
 from pydidas.image_io import CompositeImage
 

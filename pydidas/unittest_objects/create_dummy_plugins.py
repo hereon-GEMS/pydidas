@@ -97,17 +97,39 @@ def create_plugin_class(plugin_type, number=0, use_filename=True):
     _cls.number = number
     _cls.params = ParameterCollection()
     if plugin_type == INPUT_PLUGIN:
-        if use_filename:
-            if 'first_file' in _cls.default_params:
-                del _cls.default_params['first_file']
-            if 'filename' not in _cls.default_params:
-                _cls.default_params.add_param(get_generic_parameter(
-                    'filename'))
-        else:
-            if 'filename' in _cls.default_params:
-                del _cls.default_params['filename']
-            if 'first_file' not in _cls.default_params:
-                _cls.default_params.add_param(get_generic_parameter(
-                    'first_file'))
+        _cls = _setup_input_plugin(_cls, use_filename)
     _cls.__doc__ = get_random_string(600)
     return _cls
+
+
+def _setup_input_plugin(plugin_class, use_filename):
+    """
+    Setup the generic Parameters for the input class, based on the choice
+    of using the "filename" or "first_file" Parameter.
+
+    Parameters
+    ----------
+    plugin_class : type
+        The plugin class.
+    use_filename : bool
+        The flag to use the filename or the the "first_file" Parameter if
+        False.
+
+    Returns
+    -------
+    plugin_class : type
+        The updated plugin class.
+    """
+    if use_filename:
+        if 'first_file' in plugin_class.default_params:
+            del plugin_class.default_params['first_file']
+        if 'filename' not in plugin_class.default_params:
+            plugin_class.default_params.add_param(get_generic_parameter(
+                'filename'))
+    else:
+        if 'filename' in plugin_class.default_params:
+            del plugin_class.default_params['filename']
+        if 'first_file' not in plugin_class.default_params:
+            plugin_class.default_params.add_param(get_generic_parameter(
+                'first_file'))
+    return plugin_class

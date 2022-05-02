@@ -30,9 +30,10 @@ import numpy as np
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
 from pydidas.core import (Parameter, ParameterCollection, Dataset,
-                    get_generic_parameter)
+                          get_generic_parameter)
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins import InputPlugin
+
 
 class DummyLoader(InputPlugin):
     """
@@ -151,7 +152,7 @@ class DummyLoader(InputPlugin):
             The updated input kwargs dictionary.
         """
         _width = self.get_param_value('image_width')
-        _height =self.get_param_value('image_height')
+        _height = self.get_param_value('image_height')
         _data = np.random.random((_height, _width))
         _data[_data == 0] = 0.0001
         kwargs.update(dict(index=index))

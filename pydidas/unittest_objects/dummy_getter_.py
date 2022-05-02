@@ -40,8 +40,6 @@ def dummy_getter(plugin_name):
     plugin : pydidas.plugins.BasePlugin
         The new Plugin instance.
     """
-    # because this module will be loaded directly by importlib, absolute imports
-    # are required:
     from .dummy_loader import DummyLoader
     from .dummy_proc import DummyProc
     if plugin_name == 'DummyLoader':

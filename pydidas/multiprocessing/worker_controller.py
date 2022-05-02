@@ -225,7 +225,6 @@ class WorkerController(QtCore.QThread):
         """
         self._flag_running = True
 
-
     def add_task(self, task_arg):
         """
         Add a task to the worker pool.

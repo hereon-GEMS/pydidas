@@ -116,7 +116,6 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return self._config['file_size']
 
-
     def get_config(self):
         """
         Get the full _config dictionary.
@@ -214,7 +213,6 @@ class FilelistManager(ObjectWithParameterCollection):
             self._create_filelist_live_processing()
         else:
             self._create_filelist_static()
-
 
     def _check_only_first_file_selected(self):
         """

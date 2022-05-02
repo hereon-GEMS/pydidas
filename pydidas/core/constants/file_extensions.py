@@ -31,7 +31,7 @@ HDF5_EXTENSIONS = ['.h5', '.hdf', '.nxs', '.hdf5', '.HDF5']
 
 NUMPY_EXTENSIONS = ['.npy', '.np', '.npz']
 
-BINARY_EXTENSIONS = ['.raw', '.bin']
+BINARY_EXTENSIONS = ['.raw', '.bin', '.dat']
 
 TIFF_EXTENSIONS = ['.tif', '.tiff']
 

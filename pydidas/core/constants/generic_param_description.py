@@ -29,9 +29,9 @@ import numpy as np
 
 
 GENERIC_PARAM_DESCRIPTION = {
-    ###################################
-    ## Generic processing paramters
-    ###################################
+    #################################
+    # Generic processing paramters
+    ##################################
     'live_processing': {
         'type': int,
         'default': 0,
@@ -64,7 +64,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     'This value only needs to be set for output plugins or '
                     'final processing plugins in the list.')},
     ###################################
-    ## Parameters for CompositeCreation
+    # Parameters for CompositeCreation
     ###################################
     'filename': {
         'type': 'Path',
@@ -377,7 +377,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The name of the sub-directory for each scan in which the'
                     ' Eiger detector writes its data files.')},
-     'filename_suffix': {
+    'filename_suffix': {
          'type': str,
          'default': '_data_000001.h5',
          'name': 'Eiger filename suffix',
@@ -387,7 +387,7 @@ GENERIC_PARAM_DESCRIPTION = {
          'tooltip': ('The suffix to be appended to the filename pattern to get'
                      ' the full filename for the data file.')},
     #################################
-    ## Parameters for global geometry
+    # Parameters for global geometry
     #################################
     'xray_wavelength': {
         'type': float,
@@ -506,7 +506,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The detector rotation 3 (around the beam axis; '
                     'right-handed when looking downstream with the beam.)')},
     ############################
-    ## Parameters for scan setup
+    # Parameters for scan setup
     ############################
     'scan_dim': {
         'type': int,
@@ -526,7 +526,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The scan name or title. This is used exclusively for '
                     'reference in result exporters.')},
-     'scan_dir_1': {
+    'scan_dir_1': {
         'type': str,
         'default': '',
         'name': 'Name of scan direction 1',
@@ -535,7 +535,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The axis name for scan direction 1. This information'
                     ' will only be used for labelling.')},
-     'n_points_1': {
+    'n_points_1': {
         'type': int,
         'default': 0,
         'name': 'Number of scan points (dir. 1)',
@@ -572,7 +572,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The unit of the movement / steps / offset in scan '
                     'direction 1.')},
-     'scan_dir_2': {
+    'scan_dir_2': {
         'type': str,
         'default': '',
         'name': 'Name of scan direction 2',
@@ -581,7 +581,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The axis name for scan direction 2. This information'
                     ' will only be used for labelling.')},
-     'n_points_2': {
+    'n_points_2': {
         'type': int,
         'default': 0,
         'name': 'Number of scan points (dir. 2)',
@@ -618,7 +618,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The unit of the movement / steps / offset in scan '
                     'direction 2.')},
-     'scan_dir_3': {
+    'scan_dir_3': {
         'type': str,
         'default': '',
         'name': 'Name of scan direction 3',
@@ -627,7 +627,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The axis name for scan direction 3. This information'
                     ' will only be used for labelling.')},
-     'n_points_3': {
+    'n_points_3': {
         'type': int,
         'default': 0,
         'name': 'Number of scan points (dir. 3)',
@@ -664,7 +664,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The unit of the movement / steps / offset in scan '
                     'direction 3.')},
-     'scan_dir_4': {
+    'scan_dir_4': {
         'type': str,
         'default': '',
         'name': 'Name of scan direction 4',
@@ -673,7 +673,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('The axis name for scan direction 4. This information'
                     ' will only be used for labelling.')},
-     'n_points_4': {
+    'n_points_4': {
         'type': int,
         'default': 0,
         'name': 'Number of scan points (dir. 4)',
@@ -711,7 +711,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The unit of the movement / steps / offset in scan '
                     'direction 4.')},
     ############################
-    ## selected scan indices
+    # selected scan indices
     ############################
     'scan_index1': {
         'type': int,
@@ -754,7 +754,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The image number to be processed.'},
     ############################
-    ## global app settings
+    # global app settings
     ############################
     'mp_n_workers': {
         'type': int,
@@ -870,7 +870,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('The delay before any plot updates will be processed. This'
                     ' will prevent multiple frequent update of plots.')},
     ############################
-    ## global choice settings
+    # global choice settings
     ############################
     'use_global_mask': {
         'type': int,
@@ -885,7 +885,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     ' will not be used for integrating but only for '
                     'presentation or by using the MaskImage plugin.')},
     ############################
-    ## pyFAI settings parameters
+    # pyFAI settings parameters
     ############################
     'rad_npoint': {
         'type': int,
@@ -998,7 +998,7 @@ GENERIC_PARAM_DESCRIPTION = {
                     ' visit the pyfai documentation available at: '
                     'https://pyfai.readthedocs.io/')},
     ############################
-    ## Autosave results settings
+    # Autosave results settings
     ############################
     'autosave_results': {
         'type': int,
@@ -1039,7 +1039,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The output filename for the data export.'},
     ############################
-    ## Result selection settings
+    # Result selection settings
     ############################
     'selected_results': {
         'type': str,
@@ -1088,9 +1088,6 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': ('Keyword to toggle using a the data range instead of  '
                     'the indices for selecting data.')},
-    ############################
-    ## Result selection settings
-    ############################
     'scan_for_all': {
         'type': int,
         'default': False,
@@ -1135,7 +1132,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The node ID of the currently selected node.'},
     ############################
-    ## Fitting Parameters
+    # Fitting Parameters
     ############################
     'fit_func': {
         'type': str,
@@ -1172,7 +1169,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'allow_None': False,
         'tooltip': 'The lower limit (in the x-axis´ unit) to the fit region.'},
     ############################
-    ## PLugin Parameters
+    # Plugin Parameters
     ############################
     'type_selection': {
         'type': str,
@@ -1184,7 +1181,7 @@ GENERIC_PARAM_DESCRIPTION = {
         'tooltip': ('Select between using the axis values (in the respective.'
                     'unit) and the axis indices.')},
     ############################
-    ## Result visualization Parameters
+    # Result visualization Parameters
     ############################
     'plot_ax1': {
         'type': int,

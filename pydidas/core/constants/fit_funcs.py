@@ -52,12 +52,12 @@ def GAUSSIAN(c, x, data, bg_order=None):
         The residual between the fit and the data.
     """
     if bg_order is None:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))) - data
+        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1] ** 2))) - data
     if bg_order == 0:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))
+        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1] ** 2))
                 + c[3] - data)
     if bg_order == 1:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))
+        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1] ** 2))
                 + c[3] + c[4] * x - data)
 
 

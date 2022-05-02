@@ -26,7 +26,6 @@ import unittest
 import tempfile
 import shutil
 import pickle
-from pathlib import Path
 
 import numpy as np
 import h5py
@@ -36,7 +35,7 @@ from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
 
 
-PLUGIN_COLLECTION = PluginCollection()
+COLLECTION = PluginCollection()
 
 
 class TestEigerScanSeriesLoader(unittest.TestCase):
@@ -46,7 +45,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         self._img_shape = (10, 10)
         self._n_per_file = 13
         self._n_files = 11
-        self._fname_offset = 2
+        self._fname_i0 = 2
         self._pattern = 'test_{:05d}'
         self._suffix = '_data.h5'
         self._eiger_key = 'eiger9m'
@@ -59,14 +58,14 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         self._hdf5_fnames = []
         for i in range(self._n_files):
             _dir = os.path.join(self._path,
-                                self._pattern.format(i + self._fname_offset),
+                                self._pattern.format(i + self._fname_i0),
                                 self._eiger_key)
             os.makedirs(_dir)
-            _fname = os.path.join(_dir,
-                self._pattern.format(i + self._fname_offset) + self._suffix)
+            _fname = os.path.join(
+                _dir, self._pattern.format(i + self._fname_i0) + self._suffix)
             self._hdf5_fnames.append(_fname)
             _slice = slice(i * self._n_per_file,
-                           (i + 1 ) * self._n_per_file, 1)
+                           (i + 1) * self._n_per_file, 1)
             with h5py.File(_fname, 'w') as f:
                 f[self._hdf5key] = self._data[_slice]
 
@@ -74,12 +73,12 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def create_plugin_with_filelist(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
+        plugin = COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
         plugin.set_param_value('directory_path', self._path)
         plugin.set_param_value('filename_pattern', 'test_#####')
         plugin.set_param_value('eiger_key', self._eiger_key)
         plugin.set_param_value('filename_suffix', self._suffix)
-        plugin.set_param_value('first_index', self._fname_offset)
+        plugin.set_param_value('first_index', self._fname_i0)
         plugin.set_param_value('hdf5_key', self._hdf5key)
         return plugin
 
@@ -87,11 +86,11 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         return index % self._n_per_file
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
+        plugin = COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
+        plugin = COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')()
         with self.assertRaises(AppConfigError):
             plugin.pre_execute()
 
@@ -109,7 +108,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
                          self._n_per_file)
 
     def test_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')(
+        plugin = COLLECTION.get_plugin_by_name('EigerScanSeriesLoader')(
             images_per_file=1)
         with self.assertRaises(TypeError):
             plugin.execute(0)
@@ -169,6 +168,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         plugin = self.create_plugin_with_filelist()
         self.assertEqual(plugin.get_first_file_size(),
                          os.stat(self._hdf5_fnames[0]).st_size)
+
 
 if __name__ == "__main__":
     unittest.main()

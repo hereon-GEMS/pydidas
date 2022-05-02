@@ -66,11 +66,11 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         _scan_shape = tuple(SCAN.get_param_value(f'n_points_{i}')
                             for i in [1, 2, 3])
         self._shapes = {1: _scan_shape + (12, 7), 2: _scan_shape + (23,),
-                   3: _scan_shape + (1, 3, 7)}
+                        3: _scan_shape + (1, 3, 7)}
         self._labels = {1: 'Test', 2: 'not again', 3: 'another'}
         self._datalabels = {1: 'Intensity', 2: 'Peak height', 3: 'Area'}
         self._filenames = {1: 'node_01_Test.h5', 2: 'node_02_not_again.h5',
-                      3: 'node_03_another.h5'}
+                           3: 'node_03_another.h5'}
         self._resdir = os.path.join(self._dir, get_random_string(8))
         H5SAVER.prepare_files_and_directories(self._resdir, self._shapes,
                                               self._labels, self._datalabels)
@@ -116,14 +116,14 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
     def test_update_node_metadata__with_None(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape[3:]))
-                  for _key, _shape in self._shapes.items()}
+                 for _key, _shape in self._shapes.items()}
         _data1 = _data[1]
         H5SAVER.update_node_metadata(1, _data1)
 
     def test_update_node_metadata__with_entries(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape[3:]))
-                  for _key, _shape in self._shapes.items()}
+                 for _key, _shape in self._shapes.items()}
         _data[1], _labels, _units, _ranges = self.populate_metadata(_data[1])
         H5SAVER.update_node_metadata(1, _data[1])
         _fname = os.path.join(self._resdir, self._filenames[1])
@@ -131,16 +131,16 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             for _ax in [3, 4]:
                 _axentry = _file[f'entry/data/axis_{_ax}']
                 self.assertEqual(_axentry['label'][()].decode('UTF-8'),
-                                  _labels[_ax - 3])
+                                 _labels[_ax - 3])
                 self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
-                                  _units[_ax - 3])
+                                 _units[_ax - 3])
                 self.assertTrue(np.allclose(_axentry['range'][()],
                                             _ranges[_ax - 3]))
 
     def test_update_frame_metadata__standard(self):
         self.prepare_with_defaults()
         _data = {_key: Dataset(np.random.random(_shape[3:]))
-                  for _key, _shape in self._shapes.items()}
+                 for _key, _shape in self._shapes.items()}
         for _key in _data:
             _data[_key], _, _, _ = self.populate_metadata(_data[_key])
         _metadata = {_key: dict(axis_units=_item.axis_units,
@@ -171,7 +171,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             _data[_node_id], _labels, _units, _ranges = (
                 self.populate_metadata(_data[_node_id]))
             _metadata[_node_id] = dict(labels=_labels, units=_units,
-                                        ranges=_ranges)
+                                       ranges=_ranges)
         H5SAVER.write_metadata_to_files(_data)
         for _node_id in self._shapes:
             _fname = os.path.join(self._resdir, self._filenames[_node_id])
@@ -179,9 +179,9 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                 for _ax in range(3, _data[_node_id].ndim):
                     _axentry = _file[f'entry/data/axis_{_ax}']
                     self.assertEqual(_axentry['label'][()].decode('UTF-8'),
-                                      _metadata[_node_id]['labels'][_ax - 3])
+                                     _metadata[_node_id]['labels'][_ax - 3])
                     self.assertEqual(_axentry['unit'][()].decode('UTF-8'),
-                                      _metadata[_node_id]['units'][_ax - 3])
+                                     _metadata[_node_id]['units'][_ax - 3])
                     self.assertTrue(np.allclose(
                         _axentry['range'][()],
                         _metadata[_node_id]['ranges'][_ax - 3]))

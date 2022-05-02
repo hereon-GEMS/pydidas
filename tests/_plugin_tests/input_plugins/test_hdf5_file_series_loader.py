@@ -57,7 +57,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
             _fname = Path(os.path.join(self._path, f'test_{i:03d}.h5'))
             self._hdf5_fnames.append(_fname)
             _slice = slice(i * self._n_per_file,
-                           (i + 1 ) * self._n_per_file, 1)
+                           (i + 1) * self._n_per_file, 1)
             with h5py.File(_fname, 'w') as f:
                 f[self._hdf5key] = self._data[_slice]
 

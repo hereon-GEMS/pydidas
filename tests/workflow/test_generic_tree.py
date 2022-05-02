@@ -37,7 +37,7 @@ class TestGenericTree(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         root = GenericNode(node_id=0)
-        _nodes =  [[root]]
+        _nodes = [[root]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
@@ -114,7 +114,7 @@ class TestGenericTree(unittest.TestCase):
     def test_get_new_nodeid__multiple_nodes(self):
         _id = 3
         tree = GenericTree()
-        tree.node_ids = [_id -1,_id]
+        tree.node_ids = [_id - 1, _id]
         self.assertEqual(tree.get_new_nodeid(), _id + 1)
 
     def test_check_node_ids__no_ids(self):

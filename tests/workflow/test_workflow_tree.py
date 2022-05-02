@@ -60,7 +60,7 @@ class TestWorkflowTree(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=unittest_objects.DummyLoader())
-        _nodes =  [[obj00]]
+        _nodes = [[obj00]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
@@ -136,8 +136,8 @@ class TestWorkflowTree(unittest.TestCase):
         nodes, n_nodes = self.create_node_tree(depth=_depth)
         self.tree.register_node(nodes[0][0])
         _newdata, kwargs = self.tree.execute_single_plugin(n_nodes - 2, _data,
-                                                            offset=_offset)
-        self.assertTrue((abs(_newdata -_offset - _data) < 1e-15).all())
+                                                           offset=_offset)
+        self.assertTrue((abs(_newdata - _offset - _data) < 1e-15).all())
 
     def test_execute_process(self):
         _depth = 3
@@ -200,7 +200,7 @@ class TestWorkflowTree(unittest.TestCase):
     def test_create_and_add_node__with_int_parent(self):
         _node = self.tree.create_and_add_node(unittest_objects.DummyLoader())
         _node2 = self.tree.create_and_add_node(unittest_objects.DummyProc(),
-                                      parent=_node)
+                                               parent=_node)
         self.assertIsInstance(self.tree.nodes[1], GenericNode)
         self.assertEqual(self.tree.nodes[0].n_children, 1)
         self.assertEqual(_node, 0)
@@ -286,7 +286,6 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.restore_from_string('[]')
         self.assertEqual(self.tree.nodes, dict())
-
 
     def test_hash___empty_tree(self):
         tree = WorkflowTree()

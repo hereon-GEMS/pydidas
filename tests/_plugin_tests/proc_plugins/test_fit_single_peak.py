@@ -127,7 +127,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _x, _data = plugin._get_data_range(self._data)
         plugin._update_fit_startparams(_x, _data)
         self.assertEqual(plugin._fitparam_labels,
-                          ['amplitude', 'sigma', 'center'])
+                         ['amplitude', 'sigma', 'center'])
         self.assertEqual(len(plugin._fitparam_startpoints), 3)
         self.assertEqual(len(plugin._fitparam_bounds[0]), 3)
         self.assertEqual(len(plugin._fitparam_bounds[1]), 3)
@@ -138,7 +138,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _x, _data = plugin._get_data_range(self._data)
         plugin._update_fit_startparams(_x, _data)
         self.assertEqual(plugin._fitparam_labels,
-                          ['amplitude', 'sigma', 'center', 'background p0'])
+                         ['amplitude', 'sigma', 'center', 'background p0'])
         self.assertEqual(len(plugin._fitparam_startpoints), 4)
         self.assertEqual(len(plugin._fitparam_bounds[0]), 4)
         self.assertEqual(len(plugin._fitparam_bounds[1]), 4)
@@ -149,7 +149,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _x, _data = plugin._get_data_range(self._data)
         plugin._update_fit_startparams(_x, _data)
         self.assertEqual(plugin._fitparam_labels,
-                          ['amplitude', 'sigma', 'center', 'background p0',
+                         ['amplitude', 'sigma', 'center', 'background p0',
                           'background p1'])
         self.assertEqual(len(plugin._fitparam_startpoints), 5)
         self.assertEqual(len(plugin._fitparam_bounds[0]), 5)
@@ -161,8 +161,8 @@ class TestFitSinglePeak(unittest.TestCase):
         _data.metadata['test_meta'] = 123
         plugin.pre_execute()
         plugin._update_fit_startparams(_x, _data)
-        _new_data = plugin._create_new_dataset(_x, _data,
-                                                plugin._fitparam_startpoints)
+        _new_data = plugin._create_new_dataset(
+            _x, _data, plugin._fitparam_startpoints)
         self.assertTrue('fit_params' in _new_data.metadata)
         self.assertTrue('fit_func' in _new_data.metadata)
         self.assertTrue('fit_param_labels' in _new_data.metadata)

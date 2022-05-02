@@ -32,7 +32,7 @@ from pydidas.experiment.experimental_setup.experimental_setup_io_base \
     import ExperimentalSetupIoBase
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO = ExperimentalSetupIoBase
 
 
@@ -68,7 +68,7 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         # assert does not raise FileExistsError
 
     def test_verify_all_entries_present__correct(self):
-        for param in EXP_SETTINGS.params:
+        for param in EXP_SETUP.params:
             EXP_IO.imported_params[param] = True
         EXP_IO._verify_all_entries_present()
 
@@ -82,9 +82,9 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         EXP_IO.imported_params = {'detector_name': _det_name,
                                        'xray_energy': _energy}
         EXP_IO._write_to_exp_settings()
-        self.assertEqual(EXP_SETTINGS.get_param_value('detector_name'),
+        self.assertEqual(EXP_SETUP.get_param_value('detector_name'),
                          _det_name)
-        self.assertEqual(EXP_SETTINGS.get_param_value('xray_energy'), _energy)
+        self.assertEqual(EXP_SETUP.get_param_value('xray_energy'), _energy)
 
 
 if __name__ == "__main__":

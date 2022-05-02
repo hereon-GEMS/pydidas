@@ -161,7 +161,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj._active_node = 2
         obj._calc_and_store_ndim_of_results()
         self.assertEqual(obj._config['result_ndim'],
-                          len(self._scan_n) + len(self._result2_shape))
+                         len(self._scan_n) + len(self._result2_shape))
 
     def test_calc_and_store_ndim_of_results__with_timeline(self):
         self.populate_WorkflowResults()
@@ -170,7 +170,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj.set_param_value('use_scan_timeline', True)
         obj._calc_and_store_ndim_of_results()
         self.assertEqual(obj._config['result_ndim'],
-                          1 + len(self._result2_shape))
+                         1 + len(self._result2_shape))
 
     def test_select_active_node(self):
         _node = 2
@@ -392,8 +392,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _delta = [RES.shapes[_node][_i + 2] - obj._selection[_i].size
                   for _i in range(RES.ndims[_node] - 2)]
         self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
-        self.assertEqual(obj._selection[0].size,
-                        self._scan_n[0] * self._scan_n[1] * self._scan_n[2] - 1)
+        self.assertEqual(obj._selection[0].size, np.prod(self._scan_n) - 1)
 
     def test_get_best_index_for_value__low_val(self):
         _val = 42
@@ -422,14 +421,14 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _data = 12 - np.arange(0, 89, 0.5)
         _start = _data[_target_range[0]]
         _stop = _data[_target_range[-1]]
-        obj = WorkflowResultsSelector()        
+        obj = WorkflowResultsSelector()
         obj._config['active_index'] = 0
         obj._WorkflowResultsSelector__active_ranges = {0: _data}
         obj._config['index_defaults'] = [0, _data.size, 1]
         _str = [f'{_start}:{_stop}']
         _res = obj._convert_values_to_indices(_str)
         self.assertEqual(_res[0], [_target_range[0], _target_range[-1]])
-        
+
     def test_active_dims__no_active_dim(self):
         self.populate_WorkflowResults()
         _node = 1

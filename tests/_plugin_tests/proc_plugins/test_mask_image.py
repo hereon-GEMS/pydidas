@@ -109,8 +109,9 @@ class TestMaskImage(unittest.TestCase):
         kwargs = {'key': 1, 'another_key': 'another_val'}
         _masked, _kwargs = plugin.execute(_data, **kwargs)
         self.assertEqual(kwargs, _kwargs)
-        self.assertEqual(_masked.shape, ((self._shape[0] - 1) // 2,
-                                         (self._shape[1] -3) // 2))
+        self.assertEqual(
+            _masked.shape,
+            ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2))
         self.assertTrue(np.alltrue(_masked[_mask == 1] == _maskval))
 
 

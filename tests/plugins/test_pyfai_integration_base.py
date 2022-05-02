@@ -37,7 +37,7 @@ from pydidas.core import get_generic_parameter
 from pydidas.experiment import ExperimentalSetup
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 logger = logging.getLogger('pydidas_logger')
 logger.setLevel(logging.ERROR)

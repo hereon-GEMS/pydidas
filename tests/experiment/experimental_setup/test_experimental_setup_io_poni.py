@@ -36,7 +36,7 @@ from pydidas.experiment.experimental_setup.experimental_setup_io_poni import \
     ExperimentalSetupIoPoni
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO_PONI = ExperimentalSetupIoPoni
 
 _logger = logging.getLogger('pyFAI.geometry')
@@ -80,7 +80,7 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
         geo = Geometry().load(self._path + 'poni.poni').getPyFAI()
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_SETTINGS.get_param_value(key),
+            self.assertEqual(EXP_SETUP.get_param_value(key),
                              geo[key.split('_')[1]])
 
     def test_export_to_file(self):

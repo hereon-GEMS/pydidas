@@ -31,7 +31,7 @@ from pydidas.experiment.experimental_setup import (
     ExperimentalSetup, ExperimentalSetupIoBase, ExperimentalSetupIoMeta)
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO_META = ExperimentalSetupIoMeta
 EXP_IO_META.clear_registry()
 
@@ -66,7 +66,7 @@ class TestExperimentSettingsIoMeta(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._tmppath)
-        EXP_SETTINGS.restore_all_defaults(True)
+        EXP_SETUP.restore_all_defaults(True)
 
     def test_export_to_file(self):
         _fname = os.path.join(self._tmppath, 'test.test')

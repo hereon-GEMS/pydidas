@@ -128,8 +128,9 @@ class TestSubtractBgImage(unittest.TestCase):
         _data = rebin2d(self._data[1:, 3:], 2)
         _new_data, _new_kwargs = plugin.execute(_data, **_kwargs)
         self.assertEqual(_kwargs, _new_kwargs)
-        self.assertEqual(_new_data.shape, ((self._shape[0] - 1) // 2,
-                                         (self._shape[1] -3) // 2))
+        self.assertEqual(
+            _new_data.shape,
+            ((self._shape[0] - 1) // 2, (self._shape[1] - 3) // 2))
         self.assertTrue(np.alltrue(_new_data >= _thresh))
 
 

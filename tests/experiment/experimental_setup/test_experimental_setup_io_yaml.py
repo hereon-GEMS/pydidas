@@ -34,7 +34,7 @@ from pydidas.experiment.experimental_setup.experimental_setup_io_yaml import (
     ExperimentalSetupIoYaml)
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO_YAML = ExperimentalSetupIoYaml
 
 
@@ -57,7 +57,7 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
             _data = yaml.safe_load(stream)
         for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
                     'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_SETTINGS.get_param_value(key),
+            self.assertEqual(EXP_SETUP.get_param_value(key),
                              _data[key])
 
     def test_import_from_file__missing_keys(self):
@@ -77,9 +77,9 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
         EXP_IO_YAML.export_to_file(_fname)
         with open(self._tmppath + 'yaml.yml', 'r') as stream:
             _data = yaml.safe_load(stream)
-        for key in EXP_SETTINGS.params:
+        for key in EXP_SETUP.params:
             if key != 'xray_energy':
-                self.assertEqual(EXP_SETTINGS.get_param_value(key),
+                self.assertEqual(EXP_SETUP.get_param_value(key),
                                  _data[key])
 
 

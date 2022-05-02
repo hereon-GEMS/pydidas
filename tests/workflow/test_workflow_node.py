@@ -38,7 +38,7 @@ class TestWorkflowNode(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=DummyLoader())
-        _nodes =  [[obj00]]
+        _nodes = [[obj00]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []

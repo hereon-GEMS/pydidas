@@ -81,7 +81,6 @@ class TestFrameLoader(unittest.TestCase):
         self.assertEqual(plugin._file_manager.n_files, self._n)
         self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
 
-
     def test_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name('FrameLoader')(
             images_per_file=1)

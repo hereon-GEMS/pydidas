@@ -41,6 +41,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
     def setUp(self):
         self._meta_registry = META.registry.copy()
         META.reset()
+
         class SAVER(WorkflowResultSaverBase):
             extensions = ['TEST']
             default_extension = 'Test'

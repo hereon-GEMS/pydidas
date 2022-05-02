@@ -46,7 +46,7 @@ class TestPluginPositionNode(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         root = PluginPositionNode(node_id=0)
-        _nodes =  [[root]]
+        _nodes = [[root]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
@@ -118,7 +118,7 @@ class TestPluginPositionNode(unittest.TestCase):
         _childdepth = 3
         _nodes, _n_nodes = self.create_node_tree(_childdepth)
         _root = _nodes[0][0]
-        _target = ((_childdepth + 1 ) * generic_height
+        _target = ((_childdepth + 1) * generic_height
                    + child_spacing_y * _childdepth)
         self.assertEqual(_root.height, _target)
 
@@ -149,7 +149,7 @@ class TestPluginPositionNode(unittest.TestCase):
         row_width = lambda n: n * generic_width + (n - 1) * child_spacing_x
         for _node_id in range(_ntotal):
             iy, ix = self.get_pos_in_tree(_node_id, _width, _childdepth)
-            _ypos = iy  * (generic_height + child_spacing_y)
+            _ypos = iy * (generic_height + child_spacing_y)
             _deltax = (row_width(_width ** _childdepth)
                        - row_width(_width ** (iy))) // 2
             _xpos = _deltax + ix * (generic_width + child_spacing_x)

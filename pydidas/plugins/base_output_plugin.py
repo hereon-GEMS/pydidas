@@ -41,7 +41,6 @@ class OutputPlugin(BasePlugin):
     generic_params.add_param(get_generic_parameter('directory_path'))
     default_params = BasePlugin.default_params.get_copy()
 
-
     def pre_execute(self):
         """
         Prepare loading images from a file series.

@@ -44,7 +44,7 @@ from .base_proc_plugin import ProcPlugin
 
 logger = pydidas_logger()
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
                'Q / A^-1': 'q_A^-1',
@@ -93,15 +93,15 @@ class pyFAIintegrationBase(ProcPlugin):
         Check the use_global_mask Parameter and load the mask image.
         """
         if self._ai is None:
-            _lambda_in_A = EXP_SETTINGS.get_param_value('xray_wavelength')
+            _lambda_in_A = EXP_SETUP.get_param_value('xray_wavelength')
             self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
-                dist=EXP_SETTINGS.get_param_value('detector_dist'),
-                poni1=EXP_SETTINGS.get_param_value('detector_poni1'),
-                poni2=EXP_SETTINGS.get_param_value('detector_poni2'),
-                rot1=EXP_SETTINGS.get_param_value('detector_rot1'),
-                rot2=EXP_SETTINGS.get_param_value('detector_rot2'),
-                rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
-                detector=EXP_SETTINGS.get_detector(),
+                dist=EXP_SETUP.get_param_value('detector_dist'),
+                poni1=EXP_SETUP.get_param_value('detector_poni1'),
+                poni2=EXP_SETUP.get_param_value('detector_poni2'),
+                rot1=EXP_SETUP.get_param_value('detector_rot1'),
+                rot2=EXP_SETUP.get_param_value('detector_rot2'),
+                rot3=EXP_SETUP.get_param_value('detector_rot3'),
+                detector=EXP_SETUP.get_detector(),
                 wavelength=1e-10 * _lambda_in_A)
         self.load_and_store_mask()
         self._prepare_pyfai_method()
@@ -262,8 +262,8 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
 
-
     def execute(self, data, **kwargs):
         """
         To be implemented by the concrete subclass.
         """
+        raise NotImplementedError

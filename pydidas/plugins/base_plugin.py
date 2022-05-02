@@ -33,7 +33,7 @@ from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_param_collection)
 from pydidas.image_io import rebin2d, RoiController
 from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                               OUTPUT_PLUGIN)
+                                    OUTPUT_PLUGIN)
 
 
 ptype = {BASE_PLUGIN: 'Base plugin',
@@ -392,10 +392,10 @@ class BasePlugin(ObjectWithParameterCollection):
             The tuple with two slice objects which define the image ROI.
         """
         _roi = RoiController(roi=(self.get_param_value('roi_ylow'),
-                               self.get_param_value('roi_yhigh'),
-                               self.get_param_value('roi_xlow'),
-                               self.get_param_value('roi_xhigh')),
-                          input_shape=self.input_shape)
+                                  self.get_param_value('roi_yhigh'),
+                                  self.get_param_value('roi_xlow'),
+                                  self.get_param_value('roi_xhigh')),
+                             input_shape=self.input_shape)
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
@@ -411,8 +411,8 @@ class BasePlugin(ObjectWithParameterCollection):
             The binning factor which needs to be applied to the original image.
         """
         _roi = RoiController(roi=(0, self._original_input_shape[0],
-                               0, self._original_input_shape[1]),
-                          input_shape=self._original_input_shape)
+                                  0, self._original_input_shape[1]),
+                             input_shape=self._original_input_shape)
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:

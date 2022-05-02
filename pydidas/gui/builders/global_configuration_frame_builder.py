@@ -68,39 +68,39 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         self.create_label('section_multiprocessing',
                           'Multiprocessing settings', **_section_options)
         self.create_param_widget(self.get_param('mp_n_workers'),
-                                  **_options)
+                                 **_options)
         self.create_param_widget(self.get_param('shared_buffer_size'),
-                                  **_options)
+                                 **_options)
         self.create_param_widget(self.get_param('shared_buffer_max_n'),
-                                  **_options)
+                                 **_options)
         self.create_spacer('spacer_1')
 
         self.create_label('section_detector', 'Detector settings',
                           **_section_options)
         self.create_param_widget(self.get_param('det_mask'),
-                                  **_twoline_options)
+                                 **_twoline_options)
         self.create_param_widget(self.get_param('det_mask_val'),
-                                  **_options)
+                                 **_options)
         self.create_spacer('spacer_2')
 
         self.create_label('section_mosaic', 'Composite creator settings',
                           **_section_options)
         self.create_param_widget(self.get_param('mosaic_border_width'),
-                                  **_options)
+                                 **_options)
         self.create_param_widget(self.get_param('mosaic_border_value'),
-                                  **_options)
+                                 **_options)
         self.create_param_widget(self.get_param('mosaic_max_size'),
-                                  **_options)
+                                 **_options)
         self.create_spacer('spacer_3')
 
         self.create_label('section_plotting', 'Plotting settings',
                           **_section_options)
         self.create_param_widget(self.get_param('plot_update_time'),
-                                  **_options)
+                                 **_options)
         self.create_spacer('spacer_4')
 
         self.create_label('section_plugins', 'Plugin paths',
                           **_section_options)
         self.create_param_widget(self.get_param('plugin_path'),
-                                  **_twoline_options)
+                                 **_twoline_options)
         self.create_button('but_plugins', 'Update plugin collection')

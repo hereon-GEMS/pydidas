@@ -32,7 +32,7 @@ import numpy as np
 
 from ...core import get_generic_param_collection, AppConfigError
 from ...core.constants import (DEFAULT_TWO_LINE_PARAM_CONFIG,
-                                    CONFIG_WIDGET_WIDTH, HDF5_EXTENSIONS)
+                               CONFIG_WIDGET_WIDTH, HDF5_EXTENSIONS)
 from ...core.utils import get_hdf5_metadata
 from ...image_io import read_image, export_image
 from ...managers import FilelistManager

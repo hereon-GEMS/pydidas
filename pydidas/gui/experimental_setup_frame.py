@@ -37,7 +37,18 @@ from ..widgets.dialogues import critical_warning
 from .builders import ExperimentalSetupFrameBuilder
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
+
+_GEO_INVALID = ('The pyFAI geometry is not valid and cannot be copied. '
+                'This is probably due to either:\n'
+                '1. No fit has been performed.\nor\n'
+                '2. The fit did not succeed.')
+
+_ENERGY_INVALID = ('The X-ray energy / wavelength cannot be set because the '
+                   'pyFAI geometry is not valid. This is probably due to '
+                   'either:\n'
+                   '1. No fit has been performed.\nor\n'
+                   '2. The fit did not succeed.')
 
 
 class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
@@ -48,7 +59,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     def __init__(self, **kwargs):
         parent = kwargs.get('parent', None)
         ExperimentalSetupFrameBuilder.__init__(self, parent)
-        self.params = EXP_SETTINGS.params
+        self.params = EXP_SETUP.params
         self.build_frame()
         self.connect_signals()
 
@@ -73,7 +84,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
             # disconnect directly setting the parameters and route
-            # through EXP_SETTINGS to catch wavelength/energy
+            # through EXP_SETUP to catch wavelength/energy
             _w = self.param_widgets[param.refkey]
             _w.io_edited.disconnect()
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
@@ -82,8 +93,9 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the ParameterConfigWidgetMixin.set_param_value_and_widget
-        method to process the linked energy / wavelength parameters.
+        This method overloads the
+        ParameterConfigWidgetMixin.set_param_value_and_widget method to
+        process the linked energy / wavelength parameters.
 
         Parameters
         ----------
@@ -93,7 +105,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
             The new Parameter value. The datatype is determined by the
             Parameter.
         """
-        EXP_SETTINGS.set_param_value(key, value)
+        EXP_SETUP.set_param_value(key, value)
         if key in ['xray_energy', 'xray_wavelength']:
             _energy = self.get_param_value('xray_energy')
             _lambda = self.get_param_value('xray_wavelength')
@@ -113,14 +125,14 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         widget : pydidas.widgets.parameter_config.BaseParamIoWidget
             The Parameter editing widget.
         """
-        EXP_SETTINGS.set_param_value(param_key,  widget.get_value())
+        EXP_SETUP.set_param_value(param_key,  widget.get_value())
         # explicitly call update fo wavelength and energy
         if param_key == 'xray_wavelength':
             _w = self.param_widgets['xray_energy']
-            _w.set_value(EXP_SETTINGS.get_param_value('xray_energy'))
+            _w.set_value(EXP_SETUP.get_param_value('xray_energy'))
         elif param_key == 'xray_energy':
             _w = self.param_widgets['xray_wavelength']
-            _w.set_value(EXP_SETTINGS.get_param_value('xray_wavelength'))
+            _w.set_value(EXP_SETUP.get_param_value('xray_wavelength'))
 
     def select_detector(self):
         """
@@ -201,11 +213,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
                                ['detector_rot3', _geo.rotation3().value()]]:
                 self.set_param_value_and_widget(key, np.float32(value))
         elif show_warning:
-            critical_warning('pyFAI geometry invalid',
-                            'The pyFAI geometry is not valid and cannot be '
-                            'copied. This is probably due to either:\n'
-                            '1. No fit has been performed.\nor\n'
-                            '2. The fit did not succeed.')
+            critical_warning('pyFAI geometry invalid', _GEO_INVALID)
 
     def copy_energy_from_pyFAI(self, show_warning=True):
         """
@@ -225,12 +233,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
             _wavelength = _geo.wavelength().value() * 1e10
             self.set_param_value_and_widget('xray_wavelength', _wavelength)
         elif show_warning:
-            critical_warning('pyFAI geometry invalid',
-                            'The X-ray energy / wavelength cannot be set '
-                            'because the pyFAI geometry is not valid. '
-                            'This is probably due to either:\n'
-                            '1. No fit has been performed.\nor\n'
-                            '2. The fit did not succeed.')
+            critical_warning('pyFAI geometry invalid', _ENERGY_INVALID)
 
     def load_parameters_from_file(self):
         """
@@ -243,8 +246,8 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         fname = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Name of file', None, _formats)[0]
         if fname != '':
-            EXP_SETTINGS.import_from_file(fname)
-            for param in EXP_SETTINGS.params.values():
+            EXP_SETUP.import_from_file(fname)
+            for param in EXP_SETUP.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
     def __save_to_file(self):
@@ -253,7 +256,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         for the ExperimentalSetup to file.
         """
         _formats = ExperimentalSetupIoMeta.get_string_of_formats()
-        fname =  QtWidgets.QFileDialog.getSaveFileName(
+        fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None, _formats)[0]
         if fname != '':
-            EXP_SETTINGS.export_to_file(fname, overwrite=True)
+            EXP_SETUP.export_to_file(fname, overwrite=True)

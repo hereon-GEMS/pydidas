@@ -25,16 +25,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ViewResultsMixin']
 
-import time
 import os
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import get_generic_param_collection
-from ...core.utils import pydidas_logger
 from ...widgets.dialogues import critical_warning
-from ...workflow import WorkflowTree, WorkflowResults
+from ...workflow import WorkflowResults
 
 
 RESULTS = WorkflowResults()
@@ -73,7 +70,8 @@ class ViewResultsMixin:
                              'data_slices': (),
                              'frame_active': True,
                              'source_hash': RESULTS.source_hash})
-        self._axlabels = lambda i: ''
+        self._data_axlabels = ['', '']
+        self._data_axunits = ['', '']
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
 
@@ -121,7 +119,7 @@ class ViewResultsMixin:
 
     @QtCore.Slot(bool, object, int, object, str)
     def update_result_selection(self, use_timeline, active_plot_dims,
-                                  node_id, slices, plot_type):
+                                node_id, slices, plot_type):
         """
         Update the selection of results to show in the plot.
 
@@ -166,10 +164,8 @@ class ViewResultsMixin:
             _node, self._config['data_slices'],
             flattened_scan_dim=self._config['data_use_timeline'],
             force_string_metadata=True)
-        self._axlabels = lambda i: (
-            _data.axis_labels.copy()[i]
-            + (' / ' + _data.axis_units.copy()[i]
-               if len(str(_data.axis_units.copy())) > 0 else ''))
+        self._data_axlabels = self._data.axis_labels.copy()
+        self._data_axunits = self._data.axis_units.copy()
         if self._config['plot_type'] == 'group of 1D plots':
             self._widgets['plot_stack'].setCurrentIndex(0)
             self._plot_group_of_curves(_data)
@@ -182,6 +178,24 @@ class ViewResultsMixin:
         _plot = self._widgets[f'plot{_dim}d']
         _plot.setGraphTitle(RESULTS.labels[_node] + f' (node #{_node:03d})')
 
+    def _axlabels(self, index):
+        """
+        Get an axis label for a data dimension.
+
+        Parameters
+        ----------
+        index : int
+            The data dimension index.
+
+        Returns
+        -------
+        str
+            The axis label.
+        """
+        _label = self._data_axlabels[index]
+        _unit = self._data_axunits[index]
+        return _label + (' / ' + _unit if len(str(_unit)) > 0 else '')
+
     def _plot_group_of_curves(self, data):
         """
         Plot a group of 1D curves.
@@ -191,13 +205,15 @@ class ViewResultsMixin:
         data : pydidas.core.Dataset
             The dataset with the data to be plotted.
         """
+        def _legend(i):
+            return (data.axis_labels[0] + '='
+                    + f'{data.axis_ranges[0][i]:.4f}'
+                    + data.axis_units[0])
+
         _active_dim = self._config['active_dims'][0]
         _local_dim = self._config['local_dims'][_active_dim]
         if _local_dim == 0:
             data = data.transpose()
-        _legend = lambda i: (data.axis_labels[0] + '='
-                             + f'{data.axis_ranges[0][i]:.4f}'
-                             + data.axis_units[0])
         self._plot1d(data[0], replace=True, legend=_legend(0))
         for _index in range(1, data.shape[0]):
             self._plot1d(data[_index], replace=False, legend=_legend(_index),
@@ -242,13 +258,13 @@ class ViewResultsMixin:
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
                 data.axis_ranges[_dim] = np.arange(data.shape[_dim])
-        _dim0, _dim1  = self._config['active_dims']
+        _dim0, _dim1 = self._config['active_dims']
         if _dim0 > _dim1:
             data = data.transpose()
-        _ax_label = lambda i: (
-            data.axis_labels[i]
-            + (' / ' + data.axis_units[i]
-               if len(str(data.axis_units[i])) > 0 else ''))
+        _ax_labels = [data.axis_labels[i]
+                      + (' / ' + data.axis_units[i]
+                         if len(data.axis_units[i]) > 0 else '')
+                      for i in [0, 1]]
         _originx, _scalex = self.__get_2d_plot_ax_settings(
             data.axis_ranges[1])
         _originy, _scaley = self.__get_2d_plot_ax_settings(
@@ -256,8 +272,8 @@ class ViewResultsMixin:
         _plot.addImage(data, replace=True, copy=False,
                        origin=(_originx, _originy),
                        scale=(_scalex, _scaley))
-        _plot.setGraphYLabel(_ax_label(0))
-        _plot.setGraphXLabel(_ax_label(1))
+        _plot.setGraphYLabel(_ax_labels[0])
+        _plot.setGraphXLabel(_ax_labels[1])
 
     @staticmethod
     def __get_2d_plot_ax_settings(axis):

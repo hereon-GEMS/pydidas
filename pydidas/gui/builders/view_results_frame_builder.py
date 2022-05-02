@@ -25,11 +25,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['ViewResultsFrameBuilder']
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtWidgets
 from silx.gui.plot import Plot1D, Plot2D
 
 from ...core.constants import (
-    CONFIG_WIDGET_WIDTH, DEFAULT_TWO_LINE_PARAM_CONFIG)
+    CONFIG_WIDGET_WIDTH, DEFAULT_TWO_LINE_PARAM_CONFIG, FIX_EXP_POLICY,
+    EXP_EXP_POLICY)
 from ...widgets import ScrollArea, BaseFrame
 from ...widgets.selection import ResultSelectionWidget
 from ...widgets.parameter_config import ParameterEditFrame
@@ -77,21 +78,18 @@ class ViewResultsFrameBuilder(BaseFrame):
         Build the frame and create all widgets.
         """
         self.create_label('title', 'View results', fontsize=14, bold=True,
-                           gridPos=(0, 0, 1, 5))
+                          gridPos=(0, 0, 1, 5))
 
         self.create_spacer('title_spacer', height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets['config'] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5,
-            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding))
+            sizePolicy=FIX_EXP_POLICY)
 
         self.create_any_widget(
             'config_area', ScrollArea, widget=self._widgets['config'],
             fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding),
-            gridPos=(-1, 0, 1, 1), stretch=(1, 0),
+            sizePolicy=FIX_EXP_POLICY, gridPos=(-1, 0, 1, 1), stretch=(1, 0),
             layout_kwargs={'alignment': None})
 
         self.create_any_widget(
@@ -136,7 +134,6 @@ class ViewResultsFrameBuilder(BaseFrame):
         self.add_any_widget(
             'plot_stack', QtWidgets.QStackedWidget(), alignment=None,
             gridPos=(0, 1, 3, 1), visible=True, stretch=(1, 1),
-            sizePolicy=(QtWidgets.QSizePolicy.Expanding,
-                        QtWidgets.QSizePolicy.Expanding))
+            sizePolicy=EXP_EXP_POLICY)
         self._widgets['plot_stack'].addWidget(self._widgets['plot1d'])
         self._widgets['plot_stack'].addWidget(self._widgets['plot2d'])

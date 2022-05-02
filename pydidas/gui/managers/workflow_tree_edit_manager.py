@@ -69,7 +69,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         super().__init__()
         self.root = None
-        self.qt_canvas= qt_canvas
+        self.qt_canvas = qt_canvas
         self.active_node_id = None
         self._node_positions = {}
         self._node_widgets = {}
@@ -221,7 +221,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_positions = {key: pos_vals[i] for i, key in enumerate(_pos)}
         for node_id in TREE.node_ids:
             self._node_widgets[node_id].move(self._node_positions[node_id][0],
-                                       self._node_positions[node_id][1])
+                                             self._node_positions[node_id][1])
         self.qt_canvas.setFixedSize(self.root.width + 2 * self.pos_x_min
                                     + _offset,
                                     self.root.height + 2 * self.pos_y_min)

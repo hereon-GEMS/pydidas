@@ -74,11 +74,11 @@ class ScanSetupFrameBuilder(BaseFrame):
                           gridPos=(self.next_row(), 0, 1, 1))
 
         self.create_param_widget(
-            SCAN_SETTINGS.get_param('scan_dim'), width_text = self.TEXT_WIDTH,
+            SCAN_SETTINGS.get_param('scan_dim'), width_text=self.TEXT_WIDTH,
             width_io=self.PARAM_INPUT_WIDTH, width_total=_width_total,
             width_unit=0)
         self.create_param_widget(
-            SCAN_SETTINGS.get_param('scan_name'), width_text = self.TEXT_WIDTH,
+            SCAN_SETTINGS.get_param('scan_name'), width_text=self.TEXT_WIDTH,
             width_io=_width_total - 20, linebreak=True,
             width_total=_width_total, width_unit=0)
 
@@ -101,7 +101,7 @@ class ScanSetupFrameBuilder(BaseFrame):
                     halign=QtCore.Qt.AlignCenter)
 
         self.create_button('but_save', 'Save scan settings',
-                            gridPos=(-1, 0, 1, 1), fixedWidth=_width_total,
-                            icon=self.style().standardIcon(43))
+                           gridPos=(-1, 0, 1, 1), fixedWidth=_width_total,
+                           icon=self.style().standardIcon(43))
 
         self.create_spacer('final_spacer', gridPos=(_rowoffset + 1, 2, 1, 1))

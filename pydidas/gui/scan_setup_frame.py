@@ -120,7 +120,7 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         file in which the information shall be written.
         """
         _formats = ScanSetupIoMeta.get_string_of_formats()
-        fname =  QtWidgets.QFileDialog.getSaveFileName(
+        fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None, _formats)[0]
         if fname != '':
             SCAN_SETTINGS.export_to_file(fname, overwrite=True)

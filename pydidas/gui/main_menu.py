@@ -236,7 +236,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Store the current GUI state in a user-defined file.
         """
-        fname =  QtWidgets.QFileDialog.getSaveFileName(
+        fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file for export', None, 'YAML (*.yaml *.yml)')[0]
         if fname != '':
             self.export_gui_state(fname)
@@ -258,7 +258,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Restore the GUI state from a user-defined file.
         """
-        fname =  QtWidgets.QFileDialog.getOpenFileName(
+        fname = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Name of file', None, 'YAML (*.yaml *.yml)')[0]
         if fname != '':
             self.restore_gui_state(fname)
@@ -441,7 +441,6 @@ class MainMenu(QtWidgets.QMainWindow):
             SCAN.set_param_value(_key, _val)
         for _key, _val in state['exp_setup'].items():
             EXP.set_param_value(_key, _val)
-
 
     def _restore_window_states(self, state):
         """

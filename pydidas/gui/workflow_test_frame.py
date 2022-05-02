@@ -247,7 +247,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
               f'  N points: {_ax_points[_axis]}\n'
               f'  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}')
              for _axis in _meta['axis_labels']])
-        _str +=f'\n\nValues:\n{_values}'
+        _str += f'\n\nValues:\n{_values}'
         _str += f'\n\nMetadata:\n{_meta["metadata"]}'
         self._widgets['result_info'].setText(_str)
 
@@ -295,10 +295,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         _data = self._results[self._active_node]
         _plot = self._widgets['plot2d']
-        _ax_label = lambda i: (
-            _data.axis_labels[i]
-            + (' / ' + _data.axis_units[i]
-               if len(_data.axis_units[i]) > 0 else ''))
+        _ax_label = [_data.axis_labels[i]
+                     + (' / ' + _data.axis_units[i]
+                        if len(_data.axis_units[i]) > 0 else '')
+                     for i in [0, 1]]
         _originx, _scalex = self.__get_2d_plot_ax_settings(
             _data.axis_ranges[1])
         _originy, _scaley = self.__get_2d_plot_ax_settings(
@@ -306,8 +306,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _plot.addImage(_data, replace=True, copy=False,
                        origin=(_originx, _originy),
                        scale=(_scalex, _scaley))
-        _plot.setGraphYLabel(_ax_label(0))
-        _plot.setGraphXLabel(_ax_label(1))
+        _plot.setGraphYLabel(_ax_label[0])
+        _plot.setGraphXLabel(_ax_label[1])
 
     @staticmethod
     def __get_2d_plot_ax_settings(axis):

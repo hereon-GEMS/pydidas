@@ -69,7 +69,6 @@ class MainWindow(MainMenu):
         self._toolbars_created = False
         self.__create_logging_info_box()
 
-
     def __create_logging_info_box(self):
         """
         Create the InfoWidget for logging and status messages.

@@ -36,7 +36,7 @@ from ..apps import CompositeCreatorApp
 from ..core import Parameter, get_generic_parameter, AppConfigError
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
-                           LOGGING_LEVEL)
+                          LOGGING_LEVEL)
 from ..widgets import dialogues
 from ..multiprocessing import AppRunner
 from .builders import CompositeCreatorFrameBuilder
@@ -109,7 +109,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                 self.__update_n_image)
 
         self.param_widgets['use_roi'].currentTextChanged.connect(
-            self.__toggle_roi_selection )
+            self.__toggle_roi_selection)
         self.param_widgets['first_file'].io_edited.connect(
             self.__selected_first_file)
         self.param_widgets['hdf5_key'].io_edited.connect(
@@ -348,7 +348,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             self.__clear_entries(['images_per_file', 'n_total',
                                   'hdf5_dataset_shape', 'hdf5_key',
                                   'hdf5_first_image_num',
-                                  'hdf5_last_image_num', 'hdf5_stepping',],
+                                  'hdf5_last_image_num', 'hdf5_stepping'],
                                  False)
 
     def __selected_bg_file(self, fname):
@@ -383,10 +383,10 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         try:
             self._image_metadata.update()
-            self.set_param_value_and_widget('hdf5_dataset_shape',
-                                    self._image_metadata.hdf5_dset_shape)
-            self.set_param_value_and_widget('images_per_file',
-                                    self._image_metadata.images_per_file)
+            self.set_param_value_and_widget(
+                'hdf5_dataset_shape', self._image_metadata.hdf5_dset_shape)
+            self.set_param_value_and_widget(
+                'images_per_file', self._image_metadata.images_per_file)
             self._config['input_configured'] = True
         except AppConfigError:
             self.__clear_entries(['hdf5_key', 'hdf5_dataset_shape',
@@ -467,7 +467,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.set_param_value('use_bg_file', flag)
         self.toggle_param_widget_visibility('bg_file', flag)
         _bg_ext = os.path.splitext(self.get_param_value('bg_file'))[1]
-        if not _bg_ext in HDF5_EXTENSIONS:
+        if _bg_ext not in HDF5_EXTENSIONS:
             flag = False
         self.toggle_param_widget_visibility('bg_hdf5_key', flag)
         self.toggle_param_widget_visibility('bg_hdf5_frame', flag)

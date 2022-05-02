@@ -38,6 +38,17 @@ from .builders import GlobalConfigurationFrameBuilder
 PLUGINS = PluginCollection()
 
 
+@QtCore.Slot()
+def update_plugin_collection():
+    """
+    Update the plugin collection from the updated QSetting values for the
+    plugin directories.
+    """
+    PLUGINS.clear_collection(True)
+    PLUGINS.find_and_register_plugins(
+        *PLUGINS.get_q_settings_plugin_path())
+
+
 class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     """
     Frame which manages global configuration items.
@@ -63,7 +74,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
                 partial(self.update_qsetting, _param_key))
         self._widgets['but_reset'].clicked.connect(self.__reset)
         self._widgets['but_plugins'].clicked.connect(
-            self.update_plugin_collection)
+            update_plugin_collection)
 
     def update_qsetting(self, param_key, value):
         """
@@ -102,7 +113,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
 
     def __reset(self):
         qm = QtWidgets.QMessageBox
-        answer = qm.question(self,'', "Are you sure to reset all the values?",
+        answer = qm.question(self, '', "Are you sure to reset all the values?",
                              qm.Yes | qm.No)
         if answer == qm.Yes:
             self.restore_all_defaults(True)
@@ -125,13 +136,3 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         """
         value = self._qsettings_convert_value_type(param_key, value)
         self.set_param_value_and_widget(param_key, value)
-
-    @QtCore.Slot()
-    def update_plugin_collection(self):
-        """
-        Update the plugin collection from the updated QSetting values for the
-        plugin directories.
-        """
-        PLUGINS.clear_collection(True)
-        PLUGINS.find_and_register_plugins(
-            *PLUGINS.get_q_settings_plugin_path())

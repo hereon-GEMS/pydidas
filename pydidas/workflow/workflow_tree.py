@@ -168,7 +168,7 @@ class _WorkflowTree(GenericTree):
         kwargs : dict
             The (updated) kwargs dictionary.
         """
-        if not node_id in self.nodes:
+        if node_id not in self.nodes:
             raise KeyError(f'The node ID "{node_id}" is not in use.')
         self.root.propagate_shapes_and_global_config()
         self.nodes[node_id].prepare_execution()
@@ -246,7 +246,7 @@ class _WorkflowTree(GenericTree):
             raise TypeError('Nodes must be supplied as a list.')
         _new_nodes = {}
         for _item in list_of_nodes:
-            _plugin =  PLUGINS.get_plugin_by_name(_item['plugin_class'])()
+            _plugin = PLUGINS.get_plugin_by_name(_item['plugin_class'])()
             _node = WorkflowNode(node_id=_item['node_id'], plugin=_plugin)
             for key, val in _item['plugin_params']:
                 _node.plugin.set_param_value(key, val)

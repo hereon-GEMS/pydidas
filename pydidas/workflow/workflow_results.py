@@ -231,7 +231,7 @@ class _WorkflowResults(QtCore.QObject):
         Returns
         -------
         dict
-            The dictionary with the ranges with dimension keys and ranges 
+            The dictionary with the ranges with dimension keys and ranges
             values.
         """
         return self.__composites[node_id].axis_ranges.copy()
@@ -297,23 +297,23 @@ class _WorkflowResults(QtCore.QObject):
         pydidas.core.Dataset
             The subset of the results.
         """
+        _data = self.__composites[node_id].copy()
         if flattened_scan_dim:
-            _data = self.__composites[node_id].copy()
-            _DIM = lambda i: len(slices) + (SCAN.ndim - 1) - (i + 1)
+            def __dim_index(i): return len(slices) + (SCAN.ndim - 1) - (i + 1)
             for _dim, _slice in enumerate(slices[1:][::-1]):
                 if isinstance(_slice, slice):
                     _slice = np.r_[_slice]
-                _data = np.take(_data, _slice, _DIM(_dim))
+                _data = np.take(_data, _slice, __dim_index(_dim))
             _data.flatten_dims(*range(SCAN.ndim),
                                new_dim_label='Scan timeline',
                                new_dim_range=np.arange(SCAN.n_total))
-            return np.squeeze(_data[slices[0]])
-        _data = self.__composites[node_id].copy()
-        _DIM = lambda i: len(slices) - (i + 1)
-        for _dim, _slice in enumerate(slices[::-1]):
-            if isinstance(_slice, slice):
-                _slice = np.r_[_slice]
-            _data = np.take(_data, _slice, _DIM(_dim))
+            _data = _data[slices[0]]
+        else:
+            def __dim_index(i): return len(slices) - (i + 1)
+            for _dim, _slice in enumerate(slices[::-1]):
+                if isinstance(_slice, slice):
+                    _slice = np.r_[_slice]
+                _data = np.take(_data, _slice, __dim_index(_dim))
         if force_string_metadata:
             _data.axis_units = [(str(_val) if _val is not None else '')
                                 for _val in _data.axis_units.values()]
@@ -336,10 +336,10 @@ class _WorkflowResults(QtCore.QObject):
             A dictionary with the metadata stored using the "axis_labels",
             "axis_ranges", "axis_units" and "metadata" keys.
         """
-        return  {'axis_labels': self.__composites[node_id].axis_labels,
-                 'axis_units': self.__composites[node_id].axis_units,
-                 'axis_ranges': self.__composites[node_id].axis_ranges,
-                 'metadata': self.__composites[node_id].metadata}
+        return {'axis_labels': self.__composites[node_id].axis_labels,
+                'axis_units': self.__composites[node_id].axis_units,
+                'axis_ranges': self.__composites[node_id].axis_ranges,
+                'metadata': self.__composites[node_id].metadata}
 
     def save_results_to_disk(self, save_dir, *save_formats, overwrite=False,
                              node_id=None):
@@ -466,7 +466,8 @@ class _WorkflowResults(QtCore.QObject):
         node_id : int
             The node ID of the active node.
         use_scan_timeline : bool
-            The flag whether to reduce the scan dimensions to a single timeline.
+            The flag whether to reduce the scan dimensions to a single
+            timeline.
 
         Returns
         -------
@@ -476,9 +477,9 @@ class _WorkflowResults(QtCore.QObject):
         _meta = self.get_result_metadata(node_id)
         _scandim = SCAN.get_param_value('scan_dim')
         _ax_labels = copy(_meta['axis_labels'])
-        _ax_units= copy(_meta['axis_units'])
+        _ax_units = copy(_meta['axis_units'])
         _ax_ranges = {_key: utils.get_range_as_formatted_string(_range)
-                         for _key, _range in _meta['axis_ranges'].items()}
+                      for _key, _range in _meta['axis_ranges'].items()}
         _ax_types = {_key: ('(scan)' if _key < _scandim else '(data)')
                      for _key in _meta['axis_labels'].keys()}
         _ax_points = dict(enumerate(self.shapes[node_id]))

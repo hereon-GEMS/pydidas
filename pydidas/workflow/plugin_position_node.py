@@ -96,8 +96,8 @@ class PluginPositionNode(GenericNode):
         pos : dict
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
-        pos = {self.node_id: \
-                   [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
+        pos = {self.node_id:
+               [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
         if self.is_leaf:
             return pos
         xoffset = 0

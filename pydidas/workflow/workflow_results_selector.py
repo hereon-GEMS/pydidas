@@ -26,13 +26,12 @@ __status__ = "Development"
 __all__ = ['WorkflowResultsSelector']
 
 import re
-from numbers import Integral
 
 import numpy as np
 from qtpy import QtCore
 
 from ..core import (Parameter, ObjectWithParameterCollection,
-                     get_generic_param_collection, AppConfigError)
+                    get_generic_param_collection, AppConfigError)
 from ..experiment import ScanSetup
 from .workflow_results import WorkflowResults
 
@@ -195,17 +194,17 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 _slices.append(_entry[0])
             else:
                 _slices.append(slice(*_entry))
-            
+
         return np.unique(np.r_[tuple(_slices)])
 
-    def  _parse_string_indices(self, substrings):
+    def _parse_string_indices(self, substrings):
         """
         Parse the string with indices to integer values.
 
         Parameters
         ----------
         substrings : list
-            The list with individual entries (which were separated by "," in 
+            The list with individual entries (which were separated by "," in
             the original string).
         Returns
         -------
@@ -220,20 +219,20 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             for _pos, _key in enumerate(_entries):
                 _entries[_pos] = int(_defaults[_pos] if _key == '' else _key)
                 if _entries[_pos] < 0:
-                    _entries[_pos] = np.mod(_entries[_pos], 
+                    _entries[_pos] = np.mod(_entries[_pos],
                                             self._npoints[_index])
             _new_items.append(_entries)
         return _new_items
 
     def _convert_values_to_indices(self, substrings):
         """
-        Convert data value strings to indexes for selecting the required 
+        Convert data value strings to indexes for selecting the required
         datapoints.
 
         Parameters
         ----------
         substrings : list
-            The list with individual entries (which were separated by "," in 
+            The list with individual entries (which were separated by "," in
             the original string).
 
         Returns
@@ -245,8 +244,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         _range = self.__active_ranges[self._config['active_index']]
         _defaults = self._config['index_defaults']
         for _item in substrings:
-            _keys = [float(_defaults[_pos] if _val == '' else _val) 
-                     for _pos, _val in enumerate(_item.split(':'))] 
+            _keys = [float(_defaults[_pos] if _val == '' else _val)
+                     for _pos, _val in enumerate(_item.split(':'))]
             if len(_keys) == 1:
                 _index = self._get_best_index_for_value(_keys[0], _range)
                 _new_items.append([_index])
@@ -260,10 +259,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                     _index = self._get_best_index_for_value(_val, _range)
                     _new_items.append([_index])
         return _new_items
-                
+
     def _get_best_index_for_value(self, value, valrange):
         """
-        Get the index which is the closest match to the selected value from a 
+        Get the index which is the closest match to the selected value from a
         range.
 
         Parameters

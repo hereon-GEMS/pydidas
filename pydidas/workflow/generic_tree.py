@@ -71,7 +71,6 @@ class GenericTree:
         """
         self._tree_changed_flag = False
 
-
     def set_root(self, node):
         """
         Set the tree root node.

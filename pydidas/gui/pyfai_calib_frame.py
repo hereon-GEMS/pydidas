@@ -55,17 +55,19 @@ import functools
 
 from qtpy import QtWidgets, QtGui, QtCore
 import pyFAI
+from pyFAI.app.calib2 import parse_options, setup_model
 from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.utils import projecturl
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
-from pyFAI.app.calib2 import parse_options, setup_model
+from pyFAI.gui.tasks import (ExperimentTask, MaskTask, PeakPickingTask,
+                             GeometryTask, IntegrationTask)
 
 from ..widgets import BaseFrame
 from ..experiment import ExperimentalSetup
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 
 def get_pyfai_calib_icon():
@@ -126,7 +128,7 @@ class PyfaiCalibFrame(BaseFrame):
                                  QtWidgets.QSizePolicy.Fixed)
         self._stack = QtWidgets.QStackedWidget(self)
         self._stack.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                 QtWidgets.QSizePolicy.Expanding)
+                                  QtWidgets.QSizePolicy.Expanding)
 
         self.create_label('title', 'pyFAI calibration', fontsize=14, bold=True,
                           gridPos=(0, 0, 1, 1))
@@ -166,7 +168,6 @@ class PyfaiCalibFrame(BaseFrame):
         self._helpText = self._help.text()
         self._help.clicked.connect(self.__displayHelp)
 
-
     def _setup_pyfai_context(self):
         """
         Setup the context for the pyfai calibration.
@@ -203,22 +204,16 @@ class PyfaiCalibFrame(BaseFrame):
         # self.__context.saveWindowLocationSettings("main-window", self)
 
     def createTasks(self):
-        from pyFAI.gui.tasks.ExperimentTask import ExperimentTask
-        from pyFAI.gui.tasks.MaskTask import MaskTask
-        from pyFAI.gui.tasks.PeakPickingTask import PeakPickingTask
-        from pyFAI.gui.tasks.GeometryTask import GeometryTask
-        from pyFAI.gui.tasks.IntegrationTask import IntegrationTask
-
-        _it = IntegrationTask()
+        _it = IntegrationTask.IntegrationTask()
         _button = QtWidgets.QPushButton('Store geometry for pydidas use')
         _button.clicked.connect(self._store_geometry)
         _groupbox = _it.layout().itemAt(1).widget().layout().itemAt(1).widget()
         _groupbox.layout().addWidget(_button)
         tasks = [
-            ExperimentTask(),
-            MaskTask(),
-            PeakPickingTask(),
-            GeometryTask(),
+            ExperimentTask.ExperimentTask(),
+            MaskTask.MaskTask(),
+            PeakPickingTask.PeakPickingTask(),
+            GeometryTask.GeometryTask(),
             _it]
         return tasks
 
@@ -241,27 +236,15 @@ class PyfaiCalibFrame(BaseFrame):
     def _store_geometry(self):
         geo = self.model().fittedGeometry()
         det = self.model().experimentSettingsModel().detector()
-        EXP_SETTINGS.set_param_value('xray_wavelength',
-                                     geo.wavelength().value())
-        EXP_SETTINGS.set_param_value('detector_dist',
-                                     geo.distance().value())
-        EXP_SETTINGS.set_param_value('detector_poni1',
-                                     geo.poni1().value())
-        EXP_SETTINGS.set_param_value('detector_poni2',
-                                     geo.poni2().value())
-        EXP_SETTINGS.set_param_value('detector_rot1',
-                                     geo.rotation1().value())
-        EXP_SETTINGS.set_param_value('detector_rot2',
-                                     geo.rotation2().value())
-        EXP_SETTINGS.set_param_value('detector_rot3',
-                                     geo.rotation3().value())
-        EXP_SETTINGS.set_param_value('detector_name',
-                                     det.name)
-        EXP_SETTINGS.set_param_value('detector_npixx',
-                                     det.shape[1])
-        EXP_SETTINGS.set_param_value('detector_npixy',
-                                     det.shape[0])
-        EXP_SETTINGS.set_param_value('detector_pxsizex',
-                                     det.pixel2)
-        EXP_SETTINGS.set_param_value('detector_pxsizey',
-                                     det.pixel1)
+        EXP_SETUP.set_param_value('xray_wavelength', geo.wavelength().value())
+        EXP_SETUP.set_param_value('detector_dist', geo.distance().value())
+        EXP_SETUP.set_param_value('detector_poni1', geo.poni1().value())
+        EXP_SETUP.set_param_value('detector_poni2', geo.poni2().value())
+        EXP_SETUP.set_param_value('detector_rot1', geo.rotation1().value())
+        EXP_SETUP.set_param_value('detector_rot2', geo.rotation2().value())
+        EXP_SETUP.set_param_value('detector_rot3', geo.rotation3().value())
+        EXP_SETUP.set_param_value('detector_name', det.name)
+        EXP_SETUP.set_param_value('detector_npixx', det.shape[1])
+        EXP_SETUP.set_param_value('detector_npixy', det.shape[0])
+        EXP_SETUP.set_param_value('detector_pxsizex', det.pixel2)
+        EXP_SETUP.set_param_value('detector_pxsizey', det.pixel1)

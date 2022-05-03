@@ -133,9 +133,6 @@ class PyfaiCalibFrame(BaseFrame):
         self.add_any_widget('list', self._list, gridPos=(1, 0, 1, 1))
         self.add_any_widget('help', self._help, gridPos=(2, 0, 1, 1))
         self.add_any_widget('help', self._stack, gridPos=(1, 1, 2, 1))
-        # self.layout().addWidget(self._list, 0, 0, 1, 1)
-        # self.layout().addWidget(self._help, 1, 0, 1, 1)
-        # self.layout().addWidget(self._stack, 0, 1, 2, 1)
 
         self.__context = self._CALIB_CONTEXT
         model = self._CALIB_CONTEXT.getCalibrationModel()

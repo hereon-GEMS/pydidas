@@ -9,7 +9,7 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-import sphinx_rtd_theme
+
 import os
 import sys
 sys.path.insert(0, os.path.abspath('./../..'))
@@ -52,7 +52,6 @@ tls_verify = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'nature'
 html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -64,7 +63,7 @@ html_theme = 'sphinx_rtd_theme'
 #                       "body_min_width": 800,
 #                      }
 html_theme_options = {
-    'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
+    'analytics_id': 'G-XXXXXXXXXX',  # Provided by Google in your dashboard
     'analytics_anonymize_ip': False,
     'logo_only': False,
     'display_version': True,
@@ -87,6 +86,7 @@ html_theme_options = {
 html_static_path = ['_static']
 html_logo = './images/logo/pydidas_snakes_circ_bg.png'
 html_title = 'pydidas'
+
 
 def setup(app):
     app.add_css_file('_css/pydidas-custom.css')

@@ -146,15 +146,15 @@ def file_is_writable(filename, overwrite=False):
         True if file exists and is writeable and overwrite or
         directory is writable. False in other cases.
     """
-    #check for existing files:
+    # check for existing files:
     if os.path.isfile(filename):
         if os.access(filename, os.W_OK) and overwrite:
             return True
         return False
-    #check if directory is writable:
+    # check if directory is writable:
     if not os.path.isdir(filename):
         filename = os.path.dirname(filename)
-    #if directory, check if writable:
+    # if directory, check if writable:
     if os.path.isdir(filename) and os.access(filename, os.W_OK):
         return True
     return False

@@ -33,6 +33,8 @@ import multiprocessing as mp
 
 LOGGING_LEVEL = logging.DEBUG
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
 
 def pydidas_logger(level=logging.DEBUG):
     """
@@ -48,10 +50,9 @@ def pydidas_logger(level=logging.DEBUG):
     """
     logger = mp.get_logger()
     logger.setLevel(level)
-    formatter = logging.Formatter(\
+    formatter = logging.Formatter(
         '[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-        __file__))), 'logs')
+    _logpath = os.path.join(BASE_DIR, 'logs')
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
     _time = time.localtime()

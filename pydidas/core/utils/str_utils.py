@@ -220,11 +220,11 @@ def get_warning(string, severe=False, new_lines=0, print_warning=True,
         if _ll == 0:
             _s += '-' * _length + '\n'
         elif _ll <= 77:
-            _filler =  '-' * (_length - _ll - 3)
+            _filler = '-' * (_length - _ll - 3)
             _s += f'- {item} {_filler}\n'
         else:
             _s += f'- {item[:73]}[...]\n'
-    _s += '-' * _length + severe * ('\n' +  '=' * _length)
+    _s += '-' * _length + severe * ('\n' + '=' * _length)
     if print_warning:
         print(_s)
     if return_warning:

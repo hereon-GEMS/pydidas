@@ -149,11 +149,11 @@ class Parameter:
         self.__value = None
         if isinstance(meta, dict):
             kwargs.update(meta)
-        self.__meta = dict(tooltip = kwargs.get('tooltip', ''),
-                           unit = kwargs.get('unit', ''),
-                           optional = kwargs.get('optional', False),
-                           name = kwargs.get('name', ''),
-                           allow_None = kwargs.get('allow_None', False))
+        self.__meta = dict(tooltip=kwargs.get('tooltip', ''),
+                           unit=kwargs.get('unit', ''),
+                           optional=kwargs.get('optional', False),
+                           name=kwargs.get('name', ''),
+                           allow_None=kwargs.get('allow_None', False))
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
         self.value = kwargs.get('value', self.__meta['default'])
@@ -397,7 +397,6 @@ class Parameter:
                              f'Parameter value ({self.__value})')
         self.__meta['choices'] = list(choices)
 
-
     @property
     def optional(self):
         """
@@ -552,8 +551,8 @@ class Parameter:
             The string of the short description.
         """
 
-        _type =( f'{self.__type.__name__}' if self.__type is not None else
-                'None')
+        _type = (f'{self.__type.__name__}' if self.__type is not None else
+                 'None')
         if self.__meta['allow_None']:
             _type += '/None'
         _def = (f'{self.__meta["default"]}'
@@ -571,10 +570,10 @@ class Parameter:
         str
             The representation.
         """
-        _type =( f'{self.__type.__name__}' if self.__type is not None else
-                'None')
-        _unit= (f'{self.__meta["unit"]} ' if self.__meta['unit'] !=''
-                else self.__meta['unit'])
+        _type = (f'{self.__type.__name__}' if self.__type is not None else
+                 'None')
+        _unit = (f'{self.__meta["unit"]} ' if self.__meta['unit'] != ''
+                 else self.__meta['unit'])
         _val = f'{self.value}' if self.value != '' else '""'
         _def = (f'{self.__meta["default"]}'
                 if self.__meta['default'] not in (None, '') else 'None')

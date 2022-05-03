@@ -51,9 +51,9 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
     ----------
     item : Union[str, h5py.File, h5py.Group, h5py.Dataset]
         The item to be checked recursively. A str will be interpreted as
-        filepath to the hdf5 file.
+        filepath to the Hdf5 file.
     min_size : int, optional
-        A minimum size which datasets need to have. Any integers between 0
+        A minimum size which datasets need to have. Any integer between 0
         and 1,000,000,000 are acceptable. The default is 50.
     min_dim : int, optional
         The minimum dimensionality of the dataset. Allowed entries are
@@ -80,20 +80,18 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
     list
         A list with all dataset keys which correspond to the filter criteria.
     """
+    _close_on_exit = False
     _ignore = ignore_keys if ignore_keys is not None else []
     # return in case of a dataset
     if isinstance(item, h5py.Dataset):
         if hdf5_dataset_check(item, min_size, min_dim, _ignore):
             return [item.name]
         return []
-    _close_on_exit = False
+
     if isinstance(item, (str, pathlib.Path)):
-        if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
-            raise TypeError('The file does not have any extension registered'
-                            ' for hdf5 files.')
-        if os.path.exists(item):
-            item = h5py.File(item, 'r')
-            _close_on_exit = True
+        _hdf5_filename_check(item)
+        item = h5py.File(item, 'r')
+        _close_on_exit = True
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
@@ -102,6 +100,7 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
         _item = item[key]
         # add a check to filter external datasets. These are referenced
         # by their .name in the external datafile, not the current file.
+        # if file_ref == _item.file, this is a local dataset.
         if file_ref == _item.file:
             _datasets += get_hdf5_populated_dataset_keys(
                 item[key], min_size, min_dim, file_ref, _ignore)
@@ -115,6 +114,29 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
     if _close_on_exit:
         item.close()
     return _datasets
+
+
+def _hdf5_filename_check(item):
+    """
+    Check that a specified filename is okay and points to an existing file.
+
+    Parameters
+    ----------
+    item : Union[str, pathlib.Path]
+        The filename.
+
+    Raises
+    ------
+    TypeError
+        If the file extension is not a recognized Hdf5 extension.
+    FileNotFoundError
+        If the file does not exist.
+    """
+    if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
+        raise TypeError('The file does not have any extension registered'
+                        ' for hdf5 files.')
+    if not os.path.exists(item):
+        raise FileNotFoundError(f'The specified file "{item}" does not exist.')
 
 
 def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):

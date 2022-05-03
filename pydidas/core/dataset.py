@@ -69,7 +69,7 @@ class EmptyDataset(np.ndarray):
             if item in kwargs:
                 del kwargs[item]
         obj = np.ndarray.__new__(cls, *args, **kwargs)
-        obj._keys  = {}
+        obj._keys = {}
         for key in ['axis_labels', 'axis_ranges', 'axis_units']:
             _data = local_kws.get(key, _default_vals(obj.ndim))
             _labels = obj._get_dict(_data, '__new__')
@@ -384,7 +384,7 @@ class EmptyDataset(np.ndarray):
                               'defaults. (Error encountered in '
                               f'{method_name}).')
                 return _default_vals(self.ndim)
-            return  _data
+            return _data
         if isinstance(_data, (list, tuple)):
             if len(_data) != self.ndim:
                 warnings.warn('The number of keys does not match the number '
@@ -574,10 +574,10 @@ class EmptyDataset(np.ndarray):
         """
         _axes = None
         if axis is None:
-            _axes = [_index  for _index, _shape in enumerate(self.shape)
+            _axes = [_index for _index, _shape in enumerate(self.shape)
                      if _shape != 1]
         else:
-            _axes = [_index  for _index, _ in enumerate(self.shape)
+            _axes = [_index for _index, _ in enumerate(self.shape)
                      if _index != axis]
         _new = np.ndarray.squeeze(self, axis)
         for _key in ['axis_labels', 'axis_ranges', 'axis_units']:
@@ -633,7 +633,7 @@ class EmptyDataset(np.ndarray):
         for _key, _item in _obj.items():
             _lines = self.__get_item_representation(_key, _item)
             _str_entries.extend([' ' * 4 + _line for _line in _lines])
-        _str = f'{obj_name}:' + ' {\n' +  '\n'.join(_str_entries) + '}'
+        _str = f'{obj_name}:' + ' {\n' + '\n'.join(_str_entries) + '}'
         return _str
 
     def __get_item_representation(self, key, item, use_key=True):

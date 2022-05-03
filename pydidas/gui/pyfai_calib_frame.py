@@ -60,8 +60,6 @@ from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.utils import projecturl
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
-from pyFAI.gui.tasks import (ExperimentTask, MaskTask, PeakPickingTask,
-                             GeometryTask, IntegrationTask)
 
 from ..widgets import BaseFrame
 from ..experiment import ExperimentalSetup
@@ -197,13 +195,14 @@ class PyfaiCalibFrame(BaseFrame):
         self._stack.setCurrentWidget(w)
 
     def closeEvent(self, event):
-        # poniFile = self.model().experimentSettingsModel().poniFile()
         event.accept()
         for task in self.__tasks:
             task.aboutToClose()
-        # self.__context.saveWindowLocationSettings("main-window", self)
 
     def createTasks(self):
+        # Tasks must be imported here, a global import will cause errors.
+        from pyFAI.gui.tasks import (ExperimentTask, MaskTask, PeakPickingTask,
+                                     GeometryTask, IntegrationTask)
         _it = IntegrationTask.IntegrationTask()
         _button = QtWidgets.QPushButton('Store geometry for pydidas use')
         _button.clicked.connect(self._store_geometry)

@@ -58,7 +58,7 @@ def get_pydidas_icon():
     for _ in range(2):
         _path = os.path.dirname(_path)
     _logopath = os.path.join(_path, 'icons', 'pydidas_logo.svg')
-    _icon= QtGui.QIcon(_logopath)
+    _icon = QtGui.QIcon(_logopath)
     return _icon
 
 

@@ -84,11 +84,11 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
         self.create_label(None, '\nX-ray detector:', fontsize=11, bold=True,
                           gridPos=(-1, 0, 1, 1))
         self.create_button('but_select_detector',
-                            'Select X-ray detector', gridPos=(-1, 0, 1, 1),
-                            alignment=None)
+                           'Select X-ray detector', gridPos=(-1, 0, 1, 1),
+                           alignment=None)
         self.create_button('but_copy_det_from_pyfai',
-                            'Copy X-ray detector from pyFAI calibration',
-                            gridPos=(-1, 0, 1, 1), alignment=None)
+                           'Copy X-ray detector from pyFAI calibration',
+                           gridPos=(-1, 0, 1, 1), alignment=None)
 
     def __create_geometry_header(self):
         """

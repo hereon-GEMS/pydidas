@@ -28,7 +28,8 @@ __all__ = ['CompositeCreatorFrameBuilder']
 from qtpy import QtWidgets, QtCore
 from silx.gui.plot import PlotWindow
 
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import (CONFIG_WIDGET_WIDTH, FIX_EXP_POLICY,
+                               EXP_EXP_POLICY)
 from ...widgets import ScrollArea, BaseFrameWithApp
 from ...widgets.parameter_config import ParameterEditFrame
 from ..mixins import SilxPlotWindowMixIn
@@ -51,9 +52,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._widgets['config'] = ParameterEditFrame(
-            self, lineWidth=5,
-            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                         QtWidgets.QSizePolicy.Expanding))
+            self, lineWidth=5, sizePolicy=FIX_EXP_POLICY)
 
         self.create_label(
             'title', 'Composite image creator', fontsize=14, bold=True,
@@ -61,14 +60,12 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             fixedWidth=CONFIG_WIDGET_WIDTH)
 
         self.create_spacer('spacer1', gridPos=(-1, 0, 1, 2),
-                                 parent_widget=self._widgets['config'])
+                           parent_widget=self._widgets['config'])
 
         self.create_any_widget(
             'config_area', ScrollArea, widget=self._widgets['config'],
-            fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy= (QtWidgets.QSizePolicy.Fixed,
-                          QtWidgets.QSizePolicy.Expanding),
-            gridPos=(-1, 0, 1, 1), stretch=(1, 0),
+            fixedWidth=CONFIG_WIDGET_WIDTH + 40, stretch=(1, 0),
+            sizePolicy=FIX_EXP_POLICY, gridPos=(-1, 0, 1, 1),
             layout_kwargs={'alignment': None})
 
         self.create_button(
@@ -82,10 +79,8 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             yInverted=True, copy=True, save=True, print_=True, control=False,
             position=True, roi=False, mask=True)
         self.add_any_widget(
-            'plot_window', _plot, alignment=None,
-            gridPos=(0, 3, 1, 1), visible=False, stretch=(1, 1),
-            sizePolicy=(QtWidgets.QSizePolicy.Expanding,
-                        QtWidgets.QSizePolicy.Expanding))
+            'plot_window', _plot, alignment=None, stretch=(1, 1),
+            gridPos=(0, 3, 1, 1), visible=False, sizePolicy=EXP_EXP_POLICY)
 
         for _key in self.params:
             _options = self.__get_param_widget_config(_key)
@@ -97,8 +92,8 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                         'threshold_high', 'binning', 'output_fname',
                         'n_total', 'composite_dir']:
                 self.create_line(f'line_{_key}',
-                    parent_widget=self._widgets['config'],
-                    fixedWidth=CONFIG_WIDGET_WIDTH)
+                                 parent_widget=self._widgets['config'],
+                                 fixedWidth=CONFIG_WIDGET_WIDTH)
         self.create_button(
             'but_exec', 'Generate composite', gridPos=(-1, 0, 1, 2),
             parent_widget=self._widgets['config'], enabled=False,
@@ -134,7 +129,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                      'raw_image_shape', 'images_per_file']:
             self.param_widgets[_key].setEnabled(False)
         for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-                     'last_file','hdf5_stepping', 'hdf5_dataset_shape',
+                     'last_file', 'hdf5_stepping', 'hdf5_dataset_shape',
                      'hdf5_stepping']:
             self.toggle_param_widget_visibility(_key, False)
 

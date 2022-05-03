@@ -68,7 +68,7 @@ class DataBrowsingFrameBuilder(BaseFrame):
         self.create_button(
             'but_maximize', '', icon=qta.icon('fa.chevron-right'),
             iconSize=QtCore.QSize(_bsize, _bsize), fixedHeight=_bsize,
-            fixedWidth=_bsize,gridPos=(2, 1, 1, 1),
+            fixedWidth=_bsize, gridPos=(2, 1, 1, 1),
             parent_widget=self._widgets['selection'])
 
         self._widgets['viewer'] = ImageView()

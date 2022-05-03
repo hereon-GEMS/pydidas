@@ -488,8 +488,8 @@ class CompositeCreatorApp(BaseApp):
         if self._det_mask is None:
             return image
         if self._config['det_mask_val'] is None:
-            raise AppConfigError('No numerical value has been defined'
-                                  ' for the mask!')
+            raise AppConfigError('No numerical value has been defined '
+                                 'for the mask!')
         return Dataset(np.where(self._det_mask,
                                 self._config['det_mask_val'], image),
                        axis_ranges=image.axis_ranges,

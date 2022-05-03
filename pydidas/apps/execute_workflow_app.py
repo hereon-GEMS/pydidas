@@ -211,10 +211,10 @@ class ExecuteWorkflowApp(BaseApp):
         _n_dataset_in_buffer = int(np.floor(_buffer / _req_mem_per_dataset))
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker
-            _error= ('The defined buffer is too small. The required memory '
-                     f'per diffraction image is {_req_mem_per_dataset:.3f} '
-                     f'MB and {_n_worker} workers have been defined. The '
-                     f'minimum buffer size must be {_min_buffer:.2f} MB.')
+            _error = ('The defined buffer is too small. The required memory '
+                      f'per diffraction image is {_req_mem_per_dataset:.3f} '
+                      f'MB and {_n_worker} workers have been defined. The '
+                      f'minimum buffer size must be {_min_buffer:.2f} MB.')
             raise AppConfigError(_error)
         self._config['buffer_n'] = min(_n_dataset_in_buffer, _n_data,
                                        self._mp_tasks.size)

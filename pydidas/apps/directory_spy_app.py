@@ -117,7 +117,6 @@ class DirectorySpyApp(BaseApp):
         self._config['2nd_latest_file'] = None
         self._config['file_hash'] = hash((None, -1, None, -1))
 
-
     def reset_runtime_vars(self):
         """
         Reset the runtime variables for a new run.
@@ -205,7 +204,7 @@ class DirectorySpyApp(BaseApp):
             raise AppConfigError(
                 'Multiple patterns detected. Cannot process the filename '
                 'pattern.')
-        _len_pattern =_pattern_str.count('#')
+        _len_pattern = _pattern_str.count('#')
         self._config['glob_pattern'] = _pattern_str.replace('#' * _len_pattern,
                                                             '*')
         _pattern_str = _pattern_str.replace('#' * _len_pattern,
@@ -441,7 +440,7 @@ class DirectorySpyApp(BaseApp):
         dict
             The parameters required to read the frame from the given file.
         """
-        _hdf5_dataset=self.get_param_value('hdf5_key')
+        _hdf5_dataset = self.get_param_value('hdf5_key')
         _shape = get_hdf5_metadata(fname, meta='shape', dset=_hdf5_dataset)
         self.__read_image_meta = {'frame': _shape[0] - 1,
                                   'hdf5_dataset': _hdf5_dataset}
@@ -479,7 +478,6 @@ class DirectorySpyApp(BaseApp):
             return ''
         return (f' (frame: {self.__read_image_meta["frame"]}, '
                 f'hdf5_dataset: {self.__read_image_meta["hdf5_dataset"]})')
-
 
     @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, fname):

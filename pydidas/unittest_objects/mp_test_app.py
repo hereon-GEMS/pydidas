@@ -33,7 +33,7 @@ from qtpy import QtCore
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
 from pydidas.core import get_generic_param_collection, BaseApp
-from pydidas.image_io import CompositeImage
+from pydidas.data_io import CompositeImage
 
 
 def get_test_image(index, **kwargs):

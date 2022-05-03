@@ -111,8 +111,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         _n = 25
         _names = self.create_pattern_files(_name, _n)
         for _index in range(_n):
-            _fname = os.path.join(self._path, _name.replace('####',
-                                                            f'{_index:04d}'))
+            _fname = os.path.join(self._path,
+                                  _name.replace('####', f'{_index:04d}'))
             self.assertTrue(os.path.isfile(_fname))
             self.assertEqual(_fname, _names[_index])
 
@@ -432,7 +432,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app._DirectorySpyApp__update_hdf5_metadata(_fname)
         _meta = app._DirectorySpyApp__read_image_meta
         self.assertEqual(_meta['frame'], _shape[0]- 1)
-        self.assertEqual(_meta['hdf5_dataset'] ,_dset)
+        self.assertEqual(_meta['dataset'] ,_dset)
 
     def test_get_image__simple_image(self):
         app = self.create_default_app()

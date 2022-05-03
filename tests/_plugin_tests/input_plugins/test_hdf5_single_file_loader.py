@@ -75,7 +75,7 @@ class TestHdf5singleFileLoader(unittest.TestCase):
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
         self.assertEqual(kwargs['frame'], _index)
-        self.assertEqual(_data.metadata['frame'], _index)
+        self.assertEqual(_data.metadata['frame'], [_index])
 
     def test_execute__get_all_frames(self):
         plugin = self.create_plugin_with_hdf5_filelist()
@@ -83,7 +83,7 @@ class TestHdf5singleFileLoader(unittest.TestCase):
             _data, kwargs = plugin.execute(_index)
             self.assertTrue((_data == _index).all())
             self.assertEqual(kwargs['frame'], _index)
-            self.assertEqual(_data.metadata['frame'], _index)
+            self.assertEqual(_data.metadata['frame'], [_index])
 
 
 if __name__ == "__main__":

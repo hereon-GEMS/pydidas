@@ -39,7 +39,7 @@ del io_base
 import os
 import importlib
 _dir = os.path.dirname(__file__)
-_io_classes = set(item.strip('.py') for item in os.listdir(_dir)
+_io_classes = set(item[:-3] for item in os.listdir(_dir)
                   if (item.endswith('.py')
                       and item not in ['io_base.py', '__init__.py']))
 

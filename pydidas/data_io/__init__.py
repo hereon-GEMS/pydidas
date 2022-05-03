@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The image_io subpackage includes functionality to load and save data in
+The data_io subpackage includes functionality to load and save data in
 various formats.
 """
 
@@ -28,13 +28,26 @@ __all__ = []
 # import sub-packages:
 from . import implementations
 from . import low_level_readers
+from . import utils
 
 # import __all__ items from modules:
+from .composite_image import *
+from .import_export import *
 from .io_master import *
 from .rebin_ import *
+from .roi_controller import *
+from .roi_controller_1d import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import composite_image
+__all__.extend(composite_image.__all__)
+del composite_image
+
+from . import import_export
+__all__.extend(import_export.__all__)
+del import_export
+
 from . import io_master
 __all__.extend(io_master.__all__)
 del io_master
@@ -42,3 +55,11 @@ del io_master
 from . import rebin_
 __all__.extend(rebin_.__all__)
 del rebin_
+
+from . import roi_controller
+__all__.extend(roi_controller.__all__)
+del roi_controller
+
+from . import roi_controller_1d
+__all__.extend(roi_controller_1d.__all__)
+del roi_controller_1d

@@ -30,7 +30,7 @@ import numpy as np
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import ProcPlugin
-from pydidas.image_io import read_image, rebin2d
+from pydidas.data_io import import_data, rebin2d
 
 
 class MaskImage(ProcPlugin):
@@ -63,7 +63,7 @@ class MaskImage(ProcPlugin):
         else:
             _maskfile = self.get_param_value('det_mask')
             self._maskval = self.get_param_value('det_mask_val')
-        self._mask = read_image(_maskfile)
+        self._mask = import_data(_maskfile)
 
     def execute(self, data, **kwargs):
         """

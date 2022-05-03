@@ -31,7 +31,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.core import get_generic_param_collection, BaseApp
-from pydidas.image_io import CompositeImage
+from pydidas.data_io import CompositeImage
 
 
 def get_test_image(index, **kwargs):

@@ -34,7 +34,7 @@ from ...core import get_generic_param_collection, AppConfigError
 from ...core.constants import (DEFAULT_TWO_LINE_PARAM_CONFIG,
                                CONFIG_WIDGET_WIDTH, HDF5_EXTENSIONS)
 from ...core.utils import get_hdf5_metadata
-from ...image_io import read_image, export_image
+from ...data_io import import_data, export_data
 from ...managers import FilelistManager
 from ...widgets import BaseFrame, dialogues
 
@@ -196,7 +196,7 @@ class AverageImagesWindow(BaseFrame):
                 _tmpdata, _n_in_file = self.__read_hdf5_images(_fname)
                 _nimages += _n_in_file
             else:
-                _tmpdata = read_image(_fname)
+                _tmpdata = import_data(_fname)
                 _nimages += 1
             if _data is None:
                 _data = 1.0 * _tmpdata
@@ -205,11 +205,11 @@ class AverageImagesWindow(BaseFrame):
         if self.get_param_value('use_global_det_mask'):
             _mask_qsetting = self.q_settings_get_global_value('det_mask')
             if os.path.isfile(_mask_qsetting):
-                _mask = read_image(_mask_qsetting)
+                _mask = import_data(_mask_qsetting)
                 _data = np.where(_mask, 0, _data)
         _data /= _nimages
-        export_image(_data.astype(np.float32),
-                     self.get_param_value('output_fname'))
+        export_data(self.get_param_value('output_fname'),
+                    _data.astype(np.float32))
         self.close()
 
     def __read_hdf5_images(self, fname):
@@ -220,7 +220,7 @@ class AverageImagesWindow(BaseFrame):
             _max_index = get_hdf5_metadata(fname, ['shape'], dset=_key)[0]
         _data = None
         for _frame in range(_start_index, _max_index):
-            _tmp = read_image(fname, frame=_frame, hdf5_dataset=_key)
+            _tmp = import_data(fname, frame=_frame, dataset=_key)
             if _data is None:
                 _data = 1.0 * _tmp
             else:

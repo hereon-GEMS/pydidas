@@ -87,20 +87,21 @@ class Test_app_processor_without_tasks(unittest.TestCase):
     def test_run_plain(self):
         _thread = self.create_thread()
         _thread.start()
-        time.sleep(0.2)
+        time.sleep(0.05)
         self.stop_queue.put(1)
         time.sleep(0.05)
         _tasks, _results = self.get_results()
+        time.sleep(0.01)
         self.assertTrue(len(_tasks) > 0)
         self.assertEqual(self.finished_queue.get_nowait(), 1)
 
     def test_stop_signal(self):
         _thread = self.create_thread()
         _thread.start()
-        time.sleep(0.1)
+        time.sleep(0.05)
         self.assertTrue(_thread.is_alive())
         self.stop_queue.put(1)
-        time.sleep(0.1)
+        time.sleep(0.05)
         self.assertEqual(self.finished_queue.get(), 1)
 
 

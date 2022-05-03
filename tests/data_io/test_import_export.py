@@ -29,30 +29,32 @@ import os
 
 import numpy as np
 
-from pydidas.image_io import ImageReaderCollection
-from pydidas.image_io.implementations.numpy_reader import NumpyReader
+from pydidas.data_io import export_data, import_data
 
 
-class TestNumpyReader(unittest.TestCase):
+class TestImportExport(unittest.TestCase):
 
     def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, 'test.npy')
-        self._img_shape = (10, 10)
-        self._data = np.random.random(self._img_shape)
-        np.save(self._fname, self._data)
+        self._shape = np.array((10, 5, 20, 8, 3))
+        self._data = np.random.random(self._shape)
+        self._2dshape = np.array((37, 15))
+        self._2dimage = np.random.random(self._2dshape)
+        self._dir = tempfile.mkdtemp()
 
     def tearDown(self):
-        shutil.rmtree(self._path)
+        shutil.rmtree(self._dir)
 
-    def test_get_instance(self):
-        obj = ImageReaderCollection().get_reader(self._fname)
-        self.assertIsInstance(obj, NumpyReader)
+    def test_export_data(self):
+        _fname = os.path.join(self._dir, 'test.npy')
+        export_data(_fname, self._data)
+        _data = np.load(_fname)
+        self.assertTrue(np.allclose(_data, self._data))
 
-    def test_read_image(self):
-        obj = ImageReaderCollection().get_reader(self._fname)
-        img = obj.read_image(self._fname)
-        self.assertTrue((img == self._data).all())
+    def test_import_data(self):
+        _fname = os.path.join(self._dir, 'test.npy')
+        np.save(_fname, self._data)
+        _data = import_data(_fname)
+        self.assertTrue(np.allclose(_data, self._data))
 
 
 if __name__ == "__main__":

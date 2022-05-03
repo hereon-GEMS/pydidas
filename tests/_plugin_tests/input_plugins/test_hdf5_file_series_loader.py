@@ -113,7 +113,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         self.assertTrue((_data == _index).all())
         self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
         self.assertEqual(_data.metadata['frame'],
-                         self.get_index_in_file(_index))
+                         [self.get_index_in_file(_index)])
 
     def test_execute__with_roi(self):
         plugin = self.create_plugin_with_hdf5_filelist()
@@ -125,7 +125,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         self.assertTrue((_data == _index).all())
         self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
         self.assertEqual(_data.metadata['frame'],
-                         self.get_index_in_file(_index))
+                         [self.get_index_in_file(_index)])
         self.assertEqual(
             _data.shape,
             (plugin.get_param_value('roi_yhigh'), self._img_shape[1]))
@@ -138,7 +138,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
             self.assertTrue((_data == _index).all())
             self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
             self.assertEqual(_data.metadata['frame'],
-                             self.get_index_in_file(_index))
+                             [self.get_index_in_file(_index)])
 
     def test_pickle(self):
         plugin = self.create_plugin_with_hdf5_filelist()

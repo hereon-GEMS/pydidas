@@ -31,7 +31,7 @@ import numpy as np
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import get_generic_param_collection
 from pydidas.plugins import ProcPlugin
-from pydidas.image_io import rebin2d
+from pydidas.data_io import rebin2d
 
 
 class SubtractBackgroundImage(ProcPlugin):

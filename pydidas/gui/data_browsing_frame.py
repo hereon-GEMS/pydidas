@@ -30,12 +30,9 @@ from functools import partial
 
 from qtpy import QtCore
 
-from ..image_io import ImageReaderCollection, read_image
+from ..data_io import IoMaster, import_data
 from ..core.constants import HDF5_EXTENSIONS
 from .builders import DataBrowsingFrameBuilder
-
-
-IMAGE_READER = ImageReaderCollection()
 
 
 class DataBrowsingFrame(DataBrowsingFrameBuilder):
@@ -105,7 +102,7 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         if not os.path.isfile(_name):
             return
         _extension = '.' + os.path.basename(_name).split(".")[-1]
-        _supported_nothdf_ext = (set(IMAGE_READER._extensions.keys())
+        _supported_nothdf_ext = (set(IoMaster.registry_import.keys())
                                  - set(HDF5_EXTENSIONS))
         if _extension in HDF5_EXTENSIONS:
             self._widgets['hdf_dset'].setVisible(True)
@@ -113,5 +110,5 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
             return
         self._widgets['hdf_dset'].setVisible(False)
         if _extension in _supported_nothdf_ext:
-            _data = read_image(_name)
+            _data = import_data(_name)
             self._widgets['viewer'].setData(_data)

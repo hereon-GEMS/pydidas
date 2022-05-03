@@ -34,7 +34,7 @@ from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core import Parameter, get_generic_parameter, utils
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import BasePlugin
-from pydidas.image_io import rebin2d, RoiController
+from pydidas.data_io import rebin2d, RoiController
 
 
 class TestBasePlugin(unittest.TestCase):

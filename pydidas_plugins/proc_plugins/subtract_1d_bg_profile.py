@@ -32,7 +32,7 @@ import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, Parameter
-from pydidas.image_io import read_image
+from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
 
@@ -75,7 +75,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             self._thresh = None
 
         _fname = self.get_param_value('profile_name')
-        _profile = read_image(_fname)
+        _profile = import_data(_fname)
 
         _kernel = self.get_param_value('kernel_width')
         if _kernel > 0:

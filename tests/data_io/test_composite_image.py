@@ -31,7 +31,7 @@ import copy
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.image_io import CompositeImage
+from pydidas.data_io import CompositeImage
 from pydidas.core import AppConfigError
 
 

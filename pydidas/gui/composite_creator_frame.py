@@ -37,6 +37,7 @@ from ..core import Parameter, get_generic_parameter, AppConfigError
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (get_hdf5_populated_dataset_keys, pydidas_logger,
                           LOGGING_LEVEL)
+from ..data_io import IoMaster
 from ..widgets import dialogues
 from ..multiprocessing import AppRunner
 from .builders import CompositeCreatorFrameBuilder
@@ -246,11 +247,11 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         Save the composite image.
         """
-        # TODO : Change names based on image_io
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Name of file', None,
-            'TIFF (*.tif);;JPG (*.jpg);;PNG (*.png);;NUMPY (*.npy *.npz)')[0]
-        self._app.export_image(fname)
+            IoMaster.get_string_of_formats('export'))[0]
+        if fname not in [None, '']:
+            self._app.export_image(fname)
 
     @QtCore.Slot(str)
     def __selected_first_file(self, fname):

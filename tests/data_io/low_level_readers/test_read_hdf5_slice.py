@@ -30,7 +30,7 @@ import os
 import h5py
 import numpy as np
 
-from pydidas.image_io.low_level_readers.read_hdf5_slice import (
+from pydidas.data_io.low_level_readers.read_hdf5_slice import (
     read_hdf5_slice, get_selection)
 
 

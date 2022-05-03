@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Subpackage with implementations of concrete ImageReaders.
+The data_io.implementations package includes imports/exporters for data
+in different formats.
 """
 
 __author__ = "Malte Storm"
@@ -24,12 +25,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from . import hdf5_reader
+# import __all__ items from modules:
+from .figure_utils import *
 
-from . import tiff_reader
-
-from . import raw_reader
-
-from . import numpy_reader
-
-from . import fabio_reader
+# add modules' __all__ items to package's __all__ items and unclutter the
+# namespace by deleting the module references:
+from . import figure_utils
+__all__.extend(figure_utils.__all__)
+del figure_utils

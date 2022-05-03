@@ -46,8 +46,6 @@ Further code documentation
     code_docs/concepts
     code_docs/package_structure
 
-
-  
   
 Package documentation
 ---------------------
@@ -57,7 +55,7 @@ Package documentation
     
     code_docs/core
     code_docs/multiprocessing
-    code_docs/image_io
+    code_docs/data_io
     code_docs/experiment
     code_docs/managers
     code_docs/plugins

@@ -28,7 +28,7 @@ import os
 
 from ..core.constants import PROC_PLUGIN, HDF5_EXTENSIONS
 from ..core.utils import check_file_exists, check_hdf5_key_exists_in_file
-from ..image_io import read_image
+from ..data_io import import_data
 from .base_plugin import BasePlugin
 
 
@@ -72,6 +72,6 @@ class ProcPlugin(BasePlugin):
         _params = {}
         if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(fname, hdf5_dset)
-            _params = {'hdf5_dataset': hdf5_dset, 'frame': hdf5_frame}
-        _image = read_image(fname, **_params)
+            _params = {'dataset': hdf5_dset, 'frame': hdf5_frame}
+        _image = import_data(fname, **_params)
         return _image

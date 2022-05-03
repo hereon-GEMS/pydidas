@@ -37,7 +37,7 @@ from silx.opencl.common import OpenCL
 from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger
-from ..image_io import read_image, rebin2d
+from ..data_io import import_data, rebin2d
 from ..experiment import ExperimentalSetup
 from .base_proc_plugin import ProcPlugin
 
@@ -118,14 +118,14 @@ class pyFAIintegrationBase(ProcPlugin):
         _mask_qsetting = self.q_settings_get_global_value('det_mask')
         if _mask_param != pathlib.Path():
             if os.path.isfile(_mask_param):
-                self._mask = read_image(_mask_param)
+                self._mask = import_data(_mask_param)
                 return
             logger.warning(
                 ('The locally defined detector mask file "%s" does not exist.'
                  ' Falling back to the default defined in the global '
                  'settings.'), _mask_param)
         if os.path.isfile(_mask_qsetting):
-            self._mask = read_image(_mask_qsetting)
+            self._mask = import_data(_mask_qsetting)
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
         else:

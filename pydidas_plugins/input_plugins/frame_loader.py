@@ -30,7 +30,7 @@ from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import get_generic_param_collection
 from pydidas.managers import FilelistManager
 from pydidas.plugins import InputPlugin
-from pydidas.image_io import read_image
+from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring
 
 
@@ -105,7 +105,7 @@ class FrameLoader(InputPlugin):
         _fname = self.get_filename(index)
         kwargs['binning'] = self.get_param_value('binning')
         kwargs['roi'] = self._image_metadata.roi
-        _data = read_image(_fname, **kwargs)
+        _data = import_data(_fname, **kwargs)
         return _data, kwargs
 
     @copy_docstring(InputPlugin)

@@ -28,7 +28,7 @@ import os
 
 from ..core import get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
-from ..image_io import RoiController1d
+from ..data_io import RoiController1d
 from .base_plugin import BasePlugin
 
 

@@ -36,7 +36,7 @@ from ..core import (Dataset, AppConfigError, get_generic_param_collection,
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
                           copy_docstring)
-from ..image_io import CompositeImage, read_image, rebin2d
+from ..data_io import CompositeImage, import_data, rebin2d
 from ..managers import FilelistManager, ImageMetadataManager
 from .parsers import composite_creator_app_parser
 
@@ -318,9 +318,9 @@ class CompositeCreatorApp(BaseApp):
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file,
                                           self.get_param_value('bg_hdf5_key'))
-            _params['hdf5_dataset'] = self.get_param_value('bg_hdf5_key')
+            _params['dataset'] = self.get_param_value('bg_hdf5_key')
             _params['frame'] = self.get_param_value('bg_hdf5_frame')
-        _bg_image = read_image(_bg_file, **_params)
+        _bg_image = import_data(_bg_file, **_params)
         if _bg_image.shape != self._image_metadata.final_shape:
             raise AppConfigError(f'The selected background file "{_bg_file}"'
                                  ' does not have the same image dimensions '
@@ -405,7 +405,7 @@ class CompositeCreatorApp(BaseApp):
             _i_hdf = (self.get_param_value('hdf5_first_image_num')
                       + _hdf_index * self.get_param_value('hdf5_stepping'))
             _params = (_params
-                       | dict(hdf5_dataset=self.get_param_value('hdf5_key'),
+                       | dict(dataset=self.get_param_value('hdf5_key'),
                               frame=_i_hdf))
         self._config['current_fname'] = _fname
         self._config['current_kwargs'] = _params
@@ -466,8 +466,8 @@ class CompositeCreatorApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        _image = read_image(self._config['current_fname'],
-                            **self._config['current_kwargs'])
+        _image = import_data(self._config['current_fname'],
+                             **self._config['current_kwargs'])
         _image = self.__apply_mask(_image)
         return _image
 

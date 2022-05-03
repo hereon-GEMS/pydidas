@@ -29,7 +29,7 @@ from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.managers import FilelistManager
 from pydidas.plugins import InputPlugin
-from pydidas.image_io import read_image
+from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 
 
@@ -129,11 +129,11 @@ class Hdf5fileSeriesLoader(InputPlugin):
         """
         _fname = self.get_filename(index)
         _hdf_index = index % self.get_param_value('images_per_file')
-        kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')
+        kwargs['dataset'] = self.get_param_value('hdf5_key')
         kwargs['frame'] = _hdf_index
         kwargs['binning'] = self.get_param_value('binning')
         kwargs['roi'] = self._image_metadata.roi
-        _data = read_image(_fname, **kwargs)
+        _data = import_data(_fname, **kwargs)
         return _data, kwargs
 
     @copy_docstring(InputPlugin)

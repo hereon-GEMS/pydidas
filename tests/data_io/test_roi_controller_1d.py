@@ -25,7 +25,7 @@ __status__ = "Development"
 import unittest
 import copy
 
-from pydidas.image_io import RoiController1d
+from pydidas.data_io import RoiController1d
 
 
 class TestRoiController1d(unittest.TestCase):

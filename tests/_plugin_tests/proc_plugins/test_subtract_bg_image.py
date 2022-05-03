@@ -31,7 +31,7 @@ import numpy as np
 
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.image_io import rebin2d
+from pydidas.data_io import rebin2d
 
 
 PLUGIN_COLLECTION = PluginCollection()

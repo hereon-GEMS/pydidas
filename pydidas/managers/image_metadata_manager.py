@@ -32,7 +32,7 @@ from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
 from ..core import (Parameter, ParameterCollection, AppConfigError,
                     get_generic_param_collection,
                     ObjectWithParameterCollection)
-from ..image_io.read_image_ import read_image
+from ..data_io import import_data
 
 
 class ImageMetadataManager(ObjectWithParameterCollection):
@@ -244,7 +244,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from file range.
         """
-        _test_image = read_image(self.get_filename())
+        _test_image = import_data(self.get_filename())
         self._config['numbers'] = [0]
         self._config['hdf5_dset_shape'] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)

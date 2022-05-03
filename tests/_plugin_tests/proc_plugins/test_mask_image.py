@@ -32,7 +32,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.image_io import rebin2d
+from pydidas.data_io import rebin2d
 
 
 PLUGIN_COLLECTION = PluginCollection()

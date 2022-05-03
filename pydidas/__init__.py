@@ -36,7 +36,7 @@ import warnings as __warnings
 
 # import sub-packages:
 from . import core
-from . import image_io
+from . import data_io
 from . import multiprocessing
 from . import managers
 from . import experiment
@@ -46,7 +46,7 @@ from . import apps
 from . import unittest_objects
 from . import widgets
 from . import gui
-__all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
+__all__.extend(['apps', 'core', 'experiment', 'gui', 'data_io', 'managers',
                 'multiprocessing', 'plugins', 'unittest_objects', 'utils',
                 'widgets', 'workflow'])
 

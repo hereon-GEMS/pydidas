@@ -31,7 +31,7 @@ import numpy as np
 
 from pydidas.core import DatasetConfigException
 from pydidas.core.dataset import (Dataset, EmptyDataset, _default_vals)
-from pydidas.image_io import rebin2d
+from pydidas.data_io import rebin2d
 
 
 class TestDataset(unittest.TestCase):

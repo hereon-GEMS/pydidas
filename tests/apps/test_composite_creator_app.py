@@ -35,7 +35,7 @@ from qtpy import QtCore, QtTest
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollection, Dataset, AppConfigError,
                           get_generic_parameter)
-from pydidas.image_io import CompositeImage
+from pydidas.data_io import CompositeImage
 
 
 class TestCompositeCreatorApp(unittest.TestCase):
@@ -271,8 +271,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_func(self):
         app = self.get_default_app()
         app._config['current_fname'] = self._hdf5_fnames[0]
-        app._config['current_kwargs'] = dict(hdf5_dataset='/entry/data/data',
-                                              frame=0)
+        app._config['current_kwargs'] = dict(dataset='/entry/data/data',
+                                             frame=0)
         _image = app.multiprocessing_func(0)
         self.assertTrue((_image == self._data[0]).all())
 
@@ -333,8 +333,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._store_args_for_read_image(_index)
         self.assertEqual(app._config['current_fname'], self._hdf5_fnames[0])
         self.assertEqual(app._config['current_kwargs']['frame'], _index)
-        self.assertEqual(app._config['current_kwargs']['hdf5_dataset'],
-                          '/entry/data/data')
+        self.assertEqual(app._config['current_kwargs']['dataset'],
+                         '/entry/data/data')
         self.assertEqual(app._config['current_kwargs']['binning'], 1)
 
     def test_store_args_for_read_image__npy(self):

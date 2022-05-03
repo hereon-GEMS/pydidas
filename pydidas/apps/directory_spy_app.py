@@ -35,7 +35,7 @@ from ..core import BaseApp, get_generic_param_collection, AppConfigError
 from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
                           get_hdf5_metadata, pydidas_logger)
 from ..core.constants import HDF5_EXTENSIONS
-from ..image_io import read_image
+from ..data_io import import_data
 from .parsers import directory_spy_app_parser
 
 
@@ -224,9 +224,9 @@ class DirectorySpyApp(BaseApp):
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(
                 _bg_file, self.get_param_value('bg_hdf5_key'))
-            _params = {'hdf5_dataset': self.get_param_value('bg_hdf5_key'),
+            _params = {'dataset': self.get_param_value('bg_hdf5_key'),
                        'frame': self.get_param_value('bg_hdf5_frame')}
-        _bg_image = read_image(_bg_file, **_params)
+        _bg_image = import_data(_bg_file, **_params)
         self._bg_image = self._apply_mask(_bg_image)
 
     def _apply_mask(self, image):
@@ -424,7 +424,7 @@ class DirectorySpyApp(BaseApp):
             fname = str(fname)
         if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
             self.__update_hdf5_metadata(fname)
-        return read_image(fname, **self.__read_image_meta)
+        return import_data(fname, **self.__read_image_meta)
 
     def __update_hdf5_metadata(self, fname):
         """
@@ -440,10 +440,10 @@ class DirectorySpyApp(BaseApp):
         dict
             The parameters required to read the frame from the given file.
         """
-        _hdf5_dataset = self.get_param_value('hdf5_key')
-        _shape = get_hdf5_metadata(fname, meta='shape', dset=_hdf5_dataset)
+        _dataset = self.get_param_value('hdf5_key')
+        _shape = get_hdf5_metadata(fname, meta='shape', dset=_dataset)
         self.__read_image_meta = {'frame': _shape[0] - 1,
-                                  'hdf5_dataset': _hdf5_dataset}
+                                  'dataset': _dataset}
 
     def __store_image_in_shared_memory(self, image):
         """
@@ -477,7 +477,7 @@ class DirectorySpyApp(BaseApp):
         if len(self.__read_image_meta) == 0:
             return ''
         return (f' (frame: {self.__read_image_meta["frame"]}, '
-                f'hdf5_dataset: {self.__read_image_meta["hdf5_dataset"]})')
+                f'dataset: {self.__read_image_meta["dataset"]})')
 
     @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, fname):

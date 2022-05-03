@@ -25,11 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ['Hdf5singleFileLoader']
 
-
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
 from pydidas.plugins import InputPlugin
-from pydidas.image_io import read_image
+from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 
 
@@ -75,9 +74,9 @@ class Hdf5singleFileLoader(InputPlugin):
 
     def execute(self, index, **kwargs):
         fname = self.get_param_value('filename')
-        kwargs['hdf5_dataset'] = self.get_param_value('hdf5_key')
+        kwargs['dataset'] = self.get_param_value('hdf5_key')
         kwargs['frame'] = index
-        _data = read_image(fname, **kwargs)
+        _data = import_data(fname, **kwargs)
         return _data, kwargs
 
     @copy_docstring(InputPlugin)

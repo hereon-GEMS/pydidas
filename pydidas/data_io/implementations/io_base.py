@@ -28,7 +28,7 @@ __all__ = ['IoBase']
 import os
 
 from ..io_master import IoMaster
-from ...image_io.roi_controller import RoiController
+from ..roi_controller import RoiController
 from ..rebin_ import rebin
 
 

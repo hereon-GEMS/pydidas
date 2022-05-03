@@ -31,7 +31,7 @@ import numpy as np
 
 from ..core import (AppConfigError, ParameterCollection, get_generic_parameter,
                    ObjectWithParameterCollection)
-from .export_image_ import export_image
+from .import_export import export_data
 
 
 class CompositeImage(ObjectWithParameterCollection):
@@ -296,7 +296,7 @@ class CompositeImage(ObjectWithParameterCollection):
         output_fname : str
             The full file system path and filename for the output image file.
         """
-        export_image(self.__image, output_fname)
+        export_data(output_fname, self.__image)
 
     @property
     def image(self):

@@ -30,7 +30,7 @@ from .experimental_setup_io_meta import ExperimentalSetupIoMeta
 from .experimental_setup import ExperimentalSetup
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 
 class ExperimentalSetupIoBase(GenericIoBase,
@@ -48,7 +48,7 @@ class ExperimentalSetupIoBase(GenericIoBase,
         Verify that the tmp_params dictionary holds all keys from the
         ExperimentalSetup.
         """
-        for key in EXP_SETTINGS.params:
+        for key in EXP_SETUP.params:
             if key not in cls.imported_params:
                 raise KeyError(f'The setting for "{key}" is missing.')
 
@@ -58,5 +58,5 @@ class ExperimentalSetupIoBase(GenericIoBase,
         Write the loaded (temporary) Parameters to the ExperimentalSetup.
         """
         for key in cls.imported_params:
-            EXP_SETTINGS.set_param_value(key, cls.imported_params[key])
+            EXP_SETUP.set_param_value(key, cls.imported_params[key])
         cls.imported_params = {}

@@ -33,7 +33,7 @@ from .experimental_setup_io_base import ExperimentalSetupIoBase
 from .experimental_setup import ExperimentalSetup
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 
 class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
@@ -54,7 +54,7 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
             The filename of the file to be written.
         """
         cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = EXP_SETTINGS.get_param_values_as_dict()
+        tmp_params = EXP_SETUP.get_param_values_as_dict()
         del tmp_params['xray_energy']
         with open(filename, 'w') as stream:
             yaml.safe_dump(tmp_params, stream)

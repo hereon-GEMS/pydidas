@@ -32,7 +32,7 @@ from .experimental_setup_io_base import ExperimentalSetupIoBase
 from .experimental_setup import ExperimentalSetup
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
 
 class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
@@ -55,21 +55,19 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
         cls.check_for_existing_file(filename, **kwargs)
         _pdata = {}
         for key in ['rot1', 'rot2', 'rot3', 'poni1', 'poni2']:
-            _pdata[key] = EXP_SETTINGS.get_param_value(f'detector_{key}')
-        _pdata['detector'] = EXP_SETTINGS.get_param_value('detector_name')
-        _pdata['distance'] = EXP_SETTINGS.get_param_value('detector_dist')
+            _pdata[key] = EXP_SETUP.get_param_value(f'detector_{key}')
+        _pdata['detector'] = EXP_SETUP.get_param_value('detector_name')
+        _pdata['distance'] = EXP_SETUP.get_param_value('detector_dist')
         if (_pdata['detector'] in pyFAI.detectors.Detector.registry.keys()
                 and _pdata['detector'] != 'detector'):
             _pdata['detector_config'] = {}
         else:
             _pdata['detector_config'] = dict(
-                pixel1= (1e-6
-                         * EXP_SETTINGS.get_param_value('detector_pxsizey')),
-                pixel2=(1e-6
-                        * EXP_SETTINGS.get_param_value('detector_pxsizex')),
-                max_shape=(EXP_SETTINGS.get_param_value('detector_npixy'),
-                           EXP_SETTINGS.get_param_value('detector_npixx')))
-        _pdata['wavelength'] = (EXP_SETTINGS.get_param_value('xray_wavelength')
+                pixel1=(1e-6 * EXP_SETUP.get_param_value('detector_pxsizey')),
+                pixel2=(1e-6 * EXP_SETUP.get_param_value('detector_pxsizex')),
+                max_shape=(EXP_SETUP.get_param_value('detector_npixy'),
+                           EXP_SETUP.get_param_value('detector_npixx')))
+        _pdata['wavelength'] = (EXP_SETUP.get_param_value('xray_wavelength')
                                 * 1e-10)
         pfile = pyFAI.io.ponifile.PoniFile()
         pfile.read_from_dict(_pdata)

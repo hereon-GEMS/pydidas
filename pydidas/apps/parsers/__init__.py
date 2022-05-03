@@ -26,8 +26,6 @@ __status__ = "Development"
 __all__ = []
 
 
-
-
 # import __all__ items from modules:
 from .composite_creator_app_parser_ import *
 from .directory_spy_app_parser_ import *

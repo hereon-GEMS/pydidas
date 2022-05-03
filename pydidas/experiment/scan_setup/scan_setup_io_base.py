@@ -41,7 +41,6 @@ class ScanSetupIoBase(GenericIoBase, metaclass=ScanSetupIoMeta):
     format_name = 'unknown'
     imported_params = {}
 
-
     @classmethod
     def _verify_all_entries_present(cls):
         """

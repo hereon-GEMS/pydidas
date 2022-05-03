@@ -28,7 +28,7 @@ __all__ = ['ExperimentalSetup']
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_A_TO_E
-from ...core import (SingletonFactory, get_generic_param_collection, #
+from ...core import (SingletonFactory, get_generic_param_collection,
                      ObjectWithParameterCollection)
 from .experimental_setup_io_meta import ExperimentalSetupIoMeta
 
@@ -44,9 +44,9 @@ class _ExpSetup(ObjectWithParameterCollection):
     """
     default_params = get_generic_param_collection(
         'xray_wavelength', 'xray_energy', 'detector_name', 'detector_npixx',
-        'detector_npixy', 'detector_pxsizex', 'detector_pxsizey', 'detector_dist',
-        'detector_poni1', 'detector_poni2', 'detector_rot1', 'detector_rot2',
-        'detector_rot3')
+        'detector_npixy', 'detector_pxsizex', 'detector_pxsizey',
+        'detector_dist', 'detector_poni1', 'detector_poni2', 'detector_rot1',
+        'detector_rot2', 'detector_rot3')
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)

@@ -58,7 +58,7 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         self._widgets['tree'].doubleClicked.connect(self.__file_selected)
         self._widgets['tree'].clicked.connect(self.__file_highlighted)
         self._widgets['but_minimize'].clicked.connect(
-        partial(self.change_splitter_pos, False))
+            partial(self.change_splitter_pos, False))
         self._widgets['but_maximize'].clicked.connect(
             partial(self.change_splitter_pos, True))
         self.__selection_width = self._widgets['selection'].width()
@@ -104,9 +104,9 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         self.set_status(f'Opened file: {_name}')
         if not os.path.isfile(_name):
             return
-        _extension= '.' + os.path.basename(_name).split(".")[-1]
+        _extension = '.' + os.path.basename(_name).split(".")[-1]
         _supported_nothdf_ext = (set(IMAGE_READER._extensions.keys())
-                          - set(HDF5_EXTENSIONS))
+                                 - set(HDF5_EXTENSIONS))
         if _extension in HDF5_EXTENSIONS:
             self._widgets['hdf_dset'].setVisible(True)
             self._widgets['hdf_dset'].set_filename(_name)

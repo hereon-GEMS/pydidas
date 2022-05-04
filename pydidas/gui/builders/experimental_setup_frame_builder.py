@@ -41,7 +41,7 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
         """
         Build the frame and create all widgets.
         """
-        self.create_label(None, 'Experimental settings\n', fontsize=14,
+        self.create_label(None, 'Experimental setup\n', fontsize=14,
                           bold=True, gridPos=(0, 0, 1, 1))
         self.create_button('but_load_from_file',
                            'Load experimental parameters from file',

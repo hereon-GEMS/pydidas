@@ -26,6 +26,7 @@ __all__ = []
 
 import os
 from copy import copy
+from numbers import Integral
 
 from numpy import amax, squeeze
 import h5py
@@ -82,7 +83,7 @@ class Hdf5Io(IoBase):
             The data in form of a pydidas Dataset (with embedded metadata)
         """
         frame = kwargs.get('frame', 0)
-        if isinstance(frame, int):
+        if isinstance(frame, Integral):
             frame = [frame]
         dataset = kwargs.get('dataset', 'entry/data/data')
         slicing_axes = kwargs.get('slicing_axes', [0])

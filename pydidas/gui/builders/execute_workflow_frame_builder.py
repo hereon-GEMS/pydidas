@@ -103,7 +103,8 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
                                      **self.__param_widget_config(_param))
 
         self.create_line('line_autosave', gridPos=(-1, 0, 1, 1),
-                         parent_widget=self._widgets['config'])
+                         parent_widget=self._widgets['config'],
+                         fixedWidth=CONFIG_WIDGET_WIDTH)
 
         self.create_button(
             'but_exec', 'Start processing', gridPos=(-1, 0, 1, 1),
@@ -121,15 +122,18 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             parent_widget=self._widgets['config'])
 
         self.create_line('line_results', gridPos=(-1, 0, 1, 1),
-                         parent_widget=self._widgets['config'])
+                         parent_widget=self._widgets['config'],
+                         fixedWidth=CONFIG_WIDGET_WIDTH)
 
         self.create_any_widget(
             'result_selector', ResultSelectionWidget,
             parent_widget=self._widgets['config'], gridpos=(-1, 0, 1, 1),
-            select_results_param=self.get_param('selected_results'))
+            select_results_param=self.get_param('selected_results'),
+            fixedWidth=CONFIG_WIDGET_WIDTH)
 
         self.create_line('line_export', gridPos=(-1, 0, 1, 1),
-                         parent_widget=self._widgets['config'])
+                         parent_widget=self._widgets['config'],
+                         fixedWidth=CONFIG_WIDGET_WIDTH)
 
         self.create_param_widget(self.get_param('saving_format'),
                                  **self.__param_widget_config('saving_format'))

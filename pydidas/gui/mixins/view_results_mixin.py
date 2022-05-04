@@ -164,8 +164,8 @@ class ViewResultsMixin:
             _node, self._config['data_slices'],
             flattened_scan_dim=self._config['data_use_timeline'],
             force_string_metadata=True)
-        self._data_axlabels = self._data.axis_labels.copy()
-        self._data_axunits = self._data.axis_units.copy()
+        self._data_axlabels = _data.axis_labels.copy()
+        self._data_axunits = _data.axis_units.copy()
         if self._config['plot_type'] == 'group of 1D plots':
             self._widgets['plot_stack'].setCurrentIndex(0)
             self._plot_group_of_curves(_data)

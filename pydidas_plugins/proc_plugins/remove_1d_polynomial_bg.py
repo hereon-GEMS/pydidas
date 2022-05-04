@@ -62,7 +62,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
                   tooltip=('The polynomial order for the fit. This value '
                            'should typically not exceed3 or 4.')),
         Parameter('include_limits', int, 0, choices=[True, False],
-                  name='Always include endpoints',
+                  name='Always fit endpoints',
                   tooltip=('Flag to force the inclusion of both endpoints '
                            'in the initial points for the fit.')),
         Parameter('kernel_width', int, 5, name='Averaging width',

@@ -117,8 +117,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._tree.execute_process(_index, force_store_results=True)
         self.__store_tree_results()
         self.__update_selection_choices()
-        if self._config['plot_active']:
-            self.__plot_results()
+        self.__plot_results()
 
     def __get_index(self):
         """
@@ -151,6 +150,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._config['data_labels'][_node_id] = (
                 _node.plugin.get_param_value('data_label'))
             _data = _node.results
+
             _data.axis_units = [(_val if _val is not None else '')
                                 for _val in _data.axis_units.values()]
             _data.axis_labels = [(_val if _val is not None else '')
@@ -258,7 +258,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         This method will get the latest result (subset) from the
         WorkflowResults and update the plot.
         """
-        if not self._config['plot_active']:
+        if (not self._config['plot_active']) or self._active_node == -1:
             return
         _ndim = len(self._config['shapes'][self._active_node])
         if _ndim == 1:

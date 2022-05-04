@@ -24,15 +24,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-import numpy as np
-import matplotlib.pyplot as plt
-
 from ...core.constants import JPG_EXTENSIONS
-from ..utils import calculate_fig_size_arguments
-from .io_base import IoBase
+from .io_exporter_matplotlib import IoExporterMatplotlib
 
 
-class JpegIo(IoBase):
+class JpegIo(IoExporterMatplotlib):
     """IObase implementation for jpeg files."""
     extensions_export = JPG_EXTENSIONS
     extensions_import = []
@@ -55,20 +51,7 @@ class JpegIo(IoBase):
         colormap : str, optional
             The colormap to be used. Must be a colormap name supported by
             matplotlib. The default is "gray"
+        data_range : list, optional
+            The range with lower and upper bounds for the data export.
         """
-        cls.check_for_existing_file(filename, **kwargs)
-        _cmap = kwargs.get('colormap', 'gray')
-        _backend = plt.get_backend()
-        try:
-            plt.rcParams['backend'] = 'Agg'
-            _figshape, _dpi = calculate_fig_size_arguments(data.shape)
-            fig1 = plt.figure(figsize=_figshape, dpi=50)
-            ax = fig1.add_axes([0, 0, 1, 1])
-            ax.imshow(data, interpolation='none', vmin=np.amin(data),
-                      vmax=np.amax(data), cmap=_cmap)
-            ax.set_xticks([])
-            ax.set_yticks([])
-            fig1.savefig(filename, dpi=_dpi)
-            plt.close(fig1)
-        finally:
-            plt.rcParams['backend'] = _backend
+        cls.export_matplotlib_figure(filename, data, **kwargs)

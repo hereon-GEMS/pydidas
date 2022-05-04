@@ -27,6 +27,8 @@ __all__ = ['IoBase']
 
 import os
 
+from numpy import amin, amax
+
 from ..io_master import IoMaster
 from ..roi_controller import RoiController
 from ..rebin_ import rebin
@@ -99,6 +101,32 @@ class IoBase(metaclass=IoMaster):
         if os.path.exists(filename) and not _overwrite:
             raise FileExistsError(f'The file "{filename}" exists and '
                                   'overwriting has not been confirmed.')
+
+    @classmethod
+    def get_data_range(cls, data, **kwargs):
+        """
+        Get the data range from the keyword arguments or the data values.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The data to be exported.
+        **kwargs : dict
+            The keyword arguments. This method will only use the "data_range"
+            keyword.
+
+        Returns
+        -------
+        range : list
+            The range with two entries for the lower and upper boundaries as
+            numerical values.
+        """
+        _range = list(kwargs.get('data_range', (None, None)))
+        if _range[0] is None:
+            _range[0] = amin(data)
+        if _range[1] is None:
+            _range[1] = amax(data)
+        return _range
 
     @classmethod
     def return_data(cls, **kwargs):

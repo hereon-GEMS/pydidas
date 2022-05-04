@@ -251,7 +251,10 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             self, 'Name of file', None,
             IoMaster.get_string_of_formats('export'))[0]
         if fname not in [None, '']:
-            self._app.export_image(fname)
+            _cmap = self._widgets['plot_window'].getActiveImage().getColormap()
+            _data_range = _cmap.getVRange()
+            self._app.export_image(fname, data_range=_data_range,
+                                   overwrite=True)
 
     @QtCore.Slot(str)
     def __selected_first_file(self, fname):

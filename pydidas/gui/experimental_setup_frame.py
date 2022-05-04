@@ -184,9 +184,9 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
             self.set_param_value_and_widget('detector_npixx', det.shape[1])
             self.set_param_value_and_widget('detector_npixy', det.shape[0])
             self.set_param_value_and_widget('detector_pxsizex',
-                                            np.float32(1e6 * det.pixel2))
+                                            1e6 * det.pixel2)
             self.set_param_value_and_widget('detector_pxsizey',
-                                            np.float32(1e6 * det.pixel1))
+                                            1e6 * det.pixel1)
         elif show_warning:
             critical_warning('No pyFAI Detector',
                              'No detector selected in pyFAI. Cannot copy '
@@ -211,8 +211,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
                                ['detector_rot1', _geo.rotation1().value()],
                                ['detector_rot2', _geo.rotation2().value()],
                                ['detector_rot3', _geo.rotation3().value()]]:
-                self.set_param_value_and_widget(
-                    key, np.round(np.float32(value), 10))
+                self.set_param_value_and_widget(key, np.round(value, 12))
         elif show_warning:
             critical_warning('pyFAI geometry invalid', _GEO_INVALID)
 
@@ -231,8 +230,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
         model = CalibrationContext.instance().getCalibrationModel()
         _geo = model.fittedGeometry()
         if _geo.isValid():
-            _wavelength = np.round(np.float32(
-                _geo.wavelength().value() * 1e10), 10)
+            _wavelength = np.round(_geo.wavelength().value() * 1e10, 12)
             self.set_param_value_and_widget('xray_wavelength', _wavelength)
         elif show_warning:
             critical_warning('pyFAI geometry invalid', _ENERGY_INVALID)

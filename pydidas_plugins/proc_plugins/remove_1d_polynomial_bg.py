@@ -119,6 +119,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if self._kernel is not None:
+            _raw = data.copy()
             data[self._klim_low:-self._klim_high] = np.convolve(
                 data, self._kernel, mode='valid')
 
@@ -131,7 +132,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
 
         if self._include_limits:
             local_min = np.insert(local_min, 0, 0)
-            local_min = np.insert(local_min, data.size, data.size - 1)
+            local_min = np.insert(local_min, local_min.size, data.size - 1)
 
         _p_prelim = Polynomial.fit(local_min, data[local_min], self._fit_order)
 
@@ -145,6 +146,8 @@ class Remove1dPolynomialBackground(ProcPlugin):
 
         _p_final = Polynomial.fit(_local_res_min, data[_local_res_min], 3)
 
+        if self._kernel is not None:
+            data = _raw
         data = data - _p_final(_x)
         if self._thresh is not None:
             data = np.where(data < self._thresh, self._thresh, data)

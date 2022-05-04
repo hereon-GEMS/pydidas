@@ -536,7 +536,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 
-    def export_image(self, output_fname):
+    def export_image(self, output_fname, **kwargs):
         """
         Export the CompositeImage to a file.
 
@@ -548,8 +548,10 @@ class CompositeCreatorApp(BaseApp):
         ----------
         output_fname : str
             The full file system path and filename for the output image file.
+        data_range : tuple, optional
+            A tuple with lower and upper bounds for the data export.
         """
-        self._composite.export(output_fname)
+        self._composite.export(output_fname, **kwargs)
 
     @property
     def composite(self):

@@ -122,6 +122,30 @@ class TestIoBase(unittest.TestCase):
         _data = IoBase.return_data(binning=2)
         self.assertEqual(_data.shape, (5, 5))
 
+    def test_get_data_range__simple(self):
+        _data = np.random.random((15, 15))
+        _range = IoBase.get_data_range(_data)
+        self.assertEqual(_range[0], np.amin(_data))
+        self.assertEqual(_range[1], np.amax(_data))
+
+    def test_get_data_range__lower_bound_only(self):
+        _data = np.random.random((15, 15))
+        _range = IoBase.get_data_range(_data, data_range=(0.4, None))
+        self.assertEqual(_range[0], 0.4)
+        self.assertEqual(_range[1], np.amax(_data))
+
+    def test_get_data_range__upper_bound_only(self):
+        _data = np.random.random((15, 15))
+        _range = IoBase.get_data_range(_data, data_range=(None, 0.8))
+        self.assertEqual(_range[0], np.amin(_data))
+        self.assertEqual(_range[1], 0.8)
+
+    def test_get_data_range__both_bounds(self):
+        _data = np.random.random((15, 15))
+        _range = IoBase.get_data_range(_data, data_range=(0.3, 0.8))
+        self.assertEqual(_range[0], 0.3)
+        self.assertEqual(_range[1], 0.8)
+
 
 if __name__ == "__main__":
     unittest.main()

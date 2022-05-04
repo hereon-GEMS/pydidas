@@ -40,7 +40,8 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
     def setUpClass(cls):
         cls._n = 120
         cls._x = 4 + 0.42 * np.arange(cls._n)
-        cls._y = (12 + 1.67 * np.sin(cls._x / 3) + np.random.random(cls._n))
+        cls._y = (12 + 1.67 * np.sin(cls._x / 3)
+                  + (0.5 - np.random.random(cls._n)))
 
     def setUp(self):
         ...
@@ -118,6 +119,15 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
             warnings.simplefilter('ignore')
             new_data, _ = plugin.execute(data)
         self.assertTrue(np.all(new_data >= _thresh))
+
+    def test_execute__with_limits(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
+            'Remove1dPolynomialBackground')()
+        data = self.create_dataset()
+        plugin.set_param_value('include_limits', True)
+        plugin.pre_execute()
+        new_data, _ = plugin.execute(data)
+        self.assertTrue(np.allclose(data, self._y, atol=0.51))
 
 
 if __name__ == "__main__":

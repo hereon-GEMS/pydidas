@@ -27,6 +27,7 @@ __all__ = ['ExperimentalSetupIoYaml']
 
 import yaml
 import numpy as np
+from numbers import Real, Integral
 
 from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
 from .experimental_setup_io_base import ExperimentalSetupIoBase
@@ -55,6 +56,11 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         tmp_params = EXP_SETUP.get_param_values_as_dict()
+        # need to convert all float values to generic python "float" to
+        # allow using the yaml.save_dump function
+        for _key, _val in tmp_params.items():
+            if isinstance(_val, Real) and not isinstance(_val, Integral):
+                tmp_params[_key] = float(_val)
         del tmp_params['xray_energy']
         with open(filename, 'w') as stream:
             yaml.safe_dump(tmp_params, stream)

@@ -287,7 +287,7 @@ class CompositeImage(ObjectWithParameterCollection):
         """
         np.save(output_fname, self.__image)
 
-    def export(self, output_fname):
+    def export(self, output_fname, **kwargs):
         """
         Export the image to a file.
 
@@ -295,8 +295,10 @@ class CompositeImage(ObjectWithParameterCollection):
         ----------
         output_fname : str
             The full file system path and filename for the output image file.
+        **kwargs : dict
+            Optional keyword arguments to be passed to the exporters.
         """
-        export_data(output_fname, self.__image)
+        export_data(output_fname, self.__image, **kwargs)
 
     @property
     def image(self):

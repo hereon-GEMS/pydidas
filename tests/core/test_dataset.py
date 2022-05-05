@@ -88,9 +88,9 @@ class TestDataset(unittest.TestCase):
         _new = obj[0]
         self.assertEqual(list(_new.axis_labels.values()),
                          self._dset['labels'][1:])
-        for _new, _original in zip(list(_new.axis_ranges.values()),
+        for _new_ax, _original in zip(list(_new.axis_ranges.values()),
                                    self._dset['ranges'][1:]):
-            self.assertTrue(np.allclose(_new, _original))
+            self.assertTrue(np.allclose(_new_ax, _original))
         self.assertEqual(list(_new.axis_units.values()),
                          self._dset['units'][1:])
 
@@ -99,10 +99,10 @@ class TestDataset(unittest.TestCase):
         _new = obj[:, 0]
         self.assertEqual(list(_new.axis_labels.values()),
                          [self._dset['labels'][0]] + self._dset['labels'][2:])
-        for _new, _original in zip(
+        for _new_ax, _original in zip(
                 list(_new.axis_ranges.values()),
                 [self._dset['ranges'][0]] + self._dset['ranges'][2:]):
-            self.assertTrue(np.allclose(_new, _original))
+            self.assertTrue(np.allclose(_new_ax, _original))
         self.assertEqual(list(_new.axis_units.values()),
                          [self._dset['units'][0]] + self._dset['units'][2:])
 

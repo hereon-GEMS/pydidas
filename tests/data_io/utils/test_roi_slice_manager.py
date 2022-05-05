@@ -435,7 +435,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _x2 = (43, -4)
         _shape = (150, 150)
         obj = RoiSliceManager(roi=[slice(*_y1), slice(*_x1)],
-                            input_shape=_shape)
+                              input_shape=_shape)
         _roi2 = [slice(*_y2), slice(*_x2)]
         _roi2 = _y2 + _x2
         obj.apply_second_roi(_roi2)
@@ -453,7 +453,7 @@ class TestRoiSliceManager(unittest.TestCase):
         _x2 = (43, -4)
         _shape = (150, 150)
         obj = RoiSliceManager(roi=[slice(*_y1), slice(*_x1)],
-                            input_shape=_shape)
+                              input_shape=_shape)
         _roi2 = [slice(*_y2), slice(*_x2)]
         _roi2 = _y2 + _x2
         obj.apply_second_roi(_roi2)

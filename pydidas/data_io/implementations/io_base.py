@@ -31,7 +31,7 @@ from numpy import amin, amax
 
 from ...core.utils import rebin
 from ..io_master import IoMaster
-from ..utils  import RoiSliceManager
+from ..utils import RoiSliceManager
 
 
 class IoBase(metaclass=IoMaster):

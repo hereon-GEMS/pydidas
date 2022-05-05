@@ -8,3 +8,8 @@ build-backend = "setuptools.build_meta"
 
 [tools.coverage.report]
 omit = ['*/tests/*']
+
+
+[tool.black]
+line-length = 88
+target-version = ['py39']

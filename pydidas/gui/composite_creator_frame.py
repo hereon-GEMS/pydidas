@@ -28,7 +28,6 @@ __all__ = ["CompositeCreatorFrame"]
 import os
 import time
 from functools import partial
-import pyFAI
 
 import numpy as np
 from qtpy import QtWidgets, QtCore

@@ -31,8 +31,8 @@ import random
 import numpy as np
 from qtpy import QtCore
 
+from pydidas.core.utils import rebin2d
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.data_io import rebin2d
 
 
 PLUGIN_COLLECTION = PluginCollection()

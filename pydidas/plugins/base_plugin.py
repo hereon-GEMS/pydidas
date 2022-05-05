@@ -31,7 +31,8 @@ from numbers import Integral
 
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_param_collection)
-from pydidas.data_io import rebin2d, RoiController
+from pydidas.core.utils import rebin2d
+from pydidas.data_io import RoiController
 from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                     OUTPUT_PLUGIN)
 

@@ -34,7 +34,6 @@ from . import utils
 from .composite_image import *
 from .import_export import *
 from .io_master import *
-from .rebin_ import *
 from .roi_controller import *
 from .roi_controller_1d import *
 
@@ -51,10 +50,6 @@ del import_export
 from . import io_master
 __all__.extend(io_master.__all__)
 del io_master
-
-from . import rebin_
-__all__.extend(rebin_.__all__)
-del rebin_
 
 from . import roi_controller
 __all__.extend(roi_controller.__all__)

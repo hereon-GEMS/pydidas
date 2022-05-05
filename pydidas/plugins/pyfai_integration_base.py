@@ -36,8 +36,8 @@ from silx.opencl.common import OpenCL
 
 from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
-from ..core.utils import pydidas_logger
-from ..data_io import import_data, rebin2d
+from ..core.utils import pydidas_logger, rebin2d
+from ..data_io import import_data
 from ..experiment import ExperimentalSetup
 from .base_proc_plugin import ProcPlugin
 

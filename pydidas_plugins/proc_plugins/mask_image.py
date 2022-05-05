@@ -27,10 +27,11 @@ __all__ = ['MaskImage']
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
+from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core.utils import rebin2d
 from pydidas.plugins import ProcPlugin
-from pydidas.data_io import import_data, rebin2d
+from pydidas.data_io import import_data
 
 
 class MaskImage(ProcPlugin):

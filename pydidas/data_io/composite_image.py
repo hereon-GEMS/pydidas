@@ -119,9 +119,9 @@ class CompositeImage(ObjectWithParameterCollection):
         self.__verify_config()
         _shape = self.__get_composite_shape()
         self.__check_max_size(_shape)
-        self.__image = (np.zeros(_shape,
-                                 dtype=self.get_param_value('datatype'))
-                        + self.get_param_value('mosaic_border_value'))
+        self.__image = (
+            np.zeros(_shape, dtype=self.get_param_value('datatype'))
+            + self.get_param_value('mosaic_border_value'))
 
     def __get_composite_shape(self):
         """

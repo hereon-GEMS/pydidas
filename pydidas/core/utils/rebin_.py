@@ -24,7 +24,7 @@ __all__ = ['rebin2d', 'rebin']
 
 import numpy as np
 
-from ..core import Dataset
+from ..dataset import Dataset
 
 
 def rebin2d(image, binning):

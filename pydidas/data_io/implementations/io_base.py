@@ -29,9 +29,9 @@ import os
 
 from numpy import amin, amax
 
+from ...core.utils import rebin
 from ..io_master import IoMaster
 from ..roi_controller import RoiController
-from ..rebin_ import rebin
 
 
 class IoBase(metaclass=IoMaster):

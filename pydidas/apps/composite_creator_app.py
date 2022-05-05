@@ -34,9 +34,9 @@ from qtpy import QtCore
 from ..core import (Dataset, AppConfigError, get_generic_param_collection,
                     BaseApp)
 from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import (check_file_exists, check_hdf5_key_exists_in_file,
-                          copy_docstring)
-from ..data_io import CompositeImage, import_data, rebin2d
+from ..core.utils import (
+    check_file_exists, check_hdf5_key_exists_in_file, copy_docstring, rebin2d)
+from ..data_io import CompositeImage, import_data
 from ..managers import FilelistManager, ImageMetadataManager
 from .parsers import composite_creator_app_parser
 

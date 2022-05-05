@@ -27,7 +27,7 @@ import unittest
 import numpy as np
 
 from pydidas.core import Dataset
-from pydidas.data_io import rebin2d, rebin
+from pydidas.core.utils import rebin2d, rebin
 
 
 class TestRebin(unittest.TestCase):

@@ -29,9 +29,8 @@ import shutil
 import h5py
 import numpy as np
 
-from pydidas.core.utils import get_random_string
+from pydidas.core.utils import get_random_string, rebin2d
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.data_io import rebin2d
 
 
 PLUGIN_COLLECTION = PluginCollection()

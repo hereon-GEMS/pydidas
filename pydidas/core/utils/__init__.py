@@ -35,6 +35,7 @@ from .get_documentation_targets import *
 from .get_module_dir import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
+from .rebin_ import *
 from .set_default_plugin_dir_ import *
 from .signal_blocker import *
 from .sphinx_html import *
@@ -78,6 +79,10 @@ del hdf5_dataset_utils
 from . import logger_
 __all__.extend(logger_.__all__)
 del logger_
+
+from . import rebin_
+__all__.extend(rebin_.__all__)
+del rebin_
 
 from . import set_default_plugin_dir_
 __all__.extend(set_default_plugin_dir_.__all__)

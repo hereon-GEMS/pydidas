@@ -87,6 +87,5 @@ class TestRawIo(unittest.TestCase):
         self.assertTrue(np.allclose(_data, self._data))
 
 
-
 if __name__ == "__main__":
     unittest.main()

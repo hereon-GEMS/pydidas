@@ -100,14 +100,14 @@ class TestBaseInputPlugin(unittest.TestCase):
     def test_get_first_file_size(self):
         _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         plugin = _class()
-        plugin._image_metadata.get_filename = lambda : self._fname
+        plugin._image_metadata.get_filename = lambda: self._fname
         self.assertEqual(plugin.get_first_file_size(),
                          os.stat(self._fname).st_size)
 
     def test_prepare_carryon_check(self):
         _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         plugin = _class()
-        plugin._image_metadata.get_filename = lambda : self._fname
+        plugin._image_metadata.get_filename = lambda: self._fname
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config['file_size'],
                          os.stat(self._fname).st_size)
@@ -118,7 +118,8 @@ class TestBaseInputPlugin(unittest.TestCase):
         plugin.set_param_value('first_file', self._fname)
         plugin._InputPlugin__setup_image_magedata_manager()
         self.assertIsInstance(plugin._image_metadata, ImageMetadataManager)
-        self.assertFalse(plugin._image_metadata.get_param_value('use_filename'))
+        self.assertFalse(
+            plugin._image_metadata.get_param_value('use_filename'))
 
     def test_setup_image_metadata_manager__with_filename(self):
         _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)

@@ -50,7 +50,8 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         self.num = 3 * self.n_per_type
         self._syspath = copy.deepcopy(sys.path)
         self._qsettings = QtCore.QSettings('Hereon', 'pydidas')
-        self._qsettings_plugin_path = self._qsettings.value('global/plugin_path')
+        self._qsettings_plugin_path = self._qsettings.value(
+            'global/plugin_path')
         self._qsettings.setValue('global/plugin_path', '')
         self.pcoll = DummyPluginCollection(n_plugins=self.num,
                                            plugin_path=self._pluginpath,

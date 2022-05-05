@@ -101,7 +101,7 @@ class TestParameterCollection(unittest.TestCase):
     def test_add_kwarg_params(self):
         obj = ParameterCollection()
         obj._ParameterCollection__add_kwarg_params(Test0=self._params[0],
-                                                    Test1=self._params[1])
+                                                   Test1=self._params[1])
         self.assertEqual(obj.__getitem__('Test0'), self._params[0])
         self.assertEqual(obj.__getitem__('Test1'), self._params[1])
 
@@ -128,7 +128,7 @@ class TestParameterCollection(unittest.TestCase):
     def test_add_arg_params__with_collection(self):
         obj = ParameterCollection(*self._params)
         coll = ParameterCollection(Parameter('Test7', str, default='Test'),
-                                    Parameter('Test8', float, default=0))
+                                   Parameter('Test8', float, default=0))
         obj._ParameterCollection__add_arg_params(coll)
         for index in range(7, 9):
             self.assertIsInstance(obj[f'Test{index}'],
@@ -176,16 +176,16 @@ class TestParameterCollection(unittest.TestCase):
     def test_add_params__with_args(self):
         obj = ParameterCollection(*self._params)
         obj.add_params(Parameter('Test5', int, default=12),
-                        Parameter('Test6', float, default=-1),)
-        for index in range(5,6):
+                       Parameter('Test6', float, default=-1))
+        for index in range(5, 6):
             self.assertIsInstance(obj[f'Test{index}'],
                                   Parameter)
 
     def test_add_params__with_kwargs(self):
         obj = ParameterCollection(*self._params)
         obj.add_params(Test5=Parameter('Test5', int, default=12),
-                        Test6=Parameter('Test6', float, default=-1),)
-        for index in range(5,6):
+                       Test6=Parameter('Test6', float, default=-1))
+        for index in range(5, 6):
             self.assertIsInstance(obj[f'Test{index}'],
                                   Parameter)
 
@@ -197,26 +197,25 @@ class TestParameterCollection(unittest.TestCase):
     def test_add_params__mixed(self):
         obj = ParameterCollection(*self._params)
         obj.add_params(Parameter('Test5', int, default=12),
-                        Test6=Parameter('Test6', float, default=-1),)
-        for index in range(5,6):
+                       Test6=Parameter('Test6', float, default=-1))
+        for index in range(5, 6):
             self.assertIsInstance(obj[f'Test{index}'],
                                   Parameter)
 
     def test_add_params__mixed_with_collection(self):
         obj = ParameterCollection(*self._params)
         coll = ParameterCollection(Parameter('Test7', str, default='Test'),
-                                    Parameter('Test8', float, default=0))
+                                   Parameter('Test8', float, default=0))
         obj.add_params(Parameter('Test5', int, default=12),
-                        coll,
-                        Test6=Parameter('Test6', float, default=-1),)
-        for index in range(5,6):
-            self.assertIsInstance(obj[f'Test{index}'],
-                                  Parameter)
+                       coll,
+                       Test6=Parameter('Test6', float, default=-1),)
+        for index in range(5, 9):
+            self.assertIsInstance(obj[f'Test{index}'], Parameter)
 
     def test_add_params__collection(self):
         obj = ParameterCollection(*self._params)
         coll = ParameterCollection(Parameter('Test7', str, default='Test'),
-                                    Parameter('Test8', float, default=0))
+                                   Parameter('Test8', float, default=0))
         obj.add_params(coll)
         for index in range(7, 9):
             self.assertIsInstance(obj[f'Test{index}'],
@@ -226,10 +225,10 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         with self.assertRaises(KeyError):
             obj.add_params(Parameter('Test5', float, default=-1),
-                            Test5=Parameter('Test5', int, default=12))
+                           Test5=Parameter('Test5', int, default=12))
         with self.assertRaises(KeyError):
             obj.add_params(Parameter('Test5', float, default=-1),
-                            Parameter('Test5', int, default=12))
+                           Parameter('Test5', int, default=12))
 
     def test_check_arg_types__with_params(self):
         obj = ParameterCollection()
@@ -331,8 +330,7 @@ class TestParameterCollection(unittest.TestCase):
     def test_creation_with_args(self):
         obj = ParameterCollection(*self._params)
         for index in range(4):
-            self.assertEqual(obj[f'Test{index}'],
-                              self._params[index])
+            self.assertEqual(obj[f'Test{index}'], self._params[index])
 
     def test_creation_params_with_kwargs(self):
         obj = ParameterCollection(Test0=self._params[0],
@@ -340,8 +338,7 @@ class TestParameterCollection(unittest.TestCase):
                                   Test2=self._params[2],
                                   Test3=self._params[3])
         for index in range(4):
-            self.assertEqual(obj[f'Test{index}'],
-                              self._params[index])
+            self.assertEqual(obj[f'Test{index}'], self._params[index])
 
     def test_values_equal__wrong_key(self):
         obj = ParameterCollection(*self._params)

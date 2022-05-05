@@ -48,9 +48,9 @@ class TestCompositeImage(unittest.TestCase):
         del self._path
 
     def get_default_object(self, low_limit=None, high_limit=1):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                     composite_ny=5, datatype=float,
-                     threshold_low=low_limit, threshold_high=high_limit)
+        obj = CompositeImage(
+            image_shape=(20, 20), composite_nx=5, composite_ny=5,
+            datatype=float, threshold_low=low_limit, threshold_high=high_limit)
         return obj
 
     def test_creation(self):
@@ -184,10 +184,10 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_set_default_qsettings__overwrite(self):
         _maxsize_test = 150
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                     composite_ny=5, datatype=float,
-                     threshold_low=np.nan, threshold_high=1,
-                     mosaic_max_size=_maxsize_test)
+        obj = CompositeImage(
+            image_shape=(20, 20), composite_nx=5, composite_ny=5,
+            datatype=float, threshold_low=np.nan, threshold_high=1,
+            mosaic_max_size=_maxsize_test)
         self.assertEqual(obj.get_param_value('mosaic_max_size'),
                          _maxsize_test)
 
@@ -217,7 +217,7 @@ class TestCompositeImage(unittest.TestCase):
                  + (obj.get_param_value('composite_ny') - 1) * self._border,
                  _shape[1] * obj.get_param_value('composite_nx')
                  + (obj.get_param_value('composite_nx') - 1) * self._border)
-        self.assertEqual(obj.shape,_size)
+        self.assertEqual(obj.shape, _size)
 
     def test_property_shape_empty(self):
         obj = self.get_default_object()

@@ -80,6 +80,5 @@ class TestJpegIo(unittest.TestCase):
         JpegIo.export_to_file(_fname, self._data)
 
 
-
 if __name__ == "__main__":
     unittest.main()

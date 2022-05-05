@@ -29,6 +29,7 @@ import sys
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.core.utils import get_random_string
 
+
 class TestAppParsers(unittest.TestCase):
 
     def setUp(self):

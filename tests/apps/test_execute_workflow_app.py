@@ -117,8 +117,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def generate_scan(self):
         SCAN.restore_all_defaults(True)
         SCAN.set_param_value('scan_dim', 3)
-        self._nscan = (random.choice([5,7,9,11]), random.choice([2, 4, 5]),
-                       random.choice([5,6,7,8]))
+        self._nscan = (random.choice([5, 7, 9, 11]), random.choice([2, 4, 5]),
+                       random.choice([5, 6, 7, 8]))
         self._scandelta = (0.1, -0.2, 1.1)
         self._scanoffset = (-5, 0, 1.2)
         for i in range(1, 4):
@@ -181,9 +181,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app2._shared_arrays[2], np.ndarray)
         self.assertEqual(app._config['shared_memory'][1],
-                          app2._config['shared_memory'][1])
+                         app2._config['shared_memory'][1])
         self.assertEqual(app._config['shared_memory'][2],
-                          app2._config['shared_memory'][2])
+                         app2._config['shared_memory'][2])
         self.assertTrue(app.multiprocessing_carryon())
 
     def test_prepare_run__master_live_no_autosave(self):
@@ -200,32 +200,32 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         self.assertEqual(app._config['result_shapes'],
-                          TREE.get_all_result_shapes())
+                         TREE.get_all_result_shapes())
 
     def test_get_and_store_tasks(self):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__get_and_store_tasks()
-        self.assertTrue(np.equal(app._mp_tasks,
-                                  np.arange(np.prod(self._nscan))).all())
+        self.assertTrue(
+            np.allclose(app._mp_tasks, np.arange(np.prod(self._nscan))))
 
     def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__get_and_store_tasks()
-        app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
+        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         self.assertTrue(app._config['buffer_n'] > 0)
 
     def test_check_size_of_results_and_calc_buffer_size__res_too_large(self):
         app = ExecuteWorkflowApp()
         app._config['result_shapes'] = {1: (10000, 10000), 2: (15000, 20000)}
         with self.assertRaises(AppConfigError):
-            app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
+            app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
 
     def test_initialize_shared_memory(self):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
+        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         app.initialize_shared_memory()
         for key in app._config['shared_memory']:
             self.assertIsInstance(app._config['shared_memory'][key],
@@ -235,7 +235,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__get_and_store_tasks()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._ExecuteWorkflowApp__check_size_of_results_and_calc_buffer_size()
+        app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         app.initialize_shared_memory()
         app._ExecuteWorkflowApp__initialize_arrays_from_shared_memory()
         _n = app._config['buffer_n']
@@ -376,8 +376,8 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.prepare_run()
         TREE.execute_process(0)
         _locker = TestLock(app._config['shared_memory'],
-                            app._config['buffer_n'],
-                            app._config['result_shapes'])
+                           app._config['buffer_n'],
+                           app._config['result_shapes'])
         _locker.start()
         app._ExecuteWorkflowApp__write_results_to_shared_arrays()
 
@@ -399,14 +399,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app = ExecuteWorkflowApp()
         app.prepare_run()
         app.run()
-        #assert does not raise Exception
+        # assert does not raise Exception
 
     def test_run__multiple_runs(self):
         app = ExecuteWorkflowApp()
         app.prepare_run()
         app.run()
         app.run()
-        #assert does not raise Exception
+        # assert does not raise Exception
 
 
 if __name__ == "__main__":

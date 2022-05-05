@@ -32,6 +32,7 @@ import numpy as np
 from pydidas.data_io.implementations.numpy_io import NumpyIo
 from pydidas.core.constants import NUMPY_EXTENSIONS
 
+
 class TestNumpyIo(unittest.TestCase):
 
     @classmethod

@@ -75,9 +75,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self._ny = 5
         self._nx = (self._n // self._ny
                     + int(np.ceil((self._n % self._ny) / self._ny)))
-        def parser(obj):
-            return {}
-        CompositeCreatorApp.parse_func = parser
+        setattr(CompositeCreatorApp, 'parse_func', lambda obj: {})
         app = CompositeCreatorApp()
         app.set_param_value('first_file', self._fname(0))
         app.set_param_value('last_file', self._fname(self._n - 1))
@@ -363,18 +361,18 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _newtasks = app.multiprocessing_get_tasks()
         self.assertEqual(_tasks, _newtasks)
 
-    def test_verify_total_number_of_images_in_composite__no_composite_yet(self):
+    def test_check_and_update_composite_image__no_composite_yet(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         self.assertIsInstance(app._composite, CompositeImage)
 
-    def test_verify_total_number_of_images_in_composite__redo(self):
+    def test_check_and_update_composite_image__redo(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         app._CompositeCreatorApp__check_and_update_composite_image()
         self.assertIsInstance(app._composite, CompositeImage)
 
-    def test_verify_total_number_of_images_in_composite__new_img_shape(self):
+    def test_check_and_update_composite_image__new_img_shape(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         _old_shape = app.composite.shape
@@ -390,7 +388,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
         self.assertEqual(_old_shape[1] + 2 * self._nx, _new_shape[1])
 
-    def test_verify_total_number_of_images_in_composite__new_order(self):
+    def test_check_and_update_composite_image__new_order(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         app.set_param_value('composite_nx', self._ny)
@@ -408,14 +406,16 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.set_bg_params(app, self._fname(0))
         app._check_and_set_bg_file()
         _image = app._bg_image
-        self.assertTrue((_image.array == self._data[0][app._image_metadata.roi]).all())
+        self.assertTrue(
+            np.allclose(_image.array, self._data[0][app._image_metadata.roi]))
 
     def test_check_and_set_bg_file__with_hdf5_bg(self):
         app = self.get_default_app()
         self.set_bg_params(app, self._hdf5_fnames[0])
         app._check_and_set_bg_file()
         _image = app._bg_image
-        self.assertTrue((_image.array == self._data[0][app._image_metadata.roi]).all())
+        self.assertTrue(
+            np.allclose(_image.array, self._data[0][app._image_metadata.roi]))
 
     def test_check_and_set_bg_file__wrong_size(self):
         app = self.get_default_app()
@@ -427,19 +427,19 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_verify_total_number_of_images_in_composite__plain(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
         # assert does not raise AppConfigError
 
     def test_verify_total_number_of_images_in_composite__nx_default(self):
         app = self.get_default_app()
         app.set_param_value('composite_nx', -1)
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
         self.assertEqual(app.get_param_value('composite_nx'), self._nx)
 
     def test_verify_total_number_of_images_in_composite__ny_default(self):
         app = self.get_default_app()
         app.set_param_value('composite_ny', -1)
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
         self.assertEqual(app.get_param_value('composite_ny'), self._ny)
 
     def test_verify_total_number_of_images_in_composite__too_small(self):
@@ -447,14 +447,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value('composite_nx', 2)
         app.set_param_value('composite_ny', 2)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+            app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_verify_total_number_of_images_in_composite__too_large(self):
         app = self.get_default_app()
         app.set_param_value('composite_nx', 20)
         app.set_param_value('composite_ny', 20)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+            app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()

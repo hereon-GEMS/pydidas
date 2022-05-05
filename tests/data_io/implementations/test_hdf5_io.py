@@ -33,6 +33,7 @@ import numpy as np
 from pydidas.data_io.implementations.hdf5_io import Hdf5Io
 from pydidas.core.constants import HDF5_EXTENSIONS
 
+
 class TestHdf5Io(unittest.TestCase):
 
     @classmethod
@@ -92,8 +93,8 @@ class TestHdf5Io(unittest.TestCase):
         _slicing_axes = [0, 1, 2]
         _slices = [0, 0]
         with self.assertRaises(ValueError):
-            _data = Hdf5Io.import_from_file(self._fname, frame=_slices,
-                                            slicing_axes=_slicing_axes)
+            Hdf5Io.import_from_file(self._fname, frame=_slices,
+                                    slicing_axes=_slicing_axes)
 
     def test_import_from_file__w_dataset(self):
         _slicing_axes = [0, 1]

@@ -1,3 +1,6 @@
+v0.1.6
+Major changes:
+- Refactored data_io and moved classes which are not truly I/O classes.
 
 v0.1.5
 Major changes:

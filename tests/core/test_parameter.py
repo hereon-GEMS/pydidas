@@ -113,13 +113,13 @@ class TestParameter(unittest.TestCase):
 
     def test_typecheck__no_type(self):
         param = Parameter('Test0', None, 12)
-        for item in [12, '12', None, [1,2,3]]:
+        for item in [12, '12', None, [1, 2, 3]]:
             self.assertTrue(param._Parameter__typecheck(item))
 
     def test_typecheck__int(self):
         param = Parameter('Test0', int, 12)
         self.assertTrue(param._Parameter__typecheck(12))
-        for item in ['12', None, [1,2,3]]:
+        for item in ['12', None, [1, 2, 3]]:
             self.assertFalse(param._Parameter__typecheck(item))
 
     def test_typecheck__int_w_allow_none(self):
@@ -185,26 +185,26 @@ class TestParameter(unittest.TestCase):
             "Test tooltip (unit: m, type: <class 'numpy.ndarray'>)")
 
     def test_choices_setter(self):
-        obj = Parameter('Test0', int, 12, choices=[0,12])
+        obj = Parameter('Test0', int, 12, choices=[0, 12])
         self.assertEqual(obj.choices, [0, 12])
 
     def test_choices_setter_update(self):
-        obj = Parameter('Test0', int, 12, choices=[0,12])
+        obj = Parameter('Test0', int, 12, choices=[0, 12])
         obj.choices = [0, 12, 24]
         self.assertEqual(obj.choices, [0, 12, 24])
 
     def test_choices_setter_wrong_type(self):
-        obj = Parameter('Test0', int, 12, choices=[0,12])
+        obj = Parameter('Test0', int, 12, choices=[0, 12])
         with self.assertRaises(TypeError):
             obj.choices = dict(a=0, b=12)
 
     def test_choices_setter_value_not_included(self):
-        obj = Parameter('Test0', int, 12, choices=[0,12])
+        obj = Parameter('Test0', int, 12, choices=[0, 12])
         with self.assertRaises(ValueError):
             obj.choices = [0, 24]
 
     def test_choices_setter_wrong_entry(self):
-        obj = Parameter('Test0', int, 12, choices=[0,12])
+        obj = Parameter('Test0', int, 12, choices=[0, 12])
         with self.assertRaises(ValueError):
             obj.choices = [12, '24']
 

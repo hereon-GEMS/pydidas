@@ -25,11 +25,9 @@ __status__ = "Development"
 import os
 import unittest
 import tempfile
-import shutil
 
 import numpy as np
 
-from pydidas.core import Dataset, utils
 from pydidas.data_io.implementations import IoBase
 from pydidas.data_io import IoMaster
 

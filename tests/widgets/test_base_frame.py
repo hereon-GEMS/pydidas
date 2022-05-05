@@ -22,15 +22,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import random
 import unittest
 
 from qtpy import QtCore, QtWidgets
-from qtpy.QtTest import QTest
 
 from pydidas.widgets.base_frame import BaseFrame
 from pydidas.core import Parameter
 from pydidas.core.utils import get_random_string
+
 
 class SignalTestClass(QtCore.QObject):
     signal = QtCore.Signal(int)
@@ -119,8 +118,6 @@ class TestBaseFrame(unittest.TestCase):
         obj.restore_state(_state)
         _, _state = obj.export_state()
         self.assertEqual(_params, _state['params'])
-
-
 
 
 if __name__ == "__main__":

@@ -21,7 +21,6 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-
 import unittest
 import os
 
@@ -29,8 +28,9 @@ import pydidas
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins.plugin_collection_util_funcs import (
     get_generic_plugin_path, plugin_type_check)
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN)
+from pydidas.core.constants import (
+    BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN)
+
 
 class TestPluginCollectionUtilFuncs(unittest.TestCase):
 

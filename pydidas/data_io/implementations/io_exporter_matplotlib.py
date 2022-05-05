@@ -26,7 +26,6 @@ __all__ = []
 
 import matplotlib.pyplot as plt
 
-from ...core.constants import JPG_EXTENSIONS
 from ..utils import calculate_fig_size_arguments
 from .io_base import IoBase
 

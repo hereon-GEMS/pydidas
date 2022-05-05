@@ -37,6 +37,7 @@ class TestGetModuleDir(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._dir)
+
     def test_get_pydidas_module_dir__empty_path(self):
         with self.assertRaises(IOError):
             get_pydidas_module_dir('')

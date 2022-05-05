@@ -47,7 +47,8 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
 
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._path = os.path.join(_test_dir, '_data',
+                                  'load_test_exp_settings_')
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):

@@ -84,7 +84,6 @@ class TestIoMaster(unittest.TestCase):
         IoMaster.register_class(Tester, update_registry=True)
         self.assertEqual(IoMaster.registry_import['.test'], Tester)
 
-
     def test_register_class__add_and_keep_old_entry_import(self):
         IoMaster.registry_import = {'.test': None}
         with self.assertRaises(KeyError):
@@ -175,6 +174,7 @@ class TestIoMaster(unittest.TestCase):
         IoMaster.import_from_file(_fname, **_kws)
         self.assertEqual(Tester._imported[0], _fname)
         self.assertEqual(Tester._imported[1], _kws)
+
 
 if __name__ == "__main__":
     unittest.main()

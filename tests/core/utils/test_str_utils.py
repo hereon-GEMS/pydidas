@@ -49,7 +49,8 @@ class Test_str_utils(unittest.TestCase):
         shutil.rmtree(self._tmpdir)
 
     def test_get_fixed_length_str_length(self):
-        self.assertEqual(len(get_fixed_length_str('test', self.length)), self.length)
+        self.assertEqual(len(get_fixed_length_str('test', self.length)),
+                         self.length)
 
     def test_get_fixed_length_str_fill_char_too_long(self):
         with self.assertRaises(TypeError):
@@ -59,7 +60,7 @@ class Test_str_utils(unittest.TestCase):
         _num = 20
         _formatter = '{:.3f}'
         _str = get_fixed_length_str(_num, self.length, fill_char=' ',
-                          formatter=_formatter)
+                                    formatter=_formatter)
         self.assertEqual(len(_str), self.length)
         self.assertEqual(_str.strip(), _formatter.format(_num))
 
@@ -82,7 +83,7 @@ class Test_str_utils(unittest.TestCase):
         self.assertEqual(_str.strip(), repr(_obj))
 
     def test_get_fixed_length_str_w_dict(self):
-        _obj = {'a': 10, 'b':20}
+        _obj = {'a': 10, 'b': 20}
         _str = get_fixed_length_str(_obj, self.length, fill_char=' ')
         self.assertEqual(len(_str), self.length)
         self.assertEqual(_str.strip(), repr(_obj))
@@ -94,7 +95,8 @@ class Test_str_utils(unittest.TestCase):
 
     def test_get_fixed_length_str_final_char(self):
         _obj = 'test this'
-        _str = get_fixed_length_str(_obj, self.length, fill_char='.', final_space=True)
+        _str = get_fixed_length_str(_obj, self.length, fill_char='.',
+                                    final_space=True)
         self.assertEqual(len(_str), self.length)
         self.assertEqual(_str[-1], ' ')
 
@@ -102,7 +104,7 @@ class Test_str_utils(unittest.TestCase):
         _obj = 'test this'
         _fill = '.'
         _str = get_fixed_length_str(_obj, self.length, fill_char=_fill,
-                          final_space=False)
+                                    final_space=False)
         self.assertEqual(len(_str), self.length)
         self.assertEqual(_str[-1], _fill)
 
@@ -110,7 +112,7 @@ class Test_str_utils(unittest.TestCase):
         _obj = 'test this'
         _fill = '.'
         _str = get_fixed_length_str(_obj, self.length, fill_char=_fill,
-                          final_space=False, fill_back=False)
+                                    final_space=False, fill_back=False)
         self.assertEqual(len(_str), self.length)
         self.assertTrue(_str.endswith(_obj))
         self.assertTrue(_str[0], _fill)
@@ -119,7 +121,7 @@ class Test_str_utils(unittest.TestCase):
         _obj = 'test this'
         _fill = '.'
         _str = get_fixed_length_str(_obj, self.length, fill_char=_fill,
-                          final_space=False, fill_back=True)
+                                    final_space=False, fill_back=True)
         self.assertEqual(len(_str), self.length)
         self.assertTrue(_str.startswith(_obj))
         self.assertTrue(_str[-1], _fill)
@@ -222,7 +224,6 @@ class Test_str_utils(unittest.TestCase):
         self.assertTrue(w_parts[1].startswith(f'- {_teststr[0]} -'))
         self.assertEqual(w_parts[2], '-' * 60)
         self.assertTrue(w_parts[3].startswith(f'- {_teststr[2]} -'))
-
 
     def test_get_warning_long(self):
         _teststr = ''.join(random.choice(string.ascii_letters)

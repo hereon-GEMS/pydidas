@@ -51,7 +51,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_get_doc_home_address(self):
         _address = get_doc_home_address()
-        self.assertTrue(_address.startswith( 'file:///' ))
+        self.assertTrue(_address.startswith(r"file:///"))
 
     def test_get_doc_qurl(self):
         _url = get_doc_home_qurl()

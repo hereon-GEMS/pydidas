@@ -42,10 +42,10 @@ class TestRebin(unittest.TestCase):
         ...
 
     def test_rebin2d__with_Dataset(self):
-        ori = Dataset((np.random.random(self._2dshape )))
+        ori = Dataset(np.random.random(self._2dshape))
         img = rebin2d(ori, 2)
         _shape = np.array(img.shape)
-        self.assertTrue((_shape  == self._2dshape // 2).all())
+        self.assertTrue((_shape == self._2dshape // 2).all())
 
     def test_2d_bin1(self):
         img = rebin2d(self._2dimage, 1)
@@ -54,12 +54,12 @@ class TestRebin(unittest.TestCase):
     def test_2d_bin2(self):
         img = rebin2d(self._2dimage, 2)
         _shape = np.array(img.shape)
-        self.assertTrue((_shape  == self._2dshape // 2).all())
+        self.assertTrue((_shape == self._2dshape // 2).all())
 
     def test_2d_bin3(self):
         img = rebin2d(self._2dimage, 3)
         _shape = np.array(img.shape)
-        self.assertTrue((_shape  == self._2dshape // 3).all())
+        self.assertTrue((_shape == self._2dshape // 3).all())
 
     def test_bin1(self):
         data = rebin(self._data, 1)
@@ -68,18 +68,18 @@ class TestRebin(unittest.TestCase):
     def test_bin2(self):
         data = rebin(self._data, 2)
         _shape = np.array(data.shape)
-        self.assertTrue((_shape  == self._shape // 2).all())
+        self.assertTrue((_shape == self._shape // 2).all())
 
     def test_bin3(self):
         data = rebin(self._data, 3)
         _shape = np.array(data.shape)
-        self.assertTrue((_shape  == self._shape // 3).all())
+        self.assertTrue((_shape == self._shape // 3).all())
 
     def test_bin7(self):
         data = rebin(self._data, 7)
         _shape = np.array(data.shape)
         _target = np.array([max(s // 7, 1) for s in self._shape])
-        self.assertTrue((_shape  == _target).all())
+        self.assertTrue((_shape == _target).all())
 
     def test_rebin__2d_data_bin1(self):
         data = rebin(self._2dimage, 1)
@@ -88,12 +88,12 @@ class TestRebin(unittest.TestCase):
     def test_rebin_2d_data_bin2(self):
         data = rebin(self._2dimage, 2)
         _shape = np.array(data.shape)
-        self.assertTrue((_shape  == self._2dshape // 2).all())
+        self.assertTrue((_shape == self._2dshape // 2).all())
 
     def test_rebin_2d_data_bin3(self):
         data = rebin(self._2dimage, 3)
         _shape = np.array(data.shape)
-        self.assertTrue((_shape  == self._2dshape // 3).all())
+        self.assertTrue((_shape == self._2dshape // 3).all())
 
     def test_compare_rebin2d_and_rebin(self):
         data = rebin(self._2dimage, 3)

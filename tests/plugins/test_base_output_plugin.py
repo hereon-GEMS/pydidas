@@ -33,8 +33,8 @@ from pydidas.plugins import OutputPlugin
 class TestBaseOutputPlugin(unittest.TestCase):
 
     def setUp(self):
-
         ...
+
     def tearDown(self):
         ...
 

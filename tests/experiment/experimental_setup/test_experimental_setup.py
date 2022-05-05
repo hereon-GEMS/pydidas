@@ -106,7 +106,7 @@ class TestExperimentalSetup(unittest.TestCase):
             obj.set_detector_params_from_name('no such detector')
 
     def test_set_detector_params_from_name(self):
-        _det = {'name': 'Pilatus 300k', 'pixsize': 172, 'npixx' : 487,
+        _det = {'name': 'Pilatus 300k', 'pixsize': 172, 'npixx': 487,
                 'npixy': 619}
         obj = ExperimentalSetup()
         obj.set_detector_params_from_name(_det['name'])

@@ -31,14 +31,13 @@ import numpy as np
 from qtpy import QtCore, QtWidgets, QtTest
 
 from pydidas.multiprocessing import WorkerController
-from pydidas.core.utils import get_time_string
 
 
 def local_test_func(index, *args, **kwargs):
     index = (index
-              + np.sum(np.fromiter([arg for arg in args], float))
-              + np.sum(np.fromiter([kwargs[key] for key in kwargs], float))
-              )
+             + np.sum(np.fromiter([arg for arg in args], float))
+             + np.sum(np.fromiter([kwargs[key] for key in kwargs], float))
+             )
     return 3 * index
 
 
@@ -232,7 +231,7 @@ class TestWorkerController(unittest.TestCase):
         _results = get_spy_values(result_spy, index=1)
         _progress = get_spy_values(progress_spy)
         _exp_progress = [index / len(_tasks)
-                          for index in range(1, len(_tasks) + 1)]
+                         for index in range(1, len(_tasks) + 1)]
         self.assertEqual(set(_results), _target)
         self.assertEqual(_progress, _exp_progress)
 

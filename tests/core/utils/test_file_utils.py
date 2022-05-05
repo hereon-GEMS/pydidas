@@ -101,7 +101,7 @@ class TestPluginCollection(unittest.TestCase):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
         _target = set([os.path.join(self._path, _file)
-                        for _file in self._good_filenames])
+                       for _file in self._good_filenames])
         self.assertEqual(_files, _target)
 
     def test_find_files__path_tree(self):

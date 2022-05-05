@@ -228,7 +228,7 @@ class CompositeCreatorApp(BaseApp):
         """
         self._filelist.update()
         self._image_metadata.update()
-        self.__verify_total_number_of_images_in_composite()
+        self.__verify_number_of_images_fits_composite()
         if self.get_param_value('use_bg_file'):
             self._check_and_set_bg_file()
         if self.slave_mode:
@@ -263,9 +263,9 @@ class CompositeCreatorApp(BaseApp):
             _mask = _mask.astype(np.bool_)
         return _mask
 
-    def __verify_total_number_of_images_in_composite(self):
+    def __verify_number_of_images_fits_composite(self):
         """
-        Check the dimensions of the composite image and verifies that it holds
+        Check the dimensions of the composite image and verify that it holds
         the right amount of images.
 
         Raises

@@ -30,7 +30,7 @@ from copy import copy
 import numpy as np
 
 from ..core import (AppConfigError, ParameterCollection, get_generic_parameter,
-                   ObjectWithParameterCollection)
+                    ObjectWithParameterCollection)
 from .import_export import export_data
 
 
@@ -120,7 +120,7 @@ class CompositeImage(ObjectWithParameterCollection):
         _shape = self.__get_composite_shape()
         self.__check_max_size(_shape)
         self.__image = (np.zeros(_shape,
-                                 dtype = self.get_param_value('datatype'))
+                                 dtype=self.get_param_value('datatype'))
                         + self.get_param_value('mosaic_border_value'))
 
     def __get_composite_shape(self):
@@ -134,10 +134,10 @@ class CompositeImage(ObjectWithParameterCollection):
         """
         _shape = self.get_param_value('image_shape')
         _border_width = self.get_param_value('mosaic_border_width')
-        _nx =  (self.get_param_value('composite_nx')
-                * (_shape[1] + _border_width) - _border_width)
-        _ny =  (self.get_param_value('composite_ny')
-                * (_shape[0] + _border_width) - _border_width)
+        _nx = (self.get_param_value('composite_nx')
+               * (_shape[1] + _border_width) - _border_width)
+        _ny = (self.get_param_value('composite_ny')
+               * (_shape[0] + _border_width) - _border_width)
         return (_ny, _nx)
 
     def __check_max_size(self, shape):

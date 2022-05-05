@@ -138,6 +138,10 @@ class TestPluginPositionNode(unittest.TestCase):
             self.assertEqual(_pos[_node_id], [0, _ypos])
 
     def test_get_relative_positions__with_tree_children(self):
+
+        def row_width(n):
+            return n * generic_width + (n - 1) * child_spacing_x
+
         _childdepth = 3
         _width = 2
         _nodes, _n_nodes = self.create_node_tree(_childdepth, _width)
@@ -146,7 +150,6 @@ class TestPluginPositionNode(unittest.TestCase):
         _num_per_row = _width ** np.arange(_childdepth + 1)
         _row_limits = np.concatenate((np.array((0,)), np.cumsum(_num_per_row)))
         _ntotal = _row_limits[-1]
-        row_width = lambda n: n * generic_width + (n - 1) * child_spacing_x
         for _node_id in range(_ntotal):
             iy, ix = self.get_pos_in_tree(_node_id, _width, _childdepth)
             _ypos = iy * (generic_height + child_spacing_y)

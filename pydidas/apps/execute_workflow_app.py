@@ -158,7 +158,7 @@ class ExecuteWorkflowApp(BaseApp):
             self._config['scan_vals'] = SCAN.get_param_values_as_dict()
             self._config['exp_vals'] = EXP.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
-            self.__check_size_of_results_and_calc_buffer_size()
+            self.__check_size_of_results_and_buffer()
             self.initialize_shared_memory()
             if self.get_param_value('autosave_results'):
                 RESULTS.prepare_files_for_saving(
@@ -192,7 +192,7 @@ class ExecuteWorkflowApp(BaseApp):
         _n_total = np.prod(_points_per_dim)
         self._mp_tasks = np.arange(_n_total)
 
-    def __check_size_of_results_and_calc_buffer_size(self):
+    def __check_size_of_results_and_buffer(self):
         """
         Check the size of results and calculate the number of datasets which
         can be stored in the buffer.

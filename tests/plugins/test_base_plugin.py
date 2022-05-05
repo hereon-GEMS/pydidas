@@ -100,7 +100,7 @@ class TestBasePlugin(unittest.TestCase):
         _bin3 = 2
         _shape = (1253, 1273)
         _image = np.random.random((_shape))
-        _final_image =rebin2d( rebin2d(rebin2d(_image, _bin), _bin2), _bin3)
+        _final_image = rebin2d(rebin2d(rebin2d(_image, _bin), _bin2), _bin3)
         plugin = create_plugin_class(BASE_PLUGIN)()
         plugin._original_input_shape = _shape
         plugin._legacy_image_ops.append(['binning', _bin])
@@ -186,7 +186,6 @@ class TestBasePlugin(unittest.TestCase):
         self.assertEqual(_roi[0].stop, _this_roi[1])
         self.assertEqual(_roi[1].start, _this_roi[2])
         self.assertEqual(_roi[1].stop, _this_roi[3])
-
 
     def test_update_legacy_image_ops_with_this_plugin__fresh(self):
         _roi1 = (5, -55, 5, -55)

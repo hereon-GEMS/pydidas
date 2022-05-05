@@ -28,6 +28,7 @@ import sys
 
 from pydidas.apps.parsers import composite_creator_app_parser
 
+
 class TestAppParsers(unittest.TestCase):
 
     def setUp(self):

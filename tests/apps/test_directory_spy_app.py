@@ -431,8 +431,8 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value('hdf5_key', _dset)
         app._DirectorySpyApp__update_hdf5_metadata(_fname)
         _meta = app._DirectorySpyApp__read_image_meta
-        self.assertEqual(_meta['frame'], _shape[0]- 1)
-        self.assertEqual(_meta['dataset'] ,_dset)
+        self.assertEqual(_meta['frame'], _shape[0] - 1)
+        self.assertEqual(_meta['dataset'], _dset)
 
     def test_get_image__simple_image(self):
         app = self.create_default_app()

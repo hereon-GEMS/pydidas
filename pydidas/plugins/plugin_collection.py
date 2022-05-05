@@ -159,8 +159,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         self._store_plugin_path(path)
         _modules = self._get_valid_modules_and_filenames(path)
         for _modname, _file in _modules.items():
-            _class_members = self.__import_module_and_get_classes_in_module(
-                _modname, _file)
+            _class_members = self.__get_classes_in_module(_modname, _file)
             for _name, _cls in _class_members:
                 self.__check_and_register_class(_cls, reload)
 
@@ -211,7 +210,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         return _modules
 
     @staticmethod
-    def __import_module_and_get_classes_in_module(modname, filepath):
+    def __get_classes_in_module(modname, filepath):
         """
         Import a module from a file and get all class members of the module.
 

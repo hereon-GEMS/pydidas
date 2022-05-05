@@ -52,8 +52,8 @@ class _ProcThread(threading.Thread):
         self.func = func
 
     def run(self):
-       processor(self.input_queue, self.output_queue, self.stop_queue,
-                 self.finished_queue, self.func)
+        processor(self.input_queue, self.output_queue, self.stop_queue,
+                  self.finished_queue, self.func)
 
 
 class AppWithFunc:
@@ -84,8 +84,8 @@ class Test_processor(unittest.TestCase):
     def get_results(self):
         _return = np.array([self.output_queue.get()
                             for i in range(self.n_test)])
-        _res = _return[:,1]
-        _input = _return[:,0]
+        _res = _return[:, 1]
+        _input = _return[:, 0]
         return _input, _res
 
     def test_run__plain(self):

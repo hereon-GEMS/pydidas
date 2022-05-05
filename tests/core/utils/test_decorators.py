@@ -42,6 +42,7 @@ class TestClass:
         Test docstring 2.
         """
 
+
 class Test_copy_docstring(unittest.TestCase):
 
     def setUp(self):
@@ -53,8 +54,10 @@ class Test_copy_docstring(unittest.TestCase):
     def test_copy_from_class(self):
 
         class NewTest:
+
             def __init__(self):
                 ...
+
             @copy_docstring(TestClass)
             def method1(self):
                 ...
@@ -63,9 +66,12 @@ class Test_copy_docstring(unittest.TestCase):
                          TestClass.method1.__doc__)
 
     def test_copy_from_method(self):
+
         class NewTest:
+
             def __init__(self):
                 ...
+
             @copy_docstring(TestClass.method2)
             def method3(self):
                 ...

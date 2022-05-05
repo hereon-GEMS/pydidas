@@ -28,7 +28,7 @@ import random
 import sys
 
 import numpy as np
-from qtpy import  QtWidgets
+from qtpy import QtWidgets
 
 from pydidas.widgets.central_widget_stack import CentralWidgetStack
 
@@ -41,8 +41,8 @@ class TestWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.hash = hash(self)
-        self.name =''.join(random.choice(string.ascii_letters)
-                           for i in range(20))
+        self.name = ''.join(random.choice(string.ascii_letters)
+                            for i in range(20))
 
     def frame_activated(self, index):
         ...

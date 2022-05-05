@@ -158,7 +158,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
 
     def test_export_full_data_to_active_savers(self):
         _results = {1: np.random.random((10, 10, 10)),
-                          2: np.random.random((11, 27, 25))}
+                    2: np.random.random((11, 27, 25))}
         _Saver = self.create_saver_class('SAVER', 'Test')
         _Saver.export_full_data_to_file = classmethod(export_full_data_to_file)
         META.set_active_savers_and_title(['TEST'])

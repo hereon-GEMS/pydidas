@@ -81,14 +81,14 @@ class TestFileCheckFunctions(unittest.TestCase):
 
     def test_verify_files_of_range_are_same_size_correct(self):
         _data = np.random.random((10, 10))
-        _fnames = [ f'test{i:02d}.npy' for i in range(10)]
+        _fnames = [f'test{i:02d}.npy' for i in range(10)]
         for _name in _fnames:
             np.save(os.path.join(self._path, _name), _data)
         verify_files_of_range_are_same_size(self._path, _fnames)
 
     def test_verify_files_of_range_are_same_size_wrong(self):
         _data = np.random.random((10, 10))
-        _fnames = [ f'test{i:02d}.npy' for i in range(10)]
+        _fnames = [f'test{i:02d}.npy' for i in range(10)]
         for i, _name in enumerate(_fnames):
             np.save(os.path.join(self._path, _name), _data[:i, :i])
         with self.assertRaises(AppConfigError):

@@ -57,7 +57,7 @@ class TestRoiController1d(unittest.TestCase):
         self.assertEqual(_roi, obj.roi)
 
     def test_modulate_roi_keys__all_positive_and_larger_than_shape(self):
-        _roi = (slice(1,16),)
+        _roi = (slice(1, 16),)
         _shape = (12,)
         obj = RoiController1d()
         obj._roi = _roi
@@ -91,8 +91,8 @@ class TestRoiController1d(unittest.TestCase):
         obj._input_shape = _shape
         obj._modulate_roi_keys()
         self.assertEqual(obj.roi[0],
-                          slice(_roi[0].start + _shape[0],
-                                _roi[0].stop + _shape[0]))
+                         slice(_roi[0].start + _shape[0],
+                               _roi[0].stop + _shape[0]))
 
     def test_check_length_of_roi_key_entries(self):
         _roi = [slice(0, 2)]
@@ -203,10 +203,8 @@ class TestRoiController1d(unittest.TestCase):
         obj.roi = [slice(_start1[0], _stop1[0])]
         _roi2 = [slice(_start1[1], _stop1[1])]
         obj.apply_second_roi(_roi2)
-        self.assertEqual(obj.roi[0].start,
-                          _start1[0] + _start1[1])
-        self.assertEqual(obj.roi[0].stop,
-                          min(_stop1[0], _stop1[1]))
+        self.assertEqual(obj.roi[0].start, _start1[0] + _start1[1])
+        self.assertEqual(obj.roi[0].stop, min(_stop1[0], _stop1[1]))
 
     def test_merge_rois__two_normal_rois_with_ranges_and_offset(self):
         _start1 = (12, 6)
@@ -215,10 +213,9 @@ class TestRoiController1d(unittest.TestCase):
         obj.roi = [slice(_start1[0], _stop1[0])]
         _roi2 = [slice(_start1[1], _stop1[1])]
         obj.apply_second_roi(_roi2)
-        self.assertEqual(obj.roi[0].start,
-                          _start1[0] + _start1[1])
+        self.assertEqual(obj.roi[0].start, _start1[0] + _start1[1])
         self.assertEqual(obj.roi[0].stop,
-                          min(_stop1[0], _start1[0] + _stop1[1]))
+                         min(_stop1[0], _start1[0] + _stop1[1]))
 
     def test_merge_rois__two_rois_with_None_start(self):
         _x1 = (None, 123)

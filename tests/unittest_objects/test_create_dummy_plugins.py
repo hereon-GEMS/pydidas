@@ -78,8 +78,9 @@ class TestDummyPluginCollection(unittest.TestCase):
         _num = 42
         _cls = create_plugin_class(OUTPUT_PLUGIN, number=_num)
         _instance = _cls()
-        self.assertIsInstance(_instance, OutputPlugin)#
+        self.assertIsInstance(_instance, OutputPlugin)
         self.assertEqual(_instance.number, _num)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -177,7 +177,7 @@ class RoiController1d(RoiController):
                 _out.append(_roi.pop(0))
             else:
                 _msg = error_msg(self._roi_key, 'Cannot create the slice '
-                                  'object for dimension 0.')
+                                 'object for dimension 0.')
                 raise ValueError(_msg)
         except ValueError as _ve:
             raise ValueError(error_msg(self._roi_key, _ve)) from _ve

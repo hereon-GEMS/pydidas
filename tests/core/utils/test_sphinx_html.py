@@ -25,12 +25,10 @@ import sys
 import unittest
 import tempfile
 import os
-import io
 import shutil
 import copy
-from contextlib import redirect_stdout
 
-from pydidas.core.utils import sphinx_html, get_doc_make_directory
+from pydidas.core.utils import sphinx_html
 
 
 class Test_sphinx_html(unittest.TestCase):

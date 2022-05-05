@@ -82,7 +82,7 @@ class TestFilelistManager(unittest.TestCase):
         fm.update(self._fname(0), self._fname(40), False, 2)
         self.assertEqual(fm.filesize, os.stat(self._fname(0)).st_size)
 
-    def test_update_params(self):
+    def test_update_params__multiple_files(self):
         fm = FilelistManager()
         fm._update_params(None, self._fname(0), None, None)
         self.assertEqual(fm.get_param_value('first_file'), Path())
@@ -139,7 +139,8 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value('live_processing', True)
         fm._create_filelist()
         self.assertEqual(fm._config['n_files'], 50)
-        self.assertListEqual(fm._config['file_list'], [self._fname(i) for i in range(50)])
+        self.assertListEqual(fm._config['file_list'],
+                             [self._fname(i) for i in range(50)])
 
     def test_create_filelist_static(self):
         fm = FilelistManager()
@@ -147,7 +148,8 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value('last_file', self._fname(49))
         fm._create_filelist_static()
         self.assertEqual(fm._config['n_files'], 50)
-        self.assertListEqual(fm._config['file_list'], [self._fname(i) for i in range(50)])
+        self.assertListEqual(fm._config['file_list'],
+                             [self._fname(i) for i in range(50)])
 
     def test_create_filelist_static_stepping(self):
         _stepping = 7
@@ -172,7 +174,7 @@ class TestFilelistManager(unittest.TestCase):
         self.assertEqual(_range[0], _index0)
         self.assertEqual(_range[-1], _index1)
         self.assertEqual(Path(_fnames.format(index=0)),
-                          fm.get_param_value('first_file'))
+                         fm.get_param_value('first_file'))
 
     def test_get_live_processing_naming_scheme_wrong_ext(self):
         _index0 = 0

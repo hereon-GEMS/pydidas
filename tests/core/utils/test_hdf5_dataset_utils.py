@@ -45,7 +45,7 @@ class Test_file_checks(unittest.TestCase):
         self._data = np.random.random((10, 10, 10, 10))
         self._fulldsets = ['/test/path/data', '/test/path/to/data',
                            '/test/other/path/data']
-        self._2ddsets =  ['/test/path/data2', '/test/other/data']
+        self._2ddsets = ['/test/path/data2', '/test/other/data']
         with h5py.File(self._fname('data'), 'w') as _file:
             _file.create_group('ext')
             _file['ext'].create_group('path')
@@ -172,7 +172,7 @@ class Test_file_checks(unittest.TestCase):
             get_hdf5_populated_dataset_keys(self._fname(1) + '.other')
 
     def test_get_hdf5_populated_dataset__wrong_input_datatype(self):
-        _res = get_hdf5_populated_dataset_keys([1,2,3])
+        _res = get_hdf5_populated_dataset_keys([1, 2, 3])
         self.assertEqual(_res, [])
 
     def test_get_hdf5_populated_dataset_keys_str(self):

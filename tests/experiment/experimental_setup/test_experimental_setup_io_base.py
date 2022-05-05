@@ -40,7 +40,8 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
 
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._path = os.path.join(_test_dir, '_data',
+                                  'load_test_exp_settings_')
         self._tmppath = tempfile.mkdtemp()
         EXP_IO.imported_params = {}
 
@@ -80,7 +81,7 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         _det_name = 'Test Name'
         _energy = 123.45
         EXP_IO.imported_params = {'detector_name': _det_name,
-                                       'xray_energy': _energy}
+                                  'xray_energy': _energy}
         EXP_IO._write_to_exp_settings()
         self.assertEqual(EXP_SETUP.get_param_value('detector_name'),
                          _det_name)

@@ -87,39 +87,38 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = obj[0]
         self.assertEqual(list(_new.axis_labels.values()),
-                          self._dset['labels'][1:])
-        for _new_range, _original_range in zip(list(_new.axis_ranges.values()),
-                                                self._dset['ranges'][1:]):
-            self.assertTrue(np.allclose(_new_range, _original_range))
+                         self._dset['labels'][1:])
+        for _new, _original in zip(list(_new.axis_ranges.values()),
+                                   self._dset['ranges'][1:]):
+            self.assertTrue(np.allclose(_new, _original))
         self.assertEqual(list(_new.axis_units.values()),
-                          self._dset['units'][1:])
+                         self._dset['units'][1:])
 
     def test_empty_dataset_array_finalize__simple_indexing_in_middle(self):
         obj = self.create_large_dataset()
         _new = obj[:, 0]
         self.assertEqual(list(_new.axis_labels.values()),
-                          [self._dset['labels'][0]] + self._dset['labels'][2:])
-        for _new_range, _original_range in zip(
+                         [self._dset['labels'][0]] + self._dset['labels'][2:])
+        for _new, _original in zip(
                 list(_new.axis_ranges.values()),
                 [self._dset['ranges'][0]] + self._dset['ranges'][2:]):
-            self.assertTrue(np.allclose(_new_range, _original_range))
+            self.assertTrue(np.allclose(_new, _original))
         self.assertEqual(list(_new.axis_units.values()),
-                          [self._dset['units'][0]] + self._dset['units'][2:])
-
+                         [self._dset['units'][0]] + self._dset['units'][2:])
 
     def test_empty_dataset_array_finalize__simple_multi_indexing(self):
         obj = self.create_large_dataset()
         _new = obj[:, 7, 6]
         self.assertEqual(tuple(np.arange(_new.ndim)),
-                          tuple(_new.axis_labels.keys()))
+                         tuple(_new.axis_labels.keys()))
         self.assertEqual(tuple(_new.axis_labels.values()),
-                          (self._dset['labels'][0], self._dset['labels'][3]))
+                         (self._dset['labels'][0], self._dset['labels'][3]))
         for _new_range, _original_range in zip(
                 _new.axis_ranges.values(),
                 (self._dset['ranges'][0], self._dset['ranges'][3])):
             self.assertTrue(np.allclose(_new_range, _original_range))
         self.assertEqual(tuple(_new.axis_units.values()),
-                          (self._dset['units'][0], self._dset['units'][3]))
+                         (self._dset['units'][0], self._dset['units'][3]))
 
     def test_empty_dataset_array_finalize__single_slicing(self):
         obj = self.create_large_dataset()
@@ -151,9 +150,9 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         _new = obj[None, :]
         self.assertEqual(list(_new.axis_labels.values()),
-                          [None] + self._dset['labels'])
+                         [None] + self._dset['labels'])
         self.assertEqual(list(_new.axis_units.values()),
-                          [None] + self._dset['units'])
+                         [None] + self._dset['units'])
 
     def test_empty_dataset_array_finalize__add_dimension_in_middle(self):
         obj = self.create_large_dataset()
@@ -187,7 +186,7 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(_new, Dataset)
         self.assertNotEqual(id(obj), id(_new))
         self.assertEqual(tuple(_s // 2 for _s in self._dset['shape']),
-                          _new.shape)
+                         _new.shape)
 
     def test_get_rebinned_copy__bin1(self):
         obj = self.create_large_dataset()
@@ -211,7 +210,7 @@ class TestDataset(unittest.TestCase):
         obj.flatten_dims(*_dims)
         self.assertEqual(obj.ndim, len(self._dset['shape']) - 1)
         for key, preset in zip(['axis_labels', 'axis_units', 'axis_ranges'],
-                                ['Flattened', '', None]):
+                               ['Flattened', '', None]):
             self.assertEqual(getattr(obj, key)[_dims[0]], preset)
 
     def test_empty_dataest_flatten_dims__1dim_only(self):
@@ -233,7 +232,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_label=_new_label)
         _labels = [self._dset['labels'][i]
-                    for i in range(len(self._dset['labels'])) if i not in _dims]
+                   for i in range(len(self._dset['labels'])) if i not in _dims]
         _labels.insert(_dims[0], _new_label)
         self.assertEqual(list(obj.axis_labels.values()), _labels)
 
@@ -245,7 +244,7 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_unit=_new_unit)
         _units = [self._dset['units'][i]
-                    for i in range(len(self._dset['units'])) if i not in _dims]
+                  for i in range(len(self._dset['units'])) if i not in _dims]
         _units.insert(_dims[0], _new_unit)
         self.assertEqual(list(obj.axis_units.values()), _units)
 
@@ -254,15 +253,14 @@ class TestDataset(unittest.TestCase):
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims)
         _new_range = np.arange(self._dset['shape'][_dims[0]]
-                                * self._dset['shape'][_dims[1]])
+                               * self._dset['shape'][_dims[1]])
         obj = self.create_large_dataset()
         obj.flatten_dims(*_dims, new_dim_range=_new_range)
         _range = [self._dset['ranges'][i]
-                    for i in range(len(self._dset['ranges']))
-                    if i not in _dims]
+                  for i in range(len(self._dset['ranges']))
+                  if i not in _dims]
         _range.insert(_dims[0], _new_range)
         self.assertTrue(np.equal(obj.axis_ranges[_dims[0]], _new_range).all())
-
 
     def test_empty_dataset__comparison_with_allclose(self):
         obj = self.create_large_dataset()
@@ -293,12 +291,12 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_array_finalize__insert_data_simple(self):
         obj = self.create_large_dataset()
-        _new = np.random.random((12,14,16))
+        _new = np.random.random((12, 14, 16))
         obj[2] = _new
 
     def test_empty_dataset_array_finalize__insert_data(self):
         obj = self.create_large_dataset()
-        _new = np.random.random((14,16))
+        _new = np.random.random((14, 16))
         obj[2, 3] = _new
 
     def test_empty_dataset__with_rebin2d(self):
@@ -331,7 +329,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8)), axis_labels=[0, 1, 2],
                       axis_units=['a', 'b', 'c'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                    3 * np.arange(8)])
+                                   3 * np.arange(8)])
         _new = obj.transpose()
         for _i1, _i2 in [[0, 2], [2, 0], [1, 1]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -346,7 +344,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                    3 * np.arange(8), -1 * np.arange(9)])
+                                   3 * np.arange(8), -1 * np.arange(9)])
         _new = obj.transpose()
         for _i1, _i2 in [[0, 3], [3, 0], [1, 2], [2, 1]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -361,7 +359,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 8, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                    3 * np.arange(8), -1 * np.arange(9)])
+                                   3 * np.arange(8), -1 * np.arange(9)])
         _new = obj.transpose(2, 1, 0, 3)
         for _i1, _i2 in [[0, 2], [2, 0]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -376,7 +374,7 @@ class TestDataset(unittest.TestCase):
         obj = Dataset(np.random.random((6, 7, 1, 9)), axis_labels=[0, 1, 2, 3],
                       axis_units=['a', 'b', 'c', 'd'],
                       axis_ranges=[np.arange(6), 20 - np.arange(7),
-                                    3 * np.arange(8), -1 * np.arange(9)])
+                                   3 * np.arange(8), -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [1, 1], [3, 2]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -390,7 +388,7 @@ class TestDataset(unittest.TestCase):
                       axis_labels=[0, 1, 2, 3, 4],
                       axis_units=['a', 'b', 'c', 'd', 'e'],
                       axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
-                                    [6], -1 * np.arange(9)])
+                                   [6], -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [2, 1], [4, 2]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -404,7 +402,7 @@ class TestDataset(unittest.TestCase):
                       axis_labels=[0, 1, 2, 3, 4],
                       axis_units=['a', 'b', 'c', 'd', 'e'],
                       axis_ranges=[np.arange(6), [2], 20 - np.arange(7),
-                                    [6], -1 * np.arange(9)])
+                                   [6], -1 * np.arange(9)])
         _new = np.squeeze(obj)
         for _i1, _i2 in [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]]:
             self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
@@ -415,7 +413,7 @@ class TestDataset(unittest.TestCase):
 
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
-        _new = obj.__getitem__((0,0))
+        _new = obj.__getitem__((0, 0))
         self.assertIsInstance(_new, Dataset)
 
     def test_empty_dataset_get_dict__w_dict_missing_key(self):
@@ -478,21 +476,21 @@ class TestDataset(unittest.TestCase):
         _newkeys = [123, 456]
         obj.axis_labels = _newkeys
         self.assertEqual(obj.axis_labels,
-                          {i: o for i, o in enumerate(_newkeys)})
+                         {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_set_axis_units_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_units = _newkeys
         self.assertEqual(obj.axis_units,
-                          {i: o for i, o in enumerate(_newkeys)})
+                         {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_set_axis_ranges_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_ranges = _newkeys
         self.assertEqual(obj.axis_ranges,
-                          {i: o for i, o in enumerate(_newkeys)})
+                         {i: o for i, o in enumerate(_newkeys)})
 
     def test_empty_dataset_metadata_property(self):
         obj = self.create_empty_dataset()

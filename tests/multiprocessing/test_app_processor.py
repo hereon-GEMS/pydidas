@@ -47,9 +47,9 @@ class _ProcThread(threading.Thread):
         self.app_config = app_config
 
     def run(self):
-       app_processor(self.input_queue, self.output_queue, self.stop_queue,
-                     self.finished_queue, self.app, self.app_params,
-                     self.app_config)
+        app_processor(self.input_queue, self.output_queue, self.stop_queue,
+                      self.finished_queue, self.app, self.app_params,
+                      self.app_config)
 
 
 class Test_app_processor(unittest.TestCase):
@@ -88,7 +88,7 @@ class Test_app_processor(unittest.TestCase):
                       self.app.params.get_copy(), self.app._config)
         time.sleep(0.1)
         _tasks, _results = self.get_results()
-        self.assertEqual(_tasks, list( self.app.multiprocessing_get_tasks()))
+        self.assertEqual(_tasks, list(self.app.multiprocessing_get_tasks()))
         self.assertEqual(self.finished_queue.get_nowait(), 1)
 
     def test_run_with_empty_queue(self):

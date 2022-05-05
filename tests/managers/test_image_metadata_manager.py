@@ -151,7 +151,6 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(_shapex, _roi[1] - _roi[0])
         self.assertEqual(_shapey + _yhigh + 1, _roi[3] - _roi[2])
 
-
     def test_check_roi_for_consistency(self):
         imm = ImageMetadataManager()
         imm.set_param_value('filename', self._hdf5_fname)
@@ -194,7 +193,7 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm.final_shape, _shape)
 
     def test_calculate_final_image_shape__with_roi(self):
-        _xlow =7
+        _xlow = 7
         _xhigh = 17
         _ylow = 2
         _yhigh = 22
@@ -213,7 +212,7 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm.final_shape, (_yhigh - _ylow, _xhigh - _xlow))
 
     def test_calculate_final_image_shape__with_roi_and_binning(self):
-        _xlow =7
+        _xlow = 7
         _xhigh = 17
         _ylow = 2
         _yhigh = 22
@@ -259,7 +258,6 @@ class TestImageMetadataManager(unittest.TestCase):
         self.assertEqual(imm._config['datatype'], None)
         self.assertEqual(imm._config['raw_img_shape_x'], None)
         self.assertEqual(imm._config['raw_img_shape_y'], None)
-
 
     def test_verify_selection_range(self):
         _range = self._data.shape[0]

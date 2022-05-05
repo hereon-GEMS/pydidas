@@ -173,7 +173,7 @@ class RoiController:
             self._original_input_shape = self._input_shape
             self._roi_key = roi2
             self._input_shape = (self._roi[0].stop - self._roi[0].start,
-                                  self._roi[1].stop - self._roi[1].start)
+                                 self._roi[1].stop - self._roi[1].start)
             self.create_roi_slices()
             self._merge_rois()
         except ValueError as _error:
@@ -269,8 +269,9 @@ class RoiController:
             _tmpstr = _tmpstr[1:]
         # strip trailing chars:
         while True:
-            if _tmpstr[-1] in _valid_chars or (_tmpstr[-1] == ')'
-                    and _tmpstr.count(')') == _tmpstr.count('slice(')):
+            if (_tmpstr[-1] in _valid_chars
+                or ((_tmpstr[-1] == ')'
+                     and _tmpstr.count(')') == _tmpstr.count('slice(')))):
                 break
             _tmpstr = _tmpstr[:-1]
         self._roi_key = _tmpstr
@@ -378,7 +379,7 @@ class RoiController:
                     _out.append(_roi.pop(0))
                 else:
                     _msg = error_msg(self._roi_key, 'Cannot create the slice '
-                                      f'object for dimension {_dim}.')
+                                     f'object for dimension {_dim}.')
                     raise ValueError(_msg)
             except ValueError as _ve:
                 raise ValueError(error_msg(self._roi_key, _ve)) from _ve

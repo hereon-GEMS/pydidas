@@ -26,7 +26,7 @@ import unittest
 import string
 import random
 
-from qtpy import  QtWidgets
+from qtpy import QtWidgets
 
 from pydidas.core import WidgetLayoutError
 from pydidas.widgets.factory.create_widgets_mixin import (
@@ -38,8 +38,8 @@ class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
     def __init__(self, *args, parent=None, **kwargs):
         super().__init__(parent)
         self.hash = hash(self)
-        self.name =''.join(random.choice(string.ascii_letters)
-                           for i in range(20))
+        self.name = ''.join(random.choice(string.ascii_letters)
+                            for i in range(20))
 
 
 def get_test_widget(*args, **kwargs):
@@ -76,7 +76,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         _gridPos = (2, 7, 5, 3)
         obj = self.get_widget()
         _grid_pos = _get_grid_pos(obj, row=_gridPos[0], column=_gridPos[1],
-                                   n_rows=_gridPos[2], n_columns=_gridPos[3])
+                                  n_rows=_gridPos[2], n_columns=_gridPos[3])
         self.assertEqual(_grid_pos, _gridPos)
 
     def test_get_grid_pos_auto_row(self):

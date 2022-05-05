@@ -48,7 +48,7 @@ class TestRoiController(unittest.TestCase):
         self.assertIsInstance(obj, RoiController)
 
     def test_modulate_roi_keys__all_positive(self):
-        _roi = (slice(3, 7), slice(1,6))
+        _roi = (slice(3, 7), slice(1, 6))
         _shape = (12, 12)
         obj = RoiController()
         obj._roi = _roi
@@ -57,7 +57,7 @@ class TestRoiController(unittest.TestCase):
         self.assertEqual(_roi, obj.roi)
 
     def test_modulate_roi_keys__all_positive_and_larger_than_shape(self):
-        _roi = (slice(3, 7), slice(1,16))
+        _roi = (slice(3, 7), slice(1, 16))
         _shape = (12, 12)
         obj = RoiController()
         obj._roi = _roi
@@ -235,18 +235,16 @@ class TestRoiController(unittest.TestCase):
         self.assertEqual(obj._roi_key, _roi)
 
     def test_convert_str_roi_key_entries__2slices_wo_steps(self):
-        _strroi  ='(slice(1, 5), slice(0, 2))'
+        _strroi = '(slice(1, 5), slice(0, 2))'
         obj = self.create_RoiController(_strroi)
         obj._convert_str_roi_key_entries()
-        self.assertEqual(obj._roi_key,
-                          [slice(1, 5), slice(0, 2)])
+        self.assertEqual(obj._roi_key, [slice(1, 5), slice(0, 2)])
 
     def test_convert_str_roi_key_entries__2slices_with_steps(self):
-        _strroi ='(slice(1, 5, 2), slice(0, 2, 1))'
+        _strroi = '(slice(1, 5, 2), slice(0, 2, 1))'
         obj = self.create_RoiController(_strroi)
         obj._convert_str_roi_key_entries()
-        self.assertEqual(obj._roi_key,
-                          [slice(1, 5, 2), slice(0, 2, 1)])
+        self.assertEqual(obj._roi_key, [slice(1, 5, 2), slice(0, 2, 1)])
 
     def test_check_length_of_roi_key_entries(self):
         _roi = [1, 2, slice(0, 2)]
@@ -270,7 +268,7 @@ class TestRoiController(unittest.TestCase):
         obj = self.create_RoiController(_roi)
         obj._convert_roi_key_to_slice_objects()
         self.assertEqual(obj._roi,
-                          (slice(_roi[0], _roi[1]), slice(_roi[2], _roi[3])))
+                         (slice(_roi[0], _roi[1]), slice(_roi[2], _roi[3])))
 
     def test_convert_roi_key_to_slice_objects__2_slices(self):
         _roi = [slice(0, 5), slice(0, 5)]
@@ -282,15 +280,13 @@ class TestRoiController(unittest.TestCase):
         _roi = [1, 5, slice(0, 5)]
         obj = self.create_RoiController(_roi)
         obj._convert_roi_key_to_slice_objects()
-        self.assertEqual(obj._roi,
-                          (slice(_roi[0], _roi[1]), _roi[2]))
+        self.assertEqual(obj._roi, (slice(_roi[0], _roi[1]), _roi[2]))
 
     def test_convert_roi_key_to_slice_objects__slice_and_ints(self):
         _roi = [slice(0, 5), 1, 5]
         obj = self.create_RoiController(_roi)
         obj._convert_roi_key_to_slice_objects()
-        self.assertEqual(obj._roi,
-                          (_roi[0], slice(_roi[1], _roi[2])))
+        self.assertEqual(obj._roi, (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_convert_roi_key_to_slice_objects__wrong_order(self):
         _roi = [1, slice(0, 5), 1]
@@ -313,16 +309,14 @@ class TestRoiController(unittest.TestCase):
     def test_full_init(self):
         _roi = [slice(0, 5), 1, 5]
         obj = RoiController(roi=_roi)
-        self.assertEqual(obj._roi,
-                          (_roi[0], slice(_roi[1], _roi[2])))
+        self.assertEqual(obj._roi, (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_create_roi_slices(self):
         _roi = [slice(0, 5), 1, 5]
         obj = RoiController()
         obj._roi_key = _roi
         obj.create_roi_slices()
-        self.assertEqual(obj._roi,
-                          (_roi[0], slice(_roi[1], _roi[2])))
+        self.assertEqual(obj._roi, (_roi[0], slice(_roi[1], _roi[2])))
 
     def test_roi_getter(self):
         _roi = [slice(0, 5), 1, 5]
@@ -410,10 +404,11 @@ class TestRoiController(unittest.TestCase):
                  slice(_start2[1], _stop2[1])]
         obj.apply_second_roi(_roi2)
         for _axis in [0, 1]:
-            self.assertEqual(obj.roi[_axis].start,
-                             _start1[_axis] + _start2[_axis])
-            self.assertEqual(obj.roi[_axis].stop,
-                             min(_stop1[_axis], _start1[_axis] + _stop2[_axis]))
+            self.assertEqual(
+                obj.roi[_axis].start, _start1[_axis] + _start2[_axis])
+            self.assertEqual(
+                obj.roi[_axis].stop,
+                min(_stop1[_axis], _start1[_axis] + _stop2[_axis]))
 
     def test_merge_rois__two_rois_with_negative_stop(self):
         _y1 = (12, -3)
@@ -433,7 +428,7 @@ class TestRoiController(unittest.TestCase):
         _x2 = (43, -4)
         _shape = (150, 150)
         obj = RoiController(roi=[slice(*_y1), slice(*_x1)],
-                         input_shape=_shape)
+                            input_shape=_shape)
         _roi2 = [slice(*_y2), slice(*_x2)]
         _roi2 = _y2 + _x2
         obj.apply_second_roi(_roi2)
@@ -451,7 +446,7 @@ class TestRoiController(unittest.TestCase):
         _x2 = (43, -4)
         _shape = (150, 150)
         obj = RoiController(roi=[slice(*_y1), slice(*_x1)],
-                         input_shape=_shape)
+                            input_shape=_shape)
         _roi2 = [slice(*_y2), slice(*_x2)]
         _roi2 = _y2 + _x2
         obj.apply_second_roi(_roi2)

@@ -119,7 +119,7 @@ class TestWorkflowTree(unittest.TestCase):
         for node_id in tree.nodes:
             self.assertTrue(node_id in self.tree.nodes)
             self.assertEqual(tree.nodes[node_id].plugin.__class__,
-                              self.tree.nodes[node_id].plugin.__class__)
+                             self.tree.nodes[node_id].plugin.__class__)
 
     def test_execute_single_plugin__no_node(self):
         _depth = 3

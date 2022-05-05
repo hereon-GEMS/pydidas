@@ -31,7 +31,7 @@ from . import low_level_readers
 from . import utils
 
 # import __all__ items from modules:
-from .composite_image import *
+
 from .import_export import *
 from .io_master import *
 from .roi_controller import *
@@ -39,10 +39,6 @@ from .roi_controller_1d import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import composite_image
-__all__.extend(composite_image.__all__)
-del composite_image
-
 from . import import_export
 __all__.extend(import_export.__all__)
 del import_export

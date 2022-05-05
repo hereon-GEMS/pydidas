@@ -35,7 +35,7 @@ from qtpy import QtCore, QtTest
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (ParameterCollection, Dataset, AppConfigError,
                           get_generic_parameter)
-from pydidas.data_io import CompositeImage
+from pydidas.managers import CompositeImageManager
 
 
 class TestCompositeCreatorApp(unittest.TestCase):
@@ -89,14 +89,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def create_single_composite_and_insert_image(self, app):
         _image = np.random.random(self._img_shape)
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1)
         app._composite.insert_image(_image, 0)
         return _image
 
     def create_full_composite(self, app):
         app._image_metadata.update()
-        app._composite = CompositeImage(
+        app._composite = CompositeImageManager(
             image_shape=app._image_metadata.final_shape,
             composite_nx=app.get_param_value('composite_nx'),
             composite_ny=app.get_param_value('composite_ny'),
@@ -132,8 +132,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_composite_property(self):
         _image = np.random.random((10, 10))
-        _composite = CompositeImage(image_shape=_image.shape, composite_nx=1,
-                                    composite_ny=1)
+        _composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1)
         _composite.insert_image(_image, 0)
         app = CompositeCreatorApp()
         app._composite = _composite
@@ -162,8 +162,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_store_results(self):
         app = self.get_default_app()
         _image = np.random.random(self._img_shape)
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1)
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
@@ -175,8 +175,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = self.get_default_app()
         app.set_param_value('use_bg_file', True)
         app._bg_image = _image
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1)
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
@@ -364,13 +364,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_check_and_update_composite_image__no_composite_yet(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
-        self.assertIsInstance(app._composite, CompositeImage)
+        self.assertIsInstance(app._composite, CompositeImageManager)
 
     def test_check_and_update_composite_image__redo(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         app._CompositeCreatorApp__check_and_update_composite_image()
-        self.assertIsInstance(app._composite, CompositeImage)
+        self.assertIsInstance(app._composite, CompositeImageManager)
 
     def test_check_and_update_composite_image__new_img_shape(self):
         app = self.get_default_app()

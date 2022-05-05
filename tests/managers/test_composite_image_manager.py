@@ -31,7 +31,7 @@ import copy
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.data_io import CompositeImage
+from pydidas.managers import CompositeImageManager
 from pydidas.core import AppConfigError
 
 
@@ -48,32 +48,32 @@ class TestCompositeImage(unittest.TestCase):
         del self._path
 
     def get_default_object(self, low_limit=None, high_limit=1):
-        obj = CompositeImage(
+        obj = CompositeImageManager(
             image_shape=(20, 20), composite_nx=5, composite_ny=5,
             datatype=float, threshold_low=low_limit, threshold_high=high_limit)
         return obj
 
     def test_creation(self):
-        obj = CompositeImage()
-        self.assertIsInstance(obj, CompositeImage)
+        obj = CompositeImageManager()
+        self.assertIsInstance(obj, CompositeImageManager)
 
     def test_creation_with_params(self):
         obj = self.get_default_object()
-        self.assertIsInstance(obj, CompositeImage)
+        self.assertIsInstance(obj, CompositeImageManager)
         self.assertIsInstance(obj.image, np.ndarray)
 
     def test_check_config__wrong_params(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
-                             composite_ny=-2, datatype=float,
-                             threshold_low=np.nan, threshold_high=1)
-        self.assertFalse(obj._CompositeImage__check_config())
+        obj = CompositeImageManager(
+            image_shape=(20, 20), composite_nx=-2, composite_ny=-2, datatype=float,
+            threshold_low=np.nan, threshold_high=1)
+        self.assertFalse(obj._CompositeImageManager__check_config())
 
     def test_verify_config__wrong_params(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=-2,
-                             composite_ny=-2, datatype=float,
-                             threshold_low=np.nan, threshold_high=1)
+        obj = CompositeImageManager(
+            image_shape=(20, 20), composite_nx=-2, composite_ny=-2, datatype=float,
+            threshold_low=np.nan, threshold_high=1)
         with self.assertRaises(ValueError):
-            obj._CompositeImage__verify_config()
+            obj._CompositeImageManager__verify_config()
 
     def test_create_new_image(self):
         obj = self.get_default_object()
@@ -94,7 +94,7 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_insert_image__into_empty_array(self):
         obj = self.get_default_object()
-        obj._CompositeImage__image = None
+        obj._CompositeImageManager__image = None
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
@@ -135,9 +135,9 @@ class TestCompositeImage(unittest.TestCase):
         self.assertTrue(np.amin(obj.image[:20, :20]) < 0.)
 
     def test_apply_threshold_high_limit_only(self):
-        obj = CompositeImage(image_shape=(20, 20), composite_nx=5,
-                             composite_ny=5, datatype=float,
-                             threshold_low=np.nan, threshold_high=np.nan)
+        obj = CompositeImageManager(
+            image_shape=(20, 20), composite_nx=5, composite_ny=5, datatype=float,
+            threshold_low=np.nan, threshold_high=np.nan)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(high=5)
@@ -184,7 +184,7 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_set_default_qsettings__overwrite(self):
         _maxsize_test = 150
-        obj = CompositeImage(
+        obj = CompositeImageManager(
             image_shape=(20, 20), composite_nx=5, composite_ny=5,
             datatype=float, threshold_low=np.nan, threshold_high=1,
             mosaic_max_size=_maxsize_test)
@@ -196,7 +196,7 @@ class TestCompositeImage(unittest.TestCase):
         q_settings = QtCore.QSettings('Hereon', 'pydidas')
         old_maxsize = q_settings.value('global/mosaic_max_size')
         q_settings.setValue('global/mosaic_max_size', 100)
-        obj._CompositeImage__check_max_size((19e3, 5e3))
+        obj._CompositeImageManager__check_max_size((19e3, 5e3))
         if old_maxsize is not None:
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
@@ -206,7 +206,7 @@ class TestCompositeImage(unittest.TestCase):
         old_maxsize = float(q_settings.value('global/mosaic_max_size'))
         q_settings.setValue('global/mosaic_max_size', 100)
         with self.assertRaises(AppConfigError):
-            obj._CompositeImage__check_max_size((21e3, 5e3))
+            obj._CompositeImageManager__check_max_size((21e3, 5e3))
         if old_maxsize is not None:
             q_settings.setValue('global/mosaic_max_size', old_maxsize)
 
@@ -221,13 +221,13 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_property_shape_empty(self):
         obj = self.get_default_object()
-        obj._CompositeImage__image = None
+        obj._CompositeImageManager__image = None
         self.assertEqual(obj.shape, (0, 0))
 
     def test_copy(self):
         obj = self.get_default_object()
         obj2 = copy.copy(obj)
-        self.assertIsInstance(obj2, CompositeImage)
+        self.assertIsInstance(obj2, CompositeImageManager)
         self.assertNotEqual(obj, obj2)
 
 

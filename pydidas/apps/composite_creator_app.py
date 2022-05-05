@@ -36,8 +36,8 @@ from ..core import (Dataset, AppConfigError, get_generic_param_collection,
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists, check_hdf5_key_exists_in_file, copy_docstring, rebin2d)
-from ..data_io import CompositeImage, import_data
-from ..managers import FilelistManager, ImageMetadataManager
+from ..data_io import import_data
+from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
 from .parsers import composite_creator_app_parser
 
 
@@ -333,7 +333,7 @@ class CompositeCreatorApp(BaseApp):
         shape does not match the new input.
         """
         if self._composite is None:
-            self._composite = CompositeImage(
+            self._composite = CompositeImageManager(
                 image_shape=self._image_metadata.final_shape,
                 composite_nx=self.get_param_value('composite_nx'),
                 composite_ny=self.get_param_value('composite_ny'),
@@ -502,10 +502,10 @@ class CompositeCreatorApp(BaseApp):
         Perform operatinos after running main parallel processing function.
         """
 
-    @copy_docstring(CompositeImage)
+    @copy_docstring(CompositeImageManager)
     def apply_thresholds(self, **kwargs):
         """
-        Please refer to pydidas.core.CompositeImage docstring.
+        Please refer to pydidas.managers.CompositeImageManager docstring.
         """
         if (self.get_param_value('use_thresholds')
                 or 'low' in kwargs or 'high' in kwargs):
@@ -538,11 +538,11 @@ class CompositeCreatorApp(BaseApp):
 
     def export_image(self, output_fname, **kwargs):
         """
-        Export the CompositeImage to a file.
+        Export the composite image to a file.
 
-        This method is a wrapper for the CompositeImage.export method.
-        Supported file types for export are: binary, numpy, hdf5, png, tiff,
-        jpg.
+        This method is a wrapper for the CompositeImageManager.export method.
+        Supported file types for export are all generic datatypes with exporters for
+        2-dimensional data.
 
         Parameters
         ----------

@@ -31,7 +31,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.core import get_generic_param_collection, BaseApp
-from pydidas.data_io import CompositeImage
+from pydidas.managers import CompositeImageManager
 
 
 def get_test_image(index, **kwargs):
@@ -84,7 +84,7 @@ class MpTestAppWoTasks(BaseApp):
         The pre-run method sets up the tasks and creates a compositite image.
         """
         self._config['mp_pre_run_called'] = True
-        self._composite = CompositeImage(
+        self._composite = CompositeImageManager(
             image_shape=(20, 20),
             composite_nx=10,
             composite_ny=int(np.ceil((self._config['max_index'])/10)),

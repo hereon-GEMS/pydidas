@@ -22,8 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CompositeImage']
-
+__all__ = ['CompositeImageManager']
 
 from copy import copy
 
@@ -31,10 +30,10 @@ import numpy as np
 
 from ..core import (AppConfigError, ParameterCollection, get_generic_parameter,
                     ObjectWithParameterCollection)
-from .import_export import export_data
+from ..data_io import export_data
 
 
-class CompositeImage(ObjectWithParameterCollection):
+class CompositeImageManager(ObjectWithParameterCollection):
     """
     The CompositeImage class holds a numpy array to combine individual images
     to a composite and to provide basic insertion and manipulation routines.

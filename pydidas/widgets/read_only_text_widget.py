@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ReadOnlyTextWidget']
+__all__ = ["ReadOnlyTextWidget"]
 
 from qtpy import QtWidgets
 
@@ -62,16 +62,16 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
 
     def __init__(self, parent=None, **params):
         super().__init__(parent)
-        params['minimumWidth'] = params.get('minimumWidth', 500)
-        params['readOnly'] = params.get('readOnly', True)
-        params['acceptRichText'] = params.get('acceptRichText', True)
+        params["minimumWidth"] = params.get("minimumWidth", 500)
+        params["readOnly"] = params.get("readOnly", True)
+        params["acceptRichText"] = params.get("acceptRichText", True)
 
         # if fixed settings are given, overwrite the minimum size settings
         # because the minimumSize take precedence in Qt:
-        if 'fixedWidth' in params and 'minimumWidth' in params:
-            del params['minimumWidth']
-        if 'fixedHeight' in params and 'minimumHeight' in params:
-            del params['minimumHeight']
+        if "fixedWidth" in params and "minimumWidth" in params:
+            del params["minimumWidth"]
+        if "fixedHeight" in params and "minimumHeight" in params:
+            del params["minimumHeight"]
         apply_widget_properties(self, **params)
 
     def setText(self, text, title=None):
@@ -85,12 +85,11 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         title : str, optional
             The title. If None, no title will be printed. The default is None.
         """
-        super().setText('')
+        super().setText("")
         if title is not None:
             self.__add_title(title)
         self.append(text)
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)
+        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
     def __add_title(self, title):
         """
@@ -103,11 +102,10 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         """
         self.setFontPointSize(14)
         self.setFontWeight(75)
-        self.append(f'{title}')
+        self.append(f"{title}")
         self.setFontPointSize(10)
 
-    def setTextFromDict(self, text_dict, title=None, one_line_entries=False,
-                        indent=4):
+    def setTextFromDict(self, text_dict, title=None, one_line_entries=False, indent=4):
         """
         Set the widget's text.
 
@@ -129,19 +127,17 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         indent : int, optional
             The indent depth for list entries. The default is 4.
         """
-        super().setText('')
+        super().setText("")
         self.__add_title(title)
         for _key, _value in text_dict.items():
             if one_line_entries:
-                self.append(f'{_key}: {_value}')
+                self.append(f"{_key}: {_value}")
             else:
-                _items = _value.split('\n')
+                _items = _value.split("\n")
                 self.setFontWeight(75)
-                self.append(f'\n{_key}:')
+                self.append(f"\n{_key}:")
                 self.setFontWeight(50)
                 for item in _items:
-                    _indent = (' ' * indent if item[:indent] != ' ' * indent
-                               else '')
+                    _indent = " " * indent if item[:indent] != " " * indent else ""
                     self.append(_indent + item)
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)
+        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)

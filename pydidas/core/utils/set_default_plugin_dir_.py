@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['set_default_plugin_dir']
+__all__ = ["set_default_plugin_dir"]
 
 import os
 
@@ -33,11 +33,11 @@ from qtpy import QtCore
 DEFAULT_PATH = __file__
 for _ in range(4):
     DEFAULT_PATH = os.path.dirname(DEFAULT_PATH)
-DEFAULT_PATH = os.path.join(DEFAULT_PATH, 'pydidas_plugins')
+DEFAULT_PATH = os.path.join(DEFAULT_PATH, "pydidas_plugins")
 
 
 def set_default_plugin_dir():
-    _settings = QtCore.QSettings('Hereon', 'pydidas')
-    _val = _settings.value('global/plugin_path')
-    if _val in [None, '']:
-        _settings.setValue('global/plugin_path', DEFAULT_PATH)
+    _settings = QtCore.QSettings("Hereon", "pydidas")
+    _val = _settings.value("global/plugin_path")
+    if _val in [None, ""]:
+        _settings.setValue("global/plugin_path", DEFAULT_PATH)

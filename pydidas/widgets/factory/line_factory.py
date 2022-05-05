@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_line']
+__all__ = ["create_line"]
 
 from qtpy.QtWidgets import QFrame
 
@@ -54,9 +54,9 @@ def create_line(**kwargs):
         The line (in the form of a QFrame widget).
     """
     _line = QFrame()
-    kwargs['frameShape'] = kwargs.get('frameShape', QFrame.HLine)
-    kwargs['frameShadow'] = kwargs.get('frameShadow', QFrame.Sunken)
-    kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
-    kwargs['fixedHeight'] = kwargs.get('fixedHeight', 3)
+    kwargs["frameShape"] = kwargs.get("frameShape", QFrame.HLine)
+    kwargs["frameShadow"] = kwargs.get("frameShadow", QFrame.Sunken)
+    kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
+    kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
     apply_widget_properties(_line, **kwargs)
     return _line

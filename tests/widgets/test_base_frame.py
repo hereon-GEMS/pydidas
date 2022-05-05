@@ -46,7 +46,6 @@ class SignalTestClass(QtCore.QObject):
 
 
 class TestBaseFrame(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
         self.tester = SignalTestClass()
@@ -57,14 +56,14 @@ class TestBaseFrame(unittest.TestCase):
 
     def get_base_frame(self, **kwargs):
         _frame = BaseFrame(**kwargs)
-        _frame.add_param(Parameter('test_int', int, 24))
-        _frame.add_param(Parameter('test_str', str, get_random_string(30)))
-        _frame.create_param_widget(_frame.get_param('test_int'))
+        _frame.add_param(Parameter("test_int", int, 24))
+        _frame.add_param(Parameter("test_str", str, get_random_string(30)))
+        _frame.create_param_widget(_frame.get_param("test_int"))
         return _frame
 
     def create_widgets_in_frame(self, frame, n=6):
         for _index in range(n):
-            frame.create_label(f'label_{_index}', get_random_string(120))
+            frame.create_label(f"label_{_index}", get_random_string(120))
 
     def test_init(self):
         obj = self.get_base_frame()
@@ -78,7 +77,7 @@ class TestBaseFrame(unittest.TestCase):
         self.tester.send_signal(1)
 
     def test_set_status(self):
-        _test = 'This is the test status.'
+        _test = "This is the test status."
         obj = self.get_base_frame()
         obj.status_msg.connect(self.tester.get_signal)
         obj.set_status(_test)
@@ -91,8 +90,8 @@ class TestBaseFrame(unittest.TestCase):
 
     def test_next_row(self):
         obj = self.get_base_frame()
-        w = QtWidgets.QLabel('test')
-        w2 = QtWidgets.QLabel('test2')
+        w = QtWidgets.QLabel("test")
+        w2 = QtWidgets.QLabel("test2")
         obj.layout().addWidget(w, 0, 0, 1, 1)
         obj.layout().addWidget(w2, 1, 0, 1, 1)
         _row = obj.next_row()
@@ -105,19 +104,19 @@ class TestBaseFrame(unittest.TestCase):
         QtCore.QTimer.singleShot(100, self.q_app.quit)
         obj.show()
         _, _state = obj.export_state()
-        self.assertEqual(obj.get_param_values_as_dict(), _state['params'])
+        self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
 
     def test_restore_state(self):
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
-        _params = {'test_int': 42, 'test_str': get_random_string(10)}
-        _state = {'params': _params}
+        _params = {"test_int": 42, "test_str": get_random_string(10)}
+        _state = {"params": _params}
         QtCore.QTimer.singleShot(100, self.q_app.quit)
         obj.show()
         obj.restore_state(_state)
         _, _state = obj.export_state()
-        self.assertEqual(_params, _state['params'])
+        self.assertEqual(_params, _state["params"])
 
 
 if __name__ == "__main__":

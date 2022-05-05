@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['QTooltipEventFilter']
+__all__ = ["QTooltipEventFilter"]
 
 
 import html
@@ -66,7 +66,7 @@ class QTooltipEventFilter(QObject):
             _tooltip = widget.toolTip()
 
             if len(_tooltip) > 0 and not Qt.mightBeRichText(_tooltip):
-                _tooltip = f'<qt>{html.escape(_tooltip)}</qt>'
+                _tooltip = f"<qt>{html.escape(_tooltip)}</qt>"
                 widget.setToolTip(_tooltip)
                 return True
 

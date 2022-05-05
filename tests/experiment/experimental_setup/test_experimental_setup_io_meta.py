@@ -28,7 +28,10 @@ import shutil
 import tempfile
 
 from pydidas.experiment.experimental_setup import (
-    ExperimentalSetup, ExperimentalSetupIoBase, ExperimentalSetupIoMeta)
+    ExperimentalSetup,
+    ExperimentalSetupIoBase,
+    ExperimentalSetupIoMeta,
+)
 
 
 EXP_SETUP = ExperimentalSetup()
@@ -37,8 +40,8 @@ EXP_IO_META.clear_registry()
 
 
 class TestIo(ExperimentalSetupIoBase):
-    extensions = ['.test']
-    format_name = 'Test'
+    extensions = [".test"]
+    format_name = "Test"
 
     @classmethod
     def reset(cls):
@@ -59,7 +62,6 @@ class TestIo(ExperimentalSetupIoBase):
 
 
 class TestExperimentSettingsIoMeta(unittest.TestCase):
-
     def setUp(self):
         self._tmppath = tempfile.mkdtemp()
         TestIo.reset()
@@ -69,13 +71,13 @@ class TestExperimentSettingsIoMeta(unittest.TestCase):
         EXP_SETUP.restore_all_defaults(True)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmppath, 'test.test')
+        _fname = os.path.join(self._tmppath, "test.test")
         EXP_IO_META.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
     def test_import_from_file(self):
-        _fname = os.path.join(self._tmppath, 'test.test')
+        _fname = os.path.join(self._tmppath, "test.test")
         EXP_IO_META.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)

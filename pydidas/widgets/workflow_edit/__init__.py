@@ -33,17 +33,21 @@ from .workflow_tree_canvas import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import plugin_collection_browser
+
 __all__.extend(plugin_collection_browser.__all__)
 del plugin_collection_browser
 
 from . import plugin_collection_tree_widget
+
 __all__.extend(plugin_collection_tree_widget.__all__)
 del plugin_collection_tree_widget
 
 from . import plugin_in_workflow_box
+
 __all__.extend(plugin_in_workflow_box.__all__)
 del plugin_in_workflow_box
 
 from . import workflow_tree_canvas
+
 __all__.extend(workflow_tree_canvas.__all__)
 del workflow_tree_canvas

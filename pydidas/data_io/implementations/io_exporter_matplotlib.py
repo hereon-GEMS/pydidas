@@ -32,9 +32,10 @@ from .io_base import IoBase
 
 class IoExporterMatplotlib(IoBase):
     """IObase implementation for matplotlib based exporters."""
+
     extensions_export = []
     extensions_import = []
-    format_name = ''
+    format_name = ""
     dimensions = [2]
 
     @classmethod
@@ -58,18 +59,19 @@ class IoExporterMatplotlib(IoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         _range = cls.get_data_range(data, **kwargs)
-        _cmap = kwargs.get('colormap', 'gray')
+        _cmap = kwargs.get("colormap", "gray")
         _backend = plt.get_backend()
         try:
-            plt.rcParams['backend'] = 'Agg'
+            plt.rcParams["backend"] = "Agg"
             _figshape, _dpi = calculate_fig_size_arguments(data.shape)
             fig1 = plt.figure(figsize=_figshape, dpi=50)
             ax = fig1.add_axes([0, 0, 1, 1])
-            ax.imshow(data, interpolation='none', vmin=_range[0],
-                      vmax=_range[1], cmap=_cmap)
+            ax.imshow(
+                data, interpolation="none", vmin=_range[0], vmax=_range[1], cmap=_cmap
+            )
             ax.set_xticks([])
             ax.set_yticks([])
             fig1.savefig(filename, dpi=_dpi)
             plt.close(fig1)
         finally:
-            plt.rcParams['backend'] = _backend
+            plt.rcParams["backend"] = _backend

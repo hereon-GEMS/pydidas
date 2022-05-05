@@ -31,7 +31,6 @@ from pydidas.core.utils import rebin2d, rebin
 
 
 class TestRebin(unittest.TestCase):
-
     def setUp(self):
         self._shape = np.array((10, 5, 20, 8, 3))
         self._data = np.random.random(self._shape)

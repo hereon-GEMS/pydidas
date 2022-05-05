@@ -23,14 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DummyLoader']
+__all__ = ["DummyLoader"]
 
 import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import (Parameter, ParameterCollection, Dataset,
-                          get_generic_parameter)
+from pydidas.core import Parameter, ParameterCollection, Dataset, get_generic_parameter
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.plugins import InputPlugin
 
@@ -40,22 +39,34 @@ class DummyLoader(InputPlugin):
     A dummy Plugin to test Input in WorkflowTrees without actual file system
     operations.
     """
-    plugin_name = 'Dummy loader Plugin'
+
+    plugin_name = "Dummy loader Plugin"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     input_data_dim = -1
     output_data_dim = 2
     default_params = ParameterCollection(
-        Parameter('image_height', int, 10, name='The image height',
-                  tooltip='The height of the image.'),
-        Parameter('image_width', int, 10, name='The image width',
-                  tooltip='The width of the image.'),
-        get_generic_parameter('filename'))
+        Parameter(
+            "image_height",
+            int,
+            10,
+            name="The image height",
+            tooltip="The height of the image.",
+        ),
+        Parameter(
+            "image_width",
+            int,
+            10,
+            name="The image width",
+            tooltip="The width of the image.",
+        ),
+        get_generic_parameter("filename"),
+    )
 
     def __init__(self, *args, **kwargs):
         InputPlugin.__init__(self, *args, **kwargs)
         self._preexecuted = False
-        self._config['input_available'] = 12
+        self._config["input_available"] = 12
 
     def __reduce__(self):
         """
@@ -71,6 +82,7 @@ class DummyLoader(InputPlugin):
             The state to set the state of the new object.
         """
         from .dummy_getter_ import dummy_getter
+
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
     def get_first_file_size(self):
@@ -121,7 +133,7 @@ class DummyLoader(InputPlugin):
         """
         if index is None:
             return False
-        return index <= self._config['input_available']
+        return index <= self._config["input_available"]
 
     def pre_execute(self):
         """
@@ -151,8 +163,8 @@ class DummyLoader(InputPlugin):
         kwargs : dict
             The updated input kwargs dictionary.
         """
-        _width = self.get_param_value('image_width')
-        _height = self.get_param_value('image_height')
+        _width = self.get_param_value("image_width")
+        _height = self.get_param_value("image_height")
         _data = np.random.random((_height, _width))
         _data[_data == 0] = 0.0001
         kwargs.update(dict(index=index))
@@ -162,5 +174,7 @@ class DummyLoader(InputPlugin):
         """
         Calculate the shape of the Plugin's results.
         """
-        self._config['result_shape'] = (self.get_param_value('image_height'),
-                                        self.get_param_value('image_width'))
+        self._config["result_shape"] = (
+            self.get_param_value("image_height"),
+            self.get_param_value("image_width"),
+        )

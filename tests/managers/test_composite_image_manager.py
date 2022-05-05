@@ -36,12 +36,11 @@ from pydidas.core import AppConfigError
 
 
 class TestCompositeImage(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        self._maxsize = float(q_settings.value('global/mosaic_max_size'))
-        self._border = float(q_settings.value('global/mosaic_border_width'))
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        self._maxsize = float(q_settings.value("global/mosaic_max_size"))
+        self._border = float(q_settings.value("global/mosaic_border_width"))
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -49,8 +48,13 @@ class TestCompositeImage(unittest.TestCase):
 
     def get_default_object(self, low_limit=None, high_limit=1):
         obj = CompositeImageManager(
-            image_shape=(20, 20), composite_nx=5, composite_ny=5,
-            datatype=float, threshold_low=low_limit, threshold_high=high_limit)
+            image_shape=(20, 20),
+            composite_nx=5,
+            composite_ny=5,
+            datatype=float,
+            threshold_low=low_limit,
+            threshold_high=high_limit,
+        )
         return obj
 
     def test_creation(self):
@@ -64,26 +68,38 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_check_config__wrong_params(self):
         obj = CompositeImageManager(
-            image_shape=(20, 20), composite_nx=-2, composite_ny=-2, datatype=float,
-            threshold_low=np.nan, threshold_high=1)
+            image_shape=(20, 20),
+            composite_nx=-2,
+            composite_ny=-2,
+            datatype=float,
+            threshold_low=np.nan,
+            threshold_high=1,
+        )
         self.assertFalse(obj._CompositeImageManager__check_config())
 
     def test_verify_config__wrong_params(self):
         obj = CompositeImageManager(
-            image_shape=(20, 20), composite_nx=-2, composite_ny=-2, datatype=float,
-            threshold_low=np.nan, threshold_high=1)
+            image_shape=(20, 20),
+            composite_nx=-2,
+            composite_ny=-2,
+            datatype=float,
+            threshold_low=np.nan,
+            threshold_high=1,
+        )
         with self.assertRaises(ValueError):
             obj._CompositeImageManager__verify_config()
 
     def test_create_new_image(self):
         obj = self.get_default_object()
-        obj.set_param_value('composite_nx', 10)
+        obj.set_param_value("composite_nx", 10)
         obj.create_new_image()
-        _shape = obj.get_param_value('image_shape')
-        _size = (_shape[0] * obj.get_param_value('composite_ny')
-                 + (obj.get_param_value('composite_ny') - 1) * self._border,
-                 _shape[1] * obj.get_param_value('composite_nx')
-                 + (obj.get_param_value('composite_nx') - 1) * self._border)
+        _shape = obj.get_param_value("image_shape")
+        _size = (
+            _shape[0] * obj.get_param_value("composite_ny")
+            + (obj.get_param_value("composite_ny") - 1) * self._border,
+            _shape[1] * obj.get_param_value("composite_nx")
+            + (obj.get_param_value("composite_nx") - 1) * self._border,
+        )
         self.assertEqual(obj.image.shape, _size)
 
     def test_insert_image(self):
@@ -101,7 +117,7 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_insert_image__comp_dir_y(self):
         obj = self.get_default_object()
-        obj.set_param_value('composite_dir', 'y')
+        obj.set_param_value("composite_dir", "y")
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
@@ -118,50 +134,55 @@ class TestCompositeImage(unittest.TestCase):
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(low=0)
-        self.assertTrue(np.amin(obj.image[:20, :20]) >= 0.)
+        self.assertTrue(np.amin(obj.image[:20, :20]) >= 0.0)
 
     def test_apply_threshold__inf_low_limit(self):
         obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(low=np.nan)
-        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.)
+        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.0)
 
     def test_apply_threshold__None_low_limit(self):
         obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(low=None)
-        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.)
+        self.assertTrue(np.amin(obj.image[:20, :20]) < 0.0)
 
     def test_apply_threshold_high_limit_only(self):
         obj = CompositeImageManager(
-            image_shape=(20, 20), composite_nx=5, composite_ny=5, datatype=float,
-            threshold_low=np.nan, threshold_high=np.nan)
+            image_shape=(20, 20),
+            composite_nx=5,
+            composite_ny=5,
+            datatype=float,
+            threshold_low=np.nan,
+            threshold_high=np.nan,
+        )
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(high=5)
-        self.assertTrue(np.amax(obj.image[:20, :20]) <= 5.)
+        self.assertTrue(np.amax(obj.image[:20, :20]) <= 5.0)
 
     def test_apply_threshold__inf_high_limit(self):
         obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(high=np.nan)
-        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.)
+        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.0)
 
     def test_apply_threshold__None_high_limit(self):
         obj = self.get_default_object(None, None)
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
         obj.apply_thresholds(low=None)
-        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.)
+        self.assertTrue(np.amax(obj.image[:20, :20]) > 5.0)
 
     def test_save(self):
         obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
-        _fname = os.path.join(self._path, 'test.npy')
+        _fname = os.path.join(self._path, "test.npy")
         obj.save(_fname)
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())
@@ -170,53 +191,58 @@ class TestCompositeImage(unittest.TestCase):
         obj = self.get_default_object()
         img = (np.random.random((20, 20)) - 0.5) * 100
         obj.insert_image(img, 0)
-        _fname = os.path.join(self._path, 'test.npy')
+        _fname = os.path.join(self._path, "test.npy")
         obj.export(_fname)
         _img = np.load(_fname)
         self.assertTrue((obj.image == _img).all())
 
     def test_set_default_qsettings(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        _maxsize = float(q_settings.value('global/mosaic_max_size'))
-        self.assertEqual(obj.get_param_value('mosaic_max_size'),
-                         _maxsize)
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        _maxsize = float(q_settings.value("global/mosaic_max_size"))
+        self.assertEqual(obj.get_param_value("mosaic_max_size"), _maxsize)
 
     def test_set_default_qsettings__overwrite(self):
         _maxsize_test = 150
         obj = CompositeImageManager(
-            image_shape=(20, 20), composite_nx=5, composite_ny=5,
-            datatype=float, threshold_low=np.nan, threshold_high=1,
-            mosaic_max_size=_maxsize_test)
-        self.assertEqual(obj.get_param_value('mosaic_max_size'),
-                         _maxsize_test)
+            image_shape=(20, 20),
+            composite_nx=5,
+            composite_ny=5,
+            datatype=float,
+            threshold_low=np.nan,
+            threshold_high=1,
+            mosaic_max_size=_maxsize_test,
+        )
+        self.assertEqual(obj.get_param_value("mosaic_max_size"), _maxsize_test)
 
     def test_check_max_size_okay(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        old_maxsize = q_settings.value('global/mosaic_max_size')
-        q_settings.setValue('global/mosaic_max_size', 100)
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        old_maxsize = q_settings.value("global/mosaic_max_size")
+        q_settings.setValue("global/mosaic_max_size", 100)
         obj._CompositeImageManager__check_max_size((19e3, 5e3))
         if old_maxsize is not None:
-            q_settings.setValue('global/mosaic_max_size', old_maxsize)
+            q_settings.setValue("global/mosaic_max_size", old_maxsize)
 
     def test_check_max_size_too_large(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        old_maxsize = float(q_settings.value('global/mosaic_max_size'))
-        q_settings.setValue('global/mosaic_max_size', 100)
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        old_maxsize = float(q_settings.value("global/mosaic_max_size"))
+        q_settings.setValue("global/mosaic_max_size", 100)
         with self.assertRaises(AppConfigError):
             obj._CompositeImageManager__check_max_size((21e3, 5e3))
         if old_maxsize is not None:
-            q_settings.setValue('global/mosaic_max_size', old_maxsize)
+            q_settings.setValue("global/mosaic_max_size", old_maxsize)
 
     def test_property_shape(self):
         obj = self.get_default_object()
-        _shape = obj.get_param_value('image_shape')
-        _size = (_shape[0] * obj.get_param_value('composite_ny')
-                 + (obj.get_param_value('composite_ny') - 1) * self._border,
-                 _shape[1] * obj.get_param_value('composite_nx')
-                 + (obj.get_param_value('composite_nx') - 1) * self._border)
+        _shape = obj.get_param_value("image_shape")
+        _size = (
+            _shape[0] * obj.get_param_value("composite_ny")
+            + (obj.get_param_value("composite_ny") - 1) * self._border,
+            _shape[1] * obj.get_param_value("composite_nx")
+            + (obj.get_param_value("composite_nx") - 1) * self._border,
+        )
         self.assertEqual(obj.shape, _size)
 
     def test_property_shape_empty(self):

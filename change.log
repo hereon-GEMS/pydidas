@@ -1,7 +1,6 @@
 v0.1.6
 Major changes:
 - Refactored data_io and moved classes which are not truly I/O classes.
-
 Code changes:
 - Changed code formatting to use black. 
 - Changed used line width to 88 characters.

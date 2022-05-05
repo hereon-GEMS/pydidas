@@ -24,12 +24,15 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import (Parameter, get_generic_parameter,
-                          get_generic_param_collection, ParameterCollection)
+from pydidas.core import (
+    Parameter,
+    get_generic_parameter,
+    get_generic_param_collection,
+    ParameterCollection,
+)
 
 
 class TestGetGenericParameter(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -37,19 +40,19 @@ class TestGetGenericParameter(unittest.TestCase):
         ...
 
     def test_get_param(self):
-        _p = get_generic_parameter('first_file')
+        _p = get_generic_parameter("first_file")
         self.assertIsInstance(_p, Parameter)
 
     def test_get_param__wrong_key(self):
         with self.assertRaises(KeyError):
-            get_generic_parameter('there_should_be_no_such_key')
+            get_generic_parameter("there_should_be_no_such_key")
 
     def test_get_generic_param_collection__empty(self):
         _pc = get_generic_param_collection()
         self.assertIsInstance(_pc, ParameterCollection)
 
     def test_get_generic_param_collection(self):
-        _keys = ['first_file', 'last_file']
+        _keys = ["first_file", "last_file"]
         _pc = get_generic_param_collection(*_keys)
         for _key in _keys:
             self.assertIn(_key, _pc)

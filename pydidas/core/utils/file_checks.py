@@ -23,11 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['check_hdf5_key_exists_in_file',
-           'check_file_exists',
-           'verify_files_in_same_directory',
-           'verify_files_of_range_are_same_size',
-           'file_is_writable']
+__all__ = [
+    "check_hdf5_key_exists_in_file",
+    "check_file_exists",
+    "verify_files_in_same_directory",
+    "verify_files_of_range_are_same_size",
+    "file_is_writable",
+]
 
 import os
 
@@ -53,11 +55,12 @@ def check_hdf5_key_exists_in_file(fname, key):
     AppConfigError
         If the dataset key is not found in the hdf5 file.
     """
-    key = key if key.startswith('/') else f'/{key}'
+    key = key if key.startswith("/") else f"/{key}"
     dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
     if key not in dsets:
-        raise AppConfigError(f'hdf5_key "{key}" is not a valid key '
-                             f'for the file "{fname}."')
+        raise AppConfigError(
+            f'hdf5_key "{key}" is not a valid key ' f'for the file "{fname}."'
+        )
 
 
 def check_file_exists(fname):
@@ -75,8 +78,9 @@ def check_file_exists(fname):
         If the selected filename does not exist.
     """
     if not os.path.isfile(fname):
-        raise AppConfigError(f'The selected filename "{fname}" does not '
-                             'point to a valid file.')
+        raise AppConfigError(
+            f'The selected filename "{fname}" does not ' "point to a valid file."
+        )
 
 
 def verify_files_in_same_directory(filename1, filename2):
@@ -97,10 +101,11 @@ def verify_files_in_same_directory(filename1, filename2):
     """
     _path1, _name1 = os.path.split(filename1)
     _path2, _name2 = os.path.split(filename2)
-    if _path2 not in [_path1, '']:
+    if _path2 not in [_path1, ""]:
         raise AppConfigError(
-            'The selected files are not in the same directory:\n'
-            f'{filename1}\nand\n{filename2}')
+            "The selected files are not in the same directory:\n"
+            f"{filename1}\nand\n{filename2}"
+        )
 
 
 def verify_files_of_range_are_same_size(path, filenames):
@@ -119,10 +124,9 @@ def verify_files_of_range_are_same_size(path, filenames):
     AppConfigError
         If the files in the filelist are not all of the same size.
     """
-    _fsizes = array([os.stat(f'{path}/{f}').st_size for f in filenames])
-    if _fsizes.std() > 0.:
-        raise AppConfigError('The selected files are not all of the '
-                             'same size.')
+    _fsizes = array([os.stat(f"{path}/{f}").st_size for f in filenames])
+    if _fsizes.std() > 0.0:
+        raise AppConfigError("The selected files are not all of the " "same size.")
 
 
 def file_is_writable(filename, overwrite=False):

@@ -33,9 +33,10 @@ from .io_base import IoBase
 
 class FabioIo(IoBase):
     """IObase implementation for files supported by FabIO (e.g. EDF)."""
+
     extensions_export = []
     extensions_import = FABIO_EXTENSIONS
-    format_name = 'FabIO reader'
+    format_name = "FabIO reader"
     dimensions = [2]
 
     @classmethod

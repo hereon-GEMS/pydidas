@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetupIoPoni']
+__all__ = ["ExperimentalSetupIoPoni"]
 
 import pyFAI
 
@@ -39,8 +39,9 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
     """
     Base class for WorkflowTree exporters.
     """
-    extensions = ['.poni']
-    format_name = 'PONI'
+
+    extensions = [".poni"]
+    format_name = "PONI"
 
     @classmethod
     def export_to_file(cls, filename, **kwargs):
@@ -54,24 +55,28 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         _pdata = {}
-        for key in ['rot1', 'rot2', 'rot3', 'poni1', 'poni2']:
-            _pdata[key] = EXP_SETUP.get_param_value(f'detector_{key}')
-        _pdata['detector'] = EXP_SETUP.get_param_value('detector_name')
-        _pdata['distance'] = EXP_SETUP.get_param_value('detector_dist')
-        if (_pdata['detector'] in pyFAI.detectors.Detector.registry.keys()
-                and _pdata['detector'] != 'detector'):
-            _pdata['detector_config'] = {}
+        for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]:
+            _pdata[key] = EXP_SETUP.get_param_value(f"detector_{key}")
+        _pdata["detector"] = EXP_SETUP.get_param_value("detector_name")
+        _pdata["distance"] = EXP_SETUP.get_param_value("detector_dist")
+        if (
+            _pdata["detector"] in pyFAI.detectors.Detector.registry.keys()
+            and _pdata["detector"] != "detector"
+        ):
+            _pdata["detector_config"] = {}
         else:
-            _pdata['detector_config'] = dict(
-                pixel1=(1e-6 * EXP_SETUP.get_param_value('detector_pxsizey')),
-                pixel2=(1e-6 * EXP_SETUP.get_param_value('detector_pxsizex')),
-                max_shape=(EXP_SETUP.get_param_value('detector_npixy'),
-                           EXP_SETUP.get_param_value('detector_npixx')))
-        _pdata['wavelength'] = (EXP_SETUP.get_param_value('xray_wavelength')
-                                * 1e-10)
+            _pdata["detector_config"] = dict(
+                pixel1=(1e-6 * EXP_SETUP.get_param_value("detector_pxsizey")),
+                pixel2=(1e-6 * EXP_SETUP.get_param_value("detector_pxsizex")),
+                max_shape=(
+                    EXP_SETUP.get_param_value("detector_npixy"),
+                    EXP_SETUP.get_param_value("detector_npixx"),
+                ),
+            )
+        _pdata["wavelength"] = EXP_SETUP.get_param_value("xray_wavelength") * 1e-10
         pfile = pyFAI.io.ponifile.PoniFile()
         pfile.read_from_dict(_pdata)
-        with open(filename, 'w') as stream:
+        with open(filename, "w") as stream:
             pfile.write(stream)
 
     @classmethod
@@ -97,13 +102,17 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
         Update the detector information from a pyFAI Detector instance.
         """
         if not isinstance(det, pyFAI.detectors.Detector):
-            raise TypeError(f'Object "{det} (type {type(det)} is not a '
-                            'pyFAI.detectors.Detector instance.')
-        for key, value in [['detector_name', det.name],
-                           ['detector_npixx', det.shape[1]],
-                           ['detector_npixy', det.shape[0]],
-                           ['detector_pxsizex', 1e6 * det.pixel2],
-                           ['detector_pxsizey', 1e6 * det.pixel1]]:
+            raise TypeError(
+                f'Object "{det} (type {type(det)} is not a '
+                "pyFAI.detectors.Detector instance."
+            )
+        for key, value in [
+            ["detector_name", det.name],
+            ["detector_npixx", det.shape[1]],
+            ["detector_npixy", det.shape[0]],
+            ["detector_pxsizex", 1e6 * det.pixel2],
+            ["detector_pxsizey", 1e6 * det.pixel1],
+        ]:
             cls.imported_params[key] = value
 
     @classmethod
@@ -112,12 +121,19 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
         Update the geometry information from a pyFAI Geometry instance.
         """
         if not isinstance(geo, pyFAI.geometry.Geometry):
-            raise TypeError(f'Object "{geo} (type {type(geo)} is not a '
-                            'pyFAI.geometry.Geometry instance.')
-        cls.imported_params['xray_wavelength'] = geo.wavelength * 1e10
-        cls.imported_params['xray_energy'] = (LAMBDA_IN_M_TO_E
-                                              / geo.wavelength)
+            raise TypeError(
+                f'Object "{geo} (type {type(geo)} is not a '
+                "pyFAI.geometry.Geometry instance."
+            )
+        cls.imported_params["xray_wavelength"] = geo.wavelength * 1e10
+        cls.imported_params["xray_energy"] = LAMBDA_IN_M_TO_E / geo.wavelength
         _geodict = geo.getPyFAI()
-        for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                    'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            cls.imported_params[key] = _geodict[key.split('_')[1]]
+        for key in [
+            "detector_dist",
+            "detector_poni1",
+            "detector_poni2",
+            "detector_rot1",
+            "detector_rot2",
+            "detector_rot3",
+        ]:
+            cls.imported_params[key] = _geodict[key.split("_")[1]]

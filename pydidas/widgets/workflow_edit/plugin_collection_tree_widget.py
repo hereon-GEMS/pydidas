@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginCollectionTreeWidget']
+__all__ = ["PluginCollectionTreeWidget"]
 
 from functools import partial
 
@@ -53,27 +53,27 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
     **kwargs : dict
         Additional keyword arguments for widget modifications.
     """
+
     selection_changed = QtCore.Signal(str)
     selection_confirmed = QtCore.Signal(str)
 
     def __init__(self, parent=None, collection=None, **kwargs):
         super().__init__(parent)
         apply_widget_properties(self, **kwargs)
-        self.collection = (collection if collection is not None
-                           else PLUGIN_COLLECTION)
+        self.collection = collection if collection is not None else PLUGIN_COLLECTION
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.setFixedWidth(493)
         self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.header().setStyleSheet(QT_STYLES['title'])
+        self.header().setStyleSheet(QT_STYLES["title"])
 
         self._update_collection()
-        self.clicked.connect(
-            partial(self.__confirm_selection, self.selection_changed))
+        self.clicked.connect(partial(self.__confirm_selection, self.selection_changed))
         self.doubleClicked.connect(
-            partial(self.__confirm_selection, self.selection_confirmed))
+            partial(self.__confirm_selection, self.selection_confirmed)
+        )
 
     @QtCore.Slot()
     def _update_collection(self):
@@ -98,18 +98,18 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
             The tree view model.
         """
         tree_model = QtGui.QStandardItemModel()
-        tree_model.setHorizontalHeaderLabels(['Available plugins'])
+        tree_model.setHorizontalHeaderLabels(["Available plugins"])
 
         root_node = tree_model.invisibleRootItem()
-        input_plugins = QtGui.QStandardItem('Input plugins')
-        proc_plugins = QtGui.QStandardItem('Processing plugins')
-        output_plugins = QtGui.QStandardItem('Output plugins')
+        input_plugins = QtGui.QStandardItem("Input plugins")
+        proc_plugins = QtGui.QStandardItem("Processing plugins")
+        output_plugins = QtGui.QStandardItem("Output plugins")
 
-        for _plugin in self.collection.get_all_plugins_of_type('input'):
+        for _plugin in self.collection.get_all_plugins_of_type("input"):
             input_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
-        for _plugin in self.collection.get_all_plugins_of_type('proc'):
+        for _plugin in self.collection.get_all_plugins_of_type("proc"):
             proc_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
-        for _plugin in self.collection.get_all_plugins_of_type('output'):
+        for _plugin in self.collection.get_all_plugins_of_type("output"):
             output_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
 
         root_node.appendRow(input_plugins)
@@ -140,6 +140,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
     root : QStandardItem
         The root node of the QStandardItemModel.
     """
+
     def __init__(self, root):
         super().__init__()
         self._model = root.model()

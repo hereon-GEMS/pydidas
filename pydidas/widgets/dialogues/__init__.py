@@ -34,21 +34,26 @@ from .warning_box import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import critical_warning_
+
 __all__.extend(critical_warning_.__all__)
 del critical_warning_
 
 from . import error_message_box
+
 __all__.extend(error_message_box.__all__)
 del error_message_box
 
 from . import hdf5_dataset_selection_popup
+
 __all__.extend(hdf5_dataset_selection_popup.__all__)
 del hdf5_dataset_selection_popup
 
 from . import question_box
+
 __all__.extend(question_box.__all__)
 del question_box
 
 from . import warning_box
+
 __all__.extend(warning_box.__all__)
 del warning_box

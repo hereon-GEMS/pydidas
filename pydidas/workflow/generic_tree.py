@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GenericTree']
+__all__ = ["GenericTree"]
 
 import copy
 import warnings
@@ -105,8 +105,9 @@ class GenericTree:
             If the node is not a GenericNode.
         """
         if not isinstance(node, GenericNode):
-            raise TypeError('Can only register GenericNodes (or subclasses'
-                            ' in the tree.')
+            raise TypeError(
+                "Can only register GenericNodes (or subclasses" " in the tree."
+            )
 
     def clear(self):
         """
@@ -178,13 +179,15 @@ class GenericTree:
         """
         for _id in node_ids:
             if _id in self.node_ids:
-                raise ValueError('Duplicate node ID detected. Tree node has '
-                                 'not been registered!')
+                raise ValueError(
+                    "Duplicate node ID detected. Tree node has " "not been registered!"
+                )
             if _id is not None and self.node_ids and _id < max(self.node_ids):
                 raise ValueError(
-                    'Attempt to reuse a discarded node ID detected'
-                    f' (node_id = {_id}). Please choose another node_id. '
-                    'Tree node has not been registered!')
+                    "Attempt to reuse a discarded node ID detected"
+                    f" (node_id = {_id}). Please choose another node_id. "
+                    "Tree node has not been registered!"
+                )
 
     def get_new_nodeid(self):
         """

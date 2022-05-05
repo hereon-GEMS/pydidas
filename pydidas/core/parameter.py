@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Parameter']
+__all__ = ["Parameter"]
 
 
 import numbers
@@ -142,6 +142,7 @@ class Parameter:
         Keyword to allow None instead of the usual datatype. The default
         is False.
     """
+
     def __init__(self, refkey, param_type, default, meta=None, **kwargs):
         super().__init__()
         self.__refkey = refkey
@@ -149,14 +150,16 @@ class Parameter:
         self.__value = None
         if isinstance(meta, dict):
             kwargs.update(meta)
-        self.__meta = dict(tooltip=kwargs.get('tooltip', ''),
-                           unit=kwargs.get('unit', ''),
-                           optional=kwargs.get('optional', False),
-                           name=kwargs.get('name', ''),
-                           allow_None=kwargs.get('allow_None', False))
+        self.__meta = dict(
+            tooltip=kwargs.get("tooltip", ""),
+            unit=kwargs.get("unit", ""),
+            optional=kwargs.get("optional", False),
+            name=kwargs.get("name", ""),
+            allow_None=kwargs.get("allow_None", False),
+        )
         self.__process_default_input(default)
         self.__process_choices_input(kwargs)
-        self.value = kwargs.get('value', self.__meta['default'])
+        self.value = kwargs.get("value", self.__meta["default"])
 
     def __process_default_input(self, default):
         """
@@ -174,9 +177,10 @@ class Parameter:
         """
         default = self.__convenience_type_conversion(default)
         if not self.__typecheck(default):
-            raise TypeError(f'Default value "{default}" does not have data'
-                            f'type {self.__type}!')
-        self.__meta['default'] = default
+            raise TypeError(
+                f'Default value "{default}" does not have data' f"type {self.__type}!"
+            )
+        self.__meta["default"] = default
 
     def __process_choices_input(self, kwargs):
         """
@@ -194,17 +198,20 @@ class Parameter:
         ValueError
             If the default has been set and it is not in choices.
         """
-        _choices = kwargs.get('choices', None)
+        _choices = kwargs.get("choices", None)
         if not (isinstance(_choices, (list, tuple, set)) or _choices is None):
-            raise TypeError('The type of choices (type: "{type(_choices)}"'
-                            'is not supported. Please use list or tuple.')
-        self.__meta['choices'] = None if _choices is None else list(_choices)
-        _def = self.__meta['default']
-        if (self.__meta['choices'] is not None
-                and _def not in self.__meta['choices']):
-            raise ValueError(f'The default value "{_def}" does not '
-                             'correspond to any of the defined choices: '
-                             f'{self.__meta["choices"]}.')
+            raise TypeError(
+                'The type of choices (type: "{type(_choices)}"'
+                "is not supported. Please use list or tuple."
+            )
+        self.__meta["choices"] = None if _choices is None else list(_choices)
+        _def = self.__meta["default"]
+        if self.__meta["choices"] is not None and _def not in self.__meta["choices"]:
+            raise ValueError(
+                f'The default value "{_def}" does not '
+                "correspond to any of the defined choices: "
+                f'{self.__meta["choices"]}.'
+            )
 
     def __typecheck(self, val):
         """
@@ -226,7 +233,7 @@ class Parameter:
             return True
         if isinstance(val, self.__type):
             return True
-        if val is None and self.__meta['allow_None']:
+        if val is None and self.__meta["allow_None"]:
             return True
         return False
 
@@ -275,7 +282,7 @@ class Parameter:
         str
             The parameter name.
         """
-        return self.__meta['name']
+        return self.__meta["name"]
 
     @property
     def allow_None(self):
@@ -287,7 +294,7 @@ class Parameter:
         bool
             The flag setting.
         """
-        return self.__meta['allow_None']
+        return self.__meta["allow_None"]
 
     @property
     def refkey(self):
@@ -311,7 +318,7 @@ class Parameter:
         default
             The default value.
         """
-        return self.__meta['default']
+        return self.__meta["default"]
 
     @property
     def unit(self):
@@ -323,7 +330,7 @@ class Parameter:
         str
             The unit of the Parameter.
         """
-        return self.__meta['unit']
+        return self.__meta["unit"]
 
     @property
     def tooltip(self):
@@ -335,22 +342,22 @@ class Parameter:
         str
             The tooltip for the Parameter.
         """
-        _t = self.__meta['tooltip']
+        _t = self.__meta["tooltip"]
         if self.unit:
-            _t += f' (unit: {self.unit})'
+            _t += f" (unit: {self.unit})"
         if self.type == numbers.Integral:
-            _t += ' (type: integer)'
+            _t += " (type: integer)"
         elif self.type == numbers.Real:
-            _t += ' (type: float)'
+            _t += " (type: float)"
         elif self.type == str:
-            _t += ' (type: str)'
+            _t += " (type: str)"
         elif self.type == Hdf5key:
-            _t += ' (type: Hdf5key)'
+            _t += " (type: Hdf5key)"
         elif self.type == Path:
-            _t += ' (type: Path)'
+            _t += " (type: Path)"
         else:
-            _t += f' (type: {str(self.type)})'
-        return _t.replace(') (', ', ')
+            _t += f" (type: {str(self.type)})"
+        return _t.replace(") (", ", ")
 
     @property
     def choices(self):
@@ -369,7 +376,7 @@ class Parameter:
         Union[list, None]
             The allowed choices for the Parameter.
         """
-        return self.__meta['choices']
+        return self.__meta["choices"]
 
     @choices.setter
     def choices(self, choices):
@@ -387,15 +394,18 @@ class Parameter:
             new choices.
         """
         if not isinstance(choices, (list, tuple, set)):
-            raise TypeError('New choices must be a list or tuple.')
+            raise TypeError("New choices must be a list or tuple.")
         for _c in choices:
             if not self.__typecheck(_c):
-                raise ValueError(f'The new choice "{_c}" does not have the '
-                                 'correct data type.')
+                raise ValueError(
+                    f'The new choice "{_c}" does not have the ' "correct data type."
+                )
         if self.__value not in choices:
-            raise ValueError('The new choices do not include the current '
-                             f'Parameter value ({self.__value})')
-        self.__meta['choices'] = list(choices)
+            raise ValueError(
+                "The new choices do not include the current "
+                f"Parameter value ({self.__value})"
+            )
+        self.__meta["choices"] = list(choices)
 
     @property
     def optional(self):
@@ -407,7 +417,7 @@ class Parameter:
         bool
             The unit of the Parameter.
         """
-        return self.__meta['optional']
+        return self.__meta["optional"]
 
     @property
     def type(self):
@@ -450,17 +460,19 @@ class Parameter:
             datatype.
         """
         val = self.__convenience_type_conversion(val)
-        if self.__meta['choices'] and val not in self.__meta['choices']:
-            raise ValueError(f'The selected value "{val}" does not correspond'
-                             ' to any of the allowed choices: '
-                             f'{self.__meta["choices"]}')
-        if not (self.__typecheck(val)
-                or self.__meta['optional'] and (val is None)):
+        if self.__meta["choices"] and val not in self.__meta["choices"]:
             raise ValueError(
-                f'Cannot set Parameter (object ID:{id(self)}, refkey: '
+                f'The selected value "{val}" does not correspond'
+                " to any of the allowed choices: "
+                f'{self.__meta["choices"]}'
+            )
+        if not (self.__typecheck(val) or self.__meta["optional"] and (val is None)):
+            raise ValueError(
+                f"Cannot set Parameter (object ID:{id(self)}, refkey: "
                 f'"{self.__refkey}", name: "{self.__meta["name"]}")'
-                ' because it is of the wrong data type. (expected: '
-                f'{self.__type}, input type: {type(val)}')
+                " because it is of the wrong data type. (expected: "
+                f"{self.__type}, input type: {type(val)}"
+            )
         self.__value = val
 
     @property
@@ -486,14 +498,13 @@ class Parameter:
             return float(self.value)
         if self.__type in (list, tuple):
             return self.value
-        raise TypeError(f'No export format for type {self.__type} has been'
-                        ' defined.')
+        raise TypeError(f"No export format for type {self.__type} has been" " defined.")
 
     def restore_default(self):
         """
         Restore the parameter to its default value.
         """
-        self.value = self.__meta['default']
+        self.value = self.__meta["default"]
 
     def get_copy(self):
         """
@@ -521,9 +532,9 @@ class Parameter:
             Parameter (value, unit, tooltip, refkey, default, choices)
         """
         _meta = self.__meta.copy()
-        _meta.update({'value': self.__value})
-        del _meta['default']
-        return (self.__refkey, self.__type, self.__meta['default'], _meta)
+        _meta.update({"value": self.__value})
+        del _meta["default"]
+        return (self.__refkey, self.__type, self.__meta["default"], _meta)
 
     def export_refkey_and_value(self):
         """
@@ -551,15 +562,19 @@ class Parameter:
             The string of the short description.
         """
 
-        _type = (f'{self.__type.__name__}' if self.__type is not None else
-                 'None')
-        if self.__meta['allow_None']:
-            _type += '/None'
-        _def = (f'{self.__meta["default"]}'
-                if self.__meta['default'] not in (None, '') else 'None')
-        _unit = f' {self.unit}' if self.unit else ''
-        return (f'{self.refkey}: {self.value}{_unit} (type: {_type}, '
-                f'default: {_def} {self.__meta["unit"]})')
+        _type = f"{self.__type.__name__}" if self.__type is not None else "None"
+        if self.__meta["allow_None"]:
+            _type += "/None"
+        _def = (
+            f'{self.__meta["default"]}'
+            if self.__meta["default"] not in (None, "")
+            else "None"
+        )
+        _unit = f" {self.unit}" if self.unit else ""
+        return (
+            f"{self.refkey}: {self.value}{_unit} (type: {_type}, "
+            f'default: {_def} {self.__meta["unit"]})'
+        )
 
     def __repr__(self):
         """
@@ -570,17 +585,22 @@ class Parameter:
         str
             The representation.
         """
-        _type = (f'{self.__type.__name__}' if self.__type is not None else
-                 'None')
-        _unit = (f'{self.__meta["unit"]} ' if self.__meta['unit'] != ''
-                 else self.__meta['unit'])
-        _val = f'{self.value}' if self.value != '' else '""'
-        _def = (f'{self.__meta["default"]}'
-                if self.__meta['default'] not in (None, '') else 'None')
-        _s = f'Parameter <{self.__refkey} (type: {_type}'
-        if self.__meta['optional']:
-            _s += ', optional'
-        _s += f'): {_val} {_unit}(default: {_def})>'
+        _type = f"{self.__type.__name__}" if self.__type is not None else "None"
+        _unit = (
+            f'{self.__meta["unit"]} '
+            if self.__meta["unit"] != ""
+            else self.__meta["unit"]
+        )
+        _val = f"{self.value}" if self.value != "" else '""'
+        _def = (
+            f'{self.__meta["default"]}'
+            if self.__meta["default"] not in (None, "")
+            else "None"
+        )
+        _s = f"Parameter <{self.__refkey} (type: {_type}"
+        if self.__meta["optional"]:
+            _s += ", optional"
+        _s += f"): {_val} {_unit}(default: {_def})>"
         return _s
 
     def __copy__(self):
@@ -625,15 +645,24 @@ class Parameter:
             The hashed value for the Parameter.
         """
         _hash_vals = []
-        _choices = (tuple() if self.__meta['choices'] is None else
-                    tuple(self.__meta['choices']))
-        for _item in [self.__refkey, self.__type, self.__value,
-                      self.__meta['default'], self.__meta['name'],
-                      self.__meta['unit'], _choices]:
+        _choices = (
+            tuple() if self.__meta["choices"] is None else tuple(self.__meta["choices"])
+        )
+        for _item in [
+            self.__refkey,
+            self.__type,
+            self.__value,
+            self.__meta["default"],
+            self.__meta["name"],
+            self.__meta["unit"],
+            _choices,
+        ]:
             try:
                 _val = hash(_item)
                 _hash_vals.append(_val)
             except TypeError:
-                warnings.warn(f'Could not hash "{_item}". The hash value for '
-                              'the Parameter might not be accurate.')
+                warnings.warn(
+                    f'Could not hash "{_item}". The hash value for '
+                    "the Parameter might not be accurate."
+                )
         return hash(tuple(_hash_vals))

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExecuteWorkflowFrame']
+__all__ = ["ExecuteWorkflowFrame"]
 
 import time
 
@@ -34,8 +34,7 @@ from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger
 from ..multiprocessing import AppRunner
 from ..workflow import WorkflowResults
-from .builders.execute_workflow_frame_builder import (
-    ExecuteWorkflowFrameBuilder)
+from .builders.execute_workflow_frame_builder import ExecuteWorkflowFrameBuilder
 from .mixins import ViewResultsMixin
 
 
@@ -48,19 +47,26 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
     The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
     and visualize the results.
     """
+
     default_params = get_generic_param_collection(
-        'selected_results', 'saving_format', 'enable_overwrite')
-    params_not_to_restore = ['selected_results']
+        "selected_results", "saving_format", "enable_overwrite"
+    )
+    params_not_to_restore = ["selected_results"]
 
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         ExecuteWorkflowFrameBuilder.__init__(self, parent)
         _global_plot_update_time = self.q_settings_get_global_value(
-            'plot_update_time', argtype=float)
-        self._config.update({'data_use_timeline': False,
-                             'plot_last_update': 0,
-                             'plot_update_time': _global_plot_update_time})
-        self._axlabels = lambda i: ''
+            "plot_update_time", argtype=float
+        )
+        self._config.update(
+            {
+                "data_use_timeline": False,
+                "plot_last_update": 0,
+                "plot_update_time": _global_plot_update_time,
+            }
+        )
+        self._axlabels = lambda i: ""
         self._app = ExecuteWorkflowApp()
         self.set_default_params()
         self.add_params(self._app.params)
@@ -72,10 +78,11 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         Connect all required Qt slots and signals.
         """
-        self.param_widgets['autosave_results'].io_edited.connect(
-            self.__update_autosave_widget_visibility)
-        self._widgets['but_exec'].clicked.connect(self.__execute)
-        self._widgets['but_abort'].clicked.connect(self.__abort_execution)
+        self.param_widgets["autosave_results"].io_edited.connect(
+            self.__update_autosave_widget_visibility
+        )
+        self._widgets["but_exec"].clicked.connect(self.__execute)
+        self._widgets["but_abort"].clicked.connect(self.__abort_execution)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -93,7 +100,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         if index == self.frame_index:
             self._update_choices_of_selected_results()
             self._update_export_button_activation()
-        self._config['frame_active'] = (index == self.frame_index)
+        self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
         """
@@ -101,7 +108,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         if self._runner is not None:
             self._runner.send_stop_signal()
-        self.set_status('Aborted processing of full workflow.')
+        self.set_status("Aborted processing of full workflow.")
         self._finish_processing()
 
     @QtCore.Slot()
@@ -116,21 +123,20 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         Parallel implementation of the execution method.
         """
-        logger.debug('Starting workflow')
+        logger.debug("Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
-        self._config['last_update'] = time.time()
+        self._config["last_update"] = time.time()
         self.__set_proc_widget_visibility_for_running(True)
-        logger.debug('Starting AppRunner')
+        logger.debug("Starting AppRunner")
         self._runner = AppRunner(self._app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_results.connect(
-            self._app.multiprocessing_store_results)
+        self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__update_result_node_information)
         self._runner.sig_results.connect(self.__check_for_plot_update)
         self._runner.sig_finished.connect(self._apprunner_finished)
         self._runner.sig_final_app_state.connect(self._set_app)
-        logger.debug('Running AppRunner')
+        logger.debug("Running AppRunner")
         self._runner.start()
 
     def _prepare_app_run(self):
@@ -140,8 +146,8 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         This methods sets the required attributes both for serial and
         parallel running of the app.
         """
-        self.set_status('Started processing of full workflow.')
-        self._widgets['progress'].setValue(0)
+        self.set_status("Started processing of full workflow.")
+        self._widgets["progress"].setValue(0)
         self._clear_selected_results_entries()
         self._clear_plot()
 
@@ -150,11 +156,11 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         Clean up after AppRunner is done.
         """
-        logger.debug('Telling AppRunner to exit.')
+        logger.debug("Telling AppRunner to exit.")
         self._runner.exit()
         self._runner = None
-        logger.debug('AppRunner successfully shut down.')
-        self.set_status('Finished processing of full workflow.')
+        logger.debug("AppRunner successfully shut down.")
+        self.set_status("Finished processing of full workflow.")
         self._finish_processing()
         self.update_plot()
 
@@ -164,19 +170,17 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         Update the information about the nodes' results after the AppRunner
         has sent the first results.
         """
-        self._widgets['result_selector'].get_and_store_result_node_labels()
+        self._widgets["result_selector"].get_and_store_result_node_labels()
         try:
-            self._runner.results.disconnect(
-                self.__update_result_node_information)
+            self._runner.results.disconnect(self.__update_result_node_information)
         except AttributeError:
             pass
 
     @QtCore.Slot()
     def __check_for_plot_update(self):
-        _dt = time.time() - self._config['plot_last_update']
-        if (_dt > self._config['plot_update_time']
-                and self._config['frame_active']):
-            self._config['plot_last_update'] = time.time()
+        _dt = time.time() - self._config["plot_last_update"]
+        if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
+            self._config["plot_last_update"] = time.time()
             self.update_plot()
 
     def _finish_processing(self):
@@ -197,17 +201,17 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
             Flag whether the AppRunner is running and widgets shall be shown
             accordingly or not.
         """
-        self._widgets['but_exec'].setEnabled(not running)
-        self._widgets['but_abort'].setVisible(running)
-        self._widgets['progress'].setVisible(running)
-        self._widgets['but_export_all'].setEnabled(not running)
-        self._widgets['but_export_current'].setEnabled(not running)
+        self._widgets["but_exec"].setEnabled(not running)
+        self._widgets["but_abort"].setVisible(running)
+        self._widgets["progress"].setVisible(running)
+        self._widgets["but_export_all"].setEnabled(not running)
+        self._widgets["but_export_current"].setEnabled(not running)
 
     def __update_autosave_widget_visibility(self):
         """
         Update the visibility of the autosave widgets based on the selection
         of the autosae_results Parameter.
         """
-        _vis = self.get_param_value('autosave_results')
-        for _key in ['autosave_directory', 'autosave_format']:
+        _vis = self.get_param_value("autosave_results")
+        for _key in ["autosave_directory", "autosave_format"]:
             self.toggle_param_widget_visibility(_key, _vis)

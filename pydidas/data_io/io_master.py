@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IoMaster']
+__all__ = ["IoMaster"]
 
 import os
 
@@ -32,6 +32,7 @@ class IoMaster(type):
     """
     Metaclass to manage imports and exporters for different file types.
     """
+
     registry_import = {}
     registry_export = {}
 
@@ -56,8 +57,7 @@ class IoMaster(type):
         type
             The new class.
         """
-        _new_class = super(IoMaster, cls).__new__(
-            cls, clsname, bases, attrs)
+        _new_class = super(IoMaster, cls).__new__(cls, clsname, bases, attrs)
         cls.register_class(_new_class)
         return _new_class
 
@@ -82,13 +82,17 @@ class IoMaster(type):
         """
         for _ext in new_class.extensions_export:
             if _ext in cls.registry_export and not update_registry:
-                raise KeyError('An export class has already been registered '
-                               f'for the extension "{_ext}."')
+                raise KeyError(
+                    "An export class has already been registered "
+                    f'for the extension "{_ext}."'
+                )
             cls.registry_export[_ext] = new_class
         for _ext in new_class.extensions_import:
             if _ext in cls.registry_import and not update_registry:
-                raise KeyError('An import class has already been registered '
-                               f'for the extension "{_ext}."')
+                raise KeyError(
+                    "An import class has already been registered "
+                    f'for the extension "{_ext}."'
+                )
             cls.registry_import[_ext] = new_class
 
     @classmethod
@@ -100,7 +104,7 @@ class IoMaster(type):
         cls.registry_export = {}
 
     @classmethod
-    def verify_extension_is_registered(cls, ext, mode='import'):
+    def verify_extension_is_registered(cls, ext, mode="import"):
         """
         Verify the extension is registered with the MetaClass.
 
@@ -118,11 +122,12 @@ class IoMaster(type):
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext, mode=mode):
-            raise KeyError(f'The extension "{ext}" is not registered with '
-                           'the MetaClass.')
+            raise KeyError(
+                f'The extension "{ext}" is not registered with ' "the MetaClass."
+            )
 
     @classmethod
-    def is_extension_registered(cls, extension, mode='import'):
+    def is_extension_registered(cls, extension, mode="import"):
         """
         Check if the extension of filename corresponds to a registered
         class.
@@ -163,16 +168,16 @@ class IoMaster(type):
         _reg : dict
             The selected registry, based on the mode.
         """
-        if mode == 'import':
+        if mode == "import":
             _reg = cls.registry_import
-        elif mode == 'export':
+        elif mode == "export":
             _reg = cls.registry_export
         else:
             raise ValueError('The "mode" must be either import or export.')
         return _reg
 
     @classmethod
-    def get_string_of_formats(cls, mode='import'):
+    def get_string_of_formats(cls, mode="import"):
         """
         Get a list of strings with the different formats and extensions.
 
@@ -193,13 +198,13 @@ class IoMaster(type):
         """
         _formats = cls.get_registered_formats(mode=mode)
         _extensions = list(cls._get_registry(mode).keys())
-        _all = ([f'All supported files (*{" *".join(_extensions)})']
-                + [f'{name} (*{" *".join(formats)})'
-                   for name, formats in _formats.items()])
-        return ';;'.join(_all)
+        _all = [f'All supported files (*{" *".join(_extensions)})'] + [
+            f'{name} (*{" *".join(formats)})' for name, formats in _formats.items()
+        ]
+        return ";;".join(_all)
 
     @classmethod
-    def get_registered_formats(cls, mode='import'):
+    def get_registered_formats(cls, mode="import"):
         """
         Get the names of all registered formats and the corresponding
         file extensions.
@@ -215,14 +220,16 @@ class IoMaster(type):
         dict
             A dictionary with <format name> : <extensions> entries.
         """
-        if mode == 'import':
+        if mode == "import":
             _reg = cls.registry_import
-            _formats = {_class.format_name: _class.extensions_import
-                        for _class in _reg.values()}
-        elif mode == 'export':
+            _formats = {
+                _class.format_name: _class.extensions_import for _class in _reg.values()
+            }
+        elif mode == "export":
             _reg = cls.registry_export
-            _formats = {_class.format_name: _class.extensions_export
-                        for _class in _reg.values()}
+            _formats = {
+                _class.format_name: _class.extensions_export for _class in _reg.values()
+            }
         else:
             raise ValueError('The "mode" must be either import or export.')
         return _formats
@@ -243,7 +250,7 @@ class IoMaster(type):
             Any kwargs which should be passed to the udnerlying exporter.
         """
         _extension = os.path.splitext(filename)[1]
-        cls.verify_extension_is_registered(_extension, mode='export')
+        cls.verify_extension_is_registered(_extension, mode="export")
         _io_class = cls.registry_export[_extension]
         _io_class.export_to_file(filename, data, **kwargs)
 
@@ -264,6 +271,6 @@ class IoMaster(type):
             The new WorkflowTree instance.
         """
         _extension = os.path.splitext(filename)[1]
-        cls.verify_extension_is_registered(_extension, mode='import')
+        cls.verify_extension_is_registered(_extension, mode="import")
         _io_class = cls.registry_import[_extension]
         return _io_class.import_from_file(filename, **kwargs)

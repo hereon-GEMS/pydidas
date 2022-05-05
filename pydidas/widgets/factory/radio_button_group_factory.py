@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_radio_button_group']
+__all__ = ["create_radio_button_group"]
 
 from ..utilities import apply_widget_properties
 

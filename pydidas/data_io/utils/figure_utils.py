@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['calculate_fig_size_arguments']
+__all__ = ["calculate_fig_size_arguments"]
 
 
 def calculate_fig_size_arguments(image_shape, target_size_inches=10):

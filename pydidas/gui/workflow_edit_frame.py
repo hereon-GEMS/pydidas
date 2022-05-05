@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowEditFrame']
+__all__ = ["WorkflowEditFrame"]
 
 from qtpy import QtCore, QtWidgets
 
@@ -44,8 +44,9 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         c. An editing panel to modify the Parameters for the individual
            plugins.
     """
+
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         WorkflowEditFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
@@ -54,13 +55,13 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         Connect all signals and slots in the frame.
         """
-        self._widgets['plugin_collection'].selection_confirmed.connect(
-            self.workflow_add_plugin)
+        self._widgets["plugin_collection"].selection_confirmed.connect(
+            self.workflow_add_plugin
+        )
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
-        WORKFLOW_EDIT_MANAGER.update_qt_canvas(
-            self._widgets['workflow_canvas'])
-        self._widgets['but_save'].clicked.connect(self.save_tree_to_file)
-        self._widgets['but_load'].clicked.connect(self.load_tree_from_file)
+        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
+        self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
+        self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
 
     @QtCore.Slot(str)
     def workflow_add_plugin(self, name):
@@ -87,10 +88,10 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             The Plugin node ID.
         """
         if node_id == -1:
-            self._widgets['plugin_edit_canvas'].clear_layout()
+            self._widgets["plugin_edit_canvas"].clear_layout()
             return
         plugin = TREE.nodes[node_id].plugin
-        self._widgets['plugin_edit_canvas'].configure_plugin(node_id, plugin)
+        self._widgets["plugin_edit_canvas"].configure_plugin(node_id, plugin)
 
     def save_tree_to_file(self):
         """
@@ -99,8 +100,8 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
         _func = QtWidgets.QFileDialog.getSaveFileName
-        fname = _func(self, 'Name of file', None, _file_selection)[0]
-        if fname in ['', None]:
+        fname = _func(self, "Name of file", None, _file_selection)[0]
+        if fname in ["", None]:
             return
         TREE.export_to_file(fname, overwrite=True)
 
@@ -111,8 +112,8 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
         _func = QtWidgets.QFileDialog.getOpenFileName
-        fname = _func(self, 'Name of file', None, _file_selection)[0]
-        if fname in ['', None]:
+        fname = _func(self, "Name of file", None, _file_selection)[0]
+        if fname in ["", None]:
             return
         TREE.import_from_file(fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)

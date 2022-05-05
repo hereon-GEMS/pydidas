@@ -24,12 +24,10 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import (ParameterCollection, get_generic_parameter,
-                          BaseApp)
+from pydidas.core import ParameterCollection, get_generic_parameter, BaseApp
 
 
 class TestApp(BaseApp):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.stored = []
@@ -57,7 +55,6 @@ class TestApp(BaseApp):
 
 
 class TestBaseApp(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -69,17 +66,17 @@ class TestBaseApp(unittest.TestCase):
         self.assertIsInstance(app, BaseApp)
 
     def test_creation_with_args(self):
-        _nx = get_generic_parameter('composite_nx')
+        _nx = get_generic_parameter("composite_nx")
         _nx.value = 10
-        _ny = get_generic_parameter('composite_ny')
+        _ny = get_generic_parameter("composite_ny")
         _ny.value = 5
-        _dir = get_generic_parameter('composite_dir')
-        _dir.value = 'y'
+        _dir = get_generic_parameter("composite_dir")
+        _dir.value = "y"
         _args = ParameterCollection(_nx, _ny, _dir)
         app = BaseApp(_args)
-        self.assertEqual(app.get_param_value('composite_nx'), _nx.value)
-        self.assertEqual(app.get_param_value('composite_ny'), _ny.value)
-        self.assertEqual(app.get_param_value('composite_dir'), _dir.value)
+        self.assertEqual(app.get_param_value("composite_nx"), _nx.value)
+        self.assertEqual(app.get_param_value("composite_ny"), _ny.value)
+        self.assertEqual(app.get_param_value("composite_dir"), _dir.value)
 
     def test_multiprocessing_pre_run(self):
         app = BaseApp()
@@ -126,13 +123,13 @@ class TestBaseApp(unittest.TestCase):
 
     def test_get_copy__as_slave(self):
         app = BaseApp()
-        app.attributes_not_to_copy_to_slave_app = ['slave_att']
+        app.attributes_not_to_copy_to_slave_app = ["slave_att"]
         app.slave_att = 12
         app.non_slave_att = 42
         _copy = app.get_copy(slave_mode=True)
         self.assertNotEqual(app, _copy)
-        self.assertTrue(hasattr(_copy, 'non_slave_att'))
-        self.assertFalse(hasattr(_copy, 'slave_att'))
+        self.assertTrue(hasattr(_copy, "non_slave_att"))
+        self.assertFalse(hasattr(_copy, "slave_att"))
 
     def test_run(self):
         app = TestApp()
@@ -146,6 +143,7 @@ class TestBaseApp(unittest.TestCase):
     def test_set_parse_func(self):
         def dummy(obj):
             return {0: hash(self)}
+
         BaseApp.parse_func = dummy
         app = BaseApp()
         self.assertEqual(dummy(None), app.parse_func())

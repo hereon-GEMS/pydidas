@@ -41,37 +41,46 @@ from .workflow_test_frame_builder import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import composite_creator_frame_builder
+
 __all__.extend(composite_creator_frame_builder.__all__)
 del composite_creator_frame_builder
 
 from . import data_browsing_frame_builder
+
 __all__.extend(data_browsing_frame_builder.__all__)
 del data_browsing_frame_builder
 
 from . import execute_workflow_frame_builder
+
 __all__.extend(execute_workflow_frame_builder.__all__)
 del execute_workflow_frame_builder
 
 from . import experimental_setup_frame_builder
+
 __all__.extend(experimental_setup_frame_builder.__all__)
 del experimental_setup_frame_builder
 
 from . import global_configuration_frame_builder
+
 __all__.extend(global_configuration_frame_builder.__all__)
 del global_configuration_frame_builder
 
 from . import image_math_frame_builder
+
 __all__.extend(image_math_frame_builder.__all__)
 del image_math_frame_builder
 
 from . import scan_setup_frame_builder
+
 __all__.extend(scan_setup_frame_builder.__all__)
 del scan_setup_frame_builder
 
 from . import workflow_edit_frame_builder
+
 __all__.extend(workflow_edit_frame_builder.__all__)
 del workflow_edit_frame_builder
 
 from . import workflow_test_frame_builder
+
 __all__.extend(workflow_test_frame_builder.__all__)
 del workflow_test_frame_builder

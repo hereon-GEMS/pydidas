@@ -38,13 +38,16 @@ from .execute_workflow_app import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import composite_creator_app
+
 __all__.extend(composite_creator_app.__all__)
 del composite_creator_app
 
 from . import directory_spy_app
+
 __all__.extend(directory_spy_app.__all__)
 del directory_spy_app
 
 from . import execute_workflow_app
+
 __all__.extend(execute_workflow_app.__all__)
 del execute_workflow_app

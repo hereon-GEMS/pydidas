@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetupIoBase']
+__all__ = ["ExperimentalSetupIoBase"]
 
 from ...core.io_registry import GenericIoBase
 from .experimental_setup_io_meta import ExperimentalSetupIoMeta
@@ -33,13 +33,13 @@ from .experimental_setup import ExperimentalSetup
 EXP_SETUP = ExperimentalSetup()
 
 
-class ExperimentalSetupIoBase(GenericIoBase,
-                              metaclass=ExperimentalSetupIoMeta):
+class ExperimentalSetupIoBase(GenericIoBase, metaclass=ExperimentalSetupIoMeta):
     """
     Base class for ExperimentalSetup importer/exporters.
     """
+
     extensions = []
-    format_name = 'unknown'
+    format_name = "unknown"
     imported_params = {}
 
     @classmethod

@@ -48,7 +48,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PyfaiCalibFrame', 'get_pyfai_calib_icon']
+__all__ = ["PyfaiCalibFrame", "get_pyfai_calib_icon"]
 
 import os
 import functools
@@ -78,8 +78,10 @@ def get_pyfai_calib_icon():
         A QIcon instance with the calibration icon.
     """
     return QtGui.QIcon(
-        os.sep.join([os.path.dirname(pyFAI.__file__),
-                     'resources', 'gui', 'images', 'icon.png']))
+        os.sep.join(
+            [os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"]
+        )
+    )
 
 
 def pyfaiRingIcon():
@@ -92,8 +94,16 @@ def pyfaiRingIcon():
         A QIcon instance with the ring icon.
     """
     return QtGui.QIcon(
-        os.sep.join([os.path.dirname(pyFAI.__file__),
-                     'resources', 'gui', 'icons', 'task-identify-rings.svg']))
+        os.sep.join(
+            [
+                os.path.dirname(pyFAI.__file__),
+                "resources",
+                "gui",
+                "icons",
+                "task-identify-rings.svg",
+            ]
+        )
+    )
 
 
 class PyfaiCalibFrame(BaseFrame):
@@ -107,9 +117,10 @@ class PyfaiCalibFrame(BaseFrame):
     Acknowledgements go to the creators of pyFAI for making it freely
     available.
     """
+
     def __init__(self, **kwargs):
-        mainWindow = kwargs.get('mainWindow', None)
-        parent = kwargs.get('parent', None)
+        mainWindow = kwargs.get("mainWindow", None)
+        parent = kwargs.get("parent", None)
         super().__init__(parent)
         self._setup_pyfai_context()
         if mainWindow:
@@ -118,21 +129,25 @@ class PyfaiCalibFrame(BaseFrame):
             self._CALIB_CONTEXT.setParent(self)
 
         self._list = QtWidgets.QListWidget(self)
-        self._list.setSizePolicy(QtWidgets.QSizePolicy.Fixed,
-                                 QtWidgets.QSizePolicy.Expanding)
+        self._list.setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
+        )
         self._list.setFixedWidth(150)
         self._help = QtWidgets.QPushButton(self)
-        self._help.setSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                                 QtWidgets.QSizePolicy.Fixed)
+        self._help.setSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
         self._stack = QtWidgets.QStackedWidget(self)
-        self._stack.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                  QtWidgets.QSizePolicy.Expanding)
+        self._stack.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
 
-        self.create_label('title', 'pyFAI calibration', fontsize=14, bold=True,
-                          gridPos=(0, 0, 1, 1))
-        self.add_any_widget('list', self._list, gridPos=(1, 0, 1, 1))
-        self.add_any_widget('help', self._help, gridPos=(2, 0, 1, 1))
-        self.add_any_widget('help', self._stack, gridPos=(1, 1, 2, 1))
+        self.create_label(
+            "title", "pyFAI calibration", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+        )
+        self.add_any_widget("list", self._list, gridPos=(1, 0, 1, 1))
+        self.add_any_widget("help", self._help, gridPos=(2, 0, 1, 1))
+        self.add_any_widget("help", self._stack, gridPos=(1, 1, 2, 1))
 
         self.__context = self._CALIB_CONTEXT
         model = self._CALIB_CONTEXT.getCalibrationModel()
@@ -147,7 +162,8 @@ class PyfaiCalibFrame(BaseFrame):
             self._stack.addWidget(task)
             self.__menu_connections[item.text()] = task
             task.warningUpdated.connect(
-                functools.partial(self.__updateTaskState, task, item))
+                functools.partial(self.__updateTaskState, task, item)
+            )
 
         if len(self.__tasks) > 0:
             self._list.setCurrentRow(0)
@@ -168,8 +184,12 @@ class PyfaiCalibFrame(BaseFrame):
         Setup the context for the pyfai calibration.
         """
         PYFAI_SETTINGS = QtCore.QSettings(
-            QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope,
-            "pyfai", "pyfai-calib2", None)
+            QtCore.QSettings.IniFormat,
+            QtCore.QSettings.UserScope,
+            "pyfai",
+            "pyfai-calib2",
+            None,
+        )
 
         CalibrationContext._releaseSingleton()
         _calib_context = CalibrationContext(PYFAI_SETTINGS)
@@ -198,10 +218,16 @@ class PyfaiCalibFrame(BaseFrame):
 
     def createTasks(self):
         # Tasks must be imported here, a global import will cause errors.
-        from pyFAI.gui.tasks import (ExperimentTask, MaskTask, PeakPickingTask,
-                                     GeometryTask, IntegrationTask)
+        from pyFAI.gui.tasks import (
+            ExperimentTask,
+            MaskTask,
+            PeakPickingTask,
+            GeometryTask,
+            IntegrationTask,
+        )
+
         _it = IntegrationTask.IntegrationTask()
-        _button = QtWidgets.QPushButton('Store geometry for pydidas use')
+        _button = QtWidgets.QPushButton("Store geometry for pydidas use")
         _button.clicked.connect(self._store_geometry)
         _groupbox = _it.layout().itemAt(1).widget().layout().itemAt(1).widget()
         _groupbox.layout().addWidget(_button)
@@ -210,7 +236,8 @@ class PyfaiCalibFrame(BaseFrame):
             MaskTask.MaskTask(),
             PeakPickingTask.PeakPickingTask(),
             GeometryTask.GeometryTask(),
-            _it]
+            _it,
+        ]
         return tasks
 
     def model(self):
@@ -232,15 +259,15 @@ class PyfaiCalibFrame(BaseFrame):
     def _store_geometry(self):
         geo = self.model().fittedGeometry()
         det = self.model().experimentSettingsModel().detector()
-        EXP_SETUP.set_param_value('xray_wavelength', geo.wavelength().value())
-        EXP_SETUP.set_param_value('detector_dist', geo.distance().value())
-        EXP_SETUP.set_param_value('detector_poni1', geo.poni1().value())
-        EXP_SETUP.set_param_value('detector_poni2', geo.poni2().value())
-        EXP_SETUP.set_param_value('detector_rot1', geo.rotation1().value())
-        EXP_SETUP.set_param_value('detector_rot2', geo.rotation2().value())
-        EXP_SETUP.set_param_value('detector_rot3', geo.rotation3().value())
-        EXP_SETUP.set_param_value('detector_name', det.name)
-        EXP_SETUP.set_param_value('detector_npixx', det.shape[1])
-        EXP_SETUP.set_param_value('detector_npixy', det.shape[0])
-        EXP_SETUP.set_param_value('detector_pxsizex', det.pixel2)
-        EXP_SETUP.set_param_value('detector_pxsizey', det.pixel1)
+        EXP_SETUP.set_param_value("xray_wavelength", geo.wavelength().value())
+        EXP_SETUP.set_param_value("detector_dist", geo.distance().value())
+        EXP_SETUP.set_param_value("detector_poni1", geo.poni1().value())
+        EXP_SETUP.set_param_value("detector_poni2", geo.poni2().value())
+        EXP_SETUP.set_param_value("detector_rot1", geo.rotation1().value())
+        EXP_SETUP.set_param_value("detector_rot2", geo.rotation2().value())
+        EXP_SETUP.set_param_value("detector_rot3", geo.rotation3().value())
+        EXP_SETUP.set_param_value("detector_name", det.name)
+        EXP_SETUP.set_param_value("detector_npixx", det.shape[1])
+        EXP_SETUP.set_param_value("detector_npixy", det.shape[0])
+        EXP_SETUP.set_param_value("detector_pxsizex", det.pixel2)
+        EXP_SETUP.set_param_value("detector_pxsizey", det.pixel1)

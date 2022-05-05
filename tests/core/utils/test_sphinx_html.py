@@ -32,10 +32,9 @@ from pydidas.core.utils import sphinx_html
 
 
 class Test_sphinx_html(unittest.TestCase):
-
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
-        os.makedirs(os.path.join(self._tmpdir, 'docs', 'build'))
+        os.makedirs(os.path.join(self._tmpdir, "docs", "build"))
         self._argv = copy.copy(sys.argv)
 
     def tearDown(self):
@@ -49,7 +48,7 @@ class Test_sphinx_html(unittest.TestCase):
         self.assertFalse(sphinx_html.check_sphinx_html_docs(self._tmpdir))
 
     def test_check_sphinx_html_docs__sphinx_running(self):
-        sys.argv.append('sphinx-build')
+        sys.argv.append("sphinx-build")
         self.assertFalse(sphinx_html.check_sphinx_html_docs(self._tmpdir))
 
     ##############

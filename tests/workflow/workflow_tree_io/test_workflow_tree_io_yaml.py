@@ -29,8 +29,7 @@ import os
 
 import yaml
 
-from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import (
-    WorkflowTreeIoYaml)
+from pydidas.workflow.workflow_tree_io.workflow_tree_io_yaml import WorkflowTreeIoYaml
 import pydidas
 
 
@@ -38,10 +37,9 @@ PLUGIN_COLL = pydidas.plugins.PluginCollection()
 
 
 class TestWorkflowTreeIoYaml(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._filename = os.path.join(self._path, 'test.yaml')
+        self._filename = os.path.join(self._path, "test.yaml")
         self.TREE = pydidas.workflow.WorkflowTree()
 
     def tearDown(self):
@@ -49,8 +47,7 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
 
     def create_test_tree(self):
 
-        _pluginclass = PLUGIN_COLL.get_plugin_by_name(
-            'PyFAIazimuthalIntegration')
+        _pluginclass = PLUGIN_COLL.get_plugin_by_name("PyFAIazimuthalIntegration")
         _plugin = _pluginclass()
         self.TREE.clear()
         self.TREE.create_and_add_node(_plugin)
@@ -60,8 +57,10 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
         class _Tree:
             def __init__(self):
                 TREE = pydidas.workflow.WorkflowTree()
-                self.nodes = {node.node_id: node.get_copy() for node in
-                              TREE.nodes.values()}
+                self.nodes = {
+                    node.node_id: node.get_copy() for node in TREE.nodes.values()
+                }
+
         _tree = _Tree()
         return _tree
 
@@ -71,7 +70,7 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
 
     def test_import_from_file(self):
         _tree = self.create_test_tree()
-        with open(self._filename, 'w') as _f:
+        with open(self._filename, "w") as _f:
             _dump = [node.dump() for node in _tree.nodes.values()]
             yaml.safe_dump(_dump, _f)
         _new = WorkflowTreeIoYaml.import_from_file(self._filename)
@@ -84,16 +83,15 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
         # assert does not raise an error
 
     def test_export_to_file__existing_file_no_overwrite(self):
-        with open(self._filename, 'w') as f:
-            f.write('test')
+        with open(self._filename, "w") as f:
+            f.write("test")
         with self.assertRaises(FileExistsError):
             WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE)
 
     def test_export_to_file__existing_file__overwrite(self):
-        with open(self._filename, 'w') as f:
-            f.write('test')
-        WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE,
-                                          overwrite=True)
+        with open(self._filename, "w") as f:
+            f.write("test")
+        WorkflowTreeIoYaml.export_to_file(self._filename, self.TREE, overwrite=True)
         # assert does not raise an error
 
 

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['read_hdf5_slice']
+__all__ = ["read_hdf5_slice"]
 
 import itertools
 from numbers import Integral
@@ -66,7 +66,7 @@ def read_hdf5_slice(filename, dataset, axes=None):
         The dataset as a numpy array.
     """
     axes = axes if axes is not None else []
-    with h5py.File(filename, 'r') as _file:
+    with h5py.File(filename, "r") as _file:
         _ds = _file[dataset]
 
         limits = np.r_[[(0, _shape) for _shape in _ds.shape]]
@@ -86,8 +86,9 @@ def read_hdf5_slice(filename, dataset, axes=None):
             slices_original[i] = _slices[0]
             slices_target[i] = _slices[1]
 
-        for s_ori, s_new in zip(itertools.product(*slices_original),
-                                itertools.product(*slices_target)):
+        for s_ori, s_new in zip(
+            itertools.product(*slices_original), itertools.product(*slices_target)
+        ):
             data[s_new] = _ds[s_ori]
     return data
 
@@ -114,7 +115,7 @@ def get_selection(entry, size):
         return (0, size)
     entry = list(entry) if isinstance(entry, tuple) else entry
     if isinstance(entry, list) and len(entry) == 1:
-        return (entry[0], entry[0]+1)
+        return (entry[0], entry[0] + 1)
     if isinstance(entry, list) and len(entry) == 2:
         entry[0] = entry[0] if entry[0] is not None else 0
         entry[1] = entry[1] if entry[1] not in [-1, None] else size
@@ -143,16 +144,20 @@ def get_slices(limits, chunks):
     target_slices : list
         The list with the slice objects for this dimension of the new data.
     """
-    num_slices = (np.ceil(limits[1] / chunks)
-                  - np.floor(limits[0] / chunks)).astype(np.int16)
+    num_slices = (np.ceil(limits[1] / chunks) - np.floor(limits[0] / chunks)).astype(
+        np.int16
+    )
     index_offset = limits[0] // chunks
 
-    _limit_low = (lambda j, offset:
-                  max((j + index_offset) * chunks, limits[0]) - offset)
-    _limit_high = (lambda j, offset:
-                   min((j + 1 + index_offset) * chunks, limits[1]) - offset)
-    _ori = [slice(_limit_low(j, 0), _limit_high(j, 0))
-            for j in range(num_slices)]
-    _target = [slice(_limit_low(j, limits[0]), _limit_high(j, limits[0]))
-               for j in range(num_slices)]
+    def _limit_low(j, offset):
+        return max((j + index_offset) * chunks, limits[0]) - offset
+
+    def _limit_high(j, offset):
+        return min((j + 1 + index_offset) * chunks, limits[1]) - offset
+
+    _ori = [slice(_limit_low(j, 0), _limit_high(j, 0)) for j in range(num_slices)]
+    _target = [
+        slice(_limit_low(j, limits[0]), _limit_high(j, limits[0]))
+        for j in range(num_slices)
+    ]
     return _ori, _target

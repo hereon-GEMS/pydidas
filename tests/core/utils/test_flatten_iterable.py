@@ -27,7 +27,6 @@ from pydidas.core.utils import flatten, flatten_all
 
 
 class TestFlattenIterable(unittest.TestCase):
-
     def test_flatten__nested_input(self):
         _input = [[1, 2, 3, 4], [5, 6], [7, 8]]
         _flat = flatten(_input)

@@ -23,14 +23,21 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['processor']
+__all__ = ["processor"]
 
 import time
 import queue
 
 
-def processor(input_queue, output_queue, stop_queue, finished_queue,
-              function, *func_args, **func_kwargs):
+def processor(
+    input_queue,
+    output_queue,
+    stop_queue,
+    finished_queue,
+    function,
+    *func_args,
+    **func_kwargs,
+):
     """
     Start a loop to process function calls on individual frames.
 
@@ -74,8 +81,7 @@ def processor(input_queue, output_queue, stop_queue, finished_queue,
             try:
                 _results = function(_arg1, *func_args, **func_kwargs)
             except Exception as ex:
-                print('Exception occured during function call to: '
-                      f'{function}: {ex}')
+                print("Exception occured during function call to: " f"{function}: {ex}")
                 # Sleep time required to stop queues from becoming corrupted.
                 time.sleep(0.02)
                 break

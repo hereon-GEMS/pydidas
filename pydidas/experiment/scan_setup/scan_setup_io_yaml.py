@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetupIoYaml']
+__all__ = ["ScanSetupIoYaml"]
 
 import yaml
 
@@ -39,8 +39,9 @@ class ScanSetupIoYaml(ScanSetupIoBase):
     """
     YAML importer/exporter for ScanSetting files.
     """
+
     extensions = YAML_EXTENSIONS
-    format_name = 'YAML'
+    format_name = "YAML"
 
     @classmethod
     def export_to_file(cls, filename, **kwargs):
@@ -54,7 +55,7 @@ class ScanSetupIoYaml(ScanSetupIoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         tmp_params = SCAN.get_param_values_as_dict()
-        with open(filename, 'w') as stream:
+        with open(filename, "w") as stream:
             yaml.safe_dump(tmp_params, stream)
 
     @classmethod
@@ -67,7 +68,7 @@ class ScanSetupIoYaml(ScanSetupIoBase):
         filename : str
             The filename of the file to be written.
         """
-        with open(filename, 'r') as stream:
+        with open(filename, "r") as stream:
             try:
                 cls.imported_params = yaml.safe_load(stream)
             except yaml.YAMLError as yerr:

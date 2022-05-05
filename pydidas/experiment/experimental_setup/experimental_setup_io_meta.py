@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetupIoMeta']
+__all__ = ["ExperimentalSetupIoMeta"]
 
 from ...core.io_registry import GenericIoMeta
 
@@ -35,6 +35,7 @@ class ExperimentalSetupIoMeta(GenericIoMeta):
     registry with all associated file extensions for imprting/ exporting
     ExperimentalSetup.
     """
+
     # need to redefine the registry to have a unique registry for
     # ExperimentalSetupIoMeta
     registry = {}

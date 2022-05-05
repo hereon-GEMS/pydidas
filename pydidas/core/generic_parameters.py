@@ -25,7 +25,7 @@ __license__ = "GPL-3.0"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_generic_parameter', 'get_generic_param_collection']
+__all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
 from pathlib import Path
 
@@ -58,16 +58,18 @@ def get_generic_parameter(refkey):
     try:
         _config = GENERIC_PARAM_DESCRIPTION[refkey].copy()
     except KeyError as _ke:
-        raise KeyError(f'No Parameter with the reference key "{refkey}" '
-                       'in the GENERIC_PARAM_DESCRIPTION collection.') from _ke
-    if _config['type'] == 'Path':
-        _config['type'] = Path
-        _config['default'] = Path(_config['default'])
-    if _config['type'] == 'Hdf5key':
-        _config['type'] = Hdf5key
-        _config['default'] = Hdf5key(_config['default'])
-    _type = _config.pop('type')
-    _default = _config.pop('default')
+        raise KeyError(
+            f'No Parameter with the reference key "{refkey}" '
+            "in the GENERIC_PARAM_DESCRIPTION collection."
+        ) from _ke
+    if _config["type"] == "Path":
+        _config["type"] = Path
+        _config["default"] = Path(_config["default"])
+    if _config["type"] == "Hdf5key":
+        _config["type"] = Hdf5key
+        _config["default"] = Hdf5key(_config["default"])
+    _type = _config.pop("type")
+    _default = _config.pop("default")
     return Parameter(refkey, _type, _default, **_config)
 
 

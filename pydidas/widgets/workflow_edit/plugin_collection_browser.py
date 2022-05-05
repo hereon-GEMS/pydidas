@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginCollectionBrowser']
+__all__ = ["PluginCollectionBrowser"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -53,32 +53,38 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         the user. If None, this defaults to the generic plugin collection.
         The default is None.
     """
+
     selection_confirmed = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
         apply_widget_properties(self, **kwargs)
-        _local_plugin_coll = kwargs.get('collection', None)
-        self.collection = (_local_plugin_coll if _local_plugin_coll is not None
-                           else PLUGIN_COLLECTION)
+        _local_plugin_coll = kwargs.get("collection", None)
+        self.collection = (
+            _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION
+        )
 
         self._widgets = dict(
             plugin_treeview=PluginCollectionTreeWidget(self, self.collection),
-            plugin_description=ReadOnlyTextWidget(self))
+            plugin_description=ReadOnlyTextWidget(self),
+        )
 
         self.setMinimumHeight(300)
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self._widgets['plugin_treeview'])
-        _layout.addWidget(self._widgets['plugin_description'])
+        _layout.addWidget(self._widgets["plugin_treeview"])
+        _layout.addWidget(self._widgets["plugin_description"])
         self.setLayout(_layout)
 
-        self._widgets['plugin_treeview'].selection_changed.connect(
-            self.__display_plugin_description)
-        self._widgets['plugin_treeview'].selection_confirmed.connect(
-            self.__confirm_selection)
+        self._widgets["plugin_treeview"].selection_changed.connect(
+            self.__display_plugin_description
+        )
+        self._widgets["plugin_treeview"].selection_confirmed.connect(
+            self.__confirm_selection
+        )
         self.collection.sig_updated_plugins.connect(
-            self._widgets['plugin_treeview']._update_collection)
+            self._widgets["plugin_treeview"]._update_collection
+        )
 
     @QtCore.Slot(str)
     def __confirm_selection(self, name):
@@ -90,7 +96,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the selected plugin.
         """
-        if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
+        if name in ["Input plugins", "Processing plugins", "Output plugins"]:
             return
         self.selection_confirmed.emit(name)
 
@@ -104,8 +110,9 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the plugin.
         """
-        if name in ['Input plugins', 'Processing plugins', 'Output plugins']:
+        if name in ["Input plugins", "Processing plugins", "Output plugins"]:
             return
         _p = self.collection.get_plugin_by_plugin_name(name)()
-        self._widgets['plugin_description'].setTextFromDict(
-            _p.get_class_description_as_dict(), _p.plugin_name)
+        self._widgets["plugin_description"].setTextFromDict(
+            _p.get_class_description_as_dict(), _p.plugin_name
+        )

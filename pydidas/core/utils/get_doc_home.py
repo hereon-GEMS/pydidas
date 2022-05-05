@@ -23,8 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_doc_home_filename', 'get_doc_home_address',
-           'get_doc_home_qurl']
+__all__ = ["get_doc_home_filename", "get_doc_home_address", "get_doc_home_qurl"]
 
 
 import os
@@ -44,7 +43,7 @@ def get_doc_home_filename():
     _name = __file__
     for _ in range(4):
         _name = os.path.dirname(_name)
-    _docfile = os.path.join(_name, 'docs', 'build', 'html', 'index.html')
+    _docfile = os.path.join(_name, "docs", "build", "html", "index.html")
     return _docfile
 
 
@@ -57,8 +56,8 @@ def get_doc_home_address():
     _address : str
         The address of the documentation index.html.
     """
-    _address = 'file:///' + get_doc_home_filename()
-    _address = _address.replace('\\', '/')
+    _address = "file:///" + get_doc_home_filename()
+    _address = _address.replace("\\", "/")
     return _address
 
 

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTreeCanvas']
+__all__ = ["WorkflowTreeCanvas"]
 
 from qtpy import QtWidgets, QtGui
 
@@ -41,11 +41,12 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
     parent : QtWidget, optional
         The parent widget. The default is None.
     """
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.title = QtWidgets.QLabel(self)
-        self.title.setStyleSheet(QT_STYLES['title'])
-        self.title.setText('Workflow tree editor')
+        self.title.setStyleSheet(QT_STYLES["title"])
+        self.title.setText("Workflow tree editor")
         self.title.move(10, 10)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)

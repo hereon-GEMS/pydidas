@@ -34,11 +34,10 @@ from pydidas.core.constants import JPG_EXTENSIONS
 
 
 class TestJpegIo(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._path = tempfile.mkdtemp()
-        cls._fname = os.path.join(cls._path, 'test.jpg')
+        cls._fname = os.path.join(cls._path, "test.jpg")
         cls._data_shape = (127, 137)
         cls._data = np.random.random(cls._data_shape)
         cls._index = 0
@@ -50,7 +49,7 @@ class TestJpegIo(unittest.TestCase):
     @classmethod
     def get_fname(cls):
         cls._index += 1
-        return f'test_name{cls._index:03d}.jpg'
+        return f"test_name{cls._index:03d}.jpg"
 
     def setUp(self):
         self._target_roi = (slice(0, 5, None), slice(0, 5, None))

@@ -40,7 +40,6 @@ class Tester(QtCore.QObject):
 
 
 class TestSignalBlocker(unittest.TestCase):
-
     def setUp(self):
         ...
 

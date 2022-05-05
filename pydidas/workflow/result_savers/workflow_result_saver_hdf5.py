@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowResultSaverHdf5']
+__all__ = ["WorkflowResultSaverHdf5"]
 
 import os
 
@@ -41,17 +41,17 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
     """
     Base class for WorkflowTree exporters.
     """
-    extensions = ['HDF5', 'nxs', 'h5']
-    format_name = 'HDF5'
-    default_extension = 'h5'
+
+    extensions = ["HDF5", "nxs", "h5"]
+    format_name = "HDF5"
+    default_extension = "h5"
     _shapes = []
     _filenames = []
     _save_dir = None
     _metadata_written = False
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, shapes, labels,
-                                      data_labels):
+    def prepare_files_and_directories(cls, save_dir, shapes, labels, data_labels):
         """
         Prepare the hdf5 files with the metadata.
 
@@ -92,39 +92,66 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         node_id : int
             The nodeID.
         """
-        _ndim = SCAN.get_param_value('scan_dim')
+        _ndim = SCAN.get_param_value("scan_dim")
         _dsets = [
-            ['entry', 'title', {'data': cls.scan_title}],
-            ['entry', 'label', {'data': cls._labels[node_id]}],
-            ['entry', 'data_label', {'data': cls._data_labels[node_id]}],
-            ['entry', 'definition', {'data': 'custom (NXxbase-aligned)'}],
-            ['entry/instrument/source', 'probe', {'data': 'x-ray'}],
-            ['entry/instrument/source', 'type', {'data': 'synchrotron'}],
-            ['entry/instrument/detector', 'frame_start_number', {'data': (0)}],
-            ['entry/instrument/detector', 'x_pixel_size',
-             {'data': EXP.get_param_value('detector_pxsizex')}],
-            ['entry/instrument/detector', 'y_pixel_size',
-             {'data': EXP.get_param_value('detector_pxsizey')}],
-            ['entry/instrument/detector', 'distance',
-             {'data': EXP.get_param_value('detector_dist')}],
-            ['entry/data', 'data', {'shape': cls._shapes[node_id]}],
-            ['entry/scan', 'scan_dimension', {'data': _ndim}]]
+            ["entry", "title", {"data": cls.scan_title}],
+            ["entry", "label", {"data": cls._labels[node_id]}],
+            ["entry", "data_label", {"data": cls._data_labels[node_id]}],
+            ["entry", "definition", {"data": "custom (NXxbase-aligned)"}],
+            ["entry/instrument/source", "probe", {"data": "x-ray"}],
+            ["entry/instrument/source", "type", {"data": "synchrotron"}],
+            ["entry/instrument/detector", "frame_start_number", {"data": (0)}],
+            [
+                "entry/instrument/detector",
+                "x_pixel_size",
+                {"data": EXP.get_param_value("detector_pxsizex")},
+            ],
+            [
+                "entry/instrument/detector",
+                "y_pixel_size",
+                {"data": EXP.get_param_value("detector_pxsizey")},
+            ],
+            [
+                "entry/instrument/detector",
+                "distance",
+                {"data": EXP.get_param_value("detector_dist")},
+            ],
+            ["entry/data", "data", {"shape": cls._shapes[node_id]}],
+            ["entry/scan", "scan_dimension", {"data": _ndim}],
+        ]
         scanval = SCAN.get_param_value
         for _dim in range(_ndim):
-            _dsets.append([f'entry/scan/dim_{_dim}', 'name',
-                           {'data': scanval(f'scan_dir_{_dim + 1}')}])
-            _dsets.append([f'entry/scan/dim_{_dim}', 'unit',
-                           {'data': scanval(f'unit_{_dim + 1}')}])
-            _dsets.append([f'entry/scan/dim_{_dim}', 'range',
-                           {'data': SCAN.get_range_for_dim(_dim + 1)}])
+            _dsets.append(
+                [
+                    f"entry/scan/dim_{_dim}",
+                    "name",
+                    {"data": scanval(f"scan_dir_{_dim + 1}")},
+                ]
+            )
+            _dsets.append(
+                [
+                    f"entry/scan/dim_{_dim}",
+                    "unit",
+                    {"data": scanval(f"unit_{_dim + 1}")},
+                ]
+            )
+            _dsets.append(
+                [
+                    f"entry/scan/dim_{_dim}",
+                    "range",
+                    {"data": SCAN.get_range_for_dim(_dim + 1)},
+                ]
+            )
 
-        with h5py.File(os.path.join(cls._save_dir, cls._filenames[node_id]),
-                       'w') as _file:
+        with h5py.File(
+            os.path.join(cls._save_dir, cls._filenames[node_id]), "w"
+        ) as _file:
             for _group, _name, kws in _dsets:
                 create_hdf5_dataset(_file, _group, _name, **kws)
             for _dim in range(_ndim):
-                _file[f'entry/data/axis_{_dim}'] = h5py.SoftLink(
-                    f'/entry/scan/dim_{_dim}')
+                _file[f"entry/data/axis_{_dim}"] = h5py.SoftLink(
+                    f"/entry/scan/dim_{_dim}"
+                )
 
     @classmethod
     def export_frame_to_file(cls, index, frame_result_dict, **kwargs):
@@ -145,8 +172,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             cls.write_metadata_to_files(frame_result_dict)
         for _node_id, _data in frame_result_dict.items():
             _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
-            with h5py.File(_fname, 'r+') as _file:
-                _file['entry/data/data'][_indices] = _data
+            with h5py.File(_fname, "r+") as _file:
+                _file["entry/data/data"][_indices] = _data
 
     @classmethod
     def export_full_data_to_file(cls, full_data):
@@ -161,11 +188,12 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         if not cls._metadata_written:
             _indices = SCAN.get_frame_position_in_scan(0)
             cls.write_metadata_to_files(
-                {_id: _data[_indices] for _id, _data in full_data.items()})
+                {_id: _data[_indices] for _id, _data in full_data.items()}
+            )
         for _node_id, _data in full_data.items():
             _fname = os.path.join(cls._save_dir, cls._filenames[_node_id])
-            with h5py.File(_fname, 'r+') as _file:
-                _file['entry/data/data'][()] = _data.array
+            with h5py.File(_fname, "r+") as _file:
+                _file["entry/data/data"][()] = _data.array
 
     @classmethod
     def write_metadata_to_files(cls, frame_result_dict):
@@ -194,15 +222,16 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         data : pydidas.core.Dataset
             The processed Dataset.
         """
-        _ndim = SCAN.get_param_value('scan_dim')
-        with h5py.File(os.path.join(cls._save_dir, cls._filenames[index]),
-                       'r+') as _file:
+        _ndim = SCAN.get_param_value("scan_dim")
+        with h5py.File(
+            os.path.join(cls._save_dir, cls._filenames[index]), "r+"
+        ) as _file:
             for _dim in range(data.ndim):
-                _group = _file['entry/data']
-                _axisgroup = _group.create_group(f'axis_{_dim + _ndim}')
-                for _key in ['label', 'unit', 'range']:
-                    _dict = getattr(data, f'axis_{_key}s')
-                    _data = 'None' if _dict[_dim] is None else _dict[_dim]
+                _group = _file["entry/data"]
+                _axisgroup = _group.create_group(f"axis_{_dim + _ndim}")
+                for _key in ["label", "unit", "range"]:
+                    _dict = getattr(data, f"axis_{_key}s")
+                    _data = "None" if _dict[_dim] is None else _dict[_dim]
                     _axisgroup.create_dataset(_key, data=_data)
 
     @classmethod
@@ -217,16 +246,17 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             The metadata in dictionary form with entries of the form
             node_id: node_metadata.
         """
-        _ndim = SCAN.get_param_value('scan_dim')
+        _ndim = SCAN.get_param_value("scan_dim")
         for _id, _metadata in metadata.items():
-            with h5py.File(os.path.join(cls._save_dir, cls._filenames[_id]),
-                           'r+') as _file:
-                _ndim_frame = len(_metadata['axis_labels'])
+            with h5py.File(
+                os.path.join(cls._save_dir, cls._filenames[_id]), "r+"
+            ) as _file:
+                _ndim_frame = len(_metadata["axis_labels"])
                 for _dim in range(_ndim_frame):
-                    _group = _file['entry/data']
-                    _axisgroup = _group.create_group(f'axis_{_dim + _ndim}')
-                    for _key in ['label', 'unit', 'range']:
-                        _val = _metadata[f'axis_{_key}s'][_dim]
-                        _val = 'None' if _val is None else _val
+                    _group = _file["entry/data"]
+                    _axisgroup = _group.create_group(f"axis_{_dim + _ndim}")
+                    for _key in ["label", "unit", "range"]:
+                        _val = _metadata[f"axis_{_key}s"][_dim]
+                        _val = "None" if _val is None else _val
                         _axisgroup.create_dataset(_key, data=_val)
         cls._metadata_written = True

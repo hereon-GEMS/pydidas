@@ -23,11 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['QT_PALETTES', 'QT_STYLES', 'STANDARD_FONT_SIZE',
-           'QT_DEFAULT_ALIGNMENT', 'QT_COMBO_BOX_SIZE_POLICY',
-           'QT_REG_EXP_FLOAT_VALIDATOR', 'QT_REG_EXP_INT_VALIDATOR',
-           'QT_REG_EXP_SLICE_VALIDATOR', 'QT_REG_EXP_FLOAT_SLICE_VALIDATOR',
-           'FIX_EXP_POLICY', 'EXP_EXP_POLICY']
+__all__ = [
+    "QT_PALETTES",
+    "QT_STYLES",
+    "STANDARD_FONT_SIZE",
+    "QT_DEFAULT_ALIGNMENT",
+    "QT_COMBO_BOX_SIZE_POLICY",
+    "QT_REG_EXP_FLOAT_VALIDATOR",
+    "QT_REG_EXP_INT_VALIDATOR",
+    "QT_REG_EXP_SLICE_VALIDATOR",
+    "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
+    "FIX_EXP_POLICY",
+    "EXP_EXP_POLICY",
+]
 
 from qtpy import QtGui, QtCore, QtWidgets
 
@@ -35,16 +43,19 @@ from qtpy import QtGui, QtCore, QtWidgets
 STANDARD_FONT_SIZE = 10
 
 QT_PALETTES = {}
-for _key, _colors in {'clean_bg': (255, 255, 255),
-                      'workflow_plugin_widget': (225, 225, 225),
-                      'workflow_plugin_widget_active': (225, 225, 255)
-                      }.items():
+for _key, _colors in {
+    "clean_bg": (255, 255, 255),
+    "workflow_plugin_widget": (225, 225, 225),
+    "workflow_plugin_widget_active": (225, 225, 255),
+}.items():
     _pal = QtGui.QPalette()
     _pal.setColor(QtGui.QPalette.Background, QtGui.QColor(*_colors))
     QT_PALETTES[_key] = _pal
 
 QT_STYLES = {}
-QT_STYLES['workflow_plugin_active'] = """
+QT_STYLES[
+    "workflow_plugin_active"
+] = """
     QLabel{font-size: 11px;
            font: bold;
            color: rgb(0, 0, 0);
@@ -54,7 +65,9 @@ QT_STYLES['workflow_plugin_active'] = """
            background: rgb(225, 225, 255);
            margin-left: 2px;
            margin-bottom: 2px;}"""
-QT_STYLES['workflow_plugin_inactive'] = """
+QT_STYLES[
+    "workflow_plugin_inactive"
+] = """
     QPushButton{font-size: 11px;
                 color: rgb(65, 65, 65);
                 border: 0px solid rgb(205, 205, 205);}
@@ -67,33 +80,36 @@ QT_STYLES['workflow_plugin_inactive'] = """
            border: 1px solid rgb(60, 60, 60);
            border-radius: 3px;
            background: rgb(225, 225, 225);}"""
-QT_STYLES['title'] = """QWidget {font: bold; font-size: 14pt}"""
-QT_STYLES['subtitle'] = """QWidget {font: bold; font-size: 11pt}"""
-QT_STYLES['workflow_plugin_title'] = (
-    "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}")
+QT_STYLES["title"] = """QWidget {font: bold; font-size: 14pt}"""
+QT_STYLES["subtitle"] = """QWidget {font: bold; font-size: 11pt}"""
+QT_STYLES[
+    "workflow_plugin_title"
+] = "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}"
 
 QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
-QT_COMBO_BOX_SIZE_POLICY = (
-    QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+QT_COMBO_BOX_SIZE_POLICY = QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon
 
 QT_REG_EXP_FLOAT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        '-?\\d*\.?\d*|None|nan',
-        QtCore.QRegularExpression.CaseInsensitiveOption))
+        "-?\\d*\.?\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+    )
+)
 
 QT_REG_EXP_INT_VALIDATOR = QtGui.QRegularExpressionValidator(
     QtCore.QRegularExpression(
-        '-?\\d*|None|nan', QtCore.QRegularExpression.CaseInsensitiveOption))
+        "-?\\d*|None|nan", QtCore.QRegularExpression.CaseInsensitiveOption
+    )
+)
 
 QT_REG_EXP_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
-    QtCore.QRegularExpression('((-?\\d*:?){1,3},?)*'))
+    QtCore.QRegularExpression("((-?\\d*:?){1,3},?)*")
+)
 
 QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
-    QtCore.QRegularExpression('((-?\\d*\\.?\\d*:?){1,3},?)*'))
+    QtCore.QRegularExpression("((-?\\d*\\.?\\d*:?){1,3},?)*")
+)
 
-FIX_EXP_POLICY = (QtWidgets.QSizePolicy.Fixed,
-                  QtWidgets.QSizePolicy.Expanding)
+FIX_EXP_POLICY = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
 
-EXP_EXP_POLICY = (QtWidgets.QSizePolicy.Expanding,
-                  QtWidgets.QSizePolicy.Expanding)
+EXP_EXP_POLICY = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)

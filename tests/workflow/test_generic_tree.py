@@ -28,7 +28,6 @@ from pydidas.workflow import GenericTree, GenericNode
 
 
 class TestGenericTree(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -56,14 +55,14 @@ class TestGenericTree(unittest.TestCase):
 
     def test_init__with_kwargs(self):
         _val1 = 12
-        _val2 = 'something'
+        _val2 = "something"
         tree = GenericTree(test1=_val1, test2=_val2)
-        self.assertEqual(tree._config['test1'], _val1)
-        self.assertEqual(tree._config['test2'], _val2)
+        self.assertEqual(tree._config["test1"], _val1)
+        self.assertEqual(tree._config["test2"], _val2)
 
     def test_clear(self):
         tree = GenericTree()
-        tree.nodes = dict(a=1, b='c')
+        tree.nodes = dict(a=1, b="c")
         tree.node_ids = [0, 1]
         tree.root = 12
         tree.clear()
@@ -258,7 +257,7 @@ class TestGenericTree(unittest.TestCase):
             self.assertFalse(_node in _copy.nodes.values())
         for _node in _copy.root._children:
             self.assertTrue(_node in _copy.nodes.values())
-        for key in set(tree.__dict__.keys()) - {'root', 'nodes'}:
+        for key in set(tree.__dict__.keys()) - {"root", "nodes"}:
             self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
     def test_get_copy(self):
@@ -298,5 +297,5 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(hash(tree), hash(tree2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

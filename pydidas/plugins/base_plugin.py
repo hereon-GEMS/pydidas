@@ -24,33 +24,37 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BasePlugin']
+__all__ = ["BasePlugin"]
 
 import copy
 from numbers import Integral
 
-from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
-                          get_generic_param_collection)
+from pydidas.core import (
+    ParameterCollection,
+    ObjectWithParameterCollection,
+    get_generic_param_collection,
+)
 from pydidas.core.utils import rebin2d
 from pydidas.data_io.utils import RoiSliceManager
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN)
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
 
 
-ptype = {BASE_PLUGIN: 'Base plugin',
-         INPUT_PLUGIN: 'Input plugin',
-         PROC_PLUGIN: 'Processing plugin',
-         OUTPUT_PLUGIN: 'Output plugin'}
+ptype = {
+    BASE_PLUGIN: "Base plugin",
+    INPUT_PLUGIN: "Input plugin",
+    PROC_PLUGIN: "Processing plugin",
+    OUTPUT_PLUGIN: "Output plugin",
+}
 
 
 def _data_dim(entry):
     if entry is None:
-        return 'None'
+        return "None"
     if entry == -1:
-        return 'any'
+        return "any"
     if isinstance(entry, Integral) and entry >= 0:
         return str(entry)
-    raise TypeError('Entry type not understood.')
+    raise TypeError("Entry type not understood.")
 
 
 class BasePlugin(ObjectWithParameterCollection):
@@ -82,11 +86,12 @@ class BasePlugin(ObjectWithParameterCollection):
         Keyword that the Plugin creates a new dataset. This will trigger a
         re-evaluation of the output data shape.
     """
+
     basic_plugin = True
     plugin_type = BASE_PLUGIN
-    plugin_name = 'Base plugin'
+    plugin_name = "Base plugin"
     default_params = ParameterCollection()
-    generic_params = get_generic_param_collection('label', 'data_label')
+    generic_params = get_generic_param_collection("label", "data_label")
     input_data_dim = -1
     output_data_dim = -1
     new_dataset = False
@@ -105,19 +110,24 @@ class BasePlugin(ObjectWithParameterCollection):
         str
             The descripion of the plugin.
         """
-        _doc = (cls.__doc__.strip() if cls.__doc__ is not None
-                else 'No docstring available')
-        _desc = (f'Plugin name: {cls.plugin_name}\n\n'
-                 f'Plugin description:\n{_doc}\n\n'
-                 'Parameters:')
+        _doc = (
+            cls.__doc__.strip() if cls.__doc__ is not None else "No docstring available"
+        )
+        _desc = (
+            f"Plugin name: {cls.plugin_name}\n\n"
+            f"Plugin description:\n{_doc}\n\n"
+            "Parameters:"
+        )
         for param in cls.generic_params.values():
-            _desc += f'\n{param}'
+            _desc += f"\n{param}"
         for param in cls.default_params.values():
-            _desc += f'\n{param}'
-        _desc += (f'Class name: {cls.__name__}\n\n'
-                  f'Plugin type: {ptype[cls.plugin_type]}\n\n'
-                  f'Input data dimension: {_data_dim(cls.input_data_dim)}\n\n'
-                  f'Output data dimension: {_data_dim(cls.output_data_dim)}\n')
+            _desc += f"\n{param}"
+        _desc += (
+            f"Class name: {cls.__name__}\n\n"
+            f"Plugin type: {ptype[cls.plugin_type]}\n\n"
+            f"Input data dimension: {_data_dim(cls.input_data_dim)}\n\n"
+            f"Output data dimension: {_data_dim(cls.output_data_dim)}\n"
+        )
         return _desc
 
     @classmethod
@@ -134,32 +144,39 @@ class BasePlugin(ObjectWithParameterCollection):
         dict
             The descripion of the plugin.
         """
-        _doc = (cls.__doc__.strip() if cls.__doc__ is not None
-                else 'No docstring available')
-        return {'Name': cls.plugin_name,
-                'Plugin description': _doc,
-                'Parameters': '\n'.join(
-                    [str(param) for param in cls.generic_params.values()]
-                    + [str(param) for param in cls.default_params.values()]),
-                'Class name': cls.__name__,
-                'Plugin type': ptype[cls.plugin_type],
-                'Input data dimension': _data_dim(cls.input_data_dim),
-                'Output data dimension': _data_dim(cls.output_data_dim)}
+        _doc = (
+            cls.__doc__.strip() if cls.__doc__ is not None else "No docstring available"
+        )
+        return {
+            "Name": cls.plugin_name,
+            "Plugin description": _doc,
+            "Parameters": "\n".join(
+                [str(param) for param in cls.generic_params.values()]
+                + [str(param) for param in cls.default_params.values()]
+            ),
+            "Class name": cls.__name__,
+            "Plugin type": ptype[cls.plugin_type],
+            "Input data dimension": _data_dim(cls.input_data_dim),
+            "Output data dimension": _data_dim(cls.output_data_dim),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        if self.plugin_type not in [BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN]:
-            raise ValueError('Unknown value for the plugin type')
+        if self.plugin_type not in [
+            BASE_PLUGIN,
+            INPUT_PLUGIN,
+            PROC_PLUGIN,
+            OUTPUT_PLUGIN,
+        ]:
+            raise ValueError("Unknown value for the plugin type")
         self.add_params(self.generic_params.get_copy())
         self.add_params(*args)
         self.set_default_params()
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])
-        self._config = {'input_shape': None,
-                        'result_shape': None}
-        self._legacy_image_ops_meta = {'num': 0, 'included': False}
+        self._config = {"input_shape": None, "result_shape": None}
+        self._legacy_image_ops_meta = {"num": 0, "included": False}
         self._legacy_image_ops = []
         self._original_input_shape = None
         self.node_id = None
@@ -217,13 +234,14 @@ class BasePlugin(ObjectWithParameterCollection):
             The state to set the state of the new object.
         """
         from .plugin_getter_ import plugin_getter
+
         return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
     def execute(self, data, **kwargs):
         """
         Execute the processing step.
         """
-        raise NotImplementedError('Execute method has not been implemented.')
+        raise NotImplementedError("Execute method has not been implemented.")
 
     def pre_execute(self):
         """
@@ -263,8 +281,9 @@ class BasePlugin(ObjectWithParameterCollection):
         QtWidgets.QWidget
             The unique ParameterConfig widget
         """
-        raise NotImplementedError('Generic plugins do not have a unique'
-                                  ' parameter config widget.')
+        raise NotImplementedError(
+            "Generic plugins do not have a unique" " parameter config widget."
+        )
 
     @property
     def input_shape(self):
@@ -276,7 +295,7 @@ class BasePlugin(ObjectWithParameterCollection):
         Union[tuple, None]
             The shape of the plugin's input.
         """
-        return self._config['input_shape']
+        return self._config["input_shape"]
 
     @input_shape.setter
     def input_shape(self, new_shape):
@@ -295,11 +314,12 @@ class BasePlugin(ObjectWithParameterCollection):
             The shape of the plugin's input.
         """
         if not isinstance(new_shape, tuple):
-            raise TypeError('The new shape must be a tuple.')
+            raise TypeError("The new shape must be a tuple.")
         if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
-            raise ValueError('The new shape must be a tuple of length'
-                             f'{self.input_data_dim}.')
-        self._config['input_shape'] = new_shape
+            raise ValueError(
+                "The new shape must be a tuple of length" f"{self.input_data_dim}."
+            )
+        self._config["input_shape"] = new_shape
 
     @property
     def result_shape(self):
@@ -320,7 +340,7 @@ class BasePlugin(ObjectWithParameterCollection):
             The shape of the results with a value for each dimension. Unknown
             dimensions are represented as -1 value.
         """
-        return self._config['result_shape']
+        return self._config["result_shape"]
 
     def calculate_result_shape(self):
         """
@@ -333,13 +353,13 @@ class BasePlugin(ObjectWithParameterCollection):
         input shape.
         """
         if self.output_data_dim == -1:
-            self._config['result_shape'] = self._config['input_shape']
+            self._config["result_shape"] = self._config["input_shape"]
             return
-        _shape = self._config.get('input_shape', None)
+        _shape = self._config.get("input_shape", None)
         if _shape is None:
-            self._config['result_shape'] = (-1,) * self.output_data_dim
+            self._config["result_shape"] = (-1,) * self.output_data_dim
         else:
-            self._config['result_shape'] = _shape
+            self._config["result_shape"] = _shape
 
     def apply_legacy_image_ops_to_data(self, data):
         """
@@ -366,18 +386,18 @@ class BasePlugin(ObjectWithParameterCollection):
         Update the legacy image operations list with any ROI and binning
         operations performed in this plugin.
         """
-        _num = self._legacy_image_ops_meta['num']
-        if (self._legacy_image_ops_meta['included'] and _num > 0):
+        _num = self._legacy_image_ops_meta["num"]
+        if self._legacy_image_ops_meta["included"] and _num > 0:
             self._legacy_image_ops = self._legacy_image_ops[:-_num]
-            self._legacy_image_ops_meta['num'] = 0
-        if self.get_param_value('use_roi', False):
-            self._legacy_image_ops.append(['roi', self._get_own_roi()])
-            self._legacy_image_ops_meta['num'] += 1
-        _bin = self.get_param_value('binning', 1)
+            self._legacy_image_ops_meta["num"] = 0
+        if self.get_param_value("use_roi", False):
+            self._legacy_image_ops.append(["roi", self._get_own_roi()])
+            self._legacy_image_ops_meta["num"] += 1
+        _bin = self.get_param_value("binning", 1)
         if _bin != 1:
-            self._legacy_image_ops.append(['binning', _bin])
-            self._legacy_image_ops_meta['num'] += 1
-        self._legacy_image_ops_meta['included'] = True
+            self._legacy_image_ops.append(["binning", _bin])
+            self._legacy_image_ops_meta["num"] += 1
+        self._legacy_image_ops_meta["included"] = True
 
     def _get_own_roi(self):
         """
@@ -393,11 +413,14 @@ class BasePlugin(ObjectWithParameterCollection):
             The tuple with two slice objects which define the image ROI.
         """
         _roi = RoiSliceManager(
-            roi=(self.get_param_value('roi_ylow'),
-                 self.get_param_value('roi_yhigh'),
-                 self.get_param_value('roi_xlow'),
-                 self.get_param_value('roi_xhigh')),
-            input_shape=self.input_shape)
+            roi=(
+                self.get_param_value("roi_ylow"),
+                self.get_param_value("roi_yhigh"),
+                self.get_param_value("roi_xlow"),
+                self.get_param_value("roi_xhigh"),
+            ),
+            input_shape=self.input_shape,
+        )
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
@@ -412,14 +435,15 @@ class BasePlugin(ObjectWithParameterCollection):
         binning : int
             The binning factor which needs to be applied to the original image.
         """
-        _roi = RoiSliceManager(roi=(0, self._original_input_shape[0],
-                                    0, self._original_input_shape[1]),
-                               input_shape=self._original_input_shape)
+        _roi = RoiSliceManager(
+            roi=(0, self._original_input_shape[0], 0, self._original_input_shape[1]),
+            input_shape=self._original_input_shape,
+        )
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:
             _op_name, _op = _all_ops.pop(0)
-            if _op_name == 'binning':
+            if _op_name == "binning":
                 _y = int(_roi.roi[0].stop - _roi.roi[0].start)
                 _x = int(_roi.roi[1].stop - _roi.roi[1].start)
                 _dy = int(((_y // _binning) % _op) * _binning)
@@ -427,8 +451,9 @@ class BasePlugin(ObjectWithParameterCollection):
                 _tmproi = (0, _y - _dy, 0, _x - _dx)
                 _roi.apply_second_roi(_tmproi)
                 _binning *= _op
-            if _op_name == 'roi':
-                _roi_unbinned = [_binning * _r
-                                 for _r in RoiSliceManager(roi=_op).roi_coords]
+            if _op_name == "roi":
+                _roi_unbinned = [
+                    _binning * _r for _r in RoiSliceManager(roi=_op).roi_coords
+                ]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning

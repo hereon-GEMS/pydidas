@@ -35,13 +35,11 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestRemove1dPolynomialBackground(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._n = 120
         cls._x = 4 + 0.42 * np.arange(cls._n)
-        cls._y = (12 + 1.67 * np.sin(cls._x / 3)
-                  + (0.5 - np.random.random(cls._n)))
+        cls._y = 12 + 1.67 * np.sin(cls._x / 3) + (0.5 - np.random.random(cls._n))
 
     def setUp(self):
         ...
@@ -50,81 +48,72 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
         ...
 
     def create_dataset(self):
-        _data = Dataset(self._y, axis_ranges=[self._x],
-                        axis_labels=['test'], axis_units=['number'])
+        _data = Dataset(
+            self._y, axis_ranges=[self._x], axis_labels=["test"], axis_units=["number"]
+        )
         return _data
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute__no_kernel(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
-        plugin.set_param_value('kernel_width', 0)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+        plugin.set_param_value("kernel_width", 0)
         plugin.pre_execute()
         self.assertIsNone(plugin._kernel)
 
     def test_pre_execute__kernel(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
-        plugin.set_param_value('kernel_width', 3)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+        plugin.set_param_value("kernel_width", 3)
         plugin.pre_execute()
         self.assertIsInstance(plugin._kernel, np.ndarray)
 
     def test_pre_execute__nan_thresh(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
-        plugin.set_param_value('threshold_low', np.nan)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+        plugin.set_param_value("threshold_low", np.nan)
         plugin.pre_execute()
         self.assertIsNone(plugin._thresh)
 
     def test_pre_execute__None_thresh(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
-        plugin.set_param_value('threshold_low', None)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+        plugin.set_param_value("threshold_low", None)
         plugin.pre_execute()
         self.assertIsNone(plugin._thresh)
 
     def test_pre_execute__finite_thresh(self):
         _thresh = -12.6
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
-        plugin.set_param_value('threshold_low', _thresh)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
+        plugin.set_param_value("threshold_low", _thresh)
         plugin.pre_execute()
         self.assertEqual(plugin._thresh, _thresh)
 
     def test_execute__simple(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
         data = self.create_dataset()
         plugin.pre_execute()
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
+            warnings.simplefilter("ignore")
             new_data, _ = plugin.execute(data)
         self.assertEqual(data.axis_labels[0], new_data.axis_labels[0])
         self.assertEqual(data.axis_units[0], new_data.axis_units[0])
-        self.assertTrue(np.allclose(data.axis_ranges[0],
-                                    new_data.axis_ranges[0]))
+        self.assertTrue(np.allclose(data.axis_ranges[0], new_data.axis_ranges[0]))
 
     def test_execute__with_threshold(self):
         _thresh = 12
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
         data = self.create_dataset()
-        plugin.set_param_value('threshold_low', _thresh)
+        plugin.set_param_value("threshold_low", _thresh)
         plugin.pre_execute()
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
+            warnings.simplefilter("ignore")
             new_data, _ = plugin.execute(data)
         self.assertTrue(np.all(new_data >= _thresh))
 
     def test_execute__with_limits(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name(
-            'Remove1dPolynomialBackground')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Remove1dPolynomialBackground")()
         data = self.create_dataset()
-        plugin.set_param_value('include_limits', True)
+        plugin.set_param_value("include_limits", True)
         plugin.pre_execute()
         new_data, _ = plugin.execute(data)
         self.assertTrue(np.allclose(data, self._y, atol=0.51))

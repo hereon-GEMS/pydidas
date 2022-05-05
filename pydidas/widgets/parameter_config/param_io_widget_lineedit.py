@@ -24,13 +24,12 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamIoWidgetLineEdit']
+__all__ = ["ParamIoWidgetLineEdit"]
 
 from qtpy import QtWidgets, QtCore
 
 from .base_param_io_widget import BaseParamIoWidget
-from ...core.constants import (PARAM_INPUT_WIDGET_HEIGHT,
-                               PARAM_INPUT_WIDGET_WIDTH)
+from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH
 
 
 class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
@@ -49,6 +48,7 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         PARAM_INPUT_WIDGET_WIDTH value in the
         pydidas.core.constants.gui_constants module.
     """
+
     io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_WIDGET_WIDTH):
@@ -91,4 +91,4 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         Warning: This method will *not* update the connected parameter value.
         """
         self._old_value = value
-        self.setText(f'{value}')
+        self.setText(f"{value}")

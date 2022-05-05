@@ -22,14 +22,18 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CompositeImageManager']
+__all__ = ["CompositeImageManager"]
 
 from copy import copy
 
 import numpy as np
 
-from ..core import (AppConfigError, ParameterCollection, get_generic_parameter,
-                    ObjectWithParameterCollection)
+from ..core import (
+    AppConfigError,
+    ParameterCollection,
+    get_generic_parameter,
+    ObjectWithParameterCollection,
+)
 from ..data_io import export_data
 
 
@@ -38,18 +42,19 @@ class CompositeImageManager(ObjectWithParameterCollection):
     The CompositeImage class holds a numpy array to combine individual images
     to a composite and to provide basic insertion and manipulation routines.
     """
+
     default_params = ParameterCollection(
-        get_generic_parameter('image_shape'),
-        get_generic_parameter('composite_nx'),
-        get_generic_parameter('composite_ny'),
-        get_generic_parameter('composite_dir'),
-        get_generic_parameter('datatype'),
-        get_generic_parameter('threshold_low'),
-        get_generic_parameter('threshold_high'),
-        get_generic_parameter('mosaic_border_width'),
-        get_generic_parameter('mosaic_border_value'),
-        get_generic_parameter('mosaic_max_size'),
-        )
+        get_generic_parameter("image_shape"),
+        get_generic_parameter("composite_nx"),
+        get_generic_parameter("composite_ny"),
+        get_generic_parameter("composite_dir"),
+        get_generic_parameter("datatype"),
+        get_generic_parameter("threshold_low"),
+        get_generic_parameter("threshold_high"),
+        get_generic_parameter("mosaic_border_width"),
+        get_generic_parameter("mosaic_border_value"),
+        get_generic_parameter("mosaic_max_size"),
+    )
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
@@ -66,14 +71,16 @@ class CompositeImageManager(ObjectWithParameterCollection):
         Update local Parameters with the global QSetting values.
         """
         self.set_param_value(
-            'mosaic_border_width',
-            self.q_settings_get_global_value('mosaic_border_width'))
+            "mosaic_border_width",
+            self.q_settings_get_global_value("mosaic_border_width"),
+        )
         self.set_param_value(
-            'mosaic_border_value',
-            self.q_settings_get_global_value('mosaic_border_value'))
+            "mosaic_border_value",
+            self.q_settings_get_global_value("mosaic_border_value"),
+        )
         self.set_param_value(
-            'mosaic_max_size',
-            self.q_settings_get_global_value('mosaic_max_size'))
+            "mosaic_max_size", self.q_settings_get_global_value("mosaic_max_size")
+        )
 
     def __check_config(self):
         """
@@ -85,13 +92,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
             The method returns True if all Parameters have been set correctly.
         """
         _okay = True
-        if not self.get_param_value('image_shape')[0] > 0:
+        if not self.get_param_value("image_shape")[0] > 0:
             _okay = False
-        if not self.get_param_value('image_shape')[1] > 0:
+        if not self.get_param_value("image_shape")[1] > 0:
             _okay = False
-        if not self.get_param_value('composite_nx') > 0:
+        if not self.get_param_value("composite_nx") > 0:
             _okay = False
-        if not self.get_param_value('composite_ny') > 0:
+        if not self.get_param_value("composite_ny") > 0:
             _okay = False
         return _okay
 
@@ -105,8 +112,10 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If one or more of the required config fields have not been set.
         """
         if not self.__check_config():
-            raise ValueError('Not all required values for the creation of a '
-                             'CompositeImage have been set.')
+            raise ValueError(
+                "Not all required values for the creation of a "
+                "CompositeImage have been set."
+            )
 
     def __create_image_array(self):
         """
@@ -118,9 +127,9 @@ class CompositeImageManager(ObjectWithParameterCollection):
         self.__verify_config()
         _shape = self.__get_composite_shape()
         self.__check_max_size(_shape)
-        self.__image = (
-            np.zeros(_shape, dtype=self.get_param_value('datatype'))
-            + self.get_param_value('mosaic_border_value'))
+        self.__image = np.zeros(
+            _shape, dtype=self.get_param_value("datatype")
+        ) + self.get_param_value("mosaic_border_value")
 
     def __get_composite_shape(self):
         """
@@ -131,12 +140,16 @@ class CompositeImageManager(ObjectWithParameterCollection):
         tuple
             The new shape.
         """
-        _shape = self.get_param_value('image_shape')
-        _border_width = self.get_param_value('mosaic_border_width')
-        _nx = (self.get_param_value('composite_nx')
-               * (_shape[1] + _border_width) - _border_width)
-        _ny = (self.get_param_value('composite_ny')
-               * (_shape[0] + _border_width) - _border_width)
+        _shape = self.get_param_value("image_shape")
+        _border_width = self.get_param_value("mosaic_border_width")
+        _nx = (
+            self.get_param_value("composite_nx") * (_shape[1] + _border_width)
+            - _border_width
+        )
+        _ny = (
+            self.get_param_value("composite_ny") * (_shape[0] + _border_width)
+            - _border_width
+        )
         return (_ny, _nx)
 
     def __check_max_size(self, shape):
@@ -155,11 +168,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If the size of the image is larger than the defined global limit.
         """
         _size = 1e-6 * shape[0] * shape[1]
-        _maxsize = self.get_param_value('mosaic_max_size')
+        _maxsize = self.get_param_value("mosaic_max_size")
         if _size > _maxsize:
-            raise AppConfigError(f'The requested image size ({_size} Mpx)'
-                                 ' is too large for the global size limit '
-                                 f'of {_maxsize} Mpx.')
+            raise AppConfigError(
+                f"The requested image size ({_size} Mpx)"
+                " is too large for the global size limit "
+                f"of {_maxsize} Mpx."
+            )
 
     def apply_thresholds(self, **kwargs):
         """
@@ -183,12 +198,12 @@ class CompositeImageManager(ObjectWithParameterCollection):
             from the ParameterCollection will be used. A value of np.nan or
             None will be ignored.
         """
-        self.__update_threshold('low', **kwargs)
-        self.__update_threshold('high', **kwargs)
-        _thresh_low = self.get_param_value('threshold_low')
+        self.__update_threshold("low", **kwargs)
+        self.__update_threshold("high", **kwargs)
+        _thresh_low = self.get_param_value("threshold_low")
         if _thresh_low is not None:
             self.__image[self.__image < _thresh_low] = _thresh_low
-        _thresh_high = self.get_param_value('threshold_high')
+        _thresh_high = self.get_param_value("threshold_high")
         if _thresh_high is not None:
             self.__image[self.__image > _thresh_high] = _thresh_high
 
@@ -204,13 +219,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
         **kwargs : dict
             The kwargs passed on from the apply thresholds method.
         """
-        _thresh = self.get_param_value(f'threshold_{key}')
+        _thresh = self.get_param_value(f"threshold_{key}")
         if key in kwargs:
             _thresh = kwargs.get(key)
         # check for non-finite values and convert them to None:
         if _thresh is not None and not np.isfinite(_thresh):
             _thresh = None
-        self.set_param_value(f'threshold_{key}', _thresh)
+        self.set_param_value(f"threshold_{key}", _thresh)
 
     def create_new_image(self):
         """
@@ -238,14 +253,14 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         if self.__image is None:
             self.__create_image_array()
-        _image_size = self.get_param_value('image_shape')
-        _border = self.get_param_value('mosaic_border_width')
-        if self.get_param_value('composite_dir') == 'x':
-            _iy = index // self.get_param_value('composite_nx')
-            _ix = index % self.get_param_value('composite_nx')
+        _image_size = self.get_param_value("image_shape")
+        _border = self.get_param_value("mosaic_border_width")
+        if self.get_param_value("composite_dir") == "x":
+            _iy = index // self.get_param_value("composite_nx")
+            _ix = index % self.get_param_value("composite_nx")
         else:
-            _iy = index % self.get_param_value('composite_ny')
-            _ix = index // self.get_param_value('composite_ny')
+            _iy = index % self.get_param_value("composite_ny")
+            _ix = index // self.get_param_value("composite_ny")
         _start_y = _iy * (_image_size[0] + _border)
         _start_x = _ix * (_image_size[1] + _border)
         yslice = slice(_start_y, _start_y + _image_size[0])
@@ -267,8 +282,8 @@ class CompositeImageManager(ObjectWithParameterCollection):
         image : np.ndarray
             The image with thresholds applied.
         """
-        _low = self.get_param_value('threshold_low')
-        _high = self.get_param_value('threshold_high')
+        _low = self.get_param_value("threshold_low")
+        _high = self.get_param_value("threshold_high")
         if _low is not None:
             image = np.where(image < _low, _low, image)
         if _high is not None:

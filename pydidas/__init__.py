@@ -46,9 +46,23 @@ from . import apps
 from . import unittest_objects
 from . import widgets
 from . import gui
-__all__.extend(['apps', 'core', 'experiment', 'gui', 'data_io', 'managers',
-                'multiprocessing', 'plugins', 'unittest_objects', 'utils',
-                'widgets', 'workflow'])
+
+__all__.extend(
+    [
+        "apps",
+        "core",
+        "experiment",
+        "gui",
+        "data_io",
+        "managers",
+        "multiprocessing",
+        "plugins",
+        "unittest_objects",
+        "utils",
+        "widgets",
+        "workflow",
+    ]
+)
 
 
 # Check whether the sphinx documentation has been built and build it if
@@ -63,9 +77,9 @@ core.utils.set_default_plugin_dir()
 import os as __os
 import logging as __logging
 
-__os.environ['PYFAI_NO_LOGGING'] = '1'
+__os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
-pyFAI_azi_logger = __logging.getLogger('pyFAI.azimuthalIntegrator')
+pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
 pyFAI_azi_logger.setLevel(__logging.ERROR)
-silx_opencl_logger = __logging.getLogger('silx.opencl.processing')
+silx_opencl_logger = __logging.getLogger("silx.opencl.processing")
 silx_opencl_logger.setLevel(__logging.ERROR)

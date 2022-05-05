@@ -34,10 +34,9 @@ from pydidas.data_io.implementations.fabio_io import FabioIo
 
 
 class TestFabioIo(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, 'test.edf')
+        self._fname = os.path.join(self._path, "test.edf")
         self._img_shape = (10, 10)
         self._data = np.random.random(self._img_shape)
         _file = fabio.edfimage.EdfImage(self._data)

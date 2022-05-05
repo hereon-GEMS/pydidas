@@ -33,7 +33,6 @@ from pydidas.data_io import export_data, import_data
 
 
 class TestImportExport(unittest.TestCase):
-
     def setUp(self):
         self._shape = np.array((10, 5, 20, 8, 3))
         self._data = np.random.random(self._shape)
@@ -45,13 +44,13 @@ class TestImportExport(unittest.TestCase):
         shutil.rmtree(self._dir)
 
     def test_export_data(self):
-        _fname = os.path.join(self._dir, 'test.npy')
+        _fname = os.path.join(self._dir, "test.npy")
         export_data(_fname, self._data)
         _data = np.load(_fname)
         self.assertTrue(np.allclose(_data, self._data))
 
     def test_import_data(self):
-        _fname = os.path.join(self._dir, 'test.npy')
+        _fname = os.path.join(self._dir, "test.npy")
         np.save(_fname, self._data)
         _data = import_data(_fname)
         self.assertTrue(np.allclose(_data, self._data))

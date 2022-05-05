@@ -31,6 +31,7 @@ from .io_base import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import io_base
+
 __all__.extend(io_base.__all__)
 del io_base
 
@@ -38,13 +39,16 @@ del io_base
 # with the Metaclass:
 import os
 import importlib
+
 _dir = os.path.dirname(__file__)
-_io_classes = set(item[:-3] for item in os.listdir(_dir)
-                  if (item.endswith('.py')
-                      and item not in ['io_base.py', '__init__.py']))
+_io_classes = set(
+    item[:-3]
+    for item in os.listdir(_dir)
+    if (item.endswith(".py") and item not in ["io_base.py", "__init__.py"])
+)
 
 for _module in _io_classes:
-    _module = importlib.import_module(f'.{_module}', __package__)
+    _module = importlib.import_module(f".{_module}", __package__)
     __all__ += _module.__all__
 
 del _module

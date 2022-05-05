@@ -22,9 +22,14 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['delete_all_items_in_layout', 'excepthook', 'apply_font_properties',
-           'apply_widget_properties', 'create_default_grid_layout',
-           'get_pyqt_icon_from_str_reference']
+__all__ = [
+    "delete_all_items_in_layout",
+    "excepthook",
+    "apply_font_properties",
+    "apply_widget_properties",
+    "create_default_grid_layout",
+    "get_pyqt_icon_from_str_reference",
+]
 
 import os
 import time
@@ -96,7 +101,7 @@ def apply_widget_properties(obj, **kwargs):
         A dictionary with properties to be set.
     """
     for _key in kwargs:
-        _name = f'set{_key[0].upper()}{_key[1:]}'
+        _name = f"set{_key[0].upper()}{_key[1:]}"
         if hasattr(obj, _name):
             _func = getattr(obj, _name)
             _func(*_get_args_as_list(kwargs.get(_key)))
@@ -120,10 +125,10 @@ def apply_font_properties(fontobj, **kwargs):
     **kwargs : dict
         A dictionary with properties to be set.
     """
-    if 'fontsize' in kwargs and 'pointSize' not in kwargs:
-        kwargs['pointSize'] = kwargs.get('fontsize', STANDARD_FONT_SIZE)
+    if "fontsize" in kwargs and "pointSize" not in kwargs:
+        kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
     for _key in kwargs:
-        _name = f'set{_key[0].upper()}{_key[1:]}'
+        _name = f"set{_key[0].upper()}{_key[1:]}"
         if hasattr(fontobj, _name):
             _func = getattr(fontobj, _name)
             _func(*_get_args_as_list(kwargs.get(_key)))
@@ -168,24 +173,26 @@ def excepthook(exc_type, exception, trace):
     trace : traceback object
         The trace of where the exception occured.
     """
-    _sep = '\n' + '-' * 80 + '\n'
+    _sep = "\n" + "-" * 80 + "\n"
     _traceback_info = StringIO()
     traceback.print_tb(trace, None, _traceback_info)
     _traceback_info.seek(0)
     _trace = _traceback_info.read()
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
+    _logpath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
-    _logfile = os.path.join(_logpath, 'pydidas_error.log')
-    _note = ('An unhandled exception occurred. Please report the bug to:'
-             '\n\tmalte.storm@hereon.de\nor'
-             '\n\thttps://github.com/malte-storm/pydidas/issues'
-             f'\n\nA log has been written to:\n\t{_logfile}.'
-             '\n\nError information:\n')
-    _time = time.strftime('%Y-%m-%d %H:%M:%S')
-    _msg = _sep.join([_time, f'{exc_type}: {exception}', _trace])
+    _logfile = os.path.join(_logpath, "pydidas_error.log")
+    _note = (
+        "An unhandled exception occurred. Please report the bug to:"
+        "\n\tmalte.storm@hereon.de\nor"
+        "\n\thttps://github.com/malte-storm/pydidas/issues"
+        f"\n\nA log has been written to:\n\t{_logfile}."
+        "\n\nError information:\n"
+    )
+    _time = time.strftime("%Y-%m-%d %H:%M:%S")
+    _msg = _sep.join([_time, f"{exc_type}: {exception}", _trace])
     try:
-        with open(_logfile, 'w') as _file:
+        with open(_logfile, "w") as _file:
             _file.write(_msg)
     except IOError:
         pass
@@ -221,16 +228,15 @@ def get_pyqt_icon_from_str_reference(ref_string):
         The icon
 
     """
-    _type, _ref = ref_string.split('::')
-    if _type == 'qta':
+    _type, _ref = ref_string.split("::")
+    if _type == "qta":
         menuicon = qtawesome.icon(_ref)
-    elif _type == 'qt-std':
+    elif _type == "qt-std":
         _num = int(_ref)
         app = QtWidgets.QApplication.instance()
         menuicon = app.style().standardIcon(_num)
-    elif _type == 'path':
+    elif _type == "path":
         menuicon = QtGui.QIcon(_ref)
     else:
-        raise TypeError('Cannot interpret the string reference for '
-                        'the menu icon.')
+        raise TypeError("Cannot interpret the string reference for " "the menu icon.")
     return menuicon

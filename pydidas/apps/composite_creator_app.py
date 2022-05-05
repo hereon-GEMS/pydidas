@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CompositeCreatorApp']
+__all__ = ["CompositeCreatorApp"]
 
 import os
 import time
@@ -31,11 +31,14 @@ import time
 import numpy as np
 from qtpy import QtCore
 
-from ..core import (Dataset, AppConfigError, get_generic_param_collection,
-                    BaseApp)
+from ..core import Dataset, AppConfigError, get_generic_param_collection, BaseApp
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
-    check_file_exists, check_hdf5_key_exists_in_file, copy_docstring, rebin2d)
+    check_file_exists,
+    check_hdf5_key_exists_in_file,
+    copy_docstring,
+    rebin2d,
+)
 from ..data_io import import_data
 from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
 from .parsers import composite_creator_app_parser
@@ -160,17 +163,36 @@ class CompositeCreatorApp(BaseApp):
         Parameters supplied with their reference key as dict key and the
         Parameter itself as value.
     """
+
     default_params = get_generic_param_collection(
-        'live_processing', 'first_file', 'last_file', 'file_stepping',
-        'hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-        'hdf5_stepping', 'use_bg_file', 'bg_file', 'bg_hdf5_key',
-        'bg_hdf5_frame', 'use_global_det_mask', 'use_roi', 'roi_xlow',
-        'roi_xhigh', 'roi_ylow', 'roi_yhigh', 'use_thresholds',
-        'threshold_low', 'threshold_high', 'binning', 'composite_nx',
-        'composite_ny', 'composite_dir', )
+        "live_processing",
+        "first_file",
+        "last_file",
+        "file_stepping",
+        "hdf5_key",
+        "hdf5_first_image_num",
+        "hdf5_last_image_num",
+        "hdf5_stepping",
+        "use_bg_file",
+        "bg_file",
+        "bg_hdf5_key",
+        "bg_hdf5_frame",
+        "use_global_det_mask",
+        "use_roi",
+        "roi_xlow",
+        "roi_xhigh",
+        "roi_ylow",
+        "roi_yhigh",
+        "use_thresholds",
+        "threshold_low",
+        "threshold_high",
+        "binning",
+        "composite_nx",
+        "composite_ny",
+        "composite_dir",
+    )
     parse_func = composite_creator_app_parser
-    attributes_not_to_copy_to_slave_app = ['_composite', '_det_mask',
-                                           '_bg_image']
+    attributes_not_to_copy_to_slave_app = ["_composite", "_det_mask", "_bg_image"]
     mp_func_results = QtCore.Signal(object)
     updated_composite = QtCore.Signal()
 
@@ -179,28 +201,44 @@ class CompositeCreatorApp(BaseApp):
         self._composite = None
         self._det_mask = None
         self._bg_image = None
-        self._filelist = FilelistManager(*self.get_params(
-            'first_file', 'last_file', 'live_processing', 'file_stepping'))
-        self._image_metadata = ImageMetadataManager(*self.get_params(
-            'first_file', 'hdf5_key', 'hdf5_first_image_num',
-            'hdf5_last_image_num', 'hdf5_stepping', 'binning', 'use_roi',
-            'roi_xlow', 'roi_xhigh', 'roi_ylow', 'roi_yhigh'))
-        self._image_metadata.set_param_value('use_filename', False)
-        self._config = {'current_fname': None,
-                        'current_kwargs': {},
-                        'det_mask_val': None}
+        self._filelist = FilelistManager(
+            *self.get_params(
+                "first_file", "last_file", "live_processing", "file_stepping"
+            )
+        )
+        self._image_metadata = ImageMetadataManager(
+            *self.get_params(
+                "first_file",
+                "hdf5_key",
+                "hdf5_first_image_num",
+                "hdf5_last_image_num",
+                "hdf5_stepping",
+                "binning",
+                "use_roi",
+                "roi_xlow",
+                "roi_xhigh",
+                "roi_ylow",
+                "roi_yhigh",
+            )
+        )
+        self._image_metadata.set_param_value("use_filename", False)
+        self._config = {
+            "current_fname": None,
+            "current_kwargs": {},
+            "det_mask_val": None,
+        }
 
     def multiprocessing_pre_run(self):
         """
         Perform operations prior to running main parallel processing function.
         """
         self.prepare_run()
-        self._config['mp_pre_run_called'] = True
-        _ntotal = (self._image_metadata.images_per_file
-                   * self._filelist.n_files)
-        self._config['mp_tasks'] = range(_ntotal)
-        self._config['det_mask_val'] = float(self.q_settings_get_global_value(
-            'det_mask_val'))
+        self._config["mp_pre_run_called"] = True
+        _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
+        self._config["mp_tasks"] = range(_ntotal)
+        self._config["det_mask_val"] = float(
+            self.q_settings_get_global_value("det_mask_val")
+        )
         self._det_mask = self.__get_detector_mask()
 
     def prepare_run(self):
@@ -229,7 +267,7 @@ class CompositeCreatorApp(BaseApp):
         self._filelist.update()
         self._image_metadata.update()
         self.__verify_number_of_images_fits_composite()
-        if self.get_param_value('use_bg_file'):
+        if self.get_param_value("use_bg_file"):
             self._check_and_set_bg_file()
         if self.slave_mode:
             self._composite = None
@@ -247,16 +285,16 @@ class CompositeCreatorApp(BaseApp):
             If the mask could be loaded from a numpy file, return the mask.
             Else, None is returned.
         """
-        if not self.get_param_value('use_global_det_mask'):
+        if not self.get_param_value("use_global_det_mask"):
             return None
-        _maskfile = self.q_settings_get_global_value('det_mask')
+        _maskfile = self.q_settings_get_global_value("det_mask")
         try:
             _mask = np.load(_maskfile)
         except (FileNotFoundError, ValueError):
             return None
         if self._image_metadata.roi is not None:
             _mask = _mask[self._image_metadata.roi]
-        _bin = self.get_param_value('binning')
+        _bin = self.get_param_value("binning")
         if _bin > 1:
             _mask = rebin2d(_mask, _bin)
             _mask = np.where(_mask > 0, 1, 0)
@@ -274,24 +312,25 @@ class CompositeCreatorApp(BaseApp):
             If the composite dimensions are too small or too large to match
             the total number of images.
         """
-        _nx = self.get_param_value('composite_nx')
-        _ny = self.get_param_value('composite_ny')
-        _ntotal = (self._image_metadata.images_per_file
-                   * self._filelist.n_files)
+        _nx = self.get_param_value("composite_nx")
+        _ny = self.get_param_value("composite_ny")
+        _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
         if _nx == -1:
             _nx = int(np.ceil(_ntotal / _ny))
-            self.params.set_value('composite_nx', _nx)
+            self.params.set_value("composite_nx", _nx)
         if _ny == -1:
             _ny = int(np.ceil(_ntotal / _nx))
-            self.params.set_value('composite_ny', _ny)
+            self.params.set_value("composite_ny", _ny)
         if _nx * _ny < _ntotal:
             raise AppConfigError(
-                'The selected composite dimensions are too small to hold all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
-        if ((_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal):
+                "The selected composite dimensions are too small to hold all"
+                f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
+            )
+        if (_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal:
             raise AppConfigError(
-                'The selected composite dimensions are too large for all'
-                f' images. (nx={_nx}, ny={_ny}, n={_ntotal})')
+                "The selected composite dimensions are too large for all"
+                f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
+            )
 
     def _check_and_set_bg_file(self):
         """
@@ -311,20 +350,22 @@ class CompositeCreatorApp(BaseApp):
             - If the image dimensions for the background file differ from the
               image files.
         """
-        _bg_file = self.get_param_value('bg_file')
+        _bg_file = self.get_param_value("bg_file")
         check_file_exists(_bg_file)
-        _params = dict(binning=self.get_param_value('binning'),
-                       roi=self._image_metadata.roi)
+        _params = dict(
+            binning=self.get_param_value("binning"), roi=self._image_metadata.roi
+        )
         if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
-            check_hdf5_key_exists_in_file(_bg_file,
-                                          self.get_param_value('bg_hdf5_key'))
-            _params['dataset'] = self.get_param_value('bg_hdf5_key')
-            _params['frame'] = self.get_param_value('bg_hdf5_frame')
+            check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
+            _params["dataset"] = self.get_param_value("bg_hdf5_key")
+            _params["frame"] = self.get_param_value("bg_hdf5_frame")
         _bg_image = import_data(_bg_file, **_params)
         if _bg_image.shape != self._image_metadata.final_shape:
-            raise AppConfigError(f'The selected background file "{_bg_file}"'
-                                 ' does not have the same image dimensions '
-                                 'as the selected files.')
+            raise AppConfigError(
+                f'The selected background file "{_bg_file}"'
+                " does not have the same image dimensions "
+                "as the selected files."
+            )
         self._bg_image = self.__apply_mask(_bg_image)
 
     def __check_and_update_composite_image(self):
@@ -335,20 +376,22 @@ class CompositeCreatorApp(BaseApp):
         if self._composite is None:
             self._composite = CompositeImageManager(
                 image_shape=self._image_metadata.final_shape,
-                composite_nx=self.get_param_value('composite_nx'),
-                composite_ny=self.get_param_value('composite_ny'),
-                composite_dir=self.get_param_value('composite_dir'),
-                datatype=self._image_metadata.datatype)
+                composite_nx=self.get_param_value("composite_nx"),
+                composite_ny=self.get_param_value("composite_ny"),
+                composite_dir=self.get_param_value("composite_dir"),
+                datatype=self._image_metadata.datatype,
+            )
             return
         _update_required = False
-        _bwidth = self.q_settings_get_global_value('mosaic_border_width', int)
-        _bval = self.q_settings_get_global_value('mosaic_border_value', float)
+        _bwidth = self.q_settings_get_global_value("mosaic_border_width", int)
+        _bval = self.q_settings_get_global_value("mosaic_border_value", float)
         for _key, _value in [
-                ['image_shape', self._image_metadata.final_shape],
-                ['composite_nx', self.get_param_value('composite_nx')],
-                ['composite_ny', self.get_param_value('composite_ny')],
-                ['mosaic_border_width', _bwidth],
-                ['mosaic_border_value', _bval]]:
+            ["image_shape", self._image_metadata.final_shape],
+            ["composite_nx", self.get_param_value("composite_nx")],
+            ["composite_ny", self.get_param_value("composite_ny")],
+            ["mosaic_border_width", _bwidth],
+            ["mosaic_border_value", _bval],
+        ]:
             if _value != self._composite.get_param_value(_key):
                 self._composite.set_param_value(_key, _value)
                 _update_required = True
@@ -359,20 +402,24 @@ class CompositeCreatorApp(BaseApp):
         """
         Check for thresholds and store them in the local config.
         """
-        if self.get_param_value('use_thresholds'):
+        if self.get_param_value("use_thresholds"):
             self._composite.set_param_value(
-                'threshold_low', self.get_param_value('threshold_low'))
+                "threshold_low", self.get_param_value("threshold_low")
+            )
             self._composite.set_param_value(
-                'threshold_high', self.get_param_value('threshold_high'))
+                "threshold_high", self.get_param_value("threshold_high")
+            )
 
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
         """
-        if 'mp_tasks' not in self._config.keys():
-            raise KeyError('Key "mp_tasks" not found. Please execute'
-                           'multiprocessing_pre_run() first.')
-        return self._config['mp_tasks']
+        if "mp_tasks" not in self._config.keys():
+            raise KeyError(
+                'Key "mp_tasks" not found. Please execute'
+                "multiprocessing_pre_run() first."
+            )
+        return self._config["mp_tasks"]
 
     def multiprocessing_pre_cycle(self, index):
         """
@@ -398,17 +445,19 @@ class CompositeCreatorApp(BaseApp):
         _images_per_file = self._image_metadata.images_per_file
         _i_file = index // _images_per_file
         _fname = self._filelist.get_filename(_i_file)
-        _params = dict(binning=self.get_param_value('binning'),
-                       roi=self._image_metadata.roi)
+        _params = dict(
+            binning=self.get_param_value("binning"), roi=self._image_metadata.roi
+        )
         if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
             _hdf_index = index % _images_per_file
-            _i_hdf = (self.get_param_value('hdf5_first_image_num')
-                      + _hdf_index * self.get_param_value('hdf5_stepping'))
-            _params = (_params
-                       | dict(dataset=self.get_param_value('hdf5_key'),
-                              frame=_i_hdf))
-        self._config['current_fname'] = _fname
-        self._config['current_kwargs'] = _params
+            _i_hdf = self.get_param_value(
+                "hdf5_first_image_num"
+            ) + _hdf_index * self.get_param_value("hdf5_stepping")
+            _params = _params | dict(
+                dataset=self.get_param_value("hdf5_key"), frame=_i_hdf
+            )
+        self._config["current_fname"] = _fname
+        self._config["current_kwargs"] = _params
 
     def multiprocessing_carryon(self):
         """
@@ -423,9 +472,8 @@ class CompositeCreatorApp(BaseApp):
             Flag whether the processing can carry on or needs to wait.
 
         """
-        if self.get_param_value('live_processing'):
-            return self._image_exists_check(self._config['current_fname'],
-                                            timeout=0.02)
+        if self.get_param_value("live_processing"):
+            return self._image_exists_check(self._config["current_fname"], timeout=0.02)
         return True
 
     def _image_exists_check(self, fname, timeout=-1):
@@ -466,8 +514,9 @@ class CompositeCreatorApp(BaseApp):
         _image : pydidas.core.Dataset
             The (pre-processed) image.
         """
-        _image = import_data(self._config['current_fname'],
-                             **self._config['current_kwargs'])
+        _image = import_data(
+            self._config["current_fname"], **self._config["current_kwargs"]
+        )
         _image = self.__apply_mask(_image)
         return _image
 
@@ -487,15 +536,15 @@ class CompositeCreatorApp(BaseApp):
         """
         if self._det_mask is None:
             return image
-        if self._config['det_mask_val'] is None:
-            raise AppConfigError('No numerical value has been defined '
-                                 'for the mask!')
-        return Dataset(np.where(self._det_mask,
-                                self._config['det_mask_val'], image),
-                       axis_ranges=image.axis_ranges,
-                       axis_labels=image.axis_labels,
-                       axis_units=image.axis_units,
-                       metadata=image.metadata)
+        if self._config["det_mask_val"] is None:
+            raise AppConfigError("No numerical value has been defined " "for the mask!")
+        return Dataset(
+            np.where(self._det_mask, self._config["det_mask_val"], image),
+            axis_ranges=image.axis_ranges,
+            axis_labels=image.axis_labels,
+            axis_units=image.axis_units,
+            metadata=image.metadata,
+        )
 
     def multiprocessing_post_run(self):
         """
@@ -507,15 +556,19 @@ class CompositeCreatorApp(BaseApp):
         """
         Please refer to pydidas.managers.CompositeImageManager docstring.
         """
-        if (self.get_param_value('use_thresholds')
-                or 'low' in kwargs or 'high' in kwargs):
-            if 'low' in kwargs:
-                self.set_param_value('threshold_low', kwargs.get('low'))
-            if 'high' in kwargs:
-                self.set_param_value('threshold_high', kwargs.get('high'))
+        if (
+            self.get_param_value("use_thresholds")
+            or "low" in kwargs
+            or "high" in kwargs
+        ):
+            if "low" in kwargs:
+                self.set_param_value("threshold_low", kwargs.get("low"))
+            if "high" in kwargs:
+                self.set_param_value("threshold_high", kwargs.get("high"))
             self._composite.apply_thresholds(
-                low=self.get_param_value('threshold_low'),
-                high=self.get_param_value('threshold_high'))
+                low=self.get_param_value("threshold_low"),
+                high=self.get_param_value("threshold_high"),
+            )
 
     @QtCore.Slot(int, object)
     def multiprocessing_store_results(self, index, image):
@@ -531,7 +584,7 @@ class CompositeCreatorApp(BaseApp):
         """
         if self.slave_mode:
             return
-        if self.get_param_value('use_bg_file'):
+        if self.get_param_value("use_bg_file"):
             image -= self._bg_image
         self._composite.insert_image(image, index)
         self.updated_composite.emit()

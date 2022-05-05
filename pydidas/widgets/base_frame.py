@@ -23,21 +23,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BaseFrame']
+__all__ = ["BaseFrame"]
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import (ParameterCollection, PydidasQsettingsMixin,
-                    ParameterCollectionMixIn)
+from ..core import ParameterCollection, PydidasQsettingsMixin, ParameterCollectionMixIn
 from .factory import CreateWidgetsMixIn
 from .parameter_config import ParameterWidgetsMixIn
 
 
-class BaseFrame(QtWidgets.QFrame,
-                ParameterCollectionMixIn,
-                PydidasQsettingsMixin,
-                CreateWidgetsMixIn,
-                ParameterWidgetsMixIn):
+class BaseFrame(
+    QtWidgets.QFrame,
+    ParameterCollectionMixIn,
+    PydidasQsettingsMixin,
+    CreateWidgetsMixIn,
+    ParameterWidgetsMixIn,
+):
     """
     The BaseFrame is a subclassed QFrame and should be used as the
     base class for all Frames in pydidas.
@@ -57,8 +58,9 @@ class BaseFrame(QtWidgets.QFrame,
         and the subclass is responsible for setting up the layout. The
         default is True.
     """
+
     show_frame = True
-    menuicon = 'qt-std::7'
+    menuicon = "qt-std::7"
     params_not_to_restore = []
     status_msg = QtCore.Signal(str)
     default_params = ParameterCollection()
@@ -72,14 +74,14 @@ class BaseFrame(QtWidgets.QFrame,
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
 
-        init_layout = kwargs.get('init_layout', True)
+        init_layout = kwargs.get("init_layout", True)
         if init_layout:
             _layout = QtWidgets.QGridLayout()
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
-        self.ref_name = ''
-        self.title = ''
+        self.ref_name = ""
+        self.title = ""
         self._config = {}
 
     @QtCore.Slot(int)
@@ -135,7 +137,7 @@ class BaseFrame(QtWidgets.QFrame,
             frame's state.
         """
         _params = self.get_param_values_as_dict(filter_types_for_export=True)
-        return (self.frame_index, {'params': _params})
+        return (self.frame_index, {"params": _params})
 
     def restore_state(self, state):
         """
@@ -150,7 +152,7 @@ class BaseFrame(QtWidgets.QFrame,
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
-        for _key, _val in state['params'].items():
+        for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
                     self.set_param_value_and_widget(_key, _val)

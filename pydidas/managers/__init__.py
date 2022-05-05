@@ -33,13 +33,16 @@ from .image_metadata_manager import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import composite_image_manager
+
 __all__.extend(composite_image_manager.__all__)
 del composite_image_manager
 
 from . import filelist_manager
+
 __all__.extend(filelist_manager.__all__)
 del filelist_manager
 
 from . import image_metadata_manager
+
 __all__.extend(image_metadata_manager.__all__)
 del image_metadata_manager

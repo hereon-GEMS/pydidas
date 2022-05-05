@@ -30,8 +30,7 @@ import tempfile
 import yaml
 
 from pydidas.experiment import ScanSetup
-from pydidas.experiment.scan_setup.scan_setup_io_yaml import (
-    ScanSetupIoYaml)
+from pydidas.experiment.scan_setup.scan_setup_io_yaml import ScanSetupIoYaml
 
 
 SCAN = ScanSetup()
@@ -39,12 +38,9 @@ SCAN_IO_YAML = ScanSetupIoYaml
 
 
 class TestScanSettingsIoYaml(unittest.TestCase):
-
     def setUp(self):
-        _test_dir = os.path.dirname(
-            os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data',
-                                  'load_test_scan_setup_yaml.yml')
+        _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        self._path = os.path.join(_test_dir, "_data", "load_test_scan_setup_yaml.yml")
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -53,33 +49,31 @@ class TestScanSettingsIoYaml(unittest.TestCase):
 
     def test_import_from_file__correct(self):
         SCAN_IO_YAML.import_from_file(self._path)
-        with open(self._path, 'r') as stream:
+        with open(self._path, "r") as stream:
             _data = yaml.safe_load(stream)
         for key in SCAN.params.keys():
-            self.assertEqual(SCAN.get_param_value(key),
-                             _data[key])
+            self.assertEqual(SCAN.get_param_value(key), _data[key])
 
     def test_import_from_file__missing_keys(self):
-        with open(self._tmppath + 'yaml.yml', 'w') as stream:
-            stream.write('no_entry: True')
+        with open(self._tmppath + "yaml.yml", "w") as stream:
+            stream.write("no_entry: True")
         with self.assertRaises(KeyError):
-            SCAN_IO_YAML.import_from_file(self._tmppath + 'yaml.yml')
+            SCAN_IO_YAML.import_from_file(self._tmppath + "yaml.yml")
 
     def test_import_from_file__wrong_format(self):
-        with open(self._tmppath + 'yaml.yml', 'w') as stream:
-            stream.write('no_entry =True')
+        with open(self._tmppath + "yaml.yml", "w") as stream:
+            stream.write("no_entry =True")
         with self.assertRaises(AssertionError):
-            SCAN_IO_YAML.import_from_file(self._tmppath + 'yaml.yml')
+            SCAN_IO_YAML.import_from_file(self._tmppath + "yaml.yml")
 
     def test_export_to_file(self):
-        _fname = self._tmppath + 'yaml.yml'
+        _fname = self._tmppath + "yaml.yml"
         SCAN_IO_YAML.export_to_file(_fname)
-        with open(self._tmppath + 'yaml.yml', 'r') as stream:
+        with open(self._tmppath + "yaml.yml", "r") as stream:
             _data = yaml.safe_load(stream)
         for key in SCAN.params:
-            if key != 'xray_energy':
-                self.assertEqual(SCAN.get_param_value(key),
-                                 _data[key])
+            if key != "xray_energy":
+                self.assertEqual(SCAN.get_param_value(key), _data[key])
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetupIoYaml']
+__all__ = ["ExperimentalSetupIoYaml"]
 
 import yaml
 import numpy as np
@@ -41,8 +41,9 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
     """
     YAML importer/exporter for ExperimentalSetting files.
     """
+
     extensions = YAML_EXTENSIONS
-    format_name = 'YAML'
+    format_name = "YAML"
 
     @classmethod
     def export_to_file(cls, filename, **kwargs):
@@ -61,8 +62,8 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
         for _key, _val in tmp_params.items():
             if isinstance(_val, Real) and not isinstance(_val, Integral):
                 tmp_params[_key] = float(_val)
-        del tmp_params['xray_energy']
-        with open(filename, 'w') as stream:
+        del tmp_params["xray_energy"]
+        with open(filename, "w") as stream:
             yaml.safe_dump(tmp_params, stream)
 
     @classmethod
@@ -75,15 +76,15 @@ class ExperimentalSetupIoYaml(ExperimentalSetupIoBase):
         filename : str
             The filename of the file to be written.
         """
-        with open(filename, 'r') as stream:
+        with open(filename, "r") as stream:
             try:
                 cls.imported_params = yaml.safe_load(stream)
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
         assert isinstance(cls.imported_params, dict)
-        cls.imported_params['xray_energy'] = (
-            LAMBDA_IN_A_TO_E
-            / cls.imported_params.get('xray_wavelength', np.nan))
+        cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
+            "xray_wavelength", np.nan
+        )
         cls._verify_all_entries_present()
         cls._write_to_exp_settings()

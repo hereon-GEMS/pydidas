@@ -32,7 +32,6 @@ from pydidas.experiment.scan_setup.scan_setup import _ScanSetup
 
 
 class TestScanSetup(unittest.TestCase):
-
     def setUp(self):
         self._scan_shape = (5, 7, 3, 2)
         self._scan_delta = (0.1, 0.5, 1, 1.5)
@@ -42,19 +41,23 @@ class TestScanSetup(unittest.TestCase):
         ...
 
     def set_scan_params(self, _scan_settings):
-        _scan_settings.set_param_value('scan_dim', 4)
+        _scan_settings.set_param_value("scan_dim", 4)
         for index, val in enumerate(self._scan_shape):
-            _scan_settings.set_param_value(f'n_points_{index + 1}', val)
+            _scan_settings.set_param_value(f"n_points_{index + 1}", val)
         for index, val in enumerate(self._scan_delta):
-            _scan_settings.set_param_value(f'delta_{index + 1}', val)
+            _scan_settings.set_param_value(f"delta_{index + 1}", val)
         for index, val in enumerate(self._scan_offset):
-            _scan_settings.set_param_value(f'offset_{index + 1}', val)
+            _scan_settings.set_param_value(f"offset_{index + 1}", val)
 
     def get_scan_range(self, dim):
         return np.linspace(
             self._scan_offset[dim],
-            (self._scan_offset[dim] + (self._scan_shape[dim] - 1)
-             * self._scan_delta[dim]), num=self._scan_shape[dim])
+            (
+                self._scan_offset[dim]
+                + (self._scan_shape[dim] - 1) * self._scan_delta[dim]
+            ),
+            num=self._scan_shape[dim],
+        )
 
     def test_setup(self):
         # assert no Exception in setUp method.
@@ -107,8 +110,8 @@ class TestScanSetup(unittest.TestCase):
         _unit = get_random_string(5)
         _label = get_random_string(20)
         SCAN = _ScanSetup()
-        SCAN.set_param_value(f'unit_{_index + 1}', _unit)
-        SCAN.set_param_value(f'scan_dir_{_index + 1}', _label)
+        SCAN.set_param_value(f"unit_{_index + 1}", _unit)
+        SCAN.set_param_value(f"scan_dir_{_index + 1}", _label)
         self.set_scan_params(SCAN)
         _scanlabel, _scanunit, _range = SCAN.get_metadata_for_dim(_index + 1)
         self.assertEqual(_scanlabel, _label)
@@ -125,9 +128,13 @@ class TestScanSetup(unittest.TestCase):
         SCAN = _ScanSetup()
         self.set_scan_params(SCAN)
         _pos = tuple(i - 1 for i in self._scan_shape)
-        _tmpshape = self._scan_shape + (1, )
-        _n = np.sum([_pos[i] * np.prod(_tmpshape[i + 1:])
-                     for i in range(SCAN.get_param_value('scan_dim'))])
+        _tmpshape = self._scan_shape + (1,)
+        _n = np.sum(
+            [
+                _pos[i] * np.prod(_tmpshape[i + 1 :])
+                for i in range(SCAN.get_param_value("scan_dim"))
+            ]
+        )
         _index = SCAN.get_frame_position_in_scan(_n)
         self.assertEqual(_index, _pos)
 
@@ -157,10 +164,12 @@ class TestScanSetup(unittest.TestCase):
 
     def test_get_frame_number_from_scan_indices__inscan(self):
         _indices = (2, 1, 2, 1)
-        _frame = (_indices[3]
-                  + self._scan_shape[3] * _indices[2]
-                  + np.prod(self._scan_shape[2:]) * _indices[1]
-                  + np.prod(self._scan_shape[1:]) * _indices[0])
+        _frame = (
+            _indices[3]
+            + self._scan_shape[3] * _indices[2]
+            + np.prod(self._scan_shape[2:]) * _indices[1]
+            + np.prod(self._scan_shape[1:]) * _indices[0]
+        )
         SCAN = _ScanSetup()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)

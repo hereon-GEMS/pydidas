@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['IoBase']
+__all__ = ["IoBase"]
 
 import os
 
@@ -38,9 +38,10 @@ class IoBase(metaclass=IoMaster):
     """
     Base class for Metaclass-based importer/exporters.
     """
+
     extensions_export = []
     extensions_import = []
-    format_name = ''
+    format_name = ""
     dimensions = []
 
     _roi_controller = RoiSliceManager()
@@ -97,10 +98,12 @@ class IoBase(metaclass=IoMaster):
         FileExistsError
             If a file with filename exists and the overwrite flag is not True.
         """
-        _overwrite = kwargs.get('overwrite', False)
+        _overwrite = kwargs.get("overwrite", False)
         if os.path.exists(filename) and not _overwrite:
-            raise FileExistsError(f'The file "{filename}" exists and '
-                                  'overwriting has not been confirmed.')
+            raise FileExistsError(
+                f'The file "{filename}" exists and '
+                "overwriting has not been confirmed."
+            )
 
     @classmethod
     def get_data_range(cls, data, **kwargs):
@@ -121,7 +124,7 @@ class IoBase(metaclass=IoMaster):
             The range with two entries for the lower and upper boundaries as
             numerical values.
         """
-        _range = list(kwargs.get('data_range', (None, None)))
+        _range = list(kwargs.get("data_range", (None, None)))
         if _range[0] is None:
             _range[0] = amin(data)
         if _range[1] is None:
@@ -161,17 +164,17 @@ class IoBase(metaclass=IoMaster):
         _data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (a subclassed numpy.ndarray).
         """
-        _return_type = kwargs.get('datatype', 'auto')
-        _local_roi = kwargs.get('roi', None)
-        _binning = kwargs.get('binning', 1)
+        _return_type = kwargs.get("datatype", "auto")
+        _local_roi = kwargs.get("roi", None)
+        _binning = kwargs.get("binning", 1)
         if cls._data is None:
-            raise ValueError('No image has been read.')
+            raise ValueError("No image has been read.")
         _data = cls._data
         if _local_roi is not None:
             cls._roi_controller.roi = _local_roi
             _data = _data[cls._roi_controller.roi]
         if _binning != 1:
             _data = rebin(_data, int(_binning))
-        if _return_type not in ('auto', _data.dtype):
+        if _return_type not in ("auto", _data.dtype):
             _data = _data.astype(_return_type)
         return _data

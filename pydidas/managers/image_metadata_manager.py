@@ -23,15 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ImageMetadataManager']
+__all__ = ["ImageMetadataManager"]
 
 import os
 
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
-from ..core import (Parameter, ParameterCollection, AppConfigError,
-                    get_generic_param_collection,
-                    ObjectWithParameterCollection)
+from ..core import (
+    Parameter,
+    ParameterCollection,
+    AppConfigError,
+    get_generic_param_collection,
+    ObjectWithParameterCollection,
+)
 from ..data_io import import_data
 
 
@@ -72,16 +76,34 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     **kwargs : dict
         Parameters can also be supplied as kwargs, referencey by their refkey.
     """
+
     default_params = ParameterCollection(
         get_generic_param_collection(
-            'filename',  'first_file', 'hdf5_key', 'hdf5_first_image_num',
-            'hdf5_last_image_num', 'hdf5_stepping', 'binning', 'use_roi',
-            'roi_ylow', 'roi_yhigh', 'roi_xlow', 'roi_xhigh'),
+            "filename",
+            "first_file",
+            "hdf5_key",
+            "hdf5_first_image_num",
+            "hdf5_last_image_num",
+            "hdf5_stepping",
+            "binning",
+            "use_roi",
+            "roi_ylow",
+            "roi_yhigh",
+            "roi_xlow",
+            "roi_xhigh",
+        ),
         Parameter(
-            'use_filename', int, True, name='Use "filename" Parameter',
-            tooltip=('Flag to switch between the "filename" and "first_file"'
-                     ' Parameters, based on the associated App.'),
-            choices=[True, False]))
+            "use_filename",
+            int,
+            True,
+            name='Use "filename" Parameter',
+            tooltip=(
+                'Flag to switch between the "filename" and "first_file"'
+                " Parameters, based on the associated App."
+            ),
+            choices=[True, False],
+        ),
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -90,71 +112,72 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args, **kwargs)
         self.set_default_params()
-        self._config = {'raw_img_shape_x': None,
-                        'raw_img_shape_y': None,
-                        'datatype': None,
-                        'numbers': None,
-                        'final_shape': None,
-                        'roi': None,
-                        'images_per_file': -1,
-                        'hdf5_dset_shape': None
-                        }
+        self._config = {
+            "raw_img_shape_x": None,
+            "raw_img_shape_y": None,
+            "datatype": None,
+            "numbers": None,
+            "final_shape": None,
+            "roi": None,
+            "images_per_file": -1,
+            "hdf5_dset_shape": None,
+        }
 
     @property
     def raw_size_x(self):
         """
         Get the x-size of the raw image.
         """
-        return self._config['raw_img_shape_x']
+        return self._config["raw_img_shape_x"]
 
     @property
     def raw_size_y(self):
         """
         Get the y-size of the raw image.
         """
-        return self._config['raw_img_shape_y']
+        return self._config["raw_img_shape_y"]
 
     @property
     def datatype(self):
         """
         Get the datatype of the raw image.
         """
-        return self._config['datatype']
+        return self._config["datatype"]
 
     @property
     def numbers(self):
         """
         Get the numbers pointing to the selected images.
         """
-        return self._config['numbers']
+        return self._config["numbers"]
 
     @property
     def final_shape(self):
         """
         Get the final shape of the processed image (cropped & binned).
         """
-        return self._config['final_shape']
+        return self._config["final_shape"]
 
     @property
     def roi(self):
         """
         Get the ROI object required to achieve the final image shape.
         """
-        return self._config['roi']
+        return self._config["roi"]
 
     @property
     def images_per_file(self):
         """
         Get the number of images per file.
         """
-        return self._config['images_per_file']
+        return self._config["images_per_file"]
 
     @property
     def hdf5_dset_shape(self):
         """
         Get the shape of the hdf5 dataset.
         """
-        return self._config['hdf5_dset_shape']
+        return self._config["hdf5_dset_shape"]
 
     def update(self):
         """
@@ -182,9 +205,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         pathlib.Path
             The full path of the selected file.
         """
-        if self.get_param_value('use_filename'):
-            return self.get_param_value('filename')
-        return self.get_param_value('first_file')
+        if self.get_param_value("use_filename"):
+            return self.get_param_value("filename")
+        return self.get_param_value("first_file")
 
     def update_final_image(self):
         """
@@ -202,20 +225,20 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             If the selected image range is not included in the hdf5 dataset.
         """
         _filename = self.get_filename()
-        _key = self.get_param_value('hdf5_key')
+        _key = self.get_param_value("hdf5_key")
         check_hdf5_key_exists_in_file(_filename, _key)
-        _meta = get_hdf5_metadata(_filename, ['shape', 'dtype'], _key)
-        self.__verify_selection_range(_meta['shape'][0])
+        _meta = get_hdf5_metadata(_filename, ["shape", "dtype"], _key)
+        self.__verify_selection_range(_meta["shape"][0])
 
-        _n0 = self.get_param_value('hdf5_first_image_num')
-        _n1 = self._get_param_value_with_modulo('hdf5_last_image_num',
-                                                _meta['shape'][0])
-        _step = self.get_param_value('hdf5_stepping')
-        _n_per_file = ((_n1 - _n0 - 1) // _step + 1)
-        self._config['numbers'] = range(_n0, _n1, _step)
-        self._config['hdf5_dset_shape'] = _meta['shape']
-        self._store_image_data(_meta['shape'][1:3], _meta['dtype'],
-                               _n_per_file)
+        _n0 = self.get_param_value("hdf5_first_image_num")
+        _n1 = self._get_param_value_with_modulo(
+            "hdf5_last_image_num", _meta["shape"][0]
+        )
+        _step = self.get_param_value("hdf5_stepping")
+        _n_per_file = (_n1 - _n0 - 1) // _step + 1
+        self._config["numbers"] = range(_n0, _n1, _step)
+        self._config["hdf5_dset_shape"] = _meta["shape"]
+        self._store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
 
     def __verify_selection_range(self, dset_length):
         """
@@ -231,22 +254,21 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         AppConfigError
             If the range is not valid.
         """
-        _n0 = self._get_param_value_with_modulo('hdf5_first_image_num',
-                                                dset_length)
-        _n1 = self._get_param_value_with_modulo('hdf5_last_image_num',
-                                                dset_length)
+        _n0 = self._get_param_value_with_modulo("hdf5_first_image_num", dset_length)
+        _n1 = self._get_param_value_with_modulo("hdf5_last_image_num", dset_length)
         if not _n0 < _n1:
             raise AppConfigError(
-                f'The image numbers for the hdf5 file, [{_n0}, {_n1}] do'
-                ' not describe a correct range.')
+                f"The image numbers for the hdf5 file, [{_n0}, {_n1}] do"
+                " not describe a correct range."
+            )
 
     def _store_image_data_from_single_image(self):
         """
         Store config metadata from file range.
         """
         _test_image = import_data(self.get_filename())
-        self._config['numbers'] = [0]
-        self._config['hdf5_dset_shape'] = (0, 0, 0)
+        self._config["numbers"] = [0]
+        self._config["hdf5_dset_shape"] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)
 
     def _store_image_data(self, img_shape, img_dtype, n_image):
@@ -262,27 +284,26 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         n_image : int
             The number of images per file.
         """
-        self._config['images_per_file'] = n_image
-        self._config['datatype'] = img_dtype
-        self._config['raw_img_shape_x'] = img_shape[1]
-        self._config['raw_img_shape_y'] = img_shape[0]
+        self._config["images_per_file"] = n_image
+        self._config["datatype"] = img_dtype
+        self._config["raw_img_shape_x"] = img_shape[1]
+        self._config["raw_img_shape_y"] = img_shape[0]
 
     def _calculate_final_image_shape(self):
         """
         Process the ROI inputs and store the ROI.
         """
-        _binning = self.get_param_value('binning')
-        if self.get_param_value('use_roi'):
+        _binning = self.get_param_value("binning")
+        if self.get_param_value("use_roi"):
             self.__check_roi_for_consistency()
             _x0, _x1, _y0, _y1 = self.__get_modulated_roi()
             _final_shape = ((_y1 - _y0) // _binning, (_x1 - _x0) // _binning)
             _roi = (slice(_y0, _y1), slice(_x0, _x1))
         else:
-            _final_shape = (self.raw_size_y // _binning,
-                            self.raw_size_x // _binning)
+            _final_shape = (self.raw_size_y // _binning, self.raw_size_x // _binning)
             _roi = None
-        self._config['roi'] = _roi
-        self._config['final_shape'] = _final_shape
+        self._config["roi"] = _roi
+        self._config["final_shape"] = _final_shape
 
     def __check_roi_for_consistency(self):
         """
@@ -293,12 +314,12 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         AppConfigError
             If the ROI boundaries are not consistent.
         """
-        _warning = ''
+        _warning = ""
         _x0, _x1, _y0, _y1 = self.__get_modulated_roi()
         if _x1 < _x0:
-            _warning += f'ROI x-range incorrect: [{_x0}, {_x1}]. '
+            _warning += f"ROI x-range incorrect: [{_x0}, {_x1}]. "
         if _y1 < _y0:
-            _warning += f'ROI y-range incorrect: [{_y0}, {_y1}]. '
+            _warning += f"ROI y-range incorrect: [{_y0}, {_y1}]. "
         if _warning:
             raise AppConfigError(_warning)
 
@@ -313,10 +334,8 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         _nx = self.raw_size_x
         _ny = self.raw_size_y
-        _x0 = self._get_param_value_with_modulo('roi_xlow', _nx)
-        _x1 = self._get_param_value_with_modulo('roi_xhigh', _nx,
-                                                none_low=False)
-        _y0 = self._get_param_value_with_modulo('roi_ylow', _ny)
-        _y1 = self._get_param_value_with_modulo('roi_yhigh', _ny,
-                                                none_low=False)
+        _x0 = self._get_param_value_with_modulo("roi_xlow", _nx)
+        _x1 = self._get_param_value_with_modulo("roi_xhigh", _nx, none_low=False)
+        _y0 = self._get_param_value_with_modulo("roi_ylow", _ny)
+        _y1 = self._get_param_value_with_modulo("roi_yhigh", _ny, none_low=False)
         return _x0, _x1, _y0, _y1

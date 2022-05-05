@@ -23,13 +23,16 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ExperimentalSetup']
+__all__ = ["ExperimentalSetup"]
 
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_A_TO_E
-from ...core import (SingletonFactory, get_generic_param_collection,
-                     ObjectWithParameterCollection)
+from ...core import (
+    SingletonFactory,
+    get_generic_param_collection,
+    ObjectWithParameterCollection,
+)
 from .experimental_setup_io_meta import ExperimentalSetupIoMeta
 
 
@@ -42,11 +45,22 @@ class _ExpSetup(ObjectWithParameterCollection):
     The singleton factory will allow access to the single instance through
     :py:class:`pydidas.experiment.experimental_setup.ExperimentalSetup`.
     """
+
     default_params = get_generic_param_collection(
-        'xray_wavelength', 'xray_energy', 'detector_name', 'detector_npixx',
-        'detector_npixy', 'detector_pxsizex', 'detector_pxsizey',
-        'detector_dist', 'detector_poni1', 'detector_poni2', 'detector_rot1',
-        'detector_rot2', 'detector_rot3')
+        "xray_wavelength",
+        "xray_energy",
+        "detector_name",
+        "detector_npixx",
+        "detector_npixy",
+        "detector_pxsizex",
+        "detector_pxsizey",
+        "detector_dist",
+        "detector_poni1",
+        "detector_poni2",
+        "detector_rot1",
+        "detector_rot2",
+        "detector_rot3",
+    )
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
@@ -74,13 +88,12 @@ class _ExpSetup(ObjectWithParameterCollection):
             If the key does not exist.
         """
         self._check_key(param_key)
-        if param_key == 'xray_energy':
-            self.params['xray_energy'].value = value
-            self.params['xray_wavelength'].value = (
-                LAMBDA_IN_A_TO_E / value)
-        elif param_key == 'xray_wavelength':
-            self.params['xray_wavelength'].value = value
-            self.params['xray_energy'].value = LAMBDA_IN_A_TO_E / value
+        if param_key == "xray_energy":
+            self.params["xray_energy"].value = value
+            self.params["xray_wavelength"].value = LAMBDA_IN_A_TO_E / value
+        elif param_key == "xray_wavelength":
+            self.params["xray_wavelength"].value = value
+            self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
         else:
             self.params.set_value(param_key, value)
 
@@ -97,17 +110,22 @@ class _ExpSetup(ObjectWithParameterCollection):
         det : pyFAI.detectors.Detector
             The detector object.
         """
-        _name = self.get_param_value('detector_name')
+        _name = self.get_param_value("detector_name")
         try:
             _det = pyFAI.detector_factory(_name)
         except RuntimeError:
             _det = pyFAI.detectors.Detector()
         for key, value in [
-                ['pixel1', self.get_param_value('detector_pxsizey') * 1e-6],
-                ['pixel2', self.get_param_value('detector_pxsizex') * 1e-6],
-                ['max_shape', (self.get_param_value('detector_npixy'),
-                               self.get_param_value('detector_npixx'))]
-                ]:
+            ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
+            ["pixel2", self.get_param_value("detector_pxsizex") * 1e-6],
+            [
+                "max_shape",
+                (
+                    self.get_param_value("detector_npixy"),
+                    self.get_param_value("detector_npixx"),
+                ),
+            ],
+        ]:
             setattr(_det, key, value)
         return _det
 
@@ -131,13 +149,12 @@ class _ExpSetup(ObjectWithParameterCollection):
         try:
             _det = pyFAI.detector_factory(det_name)
         except RuntimeError:
-            raise NameError(f'The detector name "{det_name}"is unknown to '
-                            'pyFAI.')
-        self.set_param_value('detector_pxsizey', _det.pixel1 * 1e6)
-        self.set_param_value('detector_pxsizex', _det.pixel2 * 1e6)
-        self.set_param_value('detector_npixy', _det.max_shape[0]),
-        self.set_param_value('detector_npixx', _det.max_shape[1])
-        self.set_param_value('detector_name', _det.name)
+            raise NameError(f'The detector name "{det_name}"is unknown to ' "pyFAI.")
+        self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
+        self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
+        self.set_param_value("detector_npixy", _det.max_shape[0]),
+        self.set_param_value("detector_npixx", _det.max_shape[1])
+        self.set_param_value("detector_name", _det.name)
 
     @staticmethod
     def import_from_file(filename):

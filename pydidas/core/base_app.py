@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BaseApp']
+__all__ = ["BaseApp"]
 
 from copy import copy
 
@@ -46,15 +46,16 @@ class BaseApp(ObjectWithParameterCollection):
         A dictionary of keyword arguments. Defined by the concrete
         implementation of the app.
     """
+
     default_params = ParameterCollection()
     parse_func = None
     attributes_not_to_copy_to_slave_app = []
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.slave_mode = kwargs.get('slave_mode', False)
-        if 'slave_mode' in kwargs:
-            del kwargs['slave_mode']
+        self.slave_mode = kwargs.get("slave_mode", False)
+        if "slave_mode" in kwargs:
+            del kwargs["slave_mode"]
         self.add_params(*args, **kwargs)
         self._config = {}
         self.set_default_params()

@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTreeIoYaml']
+__all__ = ["WorkflowTreeIoYaml"]
 
 import yaml
 
@@ -34,8 +34,9 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
     """
     Base class for WorkflowTree exporters.
     """
+
     extensions = YAML_EXTENSIONS
-    format_name = 'YAML'
+    format_name = "YAML"
 
     @classmethod
     def export_to_file(cls, filename, tree, **kwargs):
@@ -53,7 +54,7 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         _dump = [node.dump() for node in tree.nodes.values()]
-        with open(filename, 'w') as _file:
+        with open(filename, "w") as _file:
             yaml.safe_dump(_dump, _file)
 
     @classmethod
@@ -75,7 +76,7 @@ class WorkflowTreeIoYaml(WorkflowTreeIoBase):
         """
         from ..workflow_tree import _WorkflowTree
 
-        with open(filename, 'r') as _file:
+        with open(filename, "r") as _file:
             _restoration = yaml.safe_load(_file)
 
         _tree = _WorkflowTree()

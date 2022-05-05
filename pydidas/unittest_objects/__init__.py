@@ -36,21 +36,26 @@ from .mp_test_app import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import create_dummy_plugins
+
 __all__.extend(create_dummy_plugins.__all__)
 del create_dummy_plugins
 
 from . import dummy_loader
+
 __all__.extend(dummy_loader.__all__)
 del dummy_loader
 
 from . import dummy_plugin_collection
+
 __all__.extend(dummy_plugin_collection.__all__)
 del dummy_plugin_collection
 
 from . import dummy_proc
+
 __all__.extend(dummy_proc.__all__)
 del dummy_proc
 
 from . import mp_test_app
+
 __all__.extend(mp_test_app.__all__)
 del mp_test_app

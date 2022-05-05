@@ -47,7 +47,6 @@ class TestClass(QtCore.QObject):
 
 
 class TestBaseFrameWithApp(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
         self.tester = TestClass()
@@ -64,7 +63,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
     def test_set_app_wrong_class(self):
         obj = BaseFrameWithApp()
         with self.assertRaises(TypeError):
-            obj._set_app('test')
+            obj._set_app("test")
 
     def test_set_app_no_existing_app(self):
         obj = BaseFrameWithApp()
@@ -74,32 +73,33 @@ class TestBaseFrameWithApp(unittest.TestCase):
 
     def test_set_app_existing_app(self):
         _bin = 5
-        _fname = Path('test/file/name.txt')
+        _fname = Path("test/file/name.txt")
         obj = BaseFrameWithApp()
-        obj._app = BaseApp(get_generic_parameter('first_file'),
-                           get_generic_parameter('binning'))
-        obj._app_attributes_to_update.append('test_attr')
-        app = BaseApp(get_generic_parameter('first_file'),
-                      get_generic_parameter('binning'))
-        app.set_param_value('binning', _bin)
-        app.set_param_value('first_file', _fname)
-        app._config['test_key'] = True
+        obj._app = BaseApp(
+            get_generic_parameter("first_file"), get_generic_parameter("binning")
+        )
+        obj._app_attributes_to_update.append("test_attr")
+        app = BaseApp(
+            get_generic_parameter("first_file"), get_generic_parameter("binning")
+        )
+        app.set_param_value("binning", _bin)
+        app.set_param_value("first_file", _fname)
+        app._config["test_key"] = True
         app.test_attr = [True, False]
         obj._set_app(app)
-        self.assertTrue(obj._app._config['test_key'])
-        self.assertEqual(obj._app.get_param_value('binning'), _bin)
-        self.assertEqual(obj._app.get_param_value('first_file'), _fname)
+        self.assertTrue(obj._app._config["test_key"])
+        self.assertEqual(obj._app.get_param_value("binning"), _bin)
+        self.assertEqual(obj._app.get_param_value("first_file"), _fname)
         self.assertEqual(obj._app.test_attr, app.test_attr)
 
     def test_apprunner_update_progress(self):
         _progress = 0.425
         obj = BaseFrameWithApp()
         obj._app = BaseApp()
-        obj._widgets['progress'] = QtWidgets.QSpinBox()
+        obj._widgets["progress"] = QtWidgets.QSpinBox()
         self.tester.signal.connect(obj._apprunner_update_progress)
         self.tester.send_progress(_progress)
-        self.assertEqual(obj._widgets['progress'].value(),
-                         round(_progress * 100))
+        self.assertEqual(obj._widgets["progress"].value(), round(_progress * 100))
 
     def test_apprunner_finished(self):
         obj = BaseFrameWithApp()

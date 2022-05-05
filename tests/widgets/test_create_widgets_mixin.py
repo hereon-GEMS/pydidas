@@ -30,16 +30,17 @@ from qtpy import QtWidgets
 
 from pydidas.core import WidgetLayoutError
 from pydidas.widgets.factory.create_widgets_mixin import (
-    CreateWidgetsMixIn, _get_widget_layout_args, _get_grid_pos)
+    CreateWidgetsMixIn,
+    _get_widget_layout_args,
+    _get_grid_pos,
+)
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
-
     def __init__(self, *args, parent=None, **kwargs):
         super().__init__(parent)
         self.hash = hash(self)
-        self.name = ''.join(random.choice(string.ascii_letters)
-                            for i in range(20))
+        self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 
 
 def get_test_widget(*args, **kwargs):
@@ -47,7 +48,6 @@ def get_test_widget(*args, **kwargs):
 
 
 class TestCreateWidgetsMixIn(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
         self.widgets = []
@@ -75,15 +75,20 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def test_get_grid_pos_kwargs(self):
         _gridPos = (2, 7, 5, 3)
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(obj, row=_gridPos[0], column=_gridPos[1],
-                                  n_rows=_gridPos[2], n_columns=_gridPos[3])
+        _grid_pos = _get_grid_pos(
+            obj,
+            row=_gridPos[0],
+            column=_gridPos[1],
+            n_rows=_gridPos[2],
+            n_columns=_gridPos[3],
+        )
         self.assertEqual(_grid_pos, _gridPos)
 
     def test_get_grid_pos_auto_row(self):
         _gridPos = (-1, 7, 5, 3)
         obj = self.get_widget()
         _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
-        self.assertEqual(_grid_pos, (0, ) + _gridPos[1:])
+        self.assertEqual(_grid_pos, (0,) + _gridPos[1:])
 
     def test_get_grid_pos_auto_row_more_items(self):
         _gridPos = (-1, 7, 5, 3)
@@ -93,7 +98,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
             _w = TestWidget()
             obj.layout().addWidget(_w, i, 0, 1, 1)
         _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
-        self.assertEqual(_grid_pos, (_nwidget, ) + _gridPos[1:])
+        self.assertEqual(_grid_pos, (_nwidget,) + _gridPos[1:])
 
     def test_get_widget_layout_args_no_layout(self):
         obj = TestWidget()
@@ -102,28 +107,25 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_get_widget_layout_box(self):
         _stretch = 1.3
-        _alignment = 'random'
+        _alignment = "random"
         obj = TestWidget()
         obj.setLayout(QtWidgets.QVBoxLayout())
-        items = _get_widget_layout_args(obj, stretch=_stretch,
-                                        alignment=_alignment)
+        items = _get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [_stretch, _alignment])
 
     def test_get_widget_layout_stacked(self):
         _stretch = 1.3
-        _alignment = 'random'
+        _alignment = "random"
         obj = TestWidget()
         obj.setLayout(QtWidgets.QStackedLayout())
-        items = _get_widget_layout_args(obj, stretch=_stretch,
-                                        alignment=_alignment)
+        items = _get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [])
 
     def test_get_widget_layout_grid_no_alignment(self):
         _gridPos = (2, 7, 5, 3)
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
-        items = _get_widget_layout_args(obj, gridPos=_gridPos,
-                                        alignment=None)
+        items = _get_widget_layout_args(obj, gridPos=_gridPos, alignment=None)
         self.assertEqual(items, [*_gridPos])
 
     def test_get_widget_layout_grid(self):
@@ -141,71 +143,70 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def test_init(self):
         obj = TestWidget()
         self.assertIsInstance(obj, CreateWidgetsMixIn)
-        self.assertTrue(hasattr(obj, '_widgets'))
+        self.assertTrue(hasattr(obj, "_widgets"))
 
     def test_create_label(self):
         obj = self.get_widget()
-        obj.create_label('ref', 'Test text', parent_widget=obj)
-        _label = obj._widgets['ref']
+        obj.create_label("ref", "Test text", parent_widget=obj)
+        _label = obj._widgets["ref"]
         self.assertEqual(_label, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_label, QtWidgets.QLabel)
 
     def test_create_line(self):
         obj = self.get_widget()
-        obj.create_line('ref', parent_widget=obj)
-        _line = obj._widgets['ref']
+        obj.create_line("ref", parent_widget=obj)
+        _line = obj._widgets["ref"]
         self.assertEqual(_line, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_line, QtWidgets.QFrame)
 
     def test_create_spacer(self):
         obj = self.get_widget()
-        obj.create_spacer('ref', parent_widget=obj)
-        _spacer = obj._widgets['ref']
+        obj.create_spacer("ref", parent_widget=obj)
+        _spacer = obj._widgets["ref"]
         self.assertEqual(_spacer, obj.layout().itemAtPosition(0, 0))
         self.assertIsInstance(_spacer, QtWidgets.QSpacerItem)
 
     def test_create_button(self):
-        _text = 'button text'
+        _text = "button text"
         obj = self.get_widget()
-        obj.create_button('ref', _text, parent_widget=obj)
-        _but = obj._widgets['ref']
+        obj.create_button("ref", _text, parent_widget=obj)
+        _but = obj._widgets["ref"]
         self.assertEqual(_but, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_but, QtWidgets.QPushButton)
         self.assertEqual(_but.text(), _text)
 
     def test_create_spinbox(self):
         obj = self.get_widget()
-        obj.create_spin_box('ref', parent_widget=obj)
-        _spin = obj._widgets['ref']
+        obj.create_spin_box("ref", parent_widget=obj)
+        _spin = obj._widgets["ref"]
         self.assertEqual(_spin, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_spin, QtWidgets.QSpinBox)
 
     def test_create_progress_bar(self):
         obj = self.get_widget()
-        obj.create_progress_bar('ref', parent_widget=obj)
-        _bar = obj._widgets['ref']
+        obj.create_progress_bar("ref", parent_widget=obj)
+        _bar = obj._widgets["ref"]
         self.assertEqual(_bar, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_bar, QtWidgets.QProgressBar)
 
     def test_create_check_box(self):
-        _text = 'another test text'
+        _text = "another test text"
         obj = self.get_widget()
-        obj.create_check_box('ref', _text, parent_widget=obj)
-        _box = obj._widgets['ref']
+        obj.create_check_box("ref", _text, parent_widget=obj)
+        _box = obj._widgets["ref"]
         self.assertEqual(_box, obj.layout().itemAtPosition(0, 0).widget())
         self.assertIsInstance(_box, QtWidgets.QCheckBox)
         self.assertEqual(_box.text(), _text)
 
     def test_create_widget__with_layout_args(self):
         obj = self.get_widget()
-        obj._CreateWidgetsMixIn__create_widget(
-            get_test_widget, 'ref', layout_kwargs={})
-        self.assertTrue('ref' in obj._widgets)
+        obj._CreateWidgetsMixIn__create_widget(get_test_widget, "ref", layout_kwargs={})
+        self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__plain(self):
         obj = self.get_widget()
-        obj.create_any_widget('ref', TestWidget)
-        self.assertTrue('ref' in obj._widgets)
+        obj.create_any_widget("ref", TestWidget)
+        self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__wrong_ref(self):
         obj = self.get_widget()
@@ -219,8 +220,8 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_add_any_widget__plain(self):
         obj = self.get_widget()
-        obj.add_any_widget('ref', TestWidget(), layout_kwargs={})
-        self.assertTrue('ref' in obj._widgets)
+        obj.add_any_widget("ref", TestWidget(), layout_kwargs={})
+        self.assertTrue("ref" in obj._widgets)
 
 
 if __name__ == "__main__":

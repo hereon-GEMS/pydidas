@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['MpTestApp']
+__all__ = ["MpTestApp"]
 
 import time
 
@@ -57,7 +57,7 @@ def get_test_image(index, **kwargs):
         A two-dimension array with random numbers.
 
     """
-    _shape = kwargs.get('shape', (20, 20))
+    _shape = kwargs.get("shape", (20, 20))
     return np.random.random(_shape) + 1e-5
 
 
@@ -65,35 +65,40 @@ class MpTestApp(BaseApp):
     """
     A test Application for multiprocessing.
     """
+
     default_params = get_generic_param_collection(
-        'hdf5_first_image_num', 'hdf5_last_image_num')
+        "hdf5_first_image_num", "hdf5_last_image_num"
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_default_params()
         self._composite = None
-        self._config = {'n_image': None,
-                        'datatype': None,
-                        'mp_pre_run_called': False,
-                        'mp_post_run_called': False,
-                        'calls': 0,
-                        'min_index': 0,
-                        'max_index': 40
-                        }
+        self._config = {
+            "n_image": None,
+            "datatype": None,
+            "mp_pre_run_called": False,
+            "mp_post_run_called": False,
+            "calls": 0,
+            "min_index": 0,
+            "max_index": 40,
+        }
 
     def multiprocessing_pre_run(self):
         """
         The pre-run method sets up the tasks and creates a compositite image.
         """
-        self._config['mp_pre_run_called'] = True
-        self._config['mp_tasks'] = range(self._config['min_index'],
-                                         self._config['max_index'])
+        self._config["mp_pre_run_called"] = True
+        self._config["mp_tasks"] = range(
+            self._config["min_index"], self._config["max_index"]
+        )
         self._composite = CompositeImageManager(
             image_shape=(20, 20),
             composite_nx=10,
-            composite_ny=int(np.ceil((self._config['max_index'])/10)),
-            composite_dir='x',
-            datatype=np.float64)
+            composite_ny=int(np.ceil((self._config["max_index"]) / 10)),
+            composite_dir="x",
+            datatype=np.float64,
+        )
 
     def multiprocessing_get_tasks(self):
         """
@@ -107,7 +112,7 @@ class MpTestApp(BaseApp):
         range
             The range of tasks.
         """
-        return self._config['mp_tasks']
+        return self._config["mp_tasks"]
 
     def multiprocessing_carryon(self):
         """
@@ -121,8 +126,8 @@ class MpTestApp(BaseApp):
         bool
             The flag whether data is available or not.
         """
-        self._config['calls'] += 1
-        if self._config['calls'] % 2:
+        self._config["calls"] += 1
+        if self._config["calls"] % 2:
             time.sleep(0.001)
             return False
         return True
@@ -143,7 +148,7 @@ class MpTestApp(BaseApp):
         image : np.ndarray
             The image data.
         """
-        _fname, _kwargs = 'dummy', {'shape': (20, 20)}
+        _fname, _kwargs = "dummy", {"shape": (20, 20)}
         _image = get_test_image(_fname, **_kwargs)
         return _image
 
@@ -162,7 +167,7 @@ class MpTestApp(BaseApp):
         image : np.ndarray
             The image data.
         """
-        self._composite.insert_image(image, index - self._config['min_index'])
+        self._composite.insert_image(image, index - self._config["min_index"])
 
     def multiprocessing_post_run(self):
         """
@@ -171,4 +176,4 @@ class MpTestApp(BaseApp):
         The MpTestApp will only store an internal variable to document that
         this method has been called.
         """
-        self._config['mp_post_run_called'] = True
+        self._config["mp_post_run_called"] = True

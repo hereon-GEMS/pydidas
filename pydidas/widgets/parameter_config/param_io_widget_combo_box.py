@@ -23,13 +23,16 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamIoWidgetComboBox']
+__all__ = ["ParamIoWidgetComboBox"]
 
 from qtpy import QtWidgets, QtCore
 
 from .base_param_io_widget import BaseParamIoWidget
-from ...core.utils import (convert_unicode_to_ascii, SignalBlocker,
-                           convert_special_chars_to_unicode)
+from ...core.utils import (
+    convert_unicode_to_ascii,
+    SignalBlocker,
+    convert_special_chars_to_unicode,
+)
 
 
 class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
@@ -37,6 +40,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
     Widgets for I/O during plugin parameter editing with predefined
     choices.
     """
+
     # because of the double inheritance, inhering the signal does not work
     io_edited = QtCore.Signal(str)
 
@@ -58,7 +62,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
         """
         super().__init__(parent, param, width)
         for choice in param.choices:
-            self.addItem(f'{convert_special_chars_to_unicode(str(choice))}')
+            self.addItem(f"{convert_special_chars_to_unicode(str(choice))}")
         self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
         self.set_value(param.value)
@@ -81,10 +85,10 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
             The input value, with 0/1 converted it True or False are
             widget choices.
         """
-        if value == 0 and 'False' in self.__items:
-            value = 'False'
-        elif value == 1 and 'True' in self.__items:
-            value = 'True'
+        if value == 0 and "False" in self.__items:
+            value = "False"
+        elif value == 1 and "True" in self.__items:
+            value = "True"
         return value
 
     def emit_signal(self):

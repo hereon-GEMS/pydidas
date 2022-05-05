@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterCollectionMixIn']
+__all__ = ["ParameterCollectionMixIn"]
 
 from numbers import Integral
 
@@ -94,7 +94,8 @@ class ParameterCollectionMixIn:
             else:
                 raise TypeError(
                     f'Cannot add object of type "{_param.__class__}" '
-                    'to ParameterCollection.')
+                    "to ParameterCollection."
+                )
 
     def set_default_params(self):
         """
@@ -129,8 +130,9 @@ class ParameterCollectionMixIn:
         """
         if param_key not in self.params:
             if len(default) == 0:
-                raise KeyError(f'No parameter with the name "{param_key}" '
-                               'has been registered.')
+                raise KeyError(
+                    f'No parameter with the name "{param_key}" ' "has been registered."
+                )
             if len(default) >= 1:
                 return default[0]
         _val = self.params.get_value(param_key)
@@ -204,9 +206,10 @@ class ParameterCollectionMixIn:
         filter_types_for_export : bool
             Flag to return objects in
         """
-        name_val_pairs = {_key: (_param.value_for_export
-                                 if filter_types_for_export else _param.value)
-                          for _key, _param in self.params.items()}
+        name_val_pairs = {
+            _key: (_param.value_for_export if filter_types_for_export else _param.value)
+            for _key, _param in self.params.items()
+        }
         return name_val_pairs
 
     def get_param_keys(self):
@@ -227,10 +230,9 @@ class ParameterCollectionMixIn:
         """
         _config = self.get_param_values_as_dict()
         for _key in _config:
-            print(f'{_key}: {_config[_key]}')
+            print(f"{_key}: {_config[_key]}")
 
-    def _get_param_value_with_modulo(self, param_refkey, modulo,
-                                     none_low=True):
+    def _get_param_value_with_modulo(self, param_refkey, modulo, none_low=True):
         """
         Get a Parameter value modulo another value.
 
@@ -264,8 +266,9 @@ class ParameterCollectionMixIn:
         """
         _param = self.get_param(param_refkey)
         if _param.type is not Integral:
-            raise ValueError(f'The datatype of Parameter "{_param.refkey}"'
-                             ' is not integer.')
+            raise ValueError(
+                f'The datatype of Parameter "{_param.refkey}"' " is not integer."
+            )
         if _param.value == modulo:
             return _param.value
         if _param.value is None:
@@ -304,5 +307,6 @@ class ParameterCollectionMixIn:
             If the key does not exist.
         """
         if key not in self.params:
-            raise KeyError(f'The key {key} is not registered with '
-                           f'{self.__class__.__name__}!')
+            raise KeyError(
+                f"The key {key} is not registered with " f"{self.__class__.__name__}!"
+            )

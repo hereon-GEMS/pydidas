@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginInWorkflowBox']
+__all__ = ["PluginInWorkflowBox"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -45,6 +45,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     parent : Union[QtWidgets.QWidget, None], optional
         The widget's parent. The default is None.
     """
+
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
     widget_activated = QtCore.Signal(int)
@@ -65,8 +66,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.del_button.setIcon(self.style().standardIcon(3))
         self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
         for item in [self, self.del_button]:
-            item.setStyleSheet(
-                qt_presets.QT_STYLES['workflow_plugin_inactive'])
+            item.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
         self.del_button.clicked.connect(self.delete)
 
     def mousePressEvent(self, event):
@@ -100,8 +100,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             (False).
         """
         if selection:
-            _style = qt_presets.QT_STYLES['workflow_plugin_active']
+            _style = qt_presets.QT_STYLES["workflow_plugin_active"]
         else:
-            _style = qt_presets.QT_STYLES['workflow_plugin_inactive']
+            _style = qt_presets.QT_STYLES["workflow_plugin_inactive"]
         self.setStyleSheet(_style)
         self.active = selection

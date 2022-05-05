@@ -33,10 +33,12 @@ from .workflow_result_saver_meta import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import workflow_result_saver_base
+
 __all__.extend(workflow_result_saver_base.__all__)
 del workflow_result_saver_base
 
 from . import workflow_result_saver_meta
+
 __all__.extend(workflow_result_saver_meta.__all__)
 del workflow_result_saver_meta
 
@@ -44,13 +46,19 @@ del workflow_result_saver_meta
 # with the Metaclass:
 import os
 import importlib
+
 _dir = os.path.dirname(__file__)
-_io_classes = set(item.strip('.py') for item in os.listdir(_dir)
-                  if (item.startswith('workflow_result_saver')
-                      and not item[-7:] in ['base.py', 'meta.py']))
+_io_classes = set(
+    item.strip(".py")
+    for item in os.listdir(_dir)
+    if (
+        item.startswith("workflow_result_saver")
+        and not item[-7:] in ["base.py", "meta.py"]
+    )
+)
 
 for _module in _io_classes:
-    _module = importlib.import_module(f'.{_module}', __package__)
+    _module = importlib.import_module(f".{_module}", __package__)
     __all__ += _module.__all__
 
 del _module

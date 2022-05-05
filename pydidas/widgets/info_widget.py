@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['InfoWidget']
+__all__ = ["InfoWidget"]
 
 from qtpy import QtWidgets, QtCore, QtGui
 
@@ -67,12 +67,10 @@ class _InfoWidget(QtWidgets.QPlainTextEdit):
             The text to add.
         """
         _cursor = self.textCursor()
-        _cursor.movePosition(QtGui.QTextCursor.Start,
-                             QtGui.QTextCursor.MoveAnchor, 1)
+        _cursor.movePosition(QtGui.QTextCursor.Start, QtGui.QTextCursor.MoveAnchor, 1)
         self.setTextCursor(_cursor)
-        self.insertPlainText(f'{get_time_string()}: {text}')
-        self.verticalScrollBar().triggerAction(
-            QtWidgets.QScrollBar.SliderToMinimum)
+        self.insertPlainText(f"{get_time_string()}: {text}")
+        self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
 
 InfoWidget = SingletonFactory(_InfoWidget)

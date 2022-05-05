@@ -34,9 +34,9 @@ from pydidas.data_io import IoMaster
 
 def create_tester_class():
     class Tester(IoBase):
-        extensions_export = ['.test', '.export']
-        extensions_import = ['.test', '.import']
-        format_name = 'Tester'
+        extensions_export = [".test", ".export"]
+        extensions_import = [".test", ".import"]
+        format_name = "Tester"
 
         @classmethod
         def export_to_file(cls, filename, data, **kwargs):
@@ -48,7 +48,6 @@ def create_tester_class():
 
 
 class TestIoBase(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._stored_exts_import = IoMaster.registry_import.copy()
@@ -69,28 +68,28 @@ class TestIoBase(unittest.TestCase):
 
     def test_export_to_file(self):
         with self.assertRaises(NotImplementedError):
-            IoBase.export_to_file('', None)
+            IoBase.export_to_file("", None)
 
     def test_import_from_file(self):
         with self.assertRaises(NotImplementedError):
-            IoBase.export_to_file('', None)
+            IoBase.export_to_file("", None)
 
     def test_check_for_existing_file__file_exists(self):
-        _fname = os.path.join(self._tmpdir, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('Test text')
+        _fname = os.path.join(self._tmpdir, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("Test text")
         with self.assertRaises(FileExistsError):
             IoBase.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_exists_overwrite(self):
-        _fname = os.path.join(self._tmpdir, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('Test text')
+        _fname = os.path.join(self._tmpdir, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("Test text")
         IoBase.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise an error
 
     def test_check_for_existing_file__file_does_not_exist(self):
-        _fname = os.path.join(self._tmpdir, 'test.txt')
+        _fname = os.path.join(self._tmpdir, "test.txt")
         IoBase.check_for_existing_file(_fname)
         # assert does not raise an error
 
@@ -106,7 +105,7 @@ class TestIoBase(unittest.TestCase):
     def test_return_data_w_roi(self):
         _roi = [2, 8, 2, 8]
         IoBase._data = np.random.random((10, 10))
-        _cropped_data = IoBase._data[_roi[0]:_roi[1], _roi[2]:_roi[3]]
+        _cropped_data = IoBase._data[_roi[0] : _roi[1], _roi[2] : _roi[3]]
         _data = IoBase.return_data(roi=_roi)
         self.assertTrue((_cropped_data == _data).all())
 

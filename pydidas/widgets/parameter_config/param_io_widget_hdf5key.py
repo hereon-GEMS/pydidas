@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamIoWidgetHdf5Key']
+__all__ = ["ParamIoWidgetHdf5Key"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -37,7 +37,8 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     """
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
-     """
+    """
+
     io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
@@ -57,8 +58,7 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
-        self._button.setToolTip(
-            'Select a dataset from all dataset keys in a file.')
+        self._button.setToolTip("Select a dataset from all dataset keys in a file.")
 
     def button_function(self):
         """
@@ -67,10 +67,9 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        _fnames = ' *'.join(HDF5_EXTENSIONS)
+        _fnames = " *".join(HDF5_EXTENSIONS)
         fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Name of file', None,
-            (f'HDF5 files (*{_fnames});; All files (*.*)')
+            self, "Name of file", None, (f"HDF5 files (*{_fnames});; All files (*.*)")
         )[0]
         if fname:
             dset = Hdf5DatasetSelectionPopup(self, fname).get_dset()

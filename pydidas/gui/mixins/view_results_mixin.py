@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ViewResultsMixin']
+__all__ = ["ViewResultsMixin"]
 
 import os
 
@@ -62,16 +62,21 @@ class ViewResultsMixin:
       - saving_format
       - enable_overwrite
     """
+
     def __init__(self, **kwargs):
-        self._config.update({'data_use_timeline': False,
-                             'plot_dim': 2,
-                             'plot_active': False,
-                             'active_node': None,
-                             'data_slices': (),
-                             'frame_active': True,
-                             'source_hash': RESULTS.source_hash})
-        self._data_axlabels = ['', '']
-        self._data_axunits = ['', '']
+        self._config.update(
+            {
+                "data_use_timeline": False,
+                "plot_dim": 2,
+                "plot_active": False,
+                "active_node": None,
+                "data_slices": (),
+                "frame_active": True,
+                "source_hash": RESULTS.source_hash,
+            }
+        )
+        self._data_axlabels = ["", ""]
+        self._data_axunits = ["", ""]
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
 
@@ -79,12 +84,11 @@ class ViewResultsMixin:
         """
         Connect all required Qt slots and signals.
         """
-        self._widgets['but_export_current'].clicked.connect(
-            self._export_current)
-        self._widgets['but_export_all'].clicked.connect(
-            self._export_all)
-        self._widgets['result_selector'].new_selection.connect(
-            self.update_result_selection)
+        self._widgets["but_export_current"].clicked.connect(self._export_current)
+        self._widgets["but_export_all"].clicked.connect(self._export_all)
+        self._widgets["result_selector"].new_selection.connect(
+            self.update_result_selection
+        )
 
     def _verify_result_shapes_uptodate(self):
         """
@@ -92,9 +96,9 @@ class ViewResultsMixin:
         (i.e. the ScanSetup and WorkflowTree) have not changed.
         """
         _hash = RESULTS.source_hash
-        if _hash != self._config['source_hash']:
+        if _hash != self._config["source_hash"]:
             RESULTS.update_shapes_from_scan_and_workflow()
-            self._config['source_hash'] = RESULTS.source_hash
+            self._config["source_hash"] = RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()
             self._update_choices_of_selected_results()
@@ -104,22 +108,23 @@ class ViewResultsMixin:
         Clear the selection of the results and reset the view. This method
         will hide the data selection widgets.
         """
-        self.set_param_value('selected_results', 'No selection')
-        self.params['selected_results'].choices = ['No selection']
-        self._widgets['result_selector'].reset()
+        self.set_param_value("selected_results", "No selection")
+        self.params["selected_results"].choices = ["No selection"]
+        self._widgets["result_selector"].reset()
 
     def _clear_plot(self):
         """
         Clear all curves / images from the plot and disable any new updates.
         """
-        self._config['plot_active'] = False
-        for _plot in [self._widgets['plot1d'], self._widgets['plot2d']]:
+        self._config["plot_active"] = False
+        for _plot in [self._widgets["plot1d"], self._widgets["plot2d"]]:
             for _item in _plot.getItems():
                 _plot.removeItem(_item)
 
     @QtCore.Slot(bool, object, int, object, str)
-    def update_result_selection(self, use_timeline, active_plot_dims,
-                                node_id, slices, plot_type):
+    def update_result_selection(
+        self, use_timeline, active_plot_dims, node_id, slices, plot_type
+    ):
         """
         Update the selection of results to show in the plot.
 
@@ -137,15 +142,16 @@ class ViewResultsMixin:
         plot_type : str
             The type of plot to be shown.
         """
-        self._config['plot_active'] = True
-        self._config['data_use_timeline'] = use_timeline
-        self._config['active_dims'] = active_plot_dims
-        self._config['active_node'] = node_id
-        self._config['data_slices'] = slices
-        self._config['plot_type'] = plot_type
+        self._config["plot_active"] = True
+        self._config["data_use_timeline"] = use_timeline
+        self._config["active_dims"] = active_plot_dims
+        self._config["active_node"] = node_id
+        self._config["data_slices"] = slices
+        self._config["plot_type"] = plot_type
         _datalength = np.asarray([_n.size for _n in slices])
-        self._config['local_dims'] = {_val: _index for _index, _val in
-                                      enumerate(np.where(_datalength > 1)[0])}
+        self._config["local_dims"] = {
+            _val: _index for _index, _val in enumerate(np.where(_datalength > 1)[0])
+        }
         self.update_plot()
 
     def update_plot(self):
@@ -155,28 +161,29 @@ class ViewResultsMixin:
         This method will get the latest result (subset) from the
         WorkflowResults and update the plot.
         """
-        if not self._config['plot_active']:
+        if not self._config["plot_active"]:
             return
-        _dim = (1 if self._config['plot_type']
-                in ['1D plot', 'roup of 1D plots'] else 2)
-        _node = self._config['active_node']
+        _dim = 1 if self._config["plot_type"] in ["1D plot", "roup of 1D plots"] else 2
+        _node = self._config["active_node"]
         _data = RESULTS.get_result_subset(
-            _node, self._config['data_slices'],
-            flattened_scan_dim=self._config['data_use_timeline'],
-            force_string_metadata=True)
+            _node,
+            self._config["data_slices"],
+            flattened_scan_dim=self._config["data_use_timeline"],
+            force_string_metadata=True,
+        )
         self._data_axlabels = _data.axis_labels.copy()
         self._data_axunits = _data.axis_units.copy()
-        if self._config['plot_type'] == 'group of 1D plots':
-            self._widgets['plot_stack'].setCurrentIndex(0)
+        if self._config["plot_type"] == "group of 1D plots":
+            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot_group_of_curves(_data)
-        elif self._config['plot_type'] == '1D plot':
-            self._widgets['plot_stack'].setCurrentIndex(0)
+        elif self._config["plot_type"] == "1D plot":
+            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot1d(_data, replace=True)
-        elif self._config['plot_type'] in ['2D full axes', '2D data subset']:
-            self._widgets['plot_stack'].setCurrentIndex(1)
+        elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
+            self._widgets["plot_stack"].setCurrentIndex(1)
             self._plot_2d(_data)
-        _plot = self._widgets[f'plot{_dim}d']
-        _plot.setGraphTitle(RESULTS.labels[_node] + f' (node #{_node:03d})')
+        _plot = self._widgets[f"plot{_dim}d"]
+        _plot.setGraphTitle(RESULTS.labels[_node] + f" (node #{_node:03d})")
 
     def _axlabels(self, index):
         """
@@ -194,7 +201,7 @@ class ViewResultsMixin:
         """
         _label = self._data_axlabels[index]
         _unit = self._data_axunits[index]
-        return _label + (' / ' + _unit if len(str(_unit)) > 0 else '')
+        return _label + (" / " + _unit if len(str(_unit)) > 0 else "")
 
     def _plot_group_of_curves(self, data):
         """
@@ -205,19 +212,24 @@ class ViewResultsMixin:
         data : pydidas.core.Dataset
             The dataset with the data to be plotted.
         """
-        def _legend(i):
-            return (data.axis_labels[0] + '='
-                    + f'{data.axis_ranges[0][i]:.4f}'
-                    + data.axis_units[0])
 
-        _active_dim = self._config['active_dims'][0]
-        _local_dim = self._config['local_dims'][_active_dim]
+        def _legend(i):
+            return (
+                data.axis_labels[0]
+                + "="
+                + f"{data.axis_ranges[0][i]:.4f}"
+                + data.axis_units[0]
+            )
+
+        _active_dim = self._config["active_dims"][0]
+        _local_dim = self._config["local_dims"][_active_dim]
         if _local_dim == 0:
             data = data.transpose()
         self._plot1d(data[0], replace=True, legend=_legend(0))
         for _index in range(1, data.shape[0]):
-            self._plot1d(data[_index], replace=False, legend=_legend(_index),
-                         label_dim=1)
+            self._plot1d(
+                data[_index], replace=False, legend=_legend(_index), label_dim=1
+            )
 
     def _plot1d(self, data, replace=True, legend=None, label_dim=0):
         """
@@ -237,12 +249,17 @@ class ViewResultsMixin:
             The dimension of the X-axis label. For 1D-Datasets, this is 0.
             The default is 0.
         """
-        _plot = self._widgets['plot1d']
+        _plot = self._widgets["plot1d"]
         if not isinstance(data.axis_ranges[0], np.ndarray):
             data.axis_ranges[0] = np.arange(data.size)
-        _plot.addCurve(data.axis_ranges[0], data.array, replace=replace,
-                       linewidth=1.5, legend=legend)
-        _plot.setGraphYLabel(RESULTS.data_labels[self._config['active_node']])
+        _plot.addCurve(
+            data.axis_ranges[0],
+            data.array,
+            replace=replace,
+            linewidth=1.5,
+            legend=legend,
+        )
+        _plot.setGraphYLabel(RESULTS.data_labels[self._config["active_node"]])
         _plot.setGraphXLabel(self._axlabels(label_dim))
 
     def _plot_2d(self, data):
@@ -254,24 +271,27 @@ class ViewResultsMixin:
         data : pydidas.core.Dataset
             The data.
         """
-        _plot = self._widgets['plot2d']
+        _plot = self._widgets["plot2d"]
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
                 data.axis_ranges[_dim] = np.arange(data.shape[_dim])
-        _dim0, _dim1 = self._config['active_dims']
+        _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()
-        _ax_labels = [data.axis_labels[i]
-                      + (' / ' + data.axis_units[i]
-                         if len(data.axis_units[i]) > 0 else '')
-                      for i in [0, 1]]
-        _originx, _scalex = self.__get_2d_plot_ax_settings(
-            data.axis_ranges[1])
-        _originy, _scaley = self.__get_2d_plot_ax_settings(
-            data.axis_ranges[0])
-        _plot.addImage(data, replace=True, copy=False,
-                       origin=(_originx, _originy),
-                       scale=(_scalex, _scaley))
+        _ax_labels = [
+            data.axis_labels[i]
+            + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
+            for i in [0, 1]
+        ]
+        _originx, _scalex = self.__get_2d_plot_ax_settings(data.axis_ranges[1])
+        _originy, _scaley = self.__get_2d_plot_ax_settings(data.axis_ranges[0])
+        _plot.addImage(
+            data,
+            replace=True,
+            copy=False,
+            origin=(_originx, _originy),
+            scale=(_scalex, _scaley),
+        )
         _plot.setGraphYLabel(_ax_labels[0])
         _plot.setGraphXLabel(_ax_labels[1])
 
@@ -303,29 +323,30 @@ class ViewResultsMixin:
         Update the choices of the "selected_results" Parameter based on the
         latest WorkflowResults.
         """
-        _param = self.get_param('selected_results')
+        _param = self.get_param("selected_results")
         RESULTS.update_param_choices_from_labels(_param)
-        self._widgets['result_selector'].get_and_store_result_node_labels()
+        self._widgets["result_selector"].get_and_store_result_node_labels()
 
     def _update_export_button_activation(self):
         """
         Update the enabled state of the export buttons based on available
         results.
         """
-        _active = (RESULTS.shapes != {})
-        self._widgets['but_export_current'].setEnabled(_active)
-        self._widgets['but_export_all'].setEnabled(_active)
+        _active = RESULTS.shapes != {}
+        self._widgets["but_export_current"].setEnabled(_active)
+        self._widgets["but_export_all"].setEnabled(_active)
 
     @QtCore.Slot()
     def _export_current(self):
         """
         Export the current node's data to a WorkflowResults saver.
         """
-        _node = self._widgets['result_selector']._active_node
+        _node = self._widgets["result_selector"]._active_node
         if _node == -1:
-            critical_warning('No node selected',
-                             ('No node has been selected. Please select a '
-                              'node and try again.'))
+            critical_warning(
+                "No node selected",
+                ("No node has been selected. Please select a " "node and try again."),
+            )
             return
         self._export(_node)
 
@@ -346,22 +367,30 @@ class ViewResultsMixin:
             The single node to be exported. If None, all nodes will be
             exported. The default is None.
         """
-        _formats = self.get_param_value('saving_format')
+        _formats = self.get_param_value("saving_format")
         if _formats is None:
-            critical_warning('No format selected',
-                             ('No saving format node has been selected. '
-                              'Please select a format and try again.'))
+            critical_warning(
+                "No format selected",
+                (
+                    "No saving format node has been selected. "
+                    "Please select a format and try again."
+                ),
+            )
             return
-        _overwrite = self.get_param_value('enable_overwrite')
+        _overwrite = self.get_param_value("enable_overwrite")
         while True:
             _dirname = QtWidgets.QFileDialog.getExistingDirectory(
-                self, 'Name of directory', None)
-            if _dirname == '' or len(os.listdir(_dirname)) == 0 or _overwrite:
+                self, "Name of directory", None
+            )
+            if _dirname == "" or len(os.listdir(_dirname)) == 0 or _overwrite:
                 break
-            critical_warning('Directory not empty',
-                             'The selected directory is not empty. Please '
-                             'select an empty directory or cancel.')
-        if _dirname == '':
+            critical_warning(
+                "Directory not empty",
+                "The selected directory is not empty. Please "
+                "select an empty directory or cancel.",
+            )
+        if _dirname == "":
             return
-        RESULTS.save_results_to_disk(_dirname, _formats, overwrite=_overwrite,
-                                     node_id=node)
+        RESULTS.save_results_to_disk(
+            _dirname, _formats, overwrite=_overwrite, node_id=node
+        )

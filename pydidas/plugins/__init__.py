@@ -39,33 +39,41 @@ from .pyfai_integration_base import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import base_input_plugin
+
 __all__.extend(base_input_plugin.__all__)
 del base_input_plugin
 
 from . import base_input_plugin_1d
+
 __all__.extend(base_input_plugin_1d.__all__)
 del base_input_plugin_1d
 
 from . import base_output_plugin
+
 __all__.extend(base_output_plugin.__all__)
 del base_output_plugin
 
 from . import base_plugin
+
 __all__.extend(base_plugin.__all__)
 del base_plugin
 
 from . import base_proc_plugin
+
 __all__.extend(base_proc_plugin.__all__)
 del base_proc_plugin
 
 from . import plugin_collection
+
 __all__.extend(plugin_collection.__all__)
 del plugin_collection
 
 from . import plugin_getter_
+
 __all__.extend(plugin_getter_.__all__)
 del plugin_getter_
 
 from . import pyfai_integration_base
+
 __all__.extend(pyfai_integration_base.__all__)
 del pyfai_integration_base

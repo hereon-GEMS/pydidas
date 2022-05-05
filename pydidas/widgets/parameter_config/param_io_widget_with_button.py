@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamIoWidgetWithButton']
+__all__ = ["ParamIoWidgetWithButton"]
 
 from functools import partial
 
@@ -51,10 +51,10 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         The icon for the button. If None, the standard "file open" icon
         will be used.
     """
+
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH,
-                 button_icon=None):
+    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH, button_icon=None):
         super().__init__(parent, param, width)
         self.ledit = QtWidgets.QLineEdit()
         self.ledit.setFixedWidth(width - PARAM_INPUT_WIDGET_HEIGHT - 2)
@@ -63,7 +63,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         if not isinstance(button_icon, QtGui.QIcon):
             button_icon = self.style().standardIcon(42)
 
-        self._button = QtWidgets.QPushButton(button_icon, '')
+        self._button = QtWidgets.QPushButton(button_icon, "")
         self._button.setFixedWidth(PARAM_INPUT_WIDGET_HEIGHT)
         self._button.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         _layout = QtWidgets.QHBoxLayout()
@@ -120,7 +120,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         This method changes the combobox selection to the specified value.
         """
         self._old_value = value
-        self.ledit.setText(f'{value}')
+        self.ledit.setText(f"{value}")
 
     def setText(self, text):
         """

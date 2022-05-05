@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasWindow']
+__all__ = ["PydidasWindow"]
 
 from qtpy import QtWidgets
 
@@ -33,6 +33,7 @@ class PydidasWindow(QtWidgets.QMainWindow):
     The PydidasWindow is a standalone QMainWindow with a persistent geometry
     upon closing and showing.
     """
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self._geometry = None
@@ -71,8 +72,7 @@ class PydidasWindow(QtWidgets.QMainWindow):
         dict
             The dictionary with the window state.
         """
-        return {'geometry': self.geometry().getRect(),
-                'visible': self.isVisible()}
+        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
 
     def restore_window_state(self, state):
         """
@@ -83,5 +83,5 @@ class PydidasWindow(QtWidgets.QMainWindow):
         state : dict
             The dictionary with the state information.
         """
-        self.setGeometry(*state['geometry'])
-        self.setVisible(state['visible'])
+        self.setGeometry(*state["geometry"])
+        self.setVisible(state["visible"])

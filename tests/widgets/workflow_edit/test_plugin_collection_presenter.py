@@ -33,35 +33,33 @@ import numpy as np
 from qtpy import QtWidgets, QtCore, QtTest, QtGui
 
 from pydidas.widgets.workflow_edit import (
-    PluginCollectionBrowser, PluginCollectionTreeWidget)
-from pydidas.unittest_objects.dummy_plugin_collection import (
-    DummyPluginCollection)
+    PluginCollectionBrowser,
+    PluginCollectionTreeWidget,
+)
+from pydidas.unittest_objects.dummy_plugin_collection import DummyPluginCollection
 
 
-_typemap = {0: 'input', 1: 'proc', 2: 'output'}
+_typemap = {0: "input", 1: "proc", 2: "output"}
 
 
 class TestPluginCollectionBrowser(unittest.TestCase):
-
     def setUp(self):
         self._pluginpath = tempfile.mkdtemp()
         self.q_app = QtWidgets.QApplication(sys.argv)
         self.n_per_type = 8
         self.num = 3 * self.n_per_type
         self._syspath = copy.deepcopy(sys.path)
-        self._qsettings = QtCore.QSettings('Hereon', 'pydidas')
-        self._qsettings_plugin_path = self._qsettings.value(
-            'global/plugin_path')
-        self._qsettings.setValue('global/plugin_path', '')
-        self.pcoll = DummyPluginCollection(n_plugins=self.num,
-                                           plugin_path=self._pluginpath,
-                                           create_empty=True)
+        self._qsettings = QtCore.QSettings("Hereon", "pydidas")
+        self._qsettings_plugin_path = self._qsettings.value("global/plugin_path")
+        self._qsettings.setValue("global/plugin_path", "")
+        self.pcoll = DummyPluginCollection(
+            n_plugins=self.num, plugin_path=self._pluginpath, create_empty=True
+        )
         self.widgets = []
 
     def tearDown(self):
         sys.path = self._syspath
-        self._qsettings.setValue('global/plugin_path',
-                                 self._qsettings_plugin_path)
+        self._qsettings.setValue("global/plugin_path", self._qsettings_plugin_path)
         shutil.rmtree(self._pluginpath)
         self.q_app.deleteLater()
         self.q_app.quit()
@@ -83,11 +81,19 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         index = model.indexFromItem(_item)
         obj.scrollTo(index)
         item_rect = obj.visualRect(index)
-        QtTest.QTest.mouseClick(obj.viewport(), QtCore.Qt.LeftButton,
-                                QtCore.Qt.NoModifier, item_rect.center())
+        QtTest.QTest.mouseClick(
+            obj.viewport(),
+            QtCore.Qt.LeftButton,
+            QtCore.Qt.NoModifier,
+            item_rect.center(),
+        )
         if double:
-            QtTest.QTest.mouseDClick(obj.viewport(), QtCore.Qt.LeftButton,
-                                     QtCore.Qt.NoModifier, item_rect.center())
+            QtTest.QTest.mouseDClick(
+                obj.viewport(),
+                QtCore.Qt.LeftButton,
+                QtCore.Qt.NoModifier,
+                item_rect.center(),
+            )
         return _item
 
     def test_PluginCollectionTreeWidget_init(self):
@@ -101,7 +107,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         self.assertIsInstance(_root, QtGui.QStandardItem)
         self.assertIsInstance(_model, QtGui.QStandardItemModel)
         self.assertEqual(_model.rowCount(), 3)
-        for _num, _ptype in enumerate(['input', 'proc', 'output']):
+        for _num, _ptype in enumerate(["input", "proc", "output"]):
             self.assertEqual(_model.item(_num).rowCount(), self.n_per_type)
 
     def test_PluginCollectionTreeWidget_single_click(self):
@@ -117,17 +123,17 @@ class TestPluginCollectionBrowser(unittest.TestCase):
     def test_PluginCollectionBrowser_confirm_selection(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
         spy = QtTest.QSignalSpy(obj.selection_confirmed)
-        _item = self.click_index(obj._widgets['plugin_treeview'], double=True)
+        _item = self.click_index(obj._widgets["plugin_treeview"], double=True)
         self.assertEqual(len(spy), 1)
         self.assertEqual(spy[0][0], _item.text())
 
     def test_PluginCollectionBrowser_preview_plugin(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
-        _item = self.click_index(obj._widgets['plugin_treeview'])
+        _item = self.click_index(obj._widgets["plugin_treeview"])
         _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
-        _text = obj._widgets['plugin_description'].toPlainText()
+        _text = obj._widgets["plugin_description"].toPlainText()
         _desc = _plugin.get_class_description_as_dict()
-        _desc['Parameters'] = '\n    '.join(_desc['Parameters'].split('\n'))
+        _desc["Parameters"] = "\n    ".join(_desc["Parameters"].split("\n"))
         _itemlist = list(_desc.values()) + list(_desc.keys())
         for n, item in enumerate(_itemlist):
             self.assertTrue(_text.find(item) >= 0)

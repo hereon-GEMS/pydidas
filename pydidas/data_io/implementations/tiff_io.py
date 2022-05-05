@@ -36,9 +36,10 @@ from .io_base import IoBase
 
 class TiffIo(IoBase):
     """IObase implementation for tiff files."""
+
     extensions_export = TIFF_EXTENSIONS
     extensions_import = TIFF_EXTENSIONS
-    format_name = 'Tiff'
+    format_name = "Tiff"
     dimensions = [2]
 
     @classmethod
@@ -96,7 +97,7 @@ class TiffIo(IoBase):
         """
         cls.check_for_existing_file(filename, **kwargs)
         with warnings.catch_warnings():
-            warnings.simplefilter('ignore', UserWarning)
+            warnings.simplefilter("ignore", UserWarning)
             if data.dtype.type in [np.float64, np.float_, np.longdouble]:
                 imsave(filename, data.astype(np.float32))
             else:

@@ -33,7 +33,6 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestRemoveOutliers(unittest.TestCase):
-
     def setUp(self):
         self._n = 120
         self._outliers_width_one = {7: 2.5, 23: 0.45, 31: 0.6, 56: 1.2, 75: 12}
@@ -51,8 +50,9 @@ class TestRemoveOutliers(unittest.TestCase):
 
     def assert_data_width_one_okay(self, data, threshold):
         for _index, _factor in self._outliers_width_one.items():
-            _rel_delta = abs((data[_index] - self._rawdata[_index])
-                             / self._rawdata[_index])
+            _rel_delta = abs(
+                (data[_index] - self._rawdata[_index]) / self._rawdata[_index]
+            )
             self.assertTrue(_rel_delta <= threshold)
             if 1 / threshold <= _factor <= threshold:
                 self.assertAlmostEqual(data[_index], self._data[_index])
@@ -60,53 +60,55 @@ class TestRemoveOutliers(unittest.TestCase):
     def assert_data_width_two_okay(self, data, threshold):
         for _index, _factor in self._outliers_width_two.items():
             for _offset in [0, 1]:
-                _rel_delta = abs((data[_index + _offset]
-                                  - self._rawdata[_index + _offset])
-                                 / self._rawdata[_index + _offset])
+                _rel_delta = abs(
+                    (data[_index + _offset] - self._rawdata[_index + _offset])
+                    / self._rawdata[_index + _offset]
+                )
                 self.assertTrue(_rel_delta <= threshold)
                 if 1 / threshold <= _factor <= threshold:
-                    self.assertAlmostEqual(data[_index + _offset],
-                                           self._data[_index + _offset])
+                    self.assertAlmostEqual(
+                        data[_index + _offset], self._data[_index + _offset]
+                    )
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
         plugin.pre_execute()
         # assert does not raise an Error
 
     def test_execute__w_kernel_1_thresh1(self):
         _thresh = 1
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
-        plugin.set_param_value('kernel_width', 1)
-        plugin.set_param_value('outlier_threshold', _thresh)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 1)
+        plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
         self.assert_data_width_one_okay(_newdata, _thresh)
 
     def test_execute__w_kernel_1_thresh5(self):
         _thresh = 5
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
-        plugin.set_param_value('kernel_width', 1)
-        plugin.set_param_value('outlier_threshold', _thresh)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 1)
+        plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
         self.assert_data_width_one_okay(_newdata, _thresh)
 
     def test_execute__w_kernel_2_thresh1(self):
         _thresh = 1
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
-        plugin.set_param_value('kernel_width', 2)
-        plugin.set_param_value('outlier_threshold', _thresh)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 2)
+        plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
         self.assert_data_width_one_okay(_newdata, _thresh)
         self.assert_data_width_two_okay(_newdata, _thresh)
 
     def test_execute__w_kernel_2_thresh5(self):
         _thresh = 5
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('RemoveOutliers')()
-        plugin.set_param_value('kernel_width', 2)
-        plugin.set_param_value('outlier_threshold', _thresh)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 2)
+        plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
         self.assert_data_width_one_okay(_newdata, _thresh)
         self.assert_data_width_two_okay(_newdata, _thresh)

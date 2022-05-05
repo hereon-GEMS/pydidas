@@ -23,14 +23,14 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DataBrowsingFrameBuilder']
+__all__ = ["DataBrowsingFrameBuilder"]
 
 from qtpy import QtWidgets, QtCore
 import qtawesome as qta
 from silx.gui.plot.ImageView import ImageView
 
 from ...widgets import BaseFrame
-from ...widgets.selection import (DirectoryExplorer, Hdf5DatasetSelector)
+from ...widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
 
 
 class DataBrowsingFrameBuilder(BaseFrame):
@@ -38,6 +38,7 @@ class DataBrowsingFrameBuilder(BaseFrame):
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
+
     def __init__(self, parent=None):
         BaseFrame.__init__(self, parent)
 
@@ -45,40 +46,58 @@ class DataBrowsingFrameBuilder(BaseFrame):
         """
         Build the frame and create all required widgets.
         """
-        self.create_label(None, 'Data browser', fontsize=14, bold=True)
+        self.create_label(None, "Data browser", fontsize=14, bold=True)
 
         _bsize = 25
-        self._widgets['selection'] = QtWidgets.QFrame()
-        self._widgets['selection'].setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
-        self._widgets['selection'].setLayout(QtWidgets.QGridLayout())
-        self._widgets['selection'].layout().setRowStretch(0, 10)
+        self._widgets["selection"] = QtWidgets.QFrame()
+        self._widgets["selection"].setSizePolicy(
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
+        )
+        self._widgets["selection"].setLayout(QtWidgets.QGridLayout())
+        self._widgets["selection"].layout().setRowStretch(0, 10)
 
-        self.create_any_widget('tree', DirectoryExplorer,
-                               parent_widget=self._widgets['selection'],
-                               gridPos=(0, 0, 3, 1))
-        self.create_any_widget('hdf_dset', Hdf5DatasetSelector,
-                               parent_widget=self._widgets['selection'],
-                               gridPos=(3, 0, 1, 1))
+        self.create_any_widget(
+            "tree",
+            DirectoryExplorer,
+            parent_widget=self._widgets["selection"],
+            gridPos=(0, 0, 3, 1),
+        )
+        self.create_any_widget(
+            "hdf_dset",
+            Hdf5DatasetSelector,
+            parent_widget=self._widgets["selection"],
+            gridPos=(3, 0, 1, 1),
+        )
         self.create_button(
-            'but_minimize', '', icon=qta.icon('fa.chevron-left'),
-            iconSize=QtCore.QSize(_bsize, _bsize), fixedHeight=_bsize,
-            fixedWidth=_bsize, gridPos=(0, 1, 1, 1),
-            parent_widget=self._widgets['selection'])
+            "but_minimize",
+            "",
+            icon=qta.icon("fa.chevron-left"),
+            iconSize=QtCore.QSize(_bsize, _bsize),
+            fixedHeight=_bsize,
+            fixedWidth=_bsize,
+            gridPos=(0, 1, 1, 1),
+            parent_widget=self._widgets["selection"],
+        )
         self.create_button(
-            'but_maximize', '', icon=qta.icon('fa.chevron-right'),
-            iconSize=QtCore.QSize(_bsize, _bsize), fixedHeight=_bsize,
-            fixedWidth=_bsize, gridPos=(2, 1, 1, 1),
-            parent_widget=self._widgets['selection'])
+            "but_maximize",
+            "",
+            icon=qta.icon("fa.chevron-right"),
+            iconSize=QtCore.QSize(_bsize, _bsize),
+            fixedHeight=_bsize,
+            fixedWidth=_bsize,
+            gridPos=(2, 1, 1, 1),
+            parent_widget=self._widgets["selection"],
+        )
 
-        self._widgets['viewer'] = ImageView()
-        self._widgets['viewer'].setData = self._widgets['viewer'].setImage
-        self._widgets['viewer'].setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self._widgets["viewer"] = ImageView()
+        self._widgets["viewer"].setData = self._widgets["viewer"].setImage
+        self._widgets["viewer"].setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-        self._widgets['hdf_dset'].register_view_widget(self._widgets['viewer'])
-        self._widgets['splitter'] = QtWidgets.QSplitter()
-        self._widgets['splitter'].setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self._widgets['splitter'].addWidget(self._widgets['selection'])
-        self._widgets['splitter'].addWidget(self._widgets['viewer'])
-        self.layout().addWidget(self._widgets['splitter'])
+        self._widgets["hdf_dset"].register_view_widget(self._widgets["viewer"])
+        self._widgets["splitter"] = QtWidgets.QSplitter()
+        self._widgets["splitter"].setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+        self._widgets["splitter"].addWidget(self._widgets["selection"])
+        self._widgets["splitter"].addWidget(self._widgets["viewer"])
+        self.layout().addWidget(self._widgets["splitter"])

@@ -22,12 +22,11 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_button']
+__all__ = ["create_button"]
 
 from qtpy.QtWidgets import QPushButton
 
-from ..utilities import (apply_widget_properties,
-                         get_pyqt_icon_from_str_reference)
+from ..utilities import apply_widget_properties, get_pyqt_icon_from_str_reference
 
 
 def create_button(text, **kwargs):
@@ -52,7 +51,7 @@ def create_button(text, **kwargs):
         The instantiated button widget.
     """
     _button = QPushButton(text)
-    if isinstance(kwargs.get('icon', None), str):
-        kwargs['icon'] = get_pyqt_icon_from_str_reference(kwargs.get('icon'))
+    if isinstance(kwargs.get("icon", None), str):
+        kwargs["icon"] = get_pyqt_icon_from_str_reference(kwargs.get("icon"))
     apply_widget_properties(_button, **kwargs)
     return _button

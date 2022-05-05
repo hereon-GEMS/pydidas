@@ -34,11 +34,10 @@ from pydidas.core.constants import NUMPY_EXTENSIONS
 
 
 class TestNumpyIo(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._path = tempfile.mkdtemp()
-        cls._fname = os.path.join(cls._path, 'test.npy')
+        cls._fname = os.path.join(cls._path, "test.npy")
         cls._data_shape = (12, 13, 14, 15)
         cls._data = np.random.random(cls._data_shape)
         np.save(cls._fname, cls._data)
@@ -67,14 +66,14 @@ class TestNumpyIo(unittest.TestCase):
             NumpyIo.export_to_file(self._fname, self._data)
 
     def test_export_to_file__file_exists_and_overwrite(self):
-        _fname = os.path.join(self._path, 'test_new.npy')
+        _fname = os.path.join(self._path, "test_new.npy")
         NumpyIo.export_to_file(_fname, self._data)
         NumpyIo.export_to_file(_fname, self._data[:11], overwrite=True)
         _data = NumpyIo.import_from_file(_fname)
         self.assertEqual(_data.shape, (11,) + self._data_shape[1:])
 
     def test_export_to_file__simple(self):
-        _fname = os.path.join(self._path, 'test_fname.npy')
+        _fname = os.path.join(self._path, "test_fname.npy")
         NumpyIo.export_to_file(_fname, self._data)
         _data = NumpyIo.import_from_file(_fname)
         self.assertTrue(np.allclose(_data, self._data))

@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterCollection']
+__all__ = ["ParameterCollection"]
 
 from itertools import chain
 
@@ -49,6 +49,7 @@ class ParameterCollection(dict):
     **kwargs : dict
         Any number of Parameters
     """
+
     def __init__(self, *args, **kwargs):
         """Setup method."""
         super().__init__()
@@ -100,7 +101,8 @@ class ParameterCollection(dict):
             raise KeyError(
                 f'The dictionary key "{key}" for Parameter "{param}" does not'
                 ' match the Parameter reference key: "{param.refkey}". Cannot'
-                ' add item.')
+                " add item."
+            )
         self.__check_key_available(param)
         super().__setitem__(key, param)
 
@@ -119,8 +121,10 @@ class ParameterCollection(dict):
         TypeError
             Error message that object cannot be added to ParameterCollection.
         """
-        raise TypeError(f'Cannot add object "{item}" of type '
-                        f'"{item.__class__}" to ParameterCollection.')
+        raise TypeError(
+            f'Cannot add object "{item}" of type '
+            f'"{item.__class__}" to ParameterCollection.'
+        )
 
     def __check_key_available(self, param, keys=None):
         """
@@ -142,8 +146,10 @@ class ParameterCollection(dict):
         if keys is None:
             keys = self.keys()
         if param.refkey in keys:
-            raise KeyError('A parameter with the reference key '
-                           f'"{param.refkey}" already exists.')
+            raise KeyError(
+                "A parameter with the reference key "
+                f'"{param.refkey}" already exists.'
+            )
 
     def add_param(self, param):
         """
@@ -245,13 +251,14 @@ class ParameterCollection(dict):
             reference key.
         """
         # flatten arguments and add them to a list
-        _new_args = list(chain.from_iterable(
-            [p] if isinstance(p, Parameter) else list(p.values())
-            for p in args))
+        _new_args = list(
+            chain.from_iterable(
+                [p] if isinstance(p, Parameter) else list(p.values()) for p in args
+            )
+        )
         _original_keys = tuple(self.keys())
         for _param in _new_args:
-            _other_keys = tuple(p.refkey for p in _new_args
-                                if p is not _param)
+            _other_keys = tuple(p.refkey for p in _new_args if p is not _param)
             _temp_keys = _original_keys + _other_keys
             self.__check_key_available(_param, keys=_temp_keys)
         _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
@@ -417,8 +424,9 @@ class ParameterCollection(dict):
         _vals = set()
         for _arg in args:
             if _arg not in self.keys():
-                raise KeyError(f'No Parameter with the key "{_arg}" has '
-                               'been registered.')
+                raise KeyError(
+                    f'No Parameter with the key "{_arg}" has ' "been registered."
+                )
             _vals.add(self.get_value(_arg))
         if len(_vals) == 1:
             return True

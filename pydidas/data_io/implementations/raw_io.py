@@ -34,9 +34,10 @@ from .io_base import IoBase
 
 class RawIo(IoBase):
     """IObase implementation for raw binary files."""
+
     extensions_export = BINARY_EXTENSIONS
     extensions_import = BINARY_EXTENSIONS
-    format_name = 'Raw binary'
+    format_name = "Raw binary"
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
@@ -74,12 +75,12 @@ class RawIo(IoBase):
             The data in form of a pydidas Dataset (with embedded metadata)
         """
         if datatype is None:
-            raise KeyError('The datatype has not been specified.')
+            raise KeyError("The datatype has not been specified.")
 
         _data = np.fromfile(filename, dtype=datatype)
         if _data.size != np.prod(shape):
             print(_data.size, np.prod(shape))
-            raise ValueError('The given shape does not match the data size.')
+            raise ValueError("The given shape does not match the data size.")
         cls._data = Dataset(_data.reshape(shape))
         return cls.return_data(**kwargs)
 
@@ -99,5 +100,5 @@ class RawIo(IoBase):
 
         """
         cls.check_for_existing_file(filename, **kwargs)
-        with open(filename, 'wb') as _file:
+        with open(filename, "wb") as _file:
             data.tofile(_file)

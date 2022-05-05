@@ -33,7 +33,6 @@ from pydidas.unittest_objects.mp_test_app import MpTestApp
 
 
 class TestAppRunner(unittest.TestCase):
-
     def setUp(self):
         self.qt_app = QtCore.QCoreApplication(sys.argv)
         self.app = MpTestApp()
@@ -50,14 +49,14 @@ class TestAppRunner(unittest.TestCase):
 
     def test_call_app_method(self):
         runner = AppRunner(self.app)
-        runner.call_app_method('multiprocessing_post_run')
-        self.assertTrue(runner._AppRunner__app._config['mp_post_run_called'])
+        runner.call_app_method("multiprocessing_post_run")
+        self.assertTrue(runner._AppRunner__app._config["mp_post_run_called"])
 
     def test_set_app_param(self):
         _num = 12345
         runner = AppRunner(self.app)
-        runner.set_app_param('hdf5_last_image_num', _num)
-        _appnum = runner._AppRunner__app.get_param_value('hdf5_last_image_num')
+        runner.set_app_param("hdf5_last_image_num", _num)
+        _appnum = runner._AppRunner__app.get_param_value("hdf5_last_image_num")
         self.assertEqual(_num, _appnum)
 
     def test_run(self):
@@ -109,7 +108,7 @@ class TestAppRunner(unittest.TestCase):
     def test_check_app_method_name(self):
         runner = AppRunner(self.app)
         with self.assertRaises(KeyError):
-            runner._AppRunner__check_app_method_name('no_such_method')
+            runner._AppRunner__check_app_method_name("no_such_method")
 
     def test_check_app_is_set(self):
         runner = AppRunner(self.app)

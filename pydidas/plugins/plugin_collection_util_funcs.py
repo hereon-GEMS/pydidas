@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_generic_plugin_path', 'plugin_type_check']
+__all__ = ["get_generic_plugin_path", "plugin_type_check"]
 
 import os
 
@@ -44,10 +44,9 @@ def get_generic_plugin_path():
     list
         A list with the path to the generic plugin folder as the only entry.
     """
-    _pydidas_module_path = os.path.dirname(
-                os.path.abspath(core.__path__[0]))
-    logger.debug('Generic module path: %s', _pydidas_module_path)
-    return [os.path.join(os.path.dirname(_pydidas_module_path), 'plugins')]
+    _pydidas_module_path = os.path.dirname(os.path.abspath(core.__path__[0]))
+    logger.debug("Generic module path: %s", _pydidas_module_path)
+    return [os.path.join(os.path.dirname(_pydidas_module_path), "plugins")]
 
 
 def plugin_type_check(cls_item):

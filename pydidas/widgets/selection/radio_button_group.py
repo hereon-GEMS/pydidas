@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['RadioButtonGroup']
+__all__ = ["RadioButtonGroup"]
 
 from qtpy import QtCore, QtWidgets
 
@@ -34,6 +34,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
     The RadioButtonGroup is a Widget which can hold a number of QRadioButtons
     in a QButtonGroup. Creation is automated based on the entries.
     """
+
     new_button_index = QtCore.Signal(int)
     new_button_label = QtCore.Signal(str)
 
@@ -60,11 +61,11 @@ class RadioButtonGroup(QtWidgets.QWidget):
             default is None.
         """
         super().__init__(parent)
-        self._title = kwargs.get('title', None)
-        for _key, _default in [['rows', 1], ['columns', -1]]:
+        self._title = kwargs.get("title", None)
+        for _key, _default in [["rows", 1], ["columns", -1]]:
             _val = kwargs.get(_key, _default)
             _val = _val if _val != -1 else len(entries)
-            setattr(self, f'_{_key}', _val)
+            setattr(self, f"_{_key}", _val)
         self._size = (0, 0)
         self._emit_signal = True
         self._active_index = 0
@@ -94,8 +95,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         if self._title is not None:
             _label = QtWidgets.QLabel(self._title)
             _label.setFixedHeight(18)
-            _layout.addWidget(_label, 0, 0, 1, self._columns,
-                              QtCore.Qt.AlignBottom)
+            _layout.addWidget(_label, 0, 0, 1, self._columns, QtCore.Qt.AlignBottom)
             _yoffset = 1
             _height += 20
 
@@ -109,8 +109,9 @@ class RadioButtonGroup(QtWidgets.QWidget):
             self._button_label[_entry] = _index
             self._buttons[_index] = _button
             self.q_button_group.addButton(_button)
-            _layout.addWidget(_button, _yoffset + _curry, _currx, 1, 1,
-                              QtCore.Qt.AlignTop)
+            _layout.addWidget(
+                _button, _yoffset + _curry, _currx, 1, 1, QtCore.Qt.AlignTop
+            )
         self._size = (CONFIG_WIDGET_WIDTH, _height)
         self._buttons[0].setChecked(True)
         self.setLayout(_layout)
@@ -142,7 +143,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
             self._emit_signal = True
         elif value is False:
             self._emit_signal = False
-        raise ValueError('The new value must be boolean.')
+        raise ValueError("The new value must be boolean.")
 
     @QtCore.Slot()
     def __toggled(self):

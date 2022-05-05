@@ -34,11 +34,10 @@ from pydidas.core.constants import BINARY_EXTENSIONS
 
 
 class TestRawIo(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._path = tempfile.mkdtemp()
-        cls._fname = os.path.join(cls._path, 'test.npy')
+        cls._fname = os.path.join(cls._path, "test.npy")
         cls._data_shape = (12, 13, 14)
         cls._data = np.random.random(cls._data_shape)
         cls._index = 0
@@ -52,7 +51,7 @@ class TestRawIo(unittest.TestCase):
     @classmethod
     def get_fname(cls):
         cls._index += 1
-        return f'test_name{cls._index:03d}.bin'
+        return f"test_name{cls._index:03d}.bin"
 
     def setUp(self):
         self._target_roi = (slice(0, 5, None), slice(0, 5, None))

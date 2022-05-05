@@ -21,12 +21,15 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetup']
+__all__ = ["ScanSetup"]
 
 import numpy as np
 
-from ...core import (SingletonFactory, get_generic_param_collection,
-                     ObjectWithParameterCollection)
+from ...core import (
+    SingletonFactory,
+    get_generic_param_collection,
+    ObjectWithParameterCollection,
+)
 from .scan_setup_io_meta import ScanSetupIoMeta
 
 
@@ -36,11 +39,31 @@ class _ScanSetup(ObjectWithParameterCollection):
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
     """
+
     default_params = get_generic_param_collection(
-        'scan_dim', 'scan_name', 'scan_dir_1', 'scan_dir_2', 'scan_dir_3',
-        'scan_dir_4', 'n_points_1', 'n_points_2', 'n_points_3', 'n_points_4',
-        'delta_1', 'delta_2', 'delta_3', 'delta_4', 'unit_1', 'unit_2',
-        'unit_3', 'unit_4', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
+        "scan_dim",
+        "scan_name",
+        "scan_dir_1",
+        "scan_dir_2",
+        "scan_dir_3",
+        "scan_dir_4",
+        "n_points_1",
+        "n_points_2",
+        "n_points_3",
+        "n_points_4",
+        "delta_1",
+        "delta_2",
+        "delta_3",
+        "delta_4",
+        "unit_1",
+        "unit_2",
+        "unit_3",
+        "unit_4",
+        "offset_1",
+        "offset_2",
+        "offset_3",
+        "offset_4",
+    )
 
     def __init__(self):
         super().__init__()
@@ -62,15 +85,18 @@ class _ScanSetup(ObjectWithParameterCollection):
             The length of indices is equal to the number of scan dimensions.
         """
         if frame < 0 or frame >= self.n_total:
-            raise ValueError(f'The demanded frame number "{frame}" is out of '
-                             f'the scope of the Scan (0, {self.n_total}).')
-        _ndim = self.get_param_value('scan_dim')
-        _N = [self.get_param_value(f'n_points_{_n}')
-              for _n in range(1, _ndim + 1)] + [1]
+            raise ValueError(
+                f'The demanded frame number "{frame}" is out of '
+                f"the scope of the Scan (0, {self.n_total})."
+            )
+        _ndim = self.get_param_value("scan_dim")
+        _N = [self.get_param_value(f"n_points_{_n}") for _n in range(1, _ndim + 1)] + [
+            1
+        ]
         _indices = [0] * _ndim
         for _dim in range(_ndim):
-            _indices[_dim] = frame // np.prod(_N[_dim + 1:])
-            frame -= _indices[_dim] * np.prod(_N[_dim + 1:])
+            _indices[_dim] = frame // np.prod(_N[_dim + 1 :])
+            frame -= _indices[_dim] * np.prod(_N[_dim + 1 :])
         return tuple(_indices)
 
     def get_frame_number_from_scan_indices(self, indices):
@@ -90,14 +116,15 @@ class _ScanSetup(ObjectWithParameterCollection):
         if not isinstance(indices, np.ndarray):
             indices = np.asarray(indices)
         _shapes = np.asarray(self.shape + (1,))
-        _indices_okay = [0 <= _index <= _shapes[_dim]
-                         for _dim, _index in enumerate(indices)]
+        _indices_okay = [
+            0 <= _index <= _shapes[_dim] for _dim, _index in enumerate(indices)
+        ]
         if False in _indices_okay:
             raise ValueError(
                 f'The given indices "{tuple(indices)}" are out of the scope '
-                f'of the scan range {self.shape}')
-        _factors = np.asarray([np.prod(_shapes[_i + 1:])
-                               for _i in range(self.ndim)])
+                f"of the scan range {self.shape}"
+            )
+        _factors = np.asarray([np.prod(_shapes[_i + 1 :]) for _i in range(self.ndim)])
         _index = np.sum(_factors * indices)
         return _index
 
@@ -123,8 +150,8 @@ class _ScanSetup(ObjectWithParameterCollection):
         range : np.ndarray
             The numerical positions of the scan.
         """
-        _label = self.get_param_value(f'scan_dir_{index}')
-        _unit = self.get_param_value(f'unit_{index}')
+        _label = self.get_param_value(f"scan_dir_{index}")
+        _unit = self.get_param_value(f"unit_{index}")
         _range = self.get_range_for_dim(index)
         return _label, _unit, _range
 
@@ -147,11 +174,10 @@ class _ScanSetup(ObjectWithParameterCollection):
             The scan range as numpy array.
         """
         if index not in [1, 2, 3, 4]:
-            raise ValueError('Only the scan dimensions [1, 2, 3, 4] are '
-                             'supported.')
-        _f0 = self.get_param_value(f'offset_{index}')
-        _df = self.get_param_value(f'delta_{index}')
-        _n = self.get_param_value(f'n_points_{index}')
+            raise ValueError("Only the scan dimensions [1, 2, 3, 4] are " "supported.")
+        _f0 = self.get_param_value(f"offset_{index}")
+        _df = self.get_param_value(f"delta_{index}")
+        _n = self.get_param_value(f"n_points_{index}")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
     @property
@@ -164,8 +190,10 @@ class _ScanSetup(ObjectWithParameterCollection):
         tuple
             The tuple with an entry of the length for each dimension.
         """
-        return tuple(self.get_param_value(f'n_points_{_i}')
-                     for _i in range(1, self.get_param_value('scan_dim') + 1))
+        return tuple(
+            self.get_param_value(f"n_points_{_i}")
+            for _i in range(1, self.get_param_value("scan_dim") + 1)
+        )
 
     @property
     def n_total(self):
@@ -177,8 +205,12 @@ class _ScanSetup(ObjectWithParameterCollection):
         int
             The total number of images.
         """
-        return np.prod([self.get_param_value(f'n_points_{_i}') for _i
-                        in range(1, self.get_param_value('scan_dim') + 1)])
+        return np.prod(
+            [
+                self.get_param_value(f"n_points_{_i}")
+                for _i in range(1, self.get_param_value("scan_dim") + 1)
+            ]
+        )
 
     @property
     def ndim(self):
@@ -192,7 +224,7 @@ class _ScanSetup(ObjectWithParameterCollection):
         int
             The number of dimensions.
         """
-        return self.get_param_value('scan_dim')
+        return self.get_param_value("scan_dim")
 
     @staticmethod
     def import_from_file(filename):

@@ -32,7 +32,6 @@ from pydidas.unittest_objects.dummy_proc import DummyProc
 
 
 class TestDummyProc(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -65,5 +64,5 @@ class TestDummyProc(unittest.TestCase):
         self.assertIsInstance(new_plugin, DummyProc)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

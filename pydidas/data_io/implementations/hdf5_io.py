@@ -40,9 +40,10 @@ from .io_base import IoBase
 
 class Hdf5Io(IoBase):
     """IObase implementation for Hdf5 files."""
+
     extensions_export = HDF5_EXTENSIONS
     extensions_import = HDF5_EXTENSIONS
-    format_name = 'Hdf5'
+    format_name = "Hdf5"
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
@@ -82,27 +83,32 @@ class Hdf5Io(IoBase):
         data : pydidas.core.Dataset
             The data in form of a pydidas Dataset (with embedded metadata)
         """
-        frame = kwargs.get('frame', 0)
+        frame = kwargs.get("frame", 0)
         if isinstance(frame, Integral):
             frame = [frame]
-        dataset = kwargs.get('dataset', 'entry/data/data')
-        slicing_axes = kwargs.get('slicing_axes', [0])
+        dataset = kwargs.get("dataset", "entry/data/data")
+        slicing_axes = kwargs.get("slicing_axes", [0])
 
         if len(frame) < len(slicing_axes):
-            raise ValueError('The number of frames must not be shorter than '
-                             'the number of slicing indices.')
+            raise ValueError(
+                "The number of frames must not be shorter than "
+                "the number of slicing indices."
+            )
 
         if len(slicing_axes) == 0:
             _slicer = []
         else:
             _tmpframe = copy(frame)
-            _slicer = [(_tmpframe.pop(0) if _i in slicing_axes else None)
-                       for _i in range(amax(slicing_axes) + 1)]
+            _slicer = [
+                (_tmpframe.pop(0) if _i in slicing_axes else None)
+                for _i in range(amax(slicing_axes) + 1)
+            ]
 
         _data = squeeze(read_hdf5_slice(filename, dataset, _slicer))
-        cls._data = Dataset(_data, metadata={'slicing_axes': slicing_axes,
-                                             'frame': frame,
-                                             'dataset': dataset})
+        cls._data = Dataset(
+            _data,
+            metadata={"slicing_axes": slicing_axes, "frame": frame, "dataset": dataset},
+        )
         return cls.return_data(**kwargs)
 
     @classmethod
@@ -124,9 +130,9 @@ class Hdf5Io(IoBase):
 
         """
         cls.check_for_existing_file(filename, **kwargs)
-        dataset = kwargs.get('dataset', 'entry/data/data')
+        dataset = kwargs.get("dataset", "entry/data/data")
         _groupname = os.path.dirname(dataset)
         _key = os.path.basename(dataset)
-        with h5py.File(filename, 'w') as _file:
+        with h5py.File(filename, "w") as _file:
             _group = _file.create_group(_groupname)
             _group.create_dataset(_key, data=data)

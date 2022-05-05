@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DataBrowsingFrame']
+__all__ = ["DataBrowsingFrame"]
 
 import os
 from functools import partial
@@ -41,8 +41,9 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
     and a main data visualization window. Its main purpose is to browse
     through datasets.
     """
+
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         DataBrowsingFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
@@ -52,13 +53,15 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         Connect all required signals and slots between widgets and class
         methods.
         """
-        self._widgets['tree'].doubleClicked.connect(self.__file_selected)
-        self._widgets['tree'].clicked.connect(self.__file_highlighted)
-        self._widgets['but_minimize'].clicked.connect(
-            partial(self.change_splitter_pos, False))
-        self._widgets['but_maximize'].clicked.connect(
-            partial(self.change_splitter_pos, True))
-        self.__selection_width = self._widgets['selection'].width()
+        self._widgets["tree"].doubleClicked.connect(self.__file_selected)
+        self._widgets["tree"].clicked.connect(self.__file_highlighted)
+        self._widgets["but_minimize"].clicked.connect(
+            partial(self.change_splitter_pos, False)
+        )
+        self._widgets["but_maximize"].clicked.connect(
+            partial(self.change_splitter_pos, True)
+        )
+        self.__selection_width = self._widgets["selection"].width()
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir=True):
@@ -75,9 +78,9 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
             is enlarged instead of the directory viewer. The default is True.
         """
         if enlarge_dir:
-            self._widgets['splitter'].moveSplitter(770, 1)
+            self._widgets["splitter"].moveSplitter(770, 1)
         else:
-            self._widgets['splitter'].moveSplitter(300, 1)
+            self._widgets["splitter"].moveSplitter(300, 1)
 
     @QtCore.Slot()
     def __file_highlighted(self):
@@ -85,30 +88,31 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         Perform actions after a file has been highlighted in the
         DirectoryExplorer.
         """
-        index = self._widgets['tree'].selectedIndexes()[0]
-        _name = self._widgets['tree']._filemodel.filePath(index)
+        index = self._widgets["tree"].selectedIndexes()[0]
+        _name = self._widgets["tree"]._filemodel.filePath(index)
         if os.path.isfile(_name):
             _name = os.path.dirname(_name)
-        self.q_settings.setValue('directory_explorer/path', _name)
+        self.q_settings.setValue("directory_explorer/path", _name)
 
     @QtCore.Slot()
     def __file_selected(self):
         """
         Open a file after sit has been selected in the DirectoryExplorer.
         """
-        index = self._widgets['tree'].selectedIndexes()[0]
-        _name = self._widgets['tree']._filemodel.filePath(index)
-        self.set_status(f'Opened file: {_name}')
+        index = self._widgets["tree"].selectedIndexes()[0]
+        _name = self._widgets["tree"]._filemodel.filePath(index)
+        self.set_status(f"Opened file: {_name}")
         if not os.path.isfile(_name):
             return
-        _extension = '.' + os.path.basename(_name).split(".")[-1]
-        _supported_nothdf_ext = (set(IoMaster.registry_import.keys())
-                                 - set(HDF5_EXTENSIONS))
+        _extension = "." + os.path.basename(_name).split(".")[-1]
+        _supported_nothdf_ext = set(IoMaster.registry_import.keys()) - set(
+            HDF5_EXTENSIONS
+        )
         if _extension in HDF5_EXTENSIONS:
-            self._widgets['hdf_dset'].setVisible(True)
-            self._widgets['hdf_dset'].set_filename(_name)
+            self._widgets["hdf_dset"].setVisible(True)
+            self._widgets["hdf_dset"].set_filename(_name)
             return
-        self._widgets['hdf_dset'].setVisible(False)
+        self._widgets["hdf_dset"].setVisible(False)
         if _extension in _supported_nothdf_ext:
             _data = import_data(_name)
-            self._widgets['viewer'].setData(_data)
+            self._widgets["viewer"].setData(_data)

@@ -56,7 +56,8 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._widgets["config"] = ParameterEditFrame(
-            self, lineWidth=5, sizePolicy=FIX_EXP_POLICY)
+            self, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+        )
 
         self.create_label(
             "title",

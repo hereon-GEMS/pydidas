@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasQsettingsMixin', 'CopyableQSettings']
+__all__ = ["PydidasQsettingsMixin", "CopyableQSettings"]
 
 from numbers import Integral, Real
 
@@ -35,16 +35,15 @@ class CopyableQSettings(QtCore.QSettings):
     QtCore.QSettings subclass with added copy, setstate and getstate methods
     to allow pickling.
     """
+
     def __copy__(self):
-        return CopyableQSettings(self.organizationName(),
-                                 self.applicationName())
+        return CopyableQSettings(self.organizationName(), self.applicationName())
 
     def __getstate__(self):
-        return {'org_name': self.organizationName(),
-                'app_name': self.applicationName()}
+        return {"org_name": self.organizationName(), "app_name": self.applicationName()}
 
     def __setstate__(self, state):
-        super().__init__(state['org_name'], state['app_name'])
+        super().__init__(state["org_name"], state["app_name"])
 
 
 class PydidasQsettingsMixin:
@@ -54,8 +53,9 @@ class PydidasQsettingsMixin:
     This class can be inherited by any class which requires access to the
     global QSettings defined in pydidas.
     """
+
     def __init__(self):
-        self.q_settings = CopyableQSettings('Hereon', 'pydidas')
+        self.q_settings = CopyableQSettings("Hereon", "pydidas")
 
     def q_settings_get_global_value(self, key, argtype=None):
         """
@@ -76,7 +76,7 @@ class PydidasQsettingsMixin:
             The value, converted to the type associated with the Parameter
             referenced by param_key or argtype, if given.
         """
-        _value = self.q_settings.value(f'global/{key}')
+        _value = self.q_settings.value(f"global/{key}")
         if argtype is not None:
             return argtype(_value)
         return self._qsettings_convert_value_type(key, _value)

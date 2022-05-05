@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ErrorMessageBox']
+__all__ = ["ErrorMessageBox"]
 
 from qtpy import QtCore, QtWidgets
 
@@ -38,25 +38,28 @@ class ErrorMessageBox(QtWidgets.QDialog):
     **kwargs : dict
         Keyword arguments passed to QtWidgets.QDialogue instanciation.
     """
+
     def __init__(self, *args, **kwargs):
         _text = None
-        if 'text' in kwargs:
-            _text = kwargs['text']
-            del kwargs['text']
+        if "text" in kwargs:
+            _text = kwargs["text"]
+            del kwargs["text"]
         super().__init__(*args, **kwargs)
         self.setWindowTitle("An exception has occured")
 
         self._label = QtWidgets.QLabel()
         self._label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self._label.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                  QtWidgets.QSizePolicy.Expanding)
+        self._label.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
         _scroll_area = QtWidgets.QScrollArea()
 
         _scroll_area.setWidget(self._label)
         _scroll_area.setWidgetResizable(True)
-        _scroll_area.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                   QtWidgets.QSizePolicy.Expanding)
-        _ok_button = QtWidgets.QPushButton('OK')
+        _scroll_area.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
+        _ok_button = QtWidgets.QPushButton("OK")
 
         _layout = QtWidgets.QVBoxLayout()
         _layout.addWidget(_scroll_area)

@@ -30,9 +30,10 @@ from .io_exporter_matplotlib import IoExporterMatplotlib
 
 class JpegIo(IoExporterMatplotlib):
     """IObase implementation for jpeg files."""
+
     extensions_export = JPG_EXTENSIONS
     extensions_import = []
-    format_name = 'jpeg'
+    format_name = "jpeg"
     dimensions = [2]
 
     @classmethod

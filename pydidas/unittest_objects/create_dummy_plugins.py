@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_plugin_class']
+__all__ = ["create_plugin_class"]
 
 import copy
 import inspect
@@ -32,8 +32,7 @@ import inspect
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
 from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN)
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import InputPlugin, ProcPlugin, OutputPlugin, BasePlugin
 
@@ -53,10 +52,15 @@ def create_base_class(base):
     _cls : type
         A duplicate with a unique set of class attributes.
     """
-    _cls = type(f'Test{base.__name__}', (base,),
-                {key: copy.copy(val)
-                 for key, val in base.__dict__.items()
-                 if not inspect.ismethod(getattr(base, key))})
+    _cls = type(
+        f"Test{base.__name__}",
+        (base,),
+        {
+            key: copy.copy(val)
+            for key, val in base.__dict__.items()
+            if not inspect.ismethod(getattr(base, key))
+        },
+    )
     _cls.default_params = base.default_params.get_copy()
     _cls.generic_params = base.generic_params.get_copy()
     return _cls
@@ -93,7 +97,7 @@ def create_plugin_class(plugin_type, number=0, use_filename=True):
     _name = get_random_string(10)
     _cls = type(_name, (_cls,), dict(_cls.__dict__))
     _cls.basic_plugin = False
-    _cls.plugin_name = f'Plugin {_name}'
+    _cls.plugin_name = f"Plugin {_name}"
     _cls.number = number
     _cls.params = ParameterCollection()
     if plugin_type == INPUT_PLUGIN:
@@ -121,15 +125,13 @@ def _setup_input_plugin(plugin_class, use_filename):
         The updated plugin class.
     """
     if use_filename:
-        if 'first_file' in plugin_class.default_params:
-            del plugin_class.default_params['first_file']
-        if 'filename' not in plugin_class.default_params:
-            plugin_class.default_params.add_param(get_generic_parameter(
-                'filename'))
+        if "first_file" in plugin_class.default_params:
+            del plugin_class.default_params["first_file"]
+        if "filename" not in plugin_class.default_params:
+            plugin_class.default_params.add_param(get_generic_parameter("filename"))
     else:
-        if 'filename' in plugin_class.default_params:
-            del plugin_class.default_params['filename']
-        if 'first_file' not in plugin_class.default_params:
-            plugin_class.default_params.add_param(get_generic_parameter(
-                'first_file'))
+        if "filename" in plugin_class.default_params:
+            del plugin_class.default_params["filename"]
+        if "first_file" not in plugin_class.default_params:
+            plugin_class.default_params.add_param(get_generic_parameter("first_file"))
     return plugin_class

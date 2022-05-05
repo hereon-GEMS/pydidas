@@ -33,9 +33,10 @@ from .io_base import IoBase
 
 class NumpyIo(IoBase):
     """IObase implementation for numpy files."""
+
     extensions_export = NUMPY_EXTENSIONS
     extensions_import = NUMPY_EXTENSIONS
-    format_name = 'Numpy'
+    format_name = "Numpy"
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod

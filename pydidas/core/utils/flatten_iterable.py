@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['flatten', 'flatten_all']
+__all__ = ["flatten", "flatten_all"]
 
 import itertools
 from collections.abc import Iterable

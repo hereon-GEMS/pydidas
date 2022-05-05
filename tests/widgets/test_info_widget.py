@@ -31,7 +31,6 @@ from pydidas.widgets.info_widget import InfoWidget
 
 
 class TestCentralWidgetStack(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication(sys.argv)
         self.widgets = []
@@ -49,7 +48,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         self.assertEqual(obj.sizeHint(), QtCore.QSize(500, 50))
 
     def test_add_status(self):
-        _test = 'This is the test string'
+        _test = "This is the test string"
         obj = InfoWidget()
         obj.add_status(_test)
         _text = obj.toPlainText()

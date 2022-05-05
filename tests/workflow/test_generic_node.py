@@ -32,7 +32,6 @@ from pydidas.workflow import GenericNode
 
 
 class TestGenericNode(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -124,21 +123,20 @@ class TestGenericNode(unittest.TestCase):
         self.assertEqual(obj.parent, _parent)
 
     def test_init__with_parent_wrong_type(self):
-        _parent = 'Something'
+        _parent = "Something"
         with self.assertRaises(TypeError):
             GenericNode(parent=_parent)
 
     def test_init__with_random_key(self):
         _testval = 1.23
         obj = GenericNode(testkey=_testval)
-        self.assertTrue(hasattr(obj, 'testkey'))
+        self.assertTrue(hasattr(obj, "testkey"))
         self.assertEqual(obj.testkey, _testval)
 
     def test_init__with_parent_and_key(self):
         _parent = GenericNode()
         _testval = 1.23
-        obj = GenericNode(parent=_parent, testkey=_testval,
-                          testkey2=_testval+1)
+        obj = GenericNode(parent=_parent, testkey=_testval, testkey2=_testval + 1)
         self.assertEqual(obj._parent, _parent)
 
     def test_is_leaf__no_children(self):
@@ -296,5 +294,5 @@ class TestGenericNode(unittest.TestCase):
         self.assertNotEqual(hash(node), hash(node2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

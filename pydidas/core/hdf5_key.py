@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Hdf5key']
+__all__ = ["Hdf5key"]
 
 from pathlib import Path
 
@@ -34,6 +34,7 @@ class Hdf5key(str):
 
     A class used for referencing hdf5 keys.
     """
+
     def __new__(cls, text):
         _instance = super().__new__(cls, text)
         _instance.__hdf_fname = None
@@ -62,6 +63,7 @@ class Hdf5key(str):
             The filename (and path) to the hdf5 file.
         """
         if type(txt) not in (str, Path):
-            raise TypeError('"hdf5_filename" property must be of type'
-                            ' str or pathlib.Path.')
+            raise TypeError(
+                '"hdf5_filename" property must be of type' " str or pathlib.Path."
+            )
         self.__hdf_fname = Path(txt)

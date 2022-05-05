@@ -33,13 +33,16 @@ from .export_eiger_pixelmask import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import average_images_window
+
 __all__.extend(average_images_window.__all__)
 del average_images_window
 
 from . import global_config_window
+
 __all__.extend(global_config_window.__all__)
 del global_config_window
 
 from . import export_eiger_pixelmask
+
 __all__.extend(export_eiger_pixelmask.__all__)
 del export_eiger_pixelmask

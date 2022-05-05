@@ -37,7 +37,6 @@ child_spacing_x = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
 
 
 class TestPluginPositionNode(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -66,7 +65,7 @@ class TestPluginPositionNode(unittest.TestCase):
         _row_of_index = np.zeros((_ntotal), dtype=np.int16)
         _pos_in_row_of_index = np.zeros((_ntotal), dtype=np.int16)
         for _row in range(depth + 1):
-            _row_of_index[_row_limits[_row]:_row_limits[_row + 1]] = _row
+            _row_of_index[_row_limits[_row] : _row_limits[_row + 1]] = _row
         _pos_in_row_of_index = np.arange(_ntotal) - _row_limits[_row_of_index]
         return (_row_of_index[index], _pos_in_row_of_index[index])
 
@@ -82,7 +81,7 @@ class TestPluginPositionNode(unittest.TestCase):
     def test_init__with_random_key(self):
         _testval = 1.23
         root = PluginPositionNode(testkey=_testval)
-        self.assertTrue(hasattr(root, 'testkey'))
+        self.assertTrue(hasattr(root, "testkey"))
         self.assertEqual(root.testkey, _testval)
 
     def test_width__no_children(self):
@@ -100,8 +99,9 @@ class TestPluginPositionNode(unittest.TestCase):
         _width = 3
         _nodes, _n_nodes = self.create_node_tree(_depth, _width)
         _root = _nodes[0][0]
-        _target = (_width ** _depth * generic_width
-                   + child_spacing_x * (_width ** _depth - 1))
+        _target = _width**_depth * generic_width + child_spacing_x * (
+            _width**_depth - 1
+        )
         self.assertEqual(_root.width, _target)
 
     def test_height__no_children(self):
@@ -118,8 +118,7 @@ class TestPluginPositionNode(unittest.TestCase):
         _childdepth = 3
         _nodes, _n_nodes = self.create_node_tree(_childdepth)
         _root = _nodes[0][0]
-        _target = ((_childdepth + 1) * generic_height
-                   + child_spacing_y * _childdepth)
+        _target = (_childdepth + 1) * generic_height + child_spacing_y * _childdepth
         self.assertEqual(_root.height, _target)
 
     def test_get_relative_positions__no_children(self):
@@ -138,7 +137,6 @@ class TestPluginPositionNode(unittest.TestCase):
             self.assertEqual(_pos[_node_id], [0, _ypos])
 
     def test_get_relative_positions__with_tree_children(self):
-
         def row_width(n):
             return n * generic_width + (n - 1) * child_spacing_x
 
@@ -153,8 +151,9 @@ class TestPluginPositionNode(unittest.TestCase):
         for _node_id in range(_ntotal):
             iy, ix = self.get_pos_in_tree(_node_id, _width, _childdepth)
             _ypos = iy * (generic_height + child_spacing_y)
-            _deltax = (row_width(_width ** _childdepth)
-                       - row_width(_width ** (iy))) // 2
+            _deltax = (
+                row_width(_width**_childdepth) - row_width(_width ** (iy))
+            ) // 2
             _xpos = _deltax + ix * (generic_width + child_spacing_x)
             if iy in [0, _childdepth]:
                 self.assertEqual(_pos[_node_id], [_xpos, _ypos])
@@ -188,5 +187,5 @@ class TestPluginPositionNode(unittest.TestCase):
         self.assertEqual(_pos, _newpos)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

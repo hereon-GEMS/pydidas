@@ -24,14 +24,17 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginPositionNode']
+__all__ = ["PluginPositionNode"]
 
 import numpy as np
 
 from .generic_node import GenericNode
 from ..core.constants import (
-    GENERIC_PLUGIN_WIDGET_WIDTH, GENERIC_PLUGIN_WIDGET_HEIGHT,
-    GENERIC_PLUGIN_WIDGET_Y_OFFSET, GENERIC_PLUGIN_WIDGET_X_OFFSET)
+    GENERIC_PLUGIN_WIDGET_WIDTH,
+    GENERIC_PLUGIN_WIDGET_HEIGHT,
+    GENERIC_PLUGIN_WIDGET_Y_OFFSET,
+    GENERIC_PLUGIN_WIDGET_X_OFFSET,
+)
 
 
 class PluginPositionNode(GenericNode):
@@ -79,9 +82,7 @@ class PluginPositionNode(GenericNode):
         _h = []
         for child in self._children:
             _h.append(child.height)
-        return (max(_h)
-                + GENERIC_PLUGIN_WIDGET_Y_OFFSET
-                + GENERIC_PLUGIN_WIDGET_HEIGHT)
+        return max(_h) + GENERIC_PLUGIN_WIDGET_Y_OFFSET + GENERIC_PLUGIN_WIDGET_HEIGHT
 
     def get_relative_positions(self):
         """
@@ -96,8 +97,7 @@ class PluginPositionNode(GenericNode):
         pos : dict
             A dictionary with entries of the type "node_id: [xpos, ypos]".
         """
-        pos = {self.node_id:
-               [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
+        pos = {self.node_id: [(self.width - GENERIC_PLUGIN_WIDGET_WIDTH) // 2, 0]}
         if self.is_leaf:
             return pos
         xoffset = 0
@@ -105,8 +105,7 @@ class PluginPositionNode(GenericNode):
         for child in self._children:
             _p = child.get_relative_positions()
             for key in _p:
-                pos.update({key: [_p[key][0] + xoffset,
-                                  _p[key][1] + yoffset]})
+                pos.update({key: [_p[key][0] + xoffset, _p[key][1] + yoffset]})
             xoffset += child.width + GENERIC_PLUGIN_WIDGET_X_OFFSET
         self.make_grid_positions_positive(pos)
         return pos
@@ -136,5 +135,4 @@ class PluginPositionNode(GenericNode):
         xoffset = np.amin(vals[:, 0])
         yoffset = np.amin(vals[:, 1])
         for key in pos_dict:
-            pos_dict[key] = [pos_dict[key][0] - xoffset,
-                             pos_dict[key][1] - yoffset]
+            pos_dict[key] = [pos_dict[key][0] - xoffset, pos_dict[key][1] - yoffset]

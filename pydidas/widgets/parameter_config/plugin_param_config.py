@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginParameterEditWidget']
+__all__ = ["PluginParameterEditWidget"]
 
 from pathlib import Path
 
@@ -42,6 +42,7 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
 
     Depending on the Parameter types, automatic typechecks are implemented.
     """
+
     FIXED_WIDTH = 385
 
     def __init__(self, parent=None):
@@ -106,14 +107,18 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         Create the required widgets for the new plugin.
         """
-        self.create_label('plugin_name', f'Plugin: {self.plugin.plugin_name}',
-                          fontsize=12, fixedWidth=self.FIXED_WIDTH,
-                          gridPos=(0, 0, 1, 2))
-        self.create_label('node_id', f'Node ID: {self.node_id}', fontsize=12,
-                          gridPos=(1, 0, 1, 2))
-        self.create_spacer('spacer', gridPos=(2, 0, 1, 2))
-        self.create_label('params', 'Parameters:', fontsize=12,
-                          gridPos=(3, 0, 1, 1))
+        self.create_label(
+            "plugin_name",
+            f"Plugin: {self.plugin.plugin_name}",
+            fontsize=12,
+            fixedWidth=self.FIXED_WIDTH,
+            gridPos=(0, 0, 1, 2),
+        )
+        self.create_label(
+            "node_id", f"Node ID: {self.node_id}", fontsize=12, gridPos=(1, 0, 1, 2)
+        )
+        self.create_spacer("spacer", gridPos=(2, 0, 1, 2))
+        self.create_label("params", "Parameters:", fontsize=12, gridPos=(3, 0, 1, 1))
         if self.plugin.has_unique_parameter_config_widget:
             self.layout().add(self.plugin.get_parameter_config_widget())
         else:
@@ -129,13 +134,15 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         This method will create a button to restore the defaults and connect
         the required slot.
         """
-        self.create_button('restore_defaults', 'Restore default parameters',
-                           icon=self.style().standardIcon(59), fixedHeight=25,
-                           fixedWidth=225,
-                           layout_kwargs={'gridPos': (2, 0, 1, 2),
-                                          'alignment': QtCore.Qt.AlignRight})
-        self._widgets['restore_defaults'].clicked.connect(
-            self.__restore_defaults)
+        self.create_button(
+            "restore_defaults",
+            "Restore default parameters",
+            icon=self.style().standardIcon(59),
+            fixedHeight=25,
+            fixedWidth=225,
+            layout_kwargs={"gridPos": (2, 0, 1, 2), "alignment": QtCore.Qt.AlignRight},
+        )
+        self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
 
     @QtCore.Slot()
     def __restore_defaults(self):
@@ -162,15 +169,19 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         # The total width is reduced by 10 because of the margins
         if param.type in [Hdf5key, Path]:
-            _kwargs = {'width_text': self.FIXED_WIDTH - 50,
-                       'width_io': self.FIXED_WIDTH - 50,
-                       'width_unit': 0,
-                       'width_total': self.FIXED_WIDTH - 10,
-                       'linebreak': True}
+            _kwargs = {
+                "width_text": self.FIXED_WIDTH - 50,
+                "width_io": self.FIXED_WIDTH - 50,
+                "width_unit": 0,
+                "width_total": self.FIXED_WIDTH - 10,
+                "linebreak": True,
+            }
         else:
-            _kwargs = {'width_text': 200,
-                       'width_io': self.FIXED_WIDTH - 240,
-                       'width_total': self.FIXED_WIDTH - 10}
+            _kwargs = {
+                "width_text": 200,
+                "width_io": self.FIXED_WIDTH - 240,
+                "width_total": self.FIXED_WIDTH - 10,
+            }
         return _kwargs
 
     def update_edits(self):

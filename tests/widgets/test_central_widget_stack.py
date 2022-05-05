@@ -34,22 +34,20 @@ from pydidas.widgets.central_widget_stack import CentralWidgetStack
 
 
 class TestWidget(QtWidgets.QWidget):
-    ref_name = ''
-    title = ''
+    ref_name = ""
+    title = ""
     menuicon = None
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.hash = hash(self)
-        self.name = ''.join(random.choice(string.ascii_letters)
-                            for i in range(20))
+        self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 
     def frame_activated(self, index):
         ...
 
 
 class TestCentralWidgetStack(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication(sys.argv)
         self.widgets = []
@@ -70,8 +68,8 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_init(self):
         obj = CentralWidgetStack()
         self.assertIsInstance(obj, QtWidgets.QStackedWidget)
-        self.assertTrue(hasattr(obj, 'widget_indices'))
-        self.assertTrue(hasattr(obj, 'widgets'))
+        self.assertTrue(hasattr(obj, "widget_indices"))
+        self.assertTrue(hasattr(obj, "widgets"))
 
     def test_register_widget(self):
         stack = CentralWidgetStack()
@@ -98,7 +96,7 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_get_widget_by_name__not_registered(self):
         stack = self.create_stack()
         with self.assertRaises(KeyError):
-            stack.get_widget_by_name('no such widget')
+            stack.get_widget_by_name("no such widget")
 
     def test_get_all_widget_names(self):
         stack = self.create_stack()
@@ -115,7 +113,7 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_activate_widget_by_name_wrong_name(self):
         stack = self.create_stack()
         with self.assertRaises(KeyError):
-            stack.activate_widget_by_name('no such name')
+            stack.activate_widget_by_name("no such name")
 
     def test_remove_widget_by_name(self):
         stack = self.create_stack()
@@ -124,7 +122,7 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_remove_widget_by_name_wrong_name(self):
         stack = self.create_stack()
         with self.assertRaises(KeyError):
-            stack.remove_widget_by_name('no such name')
+            stack.remove_widget_by_name("no such name")
 
     def test_removeWidget_widget_not_registered(self):
         stack = self.create_stack()
@@ -163,7 +161,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         self.assertFalse(stack.is_registered(TestWidget()))
 
     def test_change_reference_name__with_registered_widget(self):
-        _new = 'The new widget name'
+        _new = "The new widget name"
         stack = self.create_stack()
         w = self.widgets[0]
         stack.change_reference_name(_new, w)
@@ -171,7 +169,7 @@ class TestCentralWidgetStack(unittest.TestCase):
         self.assertEqual(w.ref_name, _new)
 
     def test_change_reference_name__with_unregistered_widget(self):
-        _new = 'The new widget name'
+        _new = "The new widget name"
         stack = self.create_stack()
         w = TestWidget()
         with self.assertRaises(KeyError):

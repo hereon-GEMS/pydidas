@@ -37,7 +37,6 @@ from pydidas.plugins import ProcPlugin
 
 
 class TestBaseProcPlugin(unittest.TestCase):
-
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
         self._shape = (20, 20)
@@ -47,14 +46,14 @@ class TestBaseProcPlugin(unittest.TestCase):
         shutil.rmtree(self._temppath)
 
     def create_image(self):
-        _fname = os.path.join(self._temppath, 'image.npy')
+        _fname = os.path.join(self._temppath, "image.npy")
         np.save(_fname, self._data)
         return _fname
 
     def create_hdf5_image(self):
-        _fname = os.path.join(self._temppath, 'image.h5')
-        _dset = get_random_string(4) + '/' + get_random_string(4) + 'data'
-        with h5py.File(_fname, 'w') as _f:
+        _fname = os.path.join(self._temppath, "image.h5")
+        _dset = get_random_string(4) + "/" + get_random_string(4) + "data"
+        with h5py.File(_fname, "w") as _f:
             _f[_dset] = self._data[None]
         return _fname, _dset
 

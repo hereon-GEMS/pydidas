@@ -34,10 +34,11 @@ from pydidas.multiprocessing import WorkerController
 
 
 def local_test_func(index, *args, **kwargs):
-    index = (index
-             + np.sum(np.fromiter([arg for arg in args], float))
-             + np.sum(np.fromiter([kwargs[key] for key in kwargs], float))
-             )
+    index = (
+        index
+        + np.sum(np.fromiter([arg for arg in args], float))
+        + np.sum(np.fromiter([kwargs[key] for key in kwargs], float))
+    )
     return 3 * index
 
 
@@ -46,7 +47,6 @@ def get_spy_values(spy, index=0):
 
 
 class TestWorkerController(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._app = QtWidgets.QApplication(sys.argv)
@@ -145,8 +145,8 @@ class TestWorkerController(unittest.TestCase):
         _args = (0, 0)
         wc = WorkerController()
         wc.change_function(local_test_func, *_args)
-        self.assertEqual(wc._processor['args'][4], local_test_func)
-        self.assertEqual(wc._processor['args'][5:], _args)
+        self.assertEqual(wc._processor["args"][4], local_test_func)
+        self.assertEqual(wc._processor["args"][5:], _args)
 
     def test_cycle_pre_run(self):
         wc = WorkerController()
@@ -200,14 +200,14 @@ class TestWorkerController(unittest.TestCase):
         wc = WorkerController()
         wc._to_process = [1, 2, 3]
         wc._put_next_task_in_queue()
-        self.assertEqual(wc._queues['send'].qsize(), 1)
+        self.assertEqual(wc._queues["send"].qsize(), 1)
 
     def test_get_and_emit_all_queue_items(self):
         _res1 = 3
         _res2 = [1, 1]
         wc = WorkerController()
-        wc._queues['recv'].put([0, _res1])
-        wc._queues['recv'].put([0, _res2])
+        wc._queues["recv"].put([0, _res1])
+        wc._queues["recv"].put([0, _res2])
         wc._progress_target = 2
         _spy = QtTest.QSignalSpy(wc.sig_results)
         time.sleep(0.005)
@@ -230,8 +230,7 @@ class TestWorkerController(unittest.TestCase):
         time.sleep(0.1)
         _results = get_spy_values(result_spy, index=1)
         _progress = get_spy_values(progress_spy)
-        _exp_progress = [index / len(_tasks)
-                         for index in range(1, len(_tasks) + 1)]
+        _exp_progress = [index / len(_tasks) for index in range(1, len(_tasks) + 1)]
         self.assertEqual(set(_results), _target)
         self.assertEqual(_progress, _exp_progress)
 
@@ -248,7 +247,7 @@ class TestWorkerController(unittest.TestCase):
         wc._workers = [1, 2, 3, 4]
         _nfinished = 3
         for i in range(_nfinished):
-            wc._queues['finished'].put(1)
+            wc._queues["finished"].put(1)
         time.sleep(0.005)
         wc._check_if_workers_done()
         self.assertEqual(wc._workers_done, _nfinished)
@@ -270,7 +269,7 @@ class TestWorkerController(unittest.TestCase):
         wc._flag_running = True
         wc._workers = [1, 2, 3, 4]
         for i in range(len(wc._workers)):
-            wc._queues['finished'].put(1)
+            wc._queues["finished"].put(1)
         # assert: does not raise TimeoutError
         wc._wait_for_worker_finished_signals(0.2)
 

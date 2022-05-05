@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScrollArea']
+__all__ = ["ScrollArea"]
 
 from qtpy import QtWidgets
 
@@ -45,13 +45,16 @@ class ScrollArea(QtWidgets.QScrollArea):
         Qt attribute name with a lowercase first character. Examples are
         ``widget``, ``fixedWidth``, ``fixedHeight``.
     """
+
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
-        kwargs['widgetResizable'] = True
-        kwargs['autoFillBackground'] = True
-        kwargs['sizePolicy'] = (QtWidgets.QSizePolicy.Expanding,
-                                QtWidgets.QSizePolicy.Expanding)
-        kwargs['frameShape'] = QtWidgets.QFrame.NoFrame
+        kwargs["widgetResizable"] = True
+        kwargs["autoFillBackground"] = True
+        kwargs["sizePolicy"] = (
+            QtWidgets.QSizePolicy.Expanding,
+            QtWidgets.QSizePolicy.Expanding,
+        )
+        kwargs["frameShape"] = QtWidgets.QFrame.NoFrame
         apply_widget_properties(self, **kwargs)
 
     def sizeHint(self):

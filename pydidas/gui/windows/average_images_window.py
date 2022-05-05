@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['AverageImagesWindow']
+__all__ = ["AverageImagesWindow"]
 
 import os
 
@@ -31,8 +31,11 @@ from qtpy import QtCore, QtWidgets
 import numpy as np
 
 from ...core import get_generic_param_collection, AppConfigError
-from ...core.constants import (DEFAULT_TWO_LINE_PARAM_CONFIG,
-                               CONFIG_WIDGET_WIDTH, HDF5_EXTENSIONS)
+from ...core.constants import (
+    DEFAULT_TWO_LINE_PARAM_CONFIG,
+    CONFIG_WIDGET_WIDTH,
+    HDF5_EXTENSIONS,
+)
 from ...core.utils import get_hdf5_metadata
 from ...data_io import import_data, export_data
 from ...managers import FilelistManager
@@ -44,16 +47,22 @@ class AverageImagesWindow(BaseFrame):
     Window with a simple dialogue to export the average of several frames from
     one or multiple files.
     """
+
     default_params = get_generic_param_collection(
-        'first_file', 'last_file', 'hdf5_key', 'hdf5_first_image_num',
-        'hdf5_last_image_num', 'use_global_det_mask', 'output_fname')
+        "first_file",
+        "last_file",
+        "hdf5_key",
+        "hdf5_first_image_num",
+        "hdf5_last_image_num",
+        "use_global_det_mask",
+        "output_fname",
+    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.set_default_params()
-        self.set_param_value('use_global_det_mask', False)
-        self._filelist = FilelistManager(
-            *self.get_params('first_file', 'last_file'))
+        self.set_param_value("use_global_det_mask", False)
+        self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
         self.build_frame()
         self.connect_signals()
 
@@ -61,41 +70,60 @@ class AverageImagesWindow(BaseFrame):
         """
         Build the frame and create all widgets.
         """
+
         def get_config(param_key):
-            if param_key in ['first_file', 'last_file', 'hdf5_key',
-                             'output_fname']:
+            if param_key in ["first_file", "last_file", "hdf5_key", "output_fname"]:
                 _config = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             else:
-                _config = dict(width_io=100, width_unit=0,
-                               width_text=CONFIG_WIDGET_WIDTH - 100,
-                               width_total=CONFIG_WIDGET_WIDTH)
-            _config['visible'] = param_key in ['first_file', 'output_fname',
-                                               'use_global_det_mask']
+                _config = dict(
+                    width_io=100,
+                    width_unit=0,
+                    width_text=CONFIG_WIDGET_WIDTH - 100,
+                    width_total=CONFIG_WIDGET_WIDTH,
+                )
+            _config["visible"] = param_key in [
+                "first_file",
+                "output_fname",
+                "use_global_det_mask",
+            ]
             return _config
 
-        self.create_label('label_title', 'Average images', fontsize=14,
-                          bold=True, gridPos=(0, 0, 1, 1))
+        self.create_label(
+            "label_title",
+            "Average images",
+            fontsize=14,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
+        )
         self.create_spacer(None)
-        self.create_label('label_input', 'Input selection', fontsize=12,
-                          bold=True, gridPos=(-1, 0, 1, 1))
+        self.create_label(
+            "label_input",
+            "Input selection",
+            fontsize=12,
+            bold=True,
+            gridPos=(-1, 0, 1, 1),
+        )
         for _key in self.params:
             _options = get_config(_key)
-            if _key == 'output_fname':
+            if _key == "output_fname":
                 self.create_spacer(None)
-                self.create_label('label_output', 'Export filename',
-                                  fontsize=12, bold=True,
-                                  gridPos=(-1, 0, 1, 1))
+                self.create_label(
+                    "label_output",
+                    "Export filename",
+                    fontsize=12,
+                    bold=True,
+                    gridPos=(-1, 0, 1, 1),
+                )
             self.create_param_widget(self.params[_key], **_options)
 
-        self.create_button('but_exec', 'Store averaged image')
+        self.create_button("but_exec", "Store averaged image")
 
     def connect_signals(self):
         """
         Build the frame and create all widgets.
         """
-        self._widgets['but_exec'].clicked.connect(self._export)
-        self.param_widgets['first_file'].io_edited.connect(
-            self.__selected_first_file)
+        self._widgets["but_exec"].clicked.connect(self._export)
+        self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
 
     @QtCore.Slot(str)
     def __selected_first_file(self, fname):
@@ -114,17 +142,16 @@ class AverageImagesWindow(BaseFrame):
             The filename of the first image file.
         """
         self.__clear_entries(
-            ['last_file', 'hdf5_key', 'hdf5_first_image_num',
-             'hdf5_last_image_num'])
+            ["last_file", "hdf5_key", "hdf5_first_image_num", "hdf5_last_image_num"]
+        )
         if not os.path.isfile(fname):
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        if (os.path.splitext(self.get_param_value('first_file'))[1]
-                in HDF5_EXTENSIONS):
+        if os.path.splitext(self.get_param_value("first_file"))[1] in HDF5_EXTENSIONS:
             self.__popup_select_hdf5_key(fname)
 
-    def __clear_entries(self, keys='all', hide=True):
+    def __clear_entries(self, keys="all", hide=True):
         """
         Clear the Parameter entries and reset to default for selected keys.
 
@@ -135,13 +162,17 @@ class AverageImagesWindow(BaseFrame):
         hide : bool, optional
             Flag for hiding the reset keys. The default is True.
         """
-        keys = keys if keys != 'all' else list(self.params.keys())
+        keys = keys if keys != "all" else list(self.params.keys())
         for _key in keys:
             param = self.params[_key]
             param.restore_default()
             self.param_widgets[_key].set_value(param.default)
-        for _key in ['hdf5_key', 'hdf5_first_image_num', 'hdf5_last_image_num',
-                     'last_file']:
+        for _key in [
+            "hdf5_key",
+            "hdf5_first_image_num",
+            "hdf5_last_image_num",
+            "last_file",
+        ]:
             if _key in keys:
                 self.toggle_param_widget_visibility(_key, not hide)
 
@@ -150,12 +181,12 @@ class AverageImagesWindow(BaseFrame):
         Update widget visibilty after selecting the first file based on the
         file format (hdf5 or not).
         """
-        hdf5_flag = (os.path.splitext(self.get_param_value('first_file'))[1]
-                     in HDF5_EXTENSIONS)
-        for _key in ['hdf5_key', 'hdf5_first_image_num',
-                     'hdf5_last_image_num']:
+        hdf5_flag = (
+            os.path.splitext(self.get_param_value("first_file"))[1] in HDF5_EXTENSIONS
+        )
+        for _key in ["hdf5_key", "hdf5_first_image_num", "hdf5_last_image_num"]:
             self.toggle_param_widget_visibility(_key, hdf5_flag)
-        self.toggle_param_widget_visibility('last_file', True)
+        self.toggle_param_widget_visibility("last_file", True)
 
     def __update_file_selection(self):
         """
@@ -164,9 +195,8 @@ class AverageImagesWindow(BaseFrame):
         try:
             self._filelist.update()
         except AppConfigError as _ex:
-            self.__clear_entries(['last_file'], hide=False)
-            QtWidgets.QMessageBox.critical(self, 'Could not create filelist.',
-                                           str(_ex))
+            self.__clear_entries(["last_file"], hide=False)
+            QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
 
     def __popup_select_hdf5_key(self, fname):
         """
@@ -179,7 +209,7 @@ class AverageImagesWindow(BaseFrame):
         """
         dset = dialogues.Hdf5DatasetSelectionPopup(self, fname).get_dset()
         if dset is not None:
-            self.set_param_value_and_widget('hdf5_key', dset)
+            self.set_param_value_and_widget("hdf5_key", dset)
 
     @QtCore.Slot()
     def _export(self):
@@ -202,22 +232,21 @@ class AverageImagesWindow(BaseFrame):
                 _data = 1.0 * _tmpdata
             else:
                 _data += _tmpdata
-        if self.get_param_value('use_global_det_mask'):
-            _mask_qsetting = self.q_settings_get_global_value('det_mask')
+        if self.get_param_value("use_global_det_mask"):
+            _mask_qsetting = self.q_settings_get_global_value("det_mask")
             if os.path.isfile(_mask_qsetting):
                 _mask = import_data(_mask_qsetting)
                 _data = np.where(_mask, 0, _data)
         _data /= _nimages
-        export_data(self.get_param_value('output_fname'),
-                    _data.astype(np.float32))
+        export_data(self.get_param_value("output_fname"), _data.astype(np.float32))
         self.close()
 
     def __read_hdf5_images(self, fname):
-        _start_index = self.get_param_value('hdf5_first_image_num')
-        _max_index = self.get_param_value('hdf5_last_image_num') + 1
-        _key = self.get_param_value('hdf5_key')
+        _start_index = self.get_param_value("hdf5_first_image_num")
+        _max_index = self.get_param_value("hdf5_last_image_num") + 1
+        _key = self.get_param_value("hdf5_key")
         if _max_index == 0:
-            _max_index = get_hdf5_metadata(fname, ['shape'], dset=_key)[0]
+            _max_index = get_hdf5_metadata(fname, ["shape"], dset=_key)[0]
         _data = None
         for _frame in range(_start_index, _max_index):
             _tmp = import_data(fname, frame=_frame, dataset=_key)
@@ -240,8 +269,7 @@ class AverageImagesWindow(BaseFrame):
         dict
             The dictionary with the window state.
         """
-        return {'geometry': self.geometry().getRect(),
-                'visible': self.isVisible()}
+        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
 
     def restore_window_state(self, state):
         """
@@ -252,5 +280,5 @@ class AverageImagesWindow(BaseFrame):
         state : dict
             The dictionary with the state information.
         """
-        self.setGeometry(*state['geometry'])
-        self.setVisible(state['visible'])
+        self.setGeometry(*state["geometry"])
+        self.setVisible(state["visible"])

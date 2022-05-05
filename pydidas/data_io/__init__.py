@@ -38,9 +38,11 @@ from .io_master import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import import_export
+
 __all__.extend(import_export.__all__)
 del import_export
 
 from . import io_master
+
 __all__.extend(io_master.__all__)
 del io_master

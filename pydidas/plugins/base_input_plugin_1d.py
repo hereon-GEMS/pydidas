@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['InputPlugin1d']
+__all__ = ["InputPlugin1d"]
 
 import os
 
@@ -36,15 +36,17 @@ class InputPlugin1d(BasePlugin):
     """
     The base plugin class for input plugins.
     """
+
     plugin_type = INPUT_PLUGIN
-    plugin_name = 'Base input plugin 1d'
+    plugin_name = "Base input plugin 1d"
     input_data_dim = None
     generic_params = BasePlugin.generic_params.get_copy()
     generic_params.add_params(
-        get_generic_parameter('use_roi'),
-        get_generic_parameter('roi_xlow'),
-        get_generic_parameter('roi_xhigh'),
-        get_generic_parameter('binning'))
+        get_generic_parameter("use_roi"),
+        get_generic_parameter("roi_xlow"),
+        get_generic_parameter("roi_xhigh"),
+        get_generic_parameter("binning"),
+    )
     default_params = BasePlugin.default_params.get_copy()
 
     def __init__(self, *args, **kwargs):
@@ -65,7 +67,7 @@ class InputPlugin1d(BasePlugin):
         By default, this gets and stores the file target size for live
         processing.
         """
-        self._config['file_size'] = self.get_first_file_size()
+        self._config["file_size"] = self.get_first_file_size()
 
     def get_first_file_size(self):
         """
@@ -77,8 +79,8 @@ class InputPlugin1d(BasePlugin):
             The file size in bytes.
         """
         _fname = self.get_filename(0)
-        self._config['file_size'] = os.stat(_fname).st_size
-        return self._config['file_size']
+        self._config["file_size"] = os.stat(_fname).st_size
+        return self._config["file_size"]
 
     def input_available(self, index):
         """
@@ -99,7 +101,7 @@ class InputPlugin1d(BasePlugin):
         """
         _fname = self.get_filename(index)
         if os.path.exists(_fname):
-            return self._config['file_size'] == os.stat(_fname).st_size
+            return self._config["file_size"] == os.stat(_fname).st_size
         return False
 
     def get_filename(self, index):
@@ -129,8 +131,8 @@ class InputPlugin1d(BasePlugin):
         """
 
         _n = self.get_raw_input_size()
-        self._config['result_shape'] = (_n, )
-        self._original_input_shape = (_n, )
+        self._config["result_shape"] = (_n,)
+        self._original_input_shape = (_n,)
 
     def get_raw_input_size(self):
         """
@@ -162,10 +164,10 @@ class InputPlugin1d(BasePlugin):
             The tuple with two slice objects which define the image ROI.
         """
         _roi = RoiSliceManager(
-            roi=(self.get_param_value('roi_xlow'),
-                 self.get_param_value('roi_xhigh')),
+            roi=(self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")),
             input_shape=self.input_shape,
-            dim=1)
+            dim=1,
+        )
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
@@ -183,19 +185,21 @@ class InputPlugin1d(BasePlugin):
         _roi = RoiSliceManager(
             roi=(0, self._original_input_shape[0]),
             input_shape=self._original_input_shape,
-            dim=1)
+            dim=1,
+        )
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:
             _op_name, _op = _all_ops.pop(0)
-            if _op_name == 'binning':
+            if _op_name == "binning":
                 _x = int(_roi.roi[1].stop - _roi.roi[1].start)
                 _dx = int(((_x // _binning) % _op) * _binning)
                 _tmproi = (0, _x - _dx)
                 _roi.apply_second_roi(_tmproi)
                 _binning *= _op
-            if _op_name == 'roi':
+            if _op_name == "roi":
                 _roi_unbinned = [
-                    _binning * _r for _r in RoiSliceManager(roi=_op, dim=1).roi_coords]
+                    _binning * _r for _r in RoiSliceManager(roi=_op, dim=1).roi_coords
+                ]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning

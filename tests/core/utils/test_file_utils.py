@@ -30,11 +30,11 @@ import os
 import copy
 import sys
 
-from pydidas.core.utils import (find_valid_python_files, flatten_list,
+from pydidas.core.utils import (find_valid_python_files, flatten,
                                 get_random_string)
 
 
-class TestPluginCollection(unittest.TestCase):
+class Test_file_utils(unittest.TestCase):
 
     def setUp(self):
         self._path = tempfile.mkdtemp()
@@ -107,7 +107,7 @@ class TestPluginCollection(unittest.TestCase):
     def test_find_files__path_tree(self):
         _dirs = self.create_python_file_tree()
         _files = set(find_valid_python_files(self._path))
-        _target = set(flatten_list(
+        _target = set(flatten(
             [[os.path.join(_dir, _file)
               for _file in self._good_filenames] for _dir in _dirs]))
         self.assertEqual(_files, _target)

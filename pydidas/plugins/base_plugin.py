@@ -32,7 +32,7 @@ from numbers import Integral
 from pydidas.core import (ParameterCollection, ObjectWithParameterCollection,
                           get_generic_param_collection)
 from pydidas.core.utils import rebin2d
-from pydidas.data_io import RoiController
+from pydidas.data_io.utils import RoiSliceManager
 from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
                                     OUTPUT_PLUGIN)
 
@@ -392,11 +392,12 @@ class BasePlugin(ObjectWithParameterCollection):
         tuple
             The tuple with two slice objects which define the image ROI.
         """
-        _roi = RoiController(roi=(self.get_param_value('roi_ylow'),
-                                  self.get_param_value('roi_yhigh'),
-                                  self.get_param_value('roi_xlow'),
-                                  self.get_param_value('roi_xhigh')),
-                             input_shape=self.input_shape)
+        _roi = RoiSliceManager(
+            roi=(self.get_param_value('roi_ylow'),
+                 self.get_param_value('roi_yhigh'),
+                 self.get_param_value('roi_xlow'),
+                 self.get_param_value('roi_xhigh')),
+            input_shape=self.input_shape)
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
@@ -411,9 +412,9 @@ class BasePlugin(ObjectWithParameterCollection):
         binning : int
             The binning factor which needs to be applied to the original image.
         """
-        _roi = RoiController(roi=(0, self._original_input_shape[0],
-                                  0, self._original_input_shape[1]),
-                             input_shape=self._original_input_shape)
+        _roi = RoiSliceManager(roi=(0, self._original_input_shape[0],
+                                    0, self._original_input_shape[1]),
+                               input_shape=self._original_input_shape)
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:
@@ -428,6 +429,6 @@ class BasePlugin(ObjectWithParameterCollection):
                 _binning *= _op
             if _op_name == 'roi':
                 _roi_unbinned = [_binning * _r
-                                 for _r in RoiController(roi=_op).roi_coords]
+                                 for _r in RoiSliceManager(roi=_op).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning

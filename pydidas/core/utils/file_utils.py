@@ -26,7 +26,7 @@ __all__ = ['trim_filename', 'find_valid_python_files']
 
 import os
 
-from .flatten_list_ import flatten_list
+from .flatten_iterable import flatten
 
 
 def trim_filename(path):
@@ -78,7 +78,7 @@ def find_valid_python_files(path):
                 if not (item.startswith('__') or item.startswith('.'))]
     _dirs = [item for item in _entries if os.path.isdir(item)]
     _files = [item for item in _entries if os.path.isfile(item)]
-    _results = flatten_list(
+    _results = flatten(
         [find_valid_python_files(os.path.join(path, entry))
          for entry in _dirs])
     _results += [f for f in _files if f.endswith('.py')]

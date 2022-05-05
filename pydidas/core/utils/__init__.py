@@ -29,7 +29,7 @@ __all__ = []
 from .decorators import *
 from .file_checks import *
 from .file_utils import *
-from .flatten_list_ import *
+from .flatten_iterable import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
 from .get_module_dir import *
@@ -56,9 +56,9 @@ from . import file_utils
 __all__.extend(file_utils.__all__)
 del file_utils
 
-from . import flatten_list_
-__all__.extend(flatten_list_.__all__)
-del flatten_list_
+from . import flatten_iterable
+__all__.extend(flatten_iterable.__all__)
+del flatten_iterable
 
 from . import format_arguments_
 __all__.extend(format_arguments_.__all__)

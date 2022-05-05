@@ -27,9 +27,14 @@ __all__ = []
 
 # import __all__ items from modules:
 from .figure_utils import *
+from .roi_slice_manager import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import figure_utils
 __all__.extend(figure_utils.__all__)
 del figure_utils
+
+from . import roi_slice_manager
+__all__.extend(roi_slice_manager.__all__)
+del roi_slice_manager

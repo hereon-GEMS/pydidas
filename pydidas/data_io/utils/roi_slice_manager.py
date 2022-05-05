@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the RoiController class which reads arguments and creates slice
+Module with the RoiSliceManager class which reads arguments and creates slice
 objects for ROI cropping.
 """
 
@@ -23,11 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['RoiController']
+__all__ = ['RoiSliceManager']
 
 import copy
 
 from numpy import mod
+
+from ...core.utils import flatten_all
 
 
 def error_msg(roi, exception=''):
@@ -52,9 +54,9 @@ def error_msg(roi, exception=''):
     return _str
 
 
-class RoiController:
+class RoiSliceManager:
     """
-    The RoiController is used to create slice objects to crop images with a
+    The RoiSliceManager is used to create slice objects to crop images with a
     region of interest.
 
     Input must be given in form of a list or tuple. Acceptable formats for each
@@ -71,6 +73,8 @@ class RoiController:
     **input_shape : Union[None, tuple], optional
         The input shape of the images. This value is only required if negative
         indices are used in the ROI to generate the correct size of the ROI.
+    **dim : int, optional
+        The dimension of the ROI. The default is 2.
     **roi : Union[None, tuple, dict]
         The region of interest to be used in an image. If not given at
         initialization, this value can be supplied through the .roi property.
@@ -81,6 +85,7 @@ class RoiController:
         self._roi = None
         self._original_roi = None
         self._input_shape = kwargs.get('input_shape', None)
+        self._dim = kwargs.get('dim', 2)
         self._original_input_shape = None
         self._roi_key = kwargs.get('roi', None)
         self.create_roi_slices()
@@ -146,12 +151,13 @@ class RoiController:
         -------
         Union[None, tuple]
             If the ROI is not set, this property returns None. Else, it
-            returns a tuple with (y_low, y_high, x_low, x_high) values.
+            returns a tuple with (ax0_low, ax0_high, ..., ax_n_low, ax_n_high) values.
         """
         if self._roi is None:
             return None
-        return (self._roi[0].start, self._roi[0].stop,
-                self._roi[1].start, self._roi[1].stop)
+        _coords = flatten_all(
+            [[_roi.start, _roi.stop] for _roi in self._roi], astype=tuple)
+        return _coords
 
     def apply_second_roi(self, roi2):
         """
@@ -172,8 +178,8 @@ class RoiController:
             self._original_roi = self._roi
             self._original_input_shape = self._input_shape
             self._roi_key = roi2
-            self._input_shape = (self._roi[0].stop - self._roi[0].start,
-                                 self._roi[1].stop - self._roi[1].start)
+            self._input_shape = tuple(
+                _roi.stop - _roi.start for _roi in self._roi)
             self.create_roi_slices()
             self._merge_rois()
         except ValueError as _error:
@@ -196,7 +202,7 @@ class RoiController:
         # https://stackoverflow.com/questions/19257498/
         # combining-two-slicing-operations
         _roi = []
-        for _axis in [0, 1]:
+        for _axis in range(self._dim):
             _slice1 = self._original_roi[_axis]
             _slice2 = self._roi[_axis]
             _step1 = _slice1.step if _slice1.step is not None else 1
@@ -351,7 +357,7 @@ class RoiController:
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
-        if _n != 4:
+        if _n != 2 * self._dim:
             _msg = error_msg(self._roi_key, 'The input does not have the '
                              'correct length')
             raise ValueError(_msg)
@@ -367,7 +373,7 @@ class RoiController:
         """
         _roi = copy.copy(self._roi_key)
         _out = []
-        for _dim in [1, 2]:
+        for _dim in range(1, self._dim + 1):
             try:
                 if (isinstance(_roi[0], (int, type(None)))
                         and isinstance(_roi[1], (int, type(None)))):
@@ -399,7 +405,7 @@ class RoiController:
                 value = mod(value, modulo)
             return value
         _new_roi = []
-        for _axis in [0, 1]:
+        for _axis in range(self._dim):
             _mod = self.input_shape[_axis]
             _start = apply_neg_mod(self._roi[_axis].start, _mod, True)
             _step = self._roi[_axis].step

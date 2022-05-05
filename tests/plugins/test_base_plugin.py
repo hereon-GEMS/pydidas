@@ -35,7 +35,7 @@ from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core.utils import rebin2d
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import BasePlugin
-from pydidas.data_io import RoiController
+from pydidas.data_io.utils import RoiSliceManager
 
 
 class TestBasePlugin(unittest.TestCase):
@@ -113,7 +113,7 @@ class TestBasePlugin(unittest.TestCase):
 
     def test_get_single_ops_from_legacy__roi(self):
         _roi1 = (5, 55, 5, 55)
-        _rm = RoiController(roi=_roi1)
+        _rm = RoiSliceManager(roi=_roi1)
         _shape = (125, 125)
         _image = np.random.random((_shape))
         _final_image = _image[_rm.roi]
@@ -129,7 +129,7 @@ class TestBasePlugin(unittest.TestCase):
         _roi2 = (3, 1235, 17, -5)
         _roi3 = (12, 758, 146, 745)
         _shape = (1257, 1235)
-        _rm = RoiController(roi=_roi1, input_shape=_shape)
+        _rm = RoiSliceManager(roi=_roi1, input_shape=_shape)
         _rm.apply_second_roi(_roi2)
         _rm.apply_second_roi(_roi3)
         _image = np.random.random((_shape))
@@ -152,11 +152,11 @@ class TestBasePlugin(unittest.TestCase):
         _bin3 = 2
         _shape = (1257, 1235)
         _image = np.random.random((_shape))
-        _final_image = _image[RoiController(roi=_roi1).roi]
+        _final_image = _image[RoiSliceManager(roi=_roi1).roi]
         _final_image = rebin2d(_final_image, _bin1)
         _final_image = rebin2d(_final_image, _bin2)
-        _final_image = _final_image[RoiController(roi=_roi2).roi]
-        _final_image = _final_image[RoiController(roi=_roi3).roi]
+        _final_image = _final_image[RoiSliceManager(roi=_roi2).roi]
+        _final_image = _final_image[RoiSliceManager(roi=_roi3).roi]
         _final_image = rebin2d(_final_image, _bin3)
         plugin = create_plugin_class(BASE_PLUGIN)()
         plugin._legacy_image_ops.append(['roi', _roi1])
@@ -223,10 +223,10 @@ class TestBasePlugin(unittest.TestCase):
         _bin2 = 4
         _shape = (1257, 1235)
         _image = np.random.random((_shape))
-        _final_image = _image[RoiController(roi=_roi1).roi]
+        _final_image = _image[RoiSliceManager(roi=_roi1).roi]
         _final_image = rebin2d(_final_image, _bin1)
         _final_image = rebin2d(_final_image, _bin2)
-        _final_image = _final_image[RoiController(roi=_roi2).roi]
+        _final_image = _final_image[RoiSliceManager(roi=_roi2).roi]
         plugin = create_plugin_class(BASE_PLUGIN)()
         plugin._original_input_shape = _shape
         plugin._legacy_image_ops.append(['roi', _roi1])

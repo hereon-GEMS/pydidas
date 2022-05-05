@@ -28,7 +28,7 @@ import os
 
 from ..core import get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
-from ..data_io import RoiController1d
+from ..data_io.utils import RoiSliceManager
 from .base_plugin import BasePlugin
 
 
@@ -161,9 +161,11 @@ class InputPlugin1d(BasePlugin):
         tuple
             The tuple with two slice objects which define the image ROI.
         """
-        _roi = RoiController1d(roi=(self.get_param_value('roi_xlow'),
-                                    self.get_param_value('roi_xhigh')),
-                               input_shape=self.input_shape)
+        _roi = RoiSliceManager(
+            roi=(self.get_param_value('roi_xlow'),
+                 self.get_param_value('roi_xhigh')),
+            input_shape=self.input_shape,
+            dim=1)
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
@@ -178,8 +180,10 @@ class InputPlugin1d(BasePlugin):
         binning : int
             The binning factor which needs to be applied to the original image.
         """
-        _roi = RoiController1d(roi=(0, self._original_input_shape[0]),
-                               input_shape=self._original_input_shape)
+        _roi = RoiSliceManager(
+            roi=(0, self._original_input_shape[0]),
+            input_shape=self._original_input_shape,
+            dim=1)
         _binning = 1
         _all_ops = self._legacy_image_ops[:]
         while len(_all_ops) > 0:
@@ -191,7 +195,7 @@ class InputPlugin1d(BasePlugin):
                 _roi.apply_second_roi(_tmproi)
                 _binning *= _op
             if _op_name == 'roi':
-                _roi_unbinned = [_binning * _r
-                                 for _r in RoiController1d(roi=_op).roi_coords]
+                _roi_unbinned = [
+                    _binning * _r for _r in RoiSliceManager(roi=_op, dim=1).roi_coords]
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning

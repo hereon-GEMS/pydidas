@@ -300,6 +300,19 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _slice = obj._get_single_slice_object(_index)
         self.assertEqual(_slice.size, 4)
 
+    def test_get_single_slice_object__multiple_slices_scan_timeline(self):
+        self.populate_WorkflowResults()
+        _node = 1
+        _index = 4
+        obj = WorkflowResultsSelector()
+        obj.set_param_value("use_data_range", True)
+        obj.set_param_value("use_scan_timeline", True)
+        obj.select_active_node(_node)
+        obj._npoints = list(RES.shapes[obj._active_node])
+        obj.set_param_value(f"data_slice_{_index}", "0:2, 4:6")
+        _slice = obj._get_single_slice_object(_index)
+        self.assertEqual(_slice.size, 4)
+
     def test_get_single_slice_object__multiple_slices_and_numbers(self):
         self.populate_WorkflowResults()
         _node = 1

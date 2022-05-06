@@ -139,8 +139,8 @@ class WorkerController(QtCore.QThread):
         """
         Stop the thread from running and clean up.
         """
-        self.suspend()
         self.add_tasks([None] * self.n_workers, stop_tasks=True)
+        self.suspend()
         self.send_stop_signal()
         self._flag_thread_alive = False
 
@@ -449,3 +449,14 @@ class WorkerController(QtCore.QThread):
             if not self._flag_running:
                 return
         raise TimeoutError("Waiting too long for workers to finish.")
+
+    def quit(self):
+        """
+        Call the quit method.
+
+        This quit method adds shutdown calls to the Queue threads.
+        """
+        for _queue in self._queues.values():
+            _queue.close()
+            _queue.join_thread()
+        super().quit()

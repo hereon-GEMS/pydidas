@@ -202,16 +202,17 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             )
         _substrings = _str.split(",")
         _slices = []
-        if self.get_param_value("use_data_range"):
-            _entries = self._convert_values_to_indices(_substrings)
-        else:
+        if (self.get_param_value('use_scan_timeline')
+            or not self.get_param_value("use_data_range")
+        ):
             _entries = self._parse_string_indices(_substrings)
+        else:
+            _entries = self._convert_values_to_indices(_substrings)
         for _entry in _entries:
             if len(_entry) == 1:
                 _slices.append(_entry[0])
             else:
                 _slices.append(slice(*_entry))
-
         return np.unique(np.r_[tuple(_slices)])
 
     def _parse_string_indices(self, substrings):
@@ -259,6 +260,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         _new_items = []
         _range = self.__active_ranges[self._config["active_index"]]
         _defaults = self._config["index_defaults"]
+        print(_defaults, _range, substrings)
         for _item in substrings:
             _keys = [
                 float(_defaults[_pos] if _val == "" else _val)
@@ -324,5 +326,5 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             return
         if _target_dims != _dims_larger_one:
             raise AppConfigError(
-                "The dimensionality of the selected data " "subset does not match "
+                "The dimensionality of the selected data subset does not match "
             )

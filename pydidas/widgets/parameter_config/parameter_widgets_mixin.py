@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterWidgetsMixIn']
+__all__ = ["ParameterWidgetsMixIn"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -37,6 +37,7 @@ class ParameterWidgetsMixIn:
     to other classes without having to inherit from ParameterConfigWidget to
     avoid multiple inheritance from QtWidgets.QFrame.
     """
+
     def __init__(self):
         self.param_widgets = {}
         self.param_composite_widgets = {}
@@ -94,13 +95,13 @@ class ParameterWidgetsMixIn:
             The widget to which the label is added. If None, this defaults
             to the calling widget, ie. "self". The default is None.
         """
-        _parent = kwargs.get('parent_widget', self)
+        _parent = kwargs.get("parent_widget", self)
         _widget = ParameterConfigWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget
 
         if _parent.layout() is None:
-            raise WidgetLayoutError('No layout set.')
+            raise WidgetLayoutError("No layout set.")
         _layout_args = self.__get_args_for_parent_layout(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
@@ -120,24 +121,33 @@ class ParameterWidgetsMixIn:
             The formatting arguments for adding the widget to the parent's
             layout.
         """
-        _nrows =  parent.layout().rowCount()
-        _next_row = (_nrows - int(parent.layout().count() == 0)
-                     if isinstance(parent.layout(), QtWidgets.QGridLayout)
-                     else -1)
-        config = {'row': kwargs.get('row', _next_row),
-                  'column': kwargs.get('column', 0),
-                  'n_columns': kwargs.get('n_columns', 1),
-                  'n_rows': kwargs.get('n_rows', 1),
-                  'halign': kwargs.get('halign', QtCore.Qt.AlignLeft),
-                  'valign': kwargs.get('valign', QtCore.Qt.AlignVCenter)}
+        _nrows = parent.layout().rowCount()
+        _next_row = (
+            _nrows - int(parent.layout().count() == 0)
+            if isinstance(parent.layout(), QtWidgets.QGridLayout)
+            else -1
+        )
+        config = {
+            "row": kwargs.get("row", _next_row),
+            "column": kwargs.get("column", 0),
+            "n_columns": kwargs.get("n_columns", 1),
+            "n_rows": kwargs.get("n_rows", 1),
+            "halign": kwargs.get("halign", QtCore.Qt.AlignLeft),
+            "valign": kwargs.get("valign", QtCore.Qt.AlignVCenter),
+        }
         if isinstance(self.layout(), QtWidgets.QGridLayout):
-            _args = (config['row'], config['column'], config['n_rows'],
-                     config['n_columns'], config['valign'] | config['halign'])
+            _args = (
+                config["row"],
+                config["column"],
+                config["n_rows"],
+                config["n_columns"],
+                config["valign"] | config["halign"],
+            )
         else:
-            _args = (0, config['valign'] | config['halign'])
+            _args = (0, config["valign"] | config["halign"])
         return _args
 
-    def update_param_value(self, key, value):
+    def set_param_value_and_widget(self, key, value):
         """
         Update a parameter value both in the Parameter and the widget.
 

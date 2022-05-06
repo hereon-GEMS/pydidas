@@ -32,9 +32,11 @@ from .menu_utils import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import gui_setup
+
 __all__.extend(gui_setup.__all__)
 del gui_setup
 
 from . import menu_utils
+
 __all__.extend(menu_utils.__all__)
 del menu_utils

@@ -40,47 +40,45 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestHdf5FileSeriesLoader(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
         self._img_shape = (10, 10)
         self._n_per_file = 13
         self._n_files = 11
         self._n = self._n_files * self._n_per_file
-        self._hdf5key = '/entry/data/data'
+        self._hdf5key = "/entry/data/data"
         self._data = np.zeros(((self._n,) + self._img_shape), dtype=np.uint16)
         for index in range(self._n):
             self._data[index] = index
 
         self._hdf5_fnames = []
         for i in range(self._n_files):
-            _fname = Path(os.path.join(self._path, f'test_{i:03d}.h5'))
+            _fname = Path(os.path.join(self._path, f"test_{i:03d}.h5"))
             self._hdf5_fnames.append(_fname)
-            _slice = slice(i * self._n_per_file,
-                           (i + 1 ) * self._n_per_file, 1)
-            with h5py.File(_fname, 'w') as f:
+            _slice = slice(i * self._n_per_file, (i + 1) * self._n_per_file, 1)
+            with h5py.File(_fname, "w") as f:
                 f[self._hdf5key] = self._data[_slice]
 
     def tearDown(self):
         shutil.rmtree(self._path)
 
     def create_plugin_with_hdf5_filelist(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')()
-        plugin.set_param_value('first_file', self._hdf5_fnames[0])
-        plugin.set_param_value('last_file', self._hdf5_fnames[-1])
-        plugin.set_param_value('images_per_file', self._n_per_file)
-        plugin.set_param_value('hdf5_key', self._hdf5key)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
+        plugin.set_param_value("first_file", self._hdf5_fnames[0])
+        plugin.set_param_value("last_file", self._hdf5_fnames[-1])
+        plugin.set_param_value("images_per_file", self._n_per_file)
+        plugin.set_param_value("hdf5_key", self._hdf5key)
         return plugin
 
     def get_index_in_file(self, index):
         return index % self._n_per_file
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
         with self.assertRaises(AppConfigError):
             plugin.pre_execute()
 
@@ -92,16 +90,16 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
 
     def test_pre_execute__no_images_per_file_set(self):
         plugin = self.create_plugin_with_hdf5_filelist()
-        plugin.set_param_value('images_per_file', -1)
+        plugin.set_param_value("images_per_file", -1)
         plugin.pre_execute()
         self.assertEqual(plugin._file_manager.n_files, self._n_files)
         self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
-        self.assertEqual(plugin.get_param_value('images_per_file'),
-                         self._n_per_file)
+        self.assertEqual(plugin.get_param_value("images_per_file"), self._n_per_file)
 
     def test_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Hdf5fileSeriesLoader')(
-            images_per_file=1)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")(
+            images_per_file=1
+        )
         with self.assertRaises(AppConfigError):
             plugin.execute(0)
 
@@ -111,24 +109,22 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
-        self.assertEqual(_data.metadata['frame'],
-                         self.get_index_in_file(_index))
+        self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
+        self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
 
     def test_execute__with_roi(self):
         plugin = self.create_plugin_with_hdf5_filelist()
-        plugin.set_param_value('use_roi', True)
-        plugin.set_param_value('roi_yhigh', 5)
+        plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_yhigh", 5)
         _index = 0
         plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
         self.assertTrue((_data == _index).all())
-        self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
-        self.assertEqual(_data.metadata['frame'],
-                         self.get_index_in_file(_index))
+        self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
+        self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
         self.assertEqual(
-            _data.shape,
-            (plugin.get_param_value('roi_yhigh'), self._img_shape[1]))
+            _data.shape, (plugin.get_param_value("roi_yhigh"), self._img_shape[1])
+        )
 
     def test_execute__get_all_frames(self):
         plugin = self.create_plugin_with_hdf5_filelist()
@@ -136,20 +132,19 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         for _index in range(self._n):
             _data, kwargs = plugin.execute(_index)
             self.assertTrue((_data == _index).all())
-            self.assertEqual(kwargs['frame'], self.get_index_in_file(_index))
-            self.assertEqual(_data.metadata['frame'],
-                             self.get_index_in_file(_index))
+            self.assertEqual(kwargs["frame"], self.get_index_in_file(_index))
+            self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
 
     def test_pickle(self):
         plugin = self.create_plugin_with_hdf5_filelist()
-        _new_params = {get_random_string(6): get_random_string(12)
-                       for i in range(7)}
+        _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, _val))
         plugin2 = pickle.loads(pickle.dumps(plugin))
         for _key in plugin.params:
-            self.assertEqual(plugin.get_param_value(_key),
-                             plugin2.get_param_value(_key))
+            self.assertEqual(
+                plugin.get_param_value(_key), plugin2.get_param_value(_key)
+            )
 
 
 if __name__ == "__main__":

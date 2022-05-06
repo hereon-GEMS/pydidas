@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GlobalConfigWindow']
+__all__ = ["GlobalConfigWindow"]
 
 from ..global_configuration_frame import GlobalConfigurationFrame
 from .pydidas_window import PydidasWindow
@@ -34,6 +34,7 @@ class GlobalConfigWindow(PydidasWindow):
     The GlobalConfigWindow is a standalone QMainWindow with the
     GlobalConfigurationFrame as sole content.
     """
+
     def __init__(self, parent=None):
         super().__init__(parent)
         _frame = GlobalConfigurationFrame()

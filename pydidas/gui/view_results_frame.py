@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ViewResultsFrame']
+__all__ = ["ViewResultsFrame"]
 
 from qtpy import QtCore
 
@@ -40,11 +40,14 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     The ViewResultsFrame is used to visualize the results from running the
     WorkflowTree.
     """
+
     default_params = get_generic_param_collection(
-        'selected_results', 'saving_format', 'enable_overwrite')
+        "selected_results", "saving_format", "enable_overwrite"
+    )
+    params_not_to_restore = ["selected_results"]
 
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         ViewResultsFrameBuilder.__init__(self, parent)
         self.set_default_params()
         self.build_frame()
@@ -66,4 +69,4 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         if index == self.frame_index:
             self._update_choices_of_selected_results()
             self._update_export_button_activation()
-        self._config['frame_active'] = (index == self.frame_index)
+        self._config["frame_active"] = index == self.frame_index

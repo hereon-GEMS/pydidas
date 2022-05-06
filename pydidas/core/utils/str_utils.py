@@ -22,11 +22,20 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_fixed_length_str', 'get_time_string', 'get_short_time_string',
-           'timed_print', 'get_warning', 'convert_unicode_to_ascii',
-           'convert_special_chars_to_unicode', 'get_range_as_formatted_string',
-           'update_separators', 'format_input_to_multiline_str',
-           'get_random_string', 'get_simplified_array_representation']
+__all__ = [
+    "get_fixed_length_str",
+    "get_time_string",
+    "get_short_time_string",
+    "timed_print",
+    "get_warning",
+    "convert_unicode_to_ascii",
+    "convert_special_chars_to_unicode",
+    "get_range_as_formatted_string",
+    "update_separators",
+    "format_input_to_multiline_str",
+    "get_random_string",
+    "get_simplified_array_representation",
+]
 
 import re
 import sys
@@ -41,8 +50,9 @@ import numpy as np
 from ..constants import GREEK_ASCII_TO_UNI, GREEK_UNI_TO_ASCII
 
 
-def get_fixed_length_str(obj, length, fill_back=True, fill_char='.',
-                         formatter='{:.3f}', final_space=True):
+def get_fixed_length_str(
+    obj, length, fill_back=True, fill_char=".", formatter="{:.3f}", final_space=True
+):
     """
     Format an input object to a string of defined length.
 
@@ -77,20 +87,22 @@ def get_fixed_length_str(obj, length, fill_back=True, fill_char='.',
         The formatted string.
     """
     if len(fill_char) != 1:
-        raise TypeError('fill_char must be exactly one character.')
+        raise TypeError("fill_char must be exactly one character.")
     if Real.__subclasscheck__(type(obj)):
         obj = formatter.format(obj)
     if not isinstance(obj, str):
         obj = repr(obj)
     if len(obj) + final_space >= length:
-        return obj[:length - final_space] + ' ' * final_space
+        return obj[: length - final_space] + " " * final_space
     _n = length - len(obj) - 1 - final_space
-    return (_n * fill_char * (not fill_back)
-            + ' ' * (not fill_back)
-            + obj
-            + ' ' * (fill_back)
-            + _n * fill_char * (fill_back)
-            + ' ' * final_space)
+    return (
+        _n * fill_char * (not fill_back)
+        + " " * (not fill_back)
+        + obj
+        + " " * (fill_back)
+        + _n * fill_char * (fill_back)
+        + " " * final_space
+    )
 
 
 def get_time_string(epoch=None, human_output=True):
@@ -125,11 +137,12 @@ def get_time_string(epoch=None, human_output=True):
     _time = time.localtime(epoch)
     _sec = _time[5] + epoch - np.floor(epoch)
     if human_output:
-        return (
-            '{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}'
-            ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))
-    return ('{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}'
-            ''.format(_time[0], _time[1], _time[2], _time[3], _time[4], _sec))
+        return "{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}" "".format(
+            _time[0], _time[1], _time[2], _time[3], _time[4], _sec
+        )
+    return "{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}" "".format(
+        _time[0], _time[1], _time[2], _time[3], _time[4], _sec
+    )
 
 
 def get_short_time_string(epoch=None):
@@ -172,11 +185,12 @@ def timed_print(string, new_lines=0, verbose=True):
         do nothing. The default is True.
     """
     if verbose:
-        print('\n' * new_lines + f'{get_time_string()}: {string}')
+        print("\n" * new_lines + f"{get_time_string()}: {string}")
 
 
-def get_warning(string, severe=False, new_lines=0, print_warning=True,
-                return_warning=False):
+def get_warning(
+    string, severe=False, new_lines=0, print_warning=True, return_warning=False
+):
     """
     Generate a warning message (formatted string in a "box" of dashes).
 
@@ -212,19 +226,17 @@ def get_warning(string, severe=False, new_lines=0, print_warning=True,
     elif isinstance(string, (list, tuple)):
         _max = np.amax(np.r_[[len(_s) for _s in string]])
     _length = 60 if _max <= 54 else 80
-    _s = ('\n' * new_lines
-          + severe * ('=' * _length + '\n')
-          + '-' * _length + '\n')
+    _s = "\n" * new_lines + severe * ("=" * _length + "\n") + "-" * _length + "\n"
     for item in string:
         _ll = len(item)
         if _ll == 0:
-            _s += '-' * _length + '\n'
+            _s += "-" * _length + "\n"
         elif _ll <= 77:
-            _filler =  '-' * (_length - _ll - 3)
-            _s += f'- {item} {_filler}\n'
+            _filler = "-" * (_length - _ll - 3)
+            _s += f"- {item} {_filler}\n"
         else:
-            _s += f'- {item[:73]}[...]\n'
-    _s += '-' * _length + severe * ('\n' +  '=' * _length)
+            _s += f"- {item[:73]}[...]\n"
+    _s += "-" * _length + severe * ("\n" + "=" * _length)
     if print_warning:
         print(_s)
     if return_warning:
@@ -256,12 +268,12 @@ def convert_special_chars_to_unicode(obj):
         for _index, _part in enumerate(_parts):
             if _part in GREEK_ASCII_TO_UNI.keys():
                 _parts[_index] = GREEK_ASCII_TO_UNI[_part]
-        obj = ' '.join(_parts)
+        obj = " ".join(_parts)
         # insert Angstrom sign (in context of ^-1):
-        obj = obj.replace('A^-1', '\u212b\u207b\u00B9')
-        obj = obj.replace('^-1', '\u207b\u00B9')
+        obj = obj.replace("A^-1", "\u212b\u207b\u00B9")
+        obj = obj.replace("^-1", "\u207b\u00B9")
         return obj
-    raise TypeError(f'Cannot process objects of type {type(obj)}')
+    raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
 def convert_unicode_to_ascii(obj):
@@ -289,11 +301,11 @@ def convert_unicode_to_ascii(obj):
         for _index, _part in enumerate(_parts):
             if _part in GREEK_UNI_TO_ASCII.keys():
                 _parts[_index] = GREEK_UNI_TO_ASCII[_part]
-        obj = ' '.join(_parts)
-        obj = obj.replace('\u212b', 'A')
-        obj = obj.replace('\u207b\u00B9', '^-1')
+        obj = " ".join(_parts)
+        obj = obj.replace("\u212b", "A")
+        obj = obj.replace("\u207b\u00B9", "^-1")
         return obj
-    raise TypeError(f'Cannot process objects of type {type(obj)}')
+    raise TypeError(f"Cannot process objects of type {type(obj)}")
 
 
 def get_range_as_formatted_string(obj):
@@ -317,15 +329,15 @@ def get_range_as_formatted_string(obj):
         _str_items = []
         for _item in [_min, _max]:
             if isinstance(_item, Integral):
-                _item = f'{_item:d}'
+                _item = f"{_item:d}"
             elif isinstance(_item, Real):
-                _item = f'{_item:.6f}'
+                _item = f"{_item:.6f}"
             else:
                 _item = str(_item)
             _str_items.append(_item)
-        return _str_items[0] + ' ... ' + _str_items[1]
+        return _str_items[0] + " ... " + _str_items[1]
     except TypeError:
-        return 'unknown range'
+        return "unknown range"
 
 
 def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
@@ -346,20 +358,22 @@ def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
     repr : str
         The simplified string representation of the array values.
     """
-    _repr = ''
+    _repr = ""
     if obj.ndim > 1:
-        _repr += (get_simplified_array_representation(obj[0])
-                  + '\n...\n'
-                  + get_simplified_array_representation(obj[-1]))
+        _repr += (
+            get_simplified_array_representation(obj[0])
+            + "\n...\n"
+            + get_simplified_array_representation(obj[-1])
+        )
     elif obj.ndim == 1:
         if obj.size <= max_items:
             _items = [np.round(o, 4) for o in obj]
         else:
             _items = [np.round(o, 4) for o in obj[np.r_[0, 1, -2, -1]]]
-            _items.insert(2, '...')
-        _repr += '[' + ', '.join(str(item) for item in _items) + ']'
-    _indent = ' ' * leading_indent
-    _repr = '\n'.join(_indent + _item.strip() for _item in _repr.split('\n'))
+            _items.insert(2, "...")
+        _repr += "[" + ", ".join(str(item) for item in _items) + "]"
+    _indent = " " * leading_indent
+    _repr = "\n".join(_indent + _item.strip() for _item in _repr.split("\n"))
     return _repr
 
 
@@ -377,13 +391,14 @@ def update_separators(path):
     str
         The path with separators updated to os.sep standard.
     """
-    if sys.platform in ['win32', 'win64']:
-        return path.replace('/', os.sep)
-    return path.replace('\\', os.sep)
+    if sys.platform in ["win32", "win64"]:
+        return path.replace("/", os.sep)
+    return path.replace("\\", os.sep)
 
 
-def format_input_to_multiline_str(input_str, max_line_length=12,
-                                  pad_to_max_length=False):
+def format_input_to_multiline_str(
+    input_str, max_line_length=12, pad_to_max_length=False
+):
     """
     Format an input string by inserting linebreaks to achieve a maximum line
     length equal to the defined max_line_length.
@@ -409,7 +424,7 @@ def format_input_to_multiline_str(input_str, max_line_length=12,
         The input string, formatted with linebreaks at the required
         positions.
     """
-    _words = [s for s in re.split(' |\n', input_str) if len(s) > 0]
+    _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
     _result_lines = []
     _current_str = _words.pop(0)
     while len(_words) > 0:
@@ -420,7 +435,7 @@ def format_input_to_multiline_str(input_str, max_line_length=12,
             _result_lines.append(_current_str)
             _current_str = _newword
         else:
-            _current_str = f'{_current_str} {_newword}'
+            _current_str = f"{_current_str} {_newword}"
     # append final line
     _result_lines.append(_current_str)
     if pad_to_max_length:
@@ -428,10 +443,8 @@ def format_input_to_multiline_str(input_str, max_line_length=12,
             _delta = max(0, max_line_length - len(_item))
             _delta_front = _delta // 2
             _delta_back = _delta // 2 + _delta % 2
-            _result_lines[_index] = (' ' * _delta_front
-                                     + _item
-                                     + ' ' * _delta_back)
-    return '\n'.join(_result_lines)
+            _result_lines[_index] = " " * _delta_front + _item + " " * _delta_back
+    return "\n".join(_result_lines)
 
 
 def get_random_string(length):
@@ -448,4 +461,4 @@ def get_random_string(length):
     str
         The random string.
     """
-    return ''.join(random.choice(string.ascii_letters) for i in range(length))
+    return "".join(random.choice(string.ascii_letters) for i in range(length))

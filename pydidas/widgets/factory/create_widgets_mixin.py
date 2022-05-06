@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CreateWidgetsMixIn']
+__all__ = ["CreateWidgetsMixIn"]
 
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
@@ -51,6 +51,7 @@ class CreateWidgetsMixIn:
     Use the "gridPos" keyword to define the widget position in the parent's
     layout.
     """
+
     def __init__(self):
         self._widgets = {}
         self.__index_unreferenced = 0
@@ -60,12 +61,12 @@ class CreateWidgetsMixIn:
         """
         Please refer to pydidas.widgets.factory.create_spacer
         """
-        _parent = kwargs.get('parent_widget', self)
+        _parent = kwargs.get("parent_widget", self)
         _spacer = create_spacer(**kwargs)
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
         if ref is None:
-            ref = f'unreferenced_{self.__index_unreferenced:03d}'
+            ref = f"unreferenced_{self.__index_unreferenced:03d}"
             self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
@@ -123,8 +124,9 @@ class CreateWidgetsMixIn:
         """
         Please refer to pydidas.widgets.factory.create_radio_button_group
         """
-        self.__create_widget(create_radio_button_group, ref, entries,
-                             vertical=vertical, **kwargs)
+        self.__create_widget(
+            create_radio_button_group, ref, entries, vertical=vertical, **kwargs
+        )
 
     def __create_widget(self, object_, ref, *args, **kwargs):
         """
@@ -141,17 +143,18 @@ class CreateWidgetsMixIn:
         **kwargs : dict
             Keyword arguments for the widget creation.
         """
-        _parent = kwargs.get('parent_widget', self)
+        _parent = kwargs.get("parent_widget", self)
         _widget = object_(*args, **kwargs)
-        if isinstance(kwargs.get('layout_kwargs'), dict):
-            kwargs.update(kwargs.get('layout_kwargs'))
-            del kwargs['layout_kwargs']
-        _layout_kwargs = dict(alignment=kwargs.get('alignment', None),
-                              gridPos=kwargs.get('gridPos', None))
+        if isinstance(kwargs.get("layout_kwargs"), dict):
+            kwargs.update(kwargs.get("layout_kwargs"))
+            del kwargs["layout_kwargs"]
+        _layout_kwargs = dict(
+            alignment=kwargs.get("alignment", None), gridPos=kwargs.get("gridPos", None)
+        )
         _layout_args = _get_widget_layout_args(_parent, **_layout_kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
         if ref is None:
-            ref = f'unreferenced_{self.__index_unreferenced:03d}'
+            ref = f"unreferenced_{self.__index_unreferenced:03d}"
             self.__index_unreferenced += 1
         self._widgets[ref] = _widget
 
@@ -161,7 +164,7 @@ class CreateWidgetsMixIn:
 
         Note
         ----
-        Widgets must support generic *args and **kwargs arguments. This means
+        Widgets must support generic args and kwargs arguments. This means
         that generic PyQt widgets cannot be created using this method. They
         can be added, however, using the ``add_any_widget`` method.
 
@@ -182,7 +185,7 @@ class CreateWidgetsMixIn:
             If the reference "ref" is not of type string.
         """
         if not isinstance(ref, str):
-            raise TypeError('Widget reference must be of type string.')
+            raise TypeError("Widget reference must be of type string.")
         self.__create_widget(widget_class, ref, *args, **kwargs)
         apply_widget_properties(self._widgets[ref], **kwargs)
 
@@ -225,12 +228,12 @@ class CreateWidgetsMixIn:
             If the reference "ref" is not of type string.
         """
         if not isinstance(ref, str):
-            raise TypeError('Widget reference must be of type string.')
+            raise TypeError("Widget reference must be of type string.")
         apply_widget_properties(widget, **kwargs)
-        _parent = kwargs.get('parent_widget', self)
-        if isinstance(kwargs.get('layout_kwargs'), dict):
-            kwargs.update(kwargs.get('layout_kwargs'))
-            del kwargs['layout_kwargs']
+        _parent = kwargs.get("parent_widget", self)
+        if isinstance(kwargs.get("layout_kwargs"), dict):
+            kwargs.update(kwargs.get("layout_kwargs"))
+            del kwargs["layout_kwargs"]
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(widget, *_layout_args)
         if ref is not None:
@@ -262,20 +265,19 @@ def _get_widget_layout_args(parent, **kwargs):
         The list of layout arguments required for adding the widget to
         the layout of the parent widget.
     """
-    if not isinstance(
-            parent.layout(),(QBoxLayout, QStackedLayout, QGridLayout)):
+    if not isinstance(parent.layout(), (QBoxLayout, QStackedLayout, QGridLayout)):
         raise WidgetLayoutError(
             f'Layout of parent widget "{parent}" is not of type '
-            'QBoxLayout, QStackedLayout or QGridLayout.')
+            "QBoxLayout, QStackedLayout or QGridLayout."
+        )
 
     # TODO: Verify alignment
     # _alignment = kwargs.get('alignment', DEFAULT_ALIGNMENT)
-    _alignment = kwargs.get('alignment', None)
+    _alignment = kwargs.get("alignment", None)
     if isinstance(parent.layout(), QtWidgets.QBoxLayout):
-        return [kwargs.get('stretch', 0), _alignment]
+        return [kwargs.get("stretch", 0), _alignment]
     if isinstance(parent.layout(), QtWidgets.QStackedLayout):
         return []
-
     _grid_pos = _get_grid_pos(parent, **kwargs)
     if _alignment is not None:
         return [*_grid_pos, _alignment]
@@ -306,21 +308,20 @@ def _get_grid_pos(parent, **kwargs):
     gridPos : tuple
         The 4-tuple of the gridPos.
     """
-    _grid_pos = kwargs.get('gridPos', None)
-    _default_row = (0 if parent.layout().count() == 0
-                    else parent.layout().rowCount())
-
+    _grid_pos = kwargs.get("gridPos", None)
+    _default_row = 0 if parent.layout().count() == 0 else parent.layout().rowCount()
     if _grid_pos is None:
-        _grid_pos = (kwargs.get('row', _default_row),
-                     kwargs.get('column', 0),
-                     kwargs.get('n_rows', 1),
-                     kwargs.get('n_columns', 2))
-
+        _grid_pos = (
+            kwargs.get("row", _default_row),
+            kwargs.get("column", 0),
+            kwargs.get("n_rows", 1),
+            kwargs.get("n_columns", 1),
+        )
     if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
         raise WidgetLayoutError(
             'The passed value for "gridPos" is not of type tuple and/or not'
-            ' of length 4.')
-
+            " of length 4."
+        )
     if _grid_pos[0] == -1:
-        _grid_pos = (_default_row, ) + _grid_pos[1:4]
+        _grid_pos = (_default_row,) + _grid_pos[1:4]
     return _grid_pos

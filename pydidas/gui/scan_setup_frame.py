@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetupFrame']
+__all__ = ["ScanSetupFrame"]
 
 import sys
 
@@ -43,7 +43,7 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
     """
 
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         ScanSetupFrameBuilder.__init__(self, parent)
         self.build_frame()
         self.connect_signals()
@@ -53,23 +53,29 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         """
         Connect all required signals and slots.
         """
-        self._widgets['but_save'].clicked.connect(self.export_to_file)
-        self._widgets['but_load'].clicked.connect(self.load_from_file)
-        self._widgets['but_reset'].clicked.connect(self.reset_entries)
-        self.param_widgets['scan_dim'].currentTextChanged.connect(
-            self.update_dim_visibility)
+        self._widgets["but_save"].clicked.connect(self.export_to_file)
+        self._widgets["but_load"].clicked.connect(self.load_from_file)
+        self._widgets["but_reset"].clicked.connect(self.reset_entries)
+        self.param_widgets["scan_dim"].currentTextChanged.connect(
+            self.update_dim_visibility
+        )
 
     def update_dim_visibility(self):
         """
         Update the visibility of dimensions based on the selected number
         of scan dimensions.
         """
-        _prefixes = ['scan_dir_{n}', 'n_points_{n}', 'delta_{n}',
-                     'unit_{n}', 'offset_{n}']
-        _dim = int(self.param_widgets['scan_dim'].currentText())
+        _prefixes = [
+            "scan_dir_{n}",
+            "n_points_{n}",
+            "delta_{n}",
+            "unit_{n}",
+            "offset_{n}",
+        ]
+        _dim = int(self.param_widgets["scan_dim"].currentText())
         for i in range(1, 5):
             _toggle = i <= _dim
-            self._widgets[f'title_{i}'].setVisible(_toggle)
+            self._widgets[f"title_{i}"].setVisible(_toggle)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
 
@@ -91,12 +97,12 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
             widget.set_value(SCAN_SETTINGS.get(param_ref))
             excepthook(*sys.exc_info())
         # explicitly call update fo wavelength and energy
-        if param_ref == 'xray_wavelength':
-            _w = self.param_widgets['xray_energy']
-            _w.set_value(SCAN_SETTINGS.get('xray_energy'))
-        elif param_ref == 'xray_energy':
-            _w = self.param_widgets['xray_wavelength']
-            _w.set_value(SCAN_SETTINGS.get('xray_wavelength') * 1e10)
+        if param_ref == "xray_wavelength":
+            _w = self.param_widgets["xray_energy"]
+            _w.set_value(SCAN_SETTINGS.get("xray_energy"))
+        elif param_ref == "xray_energy":
+            _w = self.param_widgets["xray_wavelength"]
+            _w.set_value(SCAN_SETTINGS.get("xray_wavelength") * 1e10)
 
     def load_from_file(self):
         """
@@ -106,8 +112,9 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         """
         _formats = ScanSetupIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Name of file', None, _formats)[0]
-        if fname != '':
+            self, "Name of file", None, _formats
+        )[0]
+        if fname != "":
             SCAN_SETTINGS.import_from_file(fname)
             for param in SCAN_SETTINGS.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
@@ -120,9 +127,10 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         file in which the information shall be written.
         """
         _formats = ScanSetupIoMeta.get_string_of_formats()
-        fname =  QtWidgets.QFileDialog.getSaveFileName(
-            self, 'Name of file', None, _formats)[0]
-        if fname != '':
+        fname = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Name of file", None, _formats
+        )[0]
+        if fname != "":
             SCAN_SETTINGS.export_to_file(fname, overwrite=True)
 
     def reset_entries(self):

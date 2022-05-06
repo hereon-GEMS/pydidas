@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['execute_workflow_app_parser']
+__all__ = ["execute_workflow_app_parser"]
 
 import argparse
 
@@ -47,13 +47,16 @@ def execute_workflow_app_parser(caller=None):
         and entered values or  - if missing - the default values.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--autosave', action='store_true',
-                        help=PARAMS['autosave_results']['tooltip'])
-    parser.add_argument('-autosave_dir', '-d',
-                        help=PARAMS['autosave_dir']['tooltip'])
-    parser.add_argument('-autosave_format', '-f',
-                        help=PARAMS['autosave_format']['tooltip'])
+    parser.add_argument(
+        "--autosave", action="store_true", help=PARAMS["autosave_results"]["tooltip"]
+    )
+    parser.add_argument(
+        "-autosave_directory", "-d", help=PARAMS["autosave_directory"]["tooltip"]
+    )
+    parser.add_argument(
+        "-autosave_format", "-f", help=PARAMS["autosave_format"]["tooltip"]
+    )
     _args = dict(vars(parser.parse_args()))
     # store the autosave entry for the autosave_results Parameter
-    _args['autosave_results'] = True if _args.pop('autosave') else None
+    _args["autosave_results"] = True if _args.pop("autosave") else None
     return _args

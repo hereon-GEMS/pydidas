@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spin_box']
+__all__ = ["create_spin_box"]
 
 from qtpy.QtWidgets import QSpinBox
 
@@ -50,8 +50,8 @@ def create_spin_box(**kwargs):
     box : QtWidgets.QSpinBox
         The instantiated spin box widget.
     """
-    kwargs['range'] = kwargs.get('valueRange', (0, 1))
-    kwargs['fixedWidth'] = kwargs.get('fixedWidth', 50)
+    kwargs["range"] = kwargs.get("valueRange", (0, 1))
+    kwargs["fixedWidth"] = kwargs.get("fixedWidth", 50)
     _box = QSpinBox()
     apply_widget_properties(_box, **kwargs)
     return _box

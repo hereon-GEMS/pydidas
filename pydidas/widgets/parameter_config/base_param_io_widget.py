@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BaseParamIoWidget']
+__all__ = ["BaseParamIoWidget"]
 
 import numbers
 import pathlib
@@ -33,8 +33,11 @@ from numpy import nan
 
 from ...core import Hdf5key
 from ...core.constants import (
-    PARAM_INPUT_WIDGET_HEIGHT, QT_REG_EXP_FLOAT_VALIDATOR,
-    PARAM_INPUT_EDIT_WIDTH, QT_REG_EXP_INT_VALIDATOR)
+    PARAM_INPUT_WIDGET_HEIGHT,
+    QT_REG_EXP_FLOAT_VALIDATOR,
+    PARAM_INPUT_EDIT_WIDTH,
+    QT_REG_EXP_INT_VALIDATOR,
+)
 
 
 class BaseParamIoWidget(QtWidgets.QWidget):
@@ -58,7 +61,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self.__ptype = param.type
         self._old_value = None
-        self.setToolTip(f'{param.tooltip}')
+        self.setToolTip(f"{param.tooltip}")
 
     def set_validator(self, param):
         """
@@ -80,8 +83,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
                 self.setValidator(QT_REG_EXP_FLOAT_VALIDATOR)
             else:
                 _validator = QtGui.QDoubleValidator()
-                _validator.setNotation(
-                    QtGui.QDoubleValidator.ScientificNotation)
+                _validator.setNotation(QtGui.QDoubleValidator.ScientificNotation)
                 self.setValidator(_validator)
 
     def get_value_from_text(self, text):
@@ -101,13 +103,13 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         """
         # need to process True and False explicitly because bool is a subtype
         # of int but the strings 'True' and 'False' cannot be converted to int
-        if text.upper() == 'TRUE':
+        if text.upper() == "TRUE":
             return True
-        if text.upper() == 'FALSE':
+        if text.upper() == "FALSE":
             return False
-        if text.upper() == 'NAN':
+        if text.upper() == "NAN":
             return nan
-        if text.upper() == 'NONE':
+        if text.upper() == "NONE":
             return None
         if self.__ptype == numbers.Integral:
             return int(text)

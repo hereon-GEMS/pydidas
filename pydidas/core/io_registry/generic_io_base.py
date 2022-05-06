@@ -23,17 +23,20 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GenericIoBase']
+__all__ = ["GenericIoBase"]
 
 import os
 
+from .generic_io_meta import GenericIoMeta
 
-class GenericIoBase:
+
+class GenericIoBase(metaclass=GenericIoMeta):
     """
     Base class for Metaclass-based importer/exporters.
     """
+
     extensions = []
-    format_name = 'unknown'
+    format_name = ""
     imported_params = {}
 
     @classmethod
@@ -63,7 +66,7 @@ class GenericIoBase:
         Parameters
         ----------
         filename : str
-            The filename of the file to be written.
+            The filename of the file to be imported.
         """
         raise NotImplementedError
 
@@ -87,7 +90,9 @@ class GenericIoBase:
         FileExistsError
             If a file with filename exists and the overwrite flag is not True.
         """
-        _overwrite = kwargs.get('overwrite', False)
+        _overwrite = kwargs.get("overwrite", False)
         if os.path.exists(filename) and not _overwrite:
-            raise FileExistsError(f'The file "{filename}" exists and '
-                                  'overwriting has not been confirmed.')
+            raise FileExistsError(
+                f'The file "{filename}" exists and '
+                "overwriting has not been confirmed."
+            )

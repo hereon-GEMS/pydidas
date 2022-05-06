@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_spacer']
+__all__ = ["create_spacer"]
 
 from qtpy.QtWidgets import QSpacerItem, QSizePolicy
 
@@ -62,11 +62,14 @@ def create_spacer(**kwargs):
     spacer : QSpacerItem
         The new spacer.
     """
-    _policy = kwargs.get('policy', QSizePolicy.Minimum)
-    _vertical_policy = kwargs.get('vertical_policy', _policy)
-    _spacer = QSpacerItem(kwargs.get('fixedHeight', 20),
-                          kwargs.get('fixedWidth', 20),
-                          _policy, _vertical_policy)
+    _policy = kwargs.get("policy", QSizePolicy.Minimum)
+    _vertical_policy = kwargs.get("vertical_policy", _policy)
+    _spacer = QSpacerItem(
+        kwargs.get("fixedHeight", 20),
+        kwargs.get("fixedWidth", 20),
+        _policy,
+        _vertical_policy,
+    )
 
     apply_widget_properties(_spacer, **kwargs)
     return _spacer

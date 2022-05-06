@@ -26,8 +26,6 @@ __status__ = "Development"
 __all__ = []
 
 
-
-
 # import __all__ items from modules:
 from .composite_creator_app_parser_ import *
 from .directory_spy_app_parser_ import *
@@ -36,13 +34,16 @@ from .execute_workflow_app_parser_ import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import composite_creator_app_parser_
+
 __all__.extend(composite_creator_app_parser_.__all__)
 del composite_creator_app_parser_
 
 from . import directory_spy_app_parser_
+
 __all__.extend(directory_spy_app_parser_.__all__)
 del directory_spy_app_parser_
 
 from . import execute_workflow_app_parser_
+
 __all__.extend(execute_workflow_app_parser_.__all__)
 del execute_workflow_app_parser_

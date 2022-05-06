@@ -31,59 +31,62 @@ from contextlib import redirect_stdout
 
 from qtpy import QtCore
 
-from pydidas.core import (PydidasQsettings, ParameterCollection,
-                          Parameter, CopyableQSettings)
+from pydidas.core import (
+    PydidasQsettings,
+    ParameterCollection,
+    Parameter,
+    CopyableQSettings,
+)
 
 
 class TestPydidasQSettings(unittest.TestCase):
-
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
         self._params = ParameterCollection(
-            Parameter('param_float', float, default=123.45),
-            Parameter('param_int', int, default=23),
-            Parameter('param_str', str, default='test123'))
-        self.q_settings = QtCore.QSettings('Hereon', 'pydidas')
+            Parameter("param_float", float, default=123.45),
+            Parameter("param_int", int, default=23),
+            Parameter("param_str", str, default="test123"),
+        )
+        self.q_settings = QtCore.QSettings("Hereon", "pydidas")
         for key in self._params:
-            self.q_settings.setValue(f'global/{key}',
-                                     self._params.get_value(key))
+            self.q_settings.setValue(f"global/{key}", self._params.get_value(key))
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
         for key in self._params:
-            self.q_settings.remove(f'global/{key}')
+            self.q_settings.remove(f"global/{key}")
 
     def test_creation(self):
         obj = PydidasQsettings()
         self.assertIsInstance(obj, PydidasQsettings)
-        self.assertTrue(hasattr(obj, 'q_settings'))
+        self.assertTrue(hasattr(obj, "q_settings"))
         self.assertIsInstance(obj.q_settings, CopyableQSettings)
 
     def test_show_all_stored_q_settings(self):
         obj = PydidasQsettings()
-        _fname = os.path.join(self._tmpdir, 'out.txt')
-        with open(_fname, 'w') as _f:
+        _fname = os.path.join(self._tmpdir, "out.txt")
+        with open(_fname, "w") as _f:
             with redirect_stdout(_f):
                 obj.show_all_stored_q_settings()
-        with open(_fname, 'r') as _f:
+        with open(_fname, "r") as _f:
             _text = _f.read()
         for _key in self._params:
             _val = self._params.get_value(_key)
-            self.assertIn(f'global/{_key}: {_val}', _text)
+            self.assertIn(f"global/{_key}: {_val}", _text)
 
     def test_get_all_stored_q_settings(self):
         obj = PydidasQsettings()
         _settings = obj.get_all_stored_q_settings()
         for _key, _param in self._params.items():
-            _stored_val = _settings[f'global/{_key}']
+            _stored_val = _settings[f"global/{_key}"]
             self.assertEqual(str(_param.value), str(_stored_val))
 
     def test_set_value(self):
         _val = -456.789
         obj = PydidasQsettings()
-        obj.set_value('global/param_float', _val)
+        obj.set_value("global/param_float", _val)
         _settings = obj.get_all_stored_q_settings()
-        self.assertEqual(float(_settings['global/param_float']), _val)
+        self.assertEqual(float(_settings["global/param_float"]), _val)
 
 
 if __name__ == "__main__":

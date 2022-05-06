@@ -26,7 +26,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowResultSaverMeta']
+__all__ = ["WorkflowResultSaverMeta"]
 
 
 from ...core.io_registry import GenericIoMeta
@@ -37,11 +37,12 @@ class WorkflowResultSaverMeta(GenericIoMeta):
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.
     """
+
     # need to redefine the registry to have a unique registry for
     # WorkflowResultsSaverMeta
     registry = {}
     active_savers = []
-    scan_title = ''
+    scan_title = ""
 
     @classmethod
     def reset(cls):
@@ -52,7 +53,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         cls.active_savers = []
 
     @classmethod
-    def set_active_savers_and_title(cls, savers, title='unknown'):
+    def set_active_savers_and_title(cls, savers, title="unknown"):
         """
         Set the active savers so they do not need to be specified individually
         later on.
@@ -69,7 +70,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         cls.active_savers = []
         cls.scan_title = title
         for _saver in savers:
-            if not (_saver is None or _saver == 'None'):
+            if not (_saver is None or _saver == "None"):
                 cls.verify_extension_is_registered(_saver)
                 if _saver not in cls.active_savers:
                     cls.active_savers.append(_saver)
@@ -121,12 +122,10 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
             _saver.scan_title = cls.scan_title
-            _saver.prepare_files_and_directories(save_dir, shapes, labels,
-                                                 data_labels)
+            _saver.prepare_files_and_directories(save_dir, shapes, labels, data_labels)
 
     @classmethod
-    def prepare_saver(cls, extension, save_dir, shapes, labels,
-                      data_labels):
+    def prepare_saver(cls, extension, save_dir, shapes, labels, data_labels):
         """
         Call the concrete saver associated with the extension to prepare
         all requird files and directories.
@@ -145,11 +144,10 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             keys and label values.
         data_labels : dict
             The labels of the data values in the results in form of a
-            dictionary with nodeID keys and label values.          """
+            dictionary with nodeID keys and label values."""
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
-        _saver.prepare_files_and_directories(save_dir, shapes, labels,
-                                             data_labels)
+        _saver.prepare_files_and_directories(save_dir, shapes, labels, data_labels)
 
     @classmethod
     def push_frame_metadata_to_active_savers(cls, metadata):
@@ -219,8 +217,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         _saver.export_full_data_to_file(data)
 
     @classmethod
-    def export_frame_to_file(cls, index, extension, frame_result_dict,
-                             **kwargs):
+    def export_frame_to_file(cls, index, extension, frame_result_dict, **kwargs):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.

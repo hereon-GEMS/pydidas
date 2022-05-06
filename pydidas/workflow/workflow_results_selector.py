@@ -23,15 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowResultsSelector']
+__all__ = ["WorkflowResultsSelector"]
 
 import re
 
 import numpy as np
 from qtpy import QtCore
 
-from ..core import (Parameter, ObjectWithParameterCollection,
-                     get_generic_param_collection, AppConfigError)
+from ..core import (
+    Parameter,
+    ObjectWithParameterCollection,
+    get_generic_param_collection,
+    AppConfigError,
+)
 from ..experiment import ScanSetup
 from .workflow_results import WorkflowResults
 
@@ -53,10 +57,12 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         The select_results Parameter instance. This instance should be
         shared between the ResultSelectionWidget and the parent.
     """
+
     new_selection = QtCore.Signal(bool, int, int, object)
 
     default_params = get_generic_param_collection(
-        'use_scan_timeline', 'result_n_dim')
+        "use_scan_timeline", "result_n_dim", "use_data_range"
+    )
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
@@ -64,8 +70,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self.set_default_params()
         self._selection = None
         self._active_node = -1
+        self.__active_ranges = {}
         self._npoints = []
-        self._re_pattern = re.compile('^(-?\\d*,?:?){0,30}$')
+        self._re_pattern = re.compile("^(\\s*(-?\\d*\\.?\\d*:?){1,3},?)*?$")
 
     def reset(self):
         """
@@ -87,6 +94,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._active_node = index
         self._calc_and_store_ndim_of_results()
         self._check_and_create_params_for_slice_selection()
+        self.__active_ranges = RESULTS.get_result_ranges(index)
 
     def _calc_and_store_ndim_of_results(self):
         """
@@ -94,9 +102,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         new number.
         """
         _ndim = RESULTS.ndims[self._active_node]
-        if self.get_param_value('use_scan_timeline'):
+        if self.get_param_value("use_scan_timeline"):
             _ndim -= SCAN.ndim - 1
-        self._config['result_ndim'] = _ndim
+        self._config["result_ndim"] = _ndim
 
     def _check_and_create_params_for_slice_selection(self):
         """
@@ -104,11 +112,17 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         for all current data dimensions and create and add them if they do not.
         """
         for _dim in range(RESULTS.ndims[self._active_node]):
-            _refkey = f'data_slice_{_dim}'
+            _refkey = f"data_slice_{_dim}"
             _param = Parameter(
-                _refkey, str, ':', name=f'Slice of data dim #{_dim}',
-                tooltip=('The slice description for the selected data '
-                         'dimension. Use a colon to select the full range.'))
+                _refkey,
+                str,
+                ":",
+                name=f"Slice of data dim #{_dim}",
+                tooltip=(
+                    "The slice description for the selected data "
+                    "dimension. Use a colon to select the full range."
+                ),
+            )
             if _refkey not in self.params:
                 self.add_param(_param)
 
@@ -136,21 +150,24 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             The active dimensions.
         """
         self._update_selection()
-        return [_index for _index, _items in enumerate(self._selection)
-                if _items.size > 1]
+        return [
+            _index for _index, _items in enumerate(self._selection) if _items.size > 1
+        ]
 
     def _update_selection(self):
         """
         Update the selection based on the entries for the "data_slice_##"
         Parameters.
         """
-        _use_timeline = self.get_param_value('use_scan_timeline')
+        _use_timeline = self.get_param_value("use_scan_timeline")
         self._npoints = list(RESULTS.shapes[self._active_node])
         if _use_timeline:
-            del self._npoints[:SCAN.ndim]
+            del self._npoints[: SCAN.ndim]
             self._npoints.insert(0, SCAN.n_total)
-        _selection = tuple(self._get_single_slice_object(_dim)
-                           for _dim in range(self._config['result_ndim']))
+        _selection = tuple(
+            self._get_single_slice_object(_dim)
+            for _dim in range(self._config["result_ndim"])
+        )
         self._check_for_selection_dim(_selection)
         self._selection = _selection
 
@@ -173,31 +190,116 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         np.ndarray
             The array with the selected slice indices for the given dimension.
         """
-        # Get the selection string without any blank chars to match the
-        # regular expression.
-        _str = ''.join(self.get_param_value(f'data_slice_{index}').split())
-        if _str in ['', ':']:
+        self._config["active_index"] = index
+        self._config["index_defaults"] = [0, self._npoints[index], 1]
+        _str = self.get_param_value(f"data_slice_{index}")
+        if _str in ["", ":"]:
             return np.r_[slice(0, self._npoints[index], 1)]
         if not bool(self._re_pattern.fullmatch(_str)):
-            raise AppConfigError('Cannot interprete the selection pattern for '
-                                 f'the dimension "{index}".')
-        _defaults = [0, self._npoints[index], 1]
-        _substrings = _str.split(',')
+            raise AppConfigError(
+                "Cannot interprete the selection pattern "
+                f'"{_str}" for the dimension "{index}".'
+            )
+        _substrings = _str.split(",")
         _slices = []
-        for _substr in _substrings:
-            _entries = _substr.split(':')
-            for _pos, _key in enumerate(_entries):
-                _entries[_pos] = int(_defaults[_pos] if _key == '' else _key)
-                if _entries[_pos] < 0:
-                    _entries[_pos] = np.mod(_entries[_pos],
-                                            self._npoints[index])
-            if len(_entries) == 1:
-                _slices.append(_entries[0])
-            elif len(_entries) == 2:
-                _slices.append(slice(_entries[0], _entries[1]))
-            elif len(_entries) == 3:
-                _slices.append(slice(_entries[0], _entries[1], _entries[2]))
+        if (self.get_param_value('use_scan_timeline')
+            or not self.get_param_value("use_data_range")
+        ):
+            _entries = self._parse_string_indices(_substrings)
+        else:
+            _entries = self._convert_values_to_indices(_substrings)
+        for _entry in _entries:
+            if len(_entry) == 1:
+                _slices.append(_entry[0])
+            else:
+                _slices.append(slice(*_entry))
         return np.unique(np.r_[tuple(_slices)])
+
+    def _parse_string_indices(self, substrings):
+        """
+        Parse the string with indices to integer values.
+
+        Parameters
+        ----------
+        substrings : list
+            The list with individual entries (which were separated by "," in
+            the original string).
+        Returns
+        -------
+        list
+            The list with index values for the various selections.
+        """
+        _new_items = []
+        _index = self._config["active_index"]
+        _defaults = self._config["index_defaults"]
+        for _substr in substrings:
+            _entries = _substr.split(":")
+            for _pos, _key in enumerate(_entries):
+                _entries[_pos] = int(_defaults[_pos] if _key == "" else _key)
+                if _entries[_pos] < 0:
+                    _entries[_pos] = np.mod(_entries[_pos], self._npoints[_index])
+            _new_items.append(_entries)
+        return _new_items
+
+    def _convert_values_to_indices(self, substrings):
+        """
+        Convert data value strings to indexes for selecting the required
+        datapoints.
+
+        Parameters
+        ----------
+        substrings : list
+            The list with individual entries (which were separated by "," in
+            the original string).
+
+        Returns
+        -------
+        list
+            The list with index values for the various selections.
+        """
+        _new_items = []
+        _range = self.__active_ranges[self._config["active_index"]]
+        _defaults = self._config["index_defaults"]
+        print(_defaults, _range, substrings)
+        for _item in substrings:
+            _keys = [
+                float(_defaults[_pos] if _val == "" else _val)
+                for _pos, _val in enumerate(_item.split(":"))
+            ]
+            if len(_keys) == 1:
+                _index = self._get_best_index_for_value(_keys[0], _range)
+                _new_items.append([_index])
+            elif len(_keys) == 2:
+                _startindex = self._get_best_index_for_value(_keys[0], _range)
+                _stopindex = self._get_best_index_for_value(_keys[1], _range)
+                _new_items.append([_startindex, _stopindex])
+            elif len(_keys == 3):
+                _targets = np.arange(_keys[0], _keys[1], _keys[2])
+                for _val in _targets:
+                    _index = self._get_best_index_for_value(_val, _range)
+                    _new_items.append([_index])
+        return _new_items
+
+    def _get_best_index_for_value(self, value, valrange):
+        """
+        Get the index which is the closest match to the selected value from a
+        range.
+
+        Parameters
+        ----------
+        value : float
+            The target value
+        valrange : np.ndarray
+            The array with all values.
+
+        Returns
+        -------
+        index : int
+            The index with the best match.
+        """
+        _delta = abs(valrange - value)
+        _index = _delta.argmin()
+        return _index
 
     def _check_for_selection_dim(self, selection):
         """
@@ -219,9 +321,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         for _value in selection:
             if _value.size > 1:
                 _dims_larger_one += 1
-        _target_dims = self.get_param_value('result_n_dim')
+        _target_dims = self.get_param_value("result_n_dim")
         if _target_dims == -1:
             return
         if _target_dims != _dims_larger_one:
-            raise AppConfigError('The dimensionality of the selected data '
-                                 'subset does not match ')
+            raise AppConfigError(
+                "The dimensionality of the selected data subset does not match "
+            )

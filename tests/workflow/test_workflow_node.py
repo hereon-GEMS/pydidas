@@ -29,7 +29,6 @@ from pydidas.unittest_objects import DummyLoader, DummyProc
 
 
 class TestWorkflowNode(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -38,7 +37,7 @@ class TestWorkflowNode(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=DummyLoader())
-        _nodes =  [[obj00]]
+        _nodes = [[obj00]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
@@ -80,7 +79,7 @@ class TestWorkflowNode(unittest.TestCase):
     def test_update_plugin_result_data_shape(self):
         _shape = (-1, 12, 42)
         obj = WorkflowNode(plugin=DummyProc())
-        obj.plugin._config['input_shape'] = _shape
+        obj.plugin._config["input_shape"] = _shape
         obj.update_plugin_result_data_shape()
         self.assertEqual(obj.result_shape, _shape)
 
@@ -98,8 +97,7 @@ class TestWorkflowNode(unittest.TestCase):
         obj = WorkflowNode(plugin=DummyLoader())
         _dump = obj.dump()
         self.assertIsInstance(_dump, dict)
-        for key in ('node_id', 'parent', 'children', 'plugin_class',
-                    'plugin_params'):
+        for key in ("node_id", "parent", "children", "plugin_class", "plugin_params"):
             self.assertTrue(key in _dump.keys())
 
     def test_execute_plugin_chain(self):
@@ -201,10 +199,10 @@ class TestWorkflowNode(unittest.TestCase):
     def test_hash__comparison_w_different_plugin_param(self):
         _parent = WorkflowNode(plugin=DummyLoader(), node_id=0)
         obj = WorkflowNode(plugin=DummyProc(), node_id=1, parent=_parent)
-        obj.plugin.set_param_value('label', 'Test')
+        obj.plugin.set_param_value("label", "Test")
         obj2 = WorkflowNode(plugin=DummyProc(), node_id=2, parent=_parent)
         self.assertNotEqual(hash(obj), hash(obj2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

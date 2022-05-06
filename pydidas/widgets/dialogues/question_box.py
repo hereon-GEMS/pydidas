@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['QuestionBox']
+__all__ = ["QuestionBox"]
 
 from qtpy import QtWidgets
 
@@ -46,8 +46,16 @@ class QuestionBox(QtWidgets.QMessageBox):
     tooltip : str, optional
         The tooltip text for the dialog. The default is an empty string.
     """
-    def __init__(self, title, question, explanation='', parent=None,
-                 default=QtWidgets.QMessageBox.No, tooltip=''):
+
+    def __init__(
+        self,
+        title,
+        question,
+        explanation="",
+        parent=None,
+        default=QtWidgets.QMessageBox.No,
+        tooltip="",
+    ):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setText(question)
@@ -55,8 +63,7 @@ class QuestionBox(QtWidgets.QMessageBox):
             self.setInformativeText(explanation)
         if len(tooltip) > 0:
             self.setToolTip(tooltip)
-        self.setStandardButtons(QtWidgets.QMessageBox.Yes |
-                                QtWidgets.QMessageBox.No)
+        self.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         self.setDefaultButton(default)
 
     def exec_(self):

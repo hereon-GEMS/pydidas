@@ -33,7 +33,6 @@ from pydidas.core.utils import Timer
 
 
 class TestTimer(unittest.TestCase):
-
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
 
@@ -41,14 +40,14 @@ class TestTimer(unittest.TestCase):
         shutil.rmtree(self._tmpdir)
 
     def test_timer(self):
-        _fname = os.path.join(self._tmpdir, 'out.txt')
-        with open(_fname, 'w') as _f:
+        _fname = os.path.join(self._tmpdir, "out.txt")
+        with open(_fname, "w") as _f:
             with redirect_stdout(_f):
                 with Timer():
                     time.sleep(0.01)
-        with open(_fname, 'r') as _f:
+        with open(_fname, "r") as _f:
             _text = _f.read()
-        self.assertIn('Code runtime is ', _text)
+        self.assertIn("Code runtime is ", _text)
 
 
 if __name__ == "__main__":

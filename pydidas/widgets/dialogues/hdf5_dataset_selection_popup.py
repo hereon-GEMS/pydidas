@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Hdf5DatasetSelectionPopup']
+__all__ = ["Hdf5DatasetSelectionPopup"]
 
 from qtpy import QtWidgets, QtGui
 
@@ -43,13 +43,14 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     fname : Union[str, pathlib.Path]
         The file path to the hdf5 file.
     """
+
     def __init__(self, parent=None, fname=None):
         super().__init__(parent)
         if fname is not None:
             dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
             self.__update_combo_box_items(dsets)
-        self.setWindowTitle('Select hdf5 dataset')
-        self.setLabelText('Hdf5 datasets:')
+        self.setWindowTitle("Select hdf5 dataset")
+        self.setLabelText("Hdf5 datasets:")
 
     def set_filename(self, fname):
         """
@@ -77,9 +78,8 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         metrics = QtGui.QFontMetrics(font)
         width = max([metrics.boundingRect(d).width() for d in items])
 
-        self.resize(width + 60, min(300, max(200, 50 + len(items)*10)))
-        self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems,
-                       True)
+        self.resize(width + 60, min(300, max(200, 50 + len(items) * 10)))
+        self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
     def get_dset(self):

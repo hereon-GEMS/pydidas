@@ -26,7 +26,9 @@ import unittest
 
 from pydidas.experiment import ScanSetup
 from pydidas.workflow.result_savers import (
-    WorkflowResultSaverBase, WorkflowResultSaverMeta)
+    WorkflowResultSaverBase,
+    WorkflowResultSaverMeta,
+)
 from pydidas.workflow import WorkflowTree, WorkflowResults
 
 
@@ -37,14 +39,15 @@ META = WorkflowResultSaverMeta
 
 
 class TestWorkflowResultSaverBase(unittest.TestCase):
-
     def setUp(self):
         self._meta_registry = META.registry.copy()
         META.reset()
+
         class SAVER(WorkflowResultSaverBase):
-            extensions = ['TEST']
-            default_extension = 'Test'
-            format_name = 'Test'
+            extensions = ["TEST"]
+            default_extension = "Test"
+            format_name = "Test"
+
         self.SAVER = SAVER
 
     def tearDown(self):
@@ -63,18 +66,18 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         # assert does not raise an Exception
 
     def test_prepare_files_and_directories(self):
-        self.SAVER.prepare_files_and_directories('Dir', {}, {}, {})
+        self.SAVER.prepare_files_and_directories("Dir", {}, {}, {})
         # assert does not raise an Exception
 
     def test_get_filenames_from_labels(self):
-        _labels = {0: None, 1: 'some thing', 2: '\nanother name', 3: 'label'}
+        _labels = {0: None, 1: "some thing", 2: "\nanother name", 3: "label"}
         _names = self.SAVER.get_filenames_from_labels(_labels)
         for _node_id, _name in _names.items():
-            self.assertTrue(_name.startswith(f'node_{_node_id:02d}'))
-            self.assertTrue(_name.endswith('.Test'))
-            self.assertNotIn(' ', _name)
-            self.assertNotIn('\n', _name)
+            self.assertTrue(_name.startswith(f"node_{_node_id:02d}"))
+            self.assertTrue(_name.endswith(".Test"))
+            self.assertNotIn(" ", _name)
+            self.assertNotIn("\n", _name)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

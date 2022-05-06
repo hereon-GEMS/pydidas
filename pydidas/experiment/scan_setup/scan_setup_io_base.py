@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetupIoBase']
+__all__ = ["ScanSetupIoBase"]
 
 from ...core.io_registry import GenericIoBase
 from .scan_setup_io_meta import ScanSetupIoMeta
@@ -37,10 +37,10 @@ class ScanSetupIoBase(GenericIoBase, metaclass=ScanSetupIoMeta):
     """
     Base class for ScanSetup importer/exporters.
     """
-    extensions = []
-    format_name = 'unknown'
-    imported_params = {}
 
+    extensions = []
+    format_name = "unknown"
+    imported_params = {}
 
     @classmethod
     def _verify_all_entries_present(cls):
@@ -48,14 +48,14 @@ class ScanSetupIoBase(GenericIoBase, metaclass=ScanSetupIoMeta):
         Verify that the tmp_params dictionary holds all keys from the
         scanSettings.
         """
-        if 'scan_dim' not in cls.imported_params:
+        if "scan_dim" not in cls.imported_params:
             raise KeyError('The scan dimension key "scan_dim" is missing.')
-        if 'scan_name' not in cls.imported_params:
+        if "scan_name" not in cls.imported_params:
             raise KeyError('The scan name key "scan_name" is missing.')
-        n_dim = cls.imported_params.get('scan_dim')
+        n_dim = cls.imported_params.get("scan_dim")
         for _dim in range(1, n_dim + 1):
-            for _key in ['scan_dir', 'n_points', 'delta', 'unit', 'offset']:
-                _item = f'{_key}_{_dim}'
+            for _key in ["scan_dir", "n_points", "delta", "unit", "offset"]:
+                _item = f"{_key}_{_dim}"
                 if _item not in cls.imported_params:
                     raise KeyError(f'The setting for "{_item}" is missing.')
 

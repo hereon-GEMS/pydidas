@@ -33,10 +33,18 @@ from pydidas.unittest_objects.mp_test_app_wo_tasks import MpTestAppWoTasks
 
 
 class _ProcThread(threading.Thread):
-    """ Simple Thread to test blocking input / output. """
+    """Simple Thread to test blocking input / output."""
 
-    def __init__(self, input_queue, output_queue, stop_queue, finished_queue,
-                 app, app_params, app_config):
+    def __init__(
+        self,
+        input_queue,
+        output_queue,
+        stop_queue,
+        finished_queue,
+        app,
+        app_params,
+        app_config,
+    ):
         super().__init__()
         self.input_queue = input_queue
         self.output_queue = output_queue
@@ -47,30 +55,40 @@ class _ProcThread(threading.Thread):
         self.app_config = app_config
 
     def run(self):
-       app_processor_without_tasks(
-           self.input_queue, self.output_queue, self.stop_queue,
-           self.finished_queue, self.app, self.app_params, self.app_config)
+        app_processor_without_tasks(
+            self.input_queue,
+            self.output_queue,
+            self.stop_queue,
+            self.finished_queue,
+            self.app,
+            self.app_params,
+            self.app_config,
+        )
 
 
 class Test_app_processor_without_tasks(unittest.TestCase):
-
     def setUp(self):
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
         self.stop_queue = mp.Queue()
         self.finished_queue = mp.Queue()
         self.app = MpTestAppWoTasks()
-        self.n_test = self.app._config['max_index']
+        self.n_test = self.app._config["max_index"]
         self.app.multiprocessing_pre_run()
 
     def tearDown(self):
         ...
 
     def create_thread(self):
-        return _ProcThread(self.input_queue, self.output_queue,
-                           self.stop_queue, self.finished_queue,
-                           self.app.__class__, self.app.params.get_copy(),
-                           self.app._config)
+        return _ProcThread(
+            self.input_queue,
+            self.output_queue,
+            self.stop_queue,
+            self.finished_queue,
+            self.app.__class__,
+            self.app.params.get_copy(),
+            self.app._config,
+        )
 
     def get_results(self):
         _results = []
@@ -87,20 +105,21 @@ class Test_app_processor_without_tasks(unittest.TestCase):
     def test_run_plain(self):
         _thread = self.create_thread()
         _thread.start()
-        time.sleep(0.2)
+        time.sleep(0.05)
         self.stop_queue.put(1)
         time.sleep(0.05)
         _tasks, _results = self.get_results()
+        time.sleep(0.01)
         self.assertTrue(len(_tasks) > 0)
         self.assertEqual(self.finished_queue.get_nowait(), 1)
 
     def test_stop_signal(self):
         _thread = self.create_thread()
         _thread.start()
-        time.sleep(0.1)
+        time.sleep(0.05)
         self.assertTrue(_thread.is_alive())
         self.stop_queue.put(1)
-        time.sleep(0.1)
+        time.sleep(0.05)
         self.assertEqual(self.finished_queue.get(), 1)
 
 

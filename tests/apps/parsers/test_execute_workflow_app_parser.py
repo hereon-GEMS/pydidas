@@ -29,8 +29,8 @@ import sys
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.core.utils import get_random_string
 
-class TestAppParsers(unittest.TestCase):
 
+class TestAppParsers(unittest.TestCase):
     def setUp(self):
         self._argv = copy.copy(sys.argv)
 
@@ -38,20 +38,20 @@ class TestAppParsers(unittest.TestCase):
         sys.argv = self._argv
 
     def test_parse_execute_workflow_cmdline_arguments_no_args(self):
-        sys.argv = ['test']
+        sys.argv = ["test"]
         parsed = execute_workflow_app_parser()
-        self.assertFalse(parsed['autosave_results'])
-        self.assertIsNone(parsed['autosave_dir'])
-        self.assertIsNone(parsed['autosave_format'])
+        self.assertFalse(parsed["autosave_results"])
+        self.assertIsNone(parsed["autosave_directory"])
+        self.assertIsNone(parsed["autosave_format"])
 
     def test_parse_execute_workflow_cmdline_arguments(self):
         _dir = get_random_string(12)
-        _format = ':.3f'
-        sys.argv = ['test', '--autosave', '-d', _dir, '-f', _format]
+        _format = ":.3f"
+        sys.argv = ["test", "--autosave", "-d", _dir, "-f", _format]
         parsed = execute_workflow_app_parser()
-        self.assertTrue(parsed['autosave_results'])
-        self.assertEqual(parsed['autosave_dir'], _dir)
-        self.assertEqual(parsed['autosave_format'], _format)
+        self.assertTrue(parsed["autosave_results"])
+        self.assertEqual(parsed["autosave_directory"], _dir)
+        self.assertEqual(parsed["autosave_format"], _format)
 
 
 if __name__ == "__main__":

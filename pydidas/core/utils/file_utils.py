@@ -22,11 +22,11 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['trim_filename', 'find_valid_python_files']
+__all__ = ["trim_filename", "find_valid_python_files"]
 
 import os
 
-from .flatten_list_ import flatten_list
+from .flatten_iterable import flatten
 
 
 def trim_filename(path):
@@ -44,10 +44,10 @@ def trim_filename(path):
         The path without the filename.
     """
     path = os.path.dirname(path) if os.path.isfile(path) else path
-    if os.sep == '/':
-        path.replace('\\', os.sep)
+    if os.sep == "/":
+        path.replace("\\", os.sep)
     else:
-        path.replace('/', os.sep)
+        path.replace("/", os.sep)
     return path
 
 
@@ -74,12 +74,15 @@ def find_valid_python_files(path):
     if path is None or not os.path.exists(path):
         return []
     path = trim_filename(path)
-    _entries = [os.path.join(path, item) for item in os.listdir(path)
-                if not (item.startswith('__') or item.startswith('.'))]
+    _entries = [
+        os.path.join(path, item)
+        for item in os.listdir(path)
+        if not (item.startswith("__") or item.startswith("."))
+    ]
     _dirs = [item for item in _entries if os.path.isdir(item)]
     _files = [item for item in _entries if os.path.isfile(item)]
-    _results = flatten_list(
-        [find_valid_python_files(os.path.join(path, entry))
-         for entry in _dirs])
-    _results += [f for f in _files if f.endswith('.py')]
+    _results = flatten(
+        [find_valid_python_files(os.path.join(path, entry)) for entry in _dirs]
+    )
+    _results += [f for f in _files if f.endswith(".py")]
     return _results

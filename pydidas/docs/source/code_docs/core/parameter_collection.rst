@@ -22,6 +22,7 @@
 
 .. autoclass:: pydidas.core.ParameterCollection
     :members:
+    :noindex:
     :show-inheritance:
     :inherited-members: QObject
     

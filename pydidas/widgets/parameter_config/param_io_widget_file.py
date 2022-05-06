@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParamIoWidgetFile']
+__all__ = ["ParamIoWidgetFile"]
 
 import pathlib
 
@@ -37,7 +37,8 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
     """
     Widgets for I/O during plugin parameter for filepaths.
     (Includes a small button to select a filepath from a dialogue.)
-     """
+    """
+
     io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
@@ -57,12 +58,12 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
-        self._flag_is_output = param.refkey.startswith('output')
-        self._flag_is_dir = 'directory' in param.refkey
+        self._flag_is_output = param.refkey.startswith("output")
+        self._flag_is_dir = "directory" in param.refkey
         self._file_selection = (
             f'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
-            'TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)'
-            )
+            "TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)"
+        )
 
     def button_function(self):
         """
@@ -74,14 +75,14 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         if self._flag_is_dir:
             _arg = QtWidgets.QFileDialog.ShowDirsOnly
             _func = QtWidgets.QFileDialog.getExistingDirectory
-            fname = _func(self, 'Name of file', None, _arg)
+            fname = _func(self, "Name of directory", None, _arg)
         else:
             _arg = self._file_selection
             if self._flag_is_output:
                 _func = QtWidgets.QFileDialog.getSaveFileName
             else:
                 _func = QtWidgets.QFileDialog.getOpenFileName
-            fname = _func(self, 'Name of file', None, _arg)[0]
+            fname = _func(self, "Name of file", None, _arg)[0]
         if fname:
             self.setText(fname)
             self.emit_signal()
@@ -108,4 +109,4 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The list with string entries for file selection choices in the
             format 'NAME (*.EXT1 *.EXT2 ...)'
         """
-        self._file_selection = ';;'.join(list_of_choices)
+        self._file_selection = ";;".join(list_of_choices)

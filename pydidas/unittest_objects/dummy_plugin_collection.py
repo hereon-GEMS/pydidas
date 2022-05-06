@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DummyPluginCollection']
+__all__ = ["DummyPluginCollection"]
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
@@ -37,10 +37,11 @@ class DummyPluginCollection(_PluginCollection):
     Create a unique DummyPluginCollection with a defined path and a number
     of random plugins.
     """
+
     def __init__(self, **kwargs):
-        kwargs['plugin_path'] = kwargs.get('plugin_path', [])
+        kwargs["plugin_path"] = kwargs.get("plugin_path", [])
         super().__init__(**kwargs)
-        _nplugins = kwargs.get('n_plugins', 21)
+        _nplugins = kwargs.get("n_plugins", 21)
         for num in range(_nplugins):
             _class = create_plugin_class(num % 3, number=num // 3)
             self._PluginCollection__add_new_class(_class)

@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.PyfaiCalibFrame
     :members:
+    :noindex:    
     :inherited-members: QFrame
     
 

@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_label']
+__all__ = ["create_label"]
 
 from qtpy.QtWidgets import QLabel, QApplication
 
@@ -55,10 +55,10 @@ def create_label(text, **kwargs):
     """
     _label = QLabel(text)
 
-    kwargs['pointSize'] = kwargs.get('fontsize', STANDARD_FONT_SIZE)
-    kwargs['wordWrap'] = kwargs.get('wordWrap', True)
-    kwargs['font'] = QApplication.font()
+    kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
+    kwargs["wordWrap"] = kwargs.get("wordWrap", True)
+    kwargs["font"] = QApplication.font()
 
-    apply_font_properties(kwargs['font'], **kwargs)
+    apply_font_properties(kwargs["font"], **kwargs)
     apply_widget_properties(_label, **kwargs)
     return _label

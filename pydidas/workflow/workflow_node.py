@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowNode']
+__all__ = ["WorkflowNode"]
 
 from copy import copy
 from numbers import Integral
@@ -42,7 +42,8 @@ class WorkflowNode(GenericNode):
     The WorkflowNode subclass of the GenericNode has an added plugin attribute
     to allow it to execute plugins, either individually or the full chain.
     """
-    kwargs_for_copy_creation = ['plugin', '_result_shape']
+
+    kwargs_for_copy_creation = ["plugin", "_result_shape"]
 
     def __init__(self, **kwargs):
         kwargs = self.__preprocess_kwargs(**kwargs)
@@ -73,9 +74,9 @@ class WorkflowNode(GenericNode):
             The calling keyword arguments (minus the node_id key).
         """
         self.plugin = None
-        self.__tmp_node_id = kwargs.get('node_id', None)
-        if 'node_id' in kwargs:
-            del kwargs['node_id']
+        self.__tmp_node_id = kwargs.get("node_id", None)
+        if "node_id" in kwargs:
+            del kwargs["node_id"]
         return kwargs
 
     def __confirm_plugin_existance_and_type(self):
@@ -90,11 +91,14 @@ class WorkflowNode(GenericNode):
             If the plugin is not an instance of BasePlugin.
         """
         if self.plugin is None:
-            raise KeyError('No plugin has been supplied for the WorkflowNode.'
-                           ' Node has not been created.')
+            raise KeyError(
+                "No plugin has been supplied for the WorkflowNode."
+                " Node has not been created."
+            )
         if not isinstance(self.plugin, BasePlugin):
-            raise TypeError('Plugin must be an instance of BasePlugin (or '
-                            'subclass).')
+            raise TypeError(
+                "Plugin must be an instance of BasePlugin (or " "subclass)."
+            )
 
     def __process_node_id(self):
         """
@@ -139,8 +143,9 @@ class WorkflowNode(GenericNode):
             self._node_id = new_id
             self.plugin.node_id = new_id
             return
-        raise TypeError('The new node_id is not of a correct type and has not'
-                        ' been set.')
+        raise TypeError(
+            "The new node_id is not of a correct type and has not" " been set."
+        )
 
     def prepare_execution(self):
         """
@@ -187,14 +192,15 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
-        logger.debug(f'Starting plugin node #{self.node_id}')
+        logger.debug(f"Starting plugin node #{self.node_id}")
         res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
         for _child in self._children:
-            logger.debug('Passing result to child')
+            logger.debug("Passing result to child")
             _child.execute_plugin_chain(res, **reskws)
-        logger.debug(f'Saving data node #{self.node_id}')
-        if ((self.is_leaf and self.plugin.output_data_dim is not None)
-                or kwargs.get('force_store_results', False)):
+        logger.debug(f"Saving data node #{self.node_id}")
+        if (self.is_leaf and self.plugin.output_data_dim is not None) or kwargs.get(
+            "force_store_results", False
+        ):
             self.results = res
             self.result_kws = reskws
 
@@ -213,15 +219,17 @@ class WorkflowNode(GenericNode):
         dict
             The dict with all required information about the node.
         """
-        _parent = (None if self.parent is None
-                   else self.parent._node_id)
+        _parent = None if self.parent is None else self.parent._node_id
         _children = [child._node_id for child in self._children]
-        _rep = dict(node_id=self.node_id,
-                    parent=_parent,
-                    children=_children,
-                    plugin_class=self.plugin.__class__.__name__,
-                    plugin_params=[p.export_refkey_and_value()
-                                   for p in self.plugin.params.values()])
+        _rep = dict(
+            node_id=self.node_id,
+            parent=_parent,
+            children=_children,
+            plugin_class=self.plugin.__class__.__name__,
+            plugin_params=[
+                p.export_refkey_and_value() for p in self.plugin.params.values()
+            ],
+        )
         return _rep
 
     def propagate_shapes_and_global_config(self):
@@ -249,10 +257,8 @@ class WorkflowNode(GenericNode):
             _child_plugin = _child.plugin
             _child_plugin.input_shape = self.plugin.result_shape
             if not self.plugin.new_dataset:
-                _child_plugin._legacy_image_ops = (
-                    self.plugin._legacy_image_ops[:])
-                _child_plugin._original_image_shape = (
-                    self.plugin._original_image_shape)
+                _child_plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
+                _child_plugin._original_input_shape = self.plugin._original_input_shape
             _child.propagate_shapes_and_global_config()
 
     @property
@@ -280,7 +286,6 @@ class WorkflowNode(GenericNode):
         int
             The hash value.
         """
-        _hashables = [len(self._children), self._parent, self._node_id,
-                      self.plugin]
+        _hashables = [len(self._children), self._parent, self._node_id, self.plugin]
         _hashes = tuple(hash(_item) for _item in _hashables)
         return hash(_hashes)

@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PluginCollection']
+__all__ = ["PluginCollection"]
 
 import importlib
 import os
@@ -34,23 +34,23 @@ from qtpy import QtCore
 
 from ..core import SingletonFactory, PydidasQsettingsMixin
 from ..core.utils import find_valid_python_files
-from .base_plugin import BasePlugin
-from .plugin_collection_util_funcs import (
-    get_generic_plugin_path, plugin_type_check)
+from .plugin_collection_util_funcs import get_generic_plugin_path, plugin_type_check
 
 
-class _PluginCollection(PydidasQsettingsMixin):
+class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
     """
     Class to hold references of all plugins
     """
+
+    sig_updated_plugins = QtCore.Signal()
 
     @classmethod
     def clear_qsettings(cls):
         """
         Clear the entry for the QSettings plugin_path.
         """
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        q_settings.setValue('global/plugin_path', '')
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        q_settings.setValue("global/plugin_path", "")
 
     def __init__(self, **kwargs):
         """
@@ -64,6 +64,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             separated by ";;" or as a list. None will call to the default
             paths. The default is None.
         """
+        QtCore.QObject.__init__(self)
         self.plugins = {}
         self.__plugin_types = {}
         self.__plugin_names = {}
@@ -72,9 +73,8 @@ class _PluginCollection(PydidasQsettingsMixin):
         _plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
         if _plugin_path is None:
             _plugin_path = self.__get_generic_plugin_path()
-        self._config = {'initial_plugin_path': _plugin_path,
-                        'initialized': False}
-        if kwargs.get('force_initialization', False):
+        self._config = {"initial_plugin_path": _plugin_path, "initialized": False}
+        if kwargs.get("force_initialization", False):
             self.verify_is_initialized()
 
     @staticmethod
@@ -92,9 +92,9 @@ class _PluginCollection(PydidasQsettingsMixin):
         _path : Union[list, None]
             The plugin paths. If None, no paths have been specified.
         """
-        _path = kwargs.get('plugin_path', None)
+        _path = kwargs.get("plugin_path", None)
         if isinstance(_path, str):
-            _path = [item.strip() for item in _path.split(';;')]
+            _path = [item.strip() for item in _path.split(";;")]
         return _path
 
     def __get_generic_plugin_path(self):
@@ -106,12 +106,12 @@ class _PluginCollection(PydidasQsettingsMixin):
         plugin_path : list
             A list of plugin paths.
         """
-        plugin_path = self.__get_q_settings_plugin_path()
-        if plugin_path == [''] or plugin_path is None:
+        plugin_path = self.get_q_settings_plugin_path()
+        if plugin_path == [""] or plugin_path is None:
             plugin_path = get_generic_plugin_path()
         return plugin_path
 
-    def __get_q_settings_plugin_path(self):
+    def get_q_settings_plugin_path(self):
         """
         Get the plugin path from the global QSettings
 
@@ -121,9 +121,9 @@ class _PluginCollection(PydidasQsettingsMixin):
             None if not QSettings has been defined, else a list of path
             entries.
         """
-        _path = self.q_settings_get_global_value('plugin_path')
+        _path = self.q_settings_get_global_value("plugin_path")
         if isinstance(_path, str):
-            return _path.split(';;')
+            return _path.split(";;")
         return _path
 
     def find_and_register_plugins(self, *plugin_paths, reload=True):
@@ -141,6 +141,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         for _path in plugin_paths:
             self._find_and_register_plugins_in_path(_path, reload)
+        self.sig_updated_plugins.emit()
 
     def _find_and_register_plugins_in_path(self, path, reload=True):
         """
@@ -157,8 +158,7 @@ class _PluginCollection(PydidasQsettingsMixin):
         self._store_plugin_path(path)
         _modules = self._get_valid_modules_and_filenames(path)
         for _modname, _file in _modules.items():
-            _class_members = self.__import_module_and_get_classes_in_module(
-                _modname, _file)
+            _class_members = self.__get_classes_in_module(_modname, _file)
             for _name, _cls in _class_members:
                 self.__check_and_register_class(_cls, reload)
 
@@ -175,12 +175,12 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         if plugin_path in self.__plugin_paths:
             if verbose:
-                print('Warning. Storing same path again: ', plugin_path)
+                print("Warning. Storing same path again: ", plugin_path)
             return
         if os.path.exists(plugin_path):
             self.__plugin_paths.append(plugin_path)
-        _paths = ';;'.join(self.__plugin_paths)
-        self.q_settings.setValue('global/plugin_path', _paths)
+        _paths = ";;".join(self.__plugin_paths)
+        self.q_settings.setValue("global/plugin_path", _paths)
 
     @staticmethod
     def _get_valid_modules_and_filenames(path):
@@ -198,18 +198,18 @@ class _PluginCollection(PydidasQsettingsMixin):
             A list with the module names.
         """
         _files = find_valid_python_files(path)
-        _path = path.replace(os.sep, '/')
-        _path = _path + (not _path.endswith('/')) * '/'
+        _path = path.replace(os.sep, "/")
+        _path = _path + (not _path.endswith("/")) * "/"
         _modules = {}
         for _file in _files:
-            _file = _file.replace(os.sep, '/')
-            _tmpmod = _file.removesuffix('.py').removeprefix(_path)
-            _mod = _tmpmod.replace('/', '.')
+            _file = _file.replace(os.sep, "/")
+            _tmpmod = _file.removesuffix(".py").removeprefix(_path)
+            _mod = _tmpmod.replace("/", ".")
             _modules[_mod] = _file
-        return  _modules
+        return _modules
 
     @staticmethod
-    def __import_module_and_get_classes_in_module(modname, filepath):
+    def __get_classes_in_module(modname, filepath):
         """
         Import a module from a file and get all class members of the module.
 
@@ -247,9 +247,11 @@ class _PluginCollection(PydidasQsettingsMixin):
             Flag to enable reloading of plugins. If True, new plugins will
             overwrite older stored plugins. The default is False.
         """
-        _class_bases = [".".join([_cls.__module__, _cls.__name__])
-                        for _cls in inspect.getmro(class_)]
-        if 'pydidas.plugins.base_plugin.BasePlugin' not in _class_bases:
+        _class_bases = [
+            ".".join([_cls.__module__, _cls.__name__])
+            for _cls in inspect.getmro(class_)
+        ]
+        if "pydidas.plugins.base_plugin.BasePlugin" not in _class_bases:
             return
         if class_.__name__ not in self.plugins:
             self.__add_new_class(class_)
@@ -268,11 +270,13 @@ class _PluginCollection(PydidasQsettingsMixin):
         """
         if class_.plugin_name in self.__plugin_names:
             _old_cls = self.__plugin_names[class_.plugin_name]
-            _message = ('A different class with the same plugin name '
-                        f'"{class_.plugin_name}" has already been registered.'
-                        ' Adding this class would destroy the consistency of '
-                        'the PluginCollection: '
-                        f'Registered class: {_old_cls}; New class: {class_}')
+            _message = (
+                "A different class with the same plugin name "
+                f'"{class_.plugin_name}" has already been registered.'
+                " Adding this class would destroy the consistency of "
+                "the PluginCollection: "
+                f"Registered class: {_old_cls}; New class: {class_}"
+            )
             raise KeyError(_message)
         self.plugins[class_.__name__] = class_
         self.__plugin_types[class_.__name__] = plugin_type_check(class_)
@@ -301,10 +305,10 @@ class _PluginCollection(PydidasQsettingsMixin):
         that the PluginCollection is always initialized before any user
         interaction occurs.
         """
-        if self._config['initialized']:
+        if self._config["initialized"]:
             return
-        self.find_and_register_plugins(*self._config['initial_plugin_path'])
-        self._config['initialized'] = True
+        self.find_and_register_plugins(*self._config["initial_plugin_path"])
+        self._config["initialized"] = True
 
     def get_all_plugin_names(self):
         """
@@ -335,8 +339,9 @@ class _PluginCollection(PydidasQsettingsMixin):
         self.verify_is_initialized()
         if plugin_name in self.__plugin_names:
             return self.plugins[self.__plugin_names[plugin_name]]
-        raise KeyError(f'No plugin with plugin_name "{plugin_name}" has been'
-                       ' registered!')
+        raise KeyError(
+            f'No plugin with plugin_name "{plugin_name}" has been' " registered!"
+        )
 
     def get_plugin_by_name(self, name):
         """
@@ -384,7 +389,7 @@ class _PluginCollection(PydidasQsettingsMixin):
             A list with all Plugins which have the specified type.
         """
         self.verify_is_initialized()
-        _key = {'base': -1, 'input': 0, 'proc': 1, 'output': 2}[plugin_type]
+        _key = {"base": -1, "input": 0, "proc": 1, "output": 2}[plugin_type]
         _res = []
         for _name in self.plugins:
             if self.__plugin_types[_name] == _key:
@@ -418,9 +423,12 @@ class _PluginCollection(PydidasQsettingsMixin):
             self.__plugin_types = {}
             self.__plugin_names = {}
             self.__plugin_paths = []
+            self.sig_updated_plugins.emit()
         else:
-            print('The confirmation flag was not given. The PluginCollection '
-                  'has not been reset.')
+            print(
+                "The confirmation flag was not given. The PluginCollection "
+                "has not been reset."
+            )
 
 
 PluginCollection = SingletonFactory(_PluginCollection)

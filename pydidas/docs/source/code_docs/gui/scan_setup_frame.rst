@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.ScanSetupFrame
     :members:
+    :noindex:    
     :inherited-members: QFrame
     
 

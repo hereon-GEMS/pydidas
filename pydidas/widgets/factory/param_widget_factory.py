@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['create_param_widget']
+__all__ = ["create_param_widget"]
 
 import pathlib
 
@@ -63,19 +63,17 @@ def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
     # structure.
     from ..parameter_config.param_io_widget_file import ParamIoWidgetFile
     from ..parameter_config.param_io_widget_hdf5key import ParamIoWidgetHdf5Key
-    from ..parameter_config.param_io_widget_combo_box import (
-        ParamIoWidgetComboBox)
-    from ..parameter_config.param_io_widget_lineedit import (
-        ParamIoWidgetLineEdit)
+    from ..parameter_config.param_io_widget_combo_box import ParamIoWidgetComboBox
+    from ..parameter_config.param_io_widget_lineedit import ParamIoWidgetLineEdit
 
     if param.choices:
         _widget = ParamIoWidgetComboBox(None, param, widget_width)
     else:
         if param.type == pathlib.Path:
-            _widget =  ParamIoWidgetFile(None, param, widget_width)
+            _widget = ParamIoWidgetFile(None, param, widget_width)
         elif param.type == Hdf5key:
-            _widget =  ParamIoWidgetHdf5Key(None, param, widget_width)
+            _widget = ParamIoWidgetHdf5Key(None, param, widget_width)
         else:
-            _widget =  ParamIoWidgetLineEdit(None, param, widget_width)
+            _widget = ParamIoWidgetLineEdit(None, param, widget_width)
     _widget.set_value(param.value)
     return _widget

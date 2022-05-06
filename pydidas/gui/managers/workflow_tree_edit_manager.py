@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTreeEditManager']
+__all__ = ["WorkflowTreeEditManager"]
 
 import time
 from functools import partial
@@ -52,6 +52,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     similar methods in WorkflowTreeEditManager class. This class should only
     be used by the WorkflowTreeEditManager to manage the widget aspect.
     """
+
     plugin_to_edit = QtCore.Signal(int)
     plugin_to_delete = QtCore.Signal(int)
     pos_x_min = 5
@@ -69,7 +70,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         super().__init__()
         self.root = None
-        self.qt_canvas= qt_canvas
+        self.qt_canvas = qt_canvas
         self.active_node_id = None
         self._node_positions = {}
         self._node_widgets = {}
@@ -132,8 +133,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.__create_widget(title if title else name, _node_id)
         self.set_active_node(_node_id)
         if not self.qt_canvas:
-            raise Warning('No QtCanvas defined. Nodes added but cannot be '
-                          'displayed')
+            raise Warning("No QtCanvas defined. Nodes added but cannot be " "displayed")
         self.update_node_positions()
 
     def __create_position_node(self, node_id):
@@ -166,7 +166,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _widget = PluginInWorkflowBox(title, node_id, parent=self.qt_canvas)
         _widget.widget_activated.connect(self.set_active_node)
         _widget.widget_delete_request.connect(
-            partial(self.delete_single_node_and_children, node_id))
+            partial(self.delete_single_node_and_children, node_id)
+        )
         _widget.setVisible(True)
         self._node_widgets[node_id] = _widget
 
@@ -210,21 +211,22 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if self.root is None:
             return
         _pos = self.root.get_relative_positions()
-        _width = (max(_pos.values())[0]
-                  + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH)
+        _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
         _offset = 0
         if _width < self.qt_canvas.parent().width():
             _offset = (self.qt_canvas.parent().width() - _width) // 2
         pos_vals = np.asarray(list(_pos.values()))
-        pos_vals[:, 0] += - np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
-        pos_vals[:, 1] += - np.amin(pos_vals[:, 1]) + self.pos_y_min
+        pos_vals[:, 0] += -np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
+        pos_vals[:, 1] += -np.amin(pos_vals[:, 1]) + self.pos_y_min
         self._node_positions = {key: pos_vals[i] for i, key in enumerate(_pos)}
         for node_id in TREE.node_ids:
-            self._node_widgets[node_id].move(self._node_positions[node_id][0],
-                                       self._node_positions[node_id][1])
-        self.qt_canvas.setFixedSize(self.root.width + 2 * self.pos_x_min
-                                    + _offset,
-                                    self.root.height + 2 * self.pos_y_min)
+            self._node_widgets[node_id].move(
+                self._node_positions[node_id][0], self._node_positions[node_id][1]
+            )
+        self.qt_canvas.setFixedSize(
+            self.root.width + 2 * self.pos_x_min + _offset,
+            self.root.height + 2 * self.pos_y_min,
+        )
         self.__update_node_connections()
 
     def __update_node_connections(self):
@@ -237,12 +239,18 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_conns = self.root.get_recursive_connections()
         widget_conns = []
         for node0, node1 in node_conns:
-            x0 = (self._node_positions[node0][0]
-                  + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2)
-            y0 = (self._node_positions[node0][1]
-                  + gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT)
-            x1 = (self._node_positions[node1][0]
-                  + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2)
+            x0 = (
+                self._node_positions[node0][0]
+                + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2
+            )
+            y0 = (
+                self._node_positions[node0][1]
+                + gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
+            )
+            x1 = (
+                self._node_positions[node1][0]
+                + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH // 2
+            )
             y1 = self._node_positions[node1][1]
             widget_conns.append([x0, y0, x1, y1])
         self.qt_canvas.update_widget_connections(widget_conns)

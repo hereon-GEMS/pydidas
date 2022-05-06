@@ -36,7 +36,6 @@ class TestClass:
 
 
 class TestSingletonFactory(unittest.TestCase):
-
     def setUp(self):
         self.factory = SingletonFactory(TestClass)
 

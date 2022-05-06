@@ -32,17 +32,21 @@ from .plugin_param_config import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import parameter_config_widget
+
 __all__.extend(parameter_config_widget.__all__)
 del parameter_config_widget
 
 from . import parameter_edit_frame
+
 __all__.extend(parameter_edit_frame.__all__)
 del parameter_edit_frame
 
 from . import parameter_widgets_mixin
+
 __all__.extend(parameter_widgets_mixin.__all__)
 del parameter_widgets_mixin
 
 from . import plugin_param_config
+
 __all__.extend(plugin_param_config.__all__)
 del plugin_param_config

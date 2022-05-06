@@ -22,25 +22,24 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowResultSaverBase']
+__all__ = ["WorkflowResultSaverBase"]
 
 from ...core.io_registry import GenericIoBase
 from .workflow_result_saver_meta import WorkflowResultSaverMeta
 
 
-class WorkflowResultSaverBase(GenericIoBase,
-                              metaclass=WorkflowResultSaverMeta):
+class WorkflowResultSaverBase(GenericIoBase, metaclass=WorkflowResultSaverMeta):
     """
     Base class for WorkflowTree exporters.
     """
+
     extensions = []
-    default_extension = ''
-    format_name = 'unknown'
-    scan_title = ''
+    default_extension = ""
+    format_name = "unknown"
+    scan_title = ""
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, shapes, labels,
-                                      data_labels):
+    def prepare_files_and_directories(cls, save_dir, shapes, labels, data_labels):
         """
         Prepare the required files and directories to write the data to disk.
 
@@ -80,13 +79,14 @@ class WorkflowResultSaverBase(GenericIoBase,
         """
         _names = {}
         for _id, _label in labels.items():
-            if _label is None or _label == '':
-                _names[_id] = (f'node_{_id:02d}.{cls.default_extension}')
+            if _label is None or _label == "":
+                _names[_id] = f"node_{_id:02d}.{cls.default_extension}"
             else:
-                for _key in [' ', '\n', '\t', '\r']:
-                    _label = _label.replace(_key, '_')
-                _names[_id] = (f'node_{_id:02d}_{_label}.'
-                               f'{cls.default_extension}').replace('__', '_')
+                for _key in [" ", "\n", "\t", "\r"]:
+                    _label = _label.replace(_key, "_")
+                _names[_id] = (
+                    f"node_{_id:02d}_{_label}." f"{cls.default_extension}"
+                ).replace("__", "_")
         return _names
 
     @classmethod

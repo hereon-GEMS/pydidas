@@ -30,17 +30,20 @@ import os
 import copy
 import sys
 
-from pydidas.core.utils import (find_valid_python_files, flatten_list,
-                                get_random_string)
+from pydidas.core.utils import find_valid_python_files, flatten, get_random_string
 
 
-class TestPluginCollection(unittest.TestCase):
-
+class Test_file_utils(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._good_filenames = ['test.py', 'test_2.py', 'test3.py']
-        self._bad_filenames = ['.test.py', '__test.py', 'test.txt',
-                               'another_test.pyc', 'compiled.py~']
+        self._good_filenames = ["test.py", "test_2.py", "test3.py"]
+        self._bad_filenames = [
+            ".test.py",
+            "__test.py",
+            "test.txt",
+            "another_test.pyc",
+            "compiled.py~",
+        ]
         self._syspath = copy.copy(sys.path)
 
     def tearDown(self):
@@ -58,10 +61,10 @@ class TestPluginCollection(unittest.TestCase):
         for _width in range(width):
             _dir = os.path.join(path, get_random_string(8))
             os.makedirs(_dir)
-            with open(os.path.join(_dir, '__init__.py'), 'w') as f:
-                f.write(' ')
+            with open(os.path.join(_dir, "__init__.py"), "w") as f:
+                f.write(" ")
             if depth > 1:
-                _dirs += self.create_dir_tree(_dir, width=width, depth=depth-1)
+                _dirs += self.create_dir_tree(_dir, width=width, depth=depth - 1)
             else:
                 _dirs += [_dir]
         return _dirs
@@ -72,23 +75,25 @@ class TestPluginCollection(unittest.TestCase):
             dirs = [dirs]
         for _dir in dirs:
             for _name in self._good_filenames:
-                with open(os.path.join(_dir, _name), 'w') as f:
+                with open(os.path.join(_dir, _name), "w") as f:
                     f.write(self.get_random_class_def(store_name=True))
             for _name in self._bad_filenames:
-                with open(os.path.join(_dir, _name), 'w') as f:
+                with open(os.path.join(_dir, _name), "w") as f:
                     f.write(self.get_random_class_def())
 
     def get_random_class_def(self, store_name=False):
-        _plugin = random.choice(['InputPlugin', 'ProcPlugin', 'OutputPlugin'])
+        _plugin = random.choice(["InputPlugin", "ProcPlugin", "OutputPlugin"])
         _name = get_random_string(11)
-        _str = ('from pydidas.plugins import InputPlugin, ProcPlugin, '
-                f'OutputPlugin\n\nclass {_name.upper()}({_plugin}):'
-                '\n    basic_plugin = False'
-                f'\n    plugin_name = "{_name}"'
-                '\n\n    def __init__(self, **kwargs):'
-                '\n        super().__init__(**kwargs)'
-                f'\n\nclass {get_random_string(11)}:'
-                '\n    ...')
+        _str = (
+            "from pydidas.plugins import InputPlugin, ProcPlugin, "
+            f"OutputPlugin\n\nclass {_name.upper()}({_plugin}):"
+            "\n    basic_plugin = False"
+            f'\n    plugin_name = "{_name}"'
+            "\n\n    def __init__(self, **kwargs):"
+            "\n        super().__init__(**kwargs)"
+            f"\n\nclass {get_random_string(11)}:"
+            "\n    ..."
+        )
         if store_name:
             self._class_names.append(_name.upper())
         return _str
@@ -100,16 +105,22 @@ class TestPluginCollection(unittest.TestCase):
     def test_find_files__simple_path(self):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
-        _target = set([os.path.join(self._path, _file)
-                        for _file in self._good_filenames])
+        _target = set(
+            [os.path.join(self._path, _file) for _file in self._good_filenames]
+        )
         self.assertEqual(_files, _target)
 
     def test_find_files__path_tree(self):
         _dirs = self.create_python_file_tree()
         _files = set(find_valid_python_files(self._path))
-        _target = set(flatten_list(
-            [[os.path.join(_dir, _file)
-              for _file in self._good_filenames] for _dir in _dirs]))
+        _target = set(
+            flatten(
+                [
+                    [os.path.join(_dir, _file) for _file in self._good_filenames]
+                    for _dir in _dirs
+                ]
+            )
+        )
         self.assertEqual(_files, _target)
 
 

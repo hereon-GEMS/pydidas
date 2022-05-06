@@ -22,13 +22,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ProcPlugin']
+__all__ = ["ProcPlugin"]
 
 import os
 
 from ..core.constants import PROC_PLUGIN, HDF5_EXTENSIONS
 from ..core.utils import check_file_exists, check_hdf5_key_exists_in_file
-from ..image_io import read_image
+from ..data_io import import_data
 from .base_plugin import BasePlugin
 
 
@@ -36,13 +36,13 @@ class ProcPlugin(BasePlugin):
     """
     The base plugin class for processing plugins.
     """
+
     plugin_type = PROC_PLUGIN
-    plugin_name = 'Base processing plugin'
+    plugin_name = "Base processing plugin"
     generic_params = BasePlugin.generic_params.get_copy()
     default_params = BasePlugin.default_params.get_copy()
 
-    def load_image_from_file(self, fname, hdf5_dset='entry/data/data',
-                             hdf5_frame=0):
+    def load_image_from_file(self, fname, hdf5_dset="entry/data/data", hdf5_frame=0):
         """
         Load an image from the specified filename.
 
@@ -72,6 +72,6 @@ class ProcPlugin(BasePlugin):
         _params = {}
         if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(fname, hdf5_dset)
-            _params = {'hdf5_dataset': hdf5_dset, 'frame': hdf5_frame}
-        _image = read_image(fname, **_params)
+            _params = {"dataset": hdf5_dset, "frame": hdf5_frame}
+        _image = import_data(fname, **_params)
         return _image

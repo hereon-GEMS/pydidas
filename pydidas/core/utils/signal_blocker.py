@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SignalBlocker']
+__all__ = ["SignalBlocker"]
 
 
 from qtpy import QtCore
@@ -42,9 +42,10 @@ class SignalBlocker:
     >>> with SignalBlocker(obj):
     >>>     obj.setCurrentText('Test')
     """
+
     def __init__(self, obj):
         if not isinstance(obj, QtCore.QObject):
-            raise TypeError('SignalBlocker can only be used with QObjects.')
+            raise TypeError("SignalBlocker can only be used with QObjects.")
         self.obj = obj
         self._blocked = obj.signalsBlocked()
 

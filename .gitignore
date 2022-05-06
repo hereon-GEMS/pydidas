@@ -3,6 +3,7 @@
 __pycache__
 *.pyc
 *.log
+!change.log
 pydidas/docs/build
 dist/*
 build/*
@@ -10,7 +11,7 @@ build/*
 htmlcov
 *.html
 *.svg
-!pydidas_logo*.svg
+!pydidas_*.svg
 __*
 !__init__.py
 *egg*

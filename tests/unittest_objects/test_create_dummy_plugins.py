@@ -24,15 +24,15 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN)
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
 from pydidas.plugins import BasePlugin, InputPlugin, ProcPlugin, OutputPlugin
 from pydidas.unittest_objects.create_dummy_plugins import (
-    create_base_class, create_plugin_class)
+    create_base_class,
+    create_plugin_class,
+)
 
 
 class TestDummyPluginCollection(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -41,7 +41,7 @@ class TestDummyPluginCollection(unittest.TestCase):
 
     def test_create_base_class_w_base(self):
         _cls = create_base_class(BasePlugin)
-        _cls.default_params = 'some defaults'
+        _cls.default_params = "some defaults"
         self.assertTrue(issubclass(_cls, BasePlugin))
         self.assertNotEqual(_cls.default_params, BasePlugin.default_params)
 
@@ -54,15 +54,15 @@ class TestDummyPluginCollection(unittest.TestCase):
         _cls = create_plugin_class(INPUT_PLUGIN)
         _instance = _cls()
         self.assertIsInstance(_instance, InputPlugin)
-        self.assertIn('filename', _instance.params)
-        self.assertNotIn('first_file', _instance.params)
+        self.assertIn("filename", _instance.params)
+        self.assertNotIn("first_file", _instance.params)
 
     def test_create_plugin_class__input_n_first_file(self):
         _cls = create_plugin_class(INPUT_PLUGIN, use_filename=False)
         _instance = _cls()
         self.assertIsInstance(_instance, InputPlugin)
-        self.assertNotIn('filename', _instance.params)
-        self.assertIn('first_file', _instance.params)
+        self.assertNotIn("filename", _instance.params)
+        self.assertIn("first_file", _instance.params)
 
     def test_create_plugin_class__proc(self):
         _cls = create_plugin_class(PROC_PLUGIN)
@@ -78,8 +78,9 @@ class TestDummyPluginCollection(unittest.TestCase):
         _num = 42
         _cls = create_plugin_class(OUTPUT_PLUGIN, number=_num)
         _instance = _cls()
-        self.assertIsInstance(_instance, OutputPlugin)#
+        self.assertIsInstance(_instance, OutputPlugin)
         self.assertEqual(_instance.number, _num)
+
 
 if __name__ == "__main__":
     unittest.main()

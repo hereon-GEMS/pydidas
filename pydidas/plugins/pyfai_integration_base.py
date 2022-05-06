@@ -23,57 +23,75 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['pyFAIintegrationBase', 'pyFAI_UNITS', 'pyFAI_METHOD']
+__all__ = ["pyFAIintegrationBase", "pyFAI_UNITS", "pyFAI_METHOD"]
 
 import os
 import pathlib
+import multiprocessing as mp
 
 import numpy as np
 import pyFAI
 import pyFAI.azimuthalIntegrator
+from silx.opencl.common import OpenCL
 
 from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
-from ..core.utils import pydidas_logger
-from ..image_io import read_image, rebin2d
+from ..core.utils import pydidas_logger, rebin2d
+from ..data_io import import_data
 from ..experiment import ExperimentalSetup
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 
-pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
-               'Q / A^-1': 'q_A^-1',
-               '2theta / deg': '2th_deg',
-               '2theta / rad': '2th_rad',
-               'r / mm': 'r_mm',
-               'chi / deg': 'chi_deg',
-               'chi / rad': 'chi_rad'}
+pyFAI_UNITS = {
+    "Q / nm^-1": "q_nm^-1",
+    "Q / A^-1": "q_A^-1",
+    "2theta / deg": "2th_deg",
+    "2theta / rad": "2th_rad",
+    "r / mm": "r_mm",
+    "chi / deg": "chi_deg",
+    "chi / rad": "chi_rad",
+}
 
-pyFAI_METHOD = {'CSR': ('bbox', 'csr', 'cython'),
-                'CSR OpenCL': ('bbox', 'csr', 'opencl'),
-                'CSR full': ('full', 'csr', 'cython'),
-                'CSR full OpenCL': ('full', 'csr', 'opencl'),
-                'LUT': ('bbox', 'lut', 'cython'),
-                'LUT OpenCL': ('bbox', 'lut', 'opencl'),
-                'LUT full': ('full', 'lut', 'cython'),
-                'LUT full OpenCL': ('full', 'lut', 'opencl')}
+pyFAI_METHOD = {
+    "CSR": ("bbox", "csr", "cython"),
+    "CSR OpenCL": ("bbox", "csr", "opencl"),
+    "CSR full": ("full", "csr", "cython"),
+    "CSR full OpenCL": ("full", "csr", "opencl"),
+    "LUT": ("bbox", "lut", "cython"),
+    "LUT OpenCL": ("bbox", "lut", "opencl"),
+    "LUT full": ("full", "lut", "cython"),
+    "LUT full OpenCL": ("full", "lut", "opencl"),
+}
+
+OCL = OpenCL()
 
 
 class pyFAIintegrationBase(ProcPlugin):
     """
     Provide basic functionality for the concrete integration plugins.
     """
-    plugin_name = 'PyFAI integration base'
+
+    plugin_name = "PyFAI integration base"
     basic_plugin = True
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        'rad_npoint', 'rad_unit', 'rad_use_range',
-        'rad_range_lower', 'rad_range_upper', 'azi_npoint',
-        'azi_unit', 'azi_use_range', 'azi_range_lower',
-        'azi_range_upper', 'int_method', 'det_mask')
+        "rad_npoint",
+        "rad_unit",
+        "rad_use_range",
+        "rad_range_lower",
+        "rad_range_upper",
+        "azi_npoint",
+        "azi_unit",
+        "azi_use_range",
+        "azi_range_lower",
+        "azi_range_upper",
+        "int_method",
+        "det_mask",
+    )
     input_data_dim = 2
     output_data_dim = 2
     new_dataset = True
@@ -82,24 +100,26 @@ class pyFAIintegrationBase(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._ai = None
         self._mask = None
-        self.params['det_mask']._Parameter__meta['optional'] = True
+        self.params["det_mask"]._Parameter__meta["optional"] = True
 
     def pre_execute(self):
         """
         Check the use_global_mask Parameter and load the mask image.
         """
         if self._ai is None:
-            _lambda_in_A = EXP_SETTINGS.get_param_value('xray_wavelength')
+            _lambda_in_A = EXP_SETUP.get_param_value("xray_wavelength")
             self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
-                dist=EXP_SETTINGS.get_param_value('detector_dist'),
-                poni1=EXP_SETTINGS.get_param_value('detector_poni1'),
-                poni2=EXP_SETTINGS.get_param_value('detector_poni2'),
-                rot1=EXP_SETTINGS.get_param_value('detector_rot1'),
-                rot2=EXP_SETTINGS.get_param_value('detector_rot2'),
-                rot3=EXP_SETTINGS.get_param_value('detector_rot3'),
-                detector=EXP_SETTINGS.get_detector(),
-                wavelength=1e-10 * _lambda_in_A)
+                dist=EXP_SETUP.get_param_value("detector_dist"),
+                poni1=EXP_SETUP.get_param_value("detector_poni1"),
+                poni2=EXP_SETUP.get_param_value("detector_poni2"),
+                rot1=EXP_SETUP.get_param_value("detector_rot1"),
+                rot2=EXP_SETUP.get_param_value("detector_rot2"),
+                rot3=EXP_SETUP.get_param_value("detector_rot3"),
+                detector=EXP_SETUP.get_detector(),
+                wavelength=1e-10 * _lambda_in_A,
+            )
         self.load_and_store_mask()
+        self._prepare_pyfai_method()
 
     def load_and_store_mask(self):
         """
@@ -109,22 +129,45 @@ class pyFAIintegrationBase(ProcPlugin):
         Parameter will be used. If not, the global QSetting detector mask
         will be used.
         """
-        _mask_param = self.get_param_value('det_mask')
-        _mask_qsetting = self.q_settings_get_global_value('det_mask')
+        _mask_param = self.get_param_value("det_mask")
+        _mask_qsetting = self.q_settings_get_global_value("det_mask")
         if _mask_param != pathlib.Path():
             if os.path.isfile(_mask_param):
-                self._mask = read_image(_mask_param)
+                self._mask = import_data(_mask_param)
                 return
             logger.warning(
-                ('The locally defined detector mask file "%s" does not exist.'
-                 ' Falling back  to the default defined in the global '
-                 'settings.'), _mask_param)
+                (
+                    'The locally defined detector mask file "%s" does not exist.'
+                    " Falling back to the default defined in the global "
+                    "settings."
+                ),
+                _mask_param,
+            )
         if os.path.isfile(_mask_qsetting):
-            self._mask = read_image(_mask_qsetting)
+            self._mask = import_data(_mask_qsetting)
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
         else:
             self._mask = None
+
+    def _prepare_pyfai_method(self):
+        """
+        Prepare the method name and select OpenCL device if multiple devices
+        present.
+        """
+        _method = pyFAI_METHOD[self.get_param_value("int_method")]
+        self._config["method"] = _method
+        if _method[2] != "opencl":
+            return
+        _name = mp.current_process().name
+        _platforms = [_platform.name for _platform in OCL.platforms]
+        if "NVIDIA CUDA" in _platforms and _name.startswith("pydidas_worker-"):
+            _index = int(_name.strip("pydidas_worker-"))
+            _platform = OCL.get_platform("NVIDIA CUDA")
+            _n_device = len(_platform.devices)
+            _device = _index % _n_device
+            _method = _method + ((_platform.id, _device),)
+            self._config["method"] = _method
 
     def calculate_result_shape(self):
         """
@@ -137,8 +180,9 @@ class pyFAIintegrationBase(ProcPlugin):
             returned. For 2-dimensional integrations a tuple of two integers
             is returned.
         """
-        raise NotImplementedError('Must be implemented by the concrete '
-                                  'pyFAI integration plugin')
+        raise NotImplementedError(
+            "Must be implemented by the concrete " "pyFAI integration plugin"
+        )
 
     def get_radial_range(self):
         """
@@ -153,13 +197,14 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The radial range for the pyFAI integration.
         """
-        if self.get_param_value('rad_use_range'):
-            _lower = self.get_param_value('rad_range_lower')
-            _upper = self.get_param_value('rad_range_upper')
+        if self.get_param_value("rad_use_range"):
+            _lower = self.get_param_value("rad_range_lower")
+            _upper = self.get_param_value("rad_range_upper")
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
-            logger.warning('Warning: Radial range was not correct and'
-                           ' has been ignored.')
+            logger.warning(
+                "Warning: Radial range was not correct and" " has been ignored."
+            )
         return None
 
     def get_azimuthal_range_in_rad(self):
@@ -177,7 +222,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _range = self.get_azimuthal_range_native()
         if _range is not None:
-            if 'deg' in self.get_param_value('azi_unit'):
+            if "deg" in self.get_param_value("azi_unit"):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
         return _range
 
@@ -196,7 +241,7 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         _range = self.get_azimuthal_range_native()
         if _range is not None:
-            if 'rad' in self.get_param_value('azi_unit'):
+            if "rad" in self.get_param_value("azi_unit"):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
         return _range
 
@@ -213,13 +258,14 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The azimuthal range for the pyFAI integration.
         """
-        if self.get_param_value('azi_use_range'):
-            _lower = self.get_param_value('azi_range_lower')
-            _upper = self.get_param_value('azi_range_upper')
+        if self.get_param_value("azi_use_range"):
+            _lower = self.get_param_value("azi_range_lower")
+            _upper = self.get_param_value("azi_range_upper")
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
-            logger.warning('Warning: Azimuthal range was not correct and'
-                           ' has been ignored.')
+            logger.warning(
+                "Warning: Azimuthal range was not correct and" " has been ignored."
+            )
         return None
 
     def get_pyFAI_unit_from_param(self, param_name):
@@ -238,8 +284,8 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
 
-
     def execute(self, data, **kwargs):
         """
         To be implemented by the concrete subclass.
         """
+        raise NotImplementedError

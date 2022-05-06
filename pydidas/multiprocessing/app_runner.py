@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['AppRunner']
+__all__ = ["AppRunner"]
 
 import multiprocessing as mp
 
@@ -83,18 +83,19 @@ class AppRunner(WorkerController):
         without any defined tasks. The app itself is responsible for managing
         tasks on the fly. The default is app_processor.
     """
+
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(int, object)
     sig_finished = QtCore.Signal()
     sig_final_app_state = QtCore.Signal(object)
 
     def __init__(self, app, n_workers=None, processor=app_processor):
-        logger.debug('Starting AppRunner')
+        logger.debug("Starting AppRunner")
         super().__init__(n_workers)
         self.__app = app.get_copy(slave_mode=True)
         self.__check_app_is_set()
-        self._processor['func'] = processor
-        logger.debug('Finished init')
+        self._processor["func"] = processor
+        logger.debug("Finished init")
 
     def call_app_method(self, method_name, *args, **kwargs):
         """
@@ -164,11 +165,13 @@ class AppRunner(WorkerController):
         starting the workers.
         """
         self.__app.multiprocessing_pre_run()
-        self._processor['args'] = (self._queues['send'],
-                                   self._queues['recv'],
-                                   self._queues['stop'],
-                                   self._queues['finished'],
-                                   *self.__get_app_arguments())
+        self._processor["args"] = (
+            self._queues["send"],
+            self._queues["recv"],
+            self._queues["stop"],
+            self._queues["finished"],
+            *self.__get_app_arguments(),
+        )
         _tasks = self.__app.multiprocessing_get_tasks()
         self.add_tasks(_tasks)
         self.finalize_tasks()
@@ -180,11 +183,17 @@ class AppRunner(WorkerController):
         """
         Create and start worker processes.
         """
-        self._workers = [mp.Process(target=self._processor['func'],
-                                    args=self._processor['args'], daemon=True)
-                          for i in range(self._n_workers)]
+        self._workers = [
+            mp.Process(
+                target=self._processor["func"],
+                args=self._processor["args"],
+                name=f"pydidas_worker-{i}",
+                daemon=True,
+            )
+            for i in range(self._n_workers)
+        ]
         for _worker in self._workers:
-            logger.debug('Starting Worker')
+            logger.debug("Starting Worker")
             _worker.start()
         self._flag_active = True
         self._progress_done = 0
@@ -218,15 +227,18 @@ class AppRunner(WorkerController):
     def __check_is_running(self):
         """Verify that the Thread is not actively running."""
         if self._flag_running:
-            raise RuntimeError('Cannot call Application methods while the'
-                               ' Application is running. Please call .stop()'
-                               ' on the AppRunner first.')
+            raise RuntimeError(
+                "Cannot call Application methods while the"
+                " Application is running. Please call .stop()"
+                " on the AppRunner first."
+            )
 
     def __check_app_method_name(self, method_name):
         """Verify the Application has a method with the given name."""
         if not hasattr(self.__app, method_name):
-            raise KeyError('The App does not have a method with name '
-                           f'"{method_name}".')
+            raise KeyError(
+                "The App does not have a method with name " f'"{method_name}".'
+            )
 
     def __check_app_is_set(self):
         """
@@ -234,10 +246,15 @@ class AppRunner(WorkerController):
         :py:class:`pydidas.apps.BaseApp`.
         """
         if not isinstance(self.__app, BaseApp):
-            raise TypeError('Application is not an instance of BaseApp.'
-                            ' Please set application first.')
+            raise TypeError(
+                "Application is not an instance of BaseApp."
+                " Please set application first."
+            )
 
     def __get_app_arguments(self):
         """Get the App arguments to pass to the processor."""
-        return (self.__app.__class__, self.__app.params.get_copy(),
-                self.__app.get_config())
+        return (
+            self.__app.__class__,
+            self.__app.params.get_copy(),
+            self.__app.get_config(),
+        )

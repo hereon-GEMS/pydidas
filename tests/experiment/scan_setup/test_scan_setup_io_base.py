@@ -36,10 +36,9 @@ SCAN_IO = ScanSetupIoBase
 
 
 class TestScanSettingsIoBase(unittest.TestCase):
-
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_scan_setup_')
+        self._path = os.path.join(_test_dir, "_data", "load_test_scan_setup_")
         self._tmppath = tempfile.mkdtemp()
         SCAN_IO.imported_params = {}
 
@@ -48,21 +47,21 @@ class TestScanSettingsIoBase(unittest.TestCase):
         shutil.rmtree(self._tmppath)
 
     def test_check_for_existing_file__file_present(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test entry')
+        _fname = os.path.join(self._tmppath, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test entry")
         with self.assertRaises(FileExistsError):
             SCAN_IO.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_present_and_overwrite(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test entry')
+        _fname = os.path.join(self._tmppath, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test entry")
         SCAN_IO.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise FileExistsError
 
     def test_check_for_existing_file__file_new(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
+        _fname = os.path.join(self._tmppath, "test.txt")
         SCAN_IO.check_for_existing_file(_fname)
         # assert does not raise FileExistsError
 

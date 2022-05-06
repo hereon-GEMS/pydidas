@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['FilelistManager']
+__all__ = ["FilelistManager"]
 
 import os
 import re
@@ -32,12 +32,17 @@ from pathlib import Path
 
 import numpy as np
 
-from ..core import (ObjectWithParameterCollection, AppConfigError,
-                    get_generic_param_collection)
+from ..core import (
+    ObjectWithParameterCollection,
+    AppConfigError,
+    get_generic_param_collection,
+)
 from ..core.constants import FILENAME_DELIMITERS
-from ..core.utils import (check_file_exists,
-                          verify_files_in_same_directory,
-                          verify_files_of_range_are_same_size)
+from ..core.utils import (
+    check_file_exists,
+    verify_files_in_same_directory,
+    verify_files_of_range_are_same_size,
+)
 
 
 class FilelistManager(ObjectWithParameterCollection):
@@ -78,8 +83,10 @@ class FilelistManager(ObjectWithParameterCollection):
     **kwargs : dict
         Parameters can also be supplied as kwargs, referencey by their refkey.
     """
+
     default_params = get_generic_param_collection(
-        'live_processing', 'first_file', 'last_file', 'file_stepping')
+        "live_processing", "first_file", "last_file", "file_stepping"
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -88,9 +95,7 @@ class FilelistManager(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args, **kwargs)
         self.set_default_params()
-        self._config = {'file_list': [],
-                        'file_size': None,
-                        'n_files': 0}
+        self._config = {"file_list": [], "file_size": None, "n_files": 0}
 
     @property
     def n_files(self):
@@ -102,7 +107,7 @@ class FilelistManager(ObjectWithParameterCollection):
         n_files : int
             The number of files in the filelist.
         """
-        return self._config['n_files']
+        return self._config["n_files"]
 
     @property
     def filesize(self):
@@ -114,8 +119,7 @@ class FilelistManager(ObjectWithParameterCollection):
         float
             The file size in bytes.
         """
-        return self._config['file_size']
-
+        return self._config["file_size"]
 
     def get_config(self):
         """
@@ -129,8 +133,9 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return copy.copy(self._config)
 
-    def update(self, first_file=None, last_file=None,
-               live_processing=None, file_stepping=None):
+    def update(
+        self, first_file=None, last_file=None, live_processing=None, file_stepping=None
+    ):
         """
         Create a filelist with updated parameters.
 
@@ -150,13 +155,11 @@ class FilelistManager(ObjectWithParameterCollection):
             The file stepping number. If None, the stored Parameter
             'file_stepping' will be used.  The default is None.
         """
-        self._update_params(first_file, last_file, live_processing,
-                            file_stepping)
+        self._update_params(first_file, last_file, live_processing, file_stepping)
         self._check_files()
         self._create_filelist()
 
-    def _update_params(self, first_file, last_file, live_processing,
-                       file_stepping):
+    def _update_params(self, first_file, last_file, live_processing, file_stepping):
         """
         Update the internally stored Parameters if new values have been
         provided.
@@ -179,13 +182,13 @@ class FilelistManager(ObjectWithParameterCollection):
             Parameter value will not be updated.
         """
         if first_file is not None:
-            self.set_param_value('first_file', first_file)
+            self.set_param_value("first_file", first_file)
         if last_file is not None:
-            self.set_param_value('last_file', last_file)
+            self.set_param_value("last_file", last_file)
         if live_processing is not None:
-            self.set_param_value('live_processing', live_processing)
+            self.set_param_value("live_processing", live_processing)
         if file_stepping is not None:
-            self.set_param_value('file_stepping', file_stepping)
+            self.set_param_value("file_stepping", file_stepping)
 
     def _check_files(self):
         """
@@ -197,9 +200,10 @@ class FilelistManager(ObjectWithParameterCollection):
         AppConfigError
             If any of the checks fail.
         """
-        check_file_exists(self.get_param_value('first_file'))
-        verify_files_in_same_directory(self.get_param_value('first_file'),
-                                       self.get_param_value('last_file'))
+        check_file_exists(self.get_param_value("first_file"))
+        verify_files_in_same_directory(
+            self.get_param_value("first_file"), self.get_param_value("last_file")
+        )
 
     def _create_filelist(self):
         """
@@ -210,11 +214,10 @@ class FilelistManager(ObjectWithParameterCollection):
         if self._check_only_first_file_selected():
             self._create_one_file_list()
             return
-        if self.get_param_value('live_processing'):
+        if self.get_param_value("live_processing"):
             self._create_filelist_live_processing()
         else:
             self._create_filelist_static()
-
 
     def _check_only_first_file_selected(self):
         """
@@ -226,8 +229,8 @@ class FilelistManager(ObjectWithParameterCollection):
         bool
             Flag whether only the first file points to a valid path.
         """
-        _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
-        if _path2 == '':
+        _path2, _fname2 = os.path.split(self.get_param_value("last_file"))
+        if _path2 == "":
             return True
         return False
 
@@ -235,10 +238,10 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         Create a filelist with only one the first file.
         """
-        _fullname = self.get_param_value('first_file')
-        self._config['file_list'] = [_fullname]
-        self._config['file_size'] = os.stat(_fullname).st_size
-        self._config['n_files'] = 1
+        _fullname = self.get_param_value("first_file")
+        self._config["file_list"] = [_fullname]
+        self._config["file_size"] = os.stat(_fullname).st_size
+        self._config["n_files"] = 1
 
     def _create_filelist_static(self):
         """
@@ -249,20 +252,16 @@ class FilelistManager(ObjectWithParameterCollection):
         and the first and last files names will be used to select the part
         of filesnames to be stored.
         """
-        _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
-        _path2, _fname2 = os.path.split(self.get_param_value('last_file'))
+        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
+        _path2, _fname2 = os.path.split(self.get_param_value("last_file"))
         _list = sorted(os.listdir(_path1))
         _i1 = _list.index(_fname1)
         _i2 = _list.index(_fname2)
-        _list = _list[_i1:_i2+1:self.get_param_value('file_stepping')]
+        _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
         verify_files_of_range_are_same_size(_path1, _list)
-        self._config['file_list'] = [Path(os.path.join(_path1, f))
-                                     for f in _list]
-        self._config['n_files'] = len(_list)
-        self._config['file_size'] = os.stat(
-            self.get_param_value('first_file')
-            ).st_size
-
+        self._config["file_list"] = [Path(os.path.join(_path1, f)) for f in _list]
+        self._config["n_files"] = len(_list)
+        self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
 
     def _create_filelist_live_processing(self):
         """
@@ -272,12 +271,9 @@ class FilelistManager(ObjectWithParameterCollection):
         file and try to interprete the selected range.
         """
         _fnames, _range = self._get_live_processing_naming_scheme()
-        self._config['file_size'] = os.stat(
-            self.get_param_value('first_file')
-            ).st_size
-        self._config['file_list'] = [Path(_fnames.format(index=i))
-                                     for i in _range]
-        self._config['n_files'] = len(_range)
+        self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
+        self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
+        self._config["n_files"] = len(_range)
 
     def _get_live_processing_naming_scheme(self):
         """
@@ -293,17 +289,22 @@ class FilelistManager(ObjectWithParameterCollection):
         range : range
             The range iteratable which points to all file names.
         """
+
         def raise_error():
             raise AppConfigError(
-                'Could not interprete the filenames. The filenames do not '
-                'differ in exactly one item, as determined by the delimiters.'
-                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}')
-        _path1, _fname1 = os.path.split(self.get_param_value('first_file'))
-        _fname2 = os.path.split(self.get_param_value('last_file'))[1]
+                "Could not interprete the filenames. The filenames do not "
+                "differ in exactly one item, as determined by the delimiters."
+                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}'
+            )
+
+        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
+        _fname2 = os.path.split(self.get_param_value("last_file"))[1]
         _items1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
         _items2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
-        if (len(_items1) != len(_items2) or
-                os.path.splitext(_fname1)[1] != os.path.splitext(_fname2)[1]):
+        if (
+            len(_items1) != len(_items2)
+            or os.path.splitext(_fname1)[1] != os.path.splitext(_fname2)[1]
+        ):
             raise_error()
         diff_index = []
         for index, item in enumerate(_items1):
@@ -314,13 +315,18 @@ class FilelistManager(ObjectWithParameterCollection):
             raise_error()
         diff_index = diff_index[0]
         _n = len(_items1[diff_index])
-        _strindex = int(np.sum(np.r_[[len(_items1[index]) + 1
-                                      for index in range(diff_index)]]))
-        _fnames = (_path1
-                   + os.sep
-                   + _fname1[:_strindex]
-                   + '{index:0' + f'{_n}' + 'd}'
-                   + _fname1[_strindex + _n:])
+        _strindex = int(
+            np.sum(np.r_[[len(_items1[index]) + 1 for index in range(diff_index)]])
+        )
+        _fnames = (
+            _path1
+            + os.sep
+            + _fname1[:_strindex]
+            + "{index:0"
+            + f"{_n}"
+            + "d}"
+            + _fname1[_strindex + _n :]
+        )
         _index1 = int(_items1[diff_index])
         _index2 = int(_items2[diff_index])
         return _fnames, range(_index1, _index2 + 1)
@@ -345,16 +351,16 @@ class FilelistManager(ObjectWithParameterCollection):
         Path
             The filename (and path) of the image file indexed with index.
         """
-        _n = self._config['n_files']
+        _n = self._config["n_files"]
         if not 0 <= index < _n:
-            raise AppConfigError(f'The selected number "{index}" is out of '
-                                 f'the range of the file list [0, {_n-1}]')
-        return self._config['file_list'][index]
+            raise AppConfigError(
+                f'The selected number "{index}" is out of '
+                f"the range of the file list [0, {_n-1}]"
+            )
+        return self._config["file_list"][index]
 
     def reset(self):
         """
         Reset the filelist to the initial configuration.
         """
-        self._config = {'file_list': [],
-                        'file_size': None,
-                        'n_files': 0}
+        self._config = {"file_list": [], "file_size": None, "n_files": 0}

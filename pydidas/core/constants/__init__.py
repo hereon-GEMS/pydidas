@@ -40,33 +40,41 @@ from .unicode_greek_letters import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import constants
+
 __all__.extend(constants.__all__)
 del constants
 
 from . import file_extensions
+
 __all__.extend(file_extensions.__all__)
 del file_extensions
 
 from . import fit_funcs
+
 __all__.extend(fit_funcs.__all__)
 del fit_funcs
 
 from . import generic_param_description
+
 __all__.extend(generic_param_description.__all__)
 del generic_param_description
 
 from . import gui_constants
+
 __all__.extend(gui_constants.__all__)
 del gui_constants
 
 from . import q_settings
+
 __all__.extend(q_settings.__all__)
 del q_settings
 
 from . import qt_presets
+
 __all__.extend(qt_presets.__all__)
 del qt_presets
 
 from . import unicode_greek_letters
+
 __all__.extend(unicode_greek_letters.__all__)
 del unicode_greek_letters

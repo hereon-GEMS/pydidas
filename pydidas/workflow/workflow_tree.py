@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTree']
+__all__ = ["WorkflowTree"]
 
 import ast
 from numbers import Integral
@@ -48,9 +48,11 @@ class _WorkflowTree(GenericTree):
     accessible in the pydidas namespace upon import and must be manually
     accessed.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._preexecuted = False
+        PLUGINS.sig_updated_plugins.connect(self.clear)
 
     def create_and_add_node(self, plugin, parent=None, node_id=None):
         """
@@ -167,7 +169,7 @@ class _WorkflowTree(GenericTree):
         kwargs : dict
             The (updated) kwargs dictionary.
         """
-        if not node_id in self.nodes:
+        if node_id not in self.nodes:
             raise KeyError(f'The node ID "{node_id}" is not in use.')
         self.root.propagate_shapes_and_global_config()
         self.nodes[node_id].prepare_execution()
@@ -184,7 +186,7 @@ class _WorkflowTree(GenericTree):
             The filename which holds the WorkflowTree configuration.
         """
         _new_tree = WorkflowTreeIoMeta.import_from_file(filename)
-        for _att in ['root', 'node_ids', 'nodes']:
+        for _att in ["root", "node_ids", "nodes"]:
             setattr(self, _att, getattr(_new_tree, _att))
         self._tree_changed_flag = True
 
@@ -242,18 +244,18 @@ class _WorkflowTree(GenericTree):
             Parameters).
         """
         if not isinstance(list_of_nodes, (list, tuple)):
-            raise TypeError('Nodes must be supplied as a list.')
+            raise TypeError("Nodes must be supplied as a list.")
         _new_nodes = {}
         for _item in list_of_nodes:
-            _plugin =  PLUGINS.get_plugin_by_name(_item['plugin_class'])()
-            _node = WorkflowNode(node_id=_item['node_id'], plugin=_plugin)
-            for key, val in _item['plugin_params']:
+            _plugin = PLUGINS.get_plugin_by_name(_item["plugin_class"])()
+            _node = WorkflowNode(node_id=_item["node_id"], plugin=_plugin)
+            for key, val in _item["plugin_params"]:
                 _node.plugin.set_param_value(key, val)
-            _new_nodes[_item['node_id']] = _node
+            _new_nodes[_item["node_id"]] = _node
         for _item in list_of_nodes:
-            _node_id = _item['node_id']
-            if _item['parent'] is not None:
-                _new_nodes[_node_id].parent = _new_nodes[_item['parent']]
+            _node_id = _item["node_id"]
+            if _item["parent"] is not None:
+                _new_nodes[_node_id].parent = _new_nodes[_item["parent"]]
         if 0 in _new_nodes:
             self.set_root(_new_nodes[0])
         else:
@@ -264,8 +266,8 @@ class _WorkflowTree(GenericTree):
         """
         Get the shapes of all leaves in form of a dictionary.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         force_update : bool, optional
             Keyword to enforce a new calculation of the result shapes. The
             default is False.
@@ -282,20 +284,24 @@ class _WorkflowTree(GenericTree):
             node_ids of type int and shapes of type tuple.
         """
         if self.root is None:
-            raise AppConfigError('The WorkflowTree has no nodes.')
+            raise AppConfigError("The WorkflowTree has no nodes.")
         _leaves = self.get_all_leaves()
         _shapes = [_leaf.result_shape for _leaf in _leaves]
         if None in _shapes or self._tree_changed_flag or force_update:
             self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
-        _shapes = {_leaf.node_id: _leaf.result_shape
-                   for _leaf in _leaves
-                   if _leaf.plugin.output_data_dim is not None}
+        _shapes = {
+            _leaf.node_id: _leaf.result_shape
+            for _leaf in _leaves
+            if _leaf.plugin.output_data_dim is not None
+        }
         for _id, _shape in _shapes.items():
             if -1 in _shape:
                 _plugin_cls = self.get_node_by_id(_id).plugin.__class__
-                _error = ('Cannot determine the shape of the output for node '
-                          f'"{_id}" (type {_plugin_cls}).')
+                _error = (
+                    "Cannot determine the shape of the output for node "
+                    f'"{_id}" (type {_plugin_cls}).'
+                )
                 raise AppConfigError(_error)
         return _shapes
 

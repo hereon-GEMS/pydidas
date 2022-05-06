@@ -33,9 +33,11 @@ from .generic_io_meta import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import generic_io_base
+
 __all__.extend(generic_io_base.__all__)
 del generic_io_base
 
 from . import generic_io_meta
+
 __all__.extend(generic_io_meta.__all__)
 del generic_io_meta

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DirectoryExplorer']
+__all__ = ["DirectoryExplorer"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -44,12 +44,13 @@ class DirectoryExplorer(QtWidgets.QTreeView):
     **kwargs : dict
         Any additional keyword arguments
     """
-    def __init__(self, parent=None, root_path='', **kwargs):
+
+    def __init__(self, parent=None, root_path="", **kwargs):
         super().__init__(parent)
         apply_widget_properties(self, **kwargs)
-        if root_path == '':
-            _settings = QtCore.QSettings('Hereon', 'pydidas')
-            _path = _settings.value('directory_explorer/path', None)
+        if root_path == "":
+            _settings = QtCore.QSettings("Hereon", "pydidas")
+            _path = _settings.value("directory_explorer/path", None)
             if _path is not None:
                 root_path = _path
         self._filemodel = QtWidgets.QFileSystemModel()
@@ -64,8 +65,9 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         self.setColumnWidth(1, 70)
         self.setColumnWidth(2, 100)
         self.setColumnWidth(3, 140)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                           QtWidgets.QSizePolicy.Expanding)
+        self.setSizePolicy(
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
         self.__expand_to_path(root_path)
 
     def __expand_to_path(self, path):

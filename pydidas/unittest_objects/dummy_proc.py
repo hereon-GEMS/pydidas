@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['DummyProc']
+__all__ = ["DummyProc"]
 
 import numpy as np
 
@@ -38,7 +38,8 @@ class DummyProc(ProcPlugin):
     """
     A dummy processing plugin which applies a random offset to the input data.
     """
-    plugin_name = 'Dummy processing Plugin'
+
+    plugin_name = "Dummy processing Plugin"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     input_data_dim = -1
@@ -64,6 +65,7 @@ class DummyProc(ProcPlugin):
             The state to set the state of the new object.
         """
         from .dummy_getter_ import dummy_getter
+
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
     def execute(self, data, **kwargs):
@@ -90,12 +92,12 @@ class DummyProc(ProcPlugin):
             dict keys for rerference.
         """
         self._executed = True
-        _offset = kwargs.get('offset', np.random.random())
+        _offset = kwargs.get("offset", np.random.random())
         _data = Dataset(data) + _offset
         if self.node_id is not None:
-            kwargs.update({f'offset_{self.node_id:02d}': _offset})
+            kwargs.update({f"offset_{self.node_id:02d}": _offset})
         else:
-            kwargs.update({'offset_no_ID': _offset})
+            kwargs.update({"offset_no_ID": _offset})
         return _data, kwargs
 
     def pre_execute(self):

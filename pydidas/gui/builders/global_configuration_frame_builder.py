@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GlobalConfigurationFrameBuilder']
+__all__ = ["GlobalConfigurationFrameBuilder"]
 
 from qtpy import QtCore
 
@@ -40,6 +40,7 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
     self : pydidas.gui.GlobalConfigurationFrame
         The GlobalConfigurationFrame instance.
     """
+
     TEXT_WIDTH = 180
 
     def __init__(self, parent=None):
@@ -49,57 +50,56 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         """
         Populate the GlobalConfigurationFrame with widgets.
         """
-        _twoline_options = dict(width_text=self.TEXT_WIDTH, linebreak=True,
-                                width_io=CONFIG_WIDGET_WIDTH-50,
-                                width_total=CONFIG_WIDGET_WIDTH,
-                                halign_text=QtCore.Qt.AlignLeft,
-                                valign_text=QtCore.Qt.AlignBottom)
-        _options = dict(width_text=self.TEXT_WIDTH, width_io=80,
-                        width_total=CONFIG_WIDGET_WIDTH)
-        _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 0))
+        _twoline_options = dict(
+            width_text=self.TEXT_WIDTH,
+            linebreak=True,
+            width_io=CONFIG_WIDGET_WIDTH - 50,
+            width_total=CONFIG_WIDGET_WIDTH,
+            halign_text=QtCore.Qt.AlignLeft,
+            valign_text=QtCore.Qt.AlignBottom,
+        )
+        _options = dict(
+            width_text=self.TEXT_WIDTH, width_io=80, width_total=CONFIG_WIDGET_WIDTH
+        )
+        _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 1))
 
-        self.create_label('title', 'Global settings\n', fontsize=14,
-                          bold=True, gridPos=(0, 0, 1, 0))
+        self.create_label(
+            "title", "Global settings\n", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+        )
 
-        self.create_button('but_reset', 'Restore defaults',
-                           icon=self.style().standardIcon(59),
-                           gridPos=(-1, 0, 1, 0), alignment=None)
+        self.create_button(
+            "but_reset",
+            "Restore defaults",
+            icon=self.style().standardIcon(59),
+            gridPos=(-1, 0, 1, 1),
+            alignment=None,
+        )
 
-        self.create_label('section_multiprocessing',
-                          'Multiprocessing settings', **_section_options)
-        self.create_param_widget(self.get_param('mp_n_workers'),
-                                  **_options)
-        self.create_param_widget(self.get_param('shared_buffer_size'),
-                                  **_options)
-        self.create_param_widget(self.get_param('shared_buffer_max_n'),
-                                  **_options)
-        self.create_spacer('spacer_1')
+        self.create_label(
+            "section_multiprocessing", "Multiprocessing settings", **_section_options
+        )
+        self.create_param_widget(self.get_param("mp_n_workers"), **_options)
+        self.create_param_widget(self.get_param("shared_buffer_size"), **_options)
+        self.create_param_widget(self.get_param("shared_buffer_max_n"), **_options)
+        self.create_spacer("spacer_1")
 
-        self.create_label('section_detector', 'Detector settings',
-                          **_section_options)
-        self.create_param_widget(self.get_param('det_mask'),
-                                  **_twoline_options)
-        self.create_param_widget(self.get_param('det_mask_val'),
-                                  **_options)
-        self.create_spacer('spacer_2')
+        self.create_label("section_detector", "Detector settings", **_section_options)
+        self.create_param_widget(self.get_param("det_mask"), **_twoline_options)
+        self.create_param_widget(self.get_param("det_mask_val"), **_options)
+        self.create_spacer("spacer_2")
 
-        self.create_label('section_mosaic', 'Composite creator settings',
-                          **_section_options)
-        self.create_param_widget(self.get_param('mosaic_border_width'),
-                                  **_options)
-        self.create_param_widget(self.get_param('mosaic_border_value'),
-                                  **_options)
-        self.create_param_widget(self.get_param('mosaic_max_size'),
-                                  **_options)
-        self.create_spacer('spacer_3')
+        self.create_label(
+            "section_mosaic", "Composite creator settings", **_section_options
+        )
+        self.create_param_widget(self.get_param("mosaic_border_width"), **_options)
+        self.create_param_widget(self.get_param("mosaic_border_value"), **_options)
+        self.create_param_widget(self.get_param("mosaic_max_size"), **_options)
+        self.create_spacer("spacer_3")
 
-        self.create_label('section_plotting', 'Plotting settings',
-                          **_section_options)
-        self.create_param_widget(self.get_param('plot_update_time'),
-                                  **_options)
-        self.create_spacer('spacer_4')
+        self.create_label("section_plotting", "Plotting settings", **_section_options)
+        self.create_param_widget(self.get_param("plot_update_time"), **_options)
+        self.create_spacer("spacer_4")
 
-        self.create_label('section_plugins', 'Plugin paths',
-                          **_section_options)
-        self.create_param_widget(self.get_param('plugin_path'),
-                                  **_twoline_options)
+        self.create_label("section_plugins", "Plugin paths", **_section_options)
+        self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
+        self.create_button("but_plugins", "Update plugin collection")

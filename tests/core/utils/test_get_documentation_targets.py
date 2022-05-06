@@ -29,12 +29,14 @@ import os
 from qtpy import QtCore
 
 from pydidas.core.utils import (
-    get_doc_make_directory, get_doc_home_filename, get_doc_home_address,
-    get_doc_home_qurl)
+    get_doc_make_directory,
+    get_doc_home_filename,
+    get_doc_home_address,
+    get_doc_home_qurl,
+)
 
 
 class TestGetDocQUrl(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -43,7 +45,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_get_doc_make_directory(self):
         _dir = get_doc_make_directory()
-        self.assertIn('Makefile', os.listdir(_dir))
+        self.assertIn("Makefile", os.listdir(_dir))
 
     def test_get_doc_home_filename(self):
         _fname = get_doc_home_filename()
@@ -51,7 +53,7 @@ class TestGetDocQUrl(unittest.TestCase):
 
     def test_get_doc_home_address(self):
         _address = get_doc_home_address()
-        self.assertTrue(_address.startswith( 'file:///' ))
+        self.assertTrue(_address.startswith(r"file:///"))
 
     def test_get_doc_qurl(self):
         _url = get_doc_home_qurl()

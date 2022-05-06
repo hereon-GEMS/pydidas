@@ -28,7 +28,6 @@ from pydidas.plugins import BasePlugin, plugin_getter
 
 
 class TestPluginGetter(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -36,7 +35,7 @@ class TestPluginGetter(unittest.TestCase):
         ...
 
     def test_plugin_getter(self):
-        _plugin = plugin_getter('BasePlugin')
+        _plugin = plugin_getter("BasePlugin")
         self.assertIsInstance(_plugin, BasePlugin)
 
 

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['QtaIconButton']
+__all__ = ["QtaIconButton"]
 
 import numbers
 
@@ -52,7 +52,8 @@ class QtaIconButton(QtWidgets.QPushButton):
         as the (width, height). If None, the size is not set and the
         button defaults to its sizeHint size. The default is None.
     """
-    def __init__(self, icon, text='', parent=None, size=None):
+
+    def __init__(self, icon, text="", parent=None, size=None):
         """
         Create the QtaIconButton instance.
 
@@ -65,15 +66,17 @@ class QtaIconButton(QtWidgets.QPushButton):
         if isinstance(icon, str):
             _icon = qtawesome.icon(icon)
         elif not isinstance(icon, QtCore.QIcon):
-            raise ValueError('icon is neither a QIcon nor a String')
+            raise ValueError("icon is neither a QIcon nor a String")
         super().__init__(_icon, text, parent)
         if size:
             if isinstance(size, numbers.Integral):
                 size = (size, size)
-            elif (isinstance(size, (list, tuple))
-                  and len(size) == 2
-                  and isinstance(size[0], numbers.Integral)
-                  and isinstance(size[1], numbers.Integral)):
+            elif (
+                isinstance(size, (list, tuple))
+                and len(size) == 2
+                and isinstance(size[0], numbers.Integral)
+                and isinstance(size[1], numbers.Integral)
+            ):
                 ...
             else:
                 raise ValueError(f'Cannot interprete size "{size}".')

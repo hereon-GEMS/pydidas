@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['pydidas_logger', 'LOGGING_LEVEL']
+__all__ = ["pydidas_logger", "LOGGING_LEVEL"]
 
 import os
 import logging
@@ -32,6 +32,8 @@ import multiprocessing as mp
 
 
 LOGGING_LEVEL = logging.WARNING
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
 def pydidas_logger(level=logging.DEBUG):
@@ -48,15 +50,15 @@ def pydidas_logger(level=logging.DEBUG):
     """
     logger = mp.get_logger()
     logger.setLevel(level)
-    formatter = logging.Formatter(\
-        '[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-        os.path.dirname(__file__)))), 'logs')
+    formatter = logging.Formatter(
+        "[%(asctime)s| %(levelname)s| %(processName)s] %(message)s"
+    )
+    _logpath = os.path.join(BASE_DIR, "logs")
     if not os.path.exists(_logpath):
         os.makedirs(_logpath)
     _time = time.localtime()
-    _timestr = f'{_time.tm_year:04d}{_time.tm_mon:02d}{_time.tm_mday:02d}'
-    _logfile = os.path.join(_logpath, f'pydidas_log{_timestr}.log')
+    _timestr = f"{_time.tm_year:04d}{_time.tm_mon:02d}{_time.tm_mday:02d}"
+    _logfile = os.path.join(_logpath, f"pydidas_log{_timestr}.log")
     handler = logging.FileHandler(_logfile)
     handler.setFormatter(formatter)
     # this will make sure you won't have duplicated messages in the output

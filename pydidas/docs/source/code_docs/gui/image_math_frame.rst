@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.ImageMathFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

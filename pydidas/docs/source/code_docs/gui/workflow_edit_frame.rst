@@ -21,6 +21,7 @@
 
 .. autoclass:: pydidas.gui.WorkflowEditFrame
     :members:
+    :noindex:
     :inherited-members: QFrame
     
 

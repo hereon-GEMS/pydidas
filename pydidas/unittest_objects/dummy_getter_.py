@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['dummy_getter']
+__all__ = ["dummy_getter"]
 
 
 def dummy_getter(plugin_name):
@@ -40,12 +40,11 @@ def dummy_getter(plugin_name):
     plugin : pydidas.plugins.BasePlugin
         The new Plugin instance.
     """
-    # because this module will be loaded directly by importlib, absolute imports
-    # are required:
     from .dummy_loader import DummyLoader
     from .dummy_proc import DummyProc
-    if plugin_name == 'DummyLoader':
+
+    if plugin_name == "DummyLoader":
         return DummyLoader()
-    if plugin_name == 'DummyProc':
+    if plugin_name == "DummyProc":
         return DummyProc()
     raise NameError(f'No DummyPlugin with the name "{plugin_name}" is known.')

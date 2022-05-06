@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['MainWindow']
+__all__ = ["MainWindow"]
 
 import os
 from pathlib import Path
@@ -34,8 +34,7 @@ from qtpy import QtWidgets, QtCore
 
 from ..core import FrameConfigError
 from ..core.utils import format_input_to_multiline_str
-from ..widgets import (CentralWidgetStack, InfoWidget,
-                       get_pyqt_icon_from_str_reference)
+from ..widgets import CentralWidgetStack, InfoWidget, get_pyqt_icon_from_str_reference
 from .global_configuration_frame import GlobalConfigurationFrame
 from . import utils
 from .main_menu import MainMenu
@@ -69,17 +68,17 @@ class MainWindow(MainMenu):
         self._toolbars_created = False
         self.__create_logging_info_box()
 
-
     def __create_logging_info_box(self):
         """
         Create the InfoWidget for logging and status messages.
         """
         self.__info_widget = InfoWidget()
-        _dock_widget = QtWidgets.QDockWidget('Logging && information')
+        _dock_widget = QtWidgets.QDockWidget("Logging && information")
         _dock_widget.setWidget(self.__info_widget)
         _dock_widget.setFeatures(
             QtWidgets.QDockWidget.DockWidgetMovable
-            | QtWidgets.QDockWidget.DockWidgetFloatable)
+            | QtWidgets.QDockWidget.DockWidgetFloatable
+        )
         _dock_widget.setBaseSize(500, 50)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
@@ -91,19 +90,18 @@ class MainWindow(MainMenu):
         self.__add_global_config_frame()
         self._toolbars = {}
         for tb in utils.find_toolbar_bases(self._frame_menuentries):
-            tb_title = tb if tb else 'Main toolbar'
+            tb_title = tb if tb else "Main toolbar"
             self._toolbars[tb] = QtWidgets.QToolBar(tb_title, self)
             self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}")
             self._toolbars[tb].setIconSize(QtCore.QSize(40, 40))
-            self._toolbars[tb].setToolButtonStyle(
-                QtCore.Qt.ToolButtonTextUnderIcon)
+            self._toolbars[tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
             self._toolbars[tb].setFixedWidth(85)
             self._toolbars[tb].setMovable(False)
             self._toolbars[tb].toggleViewAction().setEnabled(False)
 
         for item in self._frame_menuentries:
-            _icon = self._frame_meta[item]['icon']
-            _label = self._frame_meta[item]['label']
+            _icon = self._frame_meta[item]["icon"]
+            _label = self._frame_meta[item]["label"]
             _action = QtWidgets.QAction(_icon, _label, self)
             _action.setCheckable(True)
             _action.triggered.connect(partial(self.select_item, item))
@@ -112,12 +110,11 @@ class MainWindow(MainMenu):
             self._toolbars[itembase].addAction(_action)
 
         for _toolbar_name in self._toolbars:
-            if _toolbar_name != '':
+            if _toolbar_name != "":
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
-            self.addToolBar(QtCore.Qt.LeftToolBarArea,
-                            self._toolbars[_toolbar_name])
+            self.addToolBar(QtCore.Qt.LeftToolBarArea, self._toolbars[_toolbar_name])
             # only make the root toolbar visible to start with:
-            self._toolbars[_toolbar_name].setVisible(_toolbar_name == '')
+            self._toolbars[_toolbar_name].setVisible(_toolbar_name == "")
         self.select_item(self._frame_menuentries[0])
         self._toolbars_created = True
 
@@ -126,10 +123,14 @@ class MainWindow(MainMenu):
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        self.register_frame(GlobalConfigurationFrame, 'Global configuration',
-                            'Global configuration', 'qta::mdi.application-cog')
-        _w = CentralWidgetStack().get_widget_by_name('Global configuration')
-        _w2 = self._child_windows['global_config'].centralWidget()
+        self.register_frame(
+            GlobalConfigurationFrame,
+            "Global configuration",
+            "Global configuration",
+            "qta::mdi.application-cog",
+        )
+        _w = CentralWidgetStack().get_widget_by_name("Global configuration")
+        _w2 = self._child_windows["global_config"].centralWidget()
         _w.value_changed_signal.connect(_w2.external_update)
         _w2.value_changed_signal.connect(_w.external_update)
 
@@ -174,8 +175,9 @@ class MainWindow(MainMenu):
             If a similar menu entry has already been registered.
         """
         if menu_entry in self._frame_menuentries:
-            raise FrameConfigError(f'The selected menu entry "{menu_entry}"'
-                                   ' already exists.')
+            raise FrameConfigError(
+                f'The selected menu entry "{menu_entry}"' " already exists."
+            )
         _frame = frame()
         _frame.ref_name = menu_entry
         _frame.title = title
@@ -201,8 +203,10 @@ class MainWindow(MainMenu):
             menu icon.
         """
         _ref = frame.ref_name
-        _new_menus = ([('' if _path == Path() else _path.as_posix())
-                       for _path in reversed(Path(_ref).parents)] + [_ref])
+        _new_menus = [
+            ("" if _path == Path() else _path.as_posix())
+            for _path in reversed(Path(_ref).parents)
+        ] + [_ref]
         self._frame_menuentries.append(_ref)
         if isinstance(menuicon, str):
             menuicon = get_pyqt_icon_from_str_reference(menuicon)
@@ -210,7 +214,8 @@ class MainWindow(MainMenu):
             label=format_input_to_multiline_str(frame.title),
             icon=menuicon,
             index=frame.frame_index,
-            menus=_new_menus)
+            menus=_new_menus,
+        )
 
     @QtCore.Slot(str)
     def select_item(self, label):
@@ -226,14 +231,14 @@ class MainWindow(MainMenu):
         self.setUpdatesEnabled(False)
         self.centralWidget().setUpdatesEnabled(False)
         for _name, _toolbar in self._toolbars.items():
-            _toolbar.setVisible(_name in self._frame_meta[label]['menus'])
+            _toolbar.setVisible(_name in self._frame_meta[label]["menus"])
         _new_widget = self.centralWidget().get_widget_by_name(label)
         if _new_widget.show_frame:
             for _name, _action in self._toolbar_actions.items():
-                _action.setChecked(_name in self._frame_meta[label]['menus']
-                                   or _name == label)
-            self.centralWidget().setCurrentIndex(
-                self._frame_meta[label]['index'])
+                _action.setChecked(
+                    _name in self._frame_meta[label]["menus"] or _name == label
+                )
+            self.centralWidget().setCurrentIndex(self._frame_meta[label]["index"])
         else:
             self._toolbar_actions[label].setChecked(False)
         self.setUpdatesEnabled(True)
@@ -270,8 +275,8 @@ class MainWindow(MainMenu):
             The status message.
         """
         self.statusBar().showMessage(text)
-        if text[-1] != '\n':
-            text += '\n'
+        if text[-1] != "\n":
+            text += "\n"
         self.__info_widget.add_status(text)
 
     @QtCore.Slot(str)

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Timer']
+__all__ = ["Timer"]
 
 import time
 
@@ -40,6 +40,7 @@ class Timer:
     >>>     arr = numpy.random.random((1000, 1000, 100))
     Code runtime is 0.597181800 seconds.
     """
+
     def __init__(self, msg=None):
         self._tstart = None
         self._msg = msg
@@ -49,7 +50,7 @@ class Timer:
 
     def __exit__(self, type_, value, traceback):
         _delta = time.perf_counter() - self._tstart
-        _str = f'Code runtime is {_delta:0.9f} seconds.'
+        _str = f"Code runtime is {_delta:0.9f} seconds."
         if self._msg is not None:
-            _str = f'{self._msg}: {_str}'
+            _str = f"{self._msg}: {_str}"
         print(_str)

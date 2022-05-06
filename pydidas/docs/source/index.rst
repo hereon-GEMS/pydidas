@@ -1,5 +1,4 @@
-.. image:: ./images/logo/rings.png
-    :scale: 100%
+.. image:: ./images/logo/pydidas_snakes_w_bg.png
     :align: right
     :alt: rings_logo
 

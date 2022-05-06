@@ -3,14 +3,16 @@
 Package structure
 -----------------
 
-The pydidas sub-packages are organized hierachically with only upward references to allow
-a clean architecture. A list of the sub-packages including internal references is given below.
+The pydidas sub-packages are organized hierachically with only upward 
+references to allow a clean architecture. A list of the sub-packages including 
+internal references is given below.
 
 
 Index of sub-packages 
 ^^^^^^^^^^^^^^^^^^^^^
 
-The list of all pydidas subpackages including their internal requirements is given below:
+The list of all pydidas subpackages including their internal requirements is 
+given below:
 
 +-------------------+------------------------------------------------+
 | **sub-package**   | **requirements**                               |  
@@ -19,23 +21,23 @@ The list of all pydidas subpackages including their internal requirements is giv
 +-------------------+------------------------------------------------+
 | multiprocessing   | core                                           |
 +-------------------+------------------------------------------------+
-| image_io          | core                                           |      
+| data_io           | core                                           |      
 +-------------------+------------------------------------------------+
 | experiment        | core                                           |
 +-------------------+------------------------------------------------+
-| managers          | core, image_io                                 |
+| managers          | core, data_io                                  |
 +-------------------+------------------------------------------------+
-| plugins           | core, image_io, managers                       |
+| plugins           | core, data_io, managers                        |
 +-------------------+------------------------------------------------+
 | workflow          | core, experiment, plugins                      |
 +-------------------+------------------------------------------------+
-| apps              | core, image_io, experiment, managers, workflow |
+| apps              | core, data_io, experiment, managers, workflow  |
 +-------------------+------------------------------------------------+
 | widgets           | core, experiment, workflow, apps               |
 +-------------------+------------------------------------------------+
-| unittest_objects  | core, image_io, plugins, apps                  |
+| unittest_objects  | core, data_io, plugins, apps                   |
 +-------------------+------------------------------------------------+
-| gui               | core, multiprocessing, image_io, experiment,   |
+| gui               | core, multiprocessing, data_io, experiment,    |
 |                   | workflow, apps, widgets                        |
 +-------------------+------------------------------------------------+
 
@@ -62,25 +64,28 @@ Sub-package descriptions
   
 - **pydidas.multiprocessing** 
     
-        All the required functionality to run simple functions or apps in parallel processes.
+        All the required functionality to run simple functions or apps in 
+        parallel processes.
 
-- **pydidas.image_io** 
+- **pydidas.data_io** 
     
-        The pydidas image reader and writer implementation and a registry class for the various formats.
+        The pydidas image reader and writer implementation and a registry class 
+        for the various formats.
 
-  - *pydidas.image_io.implementations* 
+  - *pydidas.data_io.implementations* 
     
         Specific implementations for various file formats.
 
-  - *pydidas.image_io.low_level_readers* 
+  - *pydidas.data_io.low_level_readers* 
         
         Low-level implementations of file readers used by *implementations*
         (e.g. reading slices out of hdf5 files).
 
 - **pydidas.experiment** 
     
-    Singleton classes which manage global settings for the experimental setup and the scan setup. 
-    This information can be used by plugins or apps to query the global processing parameters.
+    Singleton classes which manage global settings for the experimental setup 
+    and the scan setup. This information can be used by plugins or apps to query 
+    the global processing parameters.
 
   - *pydidas.experiment.experimental_setup* 
         
@@ -97,13 +102,14 @@ Sub-package descriptions
                  
 - **pydidas.plugins** 
     
-    Base classes for plugins and the plugin collection singleton which handles the collection of plugin 
-    classes from (possibly) different locations and which can return single classes for instantiation 
-    in a workflow tree.               
+    Base classes for plugins and the plugin collection singleton which handles 
+    the collection of plugin classes from (possibly) different locations and 
+    which can return single classes for instantiation in a workflow tree.               
 
 - **pydidas.workflow** 
         
-    Classes of nodes and trees to describe the workflow and execute plugins in the order defined by the user.
+    Classes of nodes and trees to describe the workflow and execute plugins in 
+    the order defined by the user.
 
   - *pydidas.workflow.result_savers* 
     
@@ -111,12 +117,14 @@ Sub-package descriptions
                       
   - *pydidas.workflow.workflow_tree_io* 
   
-        Registry with importers/exporters and the importer/exporter implementations.
+        Registry with importers/exporters and the importer/exporter 
+        implementations.
 
 - **pydidas.apps** 
 
-    The pydidas use cases have been defined in apps which can be called from the command line or using the 
-    GUI. All apps are parallelizable using the functionality of the multiprocesing subpackage.
+    The pydidas use cases have been defined in apps which can be called from 
+    the command line or using the GUI. All apps are parallelizable using the 
+    functionality of the multiprocesing subpackage.
              
 - **pydidas.widgets** 
 
@@ -128,12 +136,13 @@ Sub-package descriptions
   
   - *pydidas.widgets.factory* 
         
-        Convenience functions to create new widgets and set Qt properties defined by the user.
+        Convenience functions to create new widgets and set Qt properties 
+        defined by the user.
 
   - *pydidas.widgets.parameter_config* 
         
-        Specific widgets to edit the values of Parameters and functionality to create and manage parameter 
-        config widgets.
+        Specific widgets to edit the values of Parameters and functionality to 
+        create and manage parameter config widgets.
                          
   - *pydidas.widgets.selection* 
         
@@ -145,17 +154,19 @@ Sub-package descriptions
   
 - **pydidas.unittest_objects** 
     
-    Objects which are not used in the deployed pydidas version but which are required to run unittests with 
-    simplified objects.
+    Objects which are not used in the deployed pydidas version but which are 
+    required to run unittests with simplified objects.
                          
 - **pydidas.gui** 
     
-    All the functionality required for building and running the graphical user interface. Functionality is 
-    organized in "frames" which can all be accessed from the main window.
+    All the functionality required for building and running the graphical user 
+    interface. Functionality is organized in "frames" which can all be accessed 
+    from the main window.
             
   - *pydidas.gui.builders*
         
-        Mix-in classes for the individual frames which include the layout and arrangement of widgets.
+        Mix-in classes for the individual frames which include the layout and 
+        arrangement of widgets.
                  
   - *pydidas.gui.managers* 
         
@@ -163,8 +174,10 @@ Sub-package descriptions
   
   - *pydidas.gui.mixins* 
         
-        Mix-in classes for the GUI which add specific functionality to the base frame classes.   
+        Mix-in classes for the GUI which add specific functionality to the base 
+        frame classes.   
   
   - *pydidas.gui.windows* 
     
-        Stand-alone main windows which can be opened from within the pydidas main window, for example for the documentation.
+        Stand-alone main windows which can be opened from within the pydidas 
+        main window, for example for the documentation.

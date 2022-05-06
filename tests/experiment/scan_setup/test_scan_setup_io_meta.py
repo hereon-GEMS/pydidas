@@ -27,8 +27,7 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.scan_setup import (
-    ScanSetup, ScanSetupIoBase, ScanSetupIoMeta)
+from pydidas.experiment.scan_setup import ScanSetup, ScanSetupIoBase, ScanSetupIoMeta
 
 
 SCAN_SETTINGS = ScanSetup()
@@ -37,8 +36,8 @@ SCAN_IO_META.clear_registry()
 
 
 class TestIo(ScanSetupIoBase):
-    extensions = ['.test']
-    format_name = 'Test'
+    extensions = [".test"]
+    format_name = "Test"
 
     @classmethod
     def reset(cls):
@@ -59,7 +58,6 @@ class TestIo(ScanSetupIoBase):
 
 
 class TestExperimentSettingsIoMeta(unittest.TestCase):
-
     def setUp(self):
         self._tmppath = tempfile.mkdtemp()
         TestIo.reset()
@@ -69,13 +67,13 @@ class TestExperimentSettingsIoMeta(unittest.TestCase):
         SCAN_SETTINGS.restore_all_defaults(True)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmppath, 'test.test')
+        _fname = os.path.join(self._tmppath, "test.test")
         SCAN_IO_META.export_to_file(_fname)
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
     def test_import_from_file(self):
-        _fname = os.path.join(self._tmppath, 'test.test')
+        _fname = os.path.join(self._tmppath, "test.test")
         SCAN_IO_META.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)

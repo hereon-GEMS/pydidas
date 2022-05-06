@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WarningBox']
+__all__ = ["WarningBox"]
 
 from qtpy import QtWidgets
 
@@ -47,6 +47,7 @@ class WarningBox(QtWidgets.QMessageBox):
     details : str, optional
         Addition details for the warning. The default is None.
     """
+
     def __init__(self, title, msg, info=None, details=None):
         super().__init__()
         self.setIcon(self.Warning)

@@ -23,12 +23,15 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import (AppConfigError, FrameConfigError, WidgetLayoutError,
-                          DatasetConfigException)
+from pydidas.core import (
+    AppConfigError,
+    FrameConfigError,
+    WidgetLayoutError,
+    DatasetConfigException,
+)
 
 
 class TestPydidasExceptions(unittest.TestCase):
-
     def setUp(self):
         ...
 

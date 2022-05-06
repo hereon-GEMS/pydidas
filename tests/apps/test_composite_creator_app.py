@@ -33,81 +33,82 @@ import h5py
 from qtpy import QtCore, QtTest
 
 from pydidas.apps import CompositeCreatorApp
-from pydidas.core import (ParameterCollection, Dataset, AppConfigError,
-                          get_generic_parameter)
-from pydidas.image_io import CompositeImage
+from pydidas.core import (
+    ParameterCollection,
+    Dataset,
+    AppConfigError,
+    get_generic_parameter,
+)
+from pydidas.managers import CompositeImageManager
 
 
 class TestCompositeCreatorApp(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        self._fname = lambda i: Path(os.path.join(self._path,
-                                                  f'test{i:02d}.npy'))
+        self._fname = lambda i: Path(os.path.join(self._path, f"test{i:02d}.npy"))
         self._img_shape = (10, 10)
         self._n = 50
         self._data = np.random.random((self._n,) + self._img_shape)
         for i in range(self._n):
             np.save(self._fname(i), self._data[i])
-        self._hdf5_fnames = [Path(os.path.join(self._path,
-                                               f'test_{i:03d}.h5'))
-                             for i in range(10)]
+        self._hdf5_fnames = [
+            Path(os.path.join(self._path, f"test_{i:03d}.h5")) for i in range(10)
+        ]
         for i in range(10):
-            with h5py.File(self._hdf5_fnames[i], 'w') as f:
-                f['/entry/data/data'] = self._data
+            with h5py.File(self._hdf5_fnames[i], "w") as f:
+                f["/entry/data/data"] = self._data
 
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        self._border = int(q_settings.value('global/mosaic_border_width'))
-        self._bgvalue = float(q_settings.value('global/mosaic_border_value'))
-        self._globalmask = q_settings.value('global/det_mask')
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        self._border = int(q_settings.value("global/mosaic_border_width"))
+        self._bgvalue = float(q_settings.value("global/mosaic_border_value"))
+        self._globalmask = q_settings.value("global/det_mask")
         _mask = np.zeros((self._img_shape), dtype=np.bool_)
-        _maskfile = Path(os.path.join(self._path, 'mask.npy'))
+        _maskfile = Path(os.path.join(self._path, "mask.npy"))
         np.save(_maskfile, _mask)
-        q_settings.setValue('global/det_mask', _maskfile)
+        q_settings.setValue("global/det_mask", _maskfile)
         self._maskfile = _maskfile
 
     def tearDown(self):
-        q_settings = QtCore.QSettings('Hereon', 'pydidas')
-        q_settings.setValue('global/det_mask', self._globalmask)
+        q_settings = QtCore.QSettings("Hereon", "pydidas")
+        q_settings.setValue("global/det_mask", self._globalmask)
         shutil.rmtree(self._path)
 
     def get_default_app(self):
         self._ny = 5
-        self._nx = (self._n // self._ny
-                    + int(np.ceil((self._n % self._ny) / self._ny)))
-        def parser(obj):
-            return {}
-        CompositeCreatorApp.parse_func = parser
+        self._nx = self._n // self._ny + int(np.ceil((self._n % self._ny) / self._ny))
+        setattr(CompositeCreatorApp, "parse_func", lambda obj: {})
         app = CompositeCreatorApp()
-        app.set_param_value('first_file', self._fname(0))
-        app.set_param_value('last_file', self._fname(self._n - 1))
-        app.set_param_value('composite_nx', self._nx)
-        app.set_param_value('composite_ny', self._ny)
-        app.set_param_value('use_roi', True)
-        app.set_param_value('roi_xlow', 5)
+        app.set_param_value("first_file", self._fname(0))
+        app.set_param_value("last_file", self._fname(self._n - 1))
+        app.set_param_value("composite_nx", self._nx)
+        app.set_param_value("composite_ny", self._ny)
+        app.set_param_value("use_roi", True)
+        app.set_param_value("roi_xlow", 5)
         app._image_metadata.update()
         app._filelist.update()
         return app
 
     def create_single_composite_and_insert_image(self, app):
         _image = np.random.random(self._img_shape)
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1
+        )
         app._composite.insert_image(_image, 0)
         return _image
 
     def create_full_composite(self, app):
         app._image_metadata.update()
-        app._composite = CompositeImage(
+        app._composite = CompositeImageManager(
             image_shape=app._image_metadata.final_shape,
-            composite_nx=app.get_param_value('composite_nx'),
-            composite_ny=app.get_param_value('composite_ny'),
-            composite_dir=app.get_param_value('composite_dir'),
-            datatype=app._image_metadata.datatype)
+            composite_nx=app.get_param_value("composite_nx"),
+            composite_ny=app.get_param_value("composite_ny"),
+            composite_dir=app.get_param_value("composite_dir"),
+            datatype=app._image_metadata.datatype,
+        )
 
     def set_bg_params(self, app, bg_fname):
-        app.set_param_value('use_bg_file', True)
-        app.set_param_value('bg_file', bg_fname)
+        app.set_param_value("use_bg_file", True)
+        app.set_param_value("bg_file", bg_fname)
         app._image_metadata.update()
 
     def test_creation(self):
@@ -115,27 +116,28 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertIsInstance(app, CompositeCreatorApp)
 
     def test_creation_with_args(self):
-        _nx = get_generic_parameter('composite_nx')
+        _nx = get_generic_parameter("composite_nx")
         _nx.value = 10
-        _ny = get_generic_parameter('composite_ny')
+        _ny = get_generic_parameter("composite_ny")
         _ny.value = 5
-        _dir = get_generic_parameter('composite_dir')
-        _dir.value = 'y'
+        _dir = get_generic_parameter("composite_dir")
+        _dir.value = "y"
         _args = ParameterCollection(_nx, _ny, _dir)
         app = CompositeCreatorApp(_args)
-        self.assertEqual(app.get_param_value('composite_nx'), _nx.value)
-        self.assertEqual(app.get_param_value('composite_ny'), _ny.value)
-        self.assertEqual(app.get_param_value('composite_dir'), 'y')
+        self.assertEqual(app.get_param_value("composite_nx"), _nx.value)
+        self.assertEqual(app.get_param_value("composite_ny"), _ny.value)
+        self.assertEqual(app.get_param_value("composite_dir"), "y")
 
     def test_creation_with_cmdargs(self):
-        CompositeCreatorApp.parse_func = lambda x: {'binning': 4}
+        CompositeCreatorApp.parse_func = lambda x: {"binning": 4}
         app = CompositeCreatorApp()
-        self.assertEqual(app.get_param_value('binning'), 4)
+        self.assertEqual(app.get_param_value("binning"), 4)
 
     def test_composite_property(self):
         _image = np.random.random((10, 10))
-        _composite = CompositeImage(image_shape=_image.shape, composite_nx=1,
-                                    composite_ny=1)
+        _composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1
+        )
         _composite.insert_image(_image, 0)
         app = CompositeCreatorApp()
         app._composite = _composite
@@ -149,14 +151,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_export_image_png(self):
         app = self.get_default_app()
         app.run()
-        _path = os.path.join(self._path, 'test_image.png')
+        _path = os.path.join(self._path, "test_image.png")
         app.export_image(_path)
         self.assertTrue(os.path.exists(_path))
 
     def test_export_image_npy(self):
         app = self.get_default_app()
         app.run()
-        _path = os.path.join(self._path, 'test_image.npy')
+        _path = os.path.join(self._path, "test_image.npy")
         app.export_image(_path)
         _data = np.load(_path)
         self.assertTrue((_data == app.composite).all())
@@ -164,8 +166,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_store_results(self):
         app = self.get_default_app()
         _image = np.random.random(self._img_shape)
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1
+        )
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
@@ -175,10 +178,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_store_results__with_bg(self):
         _image = np.random.random(self._img_shape)
         app = self.get_default_app()
-        app.set_param_value('use_bg_file', True)
+        app.set_param_value("use_bg_file", True)
         app._bg_image = _image
-        app._composite = CompositeImage(image_shape=_image.shape,
-                                        composite_nx=1, composite_ny=1)
+        app._composite = CompositeImageManager(
+            image_shape=_image.shape, composite_nx=1, composite_ny=1
+        )
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
@@ -204,9 +208,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _thresh_high = 0.6
         app = self.get_default_app()
         _ = self.create_single_composite_and_insert_image(app)
-        app.set_param_value('use_thresholds', True)
-        app.set_param_value('threshold_low', _thresh_low)
-        app.set_param_value('threshold_high', _thresh_high)
+        app.set_param_value("use_thresholds", True)
+        app.set_param_value("threshold_low", _thresh_low)
+        app.set_param_value("threshold_high", _thresh_high)
         app.apply_thresholds()
         self.assertEqual(np.where(app.composite < _thresh_low)[0].size, 0)
         self.assertEqual(np.where(app.composite > _thresh_high)[0].size, 0)
@@ -232,24 +236,24 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertTrue(np.isclose(_image, _newimage).all())
 
     def test_apply_mask__with_mask_and_no_value(self):
-        _shape = ((50, 50))
+        _shape = (50, 50)
         rng = np.random.default_rng(12345)
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config['det_mask_val'] = None
+        app._config["det_mask_val"] = None
         _image = np.random.random(_shape)
         with self.assertRaises(AppConfigError):
             app._CompositeCreatorApp__apply_mask(_image)
 
     def test_apply_mask__with_mask_and_finite_mask_val(self):
-        _shape = ((50, 50))
+        _shape = (50, 50)
         rng = np.random.default_rng(12345)
         _mask = rng.integers(low=0, high=2, size=_shape)
         _val = rng.random() * 1e3
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config['det_mask_val'] = _val
+        app._config["det_mask_val"] = _val
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         _delta = _newimage - _image
@@ -257,22 +261,21 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertTrue((_delta.array[_mask == 0] == 0).all())
 
     def test_apply_mask__with_mask_and_nan_mask_val(self):
-        _shape = ((50, 50))
+        _shape = (50, 50)
         _val = np.nan
         rng = np.random.default_rng(12345)
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config['det_mask_val'] = _val
+        app._config["det_mask_val"] = _val
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isnan(_newimage[_mask == 1]).all())
 
     def test_multiprocessing_func(self):
         app = self.get_default_app()
-        app._config['current_fname'] = self._hdf5_fnames[0]
-        app._config['current_kwargs'] = dict(hdf5_dataset='/entry/data/data',
-                                              frame=0)
+        app._config["current_fname"] = self._hdf5_fnames[0]
+        app._config["current_kwargs"] = dict(dataset="/entry/data/data", frame=0)
         _image = app.multiprocessing_func(0)
         self.assertTrue((_image == self._data[0]).all())
 
@@ -283,12 +286,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.assertTrue(app._image_exists_check(_last_file, timeout=0.1))
 
     def test_image_exists_check__no_file(self):
-        _last_file = os.path.join(self._path, 'test_10.h5')
+        _last_file = os.path.join(self._path, "test_10.h5")
         app = CompositeCreatorApp()
         self.assertFalse(app._image_exists_check(_last_file, timeout=0.1))
 
     def test_image_exists_check__wrong_size(self):
-        _last_file = os.path.join(self._path, 'test_bg.npy')
+        _last_file = os.path.join(self._path, "test_bg.npy")
         np.save(_last_file, np.ones((2, 2)))
         app = CompositeCreatorApp()
         self.assertFalse(app._image_exists_check(_last_file, timeout=0.1))
@@ -301,41 +304,40 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _last_file = self._fname(10)
         app = self.get_default_app()
         app.run()
-        app.set_param_value('live_processing', True)
-        app._config['current_fname'] = _last_file
+        app.set_param_value("live_processing", True)
+        app._config["current_fname"] = _last_file
         self.assertTrue(app.multiprocessing_carryon())
 
     def test_multiprocessing_carryon__no_file(self):
         _last_file = self._fname(80)
         app = self.get_default_app()
         app.run()
-        app.set_param_value('live_processing', True)
-        app._config['current_fname'] = _last_file
+        app.set_param_value("live_processing", True)
+        app._config["current_fname"] = _last_file
         self.assertFalse(app.multiprocessing_carryon())
 
     def test_multiprocessing_store_with_bg(self):
-        _bg_fname = os.path.join(self._path, 'bg.npy')
+        _bg_fname = os.path.join(self._path, "bg.npy")
         np.save(_bg_fname, np.ones((10, 10)))
         app = self.get_default_app()
-        app.set_param_value('use_bg_file', True)
-        app.set_param_value('bg_file', _bg_fname)
+        app.set_param_value("use_bg_file", True)
+        app.set_param_value("bg_file", _bg_fname)
         app.run()
         self.assertTrue((app._composite.image <= self._bgvalue).all())
 
     def test_store_args_for_read_image__hdf5(self):
         app = self.get_default_app()
-        app.set_param_value('hdf5_key', '/entry/data/data')
-        app.set_param_value('first_file', self._hdf5_fnames[0])
-        app.set_param_value('last_file', Path())
+        app.set_param_value("hdf5_key", "/entry/data/data")
+        app.set_param_value("first_file", self._hdf5_fnames[0])
+        app.set_param_value("last_file", Path())
         app._filelist.update()
         app._image_metadata.update()
         _index = 7
         app._store_args_for_read_image(_index)
-        self.assertEqual(app._config['current_fname'], self._hdf5_fnames[0])
-        self.assertEqual(app._config['current_kwargs']['frame'], _index)
-        self.assertEqual(app._config['current_kwargs']['hdf5_dataset'],
-                          '/entry/data/data')
-        self.assertEqual(app._config['current_kwargs']['binning'], 1)
+        self.assertEqual(app._config["current_fname"], self._hdf5_fnames[0])
+        self.assertEqual(app._config["current_kwargs"]["frame"], _index)
+        self.assertEqual(app._config["current_kwargs"]["dataset"], "/entry/data/data")
+        self.assertEqual(app._config["current_kwargs"]["binning"], 1)
 
     def test_store_args_for_read_image__npy(self):
         app = self.get_default_app()
@@ -343,8 +345,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._image_metadata.update()
         _index = 7
         app._store_args_for_read_image(_index)
-        self.assertEqual(app._config['current_fname'], self._fname(_index))
-        self.assertEqual(app._config['current_kwargs']['binning'], 1)
+        self.assertEqual(app._config["current_fname"], self._fname(_index))
+        self.assertEqual(app._config["current_kwargs"]["binning"], 1)
 
     def multiprocessing_pre_cycle(self):
         app = CompositeCreatorApp()
@@ -359,22 +361,22 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_get_tasks__tasks_defined(self):
         _tasks = [1, 2, 3, 4]
         app = CompositeCreatorApp()
-        app._config['mp_tasks'] = _tasks
+        app._config["mp_tasks"] = _tasks
         _newtasks = app.multiprocessing_get_tasks()
         self.assertEqual(_tasks, _newtasks)
 
-    def test_verify_total_number_of_images_in_composite__no_composite_yet(self):
+    def test_check_and_update_composite_image__no_composite_yet(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
-        self.assertIsInstance(app._composite, CompositeImage)
+        self.assertIsInstance(app._composite, CompositeImageManager)
 
-    def test_verify_total_number_of_images_in_composite__redo(self):
+    def test_check_and_update_composite_image__redo(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         app._CompositeCreatorApp__check_and_update_composite_image()
-        self.assertIsInstance(app._composite, CompositeImage)
+        self.assertIsInstance(app._composite, CompositeImageManager)
 
-    def test_verify_total_number_of_images_in_composite__new_img_shape(self):
+    def test_check_and_update_composite_image__new_img_shape(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
         _old_shape = app.composite.shape
@@ -382,19 +384,19 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _data2 = np.random.random((self._n,) + _img_shape2)
         for i in range(self._n):
             np.save(self._fname(i + self._n), _data2[i])
-        app.set_param_value('first_file', self._fname(self._n))
-        app.set_param_value('last_file', self._fname(2 * self._n - 1))
+        app.set_param_value("first_file", self._fname(self._n))
+        app.set_param_value("last_file", self._fname(2 * self._n - 1))
         app._image_metadata.update()
         app._CompositeCreatorApp__check_and_update_composite_image()
         _new_shape = app.composite.shape
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
         self.assertEqual(_old_shape[1] + 2 * self._nx, _new_shape[1])
 
-    def test_verify_total_number_of_images_in_composite__new_order(self):
+    def test_check_and_update_composite_image__new_order(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__check_and_update_composite_image()
-        app.set_param_value('composite_nx', self._ny)
-        app.set_param_value('composite_ny', self._nx)
+        app.set_param_value("composite_nx", self._ny)
+        app.set_param_value("composite_ny", self._nx)
         app._CompositeCreatorApp__check_and_update_composite_image()
         _new_shape = app.composite.shape
         _img_shape = app._image_metadata.final_shape
@@ -408,79 +410,84 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self.set_bg_params(app, self._fname(0))
         app._check_and_set_bg_file()
         _image = app._bg_image
-        self.assertTrue((_image.array == self._data[0][app._image_metadata.roi]).all())
+        self.assertTrue(
+            np.allclose(_image.array, self._data[0][app._image_metadata.roi])
+        )
 
     def test_check_and_set_bg_file__with_hdf5_bg(self):
         app = self.get_default_app()
         self.set_bg_params(app, self._hdf5_fnames[0])
         app._check_and_set_bg_file()
         _image = app._bg_image
-        self.assertTrue((_image.array == self._data[0][app._image_metadata.roi]).all())
+        self.assertTrue(
+            np.allclose(_image.array, self._data[0][app._image_metadata.roi])
+        )
 
     def test_check_and_set_bg_file__wrong_size(self):
         app = self.get_default_app()
-        np.save(self._fname(999), np.zeros((self._img_shape[0] - 2,
-                                            self._img_shape[1] - 2)))
+        np.save(
+            self._fname(999), np.zeros((self._img_shape[0] - 2, self._img_shape[1] - 2))
+        )
         self.set_bg_params(app, self._fname(999))
         with self.assertRaises(AppConfigError):
             app._check_and_set_bg_file()
 
     def test_verify_total_number_of_images_in_composite__plain(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
         # assert does not raise AppConfigError
 
     def test_verify_total_number_of_images_in_composite__nx_default(self):
         app = self.get_default_app()
-        app.set_param_value('composite_nx', -1)
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
-        self.assertEqual(app.get_param_value('composite_nx'), self._nx)
+        app.set_param_value("composite_nx", -1)
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
+        self.assertEqual(app.get_param_value("composite_nx"), self._nx)
 
     def test_verify_total_number_of_images_in_composite__ny_default(self):
         app = self.get_default_app()
-        app.set_param_value('composite_ny', -1)
-        app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
-        self.assertEqual(app.get_param_value('composite_ny'), self._ny)
+        app.set_param_value("composite_ny", -1)
+        app._CompositeCreatorApp__verify_number_of_images_fits_composite()
+        self.assertEqual(app.get_param_value("composite_ny"), self._ny)
 
     def test_verify_total_number_of_images_in_composite__too_small(self):
         app = self.get_default_app()
-        app.set_param_value('composite_nx', 2)
-        app.set_param_value('composite_ny', 2)
+        app.set_param_value("composite_nx", 2)
+        app.set_param_value("composite_ny", 2)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+            app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_verify_total_number_of_images_in_composite__too_large(self):
         app = self.get_default_app()
-        app.set_param_value('composite_nx', 20)
-        app.set_param_value('composite_ny', 20)
+        app.set_param_value("composite_nx", 20)
+        app.set_param_value("composite_ny", 20)
         with self.assertRaises(AppConfigError):
-            app._CompositeCreatorApp__verify_total_number_of_images_in_composite()
+            app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
-        app.q_settings.setValue('global/det_mask', 'no/such/file.tif')
+        app.q_settings.setValue("global/det_mask", "no/such/file.tif")
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__wrong_file(self):
         app = CompositeCreatorApp()
-        with open(self._maskfile, 'w') as f:
-            f.write('this is not a numpy file.')
+        with open(self._maskfile, "w") as f:
+            f.write("this is not a numpy file.")
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__with_binning(self):
         app = CompositeCreatorApp()
-        app.set_param_value('binning', 2)
+        app.set_param_value("binning", 2)
         _mask = app._CompositeCreatorApp__get_detector_mask()
         _binned_shape = (self._img_shape[0] // 2, self._img_shape[1] // 2)
         self.assertEqual(_mask.shape, _binned_shape)
 
     def test_get_detector_mask__with_roi(self):
         app = CompositeCreatorApp()
-        app.set_param_value('roi_xlow', 5)
-        app.set_param_value('use_roi', True)
-        app.set_param_value('first_file', self._hdf5_fnames[0])
+        app.set_param_value("roi_xlow", 5)
+        app.set_param_value("use_roi", True)
+        app.set_param_value("first_file", self._hdf5_fnames[0])
         app._image_metadata.update()
         _mask = app._CompositeCreatorApp__get_detector_mask()
         _target_shape = (self._img_shape[0], self._img_shape[1] - 5)
@@ -488,10 +495,10 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_get_detector_mask__with_roi_and_binning(self):
         app = CompositeCreatorApp()
-        app.set_param_value('roi_xlow', 4)
-        app.set_param_value('use_roi', True)
-        app.set_param_value('binning', 2)
-        app.set_param_value('first_file', self._hdf5_fnames[0])
+        app.set_param_value("roi_xlow", 4)
+        app.set_param_value("use_roi", True)
+        app.set_param_value("binning", 2)
+        app.set_param_value("first_file", self._hdf5_fnames[0])
         app._image_metadata.update()
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertEqual(_mask.shape, app._image_metadata.final_shape)
@@ -511,14 +518,12 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _thresh_low = -12
         _thresh_high = 42
         app = self.get_default_app()
-        app.set_param_value('use_thresholds', True)
-        app.set_param_value('threshold_low', _thresh_low)
-        app.set_param_value('threshold_high', _thresh_high)
+        app.set_param_value("use_thresholds", True)
+        app.set_param_value("threshold_low", _thresh_low)
+        app.set_param_value("threshold_high", _thresh_high)
         app.prepare_run()
-        self.assertEqual(app._composite.get_param_value('threshold_low'),
-                         _thresh_low)
-        self.assertEqual(app._composite.get_param_value('threshold_high'),
-                         _thresh_high)
+        self.assertEqual(app._composite.get_param_value("threshold_low"), _thresh_low)
+        self.assertEqual(app._composite.get_param_value("threshold_high"), _thresh_high)
 
     def test_prepare_run__slave_mode(self):
         app = self.get_default_app()
@@ -529,9 +534,9 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_multiprocessing_pre_run(self):
         app = self.get_default_app()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config['mp_pre_run_called'])
-        self.assertIsNotNone(app._config['mp_tasks'])
-        self.assertIsNotNone(app._config['det_mask_val'])
+        self.assertTrue(app._config["mp_pre_run_called"])
+        self.assertIsNotNone(app._config["mp_tasks"])
+        self.assertIsNotNone(app._config["det_mask_val"])
 
 
 if __name__ == "__main__":

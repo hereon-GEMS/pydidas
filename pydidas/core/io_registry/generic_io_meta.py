@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GenericIoMeta']
+__all__ = ["GenericIoMeta"]
 
 import os
 
@@ -33,6 +33,7 @@ class GenericIoMeta(type):
     Metaclass for a class registry which holds associated classes for
     different file extension.
     """
+
     registry = {}
 
     def __new__(cls, clsname, bases, attrs):
@@ -56,8 +57,7 @@ class GenericIoMeta(type):
         type
             The new class.
         """
-        _new_class = super(GenericIoMeta, cls).__new__(
-            cls, clsname, bases, attrs)
+        _new_class = super(GenericIoMeta, cls).__new__(cls, clsname, bases, attrs)
         cls.register_class(_new_class)
         return _new_class
 
@@ -89,8 +89,10 @@ class GenericIoMeta(type):
         """
         for _ext in new_class.extensions:
             if _ext in cls.registry and not update_registry:
-                raise KeyError('A class has already been registered for the '
-                               f'extension "{_ext}."')
+                raise KeyError(
+                    "A class has already been registered for the "
+                    f'extension "{_ext}."'
+                )
             cls.registry[_ext] = new_class
 
     @classmethod
@@ -109,8 +111,9 @@ class GenericIoMeta(type):
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext):
-            raise KeyError(f'The extension "{ext}" is not registered with '
-                           'the MetaClass.')
+            raise KeyError(
+                f'The extension "{ext}" is not registered with ' "the MetaClass."
+            )
 
     @classmethod
     def is_extension_registered(cls, extension):
@@ -148,10 +151,10 @@ class GenericIoMeta(type):
         """
         _formats = cls.get_registered_formats()
         _extensions = list(cls.registry.keys())
-        _all = ([f'All supported files (*{" *".join(_extensions)})']
-                + [f'{name} (*{" *".join(formats)})'
-                   for name, formats in _formats.items()])
-        return ';;'.join(_all)
+        _all = [f'All supported files (*{" *".join(_extensions)})'] + [
+            f'{name} (*{" *".join(formats)})' for name, formats in _formats.items()
+        ]
+        return ";;".join(_all)
 
     @classmethod
     def get_registered_formats(cls):
@@ -164,8 +167,7 @@ class GenericIoMeta(type):
         dict
             A dictionary with <format name> : <extensions> entries.
         """
-        _formats = {_cls.format_name: _cls.extensions
-                    for _cls in cls.registry.values()}
+        _formats = {_cls.format_name: _cls.extensions for _cls in cls.registry.values()}
         return _formats
 
     @classmethod

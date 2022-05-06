@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with a dialogue to compose an email with feedback or a bug report in 
+Module with a dialogue to compose an email with feedback or a bug report in
 pydidas.
 """
 
@@ -23,8 +23,9 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SMTP']
+__all__ = []
 
 
 # TO DO: Implement using QDesktopServices
-#QDesktopServices::openUrl(QUrl("mailto:" + to + "?subject=" + subject + "&body=" + body, QUrl::TolerantMode));
+# QDesktopServices::openUrl(QUrl("mailto:" + to + "?subject=" + subject +
+# "&body=" + body, QUrl::TolerantMode));

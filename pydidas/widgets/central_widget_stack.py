@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['CentralWidgetStack']
+__all__ = ["CentralWidgetStack"]
 
 from qtpy import QtWidgets
 
@@ -79,9 +79,11 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             to prevent duplicate entries in the index reference.
         """
         if ref_name in self.widget_indices:
-            raise KeyError(f'A widget with the name "{ref_name}" has already '
-                           'been registered with the CentralWidgetStack. '
-                           'The new widget has not been registered.')
+            raise KeyError(
+                f'A widget with the name "{ref_name}" has already '
+                "been registered with the CentralWidgetStack. "
+                "The new widget has not been registered."
+            )
         index = super().addWidget(widget)
         widget.frame_index = index
         self.currentChanged.connect(widget.frame_activated)
@@ -133,8 +135,9 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             The widget referenced by the name.
         """
         if ref_name not in self.widget_indices:
-            raise KeyError(f'No widget with the name "{ref_name}" has been'
-                           ' registered.')
+            raise KeyError(
+                f'No widget with the name "{ref_name}" has been' " registered."
+            )
         return self.widget(self.widget_indices[ref_name])
 
     def get_all_widget_names(self):
@@ -163,8 +166,10 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             If no widget with the name has been registered.
         """
         if ref_name not in self.widget_indices:
-            raise KeyError(f'No widget with the name "{ref_name}" has been'
-                           ' registered with the CENTRAL_WIDGET_STACK.')
+            raise KeyError(
+                f'No widget with the name "{ref_name}" has been'
+                " registered with the CENTRAL_WIDGET_STACK."
+            )
         index = self.widget_indices[ref_name]
         self.setCurrentIndex(index)
 
@@ -188,11 +193,11 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             If the reference name has not been used for registering a widget.
         """
         if ref_name not in self.widget_indices:
-            raise KeyError(f'No widget width the name "{ref_name}" has been '
-                           'registered.')
+            raise KeyError(
+                f'No widget width the name "{ref_name}" has been ' "registered."
+            )
         _widget = self.widgets[self.widget_indices[ref_name]]
         self.removeWidget(_widget)
-
 
     def addWidget(self, widget=None, name=None):
         """
@@ -207,7 +212,8 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             Reference to the register_widget method is given.
         """
         raise NotImplementedError(
-            'Please use the "register_widget(name, widget)" method.')
+            'Please use the "register_widget(name, widget)" method.'
+        )
 
     def removeWidget(self, widget):
         """

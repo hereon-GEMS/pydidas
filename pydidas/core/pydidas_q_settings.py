@@ -23,14 +23,14 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PydidasQsettings']
+__all__ = ["PydidasQsettings"]
 
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class PydidasQsettings(PydidasQsettingsMixin):
-    """
-    """
+    """ """
+
     def __init__(self):
         super().__init__()
 
@@ -40,7 +40,7 @@ class PydidasQsettings(PydidasQsettingsMixin):
         """
         _sets = self.get_all_stored_q_settings()
         for _key, _val in _sets.items():
-            print(f'{_key}: {_val}')
+            print(f"{_key}: {_val}")
 
     def get_all_stored_q_settings(self):
         """

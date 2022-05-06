@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ObjectWithParameterCollection']
+__all__ = ["ObjectWithParameterCollection"]
 
 import warnings
 from copy import copy
@@ -36,7 +36,8 @@ from .parameter_collection_mixin import ParameterCollectionMixIn
 
 
 class ObjectWithParameterCollection(
-        ParameterCollectionMixIn, PydidasQsettingsMixin, QtCore.QObject):
+    ParameterCollectionMixIn, PydidasQsettingsMixin, QtCore.QObject
+):
     """
     An object with a ParameterCollection.
 
@@ -44,6 +45,7 @@ class ObjectWithParameterCollection(
     ParameterCollection and access methods defined for it in the
     ParameterCollectionMixIn.
     """
+
     def __init__(self):
         PydidasQsettingsMixin.__init__(self)
         QtCore.QObject.__init__(self)
@@ -73,8 +75,9 @@ class ObjectWithParameterCollection(
         state : dict
             The state dictionary.
         """
-        _state = {'params': self.params.get_copy(),
-                  '_config': copy(self._config)}
+        _state = {"params": self.params.get_copy(), "_config": copy(self._config)}
+        if "shared_memory" in _state["_config"]:
+            _state["_config"]["shared_memory"] = {}
         return _state
 
     def __setstate__(self, state):

@@ -54,23 +54,21 @@ class TestCheckBox(QtWidgets.QCheckBox):
 
 
 class TestHdf5DatasetSelector(unittest.TestCase):
-
     def setUp(self):
         self.q_app = QtWidgets.QApplication([])
         self.widgets = []
         self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, 'test.h5')
+        self._fname = os.path.join(self._path, "test.h5")
         self.data1d = np.random.random((20))
         self.data2d = np.random.random((20, 20))
         self.data3d = np.random.random((20, 20, 20))
-        with h5py.File(self._fname, 'w') as _file:
-            _file.create_group('test')
-            _file['test'].create_group('test2')
-            _file['test/test2'].create_dataset('data1', data=self.data1d)
-            _file['test/test2'].create_dataset('data2', data=self.data2d)
-            _file['test/test2'].create_dataset('data3', data=self.data3d)
-        self._dsets = ['/test/test2/data1', '/test/test2/data2',
-                       '/test/test2/data3']
+        with h5py.File(self._fname, "w") as _file:
+            _file.create_group("test")
+            _file["test"].create_group("test2")
+            _file["test/test2"].create_dataset("data1", data=self.data1d)
+            _file["test/test2"].create_dataset("data2", data=self.data2d)
+            _file["test/test2"].create_dataset("data3", data=self.data3d)
+        self._dsets = ["/test/test2/data1", "/test/test2/data2", "/test/test2/data3"]
 
     def tearDown(self):
         self.q_app.deleteLater()
@@ -82,7 +80,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj = Hdf5DatasetSelector()
         self.assertIsInstance(obj, Hdf5DatasetSelector)
         self.assertIsNone(obj._frame)
-        self.assertEqual(obj._config['activeDsetFilters'], [])
+        self.assertEqual(obj._config["activeDsetFilters"], [])
 
     def test_register_view_widget_no_widget(self):
         obj = Hdf5DatasetSelector()
@@ -100,94 +98,94 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj = Hdf5DatasetSelector()
         _widget = TestWidgetWithSetData()
         obj.register_view_widget(_widget)
-        self.assertEqual(obj._widgets['viewer'], _widget)
+        self.assertEqual(obj._widgets["viewer"], _widget)
 
     def test_toggle_filter_key_nothing_happens(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
-        obj._toggle_filter_key(widget, 'test')
-        self.assertEqual(obj._config['activeDsetFilters'], [])
+        obj._toggle_filter_key(widget, "test")
+        self.assertEqual(obj._config["activeDsetFilters"], [])
 
     def test_toggle_filter_key_remove_key(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
-        obj._config['activeDsetFilters'] = ['test']
-        obj._toggle_filter_key(widget, 'test')
-        self.assertEqual(obj._config['activeDsetFilters'], [])
+        obj._config["activeDsetFilters"] = ["test"]
+        obj._toggle_filter_key(widget, "test")
+        self.assertEqual(obj._config["activeDsetFilters"], [])
 
     def test_toggle_filter_key_add_key(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
         widget.setChecked(True)
-        obj._toggle_filter_key(widget, 'test')
-        self.assertEqual(obj._config['activeDsetFilters'], ['test'])
+        obj._toggle_filter_key(widget, "test")
+        self.assertEqual(obj._config["activeDsetFilters"], ["test"])
 
     def test_toggle_filter_key_key_already_in_list(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
-        obj._config['activeDsetFilters'] = ['test']
+        obj._config["activeDsetFilters"] = ["test"]
         widget.setChecked(True)
-        obj._toggle_filter_key(widget, 'test')
-        self.assertEqual(obj._config['activeDsetFilters'], ['test'])
+        obj._toggle_filter_key(widget, "test")
+        self.assertEqual(obj._config["activeDsetFilters"], ["test"])
 
     def test_populate_dataset_list_no_limit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['min_datasize'].setValue(0)
-        obj._widgets['min_datadim'].setValue(0)
-        _widget = obj._widgets['select_dataset']
+        obj._widgets["min_datasize"].setValue(0)
+        obj._widgets["min_datadim"].setValue(0)
+        _widget = obj._widgets["select_dataset"]
         _items = [_widget.itemText(i) for i in range(_widget.count())]
         self.assertEqual(_items, self._dsets)
 
     def test_populate_dataset_list_limit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['min_datasize'].setValue(50)
-        obj._widgets['min_datadim'].setValue(0)
-        _widget = obj._widgets['select_dataset']
+        obj._widgets["min_datasize"].setValue(50)
+        obj._widgets["min_datadim"].setValue(0)
+        _widget = obj._widgets["select_dataset"]
         _items = [_widget.itemText(i) for i in range(_widget.count())]
-        self.assertEqual(_items, ['/test/test2/data2', '/test/test2/data3'])
+        self.assertEqual(_items, ["/test/test2/data2", "/test/test2/data3"])
 
     def test_populate_dataset_list_dimlimit(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['min_datasize'].setValue(0)
-        obj._widgets['min_datadim'].setValue(2)
-        _widget = obj._widgets['select_dataset']
+        obj._widgets["min_datasize"].setValue(0)
+        obj._widgets["min_datadim"].setValue(2)
+        _widget = obj._widgets["select_dataset"]
         _items = [_widget.itemText(i) for i in range(_widget.count())]
-        self.assertEqual(_items, ['/test/test2/data2', '/test/test2/data3'])
+        self.assertEqual(_items, ["/test/test2/data2", "/test/test2/data3"])
 
     def test_get_frame_3d(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['select_dataset'].setCurrentIndex(1)
+        obj._widgets["select_dataset"].setCurrentIndex(1)
         obj._Hdf5DatasetSelector__get_frame()
         self.assertTrue(np.allclose(self.data3d[0], obj._frame))
 
     def test_get_frame_2d(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['select_dataset'].setCurrentIndex(0)
+        obj._widgets["select_dataset"].setCurrentIndex(0)
         obj._Hdf5DatasetSelector__get_frame()
         self.assertTrue(np.allclose(self.data2d, obj._frame))
 
     def test_toggle_auto_update_false(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['auto_update'].setChecked(False)
+        obj._widgets["auto_update"].setChecked(False)
         obj._toggle_auto_update()
-        self.assertFalse(obj.flags['autoUpdate'])
+        self.assertFalse(obj.flags["autoUpdate"])
 
     def test_toggle_auto_update_true(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        obj._widgets['auto_update'].setChecked(True)
+        obj._widgets["auto_update"].setChecked(True)
         obj._toggle_auto_update()
-        self.assertTrue(obj.flags['autoUpdate'])
+        self.assertTrue(obj.flags["autoUpdate"])
 
     def test_enable_signal_slot_enable(self):
         obj = Hdf5DatasetSelector()

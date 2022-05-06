@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['BaseFrameWithApp']
+__all__ = ["BaseFrameWithApp"]
 
 from qtpy import QtCore
 
@@ -52,10 +52,11 @@ class BaseFrameWithApp(BaseFrame):
         If False, no layout will be initialized and the subclass is
         responsible for setting up the layout. The default is True.
     """
+
     status_msg = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
-        init_layout = kwargs.get('init_layout', True)
+        init_layout = kwargs.get("init_layout", True)
         BaseFrame.__init__(self, parent=parent, init_layout=init_layout)
         self._app = None
         self._runner = None
@@ -72,14 +73,13 @@ class BaseFrameWithApp(BaseFrame):
             Any App instance.
         """
         if not isinstance(app, BaseApp):
-            raise TypeError('The passed object must be a BaseApp instance.')
+            raise TypeError("The passed object must be a BaseApp instance.")
         if not isinstance(self._app, BaseApp):
             self._app = app.get_copy()
             self._app.slave_mode = False
             return
         for param_key in app.params:
-            self._app.set_param_value(
-                param_key, app.get_param_value(param_key))
+            self._app.set_param_value(param_key, app.get_param_value(param_key))
         self._app._config.update(app._config)
         for att in self._app_attributes_to_update:
             _att_val = getattr(app, att)
@@ -95,9 +95,9 @@ class BaseFrameWithApp(BaseFrame):
         progress : float
             The progress, given as numbers 0..1
         """
-        if 'progress' in self._widgets:
+        if "progress" in self._widgets:
             _progress = round(progress * 100)
-            self._widgets['progress'].setValue(_progress)
+            self._widgets["progress"].setValue(_progress)
 
     @QtCore.Slot()
     def _apprunner_finished(self):
@@ -122,11 +122,12 @@ class BaseFrameWithApp(BaseFrame):
             frame's state.
         """
         _index, _state = super().export_state()
-        _app_params = self._app.get_param_values_as_dict(
-            filter_types_for_export=True)
-        _app_state = {'params': _app_params,
-                      'config': self.__get_app_config_for_saving()}
-        _state['app'] = _app_state
+        _app_params = self._app.get_param_values_as_dict(filter_types_for_export=True)
+        _app_state = {
+            "params": _app_params,
+            "config": self.__get_app_config_for_saving(),
+        }
+        _state["app"] = _app_state
         return _index, _state
 
     def __get_app_config_for_saving(self):
@@ -145,9 +146,12 @@ class BaseFrameWithApp(BaseFrame):
         _newcfg = {}
         for _key, _item in _cfg.items():
             if isinstance(_item, range):
-                _newcfg[_key] = (f'::range::{_item.start}::{_item.stop}'
-                                 f'::{_item.step}')
+                _newcfg[_key] = (
+                    f"::range::{_item.start}::{_item.stop}" f"::{_item.step}"
+                )
         _cfg.update(_newcfg)
+        if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
+            _cfg["shared_memory"] = "::restore::True"
         return _cfg
 
     def restore_state(self, state):
@@ -163,10 +167,18 @@ class BaseFrameWithApp(BaseFrame):
             A dictionary with 'params', 'app' and 'visibility' keys and the
             respective information for all.
         """
-        for _key, _val in state['app']['params'].items():
+        for _key, _val in state["app"]["params"].items():
             self._app.set_param_value(_key, _val)
-        self._app._config = self.__process_app_config_from_import(
-            state['app']['config'].copy())
+        _restored_cfg = self.__process_app_config_from_import(
+            state["app"]["config"].copy()
+        )
+        self._app._config = _restored_cfg
+        if (
+            "shared_memory" in _restored_cfg
+            and _restored_cfg["shared_memory"] == "::restore::True"
+        ):
+            self._app._config["shared_memory"] = {}
+            self._app.initialize_shared_memory()
         super().restore_state(state)
 
     def __process_app_config_from_import(self, config):
@@ -186,11 +198,11 @@ class BaseFrameWithApp(BaseFrame):
         """
         _newcfg = {}
         for _key, _item in config.items():
-            if isinstance(_item, str) and _item.startswith('::range::'):
-                _, _, _start, _stop, _step = _item.split('::')
-                _start = None if _start == 'None' else int(_start)
-                _stop = None if _stop == 'None' else int(_stop)
-                _step = None if _step == 'None' else int(_step)
+            if isinstance(_item, str) and _item.startswith("::range::"):
+                _, _, _start, _stop, _step = _item.split("::")
+                _start = None if _start == "None" else int(_start)
+                _stop = None if _stop == "None" else int(_stop)
+                _step = None if _step == "None" else int(_step)
                 _newcfg[_key] = range(_start, _stop, _step)
         config.update(_newcfg)
         return config

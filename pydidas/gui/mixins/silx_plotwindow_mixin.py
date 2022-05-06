@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SilxPlotWindowMixIn']
+__all__ = ["SilxPlotWindowMixIn"]
 
 import warnings
 
@@ -43,6 +43,7 @@ class SilxPlotWindowMixIn:
     class._widgets['PlotWindow']. Due to the different layouts, this MixIn
     does *not* create the PlotWindow instance.
     """
+
     def __init__(self):
         """
         Create the required dictionary.
@@ -64,11 +65,11 @@ class SilxPlotWindowMixIn:
         yrange_target : tuple
             The target range of the data range in the format (y_min, y_max).
         """
-        self._plot_config['shape'] = shape
-        self._plot_config['xrange_target'] = xrange_target
-        self._plot_config['yrange_target'] = yrange_target
-        self._plot_config['scale'] = None
-        self._plot_config['origin'] = None
+        self._plot_config["shape"] = shape
+        self._plot_config["xrange_target"] = xrange_target
+        self._plot_config["yrange_target"] = yrange_target
+        self._plot_config["scale"] = None
+        self._plot_config["origin"] = None
         self._update_plot_origin_scale_aspect()
 
     def _update_plot_origin_scale_aspect(self):
@@ -76,8 +77,8 @@ class SilxPlotWindowMixIn:
         Update the plot settings to map the data shape to the demanded
         ranges.
         """
-        _scale = self._plot_config.get('scale', None)
-        _origin = self._plot_config.get('origin', None)
+        _scale = self._plot_config.get("scale", None)
+        _origin = self._plot_config.get("origin", None)
         if _origin is None:
             self._update_plot_origin()
         if _scale is None:
@@ -88,23 +89,29 @@ class SilxPlotWindowMixIn:
         """
         Update the plot's origin based on the axes range and store the value.
         """
-        _origin = (self._plot_config['xrange_target'][0],
-                   self._plot_config['yrange_target'][0])
-        self._plot_config['origin'] = _origin
+        _origin = (
+            self._plot_config["xrange_target"][0],
+            self._plot_config["yrange_target"][0],
+        )
+        self._plot_config["origin"] = _origin
 
     def _update_plot_scale(self):
         """
         Update the plot's scale based on the axes range and data shape
         and store the value.
         """
-        _dx = (self._plot_config['xrange_target'][1]
-               - self._plot_config['xrange_target'][0])
-        _dy = (self._plot_config['yrange_target'][1]
-               - self._plot_config['yrange_target'][0])
-        _scalex = _dx / self._plot_config['shape'][1]
-        _scaley = _dy / self._plot_config['shape'][0]
+        _dx = (
+            self._plot_config["xrange_target"][1]
+            - self._plot_config["xrange_target"][0]
+        )
+        _dy = (
+            self._plot_config["yrange_target"][1]
+            - self._plot_config["yrange_target"][0]
+        )
+        _scalex = _dx / self._plot_config["shape"][1]
+        _scaley = _dy / self._plot_config["shape"][0]
         _scale = (_scalex, _scaley)
-        self._plot_config['scale'] = _scale
+        self._plot_config["scale"] = _scale
 
     def __update_plot_aspect(self):
         """
@@ -119,27 +126,32 @@ class SilxPlotWindowMixIn:
         Warning
             If backend is not BackendMatplotlibQt.
         """
-        _aspect = (self._plot_config['scale'][0]
-                   / self._plot_config['scale'][1])
-        self._plot_config['aspect'] = _aspect
-        _backend = self._widgets['plot_window'].getBackend()
+        _aspect = self._plot_config["scale"][0] / self._plot_config["scale"][1]
+        self._plot_config["aspect"] = _aspect
+        _backend = self._widgets["plot_window"].getBackend()
         if not isinstance(_backend, BackendMatplotlibQt):
-            warnings.warn('Backend is not Matplotlib QT backend. Image '
-                          'aspects will not be equal.', TypeError)
+            warnings.warn(
+                "Backend is not Matplotlib QT backend. Image "
+                "aspects will not be equal.",
+                TypeError,
+            )
             return
         _old_aspect = _backend.ax.get_aspect()
         if _aspect != _old_aspect:
-            self._widgets['plot_window'].addImage(
-                np.zeros((10, 10)), legend='pydidas/silx.PlotWindow')
+            self._widgets["plot_window"].addImage(
+                np.zeros((10, 10)), legend="pydidas/silx.PlotWindow"
+            )
             _backend.ax.set_aspect(_aspect)
 
     def show_image_in_plot(self, image):
         """
         Show the composite image in the Viewwer.
         """
-        self._widgets['plot_window'].setVisible(True)
-        self._widgets['plot_window'].addImage(
-            image, replace=True,
-            origin=self._plot_config['origin'],
-            scale=self._plot_config['scale'],
-            legend='pydidas/silx.PlotWindow')
+        self._widgets["plot_window"].setVisible(True)
+        self._widgets["plot_window"].addImage(
+            image,
+            replace=True,
+            origin=self._plot_config["origin"],
+            scale=self._plot_config["scale"],
+            legend="pydidas/silx.PlotWindow",
+        )

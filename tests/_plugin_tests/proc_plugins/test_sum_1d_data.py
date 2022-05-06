@@ -34,7 +34,6 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestSum1dData(unittest.TestCase):
-
     def setUp(self):
         self._n = 120
         self._data = np.arange(self._n)
@@ -48,21 +47,21 @@ class TestSum1dData(unittest.TestCase):
         return _data
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         plugin.pre_execute()
         # assert does not raise an Error
 
     def test_get_index_range__w_indices(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
-        plugin.set_param_value('lower_limit', _low)
-        plugin.set_param_value('upper_limit', _high)
-        plugin.set_param_value('type_selection', 'Indices')
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
@@ -70,12 +69,12 @@ class TestSum1dData(unittest.TestCase):
     def test_get_index_range__w_data(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('lower_limit', self._x[_low])
-        plugin.set_param_value('upper_limit', self._x[_high])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("lower_limit", self._x[_low])
+        plugin.set_param_value("upper_limit", self._x[_high])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
@@ -83,24 +82,24 @@ class TestSum1dData(unittest.TestCase):
     def test_get_index_range__w_empty_range(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('lower_limit', self._x[_high])
-        plugin.set_param_value('upper_limit', self._x[_low])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("lower_limit", self._x[_high])
+        plugin.set_param_value("upper_limit", self._x[_low])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range, slice(0, 0))
 
     def test_get_index_range__w_sinple_point_range(self):
         _low = 42
         _high = 42
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('lower_limit', self._x[_high])
-        plugin.set_param_value('upper_limit', self._x[_low])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("lower_limit", self._x[_high])
+        plugin.set_param_value("upper_limit", self._x[_low])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _low + 1)
@@ -108,32 +107,35 @@ class TestSum1dData(unittest.TestCase):
     def test_execute__empty_selection(self):
         _low = 42
         _high = 40
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
-        plugin.set_param_value('lower_limit', _low)
-        plugin.set_param_value('upper_limit', _high)
-        plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
         self.assertEqual(_data[0], 0)
 
     def test_execute__sinlge_item_selection(self):
         _low = 42
         _high = 42
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
-        plugin.set_param_value('lower_limit', _low)
-        plugin.set_param_value('upper_limit', _high)
-        plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
         self.assertTrue(_data[0], self._data[_low])
 
     def test_execute__range(self):
         _low = 42
         _high = 47
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Sum1dData')()
-        plugin.set_param_value('lower_limit', _low)
-        plugin.set_param_value('upper_limit', _high)
-        plugin.set_param_value('type_selection', 'Indices')
-        _data, _ = plugin.execute(self._data)
-        self.assertTrue(_data[0], np.sum(self._data[_low:_high+1]))
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
+        self.assertTrue(_data[0], np.sum(self._data[_low : _high + 1]))
 
 
 if __name__ == "__main__":

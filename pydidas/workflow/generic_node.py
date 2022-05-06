@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GenericNode']
+__all__ = ["GenericNode"]
 
 import copy
 from numbers import Integral
@@ -34,6 +34,7 @@ class GenericNode:
     The GenericNode class is used by trees to manage connections between
     items.
     """
+
     kwargs_for_copy_creation = []
 
     @staticmethod
@@ -56,8 +57,10 @@ class GenericNode:
         if allowNone and item is None:
             return
         if not isinstance(item, GenericNode):
-            raise TypeError('Cannot add objects which are not of type '
-                            'GenericNode (or subclasses).')
+            raise TypeError(
+                "Cannot add objects which are not of type "
+                "GenericNode (or subclasses)."
+            )
 
     def __init__(self, **kwargs):
         """
@@ -126,8 +129,9 @@ class GenericNode:
         if new_id is None or isinstance(new_id, Integral):
             self._node_id = new_id
             return
-        raise TypeError('The new node_id is not of a correct type and has not'
-                        ' been set.')
+        raise TypeError(
+            "The new node_id is not of a correct type and has not" " been set."
+        )
 
     @property
     def parent_id(self):
@@ -281,8 +285,9 @@ class GenericNode:
             separated from the tree structure.
         """
         if not self.is_leaf and not recursive:
-            raise RecursionError('Node children detected but deletion'
-                                 'is not recursive.')
+            raise RecursionError(
+                "Node children detected but deletion" "is not recursive."
+            )
         if self.parent is not None:
             self.parent.remove_child_reference(self)
         for child in self._children:
@@ -309,7 +314,7 @@ class GenericNode:
             If the referenced child is not included in the node's children.
         """
         if child not in self._children:
-            raise ValueError('Instance is not a child!')
+            raise ValueError("Instance is not a child!")
         self._children.remove(child)
 
     def get_copy(self):
@@ -332,10 +337,9 @@ class GenericNode:
         GenericNode
             The copy.
         """
-        kwargs = {arg: getattr(self, arg)
-                  for arg in self.kwargs_for_copy_creation}
+        kwargs = {arg: getattr(self, arg) for arg in self.kwargs_for_copy_creation}
         _copy = self.__class__(**kwargs)
-        for _key in set(self.__dict__.keys()) - {'_children', '_parent'}:
+        for _key in set(self.__dict__.keys()) - {"_children", "_parent"}:
             _copy.__dict__[_key] = copy.copy(self.__dict__[_key])
         _copy._children = []
         _copy._parent = self.parent
@@ -357,5 +361,6 @@ class GenericNode:
         int
             The hash value.
         """
-        return hash((hash(len(self._children)), hash(self._parent),
-                     hash(self._node_id)))
+        return hash(
+            (hash(len(self._children)), hash(self._parent), hash(self._node_id))
+        )

@@ -28,7 +28,6 @@ from pydidas.core.utils.format_arguments_ import format_arguments
 
 
 class Test_format_arguments(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -36,19 +35,34 @@ class Test_format_arguments(unittest.TestCase):
         ...
 
     def test_format_arguments_only_args(self):
-        _args = format_arguments('--test', ' a = 1', 'b=2')
-        self.assertEqual(_args, ['--test', '-a', '1', '-b', '2'])
+        _args = format_arguments("--test", " a = 1", "b=2")
+        self.assertEqual(_args, ["--test", "-a", "1", "-b", "2"])
 
     def test_format_arguments_only_kwargs(self):
-        _args = format_arguments(bool_test=True, c=3, s='string', f=6.6)
-        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
-                                 '-f', '6.6'])
+        _args = format_arguments(bool_test=True, c=3, s="string", f=6.6)
+        self.assertEqual(_args, ["--bool_test", "-c", "3", "-s", "string", "-f", "6.6"])
 
     def test_format_arguments_mixed(self):
-        _args = format_arguments('--test', ' a = 1', 'b=2',
-                                 bool_test=True, c=3, s='string', f=6.6)
-        self.assertEqual(_args, ['--bool_test', '-c', '3', '-s', 'string',
-                                 '-f', '6.6', '--test', '-a', '1', '-b', '2'])
+        _args = format_arguments(
+            "--test", " a = 1", "b=2", bool_test=True, c=3, s="string", f=6.6
+        )
+        self.assertEqual(
+            _args,
+            [
+                "--bool_test",
+                "-c",
+                "3",
+                "-s",
+                "string",
+                "-f",
+                "6.6",
+                "--test",
+                "-a",
+                "1",
+                "-b",
+                "2",
+            ],
+        )
 
 
 if __name__ == "__main__":

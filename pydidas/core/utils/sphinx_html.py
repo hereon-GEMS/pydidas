@@ -24,14 +24,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['check_sphinx_html_docs', 'run_sphinx_html_build']
+__all__ = ["check_sphinx_html_docs", "run_sphinx_html_build"]
 
 import os
 import sys
 import subprocess
 
-from .get_documentation_targets import (get_doc_make_directory,
-                                        get_doc_home_filename)
+from .get_documentation_targets import get_doc_make_directory, get_doc_home_filename
 
 
 def check_sphinx_html_docs(doc_dir=None):
@@ -54,11 +53,11 @@ def check_sphinx_html_docs(doc_dir=None):
         it will return a False which can trigger a call to build the
         documentation.
     """
-    _sphinx_running = 'sphinx-build' in sys.argv[0]
+    _sphinx_running = "sphinx-build" in sys.argv[0]
     if doc_dir is None:
         _index_file = get_doc_home_filename()
     else:
-        _index_file = os.path.join(doc_dir, 'index.html')
+        _index_file = os.path.join(doc_dir, "index.html")
     if not os.path.exists(_index_file) and not _sphinx_running:
         return False
     return True
@@ -79,15 +78,15 @@ def run_sphinx_html_build(build_dir=None, verbose=True):
     if build_dir is None:
         build_dir = get_doc_make_directory()
     if verbose:
-        print('=' * 60)
-        print('-' * 60)
-        print('----- The html documentation has not yet been created! -----')
-        print('----- Running sphinx-build. This may take a bit.       -----')
-        print('----- pydidas will automatically load once building of -----')
-        print('----- the documentation has been finished.             -----')
-        print('-' * 60)
-        print('=' * 60)
-    if sys.platform in ['win32', 'win64']:
-        subprocess.call([os.path.join(build_dir, 'make.bat'), 'html'])
+        print("=" * 60)
+        print("-" * 60)
+        print("----- The html documentation has not yet been created! -----")
+        print("----- Running sphinx-build. This may take a bit.       -----")
+        print("----- pydidas will automatically load once building of -----")
+        print("----- the documentation has been finished.             -----")
+        print("-" * 60)
+        print("=" * 60)
+    if sys.platform in ["win32", "win64"]:
+        subprocess.call([os.path.join(build_dir, "make.bat"), "html"])
     else:
-        subprocess.call(['make', '-C', build_dir, 'html'])
+        subprocess.call(["make", "-C", build_dir, "html"])

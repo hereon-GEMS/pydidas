@@ -23,14 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowEditFrameBuilder']
+__all__ = ["WorkflowEditFrameBuilder"]
 
 from qtpy import QtWidgets
 
 from ...widgets import ScrollArea, BaseFrame
 from ...widgets.parameter_config import PluginParameterEditWidget
-from ...widgets.workflow_edit import (WorkflowTreeCanvas,
-                                      PluginCollectionBrowser)
+from ...widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
 
 
 class WorkflowEditFrameBuilder(BaseFrame):
@@ -38,6 +37,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
     Mix-in class which includes the build_self method to populate the
     base class's UI and initialize all widgets.
     """
+
     def __init__(self, parent=None):
         BaseFrame.__init__(self, parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -46,21 +46,29 @@ class WorkflowEditFrameBuilder(BaseFrame):
         """
         Create all widgets and initialize their state.
         """
-        self._widgets['workflow_canvas'] = WorkflowTreeCanvas(self)
-        self._widgets['plugin_edit_canvas'] = PluginParameterEditWidget(
-            self)
+        self._widgets["workflow_canvas"] = WorkflowTreeCanvas(self)
+        self._widgets["plugin_edit_canvas"] = PluginParameterEditWidget(self)
         self.create_any_widget(
-            'workflow_area', ScrollArea, minimumHeight=500,
-            widget=self._widgets['workflow_canvas'], gridPos=(0, 0, 1, 1))
-        self.create_any_widget('plugin_collection', PluginCollectionBrowser,
-                               gridPos=(1, 0, 3, 1))
+            "workflow_area",
+            ScrollArea,
+            minimumHeight=500,
+            widget=self._widgets["workflow_canvas"],
+            gridPos=(0, 0, 1, 1),
+        )
         self.create_any_widget(
-            'plugin_edit_area', ScrollArea, minimumHeight=500,
-            widget=self._widgets['plugin_edit_canvas'], fixedWidth=400,
-            sizePolicy=(QtWidgets.QSizePolicy.Expanding,
-                        QtWidgets.QSizePolicy.Expanding),
-            gridPos=(0, 1, 2, 1))
-        self.create_button('but_load', 'Load workflow from file',
-                           gridPos=(2, 1, 1, 1))
-        self.create_button('but_save', 'Save workflow to file',
-                           gridPos=(3, 1, 1, 1))
+            "plugin_collection", PluginCollectionBrowser, gridPos=(1, 0, 3, 1)
+        )
+        self.create_any_widget(
+            "plugin_edit_area",
+            ScrollArea,
+            minimumHeight=500,
+            widget=self._widgets["plugin_edit_canvas"],
+            fixedWidth=400,
+            sizePolicy=(
+                QtWidgets.QSizePolicy.Expanding,
+                QtWidgets.QSizePolicy.Expanding,
+            ),
+            gridPos=(0, 1, 2, 1),
+        )
+        self.create_button("but_load", "Load workflow from file", gridPos=(2, 1, 1, 1))
+        self.create_button("but_save", "Save workflow to file", gridPos=(3, 1, 1, 1))

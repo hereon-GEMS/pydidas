@@ -29,7 +29,6 @@ from pydidas.unittest_objects import DummyPluginCollection
 
 
 class TestDummyPluginCollection(unittest.TestCase):
-
     def setUp(self):
         ...
 

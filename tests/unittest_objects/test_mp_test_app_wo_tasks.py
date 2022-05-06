@@ -30,7 +30,6 @@ from pydidas.core import BaseApp
 
 
 class TestMpTestAppWoTasks(unittest.TestCase):
-
     def setUp(self):
         self._indices = (3, 57)
 
@@ -44,7 +43,7 @@ class TestMpTestAppWoTasks(unittest.TestCase):
     def test_mp_pre_run(self):
         app = MpTestAppWoTasks()
         app.multiprocessing_pre_run()
-        self.assertTrue(app._config['mp_pre_run_called'])
+        self.assertTrue(app._config["mp_pre_run_called"])
 
     def test_mp_get_tasks(self):
         app = MpTestAppWoTasks()
@@ -54,8 +53,8 @@ class TestMpTestAppWoTasks(unittest.TestCase):
 
     def test_mp_func(self):
         app = MpTestAppWoTasks()
-        app._config['min_index'] = self._indices[0]
-        app._config['max_index'] = self._indices[1]
+        app._config["min_index"] = self._indices[0]
+        app._config["max_index"] = self._indices[1]
         app.multiprocessing_pre_run()
         _index, _image = app.multiprocessing_func(self._indices[0])
         self.assertIsInstance(_index, int)
@@ -64,12 +63,12 @@ class TestMpTestAppWoTasks(unittest.TestCase):
     def test_mp_post_run(self):
         app = MpTestAppWoTasks()
         app.multiprocessing_post_run()
-        self.assertTrue(app._config['mp_post_run_called'])
+        self.assertTrue(app._config["mp_post_run_called"])
 
     def test_mp_store_results(self):
         app = MpTestAppWoTasks()
-        app._config['min_index'] = self._indices[0]
-        app._config['max_index'] = self._indices[1]
+        app._config["min_index"] = self._indices[0]
+        app._config["max_index"] = self._indices[1]
         app.multiprocessing_pre_run()
         _index, _image = app.multiprocessing_func(self._indices[0])
         app.multiprocessing_store_results(self._indices[0], _image)

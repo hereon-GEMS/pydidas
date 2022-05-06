@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterEditFrame']
+__all__ = ["ParameterEditFrame"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -46,14 +46,14 @@ class ParameterEditFrame(QtWidgets.QFrame, ParameterWidgetsMixIn):
     **kwargs : dict
         Additional keyword arguments
     """
+
     def __init__(self, parent=None, **kwargs):
         QtWidgets.QFrame.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
-        init_layout = kwargs.get('init_layout', True)
-        kwargs['lineWidth'] = kwargs.get('lineWidth', 2)
-        kwargs['frameStyle'] = kwargs.get('frameStyle',
-                                          QtWidgets.QFrame.Raised)
-        kwargs['autoFillBackground'] = kwargs.get('autoFillBackground', True)
+        init_layout = kwargs.get("init_layout", True)
+        kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
+        kwargs["frameStyle"] = kwargs.get("frameStyle", QtWidgets.QFrame.Raised)
+        kwargs["autoFillBackground"] = kwargs.get("autoFillBackground", True)
         apply_widget_properties(self, **kwargs)
         if init_layout:
             _layout = QtWidgets.QGridLayout()

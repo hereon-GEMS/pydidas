@@ -22,16 +22,16 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['WorkflowTreeIoBase']
+__all__ = ["WorkflowTreeIoBase"]
 
 from ...core.io_registry import GenericIoBase
 from .workflow_tree_io_meta import WorkflowTreeIoMeta
 
 
-class WorkflowTreeIoBase(GenericIoBase,
-                         metaclass=WorkflowTreeIoMeta):
+class WorkflowTreeIoBase(GenericIoBase, metaclass=WorkflowTreeIoMeta):
     """
     Base class for WorkflowTree exporters.
     """
+
     extensions = []
-    format_name = 'unknown'
+    format_name = "unknown"

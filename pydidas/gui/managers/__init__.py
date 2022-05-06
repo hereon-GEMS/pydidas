@@ -31,5 +31,6 @@ from .workflow_tree_edit_manager import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import workflow_tree_edit_manager
+
 __all__.extend(workflow_tree_edit_manager.__all__)
 del workflow_tree_edit_manager

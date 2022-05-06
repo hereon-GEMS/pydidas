@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['app_processor']
+__all__ = ["app_processor"]
 
 import queue
 import random
@@ -36,12 +36,14 @@ from ..core.utils import pydidas_logger, LOGGING_LEVEL
 logger = pydidas_logger()
 logger.setLevel(LOGGING_LEVEL)
 
-NO_ITEM = ''.join(random.choice(string.ascii_letters + string.digits)
-                  for i in range(64))
+NO_ITEM = "".join(
+    random.choice(string.ascii_letters + string.digits) for i in range(64)
+)
 
 
-def app_processor(input_queue, output_queue, stop_queue, finished_queue,
-                  app, app_params, app_config):
+def app_processor(
+    input_queue, output_queue, stop_queue, finished_queue, app, app_params, app_config
+):
     """
     Start a loop to process function calls on individual frames.
 
@@ -71,13 +73,13 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
         dictionary.
     """
     _app_carryon = True
-    logger.debug('Started process')
-    logger.debug('app_config: %s', app_config)
+    logger.debug("Started process")
+    logger.debug("app_config: %s", app_config)
     _app = app(app_params, slave_mode=True)
-    logger.debug('Started app')
+    logger.debug("Started app")
     _app._config = app_config
     _app.multiprocessing_pre_run()
-    logger.debug('Starting processing')
+    logger.debug("Starting processing")
     while True:
         # check for stop signal
         try:
@@ -98,9 +100,9 @@ def app_processor(input_queue, output_queue, stop_queue, finished_queue,
             _app.multiprocessing_pre_cycle(_arg)
             _app_carryon = _app.multiprocessing_carryon()
             if _app_carryon:
-                logger.debug('Starting computation')
+                logger.debug("Starting computation")
                 _results = _app.multiprocessing_func(_arg)
-                logger.debug('Finished computation')
+                logger.debug("Finished computation")
                 output_queue.put([_arg, _results])
         time.sleep(0.01)
     finished_queue.put(1)

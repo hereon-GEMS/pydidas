@@ -28,7 +28,6 @@ from pydidas.core.io_registry import GenericIoMeta
 
 
 class TestGenericIoMeta(unittest.TestCase):
-
     def setUp(self):
         GenericIoMeta.clear_registry()
 
@@ -37,28 +36,30 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=GenericIoMeta):
-            extensions = ['.dummy', '.test']
-            format_name = 'TEST'
+            extensions = [".dummy", ".test"]
+            format_name = "TEST"
+
         self.test_class = TestClass()
 
     def create_test_class2(self):
         class TestClass2(metaclass=GenericIoMeta):
-            extensions = ['.test2']
-            format_name = 'Test2'
+            extensions = [".test2"]
+            format_name = "Test2"
+
         self.test_class2 = TestClass2()
 
     def get_unregistered_test_class(self):
-        class TestClass3():
-            extensions = ['.test3', '.test4']
-            format_name = 'Test3'
+        class TestClass3:
+            extensions = [".test3", ".test4"]
+            format_name = "Test3"
+
         return TestClass3
 
     def test_empty(self):
         self.assertEqual(GenericIoMeta.registry, dict())
 
     def test_get_registered_formats__empty(self):
-        self.assertEqual(
-            GenericIoMeta.get_registered_formats(), {})
+        self.assertEqual(GenericIoMeta.get_registered_formats(), {})
 
     def test_get_registered_formats__with_entry(self):
         self.create_test_class()
@@ -69,29 +70,26 @@ class TestGenericIoMeta(unittest.TestCase):
     def test_get_string_of_formats(self):
         self.create_test_class()
         _str = GenericIoMeta.get_string_of_formats()
-        _target = 'All supported files (*.dummy *.test);;TEST (*.dummy *.test)'
+        _target = "All supported files (*.dummy *.test);;TEST (*.dummy *.test)"
         self.assertEqual(_str, _target)
 
     def test_is_extension_registered__True(self):
         self.create_test_class()
-        self.assertTrue(
-            GenericIoMeta.is_extension_registered('.dummy'))
+        self.assertTrue(GenericIoMeta.is_extension_registered(".dummy"))
 
     def test_is_extension_registered__False(self):
         self.create_test_class()
-        self.assertFalse(
-            GenericIoMeta.is_extension_registered('none'))
+        self.assertFalse(GenericIoMeta.is_extension_registered("none"))
 
     def test_verify_extension_is_registered__correct(self):
         self.create_test_class()
-        GenericIoMeta.verify_extension_is_registered('.test')
+        GenericIoMeta.verify_extension_is_registered(".test")
         # assert does not raise an error
 
     def test_verify_extension_is_registered__incorrect(self):
         self.create_test_class()
         with self.assertRaises(KeyError):
-            GenericIoMeta.verify_extension_is_registered(
-                'none')
+            GenericIoMeta.verify_extension_is_registered("none")
 
     def test_new__method(self):
         self.assertEqual(GenericIoMeta.registry, dict())

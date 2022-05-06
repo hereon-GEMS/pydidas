@@ -34,7 +34,6 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestCrop1dData(unittest.TestCase):
-
     def setUp(self):
         self._n = 120
         self._data = np.arange(self._n)
@@ -48,21 +47,21 @@ class TestCrop1dData(unittest.TestCase):
         return _data
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_pre_execute(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
         plugin.pre_execute()
         # assert does not raise an Error
 
     def test_get_index_range__w_indices(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
-        plugin.set_param_value('crop_low', _low)
-        plugin.set_param_value('crop_high', _high)
-        plugin.set_param_value('type_selection', 'Indices')
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
+        plugin.set_param_value("crop_low", _low)
+        plugin.set_param_value("crop_high", _high)
+        plugin.set_param_value("type_selection", "Indices")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
@@ -70,12 +69,12 @@ class TestCrop1dData(unittest.TestCase):
     def test_get_index_range__w_data(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('crop_low', self._x[_low])
-        plugin.set_param_value('crop_high', self._x[_high])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("crop_low", self._x[_low])
+        plugin.set_param_value("crop_high", self._x[_high])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
@@ -83,24 +82,24 @@ class TestCrop1dData(unittest.TestCase):
     def test_get_index_range__w_empty_range(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('crop_low', self._x[_high])
-        plugin.set_param_value('crop_high', self._x[_low])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("crop_low", self._x[_high])
+        plugin.set_param_value("crop_high", self._x[_low])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range, slice(0, 0))
 
     def test_get_index_range__w_sinple_point_range(self):
         _low = 42
         _high = 42
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value('crop_low', self._x[_high])
-        plugin.set_param_value('crop_high', self._x[_low])
-        plugin.set_param_value('type_selection', 'Data values')
+        plugin.set_param_value("crop_low", self._x[_high])
+        plugin.set_param_value("crop_high", self._x[_low])
+        plugin.set_param_value("type_selection", "Data values")
         _range = plugin._get_index_range()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _low + 1)
@@ -108,12 +107,12 @@ class TestCrop1dData(unittest.TestCase):
     def test_execute(self):
         _low = 42
         _high = 87
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name('Crop1dData')()
-        plugin.set_param_value('crop_low', _low)
-        plugin.set_param_value('crop_high', _high)
-        plugin.set_param_value('type_selection', 'Indices')
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Crop1dData")()
+        plugin.set_param_value("crop_low", _low)
+        plugin.set_param_value("crop_high", _high)
+        plugin.set_param_value("type_selection", "Indices")
         _data, _ = plugin.execute(self._data)
-        self.assertTrue(np.allclose(_data, self._data[_low:_high + 1]))
+        self.assertTrue(np.allclose(_data, self._data[_low : _high + 1]))
 
 
 if __name__ == "__main__":

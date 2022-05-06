@@ -31,18 +31,21 @@ from . import factory
 from . import parameter_config
 from . import selection
 from . import workflow_edit
-__all__.extend(['dialogues', 'factory', 'parameter_config', 'selection', 'workflow_edit'])
+
+__all__.extend(
+    ["dialogues", "factory", "parameter_config", "selection", "workflow_edit"]
+)
 
 # explicitly import items from subpackages into the module:
 from .factory import CreateWidgetsMixIn
-__all__.extend(['CreateWidgetsMixIn'])
+
+__all__.extend(["CreateWidgetsMixIn"])
 
 # import __all__ items from modules:
 from .base_frame import *
 from .base_frame_with_app import *
 from .central_widget_stack import *
 from .info_widget import *
-from .pydidas_html_doc_view import *
 from .qta_button import *
 from .read_only_text_widget import *
 from .scroll_area import *
@@ -51,37 +54,41 @@ from .utilities import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import base_frame
+
 __all__.extend(base_frame.__all__)
 del base_frame
 
 from . import base_frame_with_app
+
 __all__.extend(base_frame_with_app.__all__)
 del base_frame_with_app
 
 from . import central_widget_stack
+
 __all__.extend(central_widget_stack.__all__)
 del central_widget_stack
 
 from . import info_widget
+
 __all__.extend(info_widget.__all__)
 del info_widget
 
-from . import pydidas_html_doc_view
-__all__.extend(pydidas_html_doc_view.__all__)
-del pydidas_html_doc_view
-
 from . import qta_button
+
 __all__.extend(qta_button.__all__)
 del qta_button
 
 from . import read_only_text_widget
+
 __all__.extend(read_only_text_widget.__all__)
 del read_only_text_widget
 
 from . import scroll_area
+
 __all__.extend(scroll_area.__all__)
 del scroll_area
 
 from . import utilities
+
 __all__.extend(utilities.__all__)
 del utilities

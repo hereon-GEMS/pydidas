@@ -29,15 +29,16 @@ import logging
 import pyFAI
 
 from pydidas.experiment.experimental_setup.experimental_setup import (
-    _ExpSetup, ExperimentalSetup)
+    _ExpSetup,
+    ExperimentalSetup,
+)
 
 
-logger = logging.getLogger('pyFAI.detectors._common')
+logger = logging.getLogger("pyFAI.detectors._common")
 logger.setLevel(logging.CRITICAL)
 
 
 class TestExperimentalSetup(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -49,33 +50,35 @@ class TestExperimentalSetup(unittest.TestCase):
         self.assertIsInstance(obj, _ExpSetup)
 
     def test_set_param_generic(self):
-        _name = 'Test'
+        _name = "Test"
         obj = ExperimentalSetup()
-        obj.set_param_value('detector_name', _name)
-        self.assertEqual(obj.get_param_value('detector_name'), _name)
+        obj.set_param_value("detector_name", _name)
+        self.assertEqual(obj.get_param_value("detector_name"), _name)
 
     def test_set_param_energy(self):
         _new_E = 15.7
         obj = ExperimentalSetup()
-        obj.set_param_value('xray_energy', _new_E)
-        self.assertEqual(obj.get_param_value('xray_energy'), _new_E)
-        self.assertAlmostEqual(obj.get_param_value('xray_wavelength'),
-                               0.7897080652951567, delta=0.00005)
+        obj.set_param_value("xray_energy", _new_E)
+        self.assertEqual(obj.get_param_value("xray_energy"), _new_E)
+        self.assertAlmostEqual(
+            obj.get_param_value("xray_wavelength"), 0.7897080652951567, delta=0.00005
+        )
 
     def test_set_param_wavelength(self):
         _new_lambda = 0.98765
         obj = ExperimentalSetup()
-        obj.set_param_value('xray_wavelength', _new_lambda)
-        self.assertEqual(obj.get_param_value('xray_wavelength'), _new_lambda)
-        self.assertAlmostEqual(obj.get_param_value('xray_energy'),
-                               12.55345175429956, delta=0.0005)
+        obj.set_param_value("xray_wavelength", _new_lambda)
+        self.assertEqual(obj.get_param_value("xray_wavelength"), _new_lambda)
+        self.assertAlmostEqual(
+            obj.get_param_value("xray_energy"), 12.55345175429956, delta=0.0005
+        )
 
     def test_get_detector__from_param_name(self):
         _shape = (1000, 1000)
         obj = ExperimentalSetup()
-        obj.set_param_value('detector_name', 'Eiger 9M')
-        obj.set_param_value('detector_npixy', _shape[0])
-        obj.set_param_value('detector_npixx', _shape[1])
+        obj.set_param_value("detector_name", "Eiger 9M")
+        obj.set_param_value("detector_npixy", _shape[0])
+        obj.set_param_value("detector_npixx", _shape[1])
         _det = obj.get_detector()
         self.assertIsInstance(_det, pyFAI.detectors.Detector)
         self.assertEqual(_det.max_shape, _shape)
@@ -84,11 +87,11 @@ class TestExperimentalSetup(unittest.TestCase):
         _shape = (1000, 1000)
         _pixelsize = 100
         obj = ExperimentalSetup()
-        obj.set_param_value('detector_name', 'No Eiger')
-        obj.set_param_value('detector_npixy', _shape[0])
-        obj.set_param_value('detector_npixx', _shape[1])
-        obj.set_param_value('detector_pxsizey', _pixelsize)
-        obj.set_param_value('detector_pxsizex', _pixelsize)
+        obj.set_param_value("detector_name", "No Eiger")
+        obj.set_param_value("detector_npixy", _shape[0])
+        obj.set_param_value("detector_npixx", _shape[1])
+        obj.set_param_value("detector_pxsizey", _pixelsize)
+        obj.set_param_value("detector_pxsizex", _pixelsize)
         _det = obj.get_detector()
         self.assertIsInstance(_det, pyFAI.detectors.Detector)
         self.assertEqual(_det.max_shape, _shape)
@@ -103,20 +106,17 @@ class TestExperimentalSetup(unittest.TestCase):
     def test_set_detector_params_from_name__wrong_name(self):
         obj = ExperimentalSetup()
         with self.assertRaises(NameError):
-            obj.set_detector_params_from_name('no such detector')
+            obj.set_detector_params_from_name("no such detector")
 
     def test_set_detector_params_from_name(self):
-        _det = {'name': 'Pilatus 300k', 'pixsize': 172, 'npixx' : 487,
-                'npixy': 619}
+        _det = {"name": "Pilatus 300k", "pixsize": 172, "npixx": 487, "npixy": 619}
         obj = ExperimentalSetup()
-        obj.set_detector_params_from_name(_det['name'])
-        self.assertEqual(obj.get_param_value('detector_name'), _det['name'])
-        self.assertEqual(obj.get_param_value('detector_pxsizex'),
-                         _det['pixsize'])
-        self.assertEqual(obj.get_param_value('detector_pxsizey'),
-                         _det['pixsize'])
-        self.assertEqual(obj.get_param_value('detector_npixy'), _det['npixy'])
-        self.assertEqual(obj.get_param_value('detector_npixx'), _det['npixx'])
+        obj.set_detector_params_from_name(_det["name"])
+        self.assertEqual(obj.get_param_value("detector_name"), _det["name"])
+        self.assertEqual(obj.get_param_value("detector_pxsizex"), _det["pixsize"])
+        self.assertEqual(obj.get_param_value("detector_pxsizey"), _det["pixsize"])
+        self.assertEqual(obj.get_param_value("detector_npixy"), _det["npixy"])
+        self.assertEqual(obj.get_param_value("detector_npixx"), _det["npixx"])
 
 
 if __name__ == "__main__":

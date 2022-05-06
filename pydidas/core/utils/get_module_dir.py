@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['get_pydidas_module_dir']
+__all__ = ["get_pydidas_module_dir"]
 
 import os
 
@@ -44,18 +44,19 @@ def get_pydidas_module_dir(path):
     str
         The path to the pydidas module.
     """
-    path = update_separators(os.path.dirname(path)
-                             if os.path.isfile(path) else path)
+    path = update_separators(os.path.dirname(path) if os.path.isfile(path) else path)
     if len(path) == 0:
-        raise IOError('No path given')
+        raise IOError("No path given")
     p = path.split(os.sep)
     while len(p) > 0:
         for i_pydidas in range(3):
-            _ptmp = p + ['pydidas'] * i_pydidas
+            _ptmp = p + ["pydidas"] * i_pydidas
             _tmppath = os.sep.join(_ptmp)
-            if (_ptmp[-1] == 'pydidas' and
-                    os.path.isfile(os.path.join(_tmppath, '__init__.py'))):
+            if _ptmp[-1] == "pydidas" and os.path.isfile(
+                os.path.join(_tmppath, "__init__.py")
+            ):
                 return os.path.dirname(_tmppath)
         p.pop(-1)
-    raise FileNotFoundError('Could not locate pydidas init file in path '
-                            f'"{path}" or subdirectories')
+    raise FileNotFoundError(
+        "Could not locate pydidas init file in path " f'"{path}" or subdirectories'
+    )

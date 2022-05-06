@@ -123,6 +123,7 @@ The calling parameter is the node ID of the particular Plugin corresponding to
 the results:
 
 .. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_results
+    :noindex:
 
 An example is given below:
 
@@ -183,6 +184,7 @@ method allows to get a Dataset with all the scan dimensions flattened to a
 single dimension renamed to *timeline*:
 
 .. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_results_for_flattened_scan
+    :noindex:
 
 An example is given below:
 
@@ -236,6 +238,7 @@ For convenience, a method to access only a subset of the data is implemented as
 well: 
 
 .. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_result_subset
+    :noindex:
 
 This method is interesing if the user wants to access a specific subset in the 
 flattened data, for example the results for the frames 40 to 55 of the 
@@ -295,6 +298,7 @@ method:
 
 .. automethod:: 
     pydidas.workflow.workflow_results._WorkflowResults.save_results_to_disk
+    :noindex:
 
 For now, the only available saver is 'HDF5' and additional savers will be added
 based on users' requests.

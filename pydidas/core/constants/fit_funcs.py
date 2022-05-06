@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GAUSSIAN', 'LORENTZIAN', 'PSEUDO_VOIGT']
+__all__ = ["GAUSSIAN", "LORENTZIAN", "PSEUDO_VOIGT"]
 
 
 import numpy as np
@@ -52,13 +52,16 @@ def GAUSSIAN(c, x, data, bg_order=None):
         The residual between the fit and the data.
     """
     if bg_order is None:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))) - data
+        return (c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2))) - data
     if bg_order == 0:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))
-                + c[3] - data)
+        return c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2)) + c[3] - data
     if bg_order == 1:
-        return (c[0] * np.exp(-(x - c[2]) ** 2 / (2. * c[1]** 2))
-                + c[3] + c[4] * x - data)
+        return (
+            c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2))
+            + c[3]
+            + c[4] * x
+            - data
+        )
 
 
 def LORENTZIAN(c, x, data, bg_order=None):
@@ -118,5 +121,6 @@ def PSEUDO_VOIGT(c, x, data, bg_order=None):
         The residual between the fit and the data.
      fit function with the following Parameters:
     """
-    return ((1 - c[0]) * GAUSSIAN(c[1:], x, data, bg_order)
-            + c[0] * LORENTZIAN(c[1:], x, data, bg_order))
+    return (1 - c[0]) * GAUSSIAN(c[1:], x, data, bg_order) + c[0] * LORENTZIAN(
+        c[1:], x, data, bg_order
+    )

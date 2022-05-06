@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['GlobalConfigurationFrame']
+__all__ = ["GlobalConfigurationFrame"]
 
 from functools import partial
 
@@ -31,19 +31,34 @@ from qtpy import QtWidgets, QtCore
 
 from ..core import get_generic_param_collection
 from ..core.constants import QSETTINGS_GLOBAL_KEYS
+from ..plugins import PluginCollection
 from .builders import GlobalConfigurationFrameBuilder
+
+
+PLUGINS = PluginCollection()
+
+
+@QtCore.Slot()
+def update_plugin_collection():
+    """
+    Update the plugin collection from the updated QSetting values for the
+    plugin directories.
+    """
+    PLUGINS.clear_collection(True)
+    PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_path())
 
 
 class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     """
     Frame which manages global configuration items.
     """
+
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
     value_changed_signal = QtCore.Signal(str, object)
 
     def __init__(self, **kwargs):
-        parent = kwargs.get('parent', None)
+        parent = kwargs.get("parent", None)
         GlobalConfigurationFrameBuilder.__init__(self, parent)
         self.set_default_params()
         self.build_frame()
@@ -56,8 +71,10 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         """
         for _param_key in self.params:
             self.param_widgets[_param_key].io_edited.connect(
-                partial(self.update_qsetting, _param_key))
-        self._widgets['but_reset'].clicked.connect(self.__reset)
+                partial(self.update_qsetting, _param_key)
+            )
+        self._widgets["but_reset"].clicked.connect(self.__reset)
+        self._widgets["but_plugins"].clicked.connect(update_plugin_collection)
 
     def update_qsetting(self, param_key, value):
         """
@@ -71,7 +88,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         value : object
             The new value.
         """
-        self.q_settings.setValue(f'global/{param_key}', value)
+        self.q_settings.setValue(f"global/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(int)
@@ -92,12 +109,13 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
             return
         for _param_key in self.params:
             _value = self.q_settings_get_global_value(_param_key)
-            self.update_param_value(_param_key, _value)
+            self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
         qm = QtWidgets.QMessageBox
-        answer = qm.question(self,'', "Are you sure to reset all the values?",
-                             qm.Yes | qm.No)
+        answer = qm.question(
+            self, "", "Are you sure to reset all the values?", qm.Yes | qm.No
+        )
         if answer == qm.Yes:
             self.restore_all_defaults(True)
             for _param_key in self.params:
@@ -118,4 +136,4 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
             The new value which was set externally.
         """
         value = self._qsettings_convert_value_type(param_key, value)
-        self.update_param_value(param_key, value)
+        self.set_param_value_and_widget(param_key, value)

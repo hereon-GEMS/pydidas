@@ -24,8 +24,12 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['configure_qtapp_namespace', 'get_pydidas_icon',
-           'update_qtapp_font_size', 'apply_tooltop_event_filter']
+__all__ = [
+    "configure_qtapp_namespace",
+    "get_pydidas_icon",
+    "update_qtapp_font_size",
+    "apply_tooltip_event_filter",
+]
 
 import os
 
@@ -57,8 +61,8 @@ def get_pydidas_icon():
     _path = __file__
     for _ in range(2):
         _path = os.path.dirname(_path)
-    _logopath = os.path.join(_path, 'icons', 'pydidas_logo.svg')
-    _icon= QtGui.QIcon(_logopath)
+    _logopath = os.path.join(_path, "icons", "pydidas_logo.svg")
+    _icon = QtGui.QIcon(_logopath)
     return _icon
 
 
@@ -110,10 +114,12 @@ def update_qtapp_font_size():
     _app.setFont(_font)
 
 
-def apply_tooltop_event_filter():
+def apply_tooltip_event_filter():
     """
     Apply the pydidas.core.utils.QTooltipEventFilter to the QApplication
     to force the desired handling of tooltip.
+
+    Without this filter
     """
     _app = QtWidgets.QApplication.instance()
     _app.installEventFilter(QTooltipEventFilter(_app))

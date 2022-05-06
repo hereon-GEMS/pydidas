@@ -28,8 +28,8 @@ import sys
 
 from pydidas.apps.parsers import composite_creator_app_parser
 
-class TestAppParsers(unittest.TestCase):
 
+class TestAppParsers(unittest.TestCase):
     def setUp(self):
         self._argv = copy.copy(sys.argv)
 
@@ -37,12 +37,19 @@ class TestAppParsers(unittest.TestCase):
         sys.argv = self._argv
 
     def test_composite_creator_app_parser(self):
-        sys.argv = ['test', '-file_stepping', '5', '-binning', '2',
-                    '-first_file', 'testname']
+        sys.argv = [
+            "test",
+            "-file_stepping",
+            "5",
+            "-binning",
+            "2",
+            "-first_file",
+            "testname",
+        ]
         parsed = composite_creator_app_parser()
-        self.assertEqual(parsed['file_stepping'], 5)
-        self.assertEqual(parsed['binning'], 2)
-        self.assertEqual(parsed['first_file'], 'testname')
+        self.assertEqual(parsed["file_stepping"], 5)
+        self.assertEqual(parsed["binning"], 2)
+        self.assertEqual(parsed["first_file"], "testname")
 
 
 if __name__ == "__main__":

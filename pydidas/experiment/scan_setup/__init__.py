@@ -34,14 +34,17 @@ from .scan_setup_io_meta import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import scan_setup
+
 __all__.extend(scan_setup.__all__)
 del scan_setup
 
 from . import scan_setup_io_base
+
 __all__.extend(scan_setup_io_base.__all__)
 del scan_setup_io_base
 
 from . import scan_setup_io_meta
+
 __all__.extend(scan_setup_io_meta.__all__)
 del scan_setup_io_meta
 
@@ -49,13 +52,16 @@ del scan_setup_io_meta
 # with the Metaclass:
 import os
 import importlib
+
 _dir = os.path.dirname(__file__)
-_io_classes = set(item.strip('.py') for item in os.listdir(_dir)
-                  if (item.startswith('scan_setup_io')
-                      and not item[-7:] in ['base.py', 'meta.py']))
+_io_classes = set(
+    item.strip(".py")
+    for item in os.listdir(_dir)
+    if (item.startswith("scan_setup_io") and not item[-7:] in ["base.py", "meta.py"])
+)
 
 for _module in _io_classes:
-    _module = importlib.import_module(f'.{_module}', __package__)
+    _module = importlib.import_module(f".{_module}", __package__)
     __all__ += _module.__all__
 
 del _module

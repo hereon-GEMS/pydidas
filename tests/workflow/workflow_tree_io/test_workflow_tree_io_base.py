@@ -31,7 +31,6 @@ from pydidas.workflow.workflow_tree_io import WorkflowTreeIoBase
 
 
 class TestWorkflowTreeIoBase(unittest.TestCase):
-
     def setUp(self):
         self._path = tempfile.mkdtemp()
 
@@ -45,31 +44,31 @@ class TestWorkflowTreeIoBase(unittest.TestCase):
     def test_import_from_file(self):
         obj = WorkflowTreeIoBase
         with self.assertRaises(NotImplementedError):
-            obj.export_to_file('something')
+            obj.export_to_file("something")
 
     def test_export_to_file(self):
         obj = WorkflowTreeIoBase
         with self.assertRaises(NotImplementedError):
-            obj.import_from_file('something')
+            obj.import_from_file("something")
 
     def test_check_for_existing_file__file_does_not_exist(self):
         obj = WorkflowTreeIoBase
-        obj.check_for_existing_file(os.path.join(self._path, 'test.txt'))
+        obj.check_for_existing_file(os.path.join(self._path, "test.txt"))
         # assert does not raise an Error
 
     def test_check_for_existing_file__file_does_exist(self):
         obj = WorkflowTreeIoBase
-        _fname = os.path.join(self._path, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test')
+        _fname = os.path.join(self._path, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test")
         with self.assertRaises(FileExistsError):
             obj.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_does_exist_and_overwrite(self):
         obj = WorkflowTreeIoBase
-        _fname = os.path.join(self._path, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test')
+        _fname = os.path.join(self._path, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test")
         obj.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise an Error
 

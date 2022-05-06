@@ -41,45 +41,56 @@ from .spin_box_factory import *
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
 from . import button_factory
+
 __all__.extend(button_factory.__all__)
 del button_factory
 
 from . import check_box_factory
+
 __all__.extend(check_box_factory.__all__)
 del check_box_factory
 
 from . import combobox_factory
+
 __all__.extend(combobox_factory.__all__)
 del combobox_factory
 
 from . import create_widgets_mixin
+
 __all__.extend(create_widgets_mixin.__all__)
 del create_widgets_mixin
 
 from . import label_factory
+
 __all__.extend(label_factory.__all__)
 del label_factory
 
 from . import line_factory
+
 __all__.extend(line_factory.__all__)
 del line_factory
 
 from . import param_widget_factory
+
 __all__.extend(param_widget_factory.__all__)
 del param_widget_factory
 
 from . import progress_bar_factory
+
 __all__.extend(progress_bar_factory.__all__)
 del progress_bar_factory
 
 from . import radio_button_group_factory
+
 __all__.extend(radio_button_group_factory.__all__)
 del radio_button_group_factory
 
 from . import spacer_factory
+
 __all__.extend(spacer_factory.__all__)
 del spacer_factory
 
 from . import spin_box_factory
+
 __all__.extend(spin_box_factory.__all__)
 del spin_box_factory

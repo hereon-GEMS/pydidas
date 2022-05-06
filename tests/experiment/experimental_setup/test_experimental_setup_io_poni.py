@@ -32,22 +32,22 @@ import pyFAI
 from pyFAI.geometry import Geometry
 
 from pydidas.experiment import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_poni import \
-    ExperimentalSetupIoPoni
+from pydidas.experiment.experimental_setup.experimental_setup_io_poni import (
+    ExperimentalSetupIoPoni,
+)
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO_PONI = ExperimentalSetupIoPoni
 
-_logger = logging.getLogger('pyFAI.geometry')
+_logger = logging.getLogger("pyFAI.geometry")
 _logger.setLevel(logging.CRITICAL)
 
 
 class TestExperimentSettingsIoPoni(unittest.TestCase):
-
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._path = os.path.join(_test_dir, "_data", "load_test_exp_settings_")
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -55,11 +55,18 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
         shutil.rmtree(self._tmppath)
 
     def test_update_geometry_from_pyFAI__correct(self):
-        geo = Geometry().load(self._path + 'poni.poni')
+        geo = Geometry().load(self._path + "poni.poni")
         EXP_IO_PONI._update_geometry_from_pyFAI(geo)
-        for param in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                      'detector_rot1', 'detector_rot2', 'detector_rot3',
-                      'xray_wavelength', 'xray_energy']:
+        for param in [
+            "detector_dist",
+            "detector_poni1",
+            "detector_poni2",
+            "detector_rot1",
+            "detector_rot2",
+            "detector_rot3",
+            "xray_wavelength",
+            "xray_energy",
+        ]:
             self.assertTrue(param in EXP_IO_PONI.imported_params)
 
     def test_update_geometry_from_pyFAI__wrong_type(self):
@@ -67,7 +74,7 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
             EXP_IO_PONI._update_geometry_from_pyFAI(12)
 
     def test_update_detector_from_pyfai__correct(self):
-        det = pyFAI.detector_factory('Eiger 9M')
+        det = pyFAI.detector_factory("Eiger 9M")
         EXP_IO_PONI._update_detector_from_pyFAI(det)
 
     def test_update_detector_from_pyfai__wrong_type(self):
@@ -76,20 +83,34 @@ class TestExperimentSettingsIoPoni(unittest.TestCase):
             EXP_IO_PONI._update_detector_from_pyFAI(det)
 
     def test_import_from_file(self):
-        EXP_IO_PONI.import_from_file(self._path + 'poni.poni')
-        geo = Geometry().load(self._path + 'poni.poni').getPyFAI()
-        for key in ['detector_dist', 'detector_poni1', 'detector_poni2',
-                    'detector_rot1', 'detector_rot2', 'detector_rot3']:
-            self.assertEqual(EXP_SETTINGS.get_param_value(key),
-                             geo[key.split('_')[1]])
+        EXP_IO_PONI.import_from_file(self._path + "poni.poni")
+        geo = Geometry().load(self._path + "poni.poni").getPyFAI()
+        for key in [
+            "detector_dist",
+            "detector_poni1",
+            "detector_poni2",
+            "detector_rot1",
+            "detector_rot2",
+            "detector_rot3",
+        ]:
+            self.assertEqual(EXP_SETUP.get_param_value(key), geo[key.split("_")[1]])
 
     def test_export_to_file(self):
-        _fname = self._tmppath + 'poni.poni'
+        _fname = self._tmppath + "poni.poni"
         EXP_IO_PONI.export_to_file(_fname)
-        with open(_fname, 'r') as f:
+        with open(_fname, "r") as f:
             content = f.read()
-        for key in ['Detector', 'Detector_config', 'Distance', 'Poni1',
-                    'Poni2', 'Rot1', 'Rot2', 'Rot3', 'Wavelength']:
+        for key in [
+            "Detector",
+            "Detector_config",
+            "Distance",
+            "Poni1",
+            "Poni2",
+            "Rot1",
+            "Rot2",
+            "Rot3",
+            "Wavelength",
+        ]:
             self.assertTrue(content.find(key) > 0)
 
 

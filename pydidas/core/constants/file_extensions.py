@@ -22,23 +22,30 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['HDF5_EXTENSIONS', 'NUMPY_EXTENSIONS', 'BINARY_EXTENSIONS',
-           'TIFF_EXTENSIONS', 'JPG_EXTENSIONS', 'FABIO_EXTENSIONS',
-           'YAML_EXTENSIONS', 'FILENAME_DELIMITERS']
+__all__ = [
+    "HDF5_EXTENSIONS",
+    "NUMPY_EXTENSIONS",
+    "BINARY_EXTENSIONS",
+    "TIFF_EXTENSIONS",
+    "JPG_EXTENSIONS",
+    "FABIO_EXTENSIONS",
+    "YAML_EXTENSIONS",
+    "FILENAME_DELIMITERS",
+]
 
 
-HDF5_EXTENSIONS = ['.h5', '.hdf', '.nxs', '.hdf5', '.HDF5']
+HDF5_EXTENSIONS = [".h5", ".hdf", ".nxs", ".hdf5", ".HDF5"]
 
-NUMPY_EXTENSIONS = ['.npy', '.np', '.npz']
+NUMPY_EXTENSIONS = [".npy", ".np", ".npz"]
 
-BINARY_EXTENSIONS = ['.raw', '.bin']
+BINARY_EXTENSIONS = [".raw", ".bin", ".dat"]
 
-TIFF_EXTENSIONS = ['.tif', '.tiff']
+TIFF_EXTENSIONS = [".tif", ".tiff"]
 
-JPG_EXTENSIONS = ['.jpg', '.jpeg']
+JPG_EXTENSIONS = [".jpg", ".jpeg"]
 
-FABIO_EXTENSIONS = ['.edf', '.mccd', '.mar3450', '.f2d', '.cbf']
+FABIO_EXTENSIONS = [".edf", ".mccd", ".mar3450", ".f2d", ".cbf"]
 
-YAML_EXTENSIONS = ['.yaml', '.yml']
+YAML_EXTENSIONS = [".yaml", ".yml"]
 
-FILENAME_DELIMITERS = '\.|_|-| '
+FILENAME_DELIMITERS = "\.|_|-| "

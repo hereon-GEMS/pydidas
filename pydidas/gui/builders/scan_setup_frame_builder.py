@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ScanSetupFrameBuilder']
+__all__ = ["ScanSetupFrameBuilder"]
 
 from qtpy import QtCore
 
@@ -43,6 +43,7 @@ class ScanSetupFrameBuilder(BaseFrame):
     self : pydidas.gui.ScanSetupFrame
         The ScanSetupFrame instance.
     """
+
     TEXT_WIDTH = 200
     PARAM_INPUT_WIDTH = 120
 
@@ -55,53 +56,93 @@ class ScanSetupFrameBuilder(BaseFrame):
         """
         _width_total = self.TEXT_WIDTH + self.PARAM_INPUT_WIDTH + 10
 
-        self.create_label('label_title', 'Scan settings\n', fontsize=14,
-                          bold=True, gridPos=(0, 0, 1, 1))
-        self.create_button('but_load', 'Load scan settings from file',
-                           gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(42),
-                           fixedWidth=_width_total)
-        self.create_button('but_import', 'Open scan parameter import dialogue',
-                           gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(42),
-                           fixedWidth=_width_total)
-        self.create_button('but_reset', 'Reset all scan settings',
-                           gridPos=(-1, 0, 1, 1), alignment=None,
-                           icon=self.style().standardIcon(59),
-                           fixedWidth=_width_total)
-        self.create_label('scan_global', '\nGlobal scan parameters:',
-                          fontsize=11, bold=True,
-                          gridPos=(self.next_row(), 0, 1, 1))
+        self.create_label(
+            "label_title",
+            "Scan settings\n",
+            fontsize=14,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
+        )
+        self.create_button(
+            "but_load",
+            "Load scan settings from file",
+            gridPos=(-1, 0, 1, 1),
+            alignment=None,
+            icon=self.style().standardIcon(42),
+            fixedWidth=_width_total,
+        )
+        self.create_button(
+            "but_import",
+            "Open scan parameter import dialogue",
+            gridPos=(-1, 0, 1, 1),
+            alignment=None,
+            icon=self.style().standardIcon(42),
+            fixedWidth=_width_total,
+        )
+        self.create_button(
+            "but_reset",
+            "Reset all scan settings",
+            gridPos=(-1, 0, 1, 1),
+            alignment=None,
+            icon=self.style().standardIcon(59),
+            fixedWidth=_width_total,
+        )
+        self.create_label(
+            "scan_global",
+            "\nGlobal scan parameters:",
+            fontsize=11,
+            bold=True,
+            gridPos=(self.next_row(), 0, 1, 1),
+        )
 
         self.create_param_widget(
-            SCAN_SETTINGS.get_param('scan_dim'), width_text = self.TEXT_WIDTH,
-            width_io=self.PARAM_INPUT_WIDTH, width_total=_width_total,
-            width_unit=0)
+            SCAN_SETTINGS.get_param("scan_dim"),
+            width_text=self.TEXT_WIDTH,
+            width_io=self.PARAM_INPUT_WIDTH,
+            width_total=_width_total,
+            width_unit=0,
+        )
         self.create_param_widget(
-            SCAN_SETTINGS.get_param('scan_name'), width_text = self.TEXT_WIDTH,
-            width_io=_width_total - 20, linebreak=True,
-            width_total=_width_total, width_unit=0)
+            SCAN_SETTINGS.get_param("scan_name"),
+            width_text=self.TEXT_WIDTH,
+            width_io=_width_total - 20,
+            linebreak=True,
+            width_total=_width_total,
+            width_unit=0,
+        )
 
         _rowoffset = self.next_row()
-        _prefixes = ['scan_dir_', 'n_points_', 'delta_', 'unit_', 'offset_']
+        _prefixes = ["scan_dir_", "n_points_", "delta_", "unit_", "offset_"]
         for i_dim in range(4):
             self.create_label(
-                f'title_{i_dim + 1}', f'\nScan dimension {i_dim+1}:',
-                fontsize=11, bold=True,
-                gridPos=(_rowoffset + 6 * (i_dim % 2), 2 * (i_dim // 2), 1, 2))
+                f"title_{i_dim + 1}",
+                f"\nScan dimension {i_dim+1}:",
+                fontsize=11,
+                bold=True,
+                gridPos=(_rowoffset + 6 * (i_dim % 2), 2 * (i_dim // 2), 1, 2),
+            )
             for i_item, basename in enumerate(_prefixes):
                 _row = i_item + _rowoffset + 1 + 6 * (i_dim % 2)
                 _column = 2 * (i_dim // 2)
-                pname = f'{basename}{i_dim+1}'
+                pname = f"{basename}{i_dim+1}"
                 param = SCAN_SETTINGS.get_param(pname)
                 self.create_param_widget(
-                    param, row=_row, column=_column,
-                    width_text=self.TEXT_WIDTH + 5, width_unit=0,
-                    width_io=self.PARAM_INPUT_WIDTH, width_total=_width_total,
-                    halign=QtCore.Qt.AlignCenter)
+                    param,
+                    row=_row,
+                    column=_column,
+                    width_text=self.TEXT_WIDTH + 5,
+                    width_unit=0,
+                    width_io=self.PARAM_INPUT_WIDTH,
+                    width_total=_width_total,
+                    halign=QtCore.Qt.AlignCenter,
+                )
 
-        self.create_button('but_save', 'Save scan settings',
-                            gridPos=(-1, 0, 1, 1), fixedWidth=_width_total,
-                            icon=self.style().standardIcon(43))
+        self.create_button(
+            "but_save",
+            "Save scan settings",
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=_width_total,
+            icon=self.style().standardIcon(43),
+        )
 
-        self.create_spacer('final_spacer', gridPos=(_rowoffset + 1, 2, 1, 1))
+        self.create_spacer("final_spacer", gridPos=(_rowoffset + 1, 2, 1, 1))

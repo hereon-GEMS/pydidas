@@ -31,7 +31,6 @@ from pydidas.unittest_objects import DummyLoader
 
 
 class TestDummyLoader(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -54,12 +53,12 @@ class TestDummyLoader(unittest.TestCase):
 
     def test_input_available__true(self):
         plugin = DummyLoader()
-        plugin._config['input_available'] = 7
+        plugin._config["input_available"] = 7
         self.assertTrue(plugin.input_available(6))
 
     def test_input_available__false(self):
         plugin = DummyLoader()
-        plugin._config['input_available'] = 7
+        plugin._config["input_available"] = 7
         self.assertFalse(plugin.input_available(8))
 
     def test_pre_execute(self):
@@ -71,12 +70,12 @@ class TestDummyLoader(unittest.TestCase):
         _shape = (134, 54)
         _index = 37
         plugin = DummyLoader()
-        plugin.set_param_value('image_height', _shape[0])
-        plugin.set_param_value('image_width', _shape[1])
+        plugin.set_param_value("image_height", _shape[0])
+        plugin.set_param_value("image_width", _shape[1])
         _newdata, _kws = plugin.execute(_index)
         self.assertIsInstance(_newdata, Dataset)
         self.assertEqual(_newdata.shape, _shape)
-        self.assertEqual(_kws['index'], _index)
+        self.assertEqual(_kws["index"], _index)
 
     def test_pickle_unpickle(self):
         plugin = DummyLoader()
@@ -84,5 +83,5 @@ class TestDummyLoader(unittest.TestCase):
         self.assertIsInstance(new_plugin, DummyLoader)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['copy_docstring']
+__all__ = ["copy_docstring"]
 
 import functools
 
@@ -48,14 +48,17 @@ def copy_docstring(origin):
     ValueError
         If the origin class does not have the method with the same name.
     """
+
     def _docstring(dest, origin):
         if not isinstance(dest, type) and isinstance(origin, type):
             try:
                 origin = getattr(origin, dest.__name__)
             except AttributeError:
-                raise ValueError('Origin class has no method called '
-                                 f'{dest.__name__}')
+                raise ValueError(
+                    "Origin class has no method called " f"{dest.__name__}"
+                )
 
         dest.__doc__ = origin.__doc__
         return dest
+
     return functools.partial(_docstring, origin=origin)

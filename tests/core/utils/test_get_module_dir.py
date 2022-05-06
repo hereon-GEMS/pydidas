@@ -30,29 +30,29 @@ from pydidas.core.utils import get_pydidas_module_dir
 
 
 class TestGetModuleDir(unittest.TestCase):
-
     def setUp(self):
         self._path = get_pydidas_module_dir(__file__)
         self._dir = tempfile.mkdtemp()
 
     def tearDown(self):
         shutil.rmtree(self._dir)
+
     def test_get_pydidas_module_dir__empty_path(self):
         with self.assertRaises(IOError):
-            get_pydidas_module_dir('')
+            get_pydidas_module_dir("")
 
     def test_get_pydidas_module_dir__file(self):
-        _new = os.path.join(self._path, 'pydidas', '_exceptions.py')
+        _new = os.path.join(self._path, "pydidas", "_exceptions.py")
         _p = get_pydidas_module_dir(_new)
         self.assertIsInstance(_p, str)
 
     def test_get_pydidas_module_dir__main_directory(self):
-        _new = os.path.join(self._path, 'pydidas')
+        _new = os.path.join(self._path, "pydidas")
         _p = get_pydidas_module_dir(_new)
         self.assertIsInstance(_p, str)
 
     def test_get_pydidas_module_dir__nonexisting_subdirectory(self):
-        _new = os.path.join(self._path, 'pydidas', 'test', 'path')
+        _new = os.path.join(self._path, "pydidas", "test", "path")
         _p = get_pydidas_module_dir(_new)
         self.assertIsInstance(_p, str)
 

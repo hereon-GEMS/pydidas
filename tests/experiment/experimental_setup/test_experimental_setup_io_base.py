@@ -28,19 +28,19 @@ import shutil
 import tempfile
 
 from pydidas.experiment.experimental_setup import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_base \
-    import ExperimentalSetupIoBase
+from pydidas.experiment.experimental_setup.experimental_setup_io_base import (
+    ExperimentalSetupIoBase,
+)
 
 
-EXP_SETTINGS = ExperimentalSetup()
+EXP_SETUP = ExperimentalSetup()
 EXP_IO = ExperimentalSetupIoBase
 
 
 class TestExperimentSettingsIoBase(unittest.TestCase):
-
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, '_data', 'load_test_exp_settings_')
+        self._path = os.path.join(_test_dir, "_data", "load_test_exp_settings_")
         self._tmppath = tempfile.mkdtemp()
         EXP_IO.imported_params = {}
 
@@ -49,26 +49,26 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         shutil.rmtree(self._tmppath)
 
     def test_check_for_existing_file__file_present(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test entry')
+        _fname = os.path.join(self._tmppath, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test entry")
         with self.assertRaises(FileExistsError):
             EXP_IO.check_for_existing_file(_fname)
 
     def test_check_for_existing_file__file_present_and_overwrite(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
-        with open(_fname, 'w') as f:
-            f.write('test entry')
+        _fname = os.path.join(self._tmppath, "test.txt")
+        with open(_fname, "w") as f:
+            f.write("test entry")
         EXP_IO.check_for_existing_file(_fname, overwrite=True)
         # assert does not raise FileExistsError
 
     def test_check_for_existing_file__file_new(self):
-        _fname = os.path.join(self._tmppath, 'test.txt')
+        _fname = os.path.join(self._tmppath, "test.txt")
         EXP_IO.check_for_existing_file(_fname)
         # assert does not raise FileExistsError
 
     def test_verify_all_entries_present__correct(self):
-        for param in EXP_SETTINGS.params:
+        for param in EXP_SETUP.params:
             EXP_IO.imported_params[param] = True
         EXP_IO._verify_all_entries_present()
 
@@ -77,14 +77,12 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
             EXP_IO._verify_all_entries_present()
 
     def test_write_to_exp_settings(self):
-        _det_name = 'Test Name'
+        _det_name = "Test Name"
         _energy = 123.45
-        EXP_IO.imported_params = {'detector_name': _det_name,
-                                       'xray_energy': _energy}
+        EXP_IO.imported_params = {"detector_name": _det_name, "xray_energy": _energy}
         EXP_IO._write_to_exp_settings()
-        self.assertEqual(EXP_SETTINGS.get_param_value('detector_name'),
-                         _det_name)
-        self.assertEqual(EXP_SETTINGS.get_param_value('xray_energy'), _energy)
+        self.assertEqual(EXP_SETUP.get_param_value("detector_name"), _det_name)
+        self.assertEqual(EXP_SETUP.get_param_value("xray_energy"), _energy)
 
 
 if __name__ == "__main__":

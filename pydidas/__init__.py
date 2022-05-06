@@ -30,9 +30,13 @@ __all__ = []
 # import local modules
 from . import version
 
+# Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
+import multiprocessing as __mp
+import warnings as __warnings
+
 # import sub-packages:
 from . import core
-from . import image_io
+from . import data_io
 from . import multiprocessing
 from . import managers
 from . import experiment
@@ -42,9 +46,23 @@ from . import apps
 from . import unittest_objects
 from . import widgets
 from . import gui
-__all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
-                'multiprocessing', 'plugins', 'unittest_objects', 'utils',
-                'widgets', 'workflow'])
+
+__all__.extend(
+    [
+        "apps",
+        "core",
+        "experiment",
+        "gui",
+        "data_io",
+        "managers",
+        "multiprocessing",
+        "plugins",
+        "unittest_objects",
+        "utils",
+        "widgets",
+        "workflow",
+    ]
+)
 
 
 # Check whether the sphinx documentation has been built and build it if
@@ -52,12 +70,16 @@ __all__.extend(['apps', 'core', 'experiment', 'gui', 'image_io', 'managers',
 if not core.utils.check_sphinx_html_docs():
     core.utils.run_sphinx_html_build()
 
+# Check whether a plugin directory has been set or set the default one:
+core.utils.set_default_plugin_dir()
+
 # Disable the pyFAI logging to console
-import os
-os.environ['PYFAI_NO_LOGGING'] = '1'
+import os as __os
+import logging as __logging
+
+__os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
-import logging
-pyFAI_azi_logger = logging.getLogger('pyFAI.azimuthalIntegrator')
-pyFAI_azi_logger.setLevel(logging.ERROR)
-silx_opencl_logger = logging.getLogger('silx.opencl.processing')
-silx_opencl_logger.setLevel(logging.ERROR)
+pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
+pyFAI_azi_logger.setLevel(__logging.ERROR)
+silx_opencl_logger = __logging.getLogger("silx.opencl.processing")
+silx_opencl_logger.setLevel(__logging.ERROR)

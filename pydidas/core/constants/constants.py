@@ -22,23 +22,30 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['LAMBDA_IN_A_TO_E', 'LAMBDA_IN_M_TO_E',
-           'BASE_PLUGIN', 'INPUT_PLUGIN', 'PROC_PLUGIN',
-           'OUTPUT_PLUGIN', 'pyFAI_UNITS', 'pyFAI_METHOD']
+__all__ = [
+    "LAMBDA_IN_A_TO_E",
+    "LAMBDA_IN_M_TO_E",
+    "BASE_PLUGIN",
+    "INPUT_PLUGIN",
+    "PROC_PLUGIN",
+    "OUTPUT_PLUGIN",
+    "pyFAI_UNITS",
+    "pyFAI_METHOD",
+]
 
 import scipy.constants
 
 
-LAMBDA_IN_A_TO_E = 1e10 * (scipy.constants.h * scipy.constants.c
-                    / ( scipy.constants.e * 1e3))
+LAMBDA_IN_A_TO_E = 1e10 * (
+    scipy.constants.h * scipy.constants.c / (scipy.constants.e * 1e3)
+)
 """
 float :
     The conversion factor to change a wavelength in Angstrom to an energy in
     keV.
 """
 
-LAMBDA_IN_M_TO_E = (scipy.constants.h * scipy.constants.c
-                    / ( scipy.constants.e * 1e3))
+LAMBDA_IN_M_TO_E = scipy.constants.h * scipy.constants.c / (scipy.constants.e * 1e3)
 """
 float :
     The conversion factor to change a wavelength in meter to an energy in
@@ -50,15 +57,19 @@ INPUT_PLUGIN = 0
 PROC_PLUGIN = 1
 OUTPUT_PLUGIN = 2
 
-pyFAI_UNITS = {'Q / nm^-1': 'q_nm^-1',
-               'Q / A^-1': 'q_A^-1',
-               '2theta / deg': '2th_deg',
-               '2theta / rad': '2th_rad',
-               'r / mm': 'r_mm',
-               'chi / deg': 'chi_deg',
-               'chi / rad': 'chi_rad'}
+pyFAI_UNITS = {
+    "Q / nm^-1": "q_nm^-1",
+    "Q / A^-1": "q_A^-1",
+    "2theta / deg": "2th_deg",
+    "2theta / rad": "2th_rad",
+    "r / mm": "r_mm",
+    "chi / deg": "chi_deg",
+    "chi / rad": "chi_rad",
+}
 
-pyFAI_METHOD = {'CSR': 'csr',
-                'CSR OpenCL': 'csr ocl',
-                'LUT': 'lut',
-                'LUT OpenCL': 'lut ocl'}
+pyFAI_METHOD = {
+    "CSR": "csr",
+    "CSR OpenCL": "csr ocl",
+    "LUT": "lut",
+    "LUT OpenCL": "lut ocl",
+}

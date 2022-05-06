@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ParameterConfigWidget']
+__all__ = ["ParameterConfigWidget"]
 
 import sys
 from functools import partial
@@ -31,8 +31,12 @@ from functools import partial
 from qtpy import QtWidgets, QtCore
 
 from ...core.constants import (
-    PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH,
-    PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_TEXT_WIDTH, PARAM_INPUT_UNIT_WIDTH)
+    PARAM_INPUT_WIDGET_HEIGHT,
+    PARAM_INPUT_WIDGET_WIDTH,
+    PARAM_INPUT_EDIT_WIDTH,
+    PARAM_INPUT_TEXT_WIDTH,
+    PARAM_INPUT_UNIT_WIDTH,
+)
 from ...core.utils import convert_special_chars_to_unicode
 from ..utilities import apply_widget_properties, excepthook
 from ..factory import create_param_widget, create_label
@@ -59,6 +63,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
     **kwargs : dict
         Additional keyword arguments
     """
+
     io_edited = QtCore.Signal(str)
 
     def __init__(self, param, parent=None, **kwargs):
@@ -73,20 +78,24 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         _layout.setColumnStretch(1, 1)
         self.name_widget = self.__get_name_widget()
-        if self.config['width_unit'] > 0:
+        if self.config["width_unit"] > 0:
             self.unit_widget = self.__get_unit_widget()
-        self.io_widget = create_param_widget(param, self.config['width_io'])
+        self.io_widget = create_param_widget(param, self.config["width_io"])
 
-        _text_widget_args, _input_widget_args, _unit_widget_args = \
-            self.__get_layout_args_for_widgets()
+        (
+            _text_widget_args,
+            _input_widget_args,
+            _unit_widget_args,
+        ) = self.__get_layout_args_for_widgets()
         _layout.addWidget(self.name_widget, *_text_widget_args)
         _layout.addWidget(self.io_widget, *_input_widget_args)
-        if self.config['width_unit'] > 0:
+        if self.config["width_unit"] > 0:
             _layout.addWidget(self.unit_widget, *_unit_widget_args)
 
         self.io_widget.io_edited.connect(self.__emit_io_changed)
         self.io_widget.io_edited.connect(
-            partial(self.__set_param_value, param, self.io_widget))
+            partial(self.__set_param_value, param, self.io_widget)
+        )
         self.setLayout(_layout)
         apply_widget_properties(self, **kwargs)
 
@@ -99,10 +108,11 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         kwargs : dict
             The keyword arguments.
         """
-        _linebreak = kwargs.get('linebreak', False)
-        _width = kwargs.get('width_total', PARAM_INPUT_WIDGET_WIDTH)
-        _height = (PARAM_INPUT_WIDGET_HEIGHT
-                   + _linebreak * (PARAM_INPUT_WIDGET_HEIGHT + 4))
+        _linebreak = kwargs.get("linebreak", False)
+        _width = kwargs.get("width_total", PARAM_INPUT_WIDGET_WIDTH)
+        _height = PARAM_INPUT_WIDGET_HEIGHT + _linebreak * (
+            PARAM_INPUT_WIDGET_HEIGHT + 4
+        )
         self.setFixedWidth(_width)
         self.setFixedHeight(_height)
 
@@ -122,35 +132,27 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         config : dict
             The full formatting options, updated with the default values.
         """
-        _width = kwargs.get('width_total', PARAM_INPUT_WIDGET_WIDTH)
-        _width_unit = kwargs.get('width_unit', PARAM_INPUT_UNIT_WIDTH)
-        config = {'linebreak': kwargs.get('linebreak', False),
-                  'valign_io': kwargs.get('valign_io',
-                                          QtCore.Qt.AlignVCenter),
-                  'valign_text': kwargs.get('valign_text',
-                                            QtCore.Qt.AlignVCenter)}
-        if config['linebreak']:
-            config['width_text'] = kwargs.get('width_text', _width - 10)
-            config['width_io'] = kwargs.get('width_io',
-                                            _width - _width_unit - 20)
-            config['halign_text'] = kwargs.get('halign_text',
-                                               QtCore.Qt.AlignLeft)
-            config['halign_io'] = kwargs.get('halign_io',
-                                              QtCore.Qt.AlignRight)
+        _width = kwargs.get("width_total", PARAM_INPUT_WIDGET_WIDTH)
+        _width_unit = kwargs.get("width_unit", PARAM_INPUT_UNIT_WIDTH)
+        config = {
+            "linebreak": kwargs.get("linebreak", False),
+            "valign_io": kwargs.get("valign_io", QtCore.Qt.AlignVCenter),
+            "valign_text": kwargs.get("valign_text", QtCore.Qt.AlignVCenter),
+        }
+        if config["linebreak"]:
+            config["width_text"] = kwargs.get("width_text", _width - 10)
+            config["width_io"] = kwargs.get("width_io", _width - _width_unit - 20)
+            config["halign_text"] = kwargs.get("halign_text", QtCore.Qt.AlignLeft)
+            config["halign_io"] = kwargs.get("halign_io", QtCore.Qt.AlignRight)
         else:
-            config['width_text'] = kwargs.get('width_text',
-                                              PARAM_INPUT_TEXT_WIDTH)
-            config['width_io'] = kwargs.get('width_io',
-                                            PARAM_INPUT_EDIT_WIDTH)
-            config['halign_text'] = kwargs.get('halign_text',
-                                               QtCore.Qt.AlignLeft)
-            config['halign_io'] = kwargs.get('halign_io',
-                                             QtCore.Qt.AlignRight)
-        config['width_unit'] = _width_unit
-        config['width_total'] = _width
-        config['halign_unit'] = kwargs.get('halign_unit', QtCore.Qt.AlignLeft)
-        config['valign_unit'] = kwargs.get('valign_unit',
-                                           QtCore.Qt.AlignVCenter)
+            config["width_text"] = kwargs.get("width_text", PARAM_INPUT_TEXT_WIDTH)
+            config["width_io"] = kwargs.get("width_io", PARAM_INPUT_EDIT_WIDTH)
+            config["halign_text"] = kwargs.get("halign_text", QtCore.Qt.AlignLeft)
+            config["halign_io"] = kwargs.get("halign_io", QtCore.Qt.AlignRight)
+        config["width_unit"] = _width_unit
+        config["width_total"] = _width
+        config["halign_unit"] = kwargs.get("halign_unit", QtCore.Qt.AlignLeft)
+        config["valign_unit"] = kwargs.get("valign_unit", QtCore.Qt.AlignVCenter)
         self.config = config
 
     def __get_name_widget(self):
@@ -167,10 +169,14 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         QtWidgets.QLabel
             The label with the Parameter's name.
         """
-        _text = convert_special_chars_to_unicode(self.param.name) + ':'
-        return create_label(_text, fixedWidth=self.config['width_text'],
-                            fixedHeight=20, toolTip=self.param.tooltip,
-                            margin=0)
+        _text = convert_special_chars_to_unicode(self.param.name) + ":"
+        return create_label(
+            _text,
+            fixedWidth=self.config["width_text"],
+            fixedHeight=20,
+            toolTip=self.param.tooltip,
+            margin=0,
+        )
 
     def __get_unit_widget(self):
         """
@@ -187,9 +193,13 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             The label with the Parameter's unit text.
         """
         _text = convert_special_chars_to_unicode(self.param.unit)
-        return create_label(_text, fixedWidth=self.config['width_unit'],
-                            fixedHeight=20, toolTip=self.param.tooltip,
-                            margin=0)
+        return create_label(
+            _text,
+            fixedWidth=self.config["width_unit"],
+            fixedHeight=20,
+            toolTip=self.param.tooltip,
+            margin=0,
+        )
 
     def __get_layout_args_for_widgets(self):
         """
@@ -209,14 +219,29 @@ class ParameterConfigWidget(QtWidgets.QWidget):
         unit_args : tuple
             The tuple with the layout formatting args for the unit widget.
         """
-        _iline = int(self.config['linebreak'])
-        _iunit = int(self.config['width_unit'] > 0)
-        _txtargs = (0, 0, 1, 1 + 2 * _iline,
-                    self.config['valign_text'] | self.config['halign_text'])
-        _ioargs = (_iline, 1, 1, 2 - _iunit,
-                   self.config['valign_io'] | self.config['halign_io'])
-        _unitargs = (_iline, 2, 1, 1,
-                     self.config['valign_text'] | self.config['halign_text'])
+        _iline = int(self.config["linebreak"])
+        _iunit = int(self.config["width_unit"] > 0)
+        _txtargs = (
+            0,
+            0,
+            1,
+            1 + 2 * _iline,
+            self.config["valign_text"] | self.config["halign_text"],
+        )
+        _ioargs = (
+            _iline,
+            1,
+            1,
+            2 - _iunit,
+            self.config["valign_io"] | self.config["halign_io"],
+        )
+        _unitargs = (
+            _iline,
+            2,
+            1,
+            1,
+            self.config["valign_text"] | self.config["halign_text"],
+        )
         return _txtargs, _ioargs, _unitargs
 
     @QtCore.Slot(str)

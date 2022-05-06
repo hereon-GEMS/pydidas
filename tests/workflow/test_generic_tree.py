@@ -28,7 +28,6 @@ from pydidas.workflow import GenericTree, GenericNode
 
 
 class TestGenericTree(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -37,7 +36,7 @@ class TestGenericTree(unittest.TestCase):
 
     def create_node_tree(self, depth=3, width=3):
         root = GenericNode(node_id=0)
-        _nodes =  [[root]]
+        _nodes = [[root]]
         _index = 1
         for _depth in range(depth):
             _tiernodes = []
@@ -56,14 +55,14 @@ class TestGenericTree(unittest.TestCase):
 
     def test_init__with_kwargs(self):
         _val1 = 12
-        _val2 = 'something'
+        _val2 = "something"
         tree = GenericTree(test1=_val1, test2=_val2)
-        self.assertEqual(tree._config['test1'], _val1)
-        self.assertEqual(tree._config['test2'], _val2)
+        self.assertEqual(tree._config["test1"], _val1)
+        self.assertEqual(tree._config["test2"], _val2)
 
     def test_clear(self):
         tree = GenericTree()
-        tree.nodes = dict(a=1, b='c')
+        tree.nodes = dict(a=1, b="c")
         tree.node_ids = [0, 1]
         tree.root = 12
         tree.clear()
@@ -114,7 +113,7 @@ class TestGenericTree(unittest.TestCase):
     def test_get_new_nodeid__multiple_nodes(self):
         _id = 3
         tree = GenericTree()
-        tree.node_ids = [_id -1,_id]
+        tree.node_ids = [_id - 1, _id]
         self.assertEqual(tree.get_new_nodeid(), _id + 1)
 
     def test_check_node_ids__no_ids(self):
@@ -258,7 +257,7 @@ class TestGenericTree(unittest.TestCase):
             self.assertFalse(_node in _copy.nodes.values())
         for _node in _copy.root._children:
             self.assertTrue(_node in _copy.nodes.values())
-        for key in set(tree.__dict__.keys()) - {'root', 'nodes'}:
+        for key in set(tree.__dict__.keys()) - {"root", "nodes"}:
             self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
     def test_get_copy(self):
@@ -298,5 +297,5 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(hash(tree), hash(tree2))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -21,19 +21,19 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-
 import unittest
 import os
 
 import pydidas
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins.plugin_collection_util_funcs import (
-    get_generic_plugin_path, plugin_type_check)
-from pydidas.core.constants import (BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN,
-                                    OUTPUT_PLUGIN)
+    get_generic_plugin_path,
+    plugin_type_check,
+)
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
+
 
 class TestPluginCollectionUtilFuncs(unittest.TestCase):
-
     def setUp(self):
         ...
 
@@ -41,7 +41,7 @@ class TestPluginCollectionUtilFuncs(unittest.TestCase):
         ...
 
     def test_get_generic_plugin_path(self):
-        _target = os.path.join(os.path.dirname(pydidas.__path__[0]), 'plugins')
+        _target = os.path.join(os.path.dirname(pydidas.__path__[0]), "plugins")
         self.assertEqual(get_generic_plugin_path()[0], _target)
 
     def test_plugin_type_check__w_base_plugin(self):

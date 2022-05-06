@@ -23,8 +23,12 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['hdf5_dataset_check', 'get_hdf5_populated_dataset_keys',
-           'get_hdf5_metadata', 'create_hdf5_dataset']
+__all__ = [
+    "hdf5_dataset_check",
+    "get_hdf5_populated_dataset_keys",
+    "get_hdf5_metadata",
+    "create_hdf5_dataset",
+]
 
 import os
 import pathlib
@@ -35,8 +39,9 @@ import hdf5plugin
 from ..constants import HDF5_EXTENSIONS
 
 
-def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
-                                    file_ref=None, ignore_keys=None):
+def get_hdf5_populated_dataset_keys(
+    item, min_size=50, min_dim=3, file_ref=None, ignore_keys=None
+):
     """
     Get the dataset keys of all datasets that match the conditions.
 
@@ -51,9 +56,9 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
     ----------
     item : Union[str, h5py.File, h5py.Group, h5py.Dataset]
         The item to be checked recursively. A str will be interpreted as
-        filepath to the hdf5 file.
+        filepath to the Hdf5 file.
     min_size : int, optional
-        A minimum size which datasets need to have. Any integers between 0
+        A minimum size which datasets need to have. Any integer between 0
         and 1,000,000,000 are acceptable. The default is 50.
     min_dim : int, optional
         The minimum dimensionality of the dataset. Allowed entries are
@@ -80,20 +85,18 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
     list
         A list with all dataset keys which correspond to the filter criteria.
     """
+    _close_on_exit = False
     _ignore = ignore_keys if ignore_keys is not None else []
     # return in case of a dataset
     if isinstance(item, h5py.Dataset):
         if hdf5_dataset_check(item, min_size, min_dim, _ignore):
             return [item.name]
         return []
-    _close_on_exit = False
+
     if isinstance(item, (str, pathlib.Path)):
-        if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
-            raise TypeError('The file does not have any extension registered'
-                            ' for hdf5 files.')
-        if os.path.exists(item):
-            item = h5py.File(item, 'r')
-            _close_on_exit = True
+        _hdf5_filename_check(item)
+        item = h5py.File(item, "r")
+        _close_on_exit = True
     if not isinstance(item, (h5py.File, h5py.Group)):
         return []
     _datasets = []
@@ -102,19 +105,46 @@ def get_hdf5_populated_dataset_keys(item, min_size=50, min_dim=3,
         _item = item[key]
         # add a check to filter external datasets. These are referenced
         # by their .name in the external datafile, not the current file.
+        # if file_ref == _item.file, this is a local dataset.
         if file_ref == _item.file:
             _datasets += get_hdf5_populated_dataset_keys(
-                item[key], min_size, min_dim, file_ref, _ignore)
+                item[key], min_size, min_dim, file_ref, _ignore
+            )
         else:
             if hdf5_dataset_check(_item, min_size, min_dim, _ignore):
-                _datasets += [f'{item.name}/{key}']
+                _datasets += [f"{item.name}/{key}"]
             if isinstance(_item, (h5py.File, h5py.Group)):
                 raise KeyError(
                     'External link to hdf5.Group detected: "{item.name}/{key}'
-                    '". Cannot follow the link. Aborting ...')
+                    '". Cannot follow the link. Aborting ...'
+                )
     if _close_on_exit:
         item.close()
     return _datasets
+
+
+def _hdf5_filename_check(item):
+    """
+    Check that a specified filename is okay and points to an existing file.
+
+    Parameters
+    ----------
+    item : Union[str, pathlib.Path]
+        The filename.
+
+    Raises
+    ------
+    TypeError
+        If the file extension is not a recognized Hdf5 extension.
+    FileNotFoundError
+        If the file does not exist.
+    """
+    if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
+        raise TypeError(
+            "The file does not have any extension registered" " for hdf5 files."
+        )
+    if not os.path.exists(item):
+        raise FileNotFoundError(f'The specified file "{item}" does not exist.')
 
 
 def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
@@ -147,10 +177,12 @@ def hdf5_dataset_check(item, min_size=50, min_dim=3, to_ignore=()):
         and fulfills the requirements of minimum data size and dimensionality
         and does not start with any keys specified in the to_ignore?
     """
-    if (isinstance(item, h5py.Dataset)
-            and len(item.shape) >= min_dim
-            and item.size >= min_size
-            and not item.name.startswith(tuple(to_ignore))):
+    if (
+        isinstance(item, h5py.Dataset)
+        and len(item.shape) >= min_dim
+        and item.size >= min_size
+        and not item.name.startswith(tuple(to_ignore))
+    ):
         return True
     return False
 
@@ -187,11 +219,11 @@ def _get_hdf5_file_and_dataset_names(fname, dset=None):
     """
     fname = str(fname) if isinstance(fname, pathlib.Path) else fname
     if not isinstance(fname, str):
-        raise TypeError('The path must be specified as string or pathlib.Path')
-    if fname.find('://') > 0:
-        fname, dset = fname.split('://')
+        raise TypeError("The path must be specified as string or pathlib.Path")
+    if fname.find("://") > 0:
+        fname, dset = fname.split("://")
     if dset is None:
-        raise KeyError('No dataset specified. Cannot access information.')
+        raise KeyError("No dataset specified. Cannot access information.")
     return fname, dset
 
 
@@ -228,20 +260,19 @@ def get_hdf5_metadata(fname, meta, dset=None):
     _fname, _dset = _get_hdf5_file_and_dataset_names(fname, dset)
     meta = [meta] if isinstance(meta, str) else meta
     if not isinstance(meta, (set, list, tuple)):
-        raise TypeError('meta parameter must be of type str, set, list, '
-                        'tuple.')
+        raise TypeError("meta parameter must be of type str, set, list, " "tuple.")
     _results = {}
-    with h5py.File(_fname, 'r') as _file:
-        if 'dtype' in meta:
-            _results['dtype'] = _file[_dset].dtype
-        if 'shape' in meta:
-            _results['shape'] = _file[_dset].shape
-        if 'size' in meta:
-            _results['size'] = _file[_dset].size
-        if 'ndim' in meta:
-            _results['ndim'] = _file[_dset].ndim
-        if 'nbytes' in meta:
-            _results['nbytes'] = _file[_dset].nbytes
+    with h5py.File(_fname, "r") as _file:
+        if "dtype" in meta:
+            _results["dtype"] = _file[_dset].dtype
+        if "shape" in meta:
+            _results["shape"] = _file[_dset].shape
+        if "size" in meta:
+            _results["size"] = _file[_dset].size
+        if "ndim" in meta:
+            _results["ndim"] = _file[_dset].ndim
+        if "nbytes" in meta:
+            _results["nbytes"] = _file[_dset].nbytes
     if len(_results) == 1:
         _results = tuple(_results.values())[0]
     return _results

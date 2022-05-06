@@ -1,0 +1,15 @@
+v0.1.6
+Major changes:
+- Refactored data_io and moved classes which are not truly I/O classes.
+Code changes:
+- Changed code formatting to use black. 
+- Changed used line width to 88 characters.
+
+
+v0.1.5
+Major changes:
+- Removed dependency on QtWebEngineWidgets to fix startup problems.
+- Documentation only available in system's web browser, not in applications
+  own window.
+- Removed image_io subpackage and replaced it with new registry-based data_io
+  package.

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['ChiSaver']
+__all__ = ["ChiSaver"]
 
 import os
 
@@ -48,7 +48,8 @@ class ChiSaver(OutputPlugin):
     directory_path : Union[pathlib.Path, str]
         The output directory.
     """
-    plugin_name = 'Chi Saver'
+
+    plugin_name = "Chi Saver"
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = 1
@@ -76,29 +77,31 @@ class ChiSaver(OutputPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if data.ndim > 1:
-            raise TypeError('Only 1-d data can be saved as ASCII.')
-        self._config['global_index'] = kwargs.get('global_index', None)
-        _fname = self._get_base_output_filename() + '.chi'
+            raise TypeError("Only 1-d data can be saved as ASCII.")
+        self._config["global_index"] = kwargs.get("global_index", None)
+        _fname = self._get_base_output_filename() + ".chi"
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
             data.axis_ranges[0] = np.arange(data.size)
-            data.axis_labels[0] = 'index'
-        _title = os.path.basename(_fname) + '\n'
+            data.axis_labels[0] = "index"
+        _title = os.path.basename(_fname) + "\n"
         _unit = data.axis_units[0]
-        _axislabel = (str(data.axis_labels[0]) +
-                      (f' ({_unit})\n' if _unit is not None and len(_unit) > 0
-                      else '\n'))
+        _axislabel = str(data.axis_labels[0]) + (
+            f" ({_unit})\n" if _unit is not None and len(_unit) > 0 else "\n"
+        )
         _dataunit = data.data_unit
-        _datalabel = ('Intensity' +
-                      (f' ({_dataunit})\n' if _dataunit is not None
-                       and len(_dataunit) > 0 else '\n'))
-        _npoints = f'\t{data.size}\n'
-        with open(_fname, 'w') as _file:
+        _datalabel = "Intensity" + (
+            f" ({_dataunit})\n"
+            if _dataunit is not None and len(_dataunit) > 0
+            else "\n"
+        )
+        _npoints = f"\t{data.size}\n"
+        with open(_fname, "w") as _file:
             _file.write(_title)
             _file.write(_axislabel)
             _file.write(_datalabel)
             _file.write(_npoints)
             for _x, _y in zip(data.axis_ranges[0], data.array):
-                _file.write(f'{_x:e}\t{_y:e}\n')
+                _file.write(f"{_x:e}\t{_y:e}\n")
         return data, kwargs

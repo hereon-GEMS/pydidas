@@ -23,13 +23,12 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['EigerScanSeriesLoader']
+__all__ = ["EigerScanSeriesLoader"]
 
 import os
 
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import (ParameterCollection, AppConfigError,
-                          get_generic_parameter)
+from pydidas.core import ParameterCollection, AppConfigError, get_generic_parameter
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
@@ -81,26 +80,27 @@ class EigerScanSeriesLoader(InputPlugin):
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
     """
-    plugin_name = 'Eiger scan series loader'
+
+    plugin_name = "Eiger scan series loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
-        get_generic_parameter('directory_path'),
-        get_generic_parameter('filename_pattern'),
-        get_generic_parameter('eiger_key'),
-        get_generic_parameter('filename_suffix'),
-        get_generic_parameter('first_index'),
-        get_generic_parameter('hdf5_key'),
-        get_generic_parameter('images_per_file'),
-        get_generic_parameter('live_processing'),
-        get_generic_parameter('file_stepping'),
-        )
+        get_generic_parameter("directory_path"),
+        get_generic_parameter("filename_pattern"),
+        get_generic_parameter("eiger_key"),
+        get_generic_parameter("filename_suffix"),
+        get_generic_parameter("first_index"),
+        get_generic_parameter("hdf5_key"),
+        get_generic_parameter("images_per_file"),
+        get_generic_parameter("live_processing"),
+        get_generic_parameter("file_stepping"),
+    )
     input_data_dim = None
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, use_filename_pattern=True, **kwargs)
-        self.set_param_value('live_processing', False)
+        self.set_param_value("live_processing", False)
         self._filename_generator = None
 
     def pre_execute(self):
@@ -109,7 +109,7 @@ class EigerScanSeriesLoader(InputPlugin):
         """
         self.__create_filename_generator()
         self.__update_image_metadata()
-        if self.get_param_value('images_per_file') == -1:
+        if self.get_param_value("images_per_file") == -1:
             self.__update_images_per_file()
 
     def __create_filename_generator(self):
@@ -117,17 +117,15 @@ class EigerScanSeriesLoader(InputPlugin):
         Set up the generator that can create the full file names to load
         images.
         """
-        _basepath = self.get_param_value('directory_path', dtype=str)
-        _pattern = self.get_param_value('filename_pattern', dtype=str)
-        _eigerkey = self.get_param_value('eiger_key')
-        _suffix = self.get_param_value('filename_suffix', dtype=str)
-        _len_pattern = _pattern.count('#')
+        _basepath = self.get_param_value("directory_path", dtype=str)
+        _pattern = self.get_param_value("filename_pattern", dtype=str)
+        _eigerkey = self.get_param_value("eiger_key")
+        _suffix = self.get_param_value("filename_suffix", dtype=str)
+        _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise AppConfigError('No pattern detected!')
-        _name = os.path.join(_basepath, _pattern, _eigerkey,
-                             _pattern + _suffix)
-        _fname = _name.replace('#' * _len_pattern,
-                               '{:0' + str(_len_pattern) + 'd}')
+            raise AppConfigError("No pattern detected!")
+        _name = os.path.join(_basepath, _pattern, _eigerkey, _pattern + _suffix)
+        _fname = _name.replace("#" * _len_pattern, "{:0" + str(_len_pattern) + "d}")
         self._filename_generator = lambda index: _fname.format(index, index)
 
     def __update_image_metadata(self):
@@ -136,9 +134,8 @@ class EigerScanSeriesLoader(InputPlugin):
         input Parameters.
         """
         self.__create_filename_generator()
-        _start_fname = self._filename_generator(
-            self.get_param_value('first_index'))
-        self._image_metadata.set_param_value('filename', _start_fname)
+        _start_fname = self._filename_generator(self.get_param_value("first_index"))
+        self._image_metadata.set_param_value("filename", _start_fname)
         self._image_metadata.update()
 
     def __update_images_per_file(self):
@@ -149,9 +146,9 @@ class EigerScanSeriesLoader(InputPlugin):
         of frames in this dataset and stores the information.
         """
         _n_per_file = get_hdf5_metadata(
-            self.get_filename(0), 'shape',
-            dset=self.get_param_value('hdf5_key'))[0]
-        self.set_param_value('images_per_file', _n_per_file)
+            self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
+        )[0]
+        self.set_param_value("images_per_file", _n_per_file)
 
     def execute(self, index, **kwargs):
         """
@@ -173,11 +170,11 @@ class EigerScanSeriesLoader(InputPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         _fname = self.get_filename(index)
-        _hdf_index = index % self.get_param_value('images_per_file')
-        kwargs['dataset'] = self.get_param_value('hdf5_key')
-        kwargs['frame'] = _hdf_index
-        kwargs['binning'] = self.get_param_value('binning')
-        kwargs['roi'] = self._image_metadata.roi
+        _hdf_index = index % self.get_param_value("images_per_file")
+        kwargs["dataset"] = self.get_param_value("hdf5_key")
+        kwargs["frame"] = _hdf_index
+        kwargs["binning"] = self.get_param_value("binning")
+        kwargs["roi"] = self._image_metadata.roi
         _data = import_data(_fname, **kwargs)
         return _data, kwargs
 
@@ -188,9 +185,8 @@ class EigerScanSeriesLoader(InputPlugin):
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
-        _images_per_file = self.get_param_value('images_per_file')
-        _i_file = (index // _images_per_file
-                   + self.get_param_value('first_index'))
+        _images_per_file = self.get_param_value("images_per_file")
+        _i_file = index // _images_per_file + self.get_param_value("first_index")
         return self._filename_generator(_i_file)
 
     def calculate_result_shape(self):
@@ -198,9 +194,11 @@ class EigerScanSeriesLoader(InputPlugin):
         Calculate the shape of the Plugin's results.
         """
         self.__update_image_metadata()
-        self._config['result_shape'] = self._image_metadata.final_shape
-        self._original_input_shape = (self._image_metadata.raw_size_y,
-                                      self._image_metadata.raw_size_x)
+        self._config["result_shape"] = self._image_metadata.final_shape
+        self._original_input_shape = (
+            self._image_metadata.raw_size_y,
+            self._image_metadata.raw_size_x,
+        )
 
     def get_first_file_size(self):
         """
@@ -213,7 +211,6 @@ class EigerScanSeriesLoader(InputPlugin):
         """
         if self._filename_generator is None:
             self.__create_filename_generator()
-        _fname = self._filename_generator(
-            self.get_param_value('first_index'))
-        self._config['file_size'] = os.stat(_fname).st_size
-        return self._config['file_size']
+        _fname = self._filename_generator(self.get_param_value("first_index"))
+        self._config["file_size"] = os.stat(_fname).st_size
+        return self._config["file_size"]

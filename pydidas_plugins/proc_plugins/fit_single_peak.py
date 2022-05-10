@@ -23,14 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['FitSinglePeak']
+__all__ = ["FitSinglePeak"]
 
 
 import numpy as np
 from scipy.optimize import least_squares
 
-from pydidas.core.constants import (PROC_PLUGIN, GAUSSIAN, LORENTZIAN,
-                                    PSEUDO_VOIGT)
+from pydidas.core.constants import PROC_PLUGIN, GAUSSIAN, LORENTZIAN, PSEUDO_VOIGT
 from pydidas.core import get_generic_param_collection, Dataset, AppConfigError
 from pydidas.plugins import ProcPlugin
 
@@ -39,11 +38,13 @@ class FitSinglePeak(ProcPlugin):
     """
     Fit a single peak to a data
     """
-    plugin_name = 'Fit single peak'
+
+    plugin_name = "Fit single peak"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        'fit_func', 'fit_bg_order', 'fit_lower_limit', 'fit_upper_limit')
+        "fit_func", "fit_bg_order", "fit_lower_limit", "fit_upper_limit"
+    )
     input_data_dim = 1
     output_data_dim = 2
     new_dataset = True
@@ -61,15 +62,15 @@ class FitSinglePeak(ProcPlugin):
         """
         self._fitparam_labels = []
         self._fitparam_startpoints = []
-        if self.get_param_value('fit_func') == 'Gaussian':
+        if self.get_param_value("fit_func") == "Gaussian":
             self._ffunc = GAUSSIAN
-        elif self.get_param_value('fit_func') == 'Lorentzian':
+        elif self.get_param_value("fit_func") == "Lorentzian":
             self._ffunc = LORENTZIAN
-        elif self.get_param_value('fit_func') == 'Pseudo-Voigt':
+        elif self.get_param_value("fit_func") == "Pseudo-Voigt":
             self._ffunc = PSEUDO_VOIGT
-            self._fitparam_labels = ['fraction']
+            self._fitparam_labels = ["fraction"]
             self._fitparam_startpoints = [0.5]
-            self._fitparam_bounds = ((0, ), (1, ))
+            self._fitparam_bounds = ((0,), (1,))
 
     def execute(self, data, **kwargs):
         """
@@ -95,15 +96,18 @@ class FitSinglePeak(ProcPlugin):
         """
         _xnew, _data = self._get_data_range(data)
         self._update_fit_startparams(_xnew, _data)
-        _bg_order = self.get_param_value('fit_bg_order')
-        _res = least_squares(self._ffunc, self._fitparam_startpoints,
-                             args=(_xnew, _data.array, _bg_order),
-                             bounds=self._fitparam_bounds)
+        _bg_order = self.get_param_value("fit_bg_order")
+        _res = least_squares(
+            self._ffunc,
+            self._fitparam_startpoints,
+            args=(_xnew, _data.array, _bg_order),
+            bounds=self._fitparam_bounds,
+        )
         _new_params = _res.x
         _new_data = self._create_new_dataset(_xnew, _data, _new_params)
-        kwargs['fit_params'] = _new_params
-        kwargs['fit_func'] = self._ffunc.__name__
-        kwargs['fit_param_labels'] = self._fitparam_labels
+        kwargs["fit_params"] = _new_params
+        kwargs["fit_func"] = self._ffunc.__name__
+        kwargs["fit_param_labels"] = self._fitparam_labels
         return _new_data, kwargs
 
     def _get_data_range(self, data):
@@ -122,13 +126,16 @@ class FitSinglePeak(ProcPlugin):
         data_new : np.ndarray
             The selected data slice.
         """
-        _xlow = self.get_param_value('fit_lower_limit')
-        _xhigh = self.get_param_value('fit_upper_limit')
-        _range = np.where((data.axis_ranges[0] >= _xlow)
-                          & (data.axis_ranges[0] <= _xhigh))[0]
+        _xlow = self.get_param_value("fit_lower_limit")
+        _xhigh = self.get_param_value("fit_upper_limit")
+        _range = np.where(
+            (data.axis_ranges[0] >= _xlow) & (data.axis_ranges[0] <= _xhigh)
+        )[0]
         if _range.size < 5:
-            raise AppConfigError('The data range for the fit is too small '
-                                 'with less than 5 data points.')
+            raise AppConfigError(
+                "The data range for the fit is too small "
+                "with less than 5 data points."
+            )
         _xnew = data.axis_ranges[0][_range]
         _data_new = data[_range]
         return _xnew, _data_new
@@ -149,17 +156,19 @@ class FitSinglePeak(ProcPlugin):
         # guess that the interval is twice the FWHM
         _sigma = (x[-1] - x[0]) / 2 / 2.35
         self._fitparam_startpoints.extend([_amp, _sigma, _center])
-        self._fitparam_labels.extend(['amplitude', 'sigma', 'center'])
-        _bounds = (self._fitparam_bounds[0] + (0, 0, -np.inf),
-                   self._fitparam_bounds[1] + (np.inf, np.inf, np.inf))
-        _bg_order = self.get_param_value('fit_bg_order')
+        self._fitparam_labels.extend(["amplitude", "sigma", "center"])
+        _bounds = (
+            self._fitparam_bounds[0] + (0, 0, -np.inf),
+            self._fitparam_bounds[1] + (np.inf, np.inf, np.inf),
+        )
+        _bg_order = self.get_param_value("fit_bg_order")
         if _bg_order is not None:
             self._fitparam_startpoints.append(np.amin(data))
-            self._fitparam_labels.append('background p0')
+            self._fitparam_labels.append("background p0")
             _bounds = (_bounds[0] + (0,), _bounds[1] + (np.inf,))
         if _bg_order == 1:
             self._fitparam_startpoints.append(0)
-            self._fitparam_labels.append('background p1')
+            self._fitparam_labels.append("background p1")
             _bounds = (_bounds[0] + (-np.inf,), _bounds[1] + (np.inf,))
         self._fitparam_bounds = _bounds
 
@@ -186,16 +195,17 @@ class FitSinglePeak(ProcPlugin):
         new_data : pydidas.core.Dataset
             The new dataset.
         """
-        _datafit = self._ffunc(datafit_params, x, 0 * x,
-                               self.get_param_value('fit_bg_order'))
+        _datafit = self._ffunc(
+            datafit_params, x, 0 * x, self.get_param_value("fit_bg_order")
+        )
         _new_data = Dataset([data, _datafit, data - _datafit])
         _new_data.axis_labels[1] = data.axis_labels[0]
         _new_data.axis_units[1] = data.axis_units[0]
         _new_data.axis_ranges[1] = x
-        _new_data.axis_labels[0] = 'Data and fit'
-        _new_data.axis_ranges[0] = ['data', 'fit', 'residual']
+        _new_data.axis_labels[0] = "Data and fit"
+        _new_data.axis_ranges[0] = ["data", "fit", "residual"]
         _new_data.metadata = data.metadata
-        _new_data.metadata['fit_params'] = datafit_params
-        _new_data.metadata['fit_func'] = self._ffunc.__name__
-        _new_data.metadata['fit_param_labels'] = self._fitparam_labels
+        _new_data.metadata["fit_params"] = datafit_params
+        _new_data.metadata["fit_func"] = self._ffunc.__name__
+        _new_data.metadata["fit_param_labels"] = self._fitparam_labels
         return _new_data

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['SubtractBackgroundImage']
+__all__ = ["SubtractBackgroundImage"]
 
 
 import numpy as np
@@ -38,11 +38,13 @@ class SubtractBackgroundImage(ProcPlugin):
     """
     Subtract a background image from the data.
     """
-    plugin_name = 'Subtract background image'
+
+    plugin_name = "Subtract background image"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        'bg_file', 'bg_hdf5_key', 'bg_hdf5_frame', 'threshold_low')
+        "bg_file", "bg_hdf5_key", "bg_hdf5_frame", "threshold_low"
+    )
     input_data_dim = 2
     output_data_dim = 2
 
@@ -56,10 +58,11 @@ class SubtractBackgroundImage(ProcPlugin):
         Load the background image.
         """
         self._bg_image = self.load_image_from_file(
-            self.get_param_value('bg_file'),
-            hdf5_dset=self.get_param_value('bg_hdf5_key'),
-            hdf5_frame=self.get_param_value('bg_hdf5_frame'))
-        self._thresh = self.get_param_value('threshold_low')
+            self.get_param_value("bg_file"),
+            hdf5_dset=self.get_param_value("bg_hdf5_key"),
+            hdf5_frame=self.get_param_value("bg_hdf5_frame"),
+        )
+        self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
 

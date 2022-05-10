@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['clear_pydidas_QSettings']
+__all__ = ["clear_pydidas_QSettings"]
 
 import sys
 import os
@@ -38,10 +38,10 @@ def clear_pydidas_QSettings():
     """
     Clear all stored pydidas QSetting values and write None.
     """
-    qs = QSettings('Hereon', 'pydidas')
+    qs = QSettings("Hereon", "pydidas")
     for _key in qs.allKeys():
         qs.setValue(_key, None)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     clear_pydidas_QSettings()

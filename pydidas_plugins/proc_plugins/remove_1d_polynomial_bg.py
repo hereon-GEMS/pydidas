@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Remove1dPolynomialBackground']
+__all__ = ["Remove1dPolynomialBackground"]
 
 import numpy as np
 from numpy.polynomial import Polynomial
@@ -49,25 +49,55 @@ class Remove1dPolynomialBackground(ProcPlugin):
     calculated and the x-positions of all local minima of the residual are
     used in conjunction with their data values to fit a final background.
     """
-    plugin_name = 'Remove 1D polynomial background'
+
+    plugin_name = "Remove 1D polynomial background"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(
-        Parameter('threshold_low', float, None, allow_None=True,
-                  name='Lower threshold',
-                  tooltip=('The lower threhold. Any values in the corrected'
-                           ' dataset smaller than the threshold will be set '
-                           'to the threshold value.')),
-        Parameter('fit_order', int, 3, name='Polynomial fit order',
-                  tooltip=('The polynomial order for the fit. This value '
-                           'should typically not exceed3 or 4.')),
-        Parameter('include_limits', int, 0, choices=[True, False],
-                  name='Always fit endpoints',
-                  tooltip=('Flag to force the inclusion of both endpoints '
-                           'in the initial points for the fit.')),
-        Parameter('kernel_width', int, 5, name='Averaging width',
-                  tooltip=('The width of the averaging kernel (which is only '
-                           'applied to the data for fitting).')))
+        Parameter(
+            "threshold_low",
+            float,
+            None,
+            allow_None=True,
+            name="Lower threshold",
+            tooltip=(
+                "The lower threhold. Any values in the corrected"
+                " dataset smaller than the threshold will be set "
+                "to the threshold value."
+            ),
+        ),
+        Parameter(
+            "fit_order",
+            int,
+            3,
+            name="Polynomial fit order",
+            tooltip=(
+                "The polynomial order for the fit. This value "
+                "should typically not exceed3 or 4."
+            ),
+        ),
+        Parameter(
+            "include_limits",
+            int,
+            0,
+            choices=[True, False],
+            name="Always fit endpoints",
+            tooltip=(
+                "Flag to force the inclusion of both endpoints "
+                "in the initial points for the fit."
+            ),
+        ),
+        Parameter(
+            "kernel_width",
+            int,
+            5,
+            name="Averaging width",
+            tooltip=(
+                "The width of the averaging kernel (which is only "
+                "applied to the data for fitting)."
+            ),
+        ),
+    )
     input_data_dim = 1
     output_data_dim = 1
 
@@ -85,13 +115,13 @@ class Remove1dPolynomialBackground(ProcPlugin):
         """
         Set-up the fit and store required values.
         """
-        self._thresh = self.get_param_value('threshold_low')
+        self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None
-        self._fit_order = self.get_param_value('fit_order')
-        self._include_limits = self.get_param_value('include_limits')
+        self._fit_order = self.get_param_value("fit_order")
+        self._include_limits = self.get_param_value("include_limits")
 
-        _kernel = self.get_param_value('kernel_width')
+        _kernel = self.get_param_value("kernel_width")
         if _kernel > 0:
             self._kernel = np.ones(_kernel) / _kernel
             self._klim_low = _kernel // 2
@@ -120,14 +150,20 @@ class Remove1dPolynomialBackground(ProcPlugin):
         """
         if self._kernel is not None:
             _raw = data.copy()
-            data[self._klim_low:-self._klim_high] = np.convolve(
-                data, self._kernel, mode='valid')
+            data[self._klim_low : -self._klim_high] = np.convolve(
+                data, self._kernel, mode="valid"
+            )
 
         _x = np.arange(data.size)
 
         # find and fit the local minima
-        local_min = np.where((data[1:-1] < np.roll(data, 1)[1:-1])
-                             & (data[1:-1] < np.roll(data, -1)[1:-1]))[0] + 1
+        local_min = (
+            np.where(
+                (data[1:-1] < np.roll(data, 1)[1:-1])
+                & (data[1:-1] < np.roll(data, -1)[1:-1])
+            )[0]
+            + 1
+        )
         local_min = self.__filter_local_minima_by_offset(local_min, data, 1.2)
 
         if self._include_limits:
@@ -138,9 +174,13 @@ class Remove1dPolynomialBackground(ProcPlugin):
 
         # calculate the residual and fit residual's local minima
         _res = (data - _p_prelim(_x)) / data
-        _local_res_min = (np.where((_res[1:-1] < np.roll(_res, 1)[1:-1])
-                                   & (_res[1:-1] < np.roll(_res, -1)[1:-1]))[0]
-                          + 1)
+        _local_res_min = (
+            np.where(
+                (_res[1:-1] < np.roll(_res, 1)[1:-1])
+                & (_res[1:-1] < np.roll(_res, -1)[1:-1])
+            )[0]
+            + 1
+        )
         _tmpindices = np.where(_res[_local_res_min] <= 0.002)[0]
         _local_res_min = _local_res_min[_tmpindices]
 
@@ -178,8 +218,9 @@ class Remove1dPolynomialBackground(ProcPlugin):
         while _index < xpos.size - 1:
             _dx = xpos[_index + 1] - xpos[_index - 1]
             _dy = data[xpos[_index + 1]] - data[xpos[_index - 1]]
-            _ypos = ((xpos[_index] - xpos[_index - 1]) / _dx
-                     * _dy + data[xpos[_index - 1]])
+            _ypos = (xpos[_index] - xpos[_index - 1]) / _dx * _dy + data[
+                xpos[_index - 1]
+            ]
             if data[xpos[_index]] >= offset * _ypos:
                 xpos = np.delete(xpos, _index, 0)
             else:

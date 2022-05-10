@@ -22,14 +22,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Crop1dData']
+__all__ = ["Crop1dData"]
 
 
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import (ParameterCollection, Parameter,
-                          get_generic_parameter)
+from pydidas.core import ParameterCollection, Parameter, get_generic_parameter
 from pydidas.plugins import ProcPlugin
 
 
@@ -38,15 +37,27 @@ class Crop1dData(ProcPlugin):
     Crop a 1D dataset by specifying bounds, either indices or in the data
     range.
     """
-    plugin_name = 'Crop 1D data'
+
+    plugin_name = "Crop 1D data"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(
-        get_generic_parameter('type_selection'),
-        Parameter('crop_low', float, 0, name='Cropping lower boundary',
-                  tooltip='The lower boundary for cropping.'),
-        Parameter('crop_high', float, 0, name='Cropping upper boundary',
-                  tooltip='The upper boundary for cropping.'))
+        get_generic_parameter("type_selection"),
+        Parameter(
+            "crop_low",
+            float,
+            0,
+            name="Cropping lower boundary",
+            tooltip="The lower boundary for cropping.",
+        ),
+        Parameter(
+            "crop_high",
+            float,
+            0,
+            name="Cropping upper boundary",
+            tooltip="The upper boundary for cropping.",
+        ),
+    )
     input_data_dim = 1
     output_data_dim = 1
 
@@ -91,14 +102,15 @@ class Crop1dData(ProcPlugin):
         slice
             The slice object to select the range from the input data.
         """
-        _low = self.get_param_value('crop_low')
-        _high = self.get_param_value('crop_high')
-        if self.get_param_value('type_selection') == 'Indices':
+        _low = self.get_param_value("crop_low")
+        _high = self.get_param_value("crop_high")
+        if self.get_param_value("type_selection") == "Indices":
             return slice(int(_low), int(_high) + 1)
         _x = self._data.axis_ranges[0]
         assert isinstance(_x, np.ndarray), (
-            'The data does not have a correct range and cropping is only '
-            'available using the indices.')
+            "The data does not have a correct range and cropping is only "
+            "available using the indices."
+        )
         _bounds = np.where((_x >= _low) & (_x <= _high))[0]
         if _bounds.size == 0:
             return slice(0, 0)

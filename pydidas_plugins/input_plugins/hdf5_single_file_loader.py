@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Hdf5singleFileLoader']
+__all__ = ["Hdf5singleFileLoader"]
 
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
@@ -39,13 +39,15 @@ class Hdf5singleFileLoader(InputPlugin):
     This class is designed to load data from a single Hdf5 file. The filename
     and dataset key must be specified.
     """
-    plugin_name = 'HDF5 single file loader'
+
+    plugin_name = "HDF5 single file loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
-        get_generic_parameter('filename'),
-        get_generic_parameter('hdf5_key'),
-        get_generic_parameter('images_per_file'))
+        get_generic_parameter("filename"),
+        get_generic_parameter("hdf5_key"),
+        get_generic_parameter("images_per_file"),
+    )
     input_data_dim = None
     output_data_dim = 2
 
@@ -57,7 +59,7 @@ class Hdf5singleFileLoader(InputPlugin):
         Prepare loading of images from a single hdf5 file.
         """
         self._image_metadata.update()
-        if self.get_param_value('images_per_file') == -1:
+        if self.get_param_value("images_per_file") == -1:
             self.__update_images_per_file()
 
     def __update_images_per_file(self):
@@ -68,14 +70,16 @@ class Hdf5singleFileLoader(InputPlugin):
         of frames in this dataset and stores the information.
         """
         _n_per_file = get_hdf5_metadata(
-            self.get_param_value('filename'), 'shape',
-            dset=self.get_param_value('hdf5_key'))[0]
-        self.set_param_value('images_per_file', _n_per_file)
+            self.get_param_value("filename"),
+            "shape",
+            dset=self.get_param_value("hdf5_key"),
+        )[0]
+        self.set_param_value("images_per_file", _n_per_file)
 
     def execute(self, index, **kwargs):
-        fname = self.get_param_value('filename')
-        kwargs['dataset'] = self.get_param_value('hdf5_key')
-        kwargs['frame'] = index
+        fname = self.get_param_value("filename")
+        kwargs["dataset"] = self.get_param_value("hdf5_key")
+        kwargs["frame"] = index
         _data = import_data(fname, **kwargs)
         return _data, kwargs
 
@@ -86,4 +90,4 @@ class Hdf5singleFileLoader(InputPlugin):
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
-        return self.get_param_value('filename')
+        return self.get_param_value("filename")

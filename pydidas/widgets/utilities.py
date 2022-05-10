@@ -24,23 +24,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
     "delete_all_items_in_layout",
-    "excepthook",
     "apply_font_properties",
     "apply_widget_properties",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str_reference",
 ]
 
-import os
-import time
-import traceback
-from io import StringIO
 
 from qtpy import QtWidgets, QtCore, QtGui
 import qtawesome
 
 from ..core.constants import STANDARD_FONT_SIZE
-from .dialogues import ErrorMessageBox
 
 
 def delete_all_items_in_layout(layout):
@@ -154,51 +148,6 @@ def create_default_grid_layout():
     _layout.setHorizontalSpacing(5)
     _layout.setVerticalSpacing(5)
     return _layout
-
-
-def excepthook(exc_type, exception, trace):
-    """
-    Catch global exceptions.
-
-    This global function is used to replace the generic sys.excepthook
-    to handle exceptions. It will open a popup window with the exception
-    text.
-
-    Parameters
-    ----------
-    exc_type : type
-        The exception type
-    exception : Exception
-        The exception itself.
-    trace : traceback object
-        The trace of where the exception occured.
-    """
-    _sep = "\n" + "-" * 80 + "\n"
-    _traceback_info = StringIO()
-    traceback.print_tb(trace, None, _traceback_info)
-    _traceback_info.seek(0)
-    _trace = _traceback_info.read()
-    _logpath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
-    if not os.path.exists(_logpath):
-        os.makedirs(_logpath)
-    _logfile = os.path.join(_logpath, "pydidas_error.log")
-    _note = (
-        "An unhandled exception occurred. Please report the bug to:"
-        "\n\tmalte.storm@hereon.de\nor"
-        "\n\thttps://github.com/malte-storm/pydidas/issues"
-        f"\n\nA log has been written to:\n\t{_logfile}."
-        "\n\nError information:\n"
-    )
-    _time = time.strftime("%Y-%m-%d %H:%M:%S")
-    _msg = _sep.join([_time, f"{exc_type}: {exception}", _trace])
-    try:
-        with open(_logfile, "w") as _file:
-            _file.write(_msg)
-    except IOError:
-        pass
-    errorbox = ErrorMessageBox()
-    errorbox.set_text(_note + _msg)
-    errorbox.exec_()
 
 
 def get_pyqt_icon_from_str_reference(ref_string):

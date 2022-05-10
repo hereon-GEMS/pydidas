@@ -28,6 +28,7 @@ __all__ = ["BaseFrame"]
 from qtpy import QtWidgets, QtCore
 
 from ..core import ParameterCollection, PydidasQsettingsMixin, ParameterCollectionMixIn
+from ..core.utils import get_pydidas_icon_w_bg
 from .factory import CreateWidgetsMixIn
 from .parameter_config import ParameterWidgetsMixIn
 
@@ -70,6 +71,7 @@ class BaseFrame(
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
+        self.setWindowIcon(get_pydidas_icon_w_bg())
 
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()

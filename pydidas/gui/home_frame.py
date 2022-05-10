@@ -28,7 +28,7 @@ __all__ = ["HomeFrame"]
 import os
 from qtpy import QtGui, QtCore, QtSvg, QtWidgets
 
-from ..core.utils import get_doc_home_address
+from ..core.utils import get_doc_home_address, get_pydidas_icon_fname
 from ..widgets import BaseFrame
 
 
@@ -195,12 +195,9 @@ class HomeFrame(BaseFrame):
             stretch=(1, 1),
             policy=QtWidgets.QSizePolicy.Expanding,
         )
-        _svg_widget = QtSvg.QSvgWidget(
-            os.path.join(os.path.dirname(__file__), "icons", "pydidas_snakes.svg")
-        )
         self.add_any_widget(
             "svg_logo",
-            _svg_widget,
+            QtSvg.QSvgWidget(get_pydidas_icon_fname()),
             gridPos=(0, 2, 1, 1),
             fixedHeight=300,
             fixedWidth=300,

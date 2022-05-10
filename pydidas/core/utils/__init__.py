@@ -32,7 +32,8 @@ from .file_utils import *
 from .flatten_iterable import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
-from .get_module_dir import *
+from .get_logging_dir_ import *
+from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
 from .rebin_ import *
@@ -74,10 +75,16 @@ from . import get_documentation_targets
 __all__.extend(get_documentation_targets.__all__)
 del get_documentation_targets
 
-from . import get_module_dir
+from . import get_logging_dir_
 
-__all__.extend(get_module_dir.__all__)
-del get_module_dir
+__all__.extend(get_logging_dir_.__all__)
+del get_logging_dir_
+
+from . import get_pydidas_icons
+
+
+__all__.extend(get_pydidas_icons.__all__)
+del get_pydidas_icons
 
 from . import hdf5_dataset_utils
 

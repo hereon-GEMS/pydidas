@@ -65,6 +65,7 @@ class AverageImagesWindow(BaseFrame):
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
         self.build_frame()
         self.connect_signals()
+        self.setWindowTitle("Average images")
 
     def build_frame(self):
         """

@@ -40,3 +40,4 @@ class GlobalConfigWindow(PydidasWindow):
         _frame = GlobalConfigurationFrame()
         _frame.frame_index = 0
         self.setCentralWidget(_frame)
+        self.setWindowTitle("pydidas configuration")

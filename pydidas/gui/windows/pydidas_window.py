@@ -27,6 +27,8 @@ __all__ = ["PydidasWindow"]
 
 from qtpy import QtWidgets
 
+from ...core.utils import get_pydidas_icon_w_bg
+
 
 class PydidasWindow(QtWidgets.QMainWindow):
     """
@@ -38,6 +40,8 @@ class PydidasWindow(QtWidgets.QMainWindow):
         super().__init__(parent)
         self._geometry = None
         self.setVisible(False)
+        self.setWindowTitle("pydidas window")
+        self.setWindowIcon(get_pydidas_icon_w_bg())
 
     def closeEvent(self, event):
         """

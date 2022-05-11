@@ -1,3 +1,8 @@
+v0.1.7
+- Added feedback form to menu
+- Added semi-automatic bug reporting to excepthook
+
+
 v0.1.6
 Major changes:
 - Refactored data_io and moved classes which are not truly I/O classes.

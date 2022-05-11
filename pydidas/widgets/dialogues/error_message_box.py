@@ -34,6 +34,7 @@ from ...core.utils import (
     get_pydidas_icon_path,
 )
 from ...core.constants import EXP_EXP_POLICY, PYDIDAS_FEEDBACK_URL
+from ...core.utils import copy_text_to_system_clipbord
 from ..utilities import apply_widget_properties
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
@@ -126,7 +127,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             + "Exception trace:\n\n"
         )
         self._text = text
-        self._copy_trace_to_clipboard()
+        copy_text_to_system_clipbord(self._text)
         self._widgets["label"].setText(_note + text)
 
     def copy_to_clipboard_and_open_webpage(self):
@@ -134,13 +135,5 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         Copy the trace to the clipboard and open the URL for the pydidas
         feedback form.
         """
-        self._copy_trace_to_clipboard()
+        copy_text_to_system_clipbord(self._text)
         QtGui.QDesktopServices.openUrl(PYDIDAS_FEEDBACK_URL)
-
-    def _copy_trace_to_clipboard(self):
-        """
-        Copy the exception trace to the system's clipboard.
-        """
-        _clip = QtWidgets.QApplication.clipboard()
-        _clip.clear(mode=_clip.Clipboard)
-        _clip.setText(self._text, mode=_clip.Clipboard)

@@ -124,9 +124,7 @@ class CreateWidgetsMixIn:
         """
         Please refer to pydidas.widgets.factory.create_radio_button_group
         """
-        self.__create_widget(
-            create_radio_button_group, ref, entries, **kwargs
-        )
+        self.__create_widget(create_radio_button_group, ref, entries, **kwargs)
 
     def __create_widget(self, object_, ref, *args, **kwargs):
         """

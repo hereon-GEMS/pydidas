@@ -64,6 +64,7 @@ class BaseFrame(
     menuicon = "qt-std::7"
     params_not_to_restore = []
     status_msg = QtCore.Signal(str)
+    sig_closed = QtCore.Signal()
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
@@ -160,3 +161,15 @@ class BaseFrame(
                     self.set_param_value_and_widget(_key, _val)
                 else:
                     self.set_param_value(_key, _val)
+
+    def closeEvent(self, event):
+        """
+        Reimplement the closeEvent to emit a signal about the closing.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The event which triggered the closeEvent.
+        """
+        self.sig_closed.emit()
+        QtWidgets.QFrame.closeEvent(self, event)

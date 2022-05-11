@@ -25,8 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["AboutWindow"]
 
-import os
-
 from qtpy import QtCore, QtSvg
 
 from ...core.utils import get_pydidas_icon_fname

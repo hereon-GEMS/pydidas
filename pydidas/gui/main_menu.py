@@ -33,16 +33,17 @@ import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
 from pydidas.core import FrameConfigError
-from pydidas.core.utils import get_doc_home_qurl
+from pydidas.core.utils import get_doc_home_qurl, get_pydidas_icon_w_bg
 from pydidas.experiment import ScanSetup, ExperimentalSetup
 from pydidas.workflow import WorkflowTree
-from pydidas.widgets import CentralWidgetStack, excepthook
+from pydidas.widgets import CentralWidgetStack, gui_excepthook
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.gui import utils
 from pydidas.gui.windows import (
     GlobalConfigWindow,
     ExportEigerPixelmaskWindow,
     AverageImagesWindow,
+    AboutWindow,
 )
 
 
@@ -74,7 +75,7 @@ class MainMenu(QtWidgets.QMainWindow):
         utils.configure_qtapp_namespace()
         utils.update_qtapp_font_size()
         utils.apply_tooltip_event_filter()
-        sys.excepthook = excepthook
+        sys.excepthook = gui_excepthook
 
         self._child_windows = {}
         self._actions = {}
@@ -102,7 +103,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setCentralWidget(CentralWidgetStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI (alpha)")
-        self.setWindowIcon(utils.get_pydidas_icon())
+        self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
     def _add_global_config_window(self):
@@ -169,6 +170,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["open_documentation_browser"] = QtWidgets.QAction(
             "Open documentation in default web browser", self
         )
+        self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
 
     def _connect_menu_actions(self):
         """
@@ -189,6 +191,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["open_documentation_browser"].triggered.connect(
             self._action_open_doc_in_browser
         )
+        self._actions["open_about"].triggered.connect(self._action_open_about)
 
     def _add_actions_to_menu(self):
         """
@@ -216,6 +219,8 @@ class MainMenu(QtWidgets.QMainWindow):
 
         _help_menu = _menu.addMenu("&Help")
         _help_menu.addAction(self._actions["open_documentation_browser"])
+        _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
 
         self._menus["file"] = _file_menu
@@ -294,6 +299,14 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _ = QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
 
+    @QtCore.Slot()
+    def _action_open_about(self):
+        """
+        Open the About window.
+        """
+        self._child_windows["tmp"] = AboutWindow()
+        self._child_windows["tmp"].show()
+
     @QtCore.Slot(str)
     def update_status(self, text):
         """
@@ -359,9 +372,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _state["scan_setup"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        _state["exp_setup"] = EXP.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
+        _state["exp_setup"] = EXP.get_param_values_as_dict(filter_types_for_export=True)
         _state["workflow_tree"] = TREE.export_to_string()
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)

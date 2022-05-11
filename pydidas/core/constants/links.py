@@ -25,7 +25,7 @@ __status__ = "Development"
 __all__ = ["PYDIDAS_FEEDBACK_ADDRESS", "PYDIDAS_FEEDBACK_URL"]
 
 
-from QtCore import QUrl
+from qtpy.QtCore import QUrl
 
 
 PYDIDAS_FEEDBACK_ADDRESS = "https://ms.hereon.de/pydidas/105771/index.php.de"

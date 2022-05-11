@@ -55,7 +55,7 @@ class TestWorkerController(unittest.TestCase):
     def tearDownClass(cls):
         cls._app.quit()
 
-    def wait_for_finish_signal(self, wc, timeout=5):
+    def wait_for_finish_signal(self, wc, timeout=8):
         t0 = time.time()
         _spy = QtTest.QSignalSpy(wc.finished)
         t0 = time.time()

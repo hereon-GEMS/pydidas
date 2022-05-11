@@ -30,7 +30,7 @@ import sys
 from qtpy import QtWidgets
 
 from ..experiment import ScanSetup, ScanSetupIoMeta
-from ..widgets import excepthook
+from ..widgets import gui_excepthook
 from .builders import ScanSetupFrameBuilder
 
 
@@ -95,7 +95,7 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
             SCAN_SETTINGS.set(param_ref, widget.get_value())
         except Exception:
             widget.set_value(SCAN_SETTINGS.get(param_ref))
-            excepthook(*sys.exc_info())
+            gui_excepthook(*sys.exc_info())
         # explicitly call update fo wavelength and energy
         if param_ref == "xray_wavelength":
             _w = self.param_widgets["xray_energy"]

@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .clipboard_ import *
 from .decorators import *
 from .file_checks import *
 from .file_utils import *
@@ -45,6 +46,11 @@ from .timer import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import clipboard_
+
+__all__.extend(clipboard_.__all__)
+del clipboard_
+
 from . import decorators
 
 __all__.extend(decorators.__all__)

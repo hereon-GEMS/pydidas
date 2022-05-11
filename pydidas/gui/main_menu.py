@@ -44,6 +44,7 @@ from pydidas.gui.windows import (
     ExportEigerPixelmaskWindow,
     AverageImagesWindow,
     AboutWindow,
+    FeedbackWindow,
 )
 
 
@@ -80,6 +81,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
+        self.__window_counter = 0
 
         self._setup_mainwindow_widget(geometry)
         self._add_global_config_window()
@@ -171,6 +173,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "Open documentation in default web browser", self
         )
         self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
+        self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
         """
@@ -185,13 +188,20 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.show_window, "global_config")
         )
         self._actions["export_eiger_pixel_mask"].triggered.connect(
-            self._action_export_eiger_pixel_mask
+            partial(self.show_temp_window, ExportEigerPixelmaskWindow())
         )
-        self._actions["average_images"].triggered.connect(self._action_average_images)
+        self._actions["average_images"].triggered.connect(
+            partial(self.show_temp_window, AverageImagesWindow())
+        )
         self._actions["open_documentation_browser"].triggered.connect(
             self._action_open_doc_in_browser
         )
-        self._actions["open_about"].triggered.connect(self._action_open_about)
+        self._actions["open_about"].triggered.connect(
+            partial(self.show_temp_window, AboutWindow())
+        )
+        self._actions["open_feedback"].triggered.connect(
+            partial(self.show_temp_window, FeedbackWindow())
+        )
 
     def _add_actions_to_menu(self):
         """
@@ -219,6 +229,8 @@ class MainMenu(QtWidgets.QMainWindow):
 
         _help_menu = _menu.addMenu("&Help")
         _help_menu.addAction(self._actions["open_documentation_browser"])
+        _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["open_feedback"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
@@ -277,35 +289,11 @@ class MainMenu(QtWidgets.QMainWindow):
             self.restore_gui_state(fname)
 
     @QtCore.Slot()
-    def _action_export_eiger_pixel_mask(self):
-        """
-        Open dialogues to export an Eiger pixelmask.
-        """
-        self._child_windows["tmp"] = ExportEigerPixelmaskWindow()
-        self._child_windows["tmp"].show()
-
-    @QtCore.Slot()
-    def _action_average_images(self):
-        """
-        Open dialogue to average multiple frames and store them in a new file.
-        """
-        self._child_windows["tmp"] = AverageImagesWindow()
-        self._child_windows["tmp"].show()
-
-    @QtCore.Slot()
     def _action_open_doc_in_browser(self):
         """
         Open the link to the documentation in the system web browser.
         """
         _ = QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
-
-    @QtCore.Slot()
-    def _action_open_about(self):
-        """
-        Open the About window.
-        """
-        self._child_windows["tmp"] = AboutWindow()
-        self._child_windows["tmp"].show()
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -336,6 +324,37 @@ class MainMenu(QtWidgets.QMainWindow):
             The name key of the window to be shown.
         """
         self._child_windows[name].show()
+
+    @QtCore.Slot(str)
+    def show_temp_window(self, window):
+        """
+        Show the given temporary window.
+
+        Parameters
+        ----------
+        window : QtCore.QWidget
+            The window to be shown.
+        """
+        _name = f"temp_window_{self.__window_counter:03d}"
+        self.__window_counter += 1
+        self._child_windows[_name] = window
+        self._child_windows[_name].sig_closed.connect(
+            partial(self.remove_window_from_children, _name)
+        )
+        self._child_windows[_name].show()
+
+    @QtCore.Slot(str)
+    def remove_window_from_children(self, name):
+        """
+        Remove the specified window from the list of child window.
+
+        Parameters
+        ----------
+        name : str
+            The name key for the window.
+        """
+        if name in self._child_windows:
+            del self._child_windows[name]
 
     def deleteLater(self):
         """
@@ -478,7 +497,7 @@ class MainMenu(QtWidgets.QMainWindow):
             window states.
         """
         for _key, _window in self._child_windows.items():
-            if _key != "tmp":
+            if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
         self.__restore_mainwindow_state(state["main"])
 

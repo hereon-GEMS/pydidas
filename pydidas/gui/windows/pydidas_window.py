@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasWindow"]
 
-from qtpy import QtWidgets
+from qtpy import QtWidgets, QtCore
 
 from ...core.utils import get_pydidas_icon_w_bg
 
@@ -35,6 +35,8 @@ class PydidasWindow(QtWidgets.QMainWindow):
     The PydidasWindow is a standalone QMainWindow with a persistent geometry
     upon closing and showing.
     """
+
+    sig_closed = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -53,6 +55,7 @@ class PydidasWindow(QtWidgets.QMainWindow):
             The closing event.
         """
         self._geometry = self.geometry()
+        self.sig_closed.emit()
         super().closeEvent(event)
 
     def show(self):

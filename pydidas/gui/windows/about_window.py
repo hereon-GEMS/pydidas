@@ -29,6 +29,7 @@ import os
 
 from qtpy import QtCore, QtSvg
 
+from ...core.utils import get_pydidas_icon_fname
 from ...widgets import BaseFrame
 from ...version import VERSION
 
@@ -84,13 +85,7 @@ class AboutWindow(BaseFrame):
         )
         self.add_any_widget(
             "svg_logo",
-            QtSvg.QSvgWidget(
-                os.path.join(
-                    os.path.dirname(os.path.dirname(__file__)),
-                    "icons",
-                    "pydidas_snakes.svg",
-                )
-            ),
+            QtSvg.QSvgWidget(get_pydidas_icon_fname()),
             gridPos=(0, 1, 3, 1),
             fixedHeight=150,
             fixedWidth=150,

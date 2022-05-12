@@ -34,14 +34,14 @@ from .parameter_config import ParameterWidgetsMixIn
 
 
 class BaseFrame(
-    QtWidgets.QFrame,
+    QtWidgets.QWidget,
     ParameterCollectionMixIn,
     PydidasQsettingsMixin,
     CreateWidgetsMixIn,
     ParameterWidgetsMixIn,
 ):
     """
-    The BaseFrame is a subclassed QFrame and should be used as the
+    The BaseFrame is a subclassed QWidget and should be used as the
     base class for all Frames in pydidas.
 
     By default, a QGridLayout is applied with an alignment of left/top.
@@ -62,18 +62,21 @@ class BaseFrame(
 
     show_frame = True
     menuicon = "qt-std::7"
+    menu_title = ""
+    menu_entry = ""
     params_not_to_restore = []
     status_msg = QtCore.Signal(str)
     sig_closed = QtCore.Signal()
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QFrame.__init__(self, parent=parent)
+        QtWidgets.QWidget.__init__(self, parent=parent)
+        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setVisible(False)
+        self.setUpdatesEnabled(False)
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
-        self.setWindowIcon(get_pydidas_icon_w_bg())
-
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
 
@@ -83,8 +86,9 @@ class BaseFrame(
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
-        self.ref_name = ""
-        self.title = ""
+        self.ref_name = kwargs.get("menu_entry", self.menu_entry)
+        self.title = kwargs.get("title", self.menu_title)
+        self.icon = kwargs.get("icon", self.menuicon)
         self._config = {}
 
     @QtCore.Slot(int)
@@ -102,6 +106,17 @@ class BaseFrame(
         index : int
             The index of the activated frame.
         """
+
+    def build_frame_hidden(self):
+        """
+        Build the frame while hiding it.
+        """
+        self.setVisible(False)
+        self.setUpdatesEnabled(False)
+        self.build_frame()
+        if self.show_frame:
+            self.setVisible(True)
+        self.setUpdatesEnabled(True)
 
     def set_status(self, text):
         """
@@ -172,4 +187,4 @@ class BaseFrame(
             The event which triggered the closeEvent.
         """
         self.sig_closed.emit()
-        QtWidgets.QFrame.closeEvent(self, event)
+        QtWidgets.QWidget.closeEvent(self, event)

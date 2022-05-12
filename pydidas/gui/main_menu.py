@@ -113,7 +113,7 @@ class MainMenu(QtWidgets.QMainWindow):
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        self._child_windows["global_config"] = GlobalConfigWindow(self)
+        self._child_windows["global_config"] = GlobalConfigWindow(None)
 
     def _create_menu(self):
         """
@@ -188,19 +188,19 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.show_window, "global_config")
         )
         self._actions["export_eiger_pixel_mask"].triggered.connect(
-            partial(self.show_temp_window, ExportEigerPixelmaskWindow())
+            partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
         self._actions["average_images"].triggered.connect(
-            partial(self.show_temp_window, AverageImagesWindow())
+            partial(self.create_and_show_temp_window, AverageImagesWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
             self._action_open_doc_in_browser
         )
         self._actions["open_about"].triggered.connect(
-            partial(self.show_temp_window, AboutWindow())
+            partial(self.create_and_show_temp_window, AboutWindow)
         )
         self._actions["open_feedback"].triggered.connect(
-            partial(self.show_temp_window, FeedbackWindow())
+            partial(self.create_and_show_temp_window, FeedbackWindow)
         )
 
     def _add_actions_to_menu(self):
@@ -324,9 +324,10 @@ class MainMenu(QtWidgets.QMainWindow):
             The name key of the window to be shown.
         """
         self._child_windows[name].show()
+        self._child_windows[name].raise_()
 
-    @QtCore.Slot(str)
-    def show_temp_window(self, window):
+    @QtCore.Slot(object)
+    def create_and_show_temp_window(self, window):
         """
         Show the given temporary window.
 
@@ -337,7 +338,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _name = f"temp_window_{self.__window_counter:03d}"
         self.__window_counter += 1
-        self._child_windows[_name] = window
+        self._child_windows[_name] = window()
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )
@@ -544,7 +545,8 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        for window in self._child_windows:
-            self._child_windows[window].deleteLater()
-            self._child_windows[window].close()
+        _keys = list(self._child_windows.keys())
+        for _key in _keys:
+            self._child_windows[_key].deleteLater()
+            self._child_windows[_key].close()
         event.accept()

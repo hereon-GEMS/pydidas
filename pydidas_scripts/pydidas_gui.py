@@ -39,28 +39,32 @@ from pydidas.gui import (
     ScanSetupFrame,
     ExecuteWorkflowFrame,
     CompositeCreatorFrame,
-    get_pyfai_calib_icon,
     MainWindow,
     DirectorySpyFrame,
     ViewResultsFrame,
     WorkflowTestFrame,
+    GlobalConfigurationFrame,
 )
 from pydidas.widgets import BaseFrame
 
 
 class ProcessingFrame(BaseFrame):
+    menu_title = "Workflow processing"
+    menu_entry = "Workflow processing"
+    menuicon = "qta::mdi.cogs"
     show_frame = False
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
+    def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
 
 
 class ToolsFrame(BaseFrame):
+    menu_title = "Tools"
+    menu_entry = "Tools"
+    menuicon = "qta::mdi.cogs"
     show_frame = False
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
+    def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
 
 
@@ -87,67 +91,19 @@ def run_gui(app=None):
     if app is None:
         app = QtWidgets.QApplication(sys.argv)
     gui = MainWindow()
-    gui.register_frame(HomeFrame, "Home", "Home", "qta::mdi.home")
-    gui.register_frame(
-        DataBrowsingFrame,
-        "Data browsing",
-        "Data browsing",
-        "qta::mdi.image-search-outline",
-    )
-    gui.register_frame(
-        PyfaiCalibFrame,
-        "pyFAI calibration",
-        "pyFAI calibration",
-        get_pyfai_calib_icon(),
-    )
-    gui.register_frame(
-        CompositeCreatorFrame,
-        "Composite image creator",
-        "Composite image creator",
-        "qta::mdi.view-comfy",
-    )
-    gui.register_frame(
-        DirectorySpyFrame, "Directory spy", "Directory spy", "qta::mdi.magnify-scan"
-    )
-    gui.register_frame(
-        ProcessingFrame, "Workflow processing", "Workflow processing", "qta::mdi.cogs"
-    )
-    gui.register_frame(
-        ExperimentalSetupFrame,
-        "Experimental settings",
-        "Workflow processing/Experimental settings",
-        "qta::mdi.card-bulleted-settings-outline",
-    )
-    gui.register_frame(
-        ScanSetupFrame,
-        "Scan settings",
-        "Workflow processing/Scan settings",
-        "qta::ei.move",
-    )
-    gui.register_frame(
-        WorkflowEditFrame,
-        "Workflow editing",
-        "Workflow processing/Workflow editing",
-        "qta::ph.share-network-fill",
-    )
-    gui.register_frame(
-        WorkflowTestFrame,
-        "Test workflow",
-        "Workflow processing/Test workflow",
-        "qta::mdi.play-protected-content",
-    )
-    gui.register_frame(
-        ExecuteWorkflowFrame,
-        "Run full processing",
-        "Workflow processing/Run full processing",
-        "qta::msc.run-all",
-    )
-    gui.register_frame(
-        ViewResultsFrame,
-        "View workflow results",
-        "Workflow processing/View workflow results",
-        "qta::mdi.monitor-eye",
-    )
+    gui.register_frame(HomeFrame)
+    gui.register_frame(DataBrowsingFrame)
+    gui.register_frame(PyfaiCalibFrame)
+    gui.register_frame(CompositeCreatorFrame)
+    gui.register_frame(DirectorySpyFrame)
+    gui.register_frame(ProcessingFrame)
+    gui.register_frame(ExperimentalSetupFrame)
+    gui.register_frame(ScanSetupFrame)
+    gui.register_frame(WorkflowEditFrame)
+    gui.register_frame(WorkflowTestFrame)
+    gui.register_frame(ExecuteWorkflowFrame)
+    gui.register_frame(ViewResultsFrame)
+    gui.register_frame(GlobalConfigurationFrame)
     gui.show()
     gui.raise_()
     _ = app.exec_()
@@ -157,6 +113,5 @@ def run_gui(app=None):
 
 
 if __name__ == "__main__":
-
     app = QtWidgets.QApplication(sys.argv)
     run_gui(app)

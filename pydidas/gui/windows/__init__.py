@@ -28,9 +28,10 @@ __all__ = []
 # import __all__ items from modules:
 from .about_window import *
 from .average_images_window import *
+from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .global_config_window import *
-from .export_eiger_pixelmask import *
+from .pydidas_window import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -44,17 +45,22 @@ from . import average_images_window
 __all__.extend(average_images_window.__all__)
 del average_images_window
 
-from . import global_config_window
+from . import export_eiger_pixelmask
 
-__all__.extend(global_config_window.__all__)
-del global_config_window
+__all__.extend(export_eiger_pixelmask.__all__)
+del export_eiger_pixelmask
 
 from . import feedback_window
 
 __all__.extend(feedback_window.__all__)
 del feedback_window
 
-from . import export_eiger_pixelmask
+from . import global_config_window
 
-__all__.extend(export_eiger_pixelmask.__all__)
-del export_eiger_pixelmask
+__all__.extend(global_config_window.__all__)
+del global_config_window
+
+from . import pydidas_window
+
+__all__.extend(pydidas_window.__all__)
+del pydidas_window

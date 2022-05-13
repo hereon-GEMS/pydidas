@@ -45,27 +45,6 @@ from pydidas.gui import (
     WorkflowTestFrame,
     GlobalConfigurationFrame,
 )
-from pydidas.widgets import BaseFrame
-
-
-class ProcessingFrame(BaseFrame):
-    menu_title = "Workflow processing"
-    menu_entry = "Workflow processing"
-    menuicon = "qta::mdi.cogs"
-    show_frame = False
-
-    def __init__(self, parent=None, **kwargs):
-        super().__init__(parent)
-
-
-class ToolsFrame(BaseFrame):
-    menu_title = "Tools"
-    menu_entry = "Tools"
-    menuicon = "qta::mdi.cogs"
-    show_frame = False
-
-    def __init__(self, parent=None, **kwargs):
-        super().__init__(parent)
 
 
 def run_gui(app=None):
@@ -96,7 +75,12 @@ def run_gui(app=None):
     gui.register_frame(PyfaiCalibFrame)
     gui.register_frame(CompositeCreatorFrame)
     gui.register_frame(DirectorySpyFrame)
-    gui.register_frame(ProcessingFrame)
+    gui.register_frame(
+        "ProcessingFrame",
+        title="Workflow processing",
+        menu_entry="Workflow processing",
+        icon="qta::mdi.cogs",
+    )
     gui.register_frame(ExperimentalSetupFrame)
     gui.register_frame(ScanSetupFrame)
     gui.register_frame(WorkflowEditFrame)

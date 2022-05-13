@@ -28,8 +28,8 @@ __all__ = ["AboutWindow"]
 from qtpy import QtCore, QtSvg
 
 from ...core.utils import get_pydidas_icon_fname
-from ...widgets import BaseFrame
 from ...version import VERSION
+from .pydidas_window import PydidasWindow
 
 
 PYDIDAS_INFO = (
@@ -49,22 +49,20 @@ PYDIDAS_INFO = (
 )
 
 
-class AboutWindow(BaseFrame):
+class AboutWindow(PydidasWindow):
     """
     Window which displays basic information about the pydidas software.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.build_frame()
-        self.connect_signals()
-        self.setWindowTitle("About pydidas")
+    show_frame = False
+
+    def __init__(self, parent=None, **kwargs):
+        PydidasWindow.__init__(self, parent, title="About pydidas", **kwargs)
 
     def build_frame(self):
         """
         Build the frame and create all widgets.
         """
-
         self.create_label(
             "label_title",
             "About",
@@ -98,30 +96,3 @@ class AboutWindow(BaseFrame):
         Build the frame and create all widgets.
         """
         self._widgets["but_okay"].clicked.connect(self.close)
-
-    def export_window_state(self):
-        """
-        Get the state of the window for exporting.
-
-        The generic PydidasWindow method will return the geometry and
-        visibility. If windows need to export more information, they need
-        to reimplement this method.
-
-        Returns
-        -------
-        dict
-            The dictionary with the window state.
-        """
-        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
-
-    def restore_window_state(self, state):
-        """
-        Restore the window state from saved information.
-
-        Parameters
-        ----------
-        state : dict
-            The dictionary with the state information.
-        """
-        self.setGeometry(*state["geometry"])
-        self.setVisible(state["visible"])

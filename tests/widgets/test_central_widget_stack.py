@@ -36,7 +36,9 @@ from pydidas.widgets.central_widget_stack import CentralWidgetStack
 class TestWidget(QtWidgets.QWidget):
     ref_name = ""
     title = ""
-    menuicon = None
+    menu_icon = None
+    menu_entry = "Test/Entry"
+    menu_title = "Test"
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -55,7 +57,6 @@ class TestCentralWidgetStack(unittest.TestCase):
     def tearDown(self):
         self.q_app.deleteLater()
         self.q_app.quit()
-        CentralWidgetStack._reset_instance()
 
     def create_stack(self):
         stack = CentralWidgetStack()

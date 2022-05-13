@@ -27,10 +27,10 @@ __all__ = ["FeedbackWindow"]
 
 from qtpy import QtCore, QtWidgets, QtGui
 
-from pydidas.core import Parameter, ParameterCollection
-from pydidas.core.constants import PYDIDAS_FEEDBACK_URL
-from pydidas.core.utils import copy_text_to_system_clipbord
-from pydidas.widgets import BaseFrame
+from ...core import Parameter, ParameterCollection
+from ...core.constants import PYDIDAS_FEEDBACK_URL
+from ...core.utils import copy_text_to_system_clipbord
+from .pydidas_window import PydidasWindow
 
 
 INFO_TEXT = (
@@ -43,7 +43,7 @@ INFO_TEXT = (
 )
 
 
-class FeedbackWindow(BaseFrame):
+class FeedbackWindow(PydidasWindow):
     """
     Create all widgets and initialize their state.
 
@@ -53,17 +53,15 @@ class FeedbackWindow(BaseFrame):
         The ScanSetupFrame instance.
     """
 
+    show_frame = False
     default_params = ParameterCollection(
         Parameter("email", str, "", name="E-mail address (optional)")
     )
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
-        self.set_default_params()
-        self.build_window()
-        self._widgets["button_copy"].clicked.connect(self._submit_feedback)
+    def __init__(self, parent=None, **kwargs):
+        PydidasWindow.__init__(self, parent, title="pydidas feedback", **kwargs)
 
-    def build_window(self):
+    def build_frame(self):
         """
         Create all widgets for the frame and place them in the layout.
         """
@@ -116,6 +114,12 @@ class FeedbackWindow(BaseFrame):
         self.create_button(
             "button_copy", "Copy to clipboard and open feedback webpage."
         )
+
+    def connect_signals(self):
+        """
+        Connect the signals.
+        """
+        self._widgets["button_copy"].clicked.connect(self._submit_feedback)
 
     @QtCore.Slot()
     def _submit_feedback(self):

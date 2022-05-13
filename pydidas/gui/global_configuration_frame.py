@@ -53,17 +53,17 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     Frame which manages global configuration items.
     """
 
+    menu_icon = "qta::mdi.application-cog"
+    menu_title = "Global configuration"
+    menu_entry = "Global configuration"
+
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
     value_changed_signal = QtCore.Signal(str, object)
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        GlobalConfigurationFrameBuilder.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        GlobalConfigurationFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
-        self.build_frame()
-        self.connect_signals()
-        self.frame_activated(self.frame_index)
 
     def connect_signals(self):
         """
@@ -105,6 +105,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         index : int
             The index of the activated frame.
         """
+        super().frame_activated(index)
         if index != self.frame_index:
             return
         for _param_key in self.params:

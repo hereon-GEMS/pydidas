@@ -45,11 +45,12 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
            plugins.
     """
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        WorkflowEditFrameBuilder.__init__(self, parent)
-        self.build_frame()
-        self.connect_signals()
+    menu_title = "Workflow editing"
+    menu_entry = "Workflow processing/Workflow editing"
+    menu_icon = "qta::ph.share-network-fill"
+
+    def __init__(self, parent=None, **kwargs):
+        WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
 
     def connect_signals(self):
         """
@@ -131,5 +132,6 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         index : int
             The index of the newly activated frame.
         """
+        super().frame_activated(index)
         if self.frame_index == index:
             WORKFLOW_EDIT_MANAGER.update_from_tree()

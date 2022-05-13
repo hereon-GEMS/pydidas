@@ -179,13 +179,13 @@ def get_pyqt_icon_from_str_reference(ref_string):
     """
     _type, _ref = ref_string.split("::")
     if _type == "qta":
-        menuicon = qtawesome.icon(_ref)
+        _menu_icon = qtawesome.icon(_ref)
     elif _type == "qt-std":
         _num = int(_ref)
         app = QtWidgets.QApplication.instance()
-        menuicon = app.style().standardIcon(_num)
+        _menu_icon = app.style().standardIcon(_num)
     elif _type == "path":
-        menuicon = QtGui.QIcon(_ref)
+        _menu_icon = QtGui.QIcon(_ref)
     else:
         raise TypeError("Cannot interpret the string reference for " "the menu icon.")
-    return menuicon
+    return _menu_icon

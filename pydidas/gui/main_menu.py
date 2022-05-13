@@ -113,7 +113,9 @@ class MainMenu(QtWidgets.QMainWindow):
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        self._child_windows["global_config"] = GlobalConfigWindow(None)
+        _frame = GlobalConfigWindow(None)
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows["global_config"] = _frame
 
     def _create_menu(self):
         """
@@ -323,6 +325,8 @@ class MainMenu(QtWidgets.QMainWindow):
         name : str
             The name key of the window to be shown.
         """
+        _index = self._child_windows[name].frame_index
+        self._child_windows[name].frame_activated(_index)
         self._child_windows[name].show()
         self._child_windows[name].raise_()
 
@@ -338,7 +342,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _name = f"temp_window_{self.__window_counter:03d}"
         self.__window_counter += 1
-        self._child_windows[_name] = window()
+        self._child_windows[_name] = window(build_directly=True)
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )
@@ -445,9 +449,11 @@ class MainMenu(QtWidgets.QMainWindow):
             filename = self._get_standard_state_filename()
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
+        self.setUpdatesEnabled(False)
         self._restore_global_objects(_state)
         self._restore_window_states(_state)
         self._restore_frame_states(_state)
+        self.setUpdatesEnabled(True)
 
     def _get_standard_state_filename(self):
         """

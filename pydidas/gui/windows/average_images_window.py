@@ -39,15 +39,17 @@ from ...core.constants import (
 from ...core.utils import get_hdf5_metadata
 from ...data_io import import_data, export_data
 from ...managers import FilelistManager
-from ...widgets import BaseFrame, dialogues
+from ...widgets import dialogues
+from .pydidas_window import PydidasWindow
 
 
-class AverageImagesWindow(BaseFrame):
+class AverageImagesWindow(PydidasWindow):
     """
     Window with a simple dialogue to export the average of several frames from
     one or multiple files.
     """
 
+    show_frame = False
     default_params = get_generic_param_collection(
         "first_file",
         "last_file",
@@ -58,14 +60,10 @@ class AverageImagesWindow(BaseFrame):
         "output_fname",
     )
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.set_default_params()
+    def __init__(self, parent=None, **kwargs):
+        PydidasWindow.__init__(self, parent, title="Average images", **kwargs)
         self.set_param_value("use_global_det_mask", False)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
-        self.build_frame()
-        self.connect_signals()
-        self.setWindowTitle("Average images")
 
     def build_frame(self):
         """
@@ -256,30 +254,3 @@ class AverageImagesWindow(BaseFrame):
             else:
                 _data += _tmp
         return _data, (_max_index - _start_index)
-
-    def export_window_state(self):
-        """
-        Get the state of the window for exporting.
-
-        The generic PydidasWindow method will return the geometry and
-        visibility. If windows need to export more information, they need
-        to reimplement this method.
-
-        Returns
-        -------
-        dict
-            The dictionary with the window state.
-        """
-        return {"geometry": self.geometry().getRect(), "visible": self.isVisible()}
-
-    def restore_window_state(self, state):
-        """
-        Restore the window state from saved information.
-
-        Parameters
-        ----------
-        state : dict
-            The dictionary with the state information.
-        """
-        self.setGeometry(*state["geometry"])
-        self.setVisible(state["visible"])

@@ -55,23 +55,23 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
     visualization.
     """
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        CompositeCreatorFrameBuilder.__init__(self, parent)
+    menu_icon = "qta::mdi.view-comfy"
+    menu_title = "Composite image creator"
+    menu_entry = "Composite image creator"
+
+    def __init__(self, parent=None, **kwargs):
+        CompositeCreatorFrameBuilder.__init__(self, parent, **kwargs)
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
         self._image_metadata = self._app._image_metadata
+        self._app._config.update(self._config)
         self._config = self._app._config
         self._config["input_configured"] = False
         self._config["bg_configured"] = False
         self._config["frame_active"] = False
         self._update_timer = 0
         self._create_param_collection()
-
-        self.build_frame()
-        self.connect_signals()
-        self.setup_initial_state()
 
     def _create_param_collection(self):
         """
@@ -139,6 +139,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             partial(self.__update_composite_dim, "y")
         )
         self._app.updated_composite.connect(self.__received_composite_update)
+        self.setup_initial_state()
 
     @QtCore.Slot()
     def __received_composite_update(self):
@@ -175,6 +176,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         index : int
             The frame index.
         """
+        super().frame_activated(index)
         self._config["frame_active"] = index == self.frame_index
 
     def _run_app_serial(self):

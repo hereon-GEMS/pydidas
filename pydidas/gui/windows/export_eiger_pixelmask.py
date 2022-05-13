@@ -32,16 +32,17 @@ from qtpy import QtCore
 
 from ...core import Parameter, ParameterCollection, utils
 from ...core.constants import DEFAULT_TWO_LINE_PARAM_CONFIG
-from ...widgets import BaseFrame
 from ...widgets.dialogues import critical_warning
+from .pydidas_window import PydidasWindow
 
 
-class ExportEigerPixelmaskWindow(BaseFrame):
+class ExportEigerPixelmaskWindow(PydidasWindow):
     """
     Window with a simple dialogue to export the Pixelmask from an Eiger
     "master" file.
     """
 
+    show_frame = False
     default_params = ParameterCollection(
         Parameter(
             "master_filename",
@@ -59,12 +60,8 @@ class ExportEigerPixelmaskWindow(BaseFrame):
         ),
     )
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.set_default_params()
-        self.build_frame()
-        self.connect_signals()
-        self.setWindowTitle("Export Eiger pixelmask")
+    def __init__(self, parent=None, **kwargs):
+        PydidasWindow.__init__(self, parent, title="Export Eiger pixelmask", **kwargs)
 
     def build_frame(self):
         """

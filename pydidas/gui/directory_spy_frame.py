@@ -53,26 +53,28 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
     and display the latest data.
     """
 
+    menu_icon = "qta::mdi.magnify-scan"
+    menu_title = "Directory spy"
+    menu_entry = "Directory spy"
     default_params = ParameterCollection()
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        DirectorySpyFrameBuilder.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        DirectorySpyFrameBuilder.__init__(self, parent, **kwargs)
         _global_plot_update_time = self.q_settings_get_global_value(
             "plot_update_time", argtype=float
         )
-        self._config = {
-            "data_use_timeline": False,
-            "plot_active": True,
-            "plot_last_update": 0,
-            "plot_update_time": _global_plot_update_time,
-            "frame_active": True,
-        }
+        self._config.update(
+            {
+                "data_use_timeline": False,
+                "plot_active": True,
+                "plot_last_update": 0,
+                "plot_update_time": _global_plot_update_time,
+                "frame_active": True,
+            }
+        )
         self._app = DirectorySpyApp()
         self.set_default_params()
         self.add_params(self._app.params)
-        self.build_frame()
-        self.connect_signals()
 
     def connect_signals(self):
         """
@@ -240,6 +242,7 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         index : int
             The index of the newly activated frame.
         """
+        super().frame_activated(index)
         if index == self.frame_index:
             self.__check_for_plot_update()
         self._config["frame_active"] = index == self.frame_index

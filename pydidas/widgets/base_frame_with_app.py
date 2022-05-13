@@ -56,8 +56,7 @@ class BaseFrameWithApp(BaseFrame):
     status_msg = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
-        init_layout = kwargs.get("init_layout", True)
-        BaseFrame.__init__(self, parent=parent, init_layout=init_layout)
+        BaseFrame.__init__(self, parent=parent, **kwargs)
         self._app = None
         self._runner = None
         self._app_attributes_to_update = []

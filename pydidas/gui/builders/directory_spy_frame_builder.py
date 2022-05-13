@@ -43,11 +43,8 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrameWithApp.__init__(self, parent)
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
 
     def __param_widget_config(self, param_key):
         """

@@ -41,16 +41,23 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     WorkflowTree.
     """
 
+    menu_icon = "qta::mdi.monitor-eye"
+    menu_title = "View workflow results"
+    menu_entry = "Workflow processing/View workflow results"
+
     default_params = get_generic_param_collection(
         "selected_results", "saving_format", "enable_overwrite"
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        ViewResultsFrameBuilder.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        ViewResultsFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
-        self.build_frame()
+
+    def finalize_ui(self):
+        """
+        Connect the export functions to the results widget data.
+        """
         ViewResultsMixin.__init__(self)
 
     @QtCore.Slot(int)
@@ -66,6 +73,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         index : int
             The index of the newly activated frame.
         """
+        super().frame_activated(index)
         if index == self.frame_index:
             self._update_choices_of_selected_results()
             self._update_export_button_activation()

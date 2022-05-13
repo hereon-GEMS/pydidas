@@ -34,9 +34,8 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
-        self.layout().setContentsMargins(5, 5, 0, 0)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def build_frame(self):
         """

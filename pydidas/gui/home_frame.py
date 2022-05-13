@@ -79,10 +79,21 @@ _proc_text = (
 
 
 class HomeFrame(BaseFrame):
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        super().__init__(parent)
+    """
+    The pydidas start-up/home frame with generic information.
+    """
 
+    menu_icon = "qta::mdi.home"
+    menu_title = "Home"
+    menu_entry = "Home"
+
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent)
+
+    def build_frame(self):
+        """
+        Build the frame and add all widgets.
+        """
         _layout = QtWidgets.QGridLayout()
         _layout.setContentsMargins(5, 5, 5, 5)
         _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)

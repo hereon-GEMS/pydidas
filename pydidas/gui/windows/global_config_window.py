@@ -25,19 +25,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["GlobalConfigWindow"]
 
+
 from ..global_configuration_frame import GlobalConfigurationFrame
-from .pydidas_window import PydidasWindow
+from .pydidas_window import PydidasWindowMixIn
 
 
-class GlobalConfigWindow(PydidasWindow):
+class GlobalConfigWindow(GlobalConfigurationFrame, PydidasWindowMixIn):
     """
     The GlobalConfigWindow is a standalone QMainWindow with the
     GlobalConfigurationFrame as sole content.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        _frame = GlobalConfigurationFrame()
-        _frame.frame_index = 0
-        self.setCentralWidget(_frame)
-        self.setWindowTitle("pydidas configuration")
+    def __init__(self, parent=None, **kwargs):
+        GlobalConfigurationFrame.__init__(self, parent, **kwargs)
+        PydidasWindowMixIn.__init__(self)
+        self.setWindowTitle("pydidas global configuration")

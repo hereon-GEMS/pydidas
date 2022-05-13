@@ -42,12 +42,12 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
     Frame for managing the global scan settings.
     """
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        ScanSetupFrameBuilder.__init__(self, parent)
-        self.build_frame()
-        self.connect_signals()
-        self.update_dim_visibility()
+    menu_icon = "qta::ei.move"
+    menu_title = "Scan settings"
+    menu_entry = "Workflow processing/Scan settings"
+
+    def __init__(self, parent=None, **kwargs):
+        ScanSetupFrameBuilder.__init__(self, parent, **kwargs)
 
     def connect_signals(self):
         """
@@ -59,6 +59,14 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         self.param_widgets["scan_dim"].currentTextChanged.connect(
             self.update_dim_visibility
         )
+
+    def finalize_ui(self):
+        """
+        Finalize the UI initialization.
+        """
+        self.update_dim_visibility()
+        for param in SCAN_SETTINGS.params.values():
+            self.param_widgets[param.refkey].set_value(param.value)
 
     def update_dim_visibility(self):
         """
@@ -138,21 +146,5 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         Reset all ScanSetting entries to their default values.
         """
         SCAN_SETTINGS.restore_all_defaults(True)
-        for param in SCAN_SETTINGS.params.values():
-            self.param_widgets[param.refkey].set_value(param.value)
-
-    def restore_state(self, state):
-        """
-        Restore the frame's state from saved information.
-
-        This method overloads the generic base_frame's method and additionally
-        queries the ScanSettings because the frame has no own Parameters.
-
-        Parameters
-        ----------
-        state : dict
-            The state dictionary for this frame.
-        """
-        super().restore_state(state)
         for param in SCAN_SETTINGS.params.values():
             self.param_widgets[param.refkey].set_value(param.value)

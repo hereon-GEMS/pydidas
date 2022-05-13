@@ -45,11 +45,8 @@ class ViewResultsFrameBuilder(BaseFrame):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def __param_widget_config(self, param_key):
         """
@@ -91,13 +88,11 @@ class ViewResultsFrameBuilder(BaseFrame):
         self.create_label(
             "title", "View results", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
         )
-
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
-
         self.create_any_widget(
             "config_area",
             ScrollArea,
@@ -108,7 +103,6 @@ class ViewResultsFrameBuilder(BaseFrame):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
-
         self.create_any_widget(
             "result_selector",
             ResultSelectionWidget,
@@ -116,11 +110,9 @@ class ViewResultsFrameBuilder(BaseFrame):
             gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param("selected_results"),
         )
-
         self.create_line(
             "line_export", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
         )
-
         self.create_param_widget(
             self.get_param("saving_format"),
             **self.__param_widget_config("saving_format"),
@@ -142,7 +134,6 @@ class ViewResultsFrameBuilder(BaseFrame):
                 "and node label."
             ),
         )
-
         self.create_button(
             "but_export_all",
             "Export all results",
@@ -152,14 +143,12 @@ class ViewResultsFrameBuilder(BaseFrame):
             parent_widget=self._widgets["config"],
             tooltip=("Export all results. Note that the directory must be " "empty."),
         )
-
         self.create_spacer(
             "config_terminal_spacer",
             height=20,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
-
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
         self._widgets["plot1d"] = Plot1D()

@@ -39,8 +39,8 @@ class DataBrowsingFrameBuilder(BaseFrame):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def build_frame(self):
         """
@@ -48,7 +48,7 @@ class DataBrowsingFrameBuilder(BaseFrame):
         """
         self.create_label(None, "Data browser", fontsize=14, bold=True)
 
-        _bsize = 25
+        _button_iconsize = 25
         self._widgets["selection"] = QtWidgets.QFrame()
         self._widgets["selection"].setSizePolicy(
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
@@ -72,9 +72,9 @@ class DataBrowsingFrameBuilder(BaseFrame):
             "but_minimize",
             "",
             icon=qta.icon("fa.chevron-left"),
-            iconSize=QtCore.QSize(_bsize, _bsize),
-            fixedHeight=_bsize,
-            fixedWidth=_bsize,
+            iconSize=QtCore.QSize(_button_iconsize, _button_iconsize),
+            fixedHeight=_button_iconsize,
+            fixedWidth=_button_iconsize,
             gridPos=(0, 1, 1, 1),
             parent_widget=self._widgets["selection"],
         )
@@ -82,9 +82,9 @@ class DataBrowsingFrameBuilder(BaseFrame):
             "but_maximize",
             "",
             icon=qta.icon("fa.chevron-right"),
-            iconSize=QtCore.QSize(_bsize, _bsize),
-            fixedHeight=_bsize,
-            fixedWidth=_bsize,
+            iconSize=QtCore.QSize(_button_iconsize, _button_iconsize),
+            fixedHeight=_button_iconsize,
+            fixedWidth=_button_iconsize,
             gridPos=(2, 1, 1, 1),
             parent_widget=self._widgets["selection"],
         )

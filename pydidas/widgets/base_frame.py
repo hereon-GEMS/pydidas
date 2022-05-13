@@ -61,7 +61,7 @@ class BaseFrame(
     """
 
     show_frame = True
-    menuicon = "qt-std::7"
+    menu_icon = "qt-std::7"
     menu_title = ""
     menu_entry = ""
     params_not_to_restore = []
@@ -88,8 +88,8 @@ class BaseFrame(
         self.frame_index = -1
         self.ref_name = kwargs.get("menu_entry", self.menu_entry)
         self.title = kwargs.get("title", self.menu_title)
-        self.icon = kwargs.get("icon", self.menuicon)
-        self._config = {}
+        self.icon = kwargs.get("icon", self.menu_icon)
+        self._config = {"built": False}
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -106,17 +106,31 @@ class BaseFrame(
         index : int
             The index of the activated frame.
         """
+        if index == self.frame_index and not self._config["built"]:
+            self.setUpdatesEnabled(False)
+            self.build_frame()
+            self.setUpdatesEnabled(True)
+            self.connect_signals()
+            self.finalize_ui()
+            self._config["built"] = True
+        if "state" in self._config:
+            _state = self._config.pop("state")
+            self.restore_state(_state)
 
-    def build_frame_hidden(self):
+    def build_frame(self):
         """
-        Build the frame while hiding it.
+        Build all widgets of the frame.
         """
-        self.setVisible(False)
-        self.setUpdatesEnabled(False)
-        self.build_frame()
-        if self.show_frame:
-            self.setVisible(True)
-        self.setUpdatesEnabled(True)
+
+    def connect_signals(self):
+        """
+        Connect all the required signals for the frame.
+        """
+
+    def finalize_ui(self):
+        """
+        finalize the UI initialization.
+        """
 
     def set_status(self, text):
         """
@@ -162,7 +176,9 @@ class BaseFrame(
         Restore the frame's state from stored information.
 
         The default implementation in the BaseFrame will update all Parameters
-        (and associated widgets) and restore the visibility of all widgets.
+        (and associated widgets) and restore the visibility of all widgets. If the
+        frame has not yet been built, the state information is only stored internally
+        and not yet applied. It will be applied at the next frame activation.
 
         Parameters
         ----------
@@ -170,6 +186,9 @@ class BaseFrame(
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
+        if not self._config["built"]:
+            self._config["state"] = state
+            return
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:

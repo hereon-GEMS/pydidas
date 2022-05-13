@@ -33,12 +33,14 @@ from ..apps import ExecuteWorkflowApp
 from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger
 from ..multiprocessing import AppRunner
-from ..workflow import WorkflowResults
+from ..widgets.dialogues import WarningBox
+from ..workflow import WorkflowResults, WorkflowTree
 from .builders.execute_workflow_frame_builder import ExecuteWorkflowFrameBuilder
 from .mixins import ViewResultsMixin
 
 
 RESULTS = WorkflowResults()
+TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
@@ -48,14 +50,17 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
     and visualize the results.
     """
 
+    menu_icon = "qta::msc.run-all"
+    menu_title = "Run full processing"
+    menu_entry = "Workflow processing/Run full processing"
+
     default_params = get_generic_param_collection(
         "selected_results", "saving_format", "enable_overwrite"
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        ExecuteWorkflowFrameBuilder.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        ExecuteWorkflowFrameBuilder.__init__(self, parent, **kwargs)
         _global_plot_update_time = self.q_settings_get_global_value(
             "plot_update_time", argtype=float
         )
@@ -70,9 +75,6 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         self._app = ExecuteWorkflowApp()
         self.set_default_params()
         self.add_params(self._app.params)
-        self.build_frame()
-        self.connect_signals()
-        ViewResultsMixin.__init__(self)
 
     def connect_signals(self):
         """
@@ -83,6 +85,12 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
+
+    def finalize_ui(self):
+        """
+        Connect the export functions to the widget data.
+        """
+        ViewResultsMixin.__init__(self)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -97,6 +105,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         index : int
             The index of the newly activated frame.
         """
+        super().frame_activated(index)
         if index == self.frame_index:
             self._update_choices_of_selected_results()
             self._update_export_button_activation()
@@ -123,6 +132,8 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         """
         Parallel implementation of the execution method.
         """
+        if not self._check_tree_is_populated():
+            return
         logger.debug("Starting workflow")
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
@@ -138,6 +149,23 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         self._runner.sig_final_app_state.connect(self._set_app)
         logger.debug("Running AppRunner")
         self._runner.start()
+
+    def _check_tree_is_populated(self):
+        """
+        Check if the WorkflowTree is populated, i.e. not empty.
+
+        Returns
+        -------
+        bool
+            Flag whether the WorkflowTree is populated.
+        """
+        if TREE.root is None:
+            WarningBox(
+                "Empty WorkflowTree",
+                "The WorkflowTree is empty. Workflow processing has not been started.",
+            )
+            return False
+        return True
 
     def _prepare_app_run(self):
         """

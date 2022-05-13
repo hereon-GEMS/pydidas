@@ -34,7 +34,7 @@ from qtpy import QtWidgets, QtCore
 
 from ..core import FrameConfigError
 from ..core.utils import format_input_to_multiline_str
-from ..widgets import InfoWidget, get_pyqt_icon_from_str_reference
+from ..widgets import BaseFrame, InfoWidget, get_pyqt_icon_from_str_reference
 from . import utils
 from .main_menu import MainMenu
 
@@ -87,13 +87,12 @@ class MainWindow(MainMenu):
         Insert a create_toolbars method call into the show method if the
         toolbars have not been created at the time of the show call.
         """
-        # self.setUpdatesEnabled(False)
-        QtWidgets.QMainWindow.show(self)
         self.create_frame_instances()
         if not self._toolbars_created:
             self.create_toolbars()
         self.connect_global_config_frame()
-        # self.setUpdatesEnabled(True)
+        QtWidgets.QMainWindow.show(self)
+        self.centralWidget().currentChanged.emit(0)
 
     def create_frame_instances(self):
         """
@@ -105,18 +104,14 @@ class MainWindow(MainMenu):
             If a similar menu entry has already been registered.
 
         """
-        # self.setUpdatesEnabled(False)
-        self.centralWidget().setUpdatesEnabled(False)
         while len(self._frames_to_add) > 0:
             _class, _title, _menu_entry, _icon = self._frames_to_add.pop(0)
-            print("creating frame", _class)
             if _title is None:
                 _title = _class.menu_title
             if _menu_entry is None:
                 _menu_entry = _class.menu_entry
             if _icon is None:
-                _icon = _class.menuicon
-
+                _icon = _class.menu_icon
             if _menu_entry in self._frame_menuentries:
                 raise FrameConfigError(
                     f'The selected menu entry "{_menu_entry}"' " already exists."
@@ -129,8 +124,7 @@ class MainWindow(MainMenu):
             )
             _frame.status_msg.connect(self.update_status)
             self.centralWidget().register_widget(_menu_entry, _frame)
-            self._store_frame_metadata(_frame, _icon)
-        self.centralWidget().setUpdatesEnabled(True)
+            self._store_frame_metadata(_frame)
 
     def create_toolbars(self):
         """
@@ -173,12 +167,13 @@ class MainWindow(MainMenu):
         window and create it.
         """
         if "Global configuration" in self.centralWidget().widget_indices:
-            _w = self.centralWidget().get_widget_by_name("Global configuration")
-            _w2 = self._child_windows["global_config"]._frame
-            _w.value_changed_signal.connect(_w2.external_update)
-            _w2.value_changed_signal.connect(_w.external_update)
+            _cfg_frame = self.centralWidget().get_widget_by_name("Global configuration")
+            _cfg_frame.frame_activated(_cfg_frame.frame_index)
+            _cfg_window = self._child_windows["global_config"]
+            _cfg_frame.value_changed_signal.connect(_cfg_window.external_update)
+            _cfg_window.value_changed_signal.connect(_cfg_frame.external_update)
 
-    def register_frame(self, frame, title=None, menu_entry=None, menuicon=None):
+    def register_frame(self, frame, title=None, menu_entry=None, icon=None):
         """
         Register a frame class with the MainWindow and add it to the
         CentralWidgetStack.
@@ -190,8 +185,10 @@ class MainWindow(MainMenu):
 
         Parameters
         ----------
-        frame : pydidas.widgets.BaseFrame
+        frame : Union[pydidas.widgets.BaseFrame, str]
             The class of the Frame. This must be a subclass of BaseFrame.
+            If a string is passed, an empty frame class with the metadata
+            given by title, menu_entry and icon is created.
         title : Union[None, str], optional
             The frame's title. If None, the default title from the Frame class
             will be used. The default is None.
@@ -199,16 +196,27 @@ class MainWindow(MainMenu):
             The path to the menu entry for the frame. Hierachical levels are
             separated by a '/' item. If None, the menu_entry from the Frame
             class will be used. The default is None.
-        menuicon : Union[str, QtGui.QIcon, None], optional
-            The menuicon. If None, this defaults to the menu icon specified
+        icon : Union[str, QtGui.QIcon, None], optional
+            The menu icon. If None, this defaults to the menu icon specified
             in the frame's class. If a string is supplied, this is interpreted
             as a reference for a QIcon. For the refernce on string conversion,
             please check
             :py:func:`pydidas.widgets.get_pyqt_icon_from_str_reference`.
         """
-        self._frames_to_add.append([frame, title, menu_entry, menuicon])
+        if isinstance(frame, str):
+            frame = type(
+                frame,
+                (BaseFrame,),
+                {
+                    "menu_title": title,
+                    "menu_entry": menu_entry,
+                    "menu_icon": icon,
+                    "show_frame": False,
+                },
+            )
+        self._frames_to_add.append([frame, title, menu_entry, icon])
 
-    def _store_frame_metadata(self, frame, menuicon):
+    def _store_frame_metadata(self, frame):
         """
         Store the frame metadata in the internal dictionaries for reference.
 
@@ -223,12 +231,12 @@ class MainWindow(MainMenu):
             for _path in reversed(Path(_ref).parents)
         ] + [_ref]
         self._frame_menuentries.append(_ref)
-        menuicon = frame.icon
-        if isinstance(menuicon, str):
-            menuicon = get_pyqt_icon_from_str_reference(menuicon)
+        _menu_icon = frame.icon
+        if isinstance(_menu_icon, str):
+            _menu_icon = get_pyqt_icon_from_str_reference(_menu_icon)
         self._frame_meta[_ref] = dict(
             label=format_input_to_multiline_str(frame.title),
-            icon=menuicon,
+            icon=_menu_icon,
             index=frame.frame_index,
             menus=_new_menus,
         )
@@ -245,7 +253,6 @@ class MainWindow(MainMenu):
             The label of the selected item.
         """
         self.setUpdatesEnabled(False)
-        self.centralWidget().setUpdatesEnabled(False)
         for _name, _toolbar in self._toolbars.items():
             _toolbar.setVisible(_name in self._frame_meta[label]["menus"])
         _new_widget = self.centralWidget().get_widget_by_name(label)
@@ -258,7 +265,6 @@ class MainWindow(MainMenu):
         else:
             self._toolbar_actions[label].setChecked(False)
         self.setUpdatesEnabled(True)
-        self.centralWidget().setUpdatesEnabled(True)
 
     def restore_gui_state(self, filename=None):
         """

@@ -42,11 +42,8 @@ class ImageMathFrameBuilder(BaseFrame):
         The ImageMathFrame instance.
     """
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def build_frame(self):
         """

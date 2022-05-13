@@ -61,12 +61,13 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     saving the ExperimentalSettings in the GUI.
     """
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        ExperimentalSetupFrameBuilder.__init__(self, parent)
+    menu_icon = "qta::mdi.card-bulleted-settings-outline"
+    menu_title = "Experimental setup"
+    menu_entry = "Workflow processing/Experimental settings"
+
+    def __init__(self, parent=None, **kwargs):
+        ExperimentalSetupFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP_SETUP.params
-        self.build_frame()
-        self.connect_signals()
 
     def connect_signals(self):
         """

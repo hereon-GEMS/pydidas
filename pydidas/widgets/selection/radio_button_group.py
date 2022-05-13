@@ -67,13 +67,16 @@ class RadioButtonGroup(QtWidgets.QWidget):
             _val = _val if _val != -1 else len(entries)
             setattr(self, f"_{_key}", _val)
         self._size = (0, 0)
-        self._emit_signal = True
         self._active_index = 0
+        self._emit_signal = True
         self._buttons = {}
         self._button_indices = {}
         self._button_label = {}
         if entries is not None:
             self.__initUI(entries)
+            self._active_label = self._buttons[0].text()
+        else:
+            self._active_label = ""
 
     def __initUI(self, entries):
         """
@@ -158,6 +161,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
             _index = self._button_indices[id(_button)]
             _entry = _button.text()
             self._active_index = _index
+            self._active_label = _entry
             if self._emit_signal:
                 self.new_button_index.emit(_index)
                 self.new_button_label.emit(_entry)
@@ -172,6 +176,18 @@ class RadioButtonGroup(QtWidgets.QWidget):
             The active RadioButton's index.
         """
         return self._active_index
+
+    @property
+    def active_label(self):
+        """
+        Return the label name of the currently selected button.
+
+        Returns
+        -------
+        str
+            The label.
+        """
+        return self._active_label
 
     def select_by_index(self, index):
         """

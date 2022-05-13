@@ -28,19 +28,20 @@ __all__ = ["BaseFrame"]
 from qtpy import QtWidgets, QtCore
 
 from ..core import ParameterCollection, PydidasQsettingsMixin, ParameterCollectionMixIn
+from ..core.utils import get_pydidas_icon_w_bg
 from .factory import CreateWidgetsMixIn
 from .parameter_config import ParameterWidgetsMixIn
 
 
 class BaseFrame(
-    QtWidgets.QFrame,
+    QtWidgets.QWidget,
     ParameterCollectionMixIn,
     PydidasQsettingsMixin,
     CreateWidgetsMixIn,
     ParameterWidgetsMixIn,
 ):
     """
-    The BaseFrame is a subclassed QFrame and should be used as the
+    The BaseFrame is a subclassed QWidget and should be used as the
     base class for all Frames in pydidas.
 
     By default, a QGridLayout is applied with an alignment of left/top.
@@ -60,17 +61,22 @@ class BaseFrame(
     """
 
     show_frame = True
-    menuicon = "qt-std::7"
+    menu_icon = "qt-std::7"
+    menu_title = ""
+    menu_entry = ""
     params_not_to_restore = []
     status_msg = QtCore.Signal(str)
+    sig_closed = QtCore.Signal()
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QFrame.__init__(self, parent=parent)
+        QtWidgets.QWidget.__init__(self, parent=parent)
+        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setVisible(False)
+        self.setUpdatesEnabled(False)
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
-
         self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
 
@@ -80,9 +86,10 @@ class BaseFrame(
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
-        self.ref_name = ""
-        self.title = ""
-        self._config = {}
+        self.ref_name = kwargs.get("menu_entry", self.menu_entry)
+        self.title = kwargs.get("title", self.menu_title)
+        self.icon = kwargs.get("icon", self.menu_icon)
+        self._config = {"built": False}
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -98,6 +105,31 @@ class BaseFrame(
         ----------
         index : int
             The index of the activated frame.
+        """
+        if index == self.frame_index and not self._config["built"]:
+            self.setUpdatesEnabled(False)
+            self.build_frame()
+            self.setUpdatesEnabled(True)
+            self.connect_signals()
+            self.finalize_ui()
+            self._config["built"] = True
+        if "state" in self._config:
+            _state = self._config.pop("state")
+            self.restore_state(_state)
+
+    def build_frame(self):
+        """
+        Build all widgets of the frame.
+        """
+
+    def connect_signals(self):
+        """
+        Connect all the required signals for the frame.
+        """
+
+    def finalize_ui(self):
+        """
+        finalize the UI initialization.
         """
 
     def set_status(self, text):
@@ -144,7 +176,9 @@ class BaseFrame(
         Restore the frame's state from stored information.
 
         The default implementation in the BaseFrame will update all Parameters
-        (and associated widgets) and restore the visibility of all widgets.
+        (and associated widgets) and restore the visibility of all widgets. If the
+        frame has not yet been built, the state information is only stored internally
+        and not yet applied. It will be applied at the next frame activation.
 
         Parameters
         ----------
@@ -152,9 +186,24 @@ class BaseFrame(
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
+        if not self._config["built"]:
+            self._config["state"] = state
+            return
         for _key, _val in state["params"].items():
             if _key not in self.params_not_to_restore:
                 if _key in self.param_widgets:
                     self.set_param_value_and_widget(_key, _val)
                 else:
                     self.set_param_value(_key, _val)
+
+    def closeEvent(self, event):
+        """
+        Reimplement the closeEvent to emit a signal about the closing.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The event which triggered the closeEvent.
+        """
+        self.sig_closed.emit()
+        QtWidgets.QWidget.closeEvent(self, event)

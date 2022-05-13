@@ -34,8 +34,7 @@ from qtpy import QtWidgets, QtCore
 
 from ..core import FrameConfigError
 from ..core.utils import format_input_to_multiline_str
-from ..widgets import CentralWidgetStack, InfoWidget, get_pyqt_icon_from_str_reference
-from .global_configuration_frame import GlobalConfigurationFrame
+from ..widgets import BaseFrame, InfoWidget, get_pyqt_icon_from_str_reference
 from . import utils
 from .main_menu import MainMenu
 
@@ -62,6 +61,7 @@ class MainWindow(MainMenu):
 
         self._frame_menuentries = []
         self._frame_meta = {}
+        self._frames_to_add = []
 
         self._toolbars = {}
         self._toolbar_actions = {}
@@ -82,12 +82,55 @@ class MainWindow(MainMenu):
         _dock_widget.setBaseSize(500, 50)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
 
+    def show(self):
+        """
+        Insert a create_toolbars method call into the show method if the
+        toolbars have not been created at the time of the show call.
+        """
+        self.create_frame_instances()
+        if not self._toolbars_created:
+            self.create_toolbars()
+        self.connect_global_config_frame()
+        QtWidgets.QMainWindow.show(self)
+        self.centralWidget().currentChanged.emit(0)
+
+    def create_frame_instances(self):
+        """
+        Create the instances for all registered frames.
+
+        Raises
+        ------
+        FrameConfigError
+            If a similar menu entry has already been registered.
+
+        """
+        while len(self._frames_to_add) > 0:
+            _class, _title, _menu_entry, _icon = self._frames_to_add.pop(0)
+            if _title is None:
+                _title = _class.menu_title
+            if _menu_entry is None:
+                _menu_entry = _class.menu_entry
+            if _icon is None:
+                _icon = _class.menu_icon
+            if _menu_entry in self._frame_menuentries:
+                raise FrameConfigError(
+                    f'The selected menu entry "{_menu_entry}"' " already exists."
+                )
+            _frame = _class(
+                parent=self.centralWidget(),
+                menu_entry=_menu_entry,
+                title=_title,
+                icon=_icon,
+            )
+            _frame.status_msg.connect(self.update_status)
+            self.centralWidget().register_widget(_menu_entry, _frame)
+            self._store_frame_metadata(_frame)
+
     def create_toolbars(self):
         """
         Create the toolbars to select between different widgets in the
         centralWidget.
         """
-        self.__add_global_config_frame()
         self._toolbars = {}
         for tb in utils.find_toolbar_bases(self._frame_menuentries):
             tb_title = tb if tb else "Main toolbar"
@@ -118,32 +161,19 @@ class MainWindow(MainMenu):
         self.select_item(self._frame_menuentries[0])
         self._toolbars_created = True
 
-    def __add_global_config_frame(self):
+    def connect_global_config_frame(self):
         """
-        Add the required widgets and signals for the global configuration
+        Add the required signals for the global configuration
         window and create it.
         """
-        self.register_frame(
-            GlobalConfigurationFrame,
-            "Global configuration",
-            "Global configuration",
-            "qta::mdi.application-cog",
-        )
-        _w = CentralWidgetStack().get_widget_by_name("Global configuration")
-        _w2 = self._child_windows["global_config"].centralWidget()
-        _w.value_changed_signal.connect(_w2.external_update)
-        _w2.value_changed_signal.connect(_w.external_update)
+        if "Global configuration" in self.centralWidget().widget_indices:
+            _cfg_frame = self.centralWidget().get_widget_by_name("Global configuration")
+            _cfg_frame.frame_activated(_cfg_frame.frame_index)
+            _cfg_window = self._child_windows["global_config"]
+            _cfg_frame.value_changed_signal.connect(_cfg_window.external_update)
+            _cfg_window.value_changed_signal.connect(_cfg_frame.external_update)
 
-    def show(self):
-        """
-        Insert a create_toolbars method call into the show method if the
-        toolbars have not been created at the time of the show call.
-        """
-        if not self._toolbars_created:
-            self.create_toolbars()
-        super().show()
-
-    def register_frame(self, frame, title, menu_entry, menuicon=None):
+    def register_frame(self, frame, title=None, menu_entry=None, icon=None):
         """
         Register a frame class with the MainWindow and add it to the
         CentralWidgetStack.
@@ -155,42 +185,38 @@ class MainWindow(MainMenu):
 
         Parameters
         ----------
-        frame : pydidas.widgets.BaseFrame
+        frame : Union[pydidas.widgets.BaseFrame, str]
             The class of the Frame. This must be a subclass of BaseFrame.
-        title : str
-            The frame's title.
-        menu_entry : str
+            If a string is passed, an empty frame class with the metadata
+            given by title, menu_entry and icon is created.
+        title : Union[None, str], optional
+            The frame's title. If None, the default title from the Frame class
+            will be used. The default is None.
+        menu_entry : Union[None, str], optional
             The path to the menu entry for the frame. Hierachical levels are
-            separated by a '/' item.
-        menuicon : Union[str, QtGui.QIcon, None], optional
-            The menuicon. If None, this defaults to the menu icon specified
+            separated by a '/' item. If None, the menu_entry from the Frame
+            class will be used. The default is None.
+        icon : Union[str, QtGui.QIcon, None], optional
+            The menu icon. If None, this defaults to the menu icon specified
             in the frame's class. If a string is supplied, this is interpreted
             as a reference for a QIcon. For the refernce on string conversion,
             please check
             :py:func:`pydidas.widgets.get_pyqt_icon_from_str_reference`.
-
-        Raises
-        ------
-        FrameConfigError
-            If a similar menu entry has already been registered.
         """
-        if menu_entry in self._frame_menuentries:
-            raise FrameConfigError(
-                f'The selected menu entry "{menu_entry}"' " already exists."
+        if isinstance(frame, str):
+            frame = type(
+                frame,
+                (BaseFrame,),
+                {
+                    "menu_title": title,
+                    "menu_entry": menu_entry,
+                    "menu_icon": icon,
+                    "show_frame": False,
+                },
             )
-        _frame = frame()
-        _frame.ref_name = menu_entry
-        _frame.title = title
-        if menuicon is not None:
-            _frame.menuicon = menuicon
-        _frame.status_msg.connect(self.update_status)
-        if self.centralWidget().is_registered(_frame):
-            self.centralWidget().change_reference_name(menu_entry, _frame)
-        else:
-            self.centralWidget().register_widget(menu_entry, _frame)
-        self._store_frame_metadata(_frame, menuicon)
+        self._frames_to_add.append([frame, title, menu_entry, icon])
 
-    def _store_frame_metadata(self, frame, menuicon):
+    def _store_frame_metadata(self, frame):
         """
         Store the frame metadata in the internal dictionaries for reference.
 
@@ -198,9 +224,6 @@ class MainWindow(MainMenu):
         ----------
         frame : pydidas.widgets.BaseFrame
             The instantiated frame
-        menuicon : Union[str, QtGui.QIcon]
-            The menuicon, either as a QIcon or as a string reference for a
-            menu icon.
         """
         _ref = frame.ref_name
         _new_menus = [
@@ -208,11 +231,12 @@ class MainWindow(MainMenu):
             for _path in reversed(Path(_ref).parents)
         ] + [_ref]
         self._frame_menuentries.append(_ref)
-        if isinstance(menuicon, str):
-            menuicon = get_pyqt_icon_from_str_reference(menuicon)
+        _menu_icon = frame.icon
+        if isinstance(_menu_icon, str):
+            _menu_icon = get_pyqt_icon_from_str_reference(_menu_icon)
         self._frame_meta[_ref] = dict(
             label=format_input_to_multiline_str(frame.title),
-            icon=menuicon,
+            icon=_menu_icon,
             index=frame.frame_index,
             menus=_new_menus,
         )
@@ -229,7 +253,6 @@ class MainWindow(MainMenu):
             The label of the selected item.
         """
         self.setUpdatesEnabled(False)
-        self.centralWidget().setUpdatesEnabled(False)
         for _name, _toolbar in self._toolbars.items():
             _toolbar.setVisible(_name in self._frame_meta[label]["menus"])
         _new_widget = self.centralWidget().get_widget_by_name(label)
@@ -242,7 +265,6 @@ class MainWindow(MainMenu):
         else:
             self._toolbar_actions[label].setChecked(False)
         self.setUpdatesEnabled(True)
-        self.centralWidget().setUpdatesEnabled(True)
 
     def restore_gui_state(self, filename=None):
         """
@@ -278,18 +300,6 @@ class MainWindow(MainMenu):
         if text[-1] != "\n":
             text += "\n"
         self.__info_widget.add_status(text)
-
-    @QtCore.Slot(str)
-    def show_window(self, name):
-        """
-        Show a separate window.
-
-        Parameters
-        ----------
-        name : str
-            The name key of the window to be shown.
-        """
-        self._child_windows[name].show()
 
     def deleteLater(self):
         """

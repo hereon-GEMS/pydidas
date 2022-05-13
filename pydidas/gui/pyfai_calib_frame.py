@@ -48,7 +48,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["PyfaiCalibFrame", "get_pyfai_calib_icon"]
+__all__ = ["PyfaiCalibFrame", "get_pyfai_calib_icon_path"]
 
 import os
 import functools
@@ -68,41 +68,17 @@ from ..experiment import ExperimentalSetup
 EXP_SETUP = ExperimentalSetup()
 
 
-def get_pyfai_calib_icon():
+def get_pyfai_calib_icon_path():
     """
     Get the pyFAI calibration icon.
 
     Returns
     -------
-    QtGui.QIcon
-        A QIcon instance with the calibration icon.
+    str
+        The full path and filename for pyFAI calibration icon.
     """
-    return QtGui.QIcon(
-        os.sep.join(
-            [os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"]
-        )
-    )
-
-
-def pyfaiRingIcon():
-    """
-    Get the pyFAI ring icon.
-
-    Returns
-    -------
-    QtGui.QIcon
-        A QIcon instance with the ring icon.
-    """
-    return QtGui.QIcon(
-        os.sep.join(
-            [
-                os.path.dirname(pyFAI.__file__),
-                "resources",
-                "gui",
-                "icons",
-                "task-identify-rings.svg",
-            ]
-        )
+    return os.sep.join(
+        [os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"]
     )
 
 
@@ -118,16 +94,16 @@ class PyfaiCalibFrame(BaseFrame):
     available.
     """
 
-    def __init__(self, **kwargs):
-        mainWindow = kwargs.get("mainWindow", None)
-        parent = kwargs.get("parent", None)
-        super().__init__(parent)
-        self._setup_pyfai_context()
-        if mainWindow:
-            self._CALIB_CONTEXT.setParent(mainWindow)
-        else:
-            self._CALIB_CONTEXT.setParent(self)
+    menu_icon = "path::" + get_pyfai_calib_icon_path()
+    menu_title = "pyFAI calibration"
+    menu_entry = "pyFAI calibration"
 
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
+        self._setup_pyfai_context()
+        self._CALIB_CONTEXT.setParent(self)
+
+        self.setUpdatesEnabled(False)
         self._list = QtWidgets.QListWidget(self)
         self._list.setSizePolicy(
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
@@ -149,7 +125,6 @@ class PyfaiCalibFrame(BaseFrame):
         self.add_any_widget("help", self._help, gridPos=(2, 0, 1, 1))
         self.add_any_widget("help", self._stack, gridPos=(1, 1, 2, 1))
 
-        self.__context = self._CALIB_CONTEXT
         model = self._CALIB_CONTEXT.getCalibrationModel()
 
         self.__menu_connections = {}
@@ -178,6 +153,7 @@ class PyfaiCalibFrame(BaseFrame):
             self._help.setText("Online help...")
         self._helpText = self._help.text()
         self._help.clicked.connect(self.__displayHelp)
+        self.setUpdatesEnabled(True)
 
     def _setup_pyfai_context(self):
         """
@@ -217,7 +193,9 @@ class PyfaiCalibFrame(BaseFrame):
             task.aboutToClose()
 
     def createTasks(self):
-        # Tasks must be imported here, a global import will cause errors.
+        # Tasks must be imported here, a global import will cause errors
+        # because they will create QtWidgets before the QtApplication
+        # is instantiated.
         from pyFAI.gui.tasks import (
             ExperimentTask,
             MaskTask,

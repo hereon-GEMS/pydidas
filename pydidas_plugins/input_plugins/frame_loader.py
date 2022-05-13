@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['FrameLoader']
+__all__ = ["FrameLoader"]
 
 
 from pydidas.core.constants import INPUT_PLUGIN
@@ -62,20 +62,24 @@ class FrameLoader(InputPlugin):
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
     """
-    plugin_name = 'Single frame loader'
+
+    plugin_name = "Single frame loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
-        'first_file', 'last_file', 'live_processing', 'file_stepping')
+        "first_file", "last_file", "live_processing", "file_stepping"
+    )
     input_data_dim = None
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_param_value('live_processing', False)
+        self.set_param_value("live_processing", False)
         self._file_manager = FilelistManager(
-            *self.get_params('first_file', 'last_file', 'live_processing',
-                             'file_stepping'))
+            *self.get_params(
+                "first_file", "last_file", "live_processing", "file_stepping"
+            )
+        )
 
     def pre_execute(self):
         """
@@ -103,8 +107,8 @@ class FrameLoader(InputPlugin):
             Any input kwargs are returned to be passed on to the next plugin.
         """
         _fname = self.get_filename(index)
-        kwargs['binning'] = self.get_param_value('binning')
-        kwargs['roi'] = self._image_metadata.roi
+        kwargs["binning"] = self.get_param_value("binning")
+        kwargs["roi"] = self._image_metadata.roi
         _data = import_data(_fname, **kwargs)
         return _data, kwargs
 

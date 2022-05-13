@@ -40,8 +40,7 @@ from ..utilities import apply_widget_properties
 
 
 DEFAULT_FILTERS = {
-    "/entry/instrument/detector/detectorSpecific/":
-        '"detectorSpecific"\nkeys (Eiger detector)'
+    "/entry/instrument/detector/detectorSpecific/": '"detectorSpecific"\nkeys (Eiger detector)'
 }
 
 

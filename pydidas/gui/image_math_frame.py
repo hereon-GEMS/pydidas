@@ -29,7 +29,6 @@ __all__ = ["ImageMathFrame"]
 from ..core import Parameter, ParameterCollection, get_generic_param_collection
 from ..experiment import ScanSetup
 from ..workflow import WorkflowTree
-from ..widgets import BaseFrame
 from .builders import ImageMathFrameBuilder
 
 
@@ -51,6 +50,10 @@ class ImageMathFrame(ImageMathFrameBuilder):
     frames or to combine multiple frames.
     """
 
+    menu_icon = "qta::mdi.home"
+    menu_title = "Image math"
+    menu_entry = "Image math"
+
     default_params = ParameterCollection(
         _buffer_param,
         get_generic_param_collection(
@@ -58,12 +61,6 @@ class ImageMathFrame(ImageMathFrameBuilder):
         ),
     )
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        BaseFrame.__init__(self, parent)
-        ImageMathFrameBuilder.__init__(self)
+    def __init__(self, parent=None, **kwargs):
+        ImageMathFrameBuilder.__init__(self, parent=parent, **kwargs)
         self.set_default_params()
-        self.build_frame()
-
-    def frame_activated(self, index):
-        ...

@@ -28,10 +28,8 @@ __all__ = ["CentralWidgetStack"]
 
 from qtpy import QtWidgets
 
-from ..core import SingletonFactory
 
-
-class _CentralWidgetStack(QtWidgets.QStackedWidget):
+class CentralWidgetStack(QtWidgets.QStackedWidget):
     """
     The _CentralWidgetStack is a QStackedWidget with references to all
     the possible top level widgets.
@@ -84,7 +82,7 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
                 "been registered with the CentralWidgetStack. "
                 "The new widget has not been registered."
             )
-        index = super().addWidget(widget)
+        index = QtWidgets.QStackedWidget.addWidget(self, widget)
         widget.frame_index = index
         self.currentChanged.connect(widget.frame_activated)
         self.widgets.append(widget)
@@ -300,6 +298,3 @@ class _CentralWidgetStack(QtWidgets.QStackedWidget):
             del self.widget_indices[name]
             self.widget_indices[new_name] = index
             self.widget(index).ref_name = new_name
-
-
-CentralWidgetStack = SingletonFactory(_CentralWidgetStack)

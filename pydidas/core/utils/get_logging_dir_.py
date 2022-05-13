@@ -14,16 +14,34 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the pydidas Version number.
+Module with a function to get the pydidas logging directory.
 """
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
-__version__ = "0.1.7"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
+__all__ = ["get_logging_dir"]
+
+import os
+
+from qtpy import QtCore
 
 
-version = __version__
-VERSION = __version__
+def get_logging_dir():
+    """
+    Return the pydidas logging directory.
+
+    Returns
+    -------
+    str
+        The path to the pydidas module.
+    """
+    _docs_path = QtCore.QStandardPaths.standardLocations(
+        QtCore.QStandardPaths.DocumentsLocation
+    )[0]
+    _log_path = os.path.join(_docs_path, "pydidas", "logs")
+    if not os.path.exists(_log_path):
+        os.makedirs(_log_path)
+    return _log_path

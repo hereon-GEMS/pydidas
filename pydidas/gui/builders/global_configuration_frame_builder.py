@@ -43,8 +43,8 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
 
     TEXT_WIDTH = 180
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def build_frame(self):
         """
@@ -66,7 +66,6 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         self.create_label(
             "title", "Global settings\n", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
         )
-
         self.create_button(
             "but_reset",
             "Restore defaults",
@@ -74,7 +73,6 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )
-
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options
         )

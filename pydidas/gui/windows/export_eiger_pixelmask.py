@@ -30,19 +30,19 @@ from pathlib import Path
 
 from qtpy import QtCore
 
-from ...core import Parameter, ParameterCollection
+from ...core import Parameter, ParameterCollection, utils
 from ...core.constants import DEFAULT_TWO_LINE_PARAM_CONFIG
-from ...core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
-from ...widgets import BaseFrame
 from ...widgets.dialogues import critical_warning
+from .pydidas_window import PydidasWindow
 
 
-class ExportEigerPixelmaskWindow(BaseFrame):
+class ExportEigerPixelmaskWindow(PydidasWindow):
     """
     Window with a simple dialogue to export the Pixelmask from an Eiger
     "master" file.
     """
 
+    show_frame = False
     default_params = ParameterCollection(
         Parameter(
             "master_filename",
@@ -60,11 +60,8 @@ class ExportEigerPixelmaskWindow(BaseFrame):
         ),
     )
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.set_default_params()
-        self.build_frame()
-        self.connect_signals()
+    def __init__(self, parent=None, **kwargs):
+        PydidasWindow.__init__(self, parent, title="Export Eiger pixelmask", **kwargs)
 
     def build_frame(self):
         """
@@ -117,5 +114,7 @@ class ExportEigerPixelmaskWindow(BaseFrame):
                 (f'The specified output directory "{_out_dir}" ' "could not be found."),
             )
             return
-        store_eiger_pixel_mask_from_master_file(_master_fname, _export_fname)
+        utils.dectris_utils.store_eiger_pixel_mask_from_master_file(
+            _master_fname, _export_fname
+        )
         self.close()

@@ -426,7 +426,7 @@ def format_input_to_multiline_str(
     """
     _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
     _result_lines = []
-    _current_str = _words.pop(0)
+    _current_str = _words.pop(0) if len(_words) > 0 else ""
     while len(_words) > 0:
         _newword = _words.pop(0)
         # need to check against max_line_length - 1 to account for the

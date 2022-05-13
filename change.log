@@ -1,3 +1,10 @@
+v0.1.7
+Major changes:
+- Added feedback form to menu
+- Added semi-automatic bug reporting to excepthook
+- Changed frame creation from static to on the fly to speed up GUI creation.
+
+
 v0.1.6
 Major changes:
 - Refactored data_io and moved classes which are not truly I/O classes.

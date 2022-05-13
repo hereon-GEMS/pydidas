@@ -19,7 +19,6 @@ include LICENSE.md
 include requirements.txt
 include pyproject.toml
 include change.log
-include pydidas/gui/icons/pydidas_logo.svg
-include pydidas/gui/icons/pydidas_snakes.svg
+include pydidas/core/icons/*.svg
 include pydidas/docs/make.bat
 include pydidas/docs/Makefile

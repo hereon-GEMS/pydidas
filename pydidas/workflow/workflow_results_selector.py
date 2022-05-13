@@ -69,9 +69,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self.add_params(*args)
         self.set_default_params()
         self._selection = None
-        self._active_node = -1
-        self.__active_ranges = {}
         self._npoints = []
+        self._config["active_node"] = -1
+        self._config["active_ranges"] = {}
+        self._config["param_hash"] = -1
         self._re_pattern = re.compile("^(\\s*(-?\\d*\\.?\\d*:?){1,3},?)*?$")
 
     def reset(self):
@@ -79,7 +80,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         Reset the instance to its default selection, for example when a new
         processing has been started and the old information is no longer valid.
         """
-        self._active_node = -1
+        self._config["active_node"] = -1
         self._selection = None
 
     def select_active_node(self, index):
@@ -91,17 +92,17 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         index : int
             The new node index.
         """
-        self._active_node = index
+        self._config["active_node"] = index
         self._calc_and_store_ndim_of_results()
         self._check_and_create_params_for_slice_selection()
-        self.__active_ranges = RESULTS.get_result_ranges(index)
+        self._config["active_ranges"] = RESULTS.get_result_ranges(index)
 
     def _calc_and_store_ndim_of_results(self):
         """
         Update the number of dimensions the results will have and store the
         new number.
         """
-        _ndim = RESULTS.ndims[self._active_node]
+        _ndim = RESULTS.ndims[self._config["active_node"]]
         if self.get_param_value("use_scan_timeline"):
             _ndim -= SCAN.ndim - 1
         self._config["result_ndim"] = _ndim
@@ -111,7 +112,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         Check whether the required Parameters for the slice selection exist
         for all current data dimensions and create and add them if they do not.
         """
-        for _dim in range(RESULTS.ndims[self._active_node]):
+        for _dim in range(RESULTS.ndims[self._config["active_node"]]):
             _refkey = f"data_slice_{_dim}"
             _param = Parameter(
                 _refkey,
@@ -136,7 +137,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         tuple
             The selection for slicing the WorkflowResults array.
         """
-        self._update_selection()
+        if self._get_param_hash() != self._config["param_hash"]:
+            self._update_selection()
         return self._selection
 
     @property
@@ -149,10 +151,30 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         list
             The active dimensions.
         """
-        self._update_selection()
+        if self._get_param_hash() != self._config["param_hash"]:
+            self._update_selection()
         return [
             _index for _index, _items in enumerate(self._selection) if _items.size > 1
         ]
+
+    def _get_param_hash(self):
+        """
+        Get the hash value for all Parameter values.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _param_vals = (
+            [
+                self.get_param_value(f"data_slice_{_dim}")
+                for _dim in range(self._config["result_ndim"])
+            ]
+            + [self.get_param_value("use_scan_timeline")]
+            + [self.get_param_value("use_data_range")]
+        )
+        return hash(tuple(_param_vals))
 
     def _update_selection(self):
         """
@@ -160,7 +182,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         Parameters.
         """
         _use_timeline = self.get_param_value("use_scan_timeline")
-        self._npoints = list(RESULTS.shapes[self._active_node])
+        self._npoints = list(RESULTS.shapes[self._config["active_node"]])
         if _use_timeline:
             del self._npoints[: SCAN.ndim]
             self._npoints.insert(0, SCAN.n_total)
@@ -170,6 +192,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         )
         self._check_for_selection_dim(_selection)
         self._selection = _selection
+        self._config["param_hash"] = self._get_param_hash()
 
     def _get_single_slice_object(self, index):
         """
@@ -202,8 +225,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             )
         _substrings = _str.split(",")
         _slices = []
-        if (self.get_param_value('use_scan_timeline')
-            or not self.get_param_value("use_data_range")
+        if self.get_param_value("use_scan_timeline") or not self.get_param_value(
+            "use_data_range"
         ):
             _entries = self._parse_string_indices(_substrings)
         else:
@@ -258,9 +281,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             The list with index values for the various selections.
         """
         _new_items = []
-        _range = self.__active_ranges[self._config["active_index"]]
+        _range = self._config["active_ranges"][self._config["active_index"]]
         _defaults = self._config["index_defaults"]
-        print(_defaults, _range, substrings)
         for _item in substrings:
             _keys = [
                 float(_defaults[_pos] if _val == "" else _val)

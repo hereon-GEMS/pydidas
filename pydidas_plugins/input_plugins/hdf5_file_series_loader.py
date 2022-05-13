@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['Hdf5fileSeriesLoader']
+__all__ = ["Hdf5fileSeriesLoader"]
 
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import ParameterCollection, get_generic_parameter
@@ -64,28 +64,30 @@ class Hdf5fileSeriesLoader(InputPlugin):
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
     """
-    plugin_name = 'HDF5 file series loader'
+
+    plugin_name = "HDF5 file series loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = ParameterCollection(
-        get_generic_parameter('first_file'),
-        get_generic_parameter('last_file'),
-        get_generic_parameter('hdf5_key'),
-        get_generic_parameter('images_per_file'),
-        get_generic_parameter('live_processing'),
-        get_generic_parameter('file_stepping'),
-        )
+        get_generic_parameter("first_file"),
+        get_generic_parameter("last_file"),
+        get_generic_parameter("hdf5_key"),
+        get_generic_parameter("images_per_file"),
+        get_generic_parameter("live_processing"),
+        get_generic_parameter("file_stepping"),
+    )
     input_data_dim = None
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_param_value('live_processing', True)
+        self.set_param_value("live_processing", True)
         self._file_manager = FilelistManager(
-            self.get_param('first_file'),
-            self.get_param('last_file'),
-            self.get_param('live_processing'),
-            self.get_param('file_stepping'))
+            self.get_param("first_file"),
+            self.get_param("last_file"),
+            self.get_param("live_processing"),
+            self.get_param("file_stepping"),
+        )
 
     def pre_execute(self):
         """
@@ -93,7 +95,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
         """
         self._file_manager.update()
         self._image_metadata.update()
-        if self.get_param_value('images_per_file') == -1:
+        if self.get_param_value("images_per_file") == -1:
             self.__update_images_per_file()
 
     def __update_images_per_file(self):
@@ -104,9 +106,11 @@ class Hdf5fileSeriesLoader(InputPlugin):
         of frames in this dataset and stores the information.
         """
         _n_per_file = get_hdf5_metadata(
-            self.get_param_value('first_file'), 'shape',
-            dset=self.get_param_value('hdf5_key'))[0]
-        self.set_param_value('images_per_file', _n_per_file)
+            self.get_param_value("first_file"),
+            "shape",
+            dset=self.get_param_value("hdf5_key"),
+        )[0]
+        self.set_param_value("images_per_file", _n_per_file)
 
     def execute(self, index, **kwargs):
         """
@@ -128,11 +132,11 @@ class Hdf5fileSeriesLoader(InputPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         _fname = self.get_filename(index)
-        _hdf_index = index % self.get_param_value('images_per_file')
-        kwargs['dataset'] = self.get_param_value('hdf5_key')
-        kwargs['frame'] = _hdf_index
-        kwargs['binning'] = self.get_param_value('binning')
-        kwargs['roi'] = self._image_metadata.roi
+        _hdf_index = index % self.get_param_value("images_per_file")
+        kwargs["dataset"] = self.get_param_value("hdf5_key")
+        kwargs["frame"] = _hdf_index
+        kwargs["binning"] = self.get_param_value("binning")
+        kwargs["roi"] = self._image_metadata.roi
         _data = import_data(_fname, **kwargs)
         return _data, kwargs
 
@@ -143,6 +147,6 @@ class Hdf5fileSeriesLoader(InputPlugin):
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
-        _images_per_file = self.get_param_value('images_per_file')
+        _images_per_file = self.get_param_value("images_per_file")
         _i_file = index // _images_per_file
         return self._file_manager.get_filename(_i_file)

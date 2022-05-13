@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['AsciiSaver']
+__all__ = ["AsciiSaver"]
 
 import numpy as np
 
@@ -46,7 +46,8 @@ class AsciiSaver(OutputPlugin):
     directory_path : Union[pathlib.Path, str]
         The output directory.
     """
-    plugin_name = 'ASCII Saver'
+
+    plugin_name = "ASCII Saver"
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = 1
@@ -77,22 +78,22 @@ class AsciiSaver(OutputPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         if data.ndim > 1:
-            raise TypeError('Only 1-d data can be saved as ASCII')
-        self._config['global_index'] = kwargs.get('global_index', None)
-        _fname = self._get_base_output_filename() + '.txt'
+            raise TypeError("Only 1-d data can be saved as ASCII")
+        self._config["global_index"] = kwargs.get("global_index", None)
+        _fname = self._get_base_output_filename() + ".txt"
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
             data.axis_ranges[0] = np.arange(data.size)
-        with open(_fname, 'w') as _file:
-            _file.write('# Metadata:\n')
+        with open(_fname, "w") as _file:
+            _file.write("# Metadata:\n")
             for _key, _val in data.metadata:
-                _file.write(f'# {_key}: {_val}\n')
-            _file.write('#\n')
-            _file.write(f'# Axis label: {data.axis_labels[0]}\n')
-            _file.write(f'# Axis unit: {data.axis_units[0]}\n')
-            _file.write('# --- end of metadata ---\n')
-            _file.write('# axis\tvalue\n')
+                _file.write(f"# {_key}: {_val}\n")
+            _file.write("#\n")
+            _file.write(f"# Axis label: {data.axis_labels[0]}\n")
+            _file.write(f"# Axis unit: {data.axis_units[0]}\n")
+            _file.write("# --- end of metadata ---\n")
+            _file.write("# axis\tvalue\n")
             for _x, _y in zip(data.axis_ranges[0], data.array):
-                _file.write(f'{_x}\t{_y}\n')
+                _file.write(f"{_x}\t{_y}\n")
         return data, kwargs

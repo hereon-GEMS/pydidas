@@ -45,8 +45,8 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrameWithApp.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
         _layout = self.layout()
         _layout.setHorizontalSpacing(10)
         _layout.setVerticalSpacing(5)
@@ -103,11 +103,9 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
         self._widgets["config"] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
-
         self.create_spacer(
             "spacer1", gridPos=(-1, 0, 1, 2), parent_widget=self._widgets["config"]
         )
-
         self.create_any_widget(
             "config_area",
             ScrollArea,
@@ -118,7 +116,6 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
-
         for _param in ["autosave_results", "autosave_directory", "autosave_format"]:
             self.create_param_widget(
                 self.get_param(_param), **self.__param_widget_config(_param)
@@ -130,7 +127,6 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
         )
-
         self.create_button(
             "but_exec",
             "Start processing",
@@ -138,7 +134,6 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
-
         self.create_progress_bar(
             "progress",
             gridPos=(-1, 0, 1, 1),
@@ -148,7 +143,6 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
-
         self.create_button(
             "but_abort",
             "Abort processing",
@@ -158,14 +152,12 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
-
         self.create_line(
             "line_results",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
         )
-
         self.create_any_widget(
             "result_selector",
             ResultSelectionWidget,
@@ -174,14 +166,12 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             select_results_param=self.get_param("selected_results"),
             fixedWidth=CONFIG_WIDGET_WIDTH,
         )
-
         self.create_line(
             "line_export",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
         )
-
         self.create_param_widget(
             self.get_param("saving_format"),
             **self.__param_widget_config("saving_format"),
@@ -203,7 +193,6 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
                 "and node label."
             ),
         )
-
         self.create_button(
             "but_export_all",
             "Export all results",
@@ -213,14 +202,12 @@ class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
             parent_widget=self._widgets["config"],
             tooltip=("Export all results. Note that the directory must be " "empty."),
         )
-
         self.create_spacer(
             "config_terminal_spacer",
             height=20,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
-
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
         self._widgets["plot1d"] = Plot1D()

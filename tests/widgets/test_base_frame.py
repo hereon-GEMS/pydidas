@@ -106,10 +106,23 @@ class TestBaseFrame(unittest.TestCase):
         _, _state = obj.export_state()
         self.assertEqual(obj.get_param_values_as_dict(), _state["params"])
 
-    def test_restore_state(self):
+    def test_restore_state__hidden_frame(self):
+        _n = 10
+        obj = self.get_base_frame()
+        obj._config["built"] = False
+        self.create_widgets_in_frame(obj, _n)
+        _params = {"test_int": 42, "test_str": get_random_string(10)}
+        _state = {"params": _params}
+        QtCore.QTimer.singleShot(100, self.q_app.quit)
+        obj.show()
+        obj.restore_state(_state)
+        self.assertEqual(obj._config["state"], _state)
+
+    def test_restore_state__frame_visible(self):
         _n = 10
         obj = self.get_base_frame()
         self.create_widgets_in_frame(obj, _n)
+        obj.frame_activated(obj.frame_index)
         _params = {"test_int": 42, "test_str": get_random_string(10)}
         _state = {"params": _params}
         QtCore.QTimer.singleShot(100, self.q_app.quit)

@@ -34,9 +34,10 @@ from pydidas.core import (
     get_generic_param_collection,
     utils,
 )
-from pydidas.experiment import ScanSetup
-from pydidas.workflow import WorkflowTree
-from pydidas.gui.builders import WorkflowTestFrameBuilder
+from ..experiment import ScanSetup
+from ..workflow import WorkflowTree
+from ..widgets.dialogues import WarningBox
+from .builders import WorkflowTestFrameBuilder
 
 
 SCAN = ScanSetup()
@@ -53,6 +54,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     supplying scan indices for all active scan dimensions  (if the
     ``image_selection`` Parameter equals "Use scan indices").
     """
+
+    menu_icon = "qta::mdi.play-protected-content"
+    menu_title = "Test workflow"
+    menu_entry = "Workflow processing/Test workflow"
 
     default_params = ParameterCollection(
         Parameter(
@@ -78,9 +83,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     )
     params_not_to_restore = ["selected_results"]
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        WorkflowTestFrameBuilder.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        WorkflowTestFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.__source_hash = -1
         self._tree = None
@@ -95,9 +99,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "plot_dim": 1,
             }
         )
-        self.build_frame()
-        self.connect_signals()
-        self.__check_tree_uptodate()
 
     def connect_signals(self):
         """
@@ -110,6 +111,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.__selected_new_node
         )
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
+
+    def finalize_ui(self):
+        """
+        Check the local WorkflowTree is up to date.
+        """
+        self.__check_tree_uptodate()
 
     def __check_tree_uptodate(self):
         """
@@ -138,11 +145,30 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         Test the Workflow on the selected frame and store results for
         presentation.
         """
+        if not self._check_tree_is_populated():
+            return
         _index = self.__get_index()
         self._tree.execute_process(_index, force_store_results=True)
         self.__store_tree_results()
         self.__update_selection_choices()
         self.__plot_results()
+
+    def _check_tree_is_populated(self):
+        """
+        Check if the WorkflowTree is populated, i.e. not empty.
+
+        Returns
+        -------
+        bool
+            Flag whether the WorkflowTree is populated.
+        """
+        if TREE.root is None:
+            WarningBox(
+                "Empty WorkflowTree",
+                "The WorkflowTree is empty. Workflow processing has not been started.",
+            )
+            return False
+        return True
 
     def __get_index(self):
         """
@@ -401,6 +427,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         index : int
             The index of the newly activated frame.
         """
+        super().frame_activated(index)
         if index == self.frame_index:
             self.__update_image_selection_visibility()
             self.__check_tree_uptodate()

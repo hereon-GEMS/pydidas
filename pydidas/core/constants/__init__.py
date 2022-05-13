@@ -32,6 +32,7 @@ from .file_extensions import *
 from .fit_funcs import *
 from .generic_param_description import *
 from .gui_constants import *
+from .links import *
 from .q_settings import *
 from .qt_presets import *
 from .unicode_greek_letters import *
@@ -63,6 +64,11 @@ from . import gui_constants
 
 __all__.extend(gui_constants.__all__)
 del gui_constants
+
+from . import links
+
+__all__.extend(links.__all__)
+del links
 
 from . import q_settings
 

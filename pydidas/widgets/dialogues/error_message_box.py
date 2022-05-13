@@ -24,10 +24,23 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ErrorMessageBox"]
 
-from qtpy import QtCore, QtWidgets
+import os
+
+from qtpy import QtCore, QtWidgets, QtGui, QtSvg
+
+from ...core.utils import (
+    get_logging_dir,
+    get_pydidas_error_icon_w_bg,
+    get_pydidas_icon_path,
+)
+from ...core.constants import EXP_EXP_POLICY, PYDIDAS_FEEDBACK_URL
+from ...core.utils import copy_text_to_system_clipbord
+from ..utilities import apply_widget_properties
+from ..factory import CreateWidgetsMixIn
+from ..scroll_area import ScrollArea
 
 
-class ErrorMessageBox(QtWidgets.QDialog):
+class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
     """
     Show a dialogue box with exception information.
 
@@ -40,36 +53,57 @@ class ErrorMessageBox(QtWidgets.QDialog):
     """
 
     def __init__(self, *args, **kwargs):
-        _text = None
-        if "text" in kwargs:
-            _text = kwargs["text"]
-            del kwargs["text"]
-        super().__init__(*args, **kwargs)
-        self.setWindowTitle("An exception has occured")
-
-        self._label = QtWidgets.QLabel()
-        self._label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        self._label.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        _scroll_area = QtWidgets.QScrollArea()
-
-        _scroll_area.setWidget(self._label)
-        _scroll_area.setWidgetResizable(True)
-        _scroll_area.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-        _ok_button = QtWidgets.QPushButton("OK")
-
-        _layout = QtWidgets.QVBoxLayout()
-        _layout.addWidget(_scroll_area)
-        _layout.addWidget(_ok_button, 1, QtCore.Qt.AlignRight)
-
+        self._text = kwargs.pop("text", "")
+        QtWidgets.QDialog.__init__(self, *args, **kwargs)
+        CreateWidgetsMixIn.__init__(self)
+        self.setWindowTitle("Unhandled exception")
+        self.setWindowIcon(get_pydidas_error_icon_w_bg())
+        _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
-        _ok_button.clicked.connect(self.close)
-        self.resize(800, self.height())
-        if _text:
-            self.set_text(_text)
+
+        self.create_label(
+            "title",
+            "An unhandled exception has occurred",
+            fontsize=12,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
+        )
+        self._widgets["label"] = QtWidgets.QLabel()
+        apply_widget_properties(
+            self._widgets["label"],
+            textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
+            sizePolicy=EXP_EXP_POLICY,
+            indent=8,
+            fixedWidth=675,
+        )
+
+        self.create_any_widget(
+            "scroll_area",
+            ScrollArea,
+            widget=self._widgets["label"],
+            gridPos=(1, 0, 1, 2),
+        )
+        self.create_button("button_okay", "OK", gridPos=(2, 3, 1, 1))
+        self.create_button(
+            "button_copy", "Copy to clipboard and open webpage", gridPos=(2, 0, 1, 1)
+        )
+
+        _icon_fname = os.path.join(get_pydidas_icon_path(), "pydidas_error.svg")
+        self.add_any_widget(
+            "icon",
+            QtSvg.QSvgWidget(_icon_fname),
+            fixedHeight=150,
+            fixedWidth=150,
+            layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
+            gridPos=(0, 2, 2, 2),
+        )
+
+        self._widgets["button_okay"].clicked.connect(self.close)
+        self._widgets["button_copy"].clicked.connect(
+            self.copy_to_clipboard_and_open_webpage
+        )
+        self.resize(860, self.height())
+        self.set_text(self._text)
 
     def set_text(self, text):
         """
@@ -80,4 +114,26 @@ class ErrorMessageBox(QtWidgets.QDialog):
         text : str
             The text to be displayed.
         """
-        self._label.setText(text)
+        _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
+        _note = (
+            "Please report the bug online using the following form:\n"
+            "\thttps://ms.hereon.de/pydidas\n\n"
+            "You can simply use the button on the bottom left to open the\n"
+            "Webpage in your default browser. The exception trace has been \n"
+            "copied to your clipboard."
+            f"\n\nA log has been written to:\n\t{_logfile}\n\n"
+            + "-" * 20
+            + "\n"
+            + "Exception trace:\n\n"
+        )
+        self._text = text
+        copy_text_to_system_clipbord(self._text)
+        self._widgets["label"].setText(_note + text)
+
+    def copy_to_clipboard_and_open_webpage(self):
+        """
+        Copy the trace to the clipboard and open the URL for the pydidas
+        feedback form.
+        """
+        copy_text_to_system_clipbord(self._text)
+        QtGui.QDesktopServices.openUrl(PYDIDAS_FEEDBACK_URL)

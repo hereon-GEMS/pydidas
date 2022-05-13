@@ -47,8 +47,8 @@ class ScanSetupFrameBuilder(BaseFrame):
     TEXT_WIDTH = 200
     PARAM_INPUT_WIDTH = 120
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def build_frame(self):
         """

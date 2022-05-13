@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['PyFAI2dIntegration']
+__all__ = ["PyFAI2dIntegration"]
 
 from pydidas.core import Dataset
 from pydidas.plugins import pyFAIintegrationBase
@@ -37,7 +37,8 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
     For a full documentation of the Plugin, please refer to the pyFAI
     documentation.
     """
-    plugin_name = 'pyFAI 2D integration'
+
+    plugin_name = "pyFAI 2D integration"
     basic_plugin = False
     input_data_dim = 2
     output_data_dim = 2
@@ -46,7 +47,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self.set_param_value('rad_npoint', 720)
+        self.set_param_value("rad_npoint", 720)
 
     def execute(self, data, **kwargs):
         """
@@ -67,21 +68,27 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             Any calling kwargs, appended by any changes in the function.
         """
         _newdata = self._ai.integrate2d(
-            data, self.get_param_value('rad_npoint'),
-            npt_azim=self.get_param_value('azi_npoint'),
+            data,
+            self.get_param_value("rad_npoint"),
+            npt_azim=self.get_param_value("azi_npoint"),
             polarization_factor=1,
-            unit=self.get_pyFAI_unit_from_param('rad_unit'),
+            unit=self.get_pyFAI_unit_from_param("rad_unit"),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
-            method=self._config['method'])
+            method=self._config["method"],
+        )
 
-        _label, _unit = self.params['rad_unit'].value.split('/')
+        _label, _unit = self.params["rad_unit"].value.split("/")
         _label = _label.strip()
         _unit = _unit.strip()
 
         _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
-        _dataset = Dataset(_newdata[1], axis_labels=[_label],
-                           axis_units=[_unit], axis_ranges=[_newdata[0]])
+        _dataset = Dataset(
+            _newdata[1],
+            axis_labels=[_label],
+            axis_units=[_unit],
+            axis_ranges=[_newdata[0]],
+        )
         return _dataset, kwargs
 
     def calculate_result_shape(self):
@@ -93,6 +100,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         tuple
             The new shape: A tuple of two integers is returned.
         """
-        self._config['result_shape'] = (
-            self.get_param_value('rad_npoint'),
-            self.get_param_value('azi_npoint'))
+        self._config["result_shape"] = (
+            self.get_param_value("rad_npoint"),
+            self.get_param_value("azi_npoint"),
+        )

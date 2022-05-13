@@ -120,13 +120,11 @@ class CreateWidgetsMixIn:
         self.__create_widget(create_combo_box, ref, **kwargs)
 
     @copy_docstring(create_radio_button_group)
-    def create_radio_button_group(self, ref, entries, vertical=True, **kwargs):
+    def create_radio_button_group(self, ref, entries, **kwargs):
         """
         Please refer to pydidas.widgets.factory.create_radio_button_group
         """
-        self.__create_widget(
-            create_radio_button_group, ref, entries, vertical=vertical, **kwargs
-        )
+        self.__create_widget(create_radio_button_group, ref, entries, **kwargs)
 
     def __create_widget(self, object_, ref, *args, **kwargs):
         """

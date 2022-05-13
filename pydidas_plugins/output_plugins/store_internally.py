@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ['StoreInternally']
+__all__ = ["StoreInternally"]
 
 from pydidas.core.constants import OUTPUT_PLUGIN
 from pydidas.plugins import OutputPlugin, BasePlugin
@@ -43,7 +43,8 @@ class StoreInternally(OutputPlugin):
     directory_path : Union[pathlib.Path, str]
         The output directory.
     """
-    plugin_name = 'Store data'
+
+    plugin_name = "Store data"
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = -1

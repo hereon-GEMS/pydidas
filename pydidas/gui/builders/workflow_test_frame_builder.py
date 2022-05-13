@@ -44,11 +44,8 @@ class WorkflowTestFrameBuilder(BaseFrame):
     base class's UI and initialize all widgets.
     """
 
-    def __init__(self, parent=None):
-        BaseFrame.__init__(self, parent)
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def __param_widget_config(self, param_key):
         """
@@ -103,17 +100,14 @@ class WorkflowTestFrameBuilder(BaseFrame):
         self.create_label(
             "title", "Test workflow", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
         )
-
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
-
         self.create_spacer(
             "spacer1", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
         )
-
         self.create_any_widget(
             "config_area",
             ScrollArea,
@@ -124,7 +118,6 @@ class WorkflowTestFrameBuilder(BaseFrame):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
-
         for _param in [
             "image_selection",
             "image_num",
@@ -136,13 +129,11 @@ class WorkflowTestFrameBuilder(BaseFrame):
             self.create_param_widget(
                 self.get_param(_param), **self.__param_widget_config(_param)
             )
-
         self.create_line(
             "line_selection",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
-
         self.create_button(
             "but_exec",
             "Process frame",
@@ -150,11 +141,9 @@ class WorkflowTestFrameBuilder(BaseFrame):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
-
         self.create_line(
             "line_results", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
         )
-
         self.create_label(
             "label_results",
             "Results:",
@@ -163,12 +152,10 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
-
         self.create_param_widget(
             self.get_param("selected_results"),
             **self.__param_widget_config("selected_results"),
         )
-
         self.create_any_widget(
             "result_info",
             ReadOnlyTextWidget,
@@ -179,14 +166,12 @@ class WorkflowTestFrameBuilder(BaseFrame):
             visible=False,
             parent_widget=self._widgets["config"],
         )
-
         self.create_spacer(
             "config_terminal_spacer",
             height=20,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
-
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
         self._widgets["plot1d"] = Plot1D()

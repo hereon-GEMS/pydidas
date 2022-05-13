@@ -366,6 +366,11 @@ class Test_str_utils(unittest.TestCase):
         else:
             self.assertEqual(_new.find("\\"), -1)
 
+    def test_format_input_to_multiline_str__empty(self):
+        _test = ""
+        _new = format_input_to_multiline_str(_test)
+        self.assertEqual(_new, "")
+
     def test_format_input_to_multiline_str__simple(self):
         _test = "test test test test "
         _new = format_input_to_multiline_str(_test)

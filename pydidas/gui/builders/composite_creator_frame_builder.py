@@ -44,8 +44,8 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
     CompositeCreatorFrame.
     """
 
-    def __init__(self, parent=None):
-        BaseFrameWithApp.__init__(self, parent)
+    def __init__(self, parent=None, **kwargs):
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
         SilxPlotWindowMixIn.__init__(self)
 
     def build_frame(self):

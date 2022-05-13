@@ -14,9 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the MainWindow class which is a subclassed QMainWindow which has
-been modified for pydidas's requirements and which manages the option and
-selection bars.
+Module with gui_setup utility functions.
 """
 
 __author__ = "Malte Storm"
@@ -26,14 +24,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
     "configure_qtapp_namespace",
-    "get_pydidas_icon",
     "update_qtapp_font_size",
     "apply_tooltip_event_filter",
 ]
 
 import os
 
-from qtpy import QtWidgets, QtGui
+from qtpy import QtWidgets
 
 from ...core.constants import STANDARD_FONT_SIZE
 from .qtooltip_event_handler import QTooltipEventFilter
@@ -47,23 +44,6 @@ def configure_qtapp_namespace():
     app.setOrganizationName("Hereon")
     app.setOrganizationDomain("Hereon/WPI")
     app.setApplicationName("pydidas")
-
-
-def get_pydidas_icon():
-    """
-    Get the pydidas icon.
-
-    Returns
-    -------
-    _icon : QtGui.QIcon
-        The instantiated pydidas icon.
-    """
-    _path = __file__
-    for _ in range(2):
-        _path = os.path.dirname(_path)
-    _logopath = os.path.join(_path, "icons", "pydidas_logo.svg")
-    _icon = QtGui.QIcon(_logopath)
-    return _icon
 
 
 def find_toolbar_bases(items):

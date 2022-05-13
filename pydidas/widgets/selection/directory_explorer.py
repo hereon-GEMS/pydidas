@@ -49,17 +49,14 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         super().__init__(parent)
         apply_widget_properties(self, **kwargs)
         if root_path == "":
-            _settings = QtCore.QSettings("Hereon", "pydidas")
-            _path = _settings.value("directory_explorer/path", None)
-            if _path is not None:
-                root_path = _path
+            root_path = self._get_stored_root_path()
         self._filemodel = QtWidgets.QFileSystemModel()
         self._filemodel.setRootPath(root_path)
         self._filemodel.setReadOnly(True)
         self.setModel(self._filemodel)
-        self.header().setSortIndicator(0, QtCore.Qt.AscendingOrder)
+        # self.header().setSortIndicator(0, QtCore.Qt.AscendingOrder)
         self.setAnimated(False)
-        self.setIndentation(20)
+        self.setIndentation(12)
         self.setSortingEnabled(True)
         self.setColumnWidth(0, 400)
         self.setColumnWidth(1, 70)
@@ -69,6 +66,22 @@ class DirectoryExplorer(QtWidgets.QTreeView):
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
         self.__expand_to_path(root_path)
+        self.expanded.connect(self._sort_items)
+
+    def _get_stored_root_path(self):
+        """
+        Get the stored root path from the QSettings.
+
+        Returns
+        -------
+        str
+            The stored path.
+        """
+        _settings = QtCore.QSettings("Hereon", "pydidas")
+        _path = _settings.value("directory_explorer/path", None)
+        if _path is not None:
+            return _path
+        return ""
 
     def __expand_to_path(self, path):
         """
@@ -93,3 +106,16 @@ class DirectoryExplorer(QtWidgets.QTreeView):
             The updated size hint.
         """
         return QtCore.QSize(400, 900)
+
+    @QtCore.Slot(QtCore.QModelIndex)
+    def _sort_items(self, index):
+        """
+        Sort items in the newly expanded view.
+
+        Parameters
+        ----------
+        index : int
+            The selected FileSystemModelIndex
+        """
+        _name = self._filemodel.filePath(index)
+        self._filemodel.setRootPath(_name)

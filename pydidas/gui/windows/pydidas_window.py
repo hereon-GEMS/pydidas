@@ -25,19 +25,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasWindow"]
 
-from qtpy import QtWidgets
+from qtpy import QtCore
+
+from ...core.utils import get_pydidas_icon_w_bg
+from ...widgets import BaseFrame
 
 
-class PydidasWindow(QtWidgets.QMainWindow):
+class PydidasWindowMixIn:
     """
-    The PydidasWindow is a standalone QMainWindow with a persistent geometry
-    upon closing and showing.
+    MixIn class to extend PydidasWindow functionality to other classes also derived
+    from a QObject.
     """
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
         self._geometry = None
-        self.setVisible(False)
 
     def closeEvent(self, event):
         """
@@ -49,6 +50,7 @@ class PydidasWindow(QtWidgets.QMainWindow):
             The closing event.
         """
         self._geometry = self.geometry()
+        self.sig_closed.emit()
         super().closeEvent(event)
 
     def show(self):
@@ -85,3 +87,22 @@ class PydidasWindow(QtWidgets.QMainWindow):
         """
         self.setGeometry(*state["geometry"])
         self.setVisible(state["visible"])
+
+
+class PydidasWindow(BaseFrame, PydidasWindowMixIn):
+    """
+    The PydidasWindow is a standalone BaseFrame with a persistent geometry
+    upon closing and showing.
+    """
+
+    show_frame = False
+    sig_closed = QtCore.Signal()
+
+    def __init__(self, parent=None, **kwargs):
+        BaseFrame.__init__(self, parent, **kwargs)
+        PydidasWindowMixIn.__init__(self)
+        self.set_default_params()
+        self.frame_activated(self.frame_index)
+        self.setWindowIcon(get_pydidas_icon_w_bg())
+        if "title" in kwargs:
+            self.setWindowTitle(kwargs.get("title"))

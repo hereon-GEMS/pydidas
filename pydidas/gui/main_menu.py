@@ -33,16 +33,18 @@ import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
 from pydidas.core import FrameConfigError
-from pydidas.core.utils import get_doc_home_qurl
+from pydidas.core.utils import get_doc_home_qurl, get_pydidas_icon_w_bg
 from pydidas.experiment import ScanSetup, ExperimentalSetup
 from pydidas.workflow import WorkflowTree
-from pydidas.widgets import CentralWidgetStack, excepthook
+from pydidas.widgets import CentralWidgetStack, gui_excepthook
 from pydidas.widgets.dialogues import QuestionBox
 from pydidas.gui import utils
 from pydidas.gui.windows import (
     GlobalConfigWindow,
     ExportEigerPixelmaskWindow,
     AverageImagesWindow,
+    AboutWindow,
+    FeedbackWindow,
 )
 
 
@@ -74,11 +76,12 @@ class MainMenu(QtWidgets.QMainWindow):
         utils.configure_qtapp_namespace()
         utils.update_qtapp_font_size()
         utils.apply_tooltip_event_filter()
-        sys.excepthook = excepthook
+        sys.excepthook = gui_excepthook
 
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
+        self.__window_counter = 0
 
         self._setup_mainwindow_widget(geometry)
         self._add_global_config_window()
@@ -102,7 +105,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setCentralWidget(CentralWidgetStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI (alpha)")
-        self.setWindowIcon(utils.get_pydidas_icon())
+        self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
     def _add_global_config_window(self):
@@ -110,7 +113,9 @@ class MainMenu(QtWidgets.QMainWindow):
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        self._child_windows["global_config"] = GlobalConfigWindow(self)
+        _frame = GlobalConfigWindow(None)
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows["global_config"] = _frame
 
     def _create_menu(self):
         """
@@ -169,6 +174,8 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["open_documentation_browser"] = QtWidgets.QAction(
             "Open documentation in default web browser", self
         )
+        self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
+        self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
         """
@@ -183,11 +190,19 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.show_window, "global_config")
         )
         self._actions["export_eiger_pixel_mask"].triggered.connect(
-            self._action_export_eiger_pixel_mask
+            partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
-        self._actions["average_images"].triggered.connect(self._action_average_images)
+        self._actions["average_images"].triggered.connect(
+            partial(self.create_and_show_temp_window, AverageImagesWindow)
+        )
         self._actions["open_documentation_browser"].triggered.connect(
             self._action_open_doc_in_browser
+        )
+        self._actions["open_about"].triggered.connect(
+            partial(self.create_and_show_temp_window, AboutWindow)
+        )
+        self._actions["open_feedback"].triggered.connect(
+            partial(self.create_and_show_temp_window, FeedbackWindow)
         )
 
     def _add_actions_to_menu(self):
@@ -216,6 +231,10 @@ class MainMenu(QtWidgets.QMainWindow):
 
         _help_menu = _menu.addMenu("&Help")
         _help_menu.addAction(self._actions["open_documentation_browser"])
+        _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["open_feedback"])
+        _help_menu.addSeparator()
+        _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
 
         self._menus["file"] = _file_menu
@@ -272,22 +291,6 @@ class MainMenu(QtWidgets.QMainWindow):
             self.restore_gui_state(fname)
 
     @QtCore.Slot()
-    def _action_export_eiger_pixel_mask(self):
-        """
-        Open dialogues to export an Eiger pixelmask.
-        """
-        self._child_windows["tmp"] = ExportEigerPixelmaskWindow()
-        self._child_windows["tmp"].show()
-
-    @QtCore.Slot()
-    def _action_average_images(self):
-        """
-        Open dialogue to average multiple frames and store them in a new file.
-        """
-        self._child_windows["tmp"] = AverageImagesWindow()
-        self._child_windows["tmp"].show()
-
-    @QtCore.Slot()
     def _action_open_doc_in_browser(self):
         """
         Open the link to the documentation in the system web browser.
@@ -322,7 +325,41 @@ class MainMenu(QtWidgets.QMainWindow):
         name : str
             The name key of the window to be shown.
         """
+        _index = self._child_windows[name].frame_index
+        self._child_windows[name].frame_activated(_index)
         self._child_windows[name].show()
+        self._child_windows[name].raise_()
+
+    @QtCore.Slot(object)
+    def create_and_show_temp_window(self, window):
+        """
+        Show the given temporary window.
+
+        Parameters
+        ----------
+        window : QtCore.QWidget
+            The window to be shown.
+        """
+        _name = f"temp_window_{self.__window_counter:03d}"
+        self.__window_counter += 1
+        self._child_windows[_name] = window(build_directly=True)
+        self._child_windows[_name].sig_closed.connect(
+            partial(self.remove_window_from_children, _name)
+        )
+        self._child_windows[_name].show()
+
+    @QtCore.Slot(str)
+    def remove_window_from_children(self, name):
+        """
+        Remove the specified window from the list of child window.
+
+        Parameters
+        ----------
+        name : str
+            The name key for the window.
+        """
+        if name in self._child_windows:
+            del self._child_windows[name]
 
     def deleteLater(self):
         """
@@ -359,9 +396,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _state["scan_setup"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        _state["exp_setup"] = EXP.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
+        _state["exp_setup"] = EXP.get_param_values_as_dict(filter_types_for_export=True)
         _state["workflow_tree"] = TREE.export_to_string()
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
@@ -414,9 +449,11 @@ class MainMenu(QtWidgets.QMainWindow):
             filename = self._get_standard_state_filename()
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
+        self.setUpdatesEnabled(False)
         self._restore_global_objects(_state)
         self._restore_window_states(_state)
         self._restore_frame_states(_state)
+        self.setUpdatesEnabled(True)
 
     def _get_standard_state_filename(self):
         """
@@ -467,7 +504,7 @@ class MainMenu(QtWidgets.QMainWindow):
             window states.
         """
         for _key, _window in self._child_windows.items():
-            if _key != "tmp":
+            if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
         self.__restore_mainwindow_state(state["main"])
 
@@ -514,7 +551,8 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        for window in self._child_windows:
-            self._child_windows[window].deleteLater()
-            self._child_windows[window].close()
+        _keys = list(self._child_windows.keys())
+        for _key in _keys:
+            self._child_windows[_key].deleteLater()
+            self._child_windows[_key].close()
         event.accept()

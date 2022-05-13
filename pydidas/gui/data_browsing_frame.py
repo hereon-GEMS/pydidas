@@ -42,11 +42,12 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
     through datasets.
     """
 
-    def __init__(self, **kwargs):
-        parent = kwargs.get("parent", None)
-        DataBrowsingFrameBuilder.__init__(self, parent)
-        self.build_frame()
-        self.connect_signals()
+    menu_icon = "qta::mdi.image-search-outline"
+    menu_title = "Data browsing"
+    menu_entry = "Data browsing"
+
+    def __init__(self, parent=None, **kwargs):
+        DataBrowsingFrameBuilder.__init__(self, parent, **kwargs)
 
     def connect_signals(self):
         """
@@ -61,7 +62,6 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         self._widgets["but_maximize"].clicked.connect(
             partial(self.change_splitter_pos, True)
         )
-        self.__selection_width = self._widgets["selection"].width()
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir=True):

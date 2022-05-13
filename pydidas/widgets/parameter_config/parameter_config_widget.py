@@ -38,7 +38,8 @@ from ...core.constants import (
     PARAM_INPUT_UNIT_WIDTH,
 )
 from ...core.utils import convert_special_chars_to_unicode
-from ..utilities import apply_widget_properties, excepthook
+from ..utilities import apply_widget_properties
+from ..excepthook_ import gui_excepthook
 from ..factory import create_param_widget, create_label
 
 
@@ -276,7 +277,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             param.value = widget.get_value()
         except ValueError:
             widget.set_value(param.value)
-            excepthook(*sys.exc_info())
+            gui_excepthook(*sys.exc_info())
 
     def sizeHint(self):
         """

@@ -77,7 +77,6 @@ class BaseFrame(
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
-        self.font = QtWidgets.QApplication.font()
         self.params = ParameterCollection()
 
         init_layout = kwargs.get("init_layout", True)

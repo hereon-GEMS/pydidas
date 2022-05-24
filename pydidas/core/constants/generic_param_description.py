@@ -40,9 +40,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Set live processing to True if the files do not yet "
-            "exist at process startup. This will skip checks on"
-            "file existence and size."
+            "Set live processing to True if the files do not yet exist at process "
+            "startup. This will skip checks on file existence and size."
         ),
     },
     "label": {
@@ -53,10 +52,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "A label for identifying the Plugin node in the results. "
-            "Internally, all Plugins are identified by their node "
-            "IDs, this additional label is merely a handle for easier"
-            " human identification."
+            "A label for identifying the Plugin node in the results. Internally, all "
+            "Plugins are identified by their node IDs, this additional label is merely "
+            "a handle for easier human identification."
         ),
     },
     "data_label": {
@@ -67,9 +65,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "A label to define the axis label for the data dimension. "
-            "This value only needs to be set for output plugins or "
-            "final processing plugins in the list."
+            "A label to define the axis label for the data dimension. This value only "
+            "needs to be set for output plugins or final processing plugins in the "
+            "list."
         ),
     },
     ###################################
@@ -92,8 +90,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The name of the first file for a file series or of the "
-            "hdf5 file in case of hdf5 file input."
+            "The name of the first file for a file series or of the hdf5 file in case "
+            "of hdf5 file input."
         ),
     },
     "last_file": {
@@ -104,8 +102,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Used only for file series: The name of the last file "
-            "to be used for this app or tool."
+            "Used only for file series: The name of the last file to be used for this "
+            "app or tool."
         ),
     },
     "file_stepping": {
@@ -115,8 +113,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "allow_None": False,
         "tooltip": (
-            "The step width (in files), A value n > 1 will only "
-            "process every n-th file."
+            "The step width (in files), A value n > 1 will only process every n-th "
+            "file."
         ),
     },
     "hdf5_key": {
@@ -126,7 +124,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("Used only for hdf5 files: The dataset key."),
+        "tooltip": "Used only for hdf5 files: The dataset key.",
     },
     "hdf5_dataset_shape": {
         "type": tuple,
@@ -156,8 +154,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The last image in the hdf5-dataset to be used. "
-            "The value -1 will default to the last image."
+            "The last image in the hdf5-dataset to be used. The value -1 will default "
+            "to the last image."
         ),
     },
     "hdf5_stepping": {
@@ -234,10 +232,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of original images combined in the composite"
-            " image in x direction. A value of -1 will determine the"
-            " number of images in x direction automatically based on"
-            " the number of images in y direction."
+            "The number of original images combined in the composite image in x "
+            "direction. A value of -1 will determine the number of images in x "
+            "direction automatically based on the number of images in y direction."
         ),
     },
     "composite_ny": {
@@ -248,10 +245,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of original images combined in the composite"
-            " image in y direction. A value of -1 will determine the"
-            " number of images in y direction automatically based on"
-            " the number of images in x direction."
+            "The number of original images combined in the composite image in y "
+            "direction. A value of -1 will determine the number of images in y "
+            "direction automatically based on the number of images in x direction."
         ),
     },
     "composite_dir": {
@@ -262,9 +258,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            'The "fast" direction of the composite image. This '
-            "dimension will be filled first before going to the"
-            " next row/column."
+            "The 'fast' direction of the composite image. This dimension will be filled"
+            " first before going to the next row/column."
         ),
     },
     "use_roi": {
@@ -275,8 +270,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Keyword to toggle use of the ROI for cropping the "
-            "original images before processing them."
+            "Keyword to toggle use of the ROI for cropping the original images before "
+            "processing them."
         ),
     },
     "roi_xlow": {
@@ -287,9 +282,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "px",
         "allow_None": False,
         "tooltip": (
-            "The lower boundary (in pixel) for cropping images in x, "
-            "if use_roi is enabled. Negative values will be modulated "
-            "with the image width."
+            "The lower boundary (in pixel) for cropping images in x, if use_roi is "
+            "enabled. Negative values will be modulated with the image width."
         ),
     },
     "roi_xhigh": {
@@ -300,11 +294,10 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "px",
         "allow_None": True,
         "tooltip": (
-            "The upper boundary (in pixel) for cropping images in x, "
-            "if use_roi is enabled. Negative values will be modulated "
-            "with the image width, i.e. -1 is equivalent with the full"
-            ' image size minus 1. To take the full image, use "None" '
-            "as value for the upper ROI limit."
+            "The upper boundary (in pixel) for cropping images in x, if use_roi is "
+            "enabled. Negative values will be modulated with the image width, i.e. -1 "
+            "is equivalent with the full image size minus 1. To take the full image, "
+            "use 'None' as value for the upper ROI limit."
         ),
     },
     "roi_ylow": {
@@ -315,9 +308,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "px",
         "allow_None": False,
         "tooltip": (
-            "The lower boundary (in pixel) for cropping images in y, "
-            "if use_roi is enabled. Negative values will be modulated "
-            "with the image width."
+            "The lower boundary (in pixel) for cropping images in y, if use_roi is "
+            "enabled. Negative values will be modulated with the image width."
         ),
     },
     "roi_yhigh": {
@@ -328,11 +320,10 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "px",
         "allow_None": True,
         "tooltip": (
-            "The upper boundary (in pixel) for cropping images in y, "
-            "if use_roi is enabled. Negative values will be modulated "
-            "with the image width, i.e. -1 is equivalent with the full"
-            ' image size minus 1. To take the full image, use "None" '
-            "as value for the upper ROI limit."
+            "The upper boundary (in pixel) for cropping images in y, if use_roi is "
+            "enabled. Negative values will be modulated with the image width, i.e. -1 "
+            "is equivalent with the full image size minus 1. To take the full image, "
+            "use 'None' as value for the upper ROI limit."
         ),
     },
     "use_thresholds": {
@@ -343,9 +334,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Keyword to toggle use of the thresholds for clipping "
-            "the data range in the original images before combining "
-            "them."
+            "Keyword to toggle use of the thresholds for clipping the data range in "
+            "the original images before combining them."
         ),
     },
     "threshold_low": {
@@ -356,11 +346,10 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": True,
         "tooltip": (
-            "The lower threshold of the image. If any finite value "
-            "(i.e. not np.nan or None) is used, the value of any "
-            "pixels with a value below the threshold will be "
-            "replaced by the threshold value. A value of np.nan or "
-            "None will ignore the threshold."
+            "The lower threshold of the image. If any finite value (i.e. not np.nan or"
+            " None) is used, the value of any pixels with a value below the threshold "
+            "will be replaced by the threshold value. A value of np.nan or None will "
+            "ignore the threshold."
         ),
     },
     "threshold_high": {
@@ -371,11 +360,10 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": True,
         "tooltip": (
-            "The upper threshold of the image. If any finite value "
-            "(i.e. not np.nan or None) is used, the value of any "
-            "pixels with a value above the threshold will be "
-            "replaced by the threshold value. A value of np.nan or "
-            "None will ignore the threshold."
+            "The upper threshold of the image. If any finite value (i.e. not np.nan or "
+            "None) is used, the value of any pixels with a value above the threshold "
+            "will be replaced by the threshold value. A value of np.nan or None will "
+            "ignore the threshold."
         ),
     },
     "binning": {
@@ -419,7 +407,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "px",
         "allow_None": False,
         "tooltip": (
-            "The image shape of the original image as loaded from " "the file."
+            "The image shape of the original image as loaded from the file."
         ),
     },
     "datatype": {
@@ -562,9 +550,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "m",
         "allow_None": False,
         "tooltip": (
-            "The detector PONI1 (point of normal incidence; in y "
-            "direction). This is measured in meters from the detector"
-            "origin."
+            "The detector PONI1 (point of normal incidence; in y direction). This is "
+            "measured in meters from the detector origin."
         ),
     },
     "detector_poni2": {
@@ -575,9 +562,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "m",
         "allow_None": False,
         "tooltip": (
-            "The detector PONI2 (point of normal incidence; in x "
-            "direction). This is measured in meters from the detector"
-            "origin."
+            "The detector PONI2 (point of normal incidence; in x direction). This is "
+            "measured in meters from the detector origin."
         ),
     },
     "detector_rot1": {
@@ -597,9 +583,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "rad",
         "allow_None": False,
         "tooltip": (
-            "The detector rotation 2 (pitching the detector; "
-            "positive direction is tilting the detector top upstream "
-            "while keeping the bottom of the detector stationary."
+            "The detector rotation 2 (pitching the detector; positive direction is "
+            "tilting the detector top upstream while keeping the bottom of the "
+            "detector stationary."
         ),
     },
     "detector_rot3": {
@@ -610,8 +596,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "rad",
         "allow_None": False,
         "tooltip": (
-            "The detector rotation 3 (around the beam axis; "
-            "right-handed when looking downstream with the beam.)"
+            "The detector rotation 3 (around the beam axis; right-handed when looking "
+            "downstream with the beam.)"
         ),
     },
     ############################
@@ -625,8 +611,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The scan dimensionality. This defines the number of "
-            "processed dimensions."
+            "The scan dimensionality. This defines the number of processed dimensions."
         ),
     },
     "scan_name": {
@@ -649,8 +634,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The axis name for scan direction 1. This information"
-            " will only be used for labelling."
+            "The axis name for scan direction 1. This information will only be used "
+            "for labelling."
         ),
     },
     "n_points_1": {
@@ -669,7 +654,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The step width between two scan points in scan " "direction 1."),
+        "tooltip": ("The step width between two scan points in scan direction 1."),
     },
     "offset_1": {
         "type": float,
@@ -691,7 +676,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The unit of the movement / steps / offset in scan " "direction 1."
+            "The unit of the movement / steps / offset in scan direction 1."
         ),
     },
     "scan_dir_2": {
@@ -702,8 +687,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The axis name for scan direction 2. This information"
-            " will only be used for labelling."
+            "The axis name for scan direction 2. This information will only be used "
+            "for labelling."
         ),
     },
     "n_points_2": {
@@ -722,7 +707,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The step width between two scan points in scan " "direction 2."),
+        "tooltip": ("The step width between two scan points in scan direction 2."),
     },
     "offset_2": {
         "type": float,
@@ -744,7 +729,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The unit of the movement / steps / offset in scan " "direction 2."
+            "The unit of the movement / steps / offset in scan direction 2."
         ),
     },
     "scan_dir_3": {
@@ -755,8 +740,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The axis name for scan direction 3. This information"
-            " will only be used for labelling."
+            "The axis name for scan direction 3. This information will only be used "
+            "for labelling."
         ),
     },
     "n_points_3": {
@@ -775,7 +760,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The step width between two scan points in scan " "direction 3."),
+        "tooltip": ("The step width between two scan points in scan direction 3."),
     },
     "offset_3": {
         "type": float,
@@ -797,7 +782,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The unit of the movement / steps / offset in scan " "direction 3."
+            "The unit of the movement / steps / offset in scan direction 3."
         ),
     },
     "scan_dir_4": {
@@ -808,8 +793,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The axis name for scan direction 4. This information"
-            " will only be used for labelling."
+            "The axis name for scan direction 4. This information will only be used "
+            "for labelling."
         ),
     },
     "n_points_4": {
@@ -828,7 +813,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": ("The step width between two scan points in scan " "direction 4."),
+        "tooltip": ("The step width between two scan points in scan direction 4."),
     },
     "offset_4": {
         "type": float,
@@ -850,7 +835,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The unit of the movement / steps / offset in scan " "direction 4."
+            "The unit of the movement / steps / offset in scan direction 4."
         ),
     },
     ############################
@@ -912,12 +897,11 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of multiprocessing workers. Note that this "
-            "number should not be set too high for two reasons:\n1. "
-            "File reading processes interfere with each other if too "
-            "many are active at once.\n2. pyFAI already inherently "
-            "uses parallelization and you can only gain limited "
-            "performance increases for multiple parallel processes."
+            "The number of multiprocessing workers. Note that this number should not "
+            "be set too high for two reasons:\n1. File reading processes interfere with"
+            " each other if too many are active at once.\n2. pyFAI already inherently "
+            "uses parallelization and you can only gain limited performance increases "
+            "for multiple parallel processes."
         ),
     },
     "shared_buffer_size": {
@@ -928,10 +912,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "MB",
         "allow_None": False,
         "tooltip": (
-            "A shared buffer is used to efficiently transport data "
-            "between the main App and multiprocessing Processes. This "
-            "buffer must be large enough to store at least one "
-            "instance of all result data."
+            "A shared buffer is used to efficiently transport data between the main "
+            "App and multiprocessing Processes. This buffer must be large enough to "
+            "store at least one instance of all result data."
         ),
     },
     "shared_buffer_max_n": {
@@ -942,9 +925,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The maximum number of datasets in the buffer. A dataset "
-            "consists of all results for one frame. For performance "
-            "reasons, the buffer should not be too large."
+            "The maximum number of datasets in the buffer. A dataset consists of all "
+            "results for one frame. For performance reasons, the buffer should not be "
+            "too large."
         ),
     },
     "use_global_det_mask": {
@@ -955,8 +938,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Flag to use the global detector mask file and value. If "
-            "False, no detector mask will be used."
+            "Flag to use the global detector mask file and value. If False, no "
+            "detector mask will be used."
         ),
     },
     "det_mask": {
@@ -976,11 +959,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The value to be used for the pixels masked on the "
-            "detector. Note that this value will only be used "
-            "for displaying the images. For pyFAI integration, "
-            "the pixels will be fully masked and not be "
-            "included."
+            "The value to be used for the pixels masked on the detector. Note that "
+            "this value will only be used for displaying the images. For pyFAI "
+            "integration, the pixels will be fully masked and not be included."
         ),
     },
     "mosaic_border_width": {
@@ -1056,11 +1037,10 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            'Select "True" to use the global settings for the '
-            'detector mask and mask value. A "False" settings '
-            "uses the local mask settings. Note: The mask value"
-            " will not be used for integrating but only for "
-            "presentation or by using the MaskImage plugin."
+            "Select 'True' to use the global settings for the detector mask and mask "
+            "value. A 'False' settings uses the local mask settings. Note: The mask "
+            "value will not be used for integrating but only for presentation or by "
+            "using the MaskImage plugin."
         ),
     },
     ############################
@@ -1074,7 +1054,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of bins in radial direction for the pyFAI " "integration."
+            "The number of bins in radial direction for the pyFAI integration."
         ),
     },
     "rad_unit": {
@@ -1094,9 +1074,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Toggle to limit the radial integration range or use the "
-            "full data range. If True, boundaries need to be defined "
-            "in the lower and upper radial range Parameters."
+            "Toggle to limit the radial integration range or use the full data range. "
+            "If True, boundaries need to be defined in the lower and upper radial "
+            "range Parameters."
         ),
     },
     "rad_range_lower": {
@@ -1107,10 +1087,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The lower boundary of the radial integration range. This"
-            ' setting is only used if "Use radial range" is  True. '
-            "This value needs to be given in the unit selected as "
-            "radial unit."
+            "The lower boundary of the radial integration range. This setting is only "
+            "used if 'Use radial range' is  True. This value needs to be given in the "
+            "unit selected as radial unit."
         ),
     },
     "rad_range_upper": {
@@ -1121,10 +1100,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The upper boundary of the radial integration range. This"
-            ' setting is only used if "Use radial range" is  True. '
-            "This value needs to be given in the unit selected as "
-            "radial unit."
+            "The upper boundary of the radial integration range. This setting is only "
+            "used if 'Use radial range' is  True.  This value needs to be given in the "
+            "unit selected as radial unit."
         ),
     },
     "azi_npoint": {
@@ -1135,7 +1113,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The number of bins in azimuthal direction for the " "pyFAI integration."
+            "The number of bins in azimuthal direction for the pyFAI integration."
         ),
     },
     "azi_unit": {
@@ -1155,10 +1133,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Toggle to limit the azimuthal integration range or use "
-            "the full data range. If True, boundaries need to be "
-            "defined in the lower and upper azimuthal range "
-            "Parameters."
+            "Toggle to limit the azimuthal integration range or use the full data "
+            "range. If True, boundaries need to be defined in the lower and upper "
+            "azimuthal range Parameters."
         ),
     },
     "azi_range_lower": {
@@ -1169,10 +1146,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The lower boundary of the azimuthal integration range. "
-            'This setting is only used if "Use azimuthal range" is '
-            "True. This value needs to be given in the unit selected"
-            " as azimuthal unit."
+            "The lower boundary of the azimuthal integration range. This setting is "
+            "only used if 'Use azimuthal range' is True. This value needs to be given "
+            "in the unit selected as azimuthal unit."
         ),
     },
     "azi_range_upper": {
@@ -1183,10 +1159,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The upper boundary of the azimuthal integration range. "
-            'This setting is only used if "Use azimuthal range" is '
-            "True. This value needs to be given in the unit selected "
-            "as azimuthal unit."
+            "The upper boundary of the azimuthal integration range. This setting is "
+            "only used if 'Use azimuthal range' is True. This value needs to be given "
+            "in the unit selected as azimuthal unit."
         ),
     },
     "int_method": {
@@ -1222,10 +1197,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Save the results automatically after finishing "
-            "processing. The results for each plugin will be saved "
-            "in a separete file (or files if multiple formats have "
-            "been selected)."
+            "Save the results automatically after finishing processing. The results "
+            "for each plugin will be saved in a separete file (or files if multiple "
+            "formats have been selected)."
         ),
     },
     "autosave_directory": {
@@ -1245,10 +1219,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": True,
         "tooltip": (
-            "The file format(s) for the data to be saved after the "
-            "workflow has been excuted. All data will be saved in a "
-            "single folder for each run with one file for each "
-            "plugin."
+            "The file format(s) for the data to be saved after the workflow has been "
+            "excuted. All data will be saved in a single folder for each run with one "
+            "file for each plugin."
         ),
     },
     "output_fname": {
@@ -1271,8 +1244,8 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "The selected node of the WorkflowTree to display "
-            "the corresponding results."
+            "The selected node of the WorkflowTree to display the corresponding "
+            "results."
         ),
     },
     "saving_format": {
@@ -1295,10 +1268,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Allow overwriting of existing files and writing in "
-            "existing folders. If this Parameter is True, no further "
-            "confirmation will be asked and no further warning will "
-            "be displayed."
+            "Allow overwriting of existing files and writing in existing folders. If "
+            "this Parameter is True, no further confirmation will be asked and no "
+            "further warning will be displayed."
         ),
     },
     "use_scan_timeline": {
@@ -1321,7 +1293,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Keyword to toggle using a the data range instead of  "
+            "Keyword to toggle using a the data range instead of "
             "the indices for selecting data."
         ),
     },
@@ -1333,7 +1305,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Scan for all new files and not only files matching the " "input pattern."
+            "Scan for all new files and not only files matching the input pattern."
         ),
     },
     "filename_pattern": {
@@ -1344,9 +1316,9 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            'The pattern of the filename. Use hashes "#" for '
-            "wildcards which will be filled in with numbers."
-            "This Parameter must be set if scan_for_all is False."
+            "The pattern of the filename. Use hashes '#' for  wildcards which will be "
+            "filled in with numbers. This Parameter must be set if scan_for_all is "
+            "False."
         ),
     },
     "directory_path": {
@@ -1383,11 +1355,11 @@ GENERIC_PARAM_DESCRIPTION = {
         "type": str,
         "default": "Gaussian",
         "name": "Fit function",
-        "choices": ["Gaussian", "Lorentzian", "Pseudo-Voigt"],
+        "choices": ["Gaussian", "Lorentzian", "Voigt"],
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Select the type of fit function to be used in the " "single peak fit."
+            "Select the type of fit function to be used in the single peak fit."
         ),
     },
     "fit_bg_order": {
@@ -1398,7 +1370,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "unit": "",
         "allow_None": True,
         "tooltip": (
-            "The order of the background. None corresponds to no " "background."
+            "The order of the background. None corresponds to no background."
         ),
     },
     "fit_upper_limit": {

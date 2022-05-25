@@ -29,7 +29,7 @@ __all__ = [
     "lorentzian",
     "lorentzian_delta",
     "voigt",
-    "voigt_delta"
+    "voigt_delta",
 ]
 
 import numpy as np
@@ -67,7 +67,9 @@ def gaussian(c, x):
     np.ndarray
         The function values for the given x values.
     """
-    _gauss = c[0] * (2 * PI)**(-0.5) / c[1] * np.exp(-(x - c[2])**2 / ( 2 * c[1]**2))
+    _gauss = (
+        c[0] * (2 * PI) ** (-0.5) / c[1] * np.exp(-((x - c[2]) ** 2) / (2 * c[1] ** 2))
+    )
     if len(c) == 3:
         return _gauss
     if len(c) == 4:
@@ -130,7 +132,7 @@ def lorentzian(c, x):
     np.ndarray
         The function values for the given x values.
     """
-    _lorentz = c[0] / PI * (0.5 * c[1]) / ((x - c[2])**2 + (0.5 * c[1])**2)
+    _lorentz = c[0] / PI * (0.5 * c[1]) / ((x - c[2]) ** 2 + (0.5 * c[1]) ** 2)
     if len(c) == 3:
         return _lorentz
     if len(c) == 4:

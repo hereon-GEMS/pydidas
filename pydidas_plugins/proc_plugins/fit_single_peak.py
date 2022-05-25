@@ -35,9 +35,14 @@ from pydidas.core.constants import (
     lorentzian,
     lorentzian_delta,
     voigt,
-    voigt_delta
+    voigt_delta,
 )
-from pydidas.core import get_generic_param_collection, Dataset, AppConfigError, Parameter
+from pydidas.core import (
+    get_generic_param_collection,
+    Dataset,
+    AppConfigError,
+    Parameter,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -57,7 +62,12 @@ class FitSinglePeak(ProcPlugin):
             "output",
             str,
             "Peak area",
-            choices=["Peak area", "Peak position", "Peak area and position", "Residual"],
+            choices=[
+                "Peak area",
+                "Peak position",
+                "Peak area and position",
+                "Residual",
+            ],
             name="Output",
             tooltip=(
                 "The output of the fitting plugin. The plugin can either return"
@@ -180,11 +190,11 @@ class FitSinglePeak(ProcPlugin):
             The list with the starting guess for the
 
         """
-        if self.get_param_value("fit_func") == 'Gaussian':
+        if self.get_param_value("fit_func") == "Gaussian":
             _startguess = self._get_gaussian_startparams()
-        elif self.get_param_value("fit_func") == 'Lorentzian':
+        elif self.get_param_value("fit_func") == "Lorentzian":
             _startguess = self._get_lorentzian_startparams()
-        elif self.get_param_value("fit_func") == 'Voigt':
+        elif self.get_param_value("fit_func") == "Voigt":
             _startguess = self._get_voigt_startparams()
         # add the start guess for the center x0:
         _startguess.append(self._x[np.argmax(self._data)])

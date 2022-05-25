@@ -42,7 +42,14 @@ NO_ITEM = "".join(
 
 
 def app_processor(
-    input_queue, output_queue, stop_queue, finished_queue, app, app_params, app_config
+    input_queue,
+    output_queue,
+    stop_queue,
+    finished_queue,
+    app,
+    app_params,
+    app_config,
+    **kwargs,
 ):
     """
     Start a loop to process function calls on individual frames.
@@ -74,12 +81,9 @@ def app_processor(
     """
     _app_carryon = True
     logger.debug("Started process")
-    logger.debug("app_config: %s", app_config)
     _app = app(app_params, slave_mode=True)
-    logger.debug("Started app")
     _app._config = app_config
     _app.multiprocessing_pre_run()
-    logger.debug("Starting processing")
     while True:
         # check for stop signal
         try:

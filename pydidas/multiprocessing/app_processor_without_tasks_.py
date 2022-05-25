@@ -43,7 +43,14 @@ NO_ITEM = "".join(
 
 
 def app_processor_without_tasks(
-    input_queue, output_queue, stop_queue, finished_queue, app, app_params, app_config
+    input_queue,
+    output_queue,
+    stop_queue,
+    finished_queue,
+    app,
+    app_params,
+    app_config,
+    **kwargs,
 ):
     """
     Start a loop to process function calls on individual frames.

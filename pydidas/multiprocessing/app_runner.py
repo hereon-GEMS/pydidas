@@ -25,8 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["AppRunner"]
 
-import multiprocessing as mp
-
 from qtpy import QtCore
 
 from ..core import BaseApp
@@ -178,25 +176,6 @@ class AppRunner(WorkerController):
         self.sig_results.connect(self.__app.multiprocessing_store_results)
         self.sig_progress.connect(self.__check_progress)
         self._create_and_start_workers()
-
-    def _create_and_start_workers(self):
-        """
-        Create and start worker processes.
-        """
-        self._workers = [
-            mp.Process(
-                target=self._processor["func"],
-                args=self._processor["args"],
-                name=f"pydidas_worker-{i}",
-                daemon=True,
-            )
-            for i in range(self._n_workers)
-        ]
-        for _worker in self._workers:
-            logger.debug("Starting Worker")
-            _worker.start()
-        self._flag_active = True
-        self._progress_done = 0
 
     def _cycle_post_run(self, timeout=10):
         """

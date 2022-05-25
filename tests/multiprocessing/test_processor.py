@@ -30,6 +30,7 @@ import io
 import multiprocessing as mp
 
 import numpy as np
+from qtpy import QtWidgets
 
 from pydidas.multiprocessing import processor
 
@@ -69,6 +70,16 @@ class AppWithFunc:
 
 
 class Test_processor(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._qtapp = QtWidgets.QApplication.instance()
+        if cls._qtapp is None:
+            cls._qtapp = QtWidgets.QApplication([])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._qtapp.deleteLater()
+
     def setUp(self):
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
@@ -77,7 +88,10 @@ class Test_processor(unittest.TestCase):
         self.n_test = 20
 
     def tearDown(self):
-        ...
+        self.input_queue.close()
+        self.output_queue.close()
+        self.stop_queue.close()
+        self.finished_queue.close()
 
     def put_ints_in_queue(self):
         for i in range(self.n_test):

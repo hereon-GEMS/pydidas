@@ -53,7 +53,7 @@ class TestWorkerController(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls._app.quit()
+        cls._app.deleteLater()
 
     def wait_for_finish_signal(self, wc, timeout=8):
         t0 = time.time()

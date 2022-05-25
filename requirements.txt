@@ -6,6 +6,6 @@ scikit-image>=0.18.3
 qtawesome>=1.0.3
 sphinx>=4.4.0
 sphinx_rtd_theme>=1.0.0
-# pyopencl>=2022.1
+pyopencl>=2022.1
 # scipy>=1.8.0  -- included in pyFAI
 # pyyaml >= 6.0 -- included in scikit-image

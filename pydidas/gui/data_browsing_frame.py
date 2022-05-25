@@ -101,9 +101,9 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         """
         index = self._widgets["tree"].selectedIndexes()[0]
         _name = self._widgets["tree"]._filemodel.filePath(index)
-        self.set_status(f"Opened file: {_name}")
         if not os.path.isfile(_name):
             return
+        self.set_status(f"Opened file: {_name}")
         _extension = "." + os.path.basename(_name).split(".")[-1]
         _supported_nothdf_ext = set(IoMaster.registry_import.keys()) - set(
             HDF5_EXTENSIONS

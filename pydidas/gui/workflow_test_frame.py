@@ -25,8 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrame"]
 
-from copy import deepcopy
-
 from qtpy import QtCore
 import numpy as np
 
@@ -206,7 +204,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "data_label"
             )
             _data = _node.results
-
             _data.axis_units = [
                 (_val if _val is not None else "") for _val in _data.axis_units.values()
             ]
@@ -333,7 +330,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         This method will get the latest result (subset) from the
         WorkflowResults and update the plot.
         """
-        if (not self._config["plot_active"]):
+        if not self._config["plot_active"]:
             return
         _ndim = len(self._config["shapes"][self._active_node])
         if _ndim == 1:

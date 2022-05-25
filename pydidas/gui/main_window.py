@@ -138,7 +138,7 @@ class MainWindow(MainMenu):
             self._toolbars[tb].setStyleSheet("QToolBar{spacing:20px;}")
             self._toolbars[tb].setIconSize(QtCore.QSize(40, 40))
             self._toolbars[tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-            self._toolbars[tb].setFixedWidth(85)
+            self._toolbars[tb].setFixedWidth(90)
             self._toolbars[tb].setMovable(False)
             self._toolbars[tb].toggleViewAction().setEnabled(False)
 

@@ -406,9 +406,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "px",
         "allow_None": False,
-        "tooltip": (
-            "The image shape of the original image as loaded from the file."
-        ),
+        "tooltip": ("The image shape of the original image as loaded from the file."),
     },
     "datatype": {
         "type": None,
@@ -675,9 +673,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "The unit of the movement / steps / offset in scan direction 1."
-        ),
+        "tooltip": ("The unit of the movement / steps / offset in scan direction 1."),
     },
     "scan_dir_2": {
         "type": str,
@@ -728,9 +724,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "The unit of the movement / steps / offset in scan direction 2."
-        ),
+        "tooltip": ("The unit of the movement / steps / offset in scan direction 2."),
     },
     "scan_dir_3": {
         "type": str,
@@ -781,9 +775,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "The unit of the movement / steps / offset in scan direction 3."
-        ),
+        "tooltip": ("The unit of the movement / steps / offset in scan direction 3."),
     },
     "scan_dir_4": {
         "type": str,
@@ -834,9 +826,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "The unit of the movement / steps / offset in scan direction 4."
-        ),
+        "tooltip": ("The unit of the movement / steps / offset in scan direction 4."),
     },
     ############################
     # selected scan indices
@@ -1369,9 +1359,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": [None, 0, 1],
         "unit": "",
         "allow_None": True,
-        "tooltip": (
-            "The order of the background. None corresponds to no background."
-        ),
+        "tooltip": ("The order of the background. None corresponds to no background."),
     },
     "fit_upper_limit": {
         "type": float,

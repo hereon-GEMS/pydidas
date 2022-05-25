@@ -74,12 +74,12 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.pre_execute()
         _startguess = plugin._update_fit_startparams()
         plugin._fit_params = dict(zip(plugin._fitparam_labels, _startguess))
-        self._dummy_metadata = {'test_meta': 123}
+        self._dummy_metadata = {"test_meta": 123}
         plugin._data.metadata.update(self._dummy_metadata)
         return plugin
 
     def assert_fit_results_okay(self, fit_result_data, params, bg_order):
-        self.assertEqual(fit_result_data.shape, (1, ))
+        self.assertEqual(fit_result_data.shape, (1,))
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
@@ -90,9 +90,13 @@ class TestFitSinglePeak(unittest.TestCase):
             self.assertTrue(params["gamma"] < 5)
         self.assertTrue((params["center"] < 22) & (params["center"] > 20))
         if bg_order in [0, 1]:
-            self.assertTrue((params["background_p0"] < 1) & (params["background_p0"] > 0))
+            self.assertTrue(
+                (params["background_p0"] < 1) & (params["background_p0"] > 0)
+            )
         if bg_order == 1:
-            self.assertTrue((params["background_p1"] < 1) & (params["background_p1"] > -1))
+            self.assertTrue(
+                (params["background_p1"] < 1) & (params["background_p1"] > -1)
+            )
 
     def test_creation(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
@@ -104,10 +108,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         self.assertEqual(plugin._func, gaussian)
-        self.assertEqual(
-            plugin._fitparam_labels,
-            ["amplitude", "sigma", "center"]
-        )
+        self.assertEqual(plugin._fitparam_labels, ["amplitude", "sigma", "center"])
         self.assertEqual(plugin._fitparam_startpoints, [])
         self.assertEqual(plugin._fitparam_bounds_low, [0, 0, -np.inf])
         self.assertEqual(plugin._fitparam_bounds_high, [np.inf, np.inf, np.inf])
@@ -118,14 +119,11 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.pre_execute()
         self.assertEqual(plugin._func, lorentzian)
         self.assertEqual(
-            plugin._fitparam_labels,
-            ["amplitude", "gamma", "center", "background_p0"])
+            plugin._fitparam_labels, ["amplitude", "gamma", "center", "background_p0"]
+        )
         self.assertEqual(plugin._fitparam_startpoints, [])
         self.assertEqual(plugin._fitparam_bounds_low, [0, 0, -np.inf, -np.inf])
-        self.assertEqual(
-            plugin._fitparam_bounds_high,
-            [np.inf, np.inf, np.inf, np.inf]
-        )
+        self.assertEqual(plugin._fitparam_bounds_high, [np.inf, np.inf, np.inf, np.inf])
 
     def test_pre_execute__voigt_1st_order_bg(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
@@ -135,20 +133,14 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertEqual(plugin._func, voigt)
         self.assertEqual(
             plugin._fitparam_labels,
-            ["amplitude",
-             "sigma",
-             "gamma",
-             "center",
-             "background_p0",
-             "background_p1"]
+            ["amplitude", "sigma", "gamma", "center", "background_p0", "background_p1"],
         )
         self.assertEqual(
-            plugin._fitparam_bounds_low,
-            [0, 0, 0, -np.inf, -np.inf, -np.inf]
+            plugin._fitparam_bounds_low, [0, 0, 0, -np.inf, -np.inf, -np.inf]
         )
         self.assertEqual(
             plugin._fitparam_bounds_high,
-            [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]
+            [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf],
         )
 
     def test_crop_data_to_selected_range__no_limits(self):
@@ -212,7 +204,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (1, ))
+        self.assertEqual(_new_data.shape, (1,))
 
     def test_create_result_dataset__peak_position(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -222,7 +214,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (1, ))
+        self.assertEqual(_new_data.shape, (1,))
 
     def test_create_result_dataset__peak_area_and_position(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -232,7 +224,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (2, ))
+        self.assertEqual(_new_data.shape, (2,))
 
     def test_create_result_dataset__residual(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()

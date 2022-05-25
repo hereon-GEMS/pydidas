@@ -192,7 +192,8 @@ class DirectorySpyApp(BaseApp):
         try:
             _mask = np.load(_maskfile)
             return _mask
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, PermissionError):
+            self.set_param_value("use_global_det_mask", False)
             return None
         raise AppConfigError("Unknown error when reading detector mask file.")
 

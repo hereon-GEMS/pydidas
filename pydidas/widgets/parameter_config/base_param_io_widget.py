@@ -28,7 +28,7 @@ __all__ = ["BaseParamIoWidget"]
 import numbers
 import pathlib
 
-from qtpy import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui, QtCore
 from numpy import nan
 
 from ...core import Hdf5key
@@ -38,6 +38,14 @@ from ...core.constants import (
     PARAM_INPUT_EDIT_WIDTH,
     QT_REG_EXP_INT_VALIDATOR,
 )
+
+
+LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
+LOCAL_SETTINGS.setNumberOptions(QtCore.QLocale.RejectGroupSeparator)
+
+FLOAT_VALIDATOR = QtGui.QDoubleValidator()
+FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
+FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 
 class BaseParamIoWidget(QtWidgets.QWidget):
@@ -82,9 +90,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
             if param.allow_None:
                 self.setValidator(QT_REG_EXP_FLOAT_VALIDATOR)
             else:
-                _validator = QtGui.QDoubleValidator()
-                _validator.setNotation(QtGui.QDoubleValidator.ScientificNotation)
-                self.setValidator(_validator)
+                self.setValidator(FLOAT_VALIDATOR)
 
     def get_value_from_text(self, text):
         """

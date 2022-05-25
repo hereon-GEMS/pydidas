@@ -25,7 +25,6 @@ __status__ = "Development"
 import unittest
 import string
 import random
-import sys
 
 import numpy as np
 from qtpy import QtWidgets
@@ -50,13 +49,20 @@ class TestWidget(QtWidgets.QWidget):
 
 
 class TestCentralWidgetStack(unittest.TestCase):
-    def setUp(self):
-        self.q_app = QtWidgets.QApplication(sys.argv)
-        self.widgets = []
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication([])
+        cls.widgets = []
 
-    def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
+    @classmethod
+    def tearDownClass(cls):
+        while cls.widgets:
+            w = cls.widgets.pop()
+            w.deleteLater()
+        cls.q_app.quit()
+
+    def setUp(self):
+        self.widgets = []
 
     def create_stack(self):
         stack = CentralWidgetStack()

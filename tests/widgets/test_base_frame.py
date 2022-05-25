@@ -46,16 +46,22 @@ class SignalTestClass(QtCore.QObject):
 
 
 class TestBaseFrame(unittest.TestCase):
-    def setUp(self):
-        self.q_app = QtWidgets.QApplication([])
-        self.tester = SignalTestClass()
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication([])
+        cls.tester = SignalTestClass()
+        # cls.widgets = []
 
-    def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
+    @classmethod
+    def tearDownClass(cls):
+        # while cls.widgets:
+        #     w = cls.widgets.pop()
+        #     w.deleteLater()
+        cls.q_app.quit()
 
     def get_base_frame(self, **kwargs):
         _frame = BaseFrame(**kwargs)
+        # self.widgets.append(_frame)
         _frame.add_param(Parameter("test_int", int, 24))
         _frame.add_param(Parameter("test_str", str, get_random_string(30)))
         _frame.create_param_widget(_frame.get_param("test_int"))
@@ -85,6 +91,7 @@ class TestBaseFrame(unittest.TestCase):
 
     def test_next_row_empty(self):
         obj = BaseFrame()
+        # self.widgets.append(obj)
         _row = obj.next_row()
         self.assertEqual(_row, 0)
 

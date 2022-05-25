@@ -49,7 +49,7 @@ def create_lineedit(**kwargs):
     line : QFrame
         The line (in the form of a QFrame widget).
     """
-    _lineedit = QLineEdit(kwargs.get('text', ''))
+    _lineedit = QLineEdit(kwargs.get("text", ""))
 
     kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
     kwargs["wordWrap"] = kwargs.get("wordWrap", True)

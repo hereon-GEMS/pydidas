@@ -48,13 +48,23 @@ def get_test_widget(*args, **kwargs):
 
 
 class TestCreateWidgetsMixIn(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication([])
+        cls.widgets = []
+
+    @classmethod
+    def tearDownClass(cls):
+        while cls.widgets:
+            w = cls.widgets.pop()
+            w.deleteLater()
+        cls.q_app.quit()
+
     def setUp(self):
-        self.q_app = QtWidgets.QApplication([])
-        self.widgets = []
+        ...
 
     def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
+        ...
 
     def get_widget(self):
         _w = TestWidget()

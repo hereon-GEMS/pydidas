@@ -31,6 +31,7 @@ from ...core import Hdf5key
 from ...core.utils import get_hdf5_populated_dataset_keys
 from ..utilities import get_pyqt_icon_from_str_reference
 
+
 class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
     QInputDialog subclass for showing a pop-up dialogue to select a dataset

@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ["gui_excepthook"]
 
 import os
+import time
 import traceback
 from io import StringIO
 
@@ -55,8 +56,9 @@ def gui_excepthook(exc_type, exception, trace):
     _trace = _traceback_info.read()
     _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
 
+    _time = time.strftime("%Y-%m-%d %H:%M:%S")
     _sep = "\n" + "-" * 20 + "\n"
-    _msg = "-" * 20 + "\n" + _sep.join([f"{exc_type}: {exception}", _trace])
+    _msg = "-" * 20 + "\n" + _sep.join([_time, f"{exc_type}: {exception}", _trace])
     with open(_logfile, "a+") as _file:
         _file.write("\n\n" + _msg)
 

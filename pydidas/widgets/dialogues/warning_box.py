@@ -28,6 +28,7 @@ from qtpy import QtWidgets
 
 from ..utilities import get_pyqt_icon_from_str_reference
 
+
 class WarningBox(QtWidgets.QMessageBox):
     """
     QMessageBox subclass which simplifies the calling syntax to generate

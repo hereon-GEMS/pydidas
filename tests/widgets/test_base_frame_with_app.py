@@ -47,26 +47,42 @@ class TestClass(QtCore.QObject):
 
 
 class TestBaseFrameWithApp(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication([])
+        # cls.widgets = []
+
+    @classmethod
+    def tearDownClass(cls):
+        # while cls.widgets:
+        #     w = cls.widgets.pop()
+        #     w.deleteLater()
+        cls.q_app.quit()
+
     def setUp(self):
-        self.q_app = QtWidgets.QApplication([])
         self.tester = TestClass()
 
     def tearDown(self):
-        del self.q_app
+        ...
+
+    def get_base_frame_with_app(self):
+        _obj = BaseFrameWithApp()
+        # self.widgets.append(_obj)
+        return _obj
 
     def test_init(self):
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         self.assertIsInstance(obj, BaseFrameWithApp)
         self.assertEqual(obj.frame_index, -1)
         self.assertIsNone(obj._app)
 
     def test_set_app_wrong_class(self):
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         with self.assertRaises(TypeError):
             obj._set_app("test")
 
     def test_set_app_no_existing_app(self):
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         app = BaseApp()
         obj._set_app(app)
         self.assertIsInstance(obj._app, BaseApp)
@@ -74,7 +90,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
     def test_set_app_existing_app(self):
         _bin = 5
         _fname = Path("test/file/name.txt")
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         obj._app = BaseApp(
             get_generic_parameter("first_file"), get_generic_parameter("binning")
         )
@@ -94,7 +110,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
 
     def test_apprunner_update_progress(self):
         _progress = 0.425
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         obj._app = BaseApp()
         obj._widgets["progress"] = QtWidgets.QSpinBox()
         self.tester.signal.connect(obj._apprunner_update_progress)
@@ -102,7 +118,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
         self.assertEqual(obj._widgets["progress"].value(), round(_progress * 100))
 
     def test_apprunner_finished(self):
-        obj = BaseFrameWithApp()
+        obj = self.get_base_frame_with_app()
         obj._runner = True
         self.tester.simple_signal.connect(obj._apprunner_finished)
         self.tester.simple_signal.emit()

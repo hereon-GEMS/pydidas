@@ -29,7 +29,7 @@ import warnings
 import textwrap
 from numbers import Integral
 from collections.abc import Iterable
-from copy import copy
+from copy import deepcopy
 
 import numpy as np
 
@@ -113,12 +113,12 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None or self.shape == tuple():
             return
-        self.metadata = getattr(obj, "metadata", {})
+        self.metadata = deepcopy(getattr(obj, "metadata", {}))
         self.data_unit = getattr(obj, "data_unit", "")
         self.getitem_key = getattr(obj, "getitem_key", None)
         self.__check_and_set_default_axis_attributes()
         self._keys = {
-            _key: copy(getattr(obj, _key, _default_vals(self.ndim)))
+            _key: deepcopy(getattr(obj, _key, _default_vals(self.ndim)))
             for _key in ["axis_labels", "axis_ranges", "axis_units"]
         }
         if self.getitem_key is not None:
@@ -307,7 +307,7 @@ class EmptyDataset(np.ndarray):
         pydidas.core.Dataset
             The transposed Dataset.
         """
-        _new = copy(self)
+        _new = deepcopy(self)
         if axes is tuple():
             axes = tuple(np.arange(self.ndim)[::-1])
         _new.axis_labels = [self.axis_labels[_index] for _index in axes]

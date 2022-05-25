@@ -314,7 +314,7 @@ class TestWorkflowTree(unittest.TestCase):
         tree2.create_and_add_node(unittest_objects.DummyLoader())
         tree2.create_and_add_node(unittest_objects.DummyProc())
         tree2.create_and_add_node(unittest_objects.DummyProc())
-        self.assertEqual(hash(tree), hash(tree2))
+        self.assertNotEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree_w_different_plugin_param(self):
         tree = _WorkflowTree()

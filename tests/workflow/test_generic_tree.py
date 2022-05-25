@@ -284,7 +284,7 @@ class TestGenericTree(unittest.TestCase):
     def test_hash___simple_tree(self):
         tree = GenericTree()
         tree2 = GenericTree()
-        self.assertEqual(hash(tree), hash(tree2))
+        self.assertNotEqual(hash(tree), hash(tree2))
 
     def test_hash___full_tree(self):
         _depth = 3
@@ -294,7 +294,7 @@ class TestGenericTree(unittest.TestCase):
         _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
         tree.register_node(_nodes[0][0])
         tree2.register_node(_nodes[0][0].get_copy())
-        self.assertEqual(hash(tree), hash(tree2))
+        self.assertNotEqual(hash(tree), hash(tree2))
 
 
 if __name__ == "__main__":

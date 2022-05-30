@@ -46,7 +46,7 @@ def get_generic_plugin_path():
     """
     _pydidas_module_path = os.path.dirname(os.path.abspath(core.__path__[0]))
     logger.debug("Generic module path: %s", _pydidas_module_path)
-    return [os.path.join(os.path.dirname(_pydidas_module_path), "plugins")]
+    return [os.path.join(os.path.dirname(_pydidas_module_path), "pydidas_plugins")]
 
 
 def plugin_type_check(cls_item):

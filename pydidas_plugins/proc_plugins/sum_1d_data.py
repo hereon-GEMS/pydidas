@@ -97,7 +97,7 @@ class Sum1dData(ProcPlugin):
         _selection = self._data[self._get_index_range()]
         _sum = np.sum(_selection)
         _new_data = Dataset(
-            [_sum], axis_labels=[""], axis_units=[""], metadata=data.metadata
+            [_sum], axis_labels=["Data sum"], axis_units=[""], metadata=data.metadata
         )
         return _new_data, kwargs
 

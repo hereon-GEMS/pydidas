@@ -79,7 +79,7 @@ class FitSinglePeak(ProcPlugin):
         ),
     )
     input_data_dim = 1
-    output_data_dim = 2
+    output_data_dim = 1
     new_dataset = True
 
     def __init__(self, *args, **kwargs):
@@ -143,7 +143,8 @@ class FitSinglePeak(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._crop_data_to_selected_range(data)
+        self._data = data
+        self._crop_data_to_selected_range()
         _startguess = self._update_fit_startparams()
         _res = least_squares(
             self._ffunc,
@@ -157,28 +158,35 @@ class FitSinglePeak(ProcPlugin):
         kwargs["fit_func"] = self._func.__name__
         return _results, kwargs
 
-    def _crop_data_to_selected_range(self, data):
+    def _crop_data_to_selected_range(self):
         """
         Get the data in the range specified by the limits and store the selected
         x-range and data values.
-
-        Parameters
-        ----------
-        data : pydidas.core.Dataset
-            The input data
         """
-        _xlow = self.get_param_value("fit_lower_limit")
-        _xhigh = self.get_param_value("fit_upper_limit")
-        _range = np.where(
-            (data.axis_ranges[0] >= _xlow) & (data.axis_ranges[0] <= _xhigh)
-        )[0]
+        _range = self._get_cropped_range()
         if _range.size < 5:
             raise AppConfigError(
                 "The data range for the fit is too small "
                 "with less than 5 data points."
             )
-        self._x = data.axis_ranges[0][_range]
-        self._data = data[_range]
+        self._x = self._data.axis_ranges[0][_range]
+        self._data = self._data[_range]
+
+    def _get_cropped_range(self):
+        """
+        Get the cropped index range corresponding to the selected data range.
+
+        Returns
+        -------
+        range : np.ndarray
+            The index range corresponding to the selected data ranges.
+        """
+        _xlow = self.get_param_value("fit_lower_limit")
+        _xhigh = self.get_param_value("fit_upper_limit")
+        _range = np.where(
+            (self._data.axis_ranges[0] >= _xlow) & (self._data.axis_ranges[0] <= _xhigh)
+        )[0]
+        return _range
 
     def _update_fit_startparams(self):
         """
@@ -280,15 +288,20 @@ class FitSinglePeak(ProcPlugin):
         _residual = self._data - _datafit
         _residual_std = np.std(_residual)
         if _output == "Peak area":
-            _new_data = Dataset([self._fit_params["amplitude"]])
+            _new_data = Dataset(
+                [self._fit_params["amplitude"]], axis_labels=["Peak area"]
+            )
         elif _output == "Peak position":
-            _new_data = Dataset([self._fit_params["center"]])
+            _new_data = Dataset(
+                [self._fit_params["center"]], axis_labels=["Peak position"]
+            )
         elif _output == "Peak area and position":
             _new_data = Dataset(
-                [self._fit_params["amplitude"], self._fit_params["center"]]
+                [self._fit_params["amplitude"], self._fit_params["center"]],
+                axis_labels=["Peak area and position"],
             )
         elif _output == "Residual":
-            _new_data = Dataset(_residual)
+            _new_data = Dataset(_residual, axis_labels=["Fit residual"])
             _new_data.axis_labels[0] = self._data.axis_labels[0]
             _new_data.axis_units[0] = self._data.axis_units[0]
             _new_data.axis_ranges[0] = self._x
@@ -298,3 +311,17 @@ class FitSinglePeak(ProcPlugin):
         _new_data.metadata["fit_params"] = self._fit_params
         _new_data.metadata["fit_residual_std"] = _residual_std
         return _new_data
+
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin results.
+        """
+        _output = self.get_param_value("output")
+        if _output in ["Peak area", "Peak position"]:
+            self._config["result_shape"] = (1,)
+        elif _output == "Peak area and position":
+            self._config["result_shape"] = (2,)
+        elif _output == "Residual":
+            raise ValueError(
+                "Fit residuals are not supported in the full WorkflowTree."
+            )

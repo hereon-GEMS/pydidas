@@ -39,8 +39,9 @@ META = WorkflowResultSaverMeta
 
 
 class TestWorkflowResultSaverBase(unittest.TestCase):
-    def setUp(self):
-        self._meta_registry = META.registry.copy()
+    @classmethod
+    def setUpClass(cls):
+        cls._meta_registry = META.registry.copy()
         META.reset()
 
         class SAVER(WorkflowResultSaverBase):
@@ -48,11 +49,12 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
             default_extension = "Test"
             format_name = "Test"
 
-        self.SAVER = SAVER
+        cls.SAVER = SAVER
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         META.reset()
-        META.registry = self._meta_registry.copy()
+        META.registry = cls._meta_registry.copy()
 
     def test_class_existance(self):
         self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)
@@ -77,6 +79,10 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
             self.assertTrue(_name.endswith(".Test"))
             self.assertNotIn(" ", _name)
             self.assertNotIn("\n", _name)
+
+    def test_import_results_from_file(self):
+        with self.assertRaises(NotImplementedError):
+            self.SAVER.import_results_from_file("dummy")
 
 
 if __name__ == "__main__":

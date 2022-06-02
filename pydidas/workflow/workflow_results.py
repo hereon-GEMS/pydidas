@@ -513,7 +513,10 @@ class _WorkflowResults(QtCore.QObject):
         _meta = self.get_result_metadata(node_id)
         _scandim = SCAN.get_param_value("scan_dim")
         _ax_labels = copy(_meta["axis_labels"])
-        _ax_units = copy(_meta["axis_units"])
+        _ax_units = {
+            _key: (_item if _item is not None else "")
+            for _key, _item in _meta["axis_units"].items()
+        }
         _ax_ranges = {
             _key: utils.get_range_as_formatted_string(_range)
             for _key, _range in _meta["axis_ranges"].items()

@@ -74,7 +74,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
             sizePolicy=EXP_EXP_POLICY,
             indent=8,
-            fixedWidth=675,
+            fixedWidth=715,
         )
 
         self.create_any_widget(
@@ -102,7 +102,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self._widgets["button_copy"].clicked.connect(
             self.copy_to_clipboard_and_open_webpage
         )
-        self.resize(860, self.height())
+        self.resize(900, self.height())
         self.set_text(self._text)
 
     def set_text(self, text):

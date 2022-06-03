@@ -1,3 +1,15 @@
+v0.1.9
+======
+Major changes:
+--------------
+
+Improvements
+------------
+
+Bugfixes:
+---------
+
+
 v0.1.8
 ======
 Major changes:
@@ -29,6 +41,7 @@ Bugfixes:
 - Fixed an issue in  WorkflowResultsSelector with selection of data ranges when no 
   range was given.
 - Fixed an issue with the order of axis ranges in transposed Datasets.  
+
 
 v0.1.7
 ======

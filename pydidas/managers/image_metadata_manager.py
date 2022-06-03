@@ -25,10 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ImageMetadataManager"]
 
-import os
 
 from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file
+from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file, get_extension
 from ..core import (
     Parameter,
     ParameterCollection,
@@ -191,7 +190,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         Update the image metadata from new input.
         """
         _filename = self.get_filename()
-        if os.path.splitext(_filename)[1] in HDF5_EXTENSIONS:
+        if get_extension(_filename) in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
             self._store_image_data_from_single_image()

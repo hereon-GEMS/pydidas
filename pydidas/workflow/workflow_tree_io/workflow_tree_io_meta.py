@@ -24,9 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTreeIoMeta"]
 
-import os
-
 from ...core.io_registry import GenericIoMeta
+from ...core.utils import get_extension
 
 
 class WorkflowTreeIoMeta(GenericIoMeta):
@@ -54,7 +53,7 @@ class WorkflowTreeIoMeta(GenericIoMeta):
         kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.export_to_file(filename, tree, **kwargs)
@@ -75,7 +74,7 @@ class WorkflowTreeIoMeta(GenericIoMeta):
         pydidas.workflow.WorkflowTree
             The new WorkflowTree instance.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _tree = _io_class.import_from_file(filename)

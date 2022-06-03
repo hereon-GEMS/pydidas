@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["trim_filename", "find_valid_python_files"]
+__all__ = ["trim_filename", "get_extension", "find_valid_python_files"]
 
 import os
 
@@ -49,6 +49,26 @@ def trim_filename(path):
     else:
         path.replace("/", os.sep)
     return path
+
+
+def get_extension(path):
+    """
+    Get the extension to a file in the given path.
+
+    Parameters
+    ----------
+    path : Union[pathlib.Path, str]
+        The full filename and path
+
+    Returns
+    -------
+    str
+        The extracted file extension.
+    """
+    _ext = os.path.splitext(path)[1]
+    if _ext != "":
+        _ext = _ext[1:]
+    return _ext
 
 
 def find_valid_python_files(path):

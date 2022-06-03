@@ -36,7 +36,7 @@ from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     HDF5_EXTENSIONS,
 )
-from ...core.utils import get_hdf5_metadata
+from ...core.utils import get_hdf5_metadata, get_extension
 from ...data_io import import_data, export_data
 from ...managers import FilelistManager
 from ...widgets import dialogues
@@ -147,7 +147,7 @@ class AverageImagesWindow(PydidasWindow):
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        if os.path.splitext(self.get_param_value("first_file"))[1] in HDF5_EXTENSIONS:
+        if get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS:
             self.__popup_select_hdf5_key(fname)
 
     def __clear_entries(self, keys="all", hide=True):
@@ -180,9 +180,7 @@ class AverageImagesWindow(PydidasWindow):
         Update widget visibilty after selecting the first file based on the
         file format (hdf5 or not).
         """
-        hdf5_flag = (
-            os.path.splitext(self.get_param_value("first_file"))[1] in HDF5_EXTENSIONS
-        )
+        hdf5_flag = get_extension(self.get_param_value("first_file")) in HDF5_EXTENSIONS
         for _key in ["hdf5_key", "hdf5_first_image_num", "hdf5_last_image_num"]:
             self.toggle_param_widget_visibility(_key, hdf5_flag)
         self.toggle_param_widget_visibility("last_file", True)
@@ -221,7 +219,7 @@ class AverageImagesWindow(PydidasWindow):
         _nimages = 0
         for _index in range(0, _n):
             _fname = self._filelist.get_filename(_index)
-            if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
+            if get_extension(_fname) in HDF5_EXTENSIONS:
                 _tmpdata, _n_in_file = self.__read_hdf5_images(_fname)
                 _nimages += _n_in_file
             else:

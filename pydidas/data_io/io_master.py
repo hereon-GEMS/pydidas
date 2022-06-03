@@ -25,7 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["IoMaster"]
 
-import os
+
+from ..core.utils import get_extension
 
 
 class IoMaster(type):
@@ -197,9 +198,9 @@ class IoMaster(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats(mode=mode)
-        _extensions = list(cls._get_registry(mode).keys())
-        _all = [f'All supported files (*{" *".join(_extensions)})'] + [
-            f'{name} (*{" *".join(formats)})' for name, formats in _formats.items()
+        _extensions = [f"*.{_key}" for _key in cls._get_registry(mode).keys()]
+        _all = [f"All supported files ({' '.join(_extensions)})"] + [
+            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)
 
@@ -249,7 +250,7 @@ class IoMaster(type):
         kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension, mode="export")
         _io_class = cls.registry_export[_extension]
         _io_class.export_to_file(filename, data, **kwargs)
@@ -270,7 +271,7 @@ class IoMaster(type):
         pydidas.workflow.WorkflowTree
             The new WorkflowTree instance.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension, mode="import")
         _io_class = cls.registry_import[_extension]
         return _io_class.import_from_file(filename, **kwargs)

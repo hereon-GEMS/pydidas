@@ -31,6 +31,7 @@ __all__ = ["WorkflowResultSaverMeta"]
 import os
 
 from ...core.io_registry import GenericIoMeta
+from ...core.utils import get_extension
 
 
 class WorkflowResultSaverMeta(GenericIoMeta):
@@ -266,7 +267,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             )
         ]
         for _file in _files:
-            _, _ext = os.path.splitext(_file)
+            _ext = get_extension(_file)
             cls.verify_extension_is_registered(_ext)
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])

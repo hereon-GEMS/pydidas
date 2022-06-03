@@ -41,6 +41,7 @@ import hdf5plugin
 
 from ..constants import HDF5_EXTENSIONS
 from ..dataset import Dataset
+from .file_utils import get_extension
 
 
 def get_hdf5_populated_dataset_keys(
@@ -143,7 +144,7 @@ def _hdf5_filename_check(item):
     FileNotFoundError
         If the file does not exist.
     """
-    if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
+    if not get_extension(item) in HDF5_EXTENSIONS:
         raise TypeError(
             "The file does not have any extension registered" " for hdf5 files."
         )

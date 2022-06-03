@@ -25,7 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["GenericIoMeta"]
 
-import os
+
+from ..utils.file_utils import get_extension
 
 
 class GenericIoMeta(type):
@@ -150,9 +151,9 @@ class GenericIoMeta(type):
             each separated by a ";;".
         """
         _formats = cls.get_registered_formats()
-        _extensions = list(cls.registry.keys())
-        _all = [f'All supported files (*{" *".join(_extensions)})'] + [
-            f'{name} (*{" *".join(formats)})' for name, formats in _formats.items()
+        _extensions = [f"*.{_key}" for _key in cls.registry.keys()]
+        _all = [f"All supported files ({' '.join(_extensions)})"] + [
+            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
         ]
         return ";;".join(_all)
 
@@ -185,7 +186,7 @@ class GenericIoMeta(type):
         kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.export_to_file(filename, **kwargs)
@@ -206,7 +207,7 @@ class GenericIoMeta(type):
         pydidas.workflow.WorkflowTree
             The new WorkflowTree instance.
         """
-        _extension = os.path.splitext(filename)[1]
+        _extension = get_extension(filename)
         cls.verify_extension_is_registered(_extension)
         _io_class = cls.registry[_extension]
         _io_class.import_from_file(filename)

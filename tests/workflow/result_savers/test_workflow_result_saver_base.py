@@ -45,8 +45,8 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         META.reset()
 
         class SAVER(WorkflowResultSaverBase):
-            extensions = ["TEST"]
-            default_extension = "Test"
+            extensions = [".TEST"]
+            default_extension = ".Test"
             format_name = "Test"
 
         cls.SAVER = SAVER

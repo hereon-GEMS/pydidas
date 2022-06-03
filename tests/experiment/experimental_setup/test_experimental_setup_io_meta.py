@@ -40,7 +40,7 @@ EXP_IO_META.clear_registry()
 
 
 class TestIo(ExperimentalSetupIoBase):
-    extensions = [".test"]
+    extensions = ["test"]
     format_name = "Test"
 
     @classmethod

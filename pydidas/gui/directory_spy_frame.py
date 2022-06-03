@@ -26,13 +26,12 @@ __status__ = "Development"
 __all__ = ["DirectorySpyFrame"]
 
 import time
-import os
 
 from qtpy import QtCore
 
 from ..apps import DirectorySpyApp
 from ..core import ParameterCollection
-from ..core.utils import pydidas_logger
+from ..core.utils import pydidas_logger, get_extension
 from ..core.constants import HDF5_EXTENSIONS
 from ..experiment import ExperimentalSetup, ScanSetup
 from ..multiprocessing import AppRunner, app_processor_without_tasks
@@ -105,7 +104,7 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         _vis = self.get_param_value("scan_for_all")
         _hdf5_pattern = (
-            os.path.splitext(self.get_param_value("filename_pattern", dtype=str))[1]
+            get_extension(self.get_param_value("filename_pattern", dtype=str))
             in HDF5_EXTENSIONS
         )
         self.toggle_param_widget_visibility("filename_pattern", not _vis)
@@ -119,9 +118,7 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         _vis = self.get_param_value("use_bg_file")
         self.toggle_param_widget_visibility("bg_file", _vis)
-        _hdf5_bgfile = (
-            os.path.splitext(self.get_param_value("bg_file"))[1] in HDF5_EXTENSIONS
-        )
+        _hdf5_bgfile = get_extension(self.get_param_value("bg_file")) in HDF5_EXTENSIONS
         self.toggle_param_widget_visibility("bg_hdf5_key", _vis and _hdf5_bgfile)
         self.toggle_param_widget_visibility("bg_hdf5_frame", _vis and _hdf5_bgfile)
 

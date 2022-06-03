@@ -406,7 +406,7 @@ class TestDataset(unittest.TestCase):
             axis_ranges=[
                 np.arange(6),
                 20 - np.arange(7),
-                3 * np.arange(8),
+                3 * np.arange(1),
                 -1 * np.arange(9),
             ],
         )
@@ -438,9 +438,9 @@ class TestDataset(unittest.TestCase):
             axis_units=["a", "b", "c", "d", "e"],
             axis_ranges=[
                 np.arange(6),
-                [2],
+                [2, 5, 8, 9],
                 20 - np.arange(7),
-                [6],
+                [4, 3],
                 -1 * np.arange(9),
             ],
         )
@@ -523,11 +523,35 @@ class TestDataset(unittest.TestCase):
         obj.axis_units = _newkeys
         self.assertEqual(obj.axis_units, {i: o for i, o in enumerate(_newkeys)})
 
-    def test_empty_dataset_set_axis_ranges_property(self):
+    def test_empty_dataset_set_axis_ranges_property__single_keys(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_ranges = _newkeys
         self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+
+    def test_empty_dataset_set_axis_ranges_property__ndarrays_of_correct_len(self):
+        obj = self.create_empty_dataset()
+        _newkeys = [np.arange(_len) for _len in obj.shape]
+        obj.axis_ranges = _newkeys
+        self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+
+    def test_empty_dataset_set_axis_ranges_property__lists_of_correct_len(self):
+        obj = self.create_empty_dataset()
+        _newkeys = [list(np.arange(_len)) for _len in obj.shape]
+        obj.axis_ranges = _newkeys
+        self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+
+    def test_empty_dataset_set_axis_ranges_property__ndarrays_of_incorrect_len(self):
+        obj = self.create_empty_dataset()
+        _newkeys = [np.arange(_len + 2) for _len in obj.shape]
+        with self.assertRaises(ValueError):
+            obj.axis_ranges = _newkeys
+
+    def test_empty_dataset_set_axis_ranges_property__lists_of_incorrect_len(self):
+        obj = self.create_empty_dataset()
+        _newkeys = [list(np.arange(_len + 2)) for _len in obj.shape]
+        with self.assertRaises(ValueError):
+            obj.axis_ranges = _newkeys
 
     def test_empty_dataset_metadata_property(self):
         obj = self.create_empty_dataset()

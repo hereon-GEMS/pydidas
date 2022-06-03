@@ -32,6 +32,7 @@ import numpy as np
 import h5py
 
 from pydidas.core import Dataset, get_generic_parameter, Parameter
+from pydidas.core.utils import get_random_string, create_hdf5_dataset
 from pydidas.experiment import ScanSetup
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
@@ -97,6 +98,52 @@ class TestWorkflowResults(unittest.TestCase):
         )
         _results = {1: _res1, 2: _res2}
         return _shape1, _shape2, _results
+
+    def create_h5_test_file(self, filename):
+        _data_label = get_random_string(12)
+        _label = get_random_string(9)
+        _data = np.random.random((9, 9, 27))
+        _data_labels = {0: "None", 1: None, 2: "Label"}
+        _data_units = {0: "u1", 1: "u2", 2: None}
+        _data_ranges = {
+            0: None,
+            1: np.arange(9) - 3,
+            2: np.linspace(12, -5, num=27),
+        }
+        with h5py.File(filename, "w") as _file:
+            _file.create_group("entry")
+            _file.create_group("entry/data")
+            _file["entry"].create_dataset("data_label", data=_data_label)
+            _file["entry"].create_dataset("label", data=_label)
+            _file["entry/data"].create_dataset("data", data=_data)
+            for _dim in range(3):
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/data/axis_{_dim}",
+                    "label",
+                    data=_data_labels[_dim],
+                )
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/data/axis_{_dim}",
+                    "unit",
+                    data=_data_units[_dim],
+                )
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/data/axis_{_dim}",
+                    "range",
+                    data=_data_ranges[_dim],
+                )
+            _meta = {
+                "data": _data,
+                "data_labels": _data_label,
+                "labels": _label,
+                "axlabels": _data_labels,
+                "axunits": _data_units,
+                "axranges": _data_ranges,
+            }
+            return _meta
 
     def create_composites(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -258,7 +305,7 @@ class TestWorkflowResults(unittest.TestCase):
         _node_id = 1
         _res = RES.get_result_subset(_node_id, _slice)
         self.assertIsInstance(_res, np.ndarray)
-        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
+        self.assertEqual(_res.shape, (self._scan_n[0], 1, self._scan_n[2]))
 
     def test_get_result_subset__flatten_single_point(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -486,6 +533,35 @@ class TestWorkflowResults(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_height", 12345)
         _new_hash = RES.source_hash
         self.assertNotEqual(_hash, _new_hash)
+
+    def test_import_data_from_directory__empty_dir(self):
+        RES.update_shapes_from_scan_and_workflow()
+        RES.import_data_from_directory(self._tmpdir)
+        self.assertEqual(RES.shapes, {})
+
+    def test_import_data_from_directory__with_files(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _meta11 = self.create_h5_test_file(os.path.join(self._tmpdir, "node_11.h5"))
+        _meta5 = self.create_h5_test_file(os.path.join(self._tmpdir, "node_05.h5"))
+        RES.import_data_from_directory(self._tmpdir)
+        for _id, _local in [[5, _meta5], [11, _meta11]]:
+            for _key in ["labels", "data_labels"]:
+                self.assertEqual(getattr(RES, _key)[_id], _local[_key])
+            for _key in ["shapes", "ndims"]:
+                self.assertEqual(
+                    getattr(RES, _key)[_id], getattr(_local["data"], _key[:-1])
+                )
+            _res = RES.get_results(_id)
+            self.assertTrue(np.allclose(_res, _local["data"]))
+            self.assertEqual(_res.axis_labels, _local["axlabels"])
+            self.assertEqual(_res.axis_units, _local["axunits"])
+            for _dim in range(_res.ndim):
+                if isinstance(_res.axis_ranges[_dim], np.ndarray):
+                    self.assertTrue(
+                        np.allclose(_res.axis_ranges[_dim], _local["axranges"][_dim])
+                    )
+                else:
+                    self.assertEqual(_res.axis_ranges[_dim], _local["axranges"][_dim])
 
 
 if __name__ == "__main__":

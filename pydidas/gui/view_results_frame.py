@@ -25,14 +25,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ViewResultsFrame"]
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..core import get_generic_param_collection
-from ..workflow import WorkflowResults
+from ..workflow import WorkflowResults, result_savers
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 from .mixins import ViewResultsMixin
 
 RESULTS = WorkflowResults()
+SAVER = result_savers.WorkflowResultSaverMeta
 
 
 class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
@@ -60,6 +61,9 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         """
         ViewResultsMixin.__init__(self)
 
+    def connect_signals(self):
+        self._widgets["but_load"].clicked.connect(self.import_data_to_workflow_results)
+
     @QtCore.Slot(int)
     def frame_activated(self, index):
         """
@@ -78,3 +82,15 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
             self._update_choices_of_selected_results()
             self._update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
+
+    def import_data_to_workflow_results(self):
+        """
+        Import data to the workflow results.
+        """
+        _dir = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Select directory for import", None
+        )
+        if _dir != "":
+            RESULTS.import_data_from_directory(_dir)
+            self._update_choices_of_selected_results()
+            self._update_export_button_activation()

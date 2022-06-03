@@ -94,7 +94,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
                 np.random.random(self._result2_shape),
                 axis_units=["m", "Test", None],
                 axis_labels=["dim1", "2nd dim", "dim #3"],
-                axis_ranges=[12 + np.arange(self._result1_shape[0]), None, None],
+                axis_ranges=[12 + np.arange(self._result2_shape[0]), None, None],
             ),
         }
         RES.store_results(0, _results)

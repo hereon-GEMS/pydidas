@@ -103,6 +103,12 @@ class ViewResultsFrameBuilder(BaseFrame):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
+        self.create_button(
+            "but_load",
+            "Load results from directory",
+            gridPos=(-1, 0, 1, 1),
+            parent_widget=self._widgets["config"],
+        )
         self.create_any_widget(
             "result_selector",
             ResultSelectionWidget,

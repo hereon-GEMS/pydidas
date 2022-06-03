@@ -310,30 +310,24 @@ class _WorkflowResults(QtCore.QObject):
             The subset of the results.
         """
         _data = self.__composites[node_id].copy()
+
+        def __dim_index(i):
+            return len(slices) - (i + 1) + flattened_scan_dim * (SCAN.ndim - 1)
+
+        for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
+            if isinstance(_slice, slice):
+                _slice = np.r_[_slice]
+            _data = np.take(_data, _slice, __dim_index(_dim))
+
         if flattened_scan_dim:
 
-            def __dim_index(i):
-                return len(slices) + (SCAN.ndim - 1) - (i + 1)
-
-            for _dim, _slice in enumerate(slices[1:][::-1]):
-                if isinstance(_slice, slice):
-                    _slice = np.r_[_slice]
-                _data = np.take(_data, _slice, __dim_index(_dim))
             _data.flatten_dims(
                 *range(SCAN.ndim),
                 new_dim_label="Scan timeline",
                 new_dim_range=np.arange(SCAN.n_total),
             )
             _data = _data[slices[0]]
-        else:
 
-            def __dim_index(i):
-                return len(slices) - (i + 1)
-
-            for _dim, _slice in enumerate(slices[::-1]):
-                if isinstance(_slice, slice):
-                    _slice = np.r_[_slice]
-                _data = np.take(_data, _slice, __dim_index(_dim))
         if force_string_metadata:
             _data.axis_units = [
                 (str(_val) if _val is not None else "")
@@ -343,7 +337,8 @@ class _WorkflowResults(QtCore.QObject):
                 (str(_val) if _val is not None else "")
                 for _val in _data.axis_labels.values()
             ]
-        return np.squeeze(_data)
+        # return np.squeeze(_data)
+        return _data
 
     def get_result_metadata(self, node_id):
         """
@@ -554,6 +549,27 @@ class _WorkflowResults(QtCore.QObject):
                 for _axis in _ax_labels
             ]
         )
+
+    def import_data_from_directory(self, directory):
+        """
+        Import data from a directory.
+
+        Parameters
+        ----------
+        directory : Union[pathlib.Path, str]
+            The input directory with the exported pydidas results.
+        """
+        self.clear_all_results()
+        _data, _labels, _data_labels = RESULT_SAVER.import_data_from_directory(
+            directory
+        )
+        self._config = {
+            "shapes": {_key: _item.shape for _key, _item in _data.items()},
+            "labels": _labels,
+            "data_labels": _data_labels,
+            "metadata_complete": True,
+        }
+        self.__composites = _data
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

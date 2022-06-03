@@ -620,7 +620,9 @@ class TestDataset(unittest.TestCase):
         )
         self.assertIsInstance(obj, Dataset)
 
-    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_incorrect_len(self):
+    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_incorrect_len(
+        self,
+    ):
         _array = np.random.random((10, 10))
         with self.assertRaises(ValueError):
             Dataset(

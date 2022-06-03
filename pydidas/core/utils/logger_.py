@@ -34,7 +34,7 @@ import multiprocessing as mp
 from .get_logging_dir_ import get_logging_dir
 
 
-LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = logging.WARNING
 
 
 def pydidas_logger(level=LOGGING_LEVEL):

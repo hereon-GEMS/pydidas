@@ -598,6 +598,39 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(obj.axis_units, dict)
         self.assertIsInstance(obj.metadata, dict)
 
+    def test_dataset_creation__with_axis_ranges_property_single_values(self):
+        _array = np.random.random((10, 10))
+        obj = Dataset(
+            _array,
+            axis_labels=self._axis_labels,
+            axis_ranges=self._axis_ranges,
+            axis_units=self._axis_units,
+            metadata={},
+        )
+        self.assertIsInstance(obj, Dataset)
+
+    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_correct_len(self):
+        _array = np.random.random((10, 10))
+        obj = Dataset(
+            _array,
+            axis_labels=self._axis_labels,
+            axis_ranges=[np.arange(10), 10 - np.arange(10)],
+            axis_units=self._axis_units,
+            metadata={},
+        )
+        self.assertIsInstance(obj, Dataset)
+
+    def test_dataset_creation__with_axis_ranges_property_ndarrays_of_incorrect_len(self):
+        _array = np.random.random((10, 10))
+        with self.assertRaises(ValueError):
+            Dataset(
+                _array,
+                axis_labels=self._axis_labels,
+                axis_ranges=[np.arange(12), 10 - np.arange(10)],
+                axis_units=self._axis_units,
+                metadata={},
+            )
+
     def test_repr__dataset(self):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array)

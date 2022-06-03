@@ -45,7 +45,6 @@ def get_generic_plugin_path():
         A list with the path to the generic plugin folder as the only entry.
     """
     _pydidas_module_path = os.path.dirname(os.path.abspath(core.__path__[0]))
-    logger.debug("Generic module path: %s", _pydidas_module_path)
     return [os.path.join(os.path.dirname(_pydidas_module_path), "pydidas_plugins")]
 
 

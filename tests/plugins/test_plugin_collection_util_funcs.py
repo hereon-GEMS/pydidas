@@ -41,7 +41,7 @@ class TestPluginCollectionUtilFuncs(unittest.TestCase):
         ...
 
     def test_get_generic_plugin_path(self):
-        _target = os.path.join(os.path.dirname(pydidas.__path__[0]), "plugins")
+        _target = os.path.join(os.path.dirname(pydidas.__path__[0]), "pydidas_plugins")
         self.assertEqual(get_generic_plugin_path()[0], _target)
 
     def test_plugin_type_check__w_base_plugin(self):

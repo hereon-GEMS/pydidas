@@ -70,7 +70,8 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def create_gauss_plugin_with_dummy_fit(self):
         plugin = self.create_generic_plugin()
-        plugin._crop_data_to_selected_range(self._data)
+        plugin._data = self._data
+        plugin._crop_data_to_selected_range()
         plugin.pre_execute()
         _startguess = plugin._update_fit_startparams()
         plugin._fit_params = dict(zip(plugin._fitparam_labels, _startguess))
@@ -145,28 +146,32 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_crop_data_to_selected_range__no_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin._data = self._data
         with self.assertRaises(AppConfigError):
-            plugin._crop_data_to_selected_range(self._data)
+            plugin._crop_data_to_selected_range()
 
     def test_crop_data_to_selected_range__empty_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin.set_param_value("fit_lower_limit", 42)
         plugin.set_param_value("fit_upper_limit", 2)
+        plugin._data = self._data
         with self.assertRaises(AppConfigError):
-            plugin._crop_data_to_selected_range(self._data)
+            plugin._crop_data_to_selected_range()
 
     def test_crop_data_to_selected_range__normal_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin.set_param_value("fit_lower_limit", 0)
         plugin.set_param_value("fit_upper_limit", 20)
-        plugin._crop_data_to_selected_range(self._data)
+        plugin._data = self._data
+        plugin._crop_data_to_selected_range()
         self.assertTrue((plugin._x <= 20).all())
         self.assertTrue((plugin._x >= 0).all())
 
     def test_update_fit_startparams__no_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", None)
-        plugin._crop_data_to_selected_range(self._data)
+        plugin._data = self._data
+        plugin._crop_data_to_selected_range()
         _startguess = plugin._update_fit_startparams()
         self.assertEqual(len(_startguess), 3)
         self.assertTrue(10 <= _startguess[0] <= 60)
@@ -176,7 +181,8 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_update_fit_startparams__0order_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 0)
-        plugin._crop_data_to_selected_range(self._data)
+        plugin._data = self._data
+        plugin._crop_data_to_selected_range()
         _startguess = plugin._update_fit_startparams()
         self.assertEqual(len(_startguess), 4)
         self.assertTrue(0 <= _startguess[0] <= 50)
@@ -187,7 +193,8 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_update_fit_startparams__1order_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 1)
-        plugin._crop_data_to_selected_range(self._data)
+        plugin._data = self._data
+        plugin._crop_data_to_selected_range()
         _startguess = plugin._update_fit_startparams()
         self.assertEqual(len(_startguess), 5)
         self.assertTrue(0 <= _startguess[0] <= 50)
@@ -226,15 +233,25 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("test_meta" in _new_data.metadata)
         self.assertEqual(_new_data.shape, (2,))
 
-    def test_create_result_dataset__residual(self):
+    def test_create_result_dataset__std(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Residual")
+        plugin.set_param_value("output", "Fit normalized standard deviation")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, plugin._data.shape)
+        self.assertEqual(_new_data.shape, (1,))
+
+    def test_create_result_dataset__peak_area_and_position_and_std(self):
+        plugin = self.create_gauss_plugin_with_dummy_fit()
+        plugin.set_param_value("output", "Peak area, position and norm. std")
+        _new_data = plugin._create_result_dataset()
+        self.assertTrue("fit_params" in _new_data.metadata)
+        self.assertTrue("fit_func" in _new_data.metadata)
+        self.assertTrue("fit_residual_std" in _new_data.metadata)
+        self.assertTrue("test_meta" in _new_data.metadata)
+        self.assertEqual(_new_data.shape, (3,))
 
     def test_execute__gaussian_no_bg(self):
         plugin = self.create_generic_plugin()
@@ -298,6 +315,43 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
+
+    def test_calculate_result_shape__area(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("output", "Peak area")
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._config["result_shape"], (1,))
+
+    def test_calculate_result_shape__position(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("output", "Peak position")
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._config["result_shape"], (1,))
+
+    def test_calculate_result_shape__std(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("output", "Fit normalized standard deviation")
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._config["result_shape"], (1,))
+
+    def test_calculate_result_shape__area_and_pos(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("output", "Peak area and position")
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._config["result_shape"], (2,))
+
+    def test_calculate_result_shape__area_pos_and_std(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("output", "Peak area, position and norm. std")
+        plugin.calculate_result_shape()
+        self.assertEqual(plugin._config["result_shape"], (3,))
+
+    def test_calculate_result_shape__other(self):
+        plugin = self.create_generic_plugin()
+        plugin.params["output"].choices = plugin.params["output"].choices + ["dummy"]
+        plugin.set_param_value("output", "dummy")
+        with self.assertRaises(ValueError):
+            plugin.calculate_result_shape()
 
 
 if __name__ == "__main__":

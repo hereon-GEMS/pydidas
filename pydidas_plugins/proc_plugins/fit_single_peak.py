@@ -65,8 +65,9 @@ class FitSinglePeak(ProcPlugin):
             choices=[
                 "Peak area",
                 "Peak position",
+                "Fit normalized standard deviation",
                 "Peak area and position",
-                "Residual",
+                "Peak area, position and norm. std",
             ],
             name="Output",
             tooltip=(
@@ -286,7 +287,7 @@ class FitSinglePeak(ProcPlugin):
         _output = self.get_param_value("output")
         _datafit = self._func(list(self._fit_params.values()), self._x)
         _residual = self._data - _datafit
-        _residual_std = np.std(_residual)
+        _residual_std = np.std(_residual) / np.mean(self._data)
         if _output == "Peak area":
             _new_data = Dataset(
                 [self._fit_params["amplitude"]], axis_labels=["Peak area"]
@@ -300,12 +301,19 @@ class FitSinglePeak(ProcPlugin):
                 [self._fit_params["amplitude"], self._fit_params["center"]],
                 axis_labels=["Peak area and position"],
             )
-        elif _output == "Residual":
-            _new_data = Dataset(_residual, axis_labels=["Fit residual"])
-            _new_data.axis_labels[0] = self._data.axis_labels[0]
-            _new_data.axis_units[0] = self._data.axis_units[0]
-            _new_data.axis_ranges[0] = self._x
-            _new_data.axis_labels[0] = "residual"
+        elif _output == "Fit normalized standard deviation":
+            _new_data = Dataset(
+                [_residual_std], axis_labels=["Fit normalized standard deviation"]
+            )
+        elif _output == "Peak area, position and norm. std":
+            _new_data = Dataset(
+                [
+                    self._fit_params["amplitude"],
+                    self._fit_params["center"],
+                    _residual_std,
+                ],
+                axis_labels=["Peak area, position and norm. std"],
+            )
         _new_data.metadata = self._data.metadata
         _new_data.metadata["fit_func"] = self._func.__name__
         _new_data.metadata["fit_params"] = self._fit_params
@@ -317,11 +325,15 @@ class FitSinglePeak(ProcPlugin):
         Calculate the shape of the Plugin results.
         """
         _output = self.get_param_value("output")
-        if _output in ["Peak area", "Peak position"]:
+        if _output in [
+            "Peak area",
+            "Peak position",
+            "Fit normalized standard deviation",
+        ]:
             self._config["result_shape"] = (1,)
         elif _output == "Peak area and position":
             self._config["result_shape"] = (2,)
-        elif _output == "Residual":
-            raise ValueError(
-                "Fit residuals are not supported in the full WorkflowTree."
-            )
+        elif _output == "Peak area, position and norm. std":
+            self._config["result_shape"] = (3,)
+        else:
+            raise ValueError("No result shape defined for the selected input")

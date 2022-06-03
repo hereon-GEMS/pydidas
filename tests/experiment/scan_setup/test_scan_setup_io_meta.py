@@ -36,7 +36,7 @@ SCAN_IO_META.clear_registry()
 
 
 class TestIo(ScanSetupIoBase):
-    extensions = [".test"]
+    extensions = ["test"]
     format_name = "Test"
 
     @classmethod
@@ -57,7 +57,7 @@ class TestIo(ScanSetupIoBase):
         cls.import_filename = filename
 
 
-class TestExperimentSettingsIoMeta(unittest.TestCase):
+class TestScanSetupIoMeta(unittest.TestCase):
     def setUp(self):
         self._tmppath = tempfile.mkdtemp()
         TestIo.reset()

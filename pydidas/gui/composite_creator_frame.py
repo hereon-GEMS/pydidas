@@ -39,6 +39,7 @@ from ..core.utils import (
     get_hdf5_populated_dataset_keys,
     pydidas_logger,
     LOGGING_LEVEL,
+    get_extension,
 )
 from ..data_io import IoMaster
 from ..widgets import dialogues
@@ -357,7 +358,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         bool
             Flag whether a hdf5 file has been selected.
         """
-        _ext = os.path.splitext(self.get_param_value("first_file"))[1]
+        _ext = get_extension(self.get_param_value("first_file"))
         return _ext in HDF5_EXTENSIONS
 
     def __popup_select_hdf5_key(self, fname):
@@ -404,7 +405,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             The filename of the background image file.
         """
         self.__clear_entries(["bg_hdf5_key", "bg_hdf5_frame"])
-        hdf5_flag = os.path.splitext(fname)[1] in HDF5_EXTENSIONS
+        hdf5_flag = get_extension(fname) in HDF5_EXTENSIONS
         self._config["bg_hdf5_images"] = hdf5_flag
         self._config["bg_configured"] = not hdf5_flag
         if hdf5_flag:
@@ -511,7 +512,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             flag = flag == "True"
         self.set_param_value("use_bg_file", flag)
         self.toggle_param_widget_visibility("bg_file", flag)
-        _bg_ext = os.path.splitext(self.get_param_value("bg_file"))[1]
+        _bg_ext = get_extension(self.get_param_value("bg_file"))
         if _bg_ext not in HDF5_EXTENSIONS:
             flag = False
         self.toggle_param_widget_visibility("bg_hdf5_key", flag)

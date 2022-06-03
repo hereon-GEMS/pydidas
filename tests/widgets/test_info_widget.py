@@ -31,13 +31,16 @@ from pydidas.widgets.info_widget import InfoWidget
 
 
 class TestCentralWidgetStack(unittest.TestCase):
-    def setUp(self):
-        self.q_app = QtWidgets.QApplication(sys.argv)
-        self.widgets = []
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication.instance()
+        if cls.q_app is None:
+            cls.q_app = QtWidgets.QApplication(sys.argv)
+        cls.widgets = []
 
-    def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
+    @classmethod
+    def tearDownClass(cls):
+        cls.q_app.quit()
 
     def test_init(self):
         obj = InfoWidget()

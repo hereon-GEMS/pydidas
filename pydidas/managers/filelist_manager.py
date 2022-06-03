@@ -42,6 +42,7 @@ from ..core.utils import (
     check_file_exists,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
+    get_extension,
 )
 
 
@@ -301,9 +302,8 @@ class FilelistManager(ObjectWithParameterCollection):
         _fname2 = os.path.split(self.get_param_value("last_file"))[1]
         _items1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
         _items2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
-        if (
-            len(_items1) != len(_items2)
-            or os.path.splitext(_fname1)[1] != os.path.splitext(_fname2)[1]
+        if len(_items1) != len(_items2) or get_extension(_fname1) != get_extension(
+            _fname2
         ):
             raise_error()
         diff_index = []

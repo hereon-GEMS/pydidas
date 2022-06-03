@@ -29,7 +29,9 @@ import os
 import h5py
 
 from ...experiment import ExperimentalSetup, ScanSetup
-from ...core.utils import create_hdf5_dataset
+from ...core import Dataset
+from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
+from ...core.constants import HDF5_EXTENSIONS
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
 
@@ -42,9 +44,9 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
     Base class for WorkflowTree exporters.
     """
 
-    extensions = ["HDF5", "nxs", "h5"]
+    extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
-    default_extension = "h5"
+    default_extension = ".h5"
     _shapes = []
     _filenames = []
     _save_dir = None
@@ -124,7 +126,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             _dsets.append(
                 [
                     f"entry/scan/dim_{_dim}",
-                    "name",
+                    "label",
                     {"data": scanval(f"scan_dir_{_dim + 1}")},
                 ]
             )
@@ -231,8 +233,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 _axisgroup = _group.create_group(f"axis_{_dim + _ndim}")
                 for _key in ["label", "unit", "range"]:
                     _dict = getattr(data, f"axis_{_key}s")
-                    _data = "None" if _dict[_dim] is None else _dict[_dim]
-                    _axisgroup.create_dataset(_key, data=_data)
+                    create_hdf5_dataset(_axisgroup, None, _key, data=_dict[_dim])
 
     @classmethod
     def update_frame_metadata(cls, metadata):
@@ -260,3 +261,50 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                         _val = "None" if _val is None else _val
                         _axisgroup.create_dataset(_key, data=_val)
         cls._metadata_written = True
+
+    @classmethod
+    def import_results_from_file(cls, filename):
+        """
+        Import results from a file and store them as a Dataset.
+
+        Parameters
+        ----------
+        filename : Union[pathlib.Path, str]
+            The full filename of the file to be imported.
+
+        Returns
+        -------
+        data : pydidas.core.Dataset
+            The dataset with the imported data.
+        label : str
+            The node's label.
+        data_label : str
+            The node's data label.
+        """
+        with h5py.File(filename, "r") as _file:
+            _data = Dataset(_file["entry/data/data"][()])
+            _label = read_and_decode_hdf5_dataset(_file["entry/label"])
+            _data_label = read_and_decode_hdf5_dataset(_file["entry/data_label"])
+            _axlabels = []
+            _axunits = []
+            _axranges = []
+            for _dim in range(_data.ndim):
+                _rangeentry = read_and_decode_hdf5_dataset(
+                    _file[f"entry/data/axis_{_dim}/range"]
+                )
+                _range = (
+                    None
+                    if (isinstance(_rangeentry, bytes) and _rangeentry == b"None")
+                    else _rangeentry
+                )
+                _axranges.append(_range)
+                _axunits.append(
+                    read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/unit"])
+                )
+                _axlabels.append(
+                    read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/label"])
+                )
+        _data.axis_units = _axunits
+        _data.axis_labels = _axlabels
+        _data.axis_ranges = _axranges
+        return _data, _label, _data_label

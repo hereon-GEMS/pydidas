@@ -147,6 +147,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         self._runner.sig_results.connect(self.__check_for_plot_update)
         self._runner.sig_finished.connect(self._apprunner_finished)
         self._runner.sig_final_app_state.connect(self._set_app)
+        self._config["update_node_information_connected"] = True
         logger.debug("Running AppRunner")
         self._runner.start()
 
@@ -199,10 +200,9 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
         has sent the first results.
         """
         self._widgets["result_selector"].get_and_store_result_node_labels()
-        try:
-            self._runner.results.disconnect(self.__update_result_node_information)
-        except AttributeError:
-            pass
+        if self._config["update_node_information_connected"]:
+            self._runner.sig_results.disconnect(self.__update_result_node_information)
+            self._config["update_node_information_connected"] = False
 
     @QtCore.Slot()
     def __check_for_plot_update(self):

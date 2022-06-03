@@ -28,8 +28,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResultSaverMeta"]
 
+import os
 
 from ...core.io_registry import GenericIoMeta
+from ...core.utils import get_extension
 
 
 class WorkflowResultSaverMeta(GenericIoMeta):
@@ -236,3 +238,42 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
         _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
+
+    @classmethod
+    def import_data_from_directory(cls, dirname):
+        """
+
+
+        Parameters
+        ----------
+        dirname : Union[pathlib.Path, str]
+            The name of the directory from which data shall be imported.
+
+        Returns
+        -------
+        data_dict : dict
+            The dictionary with the data. Keys are the respective node IDs and dict
+            values is the imported data.
+        """
+        _data_dict = {}
+        _labels = {}
+        _data_labels = {}
+        _files = [
+            _file
+            for _file in os.listdir(dirname)
+            if (
+                os.path.isfile(os.path.join(dirname, _file))
+                and _file.startswith("node_")
+            )
+        ]
+        for _file in _files:
+            _ext = get_extension(_file)
+            cls.verify_extension_is_registered(_ext)
+            _importer = cls.registry[_ext]
+            _node_id = int(_file[5:7])
+            _path = os.path.join(dirname, _file)
+            _data, _label, _data_label = _importer.import_results_from_file(_path)
+            _data_dict[_node_id] = _data
+            _labels[_node_id] = _label
+            _data_labels[_node_id] = _data_label
+        return _data_dict, _labels, _data_labels

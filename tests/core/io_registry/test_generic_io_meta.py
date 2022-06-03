@@ -36,21 +36,21 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=GenericIoMeta):
-            extensions = [".dummy", ".test"]
+            extensions = ["dummy", "test"]
             format_name = "TEST"
 
         self.test_class = TestClass()
 
     def create_test_class2(self):
         class TestClass2(metaclass=GenericIoMeta):
-            extensions = [".test2"]
+            extensions = ["test2"]
             format_name = "Test2"
 
         self.test_class2 = TestClass2()
 
     def get_unregistered_test_class(self):
         class TestClass3:
-            extensions = [".test3", ".test4"]
+            extensions = ["test3", "test4"]
             format_name = "Test3"
 
         return TestClass3
@@ -73,9 +73,14 @@ class TestGenericIoMeta(unittest.TestCase):
         _target = "All supported files (*.dummy *.test);;TEST (*.dummy *.test)"
         self.assertEqual(_str, _target)
 
+    def test_get_string_of_formats__no_files_registered(self):
+        _str = GenericIoMeta.get_string_of_formats()
+        _target = "All supported files ()"
+        self.assertEqual(_str, _target)
+
     def test_is_extension_registered__True(self):
         self.create_test_class()
-        self.assertTrue(GenericIoMeta.is_extension_registered(".dummy"))
+        self.assertTrue(GenericIoMeta.is_extension_registered("dummy"))
 
     def test_is_extension_registered__False(self):
         self.create_test_class()
@@ -83,7 +88,7 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def test_verify_extension_is_registered__correct(self):
         self.create_test_class()
-        GenericIoMeta.verify_extension_is_registered(".test")
+        GenericIoMeta.verify_extension_is_registered("test")
         # assert does not raise an error
 
     def test_verify_extension_is_registered__incorrect(self):

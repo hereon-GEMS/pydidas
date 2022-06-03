@@ -372,7 +372,7 @@ class WorkerController(QtCore.QThread):
             try:
                 _task, _results = self._queues["recv"].get_nowait()
                 self.sig_results.emit(_task, _results)
-                logger.debug("Emitted results")
+                logger.debug("Emitted results %s" % _task)
                 self._progress_done += 1
                 self.sig_progress.emit(self.progress)
             except Empty:

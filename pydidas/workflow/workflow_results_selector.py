@@ -319,6 +319,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         index : int
             The index with the best match.
         """
+        if not isinstance(valrange, np.ndarray):
+            return int(value)
         _delta = abs(valrange - value)
         _index = _delta.argmin()
         return _index

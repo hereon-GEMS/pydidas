@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the StoreInternally Plugin which can be used to keep intermediate
+Module with the KeepData Plugin which can be used to keep intermediate
 data available.
 """
 
@@ -23,18 +23,18 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["StoreInternally"]
+__all__ = ["KeepData"]
 
 from pydidas.core.constants import OUTPUT_PLUGIN
 from pydidas.plugins import OutputPlugin, BasePlugin
 
 
-class StoreInternally(OutputPlugin):
+class KeepData(OutputPlugin):
     """
     A plugin to store the current results internally.
 
     This class is designed to store data passed down from other processing
-    plugins into Ascii data.
+    plugins while further analyzing it at the same time in a different branch.
 
     Parameters
     ----------
@@ -44,7 +44,7 @@ class StoreInternally(OutputPlugin):
         The output directory.
     """
 
-    plugin_name = "Store data"
+    plugin_name = "Keep data"
     basic_plugin = False
     plugin_type = OUTPUT_PLUGIN
     input_data_dim = -1

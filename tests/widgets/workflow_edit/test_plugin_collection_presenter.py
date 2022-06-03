@@ -43,29 +43,38 @@ _typemap = {0: "input", 1: "proc", 2: "output"}
 
 
 class TestPluginCollectionBrowser(unittest.TestCase):
-    def setUp(self):
-        self._pluginpath = tempfile.mkdtemp()
-        self.q_app = QtWidgets.QApplication(sys.argv)
-        self.n_per_type = 8
-        self.num = 3 * self.n_per_type
-        self._syspath = copy.deepcopy(sys.path)
-        self._qsettings = QtCore.QSettings("Hereon", "pydidas")
-        self._qsettings_plugin_path = self._qsettings.value("global/plugin_path")
-        self._qsettings.setValue("global/plugin_path", "")
-        self.pcoll = DummyPluginCollection(
-            n_plugins=self.num, plugin_path=self._pluginpath, create_empty=True
+    @classmethod
+    def setUpClass(cls):
+        cls._pluginpath = tempfile.mkdtemp()
+        cls.q_app = QtWidgets.QApplication.instance()
+        if cls.q_app is None:
+            cls.q_app = QtWidgets.QApplication(sys.argv)
+        cls.n_per_type = 8
+        cls._syspath = copy.deepcopy(sys.path)
+        cls._qsettings = QtCore.QSettings("Hereon", "pydidas")
+        cls._qsettings_plugin_path = cls._qsettings.value("global/plugin_path")
+        cls._qsettings.setValue("global/plugin_path", "")
+        cls.pcoll = DummyPluginCollection(
+            n_plugins=3 * cls.n_per_type, plugin_path=cls._pluginpath, create_empty=True
         )
-        self.widgets = []
+        cls.widgets = []
 
-    def tearDown(self):
-        sys.path = self._syspath
-        self._qsettings.setValue("global/plugin_path", self._qsettings_plugin_path)
-        shutil.rmtree(self._pluginpath)
-        self.q_app.deleteLater()
-        self.q_app.quit()
+    @classmethod
+    def tearDownClass(cls):
+        sys.path = cls._syspath
+        cls._qsettings.setValue("global/plugin_path", cls._qsettings_plugin_path)
+        shutil.rmtree(cls._pluginpath)
+        widgets = cls.widgets[:]
+        cls.widgets.clear()
+        while widgets:
+            w = widgets.pop(-1)
+            w.deleteLater()
+        cls.q_app.deleteLater()
+        cls.q_app.quit()
 
     def tree_click_test(self, double):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)
+        self.widgets.append(obj)
         spy = QtTest.QSignalSpy(obj.selection_changed)
         self.click_index(obj, double)
         _index = obj.selectedIndexes()[0]
@@ -98,11 +107,13 @@ class TestPluginCollectionBrowser(unittest.TestCase):
 
     def test_PluginCollectionTreeWidget_init(self):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)
+        self.widgets.append(obj)
         self.assertIsInstance(obj, QtWidgets.QTreeView)
         self.assertEqual(obj.width(), 493)
 
     def test_PluginCollectionTreeWidget__create_tree_model(self):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)
+        self.widgets.append(obj)
         _root, _model = obj._PluginCollectionTreeWidget__create_tree_model()
         self.assertIsInstance(_root, QtGui.QStandardItem)
         self.assertIsInstance(_model, QtGui.QStandardItemModel)
@@ -118,10 +129,12 @@ class TestPluginCollectionBrowser(unittest.TestCase):
 
     def test_PluginCollectionBrowser_init(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
+        self.widgets.append(obj)
         self.assertIsInstance(obj, QtWidgets.QWidget)
 
     def test_PluginCollectionBrowser_confirm_selection(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
+        self.widgets.append(obj)
         spy = QtTest.QSignalSpy(obj.selection_confirmed)
         _item = self.click_index(obj._widgets["plugin_treeview"], double=True)
         self.assertEqual(len(spy), 1)
@@ -129,6 +142,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
 
     def test_PluginCollectionBrowser_preview_plugin(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
+        self.widgets.append(obj)
         _item = self.click_index(obj._widgets["plugin_treeview"])
         _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
         _text = obj._widgets["plugin_description"].toPlainText()

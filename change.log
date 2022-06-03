@@ -1,20 +1,57 @@
-v0.1.7
+v0.1.8
+======
 Major changes:
+--------------
+- Updated fitting functions and included a true Voigt profile, which (in its
+  scipy implementation) is faster to compute than the pseudo-Voigt.
+- Added a functionality to load and visualize results which have been exported
+  with the pydidas WorkflowResultsSaver
+- Changed handling of file extensions to extensions without leading ".".
+
+Improvements
+------------
+- Added a check on the length of axis ranges in Dataset.
+
+Bugfixes:
+---------
+- Fixed compatibility with latest Qt (Qt 5.15)
+- Fixed an issue with dictionary passing between plugins which propagated metadata 
+  to up the WorkflowTree.
+- Fixed an issue with Datasets where the __array_finalize__ method (e.g. slicing)
+  passed the same dictionary instance of metadata instead of a copy.
+- Fixed an issue with the MaskImage plugin where is did not retain the input image 
+  metadata.
+- Fixed an issue with the update of the node description in the WorkflowTestFrame.
+- Hotfix for plugin path setting at the first startup in new system.
+- Fixed an issue with data shapes for FitSinglePeak plugins.
+- Fixed an issue with logger output formatting in WorkflowNode
+- Fixed an issue with creation of a hdf5 dataset with the same key in a file.
+- Fixed an issue in  WorkflowResultsSelector with selection of data ranges when no 
+  range was given.
+- Fixed an issue with the order of axis ranges in transposed Datasets.  
+
+v0.1.7
+======
+Major changes:
+--------------
 - Added feedback form to menu
 - Added semi-automatic bug reporting to excepthook
 - Changed frame creation from static to on the fly to speed up GUI creation.
 
 
 v0.1.6
+======
 Major changes:
+--------------
 - Refactored data_io and moved classes which are not truly I/O classes.
-Code changes:
 - Changed code formatting to use black. 
 - Changed used line width to 88 characters.
 
 
 v0.1.5
+======
 Major changes:
+--------------
 - Removed dependency on QtWebEngineWidgets to fix startup problems.
 - Documentation only available in system's web browser, not in applications
   own window.

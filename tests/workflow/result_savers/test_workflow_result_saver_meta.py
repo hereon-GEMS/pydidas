@@ -136,7 +136,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
         self.assertEqual(META.scan_title, _title)
 
     def test_set_active_savers_and_title__not_registered(self):
-        self.create_saver_class("SAVER", "Test")
+        self.create_saver_class("SAVER", ".Test")
         with self.assertRaises(KeyError):
             META.set_active_savers_and_title(["TEST", "TEST2"])
 

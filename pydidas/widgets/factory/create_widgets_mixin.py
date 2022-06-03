@@ -34,8 +34,10 @@ from ..utilities import apply_widget_properties
 from .button_factory import create_button
 from .check_box_factory import create_check_box
 from .combobox_factory import create_combo_box
+from .empty_widget_factory import create_empty_widget
 from .label_factory import create_label
 from .line_factory import create_line
+from .lineedit_factory import create_lineedit
 from .progress_bar_factory import create_progress_bar
 from .radio_button_group_factory import create_radio_button_group
 from .spacer_factory import create_spacer
@@ -84,6 +86,13 @@ class CreateWidgetsMixIn:
         """
         self.__create_widget(create_line, ref, **kwargs)
 
+    @copy_docstring(create_lineedit)
+    def create_lineedit(self, ref, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_lineedit
+        """
+        self.__create_widget(create_lineedit, ref, **kwargs)
+
     @copy_docstring(create_button)
     def create_button(self, ref, text, **kwargs):
         """
@@ -126,6 +135,13 @@ class CreateWidgetsMixIn:
         """
         self.__create_widget(create_radio_button_group, ref, entries, **kwargs)
 
+    @copy_docstring(create_empty_widget)
+    def create_empty_widget(self, ref, **kwargs):
+        """
+        Please refer to pydidas.widgets.factory.create_empty_widget
+        """
+        self.__create_widget(create_empty_widget, ref, **kwargs)
+
     def __create_widget(self, object_, ref, *args, **kwargs):
         """
         Create a widget from a object (function / class).
@@ -149,8 +165,9 @@ class CreateWidgetsMixIn:
         _layout_kwargs = dict(
             alignment=kwargs.get("alignment", None), gridPos=kwargs.get("gridPos", None)
         )
-        _layout_args = _get_widget_layout_args(_parent, **_layout_kwargs)
-        _parent.layout().addWidget(_widget, *_layout_args)
+        if _parent is not None:
+            _layout_args = _get_widget_layout_args(_parent, **_layout_kwargs)
+            _parent.layout().addWidget(_widget, *_layout_args)
         if ref is None:
             ref = f"unreferenced_{self.__index_unreferenced:03d}"
             self.__index_unreferenced += 1

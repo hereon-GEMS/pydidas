@@ -28,6 +28,8 @@ import threading
 import queue
 import multiprocessing as mp
 
+from qtpy import QtWidgets
+
 from pydidas.multiprocessing import app_processor_without_tasks
 from pydidas.unittest_objects.mp_test_app_wo_tasks import MpTestAppWoTasks
 
@@ -67,6 +69,16 @@ class _ProcThread(threading.Thread):
 
 
 class Test_app_processor_without_tasks(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._qtapp = QtWidgets.QApplication.instance()
+        if cls._qtapp is None:
+            cls._qtapp = QtWidgets.QApplication([])
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._qtapp.quit()
+
     def setUp(self):
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
@@ -77,7 +89,10 @@ class Test_app_processor_without_tasks(unittest.TestCase):
         self.app.multiprocessing_pre_run()
 
     def tearDown(self):
-        ...
+        self.input_queue.close()
+        self.output_queue.close()
+        self.stop_queue.close()
+        self.finished_queue.close()
 
     def create_thread(self):
         return _ProcThread(

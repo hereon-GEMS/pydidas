@@ -181,7 +181,7 @@ class pyFAIintegrationBase(ProcPlugin):
             is returned.
         """
         raise NotImplementedError(
-            "Must be implemented by the concrete " "pyFAI integration plugin"
+            "Must be implemented by the concrete pyFAI integration plugin"
         )
 
     def get_radial_range(self):

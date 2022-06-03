@@ -342,12 +342,12 @@ def get_range_as_formatted_string(obj):
 
 def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
     """
-    Get a simplified representation
+    Get a simplified representation of an array.
 
     Parameters
     ----------
     obj : np.ndarray
-        The input array
+        The input array.
     max_items : int, optional
         The maximum number of data entries. The default is 6.
     leading_indent : int, optional

@@ -24,10 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ProcPlugin"]
 
-import os
-
 from ..core.constants import PROC_PLUGIN, HDF5_EXTENSIONS
-from ..core.utils import check_file_exists, check_hdf5_key_exists_in_file
+from ..core.utils import check_file_exists, check_hdf5_key_exists_in_file, get_extension
 from ..data_io import import_data
 from .base_plugin import BasePlugin
 
@@ -70,7 +68,7 @@ class ProcPlugin(BasePlugin):
             fname = str(fname)
         check_file_exists(fname)
         _params = {}
-        if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
+        if get_extension(fname) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(fname, hdf5_dset)
             _params = {"dataset": hdf5_dset, "frame": hdf5_frame}
         _image = import_data(fname, **_params)

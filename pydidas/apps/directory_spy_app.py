@@ -37,6 +37,7 @@ from ..core.utils import (
     check_hdf5_key_exists_in_file,
     get_hdf5_metadata,
     pydidas_logger,
+    get_extension,
 )
 from ..core.constants import HDF5_EXTENSIONS
 from ..data_io import import_data
@@ -192,7 +193,8 @@ class DirectorySpyApp(BaseApp):
         try:
             _mask = np.load(_maskfile)
             return _mask
-        except (FileNotFoundError, ValueError):
+        except (FileNotFoundError, ValueError, PermissionError):
+            self.set_param_value("use_global_det_mask", False)
             return None
         raise AppConfigError("Unknown error when reading detector mask file.")
 
@@ -238,7 +240,7 @@ class DirectorySpyApp(BaseApp):
         _bg_file = self.get_param_value("bg_file")
         check_file_exists(_bg_file)
         _params = {}
-        if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
+        if get_extension(_bg_file) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
             _params = {
                 "dataset": self.get_param_value("bg_hdf5_key"),
@@ -440,7 +442,7 @@ class DirectorySpyApp(BaseApp):
         self.__read_image_meta = {}
         if not isinstance(fname, str):
             fname = str(fname)
-        if os.path.splitext(fname)[1] in HDF5_EXTENSIONS:
+        if get_extension(fname) in HDF5_EXTENSIONS:
             self.__update_hdf5_metadata(fname)
         return import_data(fname, **self.__read_image_meta)
 

@@ -26,8 +26,10 @@ __status__ = "Development"
 __all__ = ["GenericTree"]
 
 import copy
+import time
 import warnings
 
+from ..core.utils import get_random_string
 from .generic_node import GenericNode
 
 
@@ -51,6 +53,7 @@ class GenericTree:
         self.nodes = {}
         self._config = kwargs if kwargs else {}
         self._tree_changed_flag = False
+        self._starthash = hash((get_random_string(12), time.time()))
 
     @property
     def tree_has_changed(self):
@@ -314,7 +317,8 @@ class GenericTree:
         """
         Get the hash value for the GenericTree.
 
-        The hash value is calculated by using all nodes' IDs and node hashes.
+        The hash value is calculated by using all nodes' IDs and node hashes and a
+        unique starting value which is different for each GenericTree.
 
         Returns
         -------
@@ -334,4 +338,4 @@ class GenericTree:
                 _node_vals.append(_hash)
             except TypeError:
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
-        return hash((tuple(_node_keys), tuple(_node_vals)))
+        return hash((tuple(_node_keys), tuple(_node_vals), self._starthash))

@@ -151,7 +151,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._tree.execute_process(_index, force_store_results=True)
         self.__store_tree_results()
         self.__update_selection_choices()
-        self.__plot_results()
+        if self._active_node != -1:
+            self.__update_text_description_of_node_results()
+            self.__plot_results()
 
     def _check_tree_is_populated(self):
         """
@@ -202,7 +204,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "data_label"
             )
             _data = _node.results
-
             _data.axis_units = [
                 (_val if _val is not None else "") for _val in _data.axis_units.values()
             ]
@@ -329,7 +330,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         This method will get the latest result (subset) from the
         WorkflowResults and update the plot.
         """
-        if (not self._config["plot_active"]) or self._active_node == -1:
+        if not self._config["plot_active"]:
             return
         _ndim = len(self._config["shapes"][self._active_node])
         if _ndim == 1:

@@ -29,7 +29,7 @@ import warnings
 import textwrap
 from numbers import Integral
 from collections.abc import Iterable
-from copy import copy
+from copy import deepcopy
 
 import numpy as np
 
@@ -113,12 +113,12 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None or self.shape == tuple():
             return
-        self.metadata = getattr(obj, "metadata", {})
+        self.metadata = deepcopy(getattr(obj, "metadata", {}))
         self.data_unit = getattr(obj, "data_unit", "")
         self.getitem_key = getattr(obj, "getitem_key", None)
         self.__check_and_set_default_axis_attributes()
         self._keys = {
-            _key: copy(getattr(obj, _key, _default_vals(self.ndim)))
+            _key: deepcopy(getattr(obj, _key, _default_vals(self.ndim)))
             for _key in ["axis_labels", "axis_ranges", "axis_units"]
         }
         if self.getitem_key is not None:
@@ -307,13 +307,13 @@ class EmptyDataset(np.ndarray):
         pydidas.core.Dataset
             The transposed Dataset.
         """
-        _new = copy(self)
         if axes is tuple():
             axes = tuple(np.arange(self.ndim)[::-1])
+        _new = np.ndarray.transpose(deepcopy(self), axes)
         _new.axis_labels = [self.axis_labels[_index] for _index in axes]
         _new.axis_units = [self.axis_units[_index] for _index in axes]
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
-        return np.ndarray.transpose(_new, axes)
+        return _new
 
     def get_rebinned_copy(self, binning):
         """
@@ -359,7 +359,7 @@ class EmptyDataset(np.ndarray):
         _copy.axis_ranges = _axis_ranges
         return _copy
 
-    def _get_dict(self, _data, method_name):
+    def _get_dict(self, _data, calling_method_name):
         """
         Get an ordered dictionary with the axis keys for _data.
 
@@ -371,7 +371,7 @@ class EmptyDataset(np.ndarray):
         ----------
         _data : Union[dict, list, tuple]
             The keys for the axis meta data.
-        method_name : str
+        calling_method_name : str
             The name of the calling method (for exception handling)
 
         Raises
@@ -395,7 +395,7 @@ class EmptyDataset(np.ndarray):
                     "The number of keys does not match the number "
                     "of array dimensions. Resettings keys to "
                     "defaults. (Error encountered in "
-                    f"{method_name})."
+                    f"{calling_method_name})."
                 )
                 return _default_vals(self.ndim)
             return _data
@@ -405,14 +405,14 @@ class EmptyDataset(np.ndarray):
                     "The number of keys does not match the number "
                     "of array dimensions. Resettings keys to "
                     "defaults.(Error encountered in "
-                    f"{method_name})."
+                    f"{calling_method_name})."
                 )
                 return _default_vals(self.ndim)
             _data = dict(enumerate(_data))
             return _data
         raise DatasetConfigException(
             f"Input {_data} cannot be converted to dictionary for property"
-            f" {method_name}"
+            f" {calling_method_name}"
         )
 
     @property
@@ -469,8 +469,46 @@ class EmptyDataset(np.ndarray):
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        self._axis_ranges = self._get_dict(scales, "axis_ranges")
+        _ranges = self._get_dict(scales, "axis_ranges")
+        self._verify_range_length_okay(_ranges)
+        self._axis_ranges = _ranges
         self._keys["axis_ranges"] = self._axis_ranges.copy()
+
+    def _verify_range_length_okay(self, ranges):
+        """
+        Verify that the length of all given ranges matches the data shape for iterable
+        or np.ndarray entries
+
+        Parameters
+        ----------
+        ranges : dict
+            The dictionary with the loaded ranges.
+
+        Raises
+        ------
+        ValueError
+            If the given lengths do not match the data length.
+        """
+        _wrong_dims = []
+        for _dim, _range in ranges.items():
+            _ndata = self.shape[_dim]
+            if isinstance(_range, (tuple, list)):
+                _len = len(_range)
+                if _len != _ndata:
+                    _wrong_dims.append([_dim, _len, _ndata])
+            if isinstance(_range, np.ndarray):
+                _len = _range.size
+                if _len != _ndata:
+                    _wrong_dims.append([_dim, _len, _ndata])
+        if len(_wrong_dims) > 0:
+            _error = (
+                "The length of the given ranges does not match the size of the data."
+            )
+            for _dim, _len, _ndata in _wrong_dims:
+                _error += (
+                    f"\nDimension {_dim}: Given range: {_len}; target length: {_ndata}."
+                )
+            raise ValueError(_error)
 
     @property
     def axis_units(self):

@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The constants module holds constant nmumber defitions needed in pydidas.
+The fit_funcs module holds definitions for peak-fitting functions and functions
+to calculate the delta between the function and given data.
 """
 
 __author__ = "Malte Storm"
@@ -22,13 +23,63 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["GAUSSIAN", "LORENTZIAN", "PSEUDO_VOIGT"]
-
+__all__ = [
+    "gaussian",
+    "gaussian_delta",
+    "lorentzian",
+    "lorentzian_delta",
+    "voigt",
+    "voigt_delta",
+]
 
 import numpy as np
+from scipy.special import voigt_profile
+
+PI = np.pi
 
 
-def GAUSSIAN(c, x, data, bg_order=None):
+def gaussian(c, x):
+    """
+    Function to fit a Gaussian to data points.
+
+    The Gaussian function has the general form
+
+    f(x) = A * (2 * pi)**(-0.5) / sigma * exp(-(x - mu)**2 / ( 2 * sigma**2))
+
+    where A is the amplitude, mu is the expectation value, and sigma is the
+    variance. A polinomial background of 0th or 1st order can be added by
+    using additional coefficients.
+
+    Parameters
+    ----------
+    c : tuple
+        The tuple with the function parameters.
+        c[0] : Amplitude
+        c[1] : sigma
+        c[2] : expectation value
+        c[3], optional: A background offset.
+        c[4], optional: THe polynomial coefficient for a first order background.
+    x : np.ndarray
+        The x data points.
+
+    Returns
+    -------
+    np.ndarray
+        The function values for the given x values.
+    """
+    _gauss = (
+        c[0] * (2 * PI) ** (-0.5) / c[1] * np.exp(-((x - c[2]) ** 2) / (2 * c[1] ** 2))
+    )
+    if len(c) == 3:
+        return _gauss
+    if len(c) == 4:
+        return _gauss + c[3]
+    if len(c) == 5:
+        return _gauss + c[3] + c[4] * x
+    raise ValueError("The order of the background is not supported.")
+
+
+def gaussian_delta(c, x, data):
     """
     Function to fit a Gaussian to data points.
 
@@ -51,20 +102,47 @@ def GAUSSIAN(c, x, data, bg_order=None):
     np.ndarray
         The residual between the fit and the data.
     """
-    if bg_order is None:
-        return (c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2))) - data
-    if bg_order == 0:
-        return c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2)) + c[3] - data
-    if bg_order == 1:
-        return (
-            c[0] * np.exp(-((x - c[2]) ** 2) / (2.0 * c[1] ** 2))
-            + c[3]
-            + c[4] * x
-            - data
-        )
+    return gaussian(c, x) - data
 
 
-def LORENTZIAN(c, x, data, bg_order=None):
+def lorentzian(c, x):
+    """
+    Function to generate a Lorentzian profile for a series of x-values.
+
+    The Lorentzian has the general form
+
+    L(x) = A / pi * (GAMMA / 2) / ((x - x0)**2 + (GAMMA / 2)**2 ),
+
+    where A is the amplitude, GAMMA is the FWHM, x0 is the center.
+
+    Parameters
+    ----------
+    c : tuple
+        The tuple with the fit parameters.
+        c[0] : Amplitude
+        c[1] : Gamma
+        c[2] : Center
+        c[3], optional: A background offset.
+        c[4], optional: THe polynomial coefficient for a first order background.
+    x : np.ndarray
+        The x data points
+
+    Returns
+    -------
+    np.ndarray
+        The function values for the given x values.
+    """
+    _lorentz = c[0] / PI * (0.5 * c[1]) / ((x - c[2]) ** 2 + (0.5 * c[1]) ** 2)
+    if len(c) == 3:
+        return _lorentz
+    if len(c) == 4:
+        return _lorentz + c[3]
+    if len(c) == 5:
+        return _lorentz + c[3] + c[4] * x
+    raise ValueError("The order of the background is not supported.")
+
+
+def lorentzian_delta(c, x, data):
     """
     Function to fit a Lorentzian to data points.
 
@@ -73,7 +151,7 @@ def LORENTZIAN(c, x, data, bg_order=None):
     c : tuple
         The tuple with the fit parameters.
         c[0] : Amplitude
-        c[1] : Sigma
+        c[1] : Gamma
         c[2] : Center
         c[3] : Background order 0 (if used)
         c[4] : Background order 1 (if used)
@@ -87,15 +165,43 @@ def LORENTZIAN(c, x, data, bg_order=None):
     np.ndarray
         The residual between the fit and the data.
     """
-    if bg_order is None:
-        return c[0] / (1 + ((x - c[2]) / c[1]) ** 2) - data
-    if bg_order == 0:
-        return c[0] / (1 + ((x - c[2]) / c[1]) ** 2) + c[3] - data
-    if bg_order == 1:
-        return c[0] / (1 + ((x - c[2]) / c[1]) ** 2) + c[3] + c[4] * x - data
+    return lorentzian(c, x) - data
 
 
-def PSEUDO_VOIGT(c, x, data, bg_order=None):
+def voigt(c, x):
+    """
+    Function to calculate a Voigt profile (a convolution of a Gaussian and a
+    Lorentzian profile).
+
+    Parameters
+    ----------
+    c : tuple
+        The tuple with the fit parameters.
+        c[0] : Amplitude
+        c[1] : Sigma
+        c[2] : Gamma
+        c[3] : Center
+        c[4] : Background order 0 (if used)
+        c[5] : Background order 1 (if used)
+    x : np.ndarray
+        The x data points
+
+    Returns
+    -------
+    np.ndarray
+        The residual between the fit and the data.
+    """
+    _voigt = c[0] * voigt_profile(x - c[3], c[1], c[2])
+    if len(c) == 4:
+        return _voigt
+    if len(c) == 5:
+        return _voigt + c[4]
+    if len(c) == 6:
+        return _voigt + c[4] + c[5] * x
+    raise ValueError("The order of the background is not supported.")
+
+
+def voigt_delta(c, x, data):
     """
     Function to fit a Pseudo-Voigt to data points.
 
@@ -119,8 +225,5 @@ def PSEUDO_VOIGT(c, x, data, bg_order=None):
     -------
     np.ndarray
         The residual between the fit and the data.
-     fit function with the following Parameters:
     """
-    return (1 - c[0]) * GAUSSIAN(c[1:], x, data, bg_order) + c[0] * LORENTZIAN(
-        c[1:], x, data, bg_order
-    )
+    return voigt(c, x) - data

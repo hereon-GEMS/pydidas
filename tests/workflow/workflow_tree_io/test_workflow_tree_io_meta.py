@@ -37,7 +37,7 @@ class TestWorkflowTreeIoMeta(unittest.TestCase):
 
     def create_test_class(self):
         class TestClass(metaclass=WorkflowTreeIoMeta):
-            extensions = [".test", ".another_test"]
+            extensions = ["test", "another_test"]
             format_name = "Test"
             trees = {}
 
@@ -81,7 +81,7 @@ class TestWorkflowTreeIoMeta(unittest.TestCase):
 
     def test_get_string_of_formats__empty(self):
         self.assertEqual(
-            WorkflowTreeIoMeta.get_string_of_formats(), "All supported files (*)"
+            WorkflowTreeIoMeta.get_string_of_formats(), "All supported files ()"
         )
 
     def test_get_string_of_formats__with_entry(self):

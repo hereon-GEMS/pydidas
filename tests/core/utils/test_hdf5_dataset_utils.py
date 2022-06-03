@@ -27,21 +27,34 @@ import tempfile
 import shutil
 import os
 from pathlib import Path
+from numbers import Real
 
 import h5py
 import numpy as np
 
+from pydidas.core import Dataset
+from pydidas.core.utils import get_random_string
 from pydidas.core.utils.hdf5_dataset_utils import (
     _get_hdf5_file_and_dataset_names,
     get_hdf5_metadata,
     hdf5_dataset_check,
     get_hdf5_populated_dataset_keys,
+    convert_data_for_writing_to_hdf5_dataset,
+    create_hdf5_dataset,
+    read_and_decode_hdf5_dataset,
 )
 
 
-class Test_file_checks(unittest.TestCase):
+class Test_Hdf5_dataset_utils(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._path = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+
     def setUp(self):
-        self._path = tempfile.mkdtemp()
         self._fname = lambda s: os.path.join(self._path, f"test{s}.h5")
         self._ref = f"{self._fname(1)}:///test/path/data"
         self._data = np.random.random((10, 10, 10, 10))
@@ -71,7 +84,7 @@ class Test_file_checks(unittest.TestCase):
         self._fulldsets += ["/test/other/extdata"]
 
     def tearDown(self):
-        shutil.rmtree(self._path)
+        ...
 
     def test_get_hdf5_file_and_dataset_names_wrong_type(self):
         _name = 123
@@ -210,6 +223,158 @@ class Test_file_checks(unittest.TestCase):
     def test_get_hdf5_populated_dataset_keys_medium_size(self):
         _res = get_hdf5_populated_dataset_keys(self._fname(1), min_dim=1, min_size=1000)
         self.assertEqual(set(_res), set(self._fulldsets))
+
+    def test_convert_data_for_writing_to_hdf5_dataset__None(self):
+        _data = convert_data_for_writing_to_hdf5_dataset(None)
+        self.assertEqual(_data, "::None::")
+        self.assertIsInstance(_data, str)
+
+    def test_convert_data_for_writing_to_hdf5_dataset__data(self):
+        _input = np.random.random((12, 12))
+        _data = convert_data_for_writing_to_hdf5_dataset(_input)
+        self.assertTrue(np.allclose(_data, _input))
+        self.assertIsInstance(_data, np.ndarray)
+
+    def test_read_and_decode_hdf5_dataset__string(self):
+        _input = get_random_string(30)
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset)
+        self.assertIsInstance(_out, str)
+        self.assertEqual(_out, _input)
+
+    def test_read_and_decode_hdf5_dataset__group_not_None(self):
+        _input = get_random_string(30)
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset, group="test")
+        self.assertIsInstance(_out, str)
+        self.assertEqual(_out, _input)
+
+    def test_read_and_decode_hdf5_dataset__dataset_not_None(self):
+        _input = get_random_string(30)
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset, dataset="Test")
+        self.assertIsInstance(_out, str)
+        self.assertEqual(_out, _input)
+
+    def test_read_and_decode_hdf5_dataset__dataset_and_group_not_None(self):
+        _input = get_random_string(30)
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_file, "entry", "test")
+        self.assertIsInstance(_out, str)
+        self.assertEqual(_out, _input)
+
+    def test_read_and_decode_hdf5_dataset__None(self):
+        _input = "::None::"
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset)
+        self.assertIsNone(_out)
+
+    def test_read_and_decode_hdf5_dataset__ndarray(self):
+        _input = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset)
+        self.assertIsInstance(_out, Dataset)
+        self.assertTrue(np.allclose(_out, _input))
+
+    def test_read_and_decode_hdf5_dataset__list(self):
+        _input = [1, 2, 3]
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset)
+        self.assertIsInstance(_out, Dataset)
+        self.assertTrue(np.allclose(_out, _input))
+
+    def test_read_and_decode_hdf5_dataset__float(self):
+        _input = 12.4
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset)
+        self.assertIsInstance(_out, Real)
+        self.assertEqual(_input, _out)
+
+    def test_create_hdf5_dataset__w_data(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, data=_input)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertIsInstance(_out, Dataset)
+        self.assertTrue(np.allclose(_out, _input))
+
+    def test_create_hdf5_dataset__w_shape(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, shape=_input.shape)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertIsInstance(_out, Dataset)
+        self.assertEqual(_input.shape, _out.shape)
+
+    def test_create_hdf5_dataset__w_None(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = None
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, data=_input)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertIsNone(_out)
+
+    def test_create_hdf5_dataset__w_str(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = get_random_string(20)
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, data=_input)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertEqual(_input, _out)
+
+    def test_create_hdf5_dataset__w_int(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = 42
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, data=_input)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertEqual(_input, _out)
+
+    def test_create_hdf5_dataset__existing_dataset(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = 42
+        _input_new = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            create_hdf5_dataset(_file, _group, _dname, data=_input)
+            create_hdf5_dataset(_file, _group, _dname, data=_input_new)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertIsInstance(_out, Dataset)
+        self.assertTrue(np.allclose(_out, _input_new))
+
+    def test_create_hdf5_dataset__no_group(self):
+        _group = "entry/test"
+        _dname = "test_dataset"
+        _input = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _file.create_group(_group)
+            create_hdf5_dataset(_file[_group], None, _dname, data=_input)
+            _out = read_and_decode_hdf5_dataset(_file[_group + "/" + _dname])
+        self.assertIsInstance(_out, Dataset)
+        self.assertTrue(np.allclose(_out, _input))
 
 
 if __name__ == "__main__":

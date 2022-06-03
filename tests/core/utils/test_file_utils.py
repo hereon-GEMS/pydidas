@@ -30,7 +30,12 @@ import os
 import copy
 import sys
 
-from pydidas.core.utils import find_valid_python_files, flatten, get_random_string
+from pydidas.core.utils import (
+    find_valid_python_files,
+    flatten,
+    get_random_string,
+    get_extension,
+)
 
 
 class Test_file_utils(unittest.TestCase):
@@ -122,6 +127,19 @@ class Test_file_utils(unittest.TestCase):
             )
         )
         self.assertEqual(_files, _target)
+
+    def test_get_extension__empty_path(self):
+        _ext = get_extension("")
+        self.assertEqual(_ext, "")
+
+    def test_get_extension__no_file_extension(self):
+        _ext = get_extension("test/to/some/dir")
+        self.assertEqual(_ext, "")
+
+    def test_get_extension__generic(self):
+        _input_ext = "extension"
+        _ext = get_extension(f"test/to/some/dir/file.{_input_ext}")
+        self.assertEqual(_ext, _input_ext)
 
 
 if __name__ == "__main__":

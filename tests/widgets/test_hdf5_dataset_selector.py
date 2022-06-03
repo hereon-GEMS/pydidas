@@ -54,27 +54,30 @@ class TestCheckBox(QtWidgets.QCheckBox):
 
 
 class TestHdf5DatasetSelector(unittest.TestCase):
-    def setUp(self):
-        self.q_app = QtWidgets.QApplication([])
-        self.widgets = []
-        self._path = tempfile.mkdtemp()
-        self._fname = os.path.join(self._path, "test.h5")
-        self.data1d = np.random.random((20))
-        self.data2d = np.random.random((20, 20))
-        self.data3d = np.random.random((20, 20, 20))
-        with h5py.File(self._fname, "w") as _file:
+    @classmethod
+    def setUpClass(cls):
+        cls.q_app = QtWidgets.QApplication.instance()
+        if cls.q_app is None:
+            cls.q_app = QtWidgets.QApplication([])
+        cls.widgets = []
+
+        cls._path = tempfile.mkdtemp()
+        cls._fname = os.path.join(cls._path, "test.h5")
+        cls.data1d = np.random.random((20))
+        cls.data2d = np.random.random((20, 20))
+        cls.data3d = np.random.random((20, 20, 20))
+        with h5py.File(cls._fname, "w") as _file:
             _file.create_group("test")
             _file["test"].create_group("test2")
-            _file["test/test2"].create_dataset("data1", data=self.data1d)
-            _file["test/test2"].create_dataset("data2", data=self.data2d)
-            _file["test/test2"].create_dataset("data3", data=self.data3d)
-        self._dsets = ["/test/test2/data1", "/test/test2/data2", "/test/test2/data3"]
+            _file["test/test2"].create_dataset("data1", data=cls.data1d)
+            _file["test/test2"].create_dataset("data2", data=cls.data2d)
+            _file["test/test2"].create_dataset("data3", data=cls.data3d)
+        cls._dsets = ["/test/test2/data1", "/test/test2/data2", "/test/test2/data3"]
 
-    def tearDown(self):
-        self.q_app.deleteLater()
-        self.q_app.quit()
-        del self.q_app
-        shutil.rmtree(self._path)
+    @classmethod
+    def tearDownClass(cls):
+        cls.q_app.quit()
+        shutil.rmtree(cls._path)
 
     def test_init(self):
         obj = Hdf5DatasetSelector()
@@ -82,32 +85,32 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         self.assertIsNone(obj._frame)
         self.assertEqual(obj._config["activeDsetFilters"], [])
 
-    def test_register_view_widget_no_widget(self):
+    def test_register_view_widget__no_widget(self):
         obj = Hdf5DatasetSelector()
         _widget = None
         with self.assertRaises(TypeError):
             obj.register_view_widget(_widget)
 
-    def test_register_view_widget_widget_without_set_data(self):
+    def test_register_view_widget__widget_without_set_data(self):
         obj = Hdf5DatasetSelector()
         _widget = TestWidget()
         with self.assertRaises(TypeError):
             obj.register_view_widget(_widget)
 
-    def test_register_view_widget_correct_widget(self):
+    def test_register_view_widget__correct_widget(self):
         obj = Hdf5DatasetSelector()
         _widget = TestWidgetWithSetData()
         obj.register_view_widget(_widget)
         self.assertEqual(obj._widgets["viewer"], _widget)
 
-    def test_toggle_filter_key_nothing_happens(self):
+    def test_toggle_filter_key__nothing_happens(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
         obj._toggle_filter_key(widget, "test")
         self.assertEqual(obj._config["activeDsetFilters"], [])
 
-    def test_toggle_filter_key_remove_key(self):
+    def test_toggle_filter_key__remove_key(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()
@@ -115,7 +118,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj._toggle_filter_key(widget, "test")
         self.assertEqual(obj._config["activeDsetFilters"], [])
 
-    def test_toggle_filter_key_add_key(self):
+    def test_toggle_filter_key__add_key(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
         widget = TestCheckBox()

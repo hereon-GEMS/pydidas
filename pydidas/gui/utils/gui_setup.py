@@ -89,9 +89,10 @@ def update_qtapp_font_size():
     defined in pydidas.
     """
     _app = QtWidgets.QApplication.instance()
-    _font = _app.font()
-    _font.setPointSize(STANDARD_FONT_SIZE)
-    _app.setFont(_font)
+    if _app is not None:
+        _font = _app.font()
+        _font.setPointSize(STANDARD_FONT_SIZE)
+        _app.setFont(_font)
 
 
 def apply_tooltip_event_filter():

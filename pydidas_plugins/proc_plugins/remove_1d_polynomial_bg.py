@@ -190,7 +190,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
             data = _raw
         data = data - _p_final(_x)
         if self._thresh is not None:
-            data = np.where(data < self._thresh, self._thresh, data)
+            data[:] = np.where(data < self._thresh, self._thresh, data)
 
         return data, kwargs
 

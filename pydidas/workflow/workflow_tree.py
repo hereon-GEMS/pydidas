@@ -129,7 +129,7 @@ class _WorkflowTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        if not self._preexecuted:
+        if (not self._preexecuted) or self._tree_changed_flag:
             self.prepare_execution()
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
@@ -230,6 +230,7 @@ class _WorkflowTree(GenericTree):
         except SyntaxError:
             _nodes = []
         self.restore_from_list_of_nodes(_nodes)
+        self._tree_changed_flag = True
 
     def restore_from_list_of_nodes(self, list_of_nodes):
         """

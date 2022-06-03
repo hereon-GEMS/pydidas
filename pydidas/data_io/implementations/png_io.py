@@ -30,7 +30,7 @@ from .io_exporter_matplotlib import IoExporterMatplotlib
 class PngIo(IoExporterMatplotlib):
     """IObase implementation for png files."""
 
-    extensions_export = [".png"]
+    extensions_export = ["png"]
     extensions_import = []
     format_name = "Png"
     dimensions = [2]

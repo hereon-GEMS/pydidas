@@ -25,6 +25,7 @@ __status__ = "Development"
 import unittest
 import shutil
 import tempfile
+from numbers import Integral
 
 import numpy as np
 
@@ -93,7 +94,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
                 np.random.random(self._result2_shape),
                 axis_units=["m", "Test", None],
                 axis_labels=["dim1", "2nd dim", "dim #3"],
-                axis_ranges=[12 + np.arange(self._result1_shape[0]), None, None],
+                axis_ranges=[12 + np.arange(self._result2_shape[0]), None, None],
             ),
         }
         RES.store_results(0, _results)
@@ -427,6 +428,22 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj = WorkflowResultsSelector()
         _match = obj._get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _target)
+
+    def test_get_best_index_for_value__None_range(self):
+        _val = 42
+        _range = None
+        obj = WorkflowResultsSelector()
+        _match = obj._get_best_index_for_value(_val, _range)
+        self.assertEqual(_match, _val)
+        self.assertIsInstance(_match, Integral)
+
+    def test_get_best_index_for_value__None_range_and_float_value(self):
+        _val = 42.0
+        _range = None
+        obj = WorkflowResultsSelector()
+        _match = obj._get_best_index_for_value(_val, _range)
+        self.assertEqual(_match, _val)
+        self.assertIsInstance(_match, Integral)
 
     def test_convert_values_to_indices(self):
         _target_range = np.arange(12, 78)

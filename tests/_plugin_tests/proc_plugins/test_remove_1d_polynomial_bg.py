@@ -115,7 +115,9 @@ class TestRemove1dPolynomialBackground(unittest.TestCase):
         data = self.create_dataset()
         plugin.set_param_value("include_limits", True)
         plugin.pre_execute()
-        new_data, _ = plugin.execute(data)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            new_data, _ = plugin.execute(data)
         self.assertTrue(np.allclose(data, self._y, atol=0.51))
 
 

@@ -38,6 +38,7 @@ from ..core.utils import (
     check_hdf5_key_exists_in_file,
     copy_docstring,
     rebin2d,
+    get_extension,
 )
 from ..data_io import import_data
 from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
@@ -355,7 +356,7 @@ class CompositeCreatorApp(BaseApp):
         _params = dict(
             binning=self.get_param_value("binning"), roi=self._image_metadata.roi
         )
-        if os.path.splitext(_bg_file)[1] in HDF5_EXTENSIONS:
+        if get_extension(_bg_file) in HDF5_EXTENSIONS:
             check_hdf5_key_exists_in_file(_bg_file, self.get_param_value("bg_hdf5_key"))
             _params["dataset"] = self.get_param_value("bg_hdf5_key")
             _params["frame"] = self.get_param_value("bg_hdf5_frame")
@@ -448,7 +449,7 @@ class CompositeCreatorApp(BaseApp):
         _params = dict(
             binning=self.get_param_value("binning"), roi=self._image_metadata.roi
         )
-        if os.path.splitext(_fname)[1] in HDF5_EXTENSIONS:
+        if get_extension(_fname) in HDF5_EXTENSIONS:
             _hdf_index = index % _images_per_file
             _i_hdf = self.get_param_value(
                 "hdf5_first_image_num"

@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowNode"]
 
-from copy import copy
+from copy import deepcopy
 from numbers import Integral
 
 from ..plugins import BasePlugin
@@ -192,17 +192,36 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
-        logger.debug(f"Starting plugin node #{self.node_id}")
-        res, reskws = self.plugin.execute(copy(arg), **copy(kwargs))
+        logger.debug("Starting plugin node #%i" % self.node_id)
+        res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
         for _child in self._children:
             logger.debug("Passing result to child")
-            _child.execute_plugin_chain(res, **reskws)
-        logger.debug(f"Saving data node #{self.node_id}")
+            _child.execute_plugin_chain(res, **self._get_deep_copy_of_kwargs(reskws))
+        logger.debug("Saving data node #%i" % self.node_id)
         if (self.is_leaf and self.plugin.output_data_dim is not None) or kwargs.get(
             "force_store_results", False
         ):
             self.results = res
             self.result_kws = reskws
+
+    def _get_deep_copy_of_kwargs(self, kwargs):
+        """
+        Get a recursive deep copy of the kwargs.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The input dictionary.
+
+        Returns
+        -------
+        kwargs_copy : dict
+            A recursive deep copy of the kwargs dict.
+        """
+        _kwargs_copy = {
+            deepcopy(_key): deepcopy(_value) for _key, _value in kwargs.items()
+        }
+        return _kwargs_copy
 
     def dump(self):
         """

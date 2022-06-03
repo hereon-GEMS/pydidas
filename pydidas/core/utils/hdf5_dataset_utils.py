@@ -28,15 +28,20 @@ __all__ = [
     "get_hdf5_populated_dataset_keys",
     "get_hdf5_metadata",
     "create_hdf5_dataset",
+    "convert_data_for_writing_to_hdf5_dataset",
+    "read_and_decode_hdf5_dataset",
 ]
 
 import os
 import pathlib
 
+import numpy as np
 import h5py
 import hdf5plugin
 
 from ..constants import HDF5_EXTENSIONS
+from ..dataset import Dataset
+from .file_utils import get_extension
 
 
 def get_hdf5_populated_dataset_keys(
@@ -139,7 +144,7 @@ def _hdf5_filename_check(item):
     FileNotFoundError
         If the file does not exist.
     """
-    if not os.path.splitext(item)[1] in HDF5_EXTENSIONS:
+    if not get_extension(item) in HDF5_EXTENSIONS:
         raise TypeError(
             "The file does not have any extension registered" " for hdf5 files."
         )
@@ -285,18 +290,86 @@ def create_hdf5_dataset(origin, group, dset_name, **dset_kws):
     If the specified group does not exist, this function will create the
     necessary group for the dataset.
 
+    Note that this function will replace any existing datasets.
+
     Parameters
     ----------
     origin : Union[h5py.File, h5py.Group]
         The original object where the data shall be appended.
-    group : str
-        The path to the group, relative to origin.
+    group : Union[str, None]
+        The path to the group, relative to origin. If None, the dataset will be
+        created directly in origin.
     dset_name : str
         The name of the dataset
     **dset_kws : dict
         Any creation keywords for the h5py.Dataset.
     """
-    _group = origin.get(group)
-    if _group is None:
-        _group = origin.create_group(group)
+    if group is None:
+        _group = origin
+    else:
+        _group = origin.get(group)
+        if _group is None:
+            _group = origin.create_group(group)
+    if dset_name in _group.keys():
+        del _group[dset_name]
+    if "data" in dset_kws:
+        dset_kws["data"] = convert_data_for_writing_to_hdf5_dataset(dset_kws["data"])
     _group.create_dataset(dset_name, **dset_kws)
+
+
+def convert_data_for_writing_to_hdf5_dataset(data):
+    """
+    Convert specific datatypes which cannot be written directly with hdf5.
+
+    Parameters
+    ----------
+    data : object
+        The input data.
+
+    Returns
+    -------
+    data : object
+        The sanitized input data.
+    """
+    if data is None:
+        data = "::None::"
+    return data
+
+
+def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None):
+    """
+    Read and decode hdf5 dataset.
+
+    This function reads the data from a hdf5 dataset and converts the data type,
+    if necessary.
+    The direct link to the dataset can be given in the h5object variable or the group
+    and dataset can be specificed separately. Note that group and dataset will only be
+    used if both group and dataset are specified.
+
+    Parameters
+    ----------
+    h5object: Union[h5py.Dataset, h5py.File]
+        The input dataset. If the group and dataset are not given, this will be
+        interpreted as the full access path to the dataset.
+    group : Union[None, str]
+
+
+    dataset : h5py.Dataset
+        The input dataset.
+
+    Returns
+    -------
+    _data : object
+        The data stored in the hdf5 dataset.
+    """
+    if group is not None and dataset is not None:
+        _data = h5object[group][dataset][()]
+    else:
+        _data = h5object[()]
+    if isinstance(_data, bytes):
+        _data = _data.decode("UTF-8")
+        if _data == "::None::":
+            return None
+    if isinstance(_data, np.ndarray):
+        return Dataset(_data)
+    return _data

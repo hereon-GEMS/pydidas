@@ -32,6 +32,7 @@ from qtpy import QtCore
 
 from ..data_io import IoMaster, import_data
 from ..core.constants import HDF5_EXTENSIONS
+from ..core.utils import get_extension
 from .builders import DataBrowsingFrameBuilder
 
 
@@ -104,7 +105,7 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         if not os.path.isfile(_name):
             return
         self.set_status(f"Opened file: {_name}")
-        _extension = "." + os.path.basename(_name).split(".")[-1]
+        _extension = get_extension(_name)
         _supported_nothdf_ext = set(IoMaster.registry_import.keys()) - set(
             HDF5_EXTENSIONS
         )

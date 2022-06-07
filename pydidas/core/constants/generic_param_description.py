@@ -1011,6 +1011,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "name": "Plot update time",
         "choices": None,
         "allow_None": False,
+        "unit": "s",
         "tooltip": (
             "The delay before any plot updates will be processed. This"
             " will prevent multiple frequent update of plots."
@@ -1084,7 +1085,7 @@ GENERIC_PARAM_DESCRIPTION = {
     },
     "rad_range_upper": {
         "type": float,
-        "default": -1,
+        "default": 0,
         "name": "Radial upper range",
         "choices": None,
         "unit": "",
@@ -1143,7 +1144,7 @@ GENERIC_PARAM_DESCRIPTION = {
     },
     "azi_range_upper": {
         "type": float,
-        "default": -1,
+        "default": 0,
         "name": "Azimuthal upper range",
         "choices": None,
         "unit": "",

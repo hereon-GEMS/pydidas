@@ -65,20 +65,20 @@ class ScanSetupFrameBuilder(BaseFrame):
         )
         self.create_button(
             "but_load",
-            "Load scan settings from file",
+            "Import scan settings from file",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
             icon=self.style().standardIcon(42),
             fixedWidth=_width_total,
         )
-        self.create_button(
-            "but_import",
-            "Open scan parameter import dialogue",
-            gridPos=(-1, 0, 1, 1),
-            alignment=None,
-            icon=self.style().standardIcon(42),
-            fixedWidth=_width_total,
-        )
+        # self.create_button(
+        #     "but_import",
+        #     "Open scan parameter import dialogue",
+        #     gridPos=(-1, 0, 1, 1),
+        #     alignment=None,
+        #     icon=self.style().standardIcon(42),
+        #     fixedWidth=_width_total,
+        # )
         self.create_button(
             "but_reset",
             "Reset all scan settings",
@@ -139,7 +139,7 @@ class ScanSetupFrameBuilder(BaseFrame):
 
         self.create_button(
             "but_save",
-            "Save scan settings",
+            "Export scan settings",
             gridPos=(-1, 0, 1, 1),
             fixedWidth=_width_total,
             icon=self.style().standardIcon(43),

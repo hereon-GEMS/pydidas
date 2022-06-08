@@ -28,7 +28,7 @@ __all__ = ["WorkflowEditFrameBuilder"]
 from qtpy import QtWidgets
 
 from ...widgets import ScrollArea, BaseFrame
-from ...widgets.parameter_config import PluginParameterEditWidget
+from ...widgets.parameter_config import ConfigurePluginWidget
 from ...widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
 
 
@@ -46,7 +46,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
         Create all widgets and initialize their state.
         """
         self._widgets["workflow_canvas"] = WorkflowTreeCanvas(self)
-        self._widgets["plugin_edit_canvas"] = PluginParameterEditWidget(self)
+        self._widgets["plugin_edit_canvas"] = ConfigurePluginWidget(self)
         self.create_any_widget(
             "workflow_area",
             ScrollArea,
@@ -69,5 +69,5 @@ class WorkflowEditFrameBuilder(BaseFrame):
             ),
             gridPos=(0, 1, 2, 1),
         )
-        self.create_button("but_load", "Load workflow from file", gridPos=(2, 1, 1, 1))
-        self.create_button("but_save", "Save workflow to file", gridPos=(3, 1, 1, 1))
+        self.create_button("but_load", "Import workflow from file", gridPos=(2, 1, 1, 1))
+        self.create_button("but_save", "Export workflow to file", gridPos=(3, 1, 1, 1))

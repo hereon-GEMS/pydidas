@@ -46,7 +46,7 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
         )
         self.create_button(
             "but_load_from_file",
-            "Load experimental parameters from file",
+            "Import experimental parameters from file",
             icon=self.style().standardIcon(42),
             gridPos=(-1, 0, 1, 1),
             alignment=None,
@@ -72,7 +72,7 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
         self.create_spacer(None, gridPos=(-1, 0, 1, 1))
         self.create_button(
             "but_save_to_file",
-            "Save experimental parameters to file",
+            "Export experimental parameters to file",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
             icon=self.style().standardIcon(43),
@@ -105,7 +105,7 @@ class ExperimentalSetupFrameBuilder(BaseFrame):
         )
         self.create_button(
             "but_select_detector",
-            "Select X-ray detector",
+            "Select X-ray detector from list",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )

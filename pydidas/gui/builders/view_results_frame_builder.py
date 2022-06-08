@@ -105,7 +105,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         )
         self.create_button(
             "but_load",
-            "Load results from directory",
+            "Import results from directory",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )

@@ -179,7 +179,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
 
         self.create_button(
             "but_save",
-            "Save composite image",
+            "Export composite image to file",
             parent_widget=self._widgets["config"],
             gridPos=(-1, 0, 1, 2),
             enabled=False,

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginParameterEditWidget class used to edit plugin
+Module with the ConfigurePluginWidget class used to edit plugin
 Parameters.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["PluginParameterEditWidget"]
+__all__ = ["ConfigurePluginWidget"]
 
 from pathlib import Path
 
@@ -35,21 +35,22 @@ from ..utilities import delete_all_items_in_layout
 from .parameter_edit_frame import ParameterEditFrame
 
 
-class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
+class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
     """
-    The PluginParameterEditWidget widget creates the composite widget for
+    The ConfigurePluginWidget widget creates the composite widget for
     updating and changing values of all Parameters in a Plugin.
 
     Depending on the Parameter types, automatic typechecks are implemented.
     """
 
     FIXED_WIDTH = 385
+    sig_new_label = QtCore.Signal(int, str)
 
     def __init__(self, parent=None):
         """
         Setup method.
 
-        Create an instance on the PluginParameterEditWidget class.
+        Create an instance on the ConfigurePluginWidget class.
 
         Parameters
         ----------
@@ -84,7 +85,7 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
     def clear_layout(self):
         """
         Delete all widgets and items which currently populate the
-        PluginParameterEditWidget.
+        ConfigurePluginWidget.
         """
         _layout = self.layout()
         for i in reversed(range(_layout.count())):
@@ -126,6 +127,19 @@ class PluginParameterEditWidget(ParameterEditFrame, CreateWidgetsMixIn):
             for param in self.plugin.params.values():
                 _kwargs = self.__get_param_creation_kwargs(param)
                 self.create_param_widget(param, **_kwargs)
+            self.param_widgets["label"].io_edited.connect(self._label_updated)
+
+    @QtCore.Slot(str)
+    def _label_updated(self, label):
+        """
+        Process the updated label and emit a signal.
+
+        Parameters
+        ----------
+        label : str
+            The new label.
+        """
+        self.sig_new_label.emit(self.plugin.node_id, label)
 
     def __add_restore_default_button(self):
         """

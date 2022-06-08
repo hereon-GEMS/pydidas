@@ -27,7 +27,7 @@ __all__ = []
 from .parameter_config_widget import *
 from .parameter_edit_frame import *
 from .parameter_widgets_mixin import *
-from .plugin_param_config import *
+from .configure_plugin_widget import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -46,7 +46,7 @@ from . import parameter_widgets_mixin
 __all__.extend(parameter_widgets_mixin.__all__)
 del parameter_widgets_mixin
 
-from . import plugin_param_config
+from . import configure_plugin_widget
 
-__all__.extend(plugin_param_config.__all__)
-del plugin_param_config
+__all__.extend(configure_plugin_widget.__all__)
+del configure_plugin_widget

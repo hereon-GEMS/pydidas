@@ -43,7 +43,6 @@ from pydidas.gui import (
     DirectorySpyFrame,
     ViewResultsFrame,
     WorkflowTestFrame,
-    GlobalConfigurationFrame,
 )
 
 
@@ -87,7 +86,6 @@ def run_gui(app=None):
     gui.register_frame(WorkflowTestFrame)
     gui.register_frame(ExecuteWorkflowFrame)
     gui.register_frame(ViewResultsFrame)
-    gui.register_frame(GlobalConfigurationFrame)
     gui.show()
     gui.raise_()
     _ = app.exec_()

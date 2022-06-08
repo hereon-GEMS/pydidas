@@ -93,6 +93,9 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             return
         plugin = TREE.nodes[node_id].plugin
         self._widgets["plugin_edit_canvas"].configure_plugin(node_id, plugin)
+        self._widgets["plugin_edit_canvas"].sig_new_label.connect(
+            WORKFLOW_EDIT_MANAGER.new_node_label_selected
+        )
 
     def save_tree_to_file(self):
         """
@@ -100,8 +103,9 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         the selected file with the specified format.
         """
         _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
-        _func = QtWidgets.QFileDialog.getSaveFileName
-        fname = _func(self, "Name of file", None, _file_selection)[0]
+        fname = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Name of file", None, _file_selection
+        )[0]
         if fname in ["", None]:
             return
         TREE.export_to_file(fname, overwrite=True)

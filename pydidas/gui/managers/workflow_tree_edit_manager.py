@@ -201,6 +201,22 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.active_node_id = node_id
         self.plugin_to_edit.emit(node_id)
 
+    @QtCore.Slot(int, str)
+    def new_node_label_selected(self, node_id, label):
+        """
+        Process the newly selected plugin label.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID to be updated
+        label : str
+            The new node label.
+        plugin_name : str
+            The plugin class name.
+        """
+        self._node_widgets[node_id].update_text(node_id, label)
+
     def update_node_positions(self):
         """
         Update the node positions on the canvas after changes to the tree.

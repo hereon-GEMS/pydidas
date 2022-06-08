@@ -56,10 +56,11 @@ QT_STYLES = {}
 QT_STYLES[
     "workflow_plugin_active"
 ] = """
-    QLabel{font-size: 11px;
-           font: bold;
+    QPushButton{font-size: 11px;
+                color: rgb(60, 60, 60);
+                border: 0px solid rgb(225, 225, 225);}
+    QLabel{font-size: 12px;
            color: rgb(0, 0, 0);
-           border: 0px;
            border: 2px solid rgb(60, 60, 60);
            border-radius: 3px;
            background: rgb(225, 225, 255);
@@ -69,22 +70,17 @@ QT_STYLES[
     "workflow_plugin_inactive"
 ] = """
     QPushButton{font-size: 11px;
-                color: rgb(65, 65, 65);
-                border: 0px solid rgb(205, 205, 205);}
-    QLabel{font-size: 11px;
-           font: bold;
+                color: rgb(60, 60, 60);
+                border: 0px solid rgb(60, 60, 60);}
+    QLabel{font-size: 12px;
            color: rgb(60, 60, 60);
-           border: 0px;
+           border: 1px solid rgb(60, 60, 60);
            margin-left: 2px;
            margin-bottom: 2px;
-           border: 1px solid rgb(60, 60, 60);
            border-radius: 3px;
            background: rgb(225, 225, 225);}"""
 QT_STYLES["title"] = """QWidget {font: bold; font-size: 14pt}"""
 QT_STYLES["subtitle"] = """QWidget {font: bold; font-size: 11pt}"""
-QT_STYLES[
-    "workflow_plugin_title"
-] = "QLabel{font-size: 12px;font: bold;color: rgb(0, 0, 0);}"
 
 QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 

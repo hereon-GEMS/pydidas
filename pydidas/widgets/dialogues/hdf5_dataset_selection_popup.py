@@ -25,17 +25,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Hdf5DatasetSelectionPopup"]
 
-from qtpy import QtWidgets, QtGui
+from qtpy import QtWidgets
 
 from ...core import Hdf5key
 from ...core.utils import get_hdf5_populated_dataset_keys
-from ..utilities import get_pyqt_icon_from_str_reference
+from ..utilities import get_pyqt_icon_from_str_reference, get_max_pixel_width_of_entries
 
 
 class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
     QInputDialog subclass for showing a pop-up dialogue to select a dataset
-    from an hdf5 file..
+    from an hdf5 file.
 
     Parameters
     ----------
@@ -76,11 +76,8 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             The items which are to be displayed. This must be an iterable
             of string items.
         """
-        font = QtWidgets.QApplication.instance().font()
-        metrics = QtGui.QFontMetrics(font)
-        width = max([metrics.boundingRect(d).width() for d in items])
-
-        self.resize(width + 60, min(300, max(200, 50 + len(items) * 10)))
+        _width = get_max_pixel_width_of_entries(items)
+        self.resize(_width + 60, min(300, max(200, 50 + len(items) * 10)))
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 

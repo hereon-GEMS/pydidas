@@ -28,6 +28,7 @@ __all__ = [
     "apply_widget_properties",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str_reference",
+    "get_max_pixel_width_of_entries"
 ]
 
 
@@ -189,3 +190,28 @@ def get_pyqt_icon_from_str_reference(ref_string):
     else:
         raise TypeError("Cannot interpret the string reference for " "the menu icon.")
     return _menu_icon
+
+
+def get_max_pixel_width_of_entries(entries):
+    """
+    Get the maximum width from a number of entries.
+
+    This function calculates the width (in pixels) of a list of given strings.
+
+    Parameters
+    ----------
+    entries : Union[str, tuple, list]
+        The entries.
+
+    Returns
+    -------
+    width : int
+        The maximum width of the entries in pixels.
+    """
+    if isinstance(entries, str):
+        entries = [entries]
+
+    font = QtWidgets.QApplication.instance().font()
+    metrics = QtGui.QFontMetrics(font)
+    _width = max([metrics.boundingRect(_item).width() for _item in entries])
+    return _width

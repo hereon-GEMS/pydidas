@@ -33,6 +33,7 @@ from ...core.utils import (
     SignalBlocker,
     convert_special_chars_to_unicode,
 )
+from ..utilities import get_max_pixel_width_of_entries
 
 
 class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
@@ -63,9 +64,11 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
         super().__init__(parent, param, width)
         for choice in param.choices:
             self.addItem(f"{convert_special_chars_to_unicode(str(choice))}")
+
         self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
         self.set_value(param.value)
+        self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items ) + 50)
 
     def __convert_bool(self, value):
         """
@@ -147,3 +150,4 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
                 self.addItem(_itemstr)
             self.__items = [self.itemText(i) for i in range(self.count())]
             self.set_value(new_choices[0])
+        self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)

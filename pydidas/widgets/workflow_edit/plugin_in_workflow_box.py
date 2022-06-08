@@ -38,8 +38,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
 
     Parameters
     ----------
-    title : str
-        The QLabel's title (i.e. text).
+    plugin_name : str
+        The name of the Plugin class.
     widget_id : int
         The widget ID. This is the same as the corresponding node ID.
     parent : Union[QtWidgets.QWidget, None], optional
@@ -51,16 +51,24 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     widget_activated = QtCore.Signal(int)
     widget_delete_request = QtCore.Signal(int)
 
-    def __init__(self, title, widget_id, parent=None, **kwargs):
+    def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
         super().__init__(parent)
         apply_widget_properties(self, **kwargs)
         self.active = False
         self.widget_id = widget_id
 
-        self.setText(title)
         self.setFixedSize(self.widget_width, self.widget_height)
+
         self.setAutoFillBackground(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
+
+        _font = self.font()
+        _font.setPointSize(12)
+        _font.setBold(True)
+
+        self.id_label = QtWidgets.QLabel(self)
+        self.id_label.setFont(_font)
+        self.id_label.setGeometry(2, 2, self.widget_width - 25, 20)
 
         self.del_button = QtWidgets.QPushButton(self)
         self.del_button.setIcon(self.style().standardIcon(3))
@@ -68,6 +76,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         for item in [self, self.del_button]:
             item.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
         self.del_button.clicked.connect(self.delete)
+        self.update_text(widget_id, "")
+        self.setText(plugin_name)
 
     def mousePressEvent(self, event):
         """
@@ -104,4 +114,38 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         else:
             _style = qt_presets.QT_STYLES["workflow_plugin_inactive"]
         self.setStyleSheet(_style)
+        _childstyle = self._get_stylesheet_for_child()
+        self.id_label.setStyleSheet(_childstyle)
         self.active = selection
+
+    def update_text(self, node_id, label):
+        """
+        Update the text for node label.
+
+        Parameters
+        ----------
+        node_id : int
+            The unique node ID.
+        label : str
+            The new label for the workflow node.
+        """
+        _txt = f"node {node_id:d}"
+        if len(label) > 0:
+            _txt += f": {label}"
+        self.id_label.setText(_txt)
+
+    def _get_stylesheet_for_child(self):
+        """
+        Get the stylesheet for the child label.
+
+        Returns
+        -------
+        str
+            The modified stylesheet for the child.
+        """
+        _style = str(self.styleSheet()).split(";")
+        for _item, _entry in enumerate(_style):
+            if _entry.strip().startswith("border"):
+                _style[_item] = "border: 0px"
+        _new_style = ";".join(_style)
+        return _new_style

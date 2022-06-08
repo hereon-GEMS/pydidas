@@ -83,15 +83,11 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             self.unit_widget = self.__get_unit_widget()
         self.io_widget = create_param_widget(param, self.config["width_io"])
 
-        (
-            _text_widget_args,
-            _input_widget_args,
-            _unit_widget_args,
-        ) = self.__get_layout_args_for_widgets()
-        _layout.addWidget(self.name_widget, *_text_widget_args)
-        _layout.addWidget(self.io_widget, *_input_widget_args)
+        _text_w_args, _input_w_args, _unit_w_args = self.__get_layout_args_for_widgets()
+        _layout.addWidget(self.name_widget, *_text_w_args)
+        _layout.addWidget(self.io_widget, *_input_w_args)
         if self.config["width_unit"] > 0:
-            _layout.addWidget(self.unit_widget, *_unit_widget_args)
+            _layout.addWidget(self.unit_widget, *_unit_w_args)
 
         self.io_widget.io_edited.connect(self.__emit_io_changed)
         self.io_widget.io_edited.connect(

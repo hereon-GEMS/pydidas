@@ -204,17 +204,12 @@ class PyfaiCalibFrame(BaseFrame):
             IntegrationTask,
         )
 
-        _it = IntegrationTask.IntegrationTask()
-        _button = QtWidgets.QPushButton("Store geometry for pydidas use")
-        _button.clicked.connect(self._store_geometry)
-        _groupbox = _it.layout().itemAt(1).widget().layout().itemAt(1).widget()
-        _groupbox.layout().addWidget(_button)
         tasks = [
             ExperimentTask.ExperimentTask(),
             MaskTask.MaskTask(),
             PeakPickingTask.PeakPickingTask(),
             GeometryTask.GeometryTask(),
-            _it,
+            IntegrationTask.IntegrationTask(),
         ]
         return tasks
 

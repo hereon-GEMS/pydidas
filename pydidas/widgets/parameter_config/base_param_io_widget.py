@@ -67,7 +67,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         super().__init__(parent)
         self.setFixedWidth(width)
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
-        self.__ptype = param.type
+        self._ptype = param.type
         self._old_value = None
         self.setToolTip(f"{param.tooltip}")
 
@@ -117,13 +117,13 @@ class BaseParamIoWidget(QtWidgets.QWidget):
             return nan
         if text.upper() == "NONE":
             return None
-        if self.__ptype == numbers.Integral:
+        if self._ptype == numbers.Integral:
             return int(text)
-        if self.__ptype == numbers.Real:
+        if self._ptype == numbers.Real:
             return float(text)
-        if self.__ptype == pathlib.Path:
+        if self._ptype == pathlib.Path:
             return pathlib.Path(text)
-        if self.__ptype == Hdf5key:
+        if self._ptype == Hdf5key:
             return Hdf5key(text)
         return text
 

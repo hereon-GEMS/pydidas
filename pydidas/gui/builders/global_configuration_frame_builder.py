@@ -53,13 +53,17 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         _twoline_options = dict(
             width_text=self.TEXT_WIDTH,
             linebreak=True,
-            width_io=CONFIG_WIDGET_WIDTH - 50,
+            width_io=CONFIG_WIDGET_WIDTH - 20,
             width_total=CONFIG_WIDGET_WIDTH,
             halign_text=QtCore.Qt.AlignLeft,
             valign_text=QtCore.Qt.AlignBottom,
+            width_unit=0,
         )
         _options = dict(
-            width_text=self.TEXT_WIDTH, width_io=80, width_total=CONFIG_WIDGET_WIDTH
+            width_text=self.TEXT_WIDTH,
+            width_io=80,
+            width_unit=40,
+            width_total=CONFIG_WIDGET_WIDTH,
         )
         _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 1))
 
@@ -94,7 +98,7 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         self.create_param_widget(self.get_param("mosaic_max_size"), **_options)
         self.create_spacer("spacer_3")
 
-        self.create_label("section_plotting", "Plotting settings", **_section_options)
+        self.create_label("section_plotting", "Display settings", **_section_options)
         self.create_param_widget(self.get_param("plot_update_time"), **_options)
         self.create_spacer("spacer_4")
 

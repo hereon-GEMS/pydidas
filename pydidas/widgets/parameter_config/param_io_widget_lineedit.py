@@ -31,8 +31,11 @@ from numbers import Real
 import numpy as np
 from qtpy import QtWidgets, QtCore
 
-from ...core import PydidasQsettingsMixin
-from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH, FLOAT_DISPLAY_ACCURACY
+from ...core.constants import (
+    PARAM_INPUT_WIDGET_HEIGHT,
+    PARAM_INPUT_WIDGET_WIDTH,
+    FLOAT_DISPLAY_ACCURACY,
+)
 from .base_param_io_widget import BaseParamIoWidget
 
 

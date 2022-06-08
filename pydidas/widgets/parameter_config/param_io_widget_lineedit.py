@@ -26,10 +26,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParamIoWidgetLineEdit"]
 
+from numbers import Real
+
+import numpy as np
 from qtpy import QtWidgets, QtCore
 
+from ...core import PydidasQsettingsMixin
+from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH, FLOAT_DISPLAY_ACCURACY
 from .base_param_io_widget import BaseParamIoWidget
-from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_WIDGET_WIDTH
 
 
 class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
@@ -52,11 +56,12 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
     io_edited = QtCore.Signal(str)
 
     def __init__(self, parent, param, width=PARAM_INPUT_WIDGET_WIDTH):
-        super().__init__(parent, param, width)
+        QtWidgets.QLineEdit.__init__(self, parent)
+        BaseParamIoWidget.__init__(self, parent, param, width)
         self.set_validator(param)
-        self.editingFinished.connect(self.emit_signal)
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self.set_value(param.value)
+        self.editingFinished.connect(self.emit_signal)
 
     def emit_signal(self):
         """
@@ -90,5 +95,7 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         This method changes the combobox selection to the specified value.
         Warning: This method will *not* update the connected parameter value.
         """
+        if self._ptype == Real and value is not None and np.isfinite(value):
+            value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)
         self._old_value = value
         self.setText(f"{value}")

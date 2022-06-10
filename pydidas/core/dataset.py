@@ -26,17 +26,20 @@ __status__ = "Development"
 __all__ = ["Dataset"]
 
 import warnings
-import textwrap
 from numbers import Integral
 from collections.abc import Iterable
 from copy import deepcopy
 
 import numpy as np
 
-from .exceptions import DatasetConfigException
+from pydidas.core.exceptions import DatasetConfigException
+from pydidas.core.utils.dataset_utilities import (
+    get_number_of_entries,
+    get_axis_item_representation,
+)
 
 
-def _default_vals(ndim):
+def _default_vals(ndim, key=None):
     """
     Generate default values of None for a number of dimensions.
 
@@ -50,7 +53,22 @@ def _default_vals(ndim):
     dict
         A dict with entries of type (dim: None).
     """
+    if key == "metadata":
+        return {}
+    elif key == "data_unit":
+        return ""
     return {i: None for i in range(ndim)}
+
+
+def update_dataset_properties_from_kwargs(obj, kwargs):
+    obj._keys = {}
+    obj.axis_units = kwargs.get("axis_units", _default_vals(obj.ndim))
+    obj.axis_labels = kwargs.get("axis_labels", _default_vals(obj.ndim))
+    obj.axis_ranges = kwargs.get("axis_ranges", _default_vals(obj.ndim))
+    obj.metadata = kwargs.get("metadata", {})
+    obj.data_unit = kwargs.get("data_unit", "")
+    obj.getitem_key = None
+    return obj
 
 
 class EmptyDataset(np.ndarray):
@@ -75,14 +93,7 @@ class EmptyDataset(np.ndarray):
             if item in kwargs:
                 del kwargs[item]
         obj = np.ndarray.__new__(cls, *args, **kwargs)
-        obj._keys = {}
-        for key in ["axis_labels", "axis_ranges", "axis_units"]:
-            _data = local_kws.get(key, _default_vals(obj.ndim))
-            _labels = obj._get_dict(_data, "__new__")
-            setattr(obj, key, _labels)
-        obj.metadata = local_kws.get("metadata", {})
-        obj.data_unit = local_kws.get("data_unit", "")
-        obj.getitem_key = None
+        update_dataset_properties_from_kwargs(obj, local_kws)
         return obj
 
     def __getitem__(self, key):
@@ -101,7 +112,7 @@ class EmptyDataset(np.ndarray):
             The sliced new dataset.
         """
         self.getitem_key = key if isinstance(key, tuple) else (key,)
-        return super().__getitem__(key)
+        return np.ndarray.__getitem__(self, key)
 
     def __array_finalize__(self, obj):
         """
@@ -123,7 +134,6 @@ class EmptyDataset(np.ndarray):
         }
         if self.getitem_key is not None:
             self.__modify_axis_keys()
-        self.__update_keys_in_flattened_array()
         for _key in ["axis_labels", "axis_ranges", "axis_units"]:
             setattr(self, f"_{_key}", self._keys[_key])
         if isinstance(obj, EmptyDataset):
@@ -149,7 +159,6 @@ class EmptyDataset(np.ndarray):
             if isinstance(_cutter, np.ndarray) and _cutter.ndim > 1:
                 return
             if isinstance(_cutter, Integral):
-                self.__store_keys_in_metadata(_dim, _cutter)
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._keys[_item][_dim]
             elif isinstance(_cutter, (slice, Iterable, np.ndarray)):
@@ -166,26 +175,6 @@ class EmptyDataset(np.ndarray):
                 _index: _itemdict[_key] for _index, _key in enumerate(sorted(_itemdict))
             }
             self._keys[_item] = _newkeys
-
-    def __store_keys_in_metadata(self, dim, cutter):
-        """
-        Store the sliced key in the metadata.
-
-        Parameters
-        ----------
-        dim : int
-            The sliced dimension.
-        cutter : Union[int, slice]
-            The cutting object to reduce the specified dimension.
-        """
-        for _item in ["axis_labels", "axis_units"]:
-            _refkey = f"sliced_dim_{dim:02d}_{_item[5:-1]}"
-            self.metadata[_refkey] = self._keys[_item][dim]
-        _refkey = f"sliced_dim_{dim:02d}_range_value"
-        if self._keys["axis_ranges"][dim] is not None:
-            self.metadata[_refkey] = self._keys["axis_ranges"][dim][cutter]
-        else:
-            self.metadata[_refkey] = None
 
     def __insert_axis_keys(self, dim):
         """
@@ -209,7 +198,7 @@ class EmptyDataset(np.ndarray):
                     _copy[_key + 1] = _dict[_key]
             self._keys[_item] = _copy
 
-    def __update_keys_in_flattened_array(self):
+    def _update_keys_in_flattened_array(self):
         """
         Update the keys in flattened arrays i.e. if the new dimension is one.
         """
@@ -239,7 +228,9 @@ class EmptyDataset(np.ndarray):
         self._axis_labels = {0: "Flattened"}
         self._axis_ranges = {0: np.arange(self.size)}
         self._axis_units = {0: ""}
-        return super().flatten(order)
+        _new = np.ndarray.flatten(self, order)
+        _new._update_keys_in_flattened_array()
+        return _new
 
     def flatten_dims(
         self, *args, new_dim_label="Flattened", new_dim_unit="", new_dim_range=None
@@ -268,7 +259,7 @@ class EmptyDataset(np.ndarray):
         """
         if len(args) < 2:
             return
-        if set(np.diff(args)) != set([1]):
+        if set(np.diff(args)) != {1}:
             raise ValueError("The dimensions to flatten must be adjacent.")
         _axis_labels = []
         _axis_units = []
@@ -380,7 +371,7 @@ class EmptyDataset(np.ndarray):
             If a dictionary is passed as data and the keys do not correspond
             to the set(0, 1, ..., ndim - 1)
         DatasetConfigException
-            If a tuple of list is passed and the length of entries is not
+            If a tuple or list is passed and the length of entries is not
             equal to ndim.
 
         Returns
@@ -392,14 +383,13 @@ class EmptyDataset(np.ndarray):
         if isinstance(_data, dict):
             if set(_data.keys()) != set(np.arange(self.ndim)):
                 warnings.warn(
-                    "The number of keys does not match the number "
-                    "of array dimensions. Resettings keys to "
-                    "defaults. (Error encountered in "
+                    "The number of keys does not match the number of array dimensions. "
+                    "Resettings keys to defaults. (Error encountered in "
                     f"{calling_method_name})."
                 )
                 return _default_vals(self.ndim)
             return _data
-        if isinstance(_data, (list, tuple)):
+        if isinstance(_data, Iterable):
             if len(_data) != self.ndim:
                 warnings.warn(
                     "The number of keys does not match the number "
@@ -426,7 +416,7 @@ class EmptyDataset(np.ndarray):
             The axis labels: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
-        return self._axis_labels
+        return self._axis_labels.copy()
 
     @axis_labels.setter
     def axis_labels(self, labels):
@@ -455,7 +445,7 @@ class EmptyDataset(np.ndarray):
             The axis scales: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
-        return self._axis_ranges
+        return self._axis_ranges.copy()
 
     @axis_ranges.setter
     def axis_ranges(self, scales):
@@ -521,7 +511,7 @@ class EmptyDataset(np.ndarray):
             The axis units: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
-        return self._axis_units
+        return self._axis_units.copy()
 
     @axis_units.setter
     def axis_units(self, units):
@@ -579,7 +569,7 @@ class EmptyDataset(np.ndarray):
         integer
             The image ID.
         """
-        return self._metadata
+        return self._metadata.copy()
 
     @metadata.setter
     def metadata(self, metadata):
@@ -627,7 +617,6 @@ class EmptyDataset(np.ndarray):
         pydidas.core.Dataset
             The squeezed Dataset.
         """
-        _axes = None
         if axis is None:
             _axes = [_index for _index, _shape in enumerate(self.shape) if _shape != 1]
         else:
@@ -636,6 +625,18 @@ class EmptyDataset(np.ndarray):
         for _key in ["axis_labels", "axis_ranges", "axis_units"]:
             _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
             setattr(_new, _key, _entry)
+        return _new
+
+    def take(self, indices, axis=None, out=None, mode="raise"):
+        _new = np.ndarray.take(self, indices, axis, out, mode)
+        _nindices = get_number_of_entries(indices)
+        if axis is not None and _nindices == 1:
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+                _item = getattr(_new, _key)
+                _item.pop(axis)
+                setattr(_new, _key, _item.values())
+        if axis is not None and _nindices > 1:
+            _new._axis_ranges[axis] = np.take(self.axis_ranges[axis], indices)
         return _new
 
     def __repr__(self):
@@ -650,9 +651,7 @@ class EmptyDataset(np.ndarray):
         _thresh = np.get_printoptions()["threshold"]
         _edgeitems = 2 if self.ndim > 1 else 3
         np.set_printoptions(threshold=20, edgeitems=_edgeitems)
-        _meta_repr = "\n".join(
-            self.__get_item_representation("metadata", self._metadata)
-        )
+        _meta_repr = "\n".join(get_axis_item_representation("metadata", self._metadata))
         _info = {
             "axis_labels": self.__get_axis_item_repr("axis_labels"),
             "axis_ranges": self.__get_axis_item_repr("axis_ranges"),
@@ -688,46 +687,10 @@ class EmptyDataset(np.ndarray):
         _obj = getattr(self, obj_name)
         _str_entries = []
         for _key, _item in _obj.items():
-            _lines = self.__get_item_representation(_key, _item)
+            _lines = get_axis_item_representation(_key, _item)
             _str_entries.extend([" " * 4 + _line for _line in _lines])
         _str = f"{obj_name}:" + " {\n" + "\n".join(_str_entries) + "}"
         return _str
-
-    def __get_item_representation(self, key, item, use_key=True):
-        """
-        Get a string representation for a dictionary item of 'axis_labels',
-        'axis_ranges' or 'axis_units'
-
-        Parameters
-        ----------
-        key : str
-            The key (i.e. reference name) for the item.
-        item : object
-            The item to be represented as a string.
-        use_key : bool, optional
-            Keyword to print the key name in front of the values. The default
-            is True.
-
-        Returns
-        -------
-        list
-            A list with a representation for each line.
-        """
-        _repr = (f"{key}: " if use_key else "") + item.__repr__()
-        if isinstance(item, np.ndarray):
-            _repr = _repr.replace("\n      ", "")
-            _lines = textwrap.wrap(
-                _repr, initial_indent="", width=75, subsequent_indent=" " * 10
-            )
-            _i0 = _lines[0].find(",")
-            for _index in range(1, len(_lines)):
-                _ii = _lines[_index].find(",")
-                _lines[_index] = " " * (_i0 - _ii) + _lines[_index]
-        else:
-            _lines = textwrap.wrap(
-                _repr, initial_indent="", width=75, subsequent_indent=" " * 3
-            )
-        return _lines
 
     def __str__(self):
         """
@@ -844,10 +807,5 @@ class Dataset(EmptyDataset):
             The new dataset object.
         """
         obj = np.asarray(array).view(cls)
-        obj._keys = {}
-        obj.axis_units = kwargs.get("axis_units", _default_vals(obj.ndim))
-        obj.axis_labels = kwargs.get("axis_labels", _default_vals(obj.ndim))
-        obj.axis_ranges = kwargs.get("axis_ranges", _default_vals(obj.ndim))
-        obj.metadata = kwargs.get("metadata", {})
-        obj.data_unit = kwargs.get("data_unit", "")
+        update_dataset_properties_from_kwargs(obj, kwargs)
         return obj

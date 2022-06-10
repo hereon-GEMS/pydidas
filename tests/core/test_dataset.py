@@ -431,6 +431,23 @@ class TestDataset(unittest.TestCase):
             self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
         self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
 
+    def test_squeeze__multi_dim_with_None_range(self):
+        obj = Dataset(
+            np.random.random((6, 1, 7, 1, 9)),
+            axis_labels=[0, 1, 2, 3, 4],
+            axis_units=["a", "b", "c", "d", "e"],
+            axis_ranges=[np.arange(6), [2], 20 - np.arange(7), [6], None],
+        )
+        _new = obj.squeeze()
+        for _i1, _i2 in [[0, 0], [2, 1]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
+        self.assertEqual(obj.axis_labels[4], _new.axis_labels[2])
+        self.assertEqual(obj.axis_units[4], _new.axis_units[2])
+        self.assertIsNone(_new.axis_ranges[2])
+        self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
+
     def test_squeeze__no_dim(self):
         obj = Dataset(
             np.random.random((6, 4, 7, 2, 9)),
@@ -450,6 +467,118 @@ class TestDataset(unittest.TestCase):
             self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
             self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
         self.assertTrue(np.allclose(obj, _new))
+
+    def test_squeeze__with_slicing(self):
+        obj = Dataset(
+            np.random.random((6, 4, 7, 1, 9)),
+            axis_labels=[0, 1, 2, 3, 4],
+            axis_units=["a", "b", "c", "d", "e"],
+            axis_ranges=[
+                np.arange(6),
+                [2, 5, 8, 9],
+                20 - np.arange(7),
+                [4],
+                -1 * np.arange(9),
+            ],
+        )
+        _new = np.squeeze(obj[0:3])
+        self.assertTrue(np.allclose(obj.axis_ranges[0][:3], _new.axis_ranges[0]))
+        for _i1, _i2 in [[1, 1], [2, 2], [4, 3]]:
+            self.assertEqual(obj.axis_labels[_i1], _new.axis_labels[_i2])
+            self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
+            self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
+        self.assertTrue(np.allclose(obj[:3, :, :, 0], _new))
+
+    def test_take__full_dim_from_3d(self):
+        obj = Dataset(
+            np.random.random((6, 4, 7)),
+            axis_labels=[0, 1, 2],
+            axis_units=["a", "b", "c"],
+            axis_ranges=[
+                np.arange(6),
+                [2, 5, 8, 9],
+                20 - np.arange(7),
+            ],
+        )
+        _dim = 1
+        _slice = 1
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[:, 1], _new))
+        self.assertEqual(obj.axis_labels[0], _new.axis_labels[0])
+        self.assertEqual(obj.axis_labels[2], _new.axis_labels[1])
+        self.assertEqual(obj.axis_units[0], _new.axis_units[0])
+        self.assertEqual(obj.axis_units[2], _new.axis_units[1])
+        self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
+        self.assertTrue(np.allclose(obj.axis_ranges[2], _new.axis_ranges[1]))
+
+    def test_take__dim_subset_from_3d(self):
+        obj = Dataset(
+            np.random.random((6, 5, 7)),
+            axis_labels=[0, 1, 2],
+            axis_units=["a", "b", "c"],
+            axis_ranges=[
+                np.arange(6),
+                [2, 5, 8, 9, 11],
+                20 - np.arange(7),
+            ],
+        )
+        _dim = 1
+        _slice = (1, 2, 3)
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[:, slice(1, 4)], _new))
+        for _dim in range(3):
+            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
+            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
+            if _dim == 1:
+                self.assertTrue(
+                    np.allclose(
+                        obj.axis_ranges[_dim][slice(1, 4)], _new.axis_ranges[_dim]
+                    )
+                )
+            else:
+                self.assertTrue(
+                    np.allclose(obj.axis_ranges[_dim], _new.axis_ranges[_dim])
+                )
+
+    def test_take__full_dim_from_2d(self):
+        obj = Dataset(
+            np.random.random((6, 4)),
+            axis_labels=[0, 1],
+            axis_units=["a", "b"],
+            axis_ranges=[
+                np.arange(6),
+                [2, 5, 8, 9],
+            ],
+        )
+        _dim = 0
+        _slice = 1
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[_slice], _new))
+        self.assertEqual(obj.axis_labels[1], _new.axis_labels[0])
+        self.assertEqual(obj.axis_units[1], _new.axis_units[0])
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _new.axis_ranges[0]))
+
+    def test_take__dim_subset_from_2d(self):
+        obj = Dataset(
+            np.random.random((6, 5)),
+            axis_labels=[0, 1],
+            axis_units=["a", "b"],
+            axis_ranges=[
+                np.arange(6),
+                [2, 5, 8, 9, 11],
+            ],
+        )
+        _dim = 1
+        _slice = (1, 2, 3)
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[:, slice(1, 4)], _new))
+        for _dim in range(2):
+            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
+            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
+        self.assertTrue(
+            np.allclose(obj.axis_ranges[1][slice(1, 4)], _new.axis_ranges[1])
+        )
+        self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
 
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
@@ -503,12 +632,30 @@ class TestDataset(unittest.TestCase):
         obj = self.create_empty_dataset()
         self.assertEqual(obj.axis_labels, self.get_dict("_axis_labels"))
 
+    def test_empty_dataset_axis_labels_property__modify_copy(self):
+        obj = self.create_empty_dataset()
+        _labels = obj.axis_labels
+        _labels[0] = "new value"
+        self.assertEqual(obj.axis_labels, self.get_dict("_axis_labels"))
+
     def test_empty_dataset_axis_units_property(self):
         obj = self.create_empty_dataset()
         self.assertEqual(obj.axis_units, self.get_dict("_axis_units"))
 
+    def test_empty_dataset_axis_units_property__modify_copy(self):
+        obj = self.create_empty_dataset()
+        _units = obj.axis_units
+        _units[0] = "A new unit"
+        self.assertEqual(obj.axis_units, self.get_dict("_axis_units"))
+
     def test_empty_dataset_axis_ranges_property(self):
         obj = self.create_empty_dataset()
+        self.assertEqual(obj.axis_ranges, self.get_dict("_axis_ranges"))
+
+    def test_empty_dataset_axis_ranges_property__modify_copy(self):
+        obj = self.create_empty_dataset()
+        _ranges = obj.axis_ranges
+        _ranges[0] = 2 * _ranges[0] - 5
         self.assertEqual(obj.axis_ranges, self.get_dict("_axis_ranges"))
 
     def test_empty_dataset_set_axis_labels_property(self):

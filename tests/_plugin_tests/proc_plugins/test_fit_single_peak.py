@@ -40,7 +40,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self._data = Dataset(np.ones((150)))
         self._x = np.arange(self._data.size) * 0.5
         self._peak_x = self._x[self._peakpos]
-        self._data.axis_ranges[0] = self._x
+        self._data.axis_ranges = [self._x]
         self._data[self._peakpos - 5 : self._peakpos + 6] += [
             0.5,
             1.6,
@@ -76,7 +76,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _startguess = plugin._update_fit_startparams()
         plugin._fit_params = dict(zip(plugin._fitparam_labels, _startguess))
         self._dummy_metadata = {"test_meta": 123}
-        plugin._data.metadata.update(self._dummy_metadata)
+        plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
         return plugin
 
     def assert_fit_results_okay(self, fit_result_data, params, bg_order):

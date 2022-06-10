@@ -72,9 +72,9 @@ class _WorkflowResults(QtCore.QObject):
             _dset = Dataset(np.zeros(_shape, dtype=np.float32))
             for index in range(_dim):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index + 1)
-                _dset.axis_labels[index] = _label
-                _dset.axis_units[index] = _unit
-                _dset.axis_ranges[index] = _range
+                _dset.update_axis_labels(index, _label)
+                _dset.update_axis_units(index, _unit)
+                _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
             self._config["shapes"] = _shapes
             self._config["labels"][_node_id] = TREE.nodes[
@@ -113,9 +113,9 @@ class _WorkflowResults(QtCore.QObject):
         for node_id, _meta in metadata.items():
             _dim_offset = SCAN.get_param_value("scan_dim")
             for _key, _items in _meta.items():
-                _obj = getattr(self.__composites[node_id], _key)
+                _update_method = getattr(self.__composites[node_id], f"update_{_key}")
                 for _dim, _val in _items.items():
-                    _obj[_dim + _dim_offset] = _val
+                    _update_method(_dim + _dim_offset, _val)
         self._config["metadata_complete"] = True
 
     def store_results(self, index, results):
@@ -154,15 +154,15 @@ class _WorkflowResults(QtCore.QObject):
                 continue
             _dim_offset = SCAN.get_param_value("scan_dim")
             for _dim in range(result.ndim):
-                self.__composites[node_id].axis_labels[
-                    _dim + _dim_offset
-                ] = result.axis_labels[_dim]
-                self.__composites[node_id].axis_units[
-                    _dim + _dim_offset
-                ] = result.axis_units[_dim]
-                self.__composites[node_id].axis_ranges[
-                    _dim + _dim_offset
-                ] = result.axis_ranges[_dim]
+                self.__composites[node_id].update_axis_labels(
+                    _dim + _dim_offset, result.axis_labels[_dim]
+                )
+                self.__composites[node_id].update_axis_units(
+                    _dim + _dim_offset, result.axis_units[_dim]
+                )
+                self.__composites[node_id].update_axis_ranges(
+                    _dim + _dim_offset, result.axis_ranges[_dim]
+                )
         self._config["metadata_complete"] = True
 
     @property
@@ -320,7 +320,6 @@ class _WorkflowResults(QtCore.QObject):
             _data = np.take(_data, _slice, __dim_index(_dim))
 
         if flattened_scan_dim:
-
             _data.flatten_dims(
                 *range(SCAN.ndim),
                 new_dim_label="Scan timeline",
@@ -337,7 +336,6 @@ class _WorkflowResults(QtCore.QObject):
                 (str(_val) if _val is not None else "")
                 for _val in _data.axis_labels.values()
             ]
-        # return np.squeeze(_data)
         return _data
 
     def get_result_metadata(self, node_id):

@@ -32,43 +32,15 @@ from copy import deepcopy
 
 import numpy as np
 
-from pydidas.core.exceptions import DatasetConfigException
-from pydidas.core.utils.dataset_utilities import (
+from pydidas.core.utils.dataset_utils import (
     get_number_of_entries,
     get_axis_item_representation,
+    convert_data_to_dict,
+    update_dataset_properties_from_kwargs,
+    dataset_property_default_val,
+    dataset_ax_default_range,
+    item_is_iterable_but_not_array,
 )
-
-
-def _default_vals(ndim, key=None):
-    """
-    Generate default values of None for a number of dimensions.
-
-    Parameters
-    ----------
-    ndim : int
-        The number of dimensions
-
-    Returns
-    -------
-    dict
-        A dict with entries of type (dim: None).
-    """
-    if key == "metadata":
-        return {}
-    elif key == "data_unit":
-        return ""
-    return {i: None for i in range(ndim)}
-
-
-def update_dataset_properties_from_kwargs(obj, kwargs):
-    obj._keys = {}
-    obj.axis_units = kwargs.get("axis_units", _default_vals(obj.ndim))
-    obj.axis_labels = kwargs.get("axis_labels", _default_vals(obj.ndim))
-    obj.axis_ranges = kwargs.get("axis_ranges", _default_vals(obj.ndim))
-    obj.metadata = kwargs.get("metadata", {})
-    obj.data_unit = kwargs.get("data_unit", "")
-    obj.getitem_key = None
-    return obj
 
 
 class EmptyDataset(np.ndarray):
@@ -124,57 +96,40 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None or self.shape == tuple():
             return
-        self.metadata = deepcopy(getattr(obj, "metadata", {}))
-        self.data_unit = getattr(obj, "data_unit", "")
-        self.getitem_key = getattr(obj, "getitem_key", None)
-        self.__check_and_set_default_axis_attributes()
-        self._keys = {
-            _key: deepcopy(getattr(obj, _key, _default_vals(self.ndim)))
-            for _key in ["axis_labels", "axis_ranges", "axis_units"]
-        }
-        if self.getitem_key is not None:
-            self.__modify_axis_keys()
-        for _key in ["axis_labels", "axis_ranges", "axis_units"]:
-            setattr(self, f"_{_key}", self._keys[_key])
+        for _property in ["metadata", "data_unit", "getitem_key"]:
+            _obj_prop = getattr(obj, _property, dataset_property_default_val(_property))
+            setattr(self, _property, _obj_prop)
+        self.__update_keys_from_object(obj)
         if isinstance(obj, EmptyDataset):
             obj.getitem_key = None
         self.getitem_key = None
 
-    def __check_and_set_default_axis_attributes(self):
+    def __update_keys_from_object(self, obj):
         """
-        Check whether the attributes for axis_labels, -units and -ranges exist
-        and initialize them with default values if not.
+        Update the axis keys from the original object
         """
-        for _att in ["_axis_labels", "_axis_units", "_axis_ranges"]:
-            if not hasattr(self, _att):
-                setattr(self, _att, _default_vals(self.ndim))
-
-    def __modify_axis_keys(self):
-        """
-        Modify the axis keys (axis_labels, -_units, and -_ranges) and store
-        the new values in place.
-        """
-        for _dim, _cutter in enumerate(self.getitem_key):
+        self._keys = {
+            _key: deepcopy(getattr(obj, _key, dataset_ax_default_range(self.ndim)))
+            for _key in ["axis_labels", "axis_ranges", "axis_units"]
+        }
+        self.getitem_key = [] if self.getitem_key is None else self.getitem_key
+        for _dim, _slicer in enumerate(self.getitem_key):
             # in the case of a masked array, keep all axis keys.
-            if isinstance(_cutter, np.ndarray) and _cutter.ndim > 1:
-                return
-            if isinstance(_cutter, Integral):
+            if isinstance(_slicer, np.ndarray) and _slicer.ndim > 1:
+                break
+            if isinstance(_slicer, Integral):
                 for _item in ["axis_labels", "axis_units", "axis_ranges"]:
                     del self._keys[_item][_dim]
-            elif isinstance(_cutter, (slice, Iterable, np.ndarray)):
+            elif isinstance(_slicer, (slice, Iterable, np.ndarray)):
                 if self._keys["axis_ranges"][_dim] is not None:
                     self._keys["axis_ranges"][_dim] = self._keys["axis_ranges"][_dim][
-                        _cutter
+                        _slicer
                     ]
-            elif _cutter is None:
+            elif _slicer is None:
                 self.__insert_axis_keys(_dim)
         # finally, shift all keys to have a consistent numbering:
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
-            _itemdict = self._keys[_item]
-            _newkeys = {
-                _index: _itemdict[_key] for _index, _key in enumerate(sorted(_itemdict))
-            }
-            self._keys[_item] = _newkeys
+            self._keys[_item] = dict(enumerate(self._keys[_item].values()))
 
     def __insert_axis_keys(self, dim):
         """
@@ -197,40 +152,6 @@ class EmptyDataset(np.ndarray):
                 else:
                     _copy[_key + 1] = _dict[_key]
             self._keys[_item] = _copy
-
-    def _update_keys_in_flattened_array(self):
-        """
-        Update the keys in flattened arrays i.e. if the new dimension is one.
-        """
-        if self.ndim == 1 and (
-            len(self._keys["axis_ranges"]) > 1
-            or len(self._keys["axis_units"]) > 1
-            or len(self._keys["axis_labels"]) > 1
-        ):
-            self._keys["axis_labels"] = {0: "Flattened"}
-            self._keys["axis_ranges"] = {0: np.arange(self.size)}
-            self._keys["axis_units"] = {0: ""}
-
-    def flatten(self, order="C"):
-        """
-        Clear the metadata when flattening the array.
-
-        Parameters
-        ----------
-        order : {'C', 'F', 'A', 'K'}, optional
-            'C' means to flatten in row-major (C-style) order.
-            'F' means to flatten in column-major (Fortran-style) order.
-            'A' means to flatten in column-major order if `a` is Fortran
-            *contiguous* in memory, row-major order otherwise.
-            'K' means to flatten `a` in the order the elements occur in memory.
-            The default is 'C'.
-        """
-        self._axis_labels = {0: "Flattened"}
-        self._axis_ranges = {0: np.arange(self.size)}
-        self._axis_units = {0: ""}
-        _new = np.ndarray.flatten(self, order)
-        _new._update_keys_in_flattened_array()
-        return _new
 
     def flatten_dims(
         self, *args, new_dim_label="Flattened", new_dim_unit="", new_dim_range=None
@@ -267,9 +188,9 @@ class EmptyDataset(np.ndarray):
         _new_shape = []
         for _dim in range(self.ndim):
             if _dim not in args:
-                _axis_labels.append(self._axis_labels[_dim])
-                _axis_units.append(self._axis_units[_dim])
-                _axis_ranges.append(self._axis_ranges[_dim])
+                _axis_labels.append(self._keys["axis_labels"][_dim])
+                _axis_units.append(self._keys["axis_units"][_dim])
+                _axis_ranges.append(self._keys["axis_ranges"][_dim])
                 _new_shape.append(self.shape[_dim])
             elif _dim == args[0]:
                 _axis_labels.append(new_dim_label)
@@ -350,183 +271,9 @@ class EmptyDataset(np.ndarray):
         _copy.axis_ranges = _axis_ranges
         return _copy
 
-    def _get_dict(self, _data, calling_method_name):
-        """
-        Get an ordered dictionary with the axis keys for _data.
-
-        This method will create a dictionary from lists or tuples and sort
-        dictionary keys for dict inputs. The new keys will be 0, 1, ...,
-        ndim - 1.
-
-        Parameters
-        ----------
-        _data : Union[dict, list, tuple]
-            The keys for the axis meta data.
-        calling_method_name : str
-            The name of the calling method (for exception handling)
-
-        Raises
-        ------
-        DatasetConfigException
-            If a dictionary is passed as data and the keys do not correspond
-            to the set(0, 1, ..., ndim - 1)
-        DatasetConfigException
-            If a tuple or list is passed and the length of entries is not
-            equal to ndim.
-
-        Returns
-        -------
-        dict
-            A dictionary with keys [0, 1, ..., ndim - 1] and the corresponding
-            values from the input _data.
-        """
-        if isinstance(_data, dict):
-            if set(_data.keys()) != set(np.arange(self.ndim)):
-                warnings.warn(
-                    "The number of keys does not match the number of array dimensions. "
-                    "Resettings keys to defaults. (Error encountered in "
-                    f"{calling_method_name})."
-                )
-                return _default_vals(self.ndim)
-            return _data
-        if isinstance(_data, Iterable):
-            if len(_data) != self.ndim:
-                warnings.warn(
-                    "The number of keys does not match the number "
-                    "of array dimensions. Resettings keys to "
-                    "defaults.(Error encountered in "
-                    f"{calling_method_name})."
-                )
-                return _default_vals(self.ndim)
-            _data = dict(enumerate(_data))
-            return _data
-        raise DatasetConfigException(
-            f"Input {_data} cannot be converted to dictionary for property"
-            f" {calling_method_name}"
-        )
-
-    @property
-    def axis_labels(self):
-        """
-        Get the axis_labels
-
-        Returns
-        -------
-        dict
-            The axis labels: A dictionary with keys corresponding to the
-            dimension in the array and respective values.
-        """
-        return self._axis_labels.copy()
-
-    @axis_labels.setter
-    def axis_labels(self, labels):
-        """
-        Set the axis_labels metadata.
-
-        Parameters
-        ----------
-        labels : Union[dict, list, tuple]
-            The new axis labels. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
-        """
-        self._axis_labels = self._get_dict(labels, "axis_labels")
-        self._keys["axis_labels"] = self._axis_labels.copy()
-
-    @property
-    def axis_ranges(self):
-        """
-        Get the axis ranges. These arrays for every dimension give the range
-        of the data (in conjunction with the units).
-
-        Returns
-        -------
-        dict
-            The axis scales: A dictionary with keys corresponding to the
-            dimension in the array and respective values.
-        """
-        return self._axis_ranges.copy()
-
-    @axis_ranges.setter
-    def axis_ranges(self, scales):
-        """
-        Set the axis_ranges metadata.
-
-        Parameters
-        ----------
-        labels : Union[dict, list, tuple]
-            The new axis scales. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
-        """
-        _ranges = self._get_dict(scales, "axis_ranges")
-        self._verify_range_length_okay(_ranges)
-        self._axis_ranges = _ranges
-        self._keys["axis_ranges"] = self._axis_ranges.copy()
-
-    def _verify_range_length_okay(self, ranges):
-        """
-        Verify that the length of all given ranges matches the data shape for iterable
-        or np.ndarray entries
-
-        Parameters
-        ----------
-        ranges : dict
-            The dictionary with the loaded ranges.
-
-        Raises
-        ------
-        ValueError
-            If the given lengths do not match the data length.
-        """
-        _wrong_dims = []
-        for _dim, _range in ranges.items():
-            _ndata = self.shape[_dim]
-            if isinstance(_range, (tuple, list)):
-                _len = len(_range)
-                if _len != _ndata:
-                    _wrong_dims.append([_dim, _len, _ndata])
-            if isinstance(_range, np.ndarray):
-                _len = _range.size
-                if _len != _ndata:
-                    _wrong_dims.append([_dim, _len, _ndata])
-        if len(_wrong_dims) > 0:
-            _error = (
-                "The length of the given ranges does not match the size of the data."
-            )
-            for _dim, _len, _ndata in _wrong_dims:
-                _error += (
-                    f"\nDimension {_dim}: Given range: {_len}; target length: {_ndata}."
-                )
-            raise ValueError(_error)
-
-    @property
-    def axis_units(self):
-        """
-        Get the axis units.
-
-        Returns
-        -------
-        dict
-            The axis units: A dictionary with keys corresponding to the
-            dimension in the array and respective values.
-        """
-        return self._axis_units.copy()
-
-    @axis_units.setter
-    def axis_units(self, units):
-        """
-        Set the axis_units metadata.
-
-        Parameters
-        ----------
-        labels : Union[dict, list, tuple]
-            The new axis units. Both tuples and lists (of length ndim) as
-            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
-            accepted.
-        """
-        self._axis_units = self._get_dict(units, "axis_units")
-        self._keys["axis_units"] = self._axis_units.copy()
+    # ##########
+    # Properties
+    # ##########
 
     @property
     def data_unit(self):
@@ -602,6 +349,227 @@ class EmptyDataset(np.ndarray):
         """
         return self.__array__()
 
+    @property
+    def axis_units(self):
+        """
+        Get the axis units.
+
+        Returns
+        -------
+        dict
+            The axis units: A dictionary with keys corresponding to the
+            dimension in the array and respective values.
+        """
+        return self._keys["axis_units"].copy()
+
+    @axis_units.setter
+    def axis_units(self, units):
+        """
+        Set the axis_units metadata.
+
+        Parameters
+        ----------
+        labels : Union[dict, list, tuple]
+            The new axis units. Both tuples and lists (of length ndim) as
+            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
+            accepted.
+        """
+        self._keys["axis_units"] = convert_data_to_dict(units, self.ndim, "axis_units")
+
+    @property
+    def axis_labels(self):
+        """
+        Get the axis_labels
+
+        Returns
+        -------
+        dict
+            The axis labels: A dictionary with keys corresponding to the
+            dimension in the array and respective values.
+        """
+        return self._keys["axis_labels"].copy()
+
+    @axis_labels.setter
+    def axis_labels(self, labels):
+        """
+        Set the axis_labels metadata.
+
+        Parameters
+        ----------
+        labels : Union[dict, list, tuple]
+            The new axis labels. Both tuples and lists (of length ndim) as
+            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
+            accepted.
+        """
+        self._keys["axis_labels"] = convert_data_to_dict(
+            labels, self.ndim, "axis_labels"
+        )
+
+    @property
+    def axis_ranges(self):
+        """
+        Get the axis ranges. These arrays for every dimension give the range
+        of the data (in conjunction with the units).
+
+        Returns
+        -------
+        dict
+            The axis scales: A dictionary with keys corresponding to the
+            dimension in the array and respective values.
+        """
+        return self._keys["axis_ranges"].copy()
+
+    @axis_ranges.setter
+    def axis_ranges(self, scales):
+        """
+        Set the axis_ranges metadata.
+
+        Parameters
+        ----------
+        labels : Union[dict, list, tuple]
+            The new axis scales. Both tuples and lists (of length ndim) as
+            well as dictionaries (with keys [0, 1, ..., ndim -1]) are
+            accepted.
+        """
+        _ranges = convert_data_to_dict(scales, self.ndim, "axis_ranges")
+        self._convert_ranges_and_verify_length_okay(_ranges)
+        self._keys["axis_ranges"] = _ranges
+
+    def _convert_ranges_and_verify_length_okay(self, ranges):
+        """
+        Verify that all given true ranges (i.e. with more than one item) are of type
+        np.ndarray and that the length of all given ranges matches the data shape.
+
+        Parameters
+        ----------
+        ranges : dict
+            The dictionary with the loaded ranges.
+
+        Raises
+        ------
+        ValueError
+            If the given lengths do not match the data length.
+        """
+        _wrong_dims = []
+        for _dim, _range in ranges.items():
+            if item_is_iterable_but_not_array(_range):
+                _range = np.asarray(_range)
+                ranges[_dim] = _range
+            if isinstance(_range, np.ndarray) and _range.size != self.shape[_dim]:
+                _wrong_dims.append([_dim, _range.size, self.shape[_dim]])
+        if len(_wrong_dims) > 0:
+            _error = (
+                "The length of the given ranges does not match the size of the data."
+            )
+            for _dim, _len, _ndata in _wrong_dims:
+                _error += (
+                    f"\nDimension {_dim}: Given range: {_len}; target length: {_ndata}."
+                )
+            raise ValueError(_error)
+
+    # ################################################
+    # Implement update methods for the axis properties
+    # ################################################
+
+    def update_axis_ranges(self, index, item):
+        """
+        Update a single axis ranges value.
+
+        Parameters
+        ----------
+        index : int
+            The dimension to be updated.
+        item : Union[None, str, np.ndarray]
+            The new item for the range of the selected dimension.
+
+        Raises
+        ------
+        ValueError
+            If the index is not in range of the Dataset dimensions.
+        """
+        if not 0 <= index < self.ndim:
+            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        self._convert_ranges_and_verify_length_okay({index: item})
+        self._keys["axis_ranges"][index] = item
+
+    def update_axis_labels(self, index, item):
+        """
+        Update a single axis label value.
+
+        Parameters
+        ----------
+        index : int
+            The dimension to be updated.
+        item : Union[None, str, np.ndarray]
+            The new item for the range of the selected dimension.
+
+        Raises
+        ------
+        ValueError
+            If the index is not in range of the Dataset dimensions.
+        """
+        if not 0 <= index < self.ndim:
+            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        self._keys["axis_labels"][index] = item
+
+    def update_axis_units(self, index, item):
+        """
+        Update a single axis unit value.
+
+        Parameters
+        ----------
+        index : int
+            The dimension to be updated.
+        item : Union[None, str, np.ndarray]
+            The new item for the range of the selected dimension.
+
+        Raises
+        ------
+        ValueError
+            If the index is not in range of the Dataset dimensions.
+        """
+        if not 0 <= index < self.ndim:
+            raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
+        self._keys["axis_units"][index] = item
+
+    # ############################################
+    # Reimplementations of generic ndarray methods
+    # ############################################
+
+    def flatten(self, order="C"):
+        """
+        Clear the metadata when flattening the array.
+
+        Parameters
+        ----------
+        order : {'C', 'F', 'A', 'K'}, optional
+            'C' means to flatten in row-major (C-style) order.
+            'F' means to flatten in column-major (Fortran-style) order.
+            'A' means to flatten in column-major order if `a` is Fortran
+            *contiguous* in memory, row-major order otherwise.
+            'K' means to flatten `a` in the order the elements occur in memory.
+            The default is 'C'.
+        """
+        self._keys["axis_labels"] = {0: "Flattened"}
+        self._keys["axis_ranges"] = {0: np.arange(self.size)}
+        self._keys["axis_units"] = {0: ""}
+        _new = np.ndarray.flatten(self, order)
+        _new.update_keys_in_flattened_array()
+        return _new
+
+    def update_keys_in_flattened_array(self):
+        """
+        Update the keys in flattened arrays i.e. if the new dimension is one.
+        """
+        if self.ndim == 1 and (
+            len(self._keys["axis_ranges"]) > 1
+            or len(self._keys["axis_units"]) > 1
+            or len(self._keys["axis_labels"]) > 1
+        ):
+            self._keys["axis_labels"] = {0: "Flattened"}
+            self._keys["axis_ranges"] = {0: np.arange(self.size)}
+            self._keys["axis_units"] = {0: ""}
+
     def squeeze(self, axis=None):
         """
         Squeeze the array and remove dimensions of length one.
@@ -628,15 +596,44 @@ class EmptyDataset(np.ndarray):
         return _new
 
     def take(self, indices, axis=None, out=None, mode="raise"):
+        """
+        Take elements from an array along an axis.
+
+        This method overloads the ndarray.take method to process the axis properties
+        as well.
+
+        Parameters
+        ----------
+        indices : Union[int, array_like]
+            The indicies of the values to extract.
+        axis : Union[None, int], optional
+            The axis to take the data from. If None, data will be taken from the
+            flattened array. The default is None.
+        out : Union[np.ndarray, None], optional
+            An optional output array. If None, a new array is created. The default is
+            None.
+        mode : str, optional
+            Specifies how out-of-bounds indices will behave. The default is "raise".
+
+        Returns
+        -------
+        new : pydidas.core.Dataset
+            The new dataset.
+        """
         _new = np.ndarray.take(self, indices, axis, out, mode)
+        if not isinstance(_new, EmptyDataset) or axis is None:
+            return _new
         _nindices = get_number_of_entries(indices)
-        if axis is not None and _nindices == 1:
+        if _nindices == 1 and not isinstance(indices, Iterable):
             for _key in ["axis_labels", "axis_units", "axis_ranges"]:
                 _item = getattr(_new, _key)
                 _item.pop(axis)
                 setattr(_new, _key, _item.values())
-        if axis is not None and _nindices > 1:
-            _new._axis_ranges[axis] = np.take(self.axis_ranges[axis], indices)
+        else:
+            if isinstance(_new._keys["axis_ranges"][axis], np.ndarray):
+                _new._keys["axis_ranges"][axis] = np.take(
+                    self.axis_ranges[axis], indices
+                )
         return _new
 
     def __repr__(self):
@@ -760,7 +757,7 @@ class EmptyDataset(np.ndarray):
         """
         if out_arr.shape == ():
             return np.atleast_1d(out_arr)[0]
-        return super().__array_wrap__(out_arr, context)
+        return np.ndarray.__array_wrap__(self, out_arr, context)
 
 
 class Dataset(EmptyDataset):

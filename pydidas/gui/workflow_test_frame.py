@@ -213,7 +213,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             ]
             for _dim in range(_data.ndim):
                 if not isinstance(_data.axis_ranges[_dim], np.ndarray):
-                    _data.axis_ranges[_dim] = np.arange(_data.shape[_dim])
+                    _data.update_axis_ranges(_dim, np.arange(_data.shape[_dim]))
             self._results[_node_id] = _data
 
     def __update_selection_choices(self):

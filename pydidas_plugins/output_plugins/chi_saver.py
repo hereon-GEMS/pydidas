@@ -83,8 +83,8 @@ class ChiSaver(OutputPlugin):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
-            data.axis_ranges[0] = np.arange(data.size)
-            data.axis_labels[0] = "index"
+            data.update_axis_ranges(0, np.arange(data.size))
+            data.update_axis_labels(0, "index")
         _title = os.path.basename(_fname) + "\n"
         _unit = data.axis_units[0]
         _axislabel = str(data.axis_labels[0]) + (

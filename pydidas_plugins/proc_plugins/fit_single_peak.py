@@ -314,10 +314,12 @@ class FitSinglePeak(ProcPlugin):
                 ],
                 axis_labels=["Peak area, position and norm. std"],
             )
-        _new_data.metadata = self._data.metadata
-        _new_data.metadata["fit_func"] = self._func.__name__
-        _new_data.metadata["fit_params"] = self._fit_params
-        _new_data.metadata["fit_residual_std"] = _residual_std
+        _new_metadata = {
+            "fit_func": self._func.__name__,
+            "fit_params": self._fit_params,
+            "fit_residual_std": _residual_std,
+        }
+        _new_data.metadata = self._data.metadata | _new_metadata
         return _new_data
 
     def calculate_result_shape(self):

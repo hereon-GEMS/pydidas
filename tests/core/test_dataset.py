@@ -23,14 +23,12 @@ __status__ = "Development"
 
 
 import copy
-import warnings
 import unittest
 from numbers import Real
 
 import numpy as np
 
-from pydidas.core import DatasetConfigException
-from pydidas.core.dataset import Dataset, EmptyDataset, _default_vals
+from pydidas.core.dataset import Dataset, EmptyDataset
 from pydidas.core.utils import rebin2d
 
 
@@ -72,14 +70,7 @@ class TestDataset(unittest.TestCase):
     def get_dict(self, key):
         if isinstance(getattr(self, key), dict):
             return getattr(self, key)
-        return {i: item for i, item in enumerate(getattr(self, key))}
-
-    def test_default_vals(self):
-        _ndim = 7
-        _vals = _default_vals(_ndim)
-        for _dim in range(_ndim):
-            self.assertTrue(_dim in _vals.keys())
-            self.assertIsNone(_vals[_dim])
+        return dict(enumerate(getattr(self, key)))
 
     def test_empty_dataset_new(self):
         obj = EmptyDataset((10, 10))
@@ -172,15 +163,11 @@ class TestDataset(unittest.TestCase):
             [self._dset["units"][0]] + [None] + self._dset["units"][1:],
         )
 
-    def test_empty_dataset_array_finalize__empty_shape(self):
-        obj = self.create_large_dataset()
-        self.assertTrue((obj == obj).all())
-
     def test_empty_dataset_array_finalize__with_array_mask(self):
         obj = self.create_large_dataset()
         _mask = np.zeros(obj.shape)
         obj[_mask == 0] = 1
-        self.assertTrue((obj == obj).all())
+        self.assertTrue((obj == 1).all())
 
     def test_empty_dataset_array_finalize__get_masked(self):
         obj = self.create_large_dataset()
@@ -545,10 +532,7 @@ class TestDataset(unittest.TestCase):
             np.random.random((6, 4)),
             axis_labels=[0, 1],
             axis_units=["a", "b"],
-            axis_ranges=[
-                np.arange(6),
-                [2, 5, 8, 9],
-            ],
+            axis_ranges=[np.arange(6), [2, 5, 8, 9]],
         )
         _dim = 0
         _slice = 1
@@ -563,10 +547,7 @@ class TestDataset(unittest.TestCase):
             np.random.random((6, 5)),
             axis_labels=[0, 1],
             axis_units=["a", "b"],
-            axis_ranges=[
-                np.arange(6),
-                [2, 5, 8, 9, 11],
-            ],
+            axis_ranges=[np.arange(6), [2, 5, 8, 9, 11]],
         )
         _dim = 1
         _slice = (1, 2, 3)
@@ -580,47 +561,54 @@ class TestDataset(unittest.TestCase):
         )
         self.assertTrue(np.allclose(obj.axis_ranges[0], _new.axis_ranges[0]))
 
+    def test_take__with_None_ranges(self):
+        obj = Dataset(
+            np.random.random((6, 5)),
+            axis_labels=[0, 1],
+            axis_units=["a", "b"],
+            axis_ranges=[None, None],
+        )
+        _dim = 1
+        _slice = (1, 2, 3)
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[:, slice(1, 4)], _new))
+        for _dim in range(2):
+            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
+            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
+            self.assertEqual(obj.axis_ranges[_dim], _new.axis_ranges[_dim])
+
+    def test_take__with_single_iterable_value(self):
+        obj = Dataset(
+            np.random.random((6, 5)),
+            axis_labels=[0, 1],
+            axis_units=["a", "b"],
+            axis_ranges=[np.arange(6), [2, 5, 8, 9, 11]],
+        )
+        _dim = 0
+        _slice = [2]
+        _new = np.take(obj, _slice, _dim)
+        self.assertTrue(np.allclose(obj[2], _new))
+        for _dim in range(2):
+            self.assertEqual(obj.axis_labels[_dim], _new.axis_labels[_dim])
+            self.assertEqual(obj.axis_units[_dim], _new.axis_units[_dim])
+        self.assertTrue(np.allclose(obj.axis_ranges[0][_slice[0]], _new.axis_ranges[0]))
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _new.axis_ranges[1]))
+
+    def test_take__single_number(self):
+        obj = Dataset(
+            np.random.random((6)),
+            axis_labels=[0],
+            axis_units=["a"],
+            axis_ranges=[np.arange(6)],
+        )
+        _new = np.take(obj, 2, 0)
+        self.assertFalse(isinstance(_new, Dataset))
+        self.assertEqual(_new, obj[2])
+
     def test_empty_dataset_getitem__simple(self):
         obj = self.create_large_dataset()
         _new = obj.__getitem__((0, 0))
         self.assertIsInstance(_new, Dataset)
-
-    def test_empty_dataset_get_dict__w_dict_missing_key(self):
-        obj = EmptyDataset((10, 10))
-        with warnings.catch_warnings(record=True) as w:
-            obj._get_dict({1: 0}, "test")
-            self.assertEqual(len(w), 1)
-
-    def test_empty_dataset_get_dict__w_dict_too_many_keys(self):
-        obj = EmptyDataset((10, 10))
-        with warnings.catch_warnings(record=True) as w:
-            obj._get_dict({0: 1, 1: 2, 2: 3}, "test")
-            self.assertEqual(len(w), 1)
-
-    def test_empty_dataset_get_dict__w_dict(self):
-        obj = EmptyDataset((10, 10))
-        obj._get_dict({0: 0, 1: 1}, "test")
-
-    def test_empty_dataset_get_dict__w_list_missing_entry(self):
-        obj = EmptyDataset((10, 10))
-        with warnings.catch_warnings(record=True) as w:
-            obj._get_dict([0], "test")
-            self.assertEqual(len(w), 1)
-
-    def test_empty_dataset_get_dict__w_list_too_many_entries(self):
-        obj = EmptyDataset((10, 10))
-        with warnings.catch_warnings(record=True) as w:
-            obj._get_dict([1, 2, 3], "test")
-            self.assertEqual(len(w), 1)
-
-    def test_empty_dataset_get_dict__w_list(self):
-        obj = EmptyDataset((10, 10))
-        obj._get_dict([0, 1], "test")
-
-    def test_empty_dataset_get_dict__w_value(self):
-        obj = EmptyDataset((10, 10))
-        with self.assertRaises(DatasetConfigException):
-            obj._get_dict(0, "test")
 
     def test_empty_dataset__new__kwargs(self):
         obj = self.create_empty_dataset()
@@ -662,31 +650,32 @@ class TestDataset(unittest.TestCase):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_labels = _newkeys
-        self.assertEqual(obj.axis_labels, {i: o for i, o in enumerate(_newkeys)})
+        self.assertEqual(obj.axis_labels, dict(enumerate(_newkeys)))
 
     def test_empty_dataset_set_axis_units_property(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_units = _newkeys
-        self.assertEqual(obj.axis_units, {i: o for i, o in enumerate(_newkeys)})
+        self.assertEqual(obj.axis_units, dict(enumerate(_newkeys)))
 
     def test_empty_dataset_set_axis_ranges_property__single_keys(self):
         obj = self.create_empty_dataset()
         _newkeys = [123, 456]
         obj.axis_ranges = _newkeys
-        self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+        self.assertEqual(obj.axis_ranges, dict(enumerate(_newkeys)))
 
     def test_empty_dataset_set_axis_ranges_property__ndarrays_of_correct_len(self):
         obj = self.create_empty_dataset()
         _newkeys = [np.arange(_len) for _len in obj.shape]
         obj.axis_ranges = _newkeys
-        self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+        self.assertEqual(obj.axis_ranges, dict(enumerate(_newkeys)))
 
     def test_empty_dataset_set_axis_ranges_property__lists_of_correct_len(self):
         obj = self.create_empty_dataset()
         _newkeys = [list(np.arange(_len)) for _len in obj.shape]
         obj.axis_ranges = _newkeys
-        self.assertEqual(obj.axis_ranges, {i: o for i, o in enumerate(_newkeys)})
+        for _key, _range in obj.axis_ranges.items():
+            self.assertTrue(np.allclose(_range, np.asarray(_newkeys[_key])))
 
     def test_empty_dataset_set_axis_ranges_property__ndarrays_of_incorrect_len(self):
         obj = self.create_empty_dataset()
@@ -723,6 +712,51 @@ class TestDataset(unittest.TestCase):
     def test_empty_dataset_array_property(self):
         obj = self.create_empty_dataset()
         self.assertIsInstance(obj.array, np.ndarray)
+
+    def test_update_axis_ranges__wrong_index(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.update_axis_ranges(-4, 12)
+
+    def test_update_axis_ranges__single_val(self):
+        _val = 12
+        obj = self.create_large_dataset()
+        obj.update_axis_ranges(1, _val)
+        self.assertEqual(obj.axis_ranges[1], _val)
+
+    def test_update_axis_ranges__correct_ndarray(self):
+        obj = self.create_large_dataset()
+        _val = np.arange(obj.shape[1])
+        obj.update_axis_ranges(1, _val)
+        self.assertTrue(np.allclose(obj.axis_ranges[1], _val))
+
+    def test_update_axis_ranges__incorrect_ndarray(self):
+        obj = self.create_large_dataset()
+        _val = np.arange(obj.shape[1] + 5)
+        with self.assertRaises(ValueError):
+            obj.update_axis_ranges(1, _val)
+
+    def test_update_axis_labels__wrong_index(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.update_axis_labels(-4, 12)
+
+    def test_update_axis_labels__single_val(self):
+        _val = "a new label"
+        obj = self.create_large_dataset()
+        obj.update_axis_labels(1, _val)
+        self.assertEqual(obj.axis_labels[1], _val)
+
+    def test_update_axis_units__wrong_index(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.update_axis_units(-4, 12)
+
+    def test_update_axis_units__single_val(self):
+        _val = "a new unit"
+        obj = self.create_large_dataset()
+        obj.update_axis_units(1, _val)
+        self.assertEqual(obj.axis_units[1], _val)
 
     def test_dataset_creation(self):
         _array = np.random.random((10, 10, 10))

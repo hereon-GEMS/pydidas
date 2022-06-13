@@ -170,7 +170,8 @@ class ViewResultsMixin:
             self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
             force_string_metadata=True,
-        ).squeeze()
+            squeeze=True,
+        )
         self._data_axlabels = _data.axis_labels.copy()
         self._data_axunits = _data.axis_units.copy()
         if self._config["plot_type"] == "group of 1D plots":
@@ -251,7 +252,7 @@ class ViewResultsMixin:
         """
         _plot = self._widgets["plot1d"]
         if not isinstance(data.axis_ranges[0], np.ndarray):
-            data.axis_ranges[0] = np.arange(data.size)
+            data.update_axis_ranges(0, np.arange(data.size))
         _plot.addCurve(
             data.axis_ranges[0],
             data.array,
@@ -274,7 +275,7 @@ class ViewResultsMixin:
         _plot = self._widgets["plot2d"]
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
-                data.axis_ranges[_dim] = np.arange(data.shape[_dim])
+                data.update_axis_ranges(_dim, np.arange(data.shape[_dim]))
         _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()

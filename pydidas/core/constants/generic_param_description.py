@@ -612,7 +612,7 @@ GENERIC_PARAM_DESCRIPTION = {
             "The scan dimensionality. This defines the number of processed dimensions."
         ),
     },
-    "scan_name": {
+    "scan_title": {
         "type": str,
         "default": "",
         "name": "Scan name/title",
@@ -624,7 +624,7 @@ GENERIC_PARAM_DESCRIPTION = {
             "reference in result exporters."
         ),
     },
-    "scan_dir_1": {
+    "scan_label_1": {
         "type": str,
         "default": "",
         "name": "Name of scan direction 1",
@@ -675,7 +675,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "allow_None": False,
         "tooltip": ("The unit of the movement / steps / offset in scan direction 1."),
     },
-    "scan_dir_2": {
+    "scan_label_2": {
         "type": str,
         "default": "",
         "name": "Name of scan direction 2",
@@ -726,7 +726,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "allow_None": False,
         "tooltip": ("The unit of the movement / steps / offset in scan direction 2."),
     },
-    "scan_dir_3": {
+    "scan_label_3": {
         "type": str,
         "default": "",
         "name": "Name of scan direction 3",
@@ -777,7 +777,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "allow_None": False,
         "tooltip": ("The unit of the movement / steps / offset in scan direction 3."),
     },
-    "scan_dir_4": {
+    "scan_label_4": {
         "type": str,
         "default": "",
         "name": "Name of scan direction 4",

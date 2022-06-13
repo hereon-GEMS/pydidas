@@ -42,11 +42,11 @@ class _ScanSetup(ObjectWithParameterCollection):
 
     default_params = get_generic_param_collection(
         "scan_dim",
-        "scan_name",
-        "scan_dir_1",
-        "scan_dir_2",
-        "scan_dir_3",
-        "scan_dir_4",
+        "scan_title",
+        "scan_label_1",
+        "scan_label_2",
+        "scan_label_3",
+        "scan_label_4",
         "n_points_1",
         "n_points_2",
         "n_points_3",
@@ -150,7 +150,7 @@ class _ScanSetup(ObjectWithParameterCollection):
         range : np.ndarray
             The numerical positions of the scan.
         """
-        _label = self.get_param_value(f"scan_dir_{index}")
+        _label = self.get_param_value(f"scan_label_{index}")
         _unit = self.get_param_value(f"unit_{index}")
         _range = self.get_range_for_dim(index)
         return _label, _unit, _range
@@ -179,6 +179,24 @@ class _ScanSetup(ObjectWithParameterCollection):
         _df = self.get_param_value(f"delta_{index}")
         _n = self.get_param_value(f"n_points_{index}")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
+
+    def update_from_dictionary(self, scan_dict):
+        """
+        Update scen ScanSetup from an imported dictionary.
+
+        Parameters
+        ----------
+        scan_dict : dict
+            The dictionary with the data to import.
+        """
+        if scan_dict == {}:
+            return
+        self.set_param_value("scan_title", scan_dict["scan_title"])
+        self.set_param_value("scan_dim", scan_dict["scan_dim"])
+        for _dim in range(self.get_param_value("scan_dim")):
+            _curr_dim_info = scan_dict[_dim]
+            for _entry in ["scan_label", "unit", "offset", "delta", "n_points"]:
+                self.set_param_value(f"{_entry}_{_dim + 1}", _curr_dim_info[_entry])
 
     @property
     def shape(self):
@@ -241,7 +259,7 @@ class _ScanSetup(ObjectWithParameterCollection):
     @staticmethod
     def export_to_file(filename, overwrite=False):
         """
-        Import ScanSetup from a file.
+        Export ScanSetup to a file.
 
         Parameters
         ----------
@@ -252,6 +270,8 @@ class _ScanSetup(ObjectWithParameterCollection):
             False.
         """
         ScanSetupIoMeta.export_to_file(filename, overwrite=overwrite)
+
+
 
 
 ScanSetup = SingletonFactory(_ScanSetup)

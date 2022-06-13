@@ -74,7 +74,7 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
         of scan dimensions.
         """
         _prefixes = [
-            "scan_dir_{n}",
+            "scan_label_{n}",
             "n_points_{n}",
             "delta_{n}",
             "unit_{n}",

@@ -80,7 +80,7 @@ Each dimension is described by a total of five Parameters:
       - type
       - default
       - description
-    * - scan_dir_i
+    * - scan_label_i
       - str
       - [empty str]
       - The axis name for scan direction 1. This information will only be used 
@@ -119,12 +119,12 @@ the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, ...,
     >>> import pydidas
     >>> SCAN = pydidas.experiment.ScanSetup()
     >>> SCAN.set_param_value('scan_dim', 2)
-    >>> SCAN.set_param_value('scan_dir_1', 'x')
+    >>> SCAN.set_param_value('scan_label_1', 'x')
     >>> SCAN.set_param_value('n_points_1', 25)
     >>> SCAN.set_param_value('delta_1', 0.5)
     >>> SCAN.set_param_value('offset_1', -12.0)
     >>> SCAN.set_param_value('unit_1', 'mm')
-    >>> SCAN.set_param_value('scan_dir_2', 'x')
+    >>> SCAN.set_param_value('scan_label_2', 'x')
     >>> SCAN.set_param_value('n_points_2', 100)
     >>> SCAN.set_param_value('delta_2', 75)
     >>> SCAN.set_param_value('offset_2', 150)

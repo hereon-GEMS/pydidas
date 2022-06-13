@@ -103,7 +103,7 @@ class ScanSetupFrameBuilder(BaseFrame):
             width_unit=0,
         )
         self.create_param_widget(
-            SCAN_SETTINGS.get_param("scan_name"),
+            SCAN_SETTINGS.get_param("scan_title"),
             width_text=self.TEXT_WIDTH,
             width_io=_width_total - 20,
             linebreak=True,
@@ -112,7 +112,7 @@ class ScanSetupFrameBuilder(BaseFrame):
         )
 
         _rowoffset = self.next_row()
-        _prefixes = ["scan_dir_", "n_points_", "delta_", "unit_", "offset_"]
+        _prefixes = ["scan_label_", "n_points_", "delta_", "unit_", "offset_"]
         for i_dim in range(4):
             self.create_label(
                 f"title_{i_dim + 1}",

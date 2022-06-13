@@ -7,7 +7,7 @@ List of all ScanSetup Parameters
 - scan_name (type: str, default: '', unit: '')
     The scan name or title. This is used exclusively for reference in
     result exporters.
-- scan_dir_1 (type: str, default: '', unit: '')
+- scan_label_1 (type: str, default: '', unit: '')
     The axis name for scan direction 1. This information will only be used
     for labelling.
 - n_points_1 (type: int, default: 0, unit: '')
@@ -19,7 +19,7 @@ List of all ScanSetup Parameters
     counter / motor position for scan step #0).
 - unit_1 (type: str, default: '', unit: '')
     The unit of the movement / steps / offset in scan direction 1.
-- scan_dir_2 (type: str, default: '', unit: '')
+- scan_label_2 (type: str, default: '', unit: '')
     The axis name for scan direction 2. This information will only be used
     for labelling.
 - n_points_2 (type: int, default: 0, unit: '')
@@ -31,7 +31,7 @@ List of all ScanSetup Parameters
     counter / motor position for scan step #0).
 - unit_2 (type: str, default: '', unit: '')
     The unit of the movement / steps / offset in scan direction 2.
-- scan_dir_3 (type: str, default: '', unit: '')
+- scan_label_3 (type: str, default: '', unit: '')
     The axis name for scan direction 3. This information will only be used
     for labelling.
 - n_points_3 (type: int, default: 0, unit: '')
@@ -43,7 +43,7 @@ List of all ScanSetup Parameters
     counter / motor position for scan step #0).
 - unit_3 (type: str, default: '', unit: '')
     The unit of the movement / steps / offset in scan direction 3.
-- scan_dir_4 (type: str, default: '', unit: '')
+- scan_label_4 (type: str, default: '', unit: '')
     The axis name for scan direction 4. This information will only be used
     for labelling.
 - n_points_4 (type: int, default: 0, unit: '')

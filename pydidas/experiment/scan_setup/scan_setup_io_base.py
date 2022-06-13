@@ -50,11 +50,11 @@ class ScanSetupIoBase(GenericIoBase, metaclass=ScanSetupIoMeta):
         """
         if "scan_dim" not in cls.imported_params:
             raise KeyError('The scan dimension key "scan_dim" is missing.')
-        if "scan_name" not in cls.imported_params:
-            raise KeyError('The scan name key "scan_name" is missing.')
+        if "scan_title" not in cls.imported_params:
+            raise KeyError('The scan name key "scan_title" is missing.')
         n_dim = cls.imported_params.get("scan_dim")
         for _dim in range(1, n_dim + 1):
-            for _key in ["scan_dir", "n_points", "delta", "unit", "offset"]:
+            for _key in ["scan_label", "n_points", "delta", "unit", "offset"]:
                 _item = f"{_key}_{_dim}"
                 if _item not in cls.imported_params:
                     raise KeyError(f'The setting for "{_item}" is missing.')

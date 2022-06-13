@@ -69,5 +69,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             ),
             gridPos=(0, 1, 2, 1),
         )
-        self.create_button("but_load", "Import workflow from file", gridPos=(2, 1, 1, 1))
+        self.create_button(
+            "but_load", "Import workflow from file", gridPos=(2, 1, 1, 1)
+        )
         self.create_button("but_save", "Export workflow to file", gridPos=(3, 1, 1, 1))

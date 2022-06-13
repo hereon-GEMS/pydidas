@@ -351,4 +351,6 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         if _target_dims != _dims_larger_one:
             raise AppConfigError(
                 "The dimensionality of the selected data subset does not match "
+                f"the specified dimension. Specified dimensionality: {_dims_larger_one}"
+                f"; Target dimensionality: {_target_dims}."
             )

@@ -336,7 +336,7 @@ def convert_data_for_writing_to_hdf5_dataset(data):
     return data
 
 
-def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None):
+def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None, return_dataset=True):
     """
     Read and decode hdf5 dataset.
 
@@ -352,10 +352,12 @@ def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None):
         The input dataset. If the group and dataset are not given, this will be
         interpreted as the full access path to the dataset.
     group : Union[None, str]
-
-
+        The hdf5 group of the dataset.
     dataset : h5py.Dataset
         The input dataset.
+    return_dataset : bool, optional
+        Flag to toggle returning arrays as pydidas.core.Dataset. If False, generic
+        np.ndarrays are returned. The default is True.
 
     Returns
     -------
@@ -370,6 +372,6 @@ def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None):
         _data = _data.decode("UTF-8")
         if _data == "::None::":
             return None
-    if isinstance(_data, np.ndarray):
+    if isinstance(_data, np.ndarray) and return_dataset:
         return Dataset(_data)
     return _data

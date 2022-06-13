@@ -194,18 +194,18 @@ class TestScanSetup(unittest.TestCase):
             "scan_dim": 2,
             0: {
                 "scan_label": get_random_string(5),
-                 "unit": get_random_string(3),
-                 "delta": 1,
-                 "offset": -5,
-                 "n_points": 42
-                 },
+                "unit": get_random_string(3),
+                "delta": 1,
+                "offset": -5,
+                "n_points": 42,
+            },
             1: {
                 "scan_label": get_random_string(5),
-                 "unit": get_random_string(3),
-                 "delta": 3,
-                 "offset": 12,
-                 "n_points": 8
-                 }
+                "unit": get_random_string(3),
+                "delta": 3,
+                "offset": 12,
+                "n_points": 8,
+            },
         }
         SCAN = _ScanSetup()
         SCAN.update_from_dictionary(_scan)
@@ -214,8 +214,7 @@ class TestScanSetup(unittest.TestCase):
         for _dim in [0, 1]:
             for _entry in ["scan_label", "unit", "offset", "delta", "n_points"]:
                 self.assertEqual(
-                    _scan[_dim][_entry],
-                    SCAN.get_param_value(f"{_entry}_{_dim + 1}")
+                    _scan[_dim][_entry], SCAN.get_param_value(f"{_entry}_{_dim + 1}")
                 )
 
 

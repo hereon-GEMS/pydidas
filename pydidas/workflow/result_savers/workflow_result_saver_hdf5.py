@@ -293,8 +293,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             _axranges = []
             for _dim in range(_data.ndim):
                 _rangeentry = read_and_decode_hdf5_dataset(
-                    _file[f"entry/data/axis_{_dim}/range"],
-                    return_dataset=False
+                    _file[f"entry/data/axis_{_dim}/range"], return_dataset=False
                 )
                 _range = (
                     None
@@ -317,8 +316,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             }
             for _dim in range(_scan_ndim):
                 _range = read_and_decode_hdf5_dataset(
-                    _file[f"entry/scan/dim_{_dim}/range"],
-                    return_dataset=False
+                    _file[f"entry/scan/dim_{_dim}/range"], return_dataset=False
                 )
                 _unit = read_and_decode_hdf5_dataset(
                     _file[f"entry/scan/dim_{_dim}/unit"]

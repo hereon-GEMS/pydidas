@@ -272,6 +272,4 @@ class _ScanSetup(ObjectWithParameterCollection):
         ScanSetupIoMeta.export_to_file(filename, overwrite=overwrite)
 
 
-
-
 ScanSetup = SingletonFactory(_ScanSetup)

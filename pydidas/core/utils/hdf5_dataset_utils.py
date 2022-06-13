@@ -336,7 +336,9 @@ def convert_data_for_writing_to_hdf5_dataset(data):
     return data
 
 
-def read_and_decode_hdf5_dataset(h5object, group=None, dataset=None, return_dataset=True):
+def read_and_decode_hdf5_dataset(
+    h5object, group=None, dataset=None, return_dataset=True
+):
     """
     Read and decode hdf5 dataset.
 

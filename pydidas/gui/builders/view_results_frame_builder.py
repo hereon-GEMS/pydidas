@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ["ViewResultsFrameBuilder"]
 
 from qtpy import QtWidgets
-from silx.gui.plot import Plot1D, Plot2D
+from silx.gui.plot import Plot1D
 
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
@@ -37,6 +37,7 @@ from ...core.constants import (
 from ...widgets import ScrollArea, BaseFrame
 from ...widgets.selection import ResultSelectionWidget
 from ...widgets.parameter_config import ParameterEditFrame
+from ...widgets.silx_plot import PydidasPlot2D
 
 
 class ViewResultsFrameBuilder(BaseFrame):
@@ -160,7 +161,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         self._widgets["plot1d"] = Plot1D()
         self._widgets["plot1d"].getRoiAction().setVisible(False)
         self._widgets["plot1d"].getFitAction().setVisible(False)
-        self._widgets["plot2d"] = Plot2D()
+        self._widgets["plot2d"] = PydidasPlot2D()
         self.add_any_widget(
             "plot_stack",
             QtWidgets.QStackedWidget(),

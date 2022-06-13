@@ -28,8 +28,10 @@ __all__ = ["CentralWidgetStack"]
 
 from qtpy import QtWidgets
 
+from ..core import SingletonFactory
 
-class CentralWidgetStack(QtWidgets.QStackedWidget):
+
+class _CentralWidgetStack(QtWidgets.QStackedWidget):
     """
     The _CentralWidgetStack is a QStackedWidget with references to all
     the possible top level widgets.
@@ -298,3 +300,6 @@ class CentralWidgetStack(QtWidgets.QStackedWidget):
             del self.widget_indices[name]
             self.widget_indices[new_name] = index
             self.widget(index).ref_name = new_name
+
+
+CentralWidgetStack = SingletonFactory(_CentralWidgetStack)

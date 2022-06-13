@@ -30,10 +30,18 @@ from . import dialogues
 from . import factory
 from . import parameter_config
 from . import selection
+from . import silx_plot
 from . import workflow_edit
 
 __all__.extend(
-    ["dialogues", "factory", "parameter_config", "selection", "workflow_edit"]
+    [
+        "dialogues",
+        "factory",
+        "parameter_config",
+        "selection",
+        "workflow_edit",
+        "silx_plot",
+    ]
 )
 
 # explicitly import items from subpackages into the module:

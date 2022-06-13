@@ -68,7 +68,7 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
         self.__items = [self.itemText(i) for i in range(self.count())]
         self.currentIndexChanged.connect(self.emit_signal)
         self.set_value(param.value)
-        self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items ) + 50)
+        self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)
 
     def __convert_bool(self, value):
         """

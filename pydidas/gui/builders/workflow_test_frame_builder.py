@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ["WorkflowTestFrameBuilder"]
 
 from qtpy import QtWidgets, QtCore
-from silx.gui.plot import Plot1D, Plot2D
+from silx.gui.plot import Plot1D
 
 from ...widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
 from ...core.constants import (
@@ -36,6 +36,7 @@ from ...core.constants import (
     EXP_EXP_POLICY,
 )
 from ...widgets.parameter_config import ParameterEditFrame
+from ...widgets.silx_plot import PydidasPlot2D
 
 
 class WorkflowTestFrameBuilder(BaseFrame):
@@ -177,7 +178,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         self._widgets["plot1d"] = Plot1D()
         self._widgets["plot1d"].getRoiAction().setVisible(False)
         self._widgets["plot1d"].getFitAction().setVisible(False)
-        self._widgets["plot2d"] = Plot2D()
+        self._widgets["plot2d"] = PydidasPlot2D()
         self.add_any_widget(
             "plot_stack",
             QtWidgets.QStackedWidget(),

@@ -66,6 +66,7 @@ class TestCentralWidgetStack(unittest.TestCase):
 
     def create_stack(self):
         stack = CentralWidgetStack()
+        stack.reset()
         for i in range(4):
             w = TestWidget()
             stack.register_widget(w.name, w)

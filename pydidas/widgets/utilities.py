@@ -28,7 +28,7 @@ __all__ = [
     "apply_widget_properties",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str_reference",
-    "get_max_pixel_width_of_entries"
+    "get_max_pixel_width_of_entries",
 ]
 
 

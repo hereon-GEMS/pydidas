@@ -254,10 +254,17 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         data_dict : dict
             The dictionary with the data. Keys are the respective node IDs and dict
             values is the imported data.
+        labels : dict
+            The labels for the imported nodes.
+        data_labels : dict
+            The labels for the Datasets.
+        scan : dict
+            The dictionary with information about the Scan.
         """
         _data_dict = {}
         _labels = {}
         _data_labels = {}
+        _scan = {}
         _files = [
             _file
             for _file in os.listdir(dirname)
@@ -272,8 +279,10 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
             _path = os.path.join(dirname, _file)
-            _data, _label, _data_label = _importer.import_results_from_file(_path)
+            _data, _label, _data_label, _scan = _importer.import_results_from_file(
+                _path
+            )
             _data_dict[_node_id] = _data
             _labels[_node_id] = _label
             _data_labels[_node_id] = _data_label
-        return _data_dict, _labels, _data_labels
+        return _data_dict, _labels, _data_labels, _scan

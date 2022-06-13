@@ -67,7 +67,7 @@ class TestWorkflowResults(unittest.TestCase):
             SCAN.set_param_value(f"offset_{_dim + 1}", self._scan_offsets[_dim])
             SCAN.set_param_value(f"delta_{_dim + 1}", self._scan_delta[_dim])
             SCAN.set_param_value(f"unit_{_dim + 1}", self._scan_unit[_dim])
-            SCAN.set_param_value(f"scan_dir_{_dim + 1}", self._scan_label[_dim])
+            SCAN.set_param_value(f"scan_label_{_dim + 1}", self._scan_label[_dim])
 
     def set_up_tree(self):
         self._input_shape = (127, 324)
@@ -113,9 +113,12 @@ class TestWorkflowResults(unittest.TestCase):
         with h5py.File(filename, "w") as _file:
             _file.create_group("entry")
             _file.create_group("entry/data")
+            _file.create_group("entry/scan")
             _file["entry"].create_dataset("data_label", data=_data_label)
             _file["entry"].create_dataset("label", data=_label)
+            _file["entry"].create_dataset("title", data=get_random_string(8))
             _file["entry/data"].create_dataset("data", data=_data)
+            _file["entry/scan"].create_dataset("scan_dimension", data=2)
             for _dim in range(3):
                 create_hdf5_dataset(
                     _file,
@@ -134,6 +137,25 @@ class TestWorkflowResults(unittest.TestCase):
                     f"entry/data/axis_{_dim}",
                     "range",
                     data=_data_ranges[_dim],
+                )
+            for _dim in range(2):
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/scan/dim_{_dim}",
+                    "range",
+                    data=_data_ranges[_dim],
+                )
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/scan/dim_{_dim}",
+                    "label",
+                    data=_data_labels[_dim],
+                )
+                create_hdf5_dataset(
+                    _file,
+                    f"entry/scan/dim_{_dim}",
+                    "unit",
+                    data=_data_units[_dim],
                 )
             _meta = {
                 "data": _data,
@@ -306,6 +328,14 @@ class TestWorkflowResults(unittest.TestCase):
         _res = RES.get_result_subset(_node_id, _slice)
         self.assertIsInstance(_res, np.ndarray)
         self.assertEqual(_res.shape, (self._scan_n[0], 1, self._scan_n[2]))
+
+    def test_get_result_subset__no_flatten_w_array_indices_squeezed(self):
+        RES.update_shapes_from_scan_and_workflow()
+        _slice = (np.arange(self._scan_n[0]), [0], np.arange(self._scan_n[2]), 0, 0)
+        _node_id = 1
+        _res = RES.get_result_subset(_node_id, _slice, squeeze=True)
+        self.assertIsInstance(_res, np.ndarray)
+        self.assertEqual(_res.shape, (self._scan_n[0], self._scan_n[2]))
 
     def test_get_result_subset__flatten_single_point(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -537,7 +567,10 @@ class TestWorkflowResults(unittest.TestCase):
     def test_import_data_from_directory__empty_dir(self):
         RES.update_shapes_from_scan_and_workflow()
         RES.import_data_from_directory(self._tmpdir)
+        _scan_title = get_random_string(8)
+        SCAN.set_param_value("scan_title", _scan_title)
         self.assertEqual(RES.shapes, {})
+        self.assertEqual(SCAN.get_param_value("scan_title"), _scan_title)
 
     def test_import_data_from_directory__with_files(self):
         RES.update_shapes_from_scan_and_workflow()

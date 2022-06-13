@@ -35,7 +35,7 @@ SCAN = ScanSetup()
 SCAN_IO = ScanSetupIoBase
 
 
-class TestScanSettingsIoBase(unittest.TestCase):
+class TestScanSetupIoBase(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(_test_dir, "_data", "load_test_scan_setup_")

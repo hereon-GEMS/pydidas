@@ -284,7 +284,12 @@ class _WorkflowResults(QtCore.QObject):
         return _data
 
     def get_result_subset(
-        self, node_id, slices, flattened_scan_dim=False, force_string_metadata=False
+        self,
+        node_id,
+        slices,
+        flattened_scan_dim=False,
+        force_string_metadata=False,
+        squeeze=False,
     ):
         """
         Get a slices subset of a node_id result.
@@ -303,6 +308,8 @@ class _WorkflowResults(QtCore.QObject):
         force_string_metadata : bool, optional
             Keyword to force all metadata to be converted to strings. This will
             replace any None entries with empty strings. The default is False.
+        squeeze : bool, optional
+            Keyword to toggle squeezing of the final dataset.
 
         Returns
         -------
@@ -336,6 +343,8 @@ class _WorkflowResults(QtCore.QObject):
                 (str(_val) if _val is not None else "")
                 for _val in _data.axis_labels.values()
             ]
+        if squeeze:
+            return _data.squeeze()
         return _data
 
     def get_result_metadata(self, node_id):
@@ -427,7 +436,7 @@ class _WorkflowResults(QtCore.QObject):
             enabled.
         """
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
-        _name = SCAN.get_param_value("scan_name")
+        _name = SCAN.get_param_value("scan_title")
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _shapes = self.shapes
@@ -558,7 +567,7 @@ class _WorkflowResults(QtCore.QObject):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _data, _labels, _data_labels = RESULT_SAVER.import_data_from_directory(
+        _data, _labels, _data_labels, _scan = RESULT_SAVER.import_data_from_directory(
             directory
         )
         self._config = {
@@ -568,6 +577,7 @@ class _WorkflowResults(QtCore.QObject):
             "metadata_complete": True,
         }
         self.__composites = _data
+        SCAN.update_from_dictionary(_scan)
 
 
 WorkflowResults = SingletonFactory(_WorkflowResults)

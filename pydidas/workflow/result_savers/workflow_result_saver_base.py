@@ -140,5 +140,16 @@ class WorkflowResultSaverBase(GenericIoBase, metaclass=WorkflowResultSaverMeta):
         ------
         NotImplementedError
             This method needs to be implemented by each concrete subclass.
+
+        Returns
+        -------
+        data : pydidas.core.Dataset
+            The dataset with the imported data.
+        label : str
+            The node's label.
+        data_label : str
+            The node's data label.
+        scan : dict
+            The dictionary with meta information about the scan.
         """
         raise NotImplementedError

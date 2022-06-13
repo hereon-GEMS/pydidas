@@ -27,6 +27,7 @@ __all__ = ["WorkflowResultSaverHdf5"]
 import os
 
 import h5py
+import numpy as np
 
 from ...experiment import ExperimentalSetup, ScanSetup
 from ...core import Dataset
@@ -127,7 +128,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 [
                     f"entry/scan/dim_{_dim}",
                     "label",
-                    {"data": scanval(f"scan_dir_{_dim + 1}")},
+                    {"data": scanval(f"scan_label_{_dim + 1}")},
                 ]
             )
             _dsets.append(
@@ -280,6 +281,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             The node's label.
         data_label : str
             The node's data label.
+        scan : dict
+            The dictionary with meta information about the scan.
         """
         with h5py.File(filename, "r") as _file:
             _data = Dataset(_file["entry/data/data"][()])
@@ -290,7 +293,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             _axranges = []
             for _dim in range(_data.ndim):
                 _rangeentry = read_and_decode_hdf5_dataset(
-                    _file[f"entry/data/axis_{_dim}/range"]
+                    _file[f"entry/data/axis_{_dim}/range"],
+                    return_dataset=False
                 )
                 _range = (
                     None
@@ -304,7 +308,40 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 _axlabels.append(
                     read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/label"])
                 )
+            _scan_ndim = read_and_decode_hdf5_dataset(
+                _file["entry/scan/scan_dimension"]
+            )
+            _scan = {
+                "scan_title": read_and_decode_hdf5_dataset(_file["entry/title"]),
+                "scan_dim": _scan_ndim,
+            }
+            for _dim in range(_scan_ndim):
+                _range = read_and_decode_hdf5_dataset(
+                    _file[f"entry/scan/dim_{_dim}/range"],
+                    return_dataset=False
+                )
+                _unit = read_and_decode_hdf5_dataset(
+                    _file[f"entry/scan/dim_{_dim}/unit"]
+                )
+                _unit = _unit if _unit is not None else ""
+                _dimlabel = read_and_decode_hdf5_dataset(
+                    _file[f"entry/scan/dim_{_dim}/label"]
+                )
+                _dimlabel = _dimlabel if _dimlabel is not None else ""
+                _scandim = {
+                    "scan_label": _dimlabel,
+                    "unit": _unit,
+                    "n_points": _data.shape[_dim],
+                }
+                if isinstance(_range, np.ndarray):
+                    _scandim = _scandim | {
+                        "delta": _range[1] - _range[0],
+                        "offset": _range[0],
+                    }
+                else:
+                    _scandim = _scandim | {"delta": 1, "offset": 0}
+                _scan[_dim] = _scandim
         _data.axis_units = _axunits
         _data.axis_labels = _axlabels
         _data.axis_ranges = _axranges
-        return _data, _label, _data_label
+        return _data, _label, _data_label, _scan

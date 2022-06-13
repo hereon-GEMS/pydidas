@@ -64,7 +64,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
             SCAN.set_param_value(f"offset_{_dim + 1}", self._scan_offsets[_dim])
             SCAN.set_param_value(f"delta_{_dim + 1}", self._scan_delta[_dim])
             SCAN.set_param_value(f"unit_{_dim + 1}", self._scan_unit[_dim])
-            SCAN.set_param_value(f"scan_dir_{_dim + 1}", self._scan_label[_dim])
+            SCAN.set_param_value(f"scan_label_{_dim + 1}", self._scan_label[_dim])
 
     def set_up_tree(self):
         self._result1_shape = (12, 27)

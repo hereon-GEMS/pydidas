@@ -111,7 +111,7 @@ class TestScanSetup(unittest.TestCase):
         _label = get_random_string(20)
         SCAN = _ScanSetup()
         SCAN.set_param_value(f"unit_{_index + 1}", _unit)
-        SCAN.set_param_value(f"scan_dir_{_index + 1}", _label)
+        SCAN.set_param_value(f"scan_label_{_index + 1}", _label)
         self.set_scan_params(SCAN)
         _scanlabel, _scanunit, _range = SCAN.get_metadata_for_dim(_index + 1)
         self.assertEqual(_scanlabel, _label)
@@ -174,6 +174,49 @@ class TestScanSetup(unittest.TestCase):
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
         self.assertEqual(_index, _frame)
+
+    def test_update_from_dictionary__missing_dim(self):
+        _scan = {"scan_title": get_random_string(8), "scan_dim": 2}
+        SCAN = _ScanSetup()
+        with self.assertRaises(KeyError):
+            SCAN.update_from_dictionary(_scan)
+
+    def test_update_from_dictionary__empty_input(self):
+        _title = get_random_string(8)
+        SCAN = _ScanSetup()
+        SCAN.set_param_value("scan_title", _title)
+        SCAN.update_from_dictionary({})
+        self.assertEqual(SCAN.get_param_value("scan_title"), _title)
+
+    def test_update_from_dictionary__all_entries_present(self):
+        _scan = {
+            "scan_title": get_random_string(8),
+            "scan_dim": 2,
+            0: {
+                "scan_label": get_random_string(5),
+                 "unit": get_random_string(3),
+                 "delta": 1,
+                 "offset": -5,
+                 "n_points": 42
+                 },
+            1: {
+                "scan_label": get_random_string(5),
+                 "unit": get_random_string(3),
+                 "delta": 3,
+                 "offset": 12,
+                 "n_points": 8
+                 }
+        }
+        SCAN = _ScanSetup()
+        SCAN.update_from_dictionary(_scan)
+        self.assertEqual(SCAN.get_param_value("scan_title"), _scan["scan_title"])
+        self.assertEqual(SCAN.get_param_value("scan_dim"), _scan["scan_dim"])
+        for _dim in [0, 1]:
+            for _entry in ["scan_label", "unit", "offset", "delta", "n_points"]:
+                self.assertEqual(
+                    _scan[_dim][_entry],
+                    SCAN.get_param_value(f"{_entry}_{_dim + 1}")
+                )
 
 
 if __name__ == "__main__":

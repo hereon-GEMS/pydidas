@@ -288,6 +288,16 @@ class Test_Hdf5_dataset_utils(unittest.TestCase):
         self.assertIsInstance(_out, Dataset)
         self.assertTrue(np.allclose(_out, _input))
 
+    def test_read_and_decode_hdf5_dataset__ndarray_without_return_dataset(self):
+        _input = np.random.random((30, 30))
+        with h5py.File(self._fname("dummy"), "w") as _file:
+            _group = _file.create_group("entry")
+            _dset = _group.create_dataset("test", data=_input)
+            _out = read_and_decode_hdf5_dataset(_dset, return_dataset=False)
+        self.assertIsInstance(_out, np.ndarray)
+        self.assertFalse(isinstance(_out, Dataset))
+        self.assertTrue(np.allclose(_out, _input))
+
     def test_read_and_decode_hdf5_dataset__list(self):
         _input = [1, 2, 3]
         with h5py.File(self._fname("dummy"), "w") as _file:

@@ -147,13 +147,14 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if not self._check_tree_is_populated():
             return
-        _index = self.__get_index()
-        self._tree.execute_process(_index, force_store_results=True)
-        self.__store_tree_results()
-        self.__update_selection_choices()
-        if self._active_node != -1:
-            self.__update_text_description_of_node_results()
-            self.__plot_results()
+        with utils.ShowBusyMouse():
+            _index = self.__get_index()
+            self._tree.execute_process(_index, force_store_results=True)
+            self.__store_tree_results()
+            self.__update_selection_choices()
+            if self._active_node != -1:
+                self.__update_text_description_of_node_results()
+                self.__plot_results()
 
     def _check_tree_is_populated(self):
         """

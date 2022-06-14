@@ -39,6 +39,7 @@ from .hdf5_dataset_utils import *
 from .logger_ import *
 from .rebin_ import *
 from .set_default_plugin_dir_ import *
+from .show_busy_mouse import *
 from .signal_blocker import *
 from .sphinx_html import *
 from .str_utils import *
@@ -111,6 +112,11 @@ from . import set_default_plugin_dir_
 
 __all__.extend(set_default_plugin_dir_.__all__)
 del set_default_plugin_dir_
+
+from . import show_busy_mouse
+
+__all__.extend(show_busy_mouse.__all__)
+del show_busy_mouse
 
 from . import signal_blocker
 

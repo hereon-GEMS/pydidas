@@ -100,6 +100,9 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
 
         self.create_label("section_plotting", "Display settings", **_section_options)
         self.create_param_widget(self.get_param("plot_update_time"), **_options)
+        self.create_param_widget(
+            self.get_param("histogram_outlier_fraction"), **_options
+        )
         self.create_spacer("spacer_4")
 
         self.create_label("section_plugins", "Plugin paths", **_section_options)

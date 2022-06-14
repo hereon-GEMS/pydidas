@@ -1017,6 +1017,18 @@ GENERIC_PARAM_DESCRIPTION = {
             " will prevent multiple frequent update of plots."
         ),
     },
+    "histogram_outlier_fraction": {
+        "type": float,
+        "default": 0.07,
+        "name": "Histogram outlier fraction",
+        "choices": None,
+        "allow_None": False,
+        "unit": "",
+        "tooltip": (
+            "The fraction of pixels which will be ignored when cropping the histogram "
+            "for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger."
+        ),
+    },
     ############################
     # global choice settings
     ############################

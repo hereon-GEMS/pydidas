@@ -31,6 +31,7 @@ from silx.gui.plot.ImageView import ImageView
 
 from ...widgets import BaseFrame
 from ...widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
+from ...widgets.silx_plot import CropHistogramOutliers
 
 
 class DataBrowsingFrameBuilder(BaseFrame):
@@ -89,9 +90,7 @@ class DataBrowsingFrameBuilder(BaseFrame):
             parent_widget=self._widgets["selection"],
         )
 
-        self._widgets["viewer"] = ImageView()
-        self._widgets["viewer"].setData = self._widgets["viewer"].setImage
-        self._widgets["viewer"].setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        self._widgets["viewer"] = self._get_customized_image_view()
 
         self._widgets["hdf_dset"].register_view_widget(self._widgets["viewer"])
         self._widgets["splitter"] = QtWidgets.QSplitter()
@@ -101,3 +100,26 @@ class DataBrowsingFrameBuilder(BaseFrame):
         self._widgets["splitter"].addWidget(self._widgets["selection"])
         self._widgets["splitter"].addWidget(self._widgets["viewer"])
         self.layout().addWidget(self._widgets["splitter"])
+
+    def _get_customized_image_view(self):
+        """
+        Get the customized ImageView widget to browse data.
+
+        Returns
+        -------
+        ImageView
+            The customized ImageView instance.
+        """
+        _viewer = ImageView()
+        _viewer.setData = _viewer.setImage
+        _viewer.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+        _viewer.cropHistOutliersAction = _viewer.group.addAction(
+            CropHistogramOutliers(_viewer, parent=_viewer)
+        )
+        _viewer.cropHistOutliersAction.setVisible(True)
+        _viewer.addAction(_viewer.cropHistOutliersAction)
+        _viewer._toolbar.insertAction(
+            _viewer.keepDataAspectRatioAction, _viewer.cropHistOutliersAction
+        )
+        return _viewer

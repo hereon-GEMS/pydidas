@@ -39,4 +39,5 @@ QSETTINGS_GLOBAL_KEYS = [
     "mosaic_max_size",
     "plugin_path",
     "plot_update_time",
+    "histogram_outlier_fraction",
 ]

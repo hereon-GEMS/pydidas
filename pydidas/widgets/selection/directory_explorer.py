@@ -54,7 +54,6 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         self._filemodel.setRootPath(root_path)
         self._filemodel.setReadOnly(True)
         self.setModel(self._filemodel)
-        # self.header().setSortIndicator(0, QtCore.Qt.AscendingOrder)
         self.setAnimated(False)
         self.setIndentation(12)
         self.setSortingEnabled(True)
@@ -65,8 +64,8 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         self.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
         )
-        self.__expand_to_path(root_path)
         self.expanded.connect(self._sort_items)
+        self.__expand_to_path(root_path)
 
     def _get_stored_root_path(self):
         """

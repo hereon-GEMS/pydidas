@@ -40,7 +40,7 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
     Base class for WorkflowTree exporters.
     """
 
-    extensions = [".poni"]
+    extensions = ["poni"]
     format_name = "PONI"
 
     @classmethod

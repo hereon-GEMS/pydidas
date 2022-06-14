@@ -20,5 +20,6 @@ include requirements.txt
 include pyproject.toml
 include change.log
 include pydidas/core/icons/*.svg
+include pydidas/core/icons/*.png
 include pydidas/docs/make.bat
 include pydidas/docs/Makefile

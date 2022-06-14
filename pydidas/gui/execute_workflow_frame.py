@@ -62,7 +62,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
     def __init__(self, parent=None, **kwargs):
         ExecuteWorkflowFrameBuilder.__init__(self, parent, **kwargs)
         _global_plot_update_time = self.q_settings_get_global_value(
-            "plot_update_time", argtype=float
+            "plot_update_time", dtype=float
         )
         self._config.update(
             {

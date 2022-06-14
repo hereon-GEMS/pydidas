@@ -57,7 +57,7 @@ class PydidasQsettingsMixin:
     def __init__(self):
         self.q_settings = CopyableQSettings("Hereon", "pydidas")
 
-    def q_settings_get_global_value(self, key, argtype=None):
+    def q_settings_get_global_value(self, key, dtype=None):
         """
         Get the value from a QSetting.
 
@@ -66,19 +66,19 @@ class PydidasQsettingsMixin:
         key : str
             The QSetting reference key. A "global/" prefix will be applied
             to the selected key.
-        argtype : Union[type, None], optional
+        dtype : Union[type, None], optional
             A return datatype. If not None, the output will be returned as
-            argtype(value).
+            dtype(value).
 
         Returns
         -------
         value : object
             The value, converted to the type associated with the Parameter
-            referenced by param_key or argtype, if given.
+            referenced by param_key or dtype, if given.
         """
         _value = self.q_settings.value(f"global/{key}")
-        if argtype is not None:
-            return argtype(_value)
+        if dtype is not None:
+            return dtype(_value)
         return self._qsettings_convert_value_type(key, _value)
 
     def _qsettings_convert_value_type(self, key, value):

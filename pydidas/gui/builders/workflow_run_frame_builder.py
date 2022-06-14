@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExecuteWorkflowFrameBuilder class which is used to
-populate the ExecuteWorkflowFrame with widgets.
+Module with the WorkflowRunFrameBuilder class which is used to
+populate the WorkflowRunFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExecuteWorkflowFrameBuilder"]
+__all__ = ["WorkflowRunFrameBuilder"]
 
 from qtpy import QtWidgets
 from silx.gui.plot import Plot1D
@@ -40,7 +40,7 @@ from ...widgets.parameter_config import ParameterEditFrame
 from ...widgets.silx_plot import PydidasPlot2D
 
 
-class ExecuteWorkflowFrameBuilder(BaseFrameWithApp):
+class WorkflowRunFrameBuilder(BaseFrameWithApp):
     """
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.

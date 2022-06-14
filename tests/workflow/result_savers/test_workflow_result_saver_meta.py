@@ -28,7 +28,7 @@ import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.experiment import ScanSetup
+from pydidas.experiment import SetupScan
 from pydidas.workflow.result_savers import (
     WorkflowResultSaverBase,
     WorkflowResultSaverMeta,
@@ -36,7 +36,7 @@ from pydidas.workflow.result_savers import (
 
 
 TREE = WorkflowTree()
-SCAN = ScanSetup()
+SCAN = SetupScan()
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
 

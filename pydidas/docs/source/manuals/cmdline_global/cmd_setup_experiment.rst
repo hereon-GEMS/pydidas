@@ -1,12 +1,12 @@
-.. _experimental_setup:
+.. _setup_experiment:
 
-The ExperimentalSetup class
+The SetupExperiment class
 ===========================
 
 Introduction
 ------------
 
-The :py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>`
+The :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`
 is the pydidas Singleton instance of the ``_ExpSetup`` class. It is
 used for storing and accessing global information about the experimental setup.
 Stored information include
@@ -17,16 +17,16 @@ Stored information include
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`experimental_setup_parameters`\ .
+given in :ref:`setup_experiment_parameters`\ .
 
 Its instance can be obtained by running the following code:
 
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
 
-Configuring the ExperimentalSetup
+Configuring the SetupExperiment
 ---------------------------------
 
 X-ray energy and wavelength
@@ -41,7 +41,7 @@ Please see also the example below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
     >>> EXP.get_param_value('xray_wavelength')
     1
     >>> EXP.get_param_value('xray_energy')
@@ -103,7 +103,7 @@ detector which is not inclued in pyFAI, by setting all Parameters values:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
     >>> EXP.set_param_value('detector_name', 'A detector with very small asymmetric pixels')
     >>> EXP.set_param_value('detector_npixx', 1024)
     >>> EXP.set_param_value('detector_npixy', 2048)
@@ -115,13 +115,13 @@ Using a pyFAI detector
 
 If the detector is defined in pyFAI, this library can be used to update the 
 detector settings automatically by giving the detector name in the 
-:py:meth:`set_detector_params_from_name <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.set_detector_params_from_name>`
+:py:meth:`set_detector_params_from_name <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.set_detector_params_from_name>`
 method:
 
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
     >>> EXP.set_detector_params_from_name('Eiger 9M')
     >>> EXP.get_param_value('detector_name')
     'Eiger 9M'
@@ -161,7 +161,7 @@ up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis;
 used to move the detector with respect to the origin (sample) are applied to 
 the detector to transform the detector geometry into the experimental geometry.
 
-The correspondence between pyFAI geometry and pydidas ExperimentalSetup
+The correspondence between pyFAI geometry and pydidas SetupExperiment
 Parameter names is given below:
 
 .. list-table::
@@ -198,7 +198,7 @@ given in the table above. For an example, see below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
     >>> EXP.set_param_value('detector_poni1', 0.114731)
     >>> EXP.set_param_value('detector_poni2', 0.123635)
     >>> EXP.set_param_value('detector_dist', 0.235885)
@@ -210,20 +210,20 @@ given in the table above. For an example, see below:
 Import and Export
 -----------------
 
-The ExperimentalSetup settings can be imported and exported to files, based on
+The SetupExperiment settings can be imported and exported to files, based on
 the available im-/exporters. The standard distribution ships with support for
 YAML files and pyFAI .poni files. Both types are supported for import and 
 export. The format will be determined automatically based on the file extension.
 
 Imports and exports are started by calling the 
-:py:meth:`import_from_file(filename) <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.import_from_file>`
+:py:meth:`import_from_file(filename) <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.import_from_file>`
 and 
-:py:meth:`export_to_file(filename) <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup.export_to_file>`,
+:py:meth:`export_to_file(filename) <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.export_to_file>`,
 respectively. The filename must include the absolute path to the file. 
 
 .. warning::
 
-    Importing the ``ExperimentalSetup`` from file will overwrite all current 
+    Importing the ``SetupExperiment`` from file will overwrite all current 
     values without confirmation asked.
 
 An example to demonstrate these methods is given below:
@@ -231,7 +231,7 @@ An example to demonstrate these methods is given below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.experiment.ExperimentalSetup()
+    >>> EXP = pydidas.experiment.SetupExperiment()
     >>> EXP.get_param_values_as_dict()
     {'xray_wavelength': 1,
      'xray_energy': 12.398,
@@ -283,6 +283,6 @@ An example to demonstrate these methods is given below:
      'detector_rot2': 0,
      'detector_rot3': 0}
 
-.. _experimental_setup_parameters:
+.. _setup_experiment_parameters:
 
-.. include:: ./experimental_setup_params.rst
+.. include:: ./setup_experiment_params.rst

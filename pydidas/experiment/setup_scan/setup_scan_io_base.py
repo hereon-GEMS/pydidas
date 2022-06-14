@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetupIoBase class which exporters/importers for the
-ScanSetup should inherit from.
+Module with the SetupScanIoBase class which exporters/importers for the
+SetupScan should inherit from.
 """
 
 __author__ = "Malte Storm"
@@ -23,19 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetupIoBase"]
+__all__ = ["SetupScanIoBase"]
 
 from ...core.io_registry import GenericIoBase
-from .scan_setup_io_meta import ScanSetupIoMeta
-from .scan_setup import ScanSetup
+from .setup_scan_io_meta import SetupScanIoMeta
+from .setup_scan import SetupScan
 
 
-SCAN = ScanSetup()
+SCAN = SetupScan()
 
 
-class ScanSetupIoBase(GenericIoBase, metaclass=ScanSetupIoMeta):
+class SetupScanIoBase(GenericIoBase, metaclass=SetupScanIoMeta):
     """
-    Base class for ScanSetup importer/exporters.
+    Base class for SetupScan importer/exporters.
     """
 
     extensions = []

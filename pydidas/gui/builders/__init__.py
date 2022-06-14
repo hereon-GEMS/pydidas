@@ -30,12 +30,12 @@ __all__ = []
 # import __all__ items from modules:
 from .composite_creator_frame_builder import *
 from .data_browsing_frame_builder import *
-from .execute_workflow_frame_builder import *
-from .experimental_setup_frame_builder import *
 from .global_configuration_frame_builder import *
 from .image_math_frame_builder import *
-from .scan_setup_frame_builder import *
+from .setup_experiment_frame_builder import *
+from .setup_scan_frame_builder import *
 from .workflow_edit_frame_builder import *
+from .workflow_run_frame_builder import *
 from .workflow_test_frame_builder import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -50,16 +50,6 @@ from . import data_browsing_frame_builder
 __all__.extend(data_browsing_frame_builder.__all__)
 del data_browsing_frame_builder
 
-from . import execute_workflow_frame_builder
-
-__all__.extend(execute_workflow_frame_builder.__all__)
-del execute_workflow_frame_builder
-
-from . import experimental_setup_frame_builder
-
-__all__.extend(experimental_setup_frame_builder.__all__)
-del experimental_setup_frame_builder
-
 from . import global_configuration_frame_builder
 
 __all__.extend(global_configuration_frame_builder.__all__)
@@ -70,15 +60,25 @@ from . import image_math_frame_builder
 __all__.extend(image_math_frame_builder.__all__)
 del image_math_frame_builder
 
-from . import scan_setup_frame_builder
+from . import setup_experiment_frame_builder
 
-__all__.extend(scan_setup_frame_builder.__all__)
-del scan_setup_frame_builder
+__all__.extend(setup_experiment_frame_builder.__all__)
+del setup_experiment_frame_builder
+
+from . import setup_scan_frame_builder
+
+__all__.extend(setup_scan_frame_builder.__all__)
+del setup_scan_frame_builder
 
 from . import workflow_edit_frame_builder
 
 __all__.extend(workflow_edit_frame_builder.__all__)
 del workflow_edit_frame_builder
+
+from . import workflow_run_frame_builder
+
+__all__.extend(workflow_run_frame_builder.__all__)
+del workflow_run_frame_builder
 
 from . import workflow_test_frame_builder
 

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExecuteWorkflowFrame which allows to run the full
+Module with the WorkflowRunFrame which allows to run the full
 processing workflow and visualize the results.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExecuteWorkflowFrame"]
+__all__ = ["WorkflowRunFrame"]
 
 import time
 
@@ -35,7 +35,7 @@ from ..core.utils import pydidas_logger
 from ..multiprocessing import AppRunner
 from ..widgets.dialogues import WarningBox
 from ..workflow import WorkflowResults, WorkflowTree
-from .builders.execute_workflow_frame_builder import ExecuteWorkflowFrameBuilder
+from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 from .mixins import ViewResultsMixin
 
 
@@ -44,9 +44,9 @@ TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
+class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
     """
-    The ExecuteWorkflowFrame is used to start processing of the WorkflowTree
+    The WorkflowRunFrame is used to start processing of the WorkflowTree
     and visualize the results.
     """
 
@@ -60,7 +60,7 @@ class ExecuteWorkflowFrame(ExecuteWorkflowFrameBuilder, ViewResultsMixin):
     params_not_to_restore = ["selected_results"]
 
     def __init__(self, parent=None, **kwargs):
-        ExecuteWorkflowFrameBuilder.__init__(self, parent, **kwargs)
+        WorkflowRunFrameBuilder.__init__(self, parent, **kwargs)
         _global_plot_update_time = self.q_settings_get_global_value(
             "plot_update_time", dtype=float
         )

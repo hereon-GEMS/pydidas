@@ -38,13 +38,13 @@ from ..core.constants import PROC_PLUGIN
 from ..core import get_generic_param_collection
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
-from ..experiment import ExperimentalSetup
+from ..experiment import SetupExperiment
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the ScanSetup class which is used to manage global
+"""Module with the SetupScan class which is used to manage global
 information about the scan."""
 
 __author__ = "Malte Storm"
@@ -21,7 +21,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetup"]
+__all__ = ["SetupScan"]
 
 import numpy as np
 
@@ -30,10 +30,10 @@ from ...core import (
     get_generic_param_collection,
     ObjectWithParameterCollection,
 )
-from .scan_setup_io_meta import ScanSetupIoMeta
+from .setup_scan_io_meta import SetupScanIoMeta
 
 
-class _ScanSetup(ObjectWithParameterCollection):
+class _SetupScan(ObjectWithParameterCollection):
     """
     Class which holds the settings for the scan. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
@@ -182,7 +182,7 @@ class _ScanSetup(ObjectWithParameterCollection):
 
     def update_from_dictionary(self, scan_dict):
         """
-        Update scen ScanSetup from an imported dictionary.
+        Update scen SetupScan from an imported dictionary.
 
         Parameters
         ----------
@@ -233,7 +233,7 @@ class _ScanSetup(ObjectWithParameterCollection):
     @property
     def ndim(self):
         """
-        Get the number of dimensions in the ScanSetup.
+        Get the number of dimensions in the SetupScan.
 
         This method is a simplified wrapper for the ParameterValue "scan_dim".
 
@@ -247,19 +247,19 @@ class _ScanSetup(ObjectWithParameterCollection):
     @staticmethod
     def import_from_file(filename):
         """
-        Import ScanSetup from a file.
+        Import SetupScan from a file.
 
         Parameters
         ----------
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        ScanSetupIoMeta.import_from_file(filename)
+        SetupScanIoMeta.import_from_file(filename)
 
     @staticmethod
     def export_to_file(filename, overwrite=False):
         """
-        Export ScanSetup to a file.
+        Export SetupScan to a file.
 
         Parameters
         ----------
@@ -269,7 +269,7 @@ class _ScanSetup(ObjectWithParameterCollection):
             Keyword to allow overwriting of existing files. The default is
             False.
         """
-        ScanSetupIoMeta.export_to_file(filename, overwrite=overwrite)
+        SetupScanIoMeta.export_to_file(filename, overwrite=overwrite)
 
 
-ScanSetup = SingletonFactory(_ScanSetup)
+SetupScan = SingletonFactory(_SetupScan)

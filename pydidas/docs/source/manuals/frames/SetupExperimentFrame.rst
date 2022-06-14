@@ -2,7 +2,7 @@ Experimental settings frame
 ===========================
 
 The *Experimental settings* frame is a graphical interface to configure the 
-:py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>` 
+:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
 which holds information about the beamline setup.
 
 The frame only holds the configuration widgets:
@@ -100,11 +100,11 @@ based on the extension.
 Using the Experimental settings
 -------------------------------
 
-The :py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>` 
+The :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
 is not used directly but the information is required in applications, e.g. to
 run processing workflows.
    
 Full list of Experimental setup Parameters
 ------------------------------------------
 
-.. include:: ../cmdline_global/experimental_setup_params.rst
+.. include:: ../cmdline_global/setup_experiment_params.rst

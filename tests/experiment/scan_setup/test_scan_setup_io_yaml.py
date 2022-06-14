@@ -29,18 +29,18 @@ import tempfile
 
 import yaml
 
-from pydidas.experiment import ScanSetup
-from pydidas.experiment.scan_setup.scan_setup_io_yaml import ScanSetupIoYaml
+from pydidas.experiment import SetupScan
+from pydidas.experiment.setup_scan.setup_scan_io_yaml import SetupScanIoYaml
 
 
-SCAN = ScanSetup()
-SCAN_IO_YAML = ScanSetupIoYaml
+SCAN = SetupScan()
+SCAN_IO_YAML = SetupScanIoYaml
 
 
 class TestScanSettingsIoYaml(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_scan_setup_yaml.yml")
+        self._path = os.path.join(_test_dir, "_data", "load_test_setup_scan_yaml.yml")
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):

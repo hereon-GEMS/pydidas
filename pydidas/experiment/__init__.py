@@ -26,15 +26,15 @@ __status__ = "Development"
 __all__ = []
 
 # import sub-packages:
-from . import experimental_setup
-from . import scan_setup
+from . import setup_experiment
+from . import setup_scan
 
-__all__.extend(["experimental_setup", "scan_setup"])
+__all__.extend(["setup_experiment", "setup_scan"])
 
 # explicitly import the singleton factories from the subpackages
-from .experimental_setup import ExperimentalSetup, ExperimentalSetupIoMeta
-from .scan_setup import ScanSetup, ScanSetupIoMeta
+from .setup_experiment import SetupExperiment, SetupExperimentIoMeta
+from .setup_scan import SetupScan, SetupScanIoMeta
 
 __all__.extend(
-    ["ExperimentalSetup", "ExperimentalSetupIoMeta", "ScanSetup", "ScanSetupIoMeta"]
+    ["SetupExperiment", "SetupExperimentIoMeta", "SetupScan", "SetupScanIoMeta"]
 )

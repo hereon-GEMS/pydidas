@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetupFrame which is used to manage and modify the scan
+Module with the SetupScanFrame which is used to manage and modify the scan
 settings like dimensionality, number of points and labels.
 """
 
@@ -23,21 +23,21 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetupFrame"]
+__all__ = ["SetupScanFrame"]
 
 import sys
 
 from qtpy import QtWidgets
 
-from ..experiment import ScanSetup, ScanSetupIoMeta
+from ..experiment import SetupScan, SetupScanIoMeta
 from ..widgets import gui_excepthook
-from .builders import ScanSetupFrameBuilder
+from .builders import SetupScanFrameBuilder
 
 
-SCAN_SETTINGS = ScanSetup()
+SCAN_SETTINGS = SetupScan()
 
 
-class ScanSetupFrame(ScanSetupFrameBuilder):
+class SetupScanFrame(SetupScanFrameBuilder):
     """
     Frame for managing the global scan settings.
     """
@@ -47,7 +47,7 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
     menu_entry = "Workflow processing/Scan settings"
 
     def __init__(self, parent=None, **kwargs):
-        ScanSetupFrameBuilder.__init__(self, parent, **kwargs)
+        SetupScanFrameBuilder.__init__(self, parent, **kwargs)
 
     def connect_signals(self):
         """
@@ -114,11 +114,11 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
 
     def load_from_file(self):
         """
-        Load ScanSetup from a file.
+        Load SetupScan from a file.
 
         This method will open a QFileDialog to select the file to be read.
         """
-        _formats = ScanSetupIoMeta.get_string_of_formats()
+        _formats = SetupScanIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getOpenFileName(
             self, "Name of file", None, _formats
         )[0]
@@ -129,12 +129,12 @@ class ScanSetupFrame(ScanSetupFrameBuilder):
 
     def export_to_file(self):
         """
-        Save ScanSetup to a file.
+        Save SetupScan to a file.
 
         This method will open a QFileDialog to select a filename for the
         file in which the information shall be written.
         """
-        _formats = ScanSetupIoMeta.get_string_of_formats()
+        _formats = SetupScanIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, "Name of file", None, _formats
         )[0]

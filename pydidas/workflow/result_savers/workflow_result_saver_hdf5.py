@@ -29,15 +29,15 @@ import os
 import h5py
 import numpy as np
 
-from ...experiment import ExperimentalSetup, ScanSetup
+from ...experiment import SetupExperiment, SetupScan
 from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from ...core.constants import HDF5_EXTENSIONS
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
 
-EXP = ExperimentalSetup()
-SCAN = ScanSetup()
+EXP = SetupExperiment()
+SCAN = SetupScan()
 
 
 class WorkflowResultSaverHdf5(WorkflowResultSaverBase):

@@ -62,10 +62,10 @@ from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
 from ..widgets import BaseFrame
-from ..experiment import ExperimentalSetup
+from ..experiment import SetupExperiment
 
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 
 def get_pyfai_calib_icon_path():

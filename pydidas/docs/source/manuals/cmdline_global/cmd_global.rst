@@ -38,7 +38,7 @@ documentation, please refer to the class documentation:
 Examples
 ^^^^^^^^
 
-All examples will use the ExperimentalSetup object (please see below for a 
+All examples will use the SetupExperiment object (please see below for a 
 description of the object) and the examples will only cover the code bases, not 
 the use case. 
 
@@ -47,7 +47,7 @@ First, let us create the object called ``exp``
 .. code-block::
 
     >>> import pydidas
-    >>> exp = pydidas.core.ExperimentalSetup()
+    >>> exp = pydidas.core.SetupExperiment()
 
 The object ``exp`` will be used in all examples below.
 
@@ -126,16 +126,16 @@ All apps use the same global persistent objects (implemented as singletons), if
 required. Information is separated according to the reasons to change. The three
 main objects are:
 
-    ScanSetup
+    SetupScan
         The details about the scan. This includes crucial information like the
         number of scan dimensions and the number of points in each dimension but
         also metadata like dimension names, units, offsets and step width. The 
         latter information can be used to create the correct axis labels in 
-        plots. For the full documentation please visit :ref:`scan_setup`.
-    ExperimentalSetup
+        plots. For the full documentation please visit :ref:`setup_scan`.
+    SetupExperiment
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
-        documentation please visit :ref:`experimental_setup`.
+        documentation please visit :ref:`setup_experiment`.
     WorkflowTree
         The WorkflowTree holds information about which plugins are used and 
         about the order of plugins to be processed. For the full documentation 
@@ -146,8 +146,8 @@ These objects can be accesses by calling their respective factories:
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.ScanSetup()
-    >>> EXPERIMENT = pydidas.experiment.ExperimentalSetup()
+    >>> SCAN = pydidas.experiment.SetupScan()
+    >>> EXPERIMENT = pydidas.experiment.SetupExperiment()
     >>> TREE= pydidas.workflow.WorkflowTree()
 
 Note that the factories return a link to the unique instance and multiple calls 
@@ -156,12 +156,12 @@ yield the same object:
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.ScanSetup()
+    >>> SCAN = pydidas.experiment.SetupScan()
     >>> SCAN
-    <pydidas.experiment.scan_setup.scan_setup._ScanSetup at 0x1d4a257b820>
-    >>> SCAN2  = pydidas.experiment.ScanSetup()
+    <pydidas.experiment.setup_scan.setup_scan._SetupScan at 0x1d4a257b820>
+    >>> SCAN2  = pydidas.experiment.SetupScan()
     >>> SCAN2
-    <pydidas.experiment.scan_setup.scan_setup._ScanSetup at 0x1d4a257b820>
+    <pydidas.experiment.setup_scan.setup_scan._SetupScan at 0x1d4a257b820>
     >>> SCAN == SCAN2
     True
     

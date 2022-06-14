@@ -57,7 +57,7 @@ class MainWindow(MainMenu):
     """
 
     def __init__(self, parent=None, geometry=None):
-        super().__init__(parent)
+        MainMenu.__init__(self, parent, geometry)
 
         self._frame_menuentries = []
         self._frame_meta = {}

@@ -1,4 +1,4 @@
-Full list of Parameters for ExperimentalSetup 
+Full list of Parameters for SetupExperiment 
 ---------------------------------------------
 
 - xray_wavelength (float, unit: Angstrom, default: 1.0)

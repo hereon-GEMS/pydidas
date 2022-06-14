@@ -43,7 +43,7 @@ from ...core.constants import (
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
 )
 from ...core.utils import SignalBlocker
-from ...experiment import ScanSetup
+from ...experiment import SetupScan
 from ...workflow import WorkflowResults, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
@@ -51,7 +51,7 @@ from ..read_only_text_widget import ReadOnlyTextWidget
 from ..utilities import apply_widget_properties
 
 
-SCAN = ScanSetup()
+SCAN = SetupScan()
 RESULTS = WorkflowResults()
 
 
@@ -87,7 +87,7 @@ class ResultSelectionWidget(
     """
     The ResultSelectionWidget widget allows to select data slices for
     plotting using meta information from the
-    :py:class:`ScanSetup <pydidas.core.ScanSetup<` and
+    :py:class:`SetupScan <pydidas.core.SetupScan<` and
     :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
     singletons.
 
@@ -433,7 +433,7 @@ class ResultSelectionWidget(
     def __arrange_results_in_timeline_or_scan_shape(self, index):
         """
         Get and store the current selection for the organization of the
-        scan results in a timeline or using the ScanSetup shape.
+        scan results in a timeline or using the SetupScan shape.
 
         This method also updates the text in the ReadOnlyTextWidget to
         reflect the selection of the dimensions of the scan.

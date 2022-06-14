@@ -1,4 +1,4 @@
-List of all ScanSetup Parameters
+List of all SetupScan Parameters
 --------------------------------
 
 

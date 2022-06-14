@@ -27,15 +27,15 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.scan_setup import ScanSetup, ScanSetupIoBase, ScanSetupIoMeta
+from pydidas.experiment.setup_scan import SetupScan, SetupScanIoBase, SetupScanIoMeta
 
 
-SCAN_SETTINGS = ScanSetup()
-SCAN_IO_META = ScanSetupIoMeta
+SCAN_SETTINGS = SetupScan()
+SCAN_IO_META = SetupScanIoMeta
 SCAN_IO_META.clear_registry()
 
 
-class TestIo(ScanSetupIoBase):
+class TestIo(SetupScanIoBase):
     extensions = ["test"]
     format_name = "Test"
 
@@ -57,7 +57,7 @@ class TestIo(ScanSetupIoBase):
         cls.import_filename = filename
 
 
-class TestScanSetupIoMeta(unittest.TestCase):
+class TestSetupScanIoMeta(unittest.TestCase):
     def setUp(self):
         self._tmppath = tempfile.mkdtemp()
         TestIo.reset()

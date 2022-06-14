@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetupYamlIo class which is used to import
-ScanSetup metadata from a YAML file.
+Module with the SetupExperimentYamlIo class which is used to import
+SetupExperiment metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
@@ -23,21 +23,23 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetupIoYaml"]
+__all__ = ["SetupExperimentIoYaml"]
 
 import yaml
+import numpy as np
+from numbers import Real, Integral
 
-from ...core.constants import YAML_EXTENSIONS
-from .scan_setup_io_base import ScanSetupIoBase
-from .scan_setup import ScanSetup
+from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
+from .setup_experiment_io_base import SetupExperimentIoBase
+from .setup_experiment import SetupExperiment
 
 
-SCAN = ScanSetup()
+EXP_SETUP = SetupExperiment()
 
 
-class ScanSetupIoYaml(ScanSetupIoBase):
+class SetupExperimentIoYaml(SetupExperimentIoBase):
     """
-    YAML importer/exporter for ScanSetting files.
+    YAML importer/exporter for ExperimentalSetting files.
     """
 
     extensions = YAML_EXTENSIONS
@@ -46,7 +48,7 @@ class ScanSetupIoYaml(ScanSetupIoBase):
     @classmethod
     def export_to_file(cls, filename, **kwargs):
         """
-        Write the ScanTree to a file.
+        Write the ExperimentalTree to a file.
 
         Parameters
         ----------
@@ -54,14 +56,20 @@ class ScanSetupIoYaml(ScanSetupIoBase):
             The filename of the file to be written.
         """
         cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = SCAN.get_param_values_as_dict()
+        tmp_params = EXP_SETUP.get_param_values_as_dict()
+        # need to convert all float values to generic python "float" to
+        # allow using the yaml.save_dump function
+        for _key, _val in tmp_params.items():
+            if isinstance(_val, Real) and not isinstance(_val, Integral):
+                tmp_params[_key] = float(_val)
+        del tmp_params["xray_energy"]
         with open(filename, "w") as stream:
             yaml.safe_dump(tmp_params, stream)
 
     @classmethod
     def import_from_file(cls, filename):
         """
-        Restore the ScanSetup from a YAML file.
+        Restore the SetupExperiment from a YAML file.
 
         Parameters
         ----------
@@ -75,5 +83,8 @@ class ScanSetupIoYaml(ScanSetupIoBase):
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
         assert isinstance(cls.imported_params, dict)
+        cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
+            "xray_wavelength", np.nan
+        )
         cls._verify_all_entries_present()
-        cls._write_to_scan_settings()
+        cls._write_to_exp_settings()

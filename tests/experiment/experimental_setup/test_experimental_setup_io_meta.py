@@ -27,19 +27,19 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.experimental_setup import (
-    ExperimentalSetup,
-    ExperimentalSetupIoBase,
-    ExperimentalSetupIoMeta,
+from pydidas.experiment.setup_experiment import (
+    SetupExperiment,
+    SetupExperimentIoBase,
+    SetupExperimentIoMeta,
 )
 
 
-EXP_SETUP = ExperimentalSetup()
-EXP_IO_META = ExperimentalSetupIoMeta
+EXP_SETUP = SetupExperiment()
+EXP_IO_META = SetupExperimentIoMeta
 EXP_IO_META.clear_registry()
 
 
-class TestIo(ExperimentalSetupIoBase):
+class TestIo(SetupExperimentIoBase):
     extensions = ["test"]
     format_name = "Test"
 

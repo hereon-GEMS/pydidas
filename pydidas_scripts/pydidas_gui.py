@@ -35,9 +35,9 @@ from pydidas.gui import (
     WorkflowEditFrame,
     PyfaiCalibFrame,
     HomeFrame,
-    ExperimentalSetupFrame,
-    ScanSetupFrame,
-    ExecuteWorkflowFrame,
+    SetupExperimentFrame,
+    SetupScanFrame,
+    WorkflowRunFrame,
     CompositeCreatorFrame,
     MainWindow,
     DirectorySpyFrame,
@@ -80,11 +80,11 @@ def run_gui(app=None):
         menu_entry="Workflow processing",
         icon="qta::mdi.cogs",
     )
-    gui.register_frame(ExperimentalSetupFrame)
-    gui.register_frame(ScanSetupFrame)
+    gui.register_frame(SetupExperimentFrame)
+    gui.register_frame(SetupScanFrame)
     gui.register_frame(WorkflowEditFrame)
     gui.register_frame(WorkflowTestFrame)
-    gui.register_frame(ExecuteWorkflowFrame)
+    gui.register_frame(WorkflowRunFrame)
     gui.register_frame(ViewResultsFrame)
     gui.show()
     gui.raise_()

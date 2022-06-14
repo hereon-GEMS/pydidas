@@ -33,15 +33,15 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import get_generic_param_collection, Dataset, BaseApp, AppConfigError
-from ..experiment import ScanSetup, ExperimentalSetup
+from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
 from .parsers import execute_workflow_app_parser
 
 
 TREE = WorkflowTree()
-SCAN = ScanSetup()
-EXP = ExperimentalSetup()
+SCAN = SetupScan()
+EXP = SetupExperiment()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultSaverMeta
 
@@ -143,7 +143,7 @@ class ExecuteWorkflowApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the ScanSetup.
+            2. Get all multiprocessing tasks from the SetupScan.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -193,7 +193,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __get_and_store_tasks(self):
         """
-        Get the tasks from the global ScanSetup and store them internally.
+        Get the tasks from the global SetupScan and store them internally.
         """
         _dim = SCAN.get_param_value("scan_dim")
         _points_per_dim = [

@@ -37,16 +37,16 @@ __all__.extend(["builders", "managers", "mixins", "windows"])
 from .composite_creator_frame import *
 from .data_browsing_frame import *
 from .directory_spy_frame import *
-from .execute_workflow_frame import *
-from .experimental_setup_frame import *
+from .setup_experiment_frame import *
 from .global_configuration_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .main_window import *
 from .pyfai_calib_frame import *
-from .scan_setup_frame import *
+from .setup_scan_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
+from .workflow_run_frame import *
 from .workflow_test_frame import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -66,15 +66,10 @@ from . import directory_spy_frame
 __all__.extend(directory_spy_frame.__all__)
 del directory_spy_frame
 
-from . import execute_workflow_frame
+from . import setup_experiment_frame
 
-__all__.extend(execute_workflow_frame.__all__)
-del execute_workflow_frame
-
-from . import experimental_setup_frame
-
-__all__.extend(experimental_setup_frame.__all__)
-del experimental_setup_frame
+__all__.extend(setup_experiment_frame.__all__)
+del setup_experiment_frame
 
 from . import global_configuration_frame
 
@@ -101,10 +96,10 @@ from . import pyfai_calib_frame
 __all__.extend(pyfai_calib_frame.__all__)
 del pyfai_calib_frame
 
-from . import scan_setup_frame
+from . import setup_scan_frame
 
-__all__.extend(scan_setup_frame.__all__)
-del scan_setup_frame
+__all__.extend(setup_scan_frame.__all__)
+del setup_scan_frame
 
 from . import view_results_frame
 
@@ -115,6 +110,11 @@ from . import workflow_edit_frame
 
 __all__.extend(workflow_edit_frame.__all__)
 del workflow_edit_frame
+
+from . import workflow_run_frame
+
+__all__.extend(workflow_run_frame.__all__)
+del workflow_run_frame
 
 from . import workflow_test_frame
 

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentalSetupFrameBuilder class which is used to
+Module with the SetupExperimentFrameBuilder class which is used to
 populate the ExperimentSettingsself with widgets.
 """
 
@@ -23,12 +23,12 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentalSetupFrameBuilder"]
+__all__ = ["SetupExperimentFrameBuilder"]
 
 from ...widgets import BaseFrame
 
 
-class ExperimentalSetupFrameBuilder(BaseFrame):
+class SetupExperimentFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_self method to populate the
     base class's UI and initialize all widgets.

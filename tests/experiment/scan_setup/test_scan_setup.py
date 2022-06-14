@@ -27,11 +27,11 @@ import unittest
 import numpy as np
 
 from pydidas.core.utils import get_random_string
-from pydidas.experiment import ScanSetup
-from pydidas.experiment.scan_setup.scan_setup import _ScanSetup
+from pydidas.experiment import SetupScan
+from pydidas.experiment.setup_scan.setup_scan import _SetupScan
 
 
-class TestScanSetup(unittest.TestCase):
+class TestSetupScan(unittest.TestCase):
     def setUp(self):
         self._scan_shape = (5, 7, 3, 2)
         self._scan_delta = (0.1, 0.5, 1, 1.5)
@@ -64,42 +64,42 @@ class TestScanSetup(unittest.TestCase):
         pass
 
     def test_init(self):
-        SCAN = _ScanSetup()
-        self.assertIsInstance(SCAN, _ScanSetup)
+        SCAN = _SetupScan()
+        self.assertIsInstance(SCAN, _SetupScan)
 
     def test_init_singleton(self):
-        SCAN = ScanSetup()
-        self.assertIsInstance(SCAN, _ScanSetup)
+        SCAN = SetupScan()
+        self.assertIsInstance(SCAN, _SetupScan)
 
     def test_n_total(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.n_total, np.prod(self._scan_shape))
 
     def test_shape(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.shape, self._scan_shape)
 
     def test_ndim(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.ndim, 4)
 
     def test_get_range_for_dim__wrong_dim(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         with self.assertRaises(ValueError):
             SCAN.get_range_for_dim(5)
 
     def test_get_range_for_dim__empty_dim(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         _range = SCAN.get_range_for_dim(1)
         self.assertIsInstance(_range, np.ndarray)
 
     def test_get_range_for_dim__normal(self):
         _index = 1
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         _range = SCAN.get_range_for_dim(_index + 1)
         _target = self.get_scan_range(_index)
@@ -109,7 +109,7 @@ class TestScanSetup(unittest.TestCase):
         _index = 1
         _unit = get_random_string(5)
         _label = get_random_string(20)
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         SCAN.set_param_value(f"unit_{_index + 1}", _unit)
         SCAN.set_param_value(f"scan_label_{_index + 1}", _label)
         self.set_scan_params(SCAN)
@@ -119,13 +119,13 @@ class TestScanSetup(unittest.TestCase):
         self.assertTrue(np.equal(self.get_scan_range(_index), _range).all())
 
     def test_get_frame_position_in_scan__zero(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_position_in_scan(0)
         self.assertEqual(_index, (0, 0, 0, 0))
 
     def test_get_frame_position_in_scan__inscan(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         _pos = tuple(i - 1 for i in self._scan_shape)
         _tmpshape = self._scan_shape + (1,)
@@ -139,25 +139,25 @@ class TestScanSetup(unittest.TestCase):
         self.assertEqual(_index, _pos)
 
     def test_get_frame_position_in_scan__negative(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         with self.assertRaises(ValueError):
             SCAN.get_frame_position_in_scan(-1)
 
     def test_get_frame_position_in_scan__too_large(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         with self.assertRaises(ValueError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
 
     def test_get_frame_number_from_scan_indices__zero(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices((0, 0, 0, 0))
         self.assertEqual(_index, 0)
 
     def test_get_frame_number_from_scan_indices__negative(self):
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         with self.assertRaises(ValueError):
             SCAN.get_frame_number_from_scan_indices((0, -1, 0, 0))
@@ -170,20 +170,20 @@ class TestScanSetup(unittest.TestCase):
             + np.prod(self._scan_shape[2:]) * _indices[1]
             + np.prod(self._scan_shape[1:]) * _indices[0]
         )
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
         self.assertEqual(_index, _frame)
 
     def test_update_from_dictionary__missing_dim(self):
         _scan = {"scan_title": get_random_string(8), "scan_dim": 2}
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         with self.assertRaises(KeyError):
             SCAN.update_from_dictionary(_scan)
 
     def test_update_from_dictionary__empty_input(self):
         _title = get_random_string(8)
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         SCAN.set_param_value("scan_title", _title)
         SCAN.update_from_dictionary({})
         self.assertEqual(SCAN.get_param_value("scan_title"), _title)
@@ -207,7 +207,7 @@ class TestScanSetup(unittest.TestCase):
                 "n_points": 8,
             },
         }
-        SCAN = _ScanSetup()
+        SCAN = _SetupScan()
         SCAN.update_from_dictionary(_scan)
         self.assertEqual(SCAN.get_param_value("scan_title"), _scan["scan_title"])
         self.assertEqual(SCAN.get_param_value("scan_dim"), _scan["scan_dim"])

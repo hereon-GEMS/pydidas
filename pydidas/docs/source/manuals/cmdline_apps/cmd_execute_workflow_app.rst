@@ -10,12 +10,12 @@ The :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>` is one of
 the most important objects in pydidas as it allows to process workflows. Note 
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
 but by the global objects for 
-:py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>`,
-:py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>`,
+:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
+:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
-Documentation on the use of these objects is given in :ref:`scan_setup`,
-:ref:`experimental_setup` and :ref:`workflow_tree`, respectively.
+Documentation on the use of these objects is given in :ref:`setup_scan`,
+:ref:`setup_experiment` and :ref:`workflow_tree`, respectively.
 
 Globally controlled settings
 ----------------------------
@@ -72,8 +72,8 @@ Setup of the ExecuteWorkflowApp
 -------------------------------
 
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
-uses the aforementioned objects (:py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>`,
-:py:class:`ExperimentalSetup <pydidas.experiment.experimental_setup.experimental_setup._ExpSetup>`,
+uses the aforementioned objects (:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
+:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
 which include most of the required configuration.
 

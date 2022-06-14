@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentalSetupFrame which is used to define or modify the
+Module with the SetupExperimentFrame which is used to define or modify the
 global experimental settings like detector, geometry and energy.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentalSetupFrame"]
+__all__ = ["SetupExperimentFrame"]
 
 from functools import partial
 
@@ -32,12 +32,12 @@ from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
-from ..experiment import ExperimentalSetup, ExperimentalSetupIoMeta
+from ..experiment import SetupExperiment, SetupExperimentIoMeta
 from ..widgets.dialogues import critical_warning
-from .builders import ExperimentalSetupFrameBuilder
+from .builders import SetupExperimentFrameBuilder
 
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 _GEO_INVALID = (
     "The pyFAI geometry is not valid and cannot be copied. "
@@ -55,9 +55,9 @@ _ENERGY_INVALID = (
 )
 
 
-class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
+class SetupExperimentFrame(SetupExperimentFrameBuilder):
     """
-    The ExperimentalSetupFrame is the main frame for reading, editing and
+    The SetupExperimentFrame is the main frame for reading, editing and
     saving the ExperimentalSettings in the GUI.
     """
 
@@ -66,7 +66,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     menu_entry = "Workflow processing/Experimental settings"
 
     def __init__(self, parent=None, **kwargs):
-        ExperimentalSetupFrameBuilder.__init__(self, parent, **kwargs)
+        SetupExperimentFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP_SETUP.params
 
     def connect_signals(self):
@@ -226,7 +226,7 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     def copy_energy_from_pyFAI(self, show_warning=True):
         """
         Copy the energy setting from pyFAI and store it in the
-        ExperimentalSetup.
+        SetupExperiment.
 
         Parameters
         ----------
@@ -245,12 +245,12 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
 
     def load_parameters_from_file(self):
         """
-        Open a dialog to select a filename and load ExperimentalSetup from
+        Open a dialog to select a filename and load SetupExperiment from
         the selected file.
 
         Note: This method will overwrite all current settings.
         """
-        _formats = ExperimentalSetupIoMeta.get_string_of_formats()
+        _formats = SetupExperimentIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getOpenFileName(
             self, "Name of file", None, _formats
         )[0]
@@ -262,9 +262,9 @@ class ExperimentalSetupFrame(ExperimentalSetupFrameBuilder):
     def __save_to_file(self):
         """
         Open a dialog to select a filename and write all currrent settings
-        for the ExperimentalSetup to file.
+        for the SetupExperiment to file.
         """
-        _formats = ExperimentalSetupIoMeta.get_string_of_formats()
+        _formats = SetupExperimentIoMeta.get_string_of_formats()
         fname = QtWidgets.QFileDialog.getSaveFileName(
             self, "Name of file", None, _formats
         )[0]

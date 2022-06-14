@@ -14,7 +14,7 @@ This class does not need any configuration as the layout of the results are
 determined based on 
 
   1. The information about the scan from the 
-     :py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>` 
+     :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>` 
      class.
   2. The information about the processing steps from the 
      :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.

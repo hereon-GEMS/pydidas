@@ -27,14 +27,14 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.experimental_setup import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_base import (
-    ExperimentalSetupIoBase,
+from pydidas.experiment.setup_experiment import SetupExperiment
+from pydidas.experiment.setup_experiment.setup_experiment_io_base import (
+    SetupExperimentIoBase,
 )
 
 
-EXP_SETUP = ExperimentalSetup()
-EXP_IO = ExperimentalSetupIoBase
+EXP_SETUP = SetupExperiment()
+EXP_IO = SetupExperimentIoBase
 
 
 class TestExperimentSettingsIoBase(unittest.TestCase):

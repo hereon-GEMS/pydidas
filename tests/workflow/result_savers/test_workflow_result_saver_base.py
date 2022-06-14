@@ -24,7 +24,7 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.experiment import ScanSetup
+from pydidas.experiment import SetupScan
 from pydidas.workflow.result_savers import (
     WorkflowResultSaverBase,
     WorkflowResultSaverMeta,
@@ -33,7 +33,7 @@ from pydidas.workflow import WorkflowTree, WorkflowResults
 
 
 TREE = WorkflowTree()
-SCAN = ScanSetup()
+SCAN = SetupScan()
 RESULTS = WorkflowResults()
 META = WorkflowResultSaverMeta
 

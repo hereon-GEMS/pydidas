@@ -158,7 +158,7 @@ class DirectorySpyApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the ScanSetup.
+            2. Get all multiprocessing tasks from the SetupScan.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.

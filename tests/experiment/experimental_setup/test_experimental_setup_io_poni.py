@@ -31,14 +31,14 @@ import logging
 import pyFAI
 from pyFAI.geometry import Geometry
 
-from pydidas.experiment import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_poni import (
-    ExperimentalSetupIoPoni,
+from pydidas.experiment import SetupExperiment
+from pydidas.experiment.setup_experiment.setup_experiment_io_poni import (
+    SetupExperimentIoPoni,
 )
 
 
-EXP_SETUP = ExperimentalSetup()
-EXP_IO_PONI = ExperimentalSetupIoPoni
+EXP_SETUP = SetupExperiment()
+EXP_IO_PONI = SetupExperimentIoPoni
 
 _logger = logging.getLogger("pyFAI.geometry")
 _logger.setLevel(logging.CRITICAL)

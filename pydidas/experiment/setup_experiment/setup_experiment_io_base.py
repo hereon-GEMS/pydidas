@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentalSetupIoBase class which exporters/importers for
-ExperimentalSetup should inherit from.
+Module with the SetupExperimentIoBase class which exporters/importers for
+SetupExperiment should inherit from.
 """
 
 __author__ = "Malte Storm"
@@ -23,19 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentalSetupIoBase"]
+__all__ = ["SetupExperimentIoBase"]
 
 from ...core.io_registry import GenericIoBase
-from .experimental_setup_io_meta import ExperimentalSetupIoMeta
-from .experimental_setup import ExperimentalSetup
+from .setup_experiment_io_meta import SetupExperimentIoMeta
+from .setup_experiment import SetupExperiment
 
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 
-class ExperimentalSetupIoBase(GenericIoBase, metaclass=ExperimentalSetupIoMeta):
+class SetupExperimentIoBase(GenericIoBase, metaclass=SetupExperimentIoMeta):
     """
-    Base class for ExperimentalSetup importer/exporters.
+    Base class for SetupExperiment importer/exporters.
     """
 
     extensions = []
@@ -46,7 +46,7 @@ class ExperimentalSetupIoBase(GenericIoBase, metaclass=ExperimentalSetupIoMeta):
     def _verify_all_entries_present(cls):
         """
         Verify that the tmp_params dictionary holds all keys from the
-        ExperimentalSetup.
+        SetupExperiment.
         """
         for key in EXP_SETUP.params:
             if key not in cls.imported_params:
@@ -55,7 +55,7 @@ class ExperimentalSetupIoBase(GenericIoBase, metaclass=ExperimentalSetupIoMeta):
     @classmethod
     def _write_to_exp_settings(cls):
         """
-        Write the loaded (temporary) Parameters to the ExperimentalSetup.
+        Write the loaded (temporary) Parameters to the SetupExperiment.
         """
         for key in cls.imported_params:
             EXP_SETUP.set_param_value(key, cls.imported_params[key])

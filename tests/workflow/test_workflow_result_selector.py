@@ -30,13 +30,13 @@ from numbers import Integral
 import numpy as np
 
 from pydidas.core import Dataset, Parameter, AppConfigError
-from pydidas.experiment import ScanSetup
+from pydidas.experiment import SetupScan
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_savers import WorkflowResultSaverMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
-SCAN = ScanSetup()
+SCAN = SetupScan()
 TREE = WorkflowTree()
 RES = WorkflowResults()
 SAVER = WorkflowResultSaverMeta

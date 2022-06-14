@@ -2,7 +2,7 @@ Scan settings frame
 ===================
 
 The *Scan  settings* frame is a graphical interface to configure the 
-:py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>` 
+:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>` 
 which holds information about the beamline setup. The frame only holds the 
 configuration widgets for its Parameters as well as some buttons for convenience
 functionality.
@@ -89,13 +89,13 @@ The range of each scan dimension is determined by the number of points
 Using the Scan settings
 -------------------------------
 
-The :py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>` 
+The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>` 
 is not used directly but the information is required in applications, e.g. to
 run processing workflows.
    
-.. _scan_setup_params:
+.. _setup_scan_params:
 
 Full list of Scan settings Parameters
 -------------------------------------
 
-.. include:: ../cmdline_global/scan_setup_params.rst
+.. include:: ../cmdline_global/setup_scan_params.rst

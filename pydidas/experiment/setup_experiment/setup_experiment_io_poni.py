@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentalSetupIoPoni class which is used to import
-ExperimentalSetup metadata from a pyFAI poni file.
+Module with the SetupExperimentIoPoni class which is used to import
+SetupExperiment metadata from a pyFAI poni file.
 """
 
 __author__ = "Malte Storm"
@@ -23,19 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentalSetupIoPoni"]
+__all__ = ["SetupExperimentIoPoni"]
 
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
-from .experimental_setup_io_base import ExperimentalSetupIoBase
-from .experimental_setup import ExperimentalSetup
+from .setup_experiment_io_base import SetupExperimentIoBase
+from .setup_experiment import SetupExperiment
 
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 
-class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
+class SetupExperimentIoPoni(SetupExperimentIoBase):
     """
     Base class for WorkflowTree exporters.
     """
@@ -82,7 +82,7 @@ class ExperimentalSetupIoPoni(ExperimentalSetupIoBase):
     @classmethod
     def import_from_file(cls, filename):
         """
-        Restore the ExperimentalSetup from a YAML file.
+        Restore the SetupExperiment from a YAML file.
 
         Parameters
         ----------

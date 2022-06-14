@@ -34,10 +34,10 @@ from qtpy import QtCore
 
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 from pydidas.core import get_generic_parameter
-from pydidas.experiment import ExperimentalSetup
+from pydidas.experiment import SetupExperiment
 
 
-EXP_SETUP = ExperimentalSetup()
+EXP_SETUP = SetupExperiment()
 
 logger = logging.getLogger("pydidas_logger")
 logger.setLevel(logging.ERROR)

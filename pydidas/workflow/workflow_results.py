@@ -33,13 +33,13 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import utils, Dataset, SingletonFactory
-from ..experiment import ScanSetup
+from ..experiment import SetupScan
 from .workflow_tree import WorkflowTree
 from .result_savers import WorkflowResultSaverMeta
 
 
 RESULT_SAVER = WorkflowResultSaverMeta
-SCAN = ScanSetup()
+SCAN = SetupScan()
 TREE = WorkflowTree()
 
 
@@ -58,7 +58,7 @@ class _WorkflowResults(QtCore.QObject):
 
     def update_shapes_from_scan_and_workflow(self):
         """
-        Update the shape of the results by querying ScanSetup and
+        Update the shape of the results by querying SetupScan and
         WorkflowTree for their current dimensions and shapes.
         """
         self.clear_all_results()
@@ -217,7 +217,7 @@ class _WorkflowResults(QtCore.QObject):
     @property
     def source_hash(self):
         """
-        Get the source hash from the input WorkflowTree ans ScanSetup.
+        Get the source hash from the input WorkflowTree ans SetupScan.
 
         Returns
         -------

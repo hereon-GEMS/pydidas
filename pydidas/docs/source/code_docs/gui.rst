@@ -11,13 +11,14 @@ It provides methods to register frames and create menus.
     :maxdepth: 3
 
     gui/main_window
-    gui/composite_creator_frame
     gui/data_browsing_frame
-    gui/experimental_setup_frame
-    gui/global_configuration_frame
-    gui/image_math_frame
-    gui/execute_workflow_frame
     gui/pyfai_calib_frame
-    gui/scan_setup_frame
+    gui/composite_creator_frame
+    gui/setup_experiment_frame
+    gui/setup_scan_frame
     gui/workflow_edit_frame
+    gui/workflow_test_frame
+    gui/workflow_run_frame
+    gui/view_results_frame
+    gui/global_configuration_frame
     gui/builders

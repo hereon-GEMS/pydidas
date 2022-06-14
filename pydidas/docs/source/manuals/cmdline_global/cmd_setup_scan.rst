@@ -1,13 +1,13 @@
-.. _scan_setup:
+.. _setup_scan:
 
-The ScanSetup class
+The SetupScan class
 ===================
 
 Introduction
 ------------
 
-The :py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup>`
-is the pydidas Singleton instance of the ``_ScanSetup`` class. It is
+The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`
+is the pydidas Singleton instance of the ``_SetupScan`` class. It is
 used for storing and accessing global information about the scan layout.
 
 Stored information include
@@ -27,30 +27,30 @@ and to add metadata about the scan to plots and stored datasets.
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`scan_setup_parameters`\ .
+given in :ref:`setup_scan_parameters`\ .
 
 Its instance can be obtained by calling the following code:
 
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.ScanSetup()
+    >>> SCAN = pydidas.experiment.SetupScan()
     
 
-Configuring the ScanSetup
+Configuring the SetupScan
 -------------------------
 
 Global Parameters
 ^^^^^^^^^^^^^^^^^
 
-The :py:class:`ScanSetup <pydidas.experiment.scan_setup.scan_setup._ScanSetup` 
+The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan` 
 has two *global* Parameters for the scan title and the number of dimensions, 
 referenced by the Parameter keys ``scan_name`` and ``scan_dim``:
 
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.ScanSetup()
+    >>> SCAN = pydidas.experiment.SetupScan()
     >>> SCAN.set_param_value('scan_name', 'Test_42')
     >>> SCAN.set_param_value('scan_dim', 2)
     
@@ -117,7 +117,7 @@ the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, ...,
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.ScanSetup()
+    >>> SCAN = pydidas.experiment.SetupScan()
     >>> SCAN.set_param_value('scan_dim', 2)
     >>> SCAN.set_param_value('scan_label_1', 'x')
     >>> SCAN.set_param_value('n_points_1', 25)
@@ -140,6 +140,6 @@ contact your beamline local contact for details.
 Import functions will be implemented as required and depending on the scan
 metadata available at the beamlines.
 
-.. _scan_setup_parameters:
+.. _setup_scan_parameters:
 
-.. include:: ./scan_setup_params.rst
+.. include:: ./setup_scan_params.rst

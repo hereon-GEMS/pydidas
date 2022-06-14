@@ -87,11 +87,11 @@ Sub-package descriptions
     and the scan setup. This information can be used by plugins or apps to query 
     the global processing parameters.
 
-  - *pydidas.experiment.experimental_setup* 
+  - *pydidas.experiment.setup_experiment* 
         
         Classes for the global experimental settings and import/export.
   
-  - *pydidas.experiment.scan_setup* 
+  - *pydidas.experiment.setup_scan* 
         
         Classes for the global scan settings and import/export.
 

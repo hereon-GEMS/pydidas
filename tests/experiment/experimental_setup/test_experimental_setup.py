@@ -28,9 +28,9 @@ import logging
 
 import pyFAI
 
-from pydidas.experiment.experimental_setup.experimental_setup import (
+from pydidas.experiment.setup_experiment.setup_experiment import (
     _ExpSetup,
-    ExperimentalSetup,
+    SetupExperiment,
 )
 
 
@@ -38,7 +38,7 @@ logger = logging.getLogger("pyFAI.detectors._common")
 logger.setLevel(logging.CRITICAL)
 
 
-class TestExperimentalSetup(unittest.TestCase):
+class TestSetupExperiment(unittest.TestCase):
     def setUp(self):
         ...
 
@@ -46,18 +46,18 @@ class TestExperimentalSetup(unittest.TestCase):
         ...
 
     def test_creation(self):
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         self.assertIsInstance(obj, _ExpSetup)
 
     def test_set_param_generic(self):
         _name = "Test"
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_param_value("detector_name", _name)
         self.assertEqual(obj.get_param_value("detector_name"), _name)
 
     def test_set_param_energy(self):
         _new_E = 15.7
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_param_value("xray_energy", _new_E)
         self.assertEqual(obj.get_param_value("xray_energy"), _new_E)
         self.assertAlmostEqual(
@@ -66,7 +66,7 @@ class TestExperimentalSetup(unittest.TestCase):
 
     def test_set_param_wavelength(self):
         _new_lambda = 0.98765
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_param_value("xray_wavelength", _new_lambda)
         self.assertEqual(obj.get_param_value("xray_wavelength"), _new_lambda)
         self.assertAlmostEqual(
@@ -75,7 +75,7 @@ class TestExperimentalSetup(unittest.TestCase):
 
     def test_get_detector__from_param_name(self):
         _shape = (1000, 1000)
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_param_value("detector_name", "Eiger 9M")
         obj.set_param_value("detector_npixy", _shape[0])
         obj.set_param_value("detector_npixx", _shape[1])
@@ -86,7 +86,7 @@ class TestExperimentalSetup(unittest.TestCase):
     def test_get_detector__new_name(self):
         _shape = (1000, 1000)
         _pixelsize = 100
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_param_value("detector_name", "No Eiger")
         obj.set_param_value("detector_npixy", _shape[0])
         obj.set_param_value("detector_npixx", _shape[1])
@@ -99,18 +99,18 @@ class TestExperimentalSetup(unittest.TestCase):
         self.assertEqual(_det.pixel2, 1e-6 * _pixelsize)
 
     def test_copy(self):
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj2 = copy.copy(obj)
         self.assertEqual(obj, obj2)
 
     def test_set_detector_params_from_name__wrong_name(self):
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         with self.assertRaises(NameError):
             obj.set_detector_params_from_name("no such detector")
 
     def test_set_detector_params_from_name(self):
         _det = {"name": "Pilatus 300k", "pixsize": 172, "npixx": 487, "npixy": 619}
-        obj = ExperimentalSetup()
+        obj = SetupExperiment()
         obj.set_detector_params_from_name(_det["name"])
         self.assertEqual(obj.get_param_value("detector_name"), _det["name"])
         self.assertEqual(obj.get_param_value("detector_pxsizex"), _det["pixsize"])

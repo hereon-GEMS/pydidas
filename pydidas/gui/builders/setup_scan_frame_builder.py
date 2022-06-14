@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetupFrameBuilder class which is used to populate
-the ScanSetupFrame with widgets.
+Module with the SetupScanFrameBuilder class which is used to populate
+the SetupScanFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -23,25 +23,25 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetupFrameBuilder"]
+__all__ = ["SetupScanFrameBuilder"]
 
 from qtpy import QtCore
 
-from ...experiment import ScanSetup
+from ...experiment import SetupScan
 from ...widgets import BaseFrame
 
 
-SCAN_SETTINGS = ScanSetup()
+SCAN_SETTINGS = SetupScan()
 
 
-class ScanSetupFrameBuilder(BaseFrame):
+class SetupScanFrameBuilder(BaseFrame):
     """
     Create all widgets and initialize their state.
 
     Parameters
     ----------
-    self : pydidas.gui.ScanSetupFrame
-        The ScanSetupFrame instance.
+    self : pydidas.gui.SetupScanFrame
+        The SetupScanFrame instance.
     """
 
     TEXT_WIDTH = 200

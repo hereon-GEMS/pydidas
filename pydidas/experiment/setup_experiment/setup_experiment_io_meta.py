@@ -14,8 +14,9 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ScanSetupIoMeta class which is used for creating
-exporter/importer classes for the ScanSetup singleton and registering them.
+Module with the SetupExperimentIoMeta class which is used for creating
+exporter/importer classes for the ExperimentalSetting singleton and
+registering them.
 """
 
 __author__ = "Malte Storm"
@@ -23,18 +24,18 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanSetupIoMeta"]
+__all__ = ["SetupExperimentIoMeta"]
 
 from ...core.io_registry import GenericIoMeta
 
 
-class ScanSetupIoMeta(GenericIoMeta):
+class SetupExperimentIoMeta(GenericIoMeta):
     """
-    Metaclass for ScanSetup exporters and importers which holds the
+    Metaclass for SetupExperiment exporters and importers which holds the
     registry with all associated file extensions for imprting/ exporting
-    ExperimentalSetup.
+    SetupExperiment.
     """
 
     # need to redefine the registry to have a unique registry for
-    # ScanSetupIoMeta
+    # SetupExperimentIoMeta
     registry = {}

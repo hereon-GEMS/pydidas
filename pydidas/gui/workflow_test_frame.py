@@ -34,13 +34,13 @@ from pydidas.core import (
     get_generic_param_collection,
     utils,
 )
-from ..experiment import ScanSetup
+from ..experiment import SetupScan
 from ..workflow import WorkflowTree
 from ..widgets.dialogues import WarningBox
 from .builders import WorkflowTestFrameBuilder
 
 
-SCAN = ScanSetup()
+SCAN = SetupScan()
 TREE = WorkflowTree()
 
 

@@ -27,18 +27,18 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.experiment.scan_setup import ScanSetup
-from pydidas.experiment.scan_setup.scan_setup_io_base import ScanSetupIoBase
+from pydidas.experiment.setup_scan import SetupScan
+from pydidas.experiment.setup_scan.setup_scan_io_base import SetupScanIoBase
 
 
-SCAN = ScanSetup()
-SCAN_IO = ScanSetupIoBase
+SCAN = SetupScan()
+SCAN_IO = SetupScanIoBase
 
 
-class TestScanSetupIoBase(unittest.TestCase):
+class TestSetupScanIoBase(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_scan_setup_")
+        self._path = os.path.join(_test_dir, "_data", "load_test_setup_scan_")
         self._tmppath = tempfile.mkdtemp()
         SCAN_IO.imported_params = {}
 

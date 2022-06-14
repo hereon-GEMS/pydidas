@@ -29,14 +29,14 @@ import tempfile
 
 import yaml
 
-from pydidas.experiment import ExperimentalSetup
-from pydidas.experiment.experimental_setup.experimental_setup_io_yaml import (
-    ExperimentalSetupIoYaml,
+from pydidas.experiment import SetupExperiment
+from pydidas.experiment.setup_experiment.setup_experiment_io_yaml import (
+    SetupExperimentIoYaml,
 )
 
 
-EXP_SETUP = ExperimentalSetup()
-EXP_IO_YAML = ExperimentalSetupIoYaml
+EXP_SETUP = SetupExperiment()
+EXP_IO_YAML = SetupExperimentIoYaml
 
 
 class TestExperimentSettingsIoYaml(unittest.TestCase):

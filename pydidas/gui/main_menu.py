@@ -33,8 +33,13 @@ import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
 from pydidas.core import FrameConfigError
-from pydidas.core.utils import get_doc_home_qurl, get_pydidas_icon_w_bg
-from pydidas.experiment import ScanSetup, ExperimentalSetup
+from pydidas.core.utils import (
+    get_doc_home_qurl,
+    get_pydidas_icon_w_bg,
+    get_doc_qurl_for_frame_manual,
+    get_doc_filename_for_frame_manual,
+)
+from pydidas.experiment import SetupScan, SetupExperiment
 from pydidas.workflow import WorkflowTree
 from pydidas.widgets import CentralWidgetStack, gui_excepthook
 from pydidas.widgets.dialogues import QuestionBox
@@ -48,8 +53,8 @@ from pydidas.gui.windows import (
 )
 
 
-SCAN = ScanSetup()
-EXP = ExperimentalSetup()
+SCAN = SetupScan()
+EXP = SetupExperiment()
 TREE = WorkflowTree()
 
 
@@ -86,6 +91,8 @@ class MainMenu(QtWidgets.QMainWindow):
         self._setup_mainwindow_widget(geometry)
         self._add_global_config_window()
         self._create_menu()
+        self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
+        self._help_shortcut.activated.connect(self._open_help)
 
     def _setup_mainwindow_widget(self, geometry):
         """
@@ -393,7 +400,7 @@ class MainMenu(QtWidgets.QMainWindow):
             _frameindex, _widget_state = _widget.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _widget_state
-        _state["scan_setup"] = SCAN.get_param_values_as_dict(
+        _state["setup_scan"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
         _state["exp_setup"] = EXP.get_param_values_as_dict(filter_types_for_export=True)
@@ -478,8 +485,8 @@ class MainMenu(QtWidgets.QMainWindow):
 
     def _restore_global_objects(self, state):
         """
-        Get the states of pydidas' global objects (ScanSetup,
-        ExperimentalSetup, WorkflowTree)
+        Get the states of pydidas' global objects (SetupScan,
+        SetupExperiment, WorkflowTree)
 
         Parameters
         ----------
@@ -488,7 +495,7 @@ class MainMenu(QtWidgets.QMainWindow):
             global objects.
         """
         TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["scan_setup"].items():
+        for _key, _val in state["setup_scan"].items():
             SCAN.set_param_value(_key, _val)
         for _key, _val in state["exp_setup"].items():
             EXP.set_param_value(_key, _val)
@@ -539,6 +546,23 @@ class MainMenu(QtWidgets.QMainWindow):
             raise FrameConfigError("The state is not defined for all frames.")
         for _index, _frame in enumerate(self.centralWidget().widgets):
             _frame.restore_state(state[f"frame_{_index:02d}"])
+
+    @QtCore.Slot()
+    def _open_help(self):
+        """
+        Open the help in a browser.
+
+        This slot will check whether a helpfile exists for the current frame and open
+        the respective helpfile if it exits or the main documentation if it does not.
+        """
+        _frame_class = self.centralWidget().currentWidget().__class__.__name__
+        _docfile = get_doc_filename_for_frame_manual(_frame_class)
+
+        if os.path.exists(_docfile):
+            _url = get_doc_qurl_for_frame_manual(_frame_class)
+        else:
+            _url = get_doc_home_qurl()
+        _ = QtGui.QDesktopServices.openUrl(_url)
 
     def closeEvent(self, event):
         """

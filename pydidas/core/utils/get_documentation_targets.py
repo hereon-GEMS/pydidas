@@ -28,11 +28,66 @@ __all__ = [
     "get_doc_home_filename",
     "get_doc_home_address",
     "get_doc_home_qurl",
+    "get_doc_directory_for_frame_manuals",
+    "get_doc_filename_for_frame_manual",
+    "get_doc_qurl_for_frame_manual",
 ]
 
 import os
 
 from qtpy import QtCore
+
+
+def get_doc_qurl_for_frame_manual(name):
+    """
+    Get the QUrl for the frame manual html.
+
+    Parameters
+    ----------
+    name : str
+        The class name of the Frame.
+
+    Returns
+    -------
+    url : QtCore.QUrl
+        The QUrl object with the encoded path to the frame manual.
+    """
+    _path = get_doc_filename_for_frame_manual(name)
+    _url = QtCore.QUrl("file:///" + _path.replace("\\", "/"))
+    return _url
+
+
+def get_doc_filename_for_frame_manual(name):
+    """
+    Get the file system path for the filename of the frame manual for the given class.
+
+    Parameters
+    ----------
+    name : str
+        The class name of the Frame.
+
+    Returns
+    -------
+    str
+        The full filename for the frame manual.
+    """
+    return os.path.join(get_doc_directory_for_frame_manuals(), f"{name}.html")
+
+
+def get_doc_directory_for_frame_manuals():
+    """
+    Get the directory with the html documentation for the individual frames.
+
+    Returns
+    -------
+    str
+        The directory name of the directory with the html manuals for the individual
+        frames.
+    """
+    _docdir = os.path.join(
+        get_doc_make_directory(), "build", "html", "manuals", "frames"
+    )
+    return _docdir
 
 
 def get_doc_home_qurl():

@@ -2,13 +2,32 @@ v0.1.9
 ======
 Major changes:
 --------------
-
+- Dataset class has been reworked to function correctly with more numpy ufuncs,
+  in particularly with np.take.
+- Added a new SilxPlot2D class which allows to limit the figure canvas to the 
+  data dimensions and back to the full window. This class also has a new feature
+  to crop the top percentage of the histogram, for example to remove dead pixels.
+- Added keyboard shortcuts (F1) to open the help for the active frame.
+  
 Improvements
 ------------
+- Added settings for displaying only a limited floating point precision of 
+  Parameters.
+- Removed redundant button to store pyFAI calibration settings.
+- Changed Parameter names in ScanSetup class for better consistency.
+- Changed names of buttons from "load" or "save" to "import" or "export" for 
+  consistency.
+- Importing WorkflowResults now also updates the ScanSetup class to allow viewing
+  imported results as a scan timeline and to have the correct labels.
+- The nodes in the WorkflowTree editor now also display the node IDs and labels.
+- If the app is busy with locally running the Workflow in the TestWorkflowFrame,
+  the mouse cursor will show a busy system.
 
 Bugfixes:
 ---------
-
+- Fixed an issue with Parameter updates in the ViewResultsMixin
+- Fixed an issue with QComboBoxes being too small for the text to display the
+  full text.
 
 v0.1.8
 ======

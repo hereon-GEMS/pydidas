@@ -403,7 +403,9 @@ class MainMenu(QtWidgets.QMainWindow):
         _state["setup_scan"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        _state["exp_setup"] = EXP.get_param_values_as_dict(filter_types_for_export=True)
+        _state["setup_experiment"] = EXP.get_param_values_as_dict(
+            filter_types_for_export=True
+        )
         _state["workflow_tree"] = TREE.export_to_string()
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
@@ -497,7 +499,7 @@ class MainMenu(QtWidgets.QMainWindow):
         TREE.restore_from_string(state["workflow_tree"])
         for _key, _val in state["setup_scan"].items():
             SCAN.set_param_value(_key, _val)
-        for _key, _val in state["exp_setup"].items():
+        for _key, _val in state["setup_experiment"].items():
             EXP.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):

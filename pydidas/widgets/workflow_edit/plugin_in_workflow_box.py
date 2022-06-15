@@ -73,9 +73,14 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.del_button = QtWidgets.QPushButton(self)
         self.del_button.setIcon(self.style().standardIcon(3))
         self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
+
         for item in [self, self.del_button]:
             item.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
+        _childstyle = self._get_stylesheet_for_child()
+        self.id_label.setStyleSheet(_childstyle)
+
         self.del_button.clicked.connect(self.delete)
+
         self.update_text(widget_id, "")
         self.setText(plugin_name)
 

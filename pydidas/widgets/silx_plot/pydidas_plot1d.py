@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Package with subclassed silx widgets.
+Module with silx actions for PlotWindows.
 """
 
 __author__ = "Malte Storm"
@@ -22,32 +22,21 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ["PydidasPlot1D"]
 
-# import __all__ items from modules:
-from .create_silx_plot_stack_ import *
-from .pydidas_plot1d import *
-from .pydidas_plot2d import *
-from .silx_actions import *
+from qtpy import QtCore
+from silx.gui.plot import Plot1D
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import create_silx_plot_stack_
 
-__all__.extend(create_silx_plot_stack_.__all__)
-del create_silx_plot_stack_
+class PydidasPlot1D(Plot1D):
+    """
+    A customized silx.gui.plot.Plot1D with an additional configuration.
+    """
 
-from . import pydidas_plot1d
+    def __init__(self, parent=None, backend=None):
+        Plot1D.__init__(self, parent, backend)
 
-__all__.extend(pydidas_plot1d.__all__)
-del pydidas_plot1d
+        self.getRoiAction().setVisible(False)
+        self.getFitAction().setVisible(False)
 
-from . import pydidas_plot2d
-
-__all__.extend(pydidas_plot2d.__all__)
-del pydidas_plot2d
-
-from . import silx_actions
-
-__all__.extend(silx_actions.__all__)
-del silx_actions
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)

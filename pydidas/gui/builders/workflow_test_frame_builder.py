@@ -25,18 +25,16 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrameBuilder"]
 
-from qtpy import QtWidgets, QtCore
-from silx.gui.plot import Plot1D
+from qtpy import QtCore
 
 from ...widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
-    EXP_EXP_POLICY,
 )
 from ...widgets.parameter_config import ParameterEditFrame
-from ...widgets.silx_plot import PydidasPlot2D
+from ...widgets.silx_plot import create_silx_plot_stack
 
 
 class WorkflowTestFrameBuilder(BaseFrame):
@@ -167,6 +165,14 @@ class WorkflowTestFrameBuilder(BaseFrame):
             visible=False,
             parent_widget=self._widgets["config"],
         )
+        self.create_button(
+            "but_show_details",
+            "Show detailed results for plugin",
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets["config"],
+            visible=False,
+        )
         self.create_spacer(
             "config_terminal_spacer",
             height=20,
@@ -175,18 +181,4 @@ class WorkflowTestFrameBuilder(BaseFrame):
         )
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
-        self._widgets["plot1d"] = Plot1D()
-        self._widgets["plot1d"].getRoiAction().setVisible(False)
-        self._widgets["plot1d"].getFitAction().setVisible(False)
-        self._widgets["plot2d"] = PydidasPlot2D()
-        self.add_any_widget(
-            "plot_stack",
-            QtWidgets.QStackedWidget(),
-            alignment=None,
-            gridPos=(0, 1, 3, 1),
-            visible=True,
-            stretch=(1, 1),
-            sizePolicy=EXP_EXP_POLICY,
-        )
-        self._widgets["plot_stack"].addWidget(self._widgets["plot1d"])
-        self._widgets["plot_stack"].addWidget(self._widgets["plot2d"])
+        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1))

@@ -91,7 +91,7 @@ class EmptyDataset(np.ndarray):
         Finalizazion of numpy.ndarray object creation.
 
         This method will delete or append dimensions to the associated
-        axis_labels/_scales/_units attributes, depending on the object
+        axis_labels/_ranges/_units attributes, depending on the object
         dimensionality.
         """
         if obj is None or self.shape == tuple():
@@ -414,24 +414,24 @@ class EmptyDataset(np.ndarray):
         Returns
         -------
         dict
-            The axis scales: A dictionary with keys corresponding to the
+            The axis ranges: A dictionary with keys corresponding to the
             dimension in the array and respective values.
         """
         return self._keys["axis_ranges"].copy()
 
     @axis_ranges.setter
-    def axis_ranges(self, scales):
+    def axis_ranges(self, ranges):
         """
         Set the axis_ranges metadata.
 
         Parameters
         ----------
         labels : Union[dict, list, tuple]
-            The new axis scales. Both tuples and lists (of length ndim) as
+            The new axis ranges. Both tuples and lists (of length ndim) as
             well as dictionaries (with keys [0, 1, ..., ndim -1]) are
             accepted.
         """
-        _ranges = convert_data_to_dict(scales, self.ndim, "axis_ranges")
+        _ranges = convert_data_to_dict(ranges, self.ndim, "axis_ranges")
         self._convert_ranges_and_verify_length_okay(_ranges)
         self._keys["axis_ranges"] = _ranges
 
@@ -466,6 +466,20 @@ class EmptyDataset(np.ndarray):
                     f"\nDimension {_dim}: Given range: {_len}; target length: {_ndata}."
                 )
             raise ValueError(_error)
+
+    def convert_all_none_properties(self):
+        """
+        Convert all properties of NoneType to their default values.
+        """
+        self._data_unit = self._data_unit if self._data_unit is not None else ""
+        for _name in ["axis_units", "axis_labels"]:
+            _dict = self._keys[_name]
+            for _index, _key in _dict.items():
+                if _key is None:
+                    _dict[_index] = ""
+        for _index, _key in self._keys["axis_ranges"].items():
+            if _key is None:
+                self._keys["axis_ranges"][_index] = np.arange(self.shape[_index])
 
     # ################################################
     # Implement update methods for the axis properties
@@ -774,7 +788,7 @@ class Dataset(EmptyDataset):
         The labels for the axes. The length must correspond to the array
         dimensions. The default is None.
     **axis_ranges : Union[dict, list, tuple], optional
-        The scales for the axes. The length must correspond to the array
+        The ranges for the axes. The length must correspond to the array
         dimensions. The default is None.
     **axis_units : Union[dict, list, tuple], optional
         The units for the axes. The length must correspond to the array

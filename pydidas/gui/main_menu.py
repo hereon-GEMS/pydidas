@@ -349,7 +349,7 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _name = f"temp_window_{self.__window_counter:03d}"
         self.__window_counter += 1
-        self._child_windows[_name] = window(build_directly=True)
+        self._child_windows[_name] = window()
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )

@@ -30,8 +30,55 @@ import numpy as np
 from numpy.polynomial import Polynomial
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import ParameterCollection, Parameter
+from pydidas.core import ParameterCollection, Parameter, Dataset
 from pydidas.plugins import ProcPlugin
+
+
+DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG = ParameterCollection(
+    Parameter(
+        "threshold_low",
+        float,
+        None,
+        allow_None=True,
+        name="Lower threshold",
+        tooltip=(
+            "The lower threhold. Any values in the corrected"
+            " dataset smaller than the threshold will be set "
+            "to the threshold value."
+        ),
+    ),
+    Parameter(
+        "fit_order",
+        int,
+        3,
+        name="Polynomial fit order",
+        tooltip=(
+            "The polynomial order for the fit. This value "
+            "should typically not exceed3 or 4."
+        ),
+    ),
+    Parameter(
+        "include_limits",
+        int,
+        0,
+        choices=[True, False],
+        name="Always fit endpoints",
+        tooltip=(
+            "Flag to force the inclusion of both endpoints "
+            "in the initial points for the fit."
+        ),
+    ),
+    Parameter(
+        "kernel_width",
+        int,
+        5,
+        name="Averaging width",
+        tooltip=(
+            "The width of the averaging kernel (which is only "
+            "applied to the data for fitting)."
+        ),
+    ),
+)
 
 
 class Remove1dPolynomialBackground(ProcPlugin):
@@ -53,51 +100,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
     plugin_name = "Remove 1D polynomial background"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        Parameter(
-            "threshold_low",
-            float,
-            None,
-            allow_None=True,
-            name="Lower threshold",
-            tooltip=(
-                "The lower threhold. Any values in the corrected"
-                " dataset smaller than the threshold will be set "
-                "to the threshold value."
-            ),
-        ),
-        Parameter(
-            "fit_order",
-            int,
-            3,
-            name="Polynomial fit order",
-            tooltip=(
-                "The polynomial order for the fit. This value "
-                "should typically not exceed3 or 4."
-            ),
-        ),
-        Parameter(
-            "include_limits",
-            int,
-            0,
-            choices=[True, False],
-            name="Always fit endpoints",
-            tooltip=(
-                "Flag to force the inclusion of both endpoints "
-                "in the initial points for the fit."
-            ),
-        ),
-        Parameter(
-            "kernel_width",
-            int,
-            5,
-            name="Averaging width",
-            tooltip=(
-                "The width of the averaging kernel (which is only "
-                "applied to the data for fitting)."
-            ),
-        ),
-    )
+    default_params = DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG
     input_data_dim = 1
     output_data_dim = 1
 
@@ -110,6 +113,9 @@ class Remove1dPolynomialBackground(ProcPlugin):
         self._klim_low = 2
         self._klim_high = -2
         self._local_minina_threshold = 1.2
+        self.__input_data = None
+        self.__results = None
+        self.__kwargs = {}
 
     def pre_execute(self):
         """
@@ -148,6 +154,9 @@ class Remove1dPolynomialBackground(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        self.__input_data = data.copy()
+        self.__kwargs = kwargs
+
         if self._kernel is not None:
             _raw = data.copy()
             data[self._klim_low : -self._klim_high] = np.convolve(
@@ -192,6 +201,14 @@ class Remove1dPolynomialBackground(ProcPlugin):
         if self._thresh is not None:
             data[:] = np.where(data < self._thresh, self._thresh, data)
 
+        self.__background = Dataset(
+            _p_final(_x),
+            axis_labels=data.axis_labels,
+            axis_ranges=data.axis_ranges,
+            axis_units=data.axis_units,
+        )
+
+        self.__results = data
         return data, kwargs
 
     @staticmethod
@@ -226,3 +243,41 @@ class Remove1dPolynomialBackground(ProcPlugin):
             else:
                 _index += 1
         return xpos
+
+    def get_detailed_results(self):
+        """
+        Get the detailed results for the background removal.
+
+        This method will return detailed information to display for the user. The return
+        format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second, "plot_titles"
+        gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
+        each subplot. Fourth, "items" provides  a list with the different items to be
+        plotted. Each list entry must be a dictionary with the following keys: "plot"
+        [to detemine the plot number], "label" [for the legend label] and "data" with
+        the actual data.
+
+        Returns
+        -------
+        dict
+            The dictionary with the detailed results in the format expected by pydidas.
+        """
+        if self.__input_data is None:
+            raise ValueError("Cannot get detailed results without input data.")
+        _return = {
+            "n_plots": 2,
+            "plot_titles": {
+                0: "input data and background",
+                1: "plugin results (corrected data)",
+            },
+            "plot_ylabels": {
+                0: "intensity / a.u.",
+                1: "intensity / a.u.",
+            },
+            "items": [
+                {"plot": 0, "label": "input data", "data": self.__input_data.copy()},
+                {"plot": 0, "label": "background", "data": self.__background},
+                {"plot": 1, "label": "", "data": self.__results},
+            ],
+        }
+        return _return

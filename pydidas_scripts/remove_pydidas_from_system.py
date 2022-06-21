@@ -56,11 +56,11 @@ def remove_pydidas_from_system():
     print("\nRemoving registry settings...", end="")
     if sys.platform.startswith("win"):
         _qs = QtCore.QSettings("Hereon", "pydidas")
-        _hereon_entry = _qs.fileName()[:-len(os.sep + "pydidas")]
+        _hereon_entry = _qs.fileName()[: -len(os.sep + "pydidas")]
         _hereon_qs = QtCore.QSettings(_hereon_entry, QtCore.QSettings.NativeFormat)
         _hereon_qs.remove("pydidas")
         if len(_hereon_qs.allKeys()) == 0:
-            _parent_entry = _hereon_qs.fileName()[:-len(os.sep + "Hereon")]
+            _parent_entry = _hereon_qs.fileName()[: -len(os.sep + "Hereon")]
             _parent_qs = QtCore.QSettings(_parent_entry, QtCore.QSettings.NativeFormat)
             _parent_qs.remove("Hereon")
     elif sys.platform == "linux":
@@ -98,9 +98,12 @@ def remove_pydidas_from_system():
     shutil.rmtree(_docs_path)
     print("done")
 
-    print("\nSuccessfully removed all pydidas entries from the Windows operating "
-          "system.")
+    print(
+        "\nSuccessfully removed all pydidas entries from the Windows operating "
+        "system."
+    )
     input("Press <Enter> to continue.")
+
 
 if __name__ == "__main__":
     remove_pydidas_from_system()

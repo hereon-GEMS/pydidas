@@ -25,18 +25,13 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .create_silx_plot_stack_ import *
 from .pydidas_plot1d import *
 from .pydidas_plot2d import *
 from .silx_actions import *
+from .utilities import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import create_silx_plot_stack_
-
-__all__.extend(create_silx_plot_stack_.__all__)
-del create_silx_plot_stack_
-
 from . import pydidas_plot1d
 
 __all__.extend(pydidas_plot1d.__all__)
@@ -51,3 +46,8 @@ from . import silx_actions
 
 __all__.extend(silx_actions.__all__)
 del silx_actions
+
+from . import utilities
+
+__all__.extend(utilities.__all__)
+del utilities

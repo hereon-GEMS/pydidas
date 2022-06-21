@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["create_silx_plot_stack"]
+__all__ = ["create_silx_plot_stack", "get_2d_silx_plot_ax_settings"]
 
 from qtpy import QtWidgets
 
@@ -64,3 +64,26 @@ def create_silx_plot_stack(frame, gridPos=None):
     )
     frame._widgets["plot_stack"].addWidget(frame._widgets["plot1d"])
     frame._widgets["plot_stack"].addWidget(frame._widgets["plot2d"])
+
+
+def get_2d_silx_plot_ax_settings(axis):
+    """
+    Get the axis settings to have pixels centered at their values.
+
+    Parameters
+    ----------
+    axis : np.ndarray
+        The numpy array with the axis positions.
+
+    Returns
+    -------
+    _origin : float
+        The value for the axis origin.
+    _scale : float
+        The value for the axis scale to squeeze it into the correct
+        dimensions for silx ImageView.
+    """
+    _delta = axis[1] - axis[0]
+    _scale = (axis[-1] - axis[0] + _delta) / axis.size
+    _origin = axis[0] - _delta / 2
+    return _origin, _scale

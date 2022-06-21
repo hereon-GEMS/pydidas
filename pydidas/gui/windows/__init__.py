@@ -32,6 +32,7 @@ from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .global_config_window import *
 from .pydidas_window import *
+from .show_detailed_plugin_results import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -64,3 +65,8 @@ from . import pydidas_window
 
 __all__.extend(pydidas_window.__all__)
 del pydidas_window
+
+from . import show_detailed_plugin_results
+
+__all__.extend(show_detailed_plugin_results.__all__)
+del show_detailed_plugin_results

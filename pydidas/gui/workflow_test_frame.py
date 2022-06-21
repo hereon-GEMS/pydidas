@@ -37,7 +37,9 @@ from pydidas.core import (
 from ..experiment import SetupScan
 from ..workflow import WorkflowTree
 from ..widgets.dialogues import WarningBox
+from ..widgets.silx_plot import get_2d_silx_plot_ax_settings
 from .builders import WorkflowTestFrameBuilder
+from .windows import ShowDetailedPluginResults
 
 
 SCAN = SetupScan()
@@ -111,12 +113,15 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.__selected_new_node
         )
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
+        self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
 
     def finalize_ui(self):
         """
-        Check the local WorkflowTree is up to date.
+        Check the local WorkflowTree is up to date and create the window to show the
+        plugin results.
         """
         self.__check_tree_uptodate()
+        self.__details_window = ShowDetailedPluginResults()
 
     def __check_tree_uptodate(self):
         """
@@ -197,10 +202,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         self._config["shapes"] = {}
         self._config["labels"] = {}
+        self._config["plugin_names"] = {}
         self._config["data_labels"] = {}
         for _node_id, _node in self._tree.nodes.items():
             self._config["shapes"][_node_id] = _node.results.shape
             self._config["labels"][_node_id] = _node.plugin.get_param_value("label")
+            self._config["plugin_names"][_node_id] = _node.plugin.__class__.plugin_name
             self._config["data_labels"][_node_id] = _node.plugin.get_param_value(
                 "data_label"
             )
@@ -264,14 +271,14 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._active_node = -1
             self.__set_derived_widget_visibility(False)
             self._clear_plot()
-        elif index > 0:
-            self._active_node = int(
-                self.param_widgets["selected_results"].currentText()[-4:-1]
-            )
-            self._config["plot_active"] = True
-            self.__set_derived_widget_visibility(True)
-            self.__update_text_description_of_node_results()
-            self.__plot_results()
+            return
+        self._active_node = int(
+            self.param_widgets["selected_results"].currentText()[-4:-1]
+        )
+        self._config["plot_active"] = True
+        self.__set_derived_widget_visibility(True)
+        self.__update_text_description_of_node_results()
+        self.__plot_results()
 
     def __set_derived_widget_visibility(self, visible):
         """
@@ -287,6 +294,14 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         self._config["widget_visibility"] = visible
         self._widgets["result_info"].setVisible(visible)
+        _has_get_details_attr = (
+            False
+            if self._active_node == -1
+            else hasattr(
+                self._tree.nodes[self._active_node].plugin, "get_detailed_results"
+            )
+        )
+        self._widgets["but_show_details"].setVisible(_has_get_details_attr and visible)
 
     def __update_text_description_of_node_results(self):
         """
@@ -309,8 +324,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         }
         _ax_points = dict(enumerate(self._config["shapes"][self._active_node]))
         _values = utils.get_simplified_array_representation(_current_results)
-        _str = "\n\n".join(
-            [
+        _str = (
+            self._config["plugin_names"][self._active_node]
+            + ":\n\n"
+            + "\n\n".join(
                 (
                     f"Axis #{_axis:02d}:\n"
                     f'  Label: {_meta["axis_labels"][_axis]}\n'
@@ -318,7 +335,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                     f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}"
                 )
                 for _axis in _meta["axis_labels"]
-            ]
+            )
         )
         _str += f"\n\nValues:\n{_values}"
         _str += f'\n\nMetadata:\n{_meta["metadata"]}'
@@ -374,8 +391,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             + (" / " + _data.axis_units[i] if len(_data.axis_units[i]) > 0 else "")
             for i in [0, 1]
         ]
-        _originx, _scalex = self.__get_2d_plot_ax_settings(_data.axis_ranges[1])
-        _originy, _scaley = self.__get_2d_plot_ax_settings(_data.axis_ranges[0])
+        _originx, _scalex = get_2d_silx_plot_ax_settings(_data.axis_ranges[1])
+        _originy, _scaley = get_2d_silx_plot_ax_settings(_data.axis_ranges[0])
         _plot.addImage(
             _data,
             replace=True,
@@ -386,35 +403,28 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _plot.setGraphYLabel(_ax_label[0])
         _plot.setGraphXLabel(_ax_label[1])
 
-    @staticmethod
-    def __get_2d_plot_ax_settings(axis):
-        """
-        Get the axis settings to have pixels centered at their values.
-
-        Parameters
-        ----------
-        axis : np.ndarray
-            The numpy array with the axis positions.
-
-        Returns
-        -------
-        _origin : float
-            The value for the axis origin.
-        _scale : float
-            The value for the axis scale to squeeze it into the correct
-            dimensions for silx ImageView.
-        """
-        _delta = axis[1] - axis[0]
-        _scale = (axis[-1] - axis[0] + _delta) / axis.size
-        _origin = axis[0] - _delta / 2
-        return _origin, _scale
-
     def _clear_plot(self):
         """
         Clear the current plot and remove all items.
         """
         _plot_dim = self._config["plot_dim"]
         self._widgets[f"plot{_plot_dim }d"].remove()
+
+    @QtCore.Slot()
+    def show_plugin_details(self):
+        """
+        Show details for the selected plugin.
+
+        This method will get the detailed results for the active node and open a
+        new window to display the detailed information.
+        """
+        _plugin = self._tree.nodes[self._active_node].plugin
+        _details = _plugin.get_detailed_results()
+        _title = (
+            _plugin.plugin_name + self.param_widgets["selected_results"].currentText()
+        )
+        self.__details_window.update_results(_details, title=_title)
+        self.__details_window.show()
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

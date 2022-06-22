@@ -87,6 +87,7 @@ class FitSinglePeak(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._ffunc = None
         self._func = None
+        self._data = None
         self._fitparam_labels = []
         self._fitparam_startpoints = []
         self._fitparam_bounds_low = []
@@ -339,3 +340,59 @@ class FitSinglePeak(ProcPlugin):
             self._config["result_shape"] = (3,)
         else:
             raise ValueError("No result shape defined for the selected input")
+
+    def get_detailed_results(self):
+        """
+        Get the detailed results for the background removal.
+
+        This method will return detailed information to display for the user. The return
+        format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second, "plot_titles"
+        gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
+        each subplot. Fourth, "items" provides  a list with the different items to be
+        plotted. Each list entry must be a dictionary with the following keys: "plot"
+        [to detemine the plot number], "label" [for the legend label] and "data" with
+        the actual data.
+
+        Returns
+        -------
+        dict
+            The dictionary with the detailed results in the format expected by pydidas.
+        """
+        if self._data is None:
+            raise ValueError("Cannot get detailed results without input data.")
+        _xfit = np.linspace(self._x[0], self._x[-1], num=(self._x.size - 1) * 10 + 1)
+        _datafit = Dataset(
+            self._func(list(self._fit_params.values()), _xfit),
+            axis_ranges=[_xfit],
+            axis_labels=self._data.axis_labels,
+            axis_units=self._data.axis_units,
+            data_unit=self._data.data_unit,
+        )
+        _residual = self._data - self._func(list(self._fit_params.values()), self._x)
+        _return = {
+            "n_plots": 2,
+            "plot_titles": {0: "data and fit", 1: "residual"},
+            "plot_ylabels": {
+                0: "intensity / a.u.",
+                1: "intensity / a.u.",
+            },
+            "items": [
+                {"plot": 0, "label": "input data", "data": self._data},
+                {"plot": 0, "label": "fitted_data", "data": _datafit},
+                {"plot": 1, "label": "residual", "data": _residual},
+            ],
+        }
+        if self.get_param_value("fit_bg_order") is not None:
+            _bg_poly = [self._fit_params["background_p0"]]
+            if "background_p1" in self._fit_params:
+                _bg_poly.insert(0, self._fit_params["background_p1"])
+            _bg = Dataset(
+                np.polyval(_bg_poly, self._x),
+                axis_ranges=[self._x],
+                axis_labels=self._data.axis_labels,
+                axis_units=self._data.axis_units,
+                data_unit=self._data.data_unit,
+            )
+            _return["items"].append({"plot": 0, "label": "background", "data": _bg})
+        return _return

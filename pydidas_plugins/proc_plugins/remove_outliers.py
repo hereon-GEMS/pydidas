@@ -50,7 +50,7 @@ class RemoveOutliers(ProcPlugin):
             name="Kernel width",
             tooltip=(
                 "The width of the search kernel (i.e. the maximum "
-                "width of outliers which can be detected."
+                "width of outliers which can be detected)."
             ),
         ),
         Parameter(
@@ -95,6 +95,7 @@ class RemoveOutliers(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        self.__input_data = data.copy()
         _width = self.get_param_value("kernel_width")
         _threshold = self.get_param_value("outlier_threshold")
         _data_p = np.roll(data, _width)
@@ -106,7 +107,6 @@ class RemoveOutliers(ProcPlugin):
             _low_outliers = np.where(
                 (_data_low1 <= -_threshold) & (_data_low2 <= -_threshold)
             )[0]
-
             _data_high1 = ((data - _data_p) / _data_p)[_width:-_width]
             _data_high2 = ((data - _data_m) / _data_m)[_width:-_width]
             _high_outliers = np.where(
@@ -114,4 +114,40 @@ class RemoveOutliers(ProcPlugin):
             )[0]
         _outliers = np.concatenate((_low_outliers, _high_outliers)) + _width
         data[_outliers] = (_data_p[_outliers] + _data_m[_outliers]) / 2
+        self.__results = data
         return data, kwargs
+
+    def get_detailed_results(self):
+        """
+        Get the detailed results for the outlier removal.
+
+        This method will return detailed information to display for the user. The return
+        format is a dictionary with four keys:
+        First, "n_plots" which determines the number of plots. Second, "plot_titles"
+        gives a title for each subplot. Third, "plot_ylabels" gives a y axis label for
+        each subplot. Fourth, "items" provides  a list with the different items to be
+        plotted. Each list entry must be a dictionary with the following keys: "plot"
+        [to detemine the plot number], "label" [for the legend label] and "data" with
+        the actual data.
+
+        Returns
+        -------
+        dict
+            The dictionary with the detailed results in the format expected by pydidas.
+        """
+        if self.__input_data is None:
+            raise ValueError("Cannot get detailed results without input data.")
+        _return = {
+            "n_plots": 1,
+            "plot_titles": {
+                0: "outlier correction",
+            },
+            "plot_ylabels": {
+                0: "intensity / a.u.",
+            },
+            "items": [
+                {"plot": 0, "label": "input data", "data": self.__input_data},
+                {"plot": 0, "label": "corrected data", "data": self.__results},
+            ],
+        }
+        return _return

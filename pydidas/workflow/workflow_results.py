@@ -545,8 +545,9 @@ class _WorkflowResults(QtCore.QObject):
                     ]:
                         _item[_index + 1] = _item[_index + _scandim]
                         del _item[_index + _scandim]
-        return "".join(
-            [
+        _txt = (
+            TREE.nodes[node_id].plugin.plugin_name + ":\n\n"
+            + "".join(
                 (
                     f"Axis #{_axis:02d} {_ax_types[_axis]}:\n"
                     f"  Label: {_ax_labels[_axis]}\n"
@@ -554,8 +555,9 @@ class _WorkflowResults(QtCore.QObject):
                     f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n"
                 )
                 for _axis in _ax_labels
-            ]
+            )
         )
+        return _txt
 
     def import_data_from_directory(self, directory):
         """

@@ -24,6 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResultSaverBase"]
 
+import re
+
 from ...core.io_registry import GenericIoBase
 from .workflow_result_saver_meta import WorkflowResultSaverMeta
 
@@ -80,12 +82,12 @@ class WorkflowResultSaverBase(GenericIoBase, metaclass=WorkflowResultSaverMeta):
         _names = {}
         for _id, _label in labels.items():
             if _label is None or _label == "":
-                _names[_id] = f"node_{_id:02d}{cls.default_extension}"
+                _names[_id] = f"node_{_id:02d}.{cls.default_extension}"
             else:
-                for _key in [" ", "\n", "\t", "\r"]:
-                    _label = _label.replace(_key, "_")
+                _label = re.sub("[ \n\r\t]", "_", _label)
+                _label = re.sub("[^a-zA-Z0-9_-]", "", _label)
                 _names[_id] = (
-                    f"node_{_id:02d}_{_label}{cls.default_extension}"
+                    f"node_{_id:02d}_{_label}.{cls.default_extension}"
                 ).replace("__", "_")
         return _names
 

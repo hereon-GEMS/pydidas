@@ -35,6 +35,8 @@ Bugfixes:
   full text.
 - Fixed an issue with the PluginInWorkflowBox labels after restoring these from
   the frame state.
+- Fixed an issue with WorkflowTree results export and labels with special 
+  characters.
 
 
 v0.1.8

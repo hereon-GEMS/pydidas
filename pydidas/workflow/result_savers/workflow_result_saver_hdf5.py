@@ -47,7 +47,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
 
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
-    default_extension = ".h5"
+    default_extension = "h5"
     _shapes = []
     _filenames = []
     _save_dir = None

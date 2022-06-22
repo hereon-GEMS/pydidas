@@ -37,7 +37,7 @@ class ShowDetailedPluginResults(PydidasWindow):
     show_frame = False
 
     def __init__(self, parent=None, results=None, **kwargs):
-        PydidasWindow.__init__(self, parent, title="Plugin results", **kwargs)
+        PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
         if results is not None:
             self.update_results(results)
 
@@ -65,24 +65,9 @@ class ShowDetailedPluginResults(PydidasWindow):
         self.__update_title(title)
         _n_plots = results.get("n_plots", 0)
 
-        _titles = results.get("plot_titles", {})
-
-        self.__prepare_widgets(_n_plots, _titles)
+        self.__prepare_widgets(_n_plots)
 
         self.__plot_results(results)
-
-    def __rename_plots(self, target):
-        """
-        Rename the generic plot_stacks and plots to allow different plots.
-
-        Parameters
-        ----------
-        target : int
-            The subplot number.
-        """
-        self._widgets[f"plot{target}_stack"] = self._widgets["plot_stack"]
-        self._widgets[f"plot{target}_1d"] = self._widgets["plot1d"]
-        self._widgets[f"plot{target}_2d"] = self._widgets["plot2d"]
 
     def __update_title(self, title):
         """
@@ -98,7 +83,7 @@ class ShowDetailedPluginResults(PydidasWindow):
         else:
             self._widgets["label_title"].setText("Detailed plugin results")
 
-    def __prepare_widgets(self, n_plots, titles):
+    def __prepare_widgets(self, n_plots):
         """
         Prepare all widgets.
 
@@ -106,17 +91,13 @@ class ShowDetailedPluginResults(PydidasWindow):
         ----------
         n_plots : int
             The number of active plots
-        titles : dict
-            The dictionary with the plot titles.
         """
         self.__create_necessary_plots(n_plots)
         for _index in range(4):
             if f"plot{_index}_stack" in self._widgets:
-                _title = titles.get(_index, "")
                 self._widgets[f"plot{_index}_stack"].setVisible(_index < n_plots)
                 for _dim in [1, 2]:
                     self._widgets[f"plot{_index}_{_dim}d"].clear()
-                    self._widgets[f"plot{_index}_{_dim}d"].setGraphTitle(_title)
 
     def __create_necessary_plots(self, n_plots):
         """
@@ -135,6 +116,19 @@ class ShowDetailedPluginResults(PydidasWindow):
             create_silx_plot_stack(self, gridPos=(_y, _x, 1, 1))
             self.__rename_plots(_index)
 
+    def __rename_plots(self, target):
+        """
+        Rename the generic plot_stacks and plots to allow different plots.
+
+        Parameters
+        ----------
+        target : int
+            The subplot number.
+        """
+        self._widgets[f"plot{target}_stack"] = self._widgets["plot_stack"]
+        self._widgets[f"plot{target}_1d"] = self._widgets["plot1d"]
+        self._widgets[f"plot{target}_2d"] = self._widgets["plot2d"]
+
     def __plot_results(self, results):
         """
         Plot the provided results.
@@ -145,18 +139,22 @@ class ShowDetailedPluginResults(PydidasWindow):
             The dictionary with the new results.
         """
         _plot_ylabels = results.get("plot_ylabels", {})
+        _titles = results.get("plot_titles", {})
         for _item in results["items"]:
             _i_plot = _item["plot"]
             _label = _item.get("label", "")
+            _title = _titles.get(_i_plot, "")
             _data = _item["data"]
             _data.convert_all_none_properties()
             if _data.ndim == 1:
                 _ylabel = _plot_ylabels.get(_i_plot, "")
                 self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(0)
                 self._plot1d(_i_plot, _data, _label, _ylabel)
+                self._widgets[f"plot{_i_plot}_1d"].setGraphTitle(_title)
             elif _data.ndim == 2:
                 self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(1)
                 self._plot2d(_i_plot, _data, _label)
+                self._widgets[f"plot{_i_plot}_2d"].setGraphTitle(_title)
 
     def _plot1d(self, i_plot, data, label, plot_ylabel=None):
         """
@@ -177,10 +175,14 @@ class ShowDetailedPluginResults(PydidasWindow):
         _axlabel = data.axis_labels[0] + (
             " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
         )
-        _plot.addCurve(data.axis_ranges[0], data.array, linewidth=1.5, legend=label)
-        _plot.setGraphXLabel(_axlabel)
-        if plot_ylabel is not None:
-            _plot.setGraphYLabel(plot_ylabel)
+        _plot.addCurve(
+            data.axis_ranges[0],
+            data.array,
+            linewidth=1.5,
+            legend=label,
+            xlabel=_axlabel,
+            ylabel=plot_ylabel,
+        )
 
     def _plot2d(self, i_plot, data, label):
         """

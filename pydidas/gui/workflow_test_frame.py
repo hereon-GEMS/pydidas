@@ -421,7 +421,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _plugin = self._tree.nodes[self._active_node].plugin
         _details = _plugin.get_detailed_results()
         _title = (
-            _plugin.plugin_name + self.param_widgets["selected_results"].currentText()
+            _plugin.plugin_name
+            + ' "'
+            + self.param_widgets["selected_results"].currentText()
+            + '"'
         )
         self.__details_window.update_results(_details, title=_title)
         self.__details_window.show()

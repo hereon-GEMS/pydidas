@@ -105,6 +105,7 @@ class TestWorkflowResults(unittest.TestCase):
         _data = np.random.random((9, 9, 27))
         _data_labels = {0: "None", 1: None, 2: "Label"}
         _data_units = {0: "u1", 1: "u2", 2: None}
+        _plugin_name = get_random_string(7)
         _data_ranges = {
             0: None,
             1: np.arange(9) - 3,
@@ -115,6 +116,7 @@ class TestWorkflowResults(unittest.TestCase):
             _file.create_group("entry/data")
             _file.create_group("entry/scan")
             _file["entry"].create_dataset("data_label", data=_data_label)
+            _file["entry"].create_dataset("plugin_name", data=_plugin_name)
             _file["entry"].create_dataset("label", data=_label)
             _file["entry"].create_dataset("title", data=get_random_string(8))
             _file["entry/data"].create_dataset("data", data=_data)
@@ -164,6 +166,7 @@ class TestWorkflowResults(unittest.TestCase):
                 "axlabels": _data_labels,
                 "axunits": _data_units,
                 "axranges": _data_ranges,
+                "plugin_name": _plugin_name,
             }
             return _meta
 
@@ -526,7 +529,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_update_param_choices_from_label__only_node_entries(self):
         _param = get_generic_parameter("selected_results")
-        RES._config["labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
+        RES._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
         RES.update_param_choices_from_labels(_param, False)
         _choices = _param.choices
         for _key, _label in RES.labels.items():
@@ -538,7 +541,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_update_param_choices_from_label__node_only_bad_choice(self):
         _param = Parameter("test", str, "something", choices=["something"])
-        RES._config["labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
+        RES._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
         RES.update_param_choices_from_labels(_param, False)
         _choices = _param.choices
         for _key, _label in RES.labels.items():

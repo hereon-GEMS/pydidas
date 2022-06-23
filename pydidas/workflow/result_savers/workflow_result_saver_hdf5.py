@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowTreeExporterBase class which exporters should inherit
-from.
+Module with the WorkflowResultSaverHdf5 class which exports and imports results in
+Hdf5 file format.
 """
 
 __author__ = "Malte Storm"
@@ -33,28 +33,29 @@ from ...experiment import SetupExperiment, SetupScan
 from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from ...core.constants import HDF5_EXTENSIONS
+from ..workflow_tree import WorkflowTree
 from .workflow_result_saver_base import WorkflowResultSaverBase
 
 
+TREE = WorkflowTree()
 EXP = SetupExperiment()
 SCAN = SetupScan()
 
 
 class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
     """
-    Base class for WorkflowTree exporters.
+    Implementation of the WorkflowResultSaverBase for Hdf5 files.
     """
 
     extensions = HDF5_EXTENSIONS
     format_name = "HDF5"
     default_extension = "h5"
-    _shapes = []
     _filenames = []
     _save_dir = None
     _metadata_written = False
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, shapes, labels, data_labels):
+    def prepare_files_and_directories(cls, save_dir, node_information):
         """
         Prepare the hdf5 files with the metadata.
 
@@ -64,25 +65,22 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
             The scan name or title.
         save_dir : Union[pathlib.Path, str]
             The full path for the data to be saved.
-        shapes : dict
-            The shapes of the results in form of a dictionary with nodeID
-            keys and result values.
-        labels : dict
-            The labels of the results in form of a dictionary with nodeID
-            keys and label values.
-        data_labels : dict
-            The labels of the data values in the results in form of a
-            dictionary with nodeID keys and label values.
+        node_information : dict
+            A dictionary with nodeID keys and dictionary values. Each value dictionary
+            must have the following keys: shape, node_label, data_label, plugin_name
+            and the respecive values. The shape (tuple) detemines the shape of the
+            Dataset, the node_label is the user's name for the processing node. The
+            data_label gives the description of what the data shows (e.g. intensity)
+            and the plugin_name is simply the name of the plugin.
         """
         cls._save_dir = save_dir
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        cls._filenames = cls.get_filenames_from_labels(labels)
-        cls._shapes = shapes
-        cls._labels = labels
-        cls._data_labels = data_labels
+
+        cls._node_information = node_information
+        cls._filenames = cls.get_filenames_from_labels()
         cls._metadata_written = False
-        for _index in cls._shapes:
+        for _index in cls._node_information.keys():
             cls._create_file_and_populate_metadata(_index)
 
     @classmethod
@@ -98,8 +96,17 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         _ndim = SCAN.get_param_value("scan_dim")
         _dsets = [
             ["entry", "title", {"data": cls.scan_title}],
-            ["entry", "label", {"data": cls._labels[node_id]}],
-            ["entry", "data_label", {"data": cls._data_labels[node_id]}],
+            ["entry", "label", {"data": cls.get_node_attribute(node_id, "node_label")}],
+            [
+                "entry",
+                "plugin_name",
+                {"data": cls.get_node_attribute(node_id, "plugin_name")},
+            ],
+            [
+                "entry",
+                "data_label",
+                {"data": cls.get_node_attribute(node_id, "data_label")},
+            ],
             ["entry", "definition", {"data": "custom (NXxbase-aligned)"}],
             ["entry/instrument/source", "probe", {"data": "x-ray"}],
             ["entry/instrument/source", "type", {"data": "synchrotron"}],
@@ -119,7 +126,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 "distance",
                 {"data": EXP.get_param_value("detector_dist")},
             ],
-            ["entry/data", "data", {"shape": cls._shapes[node_id]}],
+            ["entry/data", "data", {"shape": cls.get_node_attribute(node_id, "shape")}],
             ["entry/scan", "scan_dimension", {"data": _ndim}],
         ]
         scanval = SCAN.get_param_value
@@ -277,17 +284,19 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         -------
         data : pydidas.core.Dataset
             The dataset with the imported data.
-        label : str
-            The node's label.
-        data_label : str
-            The node's data label.
+        node_info : dict
+            A dictionary with node_label, data_label, plugin_name keys and the
+            respective values.
         scan : dict
             The dictionary with meta information about the scan.
         """
         with h5py.File(filename, "r") as _file:
             _data = Dataset(_file["entry/data/data"][()])
-            _label = read_and_decode_hdf5_dataset(_file["entry/label"])
-            _data_label = read_and_decode_hdf5_dataset(_file["entry/data_label"])
+            _node_info = {
+                "node_label": read_and_decode_hdf5_dataset(_file["entry/label"]),
+                "data_label": read_and_decode_hdf5_dataset(_file["entry/data_label"]),
+                "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
+            }
             _axlabels = []
             _axunits = []
             _axranges = []
@@ -297,7 +306,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 )
                 _range = (
                     None
-                    if (isinstance(_rangeentry, bytes) and _rangeentry == b"None")
+                    if (isinstance(_rangeentry, bytes) and _rangeentry == b"::None::")
                     else _rangeentry
                 )
                 _axranges.append(_range)
@@ -342,4 +351,5 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         _data.axis_units = _axunits
         _data.axis_labels = _axlabels
         _data.axis_ranges = _axranges
-        return _data, _label, _data_label, _scan
+        _node_info["shape"] = _data.shape
+        return _data, _node_info, _scan

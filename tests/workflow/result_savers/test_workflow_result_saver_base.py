@@ -42,12 +42,17 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._meta_registry = META.registry.copy()
+        cls._node_information = {
+            5: {"test": 42, "42": "test", "node_label": "__\n _ \t pretty@!%ugly_name"},
+            7: {"test": 12, "42": "spam", "node_label": "a_beautiful_name"},
+        }
         META.reset()
 
         class SAVER(WorkflowResultSaverBase):
-            extensions = [".TEST"]
-            default_extension = ".Test"
+            extensions = ["TEST"]
+            default_extension = "Test"
             format_name = "Test"
+            _node_information = cls._node_information
 
         cls.SAVER = SAVER
 
@@ -59,26 +64,46 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
     def test_class_existance(self):
         self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)
 
+    def test_get_attribute_dict(self):
+        _name = "test"
+        _dict = self.SAVER.get_attribute_dict(_name)
+        self.assertEqual(
+            _dict, {_id: self._node_information[_id][_name] for _id in _dict}
+        )
+
+    def test_get_attribute_value(self):
+        _name = "test"
+        _id = 5
+        _val = self.SAVER.get_node_attribute(_id, _name)
+        self.assertEqual(_val, self._node_information[_id][_name])
+
     def test_export_frame_to_file(self):
-        self.SAVER.export_frame_to_file(0, {})
-        # assert does not raise an Exception
+        with self.assertRaises(NotImplementedError):
+            self.SAVER.export_frame_to_file(0, {})
 
     def test_export_full_data_to_file(self):
-        self.SAVER.export_full_data_to_file({})
-        # assert does not raise an Exception
+        with self.assertRaises(NotImplementedError):
+            self.SAVER.export_full_data_to_file({})
 
     def test_prepare_files_and_directories(self):
-        self.SAVER.prepare_files_and_directories("Dir", {}, {}, {})
+        with self.assertRaises(NotImplementedError):
+            self.SAVER.prepare_files_and_directories("Dir", {})
         # assert does not raise an Exception
 
     def test_get_filenames_from_labels(self):
-        _labels = {0: None, 1: "some thing", 2: "\nanother name", 3: "label"}
+        _names = self.SAVER.get_filenames_from_labels()
+        self.assertEqual(
+            _names,
+            {5: "node_05_pretty_ugly_name.Test", 7: "node_07_a_beautiful_name.Test"},
+        )
+
+    def test_get_filenames_from_labels__with_labels(self):
+        _labels = {_id: self._node_information[_id]["node_label"] for _id in [5, 7]}
         _names = self.SAVER.get_filenames_from_labels(_labels)
-        for _node_id, _name in _names.items():
-            self.assertTrue(_name.startswith(f"node_{_node_id:02d}"))
-            self.assertTrue(_name.endswith(".Test"))
-            self.assertNotIn(" ", _name)
-            self.assertNotIn("\n", _name)
+        self.assertEqual(
+            _names,
+            {5: "node_05_pretty_ugly_name.Test", 7: "node_07_a_beautiful_name.Test"},
+        )
 
     def test_import_results_from_file(self):
         with self.assertRaises(NotImplementedError):

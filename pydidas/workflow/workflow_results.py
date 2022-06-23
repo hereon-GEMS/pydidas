@@ -70,6 +70,7 @@ class _WorkflowResults(QtCore.QObject):
         _shapes = {_key: _points + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
             _dset = Dataset(np.zeros(_shape, dtype=np.float32))
+            _dset.convert_all_none_properties()
             for index in range(_dim):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index + 1)
                 _dset.update_axis_labels(index, _label)
@@ -77,12 +78,16 @@ class _WorkflowResults(QtCore.QObject):
                 _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
             self._config["shapes"] = _shapes
-            self._config["labels"][_node_id] = TREE.nodes[
+            self._config["node_labels"][_node_id] = TREE.nodes[
                 _node_id
             ].plugin.get_param_value("label")
             self._config["data_labels"][_node_id] = TREE.nodes[
                 _node_id
             ].plugin.get_param_value("data_label")
+            self._config["plugin_names"][_node_id] = TREE.nodes[
+                _node_id
+            ].plugin.plugin_name
+
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     def clear_all_results(self):
@@ -93,9 +98,10 @@ class _WorkflowResults(QtCore.QObject):
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
         self._config = {
             "shapes": {},
-            "labels": {},
+            "node_labels": {},
             "data_labels": {},
             "metadata_complete": False,
+            "plugin_names": {},
         }
 
     def update_frame_metadata(self, metadata):
@@ -187,7 +193,7 @@ class _WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: label>
         """
-        return self._config["labels"].copy()
+        return self._config["node_labels"].copy()
 
     @property
     def data_labels(self):
@@ -335,14 +341,7 @@ class _WorkflowResults(QtCore.QObject):
             _data = _data[slices[0]]
 
         if force_string_metadata:
-            _data.axis_units = [
-                (str(_val) if _val is not None else "")
-                for _val in _data.axis_units.values()
-            ]
-            _data.axis_labels = [
-                (str(_val) if _val is not None else "")
-                for _val in _data.axis_labels.values()
-            ]
+            _data.convert_all_none_properties()
         if squeeze:
             return _data.squeeze()
         return _data
@@ -439,13 +438,25 @@ class _WorkflowResults(QtCore.QObject):
         _name = SCAN.get_param_value("scan_title")
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
-            _shapes = self.shapes
-            _labels = self.labels
-            _data_labels = self.data_labels
+            _node_info = {
+                _id: {
+                    "shape": self._config["shapes"][_id],
+                    "node_label": self._config["node_labels"][_id],
+                    "data_label": self._config["data_labels"][_id],
+                    "plugin_name": self._config["plugin_names"][_id],
+                }
+                for _id in self.shapes
+            }
         else:
-            _shapes = {single_node: self.shapes[single_node]}
-            _labels = {single_node: self.labels[single_node]}
-            _data_labels = {single_node: self.data_labels[single_node]}
+            _node_info = {
+                single_node: {
+                    "shape": self._config["shapes"][single_node],
+                    "node_label": self._config["node_labels"][single_node],
+                    "data_label": self._config["data_labels"][single_node],
+                    "plugin_name": self._config["plugin_names"][single_node],
+                }
+            }
+        _labels = {_id: _node_info[_id]["node_label"] for _id in _node_info}
         _names = RESULT_SAVER.get_filenames_from_active_savers(_labels)
         _existcheck = [
             os.path.exists(os.path.join(save_dir, _name)) for _name in _names
@@ -458,7 +469,7 @@ class _WorkflowResults(QtCore.QObject):
             )
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        RESULT_SAVER.prepare_active_savers(save_dir, _shapes, _labels, _data_labels)
+        RESULT_SAVER.prepare_active_savers(save_dir, _node_info)
 
     def update_param_choices_from_labels(self, param, add_no_selection_entry=True):
         """
@@ -484,7 +495,7 @@ class _WorkflowResults(QtCore.QObject):
                     if len(_val) > 0
                     else f"(node #{_key:03d})"
                 )
-                for _key, _val in self._config["labels"].items()
+                for _key, _val in self._config["node_labels"].items()
             ]
         )
         if _curr_choice in _new_choices:
@@ -546,7 +557,8 @@ class _WorkflowResults(QtCore.QObject):
                         _item[_index + 1] = _item[_index + _scandim]
                         del _item[_index + _scandim]
         _txt = (
-            TREE.nodes[node_id].plugin.plugin_name + ":\n\n"
+            self._config["plugin_names"][node_id]
+            + ":\n\n"
             + "".join(
                 (
                     f"Axis #{_axis:02d} {_ax_types[_axis]}:\n"
@@ -569,13 +581,12 @@ class _WorkflowResults(QtCore.QObject):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _data, _labels, _data_labels, _scan = RESULT_SAVER.import_data_from_directory(
-            directory
-        )
+        _data, _node_info, _scan = RESULT_SAVER.import_data_from_directory(directory)
         self._config = {
             "shapes": {_key: _item.shape for _key, _item in _data.items()},
-            "labels": _labels,
-            "data_labels": _data_labels,
+            "node_labels": {_id: _node_info[_id]["node_label"] for _id in _node_info},
+            "data_labels": {_id: _node_info[_id]["data_label"] for _id in _node_info},
+            "plugin_names": {_id: _node_info[_id]["plugin_name"] for _id in _node_info},
             "metadata_complete": True,
         }
         self.__composites = _data

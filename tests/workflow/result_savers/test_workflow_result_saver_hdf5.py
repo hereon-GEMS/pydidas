@@ -68,8 +68,9 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         cls._import_data_label = get_random_string(12)
         cls._import_label = get_random_string(9)
         cls._import_data = np.random.random((9, 9, 27))
-        cls._import_data_labels = {0: "None", 1: None, 2: "Label"}
+        cls._import_data_ax_labels = {0: "None", 1: None, 2: "Label"}
         cls._import_data_units = {0: "u1", 1: "u2", 2: None}
+        cls._import_plugin_name = get_random_string(8)
         cls._import_title = get_random_string(10)
         cls._import_data_ranges = {
             0: np.arange(9),
@@ -82,6 +83,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             _file.create_group("entry/scan")
             _file["entry"].create_dataset("data_label", data=cls._import_data_label)
             _file["entry"].create_dataset("label", data=cls._import_label)
+            _file["entry"].create_dataset("plugin_name", data=cls._import_plugin_name)
             _file["entry/data"].create_dataset("data", data=cls._import_data)
             _file["entry"].create_dataset("title", data=cls._import_title)
             _file["entry/scan"].create_dataset("scan_dimension", data=SCAN.ndim)
@@ -90,7 +92,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                     _file,
                     f"entry/data/axis_{_dim}",
                     "label",
-                    data=cls._import_data_labels[_dim],
+                    data=cls._import_data_ax_labels[_dim],
                 )
                 create_hdf5_dataset(
                     _file,
@@ -115,7 +117,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
                     _file,
                     f"entry/scan/dim_{_dim}",
                     "label",
-                    data=cls._import_data_labels[_dim],
+                    data=cls._import_data_ax_labels[_dim],
                 )
                 create_hdf5_dataset(
                     _file,
@@ -144,15 +146,23 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         }
         self._labels = {1: "Test", 2: "not again", 3: "another"}
         self._datalabels = {1: "Intensity", 2: "Peak height", 3: "Area"}
+        self._plugin_names = {1: "A plugin", 2: "Plugin no 2.", 3: "Ye olde plugin"}
         self._filenames = {
             1: "node_01_Test.h5",
             2: "node_02_not_again.h5",
             3: "node_03_another.h5",
         }
+        _node_infos = {
+            _node: {
+                "node_label": self._labels[_node],
+                "data_label": self._datalabels[_node],
+                "shape": self._shapes[_node],
+                "plugin_name": self._plugin_names[_node],
+            }
+            for _node in self._shapes.keys()
+        }
         self._resdir = os.path.join(self._dir, get_random_string(8))
-        H5SAVER.prepare_files_and_directories(
-            self._resdir, self._shapes, self._labels, self._datalabels
-        )
+        H5SAVER.prepare_files_and_directories(self._resdir, _node_infos)
 
     def get_datasets(self, start_dim=3):
         return {
@@ -198,8 +208,8 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
     def test_prepare_files_and_directories(self):
         self.prepare_with_defaults()
         self.assertTrue(os.path.exists(self._resdir))
-        self.assertEqual(H5SAVER._shapes, self._shapes)
-        self.assertEqual(H5SAVER._labels, self._labels)
+        self.assertEqual(H5SAVER.get_attribute_dict("shape"), self._shapes)
+        self.assertEqual(H5SAVER.get_attribute_dict("node_label"), self._labels)
         for _key in self._shapes:
             _fname = H5SAVER._filenames[_key]
             self.assertEqual(_fname, self._filenames[_key])
@@ -314,13 +324,13 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             self.assertTrue(np.allclose(_written_data, _data[_node_id]))
 
     def test_import_results_from_file(self):
-        _data, _label, _data_label, _scan = H5SAVER.import_results_from_file(
+        _data, _node_info, _scan = H5SAVER.import_results_from_file(
             self._import_test_filename
         )
-        self.assertEqual(_label, self._import_label)
-        self.assertEqual(_data_label, self._import_data_label)
+        self.assertEqual(_node_info["node_label"], self._import_label)
+        self.assertEqual(_node_info["data_label"], self._import_data_label)
         for _ax in range(_data.ndim):
-            self.assertEqual(self._import_data_labels[_ax], _data.axis_labels[_ax])
+            self.assertEqual(self._import_data_ax_labels[_ax], _data.axis_labels[_ax])
             self.assertEqual(self._import_data_units[_ax], _data.axis_units[_ax])
             if isinstance(self._import_data_ranges[_ax], np.ndarray):
                 self.assertTrue(
@@ -332,7 +342,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
         self.assertEqual(_scan["scan_dim"], 2)
         _ranges = self._import_data_ranges
         for _dim in [0, 1]:
-            _label = self._import_data_labels[_dim]
+            _label = self._import_data_ax_labels[_dim]
             _label = _label if _label is not None else ""
             self.assertEqual(
                 _scan[_dim],
@@ -355,7 +365,7 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             create_hdf5_dataset(_file, "entry/scan/dim_0", "unit", data=None)
             del _file["entry/scan/dim_0/label"]
             create_hdf5_dataset(_file, "entry/scan/dim_0", "label", data=None)
-        _data, _label, _data_label, _scan = H5SAVER.import_results_from_file(_new_name)
+        _data, _node_info, _scan = H5SAVER.import_results_from_file(_new_name)
         self.assertEqual(_scan[0]["delta"], 1)
         self.assertEqual(_scan[0]["offset"], 0)
         self.assertEqual(_scan[0]["n_points"], _data.shape[0])

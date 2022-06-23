@@ -403,6 +403,8 @@ class TestDataset(unittest.TestCase):
             self.assertEqual(obj.axis_units[_i1], _new.axis_units[_i2])
             self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
         self.assertTrue(np.allclose(obj[0, 0, 0], _new[0, 0]))
+        self.assertEqual(obj.metadata, _new.metadata)
+        self.assertEqual(obj.data_unit, _new.data_unit)
 
     def test_squeeze__multi_dim(self):
         obj = Dataset(

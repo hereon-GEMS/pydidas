@@ -102,7 +102,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         return _names
 
     @classmethod
-    def prepare_active_savers(cls, save_dir, shapes, labels, data_labels):
+    def prepare_active_savers(cls, save_dir, node_information):
         """
         Prepare the active savers for storing data by creating the required
         files and directories.
@@ -111,23 +111,21 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         ----------
         save_dir : Union[pathlib.Path, str]
             The full path for the data to be saved.
-        shapes : dict
-            The shapes of the results in form of a dictionary with nodeID
-            keys and result values.
-        labels : dict
-            The labels of the results in form of a dictionary with nodeID
-            keys and label values.
-        data_labels : dict
-            The labels of the data values in the results in form of a
-            dictionary with nodeID keys and label values.
+        node_information : dict
+            A dictionary with nodeID keys and dictionary values. Each value dictionary
+            must have the following keys: shape, node_label, data_label, plugin_name
+            and the respecive values. The shape (tuple) detemines the shape of the
+            Dataset, the node_label is the user's name for the processing node. The
+            data_label gives the description of what the data shows (e.g. intensity)
+            and the plugin_name is simply the name of the plugin.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
             _saver.scan_title = cls.scan_title
-            _saver.prepare_files_and_directories(save_dir, shapes, labels, data_labels)
+            _saver.prepare_files_and_directories(save_dir, node_information)
 
     @classmethod
-    def prepare_saver(cls, extension, save_dir, shapes, labels, data_labels):
+    def prepare_saver(cls, extension, save_dir, node_information):
         """
         Call the concrete saver associated with the extension to prepare
         all requird files and directories.
@@ -138,18 +136,17 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             The extension of the saved files.
         save_dir : Union[pathlib.Path, str]
             The full path for the data to be saved.
-        shapes : dict
-            The shapes of the results in form of a dictionary with nodeID
-            keys and result values.
-        labels : dict
-            The labels of the results in form of a dictionary with nodeID
-            keys and label values.
-        data_labels : dict
-            The labels of the data values in the results in form of a
-            dictionary with nodeID keys and label values."""
+        node_information : dict
+            A dictionary with nodeID keys and dictionary values. Each value dictionary
+            must have the following keys: shape, node_label, data_label, plugin_name
+            and the respecive values. The shape (tuple) detemines the shape of the
+            Dataset, the node_label is the user's name for the processing node. The
+            data_label gives the description of what the data shows (e.g. intensity)
+            and the plugin_name is simply the name of the plugin.
+        """
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
-        _saver.prepare_files_and_directories(save_dir, shapes, labels, data_labels)
+        _saver.prepare_files_and_directories(save_dir, node_information)
 
     @classmethod
     def push_frame_metadata_to_active_savers(cls, metadata):
@@ -242,7 +239,8 @@ class WorkflowResultSaverMeta(GenericIoMeta):
     @classmethod
     def import_data_from_directory(cls, dirname):
         """
-
+        Import data from files in a directory and pass it in a format for the
+        WorkflowResults to update itself.
 
         Parameters
         ----------
@@ -254,16 +252,13 @@ class WorkflowResultSaverMeta(GenericIoMeta):
         data_dict : dict
             The dictionary with the data. Keys are the respective node IDs and dict
             values is the imported data.
-        labels : dict
-            The labels for the imported nodes.
-        data_labels : dict
-            The labels for the Datasets.
+        node_info_dict : dict
+            The dictionary with information for all imported nodes.
         scan : dict
             The dictionary with information about the Scan.
         """
         _data_dict = {}
-        _labels = {}
-        _data_labels = {}
+        _node_info_dict = {}
         _scan = {}
         _files = [
             _file
@@ -279,10 +274,7 @@ class WorkflowResultSaverMeta(GenericIoMeta):
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
             _path = os.path.join(dirname, _file)
-            _data, _label, _data_label, _scan = _importer.import_results_from_file(
-                _path
-            )
+            _data, _node_info, _scan = _importer.import_results_from_file(_path)
             _data_dict[_node_id] = _data
-            _labels[_node_id] = _label
-            _data_labels[_node_id] = _data_label
-        return _data_dict, _labels, _data_labels, _scan
+            _node_info_dict[_node_id] = _node_info
+        return _data_dict, _node_info_dict, _scan

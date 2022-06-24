@@ -61,6 +61,7 @@ class EmptyDataset(np.ndarray):
             "axis_units",
             "metadata",
             "data_unit",
+            "data_label",
         ]:
             if item in kwargs:
                 del kwargs[item]
@@ -96,7 +97,7 @@ class EmptyDataset(np.ndarray):
         """
         if obj is None or self.shape == tuple():
             return
-        for _property in ["metadata", "data_unit", "getitem_key"]:
+        for _property in ["metadata", "data_unit", "data_label", "getitem_key"]:
             _obj_prop = getattr(obj, _property, dataset_property_default_val(_property))
             setattr(self, _property, _obj_prop)
         self.__update_keys_from_object(obj)
@@ -300,11 +301,42 @@ class EmptyDataset(np.ndarray):
         Raises
         ------
         ValueError
-            If metadata is not str
+            If data_unit is not str
         """
         if not isinstance(data_unit, str):
             raise TypeError("Data unit must be a string.")
         self._data_unit = data_unit
+
+    @property
+    def data_label(self):
+        """
+        Get the data label.
+
+        Returns
+        -------
+        str
+            The data label.
+        """
+        return self._data_label
+
+    @data_label.setter
+    def data_label(self, data_label):
+        """
+        Set the data unit
+
+        Parameters
+        ----------
+        data_label: str
+            The new data label.
+
+        Raises
+        ------
+        ValueError
+            If data_label is not str
+        """
+        if not isinstance(data_label, str):
+            raise TypeError("Data label must be a string.")
+        self._data_label = data_label
 
     @property
     def metadata(self):
@@ -472,6 +504,7 @@ class EmptyDataset(np.ndarray):
         Convert all properties of NoneType to their default values.
         """
         self._data_unit = self._data_unit if self._data_unit is not None else ""
+        self._data_label = self._data_label if self._data_label is not None else ""
         for _name in ["axis_units", "axis_labels"]:
             _dict = self._keys[_name]
             for _index, _key in _dict.items():
@@ -669,6 +702,7 @@ class EmptyDataset(np.ndarray):
             "axis_units": self.__get_axis_item_repr("axis_units"),
             "metadata": _meta_repr,
             "data_unit": "data_unit: " + self.data_unit,
+            "data_label": "data_label: " + self.data_label,
             "array": self.__array__().__repr__(),
         }
         _repr = (
@@ -797,6 +831,8 @@ class Dataset(EmptyDataset):
         A dictionary with metadata. The default is None.
     **data_unit : str, optional
         The description of the data unit. The default is an empty string.
+    **data_label : str, optional
+        The description of the data. The default is an empty string.
     """
 
     def __new__(cls, array, *args, **kwargs):

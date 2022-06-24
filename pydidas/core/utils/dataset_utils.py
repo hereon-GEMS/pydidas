@@ -65,6 +65,7 @@ def update_dataset_properties_from_kwargs(obj, kwargs):
     obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_range(obj.ndim))
     obj.metadata = kwargs.get("metadata", {})
     obj.data_unit = kwargs.get("data_unit", "")
+    obj.data_label = kwargs.get("data_label", "")
     obj.getitem_key = None
     return obj
 
@@ -89,7 +90,7 @@ def dataset_property_default_val(entry):
     """
     if entry == "metadata":
         return {}
-    elif entry == "data_unit":
+    elif entry in ["data_unit", "data_label"]:
         return ""
     elif entry == "getitem_key":
         return None

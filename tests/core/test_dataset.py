@@ -618,6 +618,28 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(obj.axis_ranges, dict)
         self.assertIsInstance(obj.axis_units, dict)
 
+    def test_empty_dataset_data_label_property(self):
+        obj = self.create_empty_dataset()
+        _label = obj.data_label
+        self.assertIsInstance(_label, str)
+
+    def test_empty_dataset_data_label_property__modify(self):
+        obj = self.create_empty_dataset()
+        _new = "new value"
+        obj.data_label = _new
+        self.assertEqual(obj.data_label, _new)
+
+    def test_empty_dataset_data_unit_property(self):
+        obj = self.create_empty_dataset()
+        _label = obj.data_unit
+        self.assertIsInstance(_label, str)
+
+    def test_empty_dataset_data_unit_property__modify(self):
+        obj = self.create_empty_dataset()
+        _new = "new value"
+        obj.data_unit = _new
+        self.assertEqual(obj.data_unit, _new)
+
     def test_empty_dataset_axis_labels_property(self):
         obj = self.create_empty_dataset()
         self.assertEqual(obj.axis_labels, self.get_dict("_axis_labels"))

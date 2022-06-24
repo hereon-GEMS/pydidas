@@ -161,7 +161,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
 
-    def _check_tree_is_populated(self):
+    @staticmethod
+    def _check_tree_is_populated():
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 
@@ -177,6 +178,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             )
             return False
         return True
+
 
     def __get_index(self):
         """
@@ -208,8 +210,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._config["shapes"][_node_id] = _node.results.shape
             self._config["labels"][_node_id] = _node.plugin.get_param_value("label")
             self._config["plugin_names"][_node_id] = _node.plugin.__class__.plugin_name
-            self._config["data_labels"][_node_id] = _node.plugin.get_param_value(
-                "data_label"
+            self._config["data_labels"][_node_id] = _node.plugin.output_data_label + (
+                f" / {_node.plugin.output_data_unit}"
+                if len(_node.plugin.output_data_unit) > 0
+                else ""
             )
             _data = _node.results
             _data.axis_units = [
@@ -308,6 +312,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         Update the text description of the currently selected node's results.
         """
         _current_results = self._results[self._active_node]
+        _plugin = self._tree.nodes[self._active_node].plugin
         _meta = {
             "axis_labels": _current_results.axis_labels,
             "axis_units": _current_results.axis_units,
@@ -324,9 +329,15 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         }
         _ax_points = dict(enumerate(self._config["shapes"][self._active_node]))
         _values = utils.get_simplified_array_representation(_current_results)
+        _data_label = _plugin.output_data_label + (
+            f" / {_plugin.output_data_unit}"
+            if len(_plugin.output_data_unit) > 0
+            else ""
+        )
         _str = (
             self._config["plugin_names"][self._active_node]
             + ":\n\n"
+            + f"Data: {_data_label}\n\n"
             + "\n\n".join(
                 (
                     f"Axis #{_axis:02d}:\n"

@@ -413,8 +413,12 @@ class ResultSelectionWidget(
         new number.
         """
         _ndim = RESULTS.ndims[self._active_node]
+        _ndim_scan = np.where(
+            np.asarray(RESULTS.shapes[self._active_node][: SCAN.ndim]) > 1
+        )[0].size
+        _ndim = np.where(np.asarray(RESULTS.shapes[self._active_node]) > 1)[0].size
         if self.get_param_value("use_scan_timeline"):
-            _ndim -= SCAN.ndim - 1
+            _ndim -= _ndim_scan - 1
         self._config["result_ndim"] = _ndim
 
     def __update_text_description_of_node_results(self):

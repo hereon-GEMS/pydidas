@@ -39,6 +39,8 @@ class InputPlugin(BasePlugin):
 
     plugin_type = INPUT_PLUGIN
     plugin_name = "Base input plugin"
+    output_data_label = "Image intensity"
+    output_data_unit = "counts"
     input_data_dim = None
     generic_params = BasePlugin.generic_params.get_copy()
     generic_params.add_params(

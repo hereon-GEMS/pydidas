@@ -27,7 +27,6 @@ __all__ = ["WorkflowResults"]
 
 import os
 import re
-from copy import copy
 
 import numpy as np
 from qtpy import QtCore
@@ -78,15 +77,14 @@ class _WorkflowResults(QtCore.QObject):
                 _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
             self._config["shapes"] = _shapes
-            self._config["node_labels"][_node_id] = TREE.nodes[
-                _node_id
-            ].plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = TREE.nodes[
-                _node_id
-            ].plugin.get_param_value("data_label")
-            self._config["plugin_names"][_node_id] = TREE.nodes[
-                _node_id
-            ].plugin.plugin_name
+            _plugin = TREE.nodes[_node_id].plugin
+            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
+            self._config["data_labels"][_node_id] = _plugin.output_data_label + (
+                f" / {_plugin.output_data_unit}"
+                if len(_plugin.output_data_unit) > 0
+                else ""
+            )
+            self._config["plugin_names"][_node_id] = _plugin.plugin_name
 
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
@@ -218,7 +216,7 @@ class _WorkflowResults(QtCore.QObject):
         dict
             A dictionary with entries of the form <node_id: n_dim>
         """
-        return {_key: self.__composites[_key].ndim for _key in self.__composites}
+        return {_key: _item.ndim for _key, _item in self.__composites.items()}
 
     @property
     def source_hash(self):
@@ -266,7 +264,7 @@ class _WorkflowResults(QtCore.QObject):
         """
         return self.__composites[node_id]
 
-    def get_results_for_flattened_scan(self, node_id):
+    def get_results_for_flattened_scan(self, node_id, squeeze=False):
         """
         Get the combined results for the requested node_id with all scan
         dimensions flatted into a timeline
@@ -275,6 +273,8 @@ class _WorkflowResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID for which results should be retured.
+        squeeze : bool, optional
+            Keyword to toggle squeezing of the final dataset.
 
         Returns
         -------
@@ -287,6 +287,8 @@ class _WorkflowResults(QtCore.QObject):
             new_dim_label="Scan timeline",
             new_dim_range=np.arange(SCAN.n_total),
         )
+        if squeeze:
+            return _data.squeeze()
         return _data
 
     def get_result_subset(
@@ -314,8 +316,6 @@ class _WorkflowResults(QtCore.QObject):
         force_string_metadata : bool, optional
             Keyword to force all metadata to be converted to strings. This will
             replace any None entries with empty strings. The default is False.
-        squeeze : bool, optional
-            Keyword to toggle squeezing of the final dataset.
 
         Returns
         -------
@@ -346,7 +346,7 @@ class _WorkflowResults(QtCore.QObject):
             return _data.squeeze()
         return _data
 
-    def get_result_metadata(self, node_id):
+    def get_result_metadata(self, node_id, convert_none=False):
         """
         Get the stored metadata for the results of the specified node.
 
@@ -354,6 +354,9 @@ class _WorkflowResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID identifier.
+        convert_none : bool, optional
+            Flag to toggle conversion of None types to empty strings. The default is
+            False.
 
         Returns
         -------
@@ -361,6 +364,8 @@ class _WorkflowResults(QtCore.QObject):
             A dictionary with the metadata stored using the "axis_labels",
             "axis_ranges", "axis_units" and "metadata" keys.
         """
+        if convert_none:
+            self.__composites[node_id].convert_all_none_properties()
         return {
             "axis_labels": self.__composites[node_id].axis_labels,
             "axis_units": self.__composites[node_id].axis_units,
@@ -506,7 +511,9 @@ class _WorkflowResults(QtCore.QObject):
             param.value = _new_choices[0]
             param.choices = _new_choices[:-1]
 
-    def get_node_result_metadata_string(self, node_id, use_scan_timeline):
+    def get_node_result_metadata_string(
+        self, node_id, use_scan_timeline=False, squeeze_results=True
+    ):
         """
         Get the edited metadata from WorkflowResults as a formatted string.
 
@@ -514,62 +521,60 @@ class _WorkflowResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID of the active node.
-        use_scan_timeline : bool
+        use_scan_timeline : bool, optional
             The flag whether to reduce the scan dimensions to a single
-            timeline.
+            timeline. The default is False.
+        squeeze_results : bool, optional
+            Flag whether to squeeze the results (i.e. remove all dimensions of length 1)
+            from the data. The default is True.
 
         Returns
         -------
         str :
             The formatted string with a representation of all the metadata.
         """
-        _meta = self.get_result_metadata(node_id)
+        _meta = self.get_result_metadata(node_id, convert_none=True)
         _scandim = SCAN.get_param_value("scan_dim")
-        _ax_labels = copy(_meta["axis_labels"])
-        _ax_units = {
-            _key: (_item if _item is not None else "")
-            for _key, _item in _meta["axis_units"].items()
+        _start_index = use_scan_timeline * _scandim
+        _print_info = {
+            "ax_labels": list(_meta["axis_labels"].values())[_start_index:],
+            "ax_units": list(_meta["axis_units"].values())[_start_index:],
+            "ax_ranges": list(
+                utils.get_range_as_formatted_string(_range)
+                for _range in _meta["axis_ranges"].values()
+            )[_start_index:],
+            "ax_types": list(
+                ("(scan)" if _key < _scandim else "(data)")
+                for _key in _meta["axis_labels"].keys()
+            )[_start_index:],
+            "ax_points": list(self.shapes[node_id])[_start_index:],
         }
-        _ax_ranges = {
-            _key: utils.get_range_as_formatted_string(_range)
-            for _key, _range in _meta["axis_ranges"].items()
-        }
-        _ax_types = {
-            _key: ("(scan)" if _key < _scandim else "(data)")
-            for _key in _meta["axis_labels"].keys()
-        }
-        _ax_points = dict(enumerate(self.shapes[node_id]))
         if use_scan_timeline:
-            _ax_labels[0] = "chronological frame number"
-            _ax_units[0] = ""
-            _ax_ranges[0] = f"0 ... {SCAN.n_total - 1}"
-            _ax_points[0] = SCAN.n_total
-            if _scandim > 1:
-                _dims_to_edit = self.ndims[node_id] - _scandim
-                for _index in range(_dims_to_edit):
-                    for _item in [
-                        _ax_labels,
-                        _ax_units,
-                        _ax_ranges,
-                        _ax_types,
-                        _ax_points,
-                    ]:
-                        _item[_index + 1] = _item[_index + _scandim]
-                        del _item[_index + _scandim]
-        _txt = (
+            _print_info["ax_labels"].insert(0, "chronological frame number")
+            _print_info["ax_units"].insert(0, "")
+            _print_info["ax_ranges"].insert(0, f"0 ... {SCAN.n_total - 1}")
+            _print_info["ax_points"].insert(0, SCAN.n_total)
+            _print_info["ax_types"].insert(0, "(scan)")
+        if squeeze_results:
+            _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]
+            for _key in _print_info.keys():
+                _print_info[_key] = list(np.delete(_print_info[_key], _squeezed_dims))
+        _node_info = (
             self._config["plugin_names"][node_id]
             + ":\n\n"
+            + f"Data: {self._config['data_labels'][node_id]}\n\n"
             + "".join(
                 (
-                    f"Axis #{_axis:02d} {_ax_types[_axis]}:\n"
-                    f"  Label: {_ax_labels[_axis]}\n"
-                    f"  N points: {_ax_points[_axis]}\n"
-                    f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}\n"
+                    f"Axis #{_dim:02d} {_print_info['ax_types'][_dim]}:\n"
+                    f"  Label: {_print_info['ax_labels'][_dim]}\n"
+                    f"  N points: {_print_info['ax_points'][_dim]}\n"
+                    f"  Range: {_print_info['ax_ranges'][_dim]} "
+                    f"{_print_info['ax_units'][_dim]}\n"
                 )
-                for _axis in _ax_labels
+                for _dim, _ in enumerate(_print_info["ax_labels"])
             )
         )
-        return _txt
+        return _node_info
 
     def import_data_from_directory(self, directory):
         """
@@ -584,9 +589,15 @@ class _WorkflowResults(QtCore.QObject):
         _data, _node_info, _scan = RESULT_SAVER.import_data_from_directory(directory)
         self._config = {
             "shapes": {_key: _item.shape for _key, _item in _data.items()},
-            "node_labels": {_id: _node_info[_id]["node_label"] for _id in _node_info},
-            "data_labels": {_id: _node_info[_id]["data_label"] for _id in _node_info},
-            "plugin_names": {_id: _node_info[_id]["plugin_name"] for _id in _node_info},
+            "node_labels": {
+                _id: _item["node_label"] for _id, _item in _node_info.items()
+            },
+            "data_labels": {
+                _id: _item["data_label"] for _id, _item in _node_info.items()
+            },
+            "plugin_names": {
+                _id: _item["plugin_name"] for _id, _item in _node_info.items()
+            },
             "metadata_complete": True,
         }
         self.__composites = _data

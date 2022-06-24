@@ -41,6 +41,8 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
     basic_plugin = False
     input_data_dim = 2
     output_data_dim = 1
+    output_data_label = "Integrated data"
+    output_data_unit = "a.u."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -76,6 +78,8 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             axis_labels=[_label],
             axis_units=[_unit],
             axis_ranges=[_newdata[0]],
+            data_label="integrated intensity",
+            data_unit="counts",
         )
         return _dataset, kwargs
 

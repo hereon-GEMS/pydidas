@@ -60,6 +60,8 @@ class Crop1dData(ProcPlugin):
     )
     input_data_dim = 1
     output_data_dim = 1
+    output_data_label = "Cropped data"
+    output_data_unit = "a.u."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

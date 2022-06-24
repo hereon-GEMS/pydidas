@@ -91,9 +91,11 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type = BASE_PLUGIN
     plugin_name = "Base plugin"
     default_params = ParameterCollection()
-    generic_params = get_generic_param_collection("label", "data_label")
+    generic_params = get_generic_param_collection("label")
     input_data_dim = -1
     output_data_dim = -1
+    output_data_label = ""
+    output_data_unit = ""
     new_dataset = False
 
     @classmethod

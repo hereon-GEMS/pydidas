@@ -122,6 +122,8 @@ class FitSinglePeak(ProcPlugin):
             self._fitparam_labels.append("background_p1")
             self._fitparam_bounds_low.append(-np.inf)
             self._fitparam_bounds_high.append(np.inf)
+        self.output_data_label = self.get_param_value("output")
+        self.output_data_unit = "a.u."
 
     def execute(self, data, **kwargs):
         """
@@ -321,6 +323,8 @@ class FitSinglePeak(ProcPlugin):
             "fit_residual_std": _residual_std,
         }
         _new_data.metadata = self._data.metadata | _new_metadata
+        _new_data.data_label = _output
+        _new_data.data_unit = "a.u."
         return _new_data
 
     def calculate_result_shape(self):

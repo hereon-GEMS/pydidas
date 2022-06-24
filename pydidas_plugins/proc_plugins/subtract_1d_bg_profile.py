@@ -80,6 +80,8 @@ class Subtract1dBackgroundProfile(ProcPlugin):
     )
     input_data_dim = 1
     output_data_dim = 1
+    output_data_label = "Background-corrected data"
+    output_data_unit = "a.u."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

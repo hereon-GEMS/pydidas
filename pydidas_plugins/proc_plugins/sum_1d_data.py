@@ -69,6 +69,8 @@ class Sum1dData(ProcPlugin):
     )
     input_data_dim = 1
     output_data_dim = 0
+    output_data_label = "data sum (1d)"
+    output_data_unit = "a.u."
     new_dataset = True
 
     def __init__(self, *args, **kwargs):
@@ -97,7 +99,12 @@ class Sum1dData(ProcPlugin):
         _selection = self._data[self._get_index_range()]
         _sum = np.sum(_selection)
         _new_data = Dataset(
-            [_sum], axis_labels=["Data sum"], axis_units=[""], metadata=data.metadata
+            [_sum],
+            axis_labels=["Data sum"],
+            axis_units=[""],
+            metadata=data.metadata,
+            axis_label="data sum",
+            axis_unit="a.u.",
         )
         return _new_data, kwargs
 

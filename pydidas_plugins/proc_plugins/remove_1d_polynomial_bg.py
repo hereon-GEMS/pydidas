@@ -103,6 +103,8 @@ class Remove1dPolynomialBackground(ProcPlugin):
     default_params = DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG
     input_data_dim = 1
     output_data_dim = 1
+    output_data_label = "Background-corrected data"
+    output_data_unit = "a.u."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -206,6 +208,8 @@ class Remove1dPolynomialBackground(ProcPlugin):
             axis_labels=data.axis_labels,
             axis_ranges=data.axis_ranges,
             axis_units=data.axis_units,
+            data_label=data.data_label,
+            data_unit=data.data_unit,
         )
 
         self.__results = data

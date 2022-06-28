@@ -294,6 +294,9 @@ class FitSinglePeak(ProcPlugin):
         _datafit = self._func(list(self._fit_params.values()), self._x)
         _residual = self._data - _datafit
         _residual_std = abs(np.std(_residual) / np.mean(self._data))
+        print("\nstd", np.std(_residual))
+        print("mean data", np.mean(self._data))
+        print("residual norm std", _residual_std)
         if _output == "Peak area":
             _new_data = Dataset(
                 [self._fit_params["amplitude"]], axis_labels=["Peak area"]

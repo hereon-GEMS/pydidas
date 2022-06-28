@@ -1016,6 +1016,19 @@ GENERIC_PARAM_DESCRIPTION = {
             "for 2d plots. A value of 0.07 will mask all sensor gaps in the Eiger."
         ),
     },
+    "plugin_fit_std_threshold": {
+        "type": float,
+        "default": 0.25,
+        "name": "Fit sigma rejection threshold",
+        "choices": None,
+        "allow_None": False,
+        "unit": "",
+        "tooltip": (
+            "The threshold to select which fitting points to reject, based on the "
+            "normalized standard deviation. Any fit which has a normalized std which is"
+            " worse than the threshold will be rejected as failed."
+        ),
+    },
     ############################
     # global choice settings
     ############################

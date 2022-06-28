@@ -29,8 +29,6 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import get_generic_param_collection
-from ..core.constants import QSETTINGS_GLOBAL_KEYS
 from ..plugins import PluginCollection
 from .builders import GlobalConfigurationFrameBuilder
 
@@ -57,13 +55,10 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
     menu_title = "Global configuration"
     menu_entry = "Global configuration"
 
-    default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
-
     value_changed_signal = QtCore.Signal(str, object)
 
     def __init__(self, parent=None, **kwargs):
         GlobalConfigurationFrameBuilder.__init__(self, parent, **kwargs)
-        self.set_default_params()
 
     def connect_signals(self):
         """

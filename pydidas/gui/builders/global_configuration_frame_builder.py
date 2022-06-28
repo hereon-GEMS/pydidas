@@ -27,7 +27,8 @@ __all__ = ["GlobalConfigurationFrameBuilder"]
 
 from qtpy import QtCore
 
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core import get_generic_param_collection
+from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
 from ...widgets import BaseFrame
 
 
@@ -42,9 +43,11 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
     """
 
     TEXT_WIDTH = 180
+    default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
     def __init__(self, parent=None, **kwargs):
         BaseFrame.__init__(self, parent, **kwargs)
+        self.set_default_params()
 
     def build_frame(self):
         """
@@ -105,6 +108,7 @@ class GlobalConfigurationFrameBuilder(BaseFrame):
         )
         self.create_spacer("spacer_4")
 
-        self.create_label("section_plugins", "Plugin paths", **_section_options)
+        self.create_label("section_plugins", "Plugins", **_section_options)
+        self.create_param_widget(self.get_param("plugin_fit_std_threshold"), **_options)
         self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
         self.create_button("but_plugins", "Update plugin collection")

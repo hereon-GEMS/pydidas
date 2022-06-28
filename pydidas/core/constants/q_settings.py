@@ -40,4 +40,5 @@ QSETTINGS_GLOBAL_KEYS = [
     "plugin_path",
     "plot_update_time",
     "histogram_outlier_fraction",
+    "plugin_fit_std_threshold",
 ]

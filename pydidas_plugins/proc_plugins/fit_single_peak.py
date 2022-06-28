@@ -124,6 +124,9 @@ class FitSinglePeak(ProcPlugin):
             self._fitparam_bounds_high.append(np.inf)
         self.output_data_label = self.get_param_value("output")
         self.output_data_unit = "a.u."
+        self._fit_acceptance_threshold = self.q_settings_get_global_value(
+            "plugin_fit_std_threshold", dtype=float
+        )
 
     def execute(self, data, **kwargs):
         """
@@ -149,7 +152,7 @@ class FitSinglePeak(ProcPlugin):
         """
         self._data = data
         self._crop_data_to_selected_range()
-        _startguess = self._update_fit_startparams()
+        _startguess = self._calc_param_start_guess()
         _res = least_squares(
             self._ffunc,
             _startguess,
@@ -192,9 +195,9 @@ class FitSinglePeak(ProcPlugin):
         )[0]
         return _range
 
-    def _update_fit_startparams(self):
+    def _calc_param_start_guess(self):
         """
-        Update the fit starting Parameters based on the x-range and the data.
+        Calculate the fit starting Parameters based on the x-range and the data.
 
         Returns
         -------
@@ -209,7 +212,7 @@ class FitSinglePeak(ProcPlugin):
         elif self.get_param_value("fit_func") == "Voigt":
             _startguess = self._get_voigt_startparams()
         # add the start guess for the center x0:
-        _startguess.append(self._x[np.argmax(self._data)])
+        _startguess.append(self._x[self._x.size // 2])
 
         _bg_order = self.get_param_value("fit_bg_order")
         if _bg_order in [0, 1]:
@@ -290,7 +293,7 @@ class FitSinglePeak(ProcPlugin):
         _output = self.get_param_value("output")
         _datafit = self._func(list(self._fit_params.values()), self._x)
         _residual = self._data - _datafit
-        _residual_std = np.std(_residual) / np.mean(self._data)
+        _residual_std = abs(np.std(_residual) / np.mean(self._data))
         if _output == "Peak area":
             _new_data = Dataset(
                 [self._fit_params["amplitude"]], axis_labels=["Peak area"]
@@ -325,6 +328,10 @@ class FitSinglePeak(ProcPlugin):
         _new_data.metadata = self._data.metadata | _new_metadata
         _new_data.data_label = _output
         _new_data.data_unit = "a.u."
+        if _residual_std >= self._fit_acceptance_threshold or (
+            not self._x[0] <= self._fit_params["center"] <= self._x[-1]
+        ):
+            _new_data[:] = -1
         return _new_data
 
     def calculate_result_shape(self):

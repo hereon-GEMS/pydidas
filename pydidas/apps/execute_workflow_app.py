@@ -32,7 +32,7 @@ import multiprocessing as mp
 import numpy as np
 from qtpy import QtCore
 
-from ..core import get_generic_param_collection, Dataset, BaseApp, AppConfigError
+from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_savers import WorkflowResultSaverMeta
@@ -182,11 +182,6 @@ class ExecuteWorkflowApp(BaseApp):
     def __check_and_store_result_shapes(self):
         """
         Run through the WorkflowTree to get the shapes of all results.
-
-        Raises
-        ------
-        AppConfigError
-            If the WorkflowTree has no nodes.
         """
         _shapes = TREE.get_all_result_shapes()
         self._config["result_shapes"] = _shapes
@@ -209,7 +204,7 @@ class ExecuteWorkflowApp(BaseApp):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the buffer is too small to store a one dataset per MP worker.
         """
         _buffer = self.q_settings_get_global_value("shared_buffer_size", float)
@@ -228,7 +223,7 @@ class ExecuteWorkflowApp(BaseApp):
                 f"MB and {_n_worker} workers have been defined. The "
                 f"minimum buffer size must be {_min_buffer:.2f} MB."
             )
-            raise AppConfigError(_error)
+            raise UserConfigError(_error)
         self._config["buffer_n"] = min(
             _n_dataset_in_buffer, _n_data, self._mp_tasks.size
         )

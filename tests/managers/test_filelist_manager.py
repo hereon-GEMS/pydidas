@@ -31,7 +31,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import get_generic_parameter, AppConfigError
+from pydidas.core import get_generic_parameter, UserConfigError
 from pydidas.managers import FilelistManager
 
 
@@ -97,14 +97,14 @@ class TestFilelistManager(unittest.TestCase):
     def test_check_files_wrong_name(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(100))
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             fm._check_files()
 
     def test_check_files_wrong_dir(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", "/foo/bar/dummy.npy")
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             fm._check_files()
 
     def test_check_files_all_good(self):
@@ -182,7 +182,7 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
         fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:03d}.text")
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             _fnames, _range = fm._get_live_processing_naming_scheme()
 
     def test_get_live_processing_naming_scheme_wrong_length(self):
@@ -193,7 +193,7 @@ class TestFilelistManager(unittest.TestCase):
         fm.set_param_value(
             "last_file", f"/foo/path/test_0000_file_{_index1:03d}_test.txt"
         )
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             _fnames, _range = fm._get_live_processing_naming_scheme()
 
     def test_get_live_processing_naming_scheme_wrong_length_ii(self):
@@ -202,7 +202,7 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
         fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:05d}.txt")
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             _fnames, _range = fm._get_live_processing_naming_scheme()
 
     def test_get_live_processing_naming_scheme_too_many_changes(self):
@@ -211,7 +211,7 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
         fm.set_param_value("last_file", f"/foo/path/test_0001_file_{_index1:03d}.txt")
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             _fnames, _range = fm._get_live_processing_naming_scheme()
 
     def test_update_params(self):
@@ -228,13 +228,13 @@ class TestFilelistManager(unittest.TestCase):
 
     def test_get_filename_empty_list(self):
         fm = FilelistManager()
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             fm.get_filename(0)
 
     def test_get_filename_out_of_range(self):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(49))
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             fm.get_filename(80)
 
     def test_copy(self):

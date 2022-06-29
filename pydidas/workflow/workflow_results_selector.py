@@ -34,7 +34,7 @@ from ..core import (
     Parameter,
     ObjectWithParameterCollection,
     get_generic_param_collection,
-    AppConfigError,
+    UserConfigError,
 )
 from ..experiment import SetupScan
 from .workflow_results import WorkflowResults
@@ -205,7 +205,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the string pattern cannot be parsed.
 
         Returns
@@ -219,7 +219,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         if _str in ["", ":"]:
             return np.r_[slice(0, self._npoints[index], 1)]
         if not bool(self._re_pattern.fullmatch(_str)):
-            raise AppConfigError(
+            raise UserConfigError(
                 "Cannot interprete the selection pattern "
                 f'"{_str}" for the dimension "{index}".'
             )
@@ -337,7 +337,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the number of dimensions in the selection does not match the
             demanded result dimensionality.
         """
@@ -349,7 +349,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         if _target_dims == -1:
             return
         if _target_dims != _dims_larger_one:
-            raise AppConfigError(
+            raise UserConfigError(
                 "The dimensionality of the selected data subset does not match "
                 f"the specified dimension. Specified dimensionality: {_dims_larger_one}"
                 f"; Target dimensionality: {_target_dims}."

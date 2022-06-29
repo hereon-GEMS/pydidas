@@ -40,7 +40,7 @@ from numbers import Integral
 
 import numpy as np
 
-from ..exceptions import DatasetConfigException
+from ..exceptions import PydidasConfigError
 
 
 def update_dataset_properties_from_kwargs(obj, kwargs):
@@ -90,9 +90,9 @@ def dataset_property_default_val(entry):
     """
     if entry == "metadata":
         return {}
-    elif entry in ["data_unit", "data_label"]:
+    if entry in ["data_unit", "data_label"]:
         return ""
-    elif entry == "getitem_key":
+    if entry == "getitem_key":
         return None
     raise ValueError(f"No default available for '{entry}'.")
 
@@ -139,9 +139,9 @@ def get_number_of_entries(obj):
     """
     if isinstance(obj, np.ndarray):
         return obj.size
-    elif isinstance(obj, Integral):
+    if isinstance(obj, Integral):
         return 1
-    elif isinstance(obj, Iterable) and not isinstance(obj, str):
+    if isinstance(obj, Iterable) and not isinstance(obj, str):
         return len(obj)
     raise TypeError(f"Cannot calculate the number of entries for type {type(obj)}.")
 
@@ -203,12 +203,10 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
 
     Raises
     ------
-    DatasetConfigException
+    PydidasConfigError
         If a dictionary is passed as data and the keys do not correspond
-        to the set(0, 1, ..., ndim - 1)
-    DatasetConfigException
-        If a tuple or list is passed and the length of entries is not
-        equal to ndim.
+        to the set(0, 1, ..., ndim - 1) or if a tuple or list is passed and the length
+        of entries is not equal to ndim.
 
     Returns
     -------
@@ -222,7 +220,7 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
                 "The key numbers do not match the number of array dimensions. Changing "
                 f"keys to defaults. (Error encountered in {calling_method_name})."
             )
-            return {_dim: _val for _dim, _val in enumerate(data.values())}
+            return dict(enumerate(data.values()))
         return data
     if isinstance(data, Iterable) and not isinstance(data, str):
         if len(data) != target_length:
@@ -233,7 +231,7 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
             )
             return dataset_ax_default_range(target_length)
         return dict(enumerate(data))
-    raise DatasetConfigException(
+    raise PydidasConfigError(
         f"Input {data} cannot be converted to dictionary for property"
         f" {calling_method_name}"
     )

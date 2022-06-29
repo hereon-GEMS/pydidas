@@ -34,7 +34,7 @@ import h5py
 import numpy as np
 from qtpy import QtCore
 
-from pydidas.core import get_generic_parameter, AppConfigError
+from pydidas.core import get_generic_parameter, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
@@ -333,7 +333,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         os.remove(_fname)
         app = DirectorySpyApp()
         app.set_param_value("bg_file", _fname)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._load_bg_file()
 
     def test_load_bg_file__hdf5file(self):
@@ -361,7 +361,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("scan_for_all", False)
         _pattern = os.path.join(self._path, "names_with_no_pattern123.tif")
         app.set_param_value("filename_pattern", _pattern)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app.define_path_and_name()
 
     def test_define_path_and_name__with_pattern_multiple_wildcard(self):
@@ -369,7 +369,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("scan_for_all", False)
         _pattern = os.path.join(self._path, "names_with_###_patterns_###.tif")
         app.set_param_value("filename_pattern", _pattern)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app.define_path_and_name()
 
     def test_define_path_and_name__with_pattern_correct(self):

@@ -29,7 +29,7 @@ from numbers import Integral
 
 import numpy as np
 
-from pydidas.core import Dataset, Parameter, AppConfigError
+from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.experiment import SetupScan
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
@@ -193,7 +193,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _selection = (np.r_[0], np.r_[0], np.r_[1, 2, 3], np.r_[1, 2, 3], np.r_[2])
         obj = WorkflowResultsSelector()
         obj.set_param_value("result_n_dim", 0)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             obj._check_for_selection_dim(_selection)
 
     def test_check_for_selection_dim__0d_check_okay(self):
@@ -207,7 +207,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _selection = (np.r_[0], np.r_[0], np.r_[1, 2, 3], np.r_[1, 2, 3], np.r_[2])
         obj = WorkflowResultsSelector()
         obj.set_param_value("result_n_dim", 1)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             obj._check_for_selection_dim(_selection)
 
     def test_check_for_selection_dim__1d_check_okay(self):
@@ -228,7 +228,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _selection = (np.r_[0], np.r_[0], np.r_[1, 2, 3], np.r_[1, 2, 3], np.r_[2])
         obj = WorkflowResultsSelector()
         obj.set_param_value("result_n_dim", 6)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             obj._check_for_selection_dim(_selection)
 
     def test_get_single_slice_object__empty_str(self):

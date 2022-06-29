@@ -31,7 +31,7 @@ import pickle
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, AppConfigError
+from pydidas.core import Parameter, get_generic_parameter, PydidasConfigError
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.managers import ImageMetadataManager
@@ -140,7 +140,7 @@ class TestBaseInputPlugin(unittest.TestCase):
         _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
         plugin = _class()
         _class.default_params.add_param(get_generic_parameter("first_file"))
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(PydidasConfigError):
             plugin._InputPlugin__setup_image_magedata_manager()
 
     def test_setup_image_metadata_manager__with_different_hdf5_key(self):

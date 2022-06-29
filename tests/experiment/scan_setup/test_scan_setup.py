@@ -26,6 +26,7 @@ import unittest
 
 import numpy as np
 
+from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.experiment import SetupScan
 from pydidas.experiment.setup_scan.setup_scan import _SetupScan
@@ -89,7 +90,7 @@ class TestSetupScan(unittest.TestCase):
     def test_get_range_for_dim__wrong_dim(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             SCAN.get_range_for_dim(5)
 
     def test_get_range_for_dim__empty_dim(self):
@@ -141,13 +142,13 @@ class TestSetupScan(unittest.TestCase):
     def test_get_frame_position_in_scan__negative(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             SCAN.get_frame_position_in_scan(-1)
 
     def test_get_frame_position_in_scan__too_large(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
 
     def test_get_frame_number_from_scan_indices__zero(self):
@@ -159,7 +160,7 @@ class TestSetupScan(unittest.TestCase):
     def test_get_frame_number_from_scan_indices__negative(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             SCAN.get_frame_number_from_scan_indices((0, -1, 0, 0))
 
     def test_get_frame_number_from_scan_indices__inscan(self):

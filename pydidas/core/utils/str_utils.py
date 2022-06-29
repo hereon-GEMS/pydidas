@@ -397,7 +397,10 @@ def update_separators(path):
 
 
 def format_input_to_multiline_str(
-    input_str, max_line_length=12, pad_to_max_length=False
+    input_str,
+    max_line_length=60,
+    pad_to_max_length=False,
+    keep_linebreaks=True,
 ):
     """
     Format an input string by inserting linebreaks to achieve a maximum line
@@ -413,10 +416,12 @@ def format_input_to_multiline_str(
     input_str : str
         The input string
     max_line_length : int, optional
-        The maximum length of each line in characters. The default is 12.
+        The maximum length of each line in characters. The default is 60.
     pad_to_max_length : bool, optional
         Flag to toggle padding of each line to the maximum line length.
         If False, no padding is added. The default is False.
+    keep_linebreaks : bool, optional
+        Flag to keep linebreaks in the final formatting. The default is True.
 
     Returns
     -------
@@ -424,20 +429,13 @@ def format_input_to_multiline_str(
         The input string, formatted with linebreaks at the required
         positions.
     """
-    _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
-    _result_lines = []
-    _current_str = _words.pop(0) if len(_words) > 0 else ""
-    while len(_words) > 0:
-        _newword = _words.pop(0)
-        # need to check against max_line_length - 1 to account for the
-        # additional space between both entries
-        if len(_current_str + _newword) > max_line_length - 1:
-            _result_lines.append(_current_str)
-            _current_str = _newword
-        else:
-            _current_str = f"{_current_str} {_newword}"
-    # append final line
-    _result_lines.append(_current_str)
+    if keep_linebreaks:
+        _result_lines = []
+        _tmp_lines = input_str.split("\n")
+        for _curr_line in _tmp_lines:
+            _result_lines.extend(_get_unformatted_lines(_curr_line, max_line_length))
+    if not keep_linebreaks:
+        _result_lines = _get_unformatted_lines(input_str, max_line_length)
     if pad_to_max_length:
         for _index, _item in enumerate(_result_lines):
             _delta = max(0, max_line_length - len(_item))
@@ -445,6 +443,40 @@ def format_input_to_multiline_str(
             _delta_back = _delta // 2 + _delta % 2
             _result_lines[_index] = " " * _delta_front + _item + " " * _delta_back
     return "\n".join(_result_lines)
+
+
+def _get_unformatted_lines(input_str, max_line_length=60):
+    """
+    Get the input string in lines of a defined maximum length without taking into
+    account linebreaks.
+
+    Parameters
+    ----------
+    input_str : str
+        The input string
+    max_line_length : int, optional
+        The maximum length of each line in characters. The default is 60.
+
+    Returns
+    -------
+    result_lines : list
+        The list with the individual lines.
+    """
+    _words = [s for s in re.split(" |\n", input_str) if len(s) > 0]
+    _result_lines = []
+    _current_str = _words.pop(0) if len(_words) > 0 else ""
+    while len(_words) > 0:
+        _newword = _words.pop(0)
+        # need to check with the length + 1 against max_line_length to account for the
+        # additional space between both entries
+        if len(_current_str + _newword) + 1 > max_line_length:
+            _result_lines.append(_current_str)
+            _current_str = _newword
+        else:
+            _current_str = f"{_current_str} {_newword}"
+    # append final line
+    _result_lines.append(_current_str)
+    return _result_lines
 
 
 def get_random_string(length):

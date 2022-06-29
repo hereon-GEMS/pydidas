@@ -33,7 +33,7 @@ import numpy as np
 from qtpy import QtWidgets, QtCore
 
 from ..apps import CompositeCreatorApp
-from ..core import Parameter, get_generic_parameter, AppConfigError
+from ..core import Parameter, get_generic_parameter, UserConfigError
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     get_hdf5_populated_dataset_keys,
@@ -430,7 +430,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                 "images_per_file", self._image_metadata.images_per_file
             )
             self._config["input_configured"] = True
-        except AppConfigError:
+        except UserConfigError:
             self.__clear_entries(
                 ["hdf5_key", "hdf5_dataset_shape", "images_per_file"], False
             )
@@ -619,7 +619,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         try:
             self._filelist.update()
-        except AppConfigError as _ex:
+        except UserConfigError as _ex:
             self.__clear_entries(["last_file"], hide=False)
             QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
             return

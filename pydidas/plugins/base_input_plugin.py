@@ -26,7 +26,7 @@ __all__ = ["InputPlugin"]
 
 import os
 
-from ..core import get_generic_parameter, AppConfigError
+from ..core import get_generic_parameter, PydidasConfigError
 from ..core.constants import INPUT_PLUGIN
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
@@ -76,7 +76,7 @@ class InputPlugin(BasePlugin):
 
         Raises
         ------
-        AppConfigError
+        PydidasConfigError
             If neither or both "first_file" or "filename" Parameters are used
             for a non-basic plugin.
         """
@@ -105,7 +105,7 @@ class InputPlugin(BasePlugin):
             # create some dummy value
             _use_filename = True
         else:
-            raise AppConfigError(
+            raise PydidasConfigError(
                 "Ambiguous choice of Parameters. Use exactly"
                 ' one of  both "first_file" and "filename".'
             )

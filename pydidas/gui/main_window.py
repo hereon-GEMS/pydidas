@@ -32,7 +32,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import FrameConfigError
+from ..core import PydidasGuiError
 from ..core.utils import format_input_to_multiline_str
 from ..widgets import BaseFrame, InfoWidget, get_pyqt_icon_from_str_reference
 from . import utils
@@ -100,7 +100,7 @@ class MainWindow(MainMenu):
 
         Raises
         ------
-        FrameConfigError
+        PydidasGuiError
             If a similar menu entry has already been registered.
 
         """
@@ -113,7 +113,7 @@ class MainWindow(MainMenu):
             if _icon is None:
                 _icon = _class.menu_icon
             if _menu_entry in self._frame_menuentries:
-                raise FrameConfigError(
+                raise PydidasGuiError(
                     f'The selected menu entry "{_menu_entry}"' " already exists."
                 )
             _frame = _class(
@@ -235,7 +235,7 @@ class MainWindow(MainMenu):
         if isinstance(_menu_icon, str):
             _menu_icon = get_pyqt_icon_from_str_reference(_menu_icon)
         self._frame_meta[_ref] = dict(
-            label=format_input_to_multiline_str(frame.title),
+            label=format_input_to_multiline_str(frame.title, max_line_length=12),
             icon=_menu_icon,
             index=frame.frame_index,
             menus=_new_menus,

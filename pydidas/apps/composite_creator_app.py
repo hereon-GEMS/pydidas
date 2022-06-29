@@ -31,7 +31,7 @@ import time
 import numpy as np
 from qtpy import QtCore
 
-from ..core import Dataset, AppConfigError, get_generic_param_collection, BaseApp
+from ..core import Dataset, UserConfigError, get_generic_param_collection, BaseApp
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
@@ -43,6 +43,35 @@ from ..core.utils import (
 from ..data_io import import_data
 from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
 from .parsers import composite_creator_app_parser
+
+
+COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
+    "live_processing",
+    "first_file",
+    "last_file",
+    "file_stepping",
+    "hdf5_key",
+    "hdf5_first_image_num",
+    "hdf5_last_image_num",
+    "hdf5_stepping",
+    "use_bg_file",
+    "bg_file",
+    "bg_hdf5_key",
+    "bg_hdf5_frame",
+    "use_global_det_mask",
+    "use_roi",
+    "roi_xlow",
+    "roi_xhigh",
+    "roi_ylow",
+    "roi_yhigh",
+    "use_thresholds",
+    "threshold_low",
+    "threshold_high",
+    "binning",
+    "composite_nx",
+    "composite_ny",
+    "composite_dir",
+)
 
 
 class CompositeCreatorApp(BaseApp):
@@ -165,33 +194,7 @@ class CompositeCreatorApp(BaseApp):
         Parameter itself as value.
     """
 
-    default_params = get_generic_param_collection(
-        "live_processing",
-        "first_file",
-        "last_file",
-        "file_stepping",
-        "hdf5_key",
-        "hdf5_first_image_num",
-        "hdf5_last_image_num",
-        "hdf5_stepping",
-        "use_bg_file",
-        "bg_file",
-        "bg_hdf5_key",
-        "bg_hdf5_frame",
-        "use_global_det_mask",
-        "use_roi",
-        "roi_xlow",
-        "roi_xhigh",
-        "roi_ylow",
-        "roi_yhigh",
-        "use_thresholds",
-        "threshold_low",
-        "threshold_high",
-        "binning",
-        "composite_nx",
-        "composite_ny",
-        "composite_dir",
-    )
+    default_params = COMPOSITE_CREATOR_DEFAULT_PARAMS
     parse_func = composite_creator_app_parser
     attributes_not_to_copy_to_slave_app = ["_composite", "_det_mask", "_bg_image"]
     mp_func_results = QtCore.Signal(object)
@@ -309,7 +312,7 @@ class CompositeCreatorApp(BaseApp):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the composite dimensions are too small or too large to match
             the total number of images.
         """
@@ -323,12 +326,12 @@ class CompositeCreatorApp(BaseApp):
             _ny = int(np.ceil(_ntotal / _nx))
             self.params.set_value("composite_ny", _ny)
         if _nx * _ny < _ntotal:
-            raise AppConfigError(
+            raise UserConfigError(
                 "The selected composite dimensions are too small to hold all"
                 f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
             )
         if (_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal:
-            raise AppConfigError(
+            raise UserConfigError(
                 "The selected composite dimensions are too large for all"
                 f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
             )
@@ -342,7 +345,7 @@ class CompositeCreatorApp(BaseApp):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             - If the selected background file does not exist
             - If the selected dataset key does not exist (in case of hdf5
               files)
@@ -362,7 +365,7 @@ class CompositeCreatorApp(BaseApp):
             _params["frame"] = self.get_param_value("bg_hdf5_frame")
         _bg_image = import_data(_bg_file, **_params)
         if _bg_image.shape != self._image_metadata.final_shape:
-            raise AppConfigError(
+            raise UserConfigError(
                 f'The selected background file "{_bg_file}"'
                 " does not have the same image dimensions "
                 "as the selected files."
@@ -538,7 +541,7 @@ class CompositeCreatorApp(BaseApp):
         if self._det_mask is None:
             return image
         if self._config["det_mask_val"] is None:
-            raise AppConfigError("No numerical value has been defined " "for the mask!")
+            raise UserConfigError("No numerical value has been defined for the mask!")
         return Dataset(
             np.where(self._det_mask, self._config["det_mask_val"], image),
             axis_ranges=image.axis_ranges,

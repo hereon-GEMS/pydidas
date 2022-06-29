@@ -32,7 +32,7 @@ from pathlib import Path
 import skimage
 import numpy as np
 
-from pydidas.core import AppConfigError, Parameter
+from pydidas.core import UserConfigError, Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
 
@@ -71,7 +71,7 @@ class TestFrameLoader(unittest.TestCase):
 
     def test_pre_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")()
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 
     def test_pre_execute__simple(self):
@@ -82,7 +82,7 @@ class TestFrameLoader(unittest.TestCase):
 
     def test_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FrameLoader")(images_per_file=1)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin.execute(0)
 
     def test_execute__simple(self):

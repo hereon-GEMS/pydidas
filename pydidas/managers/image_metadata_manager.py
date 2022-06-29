@@ -31,7 +31,7 @@ from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file, get_e
 from ..core import (
     Parameter,
     ParameterCollection,
-    AppConfigError,
+    UserConfigError,
     get_generic_param_collection,
     ObjectWithParameterCollection,
 )
@@ -217,11 +217,6 @@ class ImageMetadataManager(ObjectWithParameterCollection):
     def _store_image_data_from_hdf5_file(self):
         """
         Store config metadata from hdf5 file.
-
-        Raises
-        ------
-        AppConfigError
-            If the selected image range is not included in the hdf5 dataset.
         """
         _filename = self.get_filename()
         _key = self.get_param_value("hdf5_key")
@@ -250,13 +245,13 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the range is not valid.
         """
         _n0 = self._get_param_value_with_modulo("hdf5_first_image_num", dset_length)
         _n1 = self._get_param_value_with_modulo("hdf5_last_image_num", dset_length)
         if not _n0 < _n1:
-            raise AppConfigError(
+            raise UserConfigError(
                 f"The image numbers for the hdf5 file, [{_n0}, {_n1}] do"
                 " not describe a correct range."
             )
@@ -310,7 +305,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the ROI boundaries are not consistent.
         """
         _warning = ""
@@ -320,7 +315,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         if _y1 < _y0:
             _warning += f"ROI y-range incorrect: [{_y0}, {_y1}]. "
         if _warning:
-            raise AppConfigError(_warning)
+            raise UserConfigError(_warning)
 
     def __get_modulated_roi(self):
         """

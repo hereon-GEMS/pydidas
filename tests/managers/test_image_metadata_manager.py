@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 import h5py
 
-from pydidas.core import get_generic_parameter, AppConfigError
+from pydidas.core import get_generic_parameter, UserConfigError
 from pydidas.managers import ImageMetadataManager
 
 
@@ -164,7 +164,7 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.set_param_value("roi_xhigh", 9)
         imm.set_param_value("roi_ylow", 12)
         imm.set_param_value("roi_yhigh", 9)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             imm._ImageMetadataManager__check_roi_for_consistency()
 
     def test_calculate_final_image_shape(self):
@@ -280,7 +280,7 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.set_param_value("hdf5_first_image_num", _i0)
         imm.set_param_value("hdf5_last_image_num", _i1)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             imm._ImageMetadataManager__verify_selection_range(_range)
 
     def test_store_image_data_from_hdf5(self):
@@ -297,7 +297,7 @@ class TestImageMetadataManager(unittest.TestCase):
         imm = ImageMetadataManager()
         imm.set_param_value("filename", self._hdf5_fname)
         imm.set_param_value("hdf5_key", "foo/bar")
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             imm._store_image_data_from_hdf5_file()
 
     def test_store_image_data_from_hdf5__with_stepping(self):

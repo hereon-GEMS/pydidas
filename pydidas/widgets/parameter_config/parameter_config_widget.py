@@ -39,7 +39,7 @@ from ...core.constants import (
 )
 from ...core.utils import convert_special_chars_to_unicode
 from ..utilities import apply_widget_properties
-from ..excepthook_ import gui_excepthook
+from ..gui_excepthook_ import gui_excepthook
 from ..factory import create_param_widget, create_label
 
 

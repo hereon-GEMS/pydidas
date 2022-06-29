@@ -35,7 +35,7 @@ import os
 
 from numpy import array
 
-from ..exceptions import AppConfigError
+from ..exceptions import UserConfigError
 from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 
 
@@ -52,13 +52,13 @@ def check_hdf5_key_exists_in_file(fname, key):
 
     Raisesa
     ------
-    AppConfigError
+    UserConfigError
         If the dataset key is not found in the hdf5 file.
     """
     key = key if key.startswith("/") else f"/{key}"
     dsets = get_hdf5_populated_dataset_keys(fname, 0, 0)
     if key not in dsets:
-        raise AppConfigError(
+        raise UserConfigError(
             f'hdf5_key "{key}" is not a valid key ' f'for the file "{fname}."'
         )
 
@@ -74,11 +74,11 @@ def check_file_exists(fname):
 
     Raises
     ------
-    AppConfigError
+    UserConfigError
         If the selected filename does not exist.
     """
     if not os.path.isfile(fname):
-        raise AppConfigError(
+        raise UserConfigError(
             f'The selected filename "{fname}" does not ' "point to a valid file."
         )
 
@@ -102,7 +102,7 @@ def verify_files_in_same_directory(filename1, filename2):
     _path1, _name1 = os.path.split(filename1)
     _path2, _name2 = os.path.split(filename2)
     if _path2 not in [_path1, ""]:
-        raise AppConfigError(
+        raise UserConfigError(
             "The selected files are not in the same directory:\n"
             f"{filename1}\nand\n{filename2}"
         )
@@ -121,12 +121,12 @@ def verify_files_of_range_are_same_size(path, filenames):
 
     Raises
     ------
-    AppConfigError
+    UserConfigError
         If the files in the filelist are not all of the same size.
     """
     _fsizes = array([os.stat(f"{path}/{f}").st_size for f in filenames])
     if _fsizes.std() > 0.0:
-        raise AppConfigError("The selected files are not all of the " "same size.")
+        raise UserConfigError("The selected files are not all of the " "same size.")
 
 
 def file_is_writable(filename, overwrite=False):

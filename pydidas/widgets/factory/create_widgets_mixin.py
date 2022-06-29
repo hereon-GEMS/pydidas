@@ -28,7 +28,7 @@ __all__ = ["CreateWidgetsMixIn"]
 from qtpy import QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
-from ...core import WidgetLayoutError
+from ...core import PydidasGuiError
 from ...core.utils import copy_docstring
 from ..utilities import apply_widget_properties
 from .button_factory import create_button
@@ -270,7 +270,7 @@ def _get_widget_layout_args(parent, **kwargs):
 
     Raises
     ------
-    WidgetLayoutError
+    PydidasGuiError
         If the parent widget has no supported layout. Supported are
         QBoxLayout, QStackedLayout or QGridLayout and subclasses.
 
@@ -281,7 +281,7 @@ def _get_widget_layout_args(parent, **kwargs):
         the layout of the parent widget.
     """
     if not isinstance(parent.layout(), (QBoxLayout, QStackedLayout, QGridLayout)):
-        raise WidgetLayoutError(
+        raise PydidasGuiError(
             f'Layout of parent widget "{parent}" is not of type '
             "QBoxLayout, QStackedLayout or QGridLayout."
         )
@@ -314,7 +314,7 @@ def _get_grid_pos(parent, **kwargs):
 
     Raises
     ------
-    WidgetLayoutError
+    PydidasGuiError
         If gridPos has been specified but is not of type tuple and not of
         length 4.
 
@@ -333,7 +333,7 @@ def _get_grid_pos(parent, **kwargs):
             kwargs.get("n_columns", 1),
         )
     if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
-        raise WidgetLayoutError(
+        raise PydidasGuiError(
             'The passed value for "gridPos" is not of type tuple and/or not'
             " of length 4."
         )

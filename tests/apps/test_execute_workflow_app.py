@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas import unittest_objects
-from pydidas.core import get_generic_parameter, AppConfigError, utils
+from pydidas.core import get_generic_parameter, UserConfigError, utils
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.experiment import SetupScan
@@ -219,7 +219,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     def test_check_size_of_results_and_calc_buffer_size__res_too_large(self):
         app = ExecuteWorkflowApp()
         app._config["result_shapes"] = {1: (10000, 10000), 2: (15000, 20000)}
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
 
     def test_initialize_shared_memory(self):

@@ -32,7 +32,7 @@ import numpy as np
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import (
     ParameterCollection,
-    AppConfigError,
+    UserConfigError,
     Parameter,
     get_generic_parameter,
     Dataset,
@@ -181,7 +181,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         _offset = self.get_param_value("first_index")
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise AppConfigError("No pattern detected!")
+            raise UserConfigError("No pattern detected!")
         _pattern = _pattern.replace(
             "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
         )

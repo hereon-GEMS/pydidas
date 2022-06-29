@@ -24,10 +24,9 @@ __status__ = "Development"
 import unittest
 
 from pydidas.core import (
-    AppConfigError,
-    FrameConfigError,
-    WidgetLayoutError,
-    DatasetConfigException,
+    PydidasConfigError,
+    UserConfigError,
+    PydidasGuiError,
 )
 
 
@@ -38,17 +37,14 @@ class TestPydidasExceptions(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_app_config_error(self):
-        self.assertTrue(issubclass(AppConfigError, Exception))
+    def test_pydidas_config_error(self):
+        self.assertTrue(issubclass(PydidasConfigError, Exception))
 
-    def test_widget_layout_error(self):
-        self.assertTrue(issubclass(WidgetLayoutError, Exception))
+    def test_user_config_error(self):
+        self.assertTrue(issubclass(UserConfigError, Exception))
 
-    def test_frame_config_error(self):
-        self.assertTrue(issubclass(FrameConfigError, Exception))
-
-    def test_dataset_config_exception(self):
-        self.assertTrue(issubclass(DatasetConfigException, Exception))
+    def test_pydidas_gui_error(self):
+        self.assertTrue(issubclass(PydidasGuiError, Exception))
 
 
 if __name__ == "__main__":

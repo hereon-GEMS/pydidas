@@ -28,7 +28,7 @@ __all__ = ["ParameterWidgetsMixIn"]
 from qtpy import QtWidgets, QtCore
 
 from .parameter_config_widget import ParameterConfigWidget
-from ...core import WidgetLayoutError
+from ...core import PydidasGuiError
 
 
 class ParameterWidgetsMixIn:
@@ -101,7 +101,7 @@ class ParameterWidgetsMixIn:
         self.param_widgets[param.refkey] = _widget.io_widget
 
         if _parent.layout() is None:
-            raise WidgetLayoutError("No layout set.")
+            raise PydidasGuiError("No layout set.")
         _layout_args = self.__get_args_for_parent_layout(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 

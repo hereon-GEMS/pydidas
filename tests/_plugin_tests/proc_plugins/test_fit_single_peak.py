@@ -26,10 +26,10 @@ import unittest
 
 import numpy as np
 
-from pydidas.core import AppConfigError, Dataset
+from pydidas.core import UserConfigError, Dataset
 from pydidas.core.constants import gaussian, lorentzian, voigt
 from pydidas.plugins import PluginCollection, BasePlugin
-from pydidas.gui.windows import ShowDetailedPluginResults
+
 
 PLUGIN_COLLECTION = PluginCollection()
 
@@ -147,7 +147,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_crop_data_to_selected_range__no_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin._data = self._data
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin._crop_data_to_selected_range()
 
     def test_crop_data_to_selected_range__empty_limits(self):
@@ -155,7 +155,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_lower_limit", 42)
         plugin.set_param_value("fit_upper_limit", 2)
         plugin._data = self._data
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin._crop_data_to_selected_range()
 
     def test_crop_data_to_selected_range__normal_limits(self):

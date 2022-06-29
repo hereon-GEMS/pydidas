@@ -33,6 +33,7 @@ from pydidas.core import (
     ParameterCollection,
     get_generic_param_collection,
     utils,
+    UserConfigError,
 )
 from ..experiment import SetupScan
 from ..workflow import WorkflowTree
@@ -179,7 +180,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return False
         return True
 
-
     def __get_index(self):
         """
         Get the frame index based on the user selection for indexing using
@@ -191,7 +191,13 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             The absolute frame number.
         """
         if self.get_param_value("image_selection") == "Use image number":
-            return self.get_param_value("image_num", dtype=int)
+            _index = self.get_param_value("image_num", dtype=int)
+            if not 0 <= _index < SCAN.n_total:
+                raise UserConfigError(
+                    f"The selected number {_index} is outside the scope of the number "
+                    f"of images in the scan (0...{SCAN.n_total - 1})"
+                )
+            return _index
         _nums = [
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]

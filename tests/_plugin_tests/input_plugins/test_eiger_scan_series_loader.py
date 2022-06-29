@@ -30,7 +30,7 @@ import pickle
 import numpy as np
 import h5py
 
-from pydidas.core import AppConfigError, Parameter
+from pydidas.core import UserConfigError, Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
 
@@ -90,7 +90,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
 
     def test_pre_execute__no_input(self):
         plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")()
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 
     def test_pre_execute__simple(self):

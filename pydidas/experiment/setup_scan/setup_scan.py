@@ -29,6 +29,7 @@ from ...core import (
     SingletonFactory,
     get_generic_param_collection,
     ObjectWithParameterCollection,
+    UserConfigError,
 )
 from .setup_scan_io_meta import SetupScanIoMeta
 
@@ -85,7 +86,7 @@ class _SetupScan(ObjectWithParameterCollection):
             The length of indices is equal to the number of scan dimensions.
         """
         if frame < 0 or frame >= self.n_total:
-            raise ValueError(
+            raise UserConfigError(
                 f'The demanded frame number "{frame}" is out of '
                 f"the scope of the Scan (0, {self.n_total})."
             )
@@ -120,7 +121,7 @@ class _SetupScan(ObjectWithParameterCollection):
             0 <= _index <= _shapes[_dim] for _dim, _index in enumerate(indices)
         ]
         if False in _indices_okay:
-            raise ValueError(
+            raise UserConfigError(
                 f'The given indices "{tuple(indices)}" are out of the scope '
                 f"of the scan range {self.shape}"
             )
@@ -174,7 +175,7 @@ class _SetupScan(ObjectWithParameterCollection):
             The scan range as numpy array.
         """
         if index not in [1, 2, 3, 4]:
-            raise ValueError("Only the scan dimensions [1, 2, 3, 4] are " "supported.")
+            raise UserConfigError("Only the scan dimensions 1, 2, 3, 4 are supported.")
         _f0 = self.get_param_value(f"offset_{index}")
         _df = self.get_param_value(f"delta_{index}")
         _n = self.get_param_value(f"n_points_{index}")

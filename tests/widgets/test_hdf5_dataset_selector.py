@@ -31,7 +31,7 @@ import h5py
 import numpy as np
 from qtpy import QtWidgets, QtTest
 
-from pydidas.core import FrameConfigError
+from pydidas.core import PydidasGuiError
 from pydidas.widgets.selection import Hdf5DatasetSelector
 
 
@@ -218,7 +218,7 @@ class TestHdf5DatasetSelector(unittest.TestCase):
     def test_click_view_button_no_widget(self):
         obj = Hdf5DatasetSelector()
         obj.set_filename(self._fname)
-        with self.assertRaises(FrameConfigError):
+        with self.assertRaises(PydidasGuiError):
             obj.click_view_button()
 
 

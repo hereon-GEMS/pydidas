@@ -29,7 +29,7 @@ import os
 import numpy as np
 import h5py
 
-from pydidas.core import AppConfigError
+from pydidas.core import UserConfigError
 from pydidas.core.utils.file_checks import (
     check_hdf5_key_exists_in_file,
     check_file_exists,
@@ -54,22 +54,22 @@ class TestFileCheckFunctions(unittest.TestCase):
         check_hdf5_key_exists_in_file(self._hdf5_fname, "test/path/data")
 
     def test_check_hdf5_key_exists_in_file_group_not_dset(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             check_hdf5_key_exists_in_file(self._hdf5_fname, "test/path")
 
     def test_check_hdf5_key_exists_in_file_wrong_key(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             check_hdf5_key_exists_in_file(self._hdf5_fname, "no/dataset")
 
     def test_check_file_exists(self):
         check_file_exists(self._hdf5_fname)
 
     def test_check_file_exists_dir(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             check_file_exists(self._path)
 
     def test_check_file_exists_nofile(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             check_file_exists(self._no_fname)
 
     def test_verify_files_in_same_directory_simple(self):
@@ -79,7 +79,7 @@ class TestFileCheckFunctions(unittest.TestCase):
         verify_files_in_same_directory(self._no_fname, "test.txt")
 
     def test_verify_files_in_same_directory_not_true(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             verify_files_in_same_directory(self._no_fname, "some/thing.txt")
 
     def test_verify_files_of_range_are_same_size_correct(self):
@@ -94,7 +94,7 @@ class TestFileCheckFunctions(unittest.TestCase):
         _fnames = [f"test{i:02d}.npy" for i in range(10)]
         for i, _name in enumerate(_fnames):
             np.save(os.path.join(self._path, _name), _data[:i, :i])
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             verify_files_of_range_are_same_size(self._path, _fnames)
 
     def test_file_is_writable_simple(self):

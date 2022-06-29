@@ -36,7 +36,7 @@ from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (
     ParameterCollection,
     Dataset,
-    AppConfigError,
+    UserConfigError,
     get_generic_parameter,
 )
 from pydidas.managers import CompositeImageManager
@@ -243,7 +243,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app._det_mask = _mask
         app._config["det_mask_val"] = None
         _image = np.random.random(_shape)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._CompositeCreatorApp__apply_mask(_image)
 
     def test_apply_mask__with_mask_and_finite_mask_val(self):
@@ -429,13 +429,13 @@ class TestCompositeCreatorApp(unittest.TestCase):
             self._fname(999), np.zeros((self._img_shape[0] - 2, self._img_shape[1] - 2))
         )
         self.set_bg_params(app, self._fname(999))
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._check_and_set_bg_file()
 
     def test_verify_total_number_of_images_in_composite__plain(self):
         app = self.get_default_app()
         app._CompositeCreatorApp__verify_number_of_images_fits_composite()
-        # assert does not raise AppConfigError
+        # assert does not raise UserConfigError
 
     def test_verify_total_number_of_images_in_composite__nx_default(self):
         app = self.get_default_app()
@@ -453,14 +453,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app = self.get_default_app()
         app.set_param_value("composite_nx", 2)
         app.set_param_value("composite_ny", 2)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_verify_total_number_of_images_in_composite__too_large(self):
         app = self.get_default_app()
         app.set_param_value("composite_nx", 20)
         app.set_param_value("composite_ny", 20)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             app._CompositeCreatorApp__verify_number_of_images_fits_composite()
 
     def test_get_detector_mask__no_file(self):

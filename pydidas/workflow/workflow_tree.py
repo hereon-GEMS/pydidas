@@ -28,7 +28,7 @@ __all__ = ["WorkflowTree"]
 import ast
 from numbers import Integral
 
-from ..core import SingletonFactory, AppConfigError
+from ..core import SingletonFactory, UserConfigError
 from ..plugins import PluginCollection
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
@@ -275,7 +275,7 @@ class _WorkflowTree(GenericTree):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the WorkflowTree has no nodes.
 
         Returns
@@ -285,7 +285,7 @@ class _WorkflowTree(GenericTree):
             node_ids of type int and shapes of type tuple.
         """
         if self.root is None:
-            raise AppConfigError("The WorkflowTree has no nodes.")
+            raise UserConfigError("The WorkflowTree has no nodes.")
         _leaves = self.get_all_leaves()
         _shapes = [_leaf.result_shape for _leaf in _leaves]
         if None in _shapes or self._tree_changed_flag or force_update:
@@ -303,7 +303,7 @@ class _WorkflowTree(GenericTree):
                     "Cannot determine the shape of the output for node "
                     f'"{_id}" (type {_plugin_cls}).'
                 )
-                raise AppConfigError(_error)
+                raise UserConfigError(_error)
         return _shapes
 
 

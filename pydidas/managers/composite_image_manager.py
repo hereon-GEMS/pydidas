@@ -29,7 +29,7 @@ from copy import copy
 import numpy as np
 
 from ..core import (
-    AppConfigError,
+    UserConfigError,
     ParameterCollection,
     get_generic_parameter,
     ObjectWithParameterCollection,
@@ -164,16 +164,15 @@ class CompositeImageManager(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the size of the image is larger than the defined global limit.
         """
         _size = 1e-6 * shape[0] * shape[1]
         _maxsize = self.get_param_value("mosaic_max_size")
         if _size > _maxsize:
-            raise AppConfigError(
-                f"The requested image size ({_size} Mpx)"
-                " is too large for the global size limit "
-                f"of {_maxsize} Mpx."
+            raise UserConfigError(
+                f"The requested image size ({_size} Mpx) is too large for the global "
+                f"size limit of {_maxsize} Mpx."
             )
 
     def apply_thresholds(self, **kwargs):

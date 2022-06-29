@@ -32,7 +32,7 @@ import pickle
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import AppConfigError, Dataset
+from pydidas.core import UserConfigError, Dataset
 from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.workflow.workflow_tree import _WorkflowTree
 from pydidas.plugins import PluginCollection
@@ -75,7 +75,7 @@ class TestWorkflowTree(unittest.TestCase):
         return _nodes, _index
 
     def test_get_all_result_shapes__no_nodes(self):
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             self.tree.get_all_result_shapes()
 
     def test_get_all_result_shapes__single_node(self):

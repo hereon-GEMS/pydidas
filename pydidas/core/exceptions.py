@@ -23,35 +23,27 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
-    "FrameConfigError",
-    "WidgetLayoutError",
-    "AppConfigError",
-    "DatasetConfigException",
+    "PydidasGuiError",
+    "PydidasConfigError",
+    "UserConfigError",
 ]
 
 
-class FrameConfigError(Exception):
+class PydidasGuiError(Exception):
     """
-    FrameConfigError is used if any required Qt references are missing or
-    any other specific issues are raised in the configuration of Frames.
-    """
-
-
-class WidgetLayoutError(Exception):
-    """
-    WidgetLayoutError is used if a widget attempts to add items to a layout
-    without having a layout.
+    PydidasGuiError is used for any specific issues with the graphical user interface.
     """
 
 
-class AppConfigError(Exception):
+class PydidasConfigError(Exception):
     """
-    AppConfigError is used when app Parameters are not consistent and cannot
+    PydidasConfigError is used when the configuration (e.g. with Parameters) cannot
     be processed.
     """
 
 
-class DatasetConfigException(Exception):
+class UserConfigError(Exception):
     """
-    Exception class for Dataset class configuration of metadata.
+    UserConfigErrors can be raised if the input cannot be processed. The exception
+    handling for UserConfigErrors is
     """

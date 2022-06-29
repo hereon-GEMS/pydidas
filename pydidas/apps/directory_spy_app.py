@@ -31,7 +31,12 @@ import multiprocessing as mp
 import numpy as np
 from qtpy import QtCore
 
-from ..core import BaseApp, get_generic_param_collection, AppConfigError
+from ..core import (
+    BaseApp,
+    get_generic_param_collection,
+    PydidasConfigError,
+    UserConfigError,
+)
 from ..core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
@@ -196,7 +201,7 @@ class DirectorySpyApp(BaseApp):
         except (FileNotFoundError, ValueError, PermissionError):
             self.set_param_value("use_global_det_mask", False)
             return None
-        raise AppConfigError("Unknown error when reading detector mask file.")
+        raise PydidasConfigError("Unknown error when reading detector mask file.")
 
     def define_path_and_name(self):
         """
@@ -204,7 +209,7 @@ class DirectorySpyApp(BaseApp):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the naming pattern could not be interpreted.
         """
         if self.get_param_value("scan_for_all"):
@@ -215,13 +220,14 @@ class DirectorySpyApp(BaseApp):
         _strs = _pattern_str.split("#")
         _lens = [len(_s) for _s in _strs]
         if len(_strs) == 1:
-            raise AppConfigError(
-                "No pattern detected in the filename. Please verify that "
-                "the hashtag has been used."
+            raise UserConfigError(
+                f"No pattern detected in the filename '{_pattern_str}'. Please verify "
+                "that the hashtag has been used."
             )
         if set(_lens[1:-1]) != {0}:
-            raise AppConfigError(
-                "Multiple patterns detected. Cannot process the filename " "pattern."
+            raise UserConfigError(
+                "Multiple patterns detected. Cannot process the filename pattern: "
+                f"'{_pattern_str}'."
             )
         _len_pattern = _pattern_str.count("#")
         self._config["glob_pattern"] = _pattern_str.replace("#" * _len_pattern, "*")

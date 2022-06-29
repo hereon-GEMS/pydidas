@@ -40,7 +40,7 @@ from pydidas.core.constants import (
 from pydidas.core import (
     get_generic_param_collection,
     Dataset,
-    AppConfigError,
+    UserConfigError,
     Parameter,
 )
 from pydidas.plugins import ProcPlugin
@@ -172,9 +172,8 @@ class FitSinglePeak(ProcPlugin):
         """
         _range = self._get_cropped_range()
         if _range.size < 5:
-            raise AppConfigError(
-                "The data range for the fit is too small "
-                "with less than 5 data points."
+            raise UserConfigError(
+                "The data range for the fit is too small with less than 5 data points."
             )
         self._x = self._data.axis_ranges[0][_range]
         self._data = self._data[_range]
@@ -294,9 +293,6 @@ class FitSinglePeak(ProcPlugin):
         _datafit = self._func(list(self._fit_params.values()), self._x)
         _residual = self._data - _datafit
         _residual_std = abs(np.std(_residual) / np.mean(self._data))
-        print("\nstd", np.std(_residual))
-        print("mean data", np.mean(self._data))
-        print("residual norm std", _residual_std)
         if _output == "Peak area":
             _new_data = Dataset(
                 [self._fit_params["amplitude"]], axis_labels=["Peak area"]

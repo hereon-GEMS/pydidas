@@ -28,7 +28,7 @@ import random
 
 from qtpy import QtWidgets
 
-from pydidas.core import WidgetLayoutError
+from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import (
     CreateWidgetsMixIn,
     _get_widget_layout_args,
@@ -112,7 +112,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_get_widget_layout_args_no_layout(self):
         obj = TestWidget()
-        with self.assertRaises(WidgetLayoutError):
+        with self.assertRaises(PydidasGuiError):
             _get_widget_layout_args(obj)
 
     def test_get_widget_layout_box(self):

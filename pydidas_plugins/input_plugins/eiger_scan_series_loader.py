@@ -28,7 +28,7 @@ __all__ = ["EigerScanSeriesLoader"]
 import os
 
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import ParameterCollection, AppConfigError, get_generic_parameter
+from pydidas.core import ParameterCollection, UserConfigError, get_generic_parameter
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
@@ -123,7 +123,7 @@ class EigerScanSeriesLoader(InputPlugin):
         _suffix = self.get_param_value("filename_suffix", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise AppConfigError("No pattern detected!")
+            raise UserConfigError("No pattern detected!")
         _name = os.path.join(_basepath, _pattern, _eigerkey, _pattern + _suffix)
         _fname = _name.replace("#" * _len_pattern, "{:0" + str(_len_pattern) + "d}")
         self._filename_generator = lambda index: _fname.format(index, index)

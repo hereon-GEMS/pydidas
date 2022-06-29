@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 import h5py
 
-from pydidas.core import AppConfigError, Parameter
+from pydidas.core import UserConfigError, Parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection, BasePlugin
 
@@ -79,7 +79,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
 
     def test_pre_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin.pre_execute()
 
     def test_pre_execute__simple(self):
@@ -100,7 +100,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")(
             images_per_file=1
         )
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             plugin.execute(0)
 
     def test_execute__simple(self):

@@ -32,7 +32,7 @@ import numpy as np
 from qtpy import QtCore
 
 from pydidas.managers import CompositeImageManager
-from pydidas.core import AppConfigError
+from pydidas.core import UserConfigError
 
 
 class TestCompositeImage(unittest.TestCase):
@@ -229,7 +229,7 @@ class TestCompositeImage(unittest.TestCase):
         q_settings = QtCore.QSettings("Hereon", "pydidas")
         old_maxsize = float(q_settings.value("global/mosaic_max_size"))
         q_settings.setValue("global/mosaic_max_size", 100)
-        with self.assertRaises(AppConfigError):
+        with self.assertRaises(UserConfigError):
             obj._CompositeImageManager__check_max_size((21e3, 5e3))
         if old_maxsize is not None:
             q_settings.setValue("global/mosaic_max_size", old_maxsize)

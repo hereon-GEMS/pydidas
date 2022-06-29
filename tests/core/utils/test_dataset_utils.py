@@ -27,7 +27,7 @@ import unittest
 
 import numpy as np
 
-from pydidas.core import DatasetConfigException
+from pydidas.core import PydidasConfigError
 from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
     update_dataset_properties_from_kwargs,
@@ -146,7 +146,7 @@ class Test_dataset_utils(unittest.TestCase):
 
     def test_convert_data_to_dict__incorrect_type(self):
         _obj = "a string"
-        with self.assertRaises(DatasetConfigException):
+        with self.assertRaises(PydidasConfigError):
             convert_data_to_dict(_obj, 3)
 
     def test_item_is_iterable_but_not_array__string(self):

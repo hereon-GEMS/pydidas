@@ -34,7 +34,7 @@ import numpy as np
 
 from ..core import (
     ObjectWithParameterCollection,
-    AppConfigError,
+    UserConfigError,
     get_generic_param_collection,
 )
 from ..core.constants import FILENAME_DELIMITERS
@@ -198,7 +198,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If any of the checks fail.
         """
         check_file_exists(self.get_param_value("first_file"))
@@ -292,7 +292,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
 
         def raise_error():
-            raise AppConfigError(
+            raise UserConfigError(
                 "Could not interprete the filenames. The filenames do not "
                 "differ in exactly one item, as determined by the delimiters."
                 f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}'
@@ -342,7 +342,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
         Raises
         ------
-        AppConfigError
+        UserConfigError
             If the file list is not correctly initiated or if the index is
             out of the range of the file list.
 
@@ -353,7 +353,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         _n = self._config["n_files"]
         if not 0 <= index < _n:
-            raise AppConfigError(
+            raise UserConfigError(
                 f'The selected number "{index}" is out of '
                 f"the range of the file list [0, {_n-1}]"
             )

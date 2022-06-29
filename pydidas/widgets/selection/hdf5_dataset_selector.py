@@ -32,7 +32,7 @@ import hdf5plugin
 from qtpy import QtWidgets, QtCore
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
-from ...core import FrameConfigError
+from ...core import PydidasGuiError
 from ...core.utils import get_hdf5_populated_dataset_keys
 from ...core.constants import QT_COMBO_BOX_SIZE_POLICY
 from ..factory import CreateWidgetsMixIn
@@ -359,5 +359,5 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         if self._frame is None or not self.flags["autoUpdate"]:
             self.__get_frame()
         if not isinstance(self._widgets["viewer"], QtWidgets.QWidget):
-            raise FrameConfigError("The reference is not a widget")
+            raise PydidasGuiError("The reference is not a widget")
         self._widgets["viewer"].setData(self._frame)

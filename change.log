@@ -11,6 +11,8 @@ Major changes:
 - Added a script to remove all local files and registry settings for the current 
   user.
 - Added a feature to display detailed plugin results in the WorkflowTestFrame.
+- Changed Excpetion handling and added a custom UserConfigError exception with 
+  its own handling.
   
 Improvements
 ------------

@@ -29,8 +29,9 @@ import time
 import traceback
 from io import StringIO
 
+from ..core import UserConfigError
 from ..core.utils import get_logging_dir
-from .dialogues import ErrorMessageBox
+from .dialogues import ErrorMessageBox, UserConfigErrorMessageBox
 
 
 def gui_excepthook(exc_type, exception, trace):
@@ -50,10 +51,14 @@ def gui_excepthook(exc_type, exception, trace):
     trace : traceback object
         The trace of where the exception occured.
     """
-    _traceback_info = StringIO()
-    traceback.print_tb(trace, None, _traceback_info)
-    _traceback_info.seek(0)
-    _trace = _traceback_info.read()
+    if exc_type is UserConfigError:
+        _exc_repr = repr(exception).split("'")[1]
+        _ = UserConfigErrorMessageBox(text=_exc_repr).exec_()
+        return
+    with StringIO() as _tmpfile:
+        traceback.print_tb(trace, None, _tmpfile)
+        _tmpfile.seek(0)
+        _trace = _tmpfile.read()
     _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
 
     _time = time.strftime("%Y-%m-%d %H:%M:%S")

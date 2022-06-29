@@ -32,7 +32,7 @@ from functools import partial
 import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
-from pydidas.core import FrameConfigError
+from pydidas.core import PydidasGuiError
 from pydidas.core.utils import (
     get_doc_home_qurl,
     get_pydidas_icon_w_bg,
@@ -545,7 +545,7 @@ class MainMenu(QtWidgets.QMainWindow):
             for _index, _ in enumerate(self.centralWidget().widgets)
         ]
         if False in _frame_info:
-            raise FrameConfigError("The state is not defined for all frames.")
+            raise PydidasGuiError("The state is not defined for all frames.")
         for _index, _frame in enumerate(self.centralWidget().widgets):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 

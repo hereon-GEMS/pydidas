@@ -30,7 +30,7 @@ import os
 from qtpy import QtCore, QtWidgets
 import numpy as np
 
-from ...core import get_generic_param_collection, AppConfigError
+from ...core import get_generic_param_collection, UserConfigError
 from ...core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     CONFIG_WIDGET_WIDTH,
@@ -191,7 +191,7 @@ class AverageImagesWindow(PydidasWindow):
         """
         try:
             self._filelist.update()
-        except AppConfigError as _ex:
+        except UserConfigError as _ex:
             self.__clear_entries(["last_file"], hide=False)
             QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
 

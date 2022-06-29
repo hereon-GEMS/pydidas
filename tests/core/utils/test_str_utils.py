@@ -374,21 +374,35 @@ class Test_str_utils(unittest.TestCase):
     def test_format_input_to_multiline_str__simple(self):
         _test = "test test test test "
         _new = format_input_to_multiline_str(_test)
+        self.assertEqual(_new, "test test test test")
+
+    def test_format_input_to_multiline_str__too_long(self):
+        _test = "test test test test "
+        _new = format_input_to_multiline_str(_test, max_line_length=12)
         self.assertEqual(_new, "test test\ntest test")
+
+    def test_format_input_to_multiline_str__dont_keep_linebreaks(self):
+        _test = "test test\n\ntest\ntest "
+        _new = format_input_to_multiline_str(_test, keep_linebreaks=False)
+        self.assertEqual(_new, "test test test test")
 
     def test_format_input_to_multiline_str__simple_with_padding(self):
         _test = "test test test test "
-        _new = format_input_to_multiline_str(_test, pad_to_max_length=True)
+        _new = format_input_to_multiline_str(
+            _test, max_line_length=12, pad_to_max_length=True
+        )
         self.assertEqual(_new, " test test  \n test test  ")
 
     def test_format_input_to_multiline_str__too_long_word(self):
         _test = "test testtesttesttest test test "
-        _new = format_input_to_multiline_str(_test)
+        _new = format_input_to_multiline_str(_test, max_line_length=12)
         self.assertEqual(_new, "test\ntesttesttesttest\ntest test")
 
     def test_format_input_to_multiline_str__too_long_word_with_padding(self):
         _test = "test testtesttesttest test test "
-        _new = format_input_to_multiline_str(_test, pad_to_max_length=True)
+        _new = format_input_to_multiline_str(
+            _test, max_line_length=12, pad_to_max_length=True
+        )
         self.assertEqual(_new, "    test    \ntesttesttesttest\n test test  ")
 
     def test_format_input_to_multiline_str__one_word_only(self):
@@ -398,7 +412,9 @@ class Test_str_utils(unittest.TestCase):
 
     def test_format_input_to_multiline_str__one_word_only_with_padding(self):
         _test = "test"
-        _new = format_input_to_multiline_str(_test, pad_to_max_length=True)
+        _new = format_input_to_multiline_str(
+            _test, max_line_length=12, pad_to_max_length=True
+        )
         self.assertEqual(_new, "    test    ")
 
     def test_format_input_to_multiline_str__max_len_changes(self):
@@ -408,12 +424,14 @@ class Test_str_utils(unittest.TestCase):
 
     def test_format_input_to_multiline_str__too_long_with_space(self):
         _test = "test testtest"
-        _new = format_input_to_multiline_str(_test)
+        _new = format_input_to_multiline_str(_test, max_line_length=12)
         self.assertEqual(_new, "test\ntesttest")
 
     def test_format_input_to_multiline_str__too_long_with_space_padding(self):
         _test = "test testtest"
-        _new = format_input_to_multiline_str(_test, pad_to_max_length=True)
+        _new = format_input_to_multiline_str(
+            _test, max_line_length=12, pad_to_max_length=True
+        )
         self.assertEqual(_new, "    test    \n  testtest  ")
 
     def test_get_random_string(self):

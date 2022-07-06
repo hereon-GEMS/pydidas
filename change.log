@@ -2,8 +2,6 @@ v0.1.9
 ======
 Major changes:
 --------------
-- Dataset class has been reworked to function correctly with more numpy ufuncs,
-  in particularly with np.take.
 - Added a new SilxPlot2D class which allows to limit the figure canvas to the 
   data dimensions and back to the full window. This class also has a new feature
   to crop the top percentage of the histogram, for example to remove dead pixels.
@@ -11,11 +9,13 @@ Major changes:
 - Added a script to remove all local files and registry settings for the current 
   user.
 - Added a feature to display detailed plugin results in the WorkflowTestFrame.
-- Changed Excpetion handling and added a custom UserConfigError exception with 
+- Changed Exception handling and added a custom UserConfigError exception with 
   its own handling.
   
 Improvements
 ------------
+- Dataset class has been reworked to function correctly with more numpy ufuncs,
+  in particularly with np.take.
 - Added settings for displaying only a limited floating point precision of 
   Parameters.
 - Removed redundant button to store pyFAI calibration settings.
@@ -39,6 +39,8 @@ Bugfixes:
   the frame state.
 - Fixed an issue with WorkflowTree results export and labels with special 
   characters.
+- Fixed an issue with running the Workflow with only exported data and no local
+  data which raised an exception.
 
 
 v0.1.8

@@ -59,11 +59,12 @@ def gui_excepthook(exc_type, exception, trace):
         traceback.print_tb(trace, None, _tmpfile)
         _tmpfile.seek(0)
         _trace = _tmpfile.read()
-    _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
 
     _time = time.strftime("%Y-%m-%d %H:%M:%S")
     _sep = "\n" + "-" * 20 + "\n"
     _msg = "-" * 20 + "\n" + _sep.join([_time, f"{exc_type}: {exception}", _trace])
+
+    _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
     with open(_logfile, "a+") as _file:
         _file.write("\n\n" + _msg)
 

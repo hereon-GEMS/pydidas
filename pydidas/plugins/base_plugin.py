@@ -284,7 +284,7 @@ class BasePlugin(ObjectWithParameterCollection):
             The unique ParameterConfig widget
         """
         raise NotImplementedError(
-            "Generic plugins do not have a unique" " parameter config widget."
+            "Generic plugins do not have a unique parameter config widget."
         )
 
     @property

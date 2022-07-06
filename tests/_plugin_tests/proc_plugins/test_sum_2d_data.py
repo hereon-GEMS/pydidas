@@ -160,7 +160,9 @@ class TestSum2dData(unittest.TestCase):
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
-        self.assertTrue(_data[0], np.sum(self._data[_low_y : _high_y + 1, _low_x : _high_x + 1]))
+        self.assertTrue(
+            _data[0], np.sum(self._data[_low_y : _high_y + 1, _low_x : _high_x + 1])
+        )
 
 
 if __name__ == "__main__":

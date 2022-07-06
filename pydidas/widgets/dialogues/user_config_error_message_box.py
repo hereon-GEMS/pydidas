@@ -95,7 +95,6 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         )
 
         self._widgets["button_okay"].clicked.connect(self.close)
-        # self.resize(650, self.height())
         self.set_text(_text)
 
     def set_text(self, text):

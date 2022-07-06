@@ -213,7 +213,7 @@ class ExecuteWorkflowApp(BaseApp):
         _req_points_per_dataset = sum(
             np.prod(s) for s in self._config["result_shapes"].values()
         )
-        _req_mem_per_dataset = 4 * _req_points_per_dataset / 2**20
+        _req_mem_per_dataset = max(4 * _req_points_per_dataset / 2**20, 0.01)
         _n_dataset_in_buffer = int(np.floor(_buffer / _req_mem_per_dataset))
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker

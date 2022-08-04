@@ -380,6 +380,7 @@ class ResultSelectionWidget(
             self._selector.select_active_node(self._active_node)
             self.__calc_and_store_ndim_of_results()
             self.__update_text_description_of_node_results()
+            self.__enable_valid_result_plot_selection()
             self.__update_dim_choices_for_plot_selection()
             self.__check_and_create_params_for_slice_selection()
 
@@ -432,6 +433,21 @@ class ResultSelectionWidget(
             )
         )
         self.__set_derived_widget_visibility(True)
+
+    def __enable_valid_result_plot_selection(self):
+        """
+        Validate the dimensionality of the results and enable/disable plot choices
+        accordingly.
+        """
+        _group = self._widgets["radio_plot_type"]
+        self._config["plot_type"] = "1D plot"
+        if self._config["result_ndim"] == 1:
+            _group.select_by_index(0)
+            for _id in [1, 2, 3]:
+                _group._buttons[_id].setEnabled(False)
+        else:
+            for _id in [1, 2, 3]:
+                _group._buttons[_id].setEnabled(True)
 
     @QtCore.Slot(int)
     def __arrange_results_in_timeline_or_scan_shape(self, index):
@@ -558,7 +574,10 @@ class ResultSelectionWidget(
             with SignalBlocker(_axwidget):
                 _axwidget.update_choices(_new_choices)
                 _axwidget.setCurrentIndex(_axparam.value)
-        if self.params.values_equal("plot_ax1", "plot_ax2"):
+        if (
+            self.params.values_equal("plot_ax1", "plot_ax2")
+            and self._config["result_ndim"] > 1
+        ):
             if self.get_param_value("plot_ax1") == _new_choices[0]:
                 self.set_param_value("plot_ax2", _new_choices[1])
                 self.param_widgets["plot_ax2"].set_value(_new_choices[1])

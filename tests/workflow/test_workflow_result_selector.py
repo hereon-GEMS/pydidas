@@ -75,8 +75,10 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.nodes[0].plugin.set_param_value("image_width", self._result1_shape[1])
         TREE.create_and_add_node(DummyProc())
         TREE.create_and_add_node(DummyProc(), parent=TREE.root)
+        TREE.create_and_add_node(DummyProc(), parent=TREE.root)
         TREE.prepare_execution()
         TREE.nodes[2]._result_shape = self._result2_shape
+        TREE.nodes[3]._result_shape = (1, )
 
     def populate_WorkflowResults(self):
         RES.update_shapes_from_scan_and_workflow()
@@ -95,6 +97,12 @@ class TestWorkflowResultSelector(unittest.TestCase):
                 axis_units=["m", "Test", None],
                 axis_labels=["dim1", "2nd dim", "dim #3"],
                 axis_ranges=[12 + np.arange(self._result2_shape[0]), None, None],
+            ),
+            3: Dataset(
+                np.random.random((1,)),
+                axis_units=["m"],
+                axis_labels=["dim1"],
+                axis_ranges=[12],
             ),
         }
         RES.store_results(0, _results)

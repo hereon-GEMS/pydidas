@@ -173,6 +173,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             ]
             + [self.get_param_value("use_scan_timeline")]
             + [self.get_param_value("use_data_range")]
+            + [self._config["result_ndim"]]
+            + [self._config["active_node"]]
         )
         return hash(tuple(_param_vals))
 

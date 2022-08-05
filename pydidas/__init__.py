@@ -27,6 +27,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+import qtpy.QtCore as __QtCore
+
 # import local modules
 from . import version
 
@@ -83,3 +85,15 @@ pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
 pyFAI_azi_logger.setLevel(__logging.ERROR)
 silx_opencl_logger = __logging.getLogger("silx.opencl.processing")
 silx_opencl_logger.setLevel(__logging.ERROR)
+
+
+# if not existing, initialize all QSettings with the default values from the
+# default Parameters to avoid having "None" keys returned.
+__version = version.VERSION
+__settings = __QtCore.QSettings("Hereon", "pydidas")
+for _key in core.constants.QSETTINGS_GLOBAL_KEYS:
+    _val = __settings.value(f"{__version}/global/{_key}")
+    if _val is None:
+        _param = core.get_generic_parameter(_key)
+        __settings.setValue(f"{__version}/global/{_key}", _param.default)
+del __settings

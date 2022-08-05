@@ -37,6 +37,7 @@ from pydidas.core import (
     Parameter,
     CopyableQSettings,
 )
+from pydidas.version import VERSION
 
 
 class TestPydidasQSettings(unittest.TestCase):
@@ -49,12 +50,14 @@ class TestPydidasQSettings(unittest.TestCase):
         )
         self.q_settings = QtCore.QSettings("Hereon", "pydidas")
         for key in self._params:
-            self.q_settings.setValue(f"global/{key}", self._params.get_value(key))
+            self.q_settings.setValue(
+                f"{VERSION}/global/{key}", self._params.get_value(key)
+            )
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
         for key in self._params:
-            self.q_settings.remove(f"global/{key}")
+            self.q_settings.remove(f"{VERSION}/global/{key}")
 
     def test_creation(self):
         obj = PydidasQsettings()
@@ -72,13 +75,13 @@ class TestPydidasQSettings(unittest.TestCase):
             _text = _f.read()
         for _key in self._params:
             _val = self._params.get_value(_key)
-            self.assertIn(f"global/{_key}: {_val}", _text)
+            self.assertIn(f"{VERSION}/global/{_key}: {_val}", _text)
 
     def test_get_all_stored_q_settings(self):
         obj = PydidasQsettings()
         _settings = obj.get_all_stored_q_settings()
         for _key, _param in self._params.items():
-            _stored_val = _settings[f"global/{_key}"]
+            _stored_val = _settings[f"{VERSION}/global/{_key}"]
             self.assertEqual(str(_param.value), str(_stored_val))
 
     def test_set_value(self):
@@ -86,7 +89,19 @@ class TestPydidasQSettings(unittest.TestCase):
         obj = PydidasQsettings()
         obj.set_value("global/param_float", _val)
         _settings = obj.get_all_stored_q_settings()
-        self.assertEqual(float(_settings["global/param_float"]), _val)
+        self.assertEqual(float(_settings[f"{VERSION}/global/param_float"]), _val)
+
+    def test_value__no_type(self):
+        obj = PydidasQsettings()
+        _val = obj.value("global/param_float")
+        self.assertIsInstance(_val, str)
+        self.assertEqual(float(_val), self._params.get_value("param_float"))
+
+    def test_value__w_type(self):
+        obj = PydidasQsettings()
+        _val = obj.value("global/param_float", float)
+        self.assertIsInstance(_val, float)
+        self.assertEqual(_val, self._params.get_value("param_float"))
 
 
 if __name__ == "__main__":

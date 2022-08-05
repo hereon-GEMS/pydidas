@@ -29,18 +29,17 @@ import unittest
 import copy
 
 import numpy as np
-from qtpy import QtCore
 
 from pydidas.managers import CompositeImageManager
-from pydidas.core import UserConfigError
+from pydidas.core import UserConfigError, PydidasQsettings
 
 
 class TestCompositeImage(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        self._maxsize = float(q_settings.value("global/mosaic_max_size"))
-        self._border = float(q_settings.value("global/mosaic_border_width"))
+        q_settings = PydidasQsettings()
+        self._maxsize = q_settings.value("global/mosaic_max_size", float)
+        self._border = q_settings.value("global/mosaic_border_width", float)
 
     def tearDown(self):
         shutil.rmtree(self._path)
@@ -198,8 +197,8 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_set_default_qsettings(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        _maxsize = float(q_settings.value("global/mosaic_max_size"))
+        q_settings = PydidasQsettings()
+        _maxsize = q_settings.value("global/mosaic_max_size", float)
         self.assertEqual(obj.get_param_value("mosaic_max_size"), _maxsize)
 
     def test_set_default_qsettings__overwrite(self):
@@ -217,22 +216,22 @@ class TestCompositeImage(unittest.TestCase):
 
     def test_check_max_size_okay(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        old_maxsize = q_settings.value("global/mosaic_max_size")
-        q_settings.setValue("global/mosaic_max_size", 100)
+        q_settings = PydidasQsettings()
+        old_maxsize = q_settings.value("global/mosaic_max_size", float)
+        q_settings.set_value("global/mosaic_max_size", 100)
         obj._CompositeImageManager__check_max_size((19e3, 5e3))
         if old_maxsize is not None:
-            q_settings.setValue("global/mosaic_max_size", old_maxsize)
+            q_settings.set_value("global/mosaic_max_size", old_maxsize)
 
     def test_check_max_size_too_large(self):
         obj = self.get_default_object()
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        old_maxsize = float(q_settings.value("global/mosaic_max_size"))
-        q_settings.setValue("global/mosaic_max_size", 100)
+        q_settings = PydidasQsettings()
+        old_maxsize = q_settings.value("global/mosaic_max_size", float)
+        q_settings.set_value("global/mosaic_max_size", 100)
         with self.assertRaises(UserConfigError):
             obj._CompositeImageManager__check_max_size((21e3, 5e3))
         if old_maxsize is not None:
-            q_settings.setValue("global/mosaic_max_size", old_maxsize)
+            q_settings.set_value("global/mosaic_max_size", old_maxsize)
 
     def test_property_shape(self):
         obj = self.get_default_object()

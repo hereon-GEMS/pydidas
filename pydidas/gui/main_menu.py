@@ -32,19 +32,20 @@ from functools import partial
 import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
-from pydidas.core import PydidasGuiError
-from pydidas.core.utils import (
+from ..core import PydidasGuiError, UserConfigError
+from ..core.utils import (
     get_doc_home_qurl,
     get_pydidas_icon_w_bg,
     get_doc_qurl_for_frame_manual,
     get_doc_filename_for_frame_manual,
 )
-from pydidas.experiment import SetupScan, SetupExperiment
-from pydidas.workflow import WorkflowTree
-from pydidas.widgets import CentralWidgetStack, gui_excepthook
-from pydidas.widgets.dialogues import QuestionBox
-from pydidas.gui import utils
-from pydidas.gui.windows import (
+from ..experiment import SetupScan, SetupExperiment
+from ..workflow import WorkflowTree
+from ..widgets import CentralWidgetStack, gui_excepthook
+from ..widgets.dialogues import QuestionBox
+from ..version import VERSION
+from . import utils
+from .windows import (
     GlobalConfigWindow,
     ExportEigerPixelmaskWindow,
     AverageImagesWindow,
@@ -74,7 +75,7 @@ class MainMenu(QtWidgets.QMainWindow):
         default values will be used. The default is None.
     """
 
-    STATE_FILENAME = "pydidas_gui_state.yaml"
+    STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
 
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
@@ -395,6 +396,9 @@ class MainMenu(QtWidgets.QMainWindow):
                 QtCore.QStandardPaths.ConfigLocation
             )[0]
             filename = os.path.join(_config_path, self.STATE_FILENAME)
+        _config_dir = os.path.dirname(filename)
+        if not os.path.exists(_config_dir):
+            os.makedirs(_config_dir)
         _state = self.__get_window_states()
         for _index, _widget in enumerate(self.centralWidget().widgets):
             _frameindex, _widget_state = _widget.export_state()
@@ -483,7 +487,10 @@ class MainMenu(QtWidgets.QMainWindow):
             _fname = os.path.join(_path, self.STATE_FILENAME)
             if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
                 return _fname
-        raise FileNotFoundError("No state config file found.")
+        raise UserConfigError(
+            "No state config file found: Cannot restore the pydidas state because the "
+            "current user has not yet stored a pydidas state for the current version."
+        )
 
     def _restore_global_objects(self, state):
         """

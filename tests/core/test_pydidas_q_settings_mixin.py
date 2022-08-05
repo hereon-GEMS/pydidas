@@ -25,6 +25,7 @@ __status__ = "Development"
 import unittest
 import copy
 import pickle
+from numbers import Integral, Real
 
 from qtpy import QtCore
 
@@ -34,6 +35,7 @@ from pydidas.core import (
     Parameter,
     CopyableQSettings,
 )
+from pydidas.version import VERSION
 
 
 class TestPydidasQSettingsMixin(unittest.TestCase):
@@ -44,12 +46,15 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
             Parameter("param_str", str, default="test123"),
         )
         self.q_settings = QtCore.QSettings("Hereon", "pydidas")
+        self.q_settings.setValue("old_version/param_int", 42)
         for key in self._params:
-            self.q_settings.setValue(f"global/{key}", self._params.get_value(key))
+            self.q_settings.setValue(f"{VERSION}/{key}", self._params.get_value(key))
 
     def tearDown(self):
+        self.q_settings.remove("old_version/param_int")
+        self.q_settings.remove("old_version")
         for key in self._params:
-            self.q_settings.remove(f"global/{key}")
+            self.q_settings.remove(f"{VERSION}/{key}")
 
     def test_creation(self):
         obj = PydidasQsettingsMixin()
@@ -87,18 +92,37 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         _newval = obj._qsettings_convert_value_type("param_str", _value)
         self.assertEqual(_value, _newval)
 
-    def test_q_settings_get_global_value__plain(self):
+    def test_q_settings_get_value__plain(self):
         obj = PydidasQsettingsMixin()
         obj.params = self._params
         obj.get_param = obj.params.get
-        _val = obj.q_settings_get_global_value("param_float")
-        self.assertEqual(_val, self._params.get_value("param_float"))
+        _val = obj.q_settings_get_value("param_float")
+        self.assertEqual(float(_val), self._params.get_value("param_float"))
 
-    def test_q_settings_get_global_value__with_dtype(self):
+    def test_q_settings_get_value__with_dtype(self):
         obj = PydidasQsettingsMixin()
-        _val = obj.q_settings_get_global_value("param_float", dtype=float)
+        _val = obj.q_settings_get_value("param_float", dtype=float)
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
+
+    def test_q_settings_get_value__with_Integral(self):
+        obj = PydidasQsettingsMixin()
+        _val = obj.q_settings_get_value("param_int", dtype=Integral)
+        self.assertTrue(isinstance(_val, int))
+        self.assertEqual(_val, self._params.get_value("param_int"))
+
+    def test_q_settings_get_value__with_Real(self):
+        obj = PydidasQsettingsMixin()
+        _val = obj.q_settings_get_value("param_float", dtype=Real)
+        self.assertTrue(isinstance(_val, float))
+        self.assertEqual(_val, self._params.get_value("param_float"))
+
+    def test_q_settings_set_key(self):
+        _val = 42.1235
+        obj = PydidasQsettingsMixin()
+        obj.q_settings_set_key("param_float", _val)
+        _new_val = float(obj.q_settings.value(f"{VERSION}/param_float"))
+        self.assertEqual(_val, _new_val)
 
     def test_q_settings_pickle(self):
         obj = PydidasQsettingsMixin()

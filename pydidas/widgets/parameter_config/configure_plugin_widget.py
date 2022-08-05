@@ -182,7 +182,7 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
             The kwargs to be used for widget creation.
         """
         # The total width is reduced by 10 because of the margins
-        if param.type in [Hdf5key, Path]:
+        if param.dtype in [Hdf5key, Path]:
             _kwargs = {
                 "width_text": self.FIXED_WIDTH - 50,
                 "width_io": self.FIXED_WIDTH - 50,

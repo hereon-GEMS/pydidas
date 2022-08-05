@@ -211,13 +211,13 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, optional=True)
         self.assertEqual(obj.optional, True)
 
-    def test_type(self):
+    def test_dtype__int(self):
         obj = Parameter("Test0", int, 12)
-        self.assertEqual(obj.type, Integral)
+        self.assertEqual(obj.dtype, Integral)
 
-    def test_type_ii(self):
+    def test_ftype_float(self):
         obj = Parameter("Test0", float, 12)
-        self.assertEqual(obj.type, Real)
+        self.assertEqual(obj.dtype, Real)
 
     def test_get_value(self):
         obj = Parameter("Test0", int, 12)

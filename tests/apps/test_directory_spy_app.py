@@ -32,9 +32,8 @@ import multiprocessing as mp
 
 import h5py
 import numpy as np
-from qtpy import QtCore
 
-from pydidas.core import get_generic_parameter, UserConfigError
+from pydidas.core import get_generic_parameter, UserConfigError, PydidasQsettings
 from pydidas.core.utils import get_random_string
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
@@ -46,7 +45,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         self._pname = "test_12345_#####_suffix.npy"
         self._ppath = os.path.join(self._path, self._pname)
         self._glob_str = self._ppath.replace("#####", "*")
-        self.q_settings = QtCore.QSettings("Hereon", "pydidas")
+        self.q_settings = PydidasQsettings()
         self._original_mask_file = self.q_settings.value("global/det_mask")
         self._shape = (20, 20)
         self._mask = np.asarray(
@@ -58,7 +57,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._path)
-        self.q_settings.setValue("global/det_mask", self._original_mask_file)
+        self.q_settings.set_value("global/det_mask", self._original_mask_file)
         DirectorySpyApp.parse_func = directory_spy_app_parser
 
     def get_test_image(self, shape=None):
@@ -160,7 +159,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_get_detector_mask__with_mask(self):
         self.create_temp_mask_file()
-        self.q_settings.setValue("global/det_mask", self._mask_fname)
+        self.q_settings.set_value("global/det_mask", self._mask_fname)
         app = DirectorySpyApp()
         _mask = app._get_detector_mask()
         self.assertTrue((_mask == self._mask).all())

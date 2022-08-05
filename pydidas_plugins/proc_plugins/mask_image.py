@@ -62,8 +62,8 @@ class MaskImage(ProcPlugin):
         Check the use_global_mask Parameter and load the mask image.
         """
         if self.get_param_value("use_global_mask"):
-            _maskfile = self.q_settings_get_global_value("det_mask")
-            self._maskval = self.q_settings_get_global_value("det_mask_val")
+            _maskfile = self.q_settings_get_value("global/det_mask")
+            self._maskval = self.q_settings_get_value("global/det_mask_val", float)
         else:
             _maskfile = self.get_param_value("det_mask")
             self._maskval = self.get_param_value("det_mask_val")

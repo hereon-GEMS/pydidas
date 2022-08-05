@@ -93,7 +93,7 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         _name = self._widgets["tree"]._filemodel.filePath(index)
         if os.path.isfile(_name):
             _name = os.path.dirname(_name)
-        self.q_settings.setValue("directory_explorer/path", _name)
+        self.q_settings_set_key("directory_explorer/path", _name)
 
     @QtCore.Slot()
     def __file_selected(self):

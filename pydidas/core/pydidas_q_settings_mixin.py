@@ -29,6 +29,8 @@ from numbers import Integral, Real
 
 from qtpy import QtCore
 
+from ..version import VERSION
+
 
 class CopyableQSettings(QtCore.QSettings):
     """
@@ -57,18 +59,18 @@ class PydidasQsettingsMixin:
     def __init__(self):
         self.q_settings = CopyableQSettings("Hereon", "pydidas")
 
-    def q_settings_get_global_value(self, key, dtype=None):
+    def q_settings_get_value(self, key, dtype=None):
         """
-        Get the value from a QSetting.
+        Get the value from a QSetting key.
 
         Parameters
         ----------
         key : str
-            The QSetting reference key. A "global/" prefix will be applied
-            to the selected key.
+            The QSetting reference key.
         dtype : Union[type, None], optional
             A return datatype. If not None, the output will be returned as
-            dtype(value).
+            dtype(value), otherwise, the generic string/int will be returned. The
+            default is None.
 
         Returns
         -------
@@ -76,10 +78,28 @@ class PydidasQsettingsMixin:
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        _value = self.q_settings.value(f"global/{key}")
+        _value = self.q_settings.value(f"{VERSION}/{key}")
         if dtype is not None:
+            if dtype == Integral:
+                return int(_value)
+            elif dtype == Real:
+                return float(_value)
             return dtype(_value)
-        return self._qsettings_convert_value_type(key, _value)
+        return _value
+        # return self._qsettings_convert_value_type(key, _value)
+
+    def q_settings_set_key(self, key, value):
+        """
+        Set the value of a QSettings key.
+
+        Parameters
+        ----------
+        key : str
+            The name of the key.
+        value : object
+            The value to be stored.
+        """
+        self.q_settings.setValue(f"{VERSION}/{key}", value)
 
     def _qsettings_convert_value_type(self, key, value):
         """
@@ -99,9 +119,9 @@ class PydidasQsettingsMixin:
         """
         try:
             _p = self.get_param(key)
-            if _p.type == Integral:
+            if _p.dtype == Integral:
                 return int(value)
-            if _p.type == Real:
+            if _p.dtype == Real:
                 return float(value)
         except (KeyError, AttributeError):
             pass

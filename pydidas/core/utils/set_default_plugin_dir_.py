@@ -27,7 +27,7 @@ __all__ = ["set_default_plugin_dir"]
 
 import os
 
-from qtpy import QtCore
+from ..pydidas_q_settings import PydidasQsettings
 
 
 DEFAULT_PATH = __file__
@@ -37,7 +37,7 @@ DEFAULT_PATH = os.path.join(DEFAULT_PATH, "pydidas_plugins")
 
 
 def set_default_plugin_dir():
-    _settings = QtCore.QSettings("Hereon", "pydidas")
+    _settings = PydidasQsettings()
     _val = _settings.value("global/plugin_path")
     if _val in [None, ""]:
-        _settings.setValue("global/plugin_path", DEFAULT_PATH)
+        _settings.set_value("global/plugin_path", DEFAULT_PATH)

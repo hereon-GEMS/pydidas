@@ -345,18 +345,18 @@ class Parameter:
         _t = self.__meta["tooltip"]
         if self.unit:
             _t += f" (unit: {self.unit})"
-        if self.type == numbers.Integral:
+        if self.dtype == numbers.Integral:
             _t += " (type: integer)"
-        elif self.type == numbers.Real:
+        elif self.dtype == numbers.Real:
             _t += " (type: float)"
-        elif self.type == str:
+        elif self.dtype == str:
             _t += " (type: str)"
-        elif self.type == Hdf5key:
+        elif self.dtype == Hdf5key:
             _t += " (type: Hdf5key)"
-        elif self.type == Path:
+        elif self.dtype == Path:
             _t += " (type: Path)"
         else:
-            _t += f" (type: {str(self.type)})"
+            _t += f" (type: {str(self.dtype)})"
         return _t.replace(") (", ", ")
 
     @property
@@ -420,14 +420,14 @@ class Parameter:
         return self.__meta["optional"]
 
     @property
-    def type(self):
+    def dtype(self):
         """
-        Get the type of the Parameter value.
+        Get the data type of the Parameter value.
 
         Returns
         -------
         object
-            The class of the parameter value type.
+            The class of the parameter value data type.
         """
         return self.__type
 

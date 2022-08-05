@@ -145,7 +145,7 @@ class DirectorySpyApp(BaseApp):
         self._shared_array = None
         self._index = -1
         self._config["det_mask_val"] = float(
-            self.q_settings_get_global_value("det_mask_val")
+            self.q_settings_get_value("global/det_mask_val")
         )
 
     def multiprocessing_pre_run(self):
@@ -194,7 +194,7 @@ class DirectorySpyApp(BaseApp):
         """
         if not self.get_param_value("use_global_det_mask"):
             return None
-        _maskfile = self.q_settings_get_global_value("det_mask")
+        _maskfile = self.q_settings_get_value("global/det_mask")
         try:
             _mask = np.load(_maskfile)
             return _mask

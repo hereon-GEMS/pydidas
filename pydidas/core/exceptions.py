@@ -45,5 +45,7 @@ class PydidasConfigError(Exception):
 class UserConfigError(Exception):
     """
     UserConfigErrors can be raised if the input cannot be processed. The exception
-    handling for UserConfigErrors is
+    handling for UserConfigErrors is different from the generic exception handling
+    to allow pydidas to raise less severe Exceptions in case of configuration
+    isues caused by the user.
     """

@@ -26,13 +26,16 @@ __status__ = "Development"
 __all__ = ["PydidasQsettings"]
 
 from .pydidas_q_settings_mixin import PydidasQsettingsMixin
+from ..version import VERSION
 
 
 class PydidasQsettings(PydidasQsettingsMixin):
-    """ """
+    """
+    A modified version of the QSettings with some additional convenience methods.
+    """
 
     def __init__(self):
-        super().__init__()
+        PydidasQsettingsMixin.__init__(self)
 
     def show_all_stored_q_settings(self):
         """
@@ -65,4 +68,27 @@ class PydidasQsettings(PydidasQsettingsMixin):
         val : object
             The new value stored for the key.
         """
-        self.q_settings.setValue(key, val)
+        self.q_settings.setValue(f"{VERSION}/{key}", val)
+
+    def value(self, key, dtype=None):
+        """
+        Get the value from a QSetting key.
+
+        This method is a wrapper for the PydidasQsettingsMixin.q_settings_get_value
+        method.
+
+        Parameters
+        ----------
+        key : str
+            The QSetting reference key.
+        dtype : Union[type, None], optional
+            A return datatype. If not None, the output will be returned as
+            dtype(value).
+
+        Returns
+        -------
+        value : object
+            The value, converted to the type associated with the Parameter
+            referenced by param_key or dtype, if given.
+        """
+        return self.q_settings_get_value(key, dtype)

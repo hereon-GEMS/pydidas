@@ -1,3 +1,20 @@
+v0.1.10
+=======
+Major changes:
+--------------
+- Changed the handling of storing persistent information for the user 
+  (Qt QSettings) to be version specific which allows to work with multiple
+  pydidas versions in parallel.
+  
+Improvements
+------------
+
+
+Bugfixes:
+---------
+- Fixed an issue with the selection of 1D data in plots.
+- Fixed an issue with non-existing config paths.
+
 v0.1.9
 ======
 Major changes:

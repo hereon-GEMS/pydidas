@@ -29,8 +29,8 @@ import shutil
 import random
 
 import numpy as np
-from qtpy import QtCore
 
+from pydidas.core import PydidasQsettings
 from pydidas.core.utils import rebin2d
 from pydidas.plugins import PluginCollection, BasePlugin
 
@@ -41,9 +41,9 @@ PLUGIN_COLLECTION = PluginCollection()
 class TestMaskImage(unittest.TestCase):
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
-        self._qsettings = QtCore.QSettings("Hereon", "pydidas")
+        self._qsettings = PydidasQsettings()
         self._qsettings_det_mask = self._qsettings.value("global/det_mask")
-        self._qsettings.setValue("global/det_mask", "")
+        self._qsettings.set_value("global/det_mask", "")
         self._shape = (20, 20)
         _n = self._shape[0] * self._shape[1]
         self._mask = np.asarray([random.choice([0, 1]) for _ in range(_n)]).reshape(
@@ -53,7 +53,7 @@ class TestMaskImage(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.setValue("global/det_mask", self._qsettings_det_mask)
+        self._qsettings.set_value("global/det_mask", self._qsettings_det_mask)
 
     def create_mask(self):
         _maskfilename = os.path.join(self._temppath, "mask.npy")
@@ -74,7 +74,7 @@ class TestMaskImage(unittest.TestCase):
 
     def test_pre_execute__q_settings_mask(self):
         _maskfilename = self.create_mask()
-        self._qsettings.setValue("global/det_mask", _maskfilename)
+        self._qsettings.set_value("global/det_mask", _maskfilename)
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
         plugin.set_param_value("use_global_mask", True)
         plugin.pre_execute()

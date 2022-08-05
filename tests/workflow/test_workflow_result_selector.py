@@ -78,7 +78,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         TREE.create_and_add_node(DummyProc(), parent=TREE.root)
         TREE.prepare_execution()
         TREE.nodes[2]._result_shape = self._result2_shape
-        TREE.nodes[3]._result_shape = (1, )
+        TREE.nodes[3]._result_shape = (1,)
 
     def populate_WorkflowResults(self):
         RES.update_shapes_from_scan_and_workflow()

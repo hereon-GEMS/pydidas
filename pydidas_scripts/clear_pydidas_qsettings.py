@@ -36,11 +36,11 @@ sys.path.insert(0, _path)
 
 def clear_pydidas_QSettings():
     """
-    Clear all stored pydidas QSetting values and write None.
+    Clear all stored pydidas QSetting values.
     """
     qs = QSettings("Hereon", "pydidas")
     for _key in qs.allKeys():
-        qs.setValue(_key, None)
+        qs.remove(_key)
 
 
 if __name__ == "__main__":

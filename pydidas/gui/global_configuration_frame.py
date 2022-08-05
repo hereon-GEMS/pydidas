@@ -83,7 +83,7 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         value : object
             The new value.
         """
-        self.q_settings.setValue(f"global/{param_key}", value)
+        self.q_settings_set_key(f"global/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(int)
@@ -103,8 +103,8 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
         super().frame_activated(index)
         if index != self.frame_index:
             return
-        for _param_key in self.params:
-            _value = self.q_settings_get_global_value(_param_key)
+        for _param_key, _param in self.params.items():
+            _value = self.q_settings_get_value(f"global/{_param_key}", _param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):

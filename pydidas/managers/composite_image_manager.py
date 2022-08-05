@@ -72,14 +72,15 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         self.set_param_value(
             "mosaic_border_width",
-            self.q_settings_get_global_value("mosaic_border_width"),
+            self.q_settings_get_value("global/mosaic_border_width", int),
         )
         self.set_param_value(
             "mosaic_border_value",
-            self.q_settings_get_global_value("mosaic_border_value"),
+            self.q_settings_get_value("global/mosaic_border_value", float),
         )
         self.set_param_value(
-            "mosaic_max_size", self.q_settings_get_global_value("mosaic_max_size")
+            "mosaic_max_size",
+            self.q_settings_get_value("global/mosaic_max_size", float),
         )
 
     def __check_config(self):

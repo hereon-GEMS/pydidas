@@ -59,8 +59,8 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
 
     def __init__(self, parent=None, **kwargs):
         DirectorySpyFrameBuilder.__init__(self, parent, **kwargs)
-        _global_plot_update_time = self.q_settings_get_global_value(
-            "plot_update_time", dtype=float
+        _global_plot_update_time = self.q_settings_get_value(
+            "global/plot_update_time", dtype=float
         )
         self._config.update(
             {

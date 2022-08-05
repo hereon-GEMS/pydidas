@@ -30,7 +30,7 @@ from pathlib import Path
 
 import numpy as np
 import h5py
-from qtpy import QtCore, QtTest
+from qtpy import QtTest
 
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (
@@ -38,6 +38,7 @@ from pydidas.core import (
     Dataset,
     UserConfigError,
     get_generic_parameter,
+    PydidasQsettings,
 )
 from pydidas.managers import CompositeImageManager
 
@@ -58,19 +59,18 @@ class TestCompositeCreatorApp(unittest.TestCase):
             with h5py.File(self._hdf5_fnames[i], "w") as f:
                 f["/entry/data/data"] = self._data
 
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        self._border = int(q_settings.value("global/mosaic_border_width"))
-        self._bgvalue = float(q_settings.value("global/mosaic_border_value"))
-        self._globalmask = q_settings.value("global/det_mask")
+        self._q_settings = PydidasQsettings()
+        self._border = self._q_settings.value("global/mosaic_border_width", int)
+        self._bgvalue = self._q_settings.value("global/mosaic_border_value", float)
+        self._globalmask = self._q_settings.value("global/det_mask")
         _mask = np.zeros((self._img_shape), dtype=np.bool_)
         _maskfile = Path(os.path.join(self._path, "mask.npy"))
         np.save(_maskfile, _mask)
-        q_settings.setValue("global/det_mask", _maskfile)
+        self._q_settings.set_value("global/det_mask", _maskfile)
         self._maskfile = _maskfile
 
     def tearDown(self):
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        q_settings.setValue("global/det_mask", self._globalmask)
+        self._q_settings.set_value("global/det_mask", self._globalmask)
         shutil.rmtree(self._path)
 
     def get_default_app(self):
@@ -465,7 +465,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
-        app.q_settings.setValue("global/det_mask", "no/such/file.tif")
+        app.q_settings_set_key("global/det_mask", "no/such/file.tif")
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertIsNone(_mask)
 

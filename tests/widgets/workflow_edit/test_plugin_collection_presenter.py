@@ -32,6 +32,7 @@ import copy
 import numpy as np
 from qtpy import QtWidgets, QtCore, QtTest, QtGui
 
+from pydidas.core import PydidasQsettings
 from pydidas.widgets.workflow_edit import (
     PluginCollectionBrowser,
     PluginCollectionTreeWidget,
@@ -51,9 +52,9 @@ class TestPluginCollectionBrowser(unittest.TestCase):
             cls.q_app = QtWidgets.QApplication(sys.argv)
         cls.n_per_type = 8
         cls._syspath = copy.deepcopy(sys.path)
-        cls._qsettings = QtCore.QSettings("Hereon", "pydidas")
+        cls._qsettings = PydidasQsettings()
         cls._qsettings_plugin_path = cls._qsettings.value("global/plugin_path")
-        cls._qsettings.setValue("global/plugin_path", "")
+        cls._qsettings.set_value("global/plugin_path", "")
         cls.pcoll = DummyPluginCollection(
             n_plugins=3 * cls.n_per_type, plugin_path=cls._pluginpath, create_empty=True
         )
@@ -62,7 +63,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         sys.path = cls._syspath
-        cls._qsettings.setValue("global/plugin_path", cls._qsettings_plugin_path)
+        cls._qsettings.set_value("global/plugin_path", cls._qsettings_plugin_path)
         shutil.rmtree(cls._pluginpath)
         widgets = cls.widgets[:]
         cls.widgets.clear()

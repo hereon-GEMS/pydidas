@@ -134,8 +134,8 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
 
-        _fraction = 1 - self.q_settings_get_global_value(
-            "histogram_outlier_fraction", dtype=float
+        _fraction = 1 - self.q_settings_get_value(
+            "global/histogram_outlier_fraction", dtype=float
         )
         _data = image.getData()
         _counts, _edges = np.histogram(_data, bins=4096)

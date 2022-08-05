@@ -124,8 +124,8 @@ class FitSinglePeak(ProcPlugin):
             self._fitparam_bounds_high.append(np.inf)
         self.output_data_label = self.get_param_value("output")
         self.output_data_unit = "a.u."
-        self._fit_acceptance_threshold = self.q_settings_get_global_value(
-            "plugin_fit_std_threshold", dtype=float
+        self._fit_acceptance_threshold = self.q_settings_get_value(
+            "global/plugin_fit_std_threshold", dtype=float
         )
 
     def execute(self, data, **kwargs):

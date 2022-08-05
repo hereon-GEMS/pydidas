@@ -32,10 +32,9 @@ import time
 import multiprocessing as mp
 
 import numpy as np
-from qtpy import QtCore
 
 from pydidas import unittest_objects
-from pydidas.core import get_generic_parameter, UserConfigError, utils
+from pydidas.core import get_generic_parameter, UserConfigError, utils, PydidasQsettings
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.experiment import SetupScan
@@ -83,17 +82,17 @@ class TestExecuteWorkflowApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.generate_scan(cls)
-        cls.q_settings = QtCore.QSettings("Hereon", "pydidas")
-        cls._buf_size = float(cls.q_settings.value("global/shared_buffer_size"))
-        cls._n_workers = int(cls.q_settings.value("global/mp_n_workers"))
+        cls.q_settings = PydidasQsettings()
+        cls._buf_size = cls.q_settings.value("global/shared_buffer_size", float)
+        cls._n_workers = cls.q_settings.value("global/mp_n_workers", int)
         _path = os.path.dirname(unittest_objects.__file__)
         if _path not in _PLUGIN_PATHS:
             COLL.find_and_register_plugins(_path)
 
     @classmethod
     def tearDownClass(cls):
-        cls.q_settings.setValue("global/shared_buffer_size", cls._buf_size)
-        cls.q_settings.setValue("global/mp_n_workers", cls._n_workers)
+        cls.q_settings.set_value("global/shared_buffer_size", cls._buf_size)
+        cls.q_settings.set_value("global/mp_n_workers", cls._n_workers)
         COLL.clear_collection(True)
         COLL.find_and_register_plugins(*_PLUGIN_PATHS)
 

@@ -33,6 +33,7 @@ from queue import Empty
 from qtpy import QtCore
 
 from .processor_ import processor
+from ..core import PydidasQsettings
 from ..core.utils import pydidas_logger
 
 logger = pydidas_logger()
@@ -65,8 +66,8 @@ class WorkerController(QtCore.QThread):
         self._flag_active = False
         self._flag_stop_after_run = False
         if n_workers is None:
-            _settings = QtCore.QSettings("Hereon", "pydidas")
-            n_workers = int(_settings.value("global/mp_n_workers"))
+            _settings = PydidasQsettings()
+            n_workers = _settings.value("global/mp_n_workers", int)
         self._n_workers = n_workers
         self._to_process = []
         self._write_lock = QtCore.QReadWriteLock()

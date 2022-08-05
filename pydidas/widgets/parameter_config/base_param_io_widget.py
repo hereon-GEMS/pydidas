@@ -67,7 +67,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         super().__init__(parent)
         self.setFixedWidth(width)
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
-        self._ptype = param.type
+        self._ptype = param.dtype
         self._old_value = None
         self.setToolTip(f"{param.tooltip}")
 
@@ -81,12 +81,12 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         param : pydidas.core.Parameter
             The associated Parameter.
         """
-        if param.type == numbers.Integral:
+        if param.dtype == numbers.Integral:
             if param.allow_None:
                 self.setValidator(QT_REG_EXP_INT_VALIDATOR)
             else:
                 self.setValidator(QtGui.QIntValidator())
-        elif param.type == numbers.Real:
+        elif param.dtype == numbers.Real:
             if param.allow_None:
                 self.setValidator(QT_REG_EXP_FLOAT_VALIDATOR)
             else:

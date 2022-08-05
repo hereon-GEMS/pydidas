@@ -25,8 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
-from qtpy import QtCore
-
 # import sub-packages:
 from . import constants
 from . import io_registry
@@ -109,15 +107,3 @@ from . import pydidas_q_settings_mixin
 
 __all__.extend(pydidas_q_settings_mixin.__all__)
 del pydidas_q_settings_mixin
-
-
-# if not existing, initialize all QSettings with the default values from the
-# default Parameters to avoid having "None" keys returned.
-settings = QtCore.QSettings("Hereon", "pydidas")
-for _key in constants.QSETTINGS_GLOBAL_KEYS:
-    _val = settings.value(f"global/{_key}")
-    if _val is None:
-        _param = get_generic_parameter(_key)
-        settings.setValue(f"global/{_key}", _param.default)
-del settings
-del QtCore

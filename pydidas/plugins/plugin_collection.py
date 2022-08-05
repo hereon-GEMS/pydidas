@@ -44,14 +44,6 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
 
     sig_updated_plugins = QtCore.Signal()
 
-    @classmethod
-    def clear_qsettings(cls):
-        """
-        Clear the entry for the QSettings plugin_path.
-        """
-        q_settings = QtCore.QSettings("Hereon", "pydidas")
-        q_settings.setValue("global/plugin_path", "")
-
     def __init__(self, **kwargs):
         """
         Setup method.
@@ -121,7 +113,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
             None if not QSettings has been defined, else a list of path
             entries.
         """
-        _path = self.q_settings_get_global_value("plugin_path")
+        _path = self.q_settings_get_value("global/plugin_path")
         if isinstance(_path, str):
             return _path.split(";;")
         return _path
@@ -180,7 +172,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         if os.path.exists(plugin_path):
             self.__plugin_paths.append(plugin_path)
         _paths = ";;".join(self.__plugin_paths)
-        self.q_settings.setValue("global/plugin_path", _paths)
+        self.q_settings_set_key("global/plugin_path", _paths)
 
     @staticmethod
     def _get_valid_modules_and_filenames(path):

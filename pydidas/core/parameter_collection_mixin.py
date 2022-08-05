@@ -265,7 +265,7 @@ class ParameterCollectionMixIn:
             The modulated Parameter value
         """
         _param = self.get_param(param_refkey)
-        if _param.type is not Integral:
+        if _param.dtype is not Integral:
             raise ValueError(
                 f'The datatype of Parameter "{_param.refkey}"' " is not integer."
             )

@@ -28,6 +28,8 @@ import os
 
 from qtpy import QtCore
 
+from ...version import VERSION
+
 
 def get_logging_dir():
     """
@@ -41,7 +43,7 @@ def get_logging_dir():
     _docs_path = QtCore.QStandardPaths.standardLocations(
         QtCore.QStandardPaths.DocumentsLocation
     )[0]
-    _log_path = os.path.join(_docs_path, "pydidas", "logs")
+    _log_path = os.path.join(_docs_path, "pydidas", VERSION)
     if not os.path.exists(_log_path):
         os.makedirs(_log_path)
     return _log_path

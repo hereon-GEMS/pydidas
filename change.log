@@ -8,12 +8,16 @@ Major changes:
   
 Improvements
 ------------
+- Moved all frames and framebuilders to subpackage in gui package.
 
 
 Bugfixes:
 ---------
 - Fixed an issue with the selection of 1D data in plots.
 - Fixed an issue with non-existing config paths.
+- Fixed an issue with the Pyfai2dIntegration plugin.
+- Fixed an issue when plugins with 2d results would return 1d output
+  data (e.g. 2d-integration with only one azimuthal value).
 
 v0.1.9
 ======

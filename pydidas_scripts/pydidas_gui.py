@@ -30,7 +30,8 @@ import multiprocessing as mp
 
 from qtpy import QtWidgets
 
-from pydidas.gui import (
+from pydidas.gui import MainWindow
+from pydidas.gui.frames import (
     DataBrowsingFrame,
     WorkflowEditFrame,
     PyfaiCalibFrame,
@@ -39,7 +40,6 @@ from pydidas.gui import (
     SetupScanFrame,
     WorkflowRunFrame,
     CompositeCreatorFrame,
-    MainWindow,
     DirectorySpyFrame,
     ViewResultsFrame,
     WorkflowTestFrame,
@@ -86,8 +86,8 @@ def run_gui(app=None):
     gui.register_frame(WorkflowTestFrame)
     gui.register_frame(WorkflowRunFrame)
     gui.register_frame(ViewResultsFrame)
-    gui.show()
     gui.raise_()
+    gui.show()
     _ = app.exec_()
     gui.deleteLater()
     app.quit()

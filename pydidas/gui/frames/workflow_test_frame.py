@@ -265,16 +265,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 else ""
             )
             _data = _node.results
-            _data.axis_units = [
-                (_val if _val is not None else "") for _val in _data.axis_units.values()
-            ]
-            _data.axis_labels = [
-                (_val if _val is not None else "")
-                for _val in _data.axis_labels.values()
-            ]
-            for _dim in range(_data.ndim):
-                if not isinstance(_data.axis_ranges[_dim], np.ndarray):
-                    _data.update_axis_ranges(_dim, np.arange(_data.shape[_dim]))
+            _data.convert_all_none_properties()
+            if 1 in set(_data.shape):
+                _data = _data.squeeze()
             self._results[_node_id] = _data
 
     def __update_selection_choices(self):
@@ -411,7 +404,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if not self._config["plot_active"]:
             return
-        _ndim = len(self._config["shapes"][self._active_node])
+        _ndim = self._results[self._active_node].ndim
         if _ndim == 1:
             self._config["plot_dim"] = 1
             self._plot1d()

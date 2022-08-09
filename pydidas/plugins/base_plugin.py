@@ -177,7 +177,7 @@ class BasePlugin(ObjectWithParameterCollection):
         for _kw in kwargs:
             if _kw in self.params.keys():
                 self.set_param_value(_kw, kwargs[_kw])
-        self._config = {"input_shape": None, "result_shape": None}
+        self._config = {"input_shape": None, "result_shape": None, "input_data": None}
         self._legacy_image_ops_meta = {"num": 0, "included": False}
         self._legacy_image_ops = []
         self._original_input_shape = None
@@ -239,19 +239,6 @@ class BasePlugin(ObjectWithParameterCollection):
 
         return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
-    def execute(self, data, **kwargs):
-        """
-        Execute the processing step.
-        """
-        raise NotImplementedError("Execute method has not been implemented.")
-
-    def pre_execute(self):
-        """
-        Run code which needs to be run only once prior to the execution of
-        multiple frames.
-        """
-        pass
-
     @property
     def has_unique_parameter_config_widget(self):
         """
@@ -264,6 +251,45 @@ class BasePlugin(ObjectWithParameterCollection):
             widget associated with it.
         """
         return False
+
+    @property
+    def input_data(self):
+        """
+        Get the current input data.
+
+        Returns
+        -------
+        Union[int, pydidas.core.Dataset]
+            The input data passed to the plugin.
+        """
+        return self._config["input_data"]
+
+    def store_input_data_copy(self, data, **kwargs):
+        """
+        Store a copy of the input data internally in the plugin.
+
+        Parameters
+        ----------
+        data : Union[int, np.ndarray]
+            The input data for the plugin.
+        **kwargs : dict
+            The calling keyword arguments
+        """
+        self._config["input_data"] = copy.deepcopy(data)
+        self._config["input_kwargs"] = copy.deepcopy(kwargs)
+
+    def execute(self, data, **kwargs):
+        """
+        Execute the processing step.
+        """
+        raise NotImplementedError("Execute method has not been implemented.")
+
+    def pre_execute(self):
+        """
+        Run code which needs to be run only once prior to the execution of
+        multiple frames.
+        """
+        pass
 
     def get_parameter_config_widget(self):
         """

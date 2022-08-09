@@ -61,18 +61,6 @@ class TestBaseProcPlugin(unittest.TestCase):
         plugin = create_plugin_class(PROC_PLUGIN)()
         self.assertIsInstance(plugin, ProcPlugin)
 
-    def test_load_image_from_file__simple(self):
-        _fname = self.create_image()
-        plugin = create_plugin_class(PROC_PLUGIN)()
-        _image = plugin.load_image_from_file(_fname)
-        self.assertTrue(np.allclose(_image, self._data))
-
-    def test_load_image_from_file__hdf5(self):
-        _fname, _dset = self.create_hdf5_image()
-        plugin = create_plugin_class(PROC_PLUGIN)()
-        _image = plugin.load_image_from_file(_fname, hdf5_dset=_dset)
-        self.assertTrue(np.allclose(_image, self._data))
-
 
 if __name__ == "__main__":
     unittest.main()

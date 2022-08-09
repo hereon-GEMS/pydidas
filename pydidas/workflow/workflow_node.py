@@ -174,6 +174,8 @@ class WorkflowNode(GenericNode):
         kws : dict
             Any keywords required for calling the next plugin.
         """
+        if kwargs.get("store_input_data", False):
+            self.plugin.store_input_data_copy(*args, **kwargs)
         return self.plugin.execute(*args, **kwargs)
 
     def execute_plugin_chain(self, arg, **kwargs):
@@ -193,6 +195,8 @@ class WorkflowNode(GenericNode):
             Any keyword arguments which need to be passed to the plugin.
         """
         logger.debug("Starting plugin node #%i" % self.node_id)
+        if kwargs.get("store_input_data", False):
+            self.plugin.store_input_data_copy(arg, **kwargs)
         res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
         for _child in self._children:
             logger.debug("Passing result to child")

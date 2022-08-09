@@ -24,6 +24,8 @@ __status__ = "Development"
 
 import unittest
 
+import numpy as np
+
 from pydidas.workflow import WorkflowNode
 from pydidas.unittest_objects import DummyLoader, DummyProc
 
@@ -123,10 +125,27 @@ class TestWorkflowNode(unittest.TestCase):
                 self.assertIsNotNone(_node.results)
                 self.assertIsNotNone(_node.result_kws)
 
+    def test_execute_plugin_chain__with_store_input_data(self):
+        _depth = 3
+        nodes, n_nodes = self.create_node_tree(depth=_depth)
+        obj = nodes[0][0]
+        obj.execute_plugin_chain(0, force_store_results=True)
+        for _d in range(_depth + 1):
+            for _node in nodes[_d]:
+                self.assertIsNotNone(_node.results)
+                self.assertIsNotNone(_node.result_kws)
+
     def test_execute_plugin__simple(self):
         obj = WorkflowNode(plugin=DummyLoader())
         _res = obj.execute_plugin(0)
         self.assertIsInstance(_res[1], dict)
+
+    def test_execute_plugin__array_input(self):
+        _input = np.random.random((10, 10))
+        obj = WorkflowNode(plugin=DummyProc())
+        _res = obj.execute_plugin(_input)
+        self.assertIsInstance(_res[0], np.ndarray)
+        self.assertEqual(_input.shape, _res[0].shape)
 
     def test_execute_plugin__single_in_tree(self):
         nodes, n_nodes = self.create_node_tree()

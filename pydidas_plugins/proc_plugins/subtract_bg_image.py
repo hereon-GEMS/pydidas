@@ -31,6 +31,7 @@ import numpy as np
 from pydidas.core import get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core.utils import rebin2d
+from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
 
 
@@ -59,10 +60,10 @@ class SubtractBackgroundImage(ProcPlugin):
         """
         Load the background image.
         """
-        self._bg_image = self.load_image_from_file(
+        self._bg_image = import_data(
             self.get_param_value("bg_file"),
-            hdf5_dset=self.get_param_value("bg_hdf5_key"),
-            hdf5_frame=self.get_param_value("bg_hdf5_frame"),
+            dataset=self.get_param_value("bg_hdf5_key"),
+            frame=self.get_param_value("bg_hdf5_frame"),
         )
         self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):

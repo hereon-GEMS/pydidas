@@ -74,22 +74,20 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             self.get_param_value("rad_npoint"),
             npt_azim=self.get_param_value("azi_npoint"),
             polarization_factor=1,
+            mask=self._mask,
             unit=self.get_pyFAI_unit_from_param("rad_unit"),
             radial_range=self.get_radial_range(),
             azimuth_range=self.get_azimuthal_range_in_deg(),
             method=self._config["method"],
         )
 
-        _label, _unit = self.params["rad_unit"].value.split("/")
-        _label = _label.strip()
-        _unit = _unit.strip()
-
-        _dataset = Dataset(_newdata, axis_labels=[_label], axis_units=[_unit])
+        _x_label, _x_unit = self.params["rad_unit"].value.replace(" ", "").split("/")
+        _y_label, _y_unit = self.params["azi_unit"].value.replace(" ", "").split("/")
         _dataset = Dataset(
-            _newdata[1],
-            axis_labels=[_label],
-            axis_units=[_unit],
-            axis_ranges=[_newdata[0]],
+            _newdata[0],
+            axis_labels=[_y_label, _x_label],
+            axis_units=[_y_unit, _x_unit],
+            axis_ranges=[_newdata[2], _newdata[1]],
             data_label="integrated intensity",
             data_unit="counts",
         )

@@ -247,6 +247,13 @@ class TestParameter(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj.value = 24
 
+    def test_set_value__float(self):
+        _val = 24.0
+        obj = Parameter("Test0", float, 12)
+        obj.value = np.float64(_val)
+        self.assertEqual(obj.value, _val)
+        self.assertEqual(type(obj.value), float)
+
     def test_restore_default(self):
         obj = Parameter("Test0", int, 12)
         obj.value = 24

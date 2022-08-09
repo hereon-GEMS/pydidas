@@ -266,6 +266,8 @@ class Parameter:
                 value = Path(value)
             elif self.__type == Hdf5key:
                 value = Hdf5key(value)
+        if self.__type == numbers.Real and not self.__meta["allow_None"]:
+            return float(value)
         if isinstance(value, list) and self.__type == tuple:
             return tuple(value)
         if isinstance(value, tuple) and self.__type == list:

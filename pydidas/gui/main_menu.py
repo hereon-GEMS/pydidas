@@ -41,10 +41,11 @@ from ..core.utils import (
 )
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree
-from ..widgets import CentralWidgetStack, gui_excepthook
+from ..widgets import CentralWidgetStack
 from ..widgets.dialogues import QuestionBox
 from ..version import VERSION
 from . import utils
+from .gui_excepthook_ import gui_excepthook
 from .windows import (
     GlobalConfigWindow,
     ExportEigerPixelmaskWindow,

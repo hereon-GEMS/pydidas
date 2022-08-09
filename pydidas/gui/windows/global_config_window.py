@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ["GlobalConfigWindow"]
 
 
-from ..global_configuration_frame import GlobalConfigurationFrame
+from ..frames.global_configuration_frame import GlobalConfigurationFrame
 from .pydidas_window import PydidasWindowMixIn
 
 

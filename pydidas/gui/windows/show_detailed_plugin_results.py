@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExportEigerPixelmaskWindow class which is a stand-alone frame
-to store the pixel mask.
+Module with the ShowDetailedPluginResults class which allows to handle and show
+additional data for the selected plugin.
 """
 
 __author__ = "Malte Storm"
@@ -64,9 +64,7 @@ class ShowDetailedPluginResults(PydidasWindow):
         """
         self.__update_title(title)
         _n_plots = results.get("n_plots", 0)
-
         self.__prepare_widgets(_n_plots)
-
         self.__plot_results(results)
 
     def __update_title(self, title):

@@ -33,6 +33,7 @@ from .feedback_window import *
 from .global_config_window import *
 from .pydidas_window import *
 from .show_detailed_plugin_results import *
+from .tweak_plugin_parameter_window import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -70,3 +71,8 @@ from . import show_detailed_plugin_results
 
 __all__.extend(show_detailed_plugin_results.__all__)
 del show_detailed_plugin_results
+
+from . import tweak_plugin_parameter_window
+
+__all__.extend(tweak_plugin_parameter_window.__all__)
+del tweak_plugin_parameter_window

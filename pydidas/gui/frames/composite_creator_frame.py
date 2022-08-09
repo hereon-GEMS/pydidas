@@ -32,18 +32,18 @@ from functools import partial
 import numpy as np
 from qtpy import QtWidgets, QtCore
 
-from ..apps import CompositeCreatorApp
-from ..core import Parameter, get_generic_parameter, UserConfigError
-from ..core.constants import HDF5_EXTENSIONS
-from ..core.utils import (
+from ...apps import CompositeCreatorApp
+from ...core import Parameter, get_generic_parameter, UserConfigError
+from ...core.constants import HDF5_EXTENSIONS
+from ...core.utils import (
     get_hdf5_populated_dataset_keys,
     pydidas_logger,
     LOGGING_LEVEL,
     get_extension,
 )
-from ..data_io import IoMaster
-from ..widgets import dialogues
-from ..multiprocessing import AppRunner
+from ...data_io import IoMaster
+from ...widgets import dialogues
+from ...multiprocessing import AppRunner
 from .builders import CompositeCreatorFrameBuilder
 
 

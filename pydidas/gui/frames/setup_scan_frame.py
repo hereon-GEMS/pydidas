@@ -25,12 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupScanFrame"]
 
-import sys
-
 from qtpy import QtWidgets
 
-from ..experiment import SetupScan, SetupScanIoMeta
-from ..widgets import gui_excepthook
+from ...experiment import SetupScan, SetupScanIoMeta
 from .builders import SetupScanFrameBuilder
 
 
@@ -103,7 +100,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
             SCAN_SETTINGS.set(param_ref, widget.get_value())
         except Exception:
             widget.set_value(SCAN_SETTINGS.get(param_ref))
-            gui_excepthook(*sys.exc_info())
+            raise
         # explicitly call update fo wavelength and energy
         if param_ref == "xray_wavelength":
             _w = self.param_widgets["xray_energy"]

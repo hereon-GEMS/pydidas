@@ -61,8 +61,8 @@ from pyFAI.gui.utils import projecturl
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
-from ..widgets import BaseFrame
-from ..experiment import SetupExperiment
+from ...widgets import BaseFrame
+from ...experiment import SetupExperiment
 
 
 EXP_SETUP = SetupExperiment()

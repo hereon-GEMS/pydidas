@@ -27,10 +27,10 @@ __all__ = ["ViewResultsFrame"]
 
 from qtpy import QtCore, QtWidgets
 
-from ..core import get_generic_param_collection
-from ..workflow import WorkflowResults, result_savers
+from ...core import get_generic_param_collection
+from ...workflow import WorkflowResults, result_savers
+from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
-from .mixins import ViewResultsMixin
 
 RESULTS = WorkflowResults()
 SAVER = result_savers.WorkflowResultSaverMeta

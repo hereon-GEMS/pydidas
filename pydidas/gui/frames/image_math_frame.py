@@ -26,9 +26,9 @@ __status__ = "Development"
 __all__ = ["ImageMathFrame"]
 
 
-from ..core import Parameter, ParameterCollection, get_generic_param_collection
-from ..experiment import SetupScan
-from ..workflow import WorkflowTree
+from ...core import Parameter, ParameterCollection, get_generic_param_collection
+from ...experiment import SetupScan
+from ...workflow import WorkflowTree
 from .builders import ImageMathFrameBuilder
 
 

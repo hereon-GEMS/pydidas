@@ -27,8 +27,8 @@ __all__ = ["SetupScanFrameBuilder"]
 
 from qtpy import QtCore
 
-from ...experiment import SetupScan
-from ...widgets import BaseFrame
+from ....experiment import SetupScan
+from ....widgets import BaseFrame
 
 
 SCAN_SETTINGS = SetupScan()

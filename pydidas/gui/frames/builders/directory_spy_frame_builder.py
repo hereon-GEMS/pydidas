@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowTestFrameBuilder class used to populate the
-the WorkflowTestFrame with widgets.
+Module with the DirectorySpyFrameBuilder class which is used to
+populate the DirectorySpyFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -23,28 +23,28 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowTestFrameBuilder"]
+__all__ = ["DirectorySpyFrameBuilder"]
 
-from qtpy import QtCore
+from silx.gui.plot import Plot2D
 
-from ...widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
-from ...core.constants import (
+from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
+    EXP_EXP_POLICY,
 )
-from ...widgets.parameter_config import ParameterEditFrame
-from ...widgets.silx_plot import create_silx_plot_stack
+from ....widgets import ScrollArea, BaseFrameWithApp
+from ....widgets.parameter_config import ParameterEditFrame
 
 
-class WorkflowTestFrameBuilder(BaseFrame):
+class DirectorySpyFrameBuilder(BaseFrameWithApp):
     """
-    Class which includes the build_self method to populate the
+    Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
 
     def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
 
     def __param_widget_config(self, param_key):
         """
@@ -60,18 +60,13 @@ class WorkflowTestFrameBuilder(BaseFrame):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ["image_selection"]:
-            _dict = dict(
-                parent_widget=self._widgets["config"],
-                halign_text=QtCore.Qt.AlignLeft,
-                valign_text=QtCore.Qt.AlignBottom,
-                width_total=CONFIG_WIDGET_WIDTH,
-                width_io=170,
-                width_text=CONFIG_WIDGET_WIDTH - 180,
-                width_unit=0,
-                row=self._widgets["config"].next_row(),
-            )
-        elif param_key in ["selected_results"]:
+        if param_key in [
+            "filename_pattern",
+            "directory_path",
+            "bg_file",
+            "hdf5_key",
+            "bg_hdf5_key",
+        ]:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             _dict.update(
                 {
@@ -88,7 +83,13 @@ class WorkflowTestFrameBuilder(BaseFrame):
                 width_total=CONFIG_WIDGET_WIDTH,
                 row=self._widgets["config"].next_row(),
             )
-        if param_key in ["scan_index1", "scan_index2", "scan_index3", "scan_index4"]:
+        if param_key in [
+            "directory_path",
+            "hdf5_key",
+            "bg_file",
+            "bg_hdf5_key",
+            "bg_hdf5_frame",
+        ]:
             _dict["visible"] = False
         return _dict
 
@@ -97,16 +98,19 @@ class WorkflowTestFrameBuilder(BaseFrame):
         Build the frame and create all widgets.
         """
         self.create_label(
-            "title", "Test workflow", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+            "title", "Directory spy", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
         )
+
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
+
         self.create_spacer(
-            "spacer1", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
+            "spacer1", gridPos=(-1, 0, 1, 2), parent_widget=self._widgets["config"]
         )
+
         self.create_any_widget(
             "config_area",
             ScrollArea,
@@ -117,68 +121,75 @@ class WorkflowTestFrameBuilder(BaseFrame):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
+
         for _param in [
-            "image_selection",
-            "image_num",
-            "scan_index1",
-            "scan_index2",
-            "scan_index3",
-            "scan_index4",
+            "scan_for_all",
+            "filename_pattern",
+            "directory_path",
+            "hdf5_key",
+            "use_global_det_mask",
+            "use_bg_file",
+            "bg_file",
+            "bg_hdf5_key",
+            "bg_hdf5_frame",
         ]:
             self.create_param_widget(
                 self.get_param(_param), **self.__param_widget_config(_param)
             )
+
         self.create_line(
-            "line_selection",
+            "line_buttons", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
+        )
+
+        self.create_button(
+            "but_once",
+            "Show latest image",
             gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
+
+        self.create_button(
+            "but_show",
+            "Force plot update",
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets["config"],
+        )
+
         self.create_button(
             "but_exec",
-            "Process frame",
+            "Start scanning",
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
         )
-        self.create_line(
-            "line_results", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
-        )
-        self.create_label(
-            "label_results",
-            "Results:",
-            fontsize=11,
-            underline=True,
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
-        )
-        self.create_param_widget(
-            self.get_param("selected_results"),
-            **self.__param_widget_config("selected_results"),
-        )
-        self.create_any_widget(
-            "result_info",
-            ReadOnlyTextWidget,
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            fixedHeight=400,
-            alignment=QtCore.Qt.AlignTop,
-            visible=False,
-            parent_widget=self._widgets["config"],
-        )
+
         self.create_button(
-            "but_show_details",
-            "Show detailed results for plugin",
+            "but_stop",
+            "Stop scanning",
             gridPos=(-1, 0, 1, 1),
+            enabled=False,
+            visible=True,
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
-            visible=False,
         )
+
         self.create_spacer(
             "config_terminal_spacer",
             height=20,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
+
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
-        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1))
+        self.add_any_widget(
+            "plot",
+            Plot2D(),
+            alignment=None,
+            gridPos=(0, 1, 3, 1),
+            visible=True,
+            stretch=(1, 1),
+            sizePolicy=EXP_EXP_POLICY,
+        )

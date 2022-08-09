@@ -25,22 +25,24 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrame"]
 
+import copy
+
 from qtpy import QtCore
 import numpy as np
 
-from pydidas.core import (
+from ...core import (
     Parameter,
     ParameterCollection,
     get_generic_param_collection,
     utils,
     UserConfigError,
 )
-from ..experiment import SetupScan
-from ..workflow import WorkflowTree
-from ..widgets.dialogues import WarningBox
-from ..widgets.silx_plot import get_2d_silx_plot_ax_settings
+from ...experiment import SetupScan
+from ...workflow import WorkflowTree
+from ...widgets.dialogues import WarningBox
+from ...widgets.silx_plot import get_2d_silx_plot_ax_settings
+from ..windows import ShowDetailedPluginResults, TweakPluginParameterWindow
 from .builders import WorkflowTestFrameBuilder
-from .windows import ShowDetailedPluginResults
 
 
 SCAN = SetupScan()
@@ -114,7 +116,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.__selected_new_node
         )
         self._widgets["but_exec"].clicked.connect(self.execute_workflow_test)
+        self._widgets["but_reload_tree"].clicked.connect(self.reload_workflow)
         self._widgets["but_show_details"].clicked.connect(self.show_plugin_details)
+        self._widgets["but_tweak_params"].clicked.connect(self.show_tweak_params_window)
 
     def finalize_ui(self):
         """
@@ -123,6 +127,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         self.__check_tree_uptodate()
         self.__details_window = ShowDetailedPluginResults()
+        self.__tweak_window = TweakPluginParameterWindow()
+        self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
 
     def __check_tree_uptodate(self):
         """
@@ -132,6 +138,33 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         if self.__source_hash != hash((hash(SCAN), hash(TREE))):
             self.__source_hash = hash((hash(SCAN), hash(TREE)))
             self._tree = TREE.get_copy()
+
+    @QtCore.Slot(int)
+    def __updated_plugin_params(self, node_id):
+        """
+        Run the subtree with the new Parameters.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID with the changed Parameters.
+        """
+        TREE.nodes[node_id].plugin.params = copy.deepcopy(
+            self._tree.nodes[node_id].plugin.params
+        )
+        _arg = self._tree.nodes[node_id].plugin._config["input_data"].copy()
+        _kwargs = self._tree.nodes[node_id].plugin._config["input_kwargs"].copy() | {
+            "force_store_results": True,
+            "store_input_data": True,
+        }
+        with utils.ShowBusyMouse():
+            self._tree.nodes[node_id].execute_plugin_chain(_arg, **_kwargs)
+            self.__store_tree_results()
+            self.__update_selection_choices()
+            if self._active_node != -1:
+                self.__update_text_description_of_node_results()
+                self.__plot_results()
+            self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     @QtCore.Slot()
     def __update_image_selection_visibility(self):
@@ -155,12 +188,22 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return
         with utils.ShowBusyMouse():
             _index = self.__get_index()
-            self._tree.execute_process(_index, force_store_results=True)
+            self._tree.execute_process(
+                _index, force_store_results=True, store_input_data=True
+            )
             self.__store_tree_results()
             self.__update_selection_choices()
             if self._active_node != -1:
                 self.__update_text_description_of_node_results()
                 self.__plot_results()
+
+    @QtCore.Slot()
+    def reload_workflow(self):
+        """
+        Reload the local WorkflowTree from the global one, e.g. to propagate changes
+        to global settings.
+        """
+        self._tree = TREE.get_copy()
 
     @staticmethod
     def _check_tree_is_populated():
@@ -304,6 +347,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         self._config["widget_visibility"] = visible
         self._widgets["result_info"].setVisible(visible)
+        self._widgets["but_tweak_params"].setVisible(visible)
         _has_get_details_attr = (
             False
             if self._active_node == -1
@@ -444,7 +488,21 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             + '"'
         )
         self.__details_window.update_results(_details, title=_title)
+        self.__details_window.raise_()
         self.__details_window.show()
+        self.__details_window.activateWindow()
+
+    @QtCore.Slot()
+    def show_tweak_params_window(self):
+        """
+        Show the window to tweak the Parameters for the active plugin.
+        """
+        _plugin = self._tree.nodes[self._active_node].plugin
+        _res = self._tree.nodes[self._active_node].results
+        self.__tweak_window.tweak_plugin(_plugin, _res)
+        self.__tweak_window.raise_()
+        self.__tweak_window.show()
+        self.__tweak_window.activateWindow()
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

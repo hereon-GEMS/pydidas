@@ -32,8 +32,8 @@ from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
-from ..experiment import SetupExperiment, SetupExperimentIoMeta
-from ..widgets.dialogues import critical_warning
+from ...experiment import SetupExperiment, SetupExperimentIoMeta
+from ...widgets.dialogues import critical_warning
 from .builders import SetupExperimentFrameBuilder
 
 
@@ -219,7 +219,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
                 ["detector_rot2", _geo.rotation2().value()],
                 ["detector_rot3", _geo.rotation3().value()],
             ]:
-                self.set_param_value_and_widget(key, np.round(value, 12))
+                self.set_param_value_and_widget(key, float(np.round(value, 12)))
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _GEO_INVALID)
 
@@ -238,7 +238,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         model = CalibrationContext.instance().getCalibrationModel()
         _geo = model.fittedGeometry()
         if _geo.isValid():
-            _wavelength = np.round(_geo.wavelength().value() * 1e10, 12)
+            _wavelength = float(np.round(_geo.wavelength().value() * 1e10, 12))
             self.set_param_value_and_widget("xray_wavelength", _wavelength)
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)

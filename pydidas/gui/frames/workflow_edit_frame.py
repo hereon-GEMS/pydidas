@@ -26,9 +26,9 @@ __all__ = ["WorkflowEditFrame"]
 
 from qtpy import QtCore, QtWidgets
 
-from ..workflow import WorkflowTree
-from ..workflow.workflow_tree_io import WorkflowTreeIoMeta
-from .managers import WorkflowTreeEditManager
+from ...workflow import WorkflowTree
+from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
+from ..managers import WorkflowTreeEditManager
 from .builders import WorkflowEditFrameBuilder
 
 TREE = WorkflowTree()

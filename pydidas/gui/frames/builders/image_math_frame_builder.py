@@ -29,7 +29,7 @@ import qtawesome as qta
 from qtpy import QtWidgets
 from silx.gui.plot.ImageView import ImageView
 
-from ...widgets import BaseFrame
+from ....widgets import BaseFrame
 
 
 class ImageMathFrameBuilder(BaseFrame):

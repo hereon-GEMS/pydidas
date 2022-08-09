@@ -29,7 +29,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
-from ..plugins import PluginCollection
+from ...plugins import PluginCollection
 from .builders import GlobalConfigurationFrameBuilder
 
 

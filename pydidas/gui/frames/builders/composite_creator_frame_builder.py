@@ -28,14 +28,14 @@ __all__ = ["CompositeCreatorFrameBuilder"]
 from qtpy import QtWidgets, QtCore
 from silx.gui.plot import PlotWindow
 
-from ...core.constants import (
+from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     FIX_EXP_POLICY,
     EXP_EXP_POLICY,
 )
-from ...widgets import ScrollArea, BaseFrameWithApp
-from ...widgets.parameter_config import ParameterEditFrame
-from ..mixins import SilxPlotWindowMixIn
+from ....widgets import ScrollArea, BaseFrameWithApp
+from ....widgets.parameter_config import ParameterEditFrame
+from ...mixins import SilxPlotWindowMixIn
 
 
 class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):

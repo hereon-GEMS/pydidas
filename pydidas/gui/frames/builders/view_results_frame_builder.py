@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowRunFrameBuilder class which is used to
-populate the WorkflowRunFrame with widgets.
+Module with the ViewResultsFrameBuilder class which is used to
+populate the ViewResultsFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -23,30 +23,27 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowRunFrameBuilder"]
+__all__ = ["ViewResultsFrameBuilder"]
 
-from ...core.constants import (
+from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
-from ...widgets import ScrollArea, BaseFrameWithApp
-from ...widgets.selection import ResultSelectionWidget
-from ...widgets.parameter_config import ParameterEditFrame
-from ...widgets.silx_plot import create_silx_plot_stack
+from ....widgets import ScrollArea, BaseFrame
+from ....widgets.selection import ResultSelectionWidget
+from ....widgets.parameter_config import ParameterEditFrame
+from ....widgets.silx_plot import create_silx_plot_stack
 
 
-class WorkflowRunFrameBuilder(BaseFrameWithApp):
+class ViewResultsFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_frame method to populate the
     base class's UI and initialize all widgets.
     """
 
     def __init__(self, parent=None, **kwargs):
-        BaseFrameWithApp.__init__(self, parent, **kwargs)
-        _layout = self.layout()
-        _layout.setHorizontalSpacing(10)
-        _layout.setVerticalSpacing(5)
+        BaseFrame.__init__(self, parent, **kwargs)
 
     def __param_widget_config(self, param_key):
         """
@@ -62,7 +59,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ["autosave_directory", "selected_results"]:
+        if param_key in ["selected_results"]:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             _dict.update(
                 {
@@ -79,8 +76,6 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
                 width_total=CONFIG_WIDGET_WIDTH,
                 row=self._widgets["config"].next_row(),
             )
-        if param_key in ["autosave_directory", "autosave_format"]:
-            _dict["visible"] = False
         return _dict
 
     def build_frame(self):
@@ -88,20 +83,12 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
         Build the frame and create all widgets.
         """
         self.create_label(
-            "title",
-            "Full workflow processing",
-            fontsize=14,
-            bold=True,
-            gridPos=(0, 0, 1, 5),
+            "title", "View results", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
         )
-
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditFrame(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
-        )
-        self.create_spacer(
-            "spacer1", gridPos=(-1, 0, 1, 2), parent_widget=self._widgets["config"]
         )
         self.create_any_widget(
             "config_area",
@@ -113,47 +100,11 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
-        for _param in ["autosave_results", "autosave_directory", "autosave_format"]:
-            self.create_param_widget(
-                self.get_param(_param), **self.__param_widget_config(_param)
-            )
-
-        self.create_line(
-            "line_autosave",
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-        )
         self.create_button(
-            "but_exec",
-            "Start processing",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
-        self.create_progress_bar(
-            "progress",
-            gridPos=(-1, 0, 1, 1),
-            visible=False,
-            minimum=0,
-            maximum=100,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
-        self.create_button(
-            "but_abort",
-            "Abort processing",
-            gridPos=(-1, 0, 1, 1),
-            enabled=True,
-            visible=False,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-        )
-        self.create_line(
-            "line_results",
+            "but_load",
+            "Import results from directory",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH,
         )
         self.create_any_widget(
             "result_selector",
@@ -161,13 +112,9 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             parent_widget=self._widgets["config"],
             gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param("selected_results"),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
         )
         self.create_line(
-            "line_export",
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH,
+            "line_export", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
         )
         self.create_param_widget(
             self.get_param("saving_format"),

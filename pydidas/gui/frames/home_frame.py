@@ -28,8 +28,8 @@ __all__ = ["HomeFrame"]
 import os
 from qtpy import QtGui, QtCore, QtSvg, QtWidgets
 
-from ..core.utils import get_doc_home_address, get_pydidas_icon_fname
-from ..widgets import BaseFrame
+from ...core.utils import get_doc_home_address, get_pydidas_icon_fname
+from ...widgets import BaseFrame
 
 
 _toolbar_use_text = (

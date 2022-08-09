@@ -29,14 +29,14 @@ import time
 
 from qtpy import QtCore
 
-from ..apps import ExecuteWorkflowApp
-from ..core import get_generic_param_collection
-from ..core.utils import pydidas_logger
-from ..multiprocessing import AppRunner
-from ..widgets.dialogues import WarningBox
-from ..workflow import WorkflowResults, WorkflowTree
+from ...apps import ExecuteWorkflowApp
+from ...core import get_generic_param_collection
+from ...core.utils import pydidas_logger
+from ...multiprocessing import AppRunner
+from ...widgets.dialogues import WarningBox
+from ...workflow import WorkflowResults, WorkflowTree
 from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
-from .mixins import ViewResultsMixin
+from ..mixins import ViewResultsMixin
 
 
 RESULTS = WorkflowResults()

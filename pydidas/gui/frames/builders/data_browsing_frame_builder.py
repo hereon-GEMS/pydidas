@@ -29,9 +29,9 @@ from qtpy import QtWidgets, QtCore
 import qtawesome as qta
 from silx.gui.plot.ImageView import ImageView
 
-from ...widgets import BaseFrame
-from ...widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
-from ...widgets.silx_plot import CropHistogramOutliers
+from ....widgets import BaseFrame
+from ....widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
+from ....widgets.silx_plot import CropHistogramOutliers
 
 
 class DataBrowsingFrameBuilder(BaseFrame):

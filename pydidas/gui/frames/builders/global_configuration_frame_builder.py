@@ -27,9 +27,9 @@ __all__ = ["GlobalConfigurationFrameBuilder"]
 
 from qtpy import QtCore
 
-from ...core import get_generic_param_collection
-from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
-from ...widgets import BaseFrame
+from ....core import get_generic_param_collection
+from ....core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
+from ....widgets import BaseFrame
 
 
 class GlobalConfigurationFrameBuilder(BaseFrame):

@@ -25,7 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParameterConfigWidget"]
 
-import sys
 from functools import partial
 
 from qtpy import QtWidgets, QtCore
@@ -39,7 +38,6 @@ from ...core.constants import (
 )
 from ...core.utils import convert_special_chars_to_unicode
 from ..utilities import apply_widget_properties
-from ..gui_excepthook_ import gui_excepthook
 from ..factory import create_param_widget, create_label
 
 
@@ -273,7 +271,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             param.value = widget.get_value()
         except ValueError:
             widget.set_value(param.value)
-            gui_excepthook(*sys.exc_info())
+            raise
 
     def sizeHint(self):
         """

@@ -50,7 +50,6 @@ def create_silx_plot_stack(frame, gridPos=None):
     frame : pydidas.core.BaseFrame
         The updated frame.
     """
-
     frame._widgets["plot1d"] = PydidasPlot1D()
     frame._widgets["plot2d"] = PydidasPlot2D()
     frame.add_any_widget(

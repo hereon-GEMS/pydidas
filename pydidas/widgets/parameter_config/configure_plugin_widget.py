@@ -46,7 +46,7 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
     FIXED_WIDTH = 385
     sig_new_label = QtCore.Signal(int, str)
 
-    def __init__(self, parent=None):
+    def __init__(self, **kwargs):
         """
         Setup method.
 
@@ -57,7 +57,7 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterEditFrame.__init__(self, parent)
+        ParameterEditFrame.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None

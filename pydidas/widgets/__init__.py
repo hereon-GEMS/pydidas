@@ -53,7 +53,6 @@ __all__.extend(["CreateWidgetsMixIn"])
 from .base_frame import *
 from .base_frame_with_app import *
 from .central_widget_stack import *
-from .gui_excepthook_ import *
 from .info_widget import *
 from .qta_button import *
 from .read_only_text_widget import *
@@ -76,11 +75,6 @@ from . import central_widget_stack
 
 __all__.extend(central_widget_stack.__all__)
 del central_widget_stack
-
-from . import gui_excepthook_
-
-__all__.extend(gui_excepthook_.__all__)
-del gui_excepthook_
 
 from . import info_widget
 

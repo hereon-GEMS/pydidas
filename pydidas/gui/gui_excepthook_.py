@@ -31,7 +31,7 @@ from io import StringIO
 
 from ..core import UserConfigError
 from ..core.utils import get_logging_dir
-from .dialogues import ErrorMessageBox, UserConfigErrorMessageBox
+from ..widgets.dialogues import ErrorMessageBox, UserConfigErrorMessageBox
 
 
 def gui_excepthook(exc_type, exception, trace):

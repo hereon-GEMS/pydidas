@@ -341,6 +341,42 @@ class TestBasePlugin(unittest.TestCase):
         plugin.input_shape = _shape
         self.assertEqual(_shape, plugin.input_shape)
 
+    def test_result_data_label__no_unit(self):
+        _label = utils.get_random_string(10)
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.output_data_label = _label
+        self.assertEqual(plugin.result_data_label, _label)
+
+    def test_result_data_label__w_unit(self):
+        _label = utils.get_random_string(10)
+        _unit = "nano Farad"
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.output_data_label = _label
+        plugin.output_data_unit = _unit
+        self.assertEqual(plugin.result_data_label, f"{_label} / {_unit}")
+
+    def test_result_title__no_node_id_no_label(self):
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        self.assertEqual(plugin.result_title, f"[{plugin.plugin_name}] (node #-01)")
+
+    def test_result_title__no_node_id_w_label(self):
+        _label = utils.get_random_string(8)
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.set_param_value("label", _label)
+        self.assertEqual(plugin.result_title, f"{_label} (node #-01)")
+
+    def test_result_title__no_label(self):
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.node_id = 12
+        self.assertEqual(plugin.result_title, f"[{plugin.plugin_name}] (node #012)")
+
+    def test_result_title__w_label(self):
+        _label = utils.get_random_string(8)
+        plugin = create_plugin_class(BASE_PLUGIN)()
+        plugin.node_id = 12
+        plugin.set_param_value("label", _label)
+        self.assertEqual(plugin.result_title, f"{_label} (node #012)")
+
     def test_get_parameter_config_widget(self):
         plugin = create_plugin_class(BASE_PLUGIN)()
         with self.assertRaises(NotImplementedError):

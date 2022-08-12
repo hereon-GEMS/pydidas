@@ -118,7 +118,8 @@ class TestWorkflowResults(unittest.TestCase):
             _file["entry"].create_dataset("data_label", data=_data_label)
             _file["entry"].create_dataset("plugin_name", data=_plugin_name)
             _file["entry"].create_dataset("label", data=_label)
-            _file["entry"].create_dataset("title", data=get_random_string(8))
+            _file["entry"].create_dataset("scan_title", data=get_random_string(8))
+            _file["entry"].create_dataset("node_id", data=6)
             _file["entry/data"].create_dataset("data", data=_data)
             _file["entry/scan"].create_dataset("scan_dimension", data=2)
             for _dim in range(3):
@@ -500,6 +501,21 @@ class TestWorkflowResults(unittest.TestCase):
         self.assertEqual(RES.shapes[2], self._scan_n + self._result2_shape)
         self.assertEqual(RES.get_results(1).shape, RES.shapes[1])
         self.assertEqual(RES.get_results(2).shape, RES.shapes[2])
+        self.assertEqual(
+            RES._config["shapes"].keys(), TREE.get_all_result_shapes().keys()
+        )
+        self.assertEqual(
+            RES._config["node_labels"].keys(), TREE.get_all_result_shapes().keys()
+        )
+        self.assertEqual(
+            RES._config["data_labels"].keys(), TREE.get_all_result_shapes().keys()
+        )
+        self.assertEqual(
+            RES._config["plugin_names"].keys(), TREE.get_all_result_shapes().keys()
+        )
+        self.assertEqual(
+            RES._config["result_titles"].keys(), TREE.get_all_result_shapes().keys()
+        )
 
     def test_update_param_choices_from_label__curr_choice_okay(self):
         _param = get_generic_parameter("selected_results")
@@ -530,26 +546,30 @@ class TestWorkflowResults(unittest.TestCase):
     def test_update_param_choices_from_label__only_node_entries(self):
         _param = get_generic_parameter("selected_results")
         RES._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
+        RES._config["result_titles"] = {
+            1: "a (node #001)",
+            2: "b (node #002)",
+            3: "c (node #003)",
+            5: "[Dummy] (node #005)",
+        }
         RES.update_param_choices_from_labels(_param, False)
         _choices = _param.choices
-        for _key, _label in RES.labels.items():
-            if len(_label) > 0:
-                _item = f"{_label} (node #{_key:03d})"
-            else:
-                _item = f"(node #{_key:03d})"
-            self.assertIn(_item, _choices)
+        for _label in RES.result_titles.values():
+            self.assertIn(_label, _choices)
 
     def test_update_param_choices_from_label__node_only_bad_choice(self):
         _param = Parameter("test", str, "something", choices=["something"])
         RES._config["node_labels"] = {1: "a", 2: "b", 3: "c", 5: ""}
+        RES._config["result_titles"] = {
+            1: "a (node #001)",
+            2: "b (node #002)",
+            3: "c (node #003)",
+            5: "[Dummy] (node #005)",
+        }
         RES.update_param_choices_from_labels(_param, False)
         _choices = _param.choices
-        for _key, _label in RES.labels.items():
-            if len(_label) > 0:
-                _item = f"{_label} (node #{_key:03d})"
-            else:
-                _item = f"(node #{_key:03d})"
-            self.assertIn(_item, _choices)
+        for _label in RES.result_titles.values():
+            self.assertIn(_label, _choices)
 
     def test_source_hash__simple(self):
         _hash = RES.source_hash

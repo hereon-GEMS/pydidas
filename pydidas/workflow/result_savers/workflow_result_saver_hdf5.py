@@ -61,8 +61,6 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
 
         Parameters
         ----------
-        title : str
-            The scan name or title.
         save_dir : Union[pathlib.Path, str]
             The full path for the data to be saved.
         node_information : dict
@@ -95,7 +93,8 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         """
         _ndim = SCAN.get_param_value("scan_dim")
         _dsets = [
-            ["entry", "title", {"data": cls.scan_title}],
+            ["entry", "scan_title", {"data": cls.scan_title}],
+            ["entry", "node_id", {"data": node_id}],
             ["entry", "label", {"data": cls.get_node_attribute(node_id, "node_label")}],
             [
                 "entry",
@@ -292,11 +291,17 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         """
         with h5py.File(filename, "r") as _file:
             _data = Dataset(_file["entry/data/data"][()])
-            _node_info = {
+            _info = {
                 "node_label": read_and_decode_hdf5_dataset(_file["entry/label"]),
                 "data_label": read_and_decode_hdf5_dataset(_file["entry/data_label"]),
                 "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
+                "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),
             }
+            _info["result_title"] = (
+                f"{_info['node_label']} (node #{_info['node_id']:03d})"
+                if len(_info["node_label"]) > 0
+                else f"[{_info['plugin_name']}] (node #{_info['node_id']:03d})"
+            )
             _axlabels = []
             _axunits = []
             _axranges = []
@@ -320,7 +325,7 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
                 _file["entry/scan/scan_dimension"]
             )
             _scan = {
-                "scan_title": read_and_decode_hdf5_dataset(_file["entry/title"]),
+                "scan_title": read_and_decode_hdf5_dataset(_file["entry/scan_title"]),
                 "scan_dim": _scan_ndim,
             }
             for _dim in range(_scan_ndim):
@@ -351,5 +356,5 @@ class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
         _data.axis_units = _axunits
         _data.axis_labels = _axlabels
         _data.axis_ranges = _axranges
-        _node_info["shape"] = _data.shape
-        return _data, _node_info, _scan
+        _info["shape"] = _data.shape
+        return _data, _info, _scan

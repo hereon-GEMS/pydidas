@@ -79,13 +79,9 @@ class _WorkflowResults(QtCore.QObject):
             self._config["shapes"] = _shapes
             _plugin = TREE.nodes[_node_id].plugin
             self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.output_data_label + (
-                f" / {_plugin.output_data_unit}"
-                if len(_plugin.output_data_unit) > 0
-                else ""
-            )
+            self._config["data_labels"][_node_id] = _plugin.result_data_label
             self._config["plugin_names"][_node_id] = _plugin.plugin_name
-
+            self._config["result_titles"][_node_id] = _plugin.result_title
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
 
     def clear_all_results(self):
@@ -100,6 +96,7 @@ class _WorkflowResults(QtCore.QObject):
             "data_labels": {},
             "metadata_complete": False,
             "plugin_names": {},
+            "result_titles": {},
         }
 
     def update_frame_metadata(self, metadata):
@@ -230,6 +227,19 @@ class _WorkflowResults(QtCore.QObject):
         """
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
         return self.__source_hash
+
+    @property
+    def result_titles(self):
+        """
+        Return the result titles for all node IDs in form of a dictionary.
+
+        Returns
+        -------
+        dict
+            The result titles in the form of a dictionary with <node_id: result_title>
+            entries.
+        """
+        return self._config["result_titles"].copy()
 
     def get_result_ranges(self, node_id):
         """
@@ -493,16 +503,7 @@ class _WorkflowResults(QtCore.QObject):
         """
         _curr_choice = param.value
         _new_choices = ["No selection"] if add_no_selection_entry else []
-        _new_choices.extend(
-            [
-                (
-                    f"{_val} (node #{_key:03d})"
-                    if len(_val) > 0
-                    else f"(node #{_key:03d})"
-                )
-                for _key, _val in self._config["node_labels"].items()
-            ]
-        )
+        _new_choices.extend(self._config["result_titles"].values())
         if _curr_choice in _new_choices:
             param.choices = _new_choices
         else:
@@ -597,6 +598,9 @@ class _WorkflowResults(QtCore.QObject):
             },
             "plugin_names": {
                 _id: _item["plugin_name"] for _id, _item in _node_info.items()
+            },
+            "result_titles": {
+                _id: _item["result_title"] for _id, _item in _node_info.items()
             },
             "metadata_complete": True,
         }

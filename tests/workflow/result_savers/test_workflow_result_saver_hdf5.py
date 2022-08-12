@@ -85,7 +85,8 @@ class TestWorkflowResultSaverHdf5(unittest.TestCase):
             _file["entry"].create_dataset("label", data=cls._import_label)
             _file["entry"].create_dataset("plugin_name", data=cls._import_plugin_name)
             _file["entry/data"].create_dataset("data", data=cls._import_data)
-            _file["entry"].create_dataset("title", data=cls._import_title)
+            _file["entry"].create_dataset("node_id", data=6)
+            _file["entry"].create_dataset("scan_title", data=cls._import_title)
             _file["entry/scan"].create_dataset("scan_dimension", data=SCAN.ndim)
             for _dim in range(3):
                 create_hdf5_dataset(

@@ -306,5 +306,41 @@ class _WorkflowTree(GenericTree):
                 raise UserConfigError(_error)
         return _shapes
 
+    def get_complete_plugin_metadata(self, force_update=False):
+        """
+        Get the metadata (e.g. shapes, labels, names) for all of the tree's plugins.
+
+        Parameters
+        ----------
+        force_update : bool, optional
+            Keyword to enforce a new calculation of the result shapes. The
+            default is False.
+
+        Returns
+        -------
+        dict
+            The dictionary with the metadata.
+        """
+        _shapes = [_node.result_shape for _node in self.nodes.values()]
+        if None in _shapes or self._tree_changed_flag or force_update:
+            self.root.propagate_shapes_and_global_config()
+            self.reset_tree_changed_flag()
+        _meta = {
+            "shapes": {},
+            "labels": {},
+            "names": {},
+            "data_labels": {},
+            "result_titles": {},
+        }
+        for _node_id, _node in self.nodes.items():
+            _label = _node.plugin.get_param_value("label")
+            _plugin_name = _node.plugin.__class__.plugin_name
+            _meta["shapes"][_node_id] = _node.result_shape
+            _meta["labels"][_node_id] = _label
+            _meta["names"][_node_id] = _plugin_name
+            _meta["data_labels"][_node_id] = _node.plugin.result_data_label
+            _meta["result_titles"][_node_id] = _node.plugin.result_title
+        return _meta
+
 
 WorkflowTree = SingletonFactory(_WorkflowTree)

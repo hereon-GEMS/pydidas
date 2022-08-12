@@ -28,7 +28,6 @@ __all__ = ["WorkflowTestFrame"]
 import copy
 
 from qtpy import QtCore
-import numpy as np
 
 from ...core import (
     Parameter,
@@ -251,22 +250,16 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         Store the WorkflowTree results in a local dictionary.
         """
-        self._config["shapes"] = {}
-        self._config["labels"] = {}
-        self._config["plugin_names"] = {}
-        self._config["data_labels"] = {}
+        _meta = self._tree.get_complete_plugin_metadata()
+        self._config["plugin_res_shapes"] = _meta["shapes"]
+        self._config["plugin_labels"] = _meta["labels"]
+        self._config["plugin_names"] = _meta["names"]
+        self._config["plugin_data_labels"] = _meta["data_labels"]
+        self._config["plugin_res_titles"] = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
-            self._config["shapes"][_node_id] = _node.results.shape
-            self._config["labels"][_node_id] = _node.plugin.get_param_value("label")
-            self._config["plugin_names"][_node_id] = _node.plugin.__class__.plugin_name
-            self._config["data_labels"][_node_id] = _node.plugin.output_data_label + (
-                f" / {_node.plugin.output_data_unit}"
-                if len(_node.plugin.output_data_unit) > 0
-                else ""
-            )
             _data = _node.results
             _data.convert_all_none_properties()
-            if 1 in set(_data.shape):
+            if 1 in set(_data.shape) and _data.shape != (1,):
                 _data = _data.squeeze()
             self._results[_node_id] = _data
 
@@ -279,16 +272,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         param = self.get_param("selected_results")
         _curr_choice = param.value
         _new_choices = ["No selection"]
-        _new_choices.extend(
-            [
-                (
-                    f"{_val} (node #{_key:03d})"
-                    if len(_val) > 0
-                    else f"(node #{_key:03d})"
-                )
-                for _key, _val in self._config["labels"].items()
-            ]
-        )
+        _new_choices.extend(self._config["plugin_res_titles"].values())
         if _curr_choice in _new_choices:
             param.choices = _new_choices
         else:
@@ -370,7 +354,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             _key: utils.get_range_as_formatted_string(_range)
             for _key, _range in _meta["axis_ranges"].items()
         }
-        _ax_points = dict(enumerate(self._config["shapes"][self._active_node]))
+        _ax_points = dict(
+            enumerate(self._config["plugin_res_shapes"][self._active_node])
+        )
         _values = utils.get_simplified_array_representation(_current_results)
         _data_label = _plugin.output_data_label + (
             f" / {_plugin.output_data_unit}"
@@ -416,10 +402,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return
         self._widgets["plot_stack"].setCurrentIndex(_ndim - 1)
         _plot = self._widgets[f"plot{_ndim}d"]
-        _plot.setGraphTitle(
-            self._config["labels"][self._active_node]
-            + f" (node #{self._active_node:03d})"
-        )
+        _plot.setGraphTitle(self._config["plugin_res_titles"][self._active_node])
 
     def _plot1d(self):
         """
@@ -431,7 +414,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             " / " + _data.axis_units[0] if len(_data.axis_units[0]) > 0 else ""
         )
         _plot.addCurve(_data.axis_ranges[0], _data.array, linewidth=1.5)
-        _plot.setGraphYLabel(self._config["data_labels"][self._active_node])
+        _plot.setGraphYLabel(self._config["plugin_data_labels"][self._active_node])
         _plot.setGraphXLabel(_axlabel)
 
     def _plot_2d(self):

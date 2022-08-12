@@ -163,7 +163,7 @@ class ViewResultsMixin:
         """
         if not self._config["plot_active"]:
             return
-        _dim = 1 if self._config["plot_type"] in ["1D plot", "roup of 1D plots"] else 2
+        _dim = 1 if self._config["plot_type"] in ["1D plot", "group of 1D plots"] else 2
         _node = self._config["active_node"]
         _data = RESULTS.get_result_subset(
             _node,
@@ -183,8 +183,7 @@ class ViewResultsMixin:
         elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
             self._widgets["plot_stack"].setCurrentIndex(1)
             self._plot_2d(_data)
-        _plot = self._widgets[f"plot{_dim}d"]
-        _plot.setGraphTitle(RESULTS.labels[_node] + f" (node #{_node:03d})")
+        self._widgets[f"plot{_dim}d"].setGraphTitle(RESULTS.result_titles[_node])
 
     def _axlabels(self, index):
         """

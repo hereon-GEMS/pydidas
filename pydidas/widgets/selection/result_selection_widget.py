@@ -440,8 +440,8 @@ class ResultSelectionWidget(
         accordingly.
         """
         _group = self._widgets["radio_plot_type"]
-        self._config["plot_type"] = "1D plot"
         if self._config["result_ndim"] == 1:
+            self._config["plot_type"] = "1D plot"
             _group.select_by_index(0)
             for _id in [1, 2, 3]:
                 _group._buttons[_id].setEnabled(False)

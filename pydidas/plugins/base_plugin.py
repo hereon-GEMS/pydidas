@@ -239,45 +239,6 @@ class BasePlugin(ObjectWithParameterCollection):
 
         return (plugin_getter, (self.__class__.__name__,), self.__getstate__())
 
-    @property
-    def has_unique_parameter_config_widget(self):
-        """
-        Get the flag whether the Plugin has a unique ParameterConfigWidget
-
-        Returns
-        -------
-        bool
-            The flag value whether the plugin has a unique configuration
-            widget associated with it.
-        """
-        return False
-
-    @property
-    def input_data(self):
-        """
-        Get the current input data.
-
-        Returns
-        -------
-        Union[int, pydidas.core.Dataset]
-            The input data passed to the plugin.
-        """
-        return self._config["input_data"]
-
-    def store_input_data_copy(self, data, **kwargs):
-        """
-        Store a copy of the input data internally in the plugin.
-
-        Parameters
-        ----------
-        data : Union[int, np.ndarray]
-            The input data for the plugin.
-        **kwargs : dict
-            The calling keyword arguments
-        """
-        self._config["input_data"] = copy.deepcopy(data)
-        self._config["input_kwargs"] = copy.deepcopy(kwargs)
-
     def execute(self, data, **kwargs):
         """
         Execute the processing step.
@@ -312,6 +273,77 @@ class BasePlugin(ObjectWithParameterCollection):
         raise NotImplementedError(
             "Generic plugins do not have a unique parameter config widget."
         )
+
+    @property
+    def has_unique_parameter_config_widget(self):
+        """
+        Get the flag whether the Plugin has a unique ParameterConfigWidget
+
+        Returns
+        -------
+        bool
+            The flag value whether the plugin has a unique configuration
+            widget associated with it.
+        """
+        return False
+
+    @property
+    def input_data(self):
+        """
+        Get the current input data.
+
+        Returns
+        -------
+        Union[int, pydidas.core.Dataset]
+            The input data passed to the plugin.
+        """
+        return self._config["input_data"]
+
+    @property
+    def result_data_label(self):
+        """
+        Get the combined result data label, consisting of the formatted
+        output_data_label and output_data_unit.
+
+        Returns
+        -------
+        str
+            The formatted data label.
+        """
+        return self.output_data_label + (
+            f" / {self.output_data_unit}" if len(self.output_data_unit) > 0 else ""
+        )
+
+    @property
+    def result_title(self):
+        """
+        Get the formatted title of the plugin's results.
+
+        Returns
+        -------
+        str
+            The formatted result title.
+        """
+        _id = self.node_id if self.node_id is not None else -1
+        return (
+            f"{self.get_param_value('label')} (node #{_id:03d})"
+            if len(self.get_param_value("label")) > 0
+            else f"[{self.plugin_name}] (node #{_id:03d})"
+        )
+
+    def store_input_data_copy(self, data, **kwargs):
+        """
+        Store a copy of the input data internally in the plugin.
+
+        Parameters
+        ----------
+        data : Union[int, np.ndarray]
+            The input data for the plugin.
+        **kwargs : dict
+            The calling keyword arguments
+        """
+        self._config["input_data"] = copy.deepcopy(data)
+        self._config["input_kwargs"] = copy.deepcopy(kwargs)
 
     @property
     def input_shape(self):

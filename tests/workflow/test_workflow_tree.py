@@ -43,19 +43,25 @@ _PLUGIN_PATHS = COLL.get_all_registered_paths()
 
 
 class TestWorkflowTree(unittest.TestCase):
-    def setUp(self):
-        self.tree = WorkflowTree()
-        self.tree.clear()
-        self._tmpdir = tempfile.mkdtemp()
+    @classmethod
+    def setUpClass(self):
         _path = os.path.dirname(unittest_objects.__file__)
         if _path not in _PLUGIN_PATHS:
             COLL.find_and_register_plugins(_path)
 
+    def setUp(self):
+        self.tree = WorkflowTree()
+        self.tree.clear()
+        self._tmpdir = tempfile.mkdtemp()
+
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
+        # PluginCollection._reset_instance()
+
+    @classmethod
+    def tearDownClass(cls):
         COLL.clear_collection(True)
         COLL.find_and_register_plugins(*_PLUGIN_PATHS)
-        # PluginCollection._reset_instance()
 
     def create_node_tree(self, depth=3, width=3):
         obj00 = WorkflowNode(node_id=0, plugin=unittest_objects.DummyLoader())
@@ -295,6 +301,53 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         self.tree.restore_from_string("[]")
         self.assertEqual(self.tree.nodes, dict())
+
+    def test_get_complete_plugin_metadata__empty_tree(self):
+        _meta = self.tree.get_complete_plugin_metadata()
+        self.assertEqual(list(_meta["shapes"].keys()), [])
+        self.assertIsInstance(_meta, dict)
+        for _key in ["shapes", "labels", "names", "data_labels", "result_titles"]:
+            self.assertIn(_key, _meta)
+
+    def test_get_complete_plugin_metadata__populated_tree(self):
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        _meta = self.tree.get_complete_plugin_metadata()
+        self.assertEqual(_meta["shapes"].keys(), self.tree.nodes.keys())
+        for _key, _node in self.tree.nodes.items():
+            self.assertEqual(_node.result_shape, _meta["shapes"][_key])
+
+    def test_get_complete_plugin_metadata__changed_tree_w_o_update(self):
+        _shape = (123, 456)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        _ = self.tree.get_complete_plugin_metadata()
+        self.tree.nodes[1]._result_shape = _shape
+        _meta_new = self.tree.get_complete_plugin_metadata()
+        self.assertEqual(_shape, _meta_new["shapes"][1])
+
+    def test_get_complete_plugin_metadata__changed_tree_w_force_update(self):
+        _shape = (123, 456)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        _meta = self.tree.get_complete_plugin_metadata()
+        self.tree.nodes[1]._result_shape = _shape
+        _meta_new = self.tree.get_complete_plugin_metadata(force_update=True)
+        self.assertEqual(_meta_new["shapes"][1], _meta["shapes"][1])
+
+    def test_get_complete_plugin_metadata__changed_tree_w_tree_changed_flag(self):
+        _shape = (123, 456)
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        _meta = self.tree.get_complete_plugin_metadata()
+        self.tree.nodes[1]._result_shape = _shape
+        self.tree._tree_changed_flag = True
+        _meta_new = self.tree.get_complete_plugin_metadata()
+        self.assertEqual(_meta_new["shapes"][1], _meta["shapes"][1])
 
     def test_hash___empty_tree(self):
         tree = WorkflowTree()

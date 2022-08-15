@@ -203,7 +203,7 @@ class pyFAIintegrationBase(ProcPlugin):
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
             logger.warning(
-                "Warning: Radial range was not correct and" " has been ignored."
+                "Warning: Radial range was not correct and has been ignored."
             )
         return None
 
@@ -264,7 +264,7 @@ class pyFAIintegrationBase(ProcPlugin):
             if 0 <= _lower < _upper:
                 return (_lower, _upper)
             logger.warning(
-                "Warning: Azimuthal range was not correct and" " has been ignored."
+                "Warning: Azimuthal range was not correct and has been ignored."
             )
         return None
 

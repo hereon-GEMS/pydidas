@@ -29,6 +29,8 @@ __all__ = ["PyFAI2dIntegration"]
 from pydidas.core import Dataset
 from pydidas.plugins import pyFAIintegrationBase
 
+import numpy as np
+
 
 class PyFAI2dIntegration(pyFAIintegrationBase):
     """
@@ -49,7 +51,8 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self.set_param_value("rad_npoint", 720)
+        self.set_param_value("rad_npoint", 1000)
+        self.set_param_value("azi_npoint", 36)
 
     def execute(self, data, **kwargs):
         """
@@ -80,14 +83,14 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             azimuth_range=self.get_azimuthal_range_in_deg(),
             method=self._config["method"],
         )
-
-        _x_label, _x_unit = self.params["rad_unit"].value.replace(" ", "").split("/")
-        _y_label, _y_unit = self.params["azi_unit"].value.replace(" ", "").split("/")
+        _range_fact =  np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
+        _x_label, _x_unit = self.get_param_value("rad_unit").replace(" ", "").split("/")
+        _y_label, _y_unit = self.get_param_value("azi_unit").replace(" ", "").split("/")
         _dataset = Dataset(
             _newdata[0],
             axis_labels=[_y_label, _x_label],
             axis_units=[_y_unit, _x_unit],
-            axis_ranges=[_newdata[2], _newdata[1]],
+            axis_ranges=[_newdata[2] * _range_fact, _newdata[1]],
             data_label="integrated intensity",
             data_unit="counts",
         )

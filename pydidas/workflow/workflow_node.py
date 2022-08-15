@@ -202,9 +202,11 @@ class WorkflowNode(GenericNode):
             logger.debug("Passing result to child")
             _child.execute_plugin_chain(res, **self._get_deep_copy_of_kwargs(reskws))
         logger.debug("Saving data node #%i" % self.node_id)
-        if (self.is_leaf and self.plugin.output_data_dim is not None) or kwargs.get(
-            "force_store_results", False
-        ):
+        if (
+            self.is_leaf
+            or self.plugin.get_param_value("keep_results")
+            or kwargs.get("force_store_results", False)
+        ) and self.plugin.output_data_dim is not None:
             self.results = res
             self.result_kws = reskws
 

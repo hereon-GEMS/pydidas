@@ -5,11 +5,15 @@ Major changes:
 - Changed the handling of storing persistent information for the user 
   (Qt QSettings) to be version specific which allows to work with multiple
   pydidas versions in parallel.
+- Added a "Always store results" flag to all plugins to allow saving of 
+  intermediary data without having to use the "Keep Data" plugin. The keep data
+  plugin has been removed.
   
 Improvements
 ------------
 - Moved all frames and framebuilders to subpackage in gui package.
-
+- Added the plugin names to the node result titles in case that no
+  user-defined node label has been set.
 
 Bugfixes:
 ---------

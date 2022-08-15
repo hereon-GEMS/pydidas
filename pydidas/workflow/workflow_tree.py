@@ -111,11 +111,11 @@ class _WorkflowTree(GenericTree):
             and results items.
         """
         self.execute_process(arg, **kwargs)
-        _leaves = self.get_all_leaves()
+        _nodes = self.get_all_nodes_with_results()
         _results = {}
-        for _leaf in _leaves:
-            if _leaf.results is not None:
-                _results[_leaf.node_id] = _leaf.results
+        for _node in _nodes:
+            if _node.results is not None:
+                _results[_node.node_id] = _node.results
         return _results
 
     def execute_process(self, arg, **kwargs):
@@ -286,25 +286,43 @@ class _WorkflowTree(GenericTree):
         """
         if self.root is None:
             raise UserConfigError("The WorkflowTree has no nodes.")
-        _leaves = self.get_all_leaves()
-        _shapes = [_leaf.result_shape for _leaf in _leaves]
+        _nodes_w_results = self.get_all_nodes_with_results()
+        _shapes = [_node.result_shape for _node in _nodes_w_results]
         if None in _shapes or self._tree_changed_flag or force_update:
             self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
         _shapes = {
-            _leaf.node_id: _leaf.result_shape
-            for _leaf in _leaves
-            if _leaf.plugin.output_data_dim is not None
+            _node.node_id: _node.result_shape
+            for _node in _nodes_w_results
+            if _node.plugin.output_data_dim is not None
         }
         for _id, _shape in _shapes.items():
             if -1 in _shape:
-                _plugin_cls = self.get_node_by_id(_id).plugin.__class__
+                _plugin_cls = self.nodes[_id].plugin.__class__
                 _error = (
                     "Cannot determine the shape of the output for node "
                     f'"{_id}" (type {_plugin_cls}).'
                 )
                 raise UserConfigError(_error)
         return _shapes
+
+    def get_all_nodes_with_results(self):
+        """
+        Get all tree nodes which have results associated with them.
+
+        These are all leaf nodes in addition to all nodes which have been flagged
+        with the "keep data" flag.
+
+        Returns
+        -------
+        list
+            A list of all leaf nodes.
+        """
+        _nodes_w_results = []
+        for _node in self.nodes.values():
+            if _node.is_leaf or _node.plugin.get_param_value("keep_results"):
+                _nodes_w_results.append(_node)
+        return _nodes_w_results
 
     def get_complete_plugin_metadata(self, force_update=False):
         """

@@ -107,6 +107,19 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(_shapes[2], _shape)
         self.assertEqual(_shapes[3], _shape)
 
+    def test_get_all_result_shapes__tree_with_keep_results(self):
+        _dummy = unittest_objects.DummyLoader()
+        _dummy.calculate_result_shape()
+        _shape = _dummy.result_shape
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.nodes[1].plugin.set_param_value("keep_results", True)
+        _shapes = self.tree.get_all_result_shapes()
+        self.assertEqual(list(_shapes.keys()), [1, 2])
+        self.assertEqual(_shapes[1], _shape)
+        self.assertEqual(_shapes[2], _shape)
+
     def test_export_to_file(self):
         _fname = os.path.join(self._tmpdir, "export.yaml")
         _nodes, _index = self.create_node_tree()
@@ -172,6 +185,15 @@ class TestWorkflowTree(unittest.TestCase):
         for _leaf in self.tree.get_all_leaves():
             _id = _leaf.node_id
             self.assertIsInstance(_res[_id], Dataset)
+
+    def test_execute_process_and_get_results__linear_w_keep_results(self):
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.create_and_add_node(unittest_objects.DummyProc())
+        self.tree.nodes[1].plugin.set_param_value("keep_results", True)
+        _res = self.tree.execute_process_and_get_results(0)
+        self.assertIsInstance(_res[1], Dataset)
+        self.assertIsInstance(_res[2], Dataset)
 
     def test_prepare_execution(self):
         _depth = 3

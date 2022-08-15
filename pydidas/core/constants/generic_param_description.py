@@ -57,6 +57,18 @@ GENERIC_PARAM_DESCRIPTION = {
             "a handle for easier human identification."
         ),
     },
+    "keep_results": {
+        "type": bool,
+        "default": False,
+        "name": "Always store results",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "Flag to force pydidas to keep the results of this plugin available even "
+            "if it is intermediary data and would normally not be stored."
+        ),
+    },
     ###################################
     # Parameters for CompositeCreation
     ###################################

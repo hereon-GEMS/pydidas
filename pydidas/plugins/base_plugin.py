@@ -127,8 +127,8 @@ class BasePlugin(ObjectWithParameterCollection):
         _desc += (
             f"Class name: {cls.__name__}\n\n"
             f"Plugin type: {ptype[cls.plugin_type]}\n\n"
-            f"Input data dimension: {_data_dim(cls.input_data_dim)}\n\n"
-            f"Output data dimension: {_data_dim(cls.output_data_dim)}\n"
+            f"Input data dimension: {cls.input_data_dim_str}\n\n"
+            f"Output data dimension: {cls.output_data_dim_str}\n"
         )
         return _desc
 
@@ -158,9 +158,43 @@ class BasePlugin(ObjectWithParameterCollection):
             ),
             "Class name": cls.__name__,
             "Plugin type": ptype[cls.plugin_type],
-            "Input data dimension": _data_dim(cls.input_data_dim),
-            "Output data dimension": _data_dim(cls.output_data_dim),
+            "Input data dimension": cls.input_data_dim_str,
+            "Output data dimension": cls.output_data_dim_str,
         }
+
+    @classmethod
+    @property
+    def input_data_dim_str(cls):
+        """
+        Get the input data dimensionality as string.
+
+        Returns
+        -------
+        str
+            The formatted input data dimensionality.
+        """
+        if cls.input_data_dim == -1:
+            return "n"
+        else:
+            return str(cls.input_data_dim)
+
+    @classmethod
+    @property
+    def output_data_dim_str(cls):
+        """
+        Get the output data dimensionality as string.
+
+        Returns
+        -------
+        str
+            The formatted input data dimensionality.
+        """
+        if cls.output_data_dim == -1:
+            return "n"
+        elif cls.output_data_dim is None:
+            return "None"
+        else:
+            return str(cls.output_data_dim)
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -377,7 +411,7 @@ class BasePlugin(ObjectWithParameterCollection):
             raise TypeError("The new shape must be a tuple.")
         if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
             raise ValueError(
-                "The new shape must be a tuple of length" f"{self.input_data_dim}."
+                f"The new shape must be a tuple of length {self.input_data_dim}."
             )
         self._config["input_shape"] = new_shape
 

@@ -43,6 +43,10 @@ from pydidas.core import (
     UserConfigError,
     Parameter,
 )
+from pydidas.core.utils import (
+    process_1d_with_multi_input_dims,
+    calculate_result_shape_for_multi_input_dims,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -55,7 +59,11 @@ class FitSinglePeak(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        "fit_func", "fit_bg_order", "fit_lower_limit", "fit_upper_limit"
+        "process_data_dim",
+        "fit_func",
+        "fit_bg_order",
+        "fit_lower_limit",
+        "fit_upper_limit",
     )
     default_params.add_param(
         Parameter(
@@ -79,8 +87,8 @@ class FitSinglePeak(ProcPlugin):
             ),
         ),
     )
-    input_data_dim = 1
-    output_data_dim = 1
+    input_data_dim = -1
+    output_data_dim = 0
     new_dataset = True
 
     def __init__(self, *args, **kwargs):
@@ -128,6 +136,7 @@ class FitSinglePeak(ProcPlugin):
             "global/plugin_fit_std_threshold", dtype=float
         )
 
+    @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
         """
         Fit a peak to the data.
@@ -333,6 +342,7 @@ class FitSinglePeak(ProcPlugin):
             _new_data[:] = -1
         return _new_data
 
+    @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):
         """
         Calculate the shape of the Plugin results.

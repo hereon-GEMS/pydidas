@@ -8,7 +8,9 @@ Major changes:
 - Added a "Always store results" flag to all plugins to allow saving of 
   intermediary data without having to use the "Keep Data" plugin. The keep data
   plugin has been removed.
-  
+- Added functionality to run selected 1d-processing plugins (FitSinglePeak,
+  Remove1dPolynomialBackground) with multidimensional input data.
+
 Improvements
 ------------
 - Moved all frames and framebuilders to subpackage in gui package.
@@ -22,6 +24,9 @@ Bugfixes:
 - Fixed an issue with the Pyfai2dIntegration plugin.
 - Fixed an issue when plugins with 2d results would return 1d output
   data (e.g. 2d-integration with only one azimuthal value).
+- Fixed an issue with azimuthal units in radians in the pyFAI 2d integration
+  plugin.
+  
 
 v0.1.9
 ======

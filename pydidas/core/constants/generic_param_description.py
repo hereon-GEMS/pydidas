@@ -1446,14 +1446,22 @@ GENERIC_PARAM_DESCRIPTION = {
             "plot of the results."
         ),
     },
-    # '': {
-    #     'type': int,
-    #     'default': ,
-    #     'name': '',
-    #     'choices': None,
-    #     'unit': '',
-    #     'allow_None': False,
-    #     'tooltip': },
+    ############################
+    # Plugin data selection
+    ############################
+    "process_data_dim": {
+        "type": int,
+        "default": -1,
+        "name": "Process data dimension",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "This parameter determines which data dimension should be processed if the "
+            "input data dimensionality is larger than the processing dimensionality. "
+            "The default of -1 will always use the last data dimension."
+        ),
+    },
     # '': {
     #     'type': int,
     #     'default': ,

@@ -83,7 +83,7 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             azimuth_range=self.get_azimuthal_range_in_deg(),
             method=self._config["method"],
         )
-        _range_fact =  np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
+        _range_fact = np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
         _x_label, _x_unit = self.get_param_value("rad_unit").replace(" ", "").split("/")
         _y_label, _y_unit = self.get_param_value("azi_unit").replace(" ", "").split("/")
         _dataset = Dataset(
@@ -106,6 +106,6 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             The new shape: A tuple of two integers is returned.
         """
         self._config["result_shape"] = (
-            self.get_param_value("rad_npoint"),
             self.get_param_value("azi_npoint"),
+            self.get_param_value("rad_npoint"),
         )

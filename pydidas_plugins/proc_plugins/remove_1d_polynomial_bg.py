@@ -30,11 +30,16 @@ import numpy as np
 from numpy.polynomial import Polynomial
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import ParameterCollection, Parameter, Dataset
+from pydidas.core import ParameterCollection, Parameter, Dataset, get_generic_parameter
+from pydidas.core.utils import (
+    process_1d_with_multi_input_dims,
+    calculate_result_shape_for_multi_input_dims,
+)
 from pydidas.plugins import ProcPlugin
 
 
 DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG = ParameterCollection(
+    get_generic_parameter("process_data_dim"),
     Parameter(
         "threshold_low",
         float,
@@ -101,7 +106,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG
-    input_data_dim = 1
+    input_data_dim = -1
     output_data_dim = 1
     output_data_label = "Background-corrected data"
     output_data_unit = "a.u."
@@ -137,6 +142,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         else:
             self._kernel = None
 
+    @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
         """
         Fit a polynomial background to the data and remove its contribution
@@ -247,6 +253,14 @@ class Remove1dPolynomialBackground(ProcPlugin):
             else:
                 _index += 1
         return xpos
+
+    @calculate_result_shape_for_multi_input_dims
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the results based on the Plugin processing and
+        the input data shape.
+        """
+        super().calculate_result_shape()
 
     def get_detailed_results(self):
         """

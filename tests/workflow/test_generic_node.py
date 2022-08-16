@@ -28,6 +28,7 @@ import copy
 
 import numpy as np
 
+from pydidas.core import UserConfigError
 from pydidas.workflow import GenericNode
 
 
@@ -250,6 +251,32 @@ class TestGenericNode(unittest.TestCase):
         root.remove_child_reference(node)
         self.assertTrue(node2 in root._children)
         self.assertFalse(node in root._children)
+
+    def test_change_node_parent__same_parent(self):
+        _nodes, _, _ = self.create_node_tree(depth=3, width=2)
+        _root = _nodes[0][0]
+        _child = _root.get_children()[0]
+        _child.change_node_parent(_root)
+        self.assertEqual(_child.parent, _root)
+        self.assertTrue(_child in _root.get_children())
+
+    def test_change_node_parent__new_parent_in_children(self):
+        _nodes, _, _ = self.create_node_tree(depth=3, width=2)
+        _root = _nodes[0][0]
+        _child = _root.get_children()[0]
+        _grandchild = _child.get_children()[0]
+        with self.assertRaises(UserConfigError):
+            _child.change_node_parent(_grandchild)
+
+    def test_change_node_parent__simple_case(self):
+        _nodes, _, _ = self.create_node_tree(depth=3, width=2)
+        _root = _nodes[0][0]
+        _child1 = _root.get_children()[0]
+        _child2 = _root.get_children()[1]
+        _child1.change_node_parent(_child2)
+        self.assertEqual(_child1.parent, _child2)
+        self.assertTrue(_child1 in _child2.get_children())
+        self.assertFalse(_child1 in _root.get_children())
 
     def test_copy(self):
         root = GenericNode(node_id=0)

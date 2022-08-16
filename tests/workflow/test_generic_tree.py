@@ -24,6 +24,7 @@ __status__ = "Development"
 
 import unittest
 
+from pydidas.core import UserConfigError
 from pydidas.workflow import GenericTree, GenericNode
 
 
@@ -70,12 +71,12 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(tree.node_ids, [])
         self.assertIsNone(tree.root)
 
-    def testverify_node_type__with_node(self):
+    def test_verify_node_type__with_node(self):
         tree = GenericTree()
         node = GenericNode()
         tree.verify_node_type(node)
 
-    def testverify_node_type__wrong_object(self):
+    def test_verify_node_type__wrong_object(self):
         tree = GenericTree()
         node = 12
         with self.assertRaises(TypeError):
@@ -245,6 +246,18 @@ class TestGenericTree(unittest.TestCase):
         _leaves = tree.get_all_leaves()
         for _node in _nodes[_depth]:
             self.assertTrue(_node in _leaves)
+
+    def test_change_node_parent(self):
+        tree = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=3, width=2)
+        tree.register_node(_nodes[0][0])
+        _child1 = tree.root.get_children()[0]
+        _child2 = tree.root.get_children()[1]
+        tree.change_node_parent(_child1.node_id, _child2.node_id)
+        self.assertTrue(tree._tree_changed_flag)
+        self.assertTrue(_child1 in _child2.get_children())
+        self.assertFalse(_child1 in tree.root.get_children())
+        self.assertEqual(_child1.parent, _child2)
 
     def test_copy(self):
         _depth = 3

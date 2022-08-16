@@ -28,6 +28,8 @@ __all__ = ["GenericNode"]
 import copy
 from numbers import Integral
 
+from ..core import UserConfigError
+
 
 class GenericNode:
     """
@@ -316,6 +318,26 @@ class GenericNode:
         if child not in self._children:
             raise ValueError("Instance is not a child!")
         self._children.remove(child)
+
+    def change_node_parent(self, new_parent):
+        """
+        Change the parent of the selected node.
+
+        Parameters
+        ----------
+        new_parent : Union[pydidas.workflow.GenericNode, None]
+            The new parent of the node.
+        """
+        if new_parent == self._parent:
+            return
+        self._verify_type(new_parent, allowNone=False)
+        if new_parent.node_id in self.get_recursive_ids():
+            raise UserConfigError(
+                "Cannot change the node parent because the newly selected node is ")
+        if self._parent is not None:
+            self._parent.remove_child_reference(self)
+        new_parent.add_child(self)
+        self._parent = new_parent
 
     def get_copy(self):
         """

@@ -251,6 +251,21 @@ class GenericTree:
             self.node_ids.remove(_id)
         self._tree_changed_flag = True
 
+    def change_node_parent(self, node_id, new_parent_id):
+        """
+        Change the parent of the selected node.
+
+        Parameters
+        ----------
+        node_id : int
+            The id of the selected node.
+        new_parent_id : int
+            The id of the selected node's new parent.
+        """
+        _new_parent = self.nodes[new_parent_id]
+        self.nodes[node_id].change_node_parent(_new_parent)
+        self._tree_changed_flag = True
+
     def get_all_leaves(self):
         """
         Get all tree nodes which are leaves.

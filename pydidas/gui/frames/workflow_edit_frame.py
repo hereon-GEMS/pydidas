@@ -156,6 +156,9 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             A dictionary with 'params' and 'visibility' keys and the respective
             information for both.
         """
+        if not self._config["built"]:
+            self._config["state"] = state
+            return
         super().restore_state(state)
         for _key, _coords in state["widgets"].items():
             self._widgets[_key].setGeometry(*_coords)

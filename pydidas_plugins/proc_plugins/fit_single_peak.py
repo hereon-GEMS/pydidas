@@ -348,6 +348,8 @@ class FitSinglePeak(ProcPlugin):
         Calculate the shape of the Plugin results.
         """
         _output = self.get_param_value("output")
+        self.output_data_label = _output
+        self.output_data_unit = "a.u."
         if _output in [
             "Peak area",
             "Peak position",

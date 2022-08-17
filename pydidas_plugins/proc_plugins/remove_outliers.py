@@ -30,7 +30,11 @@ import warnings
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import ParameterCollection, Parameter
+from pydidas.core import get_generic_param_collection, Parameter
+from pydidas.core.utils import (
+    process_1d_with_multi_input_dims,
+    calculate_result_shape_for_multi_input_dims,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -42,7 +46,8 @@ class RemoveOutliers(ProcPlugin):
     plugin_name = "Remove Outliers"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
+    default_params = get_generic_param_collection("process_data_dim")
+    default_params.add_params(
         Parameter(
             "kernel_width",
             int,
@@ -65,7 +70,7 @@ class RemoveOutliers(ProcPlugin):
             ),
         ),
     )
-    input_data_dim = 1
+    input_data_dim = -1
     output_data_dim = 1
     output_data_label = "data without outliers"
     output_data_unit = "a.u."
@@ -79,6 +84,7 @@ class RemoveOutliers(ProcPlugin):
         Set up the required functions and fit variable labels.
         """
 
+    @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
         """
         Crop 1D data.
@@ -104,20 +110,39 @@ class RemoveOutliers(ProcPlugin):
         _data_m = np.roll(data, -_width)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            _data_low1 = ((data - _data_p) / data)[_width:-_width]
-            _data_low2 = ((data - _data_m) / data)[_width:-_width]
-            _low_outliers = np.where(
-                (_data_low1 <= -_threshold) & (_data_low2 <= -_threshold)
+            _data_p_norm = ((data - _data_p) / data)[_width:-_width]
+            _data_m_norm = ((data - _data_m) / data)[_width:-_width]
+            _low_outliers_same_sign = np.where(
+                (_data_p_norm <= -_threshold) & (_data_m_norm <= -_threshold)
             )[0]
-            _data_high1 = ((data - _data_p) / _data_p)[_width:-_width]
-            _data_high2 = ((data - _data_m) / _data_m)[_width:-_width]
-            _high_outliers = np.where(
-                (_data_high1 >= _threshold) & (_data_high2 >= _threshold)
+            _data_p_norm_p = ((data - _data_p) / _data_p)[_width:-_width]
+            _data_m_norm_m = ((data - _data_m) / _data_m)[_width:-_width]
+            _high_outliers_same_sign = np.where(
+                (_data_p_norm_p >= _threshold) & (_data_m_norm_m >= _threshold)
             )[0]
-        _outliers = np.concatenate((_low_outliers, _high_outliers)) + _width
+            _high_outliers_opposize_sign = np.where(
+                (_data_p_norm_p <= -_threshold) & (_data_m_norm_m <= -_threshold)
+            )[0]
+        _outliers = (
+            np.concatenate(
+                (
+                    _high_outliers_same_sign,
+                    _high_outliers_opposize_sign,
+                    _low_outliers_same_sign,
+                )
+            )
+            + _width
+        )
         data[_outliers] = (_data_p[_outliers] + _data_m[_outliers]) / 2
         self.__results = data
         return data, kwargs
+
+    @calculate_result_shape_for_multi_input_dims
+    def calculate_result_shape(self):
+        """
+        Calculate the shape of the Plugin results.
+        """
+        ProcPlugin.calculate_result_shape(self)
 
     def get_detailed_results(self):
         """

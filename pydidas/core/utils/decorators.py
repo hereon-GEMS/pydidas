@@ -153,14 +153,16 @@ def calculate_result_shape_for_multi_input_dims(method):
         tuple
             The resulting result shape.
         """
-        _input_ndim = len(self._config["input_shape"])
         method(self)
+        if self._config["input_shape"] is None:
+            return
+        _input_ndim = len(self._config["input_shape"])
         if _input_ndim <= 1:
             return
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), _input_ndim)
         _shape = list(self._config["input_shape"])
         del _shape[_dim_to_process]
-        if self._config["result_shape"] == (1, ):
+        if self._config["result_shape"] == (1,):
             self._config["result_shape"] = tuple(_shape)
         else:
             self._config["result_shape"] = tuple(

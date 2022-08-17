@@ -63,6 +63,7 @@ class TestFitSinglePeak(unittest.TestCase):
         _high = 27
         self._rangen = np.where((self._x >= _low) & (self._x <= _high))[0].size
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin._config["input_shape"] = (150,)
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
         plugin.set_param_value("fit_upper_limit", _high)

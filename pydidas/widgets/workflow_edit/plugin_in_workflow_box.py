@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PluginInWorkflowBox"]
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
 
 from ...core.constants import gui_constants, qt_presets
 from ..utilities import apply_widget_properties
@@ -48,11 +48,13 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
 
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
-    widget_activated = QtCore.Signal(int)
-    widget_delete_request = QtCore.Signal(int)
+    sig_widget_activated = QtCore.Signal(int)
+    sig_widget_delete_request = QtCore.Signal(int)
+    sig_new_node_parent_request = QtCore.Signal(int, int)
 
     def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
         super().__init__(parent)
+        self.setAcceptDrops(True)
         apply_widget_properties(self, **kwargs)
         self.active = False
         self.widget_id = widget_id
@@ -95,14 +97,14 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         """
         event.accept()
         if not self.active:
-            self.widget_activated.emit(self.widget_id)
+            self.sig_widget_activated.emit(self.widget_id)
 
     def delete(self):
         """
         Reimplement the generic delete method and send it to the
         WorkflowTreeEditManager.
         """
-        self.widget_delete_request.emit(self.widget_id)
+        self.sig_widget_delete_request.emit(self.widget_id)
 
     def widget_select(self, selection):
         """
@@ -154,3 +156,26 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
                 _style[_item] = "border: 0px"
         _new_style = ";".join(_style)
         return _new_style
+
+    def mouseMoveEvent(self, event):
+        """
+        Implement a mouse move event to drag the plugins to a new position in the
+        WorkflowTree.
+        """
+        if event.buttons() == QtCore.Qt.LeftButton:
+            _drag = QtGui.QDrag(self)
+            _mime = QtCore.QMimeData()
+            _drag.setMimeData(_mime)
+
+            _pixmap = QtGui.QPixmap(self.size())
+            self.render(_pixmap)
+            _drag.setPixmap(_pixmap)
+            _drag.exec_(QtCore.Qt.MoveAction)
+
+    def dragEnterEvent(self, event):
+        event.accept()
+
+    def dropEvent(self, event):
+        _source_widget = event.source()
+        event.accept()
+        self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)

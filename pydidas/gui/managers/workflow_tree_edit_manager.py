@@ -122,7 +122,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(name)()
         # Check if no node is active but the TREE already has nodes.
-        # If True, we will select the last node as active to append the new
+        # If True, pydidas will select the last node as active to append the new
         # node.
         if self.active_node_id is None and len(TREE.node_ids) > 0:
             self.active_node_id = TREE.node_ids[-1]
@@ -164,10 +164,11 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node ID. Required for referencing the widgets later.
         """
         _widget = PluginInWorkflowBox(title, node_id, parent=self.qt_canvas)
-        _widget.widget_activated.connect(self.set_active_node)
-        _widget.widget_delete_request.connect(
+        _widget.sig_widget_activated.connect(self.set_active_node)
+        _widget.sig_widget_delete_request.connect(
             partial(self.delete_single_node_and_children, node_id)
         )
+        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
         _widget.setVisible(True)
         self._node_widgets[node_id] = _widget
 
@@ -217,6 +218,22 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         self._node_widgets[node_id].update_text(node_id, label)
 
+    @QtCore.Slot(int, int)
+    def new_node_parent_request(self, calling_node, new_parent_node):
+        """
+        Handle the signal that a new shall have a new parent.
+
+        Parameters
+        ----------
+        calling_node : int
+            The node ID of the calling node.
+        new_parent_node : int
+            The node ID of the requested parent.
+        """
+        TREE.change_node_parent(calling_node, new_parent_node)
+        TREE.order_node_ids()
+        self.update_from_tree()
+
     def update_node_positions(self):
         """
         Update the node positions on the canvas after changes to the tree.
@@ -229,8 +246,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _pos = self.root.get_relative_positions()
         _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
         _offset = 0
-        if _width < self.qt_canvas.parent().width():
-            _offset = (self.qt_canvas.parent().width() - _width) // 2
+        _canvas_width = self.qt_canvas.parent().parent().width()
+        if _width < _canvas_width:
+            _offset = (_canvas_width - _width) // 2
         pos_vals = np.asarray(list(_pos.values()))
         pos_vals[:, 0] += -np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
         pos_vals[:, 1] += -np.amin(pos_vals[:, 1]) + self.pos_y_min

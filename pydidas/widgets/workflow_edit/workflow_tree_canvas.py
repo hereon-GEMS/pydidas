@@ -25,9 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTreeCanvas"]
 
-from qtpy import QtWidgets, QtGui
+from qtpy import QtWidgets, QtGui, QtCore
 
-from ...core.constants import QT_STYLES
+from ...core.constants import QT_STYLES, EXP_EXP_POLICY
 
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
@@ -44,6 +44,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self.setAcceptDrops(True)
         self.title = QtWidgets.QLabel(self)
         self.title.setStyleSheet(QT_STYLES["title"])
         self.title.setText("Workflow tree editor")
@@ -52,6 +53,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.setAutoFillBackground(True)
 
         self.setLineWidth(2)
+        self.setSizePolicy(*EXP_EXP_POLICY)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 
@@ -95,3 +97,14 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         """
         self.widget_connections = widget_conns
         self.update()
+
+    def sizeHint(self):
+        """
+        Set the Qt sizeHint to be the widget's size.
+
+        Returns
+        -------
+        QtCore.QSize
+            The size of the widget.
+        """
+        return QtCore.QSize(1000, 600)

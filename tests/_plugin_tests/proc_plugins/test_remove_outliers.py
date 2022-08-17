@@ -33,42 +33,54 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestRemoveOutliers(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        _len = 50
+        _tzone = 20
+        cls._section_length = _len
+        cls._trans_zone = _tzone
+        cls._peak_heights = [5, -5, 0.4, -0.4, 1.4, -1.4, 0.8, -0.8]
+        data = np.ones(4 * _len + 3 * _tzone)
+        data[_len : _len + _tzone] = np.linspace(1, -1, _tzone)
+        data[_len + _tzone : 2 * _len + _tzone] = -1
+        data[2 * _len + _tzone : 2 * _len + 2 * _tzone] = np.linspace(-1, 1, _tzone)
+        data[3 * _len + 2 * _tzone : 3 * _len + 3 * _tzone] = np.linspace(1, -1, _tzone)
+        data[3 * _len + 3 * _tzone :] = -1
+        for _width in [1, 2]:
+            _x0 = (_width - 1) * (2 * _len + 2 * _tzone)
+            for _sign in [1, -1]:
+                for _index, _peak in enumerate(cls._peak_heights):
+                    _curr_x = (
+                        3 + 5 * _index + _x0 + int(0.5 * (1 - _sign)) * (_len + _tzone)
+                    )
+                    data[_curr_x : _curr_x + _width] = _peak
+        cls._data = data
+        cls._x = np.arange(data.size)
+
     def setUp(self):
-        self._n = 120
-        self._outliers_width_one = {7: 2.5, 23: 0.45, 31: 0.6, 56: 1.2, 75: 12}
-        self._outliers_width_two = {12: 1.5, 67: 0.4, 89: 0.6, 105: 3.2}
-        self._data = np.arange(self._n) + 1
-        self._rawdata = self._data.copy()
-        for _key, _factor in self._outliers_width_one.items():
-            self._data[_key] = self._data[_key] * _factor
-        for _key, _factor in self._outliers_width_two.items():
-            self._data[_key] = self._data[_key] * _factor
-            self._data[_key + 1] = self._data[_key + 1] * _factor
+        ...
 
     def tearDown(self):
         ...
 
-    def assert_data_width_one_okay(self, data, threshold):
-        for _index, _factor in self._outliers_width_one.items():
-            _rel_delta = abs(
-                (data[_index] - self._rawdata[_index]) / self._rawdata[_index]
-            )
-            self.assertTrue(_rel_delta <= threshold)
-            if 1 / threshold <= _factor <= threshold:
-                self.assertAlmostEqual(data[_index], self._data[_index])
-
-    def assert_data_width_two_okay(self, data, threshold):
-        for _index, _factor in self._outliers_width_two.items():
-            for _offset in [0, 1]:
-                _rel_delta = abs(
-                    (data[_index + _offset] - self._rawdata[_index + _offset])
-                    / self._rawdata[_index + _offset]
-                )
-                self.assertTrue(_rel_delta <= threshold)
-                if 1 / threshold <= _factor <= threshold:
-                    self.assertAlmostEqual(
-                        data[_index + _offset], self._data[_index + _offset]
+    def find_peak_positions(self, threshold, kernel_width):
+        _peaks = []
+        _len = self._section_length
+        _tzone = self._trans_zone
+        for _width in range(1, 1 + kernel_width):
+            _x0 = (_width - 1) * (2 * _len + 2 * _tzone)
+            for _sign in [1, -1]:
+                for _index, _peak in enumerate(self._peak_heights):
+                    _curr_x = (
+                        3 + 5 * _index + _x0 + int(0.5 * (1 - _sign)) * (_len + _tzone)
                     )
+                    if (
+                        abs((self._data[_curr_x] - _sign) / _sign) >= threshold
+                        or abs((self._data[_curr_x] - _sign) / self._data[_curr_x])
+                        >= threshold
+                    ):
+                        _peaks.append(_curr_x)
+        return _peaks
 
     def test_creation(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
@@ -85,33 +97,59 @@ class TestRemoveOutliers(unittest.TestCase):
         plugin.set_param_value("kernel_width", 1)
         plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
-        self.assert_data_width_one_okay(_newdata, _thresh)
+        _peaks = self.find_peak_positions(_thresh, 1)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
 
-    def test_execute__w_kernel_1_thresh5(self):
-        _thresh = 5
+    def test_execute__w_kernel_1_thresh4(self):
+        _thresh = 4
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
         plugin.set_param_value("kernel_width", 1)
         plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
-        self.assert_data_width_one_okay(_newdata, _thresh)
+        _peaks = self.find_peak_positions(_thresh, 1)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
 
-    def test_execute__w_kernel_2_thresh1(self):
+    def test_execute__w_kernel_1_thresh0p5(self):
+        _thresh = 0.5
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 1)
+        plugin.set_param_value("outlier_threshold", _thresh)
+        _newdata, _ = plugin.execute(self._data.copy())
+        _peaks = self.find_peak_positions(_thresh, 1)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
+
+    def test_execute__w_kernel_2_thresh_1(self):
         _thresh = 1
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
         plugin.set_param_value("kernel_width", 2)
         plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
-        self.assert_data_width_one_okay(_newdata, _thresh)
-        self.assert_data_width_two_okay(_newdata, _thresh)
+        _peaks = self.find_peak_positions(_thresh, 2)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
 
-    def test_execute__w_kernel_2_thresh5(self):
-        _thresh = 5
+    def test_execute__w_kernel_2_thresh_4(self):
+        _thresh = 4
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
         plugin.set_param_value("kernel_width", 2)
         plugin.set_param_value("outlier_threshold", _thresh)
         _newdata, _ = plugin.execute(self._data.copy())
-        self.assert_data_width_one_okay(_newdata, _thresh)
-        self.assert_data_width_two_okay(_newdata, _thresh)
+        _peaks = self.find_peak_positions(_thresh, 2)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
+
+    def test_execute__w_kernel_2_thresh_0p5(self):
+        _thresh = 0.5
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("RemoveOutliers")()
+        plugin.set_param_value("kernel_width", 2)
+        plugin.set_param_value("outlier_threshold", _thresh)
+        _newdata, _ = plugin.execute(self._data.copy())
+        _peaks = self.find_peak_positions(_thresh, 2)
+        for _peak in _peaks:
+            self.assertAlmostEqual(abs(_newdata[_peak]), 1)
 
 
 if __name__ == "__main__":

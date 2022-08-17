@@ -110,7 +110,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)
         self.widgets.append(obj)
         self.assertIsInstance(obj, QtWidgets.QTreeView)
-        self.assertEqual(obj.width(), 493)
+        self.assertEqual(obj.width(), 400)
 
     def test_PluginCollectionTreeWidget__create_tree_model(self):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)

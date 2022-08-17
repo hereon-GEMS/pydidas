@@ -23,7 +23,6 @@ __status__ = "Development"
 
 
 import unittest
-import random
 import copy
 
 import numpy as np
@@ -47,7 +46,7 @@ class TestGenericNode(unittest.TestCase):
         for _depth in range(depth):
             _tiernodes = []
             for _parent in _nodes[_depth]:
-                for _ichild in range(random.randint(1, width)):
+                for _ichild in range(width):
                     _node = GenericNode(node_id=_index)
                     _parent.add_child(_node)
                     _index += 1
@@ -257,6 +256,14 @@ class TestGenericNode(unittest.TestCase):
         _root = _nodes[0][0]
         _child = _root.get_children()[0]
         _child.change_node_parent(_root)
+        self.assertEqual(_child.parent, _root)
+        self.assertTrue(_child in _root.get_children())
+
+    def test_change_node_parent__self_parent(self):
+        _nodes, _, _ = self.create_node_tree(depth=3, width=2)
+        _root = _nodes[0][0]
+        _child = _root.get_children()[0]
+        _child.change_node_parent(_child)
         self.assertEqual(_child.parent, _root)
         self.assertTrue(_child in _root.get_children())
 

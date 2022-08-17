@@ -132,7 +132,7 @@ class GenericNode:
             self._node_id = new_id
             return
         raise TypeError(
-            "The new node_id is not of a correct type and has not" " been set."
+            "The new node_id is not of a correct type and has not been set."
         )
 
     @property
@@ -328,12 +328,14 @@ class GenericNode:
         new_parent : Union[pydidas.workflow.GenericNode, None]
             The new parent of the node.
         """
-        if new_parent == self._parent:
+        if new_parent in [self._parent, self]:
             return
         self._verify_type(new_parent, allowNone=False)
         if new_parent.node_id in self.get_recursive_ids():
             raise UserConfigError(
-                "Cannot change the node parent because the newly selected node is ")
+                "Cannot change the node parent because the new parent node "
+                "is a child of the current node."
+            )
         if self._parent is not None:
             self._parent.remove_child_reference(self)
         new_parent.add_child(self)

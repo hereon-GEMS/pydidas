@@ -24,7 +24,6 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core import UserConfigError
 from pydidas.workflow import GenericTree, GenericNode
 
 
@@ -252,12 +251,70 @@ class TestGenericTree(unittest.TestCase):
         _nodes, _n_nodes = self.create_node_tree(depth=3, width=2)
         tree.register_node(_nodes[0][0])
         _child1 = tree.root.get_children()[0]
+        _id1 = _child1.node_id
         _child2 = tree.root.get_children()[1]
+        _id2 = _child2.node_id
+        _original_ids = set(tree.node_ids)
+        tree.change_node_parent(_child2.node_id, _child1.node_id)
+        _new_ids = set(tree.node_ids)
+        self.assertTrue(tree._tree_changed_flag)
+        self.assertTrue(_child2 in _child1.get_children())
+        self.assertFalse(_child2 in tree.root.get_children())
+        self.assertEqual(_child2.parent, _child1)
+        self.assertEqual(_original_ids, _new_ids)
+        self.assertEqual(_child1.node_id, _id1)
+        self.assertEqual(_child2.node_id, _id2)
+
+    def test_change_node_parent__swap_ids(self):
+        tree = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=3, width=2)
+        tree.register_node(_nodes[0][0])
+        _child1 = tree.root.get_children()[0]
+        _id1 = _child1.node_id
+        _child2 = tree.root.get_children()[1]
+        _id2 = _child2.node_id
+        _original_ids = set(tree.node_ids)
         tree.change_node_parent(_child1.node_id, _child2.node_id)
+        _new_ids = set(tree.node_ids)
         self.assertTrue(tree._tree_changed_flag)
         self.assertTrue(_child1 in _child2.get_children())
         self.assertFalse(_child1 in tree.root.get_children())
         self.assertEqual(_child1.parent, _child2)
+        self.assertEqual(_original_ids, _new_ids)
+        self.assertEqual(_child1.node_id, _id2)
+        self.assertEqual(_child2.node_id, _id1)
+
+    def test_order_node_ids__empty_tree(self):
+        tree = GenericTree()
+        tree.order_node_ids()
+        self.assertIsNone(tree.root)
+
+    def test_order_node_ids__single_node(self):
+        tree = GenericTree()
+        _node = GenericNode()
+        _node.node_id = 12
+        tree.register_node(_node)
+        tree.order_node_ids()
+        self.assertEqual(tree.root, _node)
+        self.assertEqual(tree.root.node_id, 0)
+
+    def test_order_node_ids__full_tree(self):
+        tree = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=3, width=2)
+        tree.register_node(_nodes[0][0])
+        _new_node_ids = []
+        _new_nodes = {}
+        for _id, _node in tree.nodes.items():
+            _new_id = 2 * _id + 67
+            _node.node_id = _new_id
+            _new_nodes[_new_id] = _node
+            _new_node_ids.append(_id)
+        tree.node_ids = _new_node_ids
+        tree.nodes = _new_nodes
+        tree.order_node_ids()
+        for _num, _ in enumerate(tree.node_ids):
+            self.assertTrue(_num in tree.node_ids)
+        self.assertEqual(tree.get_new_nodeid(), len(tree.node_ids))
 
     def test_copy(self):
         _depth = 3

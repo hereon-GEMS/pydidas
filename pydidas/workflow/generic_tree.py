@@ -207,8 +207,7 @@ class GenericTree:
         """
         if len(self.node_ids) == 0:
             return 0
-        i = self.node_ids[-1]
-        return i + 1
+        return max(self.node_ids) + 1
 
     def get_node_by_id(self, node_id):
         """
@@ -264,7 +263,25 @@ class GenericTree:
         """
         _new_parent = self.nodes[new_parent_id]
         self.nodes[node_id].change_node_parent(_new_parent)
+        if new_parent_id > node_id:
+            _active_node = self.nodes[node_id]
+            _active_node.node_id = new_parent_id
+            _new_parent.node_id = node_id
+            self.nodes[new_parent_id] = _active_node
+            self.nodes[node_id] = _new_parent
         self._tree_changed_flag = True
+
+    def order_node_ids(self):
+        """
+        Order the node ids of all of the tree's nodes.
+        """
+        _root = self.root
+        if _root is None:
+            return
+        for _node in self.nodes.values():
+            _node.node_id = None
+        self.clear()
+        self.set_root(_root)
 
     def get_all_leaves(self):
         """

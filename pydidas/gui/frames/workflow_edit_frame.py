@@ -123,6 +123,44 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         TREE.import_from_file(fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
+    def export_state(self):
+        """
+        Export the state of the Frame for saving.
+
+        Returns
+        -------
+        frame_index : int
+            The frame index which can be used as key for referencing the state.
+        information : dict
+            A dictionary with all the information required to export the
+            frame's state.
+        """
+        _params = self.get_param_values_as_dict(filter_types_for_export=True)
+        _widgets = {
+            _key: _w.geometry().getCoords() for _key, _w in self._widgets.items()
+        }
+        return (self.frame_index, {"params": _params, "widgets": _widgets})
+
+    def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        The default implementation in the BaseFrame will update all Parameters
+        (and associated widgets) and restore the visibility of all widgets. If the
+        frame has not yet been built, the state information is only stored internally
+        and not yet applied. It will be applied at the next frame activation.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params' and 'visibility' keys and the respective
+            information for both.
+        """
+        super().restore_state(state)
+        for _key, _coords in state["widgets"].items():
+            self._widgets[_key].setGeometry(*_coords)
+        self.frame_activated(self.frame_index)
+
     @QtCore.Slot(int)
     def frame_activated(self, index):
         """

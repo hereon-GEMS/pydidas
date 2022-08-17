@@ -25,8 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrameBuilder"]
 
-from qtpy import QtWidgets
-
+from ....core.constants import EXP_EXP_POLICY
 from ....widgets import ScrollArea, BaseFrame
 from ....widgets.parameter_config import ConfigurePluginWidget
 from ....widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
@@ -45,7 +44,8 @@ class WorkflowEditFrameBuilder(BaseFrame):
         """
         Create all widgets and initialize their state.
         """
-        self._widgets["workflow_canvas"] = WorkflowTreeCanvas(self)
+        self._widgets["workflow_canvas"] = WorkflowTreeCanvas()
+
         self.create_any_widget(
             "workflow_area",
             ScrollArea,
@@ -63,10 +63,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             minimumHeight=500,
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
-            sizePolicy=(
-                QtWidgets.QSizePolicy.Expanding,
-                QtWidgets.QSizePolicy.Expanding,
-            ),
+            sizePolicy=EXP_EXP_POLICY,
             gridPos=(0, 1, 2, 1),
         )
         self.create_button(

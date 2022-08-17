@@ -63,7 +63,7 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.collection = collection if collection is not None else PLUGIN_COLLECTION
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.setFixedWidth(493)
+        self.setFixedWidth(400)
         self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)

@@ -27,6 +27,7 @@ __all__ = ["ScrollArea"]
 
 from qtpy import QtWidgets
 
+from ..core.constants import EXP_EXP_POLICY
 from .utilities import apply_widget_properties
 
 
@@ -50,10 +51,7 @@ class ScrollArea(QtWidgets.QScrollArea):
         super().__init__(parent)
         kwargs["widgetResizable"] = True
         kwargs["autoFillBackground"] = True
-        kwargs["sizePolicy"] = (
-            QtWidgets.QSizePolicy.Expanding,
-            QtWidgets.QSizePolicy.Expanding,
-        )
+        kwargs["sizePolicy"] = EXP_EXP_POLICY
         kwargs["frameShape"] = QtWidgets.QFrame.NoFrame
         apply_widget_properties(self, **kwargs)
 

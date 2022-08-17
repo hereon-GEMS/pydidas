@@ -127,8 +127,8 @@ class BasePlugin(ObjectWithParameterCollection):
         _desc += (
             f"Class name: {cls.__name__}\n\n"
             f"Plugin type: {ptype[cls.plugin_type]}\n\n"
-            f"Input data dimension: {cls.input_data_dim_str}\n\n"
-            f"Output data dimension: {cls.output_data_dim_str}\n"
+            f"Input data dimension: {cls.input_data_dim_str()}\n\n"
+            f"Output data dimension: {cls.output_data_dim_str()}\n"
         )
         return _desc
 
@@ -158,12 +158,11 @@ class BasePlugin(ObjectWithParameterCollection):
             ),
             "Class name": cls.__name__,
             "Plugin type": ptype[cls.plugin_type],
-            "Input data dimension": cls.input_data_dim_str,
-            "Output data dimension": cls.output_data_dim_str,
+            "Input data dimension": cls.input_data_dim_str(),
+            "Output data dimension": cls.output_data_dim_str(),
         }
 
     @classmethod
-    @property
     def input_data_dim_str(cls):
         """
         Get the input data dimensionality as string.
@@ -179,7 +178,6 @@ class BasePlugin(ObjectWithParameterCollection):
             return str(cls.input_data_dim)
 
     @classmethod
-    @property
     def output_data_dim_str(cls):
         """
         Get the output data dimensionality as string.

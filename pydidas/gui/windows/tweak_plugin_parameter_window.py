@@ -213,6 +213,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         self._central._widgets["plot1d"].addCurve(
             data.axis_ranges[0],
             data.array,
+            replace=True,
             linewidth=1.5,
             legend=label,
             xlabel=_axlabel,
@@ -258,6 +259,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             self._widgets["detailed_results"].update_results(_details, "")
         else:
             self._config["detailed_results"] = None
+            self._widgets["detailed_results"].update_results({}, "")
 
     @QtCore.Slot()
     def run_plugin(self):

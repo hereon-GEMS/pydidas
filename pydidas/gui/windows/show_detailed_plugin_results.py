@@ -38,6 +38,7 @@ class ShowDetailedPluginResults(PydidasWindow):
 
     def __init__(self, parent=None, results=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
+        self._config["n_plots"] = 0
         if results is not None:
             self.update_results(results)
 
@@ -64,6 +65,7 @@ class ShowDetailedPluginResults(PydidasWindow):
         """
         self.__update_title(title)
         _n_plots = results.get("n_plots", 0)
+        self._config["n_plots"] = _n_plots
         self.__prepare_widgets(_n_plots)
         self.__plot_results(results)
 
@@ -138,7 +140,8 @@ class ShowDetailedPluginResults(PydidasWindow):
         """
         _plot_ylabels = results.get("plot_ylabels", {})
         _titles = results.get("plot_titles", {})
-        for _item in results["items"]:
+        self.__clear_plots()
+        for _item in results.get("items", []):
             _i_plot = _item["plot"]
             _label = _item.get("label", "")
             _title = _titles.get(_i_plot, "")
@@ -153,6 +156,15 @@ class ShowDetailedPluginResults(PydidasWindow):
                 self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(1)
                 self._plot2d(_i_plot, _data, _label)
                 self._widgets[f"plot{_i_plot}_2d"].setGraphTitle(_title)
+
+    def __clear_plots(self):
+        """
+        Clear all items from the plots.
+        """
+        _n_plots = self._config["n_plots"]
+        for _index in range(_n_plots):
+            self._widgets[f"plot{_index}_1d"].clear()
+            self._widgets[f"plot{_index}_2d"].clear()
 
     def _plot1d(self, i_plot, data, label, plot_ylabel=None):
         """

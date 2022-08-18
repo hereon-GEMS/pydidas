@@ -37,6 +37,8 @@ Bugfixes:
   diffenent sign (e.g. in background-corrected data).  
 - Fixed an issue with hanging initialization when restoring the GUI state 
   at start-up.
+- Fixed an issue with the WorkflowTree edit canvas not updating correctly 
+  after editing the tree and restoring the previous state.
  
 
 v0.1.9

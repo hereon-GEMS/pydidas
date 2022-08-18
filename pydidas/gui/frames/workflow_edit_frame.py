@@ -207,6 +207,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         super().restore_state(state)
         for _key, _coords in state["widgets"].items():
             self._widgets[_key].setGeometry(*_coords)
+        WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

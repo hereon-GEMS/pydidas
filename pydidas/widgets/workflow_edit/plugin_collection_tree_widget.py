@@ -31,11 +31,12 @@ from qtpy import QtWidgets, QtGui, QtCore
 
 from ...core.constants import QT_STYLES
 from ...plugins import PluginCollection
-
+from ...workflow import WorkflowTree
 from ..utilities import apply_widget_properties
 
 
 PLUGIN_COLLECTION = PluginCollection()
+TREE = WorkflowTree()
 
 
 class PluginCollectionTreeWidget(QtWidgets.QTreeView):
@@ -54,8 +55,10 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         Additional keyword arguments for widget modifications.
     """
 
-    selection_changed = QtCore.Signal(str)
-    selection_confirmed = QtCore.Signal(str)
+    sig_plugin_preselected = QtCore.Signal(str)
+    sig_add_plugin_to_tree = QtCore.Signal(str)
+    sig_append_to_specific_node = QtCore.Signal(int, str)
+    sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, collection=None, **kwargs):
         super().__init__(parent)
@@ -70,10 +73,13 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.header().setStyleSheet(QT_STYLES["title"])
 
         self._update_collection()
-        self.clicked.connect(partial(self.__confirm_selection, self.selection_changed))
-        self.doubleClicked.connect(
-            partial(self.__confirm_selection, self.selection_confirmed)
+        self.clicked.connect(
+            partial(self.__send_signal_with_new_plugin, self.sig_plugin_preselected)
         )
+        self.doubleClicked.connect(
+            partial(self.__send_signal_with_new_plugin, self.sig_add_plugin_to_tree)
+        )
+        self.__create_menu()
 
     @QtCore.Slot()
     def _update_collection(self):
@@ -85,6 +91,86 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.setModel(_model)
         self.expandAll()
         self.setItemDelegate(_TreeviewItemDelegate(_root))
+
+    def __create_menu(self):
+        """
+        Create the custom context menu for adding an replacing nodes.
+        """
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._menu_item_context = QtWidgets.QMenu(self)
+        self.customContextMenuRequested.connect(self._open_context_menu)
+
+        self._actions = {
+            "replace": QtWidgets.QAction("Replace node", self),
+            "append": QtWidgets.QAction("Append to node", self),
+        }
+        self._actions["replace"].triggered.connect(
+            partial(self.__send_signal_with_new_plugin, self.sig_replace_plugin)
+        )
+        self._actions["append"].triggered.connect(
+            partial(self.__send_signal_with_new_plugin, self.sig_add_plugin_to_tree)
+        )
+        self._menu_to_append = QtWidgets.QMenu("Append to specific node", self)
+        self._menu_item_context.addAction(self._actions["replace"])
+        self._menu_item_context.addAction(self._actions["append"])
+        self._menu_item_context.addSeparator()
+        self._menu_item_context.addMenu(self._menu_to_append)
+
+    @QtCore.Slot(QtCore.QPoint)
+    def _open_context_menu(self, point):
+        """
+        Open the context menu after updating the menu entries based on the
+        current WorkflowTree.
+        """
+        self.__update_generic_action_names()
+        self.__update_append_menu()
+        self._menu_item_context.exec(self.viewport().mapToGlobal(point))
+
+    def __update_generic_action_names(self):
+        """
+        Update the generic action names based on the selected active node.
+        """
+        if TREE.active_node_id is None:
+            self._actions["replace"].setEnabled(False)
+            self._actions["replace"].setText("Replace node")
+            self._actions["append"].setText("Add new node")
+        else:
+            self._actions["replace"].setEnabled(True)
+            _node_str = (
+                f"#{TREE.active_node_id:03d} [{TREE.active_node.plugin.plugin_name}]"
+            )
+            self._actions["replace"].setText(f"Replace node {_node_str}")
+            self._actions["append"].setText(f"Append to node {_node_str}")
+
+    def __update_append_menu(self):
+        """
+        Update the menu to append the new node to a specific node.
+        """
+        self._menu_to_append.clear()
+        self._menu_append_actions = {}
+        for _id in TREE.node_ids:
+            _name = f"#{_id:03d} [{TREE.nodes[_id].plugin.plugin_name}]"
+            self._menu_append_actions[_id] = QtWidgets.QAction(
+                f"Append to node {_name}"
+            )
+            self._menu_to_append.addAction(self._menu_append_actions[_id])
+            self._menu_append_actions[_id].triggered.connect(
+                partial(self._emit_append_to_specific_node_signal, _id)
+            )
+
+    @QtCore.Slot(int)
+    def _emit_append_to_specific_node_signal(self, node_id):
+        """
+        Emit the signal to append the node to a specific node.
+
+        Parameters
+        ----------
+        node_id : int
+            The Node id.
+        """
+        _index = self.selectedIndexes()[0]
+        _name = self.model().itemFromIndex(_index).text()
+        self.sig_append_to_specific_node.emit(node_id, _name)
 
     def __create_tree_model(self):
         """
@@ -117,7 +203,7 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         root_node.appendRow(output_plugins)
         return root_node, tree_model
 
-    def __confirm_selection(self, signal):
+    def __send_signal_with_new_plugin(self, signal):
         """
         Confirm the selection and emit a signal with the name of the selection.
 

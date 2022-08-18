@@ -21,6 +21,8 @@ Improvements
   user-defined node label has been set.
 - The active node is now handled by the Tree itself to have consistent and
   up to date behaviour for all consumers.
+- Added a context menu in the PluginCollectionBrowser to replace plugins and 
+  add them to the Workflow at designated positions.
 
 Bugfixes:
 ---------
@@ -33,7 +35,9 @@ Bugfixes:
   plugin.
 - Fixed an issue with RemoveOutlierPlugin which did not dectect peaks of 
   diffenent sign (e.g. in background-corrected data).  
-  
+- Fixed an issue with hanging initialization when restoring the GUI state 
+  at start-up.
+ 
 
 v0.1.9
 ======

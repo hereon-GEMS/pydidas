@@ -76,7 +76,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
     def tree_click_test(self, double):
         obj = PluginCollectionTreeWidget(None, collection=self.pcoll)
         self.widgets.append(obj)
-        spy = QtTest.QSignalSpy(obj.selection_changed)
+        spy = QtTest.QSignalSpy(obj.sig_plugin_preselected)
         self.click_index(obj, double)
         _index = obj.selectedIndexes()[0]
         _name = obj.model().itemFromIndex(_index).text()
@@ -136,7 +136,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
     def test_PluginCollectionBrowser_confirm_selection(self):
         obj = PluginCollectionBrowser(None, collection=self.pcoll)
         self.widgets.append(obj)
-        spy = QtTest.QSignalSpy(obj.selection_confirmed)
+        spy = QtTest.QSignalSpy(obj.sig_add_plugin_to_tree)
         _item = self.click_index(obj._widgets["plugin_treeview"], double=True)
         self.assertEqual(len(spy), 1)
         self.assertEqual(spy[0][0], _item.text())

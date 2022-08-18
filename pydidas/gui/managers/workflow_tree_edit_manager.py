@@ -93,7 +93,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if qt_canvas:
             self.qt_canvas = qt_canvas
 
-    def add_new_plugin_node(self, name, title=None):
+    def add_new_plugin_node(self, name, title=None, parent_node_id=None):
         """
         Add a new plugin node to the workflow.
 
@@ -112,6 +112,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         title : str, optional
             The title of the plugin widget. If None, this will default to the
             widget name. The default is None.
+        parent_node : Union[int, None], optional
+            The id of the parent node, if given. If None, this will default to the
+            WorkflowTree's active node.
 
         Raises
         ------
@@ -123,7 +126,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         # Check if no node is active but the TREE already has nodes.
         # If True, pydidas will select the last node as active to append the new
         # node.
-        _parent = TREE.active_node
+        _parent = (
+            TREE.active_node if parent_node_id is None else TREE.nodes[parent_node_id]
+        )
         TREE.create_and_add_node(_plugin, parent=_parent)
         _node_id = TREE.active_node_id
         self.__create_position_node(_node_id)

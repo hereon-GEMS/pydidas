@@ -24,14 +24,18 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrame"]
 
+from functools import partial
+
 from qtpy import QtCore, QtWidgets
 
+from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
 from ..managers import WorkflowTreeEditManager
 from .builders import WorkflowEditFrameBuilder
 
 TREE = WorkflowTree()
+PLUGIN_COLLECTION = PluginCollection()
 WORKFLOW_EDIT_MANAGER = WorkflowTreeEditManager()
 
 
@@ -56,8 +60,14 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         Connect all signals and slots in the frame.
         """
-        self._widgets["plugin_collection"].selection_confirmed.connect(
-            self.workflow_add_plugin
+        self._widgets["plugin_collection"].sig_add_plugin_to_tree.connect(
+            partial(self.workflow_add_plugin_at_parent, -1)
+        )
+        self._widgets["plugin_collection"].sig_replace_plugin.connect(
+            self.workflow_replace_plugin
+        )
+        self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
+            self.workflow_add_plugin_at_parent
         )
         WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
@@ -76,6 +86,41 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             The name of the new Plugin.
         """
         WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name)
+
+    @QtCore.Slot(str)
+    def workflow_replace_plugin(self, plugin_name):
+        """
+        Get the signal that the active node's Plugin should be replaced by a new
+        Plugin class.
+
+        Parameters
+        ----------
+        plugin_name : str
+            The name of the new Plugin.
+        """
+        _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(plugin_name)()
+        TREE.active_node.plugin = _plugin
+        self.configure_plugin(TREE.active_node_id)
+        WORKFLOW_EDIT_MANAGER._node_widgets[TREE.active_node_id].setText(plugin_name)
+
+    @QtCore.Slot(int, str)
+    def workflow_add_plugin_at_parent(self, parent_id, name):
+        """
+        Get the signal that a new Plugin has been selected and must be added
+        to the WorkflowTree and forward it to the WorkflowTreeEditManager.
+
+        Parameters
+        ----------
+        parent_id : int
+            The parent node id. Because of Qt's slot signature, a -1 is used for
+            no parent. If -1, the node will be added to the WorkflowTree's
+            active node.
+        name : str
+            The name of the new Plugin.
+        """
+        if parent_id == -1:
+            parent_id = None
+        WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name, parent_node_id=parent_id)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id):
@@ -162,7 +207,6 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         super().restore_state(state)
         for _key, _coords in state["widgets"].items():
             self._widgets[_key].setGeometry(*_coords)
-        self.frame_activated(self.frame_index)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

@@ -54,7 +54,9 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         The default is None.
     """
 
-    selection_confirmed = QtCore.Signal(str)
+    sig_add_plugin_to_tree = QtCore.Signal(str)
+    sig_append_to_specific_node = QtCore.Signal(int, str)
+    sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
@@ -76,11 +78,18 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         _layout.addWidget(self._widgets["plugin_description"])
         self.setLayout(_layout)
 
-        self._widgets["plugin_treeview"].selection_changed.connect(
+        self._widgets["plugin_treeview"].sig_plugin_preselected.connect(
             self.__display_plugin_description
         )
-        self._widgets["plugin_treeview"].selection_confirmed.connect(
+        self._widgets["plugin_treeview"].sig_add_plugin_to_tree.connect(
             self.__confirm_selection
+        )
+
+        self._widgets["plugin_treeview"].sig_replace_plugin.connect(
+            self.sig_replace_plugin
+        )
+        self._widgets["plugin_treeview"].sig_append_to_specific_node.connect(
+            self.sig_append_to_specific_node
         )
         self.collection.sig_updated_plugins.connect(
             self._widgets["plugin_treeview"]._update_collection
@@ -98,7 +107,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         """
         if name in ["Input plugins", "Processing plugins", "Output plugins"]:
             return
-        self.selection_confirmed.emit(name)
+        self.sig_add_plugin_to_tree.emit(name)
 
     @QtCore.Slot(str)
     def __display_plugin_description(self, name):

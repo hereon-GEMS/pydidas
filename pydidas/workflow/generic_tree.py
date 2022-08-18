@@ -117,7 +117,6 @@ class GenericTree:
             )
         self._config["active_node_id"] = new_id
 
-
     def reset_tree_changed_flag(self):
         """
         Reset the "has changed" flag for this Tree.
@@ -209,7 +208,7 @@ class GenericTree:
             node.node_id = node_id
         self.node_ids.append(node.node_id)
         self.nodes[node.node_id] = node
-        self.active_node_id = node.node_id
+        self._config["active_node_id"] = node.node_id
         for _child in node.get_children():
             self.register_node(_child, _child.node_id, check_ids=False)
         self._config["tree_changed"] = True
@@ -295,14 +294,19 @@ class GenericTree:
             Keyword to toggle deletion of the node's children as well.
             The default is True.
         """
-        _parent_id = None if self.nodes[node_id].parent is None else self.nodes[node_id].parent.node_id
-        ids = self.nodes[node_id].get_recursive_ids()
+        _subtree_ids = self.nodes[node_id].get_recursive_ids()
+        if self.active_node_id in _subtree_ids:
+            _parent_id = (
+                None
+                if self.nodes[node_id].parent is None
+                else self.nodes[node_id].parent.node_id
+            )
+            self.active_node_id = _parent_id
         self.nodes[node_id].remove_node_from_tree(recursive=recursive)
-        for _id in ids:
+        for _id in _subtree_ids:
             del self.nodes[_id]
             self.node_ids.remove(_id)
         self._config["tree_changed"] = True
-        self.active_node_id = _parent_id
 
     def change_node_parent(self, node_id, new_parent_id):
         """

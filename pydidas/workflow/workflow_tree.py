@@ -129,7 +129,7 @@ class _WorkflowTree(GenericTree):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin chain.
         """
-        if (not self._preexecuted) or self._tree_changed_flag:
+        if (not self._preexecuted) or self.tree_has_changed:
             self.prepare_execution()
         self.root.execute_plugin_chain(arg, global_index=arg, **kwargs)
 
@@ -188,7 +188,7 @@ class _WorkflowTree(GenericTree):
         _new_tree = WorkflowTreeIoMeta.import_from_file(filename)
         for _att in ["root", "node_ids", "nodes"]:
             setattr(self, _att, getattr(_new_tree, _att))
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
 
     def export_to_file(self, filename, **kwargs):
         """
@@ -230,7 +230,7 @@ class _WorkflowTree(GenericTree):
         except SyntaxError:
             _nodes = []
         self.restore_from_list_of_nodes(_nodes)
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
 
     def restore_from_list_of_nodes(self, list_of_nodes):
         """
@@ -261,7 +261,7 @@ class _WorkflowTree(GenericTree):
             self.set_root(_new_nodes[0])
         else:
             self.clear()
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
 
     def get_all_result_shapes(self, force_update=False):
         """
@@ -288,7 +288,7 @@ class _WorkflowTree(GenericTree):
             raise UserConfigError("The WorkflowTree has no nodes.")
         _nodes_w_results = self.get_all_nodes_with_results()
         _shapes = [_node.result_shape for _node in _nodes_w_results]
-        if None in _shapes or self._tree_changed_flag or force_update:
+        if None in _shapes or self.tree_has_changed or force_update:
             self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
         _shapes = {
@@ -339,10 +339,6 @@ class _WorkflowTree(GenericTree):
         dict
             The dictionary with the metadata.
         """
-        _shapes = [_node.result_shape for _node in self.nodes.values()]
-        if None in _shapes or self._tree_changed_flag or force_update:
-            self.root.propagate_shapes_and_global_config()
-            self.reset_tree_changed_flag()
         _meta = {
             "shapes": {},
             "labels": {},
@@ -350,6 +346,12 @@ class _WorkflowTree(GenericTree):
             "data_labels": {},
             "result_titles": {},
         }
+        if self.root is None:
+            return _meta
+        _shapes = [_node.result_shape for _node in self.nodes.values()]
+        if None in _shapes or self.tree_has_changed or force_update:
+            self.root.propagate_shapes_and_global_config()
+            self.reset_tree_changed_flag()
         for _node_id, _node in self.nodes.items():
             _label = _node.plugin.get_param_value("label")
             _plugin_name = _node.plugin.__class__.plugin_name

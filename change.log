@@ -10,12 +10,17 @@ Major changes:
   plugin has been removed.
 - Added functionality to run selected 1d-processing plugins (FitSinglePeak,
   Remove1dPolynomialBackground) with multidimensional input data.
+- Added functionality to re-order WorkflowTrees on the fly.
+- Added functionality to re-order WorkflowTrees using drag & drop in the 
+  graphical user interface.
 
 Improvements
 ------------
 - Moved all frames and framebuilders to subpackage in gui package.
 - Added the plugin names to the node result titles in case that no
   user-defined node label has been set.
+- The active node is now handled by the Tree itself to have consistent and
+  up to date behaviour for all consumers.
 
 Bugfixes:
 ---------
@@ -26,6 +31,8 @@ Bugfixes:
   data (e.g. 2d-integration with only one azimuthal value).
 - Fixed an issue with azimuthal units in radians in the pyFAI 2d integration
   plugin.
+- Fixed an issue with RemoveOutlierPlugin which did not dectect peaks of 
+  diffenent sign (e.g. in background-corrected data).  
   
 
 v0.1.9

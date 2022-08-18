@@ -367,7 +367,7 @@ class TestWorkflowTree(unittest.TestCase):
         self.tree.create_and_add_node(unittest_objects.DummyProc())
         _meta = self.tree.get_complete_plugin_metadata()
         self.tree.nodes[1]._result_shape = _shape
-        self.tree._tree_changed_flag = True
+        self.tree._config["tree_changed"] = True
         _meta_new = self.tree.get_complete_plugin_metadata()
         self.assertEqual(_meta_new["shapes"][1], _meta["shapes"][1])
 

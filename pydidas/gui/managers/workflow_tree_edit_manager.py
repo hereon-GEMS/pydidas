@@ -71,7 +71,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         super().__init__()
         self.root = None
         self.qt_canvas = qt_canvas
-        self.active_node_id = None
         self._node_positions = {}
         self._node_widgets = {}
         self._nodes = {}
@@ -124,16 +123,14 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         # Check if no node is active but the TREE already has nodes.
         # If True, pydidas will select the last node as active to append the new
         # node.
-        if self.active_node_id is None and len(TREE.node_ids) > 0:
-            self.active_node_id = TREE.node_ids[-1]
-        _parent = TREE.nodes.get(self.active_node_id, None)
+        _parent = TREE.active_node
         TREE.create_and_add_node(_plugin, parent=_parent)
-        _node_id = TREE.node_ids[-1]
+        _node_id = TREE.active_node_id
         self.__create_position_node(_node_id)
         self.__create_widget(title if title else name, _node_id)
-        self.set_active_node(_node_id)
+        self.set_active_node(_node_id, force_update=True)
         if not self.qt_canvas:
-            raise Warning("No QtCanvas defined. Nodes added but cannot be " "displayed")
+            raise Warning("No QtCanvas defined. Nodes added but cannot be displayed")
         self.update_node_positions()
 
     def __create_position_node(self, node_id):
@@ -145,7 +142,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         node_id : int
             The node ID.
         """
-        _parent = self._nodes.get(self.active_node_id, None)
+        _parent_id = (
+            None
+            if TREE.nodes[node_id].parent is None
+            else TREE.nodes[node_id].parent.node_id
+        )
+        _parent = None if _parent_id is None else self._nodes.get(_parent_id, None)
         _node = PluginPositionNode(parent=_parent, node_id=node_id)
         self._nodes[node_id] = _node
         if self.root is None:
@@ -195,11 +197,11 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         if node_id not in self._nodes.keys():
             return
-        if node_id == self.active_node_id and not force_update:
+        if node_id == TREE.active_node_id and not force_update:
             return
         for nid in self._node_widgets:
             self._node_widgets[nid].widget_select(node_id == nid)
-        self.active_node_id = node_id
+        TREE.active_node_id = node_id
         self.plugin_to_edit.emit(node_id)
 
     @QtCore.Slot(int, str)
@@ -299,20 +301,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             Flag to toggle resetting the active node. After loading a
             WorkflowTree from file, this can be used to reset the selection.
         """
-        _stored_active_node = self.active_node_id
         self.__delete_all_nodes_and_widgets()
         for _node_id, _node in TREE.nodes.items():
             name = _node.plugin.plugin_name
-            self.active_node_id = _node.parent_id
             self.__create_position_node(_node_id)
             self.__create_widget(name, _node_id)
         self.update_node_positions()
         if reset_active_node:
-            self.active_node_id = None
             self.plugin_to_edit.emit(-1)
             return
-        self.active_node_id = _stored_active_node
-        self.set_active_node(_stored_active_node, force_update=True)
+        self.set_active_node(TREE.active_node_id, force_update=True)
 
     def __delete_all_nodes_and_widgets(self):
         """
@@ -341,7 +339,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.__delete_nodes_and_widgets(_ids)
         self.plugin_to_delete.emit(node_id)
         if len(TREE.node_ids) > 0:
-            self.set_active_node(TREE.node_ids[-1])
+            self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
         else:
             self.plugin_to_edit.emit(-1)
@@ -365,7 +363,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             del self._node_positions[_id]
         if len(self._nodes) == 0:
             self.root = None
-            self.active_node_id = None
             self.qt_canvas.update_widget_connections([])
 
 

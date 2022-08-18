@@ -51,8 +51,7 @@ class GenericTree:
         self.root = None
         self.node_ids = []
         self.nodes = {}
-        self._config = kwargs if kwargs else {}
-        self._tree_changed_flag = False
+        self._config = {"tree_changed": False, "active_node_id": None} | kwargs
         self._starthash = hash((get_random_string(12), time.time()))
 
     @property
@@ -66,13 +65,64 @@ class GenericTree:
         bool
             The has changed flag.
         """
-        return self._tree_changed_flag
+        return self._config["tree_changed"]
+
+    @property
+    def active_node(self):
+        """
+        Get the active node.
+
+        If no node has been selected or the tree is empty, None will be returned.
+
+        Returns
+        -------
+        Union[pydidas.workflow.GenericNode, None]
+            The active node.
+        """
+        if self.active_node_id is None or self.root is None:
+            return None
+        return self.nodes[self.active_node_id]
+
+    @property
+    def active_node_id(self):
+        """
+        Get the active node ID
+
+        Returns
+        -------
+        Union[int, None]
+            The id of the active node.
+        """
+        return self._config["active_node_id"]
+
+    @active_node_id.setter
+    def active_node_id(self, new_id):
+        """
+        Set the active node ID.
+
+        Parameters
+        ----------
+        new_id : Union[None, int]
+            Set the active node property of the tree. The new node id must be either
+            None or included in the tree's ids.
+
+        Raises
+        ------
+        ValueError
+            If new_id is not inluded in the tree's node ids.
+        """
+        if not (new_id is None or new_id in self.node_ids):
+            raise ValueError(
+                f"The given node ID '{new_id}' is not included in the stored node ids."
+            )
+        self._config["active_node_id"] = new_id
+
 
     def reset_tree_changed_flag(self):
         """
         Reset the "has changed" flag for this Tree.
         """
-        self._tree_changed_flag = False
+        self._config["tree_changed"] = False
 
     def set_root(self, node):
         """
@@ -118,6 +168,7 @@ class GenericTree:
         """
         self.nodes = {}
         self.node_ids = []
+        self._config["active_node_id"] = None
         self.root = None
 
     def register_node(self, node, node_id=None, check_ids=True):
@@ -158,9 +209,10 @@ class GenericTree:
             node.node_id = node_id
         self.node_ids.append(node.node_id)
         self.nodes[node.node_id] = node
+        self.active_node_id = node.node_id
         for _child in node.get_children():
             self.register_node(_child, _child.node_id, check_ids=False)
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
 
     def _check_node_ids(self, node_ids):
         """
@@ -243,12 +295,14 @@ class GenericTree:
             Keyword to toggle deletion of the node's children as well.
             The default is True.
         """
+        _parent_id = None if self.nodes[node_id].parent is None else self.nodes[node_id].parent.node_id
         ids = self.nodes[node_id].get_recursive_ids()
         self.nodes[node_id].remove_node_from_tree(recursive=recursive)
         for _id in ids:
             del self.nodes[_id]
             self.node_ids.remove(_id)
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
+        self.active_node_id = _parent_id
 
     def change_node_parent(self, node_id, new_parent_id):
         """
@@ -269,7 +323,7 @@ class GenericTree:
             _new_parent.node_id = node_id
             self.nodes[new_parent_id] = _active_node
             self.nodes[node_id] = _new_parent
-        self._tree_changed_flag = True
+        self._config["tree_changed"] = True
 
     def order_node_ids(self):
         """

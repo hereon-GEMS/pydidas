@@ -100,6 +100,25 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(node.parent, None)
         self.assertTrue(child in tree.nodes.values())
 
+    def test_active_node_setter__none(self):
+        tree = GenericTree()
+        tree._config["active_node"] = 1
+        tree.active_node_id = None
+        self.assertIsNone(tree.active_node_id)
+
+    def test_active_node_setter__wrong_id(self):
+        tree = GenericTree()
+        with self.assertRaises(ValueError):
+            tree.active_node_id = 12
+
+    def test_active_node_setter__correct_id(self):
+        tree = GenericTree()
+        _nodes, _n_nodes = self.create_node_tree(depth=3, width=2)
+        tree.register_node(_nodes[0][0])
+        _id = tree.node_ids[-1]
+        tree.active_node_id = _id
+        self.assertEqual(_id, tree.active_node_id)
+
     def test_get_new_nodeid__empty_tree(self):
         tree = GenericTree()
         self.assertEqual(tree.get_new_nodeid(), 0)
@@ -160,12 +179,14 @@ class TestGenericTree(unittest.TestCase):
         node = GenericNode()
         tree.register_node(node)
         self.assertTrue(node in tree.nodes.values())
+        self.assertEqual(tree.active_node_id, tree.node_ids[-1])
 
     def test_register_node__with_new_nodeid(self):
         tree = GenericTree()
         node = GenericNode()
         tree.register_node(node, node_id=3)
         self.assertTrue(node in tree.nodes.values())
+        self.assertEqual(tree.active_node_id, tree.node_ids[-1])
 
     def test_register_node__node_tree_with_new_nodeid(self):
         tree = GenericTree()
@@ -175,6 +196,7 @@ class TestGenericTree(unittest.TestCase):
         tree.register_node(node, node_id=3)
         for _node in [node, node2, node3]:
             self.assertTrue(_node in tree.nodes.values())
+        self.assertEqual(tree.active_node_id, tree.node_ids[-1])
 
     def test_register_node__node_tree_with_existing_nodeids(self):
         tree = GenericTree()
@@ -184,9 +206,7 @@ class TestGenericTree(unittest.TestCase):
         tree.register_node(node, node_id=3)
         for _node in [node, node2, node3]:
             self.assertTrue(_node in tree.nodes.values())
-        tree = GenericTree()
-        node = GenericNode(node_id=7)
-        node2 = GenericNode(parent=node, node_id=6)
+        self.assertEqual(tree.active_node_id, tree.node_ids[-1])
 
     def test_get_node_by_id(self):
         _id = 3
@@ -257,7 +277,7 @@ class TestGenericTree(unittest.TestCase):
         _original_ids = set(tree.node_ids)
         tree.change_node_parent(_child2.node_id, _child1.node_id)
         _new_ids = set(tree.node_ids)
-        self.assertTrue(tree._tree_changed_flag)
+        self.assertTrue(tree.tree_has_changed)
         self.assertTrue(_child2 in _child1.get_children())
         self.assertFalse(_child2 in tree.root.get_children())
         self.assertEqual(_child2.parent, _child1)
@@ -276,7 +296,7 @@ class TestGenericTree(unittest.TestCase):
         _original_ids = set(tree.node_ids)
         tree.change_node_parent(_child1.node_id, _child2.node_id)
         _new_ids = set(tree.node_ids)
-        self.assertTrue(tree._tree_changed_flag)
+        self.assertTrue(tree.tree_has_changed)
         self.assertTrue(_child1 in _child2.get_children())
         self.assertFalse(_child1 in tree.root.get_children())
         self.assertEqual(_child1.parent, _child2)
@@ -308,9 +328,10 @@ class TestGenericTree(unittest.TestCase):
             _new_id = 2 * _id + 67
             _node.node_id = _new_id
             _new_nodes[_new_id] = _node
-            _new_node_ids.append(_id)
+            _new_node_ids.append(_new_id)
         tree.node_ids = _new_node_ids
         tree.nodes = _new_nodes
+        tree.active_node_id = 2 * tree.active_node_id + 67
         tree.order_node_ids()
         for _num, _ in enumerate(tree.node_ids):
             self.assertTrue(_num in tree.node_ids)

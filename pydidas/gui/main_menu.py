@@ -463,11 +463,9 @@ class MainMenu(QtWidgets.QMainWindow):
             filename = self._get_standard_state_filename()
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
-        self.setUpdatesEnabled(False)
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
-        self.setUpdatesEnabled(True)
 
     def _get_standard_state_filename(self):
         """

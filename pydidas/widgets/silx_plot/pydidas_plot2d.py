@@ -28,6 +28,7 @@ from qtpy import QtCore
 from silx.gui.plot import Plot2D
 
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
+from .coordinate_transform_button import CoordinateTransformButton
 
 
 class PydidasPlot2D(Plot2D):
@@ -59,5 +60,8 @@ class PydidasPlot2D(Plot2D):
         self._toolbar.insertAction(
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
+
+        self.cs_transform_action = CoordinateTransformButton(parent=self, plot=self)
+        self._toolbar.addWidget(self.cs_transform_action)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)

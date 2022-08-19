@@ -22,58 +22,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["create_silx_plot_stack", "get_2d_silx_plot_ax_settings"]
+__all__ = ["get_2d_silx_plot_ax_settings", "get_pydidas_qt_icon"]
 
-from qtpy import QtWidgets
+import os
 
-from .pydidas_plot1d import PydidasPlot1D
-from .pydidas_plot2d import PydidasPlot2D
-from ...core.constants import (
-    EXP_EXP_POLICY,
-)
+from qtpy import QtGui
 
-
-def create_silx_plot_stack(frame, gridPos=None):
-    """
-    Create a QStackedWidget with 1D and 2D plot widgets in the input frame.
-
-
-    Parameters
-    ----------
-    frame : pydidas.core.BaseFrame
-        The input frame.
-    gridPos : Union[tuple, None], optional
-        The gridPos for the new widget. The default is None.
-
-    Returns
-    -------
-    frame : pydidas.core.BaseFrame
-        The updated frame.
-    """
-    frame._widgets["plot1d"] = PydidasPlot1D()
-    frame._widgets["plot2d"] = PydidasPlot2D()
-    frame.add_any_widget(
-        "plot_stack",
-        QtWidgets.QStackedWidget(),
-        alignment=None,
-        gridPos=gridPos,
-        visible=True,
-        stretch=(1, 1),
-        sizePolicy=EXP_EXP_POLICY,
-    )
-    frame._widgets["plot_stack"].addWidget(frame._widgets["plot1d"])
-    frame._widgets["plot_stack"].addWidget(frame._widgets["plot2d"])
+from ...core.utils import get_pydidas_icon_path
 
 
 def get_2d_silx_plot_ax_settings(axis):
     """
     Get the axis settings to have pixels centered at their values.
-
     Parameters
     ----------
     axis : np.ndarray
         The numpy array with the axis positions.
-
     Returns
     -------
     _origin : float
@@ -86,3 +50,21 @@ def get_2d_silx_plot_ax_settings(axis):
     _scale = (axis[-1] - axis[0] + _delta) / axis.size
     _origin = axis[0] - _delta / 2
     return _origin, _scale
+
+
+def get_pydidas_qt_icon(filename):
+    """
+    Get the QIcon from the file with the given name.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the image. Only the filename in the pydidas icon path is
+        needed.
+
+    Returns
+    -------
+    QtGui.QIcon
+        The QIcon created from the image file.
+    """
+    return QtGui.QIcon(os.path.join(get_pydidas_icon_path(), filename))

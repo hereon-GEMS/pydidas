@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .factory import *
 from .pydidas_plot1d import *
 from .pydidas_plot2d import *
 from .silx_actions import *
@@ -32,6 +33,11 @@ from .utilities import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import factory
+
+__all__.extend(factory.__all__)
+del factory
+
 from . import pydidas_plot1d
 
 __all__.extend(pydidas_plot1d.__all__)

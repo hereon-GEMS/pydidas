@@ -24,16 +24,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ChangeCanvasToData", "ExpandCanvas", "CropHistogramOutliers"]
 
-import os
 
 import numpy as np
 import silx.gui.plot
-from qtpy import QtGui
 from silx.gui.plot.actions import PlotAction
 from silx.gui.plot.actions.control import ResetZoomAction
 
-from ...core.utils import get_pydidas_icon_path
 from ...core import PydidasQsettingsMixin
+from .utilities import get_pydidas_qt_icon
 
 
 class ChangeCanvasToData(PlotAction):
@@ -46,9 +44,7 @@ class ChangeCanvasToData(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=QtGui.QIcon(
-                os.path.join(get_pydidas_icon_path(), "silx_limit_plot_canvas.png")
-            ),
+            icon=get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
             text="Change Canvas to data shape",
             tooltip="Change the canvas shape to match the data aspect ratio.",
             triggered=self._actionTriggered,
@@ -83,9 +79,7 @@ class ExpandCanvas(ResetZoomAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=QtGui.QIcon(
-                os.path.join(get_pydidas_icon_path(), "silx_expand_plot_canvas.png")
-            ),
+            icon=get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
             text="Maximize canvas size",
             tooltip="Maximize the canvas size.",
             triggered=self._actionTriggered,
@@ -118,9 +112,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PlotAction.__init__(
             self,
             plot,
-            icon=QtGui.QIcon(
-                os.path.join(get_pydidas_icon_path(), "silx_crop_histogram.png")
-            ),
+            icon=get_pydidas_qt_icon("silx_crop_histogram.png"),
             text="Crop histogram outliers",
             tooltip="Crop the upper histogram outliers",
             triggered=self._actionTriggered,

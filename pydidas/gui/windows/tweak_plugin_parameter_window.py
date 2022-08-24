@@ -48,6 +48,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
     show_frame = False
     sig_closed = QtCore.Signal()
     sig_new_params = QtCore.Signal(int)
+    sig_this_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
         QtWidgets.QMainWindow.__init__(self)

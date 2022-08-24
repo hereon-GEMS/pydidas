@@ -52,7 +52,10 @@ def gui_excepthook(exc_type, exception, trace):
         The trace of where the exception occured.
     """
     if exc_type is UserConfigError:
-        _exc_repr = repr(exception).split("'")[1]
+        # need to select the splitting char explicitly because used ' and " chars
+        # will alter the representation.
+        _split_char = repr(exception)[16]
+        _exc_repr = repr(exception).split(_split_char)[1]
         _ = UserConfigErrorMessageBox(text=_exc_repr).exec_()
         return
     with StringIO() as _tmpfile:

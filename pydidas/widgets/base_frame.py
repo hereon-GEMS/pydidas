@@ -67,6 +67,7 @@ class BaseFrame(
     params_not_to_restore = []
     status_msg = QtCore.Signal(str)
     sig_closed = QtCore.Signal()
+    sig_this_frame_activated = QtCore.Signal()
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
@@ -115,6 +116,7 @@ class BaseFrame(
         if "state" in self._config:
             _state = self._config.pop("state")
             self.restore_state(_state)
+        self.sig_this_frame_activated.emit()
 
     def build_frame(self):
         """

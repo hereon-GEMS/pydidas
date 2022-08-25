@@ -37,6 +37,7 @@ from .get_logging_dir_ import *
 from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
+from .math_utils import *
 from .rebin_ import *
 from .set_default_plugin_dir_ import *
 from .show_busy_mouse import *
@@ -102,6 +103,11 @@ from . import logger_
 
 __all__.extend(logger_.__all__)
 del logger_
+
+from . import math_utils
+
+__all__.extend(math_utils.__all__)
+del math_utils
 
 from . import rebin_
 

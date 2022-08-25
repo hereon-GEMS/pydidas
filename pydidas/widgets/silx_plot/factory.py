@@ -24,6 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["create_silx_plot_stack"]
 
+from functools import partial
+
 from qtpy import QtWidgets
 
 from ...core.constants import EXP_EXP_POLICY
@@ -50,6 +52,14 @@ def create_silx_plot_stack(frame, gridPos=None):
     """
     frame._widgets["plot1d"] = PydidasPlot1D()
     frame._widgets["plot2d"] = PydidasPlot2D()
+    if hasattr(frame, "sig_this_frame_activated"):
+        frame.sig_this_frame_activated.connect(
+            partial(frame._widgets["plot2d"].cs_transform.check_detector_is_set, True)
+        )
+    if hasattr(frame, "sig_this_frame_activated"):
+        frame.sig_this_frame_activated.connect(
+            frame._widgets["plot2d"].cs_transform.set_beam_center_from_exp_setup
+        )
     frame.add_any_widget(
         "plot_stack",
         QtWidgets.QStackedWidget(),

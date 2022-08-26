@@ -58,7 +58,7 @@ def create_silx_plot_stack(frame, gridPos=None):
         )
     if hasattr(frame, "sig_this_frame_activated"):
         frame.sig_this_frame_activated.connect(
-            frame._widgets["plot2d"].cs_transform.set_beam_center_from_exp_setup
+            frame._widgets["plot2d"]._positionWidget.update_exp_setup_params
         )
     frame.add_any_widget(
         "plot_stack",

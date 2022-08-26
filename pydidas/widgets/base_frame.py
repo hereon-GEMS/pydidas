@@ -116,7 +116,8 @@ class BaseFrame(
         if "state" in self._config:
             _state = self._config.pop("state")
             self.restore_state(_state)
-        self.sig_this_frame_activated.emit()
+        if index == self.frame_index:
+            self.sig_this_frame_activated.emit()
 
     def build_frame(self):
         """

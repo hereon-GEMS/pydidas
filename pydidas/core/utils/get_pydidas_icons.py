@@ -29,6 +29,7 @@ __all__ = [
     "get_pydidas_icon_w_bg",
     "get_pydidas_error_icon",
     "get_pydidas_error_icon_w_bg",
+    "get_pydidas_qt_icon",
 ]
 
 import os
@@ -116,3 +117,21 @@ def get_pydidas_error_icon_w_bg():
     _logopath = os.path.join(get_pydidas_icon_path(), "pydidas_error_w_bg.svg")
     _icon = QtGui.QIcon(_logopath)
     return _icon
+
+
+def get_pydidas_qt_icon(filename):
+    """
+    Get the QIcon from the file with the given name.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the image. Only the filename in the pydidas icon path is
+        needed.
+
+    Returns
+    -------
+    QtGui.QIcon
+        The QIcon created from the image file.
+    """
+    return QtGui.QIcon(os.path.join(get_pydidas_icon_path(), filename))

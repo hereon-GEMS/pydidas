@@ -28,10 +28,8 @@ __all__ = ["ChangeCanvasToData", "ExpandCanvas", "CropHistogramOutliers"]
 import numpy as np
 import silx.gui.plot
 from silx.gui.plot.actions import PlotAction
-from silx.gui.plot.actions.control import ResetZoomAction
 
-from ...core import PydidasQsettingsMixin
-from .utilities import get_pydidas_qt_icon
+from ...core import PydidasQsettingsMixin, utils
 
 
 class ChangeCanvasToData(PlotAction):
@@ -44,7 +42,7 @@ class ChangeCanvasToData(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
+            icon=utils.get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
             text="Change Canvas to data shape",
             tooltip="Change the canvas shape to match the data aspect ratio.",
             triggered=self._actionTriggered,
@@ -53,7 +51,14 @@ class ChangeCanvasToData(PlotAction):
         )
 
     def _actionTriggered(self, checked=False):
+        """
+        Trigger the "change canvas to data" action.
 
+        Parameters
+        ----------
+        checked : bool, optional
+            Silx flag for a checked action. The default is False.
+        """
         self.plot.setKeepDataAspectRatio(True)
         _range = self.plot.getDataRange()
         _plot_data_aspect = (
@@ -69,7 +74,7 @@ class ChangeCanvasToData(PlotAction):
         self.plot.resetZoom()
 
 
-class ExpandCanvas(ResetZoomAction):
+class ExpandCanvas(PlotAction):
     """
     A modified silx ResetZoomAction which also resets the figure canvas to the maximum
     size allowed by the widget.
@@ -79,7 +84,7 @@ class ExpandCanvas(ResetZoomAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
+            icon=utils.get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
             text="Maximize canvas size",
             tooltip="Maximize the canvas size.",
             triggered=self._actionTriggered,
@@ -88,11 +93,16 @@ class ExpandCanvas(ResetZoomAction):
         )
 
     def _actionTriggered(self, checked=False):
+        """
+        Trigger the "expand canvas" action.
 
+        Parameters
+        ----------
+        checked : bool, optional
+            Silx flag for a checked action. The default is False.
+        """
         self.plot.setKeepDataAspectRatio(False)
-        _figsize = self.plot._backend.ax.figure.get_size_inches()
-        _aspect = _figsize[1] / _figsize[0]
-        self.plot._backend.ax.set_box_aspect(_aspect)
+        self.plot._backend.ax.set_box_aspect(None)
         self.plot.resetZoom()
 
 
@@ -112,7 +122,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PlotAction.__init__(
             self,
             plot,
-            icon=get_pydidas_qt_icon("silx_crop_histogram.png"),
+            icon=utils.get_pydidas_qt_icon("silx_crop_histogram.png"),
             text="Crop histogram outliers",
             tooltip="Crop the upper histogram outliers",
             triggered=self._actionTriggered,
@@ -134,13 +144,13 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         _cumcounts = np.cumsum(_counts / _data.size)
         _index_stop = max(1, np.where(_cumcounts <= _fraction)[0].size)
 
-        _countsB, _edgesB = np.histogram(
+        _counts2, _edges2 = np.histogram(
             _data, bins=32768, range=(0, _edges[_index_stop])
         )
-        _cumcountsB = np.cumsum(_countsB / _data.size)
-        _index_stopB = max(1, np.where(_cumcountsB <= _fraction)[0].size)
+        _cumcounts2 = np.cumsum(_counts2 / _data.size)
+        _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction)[0].size)
 
-        _cmap_limit_high = _edgesB[_index_stopB]
+        _cmap_limit_high = _edges2[_index_stop2]
 
         colormap = image.getColormap()
         colormap.setVMax(_cmap_limit_high)

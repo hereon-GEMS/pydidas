@@ -22,7 +22,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["rot_matrix_rx", "rot_matrix_ry", "rot_matrix_rz", "pyfai_rot_matrix"]
+__all__ = [
+    "rot_matrix_rx",
+    "rot_matrix_ry",
+    "rot_matrix_rz",
+    "pyfai_rot_matrix",
+    "get_chi_from_x_and_y",
+]
 
 import numpy as np
 from numpy import sin, cos
@@ -110,3 +116,30 @@ def pyfai_rot_matrix(theta1, theta2, theta3):
     return np.dot(
         np.dot(rot_matrix_rz(theta3), rot_matrix_ry(-theta2)), rot_matrix_rx(-theta1)
     )
+
+
+def get_chi_from_x_and_y(x, y):
+    """
+    Get the chi position in degree.
+
+    Parameters
+    ----------
+    x : float
+        The input value for the x coordinate.
+    y : float
+        The input value for the y coordinate.
+
+    Returns
+    -------
+    float
+        The chi value based on the input variables.
+    """
+    if x == 0 and y >= 0:
+        _chi = 90
+    elif x == 0 and y < 0:
+        _chi = 270
+    else:
+        _chi = np.arctan(y / x) * 180 / np.pi
+    if x < 0:
+        _chi += 180
+    return np.mod(_chi, 360)

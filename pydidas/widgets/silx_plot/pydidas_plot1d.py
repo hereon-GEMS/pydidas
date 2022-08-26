@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with silx actions for PlotWindows.
+Module with PydidasPlot1D class which adds configurations to the base silx Plot1D.
 """
 
 __author__ = "Malte Storm"

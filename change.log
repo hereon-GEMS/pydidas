@@ -13,6 +13,8 @@ Major changes:
 - Added functionality to re-order WorkflowTrees on the fly.
 - Added functionality to re-order WorkflowTrees using drag & drop in the 
   graphical user interface.
+- Added new feature in 2D plots to convert the coordinates to polar coordinates
+  using the calibration information.
 
 Improvements
 ------------
@@ -39,7 +41,9 @@ Bugfixes:
   at start-up.
 - Fixed an issue with the WorkflowTree edit canvas not updating correctly 
   after editing the tree and restoring the previous state.
- 
+- Fixed an issue with tweaking plugin parameters with integer input data
+  (i.e. loaders).
+  
 
 v0.1.9
 ======

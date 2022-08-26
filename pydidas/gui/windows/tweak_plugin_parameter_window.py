@@ -27,6 +27,7 @@ __all__ = ["TweakPluginParameterWindow"]
 
 import copy
 
+import numpy as np
 from qtpy import QtWidgets, QtCore
 
 from pydidas.core.constants import FIX_EXP_POLICY
@@ -268,7 +269,9 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         Run the plugin with the current Parameters.
         """
         with ShowBusyMouse():
-            _arg = self.__plugin._config["input_data"].copy()
+            _arg = self.__plugin._config["input_data"]
+            if isinstance(_arg, np.ndarray):
+                _arg = self.__plugin._config["input_data"].copy()
             _kwargs = self.__plugin._config["input_kwargs"].copy()
             self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)

@@ -43,6 +43,7 @@ Bugfixes:
   after editing the tree and restoring the previous state.
 - Fixed an issue with tweaking plugin parameters with integer input data
   (i.e. loaders).
+- Fixed an issue with storing the latest open directory in the data browser.
   
 
 v0.1.9

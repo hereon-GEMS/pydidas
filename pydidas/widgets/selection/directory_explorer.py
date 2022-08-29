@@ -27,6 +27,7 @@ __all__ = ["DirectoryExplorer"]
 
 from qtpy import QtWidgets, QtCore
 
+from ...core import PydidasQsettings
 from ..utilities import apply_widget_properties
 
 
@@ -76,8 +77,8 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         str
             The stored path.
         """
-        _settings = QtCore.QSettings("Hereon", "pydidas")
-        _path = _settings.value("directory_explorer/path", None)
+        _settings = PydidasQsettings()
+        _path = _settings.value("directory_explorer/path")
         if _path is not None:
             return _path
         return ""

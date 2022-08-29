@@ -86,7 +86,6 @@ class PydidasQsettingsMixin:
                 return float(_value)
             return dtype(_value)
         return _value
-        # return self._qsettings_convert_value_type(key, _value)
 
     def q_settings_set_key(self, key, value):
         """
@@ -100,29 +99,3 @@ class PydidasQsettingsMixin:
             The value to be stored.
         """
         self.q_settings.setValue(f"{VERSION}/{key}", value)
-
-    def _qsettings_convert_value_type(self, key, value):
-        """
-        Convert a value to the datatype expected by the Parameter.
-
-        Parameters
-        ----------
-        key : str
-            The Parameter reference key.
-        value : object
-            The value whose type should be converted.
-
-        Returns
-        -------
-        value : object
-            The value in the correct datatype.
-        """
-        try:
-            _p = self.get_param(key)
-            if _p.dtype == Integral:
-                return int(value)
-            if _p.dtype == Real:
-                return float(value)
-        except (KeyError, AttributeError):
-            pass
-        return value

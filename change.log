@@ -25,6 +25,8 @@ Improvements
   up to date behaviour for all consumers.
 - Added a context menu in the PluginCollectionBrowser to replace plugins and 
   add them to the Workflow at designated positions.
+- Added coordinate transformations to data browser (for images the same size as
+  the detector defined in the SetupExperiment.
 
 Bugfixes:
 ---------

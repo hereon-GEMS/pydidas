@@ -63,6 +63,13 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         self._widgets["but_maximize"].clicked.connect(
             partial(self.change_splitter_pos, True)
         )
+        self.sig_this_frame_activated.connect(self._widgets["viewer"].get_detector_size)
+        self.sig_this_frame_activated.connect(
+            partial(self._widgets["viewer"].cs_transform.check_detector_is_set, True)
+        )
+        self.sig_this_frame_activated.connect(
+            self._widgets["viewer"]._positionWidget.update_exp_setup_params
+        )
 
     @QtCore.Slot(bool)
     def change_splitter_pos(self, enlarge_dir=True):

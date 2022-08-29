@@ -64,7 +64,7 @@ class QTooltipEventFilter(QObject):
                 raise ValueError(f'QObject "{widget}" is not a widget.')
 
             if isinstance(widget.toolTip, str):
-                return
+                return False
             _tooltip = widget.toolTip()
 
             if len(_tooltip) > 0 and not Qt.mightBeRichText(_tooltip):

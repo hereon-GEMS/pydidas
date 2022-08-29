@@ -62,36 +62,6 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         self.assertTrue(hasattr(obj, "q_settings"))
         self.assertIsInstance(obj.q_settings, CopyableQSettings)
 
-    def test_qsettings_convert_value_type_no_param(self):
-        _value = [123, 456]
-        obj = PydidasQsettingsMixin()
-        _newval = obj._qsettings_convert_value_type("test", _value)
-        self.assertEqual(_value, _newval)
-
-    def test_qsettings_convert_value_type_float(self):
-        _value = self._params.get_value("param_float")
-        obj = PydidasQsettingsMixin()
-        obj.params = self._params
-        obj.get_param = obj.params.get
-        _newval = obj._qsettings_convert_value_type("param_float", _value)
-        self.assertEqual(_value, _newval)
-
-    def test_qsettings_convert_value_type_int(self):
-        _value = self._params.get_value("param_int")
-        obj = PydidasQsettingsMixin()
-        obj.params = self._params
-        obj.get_param = obj.params.get
-        _newval = obj._qsettings_convert_value_type("param_int", _value)
-        self.assertEqual(_value, _newval)
-
-    def test_qsettings_convert_value_type_other(self):
-        _value = self._params.get_value("param_str")
-        obj = PydidasQsettingsMixin()
-        obj.params = self._params
-        obj.get_param = obj.params.get
-        _newval = obj._qsettings_convert_value_type("param_str", _value)
-        self.assertEqual(_value, _newval)
-
     def test_q_settings_get_value__plain(self):
         obj = PydidasQsettingsMixin()
         obj.params = self._params

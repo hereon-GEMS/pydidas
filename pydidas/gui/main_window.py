@@ -279,7 +279,9 @@ class MainWindow(MainMenu):
             The filename to be used to restore the state. Pydidas will use the
             internal default if the filename is None. The default is None.
         """
-        super().restore_gui_state()
+        if filename is None:
+            filename = self._get_standard_state_full_filename(self.STATE_FILENAME)
+        super().restore_gui_state(filename)
         _current_index = self.centralWidget().currentIndex()
         self.select_item(self._frame_menuentries[_current_index])
 

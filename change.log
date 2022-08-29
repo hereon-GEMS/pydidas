@@ -27,6 +27,8 @@ Improvements
   add them to the Workflow at designated positions.
 - Added coordinate transformations to data browser (for images the same size as
   the detector defined in the SetupExperiment.
+- Added feature to automatically store the GUI state on exit and added a menu
+  action to restore the exit state.
 
 Bugfixes:
 ---------

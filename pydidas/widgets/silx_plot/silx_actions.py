@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with silx actions for PlotWindows.
+Module with silx actions to extend the functionality of the generic silx plotting
+widgets.
 """
 
 __author__ = "Malte Storm"

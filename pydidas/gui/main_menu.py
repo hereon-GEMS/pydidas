@@ -59,6 +59,10 @@ SCAN = SetupScan()
 EXP = SetupExperiment()
 TREE = WorkflowTree()
 
+CONFIG_PATH = QtCore.QStandardPaths.standardLocations(
+    QtCore.QStandardPaths.ConfigLocation
+)[0]
+
 
 class MainMenu(QtWidgets.QMainWindow):
     """
@@ -77,6 +81,7 @@ class MainMenu(QtWidgets.QMainWindow):
     """
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
+    EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
 
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
@@ -163,6 +168,13 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["restore_state"] = restore_state_action
 
+        restore_state_action = QtWidgets.QAction("&Restore GUI state at exit", self)
+        restore_state_action.setStatusTip(
+            "Restore the state of the graphical user interface from the stored "
+            "information at the (correct) exit."
+        )
+        self._actions["restore_exit_state"] = restore_state_action
+
         import_state_action = QtWidgets.QAction("&Import GUI state", self)
         import_state_action.setStatusTip(
             "Import the state of the graphical user interface from a "
@@ -193,6 +205,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["store_state"].triggered.connect(self._action_store_state)
         self._actions["export_state"].triggered.connect(self._action_export_state)
         self._actions["restore_state"].triggered.connect(self._action_restore_state)
+        self._actions["restore_exit_state"].triggered.connect(self._action_restore_exit)
         self._actions["import_state"].triggered.connect(self._action_import_state)
         self._actions["exit"].triggered.connect(self.close)
         self._actions["open_settings"].triggered.connect(
@@ -225,6 +238,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _state_menu.addAction(self._actions["export_state"])
         _state_menu.addSeparator()
         _state_menu.addAction(self._actions["restore_state"])
+        _state_menu.addAction(self._actions["restore_exit_state"])
         _state_menu.addAction(self._actions["import_state"])
 
         _file_menu = _menu.addMenu("&File")
@@ -262,7 +276,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state()
+            self.export_gui_state(os.path.join(CONFIG_PATH, self.STATE_FILENAME))
 
     @QtCore.Slot()
     def _action_export_state(self):
@@ -286,7 +300,24 @@ class MainMenu(QtWidgets.QMainWindow):
             " you made and you might lose work.",
         ).exec_()
         if _reply:
-            self.restore_gui_state()
+            self.restore_gui_state(
+                self._get_standard_state_full_filename(self.STATE_FILENAME)
+            )
+
+    @QtCore.Slot()
+    def _action_restore_exit(self):
+        """
+        Restore the GUI to its state at the last exit.
+        """
+        _reply = QuestionBox(
+            "Restore GUI state",
+            "Do you want to restore the GUI state? This will reset any changes"
+            " you made and you might lose work.",
+        ).exec_()
+        if _reply:
+            self.restore_gui_state(
+                self._get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
+            )
 
     @QtCore.Slot()
     def _action_import_state(self):
@@ -382,6 +413,35 @@ class MainMenu(QtWidgets.QMainWindow):
         self.centralWidget().deleteLater()
         super().deleteLater()
 
+    def _get_standard_state_full_filename(self, filename):
+        """
+        Get the standard full path for the state filename.
+
+        This method will search all stored config paths and return the first
+        match.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the state.
+
+        Returns
+        -------
+        _fname : str
+            The file name and path to the config file.
+        """
+        _paths = QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.ConfigLocation
+        )
+        for _path in _paths:
+            _fname = os.path.join(_path, filename)
+            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
+                return _fname
+        raise UserConfigError(
+            "No state config file found: Cannot restore the pydidas state because the "
+            "current user has not yet stored a pydidas state for the current version."
+        )
+
     def export_gui_state(self, filename=None):
         """
         This function
@@ -392,11 +452,6 @@ class MainMenu(QtWidgets.QMainWindow):
             The full file system path of the configuration file. If None, a
             generic file will be created by pydidas. The default is None.
         """
-        if filename is None:
-            _config_path = QtCore.QStandardPaths.standardLocations(
-                QtCore.QStandardPaths.ConfigLocation
-            )[0]
-            filename = os.path.join(_config_path, self.STATE_FILENAME)
         _config_dir = os.path.dirname(filename)
         if not os.path.exists(_config_dir):
             os.makedirs(_config_dir)
@@ -446,7 +501,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "frame_index": self.centralWidget().currentIndex(),
         }
 
-    def restore_gui_state(self, filename=None):
+    def restore_gui_state(self, filename):
         """
         Restore the window states from saved information.
 
@@ -455,41 +510,14 @@ class MainMenu(QtWidgets.QMainWindow):
 
         Parameters
         ----------
-        filename : Union[None, str], optional
-            The filename to be used to restore the state. Pydidas will use the
-            internal default if the filename is None. The default is None.
+        filename : str
+            The filename to be used to restore the state.
         """
-        if filename is None:
-            filename = self._get_standard_state_filename()
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
-
-    def _get_standard_state_filename(self):
-        """
-        Get the standard filename for the stored state.
-
-        This method will search all stored config paths and return the first
-        match.
-
-        Returns
-        -------
-        _fname : str
-            The file name and path to the config file.
-        """
-        _paths = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )
-        for _path in _paths:
-            _fname = os.path.join(_path, self.STATE_FILENAME)
-            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
-                return _fname
-        raise UserConfigError(
-            "No state config file found: Cannot restore the pydidas state because the "
-            "current user has not yet stored a pydidas state for the current version."
-        )
 
     def _restore_global_objects(self, state):
         """
@@ -583,6 +611,7 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
+        self.export_gui_state(os.path.join(CONFIG_PATH, self.EXIT_STATE_FILENAME))
         _keys = list(self._child_windows.keys())
         for _key in _keys:
             self._child_windows[_key].deleteLater()

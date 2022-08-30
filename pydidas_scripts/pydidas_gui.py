@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The main_gui module includes a function to run the GUI.
+The pydidas_gui module includes a function to run the default pydidas processing GUI.
 """
 
 __author__ = "Malte Storm"
@@ -30,6 +30,7 @@ import multiprocessing as mp
 
 from qtpy import QtWidgets
 
+from pydidas.core import UserConfigError
 from pydidas.gui import MainWindow
 from pydidas.gui.frames import (
     DataBrowsingFrame,
@@ -46,14 +47,18 @@ from pydidas.gui.frames import (
 )
 
 
-def run_gui(app=None):
+def run_gui(app=None, restore_state="None"):
     """
     Run the GUI application with the generic pydidas layout.
 
     Parameters
     ----------
-    app : Union[QtCore.QApplication, None]
-        The main Qt application.
+    app : Union[QtCore.QApplication, None], optional
+        The main Qt application. If None, a new QApplication will be created.
+    restore_state : str, optional
+        Flag to restore the state of the pydidas GUI. Flags can be either "None" to
+        start fresh, "exit" to restore the exit state or "saved" to restore the last
+        saved state.
     """
     if mp.get_start_method() != "spawn":
         try:
@@ -61,7 +66,7 @@ def run_gui(app=None):
         except RuntimeError:
             warnings.warn(
                 "Could not set the multiprocessing Process startup method to "
-                '"spawn". Multiprocessing with OpenGL will not work in Linux. '
+                "'spawn'. Multiprocessing with OpenGL will not work in Linux. "
                 "To solve this issue, restart the kernel and import pydidas "
                 "before starting any multiprocessing."
             )
@@ -86,14 +91,16 @@ def run_gui(app=None):
     gui.register_frame(WorkflowTestFrame)
     gui.register_frame(WorkflowRunFrame)
     gui.register_frame(ViewResultsFrame)
+
+    if restore_state not in ["None", "exit", "saved"]:
+        raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
     gui.raise_()
     gui.show()
-    _ = app.exec_()
-    gui.deleteLater()
-    app.quit()
-    sys.exit()
+    if restore_state in ["exit", "saved"]:
+        gui.restore_gui_state(state=restore_state)
+    return app.exec_()
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    run_gui(app)
+    _ = run_gui(app, restore_state="None")

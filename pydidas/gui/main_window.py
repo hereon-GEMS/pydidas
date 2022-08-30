@@ -32,7 +32,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import PydidasGuiError
+from ..core import PydidasGuiError, UserConfigError
 from ..core.utils import format_input_to_multiline_str
 from ..widgets import BaseFrame, InfoWidget, get_pyqt_icon_from_str_reference
 from . import utils
@@ -266,7 +266,7 @@ class MainWindow(MainMenu):
             self._toolbar_actions[label].setChecked(False)
         self.setUpdatesEnabled(True)
 
-    def restore_gui_state(self, filename=None):
+    def restore_gui_state(self, state="saved", filename=None):
         """
         Restore the window states from saved information.
 
@@ -275,12 +275,24 @@ class MainWindow(MainMenu):
 
         Parameters
         ----------
+        state: str, optional
+            The state to be restored. Can be "saved" to restore the last saved state,
+            "exit" to restore the state on exit or "manual" to manually give a filename.
         filename : Union[None, str], optional
-            The filename to be used to restore the state. Pydidas will use the
-            internal default if the filename is None. The default is None.
+            The filename to be used to restore the state. This kwarg will only be used
+            if the state kwarg is set to "manual".
         """
-        if filename is None:
+        if state == "saved":
             filename = self._get_standard_state_full_filename(self.STATE_FILENAME)
+        elif state == "exit":
+            filename = self._get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
+        elif state == "manual":
+            if filename is None:
+                raise UserConfigError(
+                    "A filename must be supplied for 'manual' gui state restoration."
+                )
+        else:
+            raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
         super().restore_gui_state(filename)
         _current_index = self.centralWidget().currentIndex()
         self.select_item(self._frame_menuentries[_current_index])

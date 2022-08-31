@@ -11,7 +11,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.SetupScanFrame
+.. autoclass:: pydidas.gui.frames.SetupScanFrame
     :members:
 
 .. _all_methods_SetupScanFrame:
@@ -19,7 +19,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.SetupScanFrame
+.. autoclass:: pydidas.gui.frames.SetupScanFrame
     :members:
     :noindex:    
     :inherited-members: QFrame

@@ -11,7 +11,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.CompositeCreatorFrame
+.. autoclass:: pydidas.gui.frames.CompositeCreatorFrame
     :members:
 
 .. _all_methods_CompositeCreatorFrame:
@@ -19,7 +19,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.CompositeCreatorFrame
+.. autoclass:: pydidas.gui.frames.CompositeCreatorFrame
     :members:
     :noindex:
     :inherited-members: QFrame

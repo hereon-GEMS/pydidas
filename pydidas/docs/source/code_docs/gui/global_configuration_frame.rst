@@ -11,7 +11,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.GlobalConfigurationFrame
+.. autoclass:: pydidas.gui.frames.GlobalConfigurationFrame
     :members:
 
 .. _all_methods_GlobalConfigurationFrame:
@@ -19,7 +19,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.GlobalConfigurationFrame
+.. autoclass:: pydidas.gui.frames.GlobalConfigurationFrame
     :members:
     :noindex:
     :inherited-members: QFrame

@@ -11,7 +11,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.PyfaiCalibFrame
+.. autoclass:: pydidas.gui.frames.PyfaiCalibFrame
     :members:
 
 .. _all_methods_PyfaiCalibFrame:
@@ -19,7 +19,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.PyfaiCalibFrame
+.. autoclass:: pydidas.gui.frames.PyfaiCalibFrame
     :members:
     :noindex:    
     :inherited-members: QFrame

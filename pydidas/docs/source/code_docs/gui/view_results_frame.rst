@@ -11,7 +11,7 @@
 |class_name| with own methods only
 ----------------------------------
 
-.. autoclass:: pydidas.gui.ViewResultsFrame
+.. autoclass:: pydidas.gui.frames.ViewResultsFrame
     :members:
 
 .. _all_methods_ViewResultsFrame:
@@ -19,7 +19,7 @@
 |class_name| with inherited methods too
 ---------------------------------------
 
-.. autoclass:: pydidas.gui.ViewResultsFrame
+.. autoclass:: pydidas.gui.frames.ViewResultsFrame
     :members:
     :noindex:
     :inherited-members: QFrame

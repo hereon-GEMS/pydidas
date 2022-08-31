@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ViewResultsFrame which allows to visualize results from
-running the pydidas WorkflowTree.
+Module with the ViewResultsMixin which allows other classes to implement viewing of
+WorkflowTree results when running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"

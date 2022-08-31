@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the MainWindow class which is a subclassed QMainWindow which has
-been modified for pydidas's requirements and which manages the option and
-selection bars.
+Module with the MainWindow class which extends the MainMenu with a toolbar on the left
+to select the different frames.
 """
 
 __author__ = "Malte Storm"

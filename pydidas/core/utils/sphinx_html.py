@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The run_sphinx_html module includes functions to check whether the Sphinx
+The sphinx_html module includes functions to check whether the Sphinx
 documentation exists or whether it needs to be created and a function to
 generate the Sphinx html documentation.
 """

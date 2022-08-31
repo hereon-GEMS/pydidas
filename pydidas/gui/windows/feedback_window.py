@@ -15,7 +15,7 @@
 
 """
 Module with the FeedbackWindow class which allows users to create a quick feedback
-form which they can copy and pasteto submit feedback.
+form which they can copy and paste to submit feedback.
 """
 
 __author__ = "Malte Storm"

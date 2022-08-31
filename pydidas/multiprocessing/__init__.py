@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The multiprocessing module includes functionalities to run scripts and
+The pydidas.multiprocessing module includes functionalities to run scripts and
 applications in parallel procesing.
 """
 

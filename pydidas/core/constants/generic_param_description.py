@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The generic_parameter_tooltips module holds all the tooltips for generic
-Parameters in the form of a dictionary.
+The generic_param_description module holds all the required data to create generic
+Parameters.
 """
 
 __author__ = "Malte Storm"

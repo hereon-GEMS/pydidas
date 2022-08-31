@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The gui.builders sub-package includes builders for all GUI classes. The
+The gui.frames.builders sub-package includes builders for all GUI frame classes. The
 builders to create and arrange the widgets have been separated simply for
 improved code organisation. They will create the user interface "shells"
 without any connections and functionality.

@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with gui_setup utility functions.
+The pydidas.gui.utils.gui_setup module includes utility functions used for starting
+the graphical user interface.
 """
 
 __author__ = "Malte Storm"
@@ -33,7 +34,7 @@ import os
 from qtpy import QtWidgets
 
 from ...core.constants import STANDARD_FONT_SIZE
-from .qtooltip_event_handler import QTooltipEventFilter
+from .qtooltip_event_handler import QTooltipEventHandler
 
 
 def configure_qtapp_namespace():
@@ -97,10 +98,10 @@ def update_qtapp_font_size():
 
 def apply_tooltip_event_filter():
     """
-    Apply the pydidas.core.utils.QTooltipEventFilter to the QApplication
+    Apply the pydidas.core.utils.QTooltipEventHandler to the QApplication
     to force the desired handling of tooltip.
 
     Without this filter
     """
     _app = QtWidgets.QApplication.instance()
-    _app.installEventFilter(QTooltipEventFilter(_app))
+    _app.installEventFilter(QTooltipEventHandler(_app))

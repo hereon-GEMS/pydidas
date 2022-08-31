@@ -224,9 +224,9 @@ class ParameterCollection(dict):
         *kwargs : any
             Any keyword arguments.
         """
-        for _key in kwargs:
-            if not isinstance(kwargs[_key], Parameter):
-                self.__raise_type_error(kwargs[_key])
+        for _item in kwargs.values():
+            if not isinstance(_item, Parameter):
+                self.__raise_type_error(_item)
 
     def __check_duplicate_keys(self, *args, **kwargs):
         """
@@ -262,8 +262,8 @@ class ParameterCollection(dict):
             _temp_keys = _original_keys + _other_keys
             self.__check_key_available(_param, keys=_temp_keys)
         _newkeys = tuple(self.keys()) + tuple(p.refkey for p in _new_args)
-        for _key in kwargs:
-            self.__check_key_available(kwargs[_key], keys=_newkeys)
+        for _item in kwargs.values():
+            self.__check_key_available(_item, keys=_newkeys)
 
     def __add_arg_params(self, *args):
         """
@@ -289,8 +289,8 @@ class ParameterCollection(dict):
         **kwargs : dict
             A dictionary of keyword arguments.
         """
-        for _key in kwargs:
-            self.__setitem__(_key, kwargs[_key])
+        for _key, _item in kwargs.items():
+            self.__setitem__(_key, _item)
 
     def delete_param(self, key):
         """

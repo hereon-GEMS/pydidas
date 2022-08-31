@@ -15,7 +15,7 @@
 
 """
 Module with the CreateWidgetsMixIn class which can be inherited from to
-add convenience widget creation methods.
+add convenience widget creation methods to other classes.
 """
 
 __author__ = "Malte Storm"

@@ -12,7 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
+#
+# Parts of this file are adapted based on the pyfai-calib widget which is distributed
+# under the license given below:
+#
 # /*##########################################################################
 #
 # Copyright (C) 2016-2018 European Synchrotron Radiation Facility

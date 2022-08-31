@@ -381,7 +381,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, data):
+    def multiprocessing_store_results(self, index, *data):
         """
         Store the results of the multiprocessing operation.
 
@@ -389,10 +389,12 @@ class ExecuteWorkflowApp(BaseApp):
         ----------
         index : int
             The index in the composite image.
-        data : Union[tuple, int]
+        data : tuple
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.
         """
+        # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
+        data = data[0]
         if self.slave_mode:
             return
         if isinstance(data, tuple):

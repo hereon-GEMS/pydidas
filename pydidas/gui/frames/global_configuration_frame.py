@@ -108,11 +108,14 @@ class GlobalConfigurationFrame(GlobalConfigurationFrameBuilder):
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
-        qm = QtWidgets.QMessageBox
-        answer = qm.question(
-            self, "", "Are you sure to reset all the values?", qm.Yes | qm.No
+        """
+        Reset all Parameters to their default values.
+        """
+        _qm = QtWidgets.QMessageBox
+        answer = QtWidgets.QMessageBox.question(
+            self, "", "Are you sure to reset all the values?", _qm.Yes | _qm.No
         )
-        if answer == qm.Yes:
+        if answer == _qm.Yes:
             self.restore_all_defaults(True)
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)

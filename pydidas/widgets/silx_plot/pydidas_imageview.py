@@ -61,7 +61,6 @@ class PydidasImageView(ImageView):
             ("X", lambda x, y: x),
             ("Y", lambda x, y: y),
             ("Data", WeakMethodProxy(self._getImageValue)),
-            # ('Dims', WeakMethodProxy(self._getImageDims)),
         ]
 
         self.cropHistOutliersAction = self.group.addAction(

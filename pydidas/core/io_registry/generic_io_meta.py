@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FileExtensionRegistryMetaclass which is used for creating
+Module with the GenericIoMeta Metaclass which is used for creating
 a registry of classes for a specific application.
 """
 

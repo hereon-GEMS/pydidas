@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The gui.utils sub-package provides convenience functions and classes
+The pydidas.gui.utils sub-package provides convenience functions and classes
 which are used in the gui package.
 """
 

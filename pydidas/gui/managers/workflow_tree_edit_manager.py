@@ -200,12 +200,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             A KeyError is raised if the node_id key has not been registered
             with the manager yet.
         """
-        if node_id not in self._nodes.keys():
+        if node_id not in self._nodes:
             return
         if node_id == TREE.active_node_id and not force_update:
             return
-        for nid in self._node_widgets:
-            self._node_widgets[nid].widget_select(node_id == nid)
+        for _nid, _widget in self._node_widgets.items():
+            _widget.widget_select(node_id == _nid)
         TREE.active_node_id = node_id
         self.plugin_to_edit.emit(node_id)
 

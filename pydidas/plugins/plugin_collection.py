@@ -15,7 +15,7 @@
 
 """
 Module with the PluginCollection Singleton class which is used for storing
-information about all Plugins and to get the plugin classwes to instantiate
+information about all Plugins and to get the plugin classes to instantiate
 them.
 """
 
@@ -383,9 +383,9 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         self.verify_is_initialized()
         _key = {"base": -1, "input": 0, "proc": 1, "output": 2}[plugin_type]
         _res = []
-        for _name in self.plugins:
+        for _name, _plugin in self.plugins.items():
             if self.__plugin_types[_name] == _key:
-                _res.append(self.plugins[_name])
+                _res.append(_plugin)
         return _res
 
     def get_all_registered_paths(self):

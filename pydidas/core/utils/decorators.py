@@ -60,9 +60,8 @@ def copy_docstring(origin):
 
     def _docstring(dest, origin):
         if not isinstance(dest, type) and isinstance(origin, type):
-            try:
-                origin = getattr(origin, dest.__name__)
-            except AttributeError:
+            origin = getattr(origin, dest.__name__, None)
+            if origin is None:
                 raise ValueError(
                     "Origin class has no method called " f"{dest.__name__}"
                 )
@@ -102,8 +101,7 @@ def process_1d_with_multi_input_dims(method):
             return method(self, data, **kwargs)
         _results = None
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
-        _datasize = data.shape[_dim_to_process]
-        _dataslice = slice(0, _datasize)
+        _dataslice = slice(0, data.shape[_dim_to_process])
         _res_shape = list(data.shape)
         del _res_shape[_dim_to_process]
         _indices = [np.arange(_s) for _s in _res_shape]

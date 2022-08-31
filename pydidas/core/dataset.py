@@ -113,7 +113,7 @@ class EmptyDataset(np.ndarray):
             _key: deepcopy(getattr(obj, _key, dataset_ax_default_range(self.ndim)))
             for _key in ["axis_labels", "axis_ranges", "axis_units"]
         }
-        self.getitem_key = [] if self.getitem_key is None else self.getitem_key
+        self.getitem_key = tuple() if self.getitem_key is None else self.getitem_key
         for _dim, _slicer in enumerate(self.getitem_key):
             # in the case of a masked array, keep all axis keys.
             if isinstance(_slicer, np.ndarray) and _slicer.ndim > 1:

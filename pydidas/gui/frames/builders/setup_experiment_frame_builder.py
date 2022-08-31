@@ -15,7 +15,7 @@
 
 """
 Module with the SetupExperimentFrameBuilder class which is used to
-populate the ExperimentSettingsself with widgets.
+populate the ExperimentSettings with widgets.
 """
 
 __author__ = "Malte Storm"

@@ -150,7 +150,7 @@ class MpTestAppWoTasks(BaseApp):
         return index, _image
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image):
+    def multiprocessing_store_results(self, index, image, *args):
         """
         Store the result of the multiprocessing function call.
 

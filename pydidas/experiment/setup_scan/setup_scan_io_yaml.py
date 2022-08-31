@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SetupScanYamlIo class which is used to import
+Module with the SetupScanIoYaml class which is used to import and export
 SetupScan metadata from a YAML file.
 """
 

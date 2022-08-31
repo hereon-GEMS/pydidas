@@ -575,7 +575,7 @@ class CompositeCreatorApp(BaseApp):
             )
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image):
+    def multiprocessing_store_results(self, index, image, *args):
         """
         Store the results of the multiprocessing operation.
 

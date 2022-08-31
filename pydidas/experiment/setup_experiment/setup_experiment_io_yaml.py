@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the SetupExperimentYamlIo class which is used to import
+Module with the SetupExperimentIoYaml class which is used to import or export
 SetupExperiment metadata from a YAML file.
 """
 
@@ -25,9 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupExperimentIoYaml"]
 
+from numbers import Real, Integral
+
 import yaml
 import numpy as np
-from numbers import Real, Integral
 
 from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
 from .setup_experiment_io_base import SetupExperimentIoBase

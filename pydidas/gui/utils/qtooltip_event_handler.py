@@ -14,8 +14,9 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The qtooltip_event_filter changes plain text tooltips to rich text tooltips
-because Qt will format these correctly with linebreaks.
+The qtooltip_event_filter module includes the QTooltipEventFilter class which changes
+plain text tooltips to rich text tooltips because Qt will format these correctly with
+linebreaks.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +24,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["QTooltipEventFilter"]
+__all__ = ["QTooltipEventHandler"]
 
 
 import html
@@ -31,7 +32,7 @@ from qtpy.QtCore import Qt, QEvent, QObject
 from qtpy.QtWidgets import QWidget
 
 
-class QTooltipEventFilter(QObject):
+class QTooltipEventHandler(QObject):
     """
     Filter events for tooltips and convert plain text to rich text to force
     Qt to format it correctly.

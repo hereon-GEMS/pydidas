@@ -300,9 +300,7 @@ class MainMenu(QtWidgets.QMainWindow):
             " you made and you might lose work.",
         ).exec_()
         if _reply:
-            self.restore_gui_state(
-                self._get_standard_state_full_filename(self.STATE_FILENAME)
-            )
+            self.restore_gui_state(state="saved")
 
     @QtCore.Slot()
     def _action_restore_exit(self):
@@ -315,9 +313,7 @@ class MainMenu(QtWidgets.QMainWindow):
             " you made and you might lose work.",
         ).exec_()
         if _reply:
-            self.restore_gui_state(
-                self._get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
-            )
+            self.restore_gui_state(state="exit")
 
     @QtCore.Slot()
     def _action_import_state(self):
@@ -328,7 +324,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self, "Name of file", None, "YAML (*.yaml *.yml)"
         )[0]
         if fname != "":
-            self.restore_gui_state(fname)
+            self.restore_gui_state(state="manual", filename=fname)
 
     @QtCore.Slot()
     def _action_open_doc_in_browser(self):

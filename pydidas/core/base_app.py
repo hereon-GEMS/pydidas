@@ -48,7 +48,7 @@ class BaseApp(ObjectWithParameterCollection):
     """
 
     default_params = ParameterCollection()
-    parse_func = None
+    parse_func = lambda self: {}
     attributes_not_to_copy_to_slave_app = []
 
     def __init__(self, *args, **kwargs):

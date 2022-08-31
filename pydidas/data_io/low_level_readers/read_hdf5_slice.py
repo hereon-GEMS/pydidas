@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the read_hdf_slice function which is the low-level implementation
+Module with the read_hdf5_slice function which is the low-level implementation
 of the hdf5 file reader with support for indexing and chunking.
 """
 

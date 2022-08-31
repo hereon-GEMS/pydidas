@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with format_arguments functions which takes *args and **kwargs and
+Module with format_arguments function which takes *args and **kwargs and
 converts them into an argparse-compatible list.
 """
 

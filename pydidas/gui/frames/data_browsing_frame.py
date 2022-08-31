@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DataBrowsingFrame which is used to browse data in filesystem
-viewer and show it in a view window.
+Module with the DataBrowsingFrame which is used to browse through the filesystem in a
+dedicated filesystem tree and show file data in a view window.
 """
 
 __author__ = "Malte Storm"

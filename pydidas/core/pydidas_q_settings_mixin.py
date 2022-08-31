@@ -82,7 +82,7 @@ class PydidasQsettingsMixin:
         if dtype is not None:
             if dtype == Integral:
                 return int(_value)
-            elif dtype == Real:
+            if dtype == Real:
                 return float(_value)
             return dtype(_value)
         return _value

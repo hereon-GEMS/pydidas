@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowTreeIoBase class which exporters/importerss should
+Module with the WorkflowResultSaverBase class which exporters/importers should
 inherit from.
 """
 
@@ -77,7 +77,7 @@ class WorkflowResultSaverBase(GenericIoBase, metaclass=WorkflowResultSaverMeta):
         dict
             The dictionary with the node IDs and the single attribute values.
         """
-        return {_id: cls._node_information[_id][name] for _id in cls._node_information}
+        return {_id: _item[name] for _id, _item in cls._node_information.items()}
 
     @classmethod
     def get_node_attribute(cls, node_id, name):

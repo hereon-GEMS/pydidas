@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with a factory function to create formatted QSpinBoxes.
+Module with a factory function to create formatted QCheckBox.
 """
 
 __author__ = "Malte Storm"

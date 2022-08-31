@@ -71,6 +71,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.painter.setPen(QtGui.QPen(QtGui.QColor(120, 120, 120), 2))
         self.draw_connections()
         self.painter.end()
+        super().paintEvent(event)
 
     def draw_connections(self):
         """

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with file check functions to interact with files and perform some
+The file_checks module includes functions to interact with files and perform some
 basic checks for existance, size and same directory.
 """
 

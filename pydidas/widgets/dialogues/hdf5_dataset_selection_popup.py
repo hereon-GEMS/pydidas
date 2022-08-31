@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with Hdf5DatasetSelection class which shows a pop-up to select
+Module with Hdf5DatasetSelectionPopup class which shows a pop-up to select
 from the available datasets in a hdf5 file.
 """
 

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CompositeImage class used for creating mosaic images.
+Module with the CompositeImageManager class used for creating mosaic images.
 """
 
 __author__ = "Malte Storm"
@@ -61,8 +61,8 @@ class CompositeImageManager(ObjectWithParameterCollection):
         self.__image = None
         self.set_default_params()
         self.__get_default_qsettings()
-        for _key in kwargs:
-            self.set_param_value(_key, kwargs[_key])
+        for _key, _item in kwargs.items():
+            self.set_param_value(_key, _item)
         if self.__check_config():
             self.__create_image_array()
 

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowTree class which is a subclasses GenericTree
+Module with the WorkflowTree singleton which is a subclasses GenericTree
 with additional support for plugins and a plugin chain.
 """
 

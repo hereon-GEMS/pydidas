@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the JpegIo class for exporting data to JPEG files.
+Module with the IoExporterMatplotlib class for exporting data in form of matplotlib
+images.
 """
 
 __author__ = "Malte Storm"

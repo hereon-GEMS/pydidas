@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ImageMathsFrame which allows to perform mathematical
+Module with the ImageMathFrame which allows to perform mathematical
 operations on images.
 """
 

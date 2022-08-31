@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-This module includes constants for defining the look and feel of the
+The qt_presets module includes constants for defining the look and feel of the
 graphical user interface of the application.
 """
 

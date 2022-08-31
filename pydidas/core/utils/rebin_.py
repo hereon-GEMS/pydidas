@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the rebin2d function to rebin images."""
+"""
+The rebin_ module includes functions to rebin 2d and n-dimensional data.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"

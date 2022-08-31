@@ -14,7 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseApp class from which all apps should inherit.
+Module with the DirectorySpyApp which can scan directories to get the latest available
+file or file of a specific pattern.
 """
 
 __author__ = "Malte Storm"
@@ -124,15 +125,15 @@ class DirectorySpyApp(BaseApp):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._index = -1
+        self._det_mask = None
         self._bg_image = None
         self._fname = lambda x: ""
-        self._path = None
         self.__current_image = None
         self.__current_fname = ""
         self.__current_metadata = ""
         self.__read_image_meta = {}
         self.reset_runtime_vars()
+        self._config["path"] = None
         self._config["shared_memory"] = {}
         self._config["latest_file"] = None
         self._config["2nd_latest_file"] = None
@@ -213,10 +214,10 @@ class DirectorySpyApp(BaseApp):
             If the naming pattern could not be interpreted.
         """
         if self.get_param_value("scan_for_all"):
-            self._path = str(self.get_param_value("directory_path"))
+            self._config["path"] = str(self.get_param_value("directory_path"))
             return
         _pattern_str = str(self.get_param_value("filename_pattern"))
-        self._path = os.path.dirname(_pattern_str)
+        self._config["path"] = os.path.dirname(_pattern_str)
         _strs = _pattern_str.split("#")
         _lens = [len(_s) for _s in _strs]
         if len(_strs) == 1:
@@ -312,7 +313,7 @@ class DirectorySpyApp(BaseApp):
         """
         Find the file with the last timestamp in a directory.
         """
-        _files = glob.glob(self._path + os.sep + "*")
+        _files = glob.glob(self._config["path"] + os.sep + "*")
         _files = [_f for _f in _files if os.path.isfile(_f)]
         _files.sort(key=os.path.getmtime)
         _file_one = _files[-1] if len(_files) > 0 else None
@@ -506,7 +507,7 @@ class DirectorySpyApp(BaseApp):
         )
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, fname):
+    def multiprocessing_store_results(self, index, fname, *args):
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
@@ -518,7 +519,6 @@ class DirectorySpyApp(BaseApp):
         fname : str
             The filename
         """
-        logger.debug("Called MP store results")
         _flag_lock = self._config["shared_memory"]["flag"]
         with _flag_lock.get_lock():
             _width = self._config["shared_memory"]["width"].value

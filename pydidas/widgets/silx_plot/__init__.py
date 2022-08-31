@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Package with subclassed silx widgets.
+Package with subclassed silx widgets and actions.
 """
 
 __author__ = "Malte Storm"

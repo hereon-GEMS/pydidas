@@ -29,6 +29,7 @@ Improvements
   the detector defined in the SetupExperiment.
 - Added feature to automatically store the GUI state on exit and added a menu
   action to restore the exit state.
+- Sanitized all module docstrings.
 
 Bugfixes:
 ---------

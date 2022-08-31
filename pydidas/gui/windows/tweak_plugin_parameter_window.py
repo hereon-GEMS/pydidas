@@ -189,10 +189,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
                 plot_ylabel=results.data_label,
             )
         elif results.ndim == 2:
-            self._plot2d(
-                results,
-                f"{self.__plugin.plugin_name} results",
-            )
+            self._plot2d(results)
 
     def _plot1d(self, data, label, plot_ylabel=None):
         """
@@ -222,7 +219,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             ylabel=plot_ylabel,
         )
 
-    def _plot2d(self, data, label):
+    def _plot2d(self, data):
         """
         Plot a 2D-dataset in the 2D plot widget.
 
@@ -230,8 +227,6 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         ----------
         data : pydidas.core.Dataset
             The data to be plotted.
-        label : str
-            The curve label.
         """
         _ax_labels = [
             data.axis_labels[i]

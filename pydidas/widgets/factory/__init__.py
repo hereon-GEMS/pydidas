@@ -14,8 +14,9 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The factory subpackage includes factory functions for widget creation. In
-addition to the creation of the QtWidget,
+The pydidas.widgets.factory subpackage includes factory functions for widget creation.
+It also includes the CreateWidgetsMixin class which allows other classes easy access
+to simplified widget creation.
 """
 
 __author__ = "Malte Storm"

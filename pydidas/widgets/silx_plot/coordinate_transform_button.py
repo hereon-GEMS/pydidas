@@ -90,22 +90,18 @@ class CoordinateTransformButton(PlotToolButton):
         Define the required actions and create the button menu.
         """
         cartesian_action = self._create_action("cartesian")
-        # r_chi_action.triggered.connect(self.set_coordinates_xy)
         cartesian_action.triggered.connect(partial(self.set_coordinates, "cartesian"))
         cartesian_action.setIconVisibleInMenu(True)
 
         r_chi_action = self._create_action("r_chi")
-        # r_chi_action.triggered.connect(self.set_coordinates_r_chi)
         r_chi_action.triggered.connect(partial(self.set_coordinates, "r_chi"))
         r_chi_action.setIconVisibleInMenu(True)
 
         theta_chi_action = self._create_action("2theta_chi")
-        # theta_chi_action.triggered.connect(self.set_coordinates_2theta_chi)
         theta_chi_action.triggered.connect(partial(self.set_coordinates, "2theta_chi"))
         theta_chi_action.setIconVisibleInMenu(True)
 
         q_chi_action = self._create_action("q_chi")
-        # q_chi_action.triggered.connect(self.set_coordinates_q_chi)
         q_chi_action.triggered.connect(partial(self.set_coordinates, "q_chi"))
         q_chi_action.setIconVisibleInMenu(True)
 

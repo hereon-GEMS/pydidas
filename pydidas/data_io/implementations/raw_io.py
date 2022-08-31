@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Tiff class for importing and exporting raw binary data without
+Module with the RawIo class for importing and exporting raw binary data without
 a header.
 """
 
@@ -79,7 +79,6 @@ class RawIo(IoBase):
 
         _data = np.fromfile(filename, dtype=datatype)
         if _data.size != np.prod(shape):
-            print(_data.size, np.prod(shape))
             raise ValueError("The given shape does not match the data size.")
         cls._data = Dataset(_data.reshape(shape))
         return cls.return_data(**kwargs)

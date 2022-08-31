@@ -25,27 +25,19 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["HomeFrame"]
 
-import os
-from qtpy import QtGui, QtCore, QtSvg, QtWidgets
+from qtpy import QtCore, QtSvg, QtWidgets
 
 from ...core.utils import get_doc_home_address, get_pydidas_icon_fname
 from ...widgets import BaseFrame
 
 
-_toolbar_use_text = (
+_TOOOLBAR_USER_TEXT = (
     "Use the menu toolbar on the left to switch between different Frame. "
     "Some menu toolbars will open an additional submenu on  the left. The "
     "active frame is highlighted."
 )
 
-_doc_address = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-    "docs",
-    "build",
-    "html",
-    "index.html",
-).replace("\\", "/")
-_help_text = (
+_HELP_TEXT = (
     "Documentation is available in the html format. You can open the "
     'documentation from any frame using the "Help" menu entry to either open '
     "it in the system's web browser or a window.\nOr follow this link to "
@@ -53,7 +45,7 @@ _help_text = (
     "</a>."
 )
 
-_proc_setup_text = (
+_PROC_SETUP_TEXT = (
     "Setting up a processing job requires three different object to be set: "
     "\n  1. The experimental setup. This includes values such as the beamline "
     "energy, detector and detector geometry."
@@ -65,7 +57,7 @@ _proc_setup_text = (
     "exporters for the various supported formats."
 )
 
-_proc_text = (
+_PROC_TEXT = (
     "The processing can be started and visualized in the "
     '"Run Full Processing" frame.\n'
     "Once the processing has been started, it will run in a separate"
@@ -138,7 +130,7 @@ class HomeFrame(BaseFrame):
         )
         self.create_label(
             "label_toolbar_use",
-            _toolbar_use_text,
+            _TOOOLBAR_USER_TEXT,
             fixedWidth=600,
             parent_widget=self._widgets["text_frame"],
         )
@@ -155,14 +147,13 @@ class HomeFrame(BaseFrame):
         )
         self.create_label(
             "label_help",
-            _help_text,
+            _HELP_TEXT,
             fixedWidth=600,
             openExternalLinks=True,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
             textFormat=QtCore.Qt.RichText,
             parent_widget=self._widgets["text_frame"],
         )
-        self._widgets["label_help"].linkActivated.connect(self.open_link)
         self.create_spacer(None, parent_widget=self._widgets["text_frame"])
 
         self.create_label(
@@ -176,7 +167,7 @@ class HomeFrame(BaseFrame):
         )
         self.create_label(
             "label_processing_setup",
-            _proc_setup_text,
+            _PROC_SETUP_TEXT,
             fixedWidth=600,
             parent_widget=self._widgets["text_frame"],
         )
@@ -192,7 +183,7 @@ class HomeFrame(BaseFrame):
         )
         self.create_label(
             "label_processing",
-            _proc_text,
+            _PROC_TEXT,
             fixedWidth=600,
             openExternalLinks=True,
             textFormat=QtCore.Qt.RichText,
@@ -214,15 +205,3 @@ class HomeFrame(BaseFrame):
             fixedWidth=300,
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )
-
-    @QtCore.Slot(str)
-    def open_link(self, link_str):
-        """
-        Open a link in the system's default browser.
-
-        Parameters
-        ----------
-        link_str : str
-            The link address.
-        """
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl(link_str))

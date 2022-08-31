@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The gui.mixin subpackage includes gui-specific mixin-classes to extend
+The gui.mixins subpackage includes gui-specific mixin-classes to extend
 the functionality of other classes.
 """
 

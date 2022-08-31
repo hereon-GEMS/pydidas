@@ -64,6 +64,6 @@ class SetupScanIoBase(GenericIoBase, metaclass=SetupScanIoMeta):
         """
         Write the loaded (temporary) Parameters to the scanSettings.
         """
-        for key in cls.imported_params:
-            SCAN.set_param_value(key, cls.imported_params[key])
+        for _key, _item in cls.imported_params.items():
+            SCAN.set_param_value(_key, _item)
         cls.imported_params = {}

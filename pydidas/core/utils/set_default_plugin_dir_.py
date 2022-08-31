@@ -37,6 +37,10 @@ DEFAULT_PATH = os.path.join(DEFAULT_PATH, "pydidas_plugins")
 
 
 def set_default_plugin_dir():
+    """
+    St the default plugin directory if no plugin directory has been defined in the
+    QSettings at the time of the function call.
+    """
     _settings = PydidasQsettings()
     _val = _settings.value("global/plugin_path")
     if _val in [None, ""]:

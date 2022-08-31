@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The workflow_tree_io package includes importers/exporters for the WorkflowTree
-in different formats as well as a registry metaclass to handle actual
+The pydidas.workflow.workflow_tree_io package includes importers/exporters for the
+WorkflowTree in different formats as well as a registry metaclass to handle actual
 imports/exports.
 """
 

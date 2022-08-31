@@ -138,7 +138,7 @@ class TestBaseApp(unittest.TestCase):
 
     def test_parse_func(self):
         app = BaseApp()
-        self.assertIsNone(app.parse_func)
+        self.assertEqual(app.parse_func(), {})
 
     def test_set_parse_func(self):
         def dummy(obj):

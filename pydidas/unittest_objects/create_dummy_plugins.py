@@ -14,9 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The DummyPluginCollection module holds the DummyPluginCollection class used
-for testing as well as the "create_plugin_class" function which can be used
-to create plugin classes dynamically.
+The create_dummy_plugins module includes functions to create plugin classes dynamically
+for testing.
 """
 
 __author__ = "Malte Storm"

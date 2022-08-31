@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ouptut Plugin base class.
+Module with the OutputPlugin base class.
 """
 
 __author__ = "Malte Storm"

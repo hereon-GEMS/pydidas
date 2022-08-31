@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The managers sub-package includes manager classes which handle certain
+The pydidas.managers sub-package includes manager classes which handle certain
 aspects of pydidas.
 """
 

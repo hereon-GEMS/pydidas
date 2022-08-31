@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The gui.windows subpackage includes stand-alone main windows which can
+The pydidas.gui.windows subpackage includes stand-alone main windows which can
 be opened by the main GUI.
 """
 

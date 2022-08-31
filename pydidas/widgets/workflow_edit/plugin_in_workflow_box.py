@@ -173,9 +173,25 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             _drag.exec_(QtCore.Qt.MoveAction)
 
     def dragEnterEvent(self, event):
+        """
+        Enable dragging of this widget.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The drag event.
+        """
         event.accept()
 
     def dropEvent(self, event):
+        """
+        Allow dropping the widget on other WorkflowNode widgets.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The drop event.
+        """
         _source_widget = event.source()
         event.accept()
         self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)

@@ -182,14 +182,6 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self.set_status("Aborted processing of full workflow.")
         self.__set_proc_widget_enabled_for_running(False)
 
-    def __clear_plot(self):
-        """
-        Clear all curves / images from the plot and disable any new updates.
-        """
-        self._config["plot_active"] = False
-        for _item in self._widgets["plot"].getItems():
-            self._widgets["plot"].removeItem(_item)
-
     @QtCore.Slot()
     def _apprunner_finished(self):
         """
@@ -205,6 +197,9 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
 
     @QtCore.Slot()
     def __check_for_plot_update(self):
+        """
+        Check that whether the plot should be updated.
+        """
         _dt = time.time() - self._config["plot_last_update"]
         if _dt > self._config["plot_update_time"] and self._config["frame_active"]:
             self._config["plot_last_update"] = time.time()

@@ -60,7 +60,7 @@ class SetupExperimentIoPoni(SetupExperimentIoBase):
         _pdata["detector"] = EXP_SETUP.get_param_value("detector_name")
         _pdata["distance"] = EXP_SETUP.get_param_value("detector_dist")
         if (
-            _pdata["detector"] in pyFAI.detectors.Detector.registry.keys()
+            _pdata["detector"] in pyFAI.detectors.Detector.registry
             and _pdata["detector"] != "detector"
         ):
             _pdata["detector_config"] = {}

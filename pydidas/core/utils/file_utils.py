@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with file utility functions pertaining to generic names.
+Module with file utility functions pertaining to filenames.
 """
 
 __author__ = "Malte Storm"

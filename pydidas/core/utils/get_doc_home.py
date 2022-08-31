@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the GlobalConfigWindow class which is a QMainWindow widget
-to view and modify the global settings in a dedicatd window.
+The get_doc_home module includes functions to retrieve the documentation filename
+in various types.
 """
 
 __author__ = "Malte Storm"

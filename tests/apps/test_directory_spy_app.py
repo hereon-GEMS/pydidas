@@ -169,7 +169,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("scan_for_all", True)
         app.set_param_value("directory_path", self._path)
         app.define_path_and_name()
-        self.assertEqual(self._path, app._path)
+        self.assertEqual(self._path, app._config["path"])
         self.assertEqual(app._fname(0), "")
 
     def test_find_current_index__missing_inbetween(self):
@@ -257,7 +257,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_find_latest_file__empty(self):
         app = DirectorySpyApp()
-        app._path = self._path
+        app._config["path"] = self._path
         _ret = app._DirectorySpyApp__find_latest_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
@@ -267,7 +267,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         os.makedirs(os.path.join(self._path, "dir1"))
         os.makedirs(os.path.join(self._path, "dir2"))
         app = DirectorySpyApp()
-        app._path = self._path
+        app._config["path"] = self._path
         _ret = app._DirectorySpyApp__find_latest_file()
         self.assertIsNone(app._config["latest_file"])
         self.assertIsNone(app._config["2nd_latest_file"])
@@ -276,7 +276,7 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file_single_file(self):
         _names = self.create_pattern_files(n=1)
         app = DirectorySpyApp()
-        app._path = self._path
+        app._config["path"] = self._path
         _ret = app._DirectorySpyApp__find_latest_file()
         self.assertEqual(app._config["latest_file"], _names[0])
         self.assertIsNone(app._config["2nd_latest_file"])
@@ -285,7 +285,7 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file__multiple_files(self):
         _names = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app._path = self._path
+        app._config["path"] = self._path
         _ret = app._DirectorySpyApp__find_latest_file()
         self.assertEqual(app._config["latest_file"], _names[-1])
         self.assertEqual(app._config["2nd_latest_file"], _names[-2])
@@ -294,7 +294,7 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_find_latest_file__same_files_again(self):
         _ = self.create_pattern_files(n=32)
         app = DirectorySpyApp()
-        app._path = self._path
+        app._config["path"] = self._path
         _ret = app._DirectorySpyApp__find_latest_file()
         self.assertTrue(_ret)
         _ret = app._DirectorySpyApp__find_latest_file()
@@ -353,7 +353,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.set_param_value("scan_for_all", True)
         app.set_param_value("directory_path", self._path)
         app.define_path_and_name()
-        self.assertEqual(app._path, self._path)
+        self.assertEqual(app._config["path"], self._path)
 
     def test_define_path_and_name__with_pattern_no_wildcard(self):
         app = DirectorySpyApp()
@@ -377,7 +377,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.define_path_and_name()
         self.assertEqual(app._config["glob_pattern"], _pattern.replace("###", "*"))
         self.assertEqual(app._fname(42), _pattern.replace("###", "042"))
-        self.assertEqual(app._path, self._path)
+        self.assertEqual(app._config["path"], self._path)
 
     def test_multiprocessing_carryon(self):
         app = self.create_default_app()
@@ -388,7 +388,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app = self.create_default_app()
         app.prepare_run()
         self.assertIsNotNone(app._fname(42))
-        self.assertEqual(app._path, self._path)
+        self.assertEqual(app._config["path"], self._path)
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))
 
@@ -408,7 +408,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         app.multiprocessing_pre_run()
         # these tests are the same as for the prepare_run method:
         self.assertIsNotNone(app._fname(42))
-        self.assertEqual(app._path, self._path)
+        self.assertEqual(app._config["path"], self._path)
         self.assertIsInstance(app._shared_array, np.ndarray)
         self.assertEqual(app._shared_array.shape, (10000, 10000))
 

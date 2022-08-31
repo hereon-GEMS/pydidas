@@ -548,14 +548,15 @@ class ResultSelectionWidget(
             _active_dim = self.get_param_value("plot_ax1")
             self._selector.set_param_value(f"data_slice_{_active_dim}", ":")
             return [_active_dim]
-        elif self._config["plot_type"] == "2D full axes":
+        if self._config["plot_type"] == "2D full axes":
             _active_dim1 = self.get_param_value("plot_ax1")
             self._selector.set_param_value(f"data_slice_{_active_dim1}", ":")
             _active_dim2 = self.get_param_value("plot_ax2")
             self._selector.set_param_value(f"data_slice_{_active_dim2}", ":")
             return [_active_dim1, _active_dim2]
-        elif self._config["plot_type"] == "2D data subset":
+        if self._config["plot_type"] == "2D data subset":
             return self._selector.active_dims
+        raise ValueError("Undefined plot type.")
 
     def __update_dim_choices_for_plot_selection(self):
         """

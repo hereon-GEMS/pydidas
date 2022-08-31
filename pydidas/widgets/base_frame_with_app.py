@@ -15,8 +15,8 @@
 
 """
 Module with the BaseFrameWithApp, a subclass of the BaseFrame from which all
-main pydidas frames should inherit. This subclass includes some methods for
-using a pydidas App in multiprocessing.
+main pydidas frames which use apps should inherit. This subclass includes some methods
+for using a pydidas App in multiprocessing.
 """
 
 __author__ = "Malte Storm"

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The str_utils module has convenience functions for string formatting.
+The str_utils module includes convenience functions for string formatting.
 """
 
 __author__ = "Malte Storm"
@@ -42,7 +42,7 @@ import sys
 import os
 import time
 import random
-import string
+import string as _string_
 from numbers import Real, Integral
 
 import numpy as np
@@ -136,13 +136,13 @@ def get_time_string(epoch=None, human_output=True):
         epoch = time.time()
     _time = time.localtime(epoch)
     _sec = _time[5] + epoch - np.floor(epoch)
-    if human_output:
-        return "{:04d}/{:02d}/{:02d} {:02d}:{:02d}:{:06.3f}" "".format(
-            _time[0], _time[1], _time[2], _time[3], _time[4], _sec
-        )
-    return "{:04d}{:02d}{:02d}_{:02d}{:02d}{:02.0f}" "".format(
-        _time[0], _time[1], _time[2], _time[3], _time[4], _sec
+    _str = (
+        f"{_time[0]:04d}/{_time[1]:02d}/{_time[2]:02d} "
+        f"{_time[3]:02d}:{_time[4]:02d}:{_sec:06.3f}"
     )
+    if not human_output:
+        return _str.replace("/", "").replace(" ", "_")
+    return _str
 
 
 def get_short_time_string(epoch=None):
@@ -493,4 +493,4 @@ def get_random_string(length):
     str
         The random string.
     """
-    return "".join(random.choice(string.ascii_letters) for i in range(length))
+    return "".join(random.choice(_string_.ascii_letters) for i in range(length))

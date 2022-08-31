@@ -68,7 +68,8 @@ class DirectoryExplorer(QtWidgets.QTreeView):
         self.expanded.connect(self._sort_items)
         self.__expand_to_path(root_path)
 
-    def _get_stored_root_path(self):
+    @staticmethod
+    def _get_stored_root_path():
         """
         Get the stored root path from the QSettings.
 

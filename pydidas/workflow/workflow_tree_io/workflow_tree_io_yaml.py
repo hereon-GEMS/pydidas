@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowTreeExporterBase class which exporters should inherit
-from.
+Module with the WorkflowTreeIoYaml class to import/export the WorkflowTree to yaml
+files.
 """
 
 __author__ = "Malte Storm"

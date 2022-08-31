@@ -174,8 +174,7 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         if cls.input_data_dim == -1:
             return "n"
-        else:
-            return str(cls.input_data_dim)
+        return str(cls.input_data_dim)
 
     @classmethod
     def output_data_dim_str(cls):
@@ -189,10 +188,9 @@ class BasePlugin(ObjectWithParameterCollection):
         """
         if cls.output_data_dim == -1:
             return "n"
-        elif cls.output_data_dim is None:
+        if cls.output_data_dim is None:
             return "None"
-        else:
-            return str(cls.output_data_dim)
+        return str(cls.output_data_dim)
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -206,9 +204,9 @@ class BasePlugin(ObjectWithParameterCollection):
         self.add_params(self.generic_params.get_copy())
         self.add_params(*args)
         self.set_default_params()
-        for _kw in kwargs:
+        for _kw, _item in kwargs.items():
             if _kw in self.params.keys():
-                self.set_param_value(_kw, kwargs[_kw])
+                self.set_param_value(_kw, _item)
         self._config = {"input_shape": None, "result_shape": None, "input_data": None}
         self._legacy_image_ops_meta = {"num": 0, "included": False}
         self._legacy_image_ops = []
@@ -225,8 +223,8 @@ class BasePlugin(ObjectWithParameterCollection):
             The copy of the plugin.
         """
         _obj_copy = type(self)()
-        for _key in self.__dict__:
-            _obj_copy.__dict__[_key] = copy.copy(self.__dict__[_key])
+        for _key, _item in self.__dict__.items():
+            _obj_copy.__dict__[_key] = copy.copy(_item)
         return _obj_copy
 
     def __getstate__(self):
@@ -282,7 +280,6 @@ class BasePlugin(ObjectWithParameterCollection):
         Run code which needs to be run only once prior to the execution of
         multiple frames.
         """
-        pass
 
     def get_parameter_config_widget(self):
         """

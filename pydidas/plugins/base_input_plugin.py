@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the input Plugin base class.
+Module with the InputPlugin base class.
 """
 
 __author__ = "Malte Storm"

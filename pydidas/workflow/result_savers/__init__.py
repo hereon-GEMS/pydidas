@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The workflow_result_Saver package includes exporters for workflow results
+The pydidas.workflow.result_saver package includes exporters for workflow results
 in different formats as well as a registry metaclass to handle actual
 exports.
 """

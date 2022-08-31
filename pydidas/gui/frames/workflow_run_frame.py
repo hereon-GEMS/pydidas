@@ -151,7 +151,8 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         logger.debug("Running AppRunner")
         self._runner.start()
 
-    def _check_tree_is_populated(self):
+    @staticmethod
+    def _check_tree_is_populated():
         """
         Check if the WorkflowTree is populated, i.e. not empty.
 

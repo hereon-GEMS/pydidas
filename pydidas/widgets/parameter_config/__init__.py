@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Package with individual QtWidgets used for the plugin parameter settings."""
+"""
+Package with individual QWidgets used editing pydidas Parameters.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"

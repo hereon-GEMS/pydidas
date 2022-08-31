@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
-"""Module with the SetupScan class which is used to manage global
-information about the scan."""
+"""
+Module with the SetupScan class which is used to manage global
+information about the scan.
+"""
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"

@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Subpackage with GUI element and managers to access all of pydidas's
-functionality from within a graphical user interface.
+The pydidas.gui.frames subpackage includes all GUI frames which allow to access all of
+pydidas's functionality from within a graphical user interface.
 """
 
 __author__ = "Malte Storm"

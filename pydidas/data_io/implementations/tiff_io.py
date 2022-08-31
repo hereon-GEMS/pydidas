@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Tiff class for importing and exporting tiff data.
+Module with the TiffIo class for importing and exporting tiff data.
 """
 
 __author__ = "Malte Storm"

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with ScrollArea, a QScrollArea implementation with convenience
+Module with the ScrollAreaclass , a QScrollArea implementation with convenience
 calling arguments for simplified formatting.
 """
 

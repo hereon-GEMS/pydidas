@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PydidasWindow class which is a QMainWindow widget and is used
-in pydidas to display stand-alone windows.
+Module with the PydidasWindowMixIn and PydidasWindowMixIn classes which can be used
+to is a QMainWindow widget and is used to extend BaseFrames to stand-alone Qt windows.
 """
 
 __author__ = "Malte Storm"

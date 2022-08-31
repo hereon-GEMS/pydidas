@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-File_config holds information about extension names and filename formatting.
+File_extensions holds information about extension names and filename formatting.
 """
 
 __author__ = "Malte Storm"

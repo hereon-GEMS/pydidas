@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the flatten function which is a simple wrapper to get
-a flatteded list from an iterable.
+The flatten_iterable module includes functions to flatten nested iterables of various
+depths.
 """
 
 __author__ = "Malte Storm"
@@ -50,10 +50,10 @@ def flatten(nested_iterable, astype=list):
 
     Returns
     -------
-    type
+    astype
         The flattened data in the specified type.
     """
-    return astype(astype(itertools.chain.from_iterable(nested_iterable)))
+    return astype(itertools.chain.from_iterable(nested_iterable))
 
 
 def flatten_all(nested_iterable, astype=list):
@@ -79,8 +79,7 @@ def flatten_all(nested_iterable, astype=list):
         The flattened data in the specified type.
     """
     _new = []
-    _index = 0
-    for _index, _item in enumerate(nested_iterable):
+    for _item in nested_iterable:
         if isinstance(_item, Iterable):
             _items = flatten_all(_item, astype=list)
             _new.extend(_items)

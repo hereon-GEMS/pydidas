@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The plugins subpackage includes the base classes for plugins as well as the
+The pydidas.plugins subpackage includes the base classes for plugins as well as the
 PluginCollection singleton which holds all registered plugins and allows to
 get new instances of these plugins.
 """

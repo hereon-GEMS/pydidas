@@ -15,8 +15,7 @@
 
 """
 The DummyPluginCollection module holds the DummyPluginCollection class used
-for testing as well as the "create_plugin_class" function which can be used
-to create plugin classes dynamically.
+for testing.
 """
 
 __author__ = "Malte Storm"

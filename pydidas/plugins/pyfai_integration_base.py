@@ -34,8 +34,8 @@ import pyFAI
 import pyFAI.azimuthalIntegrator
 from silx.opencl.common import OpenCL
 
-from ..core.constants import PROC_PLUGIN
-from ..core import get_generic_param_collection
+from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI
+from ..core import get_generic_param_collection, UserConfigError
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
 from ..experiment import SetupExperiment
@@ -68,6 +68,8 @@ pyFAI_METHOD = {
 }
 
 OCL = OpenCL()
+
+PI_STR = GREEK_ASCII_TO_UNI["pi"]
 
 
 class pyFAIintegrationBase(ProcPlugin):
@@ -224,6 +226,8 @@ class pyFAIintegrationBase(ProcPlugin):
         if _range is not None:
             if "deg" in self.get_param_value("azi_unit"):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
+            _range = self._modulate_range(_range)
+            self._check_integration_discontinuity(*_range)
         return _range
 
     def get_azimuthal_range_in_deg(self):
@@ -243,6 +247,10 @@ class pyFAIintegrationBase(ProcPlugin):
         if _range is not None:
             if "rad" in self.get_param_value("azi_unit"):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
+            _range = self._modulate_range(_range, np.pi / 180)
+            self._check_integration_discontinuity(
+                np.pi / 180 * _range[0], np.pi / 180 * _range[1]
+            )
         return _range
 
     def get_azimuthal_range_native(self):
@@ -261,12 +269,75 @@ class pyFAIintegrationBase(ProcPlugin):
         if self.get_param_value("azi_use_range"):
             _lower = self.get_param_value("azi_range_lower")
             _upper = self.get_param_value("azi_range_upper")
-            if 0 <= _lower < _upper:
+            if _lower < _upper:
                 return (_lower, _upper)
-            logger.warning(
-                "Warning: Azimuthal range was not correct and has been ignored."
-            )
+            if _lower > _upper:
+                return (_upper, _lower)
         return None
+
+    def _check_integration_discontinuity(self, *azi_range):
+        """
+        Check the position of the integration discontinuity and adjust it according
+        to the integration bounds.
+
+        Parameters
+        ----------
+        azi_range : tuple
+            The integration range in rad.
+        """
+        _low = azi_range[0]
+        _high = azi_range[1]
+        if _high - _low > 2 * np.pi:
+            raise UserConfigError(
+                "The integration range is larger than a full circle! "
+                "Please adjust the boundaries and try again."
+            )
+        if _low >= 0:
+            if self._ai.chiDiscAtPi:
+                self._ai.reset()
+            self._ai.setChiDiscAtZero()
+        elif _low < 0 and _high <= np.pi:
+            if not self._ai.chiDiscAtPi:
+                self._ai.reset()
+            self._ai.setChiDiscAtPi()
+        else:
+            _low = np.round(_low, 5)
+            _high = np.round(_high, 5)
+            raise UserConfigError(
+                f"The chosen integration range '({_low}, {_high})' cannot be processed "
+                "because it cannot be represented in pyFAI. The range must be either "
+                f"in the interval [-{PI_STR}, {PI_STR}[ or [0, 2*{PI_STR}[."
+            )
+
+    @staticmethod
+    def _modulate_range(azi_range, scale_factor=1):
+        """
+        Modulate the range to the range [-180, 360] degree.
+
+        Parameters
+        ----------
+        azi_range : tuple
+            The azimuthal range.
+        scale_factor : float, optional
+            The scale factor to convert degrees to radians. Ranges in radians must use
+            1, ranges in degrees must use pi/180. The default is 1.
+
+        Returns
+        -------
+        azi_range : tuple
+            The updated range.
+        """
+        _low = azi_range[0] * scale_factor
+        _high = azi_range[1] * scale_factor
+        if _high > 2 * np.pi:
+            _low = np.mod(_low, 2 * np.pi)
+            _high = np.mod(_high, 2 * np.pi)
+            if _low > _high:
+                _low -= 2 * np.pi
+        if _low < -np.pi:
+            _low = np.mod(_low + np.pi, 2 * np.pi) - np.pi
+            _high = np.mod(_high + np.pi, 2 * np.pi) - np.pi
+        return (np.round(_low / scale_factor, 6), np.round(_high / scale_factor, 6))
 
     def get_pyFAI_unit_from_param(self, param_name):
         """

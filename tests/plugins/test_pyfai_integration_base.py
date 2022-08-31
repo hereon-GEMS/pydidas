@@ -104,20 +104,6 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
-    def test_get_azimuthal_range_native__lower_range_too_small(self):
-        plugin = pyFAIintegrationBase(
-            azi_use_range=True, azi_range_lower=-1, azi_range_upper=1
-        )
-        _range = plugin.get_azimuthal_range_native()
-        self.assertIsNone(_range)
-
-    def test_get_azimuthal_range_native__upper_range_too_small(self):
-        plugin = pyFAIintegrationBase(
-            azi_use_range=True, azi_range_lower=0, azi_range_upper=0
-        )
-        _range = plugin.get_azimuthal_range_native()
-        self.assertIsNone(_range)
-
     def test_get_azimuthal_range_native__equal_boundaries(self):
         plugin = pyFAIintegrationBase(
             azi_use_range=True, azi_range_lower=12, azi_range_upper=12
@@ -130,7 +116,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             azi_use_range=True, azi_range_lower=15, azi_range_upper=12
         )
         _range = plugin.get_azimuthal_range_native()
-        self.assertIsNone(_range)
+        self.assertEqual(_range, (12, 15))
 
     def test_get_azimuthal_range_native__correct(self):
         _range = (12, 37)
@@ -153,20 +139,22 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             azi_range_upper=_range[1],
             azi_unit="chi / deg",
         )
+        plugin.pre_execute()
         _newrange = plugin.get_azimuthal_range_in_deg()
         self.assertEqual(_range, _newrange)
 
     def test_get_azimuthal_range_in_deg__rad_input(self):
-        _range = (12, 37)
+        _range = (1, 1.5)
         plugin = pyFAIintegrationBase(
             azi_use_range=True,
             azi_range_lower=_range[0],
             azi_range_upper=_range[1],
             azi_unit="chi / rad",
         )
+        plugin.pre_execute()
         _newrange = plugin.get_azimuthal_range_in_deg()
-        self.assertAlmostEqual(_newrange[0], _range[0] * 180 / np.pi)
-        self.assertAlmostEqual(_newrange[1], _range[1] * 180 / np.pi)
+        self.assertAlmostEqual(_newrange[0], _range[0] * 180 / np.pi, 5)
+        self.assertAlmostEqual(_newrange[1], _range[1] * 180 / np.pi, 5)
 
     def test_get_azimuthal_range_in_rad__empty(self):
         plugin = pyFAIintegrationBase(azi_use_range=False)
@@ -181,18 +169,20 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             azi_range_upper=_range[1],
             azi_unit="chi / deg",
         )
+        plugin.pre_execute()
         _newrange = plugin.get_azimuthal_range_in_rad()
-        self.assertAlmostEqual(_newrange[0] * 180 / np.pi, _range[0])
-        self.assertAlmostEqual(_newrange[1] * 180 / np.pi, _range[1])
+        self.assertAlmostEqual(_newrange[0] * 180 / np.pi, _range[0], 4)
+        self.assertAlmostEqual(_newrange[1] * 180 / np.pi, _range[1], 4)
 
     def test_get_azimuthal_range_in_rad__rad_input(self):
-        _range = (12, 37)
+        _range = (1, 2.5)
         plugin = pyFAIintegrationBase(
             azi_use_range=True,
             azi_range_lower=_range[0],
             azi_range_upper=_range[1],
             azi_unit="chi / rad",
         )
+        plugin.pre_execute()
         _newrange = plugin.get_azimuthal_range_in_rad()
         self.assertEqual(_range, _newrange)
 

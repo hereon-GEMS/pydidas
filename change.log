@@ -49,6 +49,7 @@ Bugfixes:
 - Fixed an issue with tweaking plugin parameters with integer input data
   (i.e. loaders).
 - Fixed an issue with storing the latest open directory in the data browser.
+- Fixed an issue with the integration ranges in the pyFAI integration plugin.
   
 
 v0.1.9

@@ -43,7 +43,6 @@ def create_empty_widget(**kwargs):
         attribute name with a lowercase first character. Examples are
         ``fixedWidth``, ``visible``.
 
-
     Returns
     -------
     empty_widget : QtWidgets.QWidget

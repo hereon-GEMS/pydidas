@@ -2,12 +2,13 @@ v0.1.11
 =======
 Major changes:
 --------------
-- Added a Utilities frame to have easy access to various utilities.
+- Added a Utilities frame to have easy access to various utility windows.
 
 Improvements
 ------------
 - Removed the GlobalConfigurationFrame and moved content directly to
   GlobalConfigWindow.
+- Added fit2d mask images to the recognized file types.
 
 Bugfixes:
 ---------

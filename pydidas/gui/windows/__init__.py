@@ -30,6 +30,7 @@ from .about_window import *
 from .average_images_window import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
+from .file_series_operations_window import *
 from .global_config_window import *
 from .pydidas_window import *
 from .show_detailed_plugin_results import *
@@ -56,6 +57,11 @@ from . import feedback_window
 
 __all__.extend(feedback_window.__all__)
 del feedback_window
+
+from . import file_series_operations_window
+
+__all__.extend(file_series_operations_window.__all__)
+del file_series_operations_window
 
 from . import global_config_window
 

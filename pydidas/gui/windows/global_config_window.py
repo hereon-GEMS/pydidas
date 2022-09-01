@@ -49,12 +49,12 @@ def update_plugin_collection():
     PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_path())
 
 
-
 class GlobalConfigWindow(PydidasWindow):
     """
     The GlobalConfigWindow is a standalone QMainWindow with the
     GlobalConfigurationFrame as sole content.
     """
+
     menu_icon = "qta::mdi.application-cog"
     menu_title = "Global configuration"
     menu_entry = "Global configuration"

@@ -30,10 +30,10 @@ __all__ = []
 # import __all__ items from modules:
 from .composite_creator_frame_builder import *
 from .data_browsing_frame_builder import *
-from .global_configuration_frame_builder import *
 from .image_math_frame_builder import *
 from .setup_experiment_frame_builder import *
 from .setup_scan_frame_builder import *
+from .utilities_frame_builder import *
 from .workflow_edit_frame_builder import *
 from .workflow_run_frame_builder import *
 from .workflow_test_frame_builder import *
@@ -50,11 +50,6 @@ from . import data_browsing_frame_builder
 __all__.extend(data_browsing_frame_builder.__all__)
 del data_browsing_frame_builder
 
-from . import global_configuration_frame_builder
-
-__all__.extend(global_configuration_frame_builder.__all__)
-del global_configuration_frame_builder
-
 from . import image_math_frame_builder
 
 __all__.extend(image_math_frame_builder.__all__)
@@ -69,6 +64,11 @@ from . import setup_scan_frame_builder
 
 __all__.extend(setup_scan_frame_builder.__all__)
 del setup_scan_frame_builder
+
+from . import utilities_frame_builder
+
+__all__.extend(utilities_frame_builder.__all__)
+del utilities_frame_builder
 
 from . import workflow_edit_frame_builder
 

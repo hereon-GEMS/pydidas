@@ -30,12 +30,12 @@ __all__ = []
 from .composite_creator_frame import *
 from .data_browsing_frame import *
 from .directory_spy_frame import *
-from .global_configuration_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .pyfai_calib_frame import *
 from .setup_experiment_frame import *
 from .setup_scan_frame import *
+from .utilities_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
 from .workflow_run_frame import *
@@ -57,11 +57,6 @@ from . import directory_spy_frame
 
 __all__.extend(directory_spy_frame.__all__)
 del directory_spy_frame
-
-from . import global_configuration_frame
-
-__all__.extend(global_configuration_frame.__all__)
-del global_configuration_frame
 
 from . import home_frame
 
@@ -87,6 +82,11 @@ from . import setup_scan_frame
 
 __all__.extend(setup_scan_frame.__all__)
 del setup_scan_frame
+
+from . import utilities_frame
+
+__all__.extend(utilities_frame.__all__)
+del utilities_frame
 
 from . import view_results_frame
 

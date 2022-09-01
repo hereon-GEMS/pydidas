@@ -1,3 +1,17 @@
+v0.1.11
+=======
+Major changes:
+--------------
+
+Improvements
+------------
+- Removed the GlobalConfigurationFrame and moved content directly to
+  GlobalConfigWindow.
+
+Bugfixes:
+---------
+
+
 v0.1.10
 =======
 Major changes:

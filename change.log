@@ -13,6 +13,8 @@ Improvements
 
 Bugfixes:
 ---------
+- Fixed an issue with the canvas resize buttons in empty 2d plots.
+- Fixed missing kwargs in PydidasPlot2D class.
 
 
 v0.1.10

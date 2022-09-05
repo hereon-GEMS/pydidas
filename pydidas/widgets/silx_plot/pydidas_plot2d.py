@@ -40,7 +40,9 @@ class PydidasPlot2D(Plot2D):
     canvas to the data limits.
     """
 
-    def __init__(self, parent=None, backend=None):
+    setData = Plot2D.addImage
+
+    def __init__(self, parent=None, backend=None, **kwargs):
         Plot2D.__init__(self, parent, backend)
 
         self.changeCanvasToDataAction = self.group.addAction(

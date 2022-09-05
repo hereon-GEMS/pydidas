@@ -62,6 +62,8 @@ class ChangeCanvasToData(PlotAction):
         """
         self.plot.setKeepDataAspectRatio(True)
         _range = self.plot.getDataRange()
+        if _range.x is None or _range.y is None:
+            return
         _plot_data_aspect = (
             1
             if self.plot._backend.ax.get_aspect() == "auto"

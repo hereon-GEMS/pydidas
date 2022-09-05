@@ -29,7 +29,12 @@ from functools import partial
 from qtpy import QtCore
 
 from .builders import UtilitiesFrameBuilder
-from ..windows import ExportEigerPixelmaskWindow, FileSeriesOperationsWindow
+from ..windows import (
+    ExportEigerPixelmaskWindow,
+    FileSeriesOperationsWindow,
+    GlobalConfigWindow,
+    MaskEditorWindow,
+)
 
 
 class UtilitiesFrame(UtilitiesFrameBuilder):
@@ -45,6 +50,25 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         UtilitiesFrameBuilder.__init__(self, parent=parent, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
+        self._add_global_config_window()
+
+    def _add_global_config_window(self):
+        """
+        Add the required widgets and signals for the global configuration
+        window and create it.
+        """
+        _frame = GlobalConfigWindow()
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows["global_config"] = _frame
+
+    def finalize_ui(self):
+        """
+        finalize the UI initialization.
+        """
+        self.__main_gui = self.parent().parent()
+        self.__main_gui.sig_close_gui.connect(
+            self._child_windows["global_config"].close
+        )
 
     def connect_signals(self):
         """
@@ -55,6 +79,12 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         )
         self._widgets["button_series_operations"].clicked.connect(
             partial(self.create_and_show_temp_window, FileSeriesOperationsWindow)
+        )
+        self._widgets["button_mask_editor"].clicked.connect(
+            partial(self.create_and_show_temp_window, MaskEditorWindow)
+        )
+        self._widgets["button_global_config"].clicked.connect(
+            partial(self.show_window, "global_config")
         )
 
     @QtCore.Slot(object)
@@ -73,7 +103,23 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )
+        self.__main_gui.sig_close_gui.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()
+
+    @QtCore.Slot(str)
+    def show_window(self, name):
+        """
+        Show a separate window.
+
+        Parameters
+        ----------
+        name : str
+            The name key of the window to be shown.
+        """
+        _index = self._child_windows[name].frame_index
+        self._child_windows[name].frame_activated(_index)
+        self._child_windows[name].show()
+        self._child_windows[name].raise_()
 
     @QtCore.Slot(str)
     def remove_window_from_children(self, name):

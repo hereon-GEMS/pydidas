@@ -32,6 +32,13 @@ from ....widgets import BaseFrame
 
 
 UTILITIES = {
+    "global_config": {
+        "title": "Edit global settings",
+        "text": (
+            "Edit the global application settings (e.g. multiprocessing, plugin paths)."
+        ),
+        "button_text": "Edit global settings",
+    },
     "eiger_mask": {
         "title": "Save Eiger mask from master file",
         "text": (
@@ -40,15 +47,16 @@ UTILITIES = {
         ),
         "button_text": "Get and save Eiger mask",
     },
-    "series_operations": {
-        "title": "File series operations",
+    "mask_editor": {
+        "title": "Edit detector mask",
         "text": (
-            "Perform mathematical operations (e.g. sum, mean, median) on a series of "
-            "images and save the results to a new single image."
+            "Edit the detector mask: Import an image and add mask regions based on "
+            "threshold selections, polygons, etc. This utility is an integrated version"
+            " of the silx MaskToolsWidget."
         ),
-        "button_text": "File series operations",
+        "button_text": "Edit detector mask",
     },
-    "series_operations2": {
+    "series_operations": {
         "title": "File series operations",
         "text": (
             "Perform mathematical operations (e.g. sum, mean, median) on a series of "
@@ -70,9 +78,11 @@ class UtilitiesFrameBuilder(BaseFrame):
     """
 
     GROUP_WIDTH = 320
+    GRID_NUM = 3
 
     def __init__(self, parent=None, **kwargs):
         BaseFrame.__init__(self, parent, **kwargs)
+        self.setMinimumWidth(self.GRID_NUM * (self.GROUP_WIDTH + 10))
 
     def build_frame(self):
         """
@@ -88,8 +98,8 @@ class UtilitiesFrameBuilder(BaseFrame):
         )
 
         for _index, (_key, _entries) in enumerate(UTILITIES.items()):
-            _xpos = _index % 2
-            _ypos = _index // 2 + 1
+            _xpos = _index % self.GRID_NUM
+            _ypos = _index // self.GRID_NUM + 1
             self.create_empty_widget(
                 f"utility_{_key}",
                 gridPos=(_ypos, _xpos, 1, 1),

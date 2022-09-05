@@ -83,6 +83,8 @@ class MainMenu(QtWidgets.QMainWindow):
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
 
+    sig_close_gui = QtCore.Signal()
+
     def __init__(self, parent=None, geometry=None):
         super().__init__(parent)
         utils.configure_qtapp_namespace()
@@ -127,7 +129,7 @@ class MainMenu(QtWidgets.QMainWindow):
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        _frame = GlobalConfigWindow(None)
+        _frame = GlobalConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["global_config"] = _frame
 
@@ -246,11 +248,13 @@ class MainMenu(QtWidgets.QMainWindow):
         _file_menu.addAction(self._actions["exit"])
         _menu.addMenu(_file_menu)
 
-        _extras_menu = _menu.addMenu("&Extras")
-        _extras_menu.addAction(self._actions["open_settings"])
-        _extras_menu.addAction(self._actions["export_eiger_pixel_mask"])
-        _extras_menu.addAction(self._actions["average_images"])
-        _menu.addMenu(_extras_menu)
+        _utilities_menu = _menu.addMenu("&Utilities")
+        _utilities_menu.addAction(self._actions["export_eiger_pixel_mask"])
+        _utilities_menu.addAction(self._actions["average_images"])
+        _menu.addMenu(_utilities_menu)
+
+        _options_menu = _menu.addMenu("&Options")
+        _options_menu.addAction(self._actions["open_settings"])
 
         _help_menu = _menu.addMenu("&Help")
         _help_menu.addAction(self._actions["open_documentation_browser"])
@@ -262,7 +266,8 @@ class MainMenu(QtWidgets.QMainWindow):
 
         self._menus["file"] = _file_menu
         self._menus["state"] = _state_menu
-        self._menus["extras"] = _extras_menu
+        self._menus["utilities"] = _utilities_menu
+        self._menus["options"] = _options_menu
         self._menus["help"] = _help_menu
 
     @QtCore.Slot()
@@ -608,6 +613,7 @@ class MainMenu(QtWidgets.QMainWindow):
             The closing event.
         """
         self.export_gui_state(os.path.join(CONFIG_PATH, self.EXIT_STATE_FILENAME))
+        self.sig_close_gui.emit()
         _keys = list(self._child_windows.keys())
         for _key in _keys:
             self._child_windows[_key].deleteLater()

@@ -9,6 +9,7 @@ Improvements
 - Removed the GlobalConfigurationFrame and moved content directly to
   GlobalConfigWindow.
 - Added fit2d mask images to the recognized file types.
+- Child windows will now be closed upon exiting the main GUI window.
 
 Bugfixes:
 ---------

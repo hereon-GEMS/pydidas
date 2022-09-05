@@ -3,6 +3,7 @@ v0.1.11
 Major changes:
 --------------
 - Added a Utilities frame to have easy access to various utility windows.
+- Added new utility windows (Mask editing, file series operations)
 
 Improvements
 ------------

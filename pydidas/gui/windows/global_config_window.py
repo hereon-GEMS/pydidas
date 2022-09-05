@@ -31,7 +31,7 @@ from qtpy import QtCore, QtWidgets
 
 from .pydidas_window import PydidasWindow
 
-from ...core import get_generic_param_collection
+from ...core import get_generic_param_collection, SingletonFactory
 from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
 from ...plugins import PluginCollection
 
@@ -49,7 +49,7 @@ def update_plugin_collection():
     PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_path())
 
 
-class GlobalConfigWindow(PydidasWindow):
+class _GlobalConfigWindow(PydidasWindow):
     """
     The GlobalConfigWindow is a standalone QMainWindow with the
     GlobalConfigurationFrame as sole content.
@@ -68,6 +68,7 @@ class GlobalConfigWindow(PydidasWindow):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas global configuration")
+        self.setFixedWidth(330)
 
     def build_frame(self):
         """
@@ -209,3 +210,6 @@ class GlobalConfigWindow(PydidasWindow):
         """
         value = self._qsettings_convert_value_type(param_key, value)
         self.set_param_value_and_widget(param_key, value)
+
+
+GlobalConfigWindow = SingletonFactory(_GlobalConfigWindow)

@@ -32,6 +32,7 @@ from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .file_series_operations_window import *
 from .global_config_window import *
+from .mask_editor_window import *
 from .pydidas_window import *
 from .show_detailed_plugin_results import *
 from .tweak_plugin_parameter_window import *
@@ -67,6 +68,11 @@ from . import global_config_window
 
 __all__.extend(global_config_window.__all__)
 del global_config_window
+
+from . import mask_editor_window
+
+__all__.extend(mask_editor_window.__all__)
+del mask_editor_window
 
 from . import pydidas_window
 

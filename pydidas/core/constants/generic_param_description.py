@@ -125,6 +125,15 @@ GENERIC_PARAM_DESCRIPTION = {
         "allow_None": False,
         "tooltip": "Used only for hdf5 files: The dataset key.",
     },
+    "hdf5_frame": {
+        "type": int,
+        "default": 0,
+        "name": "Frame number",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "For hdf5 image files: The frame number in the dataset",
+    },
     "hdf5_dataset_shape": {
         "type": tuple,
         "default": (0, 0, 0),
@@ -202,9 +211,7 @@ GENERIC_PARAM_DESCRIPTION = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "For hdf5 background image files: The image number in " "the dataset"
-        ),
+        "tooltip": ("For hdf5 background image files: The image number in the dataset"),
     },
     "n_image": {
         "type": int,

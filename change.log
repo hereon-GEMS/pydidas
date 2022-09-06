@@ -11,6 +11,7 @@ Improvements
   GlobalConfigWindow.
 - Added fit2d mask images to the recognized file types.
 - Child windows will now be closed upon exiting the main GUI window.
+- Added a F1 help shortcut to all independent pydidas windows.
 
 Bugfixes:
 ---------

@@ -25,9 +25,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasWindow"]
 
-from qtpy import QtCore
+import os
 
-from ...core.utils import get_pydidas_icon_w_bg
+from qtpy import QtCore, QtWidgets, QtGui
+
+from ...core.utils import (get_pydidas_icon_w_bg,     get_doc_qurl_for_window_manual,
+    get_doc_filename_for_window_manual, get_doc_home_qurl)
+
 from ...widgets import BaseFrame
 
 
@@ -106,3 +110,24 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         self.setWindowIcon(get_pydidas_icon_w_bg())
         if "title" in kwargs:
             self.setWindowTitle(kwargs.get("title"))
+
+        self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
+        self._help_shortcut.activated.connect(self._open_help)
+
+
+    @QtCore.Slot()
+    def _open_help(self):
+        """
+        Open the help in a browser.
+
+        This slot will check whether a helpfile exists for the current frame and open
+        the respective helpfile if it exits or the main documentation if it does not.
+        """
+        _window_class = self.__class__.__name__
+        _docfile = get_doc_filename_for_window_manual(_window_class)
+
+        if os.path.exists(_docfile):
+            _url = get_doc_qurl_for_window_manual(_window_class)
+        else:
+            _url = get_doc_home_qurl()
+        _ = QtGui.QDesktopServices.openUrl(_url)

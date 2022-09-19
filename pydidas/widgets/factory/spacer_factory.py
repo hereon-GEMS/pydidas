@@ -65,8 +65,8 @@ def create_spacer(**kwargs):
     _policy = kwargs.get("policy", QSizePolicy.Minimum)
     _vertical_policy = kwargs.get("vertical_policy", _policy)
     _spacer = QSpacerItem(
-        kwargs.get("fixedHeight", 20),
         kwargs.get("fixedWidth", 20),
+        kwargs.get("fixedHeight", 20),
         _policy,
         _vertical_policy,
     )

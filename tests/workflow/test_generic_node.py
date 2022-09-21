@@ -209,33 +209,57 @@ class TestGenericNode(unittest.TestCase):
         _ids = root.get_recursive_ids()
         self.assertEqual(_ids, [0])
 
-    def test_remove_node_from_tree__no_children_not_recursive(self):
+    def test_delete_node_references__no_children_not_recursive(self):
         root = GenericNode(node_id=0)
         node = GenericNode(node_id=1, parent=root)
-        node.remove_node_from_tree()
+        node.delete_node_references()
         self.assertFalse(node in root._children)
 
-    def test_remove_node_from_tree__only_self(self):
+    def test_delete_node_references__only_self(self):
         root = GenericNode(node_id=0)
-        root.remove_node_from_tree()
+        root.delete_node_references()
 
-    def test_remove_node_from_tree__no_children_recursive(self):
+    def test_delete_node_references__no_children_recursive(self):
         root = GenericNode(node_id=0)
         node = GenericNode(node_id=1, parent=root)
-        node.remove_node_from_tree(recursive=True)
+        node.delete_node_references(recursive=True)
         self.assertFalse(node in root._children)
 
-    def test_remove_node_from_tree__with_children_not_recursive(self):
+    def test_delete_node_references__with_children_not_recursive(self):
         _nodes, _target_conns, _n_nodes = self.create_node_tree(3, 1)
         with self.assertRaises(RecursionError):
-            _nodes[1][0].remove_node_from_tree(recursive=False)
+            _nodes[1][0].delete_node_references(recursive=False)
 
-    def test_remove_node_from_tree__with_children_recursive(self):
+    def test_delete_node_references__with_children_recursive(self):
         _nodes, _target_conns, _n_nodes = self.create_node_tree(3, 1)
         _root = _nodes[0][0]
-        _nodes[1][0].remove_node_from_tree(recursive=True)
+        _nodes[1][0].delete_node_references(recursive=True)
         self.assertFalse(_nodes[1][0] in _root._children)
         self.assertEqual(_nodes[1][0].n_children, 0)
+
+    def test_connect_parent_to_children__no_parent(self):
+        root = GenericNode(node_id=0)
+        with self.assertRaises(UserConfigError):
+            root.connect_parent_to_children()
+
+    def test_connect_parent_to_children__no_children(self):
+        root = GenericNode(node_id=0)
+        node = GenericNode(node_id=1, parent=root)
+        node.connect_parent_to_children()
+        self.assertFalse(node in root._children)
+
+    def test_connect_parent_to_children__full_connection(self):
+        root = GenericNode(node_id=0)
+        node = GenericNode(node_id=1, parent=root)
+        subnode1 = GenericNode(node_id=2, parent=node)
+        subnode2 = GenericNode(node_id=3, parent=node)
+        node.connect_parent_to_children()
+        self.assertNotIn(node, root._children)
+        self.assertEqual(node._children, [])
+        self.assertIsNone(node.parent)
+        for _node in [subnode1, subnode2]:
+            self.assertIn(_node, root._children)
+            self.assertEqual(_node.parent, root)
 
     def test_remove_child_reference__wrong_child(self):
         root = GenericNode(node_id=0)

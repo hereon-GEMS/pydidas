@@ -25,6 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PluginInWorkflowBox"]
 
+from functools import partial
+
 from qtpy import QtWidgets, QtCore, QtGui
 
 from ...core.constants import gui_constants, qt_presets
@@ -49,6 +51,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
     widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
     sig_widget_activated = QtCore.Signal(int)
+    sig_widget_delete_branch_request = QtCore.Signal(int)
     sig_widget_delete_request = QtCore.Signal(int)
     sig_new_node_parent_request = QtCore.Signal(int, int)
 
@@ -56,7 +59,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         super().__init__(parent)
         self.setAcceptDrops(True)
         apply_widget_properties(self, **kwargs)
-        self.active = False
+        self._flag_active = False
+        self._flag_inconsistent = False
         self.widget_id = widget_id
 
         self.setFixedSize(self.widget_width, self.widget_height)
@@ -72,19 +76,41 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.id_label.setFont(_font)
         self.id_label.setGeometry(2, 2, self.widget_width - 25, 20)
 
-        self.del_button = QtWidgets.QPushButton(self)
-        self.del_button.setIcon(self.style().standardIcon(3))
-        self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
+        self.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
 
-        for item in [self, self.del_button]:
-            item.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
-        _childstyle = self._get_stylesheet_for_child()
-        self.id_label.setStyleSheet(_childstyle)
+        if kwargs.get("deletable", True):
+            self.del_button = QtWidgets.QPushButton(self)
+            self.del_button.setIcon(self.style().standardIcon(3))
+            self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
+            self.del_button.setStyleSheet(
+                qt_presets.QT_STYLES["workflow_plugin_inactive"]
+            )
+            self.__create_menu()
 
-        self.del_button.clicked.connect(self.delete)
+        self.id_label.setStyleSheet(self._get_stylesheet_w_o_border())
 
         self.update_text(widget_id, "")
         self.setText(plugin_name)
+
+    def __create_menu(self):
+        """
+        Create the custom context menu for adding an replacing nodes.
+        """
+        self._delete_node_context = QtWidgets.QMenu(self)
+
+        self._actions = {
+            "delete": QtWidgets.QAction("Delete this node", self),
+            "delete_branch": QtWidgets.QAction("Delete this branch", self),
+        }
+        self._actions["delete"].triggered.connect(
+            partial(self.sig_widget_delete_request.emit, self.widget_id)
+        )
+        self._actions["delete_branch"].triggered.connect(
+            partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
+        )
+        self._delete_node_context.addAction(self._actions["delete"])
+        self._delete_node_context.addAction(self._actions["delete_branch"])
+        self.del_button.setMenu(self._delete_node_context)
 
     def mousePressEvent(self, event):
         """
@@ -96,7 +122,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             The original event.
         """
         event.accept()
-        if not self.active:
+        if not self._flag_active:
             self.sig_widget_activated.emit(self.widget_id)
 
     def delete(self):
@@ -106,7 +132,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         """
         self.sig_widget_delete_request.emit(self.widget_id)
 
-    def widget_select(self, selection):
+    @QtCore.Slot(int)
+    def new_widget_selected(self, selection):
         """
         Select or deselect the widget.
 
@@ -116,14 +143,50 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             Flag whether the widget has been selected (True) or deselected
             (False).
         """
-        if selection:
+        self._flag_active = self.widget_id == selection
+        self._update_stylesheets()
+
+    def _update_stylesheets(self):
+        """
+        Update the stylesheets based on the active and consistent flags.
+        """
+        if self._flag_inconsistent:
+            _style = qt_presets.QT_STYLES["workflow_plugin_inconsistent"]
+        elif self._flag_active:
             _style = qt_presets.QT_STYLES["workflow_plugin_active"]
         else:
             _style = qt_presets.QT_STYLES["workflow_plugin_inactive"]
         self.setStyleSheet(_style)
-        _childstyle = self._get_stylesheet_for_child()
-        self.id_label.setStyleSheet(_childstyle)
-        self.active = selection
+        self.id_label.setStyleSheet(self._get_stylesheet_w_o_border())
+
+    @QtCore.Slot(int)
+    def receive_inconsistent_signal(self, *widget_ids):
+        """
+        Receive the signal that the given node ID is inconsistent and set the
+        stylesheets.
+
+        Parameters
+        ----------
+        *widget_ids : int
+            The widget node ID.
+        """
+        if self.widget_id in widget_ids:
+            self._flag_inconsistent = True
+            self._update_stylesheets()
+
+    @QtCore.Slot(int)
+    def clear_inconsistent_signal(self, *widget_ids):
+        """
+        Receive the signal that the given node ID is not inconsistent any more
+
+        Parameters
+        ----------
+        widget_id : int
+            The widget node ID.
+        """
+        if self.widget_id in widget_ids:
+            self._flag_inconsistent = False
+            self._update_stylesheets()
 
     def update_text(self, node_id, label):
         """
@@ -141,7 +204,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             _txt += f": {label}"
         self.id_label.setText(_txt)
 
-    def _get_stylesheet_for_child(self):
+    def _get_stylesheet_w_o_border(self):
         """
         Get the stylesheet for the child label.
 

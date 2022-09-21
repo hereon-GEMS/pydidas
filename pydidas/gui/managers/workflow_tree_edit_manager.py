@@ -53,8 +53,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     be used by the WorkflowTreeEditManager to manage the widget aspect.
     """
 
-    plugin_to_edit = QtCore.Signal(int)
-    plugin_to_delete = QtCore.Signal(int)
+    sig_plugin_selected = QtCore.Signal(int)
+    sig_plugin_to_delete = QtCore.Signal(int)
     pos_x_min = 5
     pos_y_min = 5
 
@@ -172,11 +172,13 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _widget = PluginInWorkflowBox(title, node_id, parent=self.qt_canvas)
         _widget.sig_widget_activated.connect(self.set_active_node)
-        _widget.sig_widget_delete_request.connect(
-            partial(self.delete_single_node_and_children, node_id)
+        _widget.sig_widget_delete_branch_request.connect(
+            partial(self.delete_branch, node_id)
         )
+        _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
         _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
         _widget.setVisible(True)
+        self.sig_plugin_selected.connect(_widget.new_widget_selected)
         self._node_widgets[node_id] = _widget
 
     @QtCore.Slot(int)
@@ -204,10 +206,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             return
         if node_id == TREE.active_node_id and not force_update:
             return
-        for _nid, _widget in self._node_widgets.items():
-            _widget.widget_select(node_id == _nid)
         TREE.active_node_id = node_id
-        self.plugin_to_edit.emit(node_id)
+        self.sig_plugin_selected.emit(node_id)
 
     @QtCore.Slot(int, str)
     def new_node_label_selected(self, node_id, label):
@@ -313,7 +313,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.__create_widget(name, _node_id)
         self.update_node_positions()
         if reset_active_node:
-            self.plugin_to_edit.emit(-1)
+            self.sig_plugin_selected.emit(-1)
             return
         self.set_active_node(TREE.active_node_id, force_update=True)
 
@@ -323,11 +323,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         new workflow.
         """
         _all_ids = list(self._node_widgets.keys())
-        self.__delete_nodes_and_widgets(_all_ids)
+        self.__delete_nodes_and_widgets(*_all_ids)
 
-    def delete_single_node_and_children(self, node_id):
+    @QtCore.Slot(int)
+    def delete_branch(self, node_id):
         """
-        Remove a node from the tree.
+        Remove a node and branch from the tree.
 
         This method will send a signal to instruct the WorkflowTree to delete
         a node. It will also instruct the corresponding node widget to delete
@@ -340,22 +341,46 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _ids = TREE.nodes[node_id].get_recursive_ids()
         TREE.delete_node_by_id(node_id)
-        self._nodes[node_id].remove_node_from_tree()
-        self.__delete_nodes_and_widgets(_ids)
-        self.plugin_to_delete.emit(node_id)
+        self._nodes[node_id].delete_node_references()
+        self.__delete_nodes_and_widgets(*_ids)
+        self.sig_plugin_to_delete.emit(node_id)
         if len(TREE.node_ids) > 0:
             self.set_active_node(TREE.active_node_id, force_update=True)
             self.update_node_positions()
         else:
-            self.plugin_to_edit.emit(-1)
+            self.sig_plugin_selected.emit(-1)
 
-    def __delete_nodes_and_widgets(self, ids):
+    @QtCore.Slot(int)
+    def delete_node(self, node_id):
+        """
+        Remove a single node from the tree and connect its children to its parent.
+
+        This method will send a signal to instruct the WorkflowTree to delete
+        a node. It will also instruct the corresponding node widget to delete
+        itself.
+
+        Parameters
+        ----------
+        node_id : int
+            The node_id if the node to be deleted.
+        """
+        TREE.delete_node_by_id(node_id, keep_children=True, recursive=False)
+        self._nodes[node_id].connect_parent_to_children()
+        self.__delete_nodes_and_widgets(node_id)
+        self.sig_plugin_to_delete.emit(node_id)
+        if len(TREE.node_ids) > 0:
+            self.set_active_node(TREE.active_node_id, force_update=True)
+            self.update_node_positions()
+        else:
+            self.sig_plugin_selected.emit(-1)
+
+    def __delete_nodes_and_widgets(self, *ids):
         """
         Delete all nodes and widgets with corresponding IDs from the manager.
 
         Parameters
         ----------
-        ids : list
+        *ids : tuple
             The list of integer widget/node IDs.
         """
         for _id in ids:

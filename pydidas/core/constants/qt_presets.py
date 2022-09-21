@@ -63,6 +63,7 @@ QT_STYLES[
     QPushButton{font-size: 11px;
                 color: rgb(60, 60, 60);
                 border: 0px solid rgb(225, 225, 225);}
+    QPushButton::menu-indicator { image: none; }
     QLabel{font-size: 12px;
            color: rgb(0, 0, 0);
            border: 2px solid rgb(60, 60, 60);
@@ -76,6 +77,7 @@ QT_STYLES[
     QPushButton{font-size: 11px;
                 color: rgb(60, 60, 60);
                 border: 0px solid rgb(60, 60, 60);}
+    QPushButton::menu-indicator { image: none; }
     QLabel{font-size: 12px;
            color: rgb(60, 60, 60);
            border: 1px solid rgb(60, 60, 60);
@@ -83,6 +85,20 @@ QT_STYLES[
            margin-bottom: 2px;
            border-radius: 3px;
            background: rgb(225, 225, 225);}"""
+QT_STYLES[
+    "workflow_plugin_inconsistent"
+] = """
+    QPushButton{font-size: 11px;
+                color: rgb(60, 60, 60);
+                border: 0px solid rgb(60, 60, 60);}
+    QPushButton::menu-indicator { image: none; }
+    QLabel{font-size: 12px;
+           color: rgb(60, 60, 60);
+           border: 1px solid rgb(60, 60, 60);
+           margin-left: 2px;
+           margin-bottom: 2px;
+           border-radius: 3px;
+           background: rgb(255, 225, 225);}"""
 QT_STYLES["title"] = """QWidget {font: bold; font-size: 14pt}"""
 QT_STYLES["subtitle"] = """QWidget {font: bold; font-size: 11pt}"""
 

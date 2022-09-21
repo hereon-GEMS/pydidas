@@ -263,10 +263,10 @@ class GenericNode:
             res += child.get_recursive_ids()
         return res
 
-    def remove_node_from_tree(self, recursive=True):
+    def delete_node_references(self, recursive=True):
         """
         Delete all references to the node from its parent and children and
-        unreferences all children.
+        unreference all children.
 
         If the node has a parent, the reference to itself is removed from the
         parent. If the node has children, references to these children are
@@ -288,12 +288,31 @@ class GenericNode:
         """
         if not self.is_leaf and not recursive:
             raise RecursionError(
-                "Node children detected but deletion" "is not recursive."
+                "Node children detected but deletion is not recursive."
             )
         if self.parent is not None:
             self.parent.remove_child_reference(self)
-        for child in self._children:
-            child.remove_node_from_tree(recursive)
+        for _child in self._children:
+            _child.delete_node_references(recursive)
+
+    def connect_parent_to_children(self):
+        """
+        Connect the own parent to the children.
+
+        Raises
+        ------
+        UserConfigError
+            If the node does not have a parent.
+        """
+        if self.parent is None:
+            raise UserConfigError(
+                "Cannot delete the node and connect its parent and children because "
+                "the nodes does not have a parent."
+            )
+        for _child in self._children:
+            self.parent.add_child(_child)
+        self._children = []
+        self.parent = None
 
     def remove_child_reference(self, child):
         """

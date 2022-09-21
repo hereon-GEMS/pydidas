@@ -276,12 +276,15 @@ class GenericTree:
         """
         return self.nodes[node_id]
 
-    def delete_node_by_id(self, node_id, recursive=True):
+    def delete_node_by_id(self, node_id, recursive=True, keep_children=False):
         """
         Remove a node from the tree and delete its object.
 
         This method deletes a node from the tree. With the optional recursive
-        keyword, node children will be deleted as well.
+        keyword, node children will be deleted as well. With the keep_children keyword,
+        children will be connected to the node's parent. Note that 'recursive' and
+        'keep_children' are mutually exclusive.
+
         Note: If you deselect the recursive option but the node has children,
         a RecursionError will be raised by the node itself upon the
         deletion request.
@@ -293,7 +296,14 @@ class GenericTree:
         recursive : bool, optional
             Keyword to toggle deletion of the node's children as well.
             The default is True.
+        keep_children : bool, optional
+            Keyword to keep the nodes children (and connect them to the node's parent).
+            The default is False.
         """
+        if recursive and keep_children:
+            raise ValueError(
+                "Conflicting selection of 'recursive' and 'keep_children' arguments."
+            )
         _subtree_ids = self.nodes[node_id].get_recursive_ids()
         if self.active_node_id in _subtree_ids:
             _parent_id = (
@@ -302,10 +312,15 @@ class GenericTree:
                 else self.nodes[node_id].parent.node_id
             )
             self.active_node_id = _parent_id
-        self.nodes[node_id].remove_node_from_tree(recursive=recursive)
-        for _id in _subtree_ids:
-            del self.nodes[_id]
-            self.node_ids.remove(_id)
+        if keep_children:
+            self.nodes[node_id].connect_parent_to_children()
+            del self.nodes[node_id]
+            self.node_ids.remove(node_id)
+        else:
+            self.nodes[node_id].delete_node_references(recursive=recursive)
+            for _id in _subtree_ids:
+                del self.nodes[_id]
+                self.node_ids.remove(_id)
         self._config["tree_changed"] = True
 
     def change_node_parent(self, node_id, new_parent_id):

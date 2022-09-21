@@ -105,4 +105,4 @@ def run_gui(app=None, restore_state="None"):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    _ = run_gui(app, restore_state="saved")
+    _ = run_gui(app, restore_state="exit")

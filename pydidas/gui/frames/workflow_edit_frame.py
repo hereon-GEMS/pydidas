@@ -89,7 +89,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
             workflow_add_plugin_at_parent
         )
-        WORKFLOW_EDIT_MANAGER.plugin_to_edit.connect(self.configure_plugin)
+        WORKFLOW_EDIT_MANAGER.sig_plugin_selected.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)

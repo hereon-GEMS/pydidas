@@ -26,9 +26,10 @@ __all__ = ["PydidasImageView"]
 
 from qtpy import QtCore
 from silx.gui.plot import ImageView, tools, Plot2D
+from silx.gui.colors import Colormap
 from silx.utils.weakref import WeakMethodProxy
 
-
+from ...core import PydidasQsettingsMixin
 from ...experiment import SetupExperiment
 from .silx_actions import CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
@@ -46,7 +47,7 @@ SNAP_MODE = (
 EXP_SETUP = SetupExperiment()
 
 
-class PydidasImageView(ImageView):
+class PydidasImageView(ImageView, PydidasQsettingsMixin):
     """
     A customized silx.gui.plot.ImageView with an additional configuration.
     """
@@ -56,6 +57,7 @@ class PydidasImageView(ImageView):
     def __init__(self, parent=None, backend=None):
 
         ImageView.__init__(self, parent, backend)
+        PydidasQsettingsMixin.__init__(self)
 
         posInfo = [
             ("X", lambda x, y: x),
@@ -88,6 +90,12 @@ class PydidasImageView(ImageView):
 
         self._positionWidget = _position_widget
         self.get_detector_size()
+
+        _cmap_name = self.q_settings_get_value("global/cmap_name").lower()
+        if _cmap_name is not None:
+            self.setDefaultColormap(
+                Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
+            )
 
     @QtCore.Slot()
     def get_detector_size(self):

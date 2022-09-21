@@ -27,7 +27,7 @@ __all__ = ["UtilitiesFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core.constants import QT_BOTTOM_ALIGNMENT
+from ....core.constants import QT_BOTTOM_LEFT_ALIGNMENT
 from ....widgets import BaseFrame
 
 
@@ -59,7 +59,7 @@ UTILITIES = {
     "series_operations": {
         "title": "File series operations",
         "text": (
-            "Perform mathematical operations (e.g. sum, mean, median) on a series of "
+            "Perform mathematical operations (e.g. sum, mean, max) on a series of "
             "images and save the results to a new single image."
         ),
         "button_text": "File series operations",
@@ -104,7 +104,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 f"utility_{_key}",
                 gridPos=(_ypos, _xpos, 1, 1),
                 fixedWidth=self.GROUP_WIDTH,
-                fixedHeight=150,
+                fixedHeight=170,
             )
             self.create_label(
                 f"title_{_key}",
@@ -137,7 +137,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(3, 0, 1, 1),
                 fixedWidth=self.GROUP_WIDTH - 20,
                 parent_widget=self._widgets[f"utility_{_key}"],
-                alignment=QT_BOTTOM_ALIGNMENT,
+                alignment=QT_BOTTOM_LEFT_ALIGNMENT,
             )
             self.create_spacer(
                 f"spacer_{_key}_2",

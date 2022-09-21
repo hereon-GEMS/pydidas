@@ -26,6 +26,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .pydidas_imageview import *
+from .pydidas_masktools_widget import *
 from .pydidas_plot1d import *
 from .pydidas_plot2d import *
 from .silx_actions import *
@@ -38,6 +39,11 @@ from . import pydidas_imageview
 
 __all__.extend(pydidas_imageview.__all__)
 del pydidas_imageview
+
+from . import pydidas_masktools_widget
+
+__all__.extend(pydidas_masktools_widget.__all__)
+del pydidas_masktools_widget
 
 from . import pydidas_plot1d
 

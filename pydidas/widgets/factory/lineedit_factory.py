@@ -55,7 +55,9 @@ def create_lineedit(**kwargs):
     kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
     kwargs["wordWrap"] = kwargs.get("wordWrap", True)
 
-    if QApplication.instance() is not None and not isinstance(kwargs.get("font", None), QFont):
+    if QApplication.instance() is not None and not isinstance(
+        kwargs.get("font", None), QFont
+    ):
         kwargs["font"] = QApplication.font()
         apply_font_properties(kwargs["font"], **kwargs)
 

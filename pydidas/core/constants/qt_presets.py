@@ -28,7 +28,10 @@ __all__ = [
     "QT_STYLES",
     "STANDARD_FONT_SIZE",
     "QT_DEFAULT_ALIGNMENT",
-    "QT_BOTTOM_ALIGNMENT",
+    "QT_TOP_RIGHT_ALIGNMENT",
+    "QT_BOTTOM_LEFT_ALIGNMENT",
+    "QT_CENTER_LEFT_ALIGNMENT",
+    "QT_CENTER_RIGHT_ALIGNMENT",
     "QT_COMBO_BOX_SIZE_POLICY",
     "QT_REG_EXP_FLOAT_VALIDATOR",
     "QT_REG_EXP_INT_VALIDATOR",
@@ -85,7 +88,13 @@ QT_STYLES["subtitle"] = """QWidget {font: bold; font-size: 11pt}"""
 
 QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
-QT_BOTTOM_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom
+QT_TOP_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
+
+QT_BOTTOM_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom
+
+QT_CENTER_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
+
+QT_CENTER_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
 
 QT_COMBO_BOX_SIZE_POLICY = QtWidgets.QComboBox.AdjustToMinimumContentsLengthWithIcon
 

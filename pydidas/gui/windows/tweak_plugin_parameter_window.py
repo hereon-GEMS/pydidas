@@ -25,20 +25,26 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["TweakPluginParameterWindow"]
 
+import os
 import copy
 
 import numpy as np
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
 
-from pydidas.core.constants import FIX_EXP_POLICY
-from pydidas.core.utils import ShowBusyMouse
-from pydidas.widgets import ScrollArea, BaseFrame
-from pydidas.widgets.parameter_config import ConfigurePluginWidget, ParameterEditFrame
-from pydidas.widgets.silx_plot import (
+from ...core.constants import FIX_EXP_POLICY
+from ...core.utils import (
+    get_doc_qurl_for_window_manual,
+    get_doc_filename_for_window_manual,
+    get_doc_home_qurl,
+    ShowBusyMouse,
+)
+from ...widgets import ScrollArea, BaseFrame
+from ...widgets.parameter_config import ConfigurePluginWidget, ParameterEditFrame
+from ...widgets.silx_plot import (
     create_silx_plot_stack,
     get_2d_silx_plot_ax_settings,
 )
-from pydidas.gui.windows import PydidasWindow, ShowDetailedPluginResults
+from ...gui.windows import PydidasWindow, ShowDetailedPluginResults
 
 
 class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
@@ -150,6 +156,23 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
         self._widgets["but_confirm"].clicked.connect(self.confirm_parameters)
         self._widgets["but_cancel"].clicked.connect(self.discard_parameter_changes)
+
+    @QtCore.Slot()
+    def open_help(self):
+        """
+        Open the help in a browser.
+
+        This slot will check whether a helpfile exists for the current frame and open
+        the respective helpfile if it exits or the main documentation if it does not.
+        """
+        _window_class = self.__class__.__name__
+        _docfile = get_doc_filename_for_window_manual(_window_class)
+
+        if os.path.exists(_docfile):
+            _url = get_doc_qurl_for_window_manual(_window_class)
+        else:
+            _url = get_doc_home_qurl()
+        _ = QtGui.QDesktopServices.openUrl(_url)
 
     def tweak_plugin(self, plugin, results):
         """

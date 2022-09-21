@@ -26,14 +26,13 @@ __status__ = "Development"
 __all__ = ["CompositeCreatorFrameBuilder"]
 
 from qtpy import QtWidgets, QtCore
-from silx.gui.plot import PlotWindow
 
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     FIX_EXP_POLICY,
     EXP_EXP_POLICY,
 )
-from ....widgets import ScrollArea, BaseFrameWithApp
+from ....widgets import ScrollArea, BaseFrameWithApp, silx_plot
 from ....widgets.parameter_config import ParameterEditFrame
 from ...mixins import SilxPlotWindowMixIn
 
@@ -90,31 +89,15 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
         )
-        self.add_any_widget(
+        self.create_any_widget(
             "plot_window",
-            PlotWindow(
-                parent=self,
-                resetzoom=True,
-                autoScale=False,
-                logScale=False,
-                grid=False,
-                curveStyle=False,
-                colormap=True,
-                aspectRatio=True,
-                yInverted=True,
-                copy=True,
-                save=True,
-                print_=True,
-                control=False,
-                position=True,
-                roi=False,
-                mask=True,
-            ),
+            silx_plot.PydidasPlot2D,
             alignment=None,
             stretch=(1, 1),
             gridPos=(0, 3, 1, 1),
             visible=False,
             sizePolicy=EXP_EXP_POLICY,
+            cs_transform=False,
         )
 
         for _key in self.params:

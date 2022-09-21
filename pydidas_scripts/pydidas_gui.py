@@ -44,6 +44,7 @@ from pydidas.gui.frames import (
     DirectorySpyFrame,
     ViewResultsFrame,
     WorkflowTestFrame,
+    UtilitiesFrame,
 )
 
 
@@ -91,6 +92,7 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(WorkflowTestFrame)
     gui.register_frame(WorkflowRunFrame)
     gui.register_frame(ViewResultsFrame)
+    gui.register_frame(UtilitiesFrame)
 
     if restore_state not in ["None", "exit", "saved"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
@@ -103,4 +105,4 @@ def run_gui(app=None, restore_state="None"):
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    _ = run_gui(app, restore_state="None")
+    _ = run_gui(app, restore_state="saved")

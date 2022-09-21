@@ -28,13 +28,15 @@ __all__ = ["PydidasPlot2D"]
 
 from qtpy import QtCore
 from silx.gui.plot import Plot2D
+from silx.gui.colors import Colormap
 
+from ...core import PydidasQsettingsMixin
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 
 
-class PydidasPlot2D(Plot2D):
+class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
     A customized silx.gui.plot.Plot2D with an additional features to limit the figure
     canvas to the data limits.
@@ -44,6 +46,7 @@ class PydidasPlot2D(Plot2D):
 
     def __init__(self, parent=None, backend=None, **kwargs):
         Plot2D.__init__(self, parent, backend)
+        PydidasQsettingsMixin.__init__(self)
 
         self.changeCanvasToDataAction = self.group.addAction(
             ChangeCanvasToData(self, parent=self)
@@ -66,8 +69,9 @@ class PydidasPlot2D(Plot2D):
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
 
-        self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
-        self._toolbar.addWidget(self.cs_transform)
+        if kwargs.get("cs_transform", True):
+            self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
+            self._toolbar.addWidget(self.cs_transform)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
@@ -80,9 +84,16 @@ class PydidasPlot2D(Plot2D):
             plot=self, converters=_pos_widget_converters
         )
         _new_position_widget.setSnappingMode(_pos_widget_snap_mode)
-        self.cs_transform.sig_new_coordinate_system.connect(
-            _new_position_widget.new_coordinate_system
-        )
+        if kwargs.get("cs_transform", True):
+            self.cs_transform.sig_new_coordinate_system.connect(
+                _new_position_widget.new_coordinate_system
+            )
         _layout = self.centralWidget().layout().itemAt(2).widget().layout()
         _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self._positionWidget = _new_position_widget
+
+        _cmap_name = self.q_settings_get_value("global/cmap_name").lower()
+        if _cmap_name is not None:
+            self.setDefaultColormap(
+                Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
+            )

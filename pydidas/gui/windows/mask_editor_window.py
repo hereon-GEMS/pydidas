@@ -28,7 +28,6 @@ __all__ = ["MaskEditorWindow"]
 import os
 
 from qtpy import QtCore, QtWidgets
-from silx.gui.plot.MaskToolsWidget import MaskToolsWidget
 
 from ...core import get_generic_param_collection, UserConfigError
 from ...core.constants import (
@@ -103,7 +102,7 @@ class MaskEditorWindow(PydidasWindow):
             "button_open_file",
             "Open selected image file",
             parent_widget=self._widgets["param_frame"],
-            enabled=False
+            enabled=False,
         )
         self.create_spacer(None, parent_widget=self._widgets["param_frame"])
         self.create_label(
@@ -116,7 +115,7 @@ class MaskEditorWindow(PydidasWindow):
 
         self.create_any_widget("plot_2d", silx_plot.PydidasPlot2D, gridPos=(0, 1, 2, 1))
 
-        self._widgets["mask_tools"] = MaskToolsWidget(
+        self._widgets["mask_tools"] = silx_plot.PydidasMaskToolsWidget(
             self, plot=self._widgets["plot_2d"]
         )
         self._widgets["mask_tools"].setDirection(QtWidgets.QBoxLayout.TopToBottom)

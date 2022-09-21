@@ -29,8 +29,12 @@ import os
 
 from qtpy import QtCore, QtWidgets, QtGui
 
-from ...core.utils import (get_pydidas_icon_w_bg,     get_doc_qurl_for_window_manual,
-    get_doc_filename_for_window_manual, get_doc_home_qurl)
+from ...core.utils import (
+    get_pydidas_icon_w_bg,
+    get_doc_qurl_for_window_manual,
+    get_doc_filename_for_window_manual,
+    get_doc_home_qurl,
+)
 
 from ...widgets import BaseFrame
 
@@ -112,11 +116,10 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
             self.setWindowTitle(kwargs.get("title"))
 
         self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
-        self._help_shortcut.activated.connect(self._open_help)
-
+        self._help_shortcut.activated.connect(self.open_help)
 
     @QtCore.Slot()
-    def _open_help(self):
+    def open_help(self):
         """
         Open the help in a browser.
 

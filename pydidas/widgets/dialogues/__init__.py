@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .acknowledge_box import *
 from .critical_warning_ import *
 from .error_message_box import *
 from .hdf5_dataset_selection_popup import *
@@ -34,6 +35,11 @@ from .warning_box import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import acknowledge_box
+
+__all__.extend(acknowledge_box.__all__)
+del acknowledge_box
+
 from . import critical_warning_
 
 __all__.extend(critical_warning_.__all__)

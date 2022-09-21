@@ -216,13 +216,13 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
-        ref : str
+        ref : Union[str, None]
             The reference name in the _widgets dictionary.
         widget : QtWidgets.QWidget
             The widget instance.
         **kwargs : dict
             Keyword arguments for the widget settings and layout.
-        **layout_args : dict
+        **layout_kwargs : dict
             Any keyword arguments which should be passed to the layout
             arguments but not to the widget creation. This is important
             for an "alignment=None" flag which cannot be passed to the
@@ -235,15 +235,15 @@ class CreateWidgetsMixIn:
         add it to the object:
 
         >>> object.add_any_widget('new_label', QLabel(), width=600,
-                                  layout_args={'alignment': None})
+                                  layout_kwargs={'alignment': None})
 
         Raises
         ------
         TypeError
             If the reference "ref" is not of type string.
         """
-        if not isinstance(ref, str):
-            raise TypeError("Widget reference must be of type string.")
+        if not (isinstance(ref, str) or ref is None):
+            raise TypeError("Widget reference must be None or a string.")
         apply_widget_properties(widget, **kwargs)
         _parent = kwargs.get("parent_widget", self)
         if isinstance(kwargs.get("layout_kwargs"), dict):
@@ -251,8 +251,10 @@ class CreateWidgetsMixIn:
             del kwargs["layout_kwargs"]
         _layout_args = _get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(widget, *_layout_args)
-        if ref is not None:
-            self._widgets[ref] = widget
+        if ref is None:
+            ref = f"unreferenced_{self.__index_unreferenced:03d}"
+            self.__index_unreferenced += 1
+        self._widgets[ref] = widget
 
 
 def _get_widget_layout_args(parent, **kwargs):
@@ -265,7 +267,7 @@ def _get_widget_layout_args(parent, **kwargs):
         The parent QWidget to be added to the layout.
     **kwargs : dict
         The keyword arguments dictionary from the calling method. This
-        method only takes the "gridPos" and "alignment" arguments from the
+        method only takes the "gridPos", "stretch" and "alignment" arguments from the
         kwargs.
 
     Raises

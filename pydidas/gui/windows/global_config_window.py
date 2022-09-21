@@ -28,12 +28,18 @@ __all__ = ["GlobalConfigWindow"]
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
+from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from .pydidas_window import PydidasWindow
 
 from ...core import get_generic_param_collection, SingletonFactory
-from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
+from ...core.constants import (
+    CONFIG_WIDGET_WIDTH,
+    QSETTINGS_GLOBAL_KEYS,
+    QT_TOP_RIGHT_ALIGNMENT,
+)
 from ...plugins import PluginCollection
+from ...widgets.dialogues import AcknowledgeBox
 
 
 PLUGINS = PluginCollection()
@@ -122,10 +128,27 @@ class _GlobalConfigWindow(PydidasWindow):
         self.create_param_widget(self.get_param("mosaic_max_size"), **_options)
         self.create_spacer("spacer_3")
 
-        self.create_label("section_plotting", "Display settings", **_section_options)
+        self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(self.get_param("plot_update_time"), **_options)
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction"), **_options
+        )
+
+        self.create_empty_widget("colormap_editor", fixedWidth=CONFIG_WIDGET_WIDTH)
+        self.create_label(
+            "label_colormap",
+            "Default colormap:",
+            gridPos=(0, 0, 1, 2),
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets["colormap_editor"],
+        )
+        self.add_any_widget(
+            "cmap_combobox",
+            ColormapNameComboBox(),
+            parent_widget=self._widgets["colormap_editor"],
+            fixedWidth=(CONFIG_WIDGET_WIDTH - 20),
+            gridPos=(1, 1, 1, 1),
+            layout_kwargs={"alignment": QT_TOP_RIGHT_ALIGNMENT},
         )
         self.create_spacer("spacer_4")
 
@@ -144,7 +167,9 @@ class _GlobalConfigWindow(PydidasWindow):
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
         self._widgets["but_plugins"].clicked.connect(update_plugin_collection)
+        self._widgets["cmap_combobox"].currentTextChanged.connect(self.update_cmap)
 
+    @QtCore.Slot(object)
     def update_qsetting(self, param_key, value):
         """
         Update a QSettings value
@@ -159,6 +184,28 @@ class _GlobalConfigWindow(PydidasWindow):
         """
         self.q_settings_set_key(f"global/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
+
+    @QtCore.Slot(str)
+    def update_cmap(self, cmap_name):
+        """
+        Update the default colormap.
+
+        Parameters
+        ----------
+        cmap_name : str
+            The name of the new colormap.
+        """
+        _ack = self.q_settings_get_value("global/cmap_acknowledge")
+        if _ack is None:
+            _set_ack = AcknowledgeBox(
+                text=(
+                    "Changing the default colormap will only become active after "
+                    "restarting pydidas."
+                )
+            ).exec_()
+            if _set_ack:
+                self.q_settings_set_key("global/cmap_acknowledge", True)
+        self.q_settings_set_key("global/cmap_name", cmap_name)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):

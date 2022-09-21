@@ -25,8 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DirectorySpyFrameBuilder"]
 
-from silx.gui.plot import Plot2D
-
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
@@ -35,6 +33,7 @@ from ....core.constants import (
 )
 from ....widgets import ScrollArea, BaseFrameWithApp
 from ....widgets.parameter_config import ParameterEditFrame
+from ....widgets.silx_plot import PydidasPlot2D
 
 
 class DirectorySpyFrameBuilder(BaseFrameWithApp):
@@ -186,7 +185,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
 
         self.add_any_widget(
             "plot",
-            Plot2D(),
+            PydidasPlot2D(),
             alignment=None,
             gridPos=(0, 1, 3, 1),
             visible=True,

@@ -174,6 +174,38 @@ class TestWorkflowNode(unittest.TestCase):
         obj = WorkflowNode(plugin=DummyLoader())
         self.assertIsInstance(obj, WorkflowNode)
 
+    def test_consistency_check__no_parent(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        self.assertTrue(obj.consistency_check())
+
+    def test_consistency_check__parent_out_any(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj2 = WorkflowNode(plugin=DummyProc(), parent=obj)
+        obj.plugin.output_data_dim = -1
+        obj2.plugin.input_data_dim = 2
+        self.assertTrue(obj2.consistency_check())
+
+    def test_consistency_check__plugin_in_any(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj2 = WorkflowNode(plugin=DummyProc(), parent=obj)
+        obj.plugin.input_data_dim = 2
+        obj2.plugin.input_data_dim = -1
+        self.assertTrue(obj2.consistency_check())
+
+    def test_consistency_check__eq_dims(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj2 = WorkflowNode(plugin=DummyProc(), parent=obj)
+        obj.plugin.input_data_dim = 2
+        obj2.plugin.input_data_dim = 2
+        self.assertTrue(obj2.consistency_check())
+
+    def test_consistency_check__neq_dims(self):
+        obj = WorkflowNode(plugin=DummyLoader())
+        obj2 = WorkflowNode(plugin=DummyProc(), parent=obj)
+        obj.plugin.input_data_dim = 2
+        obj2.plugin.input_data_dim = 1
+        self.assertFalse(obj2.consistency_check())
+
     def test_hash__simple(self):
         obj = WorkflowNode(plugin=DummyLoader(), node_id=0)
         self.assertIsInstance(hash(obj), int)

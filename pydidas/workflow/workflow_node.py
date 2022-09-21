@@ -147,6 +147,26 @@ class WorkflowNode(GenericNode):
             "The new node_id is not of a correct type and has not" " been set."
         )
 
+    def consistency_check(self):
+        """
+        Property to determine if the data is consistent.
+
+        Returns
+        -------
+        bool
+            Flag whether the parent's output is consistent with this node's input
+            dimensionality.
+        """
+        if self.parent is None:
+            return True
+        _parent_out = self.parent.plugin.output_data_dim
+        _plugin_in = self.plugin.input_data_dim
+        return self.parent.consistency_check() and (
+            _parent_out == _plugin_in
+            or _parent_out == -1
+            or _plugin_in == -1
+        )
+
     def prepare_execution(self):
         """
         Prepare the execution of the plugin chain by calling the pre_execute

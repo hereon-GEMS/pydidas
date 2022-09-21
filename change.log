@@ -15,6 +15,7 @@ Improvements
 - Added a F1 help shortcut to all independent pydidas windows.
 - Added an option to remove a single node from the WorkflowTree while 
   keeping its children.
+- Added a data dimension consistency check to WorkflowNode
 
 Bugfixes:
 ---------

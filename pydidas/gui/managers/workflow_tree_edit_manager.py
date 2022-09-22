@@ -55,6 +55,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
 
     sig_plugin_selected = QtCore.Signal(int)
     sig_plugin_to_delete = QtCore.Signal(int)
+    sig_plugin_class_selected = QtCore.Signal(str)
+    sig_inconsistent_plugins = QtCore.Signal(list)
+    sig_consistent_plugins = QtCore.Signal(list)
+
     pos_x_min = 5
     pos_y_min = 5
 
@@ -130,13 +134,17 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             TREE.active_node if parent_node_id is None else TREE.nodes[parent_node_id]
         )
         TREE.create_and_add_node(_plugin, parent=_parent)
+
+        # TODO : add consistency check
+        # TREE.active_node_id()
         _node_id = TREE.active_node_id
         self.__create_position_node(_node_id)
-        self.__create_widget(title if title else name, _node_id)
+        self.__create_widget(title if title is not None else name, _node_id)
         self.set_active_node(_node_id, force_update=True)
         if not self.qt_canvas:
             raise Warning("No QtCanvas defined. Nodes added but cannot be displayed")
         self.update_node_positions()
+        self._check_consistency()
 
     def __create_position_node(self, node_id):
         """
@@ -176,7 +184,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             partial(self.delete_branch, node_id)
         )
         _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
-        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
+        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)  #
+        self.sig_consistent_plugins.connect(_widget.receive_consistent_signal)
+        self.sig_inconsistent_plugins.connect(_widget.receive_inconsistent_signal)
         _widget.setVisible(True)
         self.sig_plugin_selected.connect(_widget.new_widget_selected)
         self._node_widgets[node_id] = _widget
@@ -208,6 +218,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             return
         TREE.active_node_id = node_id
         self.sig_plugin_selected.emit(node_id)
+        self.sig_plugin_class_selected.emit(TREE.active_node.plugin.plugin_name)
 
     @QtCore.Slot(int, str)
     def new_node_label_selected(self, node_id, label):
@@ -240,6 +251,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         TREE.change_node_parent(calling_node, new_parent_node)
         TREE.order_node_ids()
         self.update_from_tree()
+        self._check_consistency()
 
     def update_node_positions(self):
         """
@@ -316,6 +328,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.sig_plugin_selected.emit(-1)
             return
         self.set_active_node(TREE.active_node_id, force_update=True)
+        self._check_consistency()
+
+    def _check_consistency(self):
+        """
+        Check the WorkflowTree for data dimension consistency and send corresponding
+        signals to the widgets to style themselves accordingly.
+        """
+        _consistent, _inconsistent = TREE.get_consistent_and_inconsistent_nodes()
+        self.sig_consistent_plugins.emit(_consistent)
+        self.sig_inconsistent_plugins.emit(_inconsistent)
 
     def __delete_all_nodes_and_widgets(self):
         """

@@ -93,6 +93,26 @@ class _WorkflowTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
+    def get_consistent_and_inconsistent_nodes(self):
+        """
+        Get the consistency flags for all plugins in the WorkflowTree.
+
+        Returns
+        -------
+        list
+            List with the ID of consistent node
+        list
+            List with the IDs of nodes with inconsistent data
+        """
+        _consistent = []
+        _inconsistent = []
+        for _id in self.node_ids:
+            if self.nodes[_id].consistency_check():
+                _consistent.append(_id)
+            else:
+                _inconsistent.append(_id)
+        return _consistent, _inconsistent
+
     def execute_process_and_get_results(self, arg, **kwargs):
         """
         Execute the WorkflowTree process and get the results.

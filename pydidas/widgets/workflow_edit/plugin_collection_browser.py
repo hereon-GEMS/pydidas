@@ -79,7 +79,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         self.setLayout(_layout)
 
         self._widgets["plugin_treeview"].sig_plugin_preselected.connect(
-            self.__display_plugin_description
+            self.display_plugin_description
         )
         self._widgets["plugin_treeview"].sig_add_plugin_to_tree.connect(
             self.__confirm_selection
@@ -110,7 +110,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         self.sig_add_plugin_to_tree.emit(name)
 
     @QtCore.Slot(str)
-    def __display_plugin_description(self, name):
+    def display_plugin_description(self, name):
         """
         display the plugin description of the selected plugin.
 
@@ -121,7 +121,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         """
         if name in ["Input plugins", "Processing plugins", "Output plugins"]:
             return
-        _p = self.collection.get_plugin_by_plugin_name(name)()
+        _p = self.collection.get_plugin_by_plugin_name(name)
         self._widgets["plugin_description"].setTextFromDict(
             _p.get_class_description_as_dict(), _p.plugin_name
         )

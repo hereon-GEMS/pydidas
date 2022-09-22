@@ -74,20 +74,18 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
 
         self.id_label = QtWidgets.QLabel(self)
         self.id_label.setFont(_font)
-        self.id_label.setGeometry(2, 2, self.widget_width - 25, 20)
+        self.id_label.setGeometry(3, 3, self.widget_width - 25, 20)
 
-        self.setStyleSheet(qt_presets.QT_STYLES["workflow_plugin_inactive"])
+        self.setStyleSheet(self.__get_stylesheet())
 
         if kwargs.get("deletable", True):
             self.del_button = QtWidgets.QPushButton(self)
             self.del_button.setIcon(self.style().standardIcon(3))
-            self.del_button.setGeometry(self.widget_width - 18, 2, 16, 16)
-            self.del_button.setStyleSheet(
-                qt_presets.QT_STYLES["workflow_plugin_inactive"]
-            )
+            self.del_button.setGeometry(self.widget_width - 18, 3, 16, 16)
+            self.del_button.setStyleSheet(self.__get_stylesheet())
             self.__create_menu()
 
-        self.id_label.setStyleSheet(self._get_stylesheet_w_o_border())
+        self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
 
         self.update_text(widget_id, "")
         self.setText(plugin_name)
@@ -111,6 +109,40 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self._delete_node_context.addAction(self._actions["delete"])
         self._delete_node_context.addAction(self._actions["delete_branch"])
         self.del_button.setMenu(self._delete_node_context)
+
+    def __get_stylesheet(self, border=True):
+        """
+        Get the stylesheet based on the active and consistent flags.
+
+        Parameters
+        ----------
+        border : bool, optional
+            Flag to set the border. The default is True.
+
+        Returns
+        -------
+        QtWidgets.QStylesheet
+            The stylesheet for this box.
+        """
+        _border = (3 if self._flag_active else 1) if border else 0
+        if self._flag_inconsistent:
+            _bg_color = "rgb(255, 225, 225)"
+        elif self._flag_active:
+            _bg_color = "rgb(225, 225, 255)"
+        else:
+            _bg_color = "rgb(225, 225, 225)"
+        _style = (
+            "QPushButton{ border: 0px; }"
+            "QPushButton::menu-indicator { image: none; }"
+            "QLabel{font-size: 12px; "
+            f"border: {_border}px solid;"
+            "border-color: rgb(60, 60, 60);"
+            "border-radius: 3px;"
+            f"background: {_bg_color};"
+            "margin-left: 2px;"
+            "margin-bottom: 2px;}"
+        )
+        return _style
 
     def mousePressEvent(self, event):
         """
@@ -150,17 +182,11 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         """
         Update the stylesheets based on the active and consistent flags.
         """
-        if self._flag_inconsistent:
-            _style = qt_presets.QT_STYLES["workflow_plugin_inconsistent"]
-        elif self._flag_active:
-            _style = qt_presets.QT_STYLES["workflow_plugin_active"]
-        else:
-            _style = qt_presets.QT_STYLES["workflow_plugin_inactive"]
-        self.setStyleSheet(_style)
-        self.id_label.setStyleSheet(self._get_stylesheet_w_o_border())
+        self.setStyleSheet(self.__get_stylesheet())
+        self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
 
-    @QtCore.Slot(int)
-    def receive_inconsistent_signal(self, *widget_ids):
+    @QtCore.Slot(list)
+    def receive_inconsistent_signal(self, widget_ids):
         """
         Receive the signal that the given node ID is inconsistent and set the
         stylesheets.
@@ -170,12 +196,12 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         *widget_ids : int
             The widget node ID.
         """
-        if self.widget_id in widget_ids:
+        if self.widget_id in widget_ids and not self._flag_inconsistent:
             self._flag_inconsistent = True
             self._update_stylesheets()
 
-    @QtCore.Slot(int)
-    def clear_inconsistent_signal(self, *widget_ids):
+    @QtCore.Slot(list)
+    def receive_consistent_signal(self, widget_ids):
         """
         Receive the signal that the given node ID is not inconsistent any more
 
@@ -184,7 +210,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         widget_id : int
             The widget node ID.
         """
-        if self.widget_id in widget_ids:
+        if self.widget_id in widget_ids and self._flag_inconsistent:
             self._flag_inconsistent = False
             self._update_stylesheets()
 
@@ -203,22 +229,6 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         if len(label) > 0:
             _txt += f": {label}"
         self.id_label.setText(_txt)
-
-    def _get_stylesheet_w_o_border(self):
-        """
-        Get the stylesheet for the child label.
-
-        Returns
-        -------
-        str
-            The modified stylesheet for the child.
-        """
-        _style = str(self.styleSheet()).split(";")
-        for _item, _entry in enumerate(_style):
-            if _entry.strip().startswith("border"):
-                _style[_item] = "border: 0px"
-        _new_style = ";".join(_style)
-        return _new_style
 
     def mouseMoveEvent(self, event):
         """

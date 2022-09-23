@@ -118,7 +118,7 @@ class WorkerController(QtCore.QThread):
             If number is not of type Integral.
         """
         if not isinstance(number, Integral):
-            raise ValueError("The number of workers must be an integer " "number.")
+            raise ValueError("The number of workers must be an integer number.")
         self._n_workers = number
 
     @property

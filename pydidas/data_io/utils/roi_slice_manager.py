@@ -361,7 +361,7 @@ class RoiSliceManager:
                 _n += 2
         if _n != 2 * self._dim:
             _msg = error_msg(
-                self._roi_key, "The input does not have the " "correct length"
+                self._roi_key, "The input does not have the correct length"
             )
             raise ValueError(_msg)
 

@@ -273,7 +273,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         if isinstance(widget, QtWidgets.QWidget) and hasattr(widget, "setData"):
             self._widgets["viewer"] = widget
             return
-        raise TypeError("Error: Object must be a widget with a setData " "method.")
+        raise TypeError("Error: Object must be a widget with a setData method.")
 
     def _toggle_filter_key(self, widget, key):
         """

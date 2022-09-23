@@ -146,7 +146,7 @@ def _hdf5_filename_check(item):
     """
     if not get_extension(item) in HDF5_EXTENSIONS:
         raise TypeError(
-            "The file does not have any extension registered" " for hdf5 files."
+            "The file does not have any extension registered for hdf5 files."
         )
     if not os.path.exists(item):
         raise FileNotFoundError(f'The specified file "{item}" does not exist.')
@@ -265,7 +265,7 @@ def get_hdf5_metadata(fname, meta, dset=None):
     _fname, _dset = _get_hdf5_file_and_dataset_names(fname, dset)
     meta = [meta] if isinstance(meta, str) else meta
     if not isinstance(meta, (set, list, tuple)):
-        raise TypeError("meta parameter must be of type str, set, list, " "tuple.")
+        raise TypeError("meta parameter must be of type str, set, list, tuple.")
     _results = {}
     with h5py.File(_fname, "r") as _file:
         if "dtype" in meta:

@@ -49,9 +49,11 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.title = create_label(
             "Workflow tree editor",
             fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
             parent=self,
+            fixedWidth=250
         )
-        self.title.move(10, 10)
+        self.title.move(0, 0)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
 

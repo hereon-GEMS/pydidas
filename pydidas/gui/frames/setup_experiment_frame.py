@@ -195,7 +195,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         elif show_warning:
             critical_warning(
                 "No pyFAI Detector",
-                "No detector selected in pyFAI. Cannot copy " "information.",
+                "No detector selected in pyFAI. Cannot copy information.",
             )
 
     def copy_geometry_from_pyFAI(self, show_warning=True):

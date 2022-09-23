@@ -149,7 +149,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
-            tooltip=("Export all results. Note that the directory must be " "empty."),
+            tooltip=("Export all results. Note that the directory must be empty."),
         )
         self.create_spacer(
             "config_terminal_spacer",

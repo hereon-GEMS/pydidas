@@ -97,7 +97,7 @@ class WorkflowNode(GenericNode):
             )
         if not isinstance(self.plugin, BasePlugin):
             raise TypeError(
-                "Plugin must be an instance of BasePlugin (or " "subclass)."
+                "Plugin must be an instance of BasePlugin (or subclass)."
             )
 
     def __process_node_id(self):
@@ -144,7 +144,7 @@ class WorkflowNode(GenericNode):
             self.plugin.node_id = new_id
             return
         raise TypeError(
-            "The new node_id is not of a correct type and has not" " been set."
+            "The new node_id is not of a correct type and has not been set."
         )
 
     def consistency_check(self):

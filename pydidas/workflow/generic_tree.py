@@ -158,7 +158,7 @@ class GenericTree:
         """
         if not isinstance(node, GenericNode):
             raise TypeError(
-                "Can only register GenericNodes (or subclasses" " in the tree."
+                "Can only register GenericNodes (or subclasses) in the tree."
             )
 
     def clear(self):

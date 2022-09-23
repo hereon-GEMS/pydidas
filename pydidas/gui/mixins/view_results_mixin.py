@@ -345,7 +345,7 @@ class ViewResultsMixin:
         if _node == -1:
             critical_warning(
                 "No node selected",
-                ("No node has been selected. Please select a " "node and try again."),
+                ("No node has been selected. Please select a node and try again."),
             )
             return
         self._export(_node)

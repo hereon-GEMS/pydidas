@@ -91,7 +91,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             ".fio",
             name="The filename suffix",
             tooltip=(
-                "The suffix of the filename. This is anything after" " the counter."
+                "The suffix of the filename. This is anything after the counter."
             ),
         ),
         get_generic_parameter("first_index"),
@@ -121,7 +121,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             0,
             name="Energy offset",
             unit="eV",
-            tooltip=("The absolute offset in energy for the zeroth " "channel."),
+            tooltip=("The absolute offset in energy for the zeroth channel."),
         ),
         Parameter(
             "energy_delta",

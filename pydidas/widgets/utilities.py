@@ -113,7 +113,7 @@ def get_pyqt_icon_from_str_reference(ref_string):
     elif _type == "path":
         _menu_icon = QtGui.QIcon(_ref)
     else:
-        raise TypeError("Cannot interpret the string reference for " "the menu icon.")
+        raise TypeError("Cannot interpret the string reference for the menu icon.")
     return _menu_icon
 
 

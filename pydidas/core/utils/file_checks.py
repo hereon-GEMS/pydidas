@@ -126,7 +126,7 @@ def verify_files_of_range_are_same_size(path, filenames):
     """
     _fsizes = array([os.stat(f"{path}/{f}").st_size for f in filenames])
     if _fsizes.std() > 0.0:
-        raise UserConfigError("The selected files are not all of the " "same size.")
+        raise UserConfigError("The selected files are not all of the same size.")
 
 
 def file_is_writable(filename, overwrite=False):

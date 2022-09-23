@@ -75,7 +75,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             Path,
             Path(),
             name="Filename of profile file",
-            tooltip=("The filename of the file with the background " "profile."),
+            tooltip=("The filename of the file with the background profile."),
         ),
     )
     input_data_dim = 1

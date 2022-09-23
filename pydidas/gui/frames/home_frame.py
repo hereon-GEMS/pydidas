@@ -32,8 +32,16 @@ from ...core import constants
 from ...widgets import BaseFrame
 
 
+_GENERIC_INTRO = (
+    "- The pydidas GUI is organized in 'frames' with individual functionalities.\n"
+    "- The help is available as webpages eith through the menu or by pressing 'F1'\n"
+    "  to open the specific help for the current frame directly.\n"
+    "- The configuration and inputs can be stored and restored using the File->GUI\n"
+    "  state menu entries."
+)
+
 _TOOOLBAR_USER_TEXT = (
-    "Use the menu toolbar on the left to switch between different Frame. "
+    "Use the menu toolbar on the left to switch between different frames. "
     "Some menu toolbars will open an additional submenu on  the left. The "
     "active frame is highlighted."
 )
@@ -41,7 +49,7 @@ _TOOOLBAR_USER_TEXT = (
 _HELP_TEXT = (
     "Documentation is available in the html format. You can open the "
     'documentation from any frame using the "Help" menu entry to either open '
-    "it in the system's web browser or a window.\nOr follow this link to "
+    "it in the system's web browser or a window. <br>Or follow this link to "
     f'<a href="{get_doc_home_address()}">open the documentation in a browser'
     "</a>."
 )
@@ -49,22 +57,26 @@ _HELP_TEXT = (
 _PROC_SETUP_TEXT = (
     "Setting up a processing job requires three different object to be set: "
     "\n  1. The experimental setup. This includes values such as the beamline "
-    "energy, detector and detector geometry."
+    "energy, \n      detector and detector geometry. \n      "
+    "It is modified in the 'Workflow processing'->'Experimental Setup' frame."
     "\n  2. The scan setup. This includes the number of scan dimensions and "
-    "number of scan points per dimension."
+    "number\n      of scan points per dimension."
     "\n  3. The processing workflow. The workflow must includes all the "
-    "plugins which should be executed."
+    "plugins \n      which should be executed."
     "\n\nEach object has its own dedicated setup frame with importers and "
     "exporters for the various supported formats."
 )
 
 _PROC_TEXT = (
-    "The processing can be started and visualized in the "
-    '"Run Full Processing" frame.\n'
-    "Once the processing has been started, it will run in a separate"
-    " process and the GUI will stay responsive. \n"
-    "Results can be visualized on the fly while the processing is "
-    "running by selecting the desired node and axes.\n"
+    "The processing can be started for a single datapoint using the 'Test Workflow' "
+    "frame (in the 'Workflow Processing' submenu). The test also allows to view all "
+    "intermediate results.<br>"
+    "The full automatic processing can be started using the 'Run Full Processing' "
+    "frame.<br>"
+    "The full processing will run in separate processes and the GUI will stay "
+    "responsive. <br>"
+    "Results can be visualized on the fly while the processing is still running by "
+    "selecting the desired node and axes.<br>"
     "For a full tutorial, please visit the corresponding help page: "
     f'<a href="{get_doc_home_address()}">open the processing documentation'
     " in a browser</a>."
@@ -114,9 +126,17 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_quickstart",
             "Quickstart hints:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize=constants.STANDARD_FONT_SIZE + 2,
             bold=True,
+            underline=True,
             fixedWidth=400,
+            parent_widget=self._widgets["text_frame"],
+        )
+        self.create_label(
+            "label_quickstart_info",
+            _GENERIC_INTRO,
+            weight=63,
+            fixedWidth=600,
             parent_widget=self._widgets["text_frame"],
         )
         self.create_spacer(None, parent_widget=self._widgets["text_frame"])
@@ -156,10 +176,9 @@ class HomeFrame(BaseFrame):
             parent_widget=self._widgets["text_frame"],
         )
         self.create_spacer(None, parent_widget=self._widgets["text_frame"])
-
         self.create_label(
             "label_proc_setup",
-            "Processing setup:",
+            "Workflow processing setup:",
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,
@@ -172,10 +191,10 @@ class HomeFrame(BaseFrame):
             fixedWidth=600,
             parent_widget=self._widgets["text_frame"],
         )
-
+        self.create_spacer(None, parent_widget=self._widgets["text_frame"])
         self.create_label(
             "label_proc",
-            "Processing:",
+            "Running processing:",
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,

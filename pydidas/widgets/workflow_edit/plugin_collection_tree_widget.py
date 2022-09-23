@@ -30,9 +30,9 @@ from functools import partial
 from qtpy import QtWidgets, QtGui, QtCore
 
 from ...core import constants
+from ...core.utils import apply_qt_properties, apply_font_properties
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
-from ..utilities import apply_widget_properties, apply_font_properties
 
 
 PLUGIN_COLLECTION = PluginCollection()
@@ -62,7 +62,7 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
     def __init__(self, parent=None, collection=None, **kwargs):
         super().__init__(parent)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         self.collection = collection if collection is not None else PLUGIN_COLLECTION
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)

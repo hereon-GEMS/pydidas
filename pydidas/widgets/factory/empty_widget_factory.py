@@ -27,7 +27,7 @@ __all__ = ["create_empty_widget"]
 from qtpy.QtWidgets import QWidget, QGridLayout
 
 from ...core.constants import QT_DEFAULT_ALIGNMENT
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_empty_widget(**kwargs):
@@ -50,7 +50,7 @@ def create_empty_widget(**kwargs):
     """
     _widget = QWidget()
     init_layout = kwargs.get("init_layout", True)
-    apply_widget_properties(_widget, **kwargs)
+    apply_qt_properties(_widget, **kwargs)
     if init_layout:
         _layout = QGridLayout()
         _layout.setContentsMargins(0, 0, 0, 0)

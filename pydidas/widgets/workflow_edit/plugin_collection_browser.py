@@ -27,9 +27,9 @@ __all__ = ["PluginCollectionBrowser"]
 
 from qtpy import QtWidgets, QtCore
 
+from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
 from ..read_only_text_widget import ReadOnlyTextWidget
-from ..utilities import apply_widget_properties
 from .plugin_collection_tree_widget import PluginCollectionTreeWidget
 
 
@@ -60,7 +60,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
 
     def __init__(self, parent=None, **kwargs):
         super().__init__(parent)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (
             _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION

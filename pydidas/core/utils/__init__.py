@@ -38,6 +38,7 @@ from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger_ import *
 from .math_utils import *
+from .qt_utilities import *
 from .rebin_ import *
 from .set_default_plugin_dir_ import *
 from .show_busy_mouse import *
@@ -108,6 +109,11 @@ from . import math_utils
 
 __all__.extend(math_utils.__all__)
 del math_utils
+
+from . import qt_utilities
+
+__all__.extend(qt_utilities.__all__)
+del qt_utilities
 
 from . import rebin_
 

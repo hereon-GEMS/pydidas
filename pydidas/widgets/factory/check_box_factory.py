@@ -26,7 +26,7 @@ __all__ = ["create_check_box"]
 
 from qtpy.QtWidgets import QCheckBox
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_check_box(text, **kwargs):
@@ -51,5 +51,5 @@ def create_check_box(text, **kwargs):
         The instantiated spin box widget.
     """
     _box = QCheckBox(text)
-    apply_widget_properties(_box, **kwargs)
+    apply_qt_properties(_box, **kwargs)
     return _box

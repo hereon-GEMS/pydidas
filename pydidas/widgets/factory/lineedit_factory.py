@@ -28,7 +28,7 @@ from qtpy.QtWidgets import QLineEdit, QApplication
 from qtpy.QtGui import QFont
 
 from ...core.constants import STANDARD_FONT_SIZE
-from ..utilities import apply_widget_properties, apply_font_properties
+from ...core.utils import apply_qt_properties, apply_font_properties
 
 
 def create_lineedit(**kwargs):
@@ -55,11 +55,9 @@ def create_lineedit(**kwargs):
     kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
     kwargs["wordWrap"] = kwargs.get("wordWrap", True)
 
-    if QApplication.instance() is not None and not isinstance(
-        kwargs.get("font", None), QFont
-    ):
+    if not isinstance(kwargs.get("font", None), QFont):
         kwargs["font"] = QApplication.font()
-        apply_font_properties(kwargs["font"], **kwargs)
 
-    apply_widget_properties(_lineedit, **kwargs)
+    apply_font_properties(kwargs["font"], **kwargs)
+    apply_qt_properties(_lineedit, **kwargs)
     return _lineedit

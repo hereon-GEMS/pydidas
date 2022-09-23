@@ -35,7 +35,7 @@ from ...core.utils import (
 )
 from ...core.constants import EXP_EXP_POLICY, PYDIDAS_FEEDBACK_URL
 from ...core.utils import copy_text_to_system_clipbord
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -69,7 +69,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             gridPos=(0, 0, 1, 1),
         )
         self._widgets["label"] = QtWidgets.QLabel()
-        apply_widget_properties(
+        apply_qt_properties(
             self._widgets["label"],
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
             sizePolicy=EXP_EXP_POLICY,

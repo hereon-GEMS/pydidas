@@ -27,8 +27,8 @@ __all__ = ["ParameterEditFrame"]
 
 from qtpy import QtWidgets, QtCore
 
+from ...core.utils import apply_qt_properties
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
-from ..utilities import apply_widget_properties
 
 
 class ParameterEditFrame(QtWidgets.QFrame, ParameterWidgetsMixIn):
@@ -54,7 +54,7 @@ class ParameterEditFrame(QtWidgets.QFrame, ParameterWidgetsMixIn):
         kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
         kwargs["frameStyle"] = kwargs.get("frameStyle", QtWidgets.QFrame.Raised)
         kwargs["autoFillBackground"] = kwargs.get("autoFillBackground", True)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         if init_layout:
             _layout = QtWidgets.QGridLayout()
             _layout.setContentsMargins(5, 5, 5, 5)

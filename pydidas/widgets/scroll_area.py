@@ -28,7 +28,7 @@ __all__ = ["ScrollArea"]
 from qtpy import QtWidgets
 
 from ..core.constants import EXP_EXP_POLICY
-from .utilities import apply_widget_properties
+from ..core.utils import apply_qt_properties
 
 
 class ScrollArea(QtWidgets.QScrollArea):
@@ -53,7 +53,7 @@ class ScrollArea(QtWidgets.QScrollArea):
         kwargs["autoFillBackground"] = True
         kwargs["sizePolicy"] = EXP_EXP_POLICY
         kwargs["frameShape"] = QtWidgets.QFrame.NoFrame
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
 
     def sizeHint(self):
         """

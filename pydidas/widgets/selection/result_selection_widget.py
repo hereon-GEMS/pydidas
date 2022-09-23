@@ -42,13 +42,12 @@ from ...core.constants import (
     QT_REG_EXP_SLICE_VALIDATOR,
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
 )
-from ...core.utils import SignalBlocker
+from ...core.utils import SignalBlocker, apply_qt_properties
 from ...experiment import SetupScan
 from ...workflow import WorkflowResults, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
 from ..read_only_text_widget import ReadOnlyTextWidget
-from ..utilities import apply_widget_properties
 
 
 SCAN = SetupScan()
@@ -134,7 +133,7 @@ class ResultSelectionWidget(
         QtWidgets.QWidget.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         self.params = ParameterCollection()
         self._config = {
             "widget_visibility": False,

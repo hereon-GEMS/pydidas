@@ -33,10 +33,9 @@ from qtpy import QtWidgets, QtCore
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from ...core import PydidasGuiError
-from ...core.utils import get_hdf5_populated_dataset_keys
+from ...core.utils import get_hdf5_populated_dataset_keys, apply_qt_properties
 from ...core.constants import QT_COMBO_BOX_SIZE_POLICY
 from ..factory import CreateWidgetsMixIn
-from ..utilities import apply_widget_properties
 
 
 DEFAULT_FILTERS = {
@@ -76,7 +75,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
     def __init__(self, parent=None, viewWidget=None, datasetKeyFilters=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
 
         self._config = dict(
             activeDsetFilters=[],

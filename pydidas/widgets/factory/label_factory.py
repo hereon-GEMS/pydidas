@@ -27,7 +27,7 @@ __all__ = ["create_label"]
 from qtpy.QtWidgets import QLabel, QApplication
 from qtpy.QtGui import QFont
 
-from ..utilities import apply_widget_properties, apply_font_properties
+from ...core.utils import apply_qt_properties, apply_font_properties
 
 
 def create_label(text, **kwargs):
@@ -60,5 +60,5 @@ def create_label(text, **kwargs):
         kwargs["font"] = QApplication.font()
 
     apply_font_properties(kwargs["font"], **kwargs)
-    apply_widget_properties(_label, **kwargs)
+    apply_qt_properties(_label, **kwargs)
     return _label

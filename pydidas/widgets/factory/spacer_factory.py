@@ -26,7 +26,7 @@ __all__ = ["create_spacer"]
 
 from qtpy.QtWidgets import QSpacerItem, QSizePolicy
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_spacer(**kwargs):
@@ -71,5 +71,5 @@ def create_spacer(**kwargs):
         _vertical_policy,
     )
 
-    apply_widget_properties(_spacer, **kwargs)
+    apply_qt_properties(_spacer, **kwargs)
     return _spacer

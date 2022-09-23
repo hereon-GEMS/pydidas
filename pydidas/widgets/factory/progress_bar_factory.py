@@ -26,7 +26,7 @@ __all__ = ["create_progress_bar"]
 
 from qtpy.QtWidgets import QProgressBar
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_progress_bar(**kwargs):
@@ -49,5 +49,5 @@ def create_progress_bar(**kwargs):
         The instantiated progress bar widget.
     """
     _bar = QProgressBar()
-    apply_widget_properties(_bar, **kwargs)
+    apply_qt_properties(_bar, **kwargs)
     return _bar

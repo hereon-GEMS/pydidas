@@ -36,8 +36,7 @@ from ...core.constants import (
     PARAM_INPUT_TEXT_WIDTH,
     PARAM_INPUT_UNIT_WIDTH,
 )
-from ...core.utils import convert_special_chars_to_unicode
-from ..utilities import apply_widget_properties
+from ...core.utils import convert_special_chars_to_unicode, apply_qt_properties
 from ..factory import create_param_widget, create_label
 
 
@@ -92,7 +91,7 @@ class ParameterConfigWidget(QtWidgets.QWidget):
             partial(self.__set_param_value, param, self.io_widget)
         )
         self.setLayout(_layout)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
 
     def __set_size_from_kwargs(self, kwargs):
         """

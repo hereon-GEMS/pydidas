@@ -28,7 +28,7 @@ __all__ = ["DirectoryExplorer"]
 from qtpy import QtWidgets, QtCore
 
 from ...core import PydidasQsettings
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 class DirectoryExplorer(QtWidgets.QTreeView):
@@ -48,7 +48,7 @@ class DirectoryExplorer(QtWidgets.QTreeView):
 
     def __init__(self, parent=None, root_path="", **kwargs):
         super().__init__(parent)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         if root_path == "":
             root_path = self._get_stored_root_path()
         self._filemodel = QtWidgets.QFileSystemModel()

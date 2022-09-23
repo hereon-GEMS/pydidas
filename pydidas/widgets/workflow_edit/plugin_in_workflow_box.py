@@ -30,7 +30,7 @@ from functools import partial
 from qtpy import QtWidgets, QtCore, QtGui
 
 from ...core import constants
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 class PluginInWorkflowBox(QtWidgets.QLabel):
@@ -58,7 +58,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
         super().__init__(parent)
         self.setAcceptDrops(True)
-        apply_widget_properties(self, **kwargs)
+        apply_qt_properties(self, **kwargs)
         self._flag_active = False
         self._flag_inconsistent = False
         self.widget_id = widget_id

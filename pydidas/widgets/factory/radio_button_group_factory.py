@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["create_radio_button_group"]
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_radio_button_group(entries, title=None, **kwargs):
@@ -65,5 +65,5 @@ def create_radio_button_group(entries, title=None, **kwargs):
     from ..selection import RadioButtonGroup
 
     _box = RadioButtonGroup(None, entries, title=title, **kwargs)
-    apply_widget_properties(_box, **kwargs)
+    apply_qt_properties(_box, **kwargs)
     return _box

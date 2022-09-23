@@ -26,7 +26,7 @@ __all__ = ["create_spin_box"]
 
 from qtpy.QtWidgets import QSpinBox
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_spin_box(**kwargs):
@@ -53,5 +53,5 @@ def create_spin_box(**kwargs):
     kwargs["range"] = kwargs.get("valueRange", (0, 1))
     kwargs["fixedWidth"] = kwargs.get("fixedWidth", 50)
     _box = QSpinBox()
-    apply_widget_properties(_box, **kwargs)
+    apply_qt_properties(_box, **kwargs)
     return _box

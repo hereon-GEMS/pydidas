@@ -31,8 +31,7 @@ from qtpy import QtCore, QtWidgets, QtSvg
 
 from ...core.utils import get_pydidas_error_icon_w_bg, get_pydidas_icon_path
 from ...core.constants import EXP_EXP_POLICY
-from ...core.utils import format_input_to_multiline_str
-from ..utilities import apply_widget_properties
+from ...core.utils import format_input_to_multiline_str, apply_qt_properties
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -66,7 +65,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             gridPos=(0, 0, 1, 1),
         )
         self._widgets["label"] = QtWidgets.QLabel()
-        apply_widget_properties(
+        apply_qt_properties(
             self._widgets["label"],
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
             sizePolicy=EXP_EXP_POLICY,

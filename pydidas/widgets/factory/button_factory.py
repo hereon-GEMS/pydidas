@@ -26,7 +26,8 @@ __all__ = ["create_button"]
 
 from qtpy.QtWidgets import QPushButton
 
-from ..utilities import apply_widget_properties, get_pyqt_icon_from_str_reference
+from ...core.utils import apply_qt_properties
+from ..utilities import get_pyqt_icon_from_str_reference
 
 
 def create_button(text, **kwargs):
@@ -53,5 +54,5 @@ def create_button(text, **kwargs):
     _button = QPushButton(text)
     if isinstance(kwargs.get("icon", None), str):
         kwargs["icon"] = get_pyqt_icon_from_str_reference(kwargs.get("icon"))
-    apply_widget_properties(_button, **kwargs)
+    apply_qt_properties(_button, **kwargs)
     return _button

@@ -28,7 +28,7 @@ __all__ = ["ReadOnlyTextWidget"]
 from qtpy import QtWidgets
 
 from ..core import constants
-from .utilities import apply_widget_properties
+from ..core.utils import apply_qt_properties
 
 
 class ReadOnlyTextWidget(QtWidgets.QTextEdit):
@@ -73,7 +73,7 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             del params["minimumWidth"]
         if "fixedHeight" in params and "minimumHeight" in params:
             del params["minimumHeight"]
-        apply_widget_properties(self, **params)
+        apply_qt_properties(self, **params)
 
     def setText(self, text, title=None):
         """

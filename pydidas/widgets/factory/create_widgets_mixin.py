@@ -29,8 +29,7 @@ from qtpy import QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from ...core import PydidasGuiError
-from ...core.utils import copy_docstring
-from ..utilities import apply_widget_properties
+from ...core.utils import copy_docstring, apply_qt_properties
 from .button_factory import create_button
 from .check_box_factory import create_check_box
 from .combobox_factory import create_combo_box
@@ -202,7 +201,7 @@ class CreateWidgetsMixIn:
         if not isinstance(ref, str):
             raise TypeError("Widget reference must be of type string.")
         self.__create_widget(widget_class, ref, *args, **kwargs)
-        apply_widget_properties(self._widgets[ref], **kwargs)
+        apply_qt_properties(self._widgets[ref], **kwargs)
 
     def add_any_widget(self, ref, widget, **kwargs):
         """
@@ -244,7 +243,7 @@ class CreateWidgetsMixIn:
         """
         if not (isinstance(ref, str) or ref is None):
             raise TypeError("Widget reference must be None or a string.")
-        apply_widget_properties(widget, **kwargs)
+        apply_qt_properties(widget, **kwargs)
         _parent = kwargs.get("parent_widget", self)
         if isinstance(kwargs.get("layout_kwargs"), dict):
             kwargs.update(kwargs.get("layout_kwargs"))

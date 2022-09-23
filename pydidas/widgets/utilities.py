@@ -24,8 +24,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
     "delete_all_items_in_layout",
-    "apply_font_properties",
-    "apply_widget_properties",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str_reference",
     "get_max_pixel_width_of_entries",
@@ -54,77 +52,6 @@ def delete_all_items_in_layout(layout):
                 widget.deleteLater()
             else:
                 delete_all_items_in_layout(item.layout())
-
-
-def _get_args_as_list(args):
-    """
-    Format the input arguments to an interable list to be passed as *args.
-
-    Parameters
-    ----------
-    args : object
-        Any input
-
-    Returns
-    -------
-    args : Union[tuple, list, set]
-        The input arguments formatted to a iterable list.
-    """
-    if not isinstance(args, (tuple, list, set)):
-        args = [args]
-    return args
-
-
-def apply_widget_properties(obj, **kwargs):
-    """
-    Set Qt widget properties from a supplied dict.
-
-    This function takes a dictionary (ie. keyword arguments) and iterates
-    through all keys. Keys will be interpreted in Qt style: A "property: 12"
-    entry in the dictionary will verify that the widget has a "setProperty"
-    method and will then call "obj.setProperty(12)". The verificiation that
-    the methods exist allows this function to take the full kwargs of any
-    object without the need to filter out non-related keys.
-
-    Parameters
-    ----------
-    widget : QtWidgets.QWidget
-        Any QWidget.
-    **kwargs : dict
-        A dictionary with properties to be set.
-    """
-    for _key in kwargs:
-        _name = f"set{_key[0].upper()}{_key[1:]}"
-        if hasattr(obj, _name):
-            _func = getattr(obj, _name)
-            _func(*_get_args_as_list(kwargs.get(_key)))
-
-
-def apply_font_properties(fontobj, **kwargs):
-    """
-    Set font properties from a supplied dict.
-
-    This function takes a dictionary (ie. keyword arguments) and iterates
-    through all keys. Keys will be interpreted in Qt style: A "property: 12"
-    entry in the dictionary will verify that the font object  has a
-    "setProperty" method and will then call "fontobj.setProperty(12)". The
-    verificiation that methods exist allows this function to take the full
-    kwargs of any object without the need to filter out non-related keys.
-
-    Parameters
-    ----------
-    fontobj : QObject
-        Any QFont
-    **kwargs : dict
-        A dictionary with properties to be set.
-    """
-    if "fontsize" in kwargs and "pointSize" not in kwargs:
-        kwargs["pointSize"] = kwargs.get("fontsize")
-    for _key in kwargs:
-        _name = f"set{_key[0].upper()}{_key[1:]}"
-        if hasattr(fontobj, _name):
-            _func = getattr(fontobj, _name)
-            _func(*_get_args_as_list(kwargs.get(_key)))
 
 
 def create_default_grid_layout():

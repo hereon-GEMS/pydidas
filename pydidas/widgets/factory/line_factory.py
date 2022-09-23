@@ -27,7 +27,7 @@ __all__ = ["create_line"]
 
 from qtpy.QtWidgets import QFrame
 
-from ..utilities import apply_widget_properties
+from ...core.utils import apply_qt_properties
 
 
 def create_line(**kwargs):
@@ -58,5 +58,5 @@ def create_line(**kwargs):
     kwargs["frameShadow"] = kwargs.get("frameShadow", QFrame.Sunken)
     kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
     kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
-    apply_widget_properties(_line, **kwargs)
+    apply_qt_properties(_line, **kwargs)
     return _line

@@ -93,6 +93,20 @@ class _WorkflowTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
+    def replace_node_plugin(self, node_id, new_plugin):
+        """
+        Replace the plugin of the selected node with the new Plugin.
+
+        Parameters
+        ----------
+        node_id : int
+            The node ID of the node to be replaced.
+        new_plugin : pydidas.plugins.BasePlugin
+            The instance of the new Plugin.
+        """
+        self.nodes[node_id].plugin = new_plugin
+        self._config["tree_changed"] = True
+
     def get_consistent_and_inconsistent_nodes(self):
         """
         Get the consistency flags for all plugins in the WorkflowTree.

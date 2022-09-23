@@ -84,7 +84,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             partial(workflow_add_plugin_at_parent, -1)
         )
         self._widgets["plugin_collection"].sig_replace_plugin.connect(
-            self.workflow_replace_plugin
+            WORKFLOW_EDIT_MANAGER.replace_plugin
         )
         self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
             workflow_add_plugin_at_parent
@@ -96,22 +96,6 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
-
-    @QtCore.Slot(str)
-    def workflow_replace_plugin(self, plugin_name):
-        """
-        Get the signal that the active node's Plugin should be replaced by a new
-        Plugin class.
-
-        Parameters
-        ----------
-        plugin_name : str
-            The name of the new Plugin.
-        """
-        _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(plugin_name)()
-        TREE.active_node.plugin = _plugin
-        self.configure_plugin(TREE.active_node_id)
-        WORKFLOW_EDIT_MANAGER._node_widgets[TREE.active_node_id].setText(plugin_name)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id):

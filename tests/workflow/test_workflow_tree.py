@@ -32,7 +32,7 @@ import pickle
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import UserConfigError, Dataset
+from pydidas.core import UserConfigError, Dataset, Parameter
 from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
 from pydidas.workflow.workflow_tree import _WorkflowTree
 from pydidas.plugins import PluginCollection
@@ -249,6 +249,19 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(len(self.tree.nodes), 3)
         self.assertIsInstance(self.tree.nodes[_id], GenericNode)
         self.assertEqual(self.tree.nodes[_id].node_id, _id)
+
+    def test_replace_node_plugin(self):
+        _orig_plugin = unittest_objects.DummyProc()
+        _new_plugin = unittest_objects.DummyProc()
+        _new_plugin.add_param(Parameter("test", int, 1))
+        self.tree.create_and_add_node(unittest_objects.DummyLoader())
+        self.tree.create_and_add_node(_orig_plugin)
+        self.tree.reset_tree_changed_flag()
+        _hash1 = hash(self.tree)
+        self.tree.replace_node_plugin(1, _new_plugin)
+        self.assertEqual(self.tree.nodes[1].plugin, _new_plugin)
+        self.assertTrue(self.tree.tree_has_changed)
+        self.assertNotEqual(_hash1, hash(self.tree))
 
     def test_tree_copy_with_plugins(self):
         self.tree.create_and_add_node(unittest_objects.DummyLoader())

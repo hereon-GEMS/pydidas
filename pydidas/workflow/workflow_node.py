@@ -96,9 +96,7 @@ class WorkflowNode(GenericNode):
                 " Node has not been created."
             )
         if not isinstance(self.plugin, BasePlugin):
-            raise TypeError(
-                "Plugin must be an instance of BasePlugin (or subclass)."
-            )
+            raise TypeError("Plugin must be an instance of BasePlugin (or subclass).")
 
     def __process_node_id(self):
         """

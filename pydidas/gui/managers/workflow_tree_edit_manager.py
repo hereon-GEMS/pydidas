@@ -220,6 +220,22 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.sig_plugin_selected.emit(node_id)
         self.sig_plugin_class_selected.emit(TREE.active_node.plugin.plugin_name)
 
+    @QtCore.Slot(str)
+    def replace_plugin(self, plugin_name):
+        """
+        Replace the active node's Plugin by a new Plugin class.
+
+        Parameters
+        ----------
+        plugin_name : str
+            The name of the new Plugin.
+        """
+        _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(plugin_name)()
+        TREE.replace_node_plugin(TREE.active_node_id, _plugin)
+        self._node_widgets[TREE.active_node_id].setText(plugin_name)
+        self.sig_plugin_selected.emit(TREE.active_node_id)
+        self._check_consistency()
+
     @QtCore.Slot(int, str)
     def new_node_label_selected(self, node_id, label):
         """
@@ -395,6 +411,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.update_node_positions()
         else:
             self.sig_plugin_selected.emit(-1)
+        self._check_consistency()
 
     def __delete_nodes_and_widgets(self, *ids):
         """

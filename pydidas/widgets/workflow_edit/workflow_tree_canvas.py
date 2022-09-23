@@ -51,7 +51,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
             fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             parent=self,
-            fixedWidth=250
+            fixedWidth=250,
         )
         self.title.move(0, 0)
         self.painter = QtGui.QPainter()

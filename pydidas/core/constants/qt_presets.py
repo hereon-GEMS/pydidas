@@ -46,8 +46,10 @@ from qtpy import QtGui, QtCore, QtWidgets
 STANDARD_FONT_SIZE = 10
 
 QT_STYLES = {
-    "title": """QWidget {font: bold; font-size: 14pt}""",
-    "subtitle": """QWidget {font: bold; font-size: 11pt}"""
+    "title": "QWidget {font: bold; font-size: " + f"{STANDARD_FONT_SIZE + 4}" + "pt}",
+    "subtitle": "QWidget {font: bold; font-size: "
+    + f"{STANDARD_FONT_SIZE + 1}"
+    + "pt}",
 }
 
 QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop

@@ -28,6 +28,7 @@ __all__ = ["HomeFrame"]
 from qtpy import QtCore, QtSvg, QtWidgets
 
 from ...core.utils import get_doc_home_address, get_pydidas_icon_fname
+from ...core import constants
 from ...widgets import BaseFrame
 
 
@@ -96,7 +97,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_welcome",
             "Welcome to pydidas",
-            fontsize=14,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             fixedWidth=400,
             parent_widget=self._widgets["text_frame"],
@@ -104,7 +105,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_full_name",
             "- the python Diffraction Data Analysis Suite.",
-            fontsize=13,
+            fontsize=constants.STANDARD_FONT_SIZE + 3,
             bold=True,
             fixedWidth=400,
             parent_widget=self._widgets["text_frame"],
@@ -113,7 +114,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_quickstart",
             "Quickstart hints:",
-            fontsize=12,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             fixedWidth=400,
             parent_widget=self._widgets["text_frame"],
@@ -122,7 +123,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_toolbar",
             "Menu toolbar:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -139,7 +140,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_help_header",
             "Online help:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -159,7 +160,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_proc_setup",
             "Processing setup:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -175,7 +176,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_proc",
             "Processing:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             bold=True,
             fixedWidth=400,

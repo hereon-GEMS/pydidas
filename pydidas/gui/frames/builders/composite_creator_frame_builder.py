@@ -32,6 +32,7 @@ from ....core.constants import (
     FIX_EXP_POLICY,
     EXP_EXP_POLICY,
 )
+from ....core import constants
 from ....widgets import ScrollArea, BaseFrameWithApp, silx_plot
 from ....widgets.parameter_config import ParameterEditFrame
 from ...mixins import SilxPlotWindowMixIn
@@ -61,7 +62,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.create_label(
             "title",
             "Composite image creator",
-            fontsize=14,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 2),
             parent_widget=self._widgets["config"],

@@ -33,6 +33,7 @@ from ....core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
+from ....core import constants
 from ....widgets.parameter_config import ParameterEditFrame
 from ....widgets.silx_plot import create_silx_plot_stack
 
@@ -97,7 +98,11 @@ class WorkflowTestFrameBuilder(BaseFrame):
         Build the frame and create all widgets.
         """
         self.create_label(
-            "title", "Test workflow", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+            "title",
+            "Test workflow",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
         )
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
         self._widgets["config"] = ParameterEditFrame(
@@ -157,7 +162,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         self.create_label(
             "label_results",
             "Results:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             underline=True,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],

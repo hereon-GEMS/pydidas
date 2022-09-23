@@ -27,6 +27,7 @@ __all__ = ["ReadOnlyTextWidget"]
 
 from qtpy import QtWidgets
 
+from ..core import constants
 from .utilities import apply_widget_properties
 
 
@@ -100,10 +101,10 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         title : Union[str, None]
             The title. If None, this method will be skipped.
         """
-        self.setFontPointSize(14)
+        self.setFontPointSize(constants.STANDARD_FONT_SIZE + 3)
         self.setFontWeight(75)
         self.append(f"{title}")
-        self.setFontPointSize(10)
+        self.setFontPointSize(constants.STANDARD_FONT_SIZE)
 
     def setTextFromDict(self, text_dict, title=None, one_line_entries=False, indent=4):
         """

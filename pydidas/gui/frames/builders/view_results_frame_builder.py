@@ -30,6 +30,7 @@ from ....core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
+from ....core import constants
 from ....widgets import ScrollArea, BaseFrame
 from ....widgets.selection import ResultSelectionWidget
 from ....widgets.parameter_config import ParameterEditFrame
@@ -83,7 +84,11 @@ class ViewResultsFrameBuilder(BaseFrame):
         Build the frame and create all widgets.
         """
         self.create_label(
-            "title", "View results", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
+            "title",
+            "View results",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 5),
         )
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 

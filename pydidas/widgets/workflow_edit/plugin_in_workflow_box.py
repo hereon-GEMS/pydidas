@@ -29,7 +29,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore, QtGui
 
-from ...core.constants import gui_constants, qt_presets
+from ...core import constants
 from ..utilities import apply_widget_properties
 
 
@@ -48,8 +48,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         The widget's parent. The default is None.
     """
 
-    widget_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
-    widget_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
+    widget_width = constants.GENERIC_PLUGIN_WIDGET_WIDTH
+    widget_height = constants.GENERIC_PLUGIN_WIDGET_HEIGHT
     sig_widget_activated = QtCore.Signal(int)
     sig_widget_delete_branch_request = QtCore.Signal(int)
     sig_widget_delete_request = QtCore.Signal(int)
@@ -68,12 +68,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.setAutoFillBackground(True)
         self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
 
-        _font = self.font()
-        _font.setPointSize(12)
-        _font.setBold(True)
-
         self.id_label = QtWidgets.QLabel(self)
-        self.id_label.setFont(_font)
         self.id_label.setGeometry(3, 3, self.widget_width - 25, 20)
 
         self.setStyleSheet(self.__get_stylesheet())
@@ -86,6 +81,12 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             self.__create_menu()
 
         self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
+
+        _font = self.font()
+        _font.setPointSize(constants.STANDARD_FONT_SIZE + 2)
+        self.setFont(_font)
+        _font.setBold(True)
+        self.id_label.setFont(_font)
 
         self.update_text(widget_id, "")
         self.setText(plugin_name)
@@ -134,7 +135,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         _style = (
             "QPushButton{ border: 0px; }"
             "QPushButton::menu-indicator { image: none; }"
-            "QLabel{font-size: 12px; "
+            "QLabel{font-size: " + f"{constants.STANDARD_FONT_SIZE + 2}px; "
             f"border: {_border}px solid;"
             "border-color: rgb(60, 60, 60);"
             "border-radius: 3px;"

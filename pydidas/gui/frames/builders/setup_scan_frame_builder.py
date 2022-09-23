@@ -27,6 +27,7 @@ __all__ = ["SetupScanFrameBuilder"]
 
 from qtpy import QtCore
 
+from ....core import constants
 from ....experiment import SetupScan
 from ....widgets import BaseFrame
 
@@ -59,7 +60,7 @@ class SetupScanFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Scan settings\n",
-            fontsize=14,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
@@ -90,7 +91,7 @@ class SetupScanFrameBuilder(BaseFrame):
         self.create_label(
             "scan_global",
             "\nGlobal scan parameters:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             gridPos=(self.next_row(), 0, 1, 1),
         )
@@ -117,7 +118,7 @@ class SetupScanFrameBuilder(BaseFrame):
             self.create_label(
                 f"title_{i_dim + 1}",
                 f"\nScan dimension {i_dim+1}:",
-                fontsize=11,
+                fontsize=constants.STANDARD_FONT_SIZE + 1,
                 bold=True,
                 gridPos=(_rowoffset + 6 * (i_dim % 2), 2 * (i_dim // 2), 1, 2),
             )

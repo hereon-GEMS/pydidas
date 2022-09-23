@@ -33,7 +33,7 @@ import os
 
 from qtpy import QtWidgets
 
-from ...core.constants import STANDARD_FONT_SIZE
+from ...core import constants
 from .qtooltip_event_handler import QTooltipEventHandler
 
 
@@ -92,7 +92,7 @@ def update_qtapp_font_size():
     _app = QtWidgets.QApplication.instance()
     if _app is not None:
         _font = _app.font()
-        _font.setPointSize(STANDARD_FONT_SIZE)
+        _font.setPointSize(constants.STANDARD_FONT_SIZE)
         _app.setFont(_font)
 
 

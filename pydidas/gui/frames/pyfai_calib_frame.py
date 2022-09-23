@@ -64,6 +64,7 @@ from pyFAI.gui.utils import projecturl
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
 
+from ...core import constants
 from ...widgets import BaseFrame
 from ...experiment import SetupExperiment
 
@@ -122,7 +123,11 @@ class PyfaiCalibFrame(BaseFrame):
         )
 
         self.create_label(
-            "title", "pyFAI calibration", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+            "title",
+            "pyFAI calibration",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
         )
         self.add_any_widget("list", self._list, gridPos=(1, 0, 1, 1))
         self.add_any_widget("help", self._help, gridPos=(2, 0, 1, 1))

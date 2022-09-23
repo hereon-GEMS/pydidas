@@ -28,6 +28,7 @@ __all__ = ["DataBrowsingFrameBuilder"]
 from qtpy import QtWidgets, QtCore
 import qtawesome as qta
 
+from ....core import constants
 from ....widgets import BaseFrame
 from ....widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
 from ....widgets.silx_plot import PydidasImageView
@@ -46,7 +47,9 @@ class DataBrowsingFrameBuilder(BaseFrame):
         """
         Build the frame and create all required widgets.
         """
-        self.create_label(None, "Data browser", fontsize=14, bold=True)
+        self.create_label(
+            None, "Data browser", fontsize=constants.STANDARD_FONT_SIZE + 4, bold=True
+        )
 
         _button_iconsize = 25
         self._widgets["selection"] = QtWidgets.QFrame()

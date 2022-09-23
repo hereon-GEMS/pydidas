@@ -25,6 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupExperimentFrameBuilder"]
 
+from ....core import constants
 from ....widgets import BaseFrame
 
 
@@ -42,7 +43,11 @@ class SetupExperimentFrameBuilder(BaseFrame):
         Build the frame and create all widgets.
         """
         self.create_label(
-            None, "Experimental setup\n", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+            None,
+            "Experimental setup\n",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
         )
         self.create_button(
             "but_load_from_file",
@@ -85,7 +90,7 @@ class SetupExperimentFrameBuilder(BaseFrame):
         self.create_label(
             None,
             "\nBeamline X-ray energy:",
-            fontsize=11,
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
         )
@@ -101,7 +106,11 @@ class SetupExperimentFrameBuilder(BaseFrame):
         Create header items (label / buttons) for the detector.
         """
         self.create_label(
-            None, "\nX-ray detector:", fontsize=11, bold=True, gridPos=(-1, 0, 1, 1)
+            None,
+            "\nX-ray detector:",
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            bold=True,
+            gridPos=(-1, 0, 1, 1),
         )
         self.create_button(
             "but_select_detector",
@@ -121,7 +130,11 @@ class SetupExperimentFrameBuilder(BaseFrame):
         Create header items (label / buttons) for the detector.
         """
         self.create_label(
-            None, "\nDetector geometry:", fontsize=11, bold=True, gridPos=(-1, 0, 1, 1)
+            None,
+            "\nDetector geometry:",
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            bold=True,
+            gridPos=(-1, 0, 1, 1),
         )
         self.create_button(
             "but_copy_geo_from_pyfai",

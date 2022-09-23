@@ -29,10 +29,10 @@ from functools import partial
 
 from qtpy import QtWidgets, QtGui, QtCore
 
-from ...core.constants import QT_STYLES
+from ...core import constants
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
-from ..utilities import apply_widget_properties
+from ..utilities import apply_widget_properties, apply_font_properties
 
 
 PLUGIN_COLLECTION = PluginCollection()
@@ -70,7 +70,10 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.setMinimumHeight(200)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
-        self.header().setStyleSheet(QT_STYLES["title"])
+
+        _header_font = self.header().font()
+        apply_font_properties(_header_font, fontsize=constants.STANDARD_FONT_SIZE + 4)
+        self.header().setFont(_header_font)
 
         self._update_collection()
         self.clicked.connect(
@@ -248,7 +251,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
             The updated sizeHint from the QStyledItemDelegate.
         """
         size = QtWidgets.QStyledItemDelegate.sizeHint(self, p_option, p_index)
-        size.setHeight(25)
+        size.setHeight(2 * constants.STANDARD_FONT_SIZE + 2)
         return size
 
     def paint(self, painter, option, index):
@@ -268,5 +271,5 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         _parent = self._model.itemFromIndex(index).parent()
         if _parent is None:
             option.font.setWeight(QtGui.QFont.Bold)
-            option.font.setPointSize(12)
+            option.font.setPointSize(constants.STANDARD_FONT_SIZE + 2)
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

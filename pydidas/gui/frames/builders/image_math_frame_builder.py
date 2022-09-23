@@ -29,6 +29,7 @@ import qtawesome as qta
 from qtpy import QtWidgets
 from silx.gui.plot.ImageView import ImageView
 
+from ....core import constants
 from ....widgets import BaseFrame
 
 
@@ -51,7 +52,11 @@ class ImageMathFrameBuilder(BaseFrame):
         in the layout.
         """
         self.create_label(
-            "title", "Image mathematics", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
+            "title",
+            "Image mathematics",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 5),
         )
 
         self.create_spacer(None, height=20, gridPos=(-1, 0, 1, 2))

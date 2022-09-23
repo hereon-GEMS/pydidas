@@ -31,6 +31,7 @@ from ....core.constants import (
     FIX_EXP_POLICY,
     EXP_EXP_POLICY,
 )
+from ....core import constants
 from ....widgets import ScrollArea, BaseFrameWithApp
 from ....widgets.parameter_config import ParameterEditFrame
 from ....widgets.silx_plot import PydidasPlot2D
@@ -97,7 +98,11 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         Build the frame and create all widgets.
         """
         self.create_label(
-            "title", "Directory spy", fontsize=14, bold=True, gridPos=(0, 0, 1, 5)
+            "title",
+            "Directory spy",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 5),
         )
 
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))

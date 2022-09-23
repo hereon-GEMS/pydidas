@@ -29,7 +29,7 @@ from pathlib import Path
 
 from qtpy import QtWidgets, QtCore
 
-from ...core import Hdf5key
+from ...core import Hdf5key, constants
 from ..factory import CreateWidgetsMixIn
 from ..utilities import delete_all_items_in_layout
 from .parameter_edit_frame import ParameterEditFrame
@@ -111,15 +111,23 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         self.create_label(
             "plugin_name",
             f"Plugin: {self.plugin.plugin_name}",
-            fontsize=12,
+            fontsize=constants.STANDARD_FONT_SIZE + 2,
             fixedWidth=self.FIXED_WIDTH,
             gridPos=(0, 0, 1, 2),
         )
         self.create_label(
-            "node_id", f"Node ID: {self.node_id}", fontsize=12, gridPos=(1, 0, 1, 2)
+            "node_id",
+            f"Node ID: {self.node_id}",
+            fontsize=constants.STANDARD_FONT_SIZE + 2,
+            gridPos=(1, 0, 1, 2),
         )
         self.create_spacer("spacer", gridPos=(2, 0, 1, 2))
-        self.create_label("params", "Parameters:", fontsize=12, gridPos=(3, 0, 1, 1))
+        self.create_label(
+            "params",
+            "Parameters:",
+            fontsize=constants.STANDARD_FONT_SIZE + 2,
+            gridPos=(3, 0, 1, 1),
+        )
         if self.plugin.has_unique_parameter_config_widget:
             self.layout().add(self.plugin.get_parameter_config_widget())
         else:

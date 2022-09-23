@@ -35,8 +35,6 @@ __all__ = [
 from qtpy import QtWidgets, QtCore, QtGui
 import qtawesome
 
-from ..core.constants import STANDARD_FONT_SIZE
-
 
 def delete_all_items_in_layout(layout):
     """
@@ -121,7 +119,7 @@ def apply_font_properties(fontobj, **kwargs):
         A dictionary with properties to be set.
     """
     if "fontsize" in kwargs and "pointSize" not in kwargs:
-        kwargs["pointSize"] = kwargs.get("fontsize", STANDARD_FONT_SIZE)
+        kwargs["pointSize"] = kwargs.get("fontsize")
     for _key in kwargs:
         _name = f"set{_key[0].upper()}{_key[1:]}"
         if hasattr(fontobj, _name):

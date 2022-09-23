@@ -30,6 +30,7 @@ from ....core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
+from ....core import constants
 from ....widgets import ScrollArea, BaseFrameWithApp
 from ....widgets.selection import ResultSelectionWidget
 from ....widgets.parameter_config import ParameterEditFrame
@@ -90,7 +91,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
         self.create_label(
             "title",
             "Full workflow processing",
-            fontsize=14,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 5),
         )

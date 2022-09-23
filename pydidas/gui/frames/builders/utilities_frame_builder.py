@@ -27,7 +27,7 @@ __all__ = ["UtilitiesFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core.constants import QT_BOTTOM_LEFT_ALIGNMENT
+from ....core import constants
 from ....widgets import BaseFrame
 
 
@@ -91,7 +91,7 @@ class UtilitiesFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Utilities\n",
-            fontsize=14,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),
             fixedWidth=self.GROUP_WIDTH,
@@ -111,7 +111,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 _entries["title"],
                 gridPos=(0, 0, 1, 1),
                 parent_widget=self._widgets[f"utility_{_key}"],
-                fontSize=12,
+                fontSize=constants.STANDARD_FONT_SIZE + 2,
                 fixedWidth=self.GROUP_WIDTH - 20,
                 bold=True,
             )
@@ -121,7 +121,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(1, 0, 1, 1),
                 parent_widget=self._widgets[f"utility_{_key}"],
                 fixedWidth=self.GROUP_WIDTH - 20,
-                fontSize=11,
+                fontSize=constants.STANDARD_FONT_SIZE,
             )
             self.create_spacer(
                 f"spacer_{_key}",
@@ -137,7 +137,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(3, 0, 1, 1),
                 fixedWidth=self.GROUP_WIDTH - 20,
                 parent_widget=self._widgets[f"utility_{_key}"],
-                alignment=QT_BOTTOM_LEFT_ALIGNMENT,
+                alignment=constants.QT_BOTTOM_LEFT_ALIGNMENT,
             )
             self.create_spacer(
                 f"spacer_{_key}_2",

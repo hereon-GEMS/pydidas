@@ -27,7 +27,8 @@ __all__ = ["WorkflowTreeCanvas"]
 
 from qtpy import QtWidgets, QtGui, QtCore
 
-from ...core.constants import QT_STYLES, EXP_EXP_POLICY
+from ...core import constants
+from ..factory import create_label
 
 
 class WorkflowTreeCanvas(QtWidgets.QFrame):
@@ -45,15 +46,17 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setAcceptDrops(True)
-        self.title = QtWidgets.QLabel(self)
-        self.title.setStyleSheet(QT_STYLES["title"])
-        self.title.setText("Workflow tree editor")
+        self.title = create_label(
+            "Workflow tree editor",
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            parent=self,
+        )
         self.title.move(10, 10)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
 
         self.setLineWidth(2)
-        self.setSizePolicy(*EXP_EXP_POLICY)
+        self.setSizePolicy(*constants.EXP_EXP_POLICY)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 

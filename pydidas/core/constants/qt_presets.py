@@ -38,6 +38,7 @@ __all__ = [
     "QT_REG_EXP_FLOAT_SLICE_VALIDATOR",
     "FIX_EXP_POLICY",
     "EXP_EXP_POLICY",
+    "EXP_FIX_POLICY",
 ]
 
 from qtpy import QtGui, QtCore, QtWidgets
@@ -87,3 +88,5 @@ QT_REG_EXP_FLOAT_SLICE_VALIDATOR = QtGui.QRegularExpressionValidator(
 FIX_EXP_POLICY = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
 
 EXP_EXP_POLICY = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+EXP_FIX_POLICY = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)

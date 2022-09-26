@@ -396,11 +396,11 @@ class Parameter:
             new choices.
         """
         if not isinstance(choices, (list, tuple, set)):
-            raise TypeError("New choices must be a list or tuple.")
+            raise TypeError("New choices must be a list, set or tuple.")
         for _c in choices:
             if not self.__typecheck(_c):
                 raise ValueError(
-                    f'The new choice "{_c}" does not have the ' "correct data type."
+                    f"The new choice '{_c}' does not have the correct data type."
                 )
         if self.__value not in choices:
             raise ValueError(
@@ -498,9 +498,9 @@ class Parameter:
             return int(self.value)
         if self.__type == numbers.Real:
             return float(self.value)
-        if self.__type in (list, tuple):
+        if self.__type in (list, tuple, dict):
             return self.value
-        raise TypeError(f"No export format for type {self.__type} has been" " defined.")
+        raise TypeError(f"No export format for type {self.__type} has been defined.")
 
     def restore_default(self):
         """

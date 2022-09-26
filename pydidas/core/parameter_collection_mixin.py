@@ -212,6 +212,19 @@ class ParameterCollectionMixIn:
         }
         return name_val_pairs
 
+    def set_param_values_from_dict(self, value_dict):
+        """
+        Set the Parameter values from a dict with name, value paris.
+
+        Parameters
+        ----------
+        value_dict : dict
+            The dictionary with the stored information.
+        """
+        for _key, _value in value_dict.items():
+            if _key in self.params:
+                self.set_param_value(_key, _value)
+
     def get_param_keys(self):
         """
         Get the keys of all registered Parameters.

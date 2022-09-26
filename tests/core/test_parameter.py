@@ -151,27 +151,27 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, unit="The_unit")
         self.assertEqual(obj.unit, "The_unit")
 
-    def test_tooltip_int(self):
+    def test_tooltip__int(self):
         obj = Parameter("Test0", int, 12, unit="m", value=10, tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: integer)")
 
-    def test_tooltip_float(self):
+    def test_tooltip__float(self):
         obj = Parameter("Test0", float, 12, unit="m", value=10, tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: float)")
 
-    def test_tooltip_str(self):
+    def test_tooltip__str(self):
         obj = Parameter("Test0", str, "", unit="m", tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: str)")
 
-    def test_tooltip_Hdf5key(self):
+    def test_tooltip__Hdf5key(self):
         obj = Parameter("Test0", Hdf5key, "", unit="m", tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: Hdf5key)")
 
-    def test_tooltip_path(self):
+    def test_tooltip__path(self):
         obj = Parameter("Test0", Path, "", unit="m", tooltip="Test tooltip")
         self.assertEqual(obj.tooltip, "Test tooltip (unit: m, type: Path)")
 
-    def test_tooltip_other(self):
+    def test_tooltip__other(self):
         obj = Parameter(
             "Test0", np.ndarray, np.zeros((3)), unit="m", tooltip="Test tooltip"
         )
@@ -183,22 +183,22 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         self.assertEqual(obj.choices, [0, 12])
 
-    def test_choices_setter_update(self):
+    def test_choices_setter__update(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         obj.choices = [0, 12, 24]
         self.assertEqual(obj.choices, [0, 12, 24])
 
-    def test_choices_setter_wrong_type(self):
+    def test_choices_setter__wrong_type(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         with self.assertRaises(TypeError):
             obj.choices = dict(a=0, b=12)
 
-    def test_choices_setter_value_not_included(self):
+    def test_choices_setter__value_not_included(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         with self.assertRaises(ValueError):
             obj.choices = [0, 24]
 
-    def test_choices_setter_wrong_entry(self):
+    def test_choices_setter__wrong_entry(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         with self.assertRaises(ValueError):
             obj.choices = [12, "24"]
@@ -207,7 +207,7 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12)
         self.assertEqual(obj.optional, False)
 
-    def test_optional_ii(self):
+    def test_optional_true(self):
         obj = Parameter("Test0", int, 12, optional=True)
         self.assertEqual(obj.optional, True)
 
@@ -300,6 +300,11 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", tuple, (27,))
         _val = obj.value_for_export
         self.assertIsInstance(_val, tuple)
+
+    def test_get_value_for_export__with_dict(self):
+        obj = Parameter("Test0", dict, {1: "a", "b": 42})
+        _val = obj.value_for_export
+        self.assertIsInstance(_val, dict)
 
     def test_get_value_for_export__with_NoneType(self):
         obj = Parameter("Test0", None, 27.7)

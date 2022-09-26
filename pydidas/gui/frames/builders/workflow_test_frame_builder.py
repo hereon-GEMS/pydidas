@@ -70,14 +70,12 @@ class WorkflowTestFrameBuilder(BaseFrame):
                 width_io=170,
                 width_text=CONFIG_WIDGET_WIDTH - 180,
                 width_unit=0,
-                row=self._widgets["config"].next_row(),
             )
         elif param_key in ["selected_results"]:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
             _dict.update(
                 {
                     "parent_widget": self._widgets["config"],
-                    "row": self._widgets["config"].next_row(),
                 }
             )
         else:
@@ -87,7 +85,6 @@ class WorkflowTestFrameBuilder(BaseFrame):
                 width_unit=0,
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH,
-                row=self._widgets["config"].next_row(),
             )
         if param_key in ["scan_index1", "scan_index2", "scan_index3", "scan_index4"]:
             _dict["visible"] = False

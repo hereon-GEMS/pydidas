@@ -52,8 +52,10 @@ def create_empty_widget(**kwargs):
     init_layout = kwargs.get("init_layout", True)
     apply_qt_properties(_widget, **kwargs)
     if init_layout:
-        _layout = QGridLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.setAlignment(QT_DEFAULT_ALIGNMENT)
-        _widget.setLayout(_layout)
+        _widget.setLayout(QGridLayout())
+        apply_qt_properties(
+            _widget.layout(),
+            contentsMargins=(0, 0, 0, 0),
+            alignment=QT_DEFAULT_ALIGNMENT,
+        )
     return _widget

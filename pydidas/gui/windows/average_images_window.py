@@ -72,7 +72,7 @@ class AverageImagesWindow(PydidasWindow):
 
         def get_config(param_key):
             if param_key in ["first_file", "last_file", "hdf5_key", "output_fname"]:
-                _config = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
+                _config = DEFAULT_TWO_LINE_PARAM_CONFIG
             else:
                 _config = dict(
                     width_io=100,

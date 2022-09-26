@@ -29,11 +29,8 @@ import random
 from qtpy import QtWidgets
 
 from pydidas.core import PydidasGuiError
-from pydidas.widgets.factory.create_widgets_mixin import (
-    CreateWidgetsMixIn,
-    _get_widget_layout_args,
-    _get_grid_pos,
-)
+from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
+from pydidas.widgets.utilities import get_widget_layout_args, get_grid_pos
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
@@ -71,21 +68,21 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         _w.setLayout(QtWidgets.QGridLayout())
         return _w
 
-    def test_get_grid_pos_default(self):
+    def testget_grid_pos_default(self):
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(obj)
+        _grid_pos = get_grid_pos(obj)
         self.assertEqual(_grid_pos, (0, 0, 1, 1))
 
-    def test_get_grid_pos_gridPos(self):
+    def testget_grid_pos_gridPos(self):
         _gridPos = (2, 7, 5, 3)
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
+        _grid_pos = get_grid_pos(obj, gridPos=_gridPos)
         self.assertEqual(_grid_pos, _gridPos)
 
-    def test_get_grid_pos_kwargs(self):
+    def testget_grid_pos_kwargs(self):
         _gridPos = (2, 7, 5, 3)
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(
+        _grid_pos = get_grid_pos(
             obj,
             row=_gridPos[0],
             column=_gridPos[1],
@@ -94,33 +91,33 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         )
         self.assertEqual(_grid_pos, _gridPos)
 
-    def test_get_grid_pos_auto_row(self):
+    def testget_grid_pos_auto_row(self):
         _gridPos = (-1, 7, 5, 3)
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
+        _grid_pos = get_grid_pos(obj, gridPos=_gridPos)
         self.assertEqual(_grid_pos, (0,) + _gridPos[1:])
 
-    def test_get_grid_pos_auto_row_more_items(self):
+    def testget_grid_pos_auto_row_more_items(self):
         _gridPos = (-1, 7, 5, 3)
         _nwidget = 4
         obj = self.get_widget()
         for i in range(_nwidget):
             _w = TestWidget()
             obj.layout().addWidget(_w, i, 0, 1, 1)
-        _grid_pos = _get_grid_pos(obj, gridPos=_gridPos)
+        _grid_pos = get_grid_pos(obj, gridPos=_gridPos)
         self.assertEqual(_grid_pos, (_nwidget,) + _gridPos[1:])
 
-    def test_get_widget_layout_args_no_layout(self):
+    def testget_widget_layout_args_no_layout(self):
         obj = TestWidget()
         with self.assertRaises(PydidasGuiError):
-            _get_widget_layout_args(obj)
+            get_widget_layout_args(obj)
 
     def test_get_widget_layout_box(self):
         _stretch = 1.3
         _alignment = "random"
         obj = TestWidget()
         obj.setLayout(QtWidgets.QVBoxLayout())
-        items = _get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
+        items = get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [_stretch, _alignment])
 
     def test_get_widget_layout_stacked(self):
@@ -128,26 +125,26 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
         _alignment = "random"
         obj = TestWidget()
         obj.setLayout(QtWidgets.QStackedLayout())
-        items = _get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
+        items = get_widget_layout_args(obj, stretch=_stretch, alignment=_alignment)
         self.assertEqual(items, [])
 
     def test_get_widget_layout_grid_no_alignment(self):
         _gridPos = (2, 7, 5, 3)
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
-        items = _get_widget_layout_args(obj, gridPos=_gridPos, alignment=None)
+        items = get_widget_layout_args(obj, gridPos=_gridPos, alignment=None)
         self.assertEqual(items, [*_gridPos])
 
     def test_get_widget_layout_grid(self):
         _gridPos = (2, 7, 5, 3)
         obj = TestWidget()
         obj.setLayout(QtWidgets.QGridLayout())
-        items = _get_widget_layout_args(obj, gridPos=_gridPos)
+        items = get_widget_layout_args(obj, gridPos=_gridPos)
         self.assertEqual(items, [*_gridPos])
 
-    def test_get_widget_layout_args(self):
+    def testget_widget_layout_args(self):
         obj = self.get_widget()
-        _grid_pos = _get_grid_pos(obj)
+        _grid_pos = get_grid_pos(obj)
         self.assertEqual(_grid_pos, (0, 0, 1, 1))
 
     def test_init(self):

@@ -25,10 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParameterWidgetsMixIn"]
 
-from qtpy import QtWidgets, QtCore
-
 from .parameter_config_widget import ParameterConfigWidget
 from ...core import PydidasGuiError
+from ..utilities import get_widget_layout_args
 
 
 class ParameterWidgetsMixIn:
@@ -102,50 +101,8 @@ class ParameterWidgetsMixIn:
 
         if _parent.layout() is None:
             raise PydidasGuiError("No layout set.")
-        _layout_args = self.__get_args_for_parent_layout(_parent, **kwargs)
+        _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
-
-    def __get_args_for_parent_layout(self, parent, **kwargs):
-        """
-        Get the arguments for adding the widget to the parent widget.
-
-        Parameters
-        ----------
-        parent : QtWidgets.QWidget
-            The parent widget.
-        **kwargs : dict
-            Keyword arguments from the "create_param_widget" method call.
-        Returns
-        -------
-        _args : tuple
-            The formatting arguments for adding the widget to the parent's
-            layout.
-        """
-        _nrows = parent.layout().rowCount()
-        _next_row = (
-            _nrows - int(parent.layout().count() == 0)
-            if isinstance(parent.layout(), QtWidgets.QGridLayout)
-            else -1
-        )
-        config = {
-            "row": kwargs.get("row", _next_row),
-            "column": kwargs.get("column", 0),
-            "n_columns": kwargs.get("n_columns", 1),
-            "n_rows": kwargs.get("n_rows", 1),
-            "halign": kwargs.get("halign", QtCore.Qt.AlignLeft),
-            "valign": kwargs.get("valign", QtCore.Qt.AlignVCenter),
-        }
-        if isinstance(self.layout(), QtWidgets.QGridLayout):
-            _args = (
-                config["row"],
-                config["column"],
-                config["n_rows"],
-                config["n_columns"],
-                config["valign"] | config["halign"],
-            )
-        else:
-            _args = (0, config["valign"] | config["halign"])
-        return _args
 
     def set_param_value_and_widget(self, key, value):
         """

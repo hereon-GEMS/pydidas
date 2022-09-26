@@ -25,11 +25,9 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupScanFrameBuilder"]
 
-from qtpy import QtCore
-
-from ....core import constants
+from ....core import constants, utils
 from ....experiment import SetupScan
-from ....widgets import BaseFrame
+from ....widgets import BaseFrame, ScrollArea, utilities, parameter_config
 
 
 SCAN_SETTINGS = SetupScan()
@@ -56,7 +54,11 @@ class SetupScanFrameBuilder(BaseFrame):
         Create all widgets for the frame and place them in the layout.
         """
         _width_total = self.TEXT_WIDTH + self.PARAM_INPUT_WIDTH + 10
-
+        utils.apply_qt_properties(
+            self.layout(),
+            horizontalSpacing=25,
+            alignment=constants.QT_DEFAULT_ALIGNMENT,
+        )
         self.create_label(
             "label_title",
             "Scan settings\n",
@@ -67,8 +69,6 @@ class SetupScanFrameBuilder(BaseFrame):
         self.create_button(
             "but_load",
             "Import scan settings from file",
-            gridPos=(-1, 0, 1, 1),
-            alignment=None,
             icon=self.style().standardIcon(42),
             fixedWidth=_width_total,
         )
@@ -83,17 +83,40 @@ class SetupScanFrameBuilder(BaseFrame):
         self.create_button(
             "but_reset",
             "Reset all scan settings",
-            gridPos=(-1, 0, 1, 1),
-            alignment=None,
             icon=self.style().standardIcon(59),
             fixedWidth=_width_total,
         )
+
+        _param_edit_row = self.next_row()
+        self.create_empty_widget(
+            "scan_param_frame",
+            gridPos=(_param_edit_row, 0, 1, 1),
+            layout_kwargs=dict(horizontalSpacing=25),
+            alignment=constants.QT_DEFAULT_ALIGNMENT,
+        )
+        self.create_empty_widget(
+            "input_plugin_param_frame",
+            gridPos=(_param_edit_row, 1, 1, 1),
+            fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH + 25,
+            layout_kwargs=dict(
+                contentsMargins=(0, 0, 0, 0),
+            ),
+            sizePolicy=constants.EXP_FIX_POLICY,
+            alignment=constants.QT_DEFAULT_ALIGNMENT,
+        )
+        self.create_spacer(
+            "right_spacer",
+            gridPos=(_param_edit_row, 2, 1, 1),
+            stretch=1,
+            sizePolicy=constants.EXP_EXP_POLICY,
+        )
+
         self.create_label(
             "scan_global",
             "\nGlobal scan parameters:",
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
-            gridPos=(self.next_row(), 0, 1, 1),
+            parent_widget=self._widgets["scan_param_frame"],
         )
 
         self.create_param_widget(
@@ -102,6 +125,7 @@ class SetupScanFrameBuilder(BaseFrame):
             width_io=self.PARAM_INPUT_WIDTH,
             width_total=_width_total,
             width_unit=0,
+            parent_widget=self._widgets["scan_param_frame"],
         )
         self.create_param_widget(
             SCAN_SETTINGS.get_param("scan_title"),
@@ -110,9 +134,9 @@ class SetupScanFrameBuilder(BaseFrame):
             linebreak=True,
             width_total=_width_total,
             width_unit=0,
+            parent_widget=self._widgets["scan_param_frame"],
         )
-
-        _rowoffset = self.next_row()
+        # populate scan_param_frame widget
         _prefixes = ["scan_label_", "n_points_", "delta_", "unit_", "offset_"]
         for i_dim in range(4):
             self.create_label(
@@ -120,22 +144,20 @@ class SetupScanFrameBuilder(BaseFrame):
                 f"\nScan dimension {i_dim+1}:",
                 fontsize=constants.STANDARD_FONT_SIZE + 1,
                 bold=True,
-                gridPos=(_rowoffset + 6 * (i_dim % 2), 2 * (i_dim // 2), 1, 2),
+                fixedWidth=_width_total,
+                gridPos=(3 + 6 * (i_dim % 2), i_dim // 2, 1, 1),
+                parent_widget=self._widgets["scan_param_frame"],
             )
             for i_item, basename in enumerate(_prefixes):
-                _row = i_item + _rowoffset + 1 + 6 * (i_dim % 2)
-                _column = 2 * (i_dim // 2)
-                pname = f"{basename}{i_dim+1}"
-                param = SCAN_SETTINGS.get_param(pname)
+                param = SCAN_SETTINGS.get_param(f"{basename}{i_dim+1}")
                 self.create_param_widget(
                     param,
-                    row=_row,
-                    column=_column,
+                    gridPos=(4 + i_item + 6 * (i_dim % 2), i_dim // 2, 1, 1),
                     width_text=self.TEXT_WIDTH + 5,
                     width_unit=0,
                     width_io=self.PARAM_INPUT_WIDTH,
                     width_total=_width_total,
-                    halign=QtCore.Qt.AlignCenter,
+                    parent_widget=self._widgets["scan_param_frame"],
                 )
 
         self.create_button(
@@ -143,7 +165,41 @@ class SetupScanFrameBuilder(BaseFrame):
             "Export scan settings",
             gridPos=(-1, 0, 1, 1),
             fixedWidth=_width_total,
+            parent_widget=self._widgets["scan_param_frame"],
             icon=self.style().standardIcon(43),
         )
+        self.create_spacer(
+            "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.EXP_EXP_POLICY
+        )
 
-        self.create_spacer("final_spacer", gridPos=(_rowoffset + 1, 2, 1, 1))
+        self.create_label(
+            "label_input_plugin",
+            "Select input plugin:",
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            bold=True,
+            parent_widget=self._widgets["input_plugin_param_frame"],
+        )
+        self.create_combo_box(
+            "input_plugin",
+            fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,
+            parent_widget=self._widgets["input_plugin_param_frame"],
+        )
+        self.create_button(
+            "button_open_plugin_info",
+            "Show InputPlugin details",
+            icon=utilities.get_pyqt_icon_from_str_reference("qt-std::9"),
+            fixedWidth=int(2 / 3 * constants.PLUGIN_PARAM_WIDGET_WIDTH),
+            alignment=constants.QT_TOP_RIGHT_ALIGNMENT,
+            parent_widget=self._widgets["input_plugin_param_frame"],
+        )
+        self.create_spacer("final_spacer", gridPos=(2, 1, 1, 1), fixedWidth=25)
+        self._widgets["plugin_edit"] = parameter_config.ConfigurePluginWidget()
+        self.create_any_widget(
+            "plugin_edit_area",
+            ScrollArea,
+            widget=self._widgets["plugin_edit"],
+            fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH + 25,
+            sizePolicy=constants.FIX_EXP_POLICY,
+            parent_widget=self._widgets["input_plugin_param_frame"],
+            gridPos=(-1, 0, 1, 2),
+        )

@@ -43,7 +43,6 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
     Depending on the Parameter types, automatic typechecks are implemented.
     """
 
-    FIXED_WIDTH = 385
     sig_new_label = QtCore.Signal(int, str)
 
     def __init__(self, **kwargs):
@@ -61,7 +60,7 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
-        self.setFixedWidth(self.FIXED_WIDTH)
+        self.setFixedWidth(constants.PLUGIN_PARAM_WIDGET_WIDTH)
 
     def configure_plugin(self, node_id, plugin):
         """
@@ -110,17 +109,19 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         self.create_label(
             "plugin_name",
-            f"Plugin: {self.plugin.plugin_name}",
-            fontsize=constants.STANDARD_FONT_SIZE + 2,
-            fixedWidth=self.FIXED_WIDTH,
+            f"\nPlugin: {self.plugin.plugin_name}",
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            bold=True,
+            fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,
             gridPos=(0, 0, 1, 2),
         )
-        self.create_label(
-            "node_id",
-            f"Node ID: {self.node_id}",
-            fontsize=constants.STANDARD_FONT_SIZE + 2,
-            gridPos=(1, 0, 1, 2),
-        )
+        if self.node_id is not None:
+            self.create_label(
+                "node_id",
+                f"Node ID: {self.node_id}",
+                fontsize=constants.STANDARD_FONT_SIZE + 2,
+                gridPos=(1, 0, 1, 2),
+            )
         self.create_spacer("spacer", gridPos=(2, 0, 1, 2))
         self.create_label(
             "params",
@@ -192,17 +193,17 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         # The total width is reduced by 10 because of the margins
         if param.dtype in [Hdf5key, Path]:
             _kwargs = {
-                "width_text": self.FIXED_WIDTH - 50,
-                "width_io": self.FIXED_WIDTH - 50,
+                "width_text": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
+                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
                 "width_unit": 0,
-                "width_total": self.FIXED_WIDTH - 10,
+                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
                 "linebreak": True,
             }
         else:
             _kwargs = {
                 "width_text": 200,
-                "width_io": self.FIXED_WIDTH - 240,
-                "width_total": self.FIXED_WIDTH - 10,
+                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 240,
+                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
             }
         return _kwargs
 

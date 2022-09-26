@@ -31,7 +31,10 @@ __all__ = [
 
 
 from qtpy import QtWidgets, QtCore, QtGui
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 import qtawesome
+
+from ..core import PydidasGuiError
 
 
 def delete_all_items_in_layout(layout):
@@ -140,3 +143,88 @@ def get_max_pixel_width_of_entries(entries):
     metrics = QtGui.QFontMetrics(font)
     _width = max([metrics.boundingRect(_item).width() for _item in entries])
     return _width
+
+
+def get_widget_layout_args(parent, **kwargs):
+    """
+    Get the arguments for adding a widget to the layout of the parent.
+
+    Parameters
+    ----------
+    parent : QWidget
+        The parent QWidget to which the new widget shall be added.
+    **kwargs : dict
+        The keyword arguments dictionary from the calling method. This
+        method only takes the "gridPos", "stretch" and "alignment" arguments from the
+        kwargs.
+
+    Raises
+    ------
+    PydidasGuiError
+        If the parent widget has no supported layout. Supported are
+        QBoxLayout, QStackedLayout or QGridLayout and subclasses.
+
+    Returns
+    -------
+    list
+        The list of layout arguments required for adding the widget to
+        the layout of the parent widget.
+    """
+    if not isinstance(parent.layout(), (QBoxLayout, QStackedLayout, QGridLayout)):
+        raise PydidasGuiError(
+            f'Layout of parent widget "{parent}" is not of type '
+            "QBoxLayout, QStackedLayout or QGridLayout."
+        )
+
+    _alignment = kwargs.get("alignment", None)
+    if isinstance(parent.layout(), QtWidgets.QBoxLayout):
+        return [kwargs.get("stretch", 0), _alignment]
+    if isinstance(parent.layout(), QtWidgets.QStackedLayout):
+        return []
+    _grid_pos = get_grid_pos(parent, **kwargs)
+    if _alignment is not None:
+        return [*_grid_pos, _alignment]
+    return [*_grid_pos]
+
+
+def get_grid_pos(parent, **kwargs):
+    """
+    Get the gridPos format from the kwargs or create it.
+
+    Parameters
+    ----------
+    parent : QWidget
+        The parent QWidget to be added to the layout.
+    **kwargs : dict
+        The keyword arguments dictionary from the calling method. This
+        method only takes the "gridPos" and "alignment" arguments from the
+        kwargs.
+
+    Raises
+    ------
+    PydidasGuiError
+        If gridPos has been specified but is not of type tuple and not of
+        length 4.
+
+    Returns
+    -------
+    gridPos : tuple
+        The 4-tuple of the gridPos.
+    """
+    _grid_pos = kwargs.get("gridPos", None)
+    _default_row = 0 if parent.layout().count() == 0 else parent.layout().rowCount()
+    if _grid_pos is None:
+        _grid_pos = (
+            kwargs.get("row", _default_row),
+            kwargs.get("column", 0),
+            kwargs.get("n_rows", 1),
+            kwargs.get("n_columns", 1),
+        )
+    if not (isinstance(_grid_pos, tuple) and len(_grid_pos) == 4):
+        raise PydidasGuiError(
+            'The passed value for "gridPos" is not of type tuple and/or not'
+            " of length 4."
+        )
+    if _grid_pos[0] == -1:
+        _grid_pos = (_default_row,) + _grid_pos[1:4]
+    return _grid_pos

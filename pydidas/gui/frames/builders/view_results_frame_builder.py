@@ -62,12 +62,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         """
         if param_key in ["selected_results"]:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
-            _dict.update(
-                {
-                    "parent_widget": self._widgets["config"],
-                    "row": self._widgets["config"].next_row(),
-                }
-            )
+            _dict.update({"parent_widget": self._widgets["config"]})
         else:
             _dict = dict(
                 parent_widget=self._widgets["config"],
@@ -75,7 +70,6 @@ class ViewResultsFrameBuilder(BaseFrame):
                 width_unit=0,
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH,
-                row=self._widgets["config"].next_row(),
             )
         return _dict
 

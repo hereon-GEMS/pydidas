@@ -68,7 +68,6 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             _dict.update(
                 {
                     "parent_widget": self._widgets["config"],
-                    "row": self._widgets["config"].next_row(),
                 }
             )
         else:
@@ -78,7 +77,6 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
                 width_unit=0,
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH,
-                row=self._widgets["config"].next_row(),
             )
         if param_key in ["autosave_directory", "autosave_format"]:
             _dict["visible"] = False

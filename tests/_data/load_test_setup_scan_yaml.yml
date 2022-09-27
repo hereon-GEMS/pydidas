@@ -20,3 +20,9 @@ unit_1: m
 unit_2: um
 unit_3: mm
 unit_4: ''
+scan_base_directory: .
+scan_name_pattern: test_####
+scan_start_index: 0
+scan_index_stepping: 1
+scan_multiplicity: 1
+scan_multi_image_handling: Average

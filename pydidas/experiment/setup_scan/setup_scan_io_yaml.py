@@ -54,7 +54,7 @@ class SetupScanIoYaml(SetupScanIoBase):
             The filename of the file to be written.
         """
         cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = SCAN.get_param_values_as_dict()
+        tmp_params = SCAN.get_param_values_as_dict(filter_types_for_export=True)
         with open(filename, "w") as stream:
             yaml.safe_dump(tmp_params, stream)
 

@@ -300,7 +300,9 @@ class TestWorkflowResults(unittest.TestCase):
         _ndim = RES.ndims[_node] - SCAN.get_param_value("scan_dim") + 1
         _data = RES.get_results_for_flattened_scan(_node)
         self.assertEqual(_data.ndim, _ndim)
-        self.assertEqual(_data.shape, (SCAN.n_total,) + TREE.nodes[_node]._result_shape)
+        self.assertEqual(
+            _data.shape, (SCAN.n_points,) + TREE.nodes[_node]._result_shape
+        )
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))

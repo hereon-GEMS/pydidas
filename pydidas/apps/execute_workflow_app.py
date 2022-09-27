@@ -195,7 +195,9 @@ class ExecuteWorkflowApp(BaseApp):
             SCAN.get_param_value(f"n_points_{_n}") for _n in range(1, _dim + 1)
         ]
         _n_total = np.prod(_points_per_dim)
-        self._mp_tasks = np.arange(_n_total)
+        self._mp_tasks = np.arange(_n_total) * SCAN.get_param_value(
+            "scan_multiplicity"
+        )
 
     def __check_size_of_results_and_buffer(self):
         """

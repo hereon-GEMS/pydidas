@@ -395,8 +395,9 @@ GENERIC_PARAM_DESCRIPTION = (
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The number of images in the file. For hdf5 files, this "
-                "corresponds to the number of frames in the hdf5 dataset."
+                "The number of images in the file. For hdf5 files, this corresponds to "
+                "the number of frames in the hdf5 dataset. A value -1 auto-discovers "
+                "the number of images per file."
             ),
         },
         "image_shape": {
@@ -638,16 +639,84 @@ GENERIC_PARAM_DESCRIPTION = (
                 "reference in result exporters."
             ),
         },
-        "scan_input_plugin_name": {
-            "type": str,
-            "default": None,
-            "name": "Scan input Plugin name",
+        "scan_base_directory": {
+            "type": "Path",
+            "default": "",
+            "name": "Scan base directory path",
             "choices": None,
             "unit": "",
-            "allow_None": True,
+            "allow_None": False,
             "tooltip": (
-                "The scan input plugin name. This is used to restore the correct input "
-                "plugin for the WorkflowTree."
+                "The absolute path of the base directory in which to find this scan. "
+                "Note that indivual plugins may automatically discover and use "
+                "subdirectories. Please refer to the specific InputPlugin in use for "
+                "more information."
+            ),
+        },
+        "scan_name_pattern": {
+            "type": "Path",
+            "default": "",
+            "name": "The scan naming pattern",
+            "choices": None,
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The pattern used for naming scan (files9. Use hashes '#' for "
+                "wildcards which will be filled in with numbers for the various files. "
+                "Note that individual plugins may use this Parameter for either "
+                "directory or file names. Please refer to the specific InputPlugin in "
+                "use for more information."
+            ),
+        },
+        "scan_start_index": {
+            "type": int,
+            "default": 0,
+            "name": "Starting index",
+            "choices": None,
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The starting index offset for the index used to identify data "
+                "points in the scan."
+            ),
+        },
+        "scan_index_stepping": {
+            "type": int,
+            "default": 1,
+            "name": "Index stepping",
+            "choices": None,
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The stepping of the index. A value of n corresponds to only using "
+                "every n-th index. For example, an index stepping of 3 with an offset "
+                "of 5 would process the frames 5, 8, 11, 14 etc."
+            ),
+        },
+        "scan_multi_image_handling": {
+            "type": str,
+            "default": "Average",
+            "name": "Multi-image handling",
+            "choices": ["Average", "Sum"],
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "Define the handling of images if multiple images were acquired per "
+                "scan point. If all individual images should be kept, please set the "
+                "scan multiplicity to 1 and add an additional dimension with the "
+                "multiplicity to the scan."
+            ),
+        },
+        "scan_multiplicity": {
+            "type": int,
+            "default": 1,
+            "name": "Image multiplicity",
+            "choices": None,
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The number of images acquired at each scan point. The default of '1' "
+                "corresponds to one image per scan point."
             ),
         },
     }
@@ -1199,7 +1268,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The pattern of the filename. Use hashes '#' for  wildcards which will "
+                "The pattern of the filename. Use hashes '#' for wildcards which will "
                 "be filled in with numbers. This Parameter must be set if scan_for_all "
                 "is False."
             ),

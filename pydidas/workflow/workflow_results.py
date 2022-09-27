@@ -295,7 +295,7 @@ class _WorkflowResults(QtCore.QObject):
         _data.flatten_dims(
             *range(SCAN.ndim),
             new_dim_label="Scan timeline",
-            new_dim_range=np.arange(SCAN.n_total),
+            new_dim_range=np.arange(SCAN.n_points),
         )
         if squeeze:
             return _data.squeeze()
@@ -346,7 +346,7 @@ class _WorkflowResults(QtCore.QObject):
             _data.flatten_dims(
                 *range(SCAN.ndim),
                 new_dim_label="Scan timeline",
-                new_dim_range=np.arange(SCAN.n_total),
+                new_dim_range=np.arange(SCAN.n_points),
             )
             _data = _data[slices[0]]
 
@@ -553,8 +553,8 @@ class _WorkflowResults(QtCore.QObject):
         if use_scan_timeline:
             _print_info["ax_labels"].insert(0, "chronological frame number")
             _print_info["ax_units"].insert(0, "")
-            _print_info["ax_ranges"].insert(0, f"0 ... {SCAN.n_total - 1}")
-            _print_info["ax_points"].insert(0, SCAN.n_total)
+            _print_info["ax_ranges"].insert(0, f"0 ... {SCAN.n_points - 1}")
+            _print_info["ax_points"].insert(0, SCAN.n_points)
             _print_info["ax_types"].insert(0, "(scan)")
         if squeeze_results:
             _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]

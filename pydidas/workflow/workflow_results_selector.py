@@ -187,7 +187,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._npoints = list(RESULTS.shapes[self._config["active_node"]])
         if _use_timeline:
             del self._npoints[: SCAN.ndim]
-            self._npoints.insert(0, SCAN.n_total)
+            self._npoints.insert(0, SCAN.n_points)
         _selection = tuple(
             self._get_single_slice_object(_dim)
             for _dim in range(self._config["result_ndim"])

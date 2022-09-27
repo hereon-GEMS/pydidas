@@ -75,7 +75,7 @@ class TestSetupScan(unittest.TestCase):
     def test_n_total(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        self.assertEqual(SCAN.n_total, np.prod(self._scan_shape))
+        self.assertEqual(SCAN.n_points, np.prod(self._scan_shape))
 
     def test_shape(self):
         SCAN = _SetupScan()
@@ -151,6 +151,21 @@ class TestSetupScan(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
 
+    def test_get_frame_position_in_scan__multiplicity_gt_one(self):
+        SCAN = _SetupScan()
+        self.set_scan_params(SCAN)
+        SCAN.set_param_value("scan_multiplicity", 3)
+        _pos = tuple(i - 1 for i in self._scan_shape)
+        _tmpshape = self._scan_shape + (3,)
+        _n = np.sum(
+            [
+                _pos[i] * np.prod(_tmpshape[i + 1 :])
+                for i in range(SCAN.get_param_value("scan_dim"))
+            ]
+        )
+        _index = SCAN.get_frame_position_in_scan(_n)
+        self.assertEqual(_index, _pos)
+
     def test_get_frame_number_from_scan_indices__zero(self):
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
@@ -173,6 +188,20 @@ class TestSetupScan(unittest.TestCase):
         )
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
+        _index = SCAN.get_frame_number_from_scan_indices(_indices)
+        self.assertEqual(_index, _frame)
+
+    def test_get_frame_number_from_scan_indices__multiplicity_gt_one(self):
+        _indices = (2, 1, 2, 1)
+        _frame = (
+            _indices[3]
+            + self._scan_shape[3] * _indices[2]
+            + np.prod(self._scan_shape[2:]) * _indices[1]
+            + np.prod(self._scan_shape[1:]) * _indices[0]
+        ) * 3
+        SCAN = _SetupScan()
+        self.set_scan_params(SCAN)
+        SCAN.set_param_value("scan_multiplicity", 3)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
         self.assertEqual(_index, _frame)
 

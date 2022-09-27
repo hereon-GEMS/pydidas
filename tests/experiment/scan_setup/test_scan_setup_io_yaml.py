@@ -52,7 +52,7 @@ class TestScanSettingsIoYaml(unittest.TestCase):
         with open(self._path, "r") as stream:
             _data = yaml.safe_load(stream)
         for key in SCAN.params.keys():
-            self.assertEqual(SCAN.get_param_value(key), _data[key])
+            self.assertEqual(SCAN.get_param(key).value_for_export, _data[key])
 
     def test_import_from_file__missing_keys(self):
         with open(self._tmppath + "yaml.yml", "w") as stream:
@@ -73,7 +73,7 @@ class TestScanSettingsIoYaml(unittest.TestCase):
             _data = yaml.safe_load(stream)
         for key in SCAN.params:
             if key != "xray_energy":
-                self.assertEqual(SCAN.get_param_value(key), _data[key])
+                self.assertEqual(SCAN.get_param(key).value_for_export, _data[key])
 
 
 if __name__ == "__main__":

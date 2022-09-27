@@ -234,10 +234,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if self.get_param_value("image_selection") == "Use image number":
             _index = self.get_param_value("image_num", dtype=int)
-            if not 0 <= _index < SCAN.n_total:
+            if not 0 <= _index < SCAN.n_points:
                 raise UserConfigError(
                     f"The selected number {_index} is outside the scope of the number "
-                    f"of images in the scan (0...{SCAN.n_total - 1})"
+                    f"of images in the scan (0...{SCAN.n_points - 1})"
                 )
             return _index
         _nums = [

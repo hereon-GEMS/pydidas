@@ -36,6 +36,38 @@ from ...core import (
 from .setup_scan_io_meta import SetupScanIoMeta
 
 
+SETUP_SCAN_DEFAULT_PARAMS = get_generic_param_collection(
+    "scan_dim",
+    "scan_title",
+    "scan_label_1",
+    "scan_label_2",
+    "scan_label_3",
+    "scan_label_4",
+    "n_points_1",
+    "n_points_2",
+    "n_points_3",
+    "n_points_4",
+    "delta_1",
+    "delta_2",
+    "delta_3",
+    "delta_4",
+    "unit_1",
+    "unit_2",
+    "unit_3",
+    "unit_4",
+    "offset_1",
+    "offset_2",
+    "offset_3",
+    "offset_4",
+    "scan_base_directory",
+    "scan_name_pattern",
+    "scan_start_index",
+    "scan_index_stepping",
+    "scan_multiplicity",
+    "scan_multi_image_handling",
+)
+
+
 class _SetupScan(ObjectWithParameterCollection):
     """
     Class which holds the settings for the scan. This class must only be
@@ -43,30 +75,7 @@ class _SetupScan(ObjectWithParameterCollection):
     single instance exists.
     """
 
-    default_params = get_generic_param_collection(
-        "scan_dim",
-        "scan_title",
-        "scan_label_1",
-        "scan_label_2",
-        "scan_label_3",
-        "scan_label_4",
-        "n_points_1",
-        "n_points_2",
-        "n_points_3",
-        "n_points_4",
-        "delta_1",
-        "delta_2",
-        "delta_3",
-        "delta_4",
-        "unit_1",
-        "unit_2",
-        "unit_3",
-        "unit_4",
-        "offset_1",
-        "offset_2",
-        "offset_3",
-        "offset_4",
-    )
+    default_params = SETUP_SCAN_DEFAULT_PARAMS.copy()
 
     def __init__(self):
         super().__init__()
@@ -87,14 +96,15 @@ class _SetupScan(ObjectWithParameterCollection):
             The indices for indexing the position of the frame in the scan.
             The length of indices is equal to the number of scan dimensions.
         """
-        if frame < 0 or frame >= self.n_total:
+        _n_frames = self.n_points * self.get_param_value("scan_multiplicity")
+        if not 0 <= frame < _n_frames:
             raise UserConfigError(
-                f'The demanded frame number "{frame}" is out of '
-                f"the scope of the Scan (0, {self.n_total})."
+                f"The demanded frame number '{frame}' is out of the scope of the Scan "
+                f"indices (0, {_n_frames})."
             )
         _ndim = self.get_param_value("scan_dim")
         _N = [self.get_param_value(f"n_points_{_n}") for _n in range(1, _ndim + 1)] + [
-            1
+            self.get_param_value("scan_multiplicity")
         ]
         _indices = [0] * _ndim
         for _dim in range(_ndim):
@@ -105,6 +115,9 @@ class _SetupScan(ObjectWithParameterCollection):
     def get_frame_number_from_scan_indices(self, indices):
         """
         Get the frame number based on the scan indices.
+
+        Note: For an image multiplicity > 1, this frame number corresponds to the first
+        frame at this scan position.
 
         Parameters
         ----------
@@ -128,7 +141,7 @@ class _SetupScan(ObjectWithParameterCollection):
                 f"of the scan range {self.shape}"
             )
         _factors = np.asarray([np.prod(_shapes[_i + 1 :]) for _i in range(self.ndim)])
-        _index = np.sum(_factors * indices)
+        _index = np.sum(_factors * indices) * self.get_param_value("scan_multiplicity"        )
         return _index
 
     def get_metadata_for_dim(self, index):
@@ -217,7 +230,7 @@ class _SetupScan(ObjectWithParameterCollection):
         )
 
     @property
-    def n_total(self):
+    def n_points(self):
         """
         Get the total number of points in the Scan.
 

@@ -617,7 +617,7 @@ GENERIC_PARAM_DESCRIPTION = (
         ############################
         "scan_dim": {
             "type": int,
-            "default": 2,
+            "default": 1,
             "name": "Scan dimension",
             "choices": [1, 2, 3, 4],
             "unit": "",

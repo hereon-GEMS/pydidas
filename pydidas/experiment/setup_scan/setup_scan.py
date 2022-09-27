@@ -141,7 +141,7 @@ class _SetupScan(ObjectWithParameterCollection):
                 f"of the scan range {self.shape}"
             )
         _factors = np.asarray([np.prod(_shapes[_i + 1 :]) for _i in range(self.ndim)])
-        _index = np.sum(_factors * indices) * self.get_param_value("scan_multiplicity"        )
+        _index = np.sum(_factors * indices) * self.get_param_value("scan_multiplicity")
         return _index
 
     def get_metadata_for_dim(self, index):

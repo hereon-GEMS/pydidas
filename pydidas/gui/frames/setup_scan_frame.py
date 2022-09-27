@@ -25,13 +25,17 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupScanFrame"]
 
-from qtpy import QtWidgets
+from qtpy import QtWidgets, QtCore
 
 from ...experiment import SetupScan, SetupScanIoMeta
+from ...plugins import PluginCollection
+from ...workflow import WorkflowTree
 from .builders import SetupScanFrameBuilder
 
 
 SCAN_SETTINGS = SetupScan()
+PLUGINS = PluginCollection()
+WORKFLOW = WorkflowTree()
 
 
 class SetupScanFrame(SetupScanFrameBuilder):
@@ -84,31 +88,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
 
-    def update_param(self, param_ref, widget):
-        """
-        Overload the update of a parameter method to handle the linked
-        X-ray energy / X-ray wavelength variables.
-
-        Parameters
-        ----------
-        param_ref : str
-            The Parameter reference key
-        widget : pydidas.widgets.parameter_config.BaseParamIoWidget
-            The widget used for the I/O of the Parameter value.
-        """
-        try:
-            SCAN_SETTINGS.set(param_ref, widget.get_value())
-        except Exception:
-            widget.set_value(SCAN_SETTINGS.get(param_ref))
-            raise
-        # explicitly call update fo wavelength and energy
-        if param_ref == "xray_wavelength":
-            _w = self.param_widgets["xray_energy"]
-            _w.set_value(SCAN_SETTINGS.get("xray_energy"))
-        elif param_ref == "xray_energy":
-            _w = self.param_widgets["xray_wavelength"]
-            _w.set_value(SCAN_SETTINGS.get("xray_wavelength") * 1e10)
-
+    @QtCore.Slot()
     def load_from_file(self):
         """
         Load SetupScan from a file.
@@ -124,6 +104,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
             for param in SCAN_SETTINGS.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
+    @QtCore.Slot()
     def export_to_file(self):
         """
         Save SetupScan to a file.
@@ -138,6 +119,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
         if fname != "":
             SCAN_SETTINGS.export_to_file(fname, overwrite=True)
 
+    @QtCore.Slot()
     def reset_entries(self):
         """
         Reset all ScanSetting entries to their default values.

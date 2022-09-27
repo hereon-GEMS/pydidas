@@ -152,7 +152,7 @@ class ExecuteWorkflowApp(BaseApp):
         arrays from the shared memory.
         """
         self.reset_runtime_vars()
-        self.__get_and_store_tasks()
+        self._mp_tasks = np.arange(SCAN.n_points)
         if self.slave_mode:
             TREE.restore_from_string(self._config["tree_str_rep"])
             for _key, _val in self._config["scan_vals"].items():
@@ -185,19 +185,6 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _shapes = TREE.get_all_result_shapes()
         self._config["result_shapes"] = _shapes
-
-    def __get_and_store_tasks(self):
-        """
-        Get the tasks from the global SetupScan and store them internally.
-        """
-        _dim = SCAN.get_param_value("scan_dim")
-        _points_per_dim = [
-            SCAN.get_param_value(f"n_points_{_n}") for _n in range(1, _dim + 1)
-        ]
-        _n_total = np.prod(_points_per_dim)
-        self._mp_tasks = np.arange(_n_total) * SCAN.get_param_value(
-            "scan_multiplicity"
-        )
 
     def __check_size_of_results_and_buffer(self):
         """

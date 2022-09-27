@@ -28,20 +28,48 @@ import shutil
 import h5py
 import os
 import pickle
+from unittest import mock
+from functools import partial
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, PydidasConfigError
+from pydidas.core import Parameter, get_generic_parameter, Dataset
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
-from pydidas.managers import ImageMetadataManager
+from pydidas.experiment import SetupScan
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import InputPlugin
 
 
+_DUMMY_SHAPE = (130, 140)
+
+SCAN = SetupScan()
+
+
+class TestInputPlugin(InputPlugin):
+    def get_frame(self, index, **kwargs):
+        return Dataset(np.ones(_DUMMY_SHAPE) * index)
+
+    def update_filename_string(self):
+        pass
+
+
+def dummy_update_filename_string(plugin):
+    plugin.filename_string = plugin._image_metadata.filename
+
+
 class TestBaseInputPlugin(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        ...
+
+    @classmethod
+    def tearDownClass(cls):
+        SetupScan._reset_instance()
+
     def setUp(self):
-        self._datashape = (130, 140)
+        SCAN.restore_all_defaults(True)
+        self._datashape = _DUMMY_SHAPE
         self._testpath = tempfile.mkdtemp()
         self._fname = os.path.join(self._testpath, "test.h5")
         with h5py.File(self._fname, "w") as f:
@@ -81,85 +109,63 @@ class TestBaseInputPlugin(unittest.TestCase):
             self.assertIsInstance(_param, Parameter)
 
     def test_get_filename(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
         with self.assertRaises(NotImplementedError):
             plugin.get_filename(1)
 
     def test_input_available__file_exists_and_size_ok(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
         plugin._config["file_size"] = os.stat(self._fname).st_size
         plugin.get_filename = lambda x: self._fname
         self.assertTrue(plugin.input_available(1))
 
     def test_input_available__file_exists_and_wrong_size(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
         plugin._config["file_size"] = 37
         plugin.get_filename = lambda x: self._fname
         self.assertFalse(plugin.input_available(1))
 
     def test_input_available__file_does_not_exist(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
         plugin._config["file_size"] = 37
         plugin.get_filename = lambda x: os.path.join(self._testpath, "no_file.h5")
         self.assertFalse(plugin.input_available(1))
 
     def test_get_first_file_size(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
-        plugin._image_metadata.get_filename = lambda: self._fname
+        plugin._image_metadata.filename = self._fname
         self.assertEqual(plugin.get_first_file_size(), os.stat(self._fname).st_size)
 
     def test_prepare_carryon_check(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
-        plugin._image_metadata.get_filename = lambda: self._fname
+        plugin._image_metadata.filename = self._fname
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
 
-    def test_setup_image_metadata_manager__with_firstfile(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=False)
-        plugin = _class()
-        plugin.set_param_value("first_file", self._fname)
-        plugin._InputPlugin__setup_image_magedata_manager()
-        self.assertIsInstance(plugin._image_metadata, ImageMetadataManager)
-        self.assertFalse(plugin._image_metadata.get_param_value("use_filename"))
-
-    def test_setup_image_metadata_manager__with_filename(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
-        plugin = _class()
-        plugin.set_param_value("filename", self._fname)
-        plugin._InputPlugin__setup_image_magedata_manager()
-        self.assertIsInstance(plugin._image_metadata, ImageMetadataManager)
-        self.assertTrue(plugin._image_metadata.get_param_value("use_filename"))
-
-    def test_setup_image_metadata_manager__with_firstfile_and_filename(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
-        plugin = _class()
-        _class.default_params.add_param(get_generic_parameter("first_file"))
-        with self.assertRaises(PydidasConfigError):
-            plugin._InputPlugin__setup_image_magedata_manager()
-
     def test_setup_image_metadata_manager__with_different_hdf5_key(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         _class.default_params.add_param(get_generic_parameter("hdf5_key"))
+        _class.update_filename_string = mock.MagicMock()
         plugin = _class()
         with h5py.File(self._fname, "w") as f:
             f["other_entry/dataset/_data"] = np.ones((15,) + self._datashape)
         plugin.set_param_value("hdf5_key", "other_entry/dataset/_data")
-        plugin.set_param_value("filename", self._fname)
-        plugin._InputPlugin__setup_image_magedata_manager()
-        plugin._image_metadata.update()
+        plugin.update_filename_string = partial(dummy_update_filename_string, plugin)
+        plugin._image_metadata.update(filename=self._fname)
         plugin.calculate_result_shape()
         self.assertEqual(plugin.result_shape, self._datashape)
 
     def test_calculate_result_shape(self):
-        _class = create_plugin_class(INPUT_PLUGIN, use_filename=True)
+        _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
-        plugin.set_param_value("filename", self._fname)
+        plugin._image_metadata.filename = self._fname
+        plugin.update_filename_string = partial(dummy_update_filename_string, plugin)
         plugin.calculate_result_shape()
         self.assertEqual(self._datashape, plugin.result_shape)
 
@@ -173,6 +179,60 @@ class TestBaseInputPlugin(unittest.TestCase):
             self.assertEqual(
                 plugin.get_param_value(_key), plugin2.get_param_value(_key)
             )
+
+    def test_execute__simple(self):
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertIsInstance(_data, Dataset)
+        self.assertTrue(np.allclose(_data, 0))
+
+    def test_execute__w_multiplicity_and_average(self):
+        SCAN.set_param_value("scan_multiplicity", 4)
+        SCAN.set_param_value("scan_multi_image_handling", "Average")
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertTrue(np.allclose(_data, 1.5))
+
+    def test_execute__w_multiplicity_and_sum(self):
+        SCAN.set_param_value("scan_multiplicity", 4)
+        SCAN.set_param_value("scan_multi_image_handling", "Sum")
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertTrue(np.allclose(_data, 6))
+
+    def test_execute__w_start_index(self):
+        SCAN.set_param_value("scan_start_index", 4)
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        self.assertTrue(np.allclose(_data, 4))
+
+    def test_execute__w_start_index_w_delta(self):
+        SCAN.set_param_value("scan_start_index", 4)
+        SCAN.set_param_value("scan_index_stepping", 3)
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _data, _ = plugin.execute(0)
+        _data2, _ = plugin.execute(1)
+        self.assertTrue(np.allclose(_data, 4))
+        self.assertTrue(np.allclose(_data2, 7))
+
+    def test_execute__full_complexity(self):
+        SCAN.set_param_value("scan_start_index", 4)
+        SCAN.set_param_value("scan_index_stepping", 3)
+        SCAN.set_param_value("scan_multiplicity", 4)
+        SCAN.set_param_value("scan_multi_image_handling", "Sum")
+        plugin = TestInputPlugin()
+        plugin.pre_execute()
+        _result_0 = 4 + 7 + 10 + 13
+        _result_1 = 16 + 19 + 22 + 25
+        _data, _ = plugin.execute(0)
+        _data_1, _ = plugin.execute(1)
+        self.assertTrue(np.allclose(_data, _result_0))
+        self.assertTrue(np.allclose(_data_1, _result_1))
 
 
 if __name__ == "__main__":

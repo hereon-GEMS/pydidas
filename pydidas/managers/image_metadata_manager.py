@@ -25,12 +25,11 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ImageMetadataManager"]
 
+import os
 
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import get_hdf5_metadata, check_hdf5_key_exists_in_file, get_extension
 from ..core import (
-    Parameter,
-    ParameterCollection,
     UserConfigError,
     get_generic_param_collection,
     ObjectWithParameterCollection,
@@ -76,32 +75,17 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         Parameters can also be supplied as kwargs, referencey by their refkey.
     """
 
-    default_params = ParameterCollection(
-        get_generic_param_collection(
-            "filename",
-            "first_file",
-            "hdf5_key",
-            "hdf5_first_image_num",
-            "hdf5_last_image_num",
-            "hdf5_stepping",
-            "binning",
-            "use_roi",
-            "roi_ylow",
-            "roi_yhigh",
-            "roi_xlow",
-            "roi_xhigh",
-        ),
-        Parameter(
-            "use_filename",
-            int,
-            True,
-            name='Use "filename" Parameter',
-            tooltip=(
-                'Flag to switch between the "filename" and "first_file"'
-                " Parameters, based on the associated App."
-            ),
-            choices=[True, False],
-        ),
+    default_params = get_generic_param_collection(
+        "hdf5_key",
+        "hdf5_first_image_num",
+        "hdf5_last_image_num",
+        "hdf5_stepping",
+        "binning",
+        "use_roi",
+        "roi_ylow",
+        "roi_yhigh",
+        "roi_xlow",
+        "roi_xhigh",
     )
 
     def __init__(self, *args, **kwargs):
@@ -120,6 +104,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             "roi": None,
             "images_per_file": -1,
             "hdf5_dset_shape": None,
+            "filename": "",
         }
 
     @property
@@ -178,10 +163,44 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         return self._config["hdf5_dset_shape"]
 
-    def update(self):
+    @property
+    def filename(self):
+        """
+        Get the currently stored reference filename.
+        """
+        return self._config["filename"]
+
+    @filename.setter
+    def filename(self, filename):
+        """
+        Set the filename for processing.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path]
+            The full path of the selected file.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the filename cannot be found in the file system.
+        """
+        if not os.path.isfile(filename):
+            raise FileNotFoundError(f"Cannot fild the specified file '{filename}'.")
+        self._config["filename"] = filename
+
+    def update(self, filename=None):
         """
         Perform a full update.
+
+        Parameters
+        ----------
+        filename : Union[str, pathlib.Path, None], optional
+            The filename to be updated. If None, the current filename will be used.
+            The default is None.
         """
+        if filename is not None:
+            self.filename = filename
         self.update_input_data()
         self.update_final_image()
 
@@ -189,24 +208,11 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Update the image metadata from new input.
         """
-        _filename = self.get_filename()
+        _filename = self._config["filename"]
         if get_extension(_filename) in HDF5_EXTENSIONS:
             self._store_image_data_from_hdf5_file()
         else:
             self._store_image_data_from_single_image()
-
-    def get_filename(self):
-        """
-        Get the filename for processing based on the "use_filename" flag.
-
-        Returns
-        -------
-        pathlib.Path
-            The full path of the selected file.
-        """
-        if self.get_param_value("use_filename"):
-            return self.get_param_value("filename")
-        return self.get_param_value("first_file")
 
     def update_final_image(self):
         """
@@ -218,7 +224,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from hdf5 file.
         """
-        _filename = self.get_filename()
+        _filename = self._config["filename"]
         _key = self.get_param_value("hdf5_key")
         check_hdf5_key_exists_in_file(_filename, _key)
         _meta = get_hdf5_metadata(_filename, ["shape", "dtype"], _key)
@@ -260,7 +266,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         Store config metadata from file range.
         """
-        _test_image = import_data(self.get_filename())
+        _test_image = import_data(self._config["filename"])
         self._config["numbers"] = [0]
         self._config["hdf5_dset_shape"] = (0, 0, 0)
         self._store_image_data(_test_image.shape, _test_image.dtype, 1)

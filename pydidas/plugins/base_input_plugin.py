@@ -26,10 +26,16 @@ __all__ = ["InputPlugin"]
 
 import os
 
-from ..core import get_generic_parameter, PydidasConfigError
+import numpy as np
+
+from ..core import get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
+from ..experiment import SetupScan
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
+
+
+SCAN = SetupScan()
 
 
 class InputPlugin(BasePlugin):
@@ -58,27 +64,16 @@ class InputPlugin(BasePlugin):
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
-        use_filename_pattern = kwargs.get("use_filename_pattern", False)
-        self.__setup_image_magedata_manager(use_filename_pattern)
+        self.filename_string = ""
+        self.__setup_image_magedata_manager()
 
-    def __setup_image_magedata_manager(self, use_filename_pattern=False):
+    def __setup_image_magedata_manager(self):
         """
         Setup the ImageMetadataManager to determine the shape of the final
         image.
 
         The shape of the final image is required to determine the shape of
         the processed data in the WorkflowTree.
-
-        Parameters
-        ----------
-        use_filename_pattern : bool, optional
-            Keyword to use a filename pattern. The default is False.
-
-        Raises
-        ------
-        PydidasConfigError
-            If neither or both "first_file" or "filename" Parameters are used
-            for a non-basic plugin.
         """
         _metadata_params = [
             self.get_param(key)
@@ -93,35 +88,14 @@ class InputPlugin(BasePlugin):
         ]
         if "hdf5_key" in self.params:
             _metadata_params.append(self.get_param("hdf5_key"))
-        _has_first_file = "first_file" in self.default_params
-        _has_filename = "filename" in self.default_params
-        if _has_first_file and not _has_filename:
-            _metadata_params.append(self.get_param("first_file"))
-            _use_filename = False
-        elif _has_filename and not _has_first_file:
-            _metadata_params.append(self.get_param("filename"))
-            _use_filename = True
-        elif self.basic_plugin or use_filename_pattern:
-            # create some dummy value
-            _use_filename = True
-        else:
-            raise PydidasConfigError(
-                "Ambiguous choice of Parameters. Use exactly"
-                ' one of  both "first_file" and "filename".'
-            )
         self._image_metadata = ImageMetadataManager(*_metadata_params)
-        self._image_metadata.set_param_value("use_filename", _use_filename)
-
-    def pre_execute(self):
-        """
-        Run the pre-execution routines.
-        """
 
     def calculate_result_shape(self):
         """
         Calculate the shape of the Plugin's results.
         """
-        self._image_metadata.update()
+        self.update_filename_string()
+        self._image_metadata.update(filename=self.filename_string.format(index=0))
         self._config["result_shape"] = self._image_metadata.final_shape
         self._original_input_shape = (
             self._image_metadata.raw_size_y,
@@ -146,7 +120,7 @@ class InputPlugin(BasePlugin):
         int
             The file size in bytes.
         """
-        _fname = self._image_metadata.get_filename()
+        _fname = self._image_metadata.filename
         self._config["file_size"] = os.stat(_fname).st_size
         return self._config["file_size"]
 
@@ -172,6 +146,45 @@ class InputPlugin(BasePlugin):
             return self._config["file_size"] == os.stat(_fname).st_size
         return False
 
+    def pre_execute(self):
+        """
+        Run generic pre-execution routines.
+        """
+        self._config["n_multi"] = SCAN.get_param_value("scan_multiplicity")
+        self._config["start_index"] = SCAN.get_param_value("scan_start_index")
+        self._config["delta_index"] = SCAN.get_param_value("scan_index_stepping")
+
+    def execute(self, index, **kwargs):
+        """
+        Import the data and pass it on after (optionally) handling image multiplicity.
+
+        Parameters
+        ----------
+        index : int
+            The index of the scan point.
+        **kwargs : dict
+            Keyword arguments passed to the execute method.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The image data frame.
+        """
+        _data = None
+        _frames = (
+            self._config["n_multi"] * self._config["delta_index"] * index
+            + self._config["start_index"]
+            + self._config["delta_index"] * np.arange(self._config["n_multi"])
+        )
+        for _frame_index in _frames:
+            if _data is None:
+                _data = self.get_frame(_frame_index, **kwargs)
+            else:
+                _data += self.get_frame(_frame_index, **kwargs)
+        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
+            _data /= self._config["n_multi"]
+        return _data, kwargs
+
     def get_filename(self, index):
         """
         Get the filename of the file associated with the index.
@@ -190,5 +203,30 @@ class InputPlugin(BasePlugin):
         -------
         str
             The filename.
+        """
+        raise NotImplementedError
+
+    def get_frame(self, frame_index, **kwargs):
+        """
+        Get the specified image frame (which does not necessarily correspond to the
+        scan point index).
+
+        Parameters
+        ----------
+        frame_index : int
+            The index of the specific frame to be loaded.
+        **kwargs : dict
+            Keyword arguments passed for loading the frame.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The image data frame.
+        """
+        raise NotImplementedError
+
+    def update_filename_string(self):
+        """
+        Update the filename_string from the input Parameters.
         """
         raise NotImplementedError

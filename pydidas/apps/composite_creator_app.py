@@ -212,7 +212,6 @@ class CompositeCreatorApp(BaseApp):
         )
         self._image_metadata = ImageMetadataManager(
             *self.get_params(
-                "first_file",
                 "hdf5_key",
                 "hdf5_first_image_num",
                 "hdf5_last_image_num",
@@ -225,7 +224,6 @@ class CompositeCreatorApp(BaseApp):
                 "roi_yhigh",
             )
         )
-        self._image_metadata.set_param_value("use_filename", False)
         self._config = {
             "current_fname": None,
             "current_kwargs": {},
@@ -269,7 +267,7 @@ class CompositeCreatorApp(BaseApp):
               and assert the image size is the same.
         """
         self._filelist.update()
-        self._image_metadata.update()
+        self._image_metadata.update(filename=self._filelist.get_filename(0))
         self.__verify_number_of_images_fits_composite()
         if self.get_param_value("use_bg_file"):
             self._check_and_set_bg_file()

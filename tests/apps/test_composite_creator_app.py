@@ -84,7 +84,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("composite_ny", self._ny)
         app.set_param_value("use_roi", True)
         app.set_param_value("roi_xlow", 5)
-        app._image_metadata.update()
+        app._image_metadata.update(filename=self._fname(0))
         app._filelist.update()
         return app
 
@@ -331,7 +331,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("first_file", self._hdf5_fnames[0])
         app.set_param_value("last_file", Path())
         app._filelist.update()
-        app._image_metadata.update()
+        app._image_metadata.update(filename=self._hdf5_fnames[0])
         _index = 7
         app._store_args_for_read_image(_index)
         self.assertEqual(app._config["current_fname"], self._hdf5_fnames[0])
@@ -386,7 +386,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
             np.save(self._fname(i + self._n), _data2[i])
         app.set_param_value("first_file", self._fname(self._n))
         app.set_param_value("last_file", self._fname(2 * self._n - 1))
-        app._image_metadata.update()
+        app._image_metadata.update(filename=self._fname(self._n))
         app._CompositeCreatorApp__check_and_update_composite_image()
         _new_shape = app.composite.shape
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
@@ -488,7 +488,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("roi_xlow", 5)
         app.set_param_value("use_roi", True)
         app.set_param_value("first_file", self._hdf5_fnames[0])
-        app._image_metadata.update()
+        app._image_metadata.update(filename=self._hdf5_fnames[0])
         _mask = app._CompositeCreatorApp__get_detector_mask()
         _target_shape = (self._img_shape[0], self._img_shape[1] - 5)
         self.assertEqual(_mask.shape, _target_shape)
@@ -499,7 +499,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("use_roi", True)
         app.set_param_value("binning", 2)
         app.set_param_value("first_file", self._hdf5_fnames[0])
-        app._image_metadata.update()
+        app._image_metadata.update(filename=self._hdf5_fnames[0])
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertEqual(_mask.shape, app._image_metadata.final_shape)
 

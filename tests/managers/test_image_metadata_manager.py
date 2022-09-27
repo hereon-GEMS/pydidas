@@ -150,14 +150,14 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_check_roi_for_consistency(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", True)
         imm._ImageMetadataManager__check_roi_for_consistency()
 
     def test_check_roi_for_consistency__wrong_range(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", True)
         imm.set_param_value("roi_xlow", 12)
@@ -169,7 +169,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_calculate_final_image_shape(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", False)
         imm.set_param_value("binning", 1)
@@ -180,7 +180,7 @@ class TestImageMetadataManager(unittest.TestCase):
     def test_calculate_final_image_shape__with_binning(self):
         _bin = 3
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", False)
         imm.set_param_value("binning", _bin)
@@ -195,7 +195,7 @@ class TestImageMetadataManager(unittest.TestCase):
         _ylow = 2
         _yhigh = 22
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", True)
         imm.set_param_value("roi_xlow", _xlow)
@@ -214,7 +214,7 @@ class TestImageMetadataManager(unittest.TestCase):
         _yhigh = 22
         _bin = 3
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         imm.set_param_value("use_roi", True)
         imm.set_param_value("roi_xlow", _xlow)
@@ -238,7 +238,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data_from_single_image(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._fname(0))
+        imm.filename = self._fname(0)
         imm._store_image_data_from_single_image()
         self.assertEqual(imm._config["datatype"], self._data.dtype)
         self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
@@ -248,9 +248,8 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data_from_single_image__no_file(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._fname(90))
         with self.assertRaises(FileNotFoundError):
-            imm._store_image_data_from_single_image()
+            imm.filename = self._fname(90)
         self.assertEqual(imm._config["datatype"], None)
         self.assertEqual(imm._config["raw_img_shape_x"], None)
         self.assertEqual(imm._config["raw_img_shape_y"], None)
@@ -285,7 +284,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data_from_hdf5(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm._store_image_data_from_hdf5_file()
         self.assertEqual(imm._config["datatype"], self._data.dtype)
         self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
@@ -295,7 +294,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data_from_hdf5__wrong_key(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.set_param_value("hdf5_key", "foo/bar")
         with self.assertRaises(UserConfigError):
             imm._store_image_data_from_hdf5_file()
@@ -304,7 +303,7 @@ class TestImageMetadataManager(unittest.TestCase):
         _step = 3
         imm = ImageMetadataManager()
         imm.set_param_value("hdf5_stepping", _step)
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm._store_image_data_from_hdf5_file()
         self.assertEqual(imm._config["images_per_file"], self._dsize // _step + 1)
         self.assertEqual(imm._config["numbers"], range(0, self._dsize, _step))
@@ -318,64 +317,59 @@ class TestImageMetadataManager(unittest.TestCase):
         imm.update_final_image()
         # assert does not raise an Exception.
 
-    def test_get_filename__use_filename(self):
+    def test_set_filename(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("use_filename", True)
-        imm.set_param_value("filename", self._hdf5_fname)
-        imm.set_param_value("first_file", self._fname(0))
-        _fname = imm.get_filename()
-        self.assertEqual(_fname, self._hdf5_fname)
-
-    def test_get_filename__do_not_use_filename(self):
-        imm = ImageMetadataManager()
-        imm.set_param_value("use_filename", False)
-        imm.set_param_value("filename", self._hdf5_fname)
-        imm.set_param_value("first_file", self._fname(0))
-        _fname = imm.get_filename()
-        self.assertEqual(_fname, self._fname(0))
+        imm.filename = self._hdf5_fname
+        self.assertEqual(imm._config["filename"], self._hdf5_fname)
 
     def test_update_input_data__hdf5_file(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         # assert does not raise an Exception
 
     def test_update_input_data__other_file(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._fname(0))
+        imm.filename = self._fname(0)
         imm.update_input_data()
         # assert does not raise an Exception
 
     def test_update(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         self.assertEqual(imm._config["images_per_file"], self._dsize)
         self.assertEqual(imm._config["numbers"], range(self._dsize))
 
     def test_update__single_file(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._fname(0))
+        imm.filename = self._fname(0)
         imm.update_input_data()
+        self.assertEqual(imm._config["images_per_file"], 1)
+        self.assertEqual(imm._config["numbers"], [0])
+
+    def test_update__w_filename(self):
+        imm = ImageMetadataManager()
+        imm.update(filename=self._fname(0))
         self.assertEqual(imm._config["images_per_file"], 1)
         self.assertEqual(imm._config["numbers"], [0])
 
     def test_update__new_data(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update()
         self.create_second_dataset()
-        imm.set_param_value("filename", self._hdf5_fname2)
+        imm.filename = self._hdf5_fname2
         imm.update()
         self.assertEqual(imm.final_shape, self._img_shape2)
 
     def test_update__new_data_with_roi(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.set_param_value("roi_xlow", 5)
         imm.update()
         self.create_second_dataset()
-        imm.set_param_value("filename", self._hdf5_fname2)
+        imm.filename = self._hdf5_fname2
         imm.update()
         self.assertEqual(imm.final_shape, self._img_shape2)
 
@@ -395,32 +389,32 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_property_sizex(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         self.assertEqual(imm.raw_size_x, self._img_shape[1])
 
     def test_property_sizey(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         self.assertEqual(imm.raw_size_y, self._img_shape[0])
 
     def test_property_numbers(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         _n = imm.numbers
         self.assertEqual(_n, range(self._dsize))
 
     def test_property_datatype(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         self.assertEqual(imm.datatype, self._data.dtype)
 
     def test_property_roi(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.set_param_value("use_roi", True)
         imm.update()
         self.assertEqual(
@@ -429,19 +423,19 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_property_final_shape(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update()
         self.assertEqual(imm.final_shape, self._img_shape)
 
     def test_property_images_per_file(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update()
         self.assertEqual(imm.images_per_file, self._dsize)
 
     def test_property_hdf5_dset_shape(self):
         imm = ImageMetadataManager()
-        imm.set_param_value("filename", self._hdf5_fname)
+        imm.filename = self._hdf5_fname
         imm.update_input_data()
         self.assertEqual(imm.hdf5_dset_shape, (self._dsize,) + self._img_shape)
 

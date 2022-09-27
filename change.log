@@ -5,8 +5,6 @@ Major changes:
 - Added a Utilities frame to have easy access to various utility windows.
 - Added new utility windows (Mask editing, file series operations)
 - Added a global default colormap for users to select.
-- Added multiplicity parameter to SetupScan to account for multiple images
-  at the same position.
 
 Improvements
 ------------
@@ -18,12 +16,15 @@ Improvements
 - Added an option to remove a single node from the WorkflowTree while 
   keeping its children.
 - Added a data dimension consistency check to WorkflowNode
+- Added multiplicity parameter to SetupScan to account for multiple images
+  at the same position.
+- Updated SetupScanFrame.
 
 Bugfixes:
 ---------
 - Fixed an issue with the canvas resize buttons in empty 2d plots.
 - Fixed missing kwargs in PydidasPlot2D class.
-
+- Fixed minor bugs in widget layout settings.
 
 v0.1.10
 =======

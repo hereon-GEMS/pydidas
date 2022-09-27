@@ -62,11 +62,8 @@ class _WorkflowResults(QtCore.QObject):
         """
         self.clear_all_results()
         _dim = SCAN.get_param_value("scan_dim")
-        _points = tuple(
-            SCAN.get_param_value(f"n_points_{_n}") for _n in range(1, _dim + 1)
-        )
         _results = TREE.get_all_result_shapes()
-        _shapes = {_key: _points + _shape for _key, _shape in _results.items()}
+        _shapes = {_key: SCAN.shape + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
             _dset = Dataset(np.zeros(_shape, dtype=np.float32))
             _dset.convert_all_none_properties()
@@ -121,7 +118,7 @@ class _WorkflowResults(QtCore.QObject):
 
     def store_results(self, index, results):
         """
-        Store results from one frame in the WorkflowResults.
+        Store results from one scan point in the WorkflowResults.
 
         Note: If write_to_disk is enabled, please be advised that this may
         slow down the WorkflowResults
@@ -129,7 +126,7 @@ class _WorkflowResults(QtCore.QObject):
         Parameters
         ----------
         index : int
-            The frame index
+            The index of the scan point.
         results: dict
             The results as dictionary with entries of the type
             <node_id: array>.

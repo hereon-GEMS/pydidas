@@ -25,11 +25,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParamIoWidgetFile"]
 
+import os
 import pathlib
 
 from qtpy import QtWidgets, QtCore
 
-from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
+from ...core.constants import PARAM_INPUT_EDIT_WIDTH
+from ...data_io import IoMaster
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 
@@ -60,10 +62,8 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         super().__init__(parent, param, width)
         self._flag_is_output = param.refkey.startswith("output")
         self._flag_is_dir = "directory" in param.refkey
-        self._file_selection = (
-            f'All files (*.*);;HDF5 files ({"*"+" *".join(HDF5_EXTENSIONS)});;'
-            "TIFF files (*.tif, *.tiff);;NPY files (*.npy *.npz)"
-        )
+        self._flag_pattern = "pattern" in param.refkey
+        self._file_selection = "All files (*.*);;" + IoMaster.get_string_of_formats()
 
     def button_function(self):
         """
@@ -75,16 +75,18 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         if self._flag_is_dir:
             _arg = QtWidgets.QFileDialog.ShowDirsOnly
             _func = QtWidgets.QFileDialog.getExistingDirectory
-            fname = _func(self, "Name of directory", None, _arg)
+            _fname = _func(self, "Name of directory", None, _arg)
         else:
             _arg = self._file_selection
             if self._flag_is_output:
                 _func = QtWidgets.QFileDialog.getSaveFileName
             else:
                 _func = QtWidgets.QFileDialog.getOpenFileName
-            fname = _func(self, "Name of file", None, _arg)[0]
-        if fname:
-            self.setText(fname)
+            _fname = _func(self, "Name of file", None, _arg)[0]
+        if self._flag_pattern:
+            _fname = os.path.basename(_fname)
+        if _fname:
+            self.setText(_fname)
             self.emit_signal()
 
     def get_value(self):

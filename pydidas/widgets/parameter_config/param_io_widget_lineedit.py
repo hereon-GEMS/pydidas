@@ -32,7 +32,6 @@ import numpy as np
 from qtpy import QtWidgets, QtCore
 
 from ...core.constants import (
-    PARAM_INPUT_WIDGET_HEIGHT,
     PARAM_INPUT_WIDGET_WIDTH,
     FLOAT_DISPLAY_ACCURACY,
 )
@@ -62,7 +61,6 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
         QtWidgets.QLineEdit.__init__(self, parent)
         BaseParamIoWidget.__init__(self, parent, param, width)
         self.set_validator(param)
-        self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self.set_value(param.value)
         self.editingFinished.connect(self.emit_signal)
 

@@ -214,7 +214,6 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         dict
             The keyword dictionary to be passed to the ParamWidget creation.
         """
-        _config_next_row = self._widgets["config"].next_row
         # special formatting for some parameters:
         if param_key in [
             "first_file",
@@ -233,7 +232,6 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                 width_text=CONFIG_WIDGET_WIDTH - 20,
                 width_unit=0,
                 parent_widget=self._widgets["config"],
-                row=_config_next_row(),
             )
         else:
             _config = dict(

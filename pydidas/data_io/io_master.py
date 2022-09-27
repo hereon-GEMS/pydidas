@@ -200,7 +200,7 @@ class IoMaster(type):
         _formats = cls.get_registered_formats(mode=mode)
         _extensions = [f"*.{_key}" for _key in cls._get_registry(mode)]
         _all = [f"All supported files ({' '.join(_extensions)})"] + [
-            f"{name} (*.{' *.'.join(formats)})" for name, formats in _formats.items()
+            f"{_name} files (*.{' *.'.join(_ext)})" for _name, _ext in _formats.items()
         ]
         return ";;".join(_all)
 

@@ -283,7 +283,7 @@ class BasePlugin(ObjectWithParameterCollection):
 
     def get_parameter_config_widget(self):
         """
-        Get the unique ParameterConfigWidget associated to this Plugin.
+        Get the unique configuration widget associated with this Plugin.
 
         This method is useful if the configuration widget should have any
         non-standard items, e.g. sliders or interactive capability.
@@ -306,7 +306,7 @@ class BasePlugin(ObjectWithParameterCollection):
     @property
     def has_unique_parameter_config_widget(self):
         """
-        Get the flag whether the Plugin has a unique ParameterConfigWidget
+        Get the flag whether the Plugin has a unique configuration widget.
 
         Returns
         -------

@@ -55,11 +55,8 @@ class ParameterWidgetsMixIn:
 
         Keyword arguments
         -----------------
-        row : int, optional
-            The row in case a grid layout is used. The default is -1 (the
-            next row)
-        column : int, optional
-            The starting column in case of a grid layout. The default is 0.
+        gridPos : tuple, optional
+            The grid position in the layout. The default is (-1, 0, 1, 1)
         width_total : int, optional
             The total width of the widget. The width of the IO widget is
             calculated from width_total, width_text, width_unit and linebreak.
@@ -71,10 +68,6 @@ class ParameterWidgetsMixIn:
             is 30.
         width_io : int, optional
             The width of the input widget. The default is 255 pixel.
-        n_columns : int, optional
-            The number of grid columns for the i/o widget. The default is 1.
-        n_columns_text : int, optional
-            The number of grid columns for the text widget. The default is 1.
         linebreak : bool, optional
             Keyword to toggle a line break between the text label and the
             input widget. The default is False.

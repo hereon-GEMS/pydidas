@@ -25,12 +25,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Hdf5fileSeriesLoader"]
 
+from pydidas.core import get_generic_param_collection, UserConfigError
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.managers import FilelistManager
-from pydidas.plugins import InputPlugin
-from pydidas.data_io import import_data
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
+from pydidas.plugins import InputPlugin
+from pydidas.experiment import SetupScan
+from pydidas.data_io import import_data
+
+
+SCAN = SetupScan()
 
 
 class Hdf5fileSeriesLoader(InputPlugin):
@@ -38,28 +41,25 @@ class Hdf5fileSeriesLoader(InputPlugin):
     Load data frames from Hdf5 data files.
 
     This class is designed to load data from a series of hdf5 file. The file
-    series is defined through the first and last file and file stepping.
-    The key to the hdf5 dataset needs to be provided as well as the number
-    of images per file.
-    Filesystem checks can be enabled using the live_processing keyword but
-    are disabled by default.
+    series is defined through the SCAN's base directory, filename pattern and
+    start index.
+
+
+    The final filename is
+    <SCAN base directory>/<SCAN name pattern with index subsituted for hashes>.
+
+    The dataset in the Hdf5 file is defined by the hdf5_key Parameter.
 
     A region of interest and image binning can be supplied to apply directly
     to the raw image.
 
     Parameters
     ----------
-    first_file : Union[str, pathlib.Path]
-        The name of the first file in the file series.
-    last_file : Union[str, pathlib.Path]
-        The name of the last file in the file series.
-    hdf5_key : str
-        The key to access the hdf5 dataset in the file.
-    images_per_file : int
-        The number of images per file.
-    live_processing : bool, optional
-        Flag to toggle file system checks. In live_processing mode, checks
-        for the size and existance of files are disabled. The default is False.
+    hdf5_key : str, optional
+        The key to access the hdf5 dataset in the file. The default is entry/data/data.
+    images_per_file : int, optional
+        The number of images per file. If -1, pydidas will auto-discover the number
+        of images per file based on the first file. The default is -1.
     file_stepping : int, optional
         The stepping width through all files in the file list, determined
         by fist and last file. The default is 1.
@@ -68,57 +68,30 @@ class Hdf5fileSeriesLoader(InputPlugin):
     plugin_name = "HDF5 file series loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter("first_file"),
-        get_generic_parameter("last_file"),
-        get_generic_parameter("hdf5_key"),
-        get_generic_parameter("images_per_file"),
-        get_generic_parameter("live_processing"),
-        get_generic_parameter("file_stepping"),
+    default_params = get_generic_param_collection(
+        "hdf5_key", "images_per_file", "file_stepping"
     )
     input_data_dim = None
     output_data_dim = 2
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_param_value("live_processing", True)
-        self._file_manager = FilelistManager(
-            self.get_param("first_file"),
-            self.get_param("last_file"),
-            self.get_param("live_processing"),
-            self.get_param("file_stepping"),
-        )
 
     def pre_execute(self):
         """
         Prepare loading images from a file series.
         """
-        self._file_manager.update()
-        self._image_metadata.update()
+        InputPlugin.pre_execute(self)
         if self.get_param_value("images_per_file") == -1:
-            self.__update_images_per_file()
+            _n_per_file = get_hdf5_metadata(
+                self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
+            )[0]
+            self.set_param_value("images_per_file", _n_per_file)
 
-    def __update_images_per_file(self):
+    def get_frame(self, frame_index, **kwargs):
         """
-        Update the number of images per file.
-
-        This method reads the first file of the list, extracts the number
-        of frames in this dataset and stores the information.
-        """
-        _n_per_file = get_hdf5_metadata(
-            self.get_param_value("first_file"),
-            "shape",
-            dset=self.get_param_value("hdf5_key"),
-        )[0]
-        self.set_param_value("images_per_file", _n_per_file)
-
-    def execute(self, index, **kwargs):
-        """
-        Load a frame from a file.
+        Load a frame and pass it on.
 
         Parameters
         ----------
-        index : int
+        frame_index : int
             The frame index.
         **kwargs : dict
             Any calling keyword arguments. Can be used to apply a ROI or
@@ -126,27 +99,31 @@ class Hdf5fileSeriesLoader(InputPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The image data.
-        kwargs : dict
-            Any calling kwargs, appended by any changes in the function.
         """
-        _fname = self.get_filename(index)
-        _hdf_index = index % self.get_param_value("images_per_file")
+        _fname = self.get_filename(frame_index)
+        _hdf_index = frame_index % self.get_param_value("images_per_file")
         kwargs["dataset"] = self.get_param_value("hdf5_key")
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
-        kwargs["roi"] = self._image_metadata.roi
         _data = import_data(_fname, **kwargs)
         return _data, kwargs
 
     @copy_docstring(InputPlugin)
-    def get_filename(self, index):
+    def get_filename(self, frame_index):
         """
         For the full docstring, please refer to the
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
         <InputPlugin>` class.
         """
+        if self.filename_string == "":
+            raise UserConfigError(
+                "pre_execute has not been called for Hdf5FileSeriesLoader and no "
+                "filename generator has been created."
+            )
         _images_per_file = self.get_param_value("images_per_file")
-        _i_file = index // _images_per_file
-        return self._file_manager.get_filename(_i_file)
+        _i_file = (frame_index // _images_per_file) * self.get_param_value(
+            "file_stepping"
+        ) + SCAN.get_param_value("scan_start_index")
+        return self.filename_string.format(index=_i_file)

@@ -30,7 +30,7 @@ import inspect
 
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
-from pydidas.core import ParameterCollection, get_generic_parameter
+from pydidas.core import ParameterCollection
 from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import InputPlugin, ProcPlugin, OutputPlugin, BasePlugin
@@ -65,7 +65,7 @@ def create_base_class(base):
     return _cls
 
 
-def create_plugin_class(plugin_type, number=0, use_filename=True):
+def create_plugin_class(plugin_type, number=0):
     """
     Create a unique Plugin class with random attributes.
 
@@ -99,38 +99,5 @@ def create_plugin_class(plugin_type, number=0, use_filename=True):
     _cls.plugin_name = f"Plugin {_name}"
     _cls.number = number
     _cls.params = ParameterCollection()
-    if plugin_type == INPUT_PLUGIN:
-        _cls = _setup_input_plugin(_cls, use_filename)
     _cls.__doc__ = get_random_string(600)
     return _cls
-
-
-def _setup_input_plugin(plugin_class, use_filename):
-    """
-    Setup the generic Parameters for the input class, based on the choice
-    of using the "filename" or "first_file" Parameter.
-
-    Parameters
-    ----------
-    plugin_class : type
-        The plugin class.
-    use_filename : bool
-        The flag to use the filename or the the "first_file" Parameter if
-        False.
-
-    Returns
-    -------
-    plugin_class : type
-        The updated plugin class.
-    """
-    if use_filename:
-        if "first_file" in plugin_class.default_params:
-            del plugin_class.default_params["first_file"]
-        if "filename" not in plugin_class.default_params:
-            plugin_class.default_params.add_param(get_generic_parameter("filename"))
-    else:
-        if "filename" in plugin_class.default_params:
-            del plugin_class.default_params["filename"]
-        if "first_file" not in plugin_class.default_params:
-            plugin_class.default_params.add_param(get_generic_parameter("first_file"))
-    return plugin_class

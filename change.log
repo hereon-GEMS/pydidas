@@ -5,6 +5,8 @@ Major changes:
 - Added a Utilities frame to have easy access to various utility windows.
 - Added new utility windows (Mask editing, file series operations)
 - Added a global default colormap for users to select.
+- Moved input settings (directory, filename pattern) to SetupScan class
+  and out of the individual input plugins.
 
 Improvements
 ------------
@@ -27,6 +29,7 @@ Bugfixes:
 - Fixed missing kwargs in PydidasPlot2D class.
 - Fixed minor bugs in widget layout settings.
 - Fixed an issue with the config state paths.
+
 
 v0.1.10
 =======

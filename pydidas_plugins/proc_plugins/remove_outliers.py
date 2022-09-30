@@ -71,7 +71,7 @@ class RemoveOutliers(ProcPlugin):
         ),
     )
     input_data_dim = -1
-    output_data_dim = 1
+    output_data_dim = -1
     output_data_label = "data without outliers"
     output_data_unit = "a.u."
 

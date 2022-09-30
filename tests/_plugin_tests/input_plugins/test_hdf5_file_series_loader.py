@@ -33,39 +33,51 @@ import h5py
 
 from pydidas.core import UserConfigError, Parameter
 from pydidas.core.utils import get_random_string
+from pydidas.experiment import SetupScan
 from pydidas.plugins import PluginCollection, BasePlugin
 
 
 PLUGIN_COLLECTION = PluginCollection()
+SCAN = SetupScan()
 
 
 class TestHdf5FileSeriesLoader(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
-        self._img_shape = (10, 10)
-        self._n_per_file = 13
-        self._n_files = 11
-        self._n = self._n_files * self._n_per_file
-        self._hdf5key = "/entry/data/data"
-        self._data = np.zeros(((self._n,) + self._img_shape), dtype=np.uint16)
-        for index in range(self._n):
-            self._data[index] = index
+    @classmethod
+    def setUpClass(cls):
+        cls._path = tempfile.mkdtemp()
+        cls._img_shape = (10, 10)
+        cls._n_per_file = 13
+        cls._n_files = 11
+        cls._fname_i0 = 2
+        cls._n = cls._n_files * cls._n_per_file
+        cls._hdf5key = "/entry/data/data"
+        cls._data = np.repeat(
+            np.arange(cls._n, dtype=np.uint16), np.prod(cls._img_shape)
+        ).reshape((cls._n,) + cls._img_shape)
 
-        self._hdf5_fnames = []
-        for i in range(self._n_files):
-            _fname = Path(os.path.join(self._path, f"test_{i:03d}.h5"))
-            self._hdf5_fnames.append(_fname)
-            _slice = slice(i * self._n_per_file, (i + 1) * self._n_per_file, 1)
+        cls._hdf5_fnames = []
+        for i in range(cls._n_files):
+            _fname = Path(os.path.join(cls._path, f"test_{i + cls._fname_i0:05d}.h5"))
+            cls._hdf5_fnames.append(_fname)
+            _slice = slice(i * cls._n_per_file, (i + 1) * cls._n_per_file, 1)
             with h5py.File(_fname, "w") as f:
-                f[self._hdf5key] = self._data[_slice]
+                f[cls._hdf5key] = cls._data[_slice]
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+
+    def setUp(self):
+        SCAN.restore_all_defaults(True)
+        SCAN.set_param_value("scan_name_pattern", "test_#####.h5")
+        SCAN.set_param_value("scan_base_directory", self._path)
+        SCAN.set_param_value("scan_start_index", self._fname_i0)
 
     def tearDown(self):
-        shutil.rmtree(self._path)
+        SCAN.restore_all_defaults(True)
 
-    def create_plugin_with_hdf5_filelist(self):
+    def create_plugin(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        plugin.set_param_value("first_file", self._hdf5_fnames[0])
-        plugin.set_param_value("last_file", self._hdf5_fnames[-1])
         plugin.set_param_value("images_per_file", self._n_per_file)
         plugin.set_param_value("hdf5_key", self._hdf5key)
         return plugin
@@ -79,32 +91,28 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
 
     def test_pre_execute__no_input(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")()
-        with self.assertRaises(UserConfigError):
-            plugin.pre_execute()
+        plugin.pre_execute()
+        self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
 
     def test_pre_execute__simple(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         plugin.pre_execute()
-        self.assertEqual(plugin._file_manager.n_files, self._n_files)
         self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
 
     def test_pre_execute__no_images_per_file_set(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         plugin.set_param_value("images_per_file", -1)
         plugin.pre_execute()
-        self.assertEqual(plugin._file_manager.n_files, self._n_files)
         self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
         self.assertEqual(plugin.get_param_value("images_per_file"), self._n_per_file)
 
     def test_execute__no_input(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Hdf5fileSeriesLoader")(
-            images_per_file=1
-        )
+        plugin = self.create_plugin()
         with self.assertRaises(UserConfigError):
             plugin.execute(0)
 
     def test_execute__simple(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         _index = 0
         plugin.pre_execute()
         _data, kwargs = plugin.execute(_index)
@@ -113,7 +121,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
 
     def test_execute__with_roi(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         plugin.set_param_value("use_roi", True)
         plugin.set_param_value("roi_yhigh", 5)
         _index = 0
@@ -127,7 +135,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
         )
 
     def test_execute__get_all_frames(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         plugin.pre_execute()
         for _index in range(self._n):
             _data, kwargs = plugin.execute(_index)
@@ -136,7 +144,7 @@ class TestHdf5FileSeriesLoader(unittest.TestCase):
             self.assertEqual(_data.metadata["frame"], [self.get_index_in_file(_index)])
 
     def test_pickle(self):
-        plugin = self.create_plugin_with_hdf5_filelist()
+        plugin = self.create_plugin()
         _new_params = {get_random_string(6): get_random_string(12) for i in range(7)}
         for _key, _val in _new_params.items():
             plugin.add_param(Parameter(_key, str, _val))

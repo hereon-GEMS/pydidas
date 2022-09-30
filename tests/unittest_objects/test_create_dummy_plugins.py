@@ -54,15 +54,6 @@ class TestDummyPluginCollection(unittest.TestCase):
         _cls = create_plugin_class(INPUT_PLUGIN)
         _instance = _cls()
         self.assertIsInstance(_instance, InputPlugin)
-        self.assertIn("filename", _instance.params)
-        self.assertNotIn("first_file", _instance.params)
-
-    def test_create_plugin_class__input_n_first_file(self):
-        _cls = create_plugin_class(INPUT_PLUGIN, use_filename=False)
-        _instance = _cls()
-        self.assertIsInstance(_instance, InputPlugin)
-        self.assertNotIn("filename", _instance.params)
-        self.assertIn("first_file", _instance.params)
 
     def test_create_plugin_class__proc(self):
         _cls = create_plugin_class(PROC_PLUGIN)

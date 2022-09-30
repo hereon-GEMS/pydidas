@@ -90,9 +90,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             str,
             ".fio",
             name="The filename suffix",
-            tooltip=(
-                "The suffix of the filename. This is anything after the counter."
-            ),
+            tooltip=("The suffix of the filename. This is anything after the counter."),
         ),
         get_generic_parameter("first_index"),
         get_generic_parameter("file_stepping"),
@@ -181,7 +179,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         _offset = self.get_param_value("first_index")
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise UserConfigError("No pattern detected!")
+            raise UserConfigError(
+                "No filename pattern detected in the FioMcaLineScanSeriesLoader!"
+            )
         _pattern = _pattern.replace(
             "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
         )

@@ -447,7 +447,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "allow_None": False,
             "tooltip": ("The last index to be used for the file series."),
         },
-        "eiger_key": {
+        "eiger_dir": {
             "type": str,
             "default": "eiger9m",
             "name": "Eiger directory key",

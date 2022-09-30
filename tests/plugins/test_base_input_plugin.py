@@ -36,6 +36,7 @@ import numpy as np
 from pydidas.core import Parameter, get_generic_parameter, Dataset
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
+from pydidas.data_io import import_data
 from pydidas.experiment import SetupScan
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import InputPlugin
@@ -47,11 +48,20 @@ SCAN = SetupScan()
 
 
 class TestInputPlugin(InputPlugin):
+    def __init__(self, filename=""):
+        InputPlugin.__init__(self)
+        self.filename_string = filename
+
     def get_frame(self, index, **kwargs):
-        return Dataset(np.ones(_DUMMY_SHAPE) * index)
+        _frame = index + SCAN.get_param_value("scan_start_index")
+        kwargs["frame"] = _frame
+        return import_data(self.filename_string, **kwargs), kwargs
 
     def update_filename_string(self):
         pass
+
+    def get_filename(self, index):
+        return self.filename_string
 
 
 def dummy_update_filename_string(plugin):
@@ -61,22 +71,24 @@ def dummy_update_filename_string(plugin):
 class TestBaseInputPlugin(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        ...
+        cls._testpath = tempfile.mkdtemp()
+        cls._datashape = _DUMMY_SHAPE
+        cls._fname = os.path.join(cls._testpath, "test.h5")
+        with h5py.File(cls._fname, "w") as f:
+            f["entry/data/data"] = np.repeat(
+                np.arange(15, dtype=np.uint16), np.prod(_DUMMY_SHAPE)
+            ).reshape((15,) + _DUMMY_SHAPE)
 
     @classmethod
     def tearDownClass(cls):
         SetupScan._reset_instance()
+        shutil.rmtree(cls._testpath)
 
     def setUp(self):
         SCAN.restore_all_defaults(True)
-        self._datashape = _DUMMY_SHAPE
-        self._testpath = tempfile.mkdtemp()
-        self._fname = os.path.join(self._testpath, "test.h5")
-        with h5py.File(self._fname, "w") as f:
-            f["entry/data/data"] = np.ones((15,) + self._datashape)
 
     def tearDown(self):
-        shutil.rmtree(self._testpath)
+        ...
 
     def test_create_base_plugin(self):
         plugin = create_plugin_class(INPUT_PLUGIN)
@@ -109,10 +121,9 @@ class TestBaseInputPlugin(unittest.TestCase):
             self.assertIsInstance(_param, Parameter)
 
     def test_get_filename(self):
-        _class = create_plugin_class(INPUT_PLUGIN)
-        plugin = _class()
-        with self.assertRaises(NotImplementedError):
-            plugin.get_filename(1)
+        plugin = create_plugin_class(INPUT_PLUGIN)()
+        _fname = plugin.get_filename(1)
+        self.assertEqual(_fname, "")
 
     def test_input_available__file_exists_and_size_ok(self):
         _class = create_plugin_class(INPUT_PLUGIN)
@@ -138,13 +149,13 @@ class TestBaseInputPlugin(unittest.TestCase):
     def test_get_first_file_size(self):
         _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
-        plugin._image_metadata.filename = self._fname
+        plugin.get_filename = lambda index: self._fname
         self.assertEqual(plugin.get_first_file_size(), os.stat(self._fname).st_size)
 
     def test_prepare_carryon_check(self):
         _class = create_plugin_class(INPUT_PLUGIN)
         plugin = _class()
-        plugin._image_metadata.filename = self._fname
+        plugin.get_filename = lambda index: self._fname
         plugin.prepare_carryon_check()
         self.assertEqual(plugin._config["file_size"], os.stat(self._fname).st_size)
 
@@ -181,7 +192,7 @@ class TestBaseInputPlugin(unittest.TestCase):
             )
 
     def test_execute__simple(self):
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertIsInstance(_data, Dataset)
@@ -190,7 +201,7 @@ class TestBaseInputPlugin(unittest.TestCase):
     def test_execute__w_multiplicity_and_average(self):
         SCAN.set_param_value("scan_multiplicity", 4)
         SCAN.set_param_value("scan_multi_image_handling", "Average")
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 1.5))
@@ -198,14 +209,14 @@ class TestBaseInputPlugin(unittest.TestCase):
     def test_execute__w_multiplicity_and_sum(self):
         SCAN.set_param_value("scan_multiplicity", 4)
         SCAN.set_param_value("scan_multi_image_handling", "Sum")
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 6))
 
     def test_execute__w_start_index(self):
         SCAN.set_param_value("scan_start_index", 4)
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         self.assertTrue(np.allclose(_data, 4))
@@ -213,7 +224,7 @@ class TestBaseInputPlugin(unittest.TestCase):
     def test_execute__w_start_index_w_delta(self):
         SCAN.set_param_value("scan_start_index", 4)
         SCAN.set_param_value("scan_index_stepping", 3)
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _data, _ = plugin.execute(0)
         _data2, _ = plugin.execute(1)
@@ -225,7 +236,7 @@ class TestBaseInputPlugin(unittest.TestCase):
         SCAN.set_param_value("scan_index_stepping", 3)
         SCAN.set_param_value("scan_multiplicity", 4)
         SCAN.set_param_value("scan_multi_image_handling", "Sum")
-        plugin = TestInputPlugin()
+        plugin = TestInputPlugin(filename=self._fname)
         plugin.pre_execute()
         _result_0 = 4 + 7 + 10 + 13
         _result_1 = 16 + 19 + 22 + 25
@@ -233,6 +244,13 @@ class TestBaseInputPlugin(unittest.TestCase):
         _data_1, _ = plugin.execute(1)
         self.assertTrue(np.allclose(_data, _result_0))
         self.assertTrue(np.allclose(_data_1, _result_1))
+
+    def test_execute__with_roi(self):
+        plugin = TestInputPlugin(filename=self._fname)
+        plugin.set_param_value("use_roi", True)
+        plugin.set_param_value("roi_yhigh", 5)
+        plugin.pre_execute()
+        _data, kwargs = plugin.execute(0)
 
 
 if __name__ == "__main__":

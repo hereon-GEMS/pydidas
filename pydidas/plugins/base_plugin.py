@@ -33,6 +33,7 @@ from pydidas.core import (
     ParameterCollection,
     ObjectWithParameterCollection,
     get_generic_param_collection,
+    UserConfigError,
 )
 from pydidas.core.utils import rebin2d
 from pydidas.data_io.utils import RoiSliceManager
@@ -501,21 +502,83 @@ class BasePlugin(ObjectWithParameterCollection):
         tuple
             The tuple with two slice objects which define the image ROI.
         """
-        _roi = RoiSliceManager(
-            roi=(
+        if self.input_data_dim == 1:
+            _roi_bounds = (
+                self.get_param_value("roi_xlow"),
+                self.get_param_value("roi_xhigh"),
+            )
+            _dim = 1
+        elif self.input_data_dim in (2, -1):
+            _roi_bounds = (
                 self.get_param_value("roi_ylow"),
                 self.get_param_value("roi_yhigh"),
                 self.get_param_value("roi_xlow"),
                 self.get_param_value("roi_xhigh"),
-            ),
-            input_shape=self.input_shape,
-        )
+            )
+            _dim = 2
+        else:
+            raise UserConfigError(
+                "The Plugin does not have the correct data dimensionality to define a "
+                "ROI."
+            )
+        _roi = RoiSliceManager(roi=_roi_bounds, input_shape=self.input_shape, dim=_dim)
         return _roi.roi
 
     def get_single_ops_from_legacy(self):
         """
         Get the parameters for a single ROI and binning operation from
         combining all legacy operations on the data.
+
+        Returns
+        -------
+        roi : tuple
+            The ROI which needs to be applied to the original image.
+        binning : int
+            The binning factor which needs to be applied to the original image.
+        """
+        if self.input_data_dim == 1:
+            return self.__get_legacy_op_for_1d_input()
+        else:
+            return self.__get_legacy_op_for_2d_input()
+
+    def __get_legacy_op_for_1d_input(self):
+        """
+        Get the single legacy operation that transforms the raw input to the input
+        of this plugin.
+
+        Returns
+        -------
+        roi : tuple
+            The ROI which needs to be applied to the original image.
+        binning : int
+            The binning factor which needs to be applied to the original image.
+        """
+        _roi = RoiSliceManager(
+            roi=(0, self._original_input_shape[0]),
+            input_shape=self._original_input_shape,
+            dim=1,
+        )
+        _binning = 1
+        _all_ops = self._legacy_image_ops[:]
+        while len(_all_ops) > 0:
+            _op_name, _op = _all_ops.pop(0)
+            if _op_name == "binning":
+                _x = int(_roi.roi[1].stop - _roi.roi[1].start)
+                _dx = int(((_x // _binning) % _op) * _binning)
+                _tmproi = (0, _x - _dx)
+                _roi.apply_second_roi(_tmproi)
+                _binning *= _op
+            if _op_name == "roi":
+                _roi_unbinned = [
+                    _binning * _r for _r in RoiSliceManager(roi=_op, dim=1).roi_coords
+                ]
+                _roi.apply_second_roi(_roi_unbinned)
+        return _roi.roi, _binning
+
+    def __get_legacy_op_for_2d_input(self):
+        """
+        Get the single legacy operation that transforms the raw input to the input
+        of this plugin.
 
         Returns
         -------

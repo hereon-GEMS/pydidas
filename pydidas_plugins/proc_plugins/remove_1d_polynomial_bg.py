@@ -107,7 +107,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
     plugin_type = PROC_PLUGIN
     default_params = DEFAULT_PARAMS_FOR_REMOVE1dPOLYBG
     input_data_dim = -1
-    output_data_dim = 1
+    output_data_dim = -1
     output_data_label = "Background-corrected data"
     output_data_unit = "a.u."
 

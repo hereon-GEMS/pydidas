@@ -28,10 +28,8 @@ __all__ = ["FrameLoader"]
 
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import get_generic_param_collection
-from pydidas.managers import FilelistManager
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
-from pydidas.core.utils import copy_docstring
 
 
 class FrameLoader(InputPlugin):
@@ -66,57 +64,27 @@ class FrameLoader(InputPlugin):
     plugin_name = "Single frame loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = get_generic_param_collection(
-        "first_file", "last_file", "live_processing", "file_stepping"
-    )
+    default_params = get_generic_param_collection("file_stepping")
     input_data_dim = None
     output_data_dim = 2
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_param_value("live_processing", False)
-        self._file_manager = FilelistManager(
-            *self.get_params(
-                "first_file", "last_file", "live_processing", "file_stepping"
-            )
-        )
-
-    def pre_execute(self):
+    def get_frame(self, frame_index, **kwargs):
         """
-        Prepare loading of images from a series of files.
-        """
-        self._file_manager.update()
-        self._image_metadata.update()
-
-    def execute(self, index, **kwargs):
-        """
-        Execute the plugin and load an image from a file.
+        Load a frame and pass it on.
 
         Parameters
         ----------
-        index : int
-            The index for the image.
+        frame_index : int
+            The frame index.
         **kwargs : dict
-            Any optional keyword arguments for reading the file.
+            Any calling keyword arguments. Can be used to apply a ROI or
+            binning to the raw image.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data in a Dataset.
-        kwargs : dict
-            Any input kwargs are returned to be passed on to the next plugin.
+        data : pydidas.core.Dataset
+            The image data.
         """
-        _fname = self.get_filename(index)
-        kwargs["binning"] = self.get_param_value("binning")
-        kwargs["roi"] = self._image_metadata.roi
+        _fname = self.get_filename(frame_index)
         _data = import_data(_fname, **kwargs)
         return _data, kwargs
-
-    @copy_docstring(InputPlugin)
-    def get_filename(self, index):
-        """
-        For the full docstring, please refer to the
-        :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
-        <InputPlugin>` class.
-        """
-        return self._file_manager.get_filename(index)

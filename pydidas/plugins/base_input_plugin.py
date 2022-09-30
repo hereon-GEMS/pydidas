@@ -28,7 +28,7 @@ import os
 
 import numpy as np
 
-from ..core import get_generic_parameter
+from ..core import get_generic_parameter, UserConfigError
 from ..core.constants import INPUT_PLUGIN
 from ..experiment import SetupScan
 from ..managers import ImageMetadataManager
@@ -47,7 +47,7 @@ class InputPlugin(BasePlugin):
     plugin_name = "Base input plugin"
     output_data_label = "Image intensity"
     output_data_unit = "counts"
-    input_data_dim = None
+    input_data_dim = 2
     generic_params = BasePlugin.generic_params.get_copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),
@@ -56,6 +56,7 @@ class InputPlugin(BasePlugin):
         get_generic_parameter("roi_ylow"),
         get_generic_parameter("roi_yhigh"),
         get_generic_parameter("binning"),
+        get_generic_parameter("live_processing"),
     )
     default_params = BasePlugin.default_params.get_copy()
 
@@ -95,7 +96,7 @@ class InputPlugin(BasePlugin):
         Calculate the shape of the Plugin's results.
         """
         self.update_filename_string()
-        self._image_metadata.update(filename=self.filename_string.format(index=0))
+        self._image_metadata.update(filename=self.get_filename(0))
         self._config["result_shape"] = self._image_metadata.final_shape
         self._original_input_shape = (
             self._image_metadata.raw_size_y,
@@ -120,7 +121,7 @@ class InputPlugin(BasePlugin):
         int
             The file size in bytes.
         """
-        _fname = self._image_metadata.filename
+        _fname = self.get_filename(0)
         self._config["file_size"] = os.stat(_fname).st_size
         return self._config["file_size"]
 
@@ -150,9 +151,27 @@ class InputPlugin(BasePlugin):
         """
         Run generic pre-execution routines.
         """
+        self.update_filename_string()
+        self._image_metadata.update(filename=self.get_filename(0))
         self._config["n_multi"] = SCAN.get_param_value("scan_multiplicity")
         self._config["start_index"] = SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = SCAN.get_param_value("scan_index_stepping")
+
+    def update_filename_string(self):
+        """
+        Set up the generator that can create the full file names to load images.
+
+        The generic implementation only joins the base directory and filename pattern,
+        as defined in the SetupScan class.
+        """
+        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _len_pattern = _pattern.count("#")
+        if _len_pattern < 1:
+            raise UserConfigError("No filename pattern detected in the Input plugin!")
+        self.filename_string = os.path.join(_basepath, _pattern).replace(
+            "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
+        )
 
     def execute(self, index, **kwargs):
         """
@@ -170,41 +189,45 @@ class InputPlugin(BasePlugin):
         pydidas.core.Dataset
             The image data frame.
         """
+        if "n_multi" not in self._config:
+            raise UserConfigError(
+                "Calling plugin execution without prior pre-execution is not allowed."
+            )
         _data = None
-        _frames = (
-            self._config["n_multi"] * self._config["delta_index"] * index
-            + self._config["start_index"]
-            + self._config["delta_index"] * np.arange(self._config["n_multi"])
-        )
+        if "roi" not in kwargs and self.get_param_value("use_roi"):
+            kwargs["roi"] = self._image_metadata.roi
+        _frames = self._config["n_multi"] * self._config[
+            "delta_index"
+        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
         for _frame_index in _frames:
             if _data is None:
-                _data = self.get_frame(_frame_index, **kwargs)
+                _data, kwargs = self.get_frame(_frame_index, **kwargs)
             else:
-                _data += self.get_frame(_frame_index, **kwargs)
+                _data += self.get_frame(_frame_index, **kwargs)[0]
         if SCAN.get_param_value("scan_multi_image_handling") == "Average":
-            _data /= self._config["n_multi"]
+            _data = _data / self._config["n_multi"]
+        if _frames.size > 1:
+            kwargs["frames"] = _frames
         return _data, kwargs
 
-    def get_filename(self, index):
+    def get_filename(self, frame_index):
         """
-        Get the filename of the file associated with the index.
+        Get the filename of the file associated with the frame index.
 
         Parameters
         ----------
-        index : int
-            The frame index.
-
-        Raises
-        ------
-        NotImplementedError
-            This method needs to be implemented by the concrete subclass.
+        frame index : int
+            The index of the frame to be processed.
 
         Returns
         -------
         str
             The filename.
         """
-        raise NotImplementedError
+        _index = frame_index * self.get_param_value(
+            "file_stepping", 1
+        ) + SCAN.get_param_value("scan_start_index")
+        return self.filename_string.format(index=_index)
 
     def get_frame(self, frame_index, **kwargs):
         """
@@ -222,11 +245,5 @@ class InputPlugin(BasePlugin):
         -------
         pydidas.core.Dataset
             The image data frame.
-        """
-        raise NotImplementedError
-
-    def update_filename_string(self):
-        """
-        Update the filename_string from the input Parameters.
         """
         raise NotImplementedError

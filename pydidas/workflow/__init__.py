@@ -26,10 +26,10 @@ __status__ = "Development"
 __all__ = []
 
 # import sub-packages:
-from . import result_savers
+from . import result_io
 from . import workflow_tree_io
 
-__all__.extend(["result_savers", "workflow_tree_io"])
+__all__.extend(["result_io", "workflow_tree_io"])
 
 # import __all__ items from modules:
 from .generic_node import *

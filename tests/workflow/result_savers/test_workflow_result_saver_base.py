@@ -25,9 +25,9 @@ __status__ = "Development"
 import unittest
 
 from pydidas.experiment import SetupScan
-from pydidas.workflow.result_savers import (
-    WorkflowResultSaverBase,
-    WorkflowResultSaverMeta,
+from pydidas.workflow.result_io import (
+    WorkflowResultIoBase,
+    WorkflowResultIoMeta,
 )
 from pydidas.workflow import WorkflowTree, WorkflowResults
 
@@ -35,10 +35,10 @@ from pydidas.workflow import WorkflowTree, WorkflowResults
 TREE = WorkflowTree()
 SCAN = SetupScan()
 RESULTS = WorkflowResults()
-META = WorkflowResultSaverMeta
+META = WorkflowResultIoMeta
 
 
-class TestWorkflowResultSaverBase(unittest.TestCase):
+class TestWorkflowResultIoBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._meta_registry = META.registry.copy()
@@ -48,7 +48,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         }
         META.reset()
 
-        class SAVER(WorkflowResultSaverBase):
+        class SAVER(WorkflowResultIoBase):
             extensions = ["TEST"]
             default_extension = "Test"
             format_name = "Test"
@@ -62,7 +62,7 @@ class TestWorkflowResultSaverBase(unittest.TestCase):
         META.registry = cls._meta_registry.copy()
 
     def test_class_existance(self):
-        self.assertIn(WorkflowResultSaverBase, self.SAVER.__bases__)
+        self.assertIn(WorkflowResultIoBase, self.SAVER.__bases__)
 
     def test_get_attribute_dict(self):
         _name = "test"

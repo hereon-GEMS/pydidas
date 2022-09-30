@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the WorkflowResultSaverMeta class which is used for creating
+Module with the WorkflowResultIoMeta class which is used for creating
 exporter/importer classes and registering them.
 
 These exporters/importers are used to save the WorkflowTree results to
@@ -26,7 +26,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowResultSaverMeta"]
+__all__ = ["WorkflowResultIoMeta"]
 
 import os
 
@@ -34,7 +34,7 @@ from ...core.io_registry import GenericIoMeta
 from ...core.utils import get_extension
 
 
-class WorkflowResultSaverMeta(GenericIoMeta):
+class WorkflowResultIoMeta(GenericIoMeta):
     """
     Metaclass for WorkflowTree exporters and importers which holds the
     registry with all associated file extensions for exporting WorkflowTrees.

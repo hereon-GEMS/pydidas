@@ -1,7 +1,7 @@
-workflow.result_savers
+workflow.result_io
 ----------------------
 
-.. automodule:: pydidas.workflow.result_savers
+.. automodule:: pydidas.workflow.result_io
     :members:
     
 

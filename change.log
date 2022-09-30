@@ -22,6 +22,8 @@ Improvements
   at the same position.
 - Updated SetupScanFrame.
 - Overhauled ImageMetadataManager input file selection.
+- Renamed workflow/result_savers package to workflow/result_io because it
+  also includes import capabilities.
 
 Bugfixes:
 ---------

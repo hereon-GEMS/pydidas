@@ -35,7 +35,7 @@ from qtpy import QtCore
 from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree, WorkflowResults
-from ..workflow.result_savers import WorkflowResultSaverMeta
+from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
 
 
@@ -43,7 +43,7 @@ TREE = WorkflowTree()
 SCAN = SetupScan()
 EXP = SetupExperiment()
 RESULTS = WorkflowResults()
-RESULT_SAVER = WorkflowResultSaverMeta
+RESULT_SAVER = WorkflowResultIoMeta
 
 
 class ExecuteWorkflowApp(BaseApp):

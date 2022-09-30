@@ -27,20 +27,20 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .workflow_result_saver_base import *
-from .workflow_result_saver_meta import *
+from .workflow_result_io_base import *
+from .workflow_result_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import workflow_result_saver_base
+from . import workflow_result_io_base
 
-__all__.extend(workflow_result_saver_base.__all__)
-del workflow_result_saver_base
+__all__.extend(workflow_result_io_base.__all__)
+del workflow_result_io_base
 
-from . import workflow_result_saver_meta
+from . import workflow_result_io_meta
 
-__all__.extend(workflow_result_saver_meta.__all__)
-del workflow_result_saver_meta
+__all__.extend(workflow_result_io_meta.__all__)
+del workflow_result_io_meta
 
 # Automatically find and import IO classes to have them registered
 # with the Metaclass:
@@ -52,7 +52,7 @@ _io_classes = set(
     item.strip(".py")
     for item in os.listdir(_dir)
     if (
-        item.startswith("workflow_result_saver")
+        item.startswith("workflow_result_io")
         and not item[-7:] in ["base.py", "meta.py"]
     )
 )

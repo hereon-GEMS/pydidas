@@ -38,21 +38,21 @@ from pydidas.core.utils import (
     create_hdf5_dataset,
     read_and_decode_hdf5_dataset,
 )
-from pydidas.workflow.result_savers import WorkflowResultSaverMeta
+from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.workflow.result_savers.workflow_result_saver_hdf5 import (
-    WorkflowResultSaverHdf5,
+from pydidas.workflow.result_io.workflow_result_io_hdf5 import (
+    WorkflowResultIoHdf5,
 )
 
 
 TREE = WorkflowTree()
 SCAN = SetupScan()
 RESULTS = WorkflowResults()
-META = WorkflowResultSaverMeta
-H5SAVER = WorkflowResultSaverHdf5
+META = WorkflowResultIoMeta
+H5SAVER = WorkflowResultIoHdf5
 
 
-class TestWorkflowResultSaverHdf5(unittest.TestCase):
+class TestWorkflowResultIoHdf5(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._dir = tempfile.mkdtemp()

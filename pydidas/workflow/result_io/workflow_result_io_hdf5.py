@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowResultSaverHdf5 class which exports and imports results in
+Module with the WorkflowResultIoHdf5 class which exports and imports results in
 Hdf5 file format.
 """
 
@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowResultSaverHdf5"]
+__all__ = ["WorkflowResultIoHdf5"]
 
 import os
 
@@ -34,7 +34,7 @@ from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from ...core.constants import HDF5_EXTENSIONS
 from ..workflow_tree import WorkflowTree
-from .workflow_result_saver_base import WorkflowResultSaverBase
+from .workflow_result_io_base import WorkflowResultIoBase
 
 
 TREE = WorkflowTree()
@@ -42,9 +42,9 @@ EXP = SetupExperiment()
 SCAN = SetupScan()
 
 
-class WorkflowResultSaverHdf5(WorkflowResultSaverBase):
+class WorkflowResultIoHdf5(WorkflowResultIoBase):
     """
-    Implementation of the WorkflowResultSaverBase for Hdf5 files.
+    Implementation of the WorkflowResultIoBase for Hdf5 files.
     """
 
     extensions = HDF5_EXTENSIONS

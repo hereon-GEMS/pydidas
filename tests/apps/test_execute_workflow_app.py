@@ -39,14 +39,14 @@ from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.experiment import SetupScan
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.workflow.result_savers import WorkflowResultSaverMeta
+from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.plugins import PluginCollection
 
 
 TREE = WorkflowTree()
 SCAN = SetupScan()
 RESULTS = WorkflowResults()
-RESULT_SAVER = WorkflowResultSaverMeta
+RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()
 _PLUGIN_PATHS = COLL.get_all_registered_paths()
 

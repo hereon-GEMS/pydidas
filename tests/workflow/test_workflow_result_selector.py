@@ -33,13 +33,13 @@ from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.experiment import SetupScan
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.workflow.result_savers import WorkflowResultSaverMeta
+from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
 SCAN = SetupScan()
 TREE = WorkflowTree()
 RES = WorkflowResults()
-SAVER = WorkflowResultSaverMeta
+SAVER = WorkflowResultIoMeta
 
 
 class TestWorkflowResultSelector(unittest.TestCase):

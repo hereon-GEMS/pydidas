@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 """
-Module with the WorkflowResultSaverBase class which exporters/importers should
+Module with the WorkflowResultIoBase class which exporters/importers should
 inherit from.
 """
 
@@ -22,15 +22,15 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowResultSaverBase"]
+__all__ = ["WorkflowResultIoBase"]
 
 import re
 
 from ...core.io_registry import GenericIoBase
-from .workflow_result_saver_meta import WorkflowResultSaverMeta
+from .workflow_result_io_meta import WorkflowResultIoMeta
 
 
-class WorkflowResultSaverBase(GenericIoBase, metaclass=WorkflowResultSaverMeta):
+class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
     """
     Base class for WorkflowTree exporters.
     """

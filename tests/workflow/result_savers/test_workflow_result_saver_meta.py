@@ -32,16 +32,16 @@ import numpy as np
 from pydidas.core import Dataset
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.experiment import SetupScan
-from pydidas.workflow.result_savers import (
-    WorkflowResultSaverBase,
-    WorkflowResultSaverMeta,
+from pydidas.workflow.result_io import (
+    WorkflowResultIoBase,
+    WorkflowResultIoMeta,
 )
 
 
 TREE = WorkflowTree()
 SCAN = SetupScan()
 RESULTS = WorkflowResults()
-META = WorkflowResultSaverMeta
+META = WorkflowResultIoMeta
 
 
 def export_frame_to_file(saver, index, frame_result_dict, **kwargs):
@@ -109,7 +109,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
     def create_saver_class(self, title, ext):
         _cls = META(
             title.upper(),
-            (WorkflowResultSaverBase,),
+            (WorkflowResultIoBase,),
             dict(extensions=[ext.upper()], format_name=ext),
         )
         return _cls

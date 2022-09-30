@@ -111,7 +111,7 @@ Sub-package descriptions
     Classes of nodes and trees to describe the workflow and execute plugins in 
     the order defined by the user.
 
-  - *pydidas.workflow.result_savers* 
+  - *pydidas.workflow.result_io* 
     
         Classes to handle writing the results of the workflow execution to files.
                       

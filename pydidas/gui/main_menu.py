@@ -59,10 +59,6 @@ SCAN = SetupScan()
 EXP = SetupExperiment()
 TREE = WorkflowTree()
 
-CONFIG_PATH = QtCore.QStandardPaths.standardLocations(
-    QtCore.QStandardPaths.ConfigLocation
-)[0]
-
 
 class MainMenu(QtWidgets.QMainWindow):
     """
@@ -82,6 +78,9 @@ class MainMenu(QtWidgets.QMainWindow):
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
+    CONFIG_PATH = QtCore.QStandardPaths.standardLocations(
+        QtCore.QStandardPaths.ConfigLocation
+    )[0]
 
     sig_close_gui = QtCore.Signal()
 
@@ -281,7 +280,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state(os.path.join(CONFIG_PATH, self.STATE_FILENAME))
+            self.export_gui_state(os.path.join(self.CONFIG_PATH, self.STATE_FILENAME))
 
     @QtCore.Slot()
     def _action_export_state(self):
@@ -468,6 +467,7 @@ class MainMenu(QtWidgets.QMainWindow):
             filter_types_for_export=True
         )
         _state["workflow_tree"] = TREE.export_to_string()
+        print(filename)
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
@@ -612,7 +612,7 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        self.export_gui_state(os.path.join(CONFIG_PATH, self.EXIT_STATE_FILENAME))
+        self.export_gui_state(os.path.join(self.CONFIG_PATH, self.EXIT_STATE_FILENAME))
         self.sig_close_gui.emit()
         _keys = list(self._child_windows.keys())
         for _key in _keys:

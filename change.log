@@ -19,12 +19,14 @@ Improvements
 - Added multiplicity parameter to SetupScan to account for multiple images
   at the same position.
 - Updated SetupScanFrame.
+- Overhauled ImageMetadataManager input file selection.
 
 Bugfixes:
 ---------
 - Fixed an issue with the canvas resize buttons in empty 2d plots.
 - Fixed missing kwargs in PydidasPlot2D class.
 - Fixed minor bugs in widget layout settings.
+- Fixed an issue with the config state paths.
 
 v0.1.10
 =======

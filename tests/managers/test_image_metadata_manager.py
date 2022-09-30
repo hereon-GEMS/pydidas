@@ -248,7 +248,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data_from_single_image__no_file(self):
         imm = ImageMetadataManager()
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(UserConfigError):
             imm.filename = self._fname(90)
         self.assertEqual(imm._config["datatype"], None)
         self.assertEqual(imm._config["raw_img_shape_x"], None)

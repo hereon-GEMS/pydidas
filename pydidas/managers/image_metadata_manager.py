@@ -186,7 +186,10 @@ class ImageMetadataManager(ObjectWithParameterCollection):
             If the filename cannot be found in the file system.
         """
         if not os.path.isfile(filename):
-            raise FileNotFoundError(f"Cannot fild the specified file '{filename}'.")
+            raise UserConfigError(
+                f"Cannot find the file '{filename}' specified for the "
+                "ImageMetadataManager."
+            )
         self._config["filename"] = filename
 
     def update(self, filename=None):

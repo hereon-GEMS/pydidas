@@ -205,13 +205,13 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_get_and_store_tasks(self):
         app = ExecuteWorkflowApp()
-        app._ExecuteWorkflowApp__get_and_store_tasks()
+        app._mp_tasks = np.arange(SCAN.n_points)
         self.assertTrue(np.allclose(app._mp_tasks, np.arange(np.prod(self._nscan))))
 
     def test_check_size_of_results_and_calc_buffer_size__all_okay(self):
         app = ExecuteWorkflowApp()
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
-        app._ExecuteWorkflowApp__get_and_store_tasks()
+        app._mp_tasks = np.arange(SCAN.n_points)
         app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         self.assertTrue(app._config["buffer_n"] > 0)
 
@@ -223,7 +223,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_initialize_shared_memory(self):
         app = ExecuteWorkflowApp()
-        app._ExecuteWorkflowApp__get_and_store_tasks()
+        app._mp_tasks = np.arange(SCAN.n_points)
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         app.initialize_shared_memory()
@@ -234,7 +234,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
 
     def test_initialize_arrays_from_shared_memory(self):
         app = ExecuteWorkflowApp()
-        app._ExecuteWorkflowApp__get_and_store_tasks()
+        app._mp_tasks = np.arange(SCAN.n_points)
         app._ExecuteWorkflowApp__check_and_store_result_shapes()
         app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         app.initialize_shared_memory()

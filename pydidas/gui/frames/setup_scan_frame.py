@@ -25,6 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SetupScanFrame"]
 
+from functools import partial
+
 from qtpy import QtWidgets, QtCore
 
 from ...experiment import SetupScan, SetupScanIoMeta
@@ -33,7 +35,7 @@ from ...workflow import WorkflowTree
 from .builders import SetupScanFrameBuilder
 
 
-SCAN_SETTINGS = SetupScan()
+SCAN = SetupScan()
 PLUGINS = PluginCollection()
 WORKFLOW = WorkflowTree()
 
@@ -60,13 +62,20 @@ class SetupScanFrame(SetupScanFrameBuilder):
         self.param_widgets["scan_dim"].currentTextChanged.connect(
             self.update_dim_visibility
         )
+        for _index in range(1, 5):
+            self._widgets[f"button_up_{_index}"].clicked.connect(
+                partial(self.move_dim, _index, -1)
+            )
+            self._widgets[f"button_down_{_index}"].clicked.connect(
+                partial(self.move_dim, _index, 1)
+            )
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
         self.update_dim_visibility()
-        for param in SCAN_SETTINGS.params.values():
+        for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
 
     def update_dim_visibility(self):
@@ -85,6 +94,8 @@ class SetupScanFrame(SetupScanFrameBuilder):
         for i in range(1, 5):
             _toggle = i <= _dim
             self._widgets[f"title_{i}"].setVisible(_toggle)
+            self._widgets[f"button_up_{i}"].setVisible(1 < i <= _dim)
+            self._widgets[f"button_down_{i}"].setVisible(i < _dim)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
 
@@ -100,8 +111,8 @@ class SetupScanFrame(SetupScanFrameBuilder):
             self, "Name of file", None, _formats
         )[0]
         if fname != "":
-            SCAN_SETTINGS.import_from_file(fname)
-            for param in SCAN_SETTINGS.params.values():
+            SCAN.import_from_file(fname)
+            for param in SCAN.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
     @QtCore.Slot()
@@ -117,13 +128,48 @@ class SetupScanFrame(SetupScanFrameBuilder):
             self, "Name of file", None, _formats
         )[0]
         if fname != "":
-            SCAN_SETTINGS.export_to_file(fname, overwrite=True)
+            SCAN.export_to_file(fname, overwrite=True)
 
     @QtCore.Slot()
     def reset_entries(self):
         """
         Reset all ScanSetting entries to their default values.
         """
-        SCAN_SETTINGS.restore_all_defaults(True)
-        for param in SCAN_SETTINGS.params.values():
+        SCAN.restore_all_defaults(True)
+        for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
+
+    @QtCore.Slot(int, int)
+    def move_dim(self, dim_index, direction):
+        """
+        Move the selected dimension up in the arrangement of scan dimensions in the
+        defined direction.
+
+        Parameters
+        ----------
+        dim_index : int
+            The index of the selected dimension.
+        direction : int
+            The direction. Use -1 for up and 1 for down.
+        """
+        _previous_dim_entries = {
+            _key: SCAN.get_param_value(f"{_key}_{dim_index + direction}")
+            for _key in ["scan_label", "n_points", "delta", "unit", "offset"]
+        }
+        for _key in ["scan_label", "n_points", "delta", "unit", "offset"]:
+            SCAN.set_param_value(
+                f"{_key}_{dim_index + direction}",
+                SCAN.get_param_value(f"{_key}_{dim_index}")
+            )
+            SCAN.set_param_value(
+                f"{_key}_{dim_index}",
+                _previous_dim_entries[f"{_key}"]
+            )
+            self.update_widget_value(
+                f"{_key}_{dim_index + direction}",
+                SCAN.get_param_value(f"{_key}_{dim_index + direction}")
+            )
+            self.update_widget_value(
+                f"{_key}_{dim_index}",
+                SCAN.get_param_value(f"{_key}_{dim_index}")
+            )

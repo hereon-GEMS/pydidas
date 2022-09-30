@@ -29,6 +29,7 @@ __all__ = [
     "QT_DEFAULT_ALIGNMENT",
     "QT_TOP_RIGHT_ALIGNMENT",
     "QT_BOTTOM_LEFT_ALIGNMENT",
+    "QT_BOTTOM_RIGHT_ALIGNMENT",
     "QT_CENTER_LEFT_ALIGNMENT",
     "QT_CENTER_RIGHT_ALIGNMENT",
     "QT_COMBO_BOX_SIZE_POLICY",
@@ -58,6 +59,8 @@ QT_DEFAULT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 QT_TOP_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignTop
 
 QT_BOTTOM_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom
+
+QT_BOTTOM_RIGHT_ALIGNMENT = QtCore.Qt.AlignRight | QtCore.Qt.AlignBottom
 
 QT_CENTER_LEFT_ALIGNMENT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter
 

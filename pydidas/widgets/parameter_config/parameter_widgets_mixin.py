@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ["ParameterWidgetsMixIn"]
 
 from .parameter_config_widget import ParameterConfigWidget
-from ...core import PydidasGuiError
+from ...core import PydidasGuiError, utils
 from ..utilities import get_widget_layout_args
 
 
@@ -120,8 +120,9 @@ class ParameterWidgetsMixIn:
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
-        self.set_param_value(key, value)
-        self.param_widgets[key].set_value(value)
+        with utils.SignalBlocker(self.param_widgets[key]):
+            self.set_param_value(key, value)
+            self.param_widgets[key].set_value(value)
 
     def toggle_param_widget_visibility(self, key, visible):
         """

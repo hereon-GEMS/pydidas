@@ -467,7 +467,6 @@ class MainMenu(QtWidgets.QMainWindow):
             filter_types_for_export=True
         )
         _state["workflow_tree"] = TREE.export_to_string()
-        print(filename)
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 

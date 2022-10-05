@@ -25,6 +25,8 @@ Improvements
 - Renamed workflow/result_savers package to workflow/result_io because it
   also includes import capabilities.
 - Added "move scan dimension" functionality in the SetupScanFrame.
+- Updated documentation to current state.
+- Updated the names of SetupScan Parameters for consistency.
 
 Bugfixes:
 ---------

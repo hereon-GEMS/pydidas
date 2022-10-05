@@ -86,8 +86,14 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             _file["entry"].create_dataset("plugin_name", data=cls._import_plugin_name)
             _file["entry/data"].create_dataset("data", data=cls._import_data)
             _file["entry"].create_dataset("node_id", data=6)
-            _file["entry"].create_dataset("scan_title", data=cls._import_title)
-            _file["entry/scan"].create_dataset("scan_dimension", data=2)
+            _file["entry/scan"].create_dataset("scan_dim", data=2)
+            _file["entry/scan"].create_dataset("scan_title", data=cls._import_title)
+            _file["entry/scan"].create_dataset("scan_base_directory", data="/dummy")
+            _file["entry/scan"].create_dataset("scan_name_pattern", data="dummy_###")
+            _file["entry/scan"].create_dataset("scan_start_index", data=12)
+            _file["entry/scan"].create_dataset("scan_index_stepping", data=1)
+            _file["entry/scan"].create_dataset("scan_multiplicity", data=1)
+            _file["entry/scan"].create_dataset("scan_multi_image_handling", data="Sum")
             for _dim in range(3):
                 create_hdf5_dataset(
                     _file,
@@ -129,17 +135,21 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
 
     def setUp(self):
         SCAN.set_param_value("scan_dim", 3)
-        for d in range(1, 4):
-            SCAN.set_param_value(f"n_points_{d}", random.choice([3, 5, 7, 8]))
-            SCAN.set_param_value(f"delta_{d}", random.choice([0.1, 0.5, 1, 1.5]))
-            SCAN.set_param_value(f"offset_{d}", random.choice([-0.1, 0.5, 1]))
-            SCAN.set_param_value(f"scan_label_{d}", get_random_string(12))
+        for d in range(4):
+            SCAN.set_param_value(f"scan_dim{d}_n_points", random.choice([3, 5, 7, 8]))
+            SCAN.set_param_value(
+                f"scan_dim{d}_delta", random.choice([0.1, 0.5, 1, 1.5])
+            )
+            SCAN.set_param_value(f"scan_dim{d}_offset", random.choice([-0.1, 0.5, 1]))
+            SCAN.set_param_value(f"scan_dim{d}_label", get_random_string(12))
 
     def tearDown(self):
         ...
 
     def prepare_with_defaults(self):
-        _scan_shape = tuple(SCAN.get_param_value(f"n_points_{i}") for i in [1, 2, 3])
+        _scan_shape = tuple(
+            SCAN.get_param_value(f"scan_dim{i}_n_points") for i in [1, 2, 3]
+        )
         self._shapes = {
             1: _scan_shape + (12, 7),
             2: _scan_shape + (23,),
@@ -348,7 +358,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             self.assertEqual(
                 _scan[_dim],
                 {
-                    "scan_label": _label,
+                    "label": _label,
                     "unit": self._import_data_units[_dim],
                     "delta": _ranges[_dim][1] - _ranges[_dim][0],
                     "offset": _ranges[_dim][0],

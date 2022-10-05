@@ -109,9 +109,9 @@ class ParameterCollectionMixIn:
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
 
-    def get_param_value(self, param_key, *default, dtype=None):
+    def get_param_value(self, param_key, *default, dtype=None, for_export=False):
         """
-        Get a parameter value.
+        Get a Parameter value.
 
         Parameters
         ----------
@@ -122,6 +122,10 @@ class ParameterCollectionMixIn:
         dtype : type, optional
             A datatype to convert the value into. If None, the native
             datatype is returned. The default is None.
+        for_export : bool, optional
+            An optional flag to force converting the Parameter value to an export-
+            compatible format. This flag is not compatible with a specific dtype.
+            The default is False.
 
         Returns
         -------
@@ -129,12 +133,13 @@ class ParameterCollectionMixIn:
             The value of the Parameter.
         """
         if param_key not in self.params:
-            if len(default) == 0:
-                raise KeyError(
-                    f'No parameter with the name "{param_key}" ' "has been registered."
-                )
-            if len(default) >= 1:
+            if len(default) == 1:
                 return default[0]
+            raise KeyError(
+                f"No parameter with the name '{param_key}' has been registered."
+            )
+        if for_export:
+            return self.params[param_key].value_for_export
         _val = self.params.get_value(param_key)
         if dtype is not None:
             _val = dtype(_val)

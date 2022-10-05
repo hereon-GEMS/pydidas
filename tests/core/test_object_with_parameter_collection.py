@@ -24,6 +24,7 @@ __status__ = "Development"
 
 import unittest
 import warnings
+import pathlib
 import io
 import sys
 import copy
@@ -150,6 +151,20 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         _val = obj.get_param_value("Test0", dtype=float)
         self.assertIsInstance(_val, float)
+
+    def test_get_param_value__for_export(self):
+        _path = "/dummy/path/to/data"
+        obj = ObjectWithParameterCollection()
+        obj.add_param(Parameter("test_path", pathlib.Path, pathlib.Path(_path)))
+        _val = obj.get_param_value("test_path", for_export=True)
+        self.assertEqual(_path, _val.replace("\\", "/"))
+
+    def test_get_param_value__for_export_and_dtype(self):
+        _path = "/dummy/path/to/data"
+        obj = ObjectWithParameterCollection()
+        obj.add_param(Parameter("test_path", pathlib.Path, pathlib.Path(_path)))
+        _val = obj.get_param_value("test_path", for_export=True, dtype=list)
+        self.assertEqual(_path, _val.replace("\\", "/"))
 
     def test_print_param_values(self):
         obj = ObjectWithParameterCollection()

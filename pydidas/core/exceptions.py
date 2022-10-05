@@ -49,3 +49,6 @@ class UserConfigError(Exception):
     to allow pydidas to raise less severe Exceptions in case of configuration
     isues caused by the user.
     """
+
+    def __repr__(self):
+        return f"UserConfigError('{str(self)}')"

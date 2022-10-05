@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ["SetupExperimentIoBase"]
 
 from ...core.io_registry import GenericIoBase
+from ...core import UserConfigError
 from .setup_experiment_io_meta import SetupExperimentIoMeta
 from .setup_experiment import SetupExperiment
 
@@ -48,9 +49,16 @@ class SetupExperimentIoBase(GenericIoBase, metaclass=SetupExperimentIoMeta):
         Verify that the tmp_params dictionary holds all keys from the
         SetupExperiment.
         """
-        for key in EXP_SETUP.params:
-            if key not in cls.imported_params:
-                raise KeyError(f'The setting for "{key}" is missing.')
+        _missing_entries = []
+        for _key in EXP_SETUP.params:
+            if _key not in cls.imported_params:
+                _missing_entries.append(_key)
+        if len(_missing_entries) > 0:
+            _text = (
+                "The following SetupExperiment Parameters are missing:\n - "
+                + "\n - ".join(_missing_entries)
+            )
+            raise UserConfigError(_text)
 
     @classmethod
     def _write_to_exp_settings(cls):

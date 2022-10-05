@@ -41,14 +41,14 @@ class TestSetupScan(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def set_scan_params(self, _scan_settings):
-        _scan_settings.set_param_value("scan_dim", 4)
+    def set_scan_params(self, _scan):
+        _scan.set_param_value("scan_dim", 4)
         for index, val in enumerate(self._scan_shape):
-            _scan_settings.set_param_value(f"n_points_{index + 1}", val)
+            _scan.set_param_value(f"scan_dim{index}_n_points", val)
         for index, val in enumerate(self._scan_delta):
-            _scan_settings.set_param_value(f"delta_{index + 1}", val)
+            _scan.set_param_value(f"scan_dim{index}_delta", val)
         for index, val in enumerate(self._scan_offset):
-            _scan_settings.set_param_value(f"offset_{index + 1}", val)
+            _scan.set_param_value(f"scan_dim{index}_offset", val)
 
     def get_scan_range(self, dim):
         return np.linspace(
@@ -102,22 +102,22 @@ class TestSetupScan(unittest.TestCase):
         _index = 1
         SCAN = _SetupScan()
         self.set_scan_params(SCAN)
-        _range = SCAN.get_range_for_dim(_index + 1)
+        _range = SCAN.get_range_for_dim(_index)
         _target = self.get_scan_range(_index)
         self.assertTrue(np.equal(_range, _target).all())
 
     def test_get_metadata_for_dim(self):
-        _index = 1
-        _unit = get_random_string(5)
-        _label = get_random_string(20)
         SCAN = _SetupScan()
-        SCAN.set_param_value(f"unit_{_index + 1}", _unit)
-        SCAN.set_param_value(f"scan_label_{_index + 1}", _label)
         self.set_scan_params(SCAN)
-        _scanlabel, _scanunit, _range = SCAN.get_metadata_for_dim(_index + 1)
-        self.assertEqual(_scanlabel, _label)
-        self.assertEqual(_unit, _scanunit)
-        self.assertTrue(np.equal(self.get_scan_range(_index), _range).all())
+        for _index in range(4):
+            _unit = get_random_string(5)
+            _label = get_random_string(20)
+            SCAN.set_param_value(f"scan_dim{_index}_unit", _unit)
+            SCAN.set_param_value(f"scan_dim{_index}_label", _label)
+            _scanlabel, _scanunit, _range = SCAN.get_metadata_for_dim(_index)
+            self.assertEqual(_scanlabel, _label)
+            self.assertEqual(_unit, _scanunit)
+            self.assertTrue(np.equal(self.get_scan_range(_index), _range).all())
 
     def test_get_frame_position_in_scan__zero(self):
         SCAN = _SetupScan()
@@ -222,15 +222,21 @@ class TestSetupScan(unittest.TestCase):
         _scan = {
             "scan_title": get_random_string(8),
             "scan_dim": 2,
+            "scan_base_directory": "/dummy",
+            "scan_name_pattern": "test_###",
+            "scan_start_index": 1,
+            "scan_index_stepping": 1,
+            "scan_multiplicity": 1,
+            "scan_multi_image_handling": "Sum",
             0: {
-                "scan_label": get_random_string(5),
+                "label": get_random_string(5),
                 "unit": get_random_string(3),
                 "delta": 1,
                 "offset": -5,
                 "n_points": 42,
             },
             1: {
-                "scan_label": get_random_string(5),
+                "label": get_random_string(5),
                 "unit": get_random_string(3),
                 "delta": 3,
                 "offset": 12,
@@ -242,9 +248,10 @@ class TestSetupScan(unittest.TestCase):
         self.assertEqual(SCAN.get_param_value("scan_title"), _scan["scan_title"])
         self.assertEqual(SCAN.get_param_value("scan_dim"), _scan["scan_dim"])
         for _dim in [0, 1]:
-            for _entry in ["scan_label", "unit", "offset", "delta", "n_points"]:
+            for _entry in ["label", "unit", "offset", "delta", "n_points"]:
                 self.assertEqual(
-                    _scan[_dim][_entry], SCAN.get_param_value(f"{_entry}_{_dim + 1}")
+                    _scan[_dim][_entry],
+                    SCAN.get_param_value(f"scan_dim{_dim}_{_entry}"),
                 )
 
 

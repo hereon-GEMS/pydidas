@@ -39,32 +39,32 @@ from .setup_scan_io_meta import SetupScanIoMeta
 SETUP_SCAN_DEFAULT_PARAMS = get_generic_param_collection(
     "scan_dim",
     "scan_title",
-    "scan_label_1",
-    "scan_label_2",
-    "scan_label_3",
-    "scan_label_4",
-    "n_points_1",
-    "n_points_2",
-    "n_points_3",
-    "n_points_4",
-    "delta_1",
-    "delta_2",
-    "delta_3",
-    "delta_4",
-    "unit_1",
-    "unit_2",
-    "unit_3",
-    "unit_4",
-    "offset_1",
-    "offset_2",
-    "offset_3",
-    "offset_4",
     "scan_base_directory",
     "scan_name_pattern",
     "scan_start_index",
     "scan_index_stepping",
     "scan_multiplicity",
     "scan_multi_image_handling",
+    "scan_dim0_label",
+    "scan_dim1_label",
+    "scan_dim2_label",
+    "scan_dim3_label",
+    "scan_dim0_n_points",
+    "scan_dim1_n_points",
+    "scan_dim2_n_points",
+    "scan_dim3_n_points",
+    "scan_dim0_delta",
+    "scan_dim1_delta",
+    "scan_dim2_delta",
+    "scan_dim3_delta",
+    "scan_dim0_unit",
+    "scan_dim1_unit",
+    "scan_dim2_unit",
+    "scan_dim3_unit",
+    "scan_dim0_offset",
+    "scan_dim1_offset",
+    "scan_dim2_offset",
+    "scan_dim3_offset",
 )
 
 
@@ -103,7 +103,7 @@ class _SetupScan(ObjectWithParameterCollection):
                 f"indices (0, {_n_frames})."
             )
         _ndim = self.get_param_value("scan_dim")
-        _N = [self.get_param_value(f"n_points_{_n}") for _n in range(1, _ndim + 1)] + [
+        _N = [self.get_param_value(f"scan_dim{_n}_n_points") for _n in range(_ndim)] + [
             self.get_param_value("scan_multiplicity")
         ]
         _indices = [0] * _ndim
@@ -166,8 +166,8 @@ class _SetupScan(ObjectWithParameterCollection):
         range : np.ndarray
             The numerical positions of the scan.
         """
-        _label = self.get_param_value(f"scan_label_{index}")
-        _unit = self.get_param_value(f"unit_{index}")
+        _label = self.get_param_value(f"scan_dim{index}_label")
+        _unit = self.get_param_value(f"scan_dim{index}_unit")
         _range = self.get_range_for_dim(index)
         return _label, _unit, _range
 
@@ -177,11 +177,12 @@ class _SetupScan(ObjectWithParameterCollection):
 
         Note
         ----
-        The scan dimensions are 1 .. 4 and do not start with 0.
+        The scan dimensions are 0 .. 3 and follow the python convention of starting with
+        zero.
 
         Parameters
         ----------
-        index : Union[1, 2, 3, 4]
+        index : Union[0, 1, 2, 3]
             The scan dimension
 
         Returns
@@ -189,11 +190,11 @@ class _SetupScan(ObjectWithParameterCollection):
         np.ndarray
             The scan range as numpy array.
         """
-        if index not in [1, 2, 3, 4]:
-            raise UserConfigError("Only the scan dimensions 1, 2, 3, 4 are supported.")
-        _f0 = self.get_param_value(f"offset_{index}")
-        _df = self.get_param_value(f"delta_{index}")
-        _n = self.get_param_value(f"n_points_{index}")
+        if index not in [0, 1, 2, 3]:
+            raise UserConfigError("Only the scan dimensions 0, 1, 2, 3 are supported.")
+        _f0 = self.get_param_value(f"scan_dim{index}_offset")
+        _df = self.get_param_value(f"scan_dim{index}_delta")
+        _n = self.get_param_value(f"scan_dim{index}_n_points")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
     def update_from_dictionary(self, scan_dict):
@@ -207,12 +208,21 @@ class _SetupScan(ObjectWithParameterCollection):
         """
         if scan_dict == {}:
             return
-        self.set_param_value("scan_title", scan_dict["scan_title"])
-        self.set_param_value("scan_dim", scan_dict["scan_dim"])
+        for _pname in [
+            "scan_dim",
+            "scan_title",
+            "scan_base_directory",
+            "scan_name_pattern",
+            "scan_start_index",
+            "scan_index_stepping",
+            "scan_multiplicity",
+            "scan_multi_image_handling",
+        ]:
+            self.set_param_value(_pname, scan_dict[_pname])
         for _dim in range(self.get_param_value("scan_dim")):
             _curr_dim_info = scan_dict[_dim]
-            for _entry in ["scan_label", "unit", "offset", "delta", "n_points"]:
-                self.set_param_value(f"{_entry}_{_dim + 1}", _curr_dim_info[_entry])
+            for _entry in ["label", "unit", "offset", "delta", "n_points"]:
+                self.set_param_value(f"scan_dim{_dim}_{_entry}", _curr_dim_info[_entry])
 
     @property
     def shape(self):
@@ -225,8 +235,8 @@ class _SetupScan(ObjectWithParameterCollection):
             The tuple with an entry of the length for each dimension.
         """
         return tuple(
-            self.get_param_value(f"n_points_{_i}")
-            for _i in range(1, self.get_param_value("scan_dim") + 1)
+            self.get_param_value(f"scan_dim{_i}_n_points")
+            for _i in range(self.get_param_value("scan_dim"))
         )
 
     @property
@@ -241,8 +251,8 @@ class _SetupScan(ObjectWithParameterCollection):
         """
         return np.prod(
             [
-                self.get_param_value(f"n_points_{_i}")
-                for _i in range(1, self.get_param_value("scan_dim") + 1)
+                self.get_param_value(f"scan_dim{_i}_n_points")
+                for _i in range(self.get_param_value("scan_dim"))
             ]
         )
 

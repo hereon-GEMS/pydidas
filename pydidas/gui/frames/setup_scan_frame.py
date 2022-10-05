@@ -62,7 +62,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
         self.param_widgets["scan_dim"].currentTextChanged.connect(
             self.update_dim_visibility
         )
-        for _index in range(1, 5):
+        for _index in range(4):
             self._widgets[f"button_up_{_index}"].clicked.connect(
                 partial(self.move_dim, _index, -1)
             )
@@ -84,18 +84,18 @@ class SetupScanFrame(SetupScanFrameBuilder):
         of scan dimensions.
         """
         _prefixes = [
-            "scan_label_{n}",
-            "n_points_{n}",
-            "delta_{n}",
-            "unit_{n}",
-            "offset_{n}",
+            "scan_dim{n}_label",
+            "scan_dim{n}_n_points",
+            "scan_dim{n}_delta",
+            "scan_dim{n}_unit",
+            "scan_dim{n}_offset",
         ]
         _dim = int(self.param_widgets["scan_dim"].currentText())
-        for i in range(1, 5):
-            _toggle = i <= _dim
+        for i in range(4):
+            _toggle = i < _dim
             self._widgets[f"title_{i}"].setVisible(_toggle)
-            self._widgets[f"button_up_{i}"].setVisible(1 < i <= _dim)
-            self._widgets[f"button_down_{i}"].setVisible(i < _dim)
+            self._widgets[f"button_up_{i}"].setVisible(0 < i < _dim)
+            self._widgets[f"button_down_{i}"].setVisible(i < _dim - 1)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
 
@@ -153,23 +153,22 @@ class SetupScanFrame(SetupScanFrameBuilder):
             The direction. Use -1 for up and 1 for down.
         """
         _previous_dim_entries = {
-            _key: SCAN.get_param_value(f"{_key}_{dim_index + direction}")
-            for _key in ["scan_label", "n_points", "delta", "unit", "offset"]
+            _key: SCAN.get_param_value(f"scan_dim{dim_index + direction}_{_key}")
+            for _key in ["label", "n_points", "delta", "unit", "offset"]
         }
-        for _key in ["scan_label", "n_points", "delta", "unit", "offset"]:
+        for _key in ["label", "n_points", "delta", "unit", "offset"]:
             SCAN.set_param_value(
-                f"{_key}_{dim_index + direction}",
-                SCAN.get_param_value(f"{_key}_{dim_index}")
+                f"scan_dim{dim_index + direction}_{_key}",
+                SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )
             SCAN.set_param_value(
-                f"{_key}_{dim_index}",
-                _previous_dim_entries[f"{_key}"]
+                f"scan_dim{dim_index}{_key}", _previous_dim_entries[f"{_key}"]
             )
             self.update_widget_value(
-                f"{_key}_{dim_index + direction}",
-                SCAN.get_param_value(f"{_key}_{dim_index + direction}")
+                f"scan_dim{dim_index + direction}_{_key}",
+                SCAN.get_param_value(f"scan_dim{dim_index + direction}_{_key}"),
             )
             self.update_widget_value(
-                f"{_key}_{dim_index}",
-                SCAN.get_param_value(f"{_key}_{dim_index}")
+                f"scan_dim{dim_index}_{_key}",
+                SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )

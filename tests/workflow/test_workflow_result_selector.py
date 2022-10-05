@@ -60,11 +60,11 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self._scan_label = ("Test", "Dir 2", "other dim")
         SCAN.set_param_value("scan_dim", len(self._scan_n))
         for _dim in range(len(self._scan_n)):
-            SCAN.set_param_value(f"n_points_{_dim + 1}", self._scan_n[_dim])
-            SCAN.set_param_value(f"offset_{_dim + 1}", self._scan_offsets[_dim])
-            SCAN.set_param_value(f"delta_{_dim + 1}", self._scan_delta[_dim])
-            SCAN.set_param_value(f"unit_{_dim + 1}", self._scan_unit[_dim])
-            SCAN.set_param_value(f"scan_label_{_dim + 1}", self._scan_label[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_n_points", self._scan_n[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_offset", self._scan_offsets[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_delta", self._scan_delta[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_unit", self._scan_unit[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_label", self._scan_label[_dim])
 
     def set_up_tree(self):
         self._result1_shape = (12, 27)

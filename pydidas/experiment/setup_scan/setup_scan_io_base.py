@@ -26,6 +26,8 @@ __status__ = "Development"
 __all__ = ["SetupScanIoBase"]
 
 from ...core.io_registry import GenericIoBase
+from ...core.constants import SCAN_GENERIC_PARAM_NAMES
+from ...core import UserConfigError
 from .setup_scan_io_meta import SetupScanIoMeta
 from .setup_scan import SetupScan
 
@@ -48,16 +50,23 @@ class SetupScanIoBase(GenericIoBase, metaclass=SetupScanIoMeta):
         Verify that the tmp_params dictionary holds all keys from the
         scanSettings.
         """
-        if "scan_dim" not in cls.imported_params:
-            raise KeyError('The scan dimension key "scan_dim" is missing.')
-        if "scan_title" not in cls.imported_params:
-            raise KeyError('The scan name key "scan_title" is missing.')
-        n_dim = cls.imported_params.get("scan_dim")
-        for _dim in range(1, n_dim + 1):
-            for _key in ["scan_label", "n_points", "delta", "unit", "offset"]:
-                _item = f"{_key}_{_dim}"
+        _missing_entries = []
+        for _name in SCAN_GENERIC_PARAM_NAMES:
+            if _name not in cls.imported_params:
+                _missing_entries.append(_name)
+        n_dim = cls.imported_params.get("scan_dim", 0)
+        for _dim in range(n_dim):
+            for _key in ["label", "n_points", "delta", "unit", "offset"]:
+                _item = f"scan_dim{_dim}_{_key}"
                 if _item not in cls.imported_params:
-                    raise KeyError(f'The setting for "{_item}" is missing.')
+                    _missing_entries.append(_item)
+
+        if len(_missing_entries) > 0:
+            _text = (
+                "The following SetupScan Parameters are missing:\n - "
+                + "\n - ".join(_missing_entries)
+            )
+            raise UserConfigError(_text)
 
     @classmethod
     def _write_to_scan_settings(cls):

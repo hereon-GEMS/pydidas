@@ -1,25 +1,25 @@
-delta_1: 1
-delta_2: 0.1
-delta_3: 10
-delta_4: 1
-n_points_1: 4
-n_points_2: 21
-n_points_3: 0
-n_points_4: 0
-offset_1: -40
-offset_2: 10.0
-offset_3: 0
-offset_4: 0
-scan_dim: 2
-scan_label_1: Direction 1
-scan_label_2: Dir 2
-scan_label_3: Direction 3
-scan_label_4: ''
+scan_dim0_delta: 1
+scan_dim1_delta: 0.1
+scan_dim2_delta: 10
+scan_dim3_delta: 1
+scan_dim0_n_points: 4
+scan_dim1_n_points: 21
+scan_dim2_n_points: 0
+scan_dim3_n_points: 0
+scan_dim0_offset: -40
+scan_dim1_offset: 10.0
+scan_dim2_offset: 0
+scan_dim3_offset: 0
+scan_dim0_label: Direction 1
+scan_dim1_label: Dir 2
+scan_dim3_label: Direction 3
+scan_dim2_label: ''
+scan_dim0_unit: m
+scan_dim1_unit: um
+scan_dim2_unit: mm
+scan_dim3_unit: ''
 scan_title: Test
-unit_1: m
-unit_2: um
-unit_3: mm
-unit_4: ''
+scan_dim: 2
 scan_base_directory: .
 scan_name_pattern: test_####
 scan_start_index: 0

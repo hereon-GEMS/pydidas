@@ -68,7 +68,7 @@ class _WorkflowResults(QtCore.QObject):
             _dset = Dataset(np.zeros(_shape, dtype=np.float32))
             _dset.convert_all_none_properties()
             for index in range(_dim):
-                _label, _unit, _range = SCAN.get_metadata_for_dim(index + 1)
+                _label, _unit, _range = SCAN.get_metadata_for_dim(index)
                 _dset.update_axis_labels(index, _label)
                 _dset.update_axis_units(index, _unit)
                 _dset.update_axis_ranges(index, _range)

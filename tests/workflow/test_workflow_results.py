@@ -63,11 +63,11 @@ class TestWorkflowResults(unittest.TestCase):
         self._scan_label = ("Test", "Dir 2", "other dim")
         SCAN.set_param_value("scan_dim", len(self._scan_n))
         for _dim in range(len(self._scan_n)):
-            SCAN.set_param_value(f"n_points_{_dim + 1}", self._scan_n[_dim])
-            SCAN.set_param_value(f"offset_{_dim + 1}", self._scan_offsets[_dim])
-            SCAN.set_param_value(f"delta_{_dim + 1}", self._scan_delta[_dim])
-            SCAN.set_param_value(f"unit_{_dim + 1}", self._scan_unit[_dim])
-            SCAN.set_param_value(f"scan_label_{_dim + 1}", self._scan_label[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_n_points", self._scan_n[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_offset", self._scan_offsets[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_delta", self._scan_delta[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_unit", self._scan_unit[_dim])
+            SCAN.set_param_value(f"scan_dim{_dim}_label", self._scan_label[_dim])
 
     def set_up_tree(self):
         self._input_shape = (127, 324)
@@ -121,7 +121,14 @@ class TestWorkflowResults(unittest.TestCase):
             _file["entry"].create_dataset("scan_title", data=get_random_string(8))
             _file["entry"].create_dataset("node_id", data=6)
             _file["entry/data"].create_dataset("data", data=_data)
-            _file["entry/scan"].create_dataset("scan_dimension", data=2)
+            _file["entry/scan"].create_dataset("scan_dim", data=2)
+            _file["entry/scan"].create_dataset("scan_title", data="dummy")
+            _file["entry/scan"].create_dataset("scan_base_directory", data="/dummy")
+            _file["entry/scan"].create_dataset("scan_name_pattern", data="dummy_###")
+            _file["entry/scan"].create_dataset("scan_start_index", data=12)
+            _file["entry/scan"].create_dataset("scan_index_stepping", data=1)
+            _file["entry/scan"].create_dataset("scan_multiplicity", data=1)
+            _file["entry/scan"].create_dataset("scan_multi_image_handling", data="Sum")
             for _dim in range(3):
                 create_hdf5_dataset(
                     _file,
@@ -484,7 +491,7 @@ class TestWorkflowResults(unittest.TestCase):
             )
             for _dim, _scale in _res.axis_ranges.items():
                 if _dim < SCAN.get_param_value("scan_dim"):
-                    _range = SCAN.get_range_for_dim(_dim + 1)
+                    _range = SCAN.get_range_for_dim(_dim)
                     self.assertTrue(np.equal(_range, _scale).all())
                 else:
                     _target = _meta[_node]["axis_ranges"][_dim - _dim_offset]
@@ -579,7 +586,7 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_source_hash__change_in_scansetup(self):
         _hash = RES.source_hash
-        SCAN.set_param_value("unit_1", "a new unit value")
+        SCAN.set_param_value("scan_dim0_unit", "a new unit value")
         _new_hash = RES.source_hash
         self.assertNotEqual(_hash, _new_hash)
 

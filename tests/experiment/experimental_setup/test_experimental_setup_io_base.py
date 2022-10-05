@@ -27,6 +27,7 @@ import unittest
 import shutil
 import tempfile
 
+from pydidas.core import UserConfigError
 from pydidas.experiment.setup_experiment import SetupExperiment
 from pydidas.experiment.setup_experiment.setup_experiment_io_base import (
     SetupExperimentIoBase,
@@ -73,7 +74,7 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         EXP_IO._verify_all_entries_present()
 
     def test_verify_all_entries_present__missing_keys(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             EXP_IO._verify_all_entries_present()
 
     def test_write_to_exp_settings(self):

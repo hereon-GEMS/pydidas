@@ -148,11 +148,11 @@ class SetupScanFrameBuilder(BaseFrame):
             )
 
         # populate scan_param_frame widget
-        _prefixes = ["scan_label_", "n_points_", "delta_", "unit_", "offset_"]
+        _param_names = ["label", "n_points", "delta", "unit", "offset"]
         for i_dim in range(4):
             self.create_label(
-                f"title_{i_dim + 1}",
-                f"\nScan dimension {i_dim+1}:",
+                f"title_{i_dim}",
+                f"\nScan dimension {i_dim}:",
                 fontsize=constants.STANDARD_FONT_SIZE + 1,
                 bold=True,
                 fixedWidth=constants.CONFIG_WIDGET_WIDTH - 50,
@@ -161,25 +161,27 @@ class SetupScanFrameBuilder(BaseFrame):
                 parent_widget=self._widgets["scan_param_frame"],
             )
             self.create_button(
-                f"button_up_{i_dim+1}", "",
+                f"button_up_{i_dim}",
+                "",
                 icon=get_pyqt_icon_from_str_reference("qta::fa.chevron-up"),
                 fixedWidth=20,
                 fixedHeight=20,
                 alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 1, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
-                )
+            )
             self.create_button(
-                f"button_down_{i_dim+1}", "",
+                f"button_down_{i_dim}",
+                "",
                 icon=get_pyqt_icon_from_str_reference("qta::fa.chevron-down"),
                 fixedWidth=20,
                 fixedHeight=20,
                 alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 2, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
-                )
-            for i_item, basename in enumerate(_prefixes):
-                param = SCAN_SETTINGS.get_param(f"{basename}{i_dim+1}")
+            )
+            for i_item, basename in enumerate(_param_names):
+                param = SCAN_SETTINGS.get_param(f"scan_dim{i_dim}_{basename}")
                 self.create_param_widget(
                     param,
                     gridPos=(1 + i_item + 6 * (i_dim % 2), 4 * (i_dim // 2), 1, 3),
@@ -194,7 +196,7 @@ class SetupScanFrameBuilder(BaseFrame):
                 gridPos=(0, 3, 12, 1),
                 fixedWidth=20,
                 parent_widget=self._widgets["scan_param_frame"],
-                )
+            )
 
         self.create_button(
             "but_save",

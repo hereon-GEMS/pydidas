@@ -29,6 +29,7 @@ import tempfile
 
 import yaml
 
+from pydidas.core import UserConfigError
 from pydidas.experiment import SetupScan
 from pydidas.experiment.setup_scan.setup_scan_io_yaml import SetupScanIoYaml
 
@@ -37,7 +38,7 @@ SCAN = SetupScan()
 SCAN_IO_YAML = SetupScanIoYaml
 
 
-class TestScanSettingsIoYaml(unittest.TestCase):
+class TestScanSetupIoYaml(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(_test_dir, "_data", "load_test_setup_scan_yaml.yml")
@@ -57,7 +58,7 @@ class TestScanSettingsIoYaml(unittest.TestCase):
     def test_import_from_file__missing_keys(self):
         with open(self._tmppath + "yaml.yml", "w") as stream:
             stream.write("no_entry: True")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             SCAN_IO_YAML.import_from_file(self._tmppath + "yaml.yml")
 
     def test_import_from_file__wrong_format(self):

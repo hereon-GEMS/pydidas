@@ -56,7 +56,6 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.setWindowIcon(get_pydidas_error_icon_w_bg())
         _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
-
         self.create_label(
             "title",
             "Configuration error:",

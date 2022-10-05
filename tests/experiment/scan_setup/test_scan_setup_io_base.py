@@ -27,6 +27,7 @@ import unittest
 import shutil
 import tempfile
 
+from pydidas.core import UserConfigError
 from pydidas.experiment.setup_scan import SetupScan
 from pydidas.experiment.setup_scan.setup_scan_io_base import SetupScanIoBase
 
@@ -71,7 +72,7 @@ class TestSetupScanIoBase(unittest.TestCase):
         SCAN_IO._verify_all_entries_present()
 
     def test_verify_all_entries_present__missing_keys(self):
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             SCAN_IO._verify_all_entries_present()
 
 

@@ -121,11 +121,11 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         )
         self._scandelta = (0.1, -0.2, 1.1)
         self._scanoffset = (-5, 0, 1.2)
-        for i in range(1, 4):
+        for i in range(3):
             SCAN.set_param_value("scan_dim", 3)
-            SCAN.set_param_value(f"n_points_{i}", self._nscan[i - 1])
-            SCAN.set_param_value(f"delta_{i}", self._scandelta[i - 1])
-            SCAN.set_param_value(f"offset_{i}", self._scanoffset[i - 1])
+            SCAN.set_param_value(f"scan_dim{i}_n_points", self._nscan[i - 1])
+            SCAN.set_param_value(f"scan_dim{i}_delta", self._scandelta[i - 1])
+            SCAN.set_param_value(f"scan_dim{i}_offset", self._scanoffset[i - 1])
 
     def test_creation(self):
         app = ExecuteWorkflowApp()
@@ -174,9 +174,9 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.set_param_value("autosave_results", False)
         app.set_param_value("live_processing", False)
         app.prepare_run()
-        SCAN.set_param_value("offset_4", -12345)
+        SCAN.set_param_value("scan_dim3_offset", -12345)
         app2 = app.get_copy(slave_mode=True)
-        SCAN.set_param_value("offset_4", 0)
+        SCAN.set_param_value("scan_dim3_offset", 0)
         app2.prepare_run()
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)
         self.assertIsInstance(app2._shared_arrays[2], np.ndarray)

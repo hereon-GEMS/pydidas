@@ -618,7 +618,7 @@ GENERIC_PARAM_DESCRIPTION = (
         "scan_dim": {
             "type": int,
             "default": 1,
-            "name": "Scan dimension",
+            "name": "Scan dimensionsionality",
             "choices": [1, 2, 3, 4],
             "unit": "",
             "allow_None": False,
@@ -721,7 +721,7 @@ GENERIC_PARAM_DESCRIPTION = (
         },
     }
     | {
-        f"scan_label_{_index}": {
+        f"scan_dim{_index}_label": {
             "type": str,
             "default": "",
             "name": f"Name of scan direction {_index}",
@@ -733,10 +733,10 @@ GENERIC_PARAM_DESCRIPTION = (
                 "only be used for labelling."
             ),
         }
-        for _index in range(1, 5)
+        for _index in range(4)
     }
     | {
-        f"n_points_{_index}": {
+        f"scan_dim{_index}_n_points": {
             "type": int,
             "default": 0,
             "name": f"Number of scan points (dir. {_index})",
@@ -745,10 +745,10 @@ GENERIC_PARAM_DESCRIPTION = (
             "allow_None": False,
             "tooltip": f"The number of scan points in scan direction {_index}.",
         }
-        for _index in range(1, 5)
+        for _index in range(4)
     }
     | {
-        f"delta_{_index}": {
+        f"scan_dim{_index}_delta": {
             "type": float,
             "default": 1,
             "name": f"Step width in direction {_index}",
@@ -757,10 +757,10 @@ GENERIC_PARAM_DESCRIPTION = (
             "allow_None": False,
             "tooltip": f"The step width between scan points in direction {_index}.",
         }
-        for _index in range(1, 5)
+        for _index in range(4)
     }
     | {
-        f"offset_{_index}": {
+        f"scan_dim{_index}_offset": {
             "type": float,
             "default": 0,
             "name": f"Offset of direction {_index}",
@@ -772,10 +772,10 @@ GENERIC_PARAM_DESCRIPTION = (
                 f"{_index} (i.e. the counter / motor position for scan step #0)."
             ),
         }
-        for _index in range(1, 5)
+        for _index in range(4)
     }
     | {
-        f"unit_{_index}": {
+        f"scan_dim{_index}_unit": {
             "type": str,
             "default": "",
             "name": f"Unit of direction {_index}",
@@ -784,7 +784,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "allow_None": False,
             "tooltip": f"The unit of the positions in scan direction {_index}.",
         }
-        for _index in range(1, 5)
+        for _index in range(4)
     }
     | {
         ############################

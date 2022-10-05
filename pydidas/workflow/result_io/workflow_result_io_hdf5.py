@@ -32,7 +32,7 @@ import numpy as np
 from ...experiment import SetupExperiment, SetupScan
 from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
-from ...core.constants import HDF5_EXTENSIONS
+from ...core.constants import HDF5_EXTENSIONS, SCAN_GENERIC_PARAM_NAMES
 from ..workflow_tree import WorkflowTree
 from .workflow_result_io_base import WorkflowResultIoBase
 
@@ -126,29 +126,35 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 {"data": EXP.get_param_value("detector_dist")},
             ],
             ["entry/data", "data", {"shape": cls.get_node_attribute(node_id, "shape")}],
-            ["entry/scan", "scan_dimension", {"data": _ndim}],
         ]
-        scanval = SCAN.get_param_value
+        for _name in SCAN_GENERIC_PARAM_NAMES:
+            _dsets.append(
+                [
+                    "entry/scan",
+                    _name,
+                    {"data": SCAN.get_param_value(_name, for_export=True)},
+                ],
+            )
         for _dim in range(_ndim):
             _dsets.append(
                 [
                     f"entry/scan/dim_{_dim}",
                     "label",
-                    {"data": scanval(f"scan_label_{_dim + 1}")},
+                    {"data": SCAN.get_param_value(f"scan_dim{_dim}_label")},
                 ]
             )
             _dsets.append(
                 [
                     f"entry/scan/dim_{_dim}",
                     "unit",
-                    {"data": scanval(f"unit_{_dim + 1}")},
+                    {"data": SCAN.get_param_value(f"scan_dim{_dim}_unit")},
                 ]
             )
             _dsets.append(
                 [
                     f"entry/scan/dim_{_dim}",
                     "range",
-                    {"data": SCAN.get_range_for_dim(_dim + 1)},
+                    {"data": SCAN.get_range_for_dim(_dim)},
                 ]
             )
 
@@ -321,14 +327,11 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 _axlabels.append(
                     read_and_decode_hdf5_dataset(_file[f"entry/data/axis_{_dim}/label"])
                 )
-            _scan_ndim = read_and_decode_hdf5_dataset(
-                _file["entry/scan/scan_dimension"]
-            )
             _scan = {
-                "scan_title": read_and_decode_hdf5_dataset(_file["entry/scan_title"]),
-                "scan_dim": _scan_ndim,
+                _name: read_and_decode_hdf5_dataset(_file[f"entry/scan/{_name}"])
+                for _name in SCAN_GENERIC_PARAM_NAMES
             }
-            for _dim in range(_scan_ndim):
+            for _dim in range(_scan["scan_dim"]):
                 _range = read_and_decode_hdf5_dataset(
                     _file[f"entry/scan/dim_{_dim}/range"], return_dataset=False
                 )
@@ -341,7 +344,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 )
                 _dimlabel = _dimlabel if _dimlabel is not None else ""
                 _scandim = {
-                    "scan_label": _dimlabel,
+                    "label": _dimlabel,
                     "unit": _unit,
                     "n_points": _data.shape[_dim],
                 }

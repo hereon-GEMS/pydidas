@@ -31,6 +31,7 @@ from .constants import *
 from .file_extensions import *
 from .fit_funcs import *
 from .generic_param_description import *
+from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
 from .q_settings import *
@@ -59,6 +60,11 @@ from . import generic_param_description
 
 __all__.extend(generic_param_description.__all__)
 del generic_param_description
+
+from . import generic_param_lists
+
+__all__.extend(generic_param_lists.__all__)
+del generic_param_lists
 
 from . import gui_constants
 

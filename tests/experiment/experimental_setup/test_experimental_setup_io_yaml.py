@@ -29,6 +29,7 @@ import tempfile
 
 import yaml
 
+from pydidas.core import UserConfigError
 from pydidas.experiment import SetupExperiment
 from pydidas.experiment.setup_experiment.setup_experiment_io_yaml import (
     SetupExperimentIoYaml,
@@ -42,7 +43,7 @@ EXP_IO_YAML = SetupExperimentIoYaml
 class TestExperimentSettingsIoYaml(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_exp_settings_")
+        self._path = os.path.join(_test_dir, "_data", "load_test_setup_exp_")
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -66,7 +67,7 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
     def test_import_from_file__missing_keys(self):
         with open(self._tmppath + "yaml.yml", "w") as stream:
             stream.write("no_entry: True")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             EXP_IO_YAML.import_from_file(self._tmppath + "yaml.yml")
 
     def test_import_from_file__wrong_format(self):

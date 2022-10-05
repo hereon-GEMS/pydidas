@@ -163,7 +163,9 @@ class ExecuteWorkflowApp(BaseApp):
             RESULTS.update_shapes_from_scan_and_workflow()
             RESULT_SAVER.set_active_savers_and_title([])
             self._config["tree_str_rep"] = TREE.export_to_string()
-            self._config["scan_vals"] = SCAN.get_param_values_as_dict()
+            self._config["scan_vals"] = SCAN.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
             self._config["exp_vals"] = EXP.get_param_values_as_dict()
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_buffer()

@@ -6,14 +6,20 @@ The SetupScan class
 Introduction
 ------------
 
-The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`
-is the pydidas Singleton instance of the ``_SetupScan`` class. It is
-used for storing and accessing global information about the scan layout.
+The :py:class:`SetupScan` is the pydidas Singleton instance of the 
+:py:class:`_SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>` 
+class. It is used for storing and accessing global information about the scan 
+layout and generic infomation like title, directory and file naming patterns.
 
 Stored information include
 
     - Dimensionality (for arranging results)
     - Name (for metadata and titles only)
+    - Directory (for data loading)
+    - Filename pattern (for data loading)
+    - Scan multiplicity (the number of each frames at each scan point).
+    - Starting index of files/frames
+    - Index stepping    
     - Information for each scan dimension
 
         - Name for the scan dimension (for reference, e.g. motor name, time)
@@ -43,9 +49,41 @@ Configuring the SetupScan
 Global Parameters
 ^^^^^^^^^^^^^^^^^
 
-The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan` 
-has two *global* Parameters for the scan title and the number of dimensions, 
-referenced by the Parameter keys ``scan_name`` and ``scan_dim``:
+The :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>` 
+has *global* Parameters for generic information, listed in detail below:
+
+
+.. list-table::
+    :header-rows: 1
+
+    * - SetupScan Parameter name
+      - data type
+      - description
+    * - scan_dim
+      - int
+      - The number of dimensions in the scan.
+    * - scan_title
+      - str
+      - The scan title. This Parameter is only used for plot titles and
+        metadata.
+    * - scan_base_directory
+      - pathlib.Path
+      - The base directory for finding the files of the scan. 
+    * - scan_name_pattern
+      - str
+      - The naming pattern of the scan files. Use hashes '#' for wildcards 
+        which will be replaced by indices.
+    * - scan_start_index
+      - int
+      - The starting index to subsititute the wildcards in the name pattern.
+    * - scan_multiplicity
+      - int
+      - The number of frames acquired at each scan point.
+        Note: If you want to handle multiple images individually, add them as 
+        an additional scan dimension.
+    * - scan_multi_image_handling
+      - str
+      - Flag how to handle multiple images. Choices are averaging or summation.
 
 .. code-block::
 
@@ -53,6 +91,7 @@ referenced by the Parameter keys ``scan_name`` and ``scan_dim``:
     >>> SCAN = pydidas.experiment.SetupScan()
     >>> SCAN.set_param_value('scan_name', 'Test_42')
     >>> SCAN.set_param_value('scan_dim', 2)
+    >>> SCAN.set_param_value('scan_base_directory', '/home/user/dir_to_data')
     
 .. note::
 

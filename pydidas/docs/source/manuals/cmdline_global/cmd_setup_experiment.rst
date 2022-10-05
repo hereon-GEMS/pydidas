@@ -6,10 +6,13 @@ The SetupExperiment class
 Introduction
 ------------
 
-The :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`
-is the pydidas Singleton instance of the ``_ExpSetup`` class. It is
-used for storing and accessing global information about the experimental setup.
-Stored information include
+The :py:class:`SetupExperiment 
+<pydidas.experiment.setup_experiment.setup_experiment.SetupExperiment>`
+is the pydidas Singleton instance of the 
+:py:class:`_ExpSetup 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`
+class. It is used for storing and accessing global information about the 
+experimental setup. Stored information include
 
 - X-ray energy
 - detector model (pixel numbers and sizes)
@@ -34,7 +37,8 @@ X-ray energy and wavelength
 
 The X-ray energy and wavelength are two coupled Parameters and any changes to 
 one will cause the other Parameter to be updated as well. They can be accessed
-through the keys ``xray_energy`` and ``xray_wavelength``, respectively. 
+through the keys :py:data:`xray_energy` and :py:data:`xray_wavelength`, 
+respectively. 
 
 Please see also the example below:
 
@@ -90,7 +94,7 @@ The detector is defined by the following Parameters:
       - um
       - The detector pixel size in Y-direction.
 
-The ``detector_name`` is only relevant for referencing any pyFAI object but 
+The :py:data:`detector_name` is only relevant for referencing any pyFAI object but 
 is included in the metainformation and should be set correctly. The Parameters
 for numbers of pixels and pixelsize exactly what the name suggests.
 
@@ -115,7 +119,8 @@ Using a pyFAI detector
 
 If the detector is defined in pyFAI, this library can be used to update the 
 detector settings automatically by giving the detector name in the 
-:py:meth:`set_detector_params_from_name <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.set_detector_params_from_name>`
+:py:meth:`set_detector_params_from_name 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.set_detector_params_from_name>`
 method:
 
 .. code-block::
@@ -157,7 +162,7 @@ direction defines the :math:`x_3` coordinate (detector distance).
 
 Three rotations (:math:`rot_1`: mathmatically negative around the axis pointing 
 up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis; 
-:math:`rot_3`: mathematically negative around the X-ray beam direction) are 
+:math:`rot_3`: mathematically positive (!) around the X-ray beam direction) are 
 used to move the detector with respect to the origin (sample) are applied to 
 the detector to transform the detector geometry into the experimental geometry.
 
@@ -216,15 +221,18 @@ YAML files and pyFAI .poni files. Both types are supported for import and
 export. The format will be determined automatically based on the file extension.
 
 Imports and exports are started by calling the 
-:py:meth:`import_from_file(filename) <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.import_from_file>`
+:py:meth:`import_from_file(filename) 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.import_from_file>`
 and 
-:py:meth:`export_to_file(filename) <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.export_to_file>`,
+:py:meth:`export_to_file(filename) 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup.export_to_file>`,
 respectively. The filename must include the absolute path to the file. 
 
 .. warning::
 
-    Importing the ``SetupExperiment`` from file will overwrite all current 
-    values without confirmation asked.
+    Importing the :py:class:`SetupExperiment 
+    <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`
+    from file will overwrite all current values without asking for confirmation.
 
 An example to demonstrate these methods is given below:
 

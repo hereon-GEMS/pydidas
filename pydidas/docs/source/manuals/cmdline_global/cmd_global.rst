@@ -1,3 +1,7 @@
+.. |plugin_collection| replace:: DirectorySpyApp
+
+
+
 pydidas general command line tutorial
 =====================================
 
@@ -13,12 +17,12 @@ required. These objects are organized in
 direct access to the Parameter values. Usually, users do not need to create or 
 manage Parameters but only modify their values.
 
-Useful methods
-^^^^^^^^^^^^^^
+Useful methods of ParameterCollection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Users will probably manage with a handful of methods. For the full method 
-documentation, please refer to the class documentation: 
-:py:class:`ParameterCollections <pydidas.core.ParameterCollection>`.
+For the full :py:class:`ParameterCollections <pydidas.core.ParameterCollection>`
+method documentation, please refer to the class documentation. However, users 
+will probably manage with a handful of methods:
 
     **get_param_keys**\ ()
         Get all the reference keys to access the respective parameters.
@@ -42,16 +46,16 @@ All examples will use the SetupExperiment object (please see below for a
 description of the object) and the examples will only cover the code bases, not 
 the use case. 
 
-First, let us create the object called ``exp``
+First, let us create the object called :py:data:`exp`
 
 .. code-block::
 
     >>> import pydidas
-    >>> exp = pydidas.core.SetupExperiment()
+    >>> exp = pydidas.experiment.SetupExperiment()
 
-The object ``exp`` will be used in all examples below.
+The object :py:data:`exp` will be used in all examples below.
 
-    1. Get all Parameter keys contained in ``exp``:
+    1. Get all Parameter keys contained in :py:data:`exp`:
 
         .. code-block::
 
@@ -70,14 +74,16 @@ The object ``exp`` will be used in all examples below.
              'detector_rot2',
              'detector_rot3']
 
-    2. Get the value of the Parameter *xray_energy* 
+    2. Get the value of the :py:class:`Parameter <pydidas.core.Parameter>` 
+    *xray_energy* 
 
         .. code-block::
         
             >>> exp.get_param_value('xray_energy')
             15.0
             
-    3. Get the values of all Parameters as dictionary to process further:
+    3. Get the values of all :py:class:`Parameters <pydidas.core.Parameter>` as 
+    a dictionary to process further:
 
         .. code-block::
         
@@ -97,9 +103,10 @@ The object ``exp`` will be used in all examples below.
              'detector_rot2': -0.004845626736941386,
              'detector_rot3': 5.799041608456517e-08}
             
-    4. Set the value of the *xray_energy* Parameter. This is a float value,
+    4. Set the value of the *xray_energy* 
+    :py:class:`Parameter <pydidas.core.Parameter>`. This is a float value, 
     for demonstration purposes, let us set it with a string first. This will 
-    raise a ``ValueError`` and the Parameter will not be updated.
+    raise a :py:data:ValueError` and the Parameter will not be updated.
 
         .. code-block::
 
@@ -126,20 +133,24 @@ All apps use the same global persistent objects (implemented as singletons), if
 required. Information is separated according to the reasons to change. The three
 main objects are:
 
-    SetupScan
-        The details about the scan. This includes crucial information like the
-        number of scan dimensions and the number of points in each dimension but
-        also metadata like dimension names, units, offsets and step width. The 
-        latter information can be used to create the correct axis labels in 
-        plots. For the full documentation please visit :ref:`setup_scan`.
-    SetupExperiment
+    :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`
+        The details about the scan. This includes generic information like scan
+        title, data directory and scan names and specific information like the
+        number of scan dimensions and the number of points in each dimension 
+        (but also metadata like dimension names, units, offsets and step width). 
+        The latter information can be used to create the correct axis labels in 
+        plots. For the full documentation please visit the 
+        :ref:`ScanSetup manual <setup_scan>`.
+    :py:class:`SetupExperiment 
+    <pydidas.experiment.setup_experiment.setup_experiment._SetupExperiment>`
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
-        documentation please visit :ref:`setup_experiment`.
-    WorkflowTree
+        documentation please visit the 
+        :ref:`SetupExperiment manual <setup_experiment>`.
+    :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
         The WorkflowTree holds information about which plugins are used and 
         about the order of plugins to be processed. For the full documentation 
-        please visit :ref:`workflow_tree`.
+        please visit the :ref:`WorkflowTree manual <workflow_tree>`.
 
 These objects can be accesses by calling their respective factories:
 
@@ -174,8 +185,10 @@ pydidas uses a global
 :py:class:`PluginCollection <pydidas.plugins.plugin_collection._PluginCollection>` 
 to manage all known plugins. Plugins will be discovered based on known plugin 
 paths which are managed persistently in the PluginCollection using Qt's 
-QSettings which use the systems registry and are platform-independant. A 
-reference to the persistent PluginCollection object can be obtained using:
+QSettings which use the systems registry and are platform-independent. A 
+reference to the persistent :py:class:`PluginCollection 
+<pydidas.plugins.plugin_collection._PluginCollection>` object can be obtained 
+using:
 
 .. code-block::
 
@@ -192,19 +205,30 @@ Management of stored paths
 """"""""""""""""""""""""""
 
 Paths can be managed by three methods. New paths can be added using the 
-``find_and_register_plugins`` method and a list of all currently registered
-paths can be obtained by the ``get_all_registered_paths`` method.
-To permanently remove all stored paths, a user can use the ``clear_qsettings`` 
+:py:meth:`find_and_register_plugins 
+<pydidas.plugins.plugin_collection._PluginCollection.find_and_register_plugins>` 
+method and a list of all currently registered paths can be obtained by the 
+:py:meth:`get_all_registered_paths 
+<pydidas.plugins.plugin_collection._PluginCollection.get_all_registered_paths>` 
+method. To permanently remove all stored paths, a user can use the 
+:py:meth:`clear_qsettings 
+<pydidas.plugins.plugin_collection._PluginCollection.clear_qsettings>` 
 method. To remove all stored paths and plugins from the current instance, use
-the ``clear_collection`` method. This method must be called with a ``True`` flag
-to take effect and is ignored otherwise.
+the 
+:py:meth:`clear_collection 
+<pydidas.plugins.plugin_collection._PluginCollection.clear_collection>` method. 
+This method must be called with a :py:data:`True` flag to take effect and is 
+ignored otherwise.
 
 .. Warning::
-    Using the ``clear_qsettings`` method will remove all paths which have ever
-    been registered and the user is responsible to add all new paths again.
+    Using the :py:meth:`clear_qsettings 
+    <pydidas.plugins.plugin_collection._PluginCollection.clear_qsettings>` 
+    method will remove all paths which have ever been registered and the user is 
+    responsible to add all new paths again.
     
     Also, calling this method will **not** remove known plugins from the current
-    instance. If desired, this must be done using the ``clear_collection`` 
+    instance. If desired, this must be done using the :py:meth:`clear_collection 
+    <pydidas.plugins.plugin_collection._PluginCollection.clear_collection>` 
     method.
 
 An example of the use of stored paths is given below.
@@ -275,12 +299,13 @@ An example of the use of stored paths is given below.
 Plugin references
 """""""""""""""""
 
-Iternally, plugins are referenced by their class name and there can only be one
+Internally, plugins are referenced by their class name and there can only be one
 plugin registered with the same class name. This behaviour is deliberate to 
 allow overwriting generic plugins with modified private versions. By default, 
 plugin references are overridden with a new class if such a class is 
-encountered. In addition to the class name, each plugin has a ``plugin_name`` 
-attribute which allows to set a more readable reference name for the Plugin.
+encountered. In addition to the class name, each plugin has a 
+:py:data:`plugin_name` attribute which allows to set a more readable reference 
+name for the Plugin.
 
 .. tip::
     The loading of Plugins occurs in the order of the stored paths. Therefore,
@@ -298,10 +323,16 @@ attribute which allows to set a more readable reference name for the Plugin.
 Finding and getting a plugin
 """"""""""""""""""""""""""""
 
-Plugins can either be found by their class name using the ``get_plugin_by_name``
-method or by their plugin name using the ``get_plugin_by_plugin_name`` method.
-A list of all available plugin class names can be obtained with the 
-``get_all_plugin_names`` method.
+Plugins can either be found by their class name using the 
+:py:meth:`get_plugin_by_name 
+<pydidas.plugins.plugin_collection._PluginCollection.get_plugin_by_name>` 
+method or by their plugin name using the 
+:py:meth:`get_plugin_by_plugin_name 
+<pydidas.plugins.plugin_collection._PluginCollection.get_plugin_by_plugin_name>` 
+method. A list of all available plugin class names can be obtained with the 
+:py:meth:`get_all_plugin_names 
+<pydidas.plugins.plugin_collection._PluginCollection.get_all_plugin_names>` 
+method.
 
 .. code-block::
     
@@ -309,8 +340,7 @@ A list of all available plugin class names can be obtained with the
     >>> COLLECTION = pydidas.plugins.PluginCollection()
     >>> COLLECTION.get_all_plugin_names()
     ['Hdf5fileSeriesLoader',
-     'Hdf5singleFileLoader',
-     'TiffLoader',
+     'FrameLoader',
      'MaskImage',
      'PyFAI2dIntegration',
      'PyFAIazimuthalIntegration',
@@ -339,7 +369,8 @@ A list of all available plugin class names can be obtained with the
     
 Once the plugins have been created, their Parameters can be modified as 
 described in the `Accessing Parameters`_ section. The organization of plugins 
-into a WorkflowTree are covered in the section :ref:`workflow_tree`.
+into a WorkflowTree are covered in the section :ref:`WorkflowTree manual 
+<workflow_tree>`.
 
 .. _pydidas_qsettings:
 
@@ -350,7 +381,8 @@ pydidas uses Qt's QSettings to store persistent information in the system's
 registry. The :py:class:`pydidas.core.PydidasQsettings` class can be used to
 display and modify global parameters.
 The most useful methods for general users are 
-:py:meth:`show_all_stored_q_settings <pydidas.core.PydidasQsettings.show_all_stored_q_settings>` 
+:py:meth:`show_all_stored_q_settings 
+<pydidas.core.PydidasQsettings.show_all_stored_q_settings>` 
 to print the names and values of all stored settings and 
 :py:meth:`set_value <pydidas.core.PydidasQsettings.set_value>` to modify a key.
 
@@ -375,6 +407,7 @@ here for demonstration purposes.
 
 .. note::
 
-    The Qsettings are persistent on the system for every user account, i.e.
-    any changes you make will persist if you start a new pydidas instance or
-    process.
+    The Qsettings are persistent (for a specific pydidas version) on the system 
+    for every individual user account, i.e. any changes you make will persist 
+    if you start a new pydidas instance or process. Likewise, any changes made
+    as a different user will not be applied to your settings.

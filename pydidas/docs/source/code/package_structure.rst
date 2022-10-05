@@ -45,9 +45,9 @@ Sub-package descriptions
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 - **pydidas.core** 
-
-    The core classes and functions which are used throughout the pydidas package. 
-    These include data structure, generic items, and factories.
+    
+    The core classes and functions which are used throughout the pydidas 
+    package. These include data structure, generic objects, and factories.
 
   - *pydidas.core.constants* 
         
@@ -55,9 +55,9 @@ Sub-package descriptions
   
   - *pydidas.core.io_registry* 
         
-        Base classes for a metaclass-based registry to associate specific actions
-        with specific file extensions.
-                    
+        Base classes for a metaclass-based registry to associate specific 
+        actions with specific file extensions.
+
   - *pydidas.core.utils* 
         
         Utility functions for various purposes.
@@ -69,7 +69,7 @@ Sub-package descriptions
 
 - **pydidas.data_io** 
     
-        The pydidas image reader and writer implementation and a registry class 
+        The pydidas image reader and writer implementation and registry classes 
         for the various formats.
 
   - *pydidas.data_io.implementations* 
@@ -112,11 +112,12 @@ Sub-package descriptions
     the order defined by the user.
 
   - *pydidas.workflow.result_io* 
-    
-        Classes to handle writing the results of the workflow execution to files.
-                      
+        
+        Classes to handle writing the results of the workflow execution to 
+        files.
+
   - *pydidas.workflow.workflow_tree_io* 
-  
+        
         Registry with importers/exporters and the importer/exporter 
         implementations.
 
@@ -127,8 +128,9 @@ Sub-package descriptions
     functionality of the multiprocesing subpackage.
              
 - **pydidas.widgets** 
-
-    pydidas-specific PyQt5 widgets which are used in the graphical user interface.
+    
+    pydidas-specific PyQt5 widgets which are used in the graphical user 
+    interface.
 
   - *pydidas.widgets.dialogues* 
         
@@ -143,7 +145,7 @@ Sub-package descriptions
         
         Specific widgets to edit the values of Parameters and functionality to 
         create and manage parameter config widgets.
-                         
+
   - *pydidas.widgets.selection* 
         
         Widgets used to select a specific item.
@@ -163,7 +165,12 @@ Sub-package descriptions
     interface. Functionality is organized in "frames" which can all be accessed 
     from the main window.
             
-  - *pydidas.gui.builders*
+  - *pydidas.gui.frames*
+        
+        Frames are the top-level widgets used in pydidas to organize and show
+        content in the GUI.
+		
+  - *pydidas.gui.frames.builders*
         
         Mix-in classes for the individual frames which include the layout and 
         arrangement of widgets.

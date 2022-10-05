@@ -11,7 +11,7 @@ pydidas
    :caption: Contents:
    
    manuals
-   code_documentation
+   code/code_documentation
    developer_guide
 
 

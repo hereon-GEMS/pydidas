@@ -86,8 +86,8 @@ class TestDirectorySpyApp(unittest.TestCase):
     def create_default_app(self):
         app = DirectorySpyApp()
         app.set_param_value("scan_for_all", False)
-        _pattern = os.path.join(self._path, "names_with_###_patterns.tif")
-        app.set_param_value("filename_pattern", _pattern)
+        app.set_param_value("directory_path", self._path)
+        app.set_param_value("filename_pattern", "names_with_###_patterns.tif")
         app.prepare_run()
         app._det_mask = np.zeros((self._shape))
         return app
@@ -376,7 +376,10 @@ class TestDirectorySpyApp(unittest.TestCase):
         _pattern = str(app.get_param_value("filename_pattern"))
         app.define_path_and_name()
         self.assertEqual(app._config["glob_pattern"], _pattern.replace("###", "*"))
-        self.assertEqual(app._fname(42), _pattern.replace("###", "042"))
+        self.assertEqual(
+            app._fname(42),
+            os.path.join(app._config["path"], _pattern).replace("###", "042")
+        )
         self.assertEqual(app._config["path"], self._path)
 
     def test_multiprocessing_carryon(self):

@@ -550,8 +550,10 @@ class CompositeCreatorApp(BaseApp):
 
     def multiprocessing_post_run(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Perform operations after running main parallel processing function.
         """
+        if self.get_param_value("use_thresholds"):
+            self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
     def apply_thresholds(self, **kwargs):

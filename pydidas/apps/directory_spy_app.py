@@ -213,11 +213,10 @@ class DirectorySpyApp(BaseApp):
         UserConfigError
             If the naming pattern could not be interpreted.
         """
+        self._config["path"] = self.get_param_value("directory_path", dtype=str)
         if self.get_param_value("scan_for_all"):
-            self._config["path"] = str(self.get_param_value("directory_path"))
             return
-        _pattern_str = str(self.get_param_value("filename_pattern"))
-        self._config["path"] = os.path.dirname(_pattern_str)
+        _pattern_str = self.get_param_value("filename_pattern", dtype=str)
         _strs = _pattern_str.split("#")
         _lens = [len(_s) for _s in _strs]
         if len(_strs) == 1:
@@ -235,7 +234,10 @@ class DirectorySpyApp(BaseApp):
         _pattern_str = _pattern_str.replace(
             "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
         )
-        self._fname = lambda index: _pattern_str.format(index)
+        self._fname = lambda index: os.path.join(
+            self._config["path"],
+            _pattern_str
+        ).format(index)
 
     def _load_bg_file(self):
         """

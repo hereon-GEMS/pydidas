@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the GlobalConfigWindow class which is a QMainWindow widget
-to view and modify the global settings in a seperate Window.
+Module with the UserConfigWindow class which is a QMainWindow widget
+to view and modify user-specific settings in a seperate Window.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["GlobalConfigWindow"]
+__all__ = ["UserConfigWindow"]
 
 from functools import partial
 
@@ -35,8 +35,9 @@ from .pydidas_window import PydidasWindow
 from ...core import get_generic_param_collection, SingletonFactory
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
-    QSETTINGS_GLOBAL_KEYS,
+    QSETTINGS_USER_KEYS,
     QT_TOP_RIGHT_ALIGNMENT,
+    STANDARD_FONT_SIZE,
 )
 from ...plugins import PluginCollection
 from ...widgets.dialogues import AcknowledgeBox
@@ -55,9 +56,9 @@ def update_plugin_collection():
     PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_path())
 
 
-class _GlobalConfigWindow(PydidasWindow):
+class _UserConfigWindow(PydidasWindow):
     """
-    The GlobalConfigWindow is a standalone QMainWindow with the
+    The UserConfigWindow is a standalone QMainWindow with the
     GlobalConfigurationFrame as sole content.
     """
 
@@ -68,7 +69,7 @@ class _GlobalConfigWindow(PydidasWindow):
     value_changed_signal = QtCore.Signal(str, object)
 
     TEXT_WIDTH = 180
-    default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
+    default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(self, parent, **kwargs)
@@ -95,10 +96,16 @@ class _GlobalConfigWindow(PydidasWindow):
             width_unit=40,
             width_total=CONFIG_WIDGET_WIDTH,
         )
-        _section_options = dict(fontsize=13, bold=True, gridPos=(-1, 0, 1, 1))
+        _section_options = dict(
+            fontsize=STANDARD_FONT_SIZE + 3, bold=True, gridPos=(-1, 0, 1, 1)
+        )
 
         self.create_label(
-            "title", "Global settings\n", fontsize=14, bold=True, gridPos=(0, 0, 1, 1)
+            "title",
+            "Global settings\n",
+            fontsize=STANDARD_FONT_SIZE + 4,
+            bold=True,
+            gridPos=(0, 0, 1, 1),
         )
         self.create_button(
             "but_reset",
@@ -107,15 +114,10 @@ class _GlobalConfigWindow(PydidasWindow):
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )
-        self.create_label(
-            "section_multiprocessing", "Multiprocessing settings", **_section_options
-        )
-        self.create_param_widget(self.get_param("mp_n_workers"), **_options)
-        self.create_param_widget(self.get_param("shared_buffer_size"), **_options)
-        self.create_param_widget(self.get_param("shared_buffer_max_n"), **_options)
-        self.create_spacer("spacer_1")
 
-        self.create_label("section_detector", "Detector settings", **_section_options)
+        self.create_label(
+            "section_detector", "Detector mask settings", **_section_options
+        )
         self.create_param_widget(self.get_param("det_mask"), **_twoline_options)
         self.create_param_widget(self.get_param("det_mask_val"), **_options)
         self.create_spacer("spacer_2")
@@ -125,15 +127,12 @@ class _GlobalConfigWindow(PydidasWindow):
         )
         self.create_param_widget(self.get_param("mosaic_border_width"), **_options)
         self.create_param_widget(self.get_param("mosaic_border_value"), **_options)
-        self.create_param_widget(self.get_param("mosaic_max_size"), **_options)
         self.create_spacer("spacer_3")
 
         self.create_label("section_plotting", "Plot settings", **_section_options)
-        self.create_param_widget(self.get_param("plot_update_time"), **_options)
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction"), **_options
         )
-
         self.create_empty_widget("colormap_editor", fixedWidth=CONFIG_WIDGET_WIDTH)
         self.create_label(
             "label_colormap",
@@ -153,7 +152,6 @@ class _GlobalConfigWindow(PydidasWindow):
         self.create_spacer("spacer_4")
 
         self.create_label("section_plugins", "Plugins", **_section_options)
-        self.create_param_widget(self.get_param("plugin_fit_std_threshold"), **_options)
         self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
         self.create_button("but_plugins", "Update plugin collection")
 
@@ -182,7 +180,7 @@ class _GlobalConfigWindow(PydidasWindow):
         value : object
             The new value.
         """
-        self.q_settings_set_key(f"global/{param_key}", value)
+        self.q_settings_set_key(f"user/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(str)
@@ -195,7 +193,7 @@ class _GlobalConfigWindow(PydidasWindow):
         cmap_name : str
             The name of the new colormap.
         """
-        _ack = self.q_settings_get_value("global/cmap_acknowledge")
+        _ack = self.q_settings_get_value("user/cmap_acknowledge")
         if _ack is None:
             _set_ack = AcknowledgeBox(
                 text=(
@@ -204,8 +202,8 @@ class _GlobalConfigWindow(PydidasWindow):
                 )
             ).exec_()
             if _set_ack:
-                self.q_settings_set_key("global/cmap_acknowledge", True)
-        self.q_settings_set_key("global/cmap_name", cmap_name)
+                self.q_settings_set_key("user/cmap_acknowledge", True)
+        self.q_settings_set_key("user/cmap_name", cmap_name)
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -225,7 +223,7 @@ class _GlobalConfigWindow(PydidasWindow):
         if index != self.frame_index:
             return
         for _param_key, _param in self.params.items():
-            _value = self.q_settings_get_value(f"global/{_param_key}", _param.dtype)
+            _value = self.q_settings_get_value(f"user/{_param_key}", _param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):
@@ -259,4 +257,4 @@ class _GlobalConfigWindow(PydidasWindow):
         self.set_param_value_and_widget(param_key, value)
 
 
-GlobalConfigWindow = SingletonFactory(_GlobalConfigWindow)
+UserConfigWindow = SingletonFactory(_UserConfigWindow)

@@ -230,7 +230,7 @@ class AverageImagesWindow(PydidasWindow):
             else:
                 _data += _tmpdata
         if self.get_param_value("use_global_det_mask"):
-            _mask_qsetting = self.q_settings_get_value("global/det_mask")
+            _mask_qsetting = self.q_settings_get_value("user/det_mask")
             if os.path.isfile(_mask_qsetting):
                 _mask = import_data(_mask_qsetting)
                 _data = np.where(_mask, 0, _data)

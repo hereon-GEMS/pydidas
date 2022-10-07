@@ -39,6 +39,7 @@ from pydidas.core.constants import (
 )
 from pydidas.core import (
     get_generic_param_collection,
+    get_generic_parameter,
     Dataset,
     UserConfigError,
     Parameter,
@@ -87,6 +88,7 @@ class FitSinglePeak(ProcPlugin):
             ),
         ),
     )
+    default_params.add_param(get_generic_parameter("fit_sigma_threshold"))
     input_data_dim = -1
     output_data_dim = 0
     new_dataset = True
@@ -132,9 +134,6 @@ class FitSinglePeak(ProcPlugin):
             self._fitparam_bounds_high.append(np.inf)
         self.output_data_label = self.get_param_value("output")
         self.output_data_unit = "a.u."
-        self._fit_acceptance_threshold = self.q_settings_get_value(
-            "global/plugin_fit_std_threshold", dtype=float
-        )
 
     @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
@@ -336,7 +335,7 @@ class FitSinglePeak(ProcPlugin):
         _new_data.metadata = self._data.metadata | _new_metadata
         _new_data.data_label = _output
         _new_data.data_unit = "a.u."
-        if _residual_std >= self._fit_acceptance_threshold or (
+        if _residual_std >= self.get_param_value("fit_sigma_threshold") or (
             not self._x[0] <= self._fit_params["center"] <= self._x[-1]
         ):
             _new_data[:] = -1

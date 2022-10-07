@@ -91,9 +91,13 @@ silx_opencl_logger.setLevel(__logging.ERROR)
 # default Parameters to avoid having "None" keys returned.
 __version = version.VERSION
 __settings = __QtCore.QSettings("Hereon", "pydidas")
-for _key in core.constants.QSETTINGS_GLOBAL_KEYS:
-    _val = __settings.value(f"{__version}/global/{_key}")
-    if _val is None:
-        _param = core.get_generic_parameter(_key)
-        __settings.setValue(f"{__version}/global/{_key}", _param.default)
+for _prefix, _keys in (
+    ("global", core.constants.QSETTINGS_GLOBAL_KEYS),
+    ("user", core.constants.QSETTINGS_USER_KEYS),
+):
+    for _key in _keys:
+        _val = __settings.value(f"{__version}/{_prefix}/{_key}")
+        if _val is None:
+            _param = core.get_generic_parameter(_key)
+            __settings.setValue(f"{__version}/{_prefix}/{_key}", _param.default)
 del __settings

@@ -148,7 +148,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
 
     def prepare_with_defaults(self):
         _scan_shape = tuple(
-            SCAN.get_param_value(f"scan_dim{i}_n_points") for i in [1, 2, 3]
+            SCAN.get_param_value(f"scan_dim{i}_n_points") for i in range(3)
         )
         self._shapes = {
             1: _scan_shape + (12, 7),

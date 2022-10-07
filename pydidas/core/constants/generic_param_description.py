@@ -27,6 +27,7 @@ __all__ = ["GENERIC_PARAM_DESCRIPTION"]
 
 import numpy as np
 
+from .unicode_greek_letters import GREEK_ASCII_TO_UNI
 
 GENERIC_PARAM_DESCRIPTION = (
     {
@@ -855,6 +856,15 @@ GENERIC_PARAM_DESCRIPTION = (
                 "not be too large."
             ),
         },
+        "max_image_size": {
+            "type": float,
+            "default": 100,
+            "name": "Maximum image size",
+            "choices": None,
+            "unit": "Mpx",
+            "allow_None": False,
+            "tooltip": "The maximum size (in megapixels) of images.",
+        },
         "use_global_det_mask": {
             "type": bool,
             "default": True,
@@ -879,7 +889,7 @@ GENERIC_PARAM_DESCRIPTION = (
         "det_mask_val": {
             "type": float,
             "default": 0,
-            "name": "Detector mask value",
+            "name": "Detector mask display value",
             "choices": None,
             "unit": "",
             "allow_None": False,
@@ -909,15 +919,6 @@ GENERIC_PARAM_DESCRIPTION = (
             "unit": "",
             "allow_None": False,
             "tooltip": "The value to be put in the border pixels in mosaics.",
-        },
-        "mosaic_max_size": {
-            "type": float,
-            "default": 100,
-            "name": "Mosaic maximum size",
-            "choices": None,
-            "unit": "Mpx",
-            "allow_None": False,
-            "tooltip": "The maximum size (in megapixels) of mosaic images.",
         },
         "run_type": {
             "type": str,
@@ -965,10 +966,10 @@ GENERIC_PARAM_DESCRIPTION = (
                 "the Eiger."
             ),
         },
-        "plugin_fit_std_threshold": {
+        "fit_sigma_threshold": {
             "type": float,
             "default": 0.25,
-            "name": "Fit sigma rejection threshold",
+            "name": f"Fit {GREEK_ASCII_TO_UNI['sigma']} rejection threshold",
             "choices": None,
             "allow_None": False,
             "unit": "",

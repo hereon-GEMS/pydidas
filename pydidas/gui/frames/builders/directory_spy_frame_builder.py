@@ -78,7 +78,6 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
                 width_total=CONFIG_WIDGET_WIDTH,
             )
         if param_key in [
-            "directory_path",
             "hdf5_key",
             "bg_file",
             "bg_hdf5_key",
@@ -121,9 +120,9 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         )
 
         for _param in [
+            "directory_path",
             "scan_for_all",
             "filename_pattern",
-            "directory_path",
             "hdf5_key",
             "use_global_det_mask",
             "use_bg_file",

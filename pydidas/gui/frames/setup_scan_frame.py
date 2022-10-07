@@ -162,7 +162,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
                 SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )
             SCAN.set_param_value(
-                f"scan_dim{dim_index}{_key}", _previous_dim_entries[f"{_key}"]
+                f"scan_dim{dim_index}_{_key}", _previous_dim_entries[f"{_key}"]
             )
             self.update_widget_value(
                 f"scan_dim{dim_index + direction}_{_key}",

@@ -44,6 +44,7 @@ class TestHdf5Io(unittest.TestCase):
         with h5py.File(cls._fname, "w") as _file:
             _file["test/path"] = cls._data
             _file["entry/data/data"] = cls._data[:10, :10, :10, 0]
+            cls._written_shape = _file["entry/data/data"].shape
 
     @classmethod
     def tearDownClass(cls):

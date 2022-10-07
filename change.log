@@ -27,6 +27,10 @@ Improvements
 - Added "move scan dimension" functionality in the SetupScanFrame.
 - Updated documentation to current state.
 - Updated the names of SetupScan Parameters for consistency.
+- Fixed directory handling of DirectorySpyApp to always use directory_path
+  Parameter.
+- Separated global settings in "global settings" and "user config" to
+  facilitate finding the proper settings for users.
 
 Bugfixes:
 ---------

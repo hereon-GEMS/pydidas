@@ -59,7 +59,7 @@ class PydidasQsettingsMixin:
     def __init__(self):
         self.q_settings = CopyableQSettings("Hereon", "pydidas")
 
-    def q_settings_get_value(self, key, dtype=None):
+    def q_settings_get_value(self, key, dtype=None, default=None):
         """
         Get the value from a QSetting key.
 
@@ -71,6 +71,9 @@ class PydidasQsettingsMixin:
             A return datatype. If not None, the output will be returned as
             dtype(value), otherwise, the generic string/int will be returned. The
             default is None.
+        default : type, optional
+            The default value which is returned if the key defaults to None. The
+            default is None.
 
         Returns
         -------
@@ -79,6 +82,8 @@ class PydidasQsettingsMixin:
             referenced by param_key or dtype, if given.
         """
         _value = self.q_settings.value(f"{VERSION}/{key}")
+        if _value is None:
+            return default
         if dtype is not None:
             if dtype == Integral:
                 return int(_value)

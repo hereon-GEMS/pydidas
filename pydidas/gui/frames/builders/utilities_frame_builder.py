@@ -32,11 +32,17 @@ from ....widgets import BaseFrame
 
 
 UTILITIES = {
-    "global_config": {
-        "title": "Edit global settings",
+    "user_config": {
+        "title": "Edit user config",
         "text": (
-            "Edit the global application settings (e.g. multiprocessing, plugin paths)."
+            "Edit the user preferences for the generic application config."
+            "(e.g. colormaps, plugin path)."
         ),
+        "button_text": "Edit user config",
+    },
+    "global_settings": {
+        "title": "Edit global settings",
+        "text": ("Edit the global application settings (e.g. multiprocessing)."),
         "button_text": "Edit global settings",
     },
     "eiger_mask": {

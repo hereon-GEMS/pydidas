@@ -141,6 +141,8 @@ class EigerScanSeriesLoader(InputPlugin):
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
         _data = import_data(_fname, **kwargs)
+        _data.axis_units = ["pixel", "pixel"]
+        _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs
 
     @copy_docstring(InputPlugin)

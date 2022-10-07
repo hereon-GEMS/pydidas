@@ -53,8 +53,8 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         cls.n_per_type = 8
         cls._syspath = copy.deepcopy(sys.path)
         cls._qsettings = PydidasQsettings()
-        cls._qsettings_plugin_path = cls._qsettings.value("global/plugin_path")
-        cls._qsettings.set_value("global/plugin_path", "")
+        cls._qsettings_plugin_path = cls._qsettings.value("user/plugin_path")
+        cls._qsettings.set_value("user/plugin_path", "")
         cls.pcoll = DummyPluginCollection(
             n_plugins=3 * cls.n_per_type, plugin_path=cls._pluginpath, create_empty=True
         )
@@ -63,7 +63,7 @@ class TestPluginCollectionBrowser(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         sys.path = cls._syspath
-        cls._qsettings.set_value("global/plugin_path", cls._qsettings_plugin_path)
+        cls._qsettings.set_value("user/plugin_path", cls._qsettings_plugin_path)
         shutil.rmtree(cls._pluginpath)
         widgets = cls.widgets[:]
         cls.widgets.clear()

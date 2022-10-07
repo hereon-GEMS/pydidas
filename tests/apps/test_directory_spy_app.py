@@ -46,7 +46,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         self._ppath = os.path.join(self._path, self._pname)
         self._glob_str = self._ppath.replace("#####", "*")
         self.q_settings = PydidasQsettings()
-        self._original_mask_file = self.q_settings.value("global/det_mask")
+        self._original_mask_file = self.q_settings.value("user/det_mask")
         self._shape = (20, 20)
         self._mask = np.asarray(
             [
@@ -57,7 +57,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._path)
-        self.q_settings.set_value("global/det_mask", self._original_mask_file)
+        self.q_settings.set_value("user/det_mask", self._original_mask_file)
         DirectorySpyApp.parse_func = directory_spy_app_parser
 
     def get_test_image(self, shape=None):
@@ -159,7 +159,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_get_detector_mask__with_mask(self):
         self.create_temp_mask_file()
-        self.q_settings.set_value("global/det_mask", self._mask_fname)
+        self.q_settings.set_value("user/det_mask", self._mask_fname)
         app = DirectorySpyApp()
         _mask = app._get_detector_mask()
         self.assertTrue((_mask == self._mask).all())
@@ -378,7 +378,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertEqual(app._config["glob_pattern"], _pattern.replace("###", "*"))
         self.assertEqual(
             app._fname(42),
-            os.path.join(app._config["path"], _pattern).replace("###", "042")
+            os.path.join(app._config["path"], _pattern).replace("###", "042"),
         )
         self.assertEqual(app._config["path"], self._path)
 

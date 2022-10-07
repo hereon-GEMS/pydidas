@@ -239,7 +239,7 @@ class CompositeCreatorApp(BaseApp):
         _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
         self._config["mp_tasks"] = range(_ntotal)
         self._config["det_mask_val"] = float(
-            self.q_settings_get_value("global/det_mask_val")
+            self.q_settings_get_value("user/det_mask_val")
         )
         self._det_mask = self.__get_detector_mask()
 
@@ -289,7 +289,7 @@ class CompositeCreatorApp(BaseApp):
         """
         if not self.get_param_value("use_global_det_mask"):
             return None
-        _maskfile = self.q_settings_get_value("global/det_mask")
+        _maskfile = self.q_settings_get_value("user/det_mask")
         try:
             _mask = np.load(_maskfile)
         except (FileNotFoundError, ValueError):
@@ -385,8 +385,8 @@ class CompositeCreatorApp(BaseApp):
             )
             return
         _update_required = False
-        _bwidth = self.q_settings_get_value("global/mosaic_border_width", int)
-        _bval = self.q_settings_get_value("global/mosaic_border_value", float)
+        _bwidth = self.q_settings_get_value("user/mosaic_border_width", int)
+        _bval = self.q_settings_get_value("user/mosaic_border_value", float)
         for _key, _value in [
             ["image_shape", self._image_metadata.final_shape],
             ["composite_nx", self.get_param_value("composite_nx")],

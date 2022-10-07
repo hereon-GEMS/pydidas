@@ -47,11 +47,14 @@ from ..version import VERSION
 from . import utils
 from .gui_excepthook_ import gui_excepthook
 from .windows import (
-    GlobalConfigWindow,
+    GlobalSettingsWindow,
+    UserConfigWindow,
     ExportEigerPixelmaskWindow,
     AverageImagesWindow,
     AboutWindow,
     FeedbackWindow,
+    FileSeriesOperationsWindow,
+    MaskEditorWindow,
 )
 
 
@@ -97,7 +100,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.__window_counter = 0
 
         self._setup_mainwindow_widget(geometry)
-        self._add_global_config_window()
+        self._add_config_windows()
         self._create_menu()
         self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
         self._help_shortcut.activated.connect(self._open_help)
@@ -123,14 +126,17 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
-    def _add_global_config_window(self):
+    def _add_config_windows(self):
         """
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        _frame = GlobalConfigWindow()
+        _frame = GlobalSettingsWindow()
         _frame.frame_activated(_frame.frame_index)
-        self._child_windows["global_config"] = _frame
+        self._child_windows["global_settings"] = _frame
+        _frame = UserConfigWindow()
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows["user_config"] = _frame
 
     def _create_menu(self):
         """
@@ -188,10 +194,17 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["exit"] = exit_action
 
         self._actions["open_settings"] = QtWidgets.QAction("&Settings", self)
-        self._actions["export_eiger_pixel_mask"] = QtWidgets.QAction(
+        self._actions["open_user_config"] = QtWidgets.QAction("&User config", self)
+
+        self._actions["utils_export_eiger_pixel_mask"] = QtWidgets.QAction(
             "&Export Eiger Pixelmask", self
         )
-        self._actions["average_images"] = QtWidgets.QAction("&Average images", self)
+        self._actions["utils_image_series_ops"] = QtWidgets.QAction(
+            "&Image series processing", self
+        )
+        self._actions["utils_mask_editor"] = QtWidgets.QAction(
+            "Edit detector &mask", self
+        )
 
         self._actions["open_documentation_browser"] = QtWidgets.QAction(
             "Open documentation in default web browser", self
@@ -210,13 +223,19 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["import_state"].triggered.connect(self._action_import_state)
         self._actions["exit"].triggered.connect(self.close)
         self._actions["open_settings"].triggered.connect(
-            partial(self.show_window, "global_config")
+            partial(self.show_window, "global_settings")
         )
-        self._actions["export_eiger_pixel_mask"].triggered.connect(
+        self._actions["open_user_config"].triggered.connect(
+            partial(self.show_window, "user_config")
+        )
+        self._actions["utils_export_eiger_pixel_mask"].triggered.connect(
             partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
-        self._actions["average_images"].triggered.connect(
-            partial(self.create_and_show_temp_window, AverageImagesWindow)
+        self._actions["utils_image_series_ops"].triggered.connect(
+            partial(self.create_and_show_temp_window, FileSeriesOperationsWindow)
+        )
+        self._actions["utils_mask_editor"].triggered.connect(
+            partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
             self._action_open_doc_in_browser
@@ -248,11 +267,13 @@ class MainMenu(QtWidgets.QMainWindow):
         _menu.addMenu(_file_menu)
 
         _utilities_menu = _menu.addMenu("&Utilities")
-        _utilities_menu.addAction(self._actions["export_eiger_pixel_mask"])
-        _utilities_menu.addAction(self._actions["average_images"])
+        _utilities_menu.addAction(self._actions["utils_export_eiger_pixel_mask"])
+        _utilities_menu.addAction(self._actions["utils_image_series_ops"])
+        _utilities_menu.addAction(self._actions["utils_mask_editor"])
         _menu.addMenu(_utilities_menu)
 
         _options_menu = _menu.addMenu("&Options")
+        _options_menu.addAction(self._actions["open_user_config"])
         _options_menu.addAction(self._actions["open_settings"])
 
         _help_menu = _menu.addMenu("&Help")

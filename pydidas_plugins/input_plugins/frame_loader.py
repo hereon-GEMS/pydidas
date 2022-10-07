@@ -87,4 +87,6 @@ class FrameLoader(InputPlugin):
         """
         _fname = self.get_filename(frame_index)
         _data = import_data(_fname, **kwargs)
+        _data.axis_units = ["pixel", "pixel"]
+        _data.axis_labels = ["detector y", "detector x"]
         return _data, kwargs

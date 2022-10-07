@@ -56,8 +56,8 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
             "images_per_file": -1,
         }
         cls._data = np.repeat(
-            np.arange(15, dtype=np.uint16), np.prod(cls._img_shape)
-        ).reshape((15,) + cls._img_shape)
+            np.arange(cls._n, dtype=np.uint16), np.prod(cls._img_shape)
+        ).reshape((cls._n,) + cls._img_shape)
 
         cls._hdf5_fnames = []
         for i in range(cls._n_files):

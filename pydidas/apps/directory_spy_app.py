@@ -146,7 +146,7 @@ class DirectorySpyApp(BaseApp):
         self._shared_array = None
         self._index = -1
         self._config["det_mask_val"] = float(
-            self.q_settings_get_value("global/det_mask_val")
+            self.q_settings_get_value("user/det_mask_val")
         )
 
     def multiprocessing_pre_run(self):
@@ -195,7 +195,7 @@ class DirectorySpyApp(BaseApp):
         """
         if not self.get_param_value("use_global_det_mask"):
             return None
-        _maskfile = self.q_settings_get_value("global/det_mask")
+        _maskfile = self.q_settings_get_value("user/det_mask")
         try:
             _mask = np.load(_maskfile)
             return _mask
@@ -235,8 +235,7 @@ class DirectorySpyApp(BaseApp):
             "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
         )
         self._fname = lambda index: os.path.join(
-            self._config["path"],
-            _pattern_str
+            self._config["path"], _pattern_str
         ).format(index)
 
     def _load_bg_file(self):

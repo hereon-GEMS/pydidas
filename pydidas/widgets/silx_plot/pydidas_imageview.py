@@ -91,7 +91,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self._positionWidget = _position_widget
         self.get_detector_size()
 
-        _cmap_name = self.q_settings_get_value("global/cmap_name").lower()
+        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)

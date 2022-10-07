@@ -42,6 +42,6 @@ def set_default_plugin_dir():
     QSettings at the time of the function call.
     """
     _settings = PydidasQsettings()
-    _val = _settings.value("global/plugin_path")
+    _val = _settings.value("user/plugin_path")
     if _val in [None, ""]:
-        _settings.set_value("global/plugin_path", DEFAULT_PATH)
+        _settings.set_value("user/plugin_path", DEFAULT_PATH)

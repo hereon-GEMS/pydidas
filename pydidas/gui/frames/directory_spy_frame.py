@@ -108,7 +108,6 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
             in HDF5_EXTENSIONS
         )
         self.toggle_param_widget_visibility("filename_pattern", not _vis)
-        self.toggle_param_widget_visibility("directory_path", _vis)
         self.toggle_param_widget_visibility("hdf5_key", _vis or _hdf5_pattern)
 
     @QtCore.Slot()

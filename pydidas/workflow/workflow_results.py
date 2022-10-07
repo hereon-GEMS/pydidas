@@ -281,7 +281,9 @@ class _WorkflowResults(QtCore.QObject):
         node_id : int
             The node ID for which results should be retured.
         squeeze : bool, optional
-            Keyword to toggle squeezing of the final dataset.
+            Keyword to toggle squeezing of data dimensions of the final dataset. If
+            True, all dimensions with a length of 1 will be removed. The default is
+            False.
 
         Returns
         -------

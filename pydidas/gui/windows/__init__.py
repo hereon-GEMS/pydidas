@@ -31,11 +31,12 @@ from .average_images_window import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .file_series_operations_window import *
-from .global_config_window import *
+from .global_settings_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
 from .show_detailed_plugin_results import *
 from .tweak_plugin_parameter_window import *
+from .user_config_window import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -64,10 +65,10 @@ from . import file_series_operations_window
 __all__.extend(file_series_operations_window.__all__)
 del file_series_operations_window
 
-from . import global_config_window
+from . import global_settings_window
 
-__all__.extend(global_config_window.__all__)
-del global_config_window
+__all__.extend(global_settings_window.__all__)
+del global_settings_window
 
 from . import mask_editor_window
 
@@ -88,3 +89,8 @@ from . import tweak_plugin_parameter_window
 
 __all__.extend(tweak_plugin_parameter_window.__all__)
 del tweak_plugin_parameter_window
+
+from . import user_config_window
+
+__all__.extend(user_config_window.__all__)
+del user_config_window

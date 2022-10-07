@@ -46,13 +46,13 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
         self._qsettings = PydidasQsettings()
-        self._qsettings_det_mask = self._qsettings.value("global/det_mask")
-        self._qsettings.set_value("global/det_mask", "")
+        self._qsettings_det_mask = self._qsettings.value("user/det_mask")
+        self._qsettings.set_value("user/det_mask", "")
         self._shape = (50, 50)
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.set_value("global/det_mask", self._qsettings_det_mask)
+        self._qsettings.set_value("user/det_mask", self._qsettings_det_mask)
 
     def initialize_base_plugin(self, **kwargs):
         for key, value in [
@@ -243,7 +243,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def test_load_and_store_mask__q_settings(self):
         _maskfilename, _mask = self.create_mask()
-        self._qsettings.set_value("global/det_mask", _maskfilename)
+        self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
         plugin.load_and_store_mask()
@@ -251,7 +251,7 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def test_load_and_store_mask__wrong_local_mask_and_q_settings(self):
         _maskfilename, _mask = self.create_mask()
-        self._qsettings.set_value("global/det_mask", _maskfilename)
+        self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
         plugin.set_param_value("det_mask", os.path.join(self._temppath, "no_mask.npy"))

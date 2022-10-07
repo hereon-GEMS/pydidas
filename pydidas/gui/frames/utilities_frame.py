@@ -32,7 +32,8 @@ from .builders import UtilitiesFrameBuilder
 from ..windows import (
     ExportEigerPixelmaskWindow,
     FileSeriesOperationsWindow,
-    GlobalConfigWindow,
+    GlobalSettingsWindow,
+    UserConfigWindow,
     MaskEditorWindow,
 )
 
@@ -50,16 +51,19 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         UtilitiesFrameBuilder.__init__(self, parent=parent, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
-        self._add_global_config_window()
+        self._add_config_windows()
 
-    def _add_global_config_window(self):
+    def _add_config_windows(self):
         """
         Add the required widgets and signals for the global configuration
         window and create it.
         """
-        _frame = GlobalConfigWindow()
+        _frame = GlobalSettingsWindow()
         _frame.frame_activated(_frame.frame_index)
-        self._child_windows["global_config"] = _frame
+        self._child_windows["global_settings"] = _frame
+        _frame = UserConfigWindow()
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows["user_config"] = _frame
 
     def finalize_ui(self):
         """
@@ -67,7 +71,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         """
         self.__main_gui = self.parent().parent()
         self.__main_gui.sig_close_gui.connect(
-            self._child_windows["global_config"].close
+            self._child_windows["global_settings"].close
         )
 
     def connect_signals(self):
@@ -83,8 +87,11 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._widgets["button_mask_editor"].clicked.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
-        self._widgets["button_global_config"].clicked.connect(
-            partial(self.show_window, "global_config")
+        self._widgets["button_global_settings"].clicked.connect(
+            partial(self.show_window, "global_settings")
+        )
+        self._widgets["button_user_config"].clicked.connect(
+            partial(self.show_window, "user_config")
         )
 
     @QtCore.Slot(object)

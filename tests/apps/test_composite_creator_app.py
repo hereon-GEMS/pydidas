@@ -60,17 +60,17 @@ class TestCompositeCreatorApp(unittest.TestCase):
                 f["/entry/data/data"] = self._data
 
         self._q_settings = PydidasQsettings()
-        self._border = self._q_settings.value("global/mosaic_border_width", int)
-        self._bgvalue = self._q_settings.value("global/mosaic_border_value", float)
-        self._globalmask = self._q_settings.value("global/det_mask")
+        self._border = self._q_settings.value("user/mosaic_border_width", int)
+        self._bgvalue = self._q_settings.value("user/mosaic_border_value", float)
+        self._globalmask = self._q_settings.value("user/det_mask")
         _mask = np.zeros((self._img_shape), dtype=np.bool_)
         _maskfile = Path(os.path.join(self._path, "mask.npy"))
         np.save(_maskfile, _mask)
-        self._q_settings.set_value("global/det_mask", _maskfile)
+        self._q_settings.set_value("user/det_mask", _maskfile)
         self._maskfile = _maskfile
 
     def tearDown(self):
-        self._q_settings.set_value("global/det_mask", self._globalmask)
+        self._q_settings.set_value("user/det_mask", self._globalmask)
         shutil.rmtree(self._path)
 
     def get_default_app(self):
@@ -465,7 +465,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
-        app.q_settings_set_key("global/det_mask", "no/such/file.tif")
+        app.q_settings_set_key("user/det_mask", "no/such/file.tif")
         _mask = app._CompositeCreatorApp__get_detector_mask()
         self.assertIsNone(_mask)
 

@@ -53,7 +53,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         get_generic_parameter("threshold_high"),
         get_generic_parameter("mosaic_border_width"),
         get_generic_parameter("mosaic_border_value"),
-        get_generic_parameter("mosaic_max_size"),
+        get_generic_parameter("max_image_size"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -72,15 +72,15 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         self.set_param_value(
             "mosaic_border_width",
-            self.q_settings_get_value("global/mosaic_border_width", int),
+            self.q_settings_get_value("user/mosaic_border_width", int),
         )
         self.set_param_value(
             "mosaic_border_value",
-            self.q_settings_get_value("global/mosaic_border_value", float),
+            self.q_settings_get_value("user/mosaic_border_value", float),
         )
         self.set_param_value(
-            "mosaic_max_size",
-            self.q_settings_get_value("global/mosaic_max_size", float),
+            "max_image_size",
+            self.q_settings_get_value("global/max_image_size", float),
         )
 
     def __check_config(self):
@@ -169,7 +169,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If the size of the image is larger than the defined global limit.
         """
         _size = 1e-6 * shape[0] * shape[1]
-        _maxsize = self.get_param_value("mosaic_max_size")
+        _maxsize = self.get_param_value("max_image_size")
         if _size > _maxsize:
             raise UserConfigError(
                 f"The requested image size ({_size} Mpx) is too large for the global "

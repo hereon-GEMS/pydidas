@@ -57,8 +57,8 @@ class TestPluginCollection(unittest.TestCase):
         ]
         self._syspath = copy.copy(sys.path)
         self._qsettings = PydidasQsettings()
-        self._qsettings_plugin_path = self._qsettings.value("global/plugin_path")
-        self._qsettings.set_value("global/plugin_path", "")
+        self._qsettings_plugin_path = self._qsettings.value("user/plugin_path")
+        self._qsettings.set_value("user/plugin_path", "")
 
     def tearDown(self):
         DummyPluginCollection().clear_collection(True)
@@ -66,7 +66,7 @@ class TestPluginCollection(unittest.TestCase):
         for _path in self._otherpaths:
             shutil.rmtree(_path)
         sys.path = self._syspath
-        self._qsettings.set_value("global/plugin_path", self._qsettings_plugin_path)
+        self._qsettings.set_value("user/plugin_path", self._qsettings_plugin_path)
 
     def create_plugin_file_tree(self, path=None, depth=3, width=2):
         path = self._pluginpath if path is None else path
@@ -358,7 +358,7 @@ class TestPluginCollection(unittest.TestCase):
         PC.verify_is_initialized()
         _path = os.path.join(self._pluginpath, get_random_string(8))
         PC._store_plugin_path(_path)
-        _qplugin_path = self._qsettings.value("global/plugin_path")
+        _qplugin_path = self._qsettings.value("user/plugin_path")
         self.assertEqual(_qplugin_path, self._pluginpath)
         self.assertNotIn(_path, sys.path)
 
@@ -370,7 +370,7 @@ class TestPluginCollection(unittest.TestCase):
             self._otherpaths.append(_path)
             PC._store_plugin_path(_path)
         _paths = [self._pluginpath] + self._otherpaths
-        _qplugin_path = self._qsettings.value("global/plugin_path")
+        _qplugin_path = self._qsettings.value("user/plugin_path")
         self.assertEqual(_qplugin_path, ";;".join(_paths))
         for _path in self._otherpaths:
             self.assertIn(_path, PC._PluginCollection__plugin_paths)
@@ -424,33 +424,33 @@ class TestPluginCollection(unittest.TestCase):
     def test_get_q_settings_plugin_path__single_path(self):
         self._pluginpath
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("global/plugin_path", self._pluginpath)
+        self._qsettings.set_value("user/plugin_path", self._pluginpath)
         _qplugin_path = PC.get_q_settings_plugin_path()
         self.assertEqual([self._pluginpath], _qplugin_path)
 
     def test_get_q_settings_plugin_path__multiple_paths(self):
         _paths = ["test1", "some/other/path", "test_23.456"]
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("global/plugin_path", ";;".join(_paths))
+        self._qsettings.set_value("user/plugin_path", ";;".join(_paths))
         _qplugin_path = PC.get_q_settings_plugin_path()
         self.assertEqual(_paths, _qplugin_path)
 
     def test_get_generic_plugin_path__no_q_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("global/plugin_path", None)
+        self._qsettings.set_value("user/plugin_path", None)
         _path = PC._PluginCollection__get_generic_plugin_path()
         self.assertEqual(_path, get_generic_plugin_path())
 
     def test_get_generic_plugin_path__empty_q_path(self):
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("global/plugin_path", "")
+        self._qsettings.set_value("user/plugin_path", "")
         _path = PC._PluginCollection__get_generic_plugin_path()
         self.assertEqual(_path, get_generic_plugin_path())
 
     def test_get_generic_plugin_path__q_path(self):
         _path = "some/path/to/nowhere"
         PC = DummyPluginCollection(n_plugins=0, plugin_path=self._pluginpath)
-        self._qsettings.set_value("global/plugin_path", _path)
+        self._qsettings.set_value("user/plugin_path", _path)
         _newpath = PC._PluginCollection__get_generic_plugin_path()
         self.assertEqual([_path], _newpath)
 

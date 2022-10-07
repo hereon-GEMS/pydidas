@@ -132,7 +132,7 @@ class pyFAIintegrationBase(ProcPlugin):
         will be used.
         """
         _mask_param = self.get_param_value("det_mask")
-        _mask_qsetting = self.q_settings_get_value("global/det_mask")
+        _mask_qsetting = self.q_settings_get_value("user/det_mask")
         if _mask_param != pathlib.Path():
             if os.path.isfile(_mask_param):
                 self._mask = import_data(_mask_param)

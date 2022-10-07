@@ -25,20 +25,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["QSETTINGS_GLOBAL_KEYS"]
+__all__ = ["QSETTINGS_GLOBAL_KEYS", "QSETTINGS_USER_KEYS"]
 
 
 QSETTINGS_GLOBAL_KEYS = [
     "mp_n_workers",
     "shared_buffer_size",
     "shared_buffer_max_n",
+    "max_image_size",
+    "plot_update_time",
+]
+
+QSETTINGS_USER_KEYS = [
     "det_mask",
     "det_mask_val",
     "mosaic_border_width",
     "mosaic_border_value",
-    "mosaic_max_size",
-    "plugin_path",
-    "plot_update_time",
     "histogram_outlier_fraction",
-    "plugin_fit_std_threshold",
+    "plugin_path",
 ]

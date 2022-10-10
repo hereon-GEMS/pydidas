@@ -30,7 +30,7 @@ from .about_window import *
 from .average_images_window import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
-from .file_series_operations_window import *
+from .image_series_operations_window import *
 from .global_settings_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
@@ -60,10 +60,10 @@ from . import feedback_window
 __all__.extend(feedback_window.__all__)
 del feedback_window
 
-from . import file_series_operations_window
+from . import image_series_operations_window
 
-__all__.extend(file_series_operations_window.__all__)
-del file_series_operations_window
+__all__.extend(image_series_operations_window.__all__)
+del image_series_operations_window
 
 from . import global_settings_window
 

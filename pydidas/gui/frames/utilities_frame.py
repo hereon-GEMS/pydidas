@@ -31,7 +31,7 @@ from qtpy import QtCore
 from .builders import UtilitiesFrameBuilder
 from ..windows import (
     ExportEigerPixelmaskWindow,
-    FileSeriesOperationsWindow,
+    ImageSeriesOperationsWindow,
     GlobalSettingsWindow,
     UserConfigWindow,
     MaskEditorWindow,
@@ -82,7 +82,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
             partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
         self._widgets["button_series_operations"].clicked.connect(
-            partial(self.create_and_show_temp_window, FileSeriesOperationsWindow)
+            partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._widgets["button_mask_editor"].clicked.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)

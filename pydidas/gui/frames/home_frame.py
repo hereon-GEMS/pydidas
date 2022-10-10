@@ -34,7 +34,7 @@ from ...widgets import BaseFrame
 
 _GENERIC_INTRO = (
     "- The pydidas GUI is organized in 'frames' with individual functionalities.\n"
-    "- The help is available as webpages eith through the menu or by pressing 'F1'\n"
+    "- The help is available as webpages either through the menu or by pressing 'F1'\n"
     "  to open the specific help for the current frame directly.\n"
     "- The configuration and inputs can be stored and restored using the File->GUI\n"
     "  state menu entries."

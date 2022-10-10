@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FileSeriesOperationsWindow class which allows to perform mathematical
+Module with the ImageSeriesOperationsWindow class which allows to perform mathematical
 operations on a number of images.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["FileSeriesOperationsWindow"]
+__all__ = ["ImageSeriesOperationsWindow"]
 
 import os
 import numbers
@@ -48,13 +48,13 @@ _operation = Parameter(
     "operation",
     str,
     "mean",
-    name="File series operator",
+    name="Image series operator",
     choices=["mean", "sum", "max"],
-    tooltip=("The mathematical operation to be applied to the file series."),
+    tooltip=("The mathematical operation to be applied to the image series."),
 )
 
 
-class FileSeriesOperationsWindow(PydidasWindow):
+class ImageSeriesOperationsWindow(PydidasWindow):
     """
     Window with a simple dialogue to select a number of files and
     """
@@ -73,7 +73,7 @@ class FileSeriesOperationsWindow(PydidasWindow):
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Average images", **kwargs)
         self._filelist = FilelistManager(*self.get_params("first_file", "last_file"))
-        self.setWindowTitle("File series operations")
+        self.setWindowTitle("Image series operations")
         self._config["num_frames_per_file"] = 1
 
     def build_frame(self):

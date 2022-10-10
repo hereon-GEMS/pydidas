@@ -53,7 +53,7 @@ from .windows import (
     AverageImagesWindow,
     AboutWindow,
     FeedbackWindow,
-    FileSeriesOperationsWindow,
+    ImageSeriesOperationsWindow,
     MaskEditorWindow,
 )
 
@@ -122,7 +122,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self.setGeometry(40, 60, 1400, 1000)
         self.setCentralWidget(CentralWidgetStack())
         self.statusBar().showMessage("pydidas started")
-        self.setWindowTitle("pydidas GUI (alpha)")
+        self.setWindowTitle("pydidas GUI")
         self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
@@ -232,7 +232,7 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
         self._actions["utils_image_series_ops"].triggered.connect(
-            partial(self.create_and_show_temp_window, FileSeriesOperationsWindow)
+            partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._actions["utils_mask_editor"].triggered.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)

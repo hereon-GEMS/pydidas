@@ -301,9 +301,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             return
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
-        self._image_metadata.set_param_value(
-            "filename", self.get_param_value("first_file")
-        )
+        self._image_metadata.filename = self.get_param_value("first_file")
         if self.__check_if_hdf5_file():
             self._config["input_configured"] = False
             self.__popup_select_hdf5_key(fname)

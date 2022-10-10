@@ -113,7 +113,7 @@ class MainWindow(MainMenu):
                 _icon = _class.menu_icon
             if _menu_entry in self._frame_menuentries:
                 raise PydidasGuiError(
-                    f'The selected menu entry "{_menu_entry}"' " already exists."
+                    f"The selected menu entry '{_menu_entry}' already exists."
                 )
             _frame = _class(
                 parent=self.centralWidget(),

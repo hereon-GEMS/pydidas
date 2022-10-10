@@ -1,6 +1,11 @@
 Tutorial for the DirectorySpyApp
 ================================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Motivation
 ----------
 The :py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>` is
@@ -26,13 +31,24 @@ section.
 Selection of input data
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-First of all, the user needs to define whether the app will scan for all new
-files in a directory or only for files matching a specific filename pattern. 
-It is controlled through the ``scan_for_all`` Parameter.
+First of all, the user must specify the :py:data:`directory_path` Parameter to
+define the working directory. In addition, the user must decide whether the app 
+will scan for all new files the selected directory or only for files matching 
+a specific filename pattern. In the latter case, the :py:data:`filename_pattern` 
+Parameter is used and must include the filename pattern with hashes "#" for 
+the counting variable. 
 
-If set to ``True``, the ``directory_path`` Parameter must be used to specify the 
-input path. If ``False``, the ``filename_pattern`` Parameter is used and this
-must be the full path to the file. Any changing numbers must be replaced by
+The file finding behaviour is controlled through the :py:data:`scan_for_all` 
+Parameter. If set to :py:data:`True`, the app will look for all files in a 
+directory. If :py:data:`False`, it will only look for incremental counts 
+according to the filename pattern and the current index.
+
+.. note::
+
+    Using the :py:data:`scan_for_all=True` setting will be slow in directories
+    with many files and it is not recommended.
+    
+The :py:data:`filename_pattern` Parameter only includes the filename with 
 hash characters as wildcards. The number of wildcard characters must correspond
 to the length of the numbers to be replaced and it will be filled with leading
 zeros.
@@ -42,8 +58,8 @@ zeros.
     in place.
 
 If HDF5 files are used, the dataset to use must be specified with the 
-``hdf5_key``. The frame cannot be selected as the DirectorySpyApp will always
-show the latest frame. 
+:py:data:`hdf5_key`. The frame cannot be selected as the DirectorySpyApp will 
+always show the latest frame. 
 
 See :ref:`composite_creator_app_params` for the detailed list of all Parameters.
 
@@ -74,8 +90,8 @@ directory. The files are named *test_scan_01_0001.tiff*,
     >>> import pydidas
     >>> app = pydidas.apps.DirectorySpyApp()
     # scan_for_all is False by default, no need to set it.
-    >>> app.set_param_value('filename_pattern', 
-    ...                     '/scratch/test_scan/test_scan_01_####.tiff')
+    >>> app.set_param_value('directory_path', '/scratch/test_scan')
+    >>> app.set_param_value('filename_pattern', 'test_scan_01_####.tiff')
 
 
 Detector mask and background image
@@ -84,35 +100,36 @@ Detector mask and background image
 Using a mask file
 ^^^^^^^^^^^^^^^^^
 
-A mask file can be used by activating the ``use_global_det_mask`` Parameter. 
-This will instruct the app to apply the global mask to the data frame. 
+A mask file can be used by activating the :py:data:`use_global_det_mask` 
+Parameter. This will instruct the app to apply the global mask to the data 
+frame. 
 
 To modify the globally controlled detector mask used by the DirectorySpyApp,
-the global QSetting `global/det_mask` key must be used.
+the global QSetting :py:data:`user/det_mask` key must be used.
 
-To modify this values, the user needs to create a QSettings instance and adjust 
+To modify this value, the user needs to create a QSettings instance and adjust 
 the values, if required:
 
 .. code-block::
 
     >>> import pydidas
     >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('global/det_mask', '/home/user/data/detector_mask.npy')
+    >>> config.set_value('user/det_mask', '/home/user/data/detector_mask.npy')
 
     
 Using a background file
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Usage of a background file (which will be subtracted from all frames) can be
-activated by setting the ``use_bg_file`` Parameter to True.
+activated by setting the :py:data:`use_bg_file` Parameter to True.
 
-The background file itself can be selected by specifying the ``bg_file`` 
+The background file itself can be selected by specifying the :py:data:`bg_file`
 Parameter. If a hdf5 file is selected, the dataset and frame can be given by
-the ``bg_hdf5_key`` and ``bg_hdf5_frame``. These values default to 
-*entry/data/data* and 0, respectively.
+the :py:data:`bg_hdf5_key` and :py:data:`bg_hdf5_frame` Parameters. These 
+values default to *entry/data/data* and 0, respectively.
 
-As example, let us use the 0th frame from the */scratch/scan_42/test.h5df5* 
-file and the *entry/detector/data* dataset:
+As example, let us use the first frame (i.e. zero) from the 
+*/scratch/scan_42/test.h5df5* file and the *entry/detector/data* dataset:
 
 .. code-block::
 
@@ -126,37 +143,6 @@ file and the *entry/detector/data* dataset:
     >>> app.get_param_value('bg_hdf5_frame')
     0
 
-.. _directory_spy_app_params:
-
-DirectorySpyApp Parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    scan_for_all (type: bool, default: False)
-        Flag to toggle scanning for all new files or only for files matching
-        the input pattern (defined with the Paramteter ``filename_pattern``).
-    filename_pattern (type: pathlib.Path, default: <empty Path>)
-        The pattern of the filename. Use hashes "#" for wildcards which will
-        be filled in with numbers. This Parameter must be set if ``scan_for_all``
-        is False. 
-    directory_path (type: pathlib.Path, default: <empty Path>)
-        The absolute path of the directory to be used. This Parameter is only
-        used when ``scan_for_all`` is True but it is mandatory then. 
-    hdf5_key (type: Hdf5key, default: entry/data/data)
-        Used only for hdf5 files: The dataset key. 
-    use_global_det_mask (type: bool, default: True)
-        Keyword to enable or disable using the global detector mask as
-        defined by the global mask file and mask value. 
-    use_bg_file (type: bool, default: False)
-        Keyword to toggle usage of background subtraction. 
-    bg_file (type: pathlib.Path, default: <empty Path>)
-        The name of the file used for background correction. 
-    bg_hdf5_key (type: Hdf5key, default: entry/data/data)
-        Required for hdf5 background image files: The dataset key with the
-        image for the background file. 
-    bg_hdf5_frame (type: int, default: 0)
-        Required for hdf5 background image files: The image number of the
-        background image in the dataset. 
-        
 Running the DirectorySpyApp
 ---------------------------
 
@@ -170,8 +156,8 @@ is run like any pydidas app, as described in detail in
     
 
 To run it utilizing parallelization, set up an 
-:py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` and use the ``start``
-method:
+:py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` and use the 
+:py:meth:`start <pydidas.multiprocessing.AppRunner.start>` method:
 
 .. code-block::
 
@@ -182,17 +168,17 @@ method:
 Accessing results
 -----------------
 
-Results can be accessed After running the 
-:py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>`, results can
-be accessed either directly to store the object for further use in the Python
-console or script or they can be stored.
+:py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>` results can
+be only be accessed indirectly within Python.
 
 Accessing results within Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The results can be accessed through the ``image``, ``filename`` and 
-``image_metadata`` properties. Note that this requires to connect the AppRunner
-results with the local apps ``multiprocessing_store_results``.
+The results can be accessed through the :py:data:`image`, :py:data:`filename` 
+and :py:data:`image_metadata` properties. Note that this requires to connect 
+the AppRunner :py:data:`sig_results` with the local app's 
+:py:meth:`multiprocessing_store_results 
+<pydidas.apps.DirectorySpyApp.multiprocessing_store_results>` method:
 
 .. code-block::
 
@@ -217,3 +203,34 @@ results with the local apps ``multiprocessing_store_results``.
     >>> app.filename
     /scratch/test_scan/test_scan_01_0004.tiff
 
+.. _directory_spy_app_params:
+
+DirectorySpyApp Parameters
+--------------------------
+
+    scan_for_all (type: bool, default: False)
+        Flag to toggle scanning for all new files or only for files matching
+        the input pattern (defined with the Parameter 
+        :py:data:`filename_pattern`).
+    filename_pattern (type: pathlib.Path, default: <empty Path>)
+        The pattern of the filename. Use hashes "#" for wildcards which will
+        be filled in with numbers. This Parameter must be set if 
+        :py:data:`scan_for_all` is :py:data:`False`.
+    directory_path (type: pathlib.Path, default: <empty Path>)
+        The absolute path of the directory to be used. 
+    hdf5_key (type: Hdf5key, default: entry/data/data)
+        Used only for hdf5 files: The dataset key. 
+    use_global_det_mask (type: bool, default: True)
+        Keyword to enable or disable using the global detector mask as
+        defined by the global mask file and mask value. 
+    use_bg_file (type: bool, default: False)
+        Keyword to toggle usage of background subtraction. 
+    bg_file (type: pathlib.Path, default: <empty Path>)
+        The name of the file used for background correction. 
+    bg_hdf5_key (type: Hdf5key, default: entry/data/data)
+        Required for hdf5 background image files: The dataset key with the
+        image for the background file. 
+    bg_hdf5_frame (type: int, default: 0)
+        Required for hdf5 background image files: The image number of the
+        background image in the dataset. 
+        

@@ -1,8 +1,10 @@
 Key concepts
 ------------
 
-pydidas is built using the following key concepts:
-
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
 
 Variable handling
 ^^^^^^^^^^^^^^^^^

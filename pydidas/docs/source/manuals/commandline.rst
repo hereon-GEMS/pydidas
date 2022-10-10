@@ -9,7 +9,7 @@ The following general manuals are available:
 
 .. toctree::
     :maxdepth: 1
-    
+        
     cmdline_global/cmd_global
     cmdline_global/cmd_setup_experiment
     cmdline_global/cmd_setup_scan

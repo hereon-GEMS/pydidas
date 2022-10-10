@@ -13,7 +13,7 @@ Types of input
 Different types of widgets are implemented to help the user:
 
 - Generic inputs
-    .. image:: ../../images/gui_params/param_generic.png
+    .. image:: images/param_generic.png
         :width: 300px
         :align: left
         
@@ -23,7 +23,7 @@ Different types of widgets are implemented to help the user:
     any characters.
 
 - Parameters with predefined choices
-    .. image:: ../../images/gui_params/param_choice.png
+    .. image:: images/param_choice.png
         :width: 300px
         :align: left
         
@@ -31,7 +31,7 @@ Different types of widgets are implemented to help the user:
     restricted to these choices by allowing only to select between the 
     predefined choices from a drop-down menu:
     
-    .. image:: ../../images/gui_params/param_choice_dropdown.png
+    .. image:: images/param_choice_dropdown.png
         :width: 300px
         :align: left
     
@@ -39,7 +39,7 @@ Different types of widgets are implemented to help the user:
     Parameter value.
     
 - Filenames
-    .. image:: ../../images/gui_params/param_filename.png
+    .. image:: images/param_filename.png
         :width: 300px
         :align: left
         
@@ -52,7 +52,7 @@ Different types of widgets are implemented to help the user:
     system.
 
 - Hdf5 dataset keys
-    .. image:: ../../images/gui_params/param_hdf5key.png
+    .. image:: images/param_hdf5key.png
         :width: 300px
         :align: left
         
@@ -61,7 +61,7 @@ Different types of widgets are implemented to help the user:
     Clicking on the "open" button opens a selection dialogue to pick a hdf5 
     file. 
     
-    .. image:: ../../images/gui_params/param_hdf5key_popup.png
+    .. image:: images/param_hdf5key_popup.png
         :width: 183
         :align: right
 
@@ -81,7 +81,7 @@ the mouse over either the Parameter label or the selection widget.
 
 An example is shown below:
 
-.. image:: ../../images/gui_params/param_help.png
+.. image:: images/param_help.png
     :width: 674px
     :align: left
 
@@ -96,7 +96,7 @@ types are used for input:
 - floating point numbers
 - strings
 
-Depending on the type of the Parameter, the following characters are acceptable
+Depending on the type of the Parameter, the following characters are acceptable:
 
 .. list-table::
     :widths: 25 75
@@ -118,3 +118,6 @@ Depending on the type of the Parameter, the following characters are acceptable
       - as above, additionally accepts "None" (case insensitive)
     * - string
       - Accepts any UTF-8 characters in any combination.
+
+In addition, some unique Parameters may also accept other inputs, for example
+:py:data:`nan` for numbers.

@@ -3,10 +3,16 @@
 The WorkflowResults class
 =========================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Introduction
 ------------
 
-The ``WorkflowResults`` is the Singleton instance of the 
+The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the 
+Singleton instance of the 
 :py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`.
 It is used for managing the processing results.
 
@@ -301,7 +307,7 @@ method:
     :noindex:
 
 For now, the only available saver is 'HDF5' and additional savers will be added
-based on users' requests.
+based on users' requests if deemed feasible with the file system structure.
 
 An example is given below:
 

@@ -3,17 +3,23 @@
 The WorkflowTree class
 ======================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Introduction to the WorkflowTree
 --------------------------------
 
-The tree consists of :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`
+The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` 
+consists of multipke :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>` 
 which store information about their position in the tree and their parents and
 children as well as their associated processing plugin but the nodes are
 agnostic to any meta-information.
 
 The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
-is a pydidas object with only a single running instance. It manages the 
-interactions between the user and the individual nodes.
+is a pydidas singleton object with only a single instance at runtime. It manages 
+the interactions between the user and the individual nodes.
 
 Its instance can be obtained by calling the following code:
 
@@ -30,19 +36,24 @@ allows to easily run the WorkflowTree in serial or parallel processing.
 Assembling a WorkflowTree
 -------------------------
 
-To assemble a ``WorkflowTree``, users need to know which Plugins they want to 
-use and they need to configure these plugins. Then, they can add these plugins 
-to the tree. If the plugins are passed to the WorkflowTree without any further 
-information, they will be connected in a linear manner, with every plugin 
-appended to the last one.
+To assemble a 
+:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`, users 
+need to know which Plugins they want to use and they need to configure these 
+plugins. Then, they can add these plugins to the tree. If the plugins are 
+passed to the WorkflowTree without any further information, they will be 
+connected in a linear manner, with every plugin appended to the last one.
 
-Plugins can be configured either in the ``WorkflowTree`` or before adding them 
-to the tree. Access to the individual plugins in the tree is somewhat hidded,
-though, and it is recommended to configure each ``Plugin`` before adding it to 
-the ``WorkflowTree``.
+:py:class:`Plugins <pydidas.plugins.BasePlugin>` can be configured either in the 
+:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` or 
+before adding them to the tree. Access to the individual plugins in the tree 
+is somewhat hidded, though, and it is recommended to configure each 
+:py:class:`Plugins <pydidas.plugins.BasePlugin>` before adding it to 
+the :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
-To create a new node with a plugin and add it to the ``WorkflowTree``, use the
-``create_and_add_node`` method:
+To create a new node with a plugin and add it to the 
+:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`, use the
+:py:meth:`create_and_add_node 
+<pydidas.workflow.workflow_tree._WorkflowTree.create_and_add_node>` method:
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.create_and_add_node
     :noindex:
@@ -57,8 +68,8 @@ Hdf5 file and performs two separate integrations in different angular ranges:
     >>> COLLECTION = pydidas.plugins.PluginCollection()
     
     # Create a loader plugin and set the file path
-    >>> loader = COLLECTION.get_plugin_by_name('Hdf5singleFileLoader')()
-    >>> loader.set_param_value('filename', '/home/someuser/test/file.h5')
+    >>> loader = COLLECTION.get_plugin_by_name('Hdf5FileSeriesLoader')()
+    # The configuration of the loader is not detailed here.
     
     # Create an integrator plugin for a specific radial range
     >>> integrator1 = COLLECTION.get_plugin_by_name('PyFAIazimuthalIntegration')()
@@ -90,13 +101,15 @@ Hdf5 file and performs two separate integrations in different angular ranges:
 Running workflows
 -----------------
 
-The ``WorkflowTree`` includes several methods to run either the full Workflow
-or just individual plugins for testing.
+The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` 
+includes several methods to run either the full Workflow or just individual 
+plugins for testing.
 
 Test individual plugins
 """""""""""""""""""""""
 
-To test individual plugins, users can use the ``execute_single_plugin`` method. 
+To test individual plugins, users can use the :py:meth:`execute_single_plugin 
+<pydidas.workflow.workflow_tree._WorkflowTree.execute_single_plugin>` method. 
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_single_plugin
     :noindex:
@@ -116,15 +129,15 @@ from the previous example are still existing).
     >>> res
     Dataset(
     axis_labels: {
-        0: None
-        1: None},
+        0: "detector y",
+        1: "detector x"},
     axis_ranges: {
         0: None
         1: None},
     axis_units: {
-        0: None
-        1: None},
-    metadata: {'axis': 0, 'frame': 0, 'dataset':
+        0: "pixel",
+        1: "pixel"},
+    metadata: {'slicing_axes': [0], 'frame': [0], 'dataset':
        '/entry/data/data'},
     array([[0, 1, 0, ..., 1, 0, 1],
            [0, 0, 1, ..., 2, 0, 0],
@@ -139,19 +152,26 @@ from the previous example are still existing).
 Run the full WorkflowTree
 """""""""""""""""""""""""
 
-Two different methods are available to run the full ``WorkflowTree``. First,
-there is the ``execute_process`` method which will run the full workflow for a 
-single frame but will not gather any results from the nodes nor return any 
-values. Secondly, the ``execute_process_and_get_results`` method will do the 
-same calculations but also gathers the results from the individual plugins and
-returns them to the user. The documentation for the 
-``execute_process_and_get_results`` method is given below. 
+Two different methods are available to run the full 
+:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`. First,
+there is the :py:meth:`execute_process 
+<pydidas.workflow.workflow_tree._WorkflowTree.execute_process>` method which 
+will run the full workflow for a single frame but will not gather any results 
+from the nodes nor return any values. This method is used by the automatic 
+processing where pydidas organizes results. Secondly, the 
+:py:meth:`execute_process_and_get_results 
+<pydidas.workflow.workflow_tree._WorkflowTree.execute_process_and_get_results>` 
+method will do the same calculations but also gathers the results from the 
+individual plugins and returns them to the user. The documentation for the 
+:py:meth:`execute_process_and_get_results 
+<pydidas.workflow.workflow_tree._WorkflowTree.execute_process_and_get_results>` 
+method is given below. 
 
 .. automethod:: pydidas.workflow.workflow_tree._WorkflowTree.execute_process_and_get_results
     :noindex:
 
-Using the ``WorkflowTree`` from the example above, the following example 
-demonstrates the usage.
+Using the :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
+from the example above, the following example demonstrates the usage.
 
 .. code-block::
 
@@ -188,7 +208,7 @@ demonstrates the usage.
             22.341616 ], dtype=float32)
      )}
 
-To run the workflow for multiple data frames, please use the 
-:py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>`. A tutorial
-for this application can be found :ref:`execute_workflow_app`.
+To run the workflow for multiple data frames, it is recommended to use the 
+:py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>`. Please refer
+to the :ref:`execute_workflow_app`.
 

@@ -1,7 +1,12 @@
 Code documentation
 ==================
 
-This sections lays documents the code and is intended as reference for developers.
+This section documents the code and is intended as reference for developers.
+
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
 
 Introduction
 ------------

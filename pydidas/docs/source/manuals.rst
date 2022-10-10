@@ -13,4 +13,4 @@ the same for both interfaces, the setup typically is very different.
     :maxdepth: 2
 
     manuals/commandline
-    manuals/graphical_user_interface
+    manuals/gui/graphical_user_interface

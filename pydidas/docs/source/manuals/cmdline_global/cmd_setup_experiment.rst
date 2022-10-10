@@ -3,6 +3,11 @@
 The SetupExperiment class
 ===========================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Introduction
 ------------
 
@@ -293,4 +298,4 @@ An example to demonstrate these methods is given below:
 
 .. _setup_experiment_parameters:
 
-.. include:: ./setup_experiment_params.rst
+.. include:: ../global/setup_experiment_params.rst

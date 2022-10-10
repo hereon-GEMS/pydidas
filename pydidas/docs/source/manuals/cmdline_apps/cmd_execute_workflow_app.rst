@@ -3,6 +3,11 @@
 Tutorial for the ExecuteWorkflowApp
 ===================================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Motivation
 ----------
 
@@ -23,7 +28,7 @@ Globally controlled settings
 Some settings used by the ExecuteWorkflowApp are controlled globally by pydidas. 
 These are:
 
-- The file path for the global detector mask file (`global/det_mask`)
+- The file path for the global detector mask file (`user/det_mask`)
 
 and for parallel processing additionally:
 
@@ -65,15 +70,17 @@ these values, if required:
 
     >>> import pydidas
     >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('global/det_mask', '/scratch/config/det_mask.npy')
+    >>> config.set_value('user/det_mask', '/scratch/config/det_mask.npy')
     >>> config.set_value('global/mp_n_workers', 2)
 
 Setup of the ExecuteWorkflowApp
 -------------------------------
 
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
-uses the aforementioned objects (:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
-:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
+uses the aforementioned objects (
+:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
+:py:class:`SetupExperiment 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
 which include most of the required configuration.
 
@@ -85,7 +92,7 @@ Live processing
 
 The live processing flag determines whether pydidas will check all files at
 the start of processing or accept file names without corresponding written 
-files. This flag is modified using the ``live_processing`` Parameter:
+files. This flag is modified using the :py:data:`live_processing` Parameter:
 
     >>> import pydidas
     >>> app = pydidas.apps.ExecuteWorkflowApp()
@@ -96,11 +103,11 @@ Automatic saving
 
 The ExecuteWorkflowApp includes the possibility to write results dynamically to
 disk as soon as they have been processed. The behaviour is controlled by the 
-``autosave_results`` flag. A parent directory for all results must be defined
-using the ``autosave_dir`` Parameter and the saving format can be selected using
-the ``autosave_format`` Parameter. The different formats are predefined and only
-implemented formats can be chosen. To query the available choices, please look
-at the code in the example below:
+:py:data:`autosave_results``flag. A parent directory for all results must be 
+defined using the :py:data:`autosave_dir` Parameter and the saving format can 
+be selected using the :py:data:`autosave_format` Parameter. The different 
+formats are predefined and only implemented formats can be chosen. To query the 
+available choices, please look at the code in the example below:
 
 .. code-block::
     
@@ -119,6 +126,12 @@ at the code in the example below:
     # Now, update the formats:
     >>> app.set_param_value('autosave_format', 'HDF5')
 
+.. warning::
+
+    Note that auto-saving each frame will result will have a significant 
+    performance cost because the output files will need to be accessed for 
+    each processed scan point. Using auto-saving is only encouraged for very 
+    long processing times, e.g. multiple fittings for each scan data point.
 
 
 Running the ExecuteWorkflowApp
@@ -128,21 +141,23 @@ Once configured, the :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflow
 is run like any pydidas app, as described in detail in 
 :ref:`running_pydidas_applications`.
 
-As a recap, to run the app serially, use the ``run`` method:
+As a recap, to run the app serially, use the :py:meth:`run 
+<pydidas.apps.ExecuteWorkflowApp.run>` method:
 
     >>> import pydidas
     >>> app = pydidas.apps.ExecuteWorkflowApp()
     >>> app.run()
 
 To run it utilizing parallelization, set up an 
-:py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` and use the ``start``
-method:
+:py:class:`AppRunner <pydidas.multiprocessing.AppRunner>` and use the 
+:py:meth:`start <pydidas.multiprocessing.AppRunner.start>` method:
 
 .. code-block::
 
     >>> app = pydidas.apps.ExecuteWorkflowApp()
     >>> runner = pydidas.multiprocessing.AppRunner(app)
     >>> runner.start()
+    # After running, get the updated app with the results back:
     >>> app = runner.get_app()
 
 
@@ -155,13 +170,18 @@ Using autosave
 If autosave has been enabled, the results are written to files and can be 
 accessed externally by any program which can read the defined data type.
 
+.. note::
+    Please be advised that accessing the data while processing is still running
+    can corrupt the output files and make them illegible.
+
 Accessing results within Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The results from the ExecuteWorkflowApp are written in the global 
-``WorkflowResults`` (Singleton instance of 
-:py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`) 
-which is described in detail in :ref:`workflow_results`.
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` (the Singleton 
+instance of :py:class:`_WorkflowResults 
+<pydidas.workflow.workflow_results._WorkflowResults>`) which is described in 
+detail in :ref:`workflow_results`.
 
 List of all ExecuteWorkflowApp Parameters
 -----------------------------------------

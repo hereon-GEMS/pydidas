@@ -29,7 +29,7 @@
         composite creation.
     - Mosaic border value (key: mosaic_border_value, type: float, default: 0)
         The value to be put in the border pixels in mosaics.
-    - Mosaic maximum size (key: mosaic_max_size, type: float, default: 100, unit: Mpx)
+    - Mosaic maximum size (key: max_image_size, type: float, default: 100, unit: Mpx)
         The maximum size (in megapixels) of mosaic images.
 
 - Plotting settings

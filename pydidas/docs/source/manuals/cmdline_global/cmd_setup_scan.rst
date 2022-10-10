@@ -3,6 +3,11 @@
 The SetupScan class
 ===================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 Introduction
 ------------
 
@@ -103,15 +108,15 @@ has *global* Parameters for generic information, listed in detail below:
 Parameters for each dimension
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The Parameters for each dimension are distinguished by a trailing *_1*, *_2*, 
-*_3*, or *_4*, respectively. In the description, the numbers are substituted
-by a *_i* for generality. It is important to preserve the order from the scan
-to have the results in the correct structure.
+The Parameters for each dimension are distinguished by a dimension index in the
+Parameter names, respectively. In the description, the numbers are substituted
+by an *i* for generality. It is important to preserve the scan order from the
+experiment to have the results in the correct structure.
 
 Each dimension is described by a total of five Parameters:
 
 .. list-table::
-    :widths: 15 10 15 60
+    :widths: 15 10 16 59
     :header-rows: 1
     :class: tight-table
     
@@ -119,34 +124,35 @@ Each dimension is described by a total of five Parameters:
       - type
       - default
       - description
-    * - scan_label_i
+    * - scan_dim{i}_label
       - str
       - [empty str]
-      - The axis name for scan direction 1. This information will only be used 
+      - The axis name for scan direction *i*. This information will only be used 
         for labelling.
-    * - n_points_i
+    * - scan_dim{i}_n_points
       - int
       - 0
       - The number of scan points in scan direction *i*.
-    * - delta_i
+    * - scan_dim{i}_delta
       - float
       - 2
       - The step width between two scan points in scan direction *i*.
-    * - offset_i
+    * - scan_dim{i}_offset
       - float
       - 0
       - The coordinate offset of the movement in scan direction *i* (i.e. the 
         counter / motor position for scan step #0)
-    * - unit_i
+    * - scan_dim{i}_unit
       - str
       - [empty str]
-      - The unit of the movement / steps / offset in scan direction *i*.
+      - The unit of the movement / steps / offset in scan direction *i*. This 
+        value will only be used for labelling these numbers.
 
 .. note::
 
     The only Parameter that must be set for each dimension is the number of 
-    points ``n_points_i`` to allow pydidas to organize results in the correct
-    grid.
+    points :py:data:`scan_dim{i}_n_points` to allow pydidas to organize results 
+    in the correct grid.
     
 As example, let us configure a scan with 2 dimensions. The slow motor is the 
 x-axis with 25 scan points in the range [-12.0 mm, -11.5 mm, ..., 12.0 mm] and 
@@ -158,16 +164,16 @@ the fast motor is the z-axis with 100 points in the range [150 nm, 225, nm, ...,
     >>> import pydidas
     >>> SCAN = pydidas.experiment.SetupScan()
     >>> SCAN.set_param_value('scan_dim', 2)
-    >>> SCAN.set_param_value('scan_label_1', 'x')
-    >>> SCAN.set_param_value('n_points_1', 25)
-    >>> SCAN.set_param_value('delta_1', 0.5)
-    >>> SCAN.set_param_value('offset_1', -12.0)
-    >>> SCAN.set_param_value('unit_1', 'mm')
-    >>> SCAN.set_param_value('scan_label_2', 'x')
-    >>> SCAN.set_param_value('n_points_2', 100)
-    >>> SCAN.set_param_value('delta_2', 75)
-    >>> SCAN.set_param_value('offset_2', 150)
-    >>> SCAN.set_param_value('unit_2', 'nm')
+    >>> SCAN.set_param_value('scan_dim0_label', 'x')
+    >>> SCAN.set_param_value('scan_dim0_n_points', 25)
+    >>> SCAN.set_param_value('scan_dim0_delta', 0.5)
+    >>> SCAN.set_param_value('scan_dim0_offset', -12.0)
+    >>> SCAN.set_param_value('scan_dim0_unit', 'mm')
+    >>> SCAN.set_param_value('scan_dim1_label', 'x')
+    >>> SCAN.set_param_value('scan_dim1_n_points', 100)
+    >>> SCAN.set_param_value('scan_dim1_delta', 75)
+    >>> SCAN.set_param_value('scan_dim1_offset', 150)
+    >>> SCAN.set_param_value('scan_dim1_unit', 'nm')
 
 
 Import of scan metadata
@@ -181,4 +187,4 @@ metadata available at the beamlines.
 
 .. _setup_scan_parameters:
 
-.. include:: ./setup_scan_params.rst
+.. include:: ../global/setup_scan_params.rst

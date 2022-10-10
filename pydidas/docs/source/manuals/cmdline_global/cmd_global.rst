@@ -1,9 +1,12 @@
 .. |plugin_collection| replace:: DirectorySpyApp
 
-
-
 pydidas general command line tutorial
 =====================================
+
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
 
 .. _accessing_parameters:
 
@@ -141,8 +144,7 @@ main objects are:
         The latter information can be used to create the correct axis labels in 
         plots. For the full documentation please visit the 
         :ref:`ScanSetup manual <setup_scan>`.
-    :py:class:`SetupExperiment 
-    <pydidas.experiment.setup_experiment.setup_experiment._SetupExperiment>`
+    :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._SetupExperiment>`
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
         documentation please visit the 

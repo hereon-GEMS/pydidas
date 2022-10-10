@@ -4,105 +4,97 @@ The menu
 ========
 
 The main user interaction with the GUI is controlled by the toolbar to the left
-and the frames itself. The menu houses some functions which are not used as 
-frequently.
+and the frames itself. The menu includes some functions which are not used as 
+frequently. 
 
-The UI state
-------------
+**This documentation page covers the menu bar, not the toolbar.**
 
-The state of the interface, including all configurations of frames and apps, can
-be stored and restored by the user. This is handled in the **File > GUI state**
-menu and details will be explained in detail in the corresponding menu section.
+pydidas menu structure
+----------------------
 
-This function allows to either store the state in a automatically controlled 
-file in the OS-specific user's application config directory or in a file 
-specified by the user itself. For restoring, similar options exist.
+- File 
+    - GUI state
+        The *GUI state* submenu includes entries to save and restore the UI 
+        state as discussed above.
+        
+        - Store GUI state
+            The *Store* entry will store the current state in an automatically 
+            handled file. The file location depends on the operating system and 
+            is handled through Qts QStandardPaths. A dialog asks for 
+            confirmation before actually writing the file to disk.
+        - Export GUI state
+            The *Export* entry will query the user to select a file to store 
+            the state. The file content is similar to the *Store* action but 
+            the file can be placed anywhere in the filesystem and therefore 
+            allows to share state between different users or machines.
+        - Restore GUI state
+            The *Restore* entry will open a dialog to confirm that the user 
+            wants to restore the UI state from pydidas's automatically handled 
+            state file. If confirmed, all pydidas objects are updated and the 
+            GUI view is changed to the active view. (Corresponding saver: 
+            *Store GUI state*)
+        - Restore GUI state at exit
+            The *Restore at Exit* entry will open a dialog to confirm that the 
+            user wants to restore the UI state from pydidas's automatically 
+            handled exit state file. If confirmed, all pydidas objects are 
+            updated and the GUI view is changed to the active view when last 
+            closing the GUI.
 
-.. note::
-    The automatically-controlled files are user-specific and if users log in
-    on the same machine using a different user account, the file will not be
-    accessible. 
-
-
-The File menu
--------------
-
-GUI state
-^^^^^^^^^
-
-The *GUI state* submenu includes entries to save and restore the UI state as 
-discussed above.
-
-GUI state > Store
-"""""""""""""""""
-
-The *Store* entry will store the current state in an automatically handled file.
-The file location depends on the operating system and is handled through Qts
-QStandardPaths. 
-A dialog asks for confirmation before actually writing the file to disk.
-
-GUI state > Export
-""""""""""""""""""
-
-The *Export* entry will query the user to select a file to store the state. The 
-file content is similar to the *Store* action but the file can be placed 
-anywhere in the filesystem and therefore allows to share state between different
-users or machines.
-
-GUI state > Restore
-"""""""""""""""""""
-
-The *Restore* entry will open a dialog to confirm that the user wants to restore 
-the UI state from pydidas's automatically handled state file. If confirmed,
-all pydidas objects are updated and the GUI view is changed to the active view
-when storing the state.
-
-GUI state > Import
-""""""""""""""""""
-
-The *Import* entry will open a file selection dialog to select a file with the 
-UI state. 
-
-.. note::
-    No additional confirmation is required, selecting a file is sufficient. To
-    abort, simple use the *Cancel* button (or the ``Esc`` key) in the file 
-    selection dialog, this will stop the import.
+            .. warning::
+                The stored state at exit is written when the GUI closes 
+                correctly, i.e. this state will not be updated upon a crash or 
+                upon terminating the process using OS tools. Therefore, the exit 
+                state is not necessarily the state when the user last used the 
+                pydidas GUI.
     
-Exit
-^^^^
+        - Import
+            The *Import* entry will open a file selection dialog to select a 
+            file with the UI state to be restored.
 
-This action will close the pydidas GUI **without confirmation**.
-
-The Extras menu
----------------
-
-Settings
-^^^^^^^^
-
-The settings menu entry will open an independent window which allows to 
-configure the pydidas global settings, similar to the :ref:`global_settings_frame`.
-Please refer to the documentation there for more information.
-
-Export Eiger Pixelmask
-^^^^^^^^^^^^^^^^^^^^^^
-
-This menu item will open a small window which allows the user to specify an
-Eiger-written *master* file which includes detector metadata, including the
-detector pixelmask and an output filename to write the exported mask.
-
-Average images
-^^^^^^^^^^^^^^
-
-The *Average images* menu entry allows users to select any number of frames from
-one or multiple files and average them all and store the result in a single new
-file. This functionality is designed for example for averaging calibration data.
-
-The Help menu
--------------
-
-The help menu has options to show the html documentation. Either as a pop-up
-window using the *Open documentation in a separate window* entry or in a
-browser by using the *Open documentation in default web browser*. Note that the
-default web browser is determined by the user settings in the operating system.
-
-
+            .. note::
+                No additional confirmation is required, selecting a file is 
+                sufficient. To abort, simple use the **Cancel** button (or the 
+                :py:data`Esc` key) in the file selection dialog, this will stop 
+                the import.
+        
+    - Exit
+        This action will close the pydidas GUI **without confirmation**.
+- Utilities
+    - Export Eiger Pixelmask
+        This menu item will open a small window which allows the user to 
+        specify an Eiger-written *master* file which includes detector metadata, 
+        including the detector pixelmask and an output filename to write the 
+        exported mask.
+    - Images series processing
+        The *Image series processing* menu entry opens a new window to proces 
+        a series of images. This allows a user, for example, to average 
+        calibration data. For more information, please refer to the :ref:`Image 
+        series operations window manual <image_series_operations_window>`.
+    - Edit detector mask
+        This menu entry will open a window to define and edit a detector mask. 
+        For more information, please refer to the corresponding :ref:`Mask 
+        editor window manual <mask_editor_window>`.
+- Options
+    - User config
+        The User config entry opens a window to modify user preferences like 
+        colormaps, default detector masks, or the plugin paths. For more 
+        information, please see the :ref:`User config manual 
+        <user_config_window>`.
+    - Settings
+        The settings menu entry will open a window with global settings like
+        multiprocessing and memory configuration. For more information, please 
+        refer to the documentation in the :ref:`Global settings window manual 
+        <global_settings_window>`.
+- Help
+    - Open documentation in browser
+        Using this menu entry will open the documentation home in a new tab in 
+        the operating system's default web browser. 
+    - Open feedback form
+        The *open feedback form* will open the pydidas feedback form in a new 
+        web browser tab. The feedback form allows to submit bug reports,
+        improvement suggestions or questions.
+    - About
+        The about window has copyright information and links to the pydidas 
+        homepage and github home.
+        
+        

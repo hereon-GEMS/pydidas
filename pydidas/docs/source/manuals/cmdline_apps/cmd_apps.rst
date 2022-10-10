@@ -1,7 +1,10 @@
 Command line applications
 =========================
 
-These apps are available from the command line:
+This section includes a generic manual for running apps from the command line
+as well as specific application manuals for generic pydidas apps.
+
+These apps are available in pydidas:
 
     CompositeCreatorApp
         An application that allows to create a composite image by stitching
@@ -26,7 +29,7 @@ The following manuals are available:
 .. toctree::
     :maxdepth: 1
     
-    running_apps
+    cmd_running_apps
     cmd_composite_creator_app
     cmd_execute_workflow_app
     cmd_directory_spy_app

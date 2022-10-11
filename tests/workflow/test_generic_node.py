@@ -237,8 +237,15 @@ class TestGenericNode(unittest.TestCase):
         self.assertFalse(_nodes[1][0] in _root._children)
         self.assertEqual(_nodes[1][0].n_children, 0)
 
+    def test_connect_parent_to_children__no_parent_no_children(self):
+        root = GenericNode(node_id=0)
+        root._parent = unittest.mock.MagicMock()
+        root.connect_parent_to_children()
+        self.assertIsNone(root.parent)
+
     def test_connect_parent_to_children__no_parent(self):
         root = GenericNode(node_id=0)
+        _ = GenericNode(node_id=1, parent=root)
         with self.assertRaises(UserConfigError):
             root.connect_parent_to_children()
 

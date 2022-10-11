@@ -123,4 +123,3 @@ menu entries description
       - Create and delete line profiles. This function allows the selection and
         editing of line profiles. The line profiles are shown in the histograms
         plots for the vertical and horizontal, respectively.
-

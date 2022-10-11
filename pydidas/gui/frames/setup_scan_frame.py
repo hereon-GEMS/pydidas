@@ -42,12 +42,12 @@ WORKFLOW = WorkflowTree()
 
 class SetupScanFrame(SetupScanFrameBuilder):
     """
-    Frame for managing the global scan settings.
+    Frame for managing the global scan setup.
     """
 
     menu_icon = "qta::ei.move"
     menu_title = "Scan settings"
-    menu_entry = "Workflow processing/Scan settings"
+    menu_entry = "Workflow processing/Scan setup"
 
     def __init__(self, parent=None, **kwargs):
         SetupScanFrameBuilder.__init__(self, parent, **kwargs)

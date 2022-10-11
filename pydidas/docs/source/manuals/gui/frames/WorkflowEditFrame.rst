@@ -1,58 +1,47 @@
 The Workflow edit frame
 =======================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+
 The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` can 
 be visualized and edited in the Workflow edit frame. The starting layout of the 
 frame is shown below.
 
-.. image:: images/workflow_edit_01_overview.png
-    :width:  469px
+.. image:: images/workflow_edit_overview.png
+    :width:  600px
     :align: center
 
-The frame holds three main widgets (1-3) as well as control buttons (4). The 
-top left widget (1) :ref:`visualizes the WorkflowTree <workflow_tree_vis>` and 
-the Plugin collection is presented in the widget at the bottom (2). Widgets to 
-edit a plugin are shown on the right (3).
+- PluginBrowser
+    This widget displays all available Plugins in the PluginCollection on the 
+    left as well as a description of the selected plugin on the right.
+- Workflow tree canvas
+    This is the area where the visualization of the 
+    :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` 
+    and its :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`.
+- Plugin parameter edit area
+    Once a Plugin has been added to the WorkflowTree, its Parameters can be
+    edited here after selecting the respective plugin.
+- I/O buttons
+    Buttons for importing and exporting the workflow are situated here.
 
-Detailed description of frame items
------------------------------------
-
-.. _workflow_tree_vis:
-
-Workflow tree visualization
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. image:: images/workflow_edit_02_workflow_tree.png
-    :width:  500px
-    :align: center
-
-The image above shows an example WorkflowTree visualization. Each plugin is 
-depicted in a box with its name (1). Connections between plugins are displayed 
-with lines (labeled with as asterisk). By clicking on a plugin, this plugin gets 
-selected and is highlighted (thicker border, bold print and change in background
-color). In addition, the :ref:`workflow_plugin_param_editing` widget will 
-display the selected plugin's Parameters. 
-
-.. tip::
-    New plugins will always be children of the active plugin and adding a new
-    plugin will also activate that plugin.
-    
-    To make a branching tree, you will need to activate the original plugin 
-    again after adding a first new plugin.
 
 .. _workflow_plugin_presenter:
 
-Plugin collection presenter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-
-.. image:: images/workflow_edit_03_plugin_presenter.png
-    :width:  500px
-    :align: center
+Plugin browser
+--------------
 
 The Plugin collection presenter consists of two parts. On the left, it will show
 all Plugins which have been registered with the :py:class:`PluginCollection
-<pydidas.plugins.PluginCollection>` (for more information about how paths are
-managed, please refer to :ref:`global_plugincollection`).
+<pydidas.plugins.plugin_collection._PluginCollection>` (for more information 
+about how paths are managed, please refer to :ref:`global_plugincollection`).
+On the right, it shows detailed information about the selected plugin:
+
+.. image:: images/workflow_edit_plugin_browser.png
+    :width:  500px
+    :align: center
 
 A single click on a Plugin's name on the left will show more information about 
 the selected Plugin on the right. This information included the description, a 
@@ -64,15 +53,99 @@ the :py:class:`WorkflowTree <pydidas.experiment.workflow_tree._WorkflowTree>`.
 The new instance will always be appended to the currently active Plugin (or it
 will become the new root Plugin if the Tree is empty).
 
+.. image:: images/workflow_edit_plugin_menu.png
+    :align: left
+
+Left-clicking on a Plugin name will open a context menu with additional options: 
+The user can replace the active node, append a new :py:class:`WorkflowNode 
+<pydidas.workflow.WorkflowNode>` to the active node or append to a specific 
+node. The *Append to a specific node* menu entry will open a new sub-menu with 
+a list of all nodes in the :py:class:`WorkflowTree 
+<pydidas.workflow.workflow_tree._WorkflowTree>`.
+
+.. tip::
+    Adding a new node to the WorkflowTree will also activate that node.
+    
+    To make a branching tree, you will need to activate the original node
+    again after adding the first new node.
+    
+.. _workflow_tree_canvas:
+
+Workflow tree canvas
+--------------------
+
+.. image:: images/workflow_edit_workflow_canvas.png
+    :width:  500px
+    :align: center
+
+The image above shows an example :py:class:`WorkflowTree 
+<pydidas.workflow.workflow_tree._WorkflowTree>` visualization. Each plugin is 
+depicted in a box with its node number and name and connections between nodes 
+are displayed with lines. The color and frame indicate the status of the 
+selected :py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>`:
+
+    - Blue background, bold frame
+        The currently selected, active :py:class:`WorkflowNode 
+        <pydidas.workflow.WorkflowNode>`
+    - Grey background, regular frame
+        A consistent :py:class:`WorkflowNode 
+        <pydidas.workflow.WorkflowNode>` in the :py:class:`WorkflowTree 
+        <pydidas.workflow.workflow_tree._WorkflowTree>`; not currently selected.
+    - Red background
+        An inconsistent :py:class:`WorkflowNode 
+        <pydidas.workflow.WorkflowNode>` in the :py:class:`WorkflowTree 
+        <pydidas.workflow.workflow_tree._WorkflowTree>`: The input data 
+        dimension of the node's plugin do not match the output data dimension of
+        its parent. 
+    - Red background, bold frame
+        An inconsistent :py:class:`WorkflowNode 
+        <pydidas.workflow.WorkflowNode>` which has been selected as active 
+        node.
+        
+.. note:        
+    Note that children of an inconsistent plugin will also be regarded of 
+    inconsistent, irrespective of the actual consistency.
+        
+By clicking on a plugin, this plugin gets selected and is highlighted 
+(bold  border and change in background color). In addition, the 
+:ref:`workflow_plugin_param_editing` widget will display the selected plugin's 
+Parameters. 
+
+Removing nodes from the WorkflowTree
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: images/workflow_edit_node_x_button.png
+    :align: left
+    
+Clicking on the :py:data:`x` button in the top right corner of a 
+:py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>` widget will open a 
+context menu to delete the current node or branch:
+
+- Delete this node
+    Using this option will remove only the current node and connect the node's 
+    children with the node's parent. 
+- Delete this branch
+    This option will delete the current node and all its children (recursively).
+
+Rearranging nodes in the WorkflowTree
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Workflow tree canvas supports rearranging :py:class:`WorkflowNodes 
+<pydidas.workflow.WorkflowNode>` by drag & drop: Click and hold a node and move
+it on another plugin, then release. This will make the dropped node a child of
+the node on which it was dropped. All of the dragged node's children will be 
+moved as well.
+
+
 .. _workflow_plugin_param_editing:
 
 Plugin Parameter editing
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
-.. image:: images/workflow_edit_04_plugin_param_edit.png
+.. image:: images/workflow_edit_plugin_param_edit.png
     :align: left
 
-After selecting a Plugin in the :ref:`workflow_tree_vis`, the Plugin Parameter
+After selecting a Plugin in the :ref:`workflow_tree_canvas`, the Plugin Parameter
 editing widget will be updated with the information from the selected Plugin. 
 The first two lines are the plugin name and the node ID.
 
@@ -82,9 +155,14 @@ plugin's Parameters to their defaults.
 Below, all of the Plugin's Parameters are listed. Please refer to the 
 :ref:`gui_editing_parameters` manual on how to change these. 
 
-All Plugins have a Parameter called ``label`` which allows the user to give the 
-plugin a reference name. The other Parameters are Plugin-specific and will not
-be discussed here.
+All Plugins have two generic Parameters: :py:data:`always_store_results` and 
+:py:data:`label`. By default, pydidas only stores results of workflow leaves,
+i.e. if a :py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>` does not 
+have any children. When :py:data:`always_store_results` is set to 
+:py:data:`True`, pydidas will store this node's results irrespective of its
+position in the WorkflowTree.
+The :py:data:`label` allows the user to give the plugin a reference name. This 
+name will be used as identifier when displaying or exporting data.
 
 .. tip::
 
@@ -97,7 +175,7 @@ be discussed here.
     make a note of the plugin node IDs.
 
 Import and Export
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. image:: images/workflow_edit_05_import_export.png
     :align: left

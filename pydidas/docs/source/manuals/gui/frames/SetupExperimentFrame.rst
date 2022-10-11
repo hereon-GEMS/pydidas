@@ -1,14 +1,20 @@
-Experimental settings frame
-===========================
+Experimental setup frame
+========================
 
-The *Experimental settings* frame is a graphical interface to configure the 
-:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
-which holds information about the beamline setup.
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+    
+The *Experimental setup* frame is a graphical interface to configure the 
+:py:class:`SetupExperiment 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
+which holds information about the experimental/beamline setup.
 
 The frame only holds the configuration widgets:
 
-.. image:: images/experimental_settings_01_full.png
-    :width:  182px
+.. image:: images/experimental_settings_full.png
+    :width: 300px
     :align: center
 
 Detailed description of frame items
@@ -17,17 +23,17 @@ Detailed description of frame items
 Load settings
 ^^^^^^^^^^^^^
 
-.. image:: images/experimental_settings_02_button_load.png
+.. image:: images/experimental_settings_button_import.png
     :align: left
 
-Experimental settings can be loaded from file. Clicking the corresponding 
+Experimental settings can be import from file. Clicking the corresponding 
 button will open a selection dialogue to pick the file with the stored settings.
 File extensions will be pre-selected based on the available importers. 
 
 Copy Parameters from calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image:: images/experimental_settings_03_button_copyall.png
+.. image:: images/experimental_settings_button_copyall.png
     :align: left
 
 If a calibration using the :ref:`pyfai_calib_frame` has been performed during
@@ -37,7 +43,7 @@ the last successful fit in the pyFAI calibration tool.
 Beamline energy
 ^^^^^^^^^^^^^^^
 
-.. image:: images/experimental_settings_04_energy.png
+.. image:: images/experimental_settings_energy.png
     :align: left
 
 The beamline energy can either be copied from the pyFAI calibration tool (a 
@@ -49,7 +55,7 @@ modify the other value to keep them consistent.
 Detector model
 ^^^^^^^^^^^^^^
 
-.. image:: images/experimental_settings_05_detector.png
+.. image:: images/experimental_settings_detector.png
     :align: left
 
 To select a detector and automatically update all detector Parameters, the 
@@ -57,7 +63,7 @@ To select a detector and automatically update all detector Parameters, the
 pyFAI DetectorSelectorDialog, see the screenshot below) which allows to select 
 a detector based on manufacturer and model.
 
-.. image:: images/experimental_settings_06_detector_popup.png
+.. image:: images/experimental_settings_detector_popup.png
     :width: 361px
     :align: right
 
@@ -71,7 +77,7 @@ manually in the input fields.
 Detector geometry
 ^^^^^^^^^^^^^^^^^
 
-.. image:: images/experimental_settings_07_detector_geometry.png
+.. image:: images/experimental_settings_detector_geometry.png
     :align: left
     
 pydidas uses the `Default geometry in pyFAI 
@@ -89,7 +95,7 @@ values can be entered manually.
 Saving
 ^^^^^^
 
-.. image:: images/experimental_settings_08_save.png
+.. image:: images/experimental_settings_export.png
     :align: left
     
 All settings can be exported to file using the saving button. Clicking the 
@@ -100,11 +106,9 @@ based on the extension.
 Using the Experimental settings
 -------------------------------
 
-The :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
+The :py:class:`SetupExperiment 
+<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>` 
 is not used directly but the information is required in applications, e.g. to
-run processing workflows.
+run processing workflows or to determine the beam center on the detector.
    
-Full list of Experimental setup Parameters
-------------------------------------------
-
 .. include:: ../../global/setup_experiment_params.rst

@@ -95,7 +95,7 @@ Result visualization
     :align: center
 
 Results are visualized in a :py:class:`PydidasPlot2d <pydidas.widgets.silx_plot.PydidasPlot2d>`,
-described b elow:
+described below:
 
 .. include:: ../silx/plot2d.rst
 

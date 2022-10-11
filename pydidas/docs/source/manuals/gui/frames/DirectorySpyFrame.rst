@@ -1,6 +1,11 @@
 Directory spy frame
 ===================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+    
 The *Directory spy* frame is a graphical interface to configure and run the 
 :py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>`. It is split in two 
 main parts: On the left are the controls for configuring and running the 
@@ -8,60 +13,56 @@ application. The right part of the frame is taken by a visualization widget for
 the latest images read from the :py:class:`DirectorySpyApp 
 <pydidas.apps.DirectorySpyApp>`.
 
-.. image:: images/directory_spy_01_overview.png
-    :width: 461px
+.. image:: images/directory_spy_full.png
+    :width: 600px
     :align: center
 
 The configuration on the left holds widgets to configure all necessary
 application Parameters as well as to start and stop running the actual 
 application.
 
-Detailed description of frame items
------------------------------------
 
 Configuring the input
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
-.. image:: images/directory_spy_02_filename_pattern.png
+Data source
+^^^^^^^^^^^
+
+.. image:: images/directory_spy_path.png
     :align: left
 
-The default settings of the app is to scan for files corresponging to a specific
-naming pattern (including the full directory path). An existing file can be
-selected using the *Open* button and its filename modified to exchange the 
-counters in the filename with hashtags.
+The first Parameter the user must define is the working path for the app. Either
+copy the full directory path in the field or use the *Open* button to select a 
+path in a pop-up window.
 
-.. image:: images/directory_spy_03_directory_path.png
+.. image:: images/directory_spy_filename_pattern.png
     :align: right
 
-If the ``scan_for_all`` option has been selected, the required Parameter for the 
-directory path is shown and clicking on the *Open* icon will open a dialogue to
-select a directory. Note that the Hdf5 dataset key Parameter is also shown and
-this dataset is looked for in all new files in the specified folder.
+The default settings of the app is to scan for files corresponging to a specific
+file-naming pattern. An existing file can be selected using the *Open* button 
+and its filename modified to exchange the counters in the filename with 
+hashtags. An example of a filename with wildcards is given on the right. Note 
+that the Hdf5 dataset key Parameter widget is also shown automatically if a 
+hdf5 file extension was detected.
 
-An example of a filename with wildcards is given on the left. Note that the Hdf5 
-dataset key Parameter widget is also shown automatically because a hdf5 file 
-extension was detected.
-
-.. image:: images/directory_spy_04_wildcard_pattern.png
+.. image:: images/directory_spy_scan_for_all.png
     :align: left
 
-| 
-| 
-| 
-| 
-| 
-| 
+If the :py:data:`scan_for_all` option has been selected, the filename pattern
+Parameter will be hidded. Note that the Hdf5 dataset key Parameter is also 
+shown and this dataset is looked for in all new files in the specified folder.
+
 
 Image corrections
 ^^^^^^^^^^^^^^^^^
 
-.. image:: images/directory_spy_05_corrections.png
+.. image:: images/directory_spy_corrections.png
     :align: left
 
 The *Directory spy frame* allows to mask the images with the global detector 
 mask, toggled by changing the corresponding Parameter value. 
 
-.. image:: images/directory_spy_06_corrections_bg.png
+.. image:: images/directory_spy_bg_correction.png
     :align: right
 
 In addition, a generic background image can be subtracted from all images. If 
@@ -71,9 +72,9 @@ number are shown as well, see image on the right.
 
     
 Running the App
-^^^^^^^^^^^^^^^
+---------------
 
-.. image:: images/directory_spy_07_running.png
+.. image:: images/directory_spy_app_running.png
     :align: left    
 
 Running the :py:class:`DirectorySpyApp <pydidas.apps.DirectorySpyApp>` in this
@@ -102,23 +103,8 @@ frequency set in the global settings.
     latest image. A forced updated can be executed by using the *Force plot 
     update* button.
 
-Presentation of image data
-^^^^^^^^^^^^^^^^^^^^^^^^^^ 
-
-Image data are presented in a `silx Plot2D widget 
-<http://www.silx.org/doc/silx/latest/modules/gui/plot/plotwindow.html#silx.gui.plot.PlotWindow.Plot2D>`_\ .
-The toolbar options will be explained in detail below. Moving the mouse over the
-canvas will update the labels for x/y position and data value at the bottom of 
-the canvas. Note that the x and y axis positions for each pixel are defined at
-the pixel center and the given values must be treated carefully with respect to
-the pixel shape, especially for coarse pixels.
-
-.. tip::
-
-    The scaling of the results can be achieved by modifying the colormap 
-    settings.
-
-Toolbar menu entries
-""""""""""""""""""""
+Image data visualization
+------------------------
 
 .. include:: ../silx/plot2d.rst
+

@@ -106,6 +106,8 @@ Detailed information about the individual windows is given here.
     windows/mask_editor_window
     windows/user_config_window
     windows/global_settings_window
+    windows/tweak_plugin_parameters_window
+    windows/show_plugin_details_window
 
 .. _gui_recipes:
 

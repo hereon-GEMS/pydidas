@@ -1,24 +1,43 @@
 The Workflow test frame
 =======================
 
+.. contents::
+    :depth: 2
+    :local:
+    :backlinks: none
+    
 The Workflow test frame can be used to run the 
 :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` locally
-for a single data point and visualize all results, including intermediate 
+for a single scan point and visualize all results, including intermediate 
 results.
 
-.. image:: images/workflow_test_01_overview.png
-    :width:  468px
+.. image:: images/workflow_test_overview.png
+    :width:  600px
     :align: center
 
-The frame holds control widgets on the left and plot canvas on the right.
+The frame holds control and result selection widgets on the left and a plot 
+canvas for data visualization on the right.
 
-Detailed description of frame items
------------------------------------
+Keeping the Workflow up to date
+-------------------------------
 
-Image selection
-^^^^^^^^^^^^^^^
+The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
+is automatically kept up to date. If any Plugin, Plugin Parameter or SetupScan
+Parameter changes, the WorkflowTree is automatically updated.
+In these instances, it is not required to manually update the 
+:py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
-.. image:: images/workflow_test_02_image_selection.png
+.. image: images/workflow_test_reset.png
+    :align: right
+    
+However, if any global settings have changed, for example the detector mask
+file, the user needs to manually reset the WorkflowTree. This can be done by
+clicking the corresponding button at the top left of the frame.
+
+Data source selection
+---------------------
+
+.. image:: images/workflow_test_image_selection.png
     :align: right
 
 
@@ -27,7 +46,7 @@ A single frame must be selected to test the
 options exist for selecting the frame which can be toggled by the "Image 
 selection" Parameter (see image on the right). 
 
-.. image:: images/workflow_test_03_image_number.png
+.. image:: images/workflow_test_image_number.png
     :align: left
 
 Using the "Image number" entry, a datapoint can be selected by its absolute 
@@ -35,7 +54,7 @@ number in the acquisition sequence (i.e. chronologically). This number must be
 given in the "Image number" Parameter field.
 
 
-.. image:: images/workflow_test_04_scan_indices.png
+.. image:: images/workflow_test_scan_indices.png
     :align: left
 
 Selecting the "Use scan indices" will allow the user to pick a datapoint based
@@ -43,37 +62,83 @@ on its position in the scan. Parameters for all defined scan dimensions are
 shown and must be used to select the desired datapoint.
 
 Processing
-^^^^^^^^^^
+----------
 
 Clicking the "Process frame" button will start the workflow processing.
 
 .. note::
 
     Depending on the selected workflow, this operation might take a few seconds
-    and the GUI will be unresponsive during processing.
-    (Any pyFAI integration will require an initialization which takes several
-    seconds.)
+    and the GUI will be unresponsive during processing. The user is also
+    informed that pydidas is busy by displaying the OS's busy mouse cursor.
+    
+    Any pyFAI integration will require an initialization which takes several
+    seconds and must be performed again if any pyFAI integration Parameters
+    change.
 
 Results
-^^^^^^^
+-------
 
-.. image:: images/workflow_test_05_result_selection.png
+.. image:: images/workflow_test_result_selection.png
+    :align: left
+
+.. image:: images/workflow_test_result_info.png
     :align: left
 
 After running the local processing, the results for the different nodes can be
 visualized by selecting the corresponding entry from the results drop-down
 selection. This will open a text box with additional information about the 
-plugin results. If the results are a one-dimensional dataset, a plot is shown in
-the plot widget and if the results are two-dimensional, the image is shown in
-the plot widget. For any other dimensions, only the text information will be 
-shown.
+plugin results (see image below). 
+Information about all result axes, values and metadata will be displayed in the 
+box and a plot or image will be shown in the data display, if the results are
+one- or two-dimensional, respectively. For any other result dimensions, only the 
+text information will be shown in the box.
 
-.. image:: images/workflow_test_06_result_info.png
+|
+|
+|
+|
+|
+|
+|
+|
+
+
+Further details
+---------------
+
+Detailed results
+^^^^^^^^^^^^^^^^
+
+.. image:: images/workflow_test_detailed_results_button.png
+    :align: left
+    
+Some plugins have defined detailed results which can be visualized in addition
+to the generic plugin results. This information can be used for checking if the 
+Plugin behaves as expected. Details about the opened window can be found
+in the :ref:`Show Plugin Details window manual 
+<show_plugin_details_window>`
+
+.. note:
+    Whether a Plugin includes detailed results and what data exactly is 
+    defined individually within each Plugin.
+
+Tweak plugin parameters
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. image:: images/workflow_test_tweak_plugin_button.png
     :align: left
 
+The option to *tweak plugin parameters* exists for all plugins and appears below
+the result info box once a plugin has been selected.
 
+This button will open a new window which allows to test different Parameter 
+options on the fly. For details, please refer to the :ref:`Tweak Plugin 
+Parameter window manual <tweak_plugin_parameters_window>`
 
-
-
+.. tip:
+    Tweaking Plugin Parameters will run the WorkflowTree again for the active 
+    plugin and its children. All available information is always consistent 
+    when Parameter changes have been accepted.
 
 

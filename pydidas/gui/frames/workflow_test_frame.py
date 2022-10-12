@@ -446,6 +446,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         _plot_dim = self._config["plot_dim"]
         self._widgets[f"plot{_plot_dim }d"].remove()
+        self._widgets[f"plot{_plot_dim }d"].setGraphTitle("")
+        self._widgets[f"plot{_plot_dim }d"].setGraphYLabel("")
+        self._widgets[f"plot{_plot_dim }d"].setGraphXLabel("")
 
     @QtCore.Slot()
     def show_plugin_details(self):

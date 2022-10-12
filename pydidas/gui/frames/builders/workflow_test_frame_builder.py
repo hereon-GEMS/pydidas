@@ -179,16 +179,16 @@ class WorkflowTestFrameBuilder(BaseFrame):
             parent_widget=self._widgets["config"],
         )
         self.create_button(
-            "but_tweak_params",
-            "Tweak plugin parameters",
+            "but_show_details",
+            "Show detailed results for plugin",
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             visible=False,
         )
         self.create_button(
-            "but_show_details",
-            "Show detailed results for plugin",
+            "but_tweak_params",
+            "Tweak plugin parameters",
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],

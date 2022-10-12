@@ -38,7 +38,6 @@ from ...core.constants import (
     STANDARD_FONT_SIZE,
 )
 from ...plugins import PluginCollection
-from ...widgets.dialogues import AcknowledgeBox
 
 
 PLUGINS = PluginCollection()

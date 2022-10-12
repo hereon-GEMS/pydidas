@@ -50,7 +50,6 @@ from .windows import (
     GlobalSettingsWindow,
     UserConfigWindow,
     ExportEigerPixelmaskWindow,
-    AverageImagesWindow,
     AboutWindow,
     FeedbackWindow,
     ImageSeriesOperationsWindow,

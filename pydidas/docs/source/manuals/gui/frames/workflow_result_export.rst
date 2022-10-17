@@ -1,7 +1,7 @@
 Data export
 ^^^^^^^^^^^
 
-.. image:: images/execute_workflow_10_export.png
+.. image:: images/workflow_export.png
     :align: left
 
 The data export section allows users to export results either for the current

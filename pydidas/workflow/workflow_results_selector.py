@@ -225,10 +225,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 "Cannot interprete the selection pattern "
                 f'"{_str}" for the dimension "{index}".'
             )
-        _substrings = _str.split(",")
+        _substrings = [_s.strip() for _s in _str.split(",")]
         _slices = []
-        if self.get_param_value("use_scan_timeline") or not self.get_param_value(
-            "use_data_range"
+        if ((self.get_param_value("use_scan_timeline") and index == 0)
+            or not self.get_param_value("use_data_range")
         ):
             _entries = self._parse_string_indices(_substrings)
         else:
@@ -236,8 +236,12 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         for _entry in _entries:
             if len(_entry) == 1:
                 _slices.append(_entry[0])
-            else:
+            elif len(_entry) in (2, 3):
                 _slices.append(slice(*_entry))
+            else:
+                raise UserConfigError(
+                    f"Cannot interpret slice objects with 4 items: '{_str}'"
+                )
         return np.unique(np.r_[tuple(_slices)])
 
     def _parse_string_indices(self, substrings):

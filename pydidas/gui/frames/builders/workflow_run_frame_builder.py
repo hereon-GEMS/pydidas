@@ -88,7 +88,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
         """
         self.create_label(
             "title",
-            "Full workflow processing",
+            "Run full workflow processing",
             fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 5),

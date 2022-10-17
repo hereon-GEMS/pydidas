@@ -312,7 +312,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
     def test_get_single_slice_object__multiple_slices_scan_timeline(self):
         self.populate_WorkflowResults()
         _node = 1
-        _index = 4
+        _index = 0
         obj = WorkflowResultsSelector()
         obj.set_param_value("use_data_range", True)
         obj.set_param_value("use_scan_timeline", True)

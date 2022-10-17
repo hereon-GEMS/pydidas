@@ -177,7 +177,7 @@ name will be used as identifier when displaying or exporting data.
 Import and Export
 -----------------
 
-.. image:: images/workflow_edit_05_import_export.png
+.. image:: images/workflow_edit_import_export.png
     :align: left
 
 Workflows can be imported and exported using the respective buttons in the 

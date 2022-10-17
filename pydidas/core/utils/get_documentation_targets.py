@@ -126,7 +126,7 @@ def get_doc_directory_for_frame_manuals():
         frames.
     """
     _docdir = os.path.join(
-        get_doc_make_directory(), "build", "html", "manuals", "frames"
+        get_doc_make_directory(), "build", "html", "manuals", "gui", "frames"
     )
     return _docdir
 

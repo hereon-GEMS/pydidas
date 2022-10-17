@@ -4,8 +4,8 @@ The View workflow results frame
 The "View workflow results" frame is very similar to the "Run full processing"
 frame except that it does not allow to start the processing.
 
-The idea is to allow exploration of results without forcing an update of the
-results if the WorkflowTree has changed.
+The idea for this frame is to allow exploration of results without forcing an 
+update of the results if the WorkflowTree has changed.
 
 .. image:: images/view_results_01_overview.png
     :width:  469px

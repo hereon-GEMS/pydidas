@@ -51,8 +51,8 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
     """
 
     menu_icon = "qta::msc.run-all"
-    menu_title = "Run full processing"
-    menu_entry = "Workflow processing/Run full processing"
+    menu_title = "Run full workflow"
+    menu_entry = "Workflow processing/Run full workflow"
 
     default_params = get_generic_param_collection(
         "selected_results", "saving_format", "enable_overwrite"

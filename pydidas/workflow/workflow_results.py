@@ -293,7 +293,7 @@ class _WorkflowResults(QtCore.QObject):
         _data = self.__composites[node_id].copy()
         _data.flatten_dims(
             *range(SCAN.ndim),
-            new_dim_label="Scan timeline",
+            new_dim_label="Chronological scan points",
             new_dim_range=np.arange(SCAN.n_points),
         )
         if squeeze:
@@ -344,7 +344,7 @@ class _WorkflowResults(QtCore.QObject):
         if flattened_scan_dim:
             _data.flatten_dims(
                 *range(SCAN.ndim),
-                new_dim_label="Scan timeline",
+                new_dim_label="Chronological scan points",
                 new_dim_range=np.arange(SCAN.n_points),
             )
             _data = _data[slices[0]]
@@ -550,7 +550,7 @@ class _WorkflowResults(QtCore.QObject):
             "ax_points": list(self.shapes[node_id])[_start_index:],
         }
         if use_scan_timeline:
-            _print_info["ax_labels"].insert(0, "chronological frame number")
+            _print_info["ax_labels"].insert(0, "Chronological scan points")
             _print_info["ax_units"].insert(0, "")
             _print_info["ax_ranges"].insert(0, f"0 ... {SCAN.n_points - 1}")
             _print_info["ax_points"].insert(0, SCAN.n_points)

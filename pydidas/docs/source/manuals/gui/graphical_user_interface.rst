@@ -90,6 +90,7 @@ Detailed descriptions of the individual frames are given here.
     frames/WorkflowTestFrame
     frames/WorkflowRunFrame
     frames/ViewResultsFrame
+    frames/UtilitiesFrame
     
 
 .. _gui_windows:
@@ -102,12 +103,13 @@ Detailed information about the individual windows is given here.
 .. toctree::
     :maxdepth: 1
 
-    windows/image_series_operations_window
-    windows/mask_editor_window
-    windows/user_config_window
-    windows/global_settings_window
-    windows/tweak_plugin_parameters_window
-    windows/show_plugin_details_window
+    windows/ImageSeriesOperationsWindow
+    windows/MaskEditorWindow
+    windows/ExportEigerPixelmaskWindow
+    windows/UserConfigWindow
+    windows/GlobalSettingsWindow
+    windows/TweakPluginParameterWindow
+    windows/ShowDetailedPluginResultsWindow
 
 .. _gui_recipes:
 

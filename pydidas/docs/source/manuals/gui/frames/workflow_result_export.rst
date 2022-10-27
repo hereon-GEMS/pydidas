@@ -1,11 +1,8 @@
-Data export
-^^^^^^^^^^^
-
 .. image:: images/workflow_export.png
     :align: left
 
 The data export section allows users to export results either for the current
-node or for all nodes.
+node or for all nodes. The current node is the selected node for visualization.
 
 .. note::
 

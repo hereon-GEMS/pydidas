@@ -6,6 +6,8 @@ The Run full workflow frame
     :local:
     :backlinks: none
 
+The *Run full workflow* frame allows to execute the current workflow with the 
+current scan and experiment configurations. 
 
 The "Run full workflow" frame is split in two main parts. On the left are the 
 controls for the configuration of running the Workflow, the automatic saving 
@@ -25,7 +27,13 @@ described in more detail below:
   - Selecting the results to be plotted
   - Manually exporting results
 
-In addition, the 
+In addition, the data display allows to visualize one-dimensional and 
+two-dimensional results on the fly.
+
+.. tip:
+
+    Data can be visualized while the processing is still running and the results
+    will be updated as more results become available.
 
 Control elements
 ----------------
@@ -42,18 +50,24 @@ Parameter to enable it is visible. Enabling the autosave will show two
 additional Parameter configuration widgets to select the saving directory and 
 the type of files. 
 
-.. image:: images/workflow_run_autosave_active.png
-    :align: left
-
-Files will be automatically created based on different autosave formats selected
-in the Parameter.
-
 .. note::
 
     The autosave directory must be an empty directory at the start of the 
     processing, even though this condition is not enforced at the time of 
     selection.
     
+.. image:: images/workflow_run_autosave_active.png
+    :align: left
+
+Files will be automatically created based on different autosave formats selected
+in the Parameter.
+
+.. warning::
+
+    Automatic saving is fairly slow because of the required disk write access
+    for every processed scan point and is only advisable for workflows which
+    have very long processing times.
+
 Running the workflow
 ^^^^^^^^^^^^^^^^^^^^
 

@@ -1,5 +1,3 @@
-Selection of results
-^^^^^^^^^^^^^^^^^^^^ 
 
 .. image:: images/workflow_results_no_selection.png
     :align: left
@@ -18,26 +16,20 @@ image below).
 |
 
 
-.. image:: images/workflow_results_full_selector.png
+.. image:: images/workflow_results_selector_overview.png
     :align: right
-
+ 
 Once a node has been selected, additional information for these node's results 
 will be displayed, see the image to the right.
 
-^^^^^^^^^^^^^^^^^^^^
-TODO
-
-- Finish overlay in  workflow_results_full_selector
-- add images ?
-^^^^^^^^^^^^^^^^^^^^^^^^
-Arrangement
-"""""""""""
+Result Arrangement
+""""""""""""""""""
 
 For some applications, it can be interesting to arrange the results not by
 scan shape but as a timeline, effictively collapsing all scan dimensions to a 
 single frame index dimension. Changing between the two is done by selecting the
 corrsponding radio button item. This will also trigger an update of the results
-metadata, as seen on the image to the right. Note that the first dimension is 
+metadata, as seen on the image to the left. Note that the first dimension is 
 now labelled *Chronological scan points*.
 
 .. image:: images/workflow_results_timeline.png
@@ -56,8 +48,8 @@ now labelled *Chronological scan points*.
 |
 |
 
-Description of metadata
-"""""""""""""""""""""""
+Result metadata
+"""""""""""""""
 
 The name of the plugin and the data label and unit are shown at the top of the
 metadata, followed by descriptions of the different data axes. The axes are
@@ -67,16 +59,27 @@ the label (either from the scan definition or from the plugin data
 dimension) is given with the number of points in this axis and the axis range.
 
 
-Plot definition
-"""""""""""""""
+Select plot type
+""""""""""""""""
 
 The user can select between 1-dimensional line plots or 2-dimensional images.
 Use *1D plot* to plot a single line or *group of 1D plots* to plot multiple 
 lines at once. *2D full axes* and *2D data subset* will display data in image
 form.
 
+Result subset selection
+"""""""""""""""""""""""
+
+.. figure:: images/workflow_results_data_selection.png
+    :figwidth: 302 px
+    :align: right
+    
+    Data selection. In this example, the axes 1 and 2 will be used for the 
+    plot. The axis zero is sliced at the index corresponding to the data value
+    30.
+    
 The *Data selection* radio buttons allow to toggle the selection of data 
-between data values and axis indices. If axis indices are toggles, integer
+between data values and axis indices. If axis indices are toggled, integer
 values must be used for the selection. Data values must be given in the 
 respective unit for each dimension (unit and range are given for each axis in 
 the metadata window). Any data value will be converted to the closest matching

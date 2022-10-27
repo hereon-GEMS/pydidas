@@ -27,14 +27,13 @@ __all__ = []
 
 # import __all__ items from modules:
 from .about_window import *
-from .average_images_window import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .image_series_operations_window import *
 from .global_settings_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
-from .show_detailed_plugin_results import *
+from .show_detailed_plugin_results_window import *
 from .tweak_plugin_parameter_window import *
 from .user_config_window import *
 
@@ -44,11 +43,6 @@ from . import about_window
 
 __all__.extend(about_window.__all__)
 del about_window
-
-from . import average_images_window
-
-__all__.extend(average_images_window.__all__)
-del average_images_window
 
 from . import export_eiger_pixelmask
 
@@ -80,10 +74,10 @@ from . import pydidas_window
 __all__.extend(pydidas_window.__all__)
 del pydidas_window
 
-from . import show_detailed_plugin_results
+from . import show_detailed_plugin_results_window
 
-__all__.extend(show_detailed_plugin_results.__all__)
-del show_detailed_plugin_results
+__all__.extend(show_detailed_plugin_results_window.__all__)
+del show_detailed_plugin_results_window
 
 from . import tweak_plugin_parameter_window
 

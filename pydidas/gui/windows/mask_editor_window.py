@@ -35,7 +35,7 @@ from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     HDF5_EXTENSIONS,
 )
-from ...core.utils import get_extension
+from ...core.utils import get_extension, update_size_policy
 from ...data_io import import_data
 from ...widgets import dialogues, silx_plot, parameter_config
 from .pydidas_window import PydidasWindow
@@ -114,6 +114,7 @@ class MaskEditorWindow(PydidasWindow):
         )
 
         self.create_any_widget("plot_2d", silx_plot.PydidasPlot2D, gridPos=(0, 1, 2, 1))
+        update_size_policy(self._widgets["plot_2d"], horizontalStretch=1)
 
         self._widgets["mask_tools"] = silx_plot.PydidasMaskToolsWidget(
             self, plot=self._widgets["plot_2d"]

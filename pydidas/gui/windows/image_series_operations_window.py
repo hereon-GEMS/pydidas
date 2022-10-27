@@ -100,7 +100,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
         self.create_label(
             "label_title",
-            "File series operations",
+            "Image series operations",
             fontsize=14,
             bold=True,
         )
@@ -139,7 +139,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.params["output_fname"], **get_config("output_fname")
         )
         self.create_spacer(None)
-        self.create_button("but_exec", "Process and save image")
+        self.create_button("but_exec", "Process and export image")
 
     def connect_signals(self):
         """

@@ -46,12 +46,12 @@ UTILITIES = {
         "button_text": "Edit global settings",
     },
     "eiger_mask": {
-        "title": "Save Eiger mask from master file",
+        "title": "Export Eiger mask from master file",
         "text": (
             "Get the mask file for the Eiger detector from a Hdf5 master file written "
-            "by the Eiger detector."
+            "by the Eiger detector and export it as image."
         ),
-        "button_text": "Get and save Eiger mask",
+        "button_text": "Export Eiger mask",
     },
     "mask_editor": {
         "title": "Edit detector mask",
@@ -63,12 +63,12 @@ UTILITIES = {
         "button_text": "Edit detector mask",
     },
     "series_operations": {
-        "title": "File series operations",
+        "title": "Image series operations",
         "text": (
             "Perform mathematical operations (e.g. sum, mean, max) on a series of "
             "images and save the results to a new single image."
         ),
-        "button_text": "File series operations",
+        "button_text": "Image series operations",
     },
 }
 

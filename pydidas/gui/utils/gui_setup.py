@@ -29,8 +29,6 @@ __all__ = [
     "apply_tooltip_event_filter",
 ]
 
-import os
-
 from qtpy import QtWidgets
 
 from ...core import constants
@@ -45,43 +43,6 @@ def configure_qtapp_namespace():
     app.setOrganizationName("Hereon")
     app.setOrganizationDomain("Hereon/WPI")
     app.setApplicationName("pydidas")
-
-
-def find_toolbar_bases(items):
-    """
-    Find the bases of all toolbar items which are not included in the items
-    itself.
-
-    Base levels in items are separated by forward slashes.
-
-    Parameters
-    ----------
-    items : Union[list, tuple]
-        An iterable of string items.
-
-    Example
-    -------
-    >>> items = ['a', 'a/b', 'a/c', 'b', 'd/e']
-    >>> _find_toolbar_bases(items)
-    ['', 'a', 'd']
-
-    The '' entry is the root for all top-level items. Even though 'a' is an
-    item itself, it is also a parent for 'a/b' and 'a/c' and it is therefore
-    also included in the list, similar to 'd'.
-
-    Returns
-    -------
-    itembases : list
-        A list with string entries of all the items' parents.
-    """
-    _itembases = []
-    for _item in items:
-        _parent = os.path.dirname(_item)
-        if _parent not in _itembases:
-            _itembases.append(_parent)
-        _item = _parent
-    _itembases.sort()
-    return _itembases
 
 
 def update_qtapp_font_size():

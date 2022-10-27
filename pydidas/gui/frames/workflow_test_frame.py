@@ -40,7 +40,8 @@ from ...experiment import SetupScan
 from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
 from ...widgets.silx_plot import get_2d_silx_plot_ax_settings
-from ..windows import ShowDetailedPluginResults, TweakPluginParameterWindow
+from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
+from ..utils import get_main_menu
 from .builders import WorkflowTestFrameBuilder
 
 
@@ -125,9 +126,11 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         plugin results.
         """
         self.__check_tree_uptodate()
-        self.__details_window = ShowDetailedPluginResults()
+        self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window = TweakPluginParameterWindow()
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
+        _main = get_main_menu()
+        _main.sig_close_gui.connect(self.__tweak_window.close)
 
     def __check_tree_uptodate(self):
         """

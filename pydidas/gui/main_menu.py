@@ -101,7 +101,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
         self._create_menu()
-        self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
+        self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self._open_help)
 
     def _setup_mainwindow_widget(self, geometry):

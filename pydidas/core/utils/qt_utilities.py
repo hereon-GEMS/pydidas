@@ -22,7 +22,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["apply_qt_properties", "apply_font_properties"]
+__all__ = ["update_size_policy", "apply_qt_properties", "apply_font_properties"]
 
 
 def _get_args_as_list(args):
@@ -44,6 +44,29 @@ def _get_args_as_list(args):
     return args
 
 
+def update_size_policy(obj, **kwargs):
+    """
+    Update the sizePolicy of an object with various keywords.
+
+    This function takes a dictionary (ie. keyword arguments) and iterates
+    through all keys. Keys will be interpreted in Qt style: A "property: 12"
+    entry in the dictionary will verify that the widget has a "setProperty"
+    method and will then call "obj.setProperty(12)". The verificiation that
+    the methods exist allows this function to take the full kwargs of any
+    object without the need to filter out non-related keys.
+
+    Parameters
+    ----------
+    obj : QtWidgets.QWidget
+        Any QWidget (because other QObjects do not have a sicePolicy).
+    **kwargs : dict
+        A dictionary with properties to set.
+    """
+    _policy = obj.sizePolicy()
+    apply_qt_properties(_policy, **kwargs)
+    obj.setSizePolicy(_policy)
+
+
 def apply_qt_properties(obj, **kwargs):
     """
     Set Qt widget properties from a supplied dict.
@@ -57,8 +80,8 @@ def apply_qt_properties(obj, **kwargs):
 
     Parameters
     ----------
-    widget : QtWidgets.QWidget
-        Any QWidget.
+    obj : QtCore.QObject
+        Any QObject.
     **kwargs : dict
         A dictionary with properties to be set.
     """

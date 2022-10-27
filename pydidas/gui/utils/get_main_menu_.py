@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas.gui.utils sub-package provides convenience functions and classes
-which are used in the gui package.
+The pydidas.gui.utils.get_main_window module includes a utility function to get the
+instance of the MainMenu.
 """
 
 __author__ = "Malte Storm"
@@ -23,26 +23,23 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = []
+__all__ = ["get_main_menu"]
 
-# import __all__ items from modules:
-from .get_main_menu_ import *
-from .gui_setup import *
-from .menu_utils import *
+from qtpy import QtWidgets
 
-# add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import get_main_menu_
+from ..main_menu import MainMenu
 
-__all__.extend(get_main_menu_.__all__)
-del get_main_menu_
 
-from . import gui_setup
+def get_main_menu():
+    """
+    Get the pydidas MainMenu instance.
 
-__all__.extend(gui_setup.__all__)
-del gui_setup
-
-from . import menu_utils
-
-__all__.extend(menu_utils.__all__)
-del menu_utils
+    Returns
+    -------
+    pydidas.gui.MainMenu
+        The instance.
+    """
+    for _widget in QtWidgets.QApplication.instance().topLevelWidgets():
+        if isinstance(_widget, MainMenu):
+            return _widget
+    raise ValueError("Could not find MainMenu instance")

@@ -227,9 +227,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             )
         _substrings = [_s.strip() for _s in _str.split(",")]
         _slices = []
-        if ((self.get_param_value("use_scan_timeline") and index == 0)
-            or not self.get_param_value("use_data_range")
-        ):
+        if (
+            self.get_param_value("use_scan_timeline") and index == 0
+        ) or not self.get_param_value("use_data_range"):
             _entries = self._parse_string_indices(_substrings)
         else:
             _entries = self._convert_values_to_indices(_substrings)
@@ -301,7 +301,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 _startindex = self._get_best_index_for_value(_keys[0], _range)
                 _stopindex = self._get_best_index_for_value(_keys[1], _range)
                 _new_items.append([_startindex, _stopindex])
-            elif len(_keys == 3):
+            elif len(_keys) == 3:
                 _targets = np.arange(_keys[0], _keys[1], _keys[2])
                 for _val in _targets:
                     _index = self._get_best_index_for_value(_val, _range)

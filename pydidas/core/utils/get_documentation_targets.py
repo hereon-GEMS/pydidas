@@ -74,7 +74,7 @@ def get_doc_filename_for_window_manual(name):
         The full filename for the window manual.
     """
     _docdir = os.path.join(
-        get_doc_make_directory(), "build", "html", "manuals", "windows"
+        get_doc_make_directory(), "build", "html", "manuals", "gui", "windows"
     )
     return os.path.join(_docdir, f"{name}.html")
 

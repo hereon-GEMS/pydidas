@@ -115,7 +115,7 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         if "title" in kwargs:
             self.setWindowTitle(kwargs.get("title"))
 
-        self._help_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("F1"), self)
+        self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self.open_help)
 
     @QtCore.Slot()

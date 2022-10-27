@@ -63,8 +63,8 @@ class _UserConfigWindow(PydidasWindow):
     """
 
     menu_icon = "qta::mdi.application-cog"
-    menu_title = "Global configuration"
-    menu_entry = "Global configuration"
+    menu_title = "User configuration"
+    menu_entry = "User configuration"
 
     value_changed_signal = QtCore.Signal(str, object)
 
@@ -74,7 +74,7 @@ class _UserConfigWindow(PydidasWindow):
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
-        self.setWindowTitle("pydidas global configuration")
+        self.setWindowTitle("pydidas user configuration")
         self.setFixedWidth(330)
 
     def build_frame(self):
@@ -102,7 +102,7 @@ class _UserConfigWindow(PydidasWindow):
 
         self.create_label(
             "title",
-            "Global settings\n",
+            "User configuration\n",
             fontsize=STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),

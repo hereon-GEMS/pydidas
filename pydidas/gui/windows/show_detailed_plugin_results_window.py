@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ShowDetailedPluginResults class which allows to handle and show
+Module with the ShowDetailedPluginResultsWindow class which allows to handle and show
 additional data for the selected plugin.
 """
 
@@ -23,13 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ShowDetailedPluginResults"]
+__all__ = ["ShowDetailedPluginResultsWindow"]
 
 from ...widgets.silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
 from .pydidas_window import PydidasWindow
 
 
-class ShowDetailedPluginResults(PydidasWindow):
+class ShowDetailedPluginResultsWindow(PydidasWindow):
     """
     Window to display detailed plugin results.
     """

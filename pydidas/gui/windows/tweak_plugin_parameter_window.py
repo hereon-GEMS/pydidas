@@ -15,7 +15,7 @@
 
 """
 Module with the TweakPluginParameterWindow class which is a stand-alone frame
-to store the pixel mask.
+to store the Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
@@ -44,12 +44,14 @@ from ...widgets.silx_plot import (
     create_silx_plot_stack,
     get_2d_silx_plot_ax_settings,
 )
-from ...gui.windows import PydidasWindow, ShowDetailedPluginResults
+from .pydidas_window import PydidasWindow
+from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
 
 class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
     """
-    Window to display detailed plugin results.
+    Window to display detailed plugin results in combination with all Plugin
+    Parameters to allow running the Plugin with different values.
     """
 
     show_frame = False
@@ -70,6 +72,10 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             "parent": parent,
             "accept_changes": False,
         }
+        print(self._help_shortcut.key(), self._help_shortcut.parentWidget())
+        del self._help_shortcut
+        self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F2, self)
+        self._help_shortcut.activated.connect(self.open_help)
 
     def build_frame(self):
         """
@@ -141,7 +147,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
 
         create_silx_plot_stack(self._central, gridPos=(1, 1, 1, 1))
 
-        self._widgets["detailed_results"] = ShowDetailedPluginResults()
+        self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
 
         _dock_widget = QtWidgets.QDockWidget("Details")
         _dock_widget.setWidget(self._widgets["detailed_results"])
@@ -151,6 +157,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         )
         _dock_widget.setBaseSize(500, 50)
         self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
+        self._docker = _dock_widget
 
     def connect_signals(self):
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
@@ -165,6 +172,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         This slot will check whether a helpfile exists for the current frame and open
         the respective helpfile if it exits or the main documentation if it does not.
         """
+        print("open help")
         _window_class = self.__class__.__name__
         _docfile = get_doc_filename_for_window_manual(_window_class)
 
@@ -314,7 +322,8 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         """
         self._config["accept_changes"] = False
         self.setVisible(False)
-        self.__plugin.params = copy.deepcopy(self.__original_plugin_params)
+        if self.__plugin is not None:
+            self.__plugin.params = copy.deepcopy(self.__original_plugin_params)
         self.sig_closed.emit()
 
     @QtCore.Slot()
@@ -329,4 +338,5 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         """
         if not self._config["accept_changes"]:
             self.discard_parameter_changes()
+        self._docker.close()
         QtWidgets.QMainWindow.closeEvent(self, event)

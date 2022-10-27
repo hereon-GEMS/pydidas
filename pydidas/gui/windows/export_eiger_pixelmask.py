@@ -33,6 +33,7 @@ from qtpy import QtCore
 from ...core import Parameter, ParameterCollection, utils
 from ...core.constants import DEFAULT_TWO_LINE_PARAM_CONFIG
 from ...widgets.dialogues import critical_warning
+from ...data_io import IoMaster
 from .pydidas_window import PydidasWindow
 
 
@@ -84,7 +85,7 @@ class ExportEigerPixelmaskWindow(PydidasWindow):
         )
         self.param_widgets[
             "output_filename"
-        ]._file_selection = "NPY files (*.npy *.npz)"
+        ]._file_selection = IoMaster.get_string_of_formats("export")
 
         self.create_button("but_exec", "Export pixelmask")
 

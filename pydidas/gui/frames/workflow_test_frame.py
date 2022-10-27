@@ -131,6 +131,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
         _main = get_main_menu()
         _main.sig_close_gui.connect(self.__tweak_window.close)
+        _main.sig_close_gui.connect(self.__details_window.close)
 
     def __check_tree_uptodate(self):
         """

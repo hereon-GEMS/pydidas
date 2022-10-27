@@ -25,20 +25,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["TweakPluginParameterWindow"]
 
-import os
 import copy
 
 import numpy as np
-from qtpy import QtWidgets, QtCore, QtGui
+from qtpy import QtWidgets, QtCore
 
 from ...core.constants import FIX_EXP_POLICY
-from ...core.utils import (
-    get_doc_qurl_for_window_manual,
-    get_doc_filename_for_window_manual,
-    get_doc_home_qurl,
-    ShowBusyMouse,
-)
-from ...widgets import ScrollArea, BaseFrame
+from ...core.utils import ShowBusyMouse
+from ...widgets import ScrollArea
 from ...widgets.parameter_config import ConfigurePluginWidget, ParameterEditFrame
 from ...widgets.silx_plot import (
     create_silx_plot_stack,
@@ -48,7 +42,7 @@ from .pydidas_window import PydidasWindow
 from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
 
-class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
+class TweakPluginParameterWindow(PydidasWindow):
     """
     Window to display detailed plugin results in combination with all Plugin
     Parameters to allow running the Plugin with different values.
@@ -60,10 +54,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
     sig_this_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QMainWindow.__init__(self)
-        PydidasWindow.__init__(
-            self, parent, title="Tweak plugin parameters", init_layout=False, **kwargs
-        )
+        PydidasWindow.__init__(self, parent, title="Tweak plugin parameters", **kwargs)
         self.__plugin = None
         self._config = self._config | {
             "initial_results": None,
@@ -72,21 +63,14 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             "parent": parent,
             "accept_changes": False,
         }
-        print(self._help_shortcut.key(), self._help_shortcut.parentWidget())
-        del self._help_shortcut
-        self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F2, self)
-        self._help_shortcut.activated.connect(self.open_help)
 
     def build_frame(self):
         """
         Build the frame and create all widgets.
         """
-        self._central = BaseFrame()
-        self._central.frame_activated(self._central.frame_index)
-        self._central.setVisible(True)
-        self.setCentralWidget(self._central)
+        # self.setVisible(True)
 
-        self._central.create_label(
+        self.create_label(
             "label_title",
             "Tweak plugin parameters",
             fontsize=14,
@@ -100,7 +84,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             sizePolicy=FIX_EXP_POLICY,
             fixedWidth=385,
         )
-        self._central.create_any_widget(
+        self.create_any_widget(
             "config_scroll_area",
             ScrollArea,
             minimumHeight=500,
@@ -145,42 +129,14 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             parent_widget=self._widgets["config_area"],
         )
 
-        create_silx_plot_stack(self._central, gridPos=(1, 1, 1, 1))
+        create_silx_plot_stack(self, gridPos=(1, 1, 1, 1))
 
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
-
-        _dock_widget = QtWidgets.QDockWidget("Details")
-        _dock_widget.setWidget(self._widgets["detailed_results"])
-        _dock_widget.setFeatures(
-            QtWidgets.QDockWidget.DockWidgetMovable
-            | QtWidgets.QDockWidget.DockWidgetFloatable
-        )
-        _dock_widget.setBaseSize(500, 50)
-        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, _dock_widget)
-        self._docker = _dock_widget
 
     def connect_signals(self):
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
         self._widgets["but_confirm"].clicked.connect(self.confirm_parameters)
         self._widgets["but_cancel"].clicked.connect(self.discard_parameter_changes)
-
-    @QtCore.Slot()
-    def open_help(self):
-        """
-        Open the help in a browser.
-
-        This slot will check whether a helpfile exists for the current frame and open
-        the respective helpfile if it exits or the main documentation if it does not.
-        """
-        print("open help")
-        _window_class = self.__class__.__name__
-        _docfile = get_doc_filename_for_window_manual(_window_class)
-
-        if os.path.exists(_docfile):
-            _url = get_doc_qurl_for_window_manual(_window_class)
-        else:
-            _url = get_doc_home_qurl()
-        _ = QtGui.QDesktopServices.openUrl(_url)
 
     def tweak_plugin(self, plugin, results):
         """
@@ -212,7 +168,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
             The plugin results.
         """
         results.convert_all_none_properties()
-        self._central._widgets["plot_stack"].setCurrentIndex(results.ndim - 1)
+        self._widgets["plot_stack"].setCurrentIndex(results.ndim - 1)
         if results.ndim == 1:
             self._plot1d(
                 results,
@@ -240,7 +196,7 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         _axlabel = data.axis_labels[0] + (
             " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
         )
-        self._central._widgets["plot1d"].addCurve(
+        self._widgets["plot1d"].addCurve(
             data.axis_ranges[0],
             data.array,
             replace=True,
@@ -266,15 +222,15 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         ]
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self._central._widgets["plot2d"].addImage(
+        self._widgets["plot2d"].addImage(
             data,
             replace=True,
             copy=False,
             origin=(_originx, _originy),
             scale=(_scalex, _scaley),
         )
-        self._central._widgets["plot2d"].setGraphYLabel(_ax_labels[0])
-        self._central._widgets["plot2d"].setGraphXLabel(_ax_labels[1])
+        self._widgets["plot2d"].setGraphYLabel(_ax_labels[0])
+        self._widgets["plot2d"].setGraphXLabel(_ax_labels[1])
 
     def __process_detailed_results(self):
         """
@@ -284,10 +240,19 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         if hasattr(self.__plugin, "get_detailed_results"):
             _details = self.__plugin.get_detailed_results()
             self._config["detailed_results"] = _details
-            self._widgets["detailed_results"].update_results(_details, "")
+            self._widgets["detailed_results"].update_results(
+                _details,
+                (
+                    f"Tweak plugin {self.__plugin.plugin_name} "
+                    f"(node #{self.__plugin.node_id:03d})"
+                ),
+            )
+            self._widgets["detailed_results"].setVisible(True)
+            self._widgets["detailed_results"].raise_()
         else:
             self._config["detailed_results"] = None
             self._widgets["detailed_results"].update_results({}, "")
+            self._widgets["detailed_results"].setVisible(False)
 
     @QtCore.Slot()
     def run_plugin(self):
@@ -338,5 +303,5 @@ class TweakPluginParameterWindow(QtWidgets.QMainWindow, PydidasWindow):
         """
         if not self._config["accept_changes"]:
             self.discard_parameter_changes()
-        self._docker.close()
-        QtWidgets.QMainWindow.closeEvent(self, event)
+        self._widgets["detailed_results"].close()
+        QtWidgets.QWidget.closeEvent(self, event)

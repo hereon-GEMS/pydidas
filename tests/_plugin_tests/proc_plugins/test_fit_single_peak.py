@@ -21,7 +21,7 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-
+import itertools
 import unittest
 
 import numpy as np
@@ -398,6 +398,32 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("output", "dummy")
         with self.assertRaises(ValueError):
             plugin.calculate_result_shape()
+
+    def test_detailed_results(self):
+        plugin = self.create_generic_plugin()
+        plugin.pre_execute()
+        _data, _kwargs = plugin.execute(self._data)
+        _details = plugin.detailed_results
+        self.assertEqual(set(_details.keys()), {None})
+
+    def test_detailed_results__multidim(self):
+        _data = np.tile(self._data, (3, 3, 1))
+        _data.axis_labels = ("a", "b", "data")
+        _data.axis_ranges = (
+            np.array((0, 2, 4)),
+            np.array((1, 5, 9)),
+            np.arange(self._data.size),
+        )
+        _data.axis_units = ("u0", "u1", "u2")
+        plugin = self.create_generic_plugin()
+        plugin.pre_execute()
+        _new_data, _kwargs = plugin.execute(_data)
+        _details = plugin.detailed_results
+        for _indices in itertools.product(np.arange(3), np.arange(3)):
+            self.assertIn(
+                _data.get_description_of_point(_indices + (None,)), _details.keys()
+            )
+        self.assertNotIn(None, _details.keys())
 
 
 if __name__ == "__main__":

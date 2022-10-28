@@ -332,9 +332,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _has_get_details_attr = (
             False
             if self._active_node == -1
-            else hasattr(
-                self._tree.nodes[self._active_node].plugin, "get_detailed_results"
-            )
+            else hasattr(self._tree.nodes[self._active_node].plugin, "detailed_results")
         )
         self._widgets["but_show_details"].setVisible(_has_get_details_attr and visible)
 
@@ -463,7 +461,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         new window to display the detailed information.
         """
         _plugin = self._tree.nodes[self._active_node].plugin
-        _details = _plugin.get_detailed_results()
+        _details = _plugin.detailed_results
         _title = (
             _plugin.plugin_name
             + ' "'

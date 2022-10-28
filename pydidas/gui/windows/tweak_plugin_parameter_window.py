@@ -237,8 +237,8 @@ class TweakPluginParameterWindow(PydidasWindow):
         Process the detailed results for the plugin, if it has the respective
         attribute.
         """
-        if hasattr(self.__plugin, "get_detailed_results"):
-            _details = self.__plugin.get_detailed_results()
+        if hasattr(self.__plugin, "detailed_results"):
+            _details = self.__plugin.detailed_results
             self._config["detailed_results"] = _details
             self._widgets["detailed_results"].update_results(
                 _details,

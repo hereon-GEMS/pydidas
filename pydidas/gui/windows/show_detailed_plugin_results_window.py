@@ -25,6 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
+from qtpy import QtCore
+
+from ...core.utils import SignalBlocker, update_size_policy
+from ...core.constants import STANDARD_FONT_SIZE
 from ...widgets.silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
 from .pydidas_window import PydidasWindow
 
@@ -35,10 +39,12 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     """
 
     show_frame = False
+    sig_new_selection = QtCore.Signal(str)
 
     def __init__(self, parent=None, results=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
         self._config["n_plots"] = 0
+        self._results = results
         if results is not None:
             self.update_results(results)
 
@@ -49,10 +55,49 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Detailed plugin results",
-            fontsize=14,
+            fontsize=STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 2),
         )
+        self.create_empty_widget("metadata", gridPos=(1, 0, 2, 1))
+        self.create_combo_box(
+            "selector",
+            parent_widget=self._widgets["metadata"],
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=250,
+        )
+        self.create_label(
+            "metadata_title",
+            "Metadata:",
+            parent_widget=self._widgets["metadata"],
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=250,
+            fontsize=STANDARD_FONT_SIZE + 2,
+        )
+        self.create_label(
+            "metadata_label",
+            "",
+            parent_widget=self._widgets["metadata"],
+            gridPos=(-1, 0, 1, 1),
+            fixedWidth=250,
+        )
+
+    def connect_signals(self):
+        """
+        Connect all the required signals for the frame.
+        """
+        self._widgets["selector"].currentTextChanged.connect(self.__select_point)
+
+    def sizeHint(self):
+        """
+        Set the sizeHint for the preferred size.
+
+        Returns
+        -------
+        QtCore.QSize
+            The desired size.
+        """
+        return QtCore.QSize(1200, 600)
 
     def update_results(self, results, title=None):
         """
@@ -63,11 +108,14 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         results : dict
             The dictionary with the new results.
         """
+        self._results = results
+        self._config["result_keys"] = list(results.keys())
         self.__update_title(title)
-        _n_plots = results.get("n_plots", 0)
+        _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)
         self._config["n_plots"] = _n_plots
-        self.__prepare_widgets(_n_plots)
-        self.__plot_results(results)
+        self.__prepare_widgets()
+        self.__update_metadata()
+        self.__plot_results(self._config["result_keys"][0])
 
     def __update_title(self, title):
         """
@@ -83,38 +131,33 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         else:
             self._widgets["label_title"].setText("Detailed plugin results")
 
-    def __prepare_widgets(self, n_plots):
+    def __prepare_widgets(self):
         """
         Prepare all widgets.
-
-        Parameters
-        ----------
-        n_plots : int
-            The number of active plots
         """
-        self.__create_necessary_plots(n_plots)
+        self.__create_necessary_plots()
         for _index in range(4):
             if f"plot{_index}_stack" in self._widgets:
-                self._widgets[f"plot{_index}_stack"].setVisible(_index < n_plots)
+                self._widgets[f"plot{_index}_stack"].setVisible(
+                    _index < self._config["n_plots"]
+                )
                 for _dim in [1, 2]:
                     self._widgets[f"plot{_index}_{_dim}d"].clear()
 
-    def __create_necessary_plots(self, n_plots):
+    def __create_necessary_plots(self):
         """
         Create all required plots
-
-        Parameters
-        ----------
-        n_plots : int
-            The number of required plots.
         """
-        for _index in range(n_plots):
+        for _index in range(self._config["n_plots"]):
             if f"plot{_index}_stack" in self._widgets:
                 continue
             _y = 1 + _index // 2
-            _x = _index % 2
+            _x = 1 + _index % 2
             create_silx_plot_stack(self, gridPos=(_y, _x, 1, 1))
             self.__rename_plots(_index)
+            update_size_policy(
+                self._widgets[f"plot{_index}_stack"], horizontalStretch=0.5
+            )
 
     def __rename_plots(self, target):
         """
@@ -129,19 +172,52 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self._widgets[f"plot{target}_1d"] = self._widgets["plot1d"]
         self._widgets[f"plot{target}_2d"] = self._widgets["plot2d"]
 
-    def __plot_results(self, results):
+    def __update_metadata(self):
+        """
+        Update the metadata of the results.
+        """
+        if set(self._results.keys()) == {None}:
+            self._widgets["selector"].setVisible(False)
+            self.__select_point(None)
+        else:
+            with SignalBlocker(self._widgets["selector"]):
+                self._widgets["selector"].clear()
+                self._widgets["selector"].addItems(list(self._results.keys()))
+            self._widgets["selector"].setCurrentIndex(0)
+            self.__select_point(self._config["result_keys"][0])
+
+    @QtCore.Slot(str)
+    def __select_point(self, key):
+        """
+        Select a datapoint to display.
+
+        Parameters
+        ----------
+        key : str
+            The key to identify the results.
+        """
+        _has_metadata = "metadata" in self._results[key].keys()
+        if _has_metadata:
+            _meta_text = self._results[key]["metadata"]
+            self._widgets["metadata_label"].setText(_meta_text)
+        self._widgets["metadata_title"].setVisible(_has_metadata)
+        self._widgets["metadata_label"].setVisible(_has_metadata)
+        self.__plot_results(key)
+
+    def __plot_results(self, key):
         """
         Plot the provided results.
 
         Parameters
         ----------
-        results : dict
-            The dictionary with the new results.
+        key : Union[str, None]
+            The key to find the specific results.
         """
-        _plot_ylabels = results.get("plot_ylabels", {})
-        _titles = results.get("plot_titles", {})
+        _point_result = self._results[key]
+        _plot_ylabels = _point_result.get("plot_ylabels", {})
+        _titles = _point_result.get("plot_titles", {})
         self.__clear_plots()
-        for _item in results.get("items", []):
+        for _item in _point_result.get("items", []):
             _i_plot = _item["plot"]
             _label = _item.get("label", "")
             _title = _titles.get(_i_plot, "")
@@ -154,7 +230,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 self._widgets[f"plot{_i_plot}_1d"].setGraphTitle(_title)
             elif _data.ndim == 2:
                 self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(1)
-                self._plot2d(_i_plot, _data, _label)
+                self._plot2d(_i_plot, _data)
                 self._widgets[f"plot{_i_plot}_2d"].setGraphTitle(_title)
 
     def __clear_plots(self):
@@ -194,7 +270,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             ylabel=plot_ylabel,
         )
 
-    def _plot2d(self, i_plot, data, label):
+    def _plot2d(self, i_plot, data):
         """
         Plot a 2D-dataset in the 2D plot widget.
 
@@ -204,8 +280,6 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             The plot number.
         data : pydidas.core.Dataset
             The data to be plotted.
-        label : str
-            The curve label.
         """
         _plot = self._widgets[f"plot{i_plot}_2d"]
         _ax_labels = [

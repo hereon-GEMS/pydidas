@@ -98,10 +98,23 @@ class FitSinglePeak(ProcPlugin):
         self._ffunc = None
         self._func = None
         self._data = None
+        self._details = None
         self._fitparam_labels = []
         self._fitparam_startpoints = []
         self._fitparam_bounds_low = []
         self._fitparam_bounds_high = []
+
+    @property
+    def detailed_results(self):
+        """
+        Get the detailed results for the FitSinglePeak plugin.
+
+        Returns
+        -------
+        dict
+            The dictionary with detailed results.
+        """
+        return self._details
 
     def pre_execute(self):
         """
@@ -171,6 +184,7 @@ class FitSinglePeak(ProcPlugin):
         _results = self._create_result_dataset()
         kwargs["fit_params"] = self._fit_params
         kwargs["fit_func"] = self._func.__name__
+        self._details = {None: self._create_detailed_results(_results)}
         return _results, kwargs
 
     def _crop_data_to_selected_range(self):
@@ -362,9 +376,9 @@ class FitSinglePeak(ProcPlugin):
         else:
             raise ValueError("No result shape defined for the selected input")
 
-    def get_detailed_results(self):
+    def _create_detailed_results(self, results):
         """
-        Get the detailed results for the background removal.
+        Create the detailed results for the single peak fitting.
 
         This method will return detailed information to display for the user. The return
         format is a dictionary with four keys:
@@ -374,6 +388,11 @@ class FitSinglePeak(ProcPlugin):
         plotted. Each list entry must be a dictionary with the following keys: "plot"
         [to detemine the plot number], "label" [for the legend label] and "data" with
         the actual data.
+
+        Parameters
+        ----------
+        results : pydidas.core.Dataset
+            The Dataset with the regular results.
 
         Returns
         -------
@@ -391,13 +410,18 @@ class FitSinglePeak(ProcPlugin):
             data_unit=self._data.data_unit,
         )
         _residual = self._data - self._func(list(self._fit_params.values()), self._x)
-        _return = {
+        _meta = "\n".join(
+            f"{_key}: {results.metadata[_key]}"
+            for _key in ["fit_func", "fit_params", "fit_residual_std"]
+        )
+        _details = {
             "n_plots": 2,
             "plot_titles": {0: "data and fit", 1: "residual"},
             "plot_ylabels": {
                 0: "intensity / a.u.",
                 1: "intensity / a.u.",
             },
+            "metadata": _meta,
             "items": [
                 {"plot": 0, "label": "input data", "data": self._data},
                 {"plot": 0, "label": "fitted_data", "data": _datafit},
@@ -415,5 +439,5 @@ class FitSinglePeak(ProcPlugin):
                 axis_units=self._data.axis_units,
                 data_unit=self._data.data_unit,
             )
-            _return["items"].append({"plot": 0, "label": "background", "data": _bg})
-        return _return
+            _details["items"].append({"plot": 0, "label": "background", "data": _bg})
+        return _details

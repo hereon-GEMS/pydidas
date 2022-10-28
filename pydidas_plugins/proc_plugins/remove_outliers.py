@@ -78,6 +78,19 @@ class RemoveOutliers(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
+        self._details = None
+
+    @property
+    def detailed_results(self):
+        """
+        Get the detailed results for the Remove1dPolynomialBackground plugin.
+
+        Returns
+        -------
+        dict
+            The dictionary with detailed results.
+        """
+        return self._details
 
     def pre_execute(self):
         """
@@ -103,7 +116,7 @@ class RemoveOutliers(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self.__input_data = data.copy()
+        self._input_data = data.copy()
         _width = self.get_param_value("kernel_width")
         _threshold = self.get_param_value("outlier_threshold")
         _data_p = np.roll(data, _width)
@@ -134,7 +147,8 @@ class RemoveOutliers(ProcPlugin):
             + _width
         )
         data[_outliers] = (_data_p[_outliers] + _data_m[_outliers]) / 2
-        self.__results = data
+        self._results = data
+        self._details = {None: self._create_detailed_results()}
         return data, kwargs
 
     @calculate_result_shape_for_multi_input_dims
@@ -144,7 +158,7 @@ class RemoveOutliers(ProcPlugin):
         """
         ProcPlugin.calculate_result_shape(self)
 
-    def get_detailed_results(self):
+    def _create_detailed_results(self):
         """
         Get the detailed results for the outlier removal.
 
@@ -162,9 +176,9 @@ class RemoveOutliers(ProcPlugin):
         dict
             The dictionary with the detailed results in the format expected by pydidas.
         """
-        if self.__input_data is None:
+        if self._input_data is None:
             raise ValueError("Cannot get detailed results without input data.")
-        _return = {
+        return {
             "n_plots": 1,
             "plot_titles": {
                 0: "outlier correction",
@@ -173,8 +187,7 @@ class RemoveOutliers(ProcPlugin):
                 0: "intensity / a.u.",
             },
             "items": [
-                {"plot": 0, "label": "input data", "data": self.__input_data},
-                {"plot": 0, "label": "corrected data", "data": self.__results},
+                {"plot": 0, "label": "input data", "data": self._input_data},
+                {"plot": 0, "label": "corrected data", "data": self._results},
             ],
         }
-        return _return

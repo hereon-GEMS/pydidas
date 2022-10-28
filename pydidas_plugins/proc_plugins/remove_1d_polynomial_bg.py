@@ -122,7 +122,20 @@ class Remove1dPolynomialBackground(ProcPlugin):
         self._local_minina_threshold = 1.2
         self.__input_data = None
         self.__results = None
+        self._details = None
         self.__kwargs = {}
+
+    @property
+    def detailed_results(self):
+        """
+        Get the detailed results for the Remove1dPolynomialBackground plugin.
+
+        Returns
+        -------
+        dict
+            The dictionary with detailed results.
+        """
+        return self._details
 
     def pre_execute(self):
         """
@@ -219,6 +232,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         )
 
         self.__results = data
+        self._details = {None: self._create_detailed_results()}
         return data, kwargs
 
     @staticmethod
@@ -262,7 +276,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         """
         super().calculate_result_shape()
 
-    def get_detailed_results(self):
+    def _create_detailed_results(self):
         """
         Get the detailed results for the background removal.
 
@@ -282,7 +296,7 @@ class Remove1dPolynomialBackground(ProcPlugin):
         """
         if self.__input_data is None:
             raise ValueError("Cannot get detailed results without input data.")
-        _return = {
+        return {
             "n_plots": 2,
             "plot_titles": {
                 0: "input data and background",
@@ -298,4 +312,3 @@ class Remove1dPolynomialBackground(ProcPlugin):
                 {"plot": 1, "label": "", "data": self.__results},
             ],
         }
-        return _return

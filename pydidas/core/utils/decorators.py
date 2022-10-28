@@ -34,6 +34,11 @@ import itertools
 import numpy as np
 
 from ..dataset import Dataset
+from .iterable_utils import (
+    insert_item_in_tuple,
+    replace_item_in_iterable,
+    remove_item_at_index_from_iterable,
+)
 
 
 def copy_docstring(origin):
@@ -100,34 +105,45 @@ def process_1d_with_multi_input_dims(method):
         if data.ndim == 1:
             return method(self, data, **kwargs)
         _results = None
+        _details = {}
         _dim_to_process = np.mod(self.get_param_value("process_data_dim"), data.ndim)
-        _dataslice = slice(0, data.shape[_dim_to_process])
-        _res_shape = list(data.shape)
-        del _res_shape[_dim_to_process]
-        _indices = [np.arange(_s) for _s in _res_shape]
+        _results_shape = remove_item_at_index_from_iterable(data.shape, _dim_to_process)
+        _indices = [np.arange(_s) for _s in _results_shape]
         for _params in itertools.product(*_indices):
-            _input_slices = list(_params)
-            _input_slices.insert(_dim_to_process, _dataslice)
-            _input_slices = tuple(_input_slices)
-            _single_result, _new_kws = method(self, data[_input_slices], **kwargs)
+            _input_slices = insert_item_in_tuple(
+                _params, _dim_to_process, slice(0, data.shape[_dim_to_process])
+            )
+            _input = data[_input_slices]
+            _single_result, _new_kws = method(self, _input, **kwargs)
+
+            _point = insert_item_in_tuple(_params, _dim_to_process, None)
+            _detail_identifier = data.get_description_of_point(_point)
+            _details[_detail_identifier] = self._details[None].copy()
+            del self._details[None]
+
+            _output_slices = insert_item_in_tuple(
+                _params, _dim_to_process, slice(0, _single_result.size)
+            )
             if _results is None:
-                _res_shape.insert(_dim_to_process, _single_result.size)
+                _results_shape = insert_item_in_tuple(
+                    _results_shape, _dim_to_process, _single_result.size
+                )
                 _results = Dataset(
-                    np.zeros(_res_shape),
+                    np.zeros(_results_shape),
                     data_unit=_single_result.data_unit,
                     data_label=_single_result.data_label,
                 )
                 for _prop in ["axis_labels", "axis_units", "axis_ranges"]:
-                    _tmp = list(getattr(data, _prop).values())
-                    del _tmp[_dim_to_process]
-                    _tmp.insert(_dim_to_process, getattr(_single_result, _prop).get(0))
-                    setattr(_results, _prop, _tmp)
-            _output_slices = list(_params)
-            _output_slices.insert(_dim_to_process, slice(0, _single_result.size))
-            _output_slices = tuple(_output_slices)
+                    _value = replace_item_in_iterable(
+                        tuple(getattr(data, _prop).values()),
+                        _dim_to_process,
+                        getattr(_single_result, _prop).get(0),
+                    )
+                    setattr(_results, _prop, _value)
             _results[_output_slices] = _single_result
         if _results.shape[_dim_to_process] == 1:
             _results = _results.squeeze(_dim_to_process)
+        self._details = _details
         return _results, _new_kws
 
     _implementation.__doc__ = method.__doc__

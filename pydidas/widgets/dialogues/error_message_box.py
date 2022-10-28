@@ -35,7 +35,7 @@ from ...core.utils import (
 )
 from ...core.constants import EXP_EXP_POLICY, PYDIDAS_FEEDBACK_URL
 from ...core.utils import copy_text_to_system_clipbord
-from ...core.utils import apply_qt_properties
+from ...core.utils import apply_qt_properties, update_size_policy
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -67,6 +67,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             fontsize=12,
             bold=True,
             gridPos=(0, 0, 1, 1),
+            fixedWidth=450,
         )
         self._widgets["label"] = QtWidgets.QLabel()
         apply_qt_properties(
@@ -74,7 +75,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
             sizePolicy=EXP_EXP_POLICY,
             indent=8,
-            fixedWidth=715,
+            # fixedWidth=715,
         )
 
         self.create_any_widget(
@@ -83,9 +84,12 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             widget=self._widgets["label"],
             gridPos=(1, 0, 1, 2),
         )
-        self.create_button("button_okay", "OK", gridPos=(2, 3, 1, 1))
+        update_size_policy(self._widgets["scroll_area"], horizontalStretch=1)
         self.create_button(
-            "button_copy", "Copy to clipboard and open webpage", gridPos=(2, 0, 1, 1)
+            "button_copy",
+            "Copy to clipboard and open webpage",
+            gridPos=(2, 0, 1, 1),
+            fixedWidth=300,
         )
 
         _icon_fname = os.path.join(get_pydidas_icon_path(), "pydidas_error.svg")
@@ -95,14 +99,15 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             fixedHeight=150,
             fixedWidth=150,
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
-            gridPos=(0, 2, 2, 2),
+            gridPos=(0, 2, 2, 1),
         )
+        self.create_button("button_okay", "OK", gridPos=(2, 2, 1, 1), fixdWidth=150)
 
         self._widgets["button_okay"].clicked.connect(self.close)
         self._widgets["button_copy"].clicked.connect(
             self.copy_to_clipboard_and_open_webpage
         )
-        self.resize(900, self.height())
+        self.resize(950, self.height())
         self.set_text(self._text)
 
     def set_text(self, text):

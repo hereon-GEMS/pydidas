@@ -26,7 +26,7 @@ __all__ = ["trim_filename", "get_extension", "find_valid_python_files"]
 
 import os
 
-from .flatten_iterable import flatten
+from .iterable_utils import flatten
 
 
 def trim_filename(path):

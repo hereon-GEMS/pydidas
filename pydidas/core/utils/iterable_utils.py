@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["flatten", "flatten_all"]
+__all__ = ["flatten", "flatten_all", "insert_item_in_tuple", "replace_item_in_iterable"]
 
 import itertools
 from collections.abc import Iterable
@@ -86,3 +86,73 @@ def flatten_all(nested_iterable, astype=list):
         else:
             _new.append(_item)
     return astype(_new)
+
+
+def insert_item_in_tuple(obj, index, item):
+    """
+    Function to insert an item into a tuple
+
+    Parameters
+    ----------
+    obj : tuple
+        The original tuple
+    index : int
+        The index for the new item
+    item : object
+        The new item to be inserted.
+
+    Returns
+    -------
+    tuple
+        The updated tuple.
+    """
+    _new = list(obj)
+    _new.insert(index, item)
+    return tuple(_new)
+
+
+def replace_item_in_iterable(obj, index, item):
+    """
+    Function to replace an item in an existing tuple
+
+    Parameters
+    ----------
+    obj : type
+        The original iterable
+    index : int
+        The index for the new item
+    item : type
+        The new item to be inserted.
+
+    Returns
+    -------
+    type
+        The updated iterable.
+    """
+    _type = type(obj)
+    _new = list(obj)
+    del _new[index]
+    _new.insert(index, item)
+    return _type(_new)
+
+
+def remove_item_at_index_from_iterable(obj, index):
+    """
+    Function to remove an item
+
+    Parameters
+    ----------
+    obj : type
+        The iterable
+    index : int
+        The index of the item to be removed.
+
+    Returns
+    -------
+    type
+        The updated iterable.
+    """
+    _type = type(obj)
+    _new = list(obj)
+    del _new[index]
+    return _type(_new)

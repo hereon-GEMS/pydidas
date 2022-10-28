@@ -579,6 +579,35 @@ class EmptyDataset(np.ndarray):
             raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
         self._keys["axis_units"][index] = item
 
+    def get_description_of_point(self, indices):
+        """
+        Get the metadata description of a single point in the array.
+
+        Index values of "None" will be interpreted as request to skip this axis.
+
+        Parameters
+        ----------
+        indices : Union[tuple, list]
+            The indices for each dimension.
+
+        Returns
+        -------
+        str
+            A string description of the selected point.
+        """
+        _str = ""
+        if len(indices) != self.ndim:
+            raise ValueError("Wrong number of indices for Dataset dimensions.")
+        for _dim, _index in enumerate(indices):
+            if _index is None:
+                continue
+            _label = self._keys["axis_labels"][_dim]
+            _value = self._keys["axis_ranges"][_dim][_index]
+            _unit = self._keys["axis_units"][_dim]
+            _s = f"{_label}: {_value:.4f} {_unit}"
+            _str = _str + "; " + _s if len(_str) > 0 else _s
+        return _str
+
     # ############################################
     # Reimplementations of generic ndarray methods
     # ############################################

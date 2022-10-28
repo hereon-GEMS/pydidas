@@ -782,6 +782,21 @@ class TestDataset(unittest.TestCase):
         obj.update_axis_units(1, _val)
         self.assertEqual(obj.axis_units[1], _val)
 
+    def test_get_description_of_point__wrong_arg_len(self):
+        obj = self.create_large_dataset()
+        with self.assertRaises(ValueError):
+            obj.get_description_of_point((1, 2, 3, 4, 5, 6))
+
+    def test_get_description_of_point__simple(self):
+        obj = self.create_large_dataset()
+        _str = obj.get_description_of_point((1, 2, 3, 4))
+        self.assertEqual(_str, "a: 1.0000 ua; b: 2.0000 ub; c: 3.0000 uc; d: 4.0000 ud")
+
+    def test_get_description_of_point__wNone(self):
+        obj = self.create_large_dataset()
+        _str = obj.get_description_of_point((None, 2, None, 4))
+        self.assertEqual(_str, "b: 2.0000 ub; d: 4.0000 ud")
+
     def test_dataset_creation(self):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array)

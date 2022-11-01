@@ -33,10 +33,9 @@ from .file_utils import *
 from .iterable_utils import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
-from .get_logging_dir_ import *
 from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
-from .logger_ import *
+from .logger import *
 from .math_utils import *
 from .qt_utilities import *
 from .rebin_ import *
@@ -79,13 +78,7 @@ from . import get_documentation_targets
 __all__.extend(get_documentation_targets.__all__)
 del get_documentation_targets
 
-from . import get_logging_dir_
-
-__all__.extend(get_logging_dir_.__all__)
-del get_logging_dir_
-
 from . import get_pydidas_icons
-
 
 __all__.extend(get_pydidas_icons.__all__)
 del get_pydidas_icons
@@ -100,10 +93,10 @@ from . import iterable_utils
 __all__.extend(iterable_utils.__all__)
 del iterable_utils
 
-from . import logger_
+from . import logger
 
-__all__.extend(logger_.__all__)
-del logger_
+__all__.extend(logger.__all__)
+del logger
 
 from . import math_utils
 

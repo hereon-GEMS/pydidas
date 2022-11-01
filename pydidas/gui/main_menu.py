@@ -38,6 +38,8 @@ from ..core.utils import (
     get_pydidas_icon_w_bg,
     get_doc_qurl_for_frame_manual,
     get_doc_filename_for_frame_manual,
+    get_logging_dir,
+    clear_logging_dir,
 )
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree
@@ -195,14 +197,17 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["open_settings"] = QtWidgets.QAction("&Settings", self)
         self._actions["open_user_config"] = QtWidgets.QAction("&User config", self)
 
-        self._actions["utils_export_eiger_pixel_mask"] = QtWidgets.QAction(
+        self._actions["tools_export_eiger_pixel_mask"] = QtWidgets.QAction(
             "&Export Eiger Pixelmask", self
         )
-        self._actions["utils_image_series_ops"] = QtWidgets.QAction(
+        self._actions["tools_image_series_ops"] = QtWidgets.QAction(
             "&Image series processing", self
         )
-        self._actions["utils_mask_editor"] = QtWidgets.QAction(
+        self._actions["tools_mask_editor"] = QtWidgets.QAction(
             "Edit detector &mask", self
+        )
+        self._actions["tools_clear_local_logs"] = QtWidgets.QAction(
+            "&Clear local log files", self
         )
 
         self._actions["open_documentation_browser"] = QtWidgets.QAction(
@@ -227,13 +232,16 @@ class MainMenu(QtWidgets.QMainWindow):
         self._actions["open_user_config"].triggered.connect(
             partial(self.show_window, "user_config")
         )
-        self._actions["utils_export_eiger_pixel_mask"].triggered.connect(
+        self._actions["tools_export_eiger_pixel_mask"].triggered.connect(
             partial(self.create_and_show_temp_window, ExportEigerPixelmaskWindow)
         )
-        self._actions["utils_image_series_ops"].triggered.connect(
+        self._actions["tools_image_series_ops"].triggered.connect(
             partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
-        self._actions["utils_mask_editor"].triggered.connect(
+        self._actions["tools_clear_local_logs"].triggered.connect(
+            self.clear_local_log_files
+        )
+        self._actions["tools_mask_editor"].triggered.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
@@ -265,10 +273,12 @@ class MainMenu(QtWidgets.QMainWindow):
         _file_menu.addAction(self._actions["exit"])
         _menu.addMenu(_file_menu)
 
-        _utilities_menu = _menu.addMenu("&Utilities")
-        _utilities_menu.addAction(self._actions["utils_export_eiger_pixel_mask"])
-        _utilities_menu.addAction(self._actions["utils_image_series_ops"])
-        _utilities_menu.addAction(self._actions["utils_mask_editor"])
+        _utilities_menu = _menu.addMenu("&Tools")
+        _utilities_menu.addAction(self._actions["tools_export_eiger_pixel_mask"])
+        _utilities_menu.addAction(self._actions["tools_image_series_ops"])
+        _utilities_menu.addAction(self._actions["tools_mask_editor"])
+        _utilities_menu.addSeparator()
+        _utilities_menu.addAction(self._actions["tools_clear_local_logs"])
         _menu.addMenu(_utilities_menu)
 
         _options_menu = _menu.addMenu("&Options")
@@ -420,6 +430,26 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         if name in self._child_windows:
             del self._child_windows[name]
+
+    @QtCore.Slot()
+    def clear_local_log_files(self):
+        """
+        Clear all local log files for this pydidas version.
+        """
+        _logdir = get_logging_dir()
+        _reply = QuestionBox(
+            "Clear all local log files",
+            "Do you want to delete all local log files for this pydidas version? "
+            f"\nLog directory: {_logdir}"
+            "\n\nNote that the currently active logfile will be excluded.",
+        ).exec_()
+        if _reply:
+            _access_error = clear_logging_dir()
+            if len(_access_error) > 0:
+                raise UserConfigError(
+                    "Could not delete the following log file(s):\n - "
+                    + "\n - ".join(_access_error)
+                )
 
     def deleteLater(self):
         """

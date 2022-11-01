@@ -49,10 +49,20 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._mask = None
-        self._maskval = None
+        self.__ai_params = {}
         self.set_param_value("rad_npoint", 1000)
         self.set_param_value("azi_npoint", 36)
+
+    def pre_execute(self):
+        """
+        Pre-execute the plugin and store the Parameters required for the execution.
+        """
+        self.__ai_params["npt_rad"] = self.get_param_value("rad_npoint")
+        self.__ai_params["npt_azim"] = self.get_param_value("azi_npoint")
+        self.__ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
+        self.__ai_params["radial_range"] = self.get_radial_range()
+        self.__ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+        pyFAIintegrationBase.pre_execute(self)
 
     def execute(self, data, **kwargs):
         """
@@ -74,13 +84,12 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         """
         _newdata = self._ai.integrate2d(
             data,
-            self.get_param_value("rad_npoint"),
-            npt_azim=self.get_param_value("azi_npoint"),
+            self.__ai_params["npt_rad"],
+            npt_azim=self.__ai_params["npt_azim"],
             polarization_factor=1,
-            mask=self._mask,
-            unit=self.get_pyFAI_unit_from_param("rad_unit"),
-            radial_range=self.get_radial_range(),
-            azimuth_range=self.get_azimuthal_range_in_deg(),
+            unit=self.__ai_params["unit"],
+            radial_range=self.__ai_params["radial_range"],
+            azimuth_range=self.__ai_params["azimuth_range"],
             method=self._config["method"],
         )
         _range_fact = np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1

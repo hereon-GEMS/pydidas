@@ -30,6 +30,7 @@ from scipy.optimize import least_squares
 
 from pydidas.core.constants import (
     PROC_PLUGIN,
+    PROC_PLUGIN_INTEGRATED,
     gaussian,
     gaussian_delta,
     lorentzian,
@@ -59,6 +60,7 @@ class FitSinglePeak(ProcPlugin):
     plugin_name = "Fit single peak"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_INTEGRATED
     default_params = get_generic_param_collection(
         "process_data_dim",
         "fit_func",
@@ -70,10 +72,10 @@ class FitSinglePeak(ProcPlugin):
         Parameter(
             "output",
             str,
-            "Peak area",
+            "Peak position",
             choices=[
-                "Peak area",
                 "Peak position",
+                "Peak area",
                 "Fit normalized standard deviation",
                 "Peak area and position",
                 "Peak area, position and norm. std",
@@ -103,6 +105,10 @@ class FitSinglePeak(ProcPlugin):
         self._fitparam_startpoints = []
         self._fitparam_bounds_low = []
         self._fitparam_bounds_high = []
+        self._config = self._config | {
+            "range_slice": None,
+            "settings_updated_from_data": False,
+        }
 
     @property
     def detailed_results(self):
@@ -146,7 +152,9 @@ class FitSinglePeak(ProcPlugin):
             self._fitparam_bounds_low.append(-np.inf)
             self._fitparam_bounds_high.append(np.inf)
         self.output_data_label = self.get_param_value("output")
-        self.output_data_unit = "a.u."
+        self.output_data_unit = ""
+        self._config["range_slice"] = None
+        self._config["settings_updated_from_data"] = False
 
     @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
@@ -172,6 +180,7 @@ class FitSinglePeak(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
+        self._update_settings_from_data()
         self._crop_data_to_selected_range()
         _startguess = self._calc_param_start_guess()
         _res = least_squares(
@@ -186,6 +195,26 @@ class FitSinglePeak(ProcPlugin):
         kwargs["fit_func"] = self._func.__name__
         self._details = {None: self._create_detailed_results(_results)}
         return _results, kwargs
+
+    def _update_settings_from_data(self):
+        """
+        Output Plugin settings which depend on the input data.
+        """
+        if self._config["settings_updated_from_data"]:
+            return
+        if self.get_param_value("fit_func") in ["Gaussian", "Lorentzian"]:
+            _center_index = 2
+        elif self.get_param_value("fit_func") == "Voigt":
+            _center_index = 3
+        self._fitparam_bounds_low[_center_index] = np.amin(self._data.axis_ranges[0])
+        self._fitparam_bounds_high[_center_index] = np.amax(self._data.axis_ranges[0])
+        if self.get_param_value("output") == "Peak position":
+            self.output_data_unit = self._data.axis_units[0]
+        elif self.get_param_value("output") == "Peak area":
+            _pos_unit = self._data.axis_units[0]
+            _val_unit = self._data.data_unit
+            self.output_data_unit = f"({_pos_unit} * {_val_unit})"
+        self._config["settings_updated_from_data"] = True
 
     def _crop_data_to_selected_range(self):
         """
@@ -209,11 +238,14 @@ class FitSinglePeak(ProcPlugin):
         range : np.ndarray
             The index range corresponding to the selected data ranges.
         """
+        if self._config["range_slice"] is not None:
+            return self._config["range_slice"]
         _xlow = self.get_param_value("fit_lower_limit")
         _xhigh = self.get_param_value("fit_upper_limit")
         _range = np.where(
             (self._data.axis_ranges[0] >= _xlow) & (self._data.axis_ranges[0] <= _xhigh)
         )[0]
+        self._config["range_slice"] = _range
         return _range
 
     def _calc_param_start_guess(self):
@@ -321,7 +353,9 @@ class FitSinglePeak(ProcPlugin):
             )
         elif _output == "Peak position":
             _new_data = Dataset(
-                [self._fit_params["center"]], axis_labels=["Peak position"]
+                [self._fit_params["center"]],
+                axis_labels=["Peak position"],
+                axis_units=[self._data.axis_units[0]],
             )
         elif _output == "Peak area and position":
             _new_data = Dataset(
@@ -330,7 +364,9 @@ class FitSinglePeak(ProcPlugin):
             )
         elif _output == "Fit normalized standard deviation":
             _new_data = Dataset(
-                [_residual_std], axis_labels=["Fit normalized standard deviation"]
+                [_residual_std],
+                axis_labels=["Fit normalized standard deviation"],
+                axis_units=[self._data.axis_units[0]],
             )
         elif _output == "Peak area, position and norm. std":
             _new_data = Dataset(

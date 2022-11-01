@@ -234,34 +234,34 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             plugin.calculate_result_shape()
 
-    def test_load_and_store_mask__local_mask_value(self):
+    def test_load_and_set_mask__local_mask_value(self):
         _maskfilename, _mask = self.create_mask()
         plugin = pyFAIintegrationBase()
         plugin.set_param_value("det_mask", _maskfilename)
-        plugin.load_and_store_mask()
+        plugin.load_and_set_mask()
         self.assertTrue((plugin._mask == _mask).all())
 
-    def test_load_and_store_mask__q_settings(self):
+    def test_load_and_set_mask__q_settings(self):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
-        plugin.load_and_store_mask()
+        plugin.load_and_set_mask()
         self.assertTrue(np.equal(plugin._mask, _mask).all())
 
-    def test_load_and_store_mask__wrong_local_mask_and_q_settings(self):
+    def test_load_and_set_mask__wrong_local_mask_and_q_settings(self):
         _maskfilename, _mask = self.create_mask()
         self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
         plugin.set_param_value("det_mask", os.path.join(self._temppath, "no_mask.npy"))
-        plugin.load_and_store_mask()
+        plugin.load_and_set_mask()
         self.assertTrue(np.equal(plugin._mask, _mask).all())
 
-    def test_load_and_store_mask__no_mask(self):
+    def test_load_and_set_mask__no_mask(self):
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 45)
-        plugin.load_and_store_mask()
+        plugin.load_and_set_mask()
         self.assertIsNone(plugin._mask)
 
     def test_pre_execute(self):

@@ -34,7 +34,7 @@ import pyFAI
 import pyFAI.azimuthalIntegrator
 from silx.opencl.common import OpenCL
 
-from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI
+from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI, PROC_PLUGIN_IMAGE
 from ..core import get_generic_param_collection, UserConfigError
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
@@ -80,6 +80,7 @@ class pyFAIintegrationBase(ProcPlugin):
     plugin_name = "PyFAI integration base"
     basic_plugin = True
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = get_generic_param_collection(
         "rad_npoint",
         "rad_unit",
@@ -101,6 +102,7 @@ class pyFAIintegrationBase(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._ai = None
+        self._exp_hash = -1
         self._mask = None
         self.params["det_mask"]._Parameter__meta["optional"] = True
 
@@ -108,7 +110,8 @@ class pyFAIintegrationBase(ProcPlugin):
         """
         Check the use_global_mask Parameter and load the mask image.
         """
-        if self._ai is None:
+        self.load_and_set_mask()
+        if self._exp_hash != hash(EXP_SETUP):
             _lambda_in_A = EXP_SETUP.get_param_value("xray_wavelength")
             self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
                 dist=EXP_SETUP.get_param_value("detector_dist"),
@@ -120,10 +123,11 @@ class pyFAIintegrationBase(ProcPlugin):
                 detector=EXP_SETUP.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
-        self.load_and_store_mask()
+        if self._mask is not None:
+            self._ai.set_mask(self._mask)
         self._prepare_pyfai_method()
 
-    def load_and_store_mask(self):
+    def load_and_set_mask(self):
         """
         Load and store the mask.
 
@@ -304,7 +308,7 @@ class pyFAIintegrationBase(ProcPlugin):
             _low = np.round(_low, 5)
             _high = np.round(_high, 5)
             raise UserConfigError(
-                f"The chosen integration range '({_low}, {_high})' cannot be processed "
+                f"The chosen integration range ({_low}, {_high}) cannot be processed "
                 "because it cannot be represented in pyFAI. The range must be either "
                 f"in the interval [-{PI_STR}, {PI_STR}[ or [0, 2*{PI_STR}[."
             )

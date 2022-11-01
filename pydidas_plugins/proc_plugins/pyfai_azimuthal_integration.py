@@ -49,6 +49,16 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         self.params["rad_unit"].choices = ["Q / nm^-1", "2theta / deg", "r / mm"]
         del self.params["azi_npoint"]
 
+    def pre_execute(self):
+        """
+        Pre-execute the plugin and store the Parameters required for the execution.
+        """
+        self.__ai_params["npt_rad"] = self.get_param_value("rad_npoint")
+        self.__ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
+        self.__ai_params["radial_range"] = self.get_radial_range()
+        self.__ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+        pyFAIintegrationBase.pre_execute(self)
+
     def execute(self, data, **kwargs):
         """
         Run the azimuthal integration on the input data.
@@ -62,11 +72,10 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         """
         _newdata = self._ai.integrate1d(
             data,
-            self.get_param_value("rad_npoint"),
-            unit=self.get_pyFAI_unit_from_param("rad_unit"),
-            radial_range=self.get_radial_range(),
-            azimuth_range=self.get_azimuthal_range_in_deg(),
-            mask=self._mask,
+            self.__ai_params["npt_rad"],
+            unit=self.__ai_params["unit"],
+            radial_range=self.__ai_params["radial_range"],
+            azimuth_range=self.__ai_params["azimuth_range"],
             polarization_factor=1,
             method=self._config["method"],
         )

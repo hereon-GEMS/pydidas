@@ -31,6 +31,9 @@ __all__ = [
     "OUTPUT_PLUGIN",
     "pyFAI_UNITS",
     "pyFAI_METHOD",
+    "PROC_PLUGIN_GENERIC",
+    "PROC_PLUGIN_IMAGE",
+    "PROC_PLUGIN_INTEGRATED",
 ]
 
 import scipy.constants
@@ -56,6 +59,10 @@ BASE_PLUGIN = -1
 INPUT_PLUGIN = 0
 PROC_PLUGIN = 1
 OUTPUT_PLUGIN = 2
+
+PROC_PLUGIN_GENERIC = 10
+PROC_PLUGIN_IMAGE = 11
+PROC_PLUGIN_INTEGRATED = 12
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",

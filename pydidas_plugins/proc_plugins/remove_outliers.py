@@ -29,12 +29,9 @@ import warnings
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core import get_generic_param_collection, Parameter
-from pydidas.core.utils import (
-    process_1d_with_multi_input_dims,
-    calculate_result_shape_for_multi_input_dims,
-)
+from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
 
@@ -46,6 +43,7 @@ class RemoveOutliers(ProcPlugin):
     plugin_name = "Remove Outliers"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_INTEGRATED
     default_params = get_generic_param_collection("process_data_dim")
     default_params.add_params(
         Parameter(
@@ -150,13 +148,6 @@ class RemoveOutliers(ProcPlugin):
         self._results = data
         self._details = {None: self._create_detailed_results()}
         return data, kwargs
-
-    @calculate_result_shape_for_multi_input_dims
-    def calculate_result_shape(self):
-        """
-        Calculate the shape of the Plugin results.
-        """
-        ProcPlugin.calculate_result_shape(self)
 
     def _create_detailed_results(self):
         """

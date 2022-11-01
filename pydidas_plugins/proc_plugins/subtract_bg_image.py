@@ -29,7 +29,7 @@ __all__ = ["SubtractBackgroundImage"]
 import numpy as np
 
 from pydidas.core import get_generic_param_collection
-from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
@@ -43,6 +43,7 @@ class SubtractBackgroundImage(ProcPlugin):
     plugin_name = "Subtract background image"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = get_generic_param_collection(
         "bg_file", "bg_hdf5_key", "bg_hdf5_frame", "threshold_low"
     )

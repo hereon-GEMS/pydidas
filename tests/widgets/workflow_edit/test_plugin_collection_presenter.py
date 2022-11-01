@@ -85,7 +85,8 @@ class TestPluginCollectionBrowser(unittest.TestCase):
 
     def click_index(self, obj, double=False):
         model = obj.model()
-        _type = random.choice([0, 1, 2])
+        # ignore processing plugins because they are grouped differently
+        _type = random.choice([0, 4])
         _num = random.choice(np.arange(self.n_per_type))
         _item = model.item(_type).child(_num)
         index = model.indexFromItem(_item)
@@ -118,8 +119,9 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         _root, _model = obj._PluginCollectionTreeWidget__create_tree_model()
         self.assertIsInstance(_root, QtGui.QStandardItem)
         self.assertIsInstance(_model, QtGui.QStandardItemModel)
-        self.assertEqual(_model.rowCount(), 3)
-        for _num, _ptype in enumerate(["input", "proc", "output"]):
+        self.assertEqual(_model.rowCount(), 5)
+        # only check 0, 1, 4 for input, generic proc and output
+        for _num in [0, 1, 4]:
             self.assertEqual(_model.item(_num).rowCount(), self.n_per_type)
 
     def test_PluginCollectionTreeWidget_single_click(self):

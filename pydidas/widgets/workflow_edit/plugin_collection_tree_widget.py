@@ -67,12 +67,14 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.setFixedWidth(400)
-        self.setMinimumHeight(200)
+        self.setMinimumHeight(400)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 
         _header_font = self.header().font()
-        apply_font_properties(_header_font, fontsize=constants.STANDARD_FONT_SIZE + 4)
+        apply_font_properties(
+            _header_font, fontsize=constants.STANDARD_FONT_SIZE + 4, underline=True
+        )
         self.header().setFont(_header_font)
 
         self._update_collection()
@@ -191,18 +193,31 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
         root_node = tree_model.invisibleRootItem()
         input_plugins = QtGui.QStandardItem("Input plugins")
-        proc_plugins = QtGui.QStandardItem("Processing plugins")
         output_plugins = QtGui.QStandardItem("Output plugins")
+
+        proc_plugin_generic = QtGui.QStandardItem("Generic processing plugins")
+        proc_plugin_image = QtGui.QStandardItem("Processing plugins for image data")
+        proc_plugin_integrated = QtGui.QStandardItem(
+            "Processing plugins for integrated data"
+        )
 
         for _plugin in self.collection.get_all_plugins_of_type("input"):
             input_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type("proc"):
-            proc_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
+            if _plugin.plugin_subtype == constants.PROC_PLUGIN_GENERIC:
+                _parent = proc_plugin_generic
+            elif _plugin.plugin_subtype == constants.PROC_PLUGIN_IMAGE:
+                _parent = proc_plugin_image
+            elif _plugin.plugin_subtype == constants.PROC_PLUGIN_INTEGRATED:
+                _parent = proc_plugin_integrated
+            _parent.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type("output"):
             output_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
 
         root_node.appendRow(input_plugins)
-        root_node.appendRow(proc_plugins)
+        root_node.appendRow(proc_plugin_generic)
+        root_node.appendRow(proc_plugin_image)
+        root_node.appendRow(proc_plugin_integrated)
         root_node.appendRow(output_plugins)
         return root_node, tree_model
 
@@ -270,6 +285,5 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         """
         _parent = self._model.itemFromIndex(index).parent()
         if _parent is None:
-            option.font.setWeight(QtGui.QFont.Bold)
             option.font.setPointSize(constants.STANDARD_FONT_SIZE + 2)
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

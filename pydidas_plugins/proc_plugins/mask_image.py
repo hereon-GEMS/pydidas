@@ -28,7 +28,7 @@ __all__ = ["MaskImage"]
 import numpy as np
 
 from pydidas.core import ParameterCollection, get_generic_parameter
-from pydidas.core.constants import PROC_PLUGIN
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.plugins import ProcPlugin
 from pydidas.data_io import import_data
@@ -42,6 +42,7 @@ class MaskImage(ProcPlugin):
     plugin_name = "Mask image"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = ParameterCollection(
         get_generic_parameter("use_global_mask"),
         get_generic_parameter("det_mask"),

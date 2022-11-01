@@ -24,7 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ProcPlugin"]
 
-from ..core.constants import PROC_PLUGIN
+from ..core.constants import PROC_PLUGIN, PROC_PLUGIN_GENERIC
 from .base_plugin import BasePlugin
 
 
@@ -34,6 +34,7 @@ class ProcPlugin(BasePlugin):
     """
 
     plugin_type = PROC_PLUGIN
+    plugin_subtype = PROC_PLUGIN_GENERIC
     plugin_name = "Base processing plugin"
     generic_params = BasePlugin.generic_params.get_copy()
     default_params = BasePlugin.default_params.get_copy()

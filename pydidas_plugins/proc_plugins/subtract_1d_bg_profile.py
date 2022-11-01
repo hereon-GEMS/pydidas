@@ -30,10 +30,33 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import ParameterCollection, Parameter
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.utils import process_1d_with_multi_input_dims
+from pydidas.core import Parameter, get_generic_param_collection
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
+
+
+_PARAM_THRESH = Parameter(
+    "threshold_low",
+    float,
+    None,
+    allow_None=True,
+    name="Lower threshold",
+    tooltip=(
+        "The lower threhold. Any values in the corrected"
+        " dataset smaller than the threshold will be set "
+        "to the threshold value."
+    ),
+)
+
+_PARAM_PROFILE_FILE = Parameter(
+    "profile_file",
+    Path,
+    Path(),
+    name="Filename of profile file",
+    tooltip=("The filename of the file with the background profile."),
+)
 
 
 class Subtract1dBackgroundProfile(ProcPlugin):
@@ -47,37 +70,9 @@ class Subtract1dBackgroundProfile(ProcPlugin):
     plugin_name = "Subtract 1D background profile"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        Parameter(
-            "kernel_width",
-            int,
-            5,
-            name="Averaging width",
-            tooltip=(
-                "The width of the averaging kernel (which is only "
-                "applied to the data for fitting)."
-            ),
-        ),
-        Parameter(
-            "threshold_low",
-            float,
-            None,
-            allow_None=True,
-            name="Lower threshold",
-            tooltip=(
-                "The lower threhold. Any values in the corrected"
-                " dataset smaller than the threshold will be set "
-                "to the threshold value."
-            ),
-        ),
-        Parameter(
-            "profile_file",
-            Path,
-            Path(),
-            name="Filename of profile file",
-            tooltip=("The filename of the file with the background profile."),
-        ),
-    )
+    plugin_subtype = PROC_PLUGIN_INTEGRATED
+    default_params = get_generic_param_collection("process_data_dim")
+    default_params.add_params(_PARAM_THRESH.get_copy(), _PARAM_PROFILE_FILE.get_copy())
     input_data_dim = 1
     output_data_dim = 1
     output_data_label = "Background-corrected data"
@@ -98,18 +93,12 @@ class Subtract1dBackgroundProfile(ProcPlugin):
         _fname = self.get_param_value("profile_name")
         _profile = import_data(_fname)
 
-        _kernel = self.get_param_value("kernel_width")
-        if _kernel > 0:
-            _kernel = np.ones(_kernel) / _kernel
-            _klim_low = _kernel // 2
-            _klim_high = _kernel - 1 - _kernel // 2
-
-        _profile[_klim_low:-_klim_high] = np.convolve(_profile, _kernel, mode="valid")
         self._profile = _profile
 
+    @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
         """
-        Apply a mask to an image (2d data-array).
+        Subtract a one-dimensional background profile.
 
         Parameters
         ----------

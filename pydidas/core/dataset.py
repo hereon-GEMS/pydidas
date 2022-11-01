@@ -38,7 +38,7 @@ from pydidas.core.utils.dataset_utils import (
     convert_data_to_dict,
     update_dataset_properties_from_kwargs,
     dataset_property_default_val,
-    dataset_ax_default_range,
+    dataset_ax_default,
     item_is_iterable_but_not_array,
 )
 
@@ -110,7 +110,7 @@ class EmptyDataset(np.ndarray):
         Update the axis keys from the original object
         """
         self._keys = {
-            _key: deepcopy(getattr(obj, _key, dataset_ax_default_range(self.ndim)))
+            _key: deepcopy(getattr(obj, _key, dataset_ax_default(self.ndim)))
             for _key in ["axis_labels", "axis_ranges", "axis_units"]
         }
         self.getitem_key = tuple() if self.getitem_key is None else self.getitem_key

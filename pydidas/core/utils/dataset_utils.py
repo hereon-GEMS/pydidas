@@ -25,7 +25,7 @@ __status__ = "Development"
 __all__ = [
     "update_dataset_properties_from_kwargs",
     "dataset_property_default_val",
-    "dataset_ax_default_range",
+    "dataset_ax_default",
     "get_number_of_entries",
     "get_axis_item_representation",
     "convert_data_to_dict",
@@ -60,9 +60,9 @@ def update_dataset_properties_from_kwargs(obj, kwargs):
         The updated Dataset.
     """
     obj._keys = {}
-    obj.axis_units = kwargs.get("axis_units", dataset_ax_default_range(obj.ndim))
-    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_default_range(obj.ndim))
-    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_range(obj.ndim))
+    obj.axis_units = kwargs.get("axis_units", dataset_ax_default(obj.ndim, True))
+    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_default(obj.ndim, True))
+    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default(obj.ndim))
     obj.metadata = kwargs.get("metadata", {})
     obj.data_unit = kwargs.get("data_unit", "")
     obj.data_label = kwargs.get("data_label", "")
@@ -70,7 +70,7 @@ def update_dataset_properties_from_kwargs(obj, kwargs):
     return obj
 
 
-def dataset_property_default_val(entry):
+def dataset_property_default_val(entry, length=None):
     """
     Generate default values for the properties in a Dataset.
 
@@ -97,7 +97,7 @@ def dataset_property_default_val(entry):
     raise ValueError(f"No default available for '{entry}'.")
 
 
-def dataset_ax_default_range(ndim):
+def dataset_ax_default(ndim, get_string=False):
     """
     Generate default values for the properties in a Dataset.
 
@@ -105,15 +105,19 @@ def dataset_ax_default_range(ndim):
 
     Parameters
     ----------
+
     ndim : int
         The number of dimensions in the Dataset.
+    get_string : bool
+        Keyword to return an empty string instead of "None".
 
     Returns
     -------
     dict
         The default entries: a dictionary with None entries for each dimension.
     """
-    return {i: None for i in range(ndim)}
+    _val = "" if get_string else None
+    return {i: _val for i in range(ndim)}
 
 
 def get_number_of_entries(obj):
@@ -229,7 +233,7 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
                 "dimensions. Resettings keys to defaults. (Error encountered in "
                 f"{calling_method_name})."
             )
-            return dataset_ax_default_range(target_length)
+            return dataset_ax_default(target_length)
         return dict(enumerate(data))
     raise PydidasConfigError(
         f"Input {data} cannot be converted to dictionary for property"

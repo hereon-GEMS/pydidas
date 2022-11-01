@@ -32,7 +32,7 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
     update_dataset_properties_from_kwargs,
     dataset_property_default_val,
-    dataset_ax_default_range,
+    dataset_ax_default,
     get_number_of_entries,
     convert_data_to_dict,
     item_is_iterable_but_not_array,
@@ -90,8 +90,8 @@ class Test_dataset_utils(unittest.TestCase):
     def test_dataset_property_default_val__getitem_key(self):
         self.assertIsNone(dataset_property_default_val("getitem_key"))
 
-    def test_dataset_ax_default_range(self):
-        _range = dataset_ax_default_range(5)
+    def test_dataset_ax_default(self):
+        _range = dataset_ax_default(5)
         self.assertEqual(set(np.arange(5)), set(_range.keys()))
         self.assertEqual(set([None]), set(_range.values()))
 
@@ -142,7 +142,7 @@ class Test_dataset_utils(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             _new = convert_data_to_dict(_obj, 3)
-            self.assertEqual(_new, dataset_ax_default_range(3))
+            self.assertEqual(_new, dataset_ax_default(3))
 
     def test_convert_data_to_dict__incorrect_type(self):
         _obj = "a string"

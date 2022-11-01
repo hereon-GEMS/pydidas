@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ["WorkflowEditFrameBuilder"]
 
 from ....core.constants import EXP_EXP_POLICY
+from ....core.utils import update_size_policy
 from ....widgets import ScrollArea, BaseFrame
 from ....widgets.parameter_config import ConfigurePluginWidget
 from ....widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
@@ -70,3 +71,6 @@ class WorkflowEditFrameBuilder(BaseFrame):
             "but_load", "Import workflow from file", gridPos=(2, 1, 1, 1)
         )
         self.create_button("but_save", "Export workflow to file", gridPos=(3, 1, 1, 1))
+
+        update_size_policy(self._widgets["workflow_area"], verticalStretch=2)
+        update_size_policy(self._widgets["plugin_collection"], verticalStretch=1)

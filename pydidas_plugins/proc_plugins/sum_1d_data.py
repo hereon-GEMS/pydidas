@@ -29,6 +29,10 @@ import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
 from pydidas.core import Dataset, ParameterCollection, Parameter, get_generic_parameter
+from pydidas.core.utils import (
+    process_1d_with_multi_input_dims,
+    calculate_result_shape_for_multi_input_dims,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -41,6 +45,7 @@ class Sum1dData(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = ParameterCollection(
+        get_generic_parameter("process_data_dim"),
         get_generic_parameter("type_selection"),
         Parameter(
             "lower_limit",
@@ -67,7 +72,7 @@ class Sum1dData(ProcPlugin):
             ),
         ),
     )
-    input_data_dim = 1
+    input_data_dim = -1
     output_data_dim = 0
     output_data_label = "data sum (1d)"
     output_data_unit = "a.u."
@@ -77,6 +82,7 @@ class Sum1dData(ProcPlugin):
         super().__init__(*args, **kwargs)
         self._data = None
 
+    @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
         """
         Sum data.
@@ -133,6 +139,7 @@ class Sum1dData(ProcPlugin):
             return slice(_bounds[0], _bounds[0] + 1)
         return slice(_bounds[0], _bounds[-1] + 1)
 
+    @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):
         """
         Calculate the shape of the Plugin results.

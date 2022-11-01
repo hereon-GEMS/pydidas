@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["Timer"]
+__all__ = ["Timer", "TimerSaveRuntime"]
 
 import time
 
@@ -54,3 +54,31 @@ class Timer:
         if self._msg is not None:
             _str = f"{self._msg}: {_str}"
         print(_str)
+
+
+class TimerSaveRuntime:
+    """
+    The TimerSaveRuntime class can be used to time running code and save the result
+    to a variable.
+
+    Is it designed to be used in a "with TimerSaveRuntime(var):" statement.
+
+    Example
+    -------
+    >>> a = 0
+    >>> with TimerSaveRuntime(a):
+    >>>     arr = numpy.random.random((1000, 1000, 100))
+    >>> print(a)
+    0.597181800
+    """
+
+    def __init__(self):
+        self._tstart = 0
+        self._tend = 0
+
+    def __enter__(self):
+        self._tstart = time.perf_counter()
+        return lambda: self._tend - self._tstart
+
+    def __exit__(self, type_, value, traceback):
+        self._tend = time.perf_counter()

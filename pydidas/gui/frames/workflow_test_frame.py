@@ -381,6 +381,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         )
         _str += f"\n\nValues:\n{_values}"
         _str += f'\n\nMetadata:\n{_meta["metadata"]}'
+        _str += (
+            f"\n\nPlugin runtime: {self._tree.nodes[self._active_node].runtime:.4f} s"
+        )
         self._widgets["result_info"].setText(_str)
 
     def __plot_results(self):

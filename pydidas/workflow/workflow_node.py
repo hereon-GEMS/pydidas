@@ -25,11 +25,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowNode"]
 
+
 from copy import deepcopy
 from numbers import Integral
 
 from ..plugins import BasePlugin
-from ..core.utils import pydidas_logger, LOGGING_LEVEL
+from ..core.utils import pydidas_logger, LOGGING_LEVEL, TimerSaveRuntime
 from .generic_node import GenericNode
 
 
@@ -54,6 +55,7 @@ class WorkflowNode(GenericNode):
         self.results = None
         self.result_kws = None
         self._result_shape = None
+        self.runtime = -1
 
     def __preprocess_kwargs(self, **kwargs):
         """
@@ -190,9 +192,12 @@ class WorkflowNode(GenericNode):
         kws : dict
             Any keywords required for calling the next plugin.
         """
-        if kwargs.get("store_input_data", False):
-            self.plugin.store_input_data_copy(*args, **kwargs)
-        return self.plugin.execute(*args, **kwargs)
+        with TimerSaveRuntime() as _runtime:
+            if kwargs.get("store_input_data", False):
+                self.plugin.store_input_data_copy(*args, **kwargs)
+            _results = self.plugin.execute(*args, **kwargs)
+        self.runtime = _runtime()
+        return _results
 
     def execute_plugin_chain(self, arg, **kwargs):
         """
@@ -211,12 +216,10 @@ class WorkflowNode(GenericNode):
             Any keyword arguments which need to be passed to the plugin.
         """
         logger.debug(f"Starting plugin node #{self.node_id}")
-        if kwargs.get("store_input_data", False):
-            self.plugin.store_input_data_copy(arg, **kwargs)
-        res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
-        for _child in self._children:
-            logger.debug("Passing result to child")
-            _child.execute_plugin_chain(res, **self._get_deep_copy_of_kwargs(reskws))
+        with TimerSaveRuntime() as _runtime:
+            if kwargs.get("store_input_data", False):
+                self.plugin.store_input_data_copy(arg, **kwargs)
+            res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
         logger.debug(f"Saving data node #{self.node_id}")
         if (
             self.is_leaf
@@ -225,6 +228,10 @@ class WorkflowNode(GenericNode):
         ) and self.plugin.output_data_dim is not None:
             self.results = res
             self.result_kws = reskws
+        self.runtime = _runtime()
+        for _child in self._children:
+            logger.debug("Passing result to child")
+            _child.execute_plugin_chain(res, **self._get_deep_copy_of_kwargs(reskws))
 
     @staticmethod
     def _get_deep_copy_of_kwargs(kwargs):

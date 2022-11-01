@@ -111,11 +111,12 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self._results = results
         self._config["result_keys"] = list(results.keys())
         self.__update_title(title)
-        _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)
-        self._config["n_plots"] = _n_plots
-        self.__prepare_widgets()
-        self.__update_metadata()
-        self.__plot_results(self._config["result_keys"][0])
+        if len(self._config["result_keys"]) > 0:
+            _n_plots = results[self._config["result_keys"][0]].get("n_plots", 0)
+            self._config["n_plots"] = _n_plots
+            self.__prepare_widgets()
+            self.__update_metadata()
+            self.__plot_results(self._config["result_keys"][0])
 
     def __update_title(self, title):
         """

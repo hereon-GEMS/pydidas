@@ -134,6 +134,9 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
 
     def connect_signals(self):
+        """
+        Connect the signals for the buttons to their respective slots.
+        """
         self._widgets["but_run_plugin"].clicked.connect(self.run_plugin)
         self._widgets["but_confirm"].clicked.connect(self.confirm_parameters)
         self._widgets["but_cancel"].clicked.connect(self.discard_parameter_changes)
@@ -277,6 +280,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._config["accept_changes"] = True
         self.setVisible(False)
         self.sig_new_params.emit(self.__plugin.node_id)
+        self._widgets["detailed_results"].setVisible(False)
         self.sig_closed.emit()
 
     @QtCore.Slot()
@@ -289,12 +293,13 @@ class TweakPluginParameterWindow(PydidasWindow):
         self.setVisible(False)
         if self.__plugin is not None:
             self.__plugin.params = copy.deepcopy(self.__original_plugin_params)
+        self._widgets["detailed_results"].setVisible(False)
         self.sig_closed.emit()
 
     @QtCore.Slot()
     def closeEvent(self, event):
         """
-        Handle the close event and discard
+        Handle the close event and discard any possible changes.
 
         Parameters
         ----------

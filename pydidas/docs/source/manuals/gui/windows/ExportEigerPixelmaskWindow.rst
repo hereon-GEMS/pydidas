@@ -1,7 +1,7 @@
-.. _export_eiger_mask_window:
+.. _export_eiger_pixelmask_window:
 
-Export Eiger mask window
-========================
+Export Eiger pixel mask window
+==============================
 
 .. image:: images/export_eiger_mask_window.png
     :align: center

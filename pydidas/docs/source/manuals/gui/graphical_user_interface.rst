@@ -106,8 +106,8 @@ Detailed information about the individual windows is given here.
     windows/ImageSeriesOperationsWindow
     windows/MaskEditorWindow
     windows/ExportEigerPixelmaskWindow
-    windows/UserConfigWindow
-    windows/GlobalSettingsWindow
+    windows/_UserConfigWindow
+    windows/_GlobalSettingsWindow
     windows/TweakPluginParameterWindow
     windows/ShowDetailedPluginResultsWindow
 

@@ -1,17 +1,25 @@
+# local files from running pydidas
 .pylint.d
 .pylint.d/*
 __pycache__
 *.pyc
-*.log
-!change.log
-pydidas/docs/build
-dist/*
-build/*
-.coverage
-htmlcov
-*.html
-*.svg
-!pydidas_*.svg
 __*
 !__init__.py
+
+# local build files
+pydidas/docs/build
+*.html
+dist/*
+build/*
 *egg*
+.coverage
+htmlcov
+
+# logging
+*.log
+!change.log
+
+# svg files
+*.svg
+!pydidas_images/**/*.svg
+!pydidas*.svg

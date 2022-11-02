@@ -117,7 +117,7 @@ Some plugins have defined detailed results which can be visualized in addition
 to the generic plugin results. This information can be used for checking if the 
 Plugin behaves as expected. Details about the opened window can be found
 in the :ref:`Show Detailed Plugin Results window manual 
-<show_plugin_detailed_results_window>`
+<show_detailed_plugin_results_window>`
 
 .. note:
     Whether a Plugin includes detailed results and what data exactly is 

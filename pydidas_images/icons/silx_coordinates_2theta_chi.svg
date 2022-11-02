@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="8.0059862mm"
+   height="8mm"
+   viewBox="0 0 8.0059862 8"
+   version="1.1"
+   id="svg4213"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="silx_coordinates_2theta_chi.svg"
+   inkscape:export-filename="H:\myPython\pydidas\pydidas\core\icons\silx_coordinates_r_theta.png"
+   inkscape:export-xdpi="104.37125"
+   inkscape:export-ydpi="104.37125">
+  <defs
+     id="defs4207">
+    <rect
+       x="212.41433"
+       y="22.965245"
+       width="21.994468"
+       height="40.763081"
+       id="rect931" />
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 4 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="8.0059862 : 4 : 1"
+       inkscape:persp3d-origin="4.0029931 : 2.6666667 : 1"
+       id="perspective913" />
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Checkerboard"
+       id="pattern5261"
+       patternTransform="matrix(0.47234715,0.30196607,0.17440265,0.89907118,169.66067,13.547364)" />
+    <linearGradient
+       id="linearGradient5257"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#222222;stop-opacity:1;"
+         offset="0"
+         id="stop5255" />
+    </linearGradient>
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#Checkerboard"
+       id="pattern5216"
+       patternTransform="matrix(10,0,0,10,6.75679,19.378014)" />
+    <pattern
+       inkscape:collect="always"
+       patternUnits="userSpaceOnUse"
+       width="2"
+       height="2"
+       patternTransform="translate(0,0) scale(10,10)"
+       id="Checkerboard"
+       inkscape:stockid="Checkerboard"
+       inkscape:isstock="true">
+      <rect
+         style="fill:black;stroke:none"
+         x="0"
+         y="0"
+         width="1"
+         height="1"
+         id="rect1885" />
+      <rect
+         style="fill:black;stroke:none"
+         x="1"
+         y="1"
+         width="1"
+         height="1"
+         id="rect1887" />
+    </pattern>
+    <marker
+       style="overflow:visible"
+       id="marker4868"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Send"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.3,0,0,-0.3,0.69,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#f7941e;fill-opacity:1;fill-rule:evenodd;stroke:#f7941e;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path4866" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker4858"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Send"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.3,0,0,-0.3,0.69,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#f7941e;fill-opacity:1;fill-rule:evenodd;stroke:#f7941e;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path4856" />
+    </marker>
+    <rect
+       x="212.41434"
+       y="22.965244"
+       width="9.6261589"
+       height="4.7729654"
+       id="rect931-5" />
+    <rect
+       x="212.41434"
+       y="22.965244"
+       width="21.994469"
+       height="40.763081"
+       id="rect948" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="18.04431"
+     inkscape:cx="11.613437"
+     inkscape:cy="16.567617"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1177"
+     inkscape:window-x="5352"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata4210">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-228.07439,-28.595829)">
+    <g
+       id="g1001"
+       transform="rotate(-50.155467,237.77016,42.292852)"
+       style="stroke:#0000ff;stroke-opacity:1">
+      <path
+         style="fill:#f7941e;fill-opacity:1;stroke:#0000ff;stroke-width:0.333;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 240.70612,32.58932 2.2925,-1.5e-5"
+         id="path5426-2"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:#f7941e;fill-opacity:1;stroke:#0000ff;stroke-width:0.333264;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 242.99868,32.589305 -0.63785,0.603007"
+         id="path5428-2" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#0000ff;stroke-width:0.333;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 242.99868,32.589305 -0.59621,-0.560987"
+         id="path5428-5-3" />
+    </g>
+    <text
+       xml:space="preserve"
+       id="text929-0"
+       style="font-style:normal;font-weight:normal;font-size:2.04319px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect931-5);fill:#0000ff;fill-opacity:1;stroke:none;"
+       transform="matrix(1.2431534,0,0,1.2431534,-36.228365,-0.00570185)"><tspan
+         x="212.41406"
+         y="24.828908"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.04319px;font-family:sans-serif;-inkscape-font-specification:sans-serif">(</tspan><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.04319px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'">2θ,χ</tspan><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.04319px;font-family:sans-serif;-inkscape-font-specification:sans-serif">)</tspan></tspan></text>
+    <path
+       style="fill:#f7941e;fill-opacity:1;stroke:#f7941e;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 232.12359,36.387171 -1e-5,-4.905373"
+       id="path5426-2-4"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#f7941e;fill-opacity:1;stroke:#f7941e;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 228.1411,33.885466 7.91237,-1e-5"
+       id="path5426-2-4-3"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

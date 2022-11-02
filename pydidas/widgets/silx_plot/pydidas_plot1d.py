@@ -40,3 +40,50 @@ class PydidasPlot1D(Plot1D):
         self.getFitAction().setVisible(False)
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+
+    def plot_pydidas_dataset(self, data, replace=True, title=None, legend=None):
+        """
+        Plot a pydidas dataset.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The data to be plotted.
+        replace : bool
+            Keyword to replace the active plot. If False, the new graph will be added
+            to the existing graph. THe default is True.
+        title : Union[None, str], optional
+            The title for the plot. If None, no title will be added to the plot.
+        legend : Union[None, str], optional
+            If desired, a legend entry for this curve. If None, no legend
+            entry will be added. The default is None.
+        """
+        if replace:
+            self.clear_plot()
+
+        _x_axlabel = data.axis_labels[0] + (
+            " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
+        )
+        _y_axlabel = data.data_label + (
+            " / " + data.data_unit if len(data.data_unit) > 0 else ""
+        )
+        self.addCurve(
+            data.axis_ranges[0],
+            data.array,
+            linewidth=1.5,
+            legend=legend,
+            replace=replace,
+        )
+        self.setGraphYLabel(_y_axlabel)
+        self.setGraphXLabel(_x_axlabel)
+        if title is not None:
+            self.setGraphTitle(title)
+
+    def clear_plot(self):
+        """
+        Clear the plot and remove all items.
+        """
+        self.remove()
+        self.setGraphTitle("")
+        self.setGraphYLabel("")
+        self.setGraphXLabel("")

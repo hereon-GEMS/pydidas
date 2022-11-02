@@ -37,10 +37,10 @@ EXP_SETUP = SetupExperiment()
 
 
 AX_LABELS = {
-    "cartesian": ("x [px]", "y [px]"),
-    "r_chi": ("r [px]", "&#x3C7; [deg]"),
-    "q_chi": ("q [nm^-1]", "&#x3C7; [deg]"),
-    "2theta_chi": ("2&#x3B8; [deg]", "&#x3C7; [deg]"),
+    "cartesian": ("x", "px", "y", "px"),
+    "r_chi": ("r", "px", "&#x3C7;", "deg"),
+    "q_chi": ("q", "nm^-1", "&#x3C7;", "deg"),
+    "2theta_chi": ("2&#x3B8;", "deg", "&#x3C7;", "deg"),
 }
 
 
@@ -55,6 +55,8 @@ class PydidasPositionInfo(PositionInfo):
         self._x_widget = self.layout().itemAt(0).widget()
         self._y_widget = self.layout().itemAt(2).widget()
         self._cs_name = "cartesian"
+        self._cs_x_unit = "px"
+        self._cs_y_unit = "px"
         self._beam_center = (0, 0, 0.1)
         self._pixelsize = (100e-6, 100e-6)
         self.update_coordinate_labels()
@@ -71,6 +73,8 @@ class PydidasPositionInfo(PositionInfo):
             The name of the new coordinate system.
         """
         self._cs_name = cs_name
+        self._cs_x_unit = AX_LABELS[cs_name][1]
+        self._cs_y_unit = AX_LABELS[cs_name][3]
         self.update_coordinate_labels()
 
     def update_coordinate_labels(self):
@@ -85,9 +89,25 @@ class PydidasPositionInfo(PositionInfo):
         ylabel : str
             The label for the second (generic "y") coordinate.
         """
-        _x_text, _y_text = AX_LABELS[self._cs_name]
+        _x_text = AX_LABELS[self._cs_name][0] + f" [{self._cs_x_unit}]"
+        _y_text = AX_LABELS[self._cs_name][2] + f" [{self._cs_y_unit}]"
         self._x_widget.setText(f"<b>{_x_text}:</b>")
         self._y_widget.setText(f"<b>{_y_text}:</b>")
+
+    def update_coordinate_units(self, x_unit, y_unit):
+        """
+        Update the coordinate units in the PositionInfo widget.
+
+        Parameters
+        ----------
+        x_unit : str
+            The unit for the x-axis data.
+        y_unit : str
+            The unit for the y-axis data.
+        """
+        self._cs_x_unit = x_unit
+        self._cs_y_unit = y_unit
+        self.update_coordinate_labels()
 
     @QtCore.Slot()
     def update_exp_setup_params(self):

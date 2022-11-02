@@ -31,9 +31,13 @@ from silx.gui.plot import Plot2D
 from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin
+from ...experiment import SetupExperiment
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
+from .utilities import get_2d_silx_plot_ax_settings
+
+EXP = SetupExperiment()
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -97,3 +101,78 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
+
+    def enable_cs_transform(self, enable):
+        """
+        Enable or disable the coordinate system transformations.
+
+        Parameters
+        ----------
+        enable : bool
+            Flag to enable the coordinate system transformations.
+        """
+        if not enable:
+            self.cs_transform.set_coordinates("cartesian")
+        self.cs_transform.setEnabled(enable)
+
+    def update_cs_units(self, x_unit, y_unit):
+        """
+        Update the coordinate system units.
+
+        Note: Any changes to the CS transform will overwrite these settings.
+
+        Parameters
+        ----------
+        x_unit : str
+            The unit for the data x-axis.
+        y_unit : str
+            The unit for the data y-axis
+        """
+        self._positionWidget.update_coordinate_units(x_unit, y_unit)
+
+    def plot_pydidas_dataset(self, data, title=None):
+        """
+        Plot a pydidas dataset.
+
+        Parameters
+        ----------
+        data : pydidas.core.Dataset
+            The data to be plotted.
+        title : Union[None, str], optional
+            The title for the plot. If None, no title will be added to the plot.
+        """
+        self.enable_cs_transform(
+            data.shape
+            == (
+                EXP.get_param_value("detector_npixy"),
+                EXP.get_param_value("detector_npixx"),
+            )
+        )
+        self.update_cs_units(data.axis_units[1], data.axis_units[0])
+        _ax_label = [
+            data.axis_labels[i]
+            + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
+            for i in [0, 1]
+        ]
+        _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
+        _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
+        self.addImage(
+            data,
+            replace=True,
+            copy=False,
+            origin=(_originx, _originy),
+            scale=(_scalex, _scaley),
+        )
+        self.setGraphYLabel(_ax_label[0])
+        self.setGraphXLabel(_ax_label[1])
+        if title is not None:
+            self.setGraphTitle(title)
+
+    def clear_plot(self):
+        """
+        Clear the plot and remove all items.
+        """
+        self.remove()
+        self.setGraphTitle("")
+        self.setGraphYLabel("")
+        self.setGraphXLabel("")

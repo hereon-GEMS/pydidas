@@ -30,6 +30,7 @@ import os
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
+from ...core import UserConfigError
 from ...widgets.dialogues import critical_warning
 from ...workflow import WorkflowResults
 
@@ -118,8 +119,7 @@ class ViewResultsMixin:
         """
         self._config["plot_active"] = False
         for _plot in [self._widgets["plot1d"], self._widgets["plot2d"]]:
-            for _item in _plot.getItems():
-                _plot.removeItem(_item)
+            _plot.clear_plot()
 
     @QtCore.Slot(bool, object, int, object, str)
     def update_result_selection(
@@ -185,24 +185,6 @@ class ViewResultsMixin:
             self._plot_2d(_data)
         self._widgets[f"plot{_dim}d"].setGraphTitle(RESULTS.result_titles[_node])
 
-    def _axlabels(self, index):
-        """
-        Get an axis label for a data dimension.
-
-        Parameters
-        ----------
-        index : int
-            The data dimension index.
-
-        Returns
-        -------
-        str
-            The axis label.
-        """
-        _label = self._data_axlabels[index]
-        _unit = self._data_axunits[index]
-        return _label + (" / " + _unit if len(str(_unit)) > 0 else "")
-
     def _plot_group_of_curves(self, data):
         """
         Plot a group of 1D curves.
@@ -227,11 +209,9 @@ class ViewResultsMixin:
             data = data.transpose()
         self._plot1d(data[0], replace=True, legend=_legend(0))
         for _index in range(1, data.shape[0]):
-            self._plot1d(
-                data[_index], replace=False, legend=_legend(_index), label_dim=1
-            )
+            self._plot1d(data[_index], replace=False, legend=_legend(_index))
 
-    def _plot1d(self, data, replace=True, legend=None, label_dim=0):
+    def _plot1d(self, data, replace=True, legend=None):
         """
         Plot a 1D-dataset in the 1D plot widget.
 
@@ -249,18 +229,18 @@ class ViewResultsMixin:
             The dimension of the X-axis label. For 1D-Datasets, this is 0.
             The default is 0.
         """
-        _plot = self._widgets["plot1d"]
+        if data.ndim != 1:
+            raise UserConfigError(
+                "The selected data is not one-dimensional. Cannot create a line plot."
+            )
         if not isinstance(data.axis_ranges[0], np.ndarray):
             data.update_axis_ranges(0, np.arange(data.size))
-        _plot.addCurve(
-            data.axis_ranges[0],
-            data.array,
+        self._widgets["plot1d"].plot_pydidas_dataset(
+            data,
             replace=replace,
-            linewidth=1.5,
             legend=legend,
+            title=RESULTS.result_titles[self._config["active_node"]],
         )
-        _plot.setGraphYLabel(RESULTS.data_labels[self._config["active_node"]])
-        _plot.setGraphXLabel(self._axlabels(label_dim))
 
     def _plot_2d(self, data):
         """
@@ -271,52 +251,15 @@ class ViewResultsMixin:
         data : pydidas.core.Dataset
             The data.
         """
-        _plot = self._widgets["plot2d"]
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
                 data.update_axis_ranges(_dim, np.arange(data.shape[_dim]))
         _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()
-        _ax_labels = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
-            for i in [0, 1]
-        ]
-        _originx, _scalex = self.__get_2d_plot_ax_settings(data.axis_ranges[1])
-        _originy, _scaley = self.__get_2d_plot_ax_settings(data.axis_ranges[0])
-        _plot.addImage(
-            data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
+        self._widgets["plot2d"].plot_pydidas_dataset(
+            data, title=RESULTS.result_titles[self._config["active_node"]]
         )
-        _plot.setGraphYLabel(_ax_labels[0])
-        _plot.setGraphXLabel(_ax_labels[1])
-
-    @staticmethod
-    def __get_2d_plot_ax_settings(axis):
-        """
-        Get the
-
-        Parameters
-        ----------
-        axis : np.ndarray
-            The numpy array with the axis positions.
-
-        Returns
-        -------
-        _origin : float
-            The value for the axis origin.
-        _scale : float
-            The value for the axis scale to squeeze it into the correct
-            dimensions for silx ImageView.
-        """
-        _delta = axis[1] - axis[0]
-        _scale = (axis[-1] - axis[0] + _delta) / axis.size
-        _origin = axis[0] - _delta / 2
-        return _origin, _scale
 
     def _update_choices_of_selected_results(self):
         """

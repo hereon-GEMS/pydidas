@@ -36,17 +36,77 @@ from ...core import (
     utils,
     UserConfigError,
 )
-from ...experiment import SetupScan
+from ...experiment import SetupScan, SetupExperiment
 from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
-from ...widgets.silx_plot import get_2d_silx_plot_ax_settings
 from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
 from ..utils import get_main_menu
 from .builders import WorkflowTestFrameBuilder
 
 
 SCAN = SetupScan()
+EXP = SetupExperiment()
 TREE = WorkflowTree()
+
+
+def _create_str_description_of_node_result(node, plugin_results):
+    """
+    Create a string description of the node results with all axes and data units
+    and metadata for the node.
+
+    Parameters
+    ----------
+    node : pydidas.workflow.WorkflowNode
+        The WorkflowNode which created the results.
+    plugin_results : pydidas.core.Dataset
+        The resulting Dataset.
+    config : dict
+        The
+
+    Returns
+    -------
+    str
+        The string description of the nodes result.s
+    """
+    _meta = {
+        "axis_labels": plugin_results.axis_labels,
+        "axis_units": plugin_results.axis_units,
+        "axis_ranges": plugin_results.axis_ranges,
+        "metadata": plugin_results.metadata,
+    }
+    _ax_units = {
+        _dim: (_ax_unit if _ax_unit is not None else "")
+        for _dim, _ax_unit in _meta["axis_units"].items()
+    }
+    _ax_ranges = {
+        _key: utils.get_range_as_formatted_string(_range)
+        for _key, _range in _meta["axis_ranges"].items()
+    }
+    _ax_points = dict(enumerate(plugin_results.shape))
+    _values = utils.get_simplified_array_representation(plugin_results)
+    _data_label = node.plugin.output_data_label + (
+        f" / {node.plugin.output_data_unit}"
+        if len(node.plugin.output_data_unit) > 0
+        else ""
+    )
+    _str = (
+        node.plugin.plugin_name
+        + ":\n\n"
+        + f"Data: {_data_label}\n\n"
+        + "\n\n".join(
+            (
+                f"Axis #{_axis:02d}:\n"
+                f'  Label: {_meta["axis_labels"][_axis]}\n'
+                f"  N points: {_ax_points[_axis]}\n"
+                f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}"
+            )
+            for _axis in _meta["axis_labels"]
+        )
+    )
+    _str += f"\n\nValues:\n{_values}"
+    _str += f'\n\nMetadata:\n{_meta["metadata"]}'
+    _str += f"\n\nPlugin runtime: {node.runtime:.4f} s"
+    return _str
 
 
 class WorkflowTestFrame(WorkflowTestFrameBuilder):
@@ -340,49 +400,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         Update the text description of the currently selected node's results.
         """
-        _current_results = self._results[self._active_node]
-        _plugin = self._tree.nodes[self._active_node].plugin
-        _meta = {
-            "axis_labels": _current_results.axis_labels,
-            "axis_units": _current_results.axis_units,
-            "axis_ranges": _current_results.axis_ranges,
-            "metadata": _current_results.metadata,
-        }
-        _ax_units = {
-            _dim: (_ax_unit if _ax_unit is not None else "")
-            for _dim, _ax_unit in _meta["axis_units"].items()
-        }
-        _ax_ranges = {
-            _key: utils.get_range_as_formatted_string(_range)
-            for _key, _range in _meta["axis_ranges"].items()
-        }
-        _ax_points = dict(
-            enumerate(self._config["plugin_res_shapes"][self._active_node])
-        )
-        _values = utils.get_simplified_array_representation(_current_results)
-        _data_label = _plugin.output_data_label + (
-            f" / {_plugin.output_data_unit}"
-            if len(_plugin.output_data_unit) > 0
-            else ""
-        )
-        _str = (
-            self._config["plugin_names"][self._active_node]
-            + ":\n\n"
-            + f"Data: {_data_label}\n\n"
-            + "\n\n".join(
-                (
-                    f"Axis #{_axis:02d}:\n"
-                    f'  Label: {_meta["axis_labels"][_axis]}\n'
-                    f"  N points: {_ax_points[_axis]}\n"
-                    f"  Range: {_ax_ranges[_axis]} {_ax_units[_axis]}"
-                )
-                for _axis in _meta["axis_labels"]
-            )
-        )
-        _str += f"\n\nValues:\n{_values}"
-        _str += f'\n\nMetadata:\n{_meta["metadata"]}'
-        _str += (
-            f"\n\nPlugin runtime: {self._tree.nodes[self._active_node].runtime:.4f} s"
+        _str = _create_str_description_of_node_result(
+            self._tree.nodes[self._active_node], self._results[self._active_node]
         )
         self._widgets["result_info"].setText(_str)
 
@@ -397,63 +416,36 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             return
         _ndim = self._results[self._active_node].ndim
         if _ndim == 1:
-            self._config["plot_dim"] = 1
             self._plot1d()
         elif _ndim == 2:
-            self._config["plot_dim"] = 2
             self._plot_2d()
         else:
             self._clear_plot()
             return
         self._widgets["plot_stack"].setCurrentIndex(_ndim - 1)
-        _plot = self._widgets[f"plot{_ndim}d"]
-        _plot.setGraphTitle(self._config["plugin_res_titles"][self._active_node])
 
     def _plot1d(self):
         """
         Plot a 1D-dataset in the 1D plot widget.
         """
         _data = self._results[self._active_node]
-        _plot = self._widgets["plot1d"]
-        _axlabel = _data.axis_labels[0] + (
-            " / " + _data.axis_units[0] if len(_data.axis_units[0]) > 0 else ""
-        )
-        _plot.addCurve(_data.axis_ranges[0], _data.array, linewidth=1.5)
-        _plot.setGraphYLabel(self._config["plugin_data_labels"][self._active_node])
-        _plot.setGraphXLabel(_axlabel)
+        _title = self._config["plugin_res_titles"][self._active_node]
+        self._widgets["plot1d"].plot_pydidas_dataset(_data, title=_title)
 
     def _plot_2d(self):
         """
         Plot a 2D dataset as an image.
         """
         _data = self._results[self._active_node]
-        _plot = self._widgets["plot2d"]
-        _ax_label = [
-            _data.axis_labels[i]
-            + (" / " + _data.axis_units[i] if len(_data.axis_units[i]) > 0 else "")
-            for i in [0, 1]
-        ]
-        _originx, _scalex = get_2d_silx_plot_ax_settings(_data.axis_ranges[1])
-        _originy, _scaley = get_2d_silx_plot_ax_settings(_data.axis_ranges[0])
-        _plot.addImage(
-            _data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-        )
-        _plot.setGraphYLabel(_ax_label[0])
-        _plot.setGraphXLabel(_ax_label[1])
+        _title = self._config["plugin_res_titles"][self._active_node]
+        self._widgets["plot2d"].plot_pydidas_dataset(_data, title=_title)
 
     def _clear_plot(self):
         """
         Clear the current plot and remove all items.
         """
-        _plot_dim = self._config["plot_dim"]
-        self._widgets[f"plot{_plot_dim }d"].remove()
-        self._widgets[f"plot{_plot_dim }d"].setGraphTitle("")
-        self._widgets[f"plot{_plot_dim }d"].setGraphYLabel("")
-        self._widgets[f"plot{_plot_dim }d"].setGraphXLabel("")
+        self._widgets["plot1d"].clear_plot()
+        self._widgets["plot2d"].clear_plot()
 
     @QtCore.Slot()
     def show_plugin_details(self):

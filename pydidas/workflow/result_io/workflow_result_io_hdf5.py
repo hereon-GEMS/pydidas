@@ -106,6 +106,11 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                 "data_label",
                 {"data": cls.get_node_attribute(node_id, "data_label")},
             ],
+            [
+                "entry",
+                "data_unit",
+                {"data": cls.get_node_attribute(node_id, "data_unit")},
+            ],
             ["entry", "definition", {"data": "custom (NXxbase-aligned)"}],
             ["entry/instrument/source", "probe", {"data": "x-ray"}],
             ["entry/instrument/source", "type", {"data": "synchrotron"}],
@@ -300,6 +305,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             _info = {
                 "node_label": read_and_decode_hdf5_dataset(_file["entry/label"]),
                 "data_label": read_and_decode_hdf5_dataset(_file["entry/data_label"]),
+                "data_unit": read_and_decode_hdf5_dataset(_file["entry/data_unit"]),
                 "plugin_name": read_and_decode_hdf5_dataset(_file["entry/plugin_name"]),
                 "node_id": read_and_decode_hdf5_dataset(_file["entry/node_id"]),
             }
@@ -359,5 +365,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _data.axis_units = _axunits
         _data.axis_labels = _axlabels
         _data.axis_ranges = _axranges
+        _data.data_label = _info["data_label"]
+        _data.data_unit = _info["data_unit"]
         _info["shape"] = _data.shape
         return _data, _info, _scan

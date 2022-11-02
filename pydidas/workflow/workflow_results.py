@@ -76,7 +76,8 @@ class _WorkflowResults(QtCore.QObject):
             self._config["shapes"] = _shapes
             _plugin = TREE.nodes[_node_id].plugin
             self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.result_data_label
+            self._config["data_labels"][_node_id] = _plugin.output_data_label
+            self._config["data_units"][_node_id] = _plugin.output_data_unit
             self._config["plugin_names"][_node_id] = _plugin.plugin_name
             self._config["result_titles"][_node_id] = _plugin.result_title
         self.__source_hash = hash((hash(SCAN), hash(TREE)))
@@ -91,6 +92,7 @@ class _WorkflowResults(QtCore.QObject):
             "shapes": {},
             "node_labels": {},
             "data_labels": {},
+            "data_units": {},
             "metadata_complete": False,
             "plugin_names": {},
             "result_titles": {},
@@ -199,6 +201,19 @@ class _WorkflowResults(QtCore.QObject):
             A dictionary with entries of the form <node_id: label>
         """
         return self._config["data_labels"].copy()
+
+    @property
+    def data_units(self):
+        """
+        Return the data units of the different Plugins to in form of a
+        dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with entries of the form <node_id: label>
+        """
+        return self._config["data_units"].copy()
 
     @property
     def ndims(self):
@@ -452,24 +467,19 @@ class _WorkflowResults(QtCore.QObject):
         _name = SCAN.get_param_value("scan_title")
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
-            _node_info = {
-                _id: {
-                    "shape": self._config["shapes"][_id],
-                    "node_label": self._config["node_labels"][_id],
-                    "data_label": self._config["data_labels"][_id],
-                    "plugin_name": self._config["plugin_names"][_id],
-                }
-                for _id in self.shapes
-            }
+            _keys = list(self.shapes.keys())
         else:
-            _node_info = {
-                single_node: {
-                    "shape": self._config["shapes"][single_node],
-                    "node_label": self._config["node_labels"][single_node],
-                    "data_label": self._config["data_labels"][single_node],
-                    "plugin_name": self._config["plugin_names"][single_node],
-                }
+            _keys = [single_node]
+        _node_info = {
+            _id: {
+                "shape": self._config["shapes"][_id],
+                "node_label": self._config["node_labels"][_id],
+                "data_label": self._config["data_labels"][_id],
+                "data_unit": self._config["data_units"][_id],
+                "plugin_name": self._config["plugin_names"][_id],
             }
+            for _id in _keys
+        }
         _labels = {_id: _node_info[_id]["node_label"] for _id in _node_info}
         _names = RESULT_SAVER.get_filenames_from_active_savers(_labels)
         _existcheck = [
@@ -477,9 +487,8 @@ class _WorkflowResults(QtCore.QObject):
         ]
         if True in _existcheck and not overwrite:
             raise FileExistsError(
-                f'The specified directory "{save_dir}" '
-                "exists and is not empty. Please select"
-                " a different directory."
+                f"The specified directory '{save_dir}' exists and is not empty. Please "
+                "select a different directory."
             )
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
@@ -559,10 +568,15 @@ class _WorkflowResults(QtCore.QObject):
             _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]
             for _key in _print_info.keys():
                 _print_info[_key] = list(np.delete(_print_info[_key], _squeezed_dims))
+        _data_label = self._config["data_labels"][node_id] + (
+            f" / {self._config['data_units'][node_id]}"
+            if len(self._config["data_units"][node_id]) > 0
+            else ""
+        )
         _node_info = (
             self._config["plugin_names"][node_id]
             + ":\n\n"
-            + f"Data: {self._config['data_labels'][node_id]}\n\n"
+            + f"Data: {_data_label}\n\n"
             + "".join(
                 (
                     f"Axis #{_dim:02d} {_print_info['ax_types'][_dim]}:\n"
@@ -594,6 +608,9 @@ class _WorkflowResults(QtCore.QObject):
             },
             "data_labels": {
                 _id: _item["data_label"] for _id, _item in _node_info.items()
+            },
+            "data_units": {
+                _id: _item["data_unit"] for _id, _item in _node_info.items()
             },
             "plugin_names": {
                 _id: _item["plugin_name"] for _id, _item in _node_info.items()

@@ -66,6 +66,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
     def _create_h5_test_file(cls):
         cls._import_test_filename = os.path.join(cls._dir, "import_test.h5")
         cls._import_data_label = get_random_string(12)
+        cls._import_data_unit = get_random_string(3)
         cls._import_label = get_random_string(9)
         cls._import_data = np.random.random((9, 9, 27))
         cls._import_data_ax_labels = {0: "None", 1: None, 2: "Label"}
@@ -82,6 +83,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             _file.create_group("entry/data")
             _file.create_group("entry/scan")
             _file["entry"].create_dataset("data_label", data=cls._import_data_label)
+            _file["entry"].create_dataset("data_unit", data=cls._import_data_unit)
             _file["entry"].create_dataset("label", data=cls._import_label)
             _file["entry"].create_dataset("plugin_name", data=cls._import_plugin_name)
             _file["entry/data"].create_dataset("data", data=cls._import_data)
@@ -157,6 +159,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
         }
         self._labels = {1: "Test", 2: "not again", 3: "another"}
         self._datalabels = {1: "Intensity", 2: "Peak height", 3: "Area"}
+        self._dataunits = {1: "a.u.", 2: "km", 3: "square inch"}
         self._plugin_names = {1: "A plugin", 2: "Plugin no 2.", 3: "Ye olde plugin"}
         self._filenames = {
             1: "node_01_Test.h5",
@@ -167,6 +170,7 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             _node: {
                 "node_label": self._labels[_node],
                 "data_label": self._datalabels[_node],
+                "data_unit": self._dataunits[_node],
                 "shape": self._shapes[_node],
                 "plugin_name": self._plugin_names[_node],
             }

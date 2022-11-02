@@ -101,10 +101,11 @@ class TestWorkflowResults(unittest.TestCase):
 
     def create_h5_test_file(self, filename):
         _data_label = get_random_string(12)
+        _data_unit = get_random_string(4)
         _label = get_random_string(9)
         _data = np.random.random((9, 9, 27))
-        _data_labels = {0: "None", 1: None, 2: "Label"}
-        _data_units = {0: "u1", 1: "u2", 2: None}
+        _data_ax_labels = {0: "None", 1: None, 2: "Label"}
+        _data_ax_units = {0: "u1", 1: "u2", 2: None}
         _plugin_name = get_random_string(7)
         _data_ranges = {
             0: None,
@@ -116,6 +117,7 @@ class TestWorkflowResults(unittest.TestCase):
             _file.create_group("entry/data")
             _file.create_group("entry/scan")
             _file["entry"].create_dataset("data_label", data=_data_label)
+            _file["entry"].create_dataset("data_unit", data=_data_unit)
             _file["entry"].create_dataset("plugin_name", data=_plugin_name)
             _file["entry"].create_dataset("label", data=_label)
             _file["entry"].create_dataset("scan_title", data=get_random_string(8))
@@ -134,13 +136,13 @@ class TestWorkflowResults(unittest.TestCase):
                     _file,
                     f"entry/data/axis_{_dim}",
                     "label",
-                    data=_data_labels[_dim],
+                    data=_data_ax_labels[_dim],
                 )
                 create_hdf5_dataset(
                     _file,
                     f"entry/data/axis_{_dim}",
                     "unit",
-                    data=_data_units[_dim],
+                    data=_data_ax_units[_dim],
                 )
                 create_hdf5_dataset(
                     _file,
@@ -159,20 +161,20 @@ class TestWorkflowResults(unittest.TestCase):
                     _file,
                     f"entry/scan/dim_{_dim}",
                     "label",
-                    data=_data_labels[_dim],
+                    data=_data_ax_labels[_dim],
                 )
                 create_hdf5_dataset(
                     _file,
                     f"entry/scan/dim_{_dim}",
                     "unit",
-                    data=_data_units[_dim],
+                    data=_data_ax_units[_dim],
                 )
             _meta = {
                 "data": _data,
                 "data_labels": _data_label,
                 "labels": _label,
-                "axlabels": _data_labels,
-                "axunits": _data_units,
+                "axlabels": _data_ax_labels,
+                "axunits": _data_ax_units,
                 "axranges": _data_ranges,
                 "plugin_name": _plugin_name,
             }

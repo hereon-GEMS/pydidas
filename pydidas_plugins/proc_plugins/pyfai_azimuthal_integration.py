@@ -39,10 +39,7 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
 
     plugin_name = "pyFAI azimuthal integration"
     basic_plugin = False
-    input_data_dim = 2
     output_data_dim = 1
-    output_data_label = "Integrated data"
-    output_data_unit = "a.u."
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

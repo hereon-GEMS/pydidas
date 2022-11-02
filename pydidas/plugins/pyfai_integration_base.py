@@ -96,7 +96,8 @@ class pyFAIintegrationBase(ProcPlugin):
         "det_mask",
     )
     input_data_dim = 2
-    output_data_dim = 2
+    output_data_label = "Integrated data"
+    output_data_unit = "a.u."
     new_dataset = True
 
     def __init__(self, *args, **kwargs):

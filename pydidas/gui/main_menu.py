@@ -82,9 +82,6 @@ class MainMenu(QtWidgets.QMainWindow):
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
-    CONFIG_PATH = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.ConfigLocation
-    )[0]
 
     sig_close_gui = QtCore.Signal()
 
@@ -95,6 +92,9 @@ class MainMenu(QtWidgets.QMainWindow):
         utils.apply_tooltip_event_filter()
         sys.excepthook = gui_excepthook
 
+        self.config_path = QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.ConfigLocation
+        )[0]
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
@@ -310,7 +310,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state(os.path.join(self.CONFIG_PATH, self.STATE_FILENAME))
+            self.export_gui_state(os.path.join(self.config_path, self.STATE_FILENAME))
 
     @QtCore.Slot()
     def _action_export_state(self):
@@ -462,35 +462,6 @@ class MainMenu(QtWidgets.QMainWindow):
                 pass
         self.centralWidget().deleteLater()
         super().deleteLater()
-
-    def _get_standard_state_full_filename(self, filename):
-        """
-        Get the standard full path for the state filename.
-
-        This method will search all stored config paths and return the first
-        match.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the state.
-
-        Returns
-        -------
-        _fname : str
-            The file name and path to the config file.
-        """
-        _paths = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )
-        for _path in _paths:
-            _fname = os.path.join(_path, filename)
-            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
-                return _fname
-        raise UserConfigError(
-            "No state config file found: Cannot restore the pydidas state because the "
-            "current user has not yet stored a pydidas state for the current version."
-        )
 
     def export_gui_state(self, filename=None):
         """
@@ -661,7 +632,7 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        self.export_gui_state(os.path.join(self.CONFIG_PATH, self.EXIT_STATE_FILENAME))
+        self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
         self.sig_close_gui.emit()
         _keys = list(self._child_windows.keys())
         for _key in _keys:

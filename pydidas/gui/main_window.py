@@ -296,6 +296,35 @@ class MainWindow(MainMenu):
         _current_index = self.centralWidget().currentIndex()
         self.select_item(self._frame_menuentries[_current_index])
 
+    def _get_standard_state_full_filename(self, filename):
+        """
+        Get the standard full path for the state filename.
+
+        This method will search all stored config paths and return the first
+        match.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the state.
+
+        Returns
+        -------
+        _fname : str
+            The file name and path to the config file.
+        """
+        _paths = QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.ConfigLocation
+        )
+        for _path in _paths:
+            _fname = os.path.join(_path, filename)
+            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
+                return _fname
+        raise UserConfigError(
+            "No state config file found: Cannot restore the pydidas state because the "
+            "current user has not yet stored a pydidas state for the current version."
+        )
+
     @QtCore.Slot(str)
     def update_status(self, text):
         """

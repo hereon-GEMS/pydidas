@@ -31,7 +31,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import PydidasGuiError, UserConfigError
+from ..core import PydidasGuiError
 from ..core.utils import format_input_to_multiline_str
 from ..widgets import BaseFrame, InfoWidget, get_pyqt_icon_from_str_reference
 from . import utils
@@ -269,8 +269,8 @@ class MainWindow(MainMenu):
         """
         Restore the window states from saved information.
 
-        If the filename is not specified, the internally used file for storing
-        the state will be opened.
+        This method also updates the left toolbar entry according to the restored
+        frame.
 
         Parameters
         ----------
@@ -281,49 +281,9 @@ class MainWindow(MainMenu):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
-        if state == "saved":
-            filename = self._get_standard_state_full_filename(self.STATE_FILENAME)
-        elif state == "exit":
-            filename = self._get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
-        elif state == "manual":
-            if filename is None:
-                raise UserConfigError(
-                    "A filename must be supplied for 'manual' gui state restoration."
-                )
-        else:
-            raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
-        super().restore_gui_state(filename)
+        MainMenu.restore_gui_state(self, state, filename)
         _current_index = self.centralWidget().currentIndex()
         self.select_item(self._frame_menuentries[_current_index])
-
-    def _get_standard_state_full_filename(self, filename):
-        """
-        Get the standard full path for the state filename.
-
-        This method will search all stored config paths and return the first
-        match.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the state.
-
-        Returns
-        -------
-        _fname : str
-            The file name and path to the config file.
-        """
-        _paths = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )
-        for _path in _paths:
-            _fname = os.path.join(_path, filename)
-            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
-                return _fname
-        raise UserConfigError(
-            "No state config file found: Cannot restore the pydidas state because the "
-            "current user has not yet stored a pydidas state for the current version."
-        )
 
     @QtCore.Slot(str)
     def update_status(self, text):

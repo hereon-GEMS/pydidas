@@ -26,16 +26,16 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .get_main_menu_ import *
 from .gui_setup import *
+from .main_menu_utils import *
 from .menu_utils import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import get_main_menu_
+from . import main_menu_utils
 
-__all__.extend(get_main_menu_.__all__)
-del get_main_menu_
+__all__.extend(main_menu_utils.__all__)
+del main_menu_utils
 
 from . import gui_setup
 

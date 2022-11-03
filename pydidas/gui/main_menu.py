@@ -38,8 +38,6 @@ from ..core.utils import (
     get_pydidas_icon_w_bg,
     get_doc_qurl_for_frame_manual,
     get_doc_filename_for_frame_manual,
-    get_logging_dir,
-    clear_logging_dir,
 )
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree
@@ -239,13 +237,13 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._actions["tools_clear_local_logs"].triggered.connect(
-            self.clear_local_log_files
+            utils.clear_local_log_files
         )
         self._actions["tools_mask_editor"].triggered.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
-            self._action_open_doc_in_browser
+            utils.open_doc_in_browser
         )
         self._actions["open_about"].triggered.connect(
             partial(self.create_and_show_temp_window, AboutWindow)
@@ -360,13 +358,6 @@ class MainMenu(QtWidgets.QMainWindow):
         if fname != "":
             self.restore_gui_state(state="manual", filename=fname)
 
-    @QtCore.Slot()
-    def _action_open_doc_in_browser(self):
-        """
-        Open the link to the documentation in the system web browser.
-        """
-        _ = QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
-
     @QtCore.Slot(str)
     def update_status(self, text):
         """
@@ -430,26 +421,6 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         if name in self._child_windows:
             del self._child_windows[name]
-
-    @QtCore.Slot()
-    def clear_local_log_files(self):
-        """
-        Clear all local log files for this pydidas version.
-        """
-        _logdir = get_logging_dir()
-        _reply = QuestionBox(
-            "Clear all local log files",
-            "Do you want to delete all local log files for this pydidas version? "
-            f"\nLog directory: {_logdir}"
-            "\n\nNote that the currently active logfile will be excluded.",
-        ).exec_()
-        if _reply:
-            _access_error = clear_logging_dir()
-            if len(_access_error) > 0:
-                raise UserConfigError(
-                    "Could not delete the following log file(s):\n - "
-                    + "\n - ".join(_access_error)
-                )
 
     def deleteLater(self):
         """
@@ -522,7 +493,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "frame_index": self.centralWidget().currentIndex(),
         }
 
-    def restore_gui_state(self, filename):
+    def restore_gui_state(self, state="saved", filename=None):
         """
         Restore the window states from saved information.
 
@@ -531,16 +502,31 @@ class MainMenu(QtWidgets.QMainWindow):
 
         Parameters
         ----------
-        filename : str
-            The filename to be used to restore the state.
+        state: str, optional
+            The state to be restored. Can be "saved" to restore the last saved state,
+            "exit" to restore the state on exit or "manual" to manually give a filename.
+        filename : Union[None, str], optional
+            The filename to be used to restore the state. This kwarg will only be used
+            if the state kwarg is set to "manual".
         """
+        if state == "saved":
+            filename = utils.get_standard_state_full_filename(self.STATE_FILENAME)
+        elif state == "exit":
+            filename = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
+        elif state == "manual" and filename is None:
+            raise UserConfigError(
+                "A filename must be supplied for 'manual' gui state restoration."
+            )
+        else:
+            raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
 
-    def _restore_global_objects(self, state):
+    @staticmethod
+    def _restore_global_objects(state):
         """
         Get the states of pydidas' global objects (SetupScan,
         SetupExperiment, WorkflowTree)

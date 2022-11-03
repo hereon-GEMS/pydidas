@@ -215,12 +215,14 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         TREE.nodes[node_id].plugin.params = copy.deepcopy(
             self._tree.nodes[node_id].plugin.params
         )
+
         _arg = self._tree.nodes[node_id].plugin._config["input_data"].copy()
         _kwargs = self._tree.nodes[node_id].plugin._config["input_kwargs"].copy() | {
             "force_store_results": True,
             "store_input_data": True,
         }
         with utils.ShowBusyMouse():
+            self._tree.nodes[node_id].plugin.pre_execute()
             self._tree.nodes[node_id].execute_plugin_chain(_arg, **_kwargs)
             self.__store_tree_results()
             self.__update_selection_choices()

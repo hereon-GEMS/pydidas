@@ -35,7 +35,7 @@ from qtpy import QtCore
 from ...version import VERSION
 
 
-LOGGING_LEVEL = logging.DEBUG
+LOGGING_LEVEL = logging.WARNING
 
 
 _LOG_FORMATTER = logging.Formatter(

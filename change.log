@@ -47,7 +47,8 @@ Bugfixes:
 - Fixed minor bugs in widget layout settings.
 - Fixed an issue with the config state paths.
 - Fixed an issue with removing a node when it has neither parent nor children.
-
+- Fixed an issue with Plugin Parameter tweaking which did not call the 
+  Plugin's pre_execute method.
 
 v0.1.10
 =======

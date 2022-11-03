@@ -31,6 +31,14 @@ Improvements
   Parameter.
 - Separated global settings in "global settings" and "user config" to
   facilitate finding the proper settings for users.
+- Added a new Plugin to extract a subset of azimuthal sectors from pyFAI 2D
+  integration.
+- Updated the documentation.
+- Moved base svg images for the documentation to pydidas_images
+- Added feature to remove all local pydidas logs.
+- Organized processing plugins according to subtypes.
+- Details for all sub-points are now available for multi-dimensional processing
+
 
 Bugfixes:
 ---------
@@ -38,6 +46,7 @@ Bugfixes:
 - Fixed missing kwargs in PydidasPlot2D class.
 - Fixed minor bugs in widget layout settings.
 - Fixed an issue with the config state paths.
+- Fixed an issue with removing a node when it has neither parent nor children.
 
 
 v0.1.10

@@ -34,7 +34,11 @@ __all__ = [
     "PROC_PLUGIN_GENERIC",
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
+    "FLOAT_REGEX",
 ]
+
+
+import re
 
 import scipy.constants
 
@@ -80,3 +84,8 @@ pyFAI_METHOD = {
     "LUT": "lut",
     "LUT OpenCL": "lut ocl",
 }
+
+FLOAT_REGEX = re.compile(
+    r"\s*[+-]?[0-9]*\.?[0-9]+(?:[e][+-]?[0-9]+)?\s*"
+    r"|\s*[+-]?[0-9]+\.?[0-9]*(?:[e][+-]?[0-9]+)?\s*"
+)

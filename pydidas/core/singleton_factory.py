@@ -26,9 +26,13 @@ __status__ = "Development"
 __all__ = ["SingletonFactory"]
 
 
+from qtpy import QtCore
+
+
 class SingletonFactory:
     """
-    Factory to create a Singleton.
+    Factory to create a Singleton. This factory also handles QObjects and removes
+    the instance if the corresponding QObject has been destroyed.
 
     Parameters
     ----------
@@ -60,6 +64,8 @@ class SingletonFactory:
         """
         if self.__instance is None:
             self.__instance = self.__class(**kwargs)
+            if isinstance(self.__instance, QtCore.QObject):
+                self.__instance.destroyed.connect(self._clear_instance)
         return self.__instance
 
     def _reset_instance(self, **kwargs):

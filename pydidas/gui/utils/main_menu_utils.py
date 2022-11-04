@@ -74,7 +74,6 @@ def get_standard_state_full_filename(filename):
     _paths = QtCore.QStandardPaths.standardLocations(
         QtCore.QStandardPaths.ConfigLocation
     )
-    print(_paths)
     for _path in _paths:
         _fname = os.path.join(_path, filename)
         if os.path.isfile(_fname) and os.access(_fname, os.R_OK):

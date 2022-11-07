@@ -38,6 +38,11 @@ class SingletonFactory:
     ----------
     cls : class
         The Python class which should be managed by the SingletonFactory.
+    unreference_deleted_qt_object : bool
+        Flag to unreference the associated QObject if a deletion request has been
+        sent. This must be True unless the QObject handles its own deletion differently
+        from generic objects. If the QObject overwrites delete requests, set to False
+        to keep the reference intact. The default is True
     """
 
     def __init__(self, cls):
@@ -47,7 +52,7 @@ class SingletonFactory:
         self.__instance = None
         self.__class = cls
 
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         """
         Get the instance of the Singleton.
 
@@ -63,7 +68,7 @@ class SingletonFactory:
             The instance of the Singleton class.
         """
         if self.__instance is None:
-            self.__instance = self.__class(**kwargs)
+            self.__instance = self.__class(*args, **kwargs)
             if isinstance(self.__instance, QtCore.QObject):
                 self.__instance.destroyed.connect(self._clear_instance)
         return self.__instance
@@ -86,6 +91,7 @@ class SingletonFactory:
         """
         self.__instance = None
 
+    @property
     def instance(self, **kwargs):
         """
         Get the instance. A wrapper for __call__

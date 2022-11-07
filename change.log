@@ -1,3 +1,14 @@
+v0.1.12
+=======
+
+Bugfixes
+--------
+- Fixed an issue where destroyed QObjects were still referenced in the 
+  SingletonFactory.
+- Fixed an issue with persistent object references in the SingletonFactory for
+  destroyed C++ Qt objects.
+
+
 v0.1.11
 =======
 Major changes:

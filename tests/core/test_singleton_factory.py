@@ -37,6 +37,11 @@ class TestClass:
         self.attr2 = get_random_string(64)
 
 
+class TestQObject(QtCore.QObject):
+    def deleteLater(self):
+        pass
+
+
 class TestSingletonFactory(unittest.TestCase):
     def setUp(self):
         self.factory = SingletonFactory(TestClass)
@@ -58,7 +63,7 @@ class TestSingletonFactory(unittest.TestCase):
         self.assertEqual(obj, obj2)
 
     def test_instance(self):
-        obj = self.factory.instance()
+        obj = self.factory.instance
         self.assertIsInstance(obj, TestClass)
 
     def test_reset(self):
@@ -70,6 +75,7 @@ class TestSingletonFactory(unittest.TestCase):
     def test_with_qobject(self):
         _factory = SingletonFactory(QtCore.QObject)
         obj = _factory()
+        obj_id = id(obj)
         self.assertIsInstance(obj, QtCore.QObject)
         obj.deleteLater()
         app = QtWidgets.QApplication([])
@@ -77,8 +83,9 @@ class TestSingletonFactory(unittest.TestCase):
         _timer.timeout.connect(app.exit)
         _timer.start(100)
         app.exec_()
-        obj2 =  _factory()
-        self.assertNotEqual(obj2, QtCore.QObject)
+        obj2 = _factory()
+        self.assertNotEqual(id(obj2), obj_id)
+        self.assertIsInstance(obj2, QtCore.QObject)
 
 
 if __name__ == "__main__":

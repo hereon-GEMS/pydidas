@@ -26,7 +26,7 @@ __all__ = ["UtilitiesFrame"]
 
 from functools import partial
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from .builders import UtilitiesFrameBuilder
 from ..windows import (
@@ -69,10 +69,8 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         """
         finalize the UI initialization.
         """
-        self.__main_gui = self.parent().parent()
-        self.__main_gui.sig_close_gui.connect(
-            self._child_windows["global_settings"].close
-        )
+        self.__app = QtWidgets.QApplication.instance()
+        self.__app.sig_close_gui.connect(self._child_windows["global_settings"].close)
 
     def connect_signals(self):
         """
@@ -110,7 +108,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._child_windows[_name].sig_closed.connect(
             partial(self.remove_window_from_children, _name)
         )
-        self.__main_gui.sig_close_gui.connect(self._child_windows[_name].close)
+        self.__app.sig_close_gui.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()
 
     @QtCore.Slot(str)

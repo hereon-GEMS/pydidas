@@ -38,12 +38,10 @@ from ..core.utils import (
     get_pydidas_icon_w_bg,
     get_doc_qurl_for_frame_manual,
     get_doc_filename_for_frame_manual,
-    get_logging_dir,
-    clear_logging_dir,
 )
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree
-from ..widgets import CentralWidgetStack
+from ..widgets import PydidasFrameStack
 from ..widgets.dialogues import QuestionBox
 from ..version import VERSION
 from . import utils
@@ -82,19 +80,16 @@ class MainMenu(QtWidgets.QMainWindow):
 
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
-    CONFIG_PATH = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.ConfigLocation
-    )[0]
 
-    sig_close_gui = QtCore.Signal()
+    sig_close_main_window = QtCore.Signal()
 
     def __init__(self, parent=None, geometry=None):
-        super().__init__(parent)
-        utils.configure_qtapp_namespace()
-        utils.update_qtapp_font_size()
-        utils.apply_tooltip_event_filter()
+        QtWidgets.QMainWindow.__init__(self, parent)
         sys.excepthook = gui_excepthook
 
+        self.config_path = QtCore.QStandardPaths.standardLocations(
+            QtCore.QStandardPaths.ConfigLocation
+        )[0]
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
@@ -103,8 +98,13 @@ class MainMenu(QtWidgets.QMainWindow):
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
         self._create_menu()
+
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self._open_help)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        _app = QtWidgets.QApplication.instance()
+        _app.aboutToQuit.connect(self.centralWidget().reset)
+        self.sig_close_main_window.connect(_app.send_gui_close_signal)
 
     def _setup_mainwindow_widget(self, geometry):
         """
@@ -121,7 +121,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self.setGeometry(*geometry)
         else:
             self.setGeometry(40, 60, 1400, 1000)
-        self.setCentralWidget(CentralWidgetStack())
+        self.setCentralWidget(PydidasFrameStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI")
         self.setWindowIcon(get_pydidas_icon_w_bg())
@@ -239,13 +239,13 @@ class MainMenu(QtWidgets.QMainWindow):
             partial(self.create_and_show_temp_window, ImageSeriesOperationsWindow)
         )
         self._actions["tools_clear_local_logs"].triggered.connect(
-            self.clear_local_log_files
+            utils.clear_local_log_files
         )
         self._actions["tools_mask_editor"].triggered.connect(
             partial(self.create_and_show_temp_window, MaskEditorWindow)
         )
         self._actions["open_documentation_browser"].triggered.connect(
-            self._action_open_doc_in_browser
+            utils.open_doc_in_browser
         )
         self._actions["open_about"].triggered.connect(
             partial(self.create_and_show_temp_window, AboutWindow)
@@ -310,7 +310,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state(os.path.join(self.CONFIG_PATH, self.STATE_FILENAME))
+            self.export_gui_state(os.path.join(self.config_path, self.STATE_FILENAME))
 
     @QtCore.Slot()
     def _action_export_state(self):
@@ -359,13 +359,6 @@ class MainMenu(QtWidgets.QMainWindow):
         )[0]
         if fname != "":
             self.restore_gui_state(state="manual", filename=fname)
-
-    @QtCore.Slot()
-    def _action_open_doc_in_browser(self):
-        """
-        Open the link to the documentation in the system web browser.
-        """
-        _ = QtGui.QDesktopServices.openUrl(get_doc_home_qurl())
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -431,67 +424,6 @@ class MainMenu(QtWidgets.QMainWindow):
         if name in self._child_windows:
             del self._child_windows[name]
 
-    @QtCore.Slot()
-    def clear_local_log_files(self):
-        """
-        Clear all local log files for this pydidas version.
-        """
-        _logdir = get_logging_dir()
-        _reply = QuestionBox(
-            "Clear all local log files",
-            "Do you want to delete all local log files for this pydidas version? "
-            f"\nLog directory: {_logdir}"
-            "\n\nNote that the currently active logfile will be excluded.",
-        ).exec_()
-        if _reply:
-            _access_error = clear_logging_dir()
-            if len(_access_error) > 0:
-                raise UserConfigError(
-                    "Could not delete the following log file(s):\n - "
-                    + "\n - ".join(_access_error)
-                )
-
-    def deleteLater(self):
-        """
-        Add deleteLater entries for the associated windows.
-        """
-        for _window in self._child_windows.values():
-            try:
-                _window.deleteLater()
-            except RuntimeError:
-                pass
-        self.centralWidget().deleteLater()
-        super().deleteLater()
-
-    def _get_standard_state_full_filename(self, filename):
-        """
-        Get the standard full path for the state filename.
-
-        This method will search all stored config paths and return the first
-        match.
-
-        Parameters
-        ----------
-        filename : str
-            The filename of the state.
-
-        Returns
-        -------
-        _fname : str
-            The file name and path to the config file.
-        """
-        _paths = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )
-        for _path in _paths:
-            _fname = os.path.join(_path, filename)
-            if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
-                return _fname
-        raise UserConfigError(
-            "No state config file found: Cannot restore the pydidas state because the "
-            "current user has not yet stored a pydidas state for the current version."
-        )
-
     def export_gui_state(self, filename=None):
         """
         This function
@@ -506,7 +438,7 @@ class MainMenu(QtWidgets.QMainWindow):
         if not os.path.exists(_config_dir):
             os.makedirs(_config_dir)
         _state = self.__get_window_states()
-        for _index, _widget in enumerate(self.centralWidget().widgets):
+        for _index, _widget in enumerate(self.centralWidget().frames):
             _frameindex, _widget_state = _widget.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _widget_state
@@ -551,7 +483,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "frame_index": self.centralWidget().currentIndex(),
         }
 
-    def restore_gui_state(self, filename):
+    def restore_gui_state(self, state="saved", filename=None):
         """
         Restore the window states from saved information.
 
@@ -560,16 +492,31 @@ class MainMenu(QtWidgets.QMainWindow):
 
         Parameters
         ----------
-        filename : str
-            The filename to be used to restore the state.
+        state: str, optional
+            The state to be restored. Can be "saved" to restore the last saved state,
+            "exit" to restore the state on exit or "manual" to manually give a filename.
+        filename : Union[None, str], optional
+            The filename to be used to restore the state. This kwarg will only be used
+            if the state kwarg is set to "manual".
         """
+        if state == "saved":
+            filename = utils.get_standard_state_full_filename(self.STATE_FILENAME)
+        elif state == "exit":
+            filename = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
+        elif state == "manual" and filename is None:
+            raise UserConfigError(
+                "A filename must be supplied for 'manual' gui state restoration."
+            )
+        else:
+            raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
 
-    def _restore_global_objects(self, state):
+    @staticmethod
+    def _restore_global_objects(state):
         """
         Get the states of pydidas' global objects (SetupScan,
         SetupExperiment, WorkflowTree)
@@ -617,7 +564,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
     def _restore_frame_states(self, state):
         """
-        Restore the states of all the frames in the CentralWidgetStack.
+        Restore the states of all the frames in the PydidasFrameStack.
 
         Parameters
         ----------
@@ -626,11 +573,11 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _frame_info = [
             f"frame_{_index:02d}" in state.keys()
-            for _index, _ in enumerate(self.centralWidget().widgets)
+            for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
             raise PydidasGuiError("The state is not defined for all frames.")
-        for _index, _frame in enumerate(self.centralWidget().widgets):
+        for _index, _frame in enumerate(self.centralWidget().frames):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 
     @QtCore.Slot()
@@ -650,6 +597,17 @@ class MainMenu(QtWidgets.QMainWindow):
             _url = get_doc_home_qurl()
         _ = QtGui.QDesktopServices.openUrl(_url)
 
+    def deleteLater(self):
+        """
+        Add deleteLater entries for the associated windows.
+        """
+        for _window in self._child_windows.values():
+            try:
+                _window.deleteLater()
+            except RuntimeError:
+                pass
+        super().deleteLater()
+
     def closeEvent(self, event):
         """
         Handle the Qt closeEvent.
@@ -661,10 +619,6 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
-        self.export_gui_state(os.path.join(self.CONFIG_PATH, self.EXIT_STATE_FILENAME))
-        self.sig_close_gui.emit()
-        _keys = list(self._child_windows.keys())
-        for _key in _keys:
-            self._child_windows[_key].deleteLater()
-            self._child_windows[_key].close()
+        self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
+        self.sig_close_main_window.emit()
         event.accept()

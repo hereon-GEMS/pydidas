@@ -73,8 +73,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The default is None.
         """
         super().__init__()
-        self.root = None
         self.qt_canvas = qt_canvas
+        self.root = None
         self._node_positions = {}
         self._node_widgets = {}
         self._nodes = {}
@@ -96,6 +96,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         if qt_canvas:
             self.qt_canvas = qt_canvas
+
+    @QtCore.Slot()
+    def reset(self):
+        """
+        Reset the current instance.
+        """
+        self.root = None
+        self._node_positions = {}
+        self._node_widgets = {}
+        self._nodes = {}
 
     def add_new_plugin_node(self, name, title=None, parent_node_id=None):
         """
@@ -135,8 +145,6 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         )
         TREE.create_and_add_node(_plugin, parent=_parent)
 
-        # TODO : add consistency check
-        # TREE.active_node_id()
         _node_id = TREE.active_node_id
         self.__create_position_node(_node_id)
         self.__create_widget(title if title is not None else name, _node_id)

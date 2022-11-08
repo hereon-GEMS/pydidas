@@ -40,7 +40,6 @@ from ...experiment import SetupScan, SetupExperiment
 from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
 from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
-from ..utils import get_main_menu
 from .builders import WorkflowTestFrameBuilder
 
 
@@ -189,9 +188,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window = TweakPluginParameterWindow()
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
-        _main = get_main_menu()
-        _main.sig_close_gui.connect(self.__tweak_window.close)
-        _main.sig_close_gui.connect(self.__details_window.close)
 
     def __check_tree_uptodate(self):
         """

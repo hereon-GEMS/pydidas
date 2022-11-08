@@ -25,6 +25,8 @@ __status__ = "Development"
 import unittest
 import time
 
+from qtpy import QtCore, QtWidgets
+
 from pydidas.core import SingletonFactory
 from pydidas.core.utils import get_random_string
 
@@ -33,6 +35,11 @@ class TestClass:
     def __init__(self):
         self.attr1 = hash(time.time())
         self.attr2 = get_random_string(64)
+
+
+class TestQObject(QtCore.QObject):
+    def deleteLater(self):
+        pass
 
 
 class TestSingletonFactory(unittest.TestCase):
@@ -56,7 +63,7 @@ class TestSingletonFactory(unittest.TestCase):
         self.assertEqual(obj, obj2)
 
     def test_instance(self):
-        obj = self.factory.instance()
+        obj = self.factory.instance
         self.assertIsInstance(obj, TestClass)
 
     def test_reset(self):
@@ -64,6 +71,21 @@ class TestSingletonFactory(unittest.TestCase):
         self.factory._reset_instance()
         obj2 = self.factory()
         self.assertNotEqual(obj, obj2)
+
+    def test_with_qobject(self):
+        _factory = SingletonFactory(QtCore.QObject)
+        obj = _factory()
+        obj_id = id(obj)
+        self.assertIsInstance(obj, QtCore.QObject)
+        obj.deleteLater()
+        app = QtWidgets.QApplication([])
+        _timer = QtCore.QTimer(app)
+        _timer.timeout.connect(app.exit)
+        _timer.start(100)
+        app.exec_()
+        obj2 = _factory()
+        self.assertNotEqual(id(obj2), obj_id)
+        self.assertIsInstance(obj2, QtCore.QObject)
 
 
 if __name__ == "__main__":

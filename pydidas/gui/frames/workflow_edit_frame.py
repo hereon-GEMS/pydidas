@@ -80,6 +80,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         Connect all signals and slots in the frame.
         """
+        _app = QtWidgets.QApplication.instance()
         self._widgets["plugin_collection"].sig_add_plugin_to_tree.connect(
             partial(workflow_add_plugin_at_parent, -1)
         )
@@ -89,6 +90,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
             workflow_add_plugin_at_parent
         )
+        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
         WORKFLOW_EDIT_MANAGER.sig_plugin_selected.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.sig_plugin_class_selected.connect(
             self._widgets["plugin_collection"].display_plugin_description

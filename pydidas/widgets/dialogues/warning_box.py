@@ -26,7 +26,7 @@ __all__ = ["WarningBox"]
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str_reference
+from ..utilities import get_pyqt_icon_from_str
 
 
 class WarningBox(QtWidgets.QMessageBox):
@@ -54,7 +54,7 @@ class WarningBox(QtWidgets.QMessageBox):
         super().__init__()
         self.setIcon(self.Warning)
         self.setWindowTitle(title)
-        self.setWindowIcon(get_pyqt_icon_from_str_reference("qt-std::10"))
+        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::10"))
         self.setText(msg)
         if info:
             self.setInformativeText(info)

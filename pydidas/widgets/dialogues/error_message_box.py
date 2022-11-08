@@ -109,6 +109,11 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         )
         self.resize(950, self.height())
         self.set_text(self._text)
+        for _name in ["icon", "label", "scroll_area", "title"]:
+            self._widgets[_name].setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        for _name in ["button_okay", "button_copy"]:
+            self._widgets[_name].setFocusPolicy(QtCore.Qt.FocusPolicy.TabFocus)
+        self.setTabOrder(self._widgets["button_copy"], self._widgets["button_okay"])
 
     def set_text(self, text):
         """

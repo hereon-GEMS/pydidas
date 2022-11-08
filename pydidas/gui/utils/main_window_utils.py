@@ -22,9 +22,17 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["find_toolbar_bases"]
+__all__ = [
+    "find_toolbar_bases",
+    "get_generic_menu_entries",
+    "create_generic_toolbar_entry",
+]
 
 import os
+from pathlib import Path
+
+from ...core.utils import format_input_to_multiline_str
+from ...widgets.utilities import get_pyqt_icon_from_str
 
 
 def find_toolbar_bases(items):
@@ -62,3 +70,52 @@ def find_toolbar_bases(items):
         _item = _parent
     _itembases.sort()
     return _itembases
+
+
+def create_generic_toolbar_entry(entry):
+    """
+    Create a generic toolbar entry for the given reference.
+
+    Parameters
+    ----------
+    entry : str
+        The reference string for the given entry.
+
+    Returns
+    -------
+    dict
+        The metadata entry for the reference key.
+    """
+    _generic_entries = get_generic_menu_entries()
+    if entry in _generic_entries:
+        return _generic_entries[entry]
+    return {
+        "label": format_input_to_multiline_str(entry, max_line_length=12),
+        "icon": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
+        "menu_tree": [
+            ("" if _path == Path() else _path.as_posix())
+            for _path in reversed(Path(entry).parents)
+        ]
+        + [entry],
+    }
+
+
+def get_generic_menu_entries():
+    """
+    Get the generic menu entries for the MainWindow.
+
+    Note: This dict must be implemented as function return value not to call the
+    qtawesome icon creation without a QApplication.
+
+    Returns
+    -------
+    dict
+        The generic menu entries.
+    """
+    return {
+        "Workflow processing": {
+            "label": "Workflow\nprocessing",
+            "icon": get_pyqt_icon_from_str("qta::mdi.cogs"),
+            "menu_tree": ["", "Workflow processing"],
+        }
+    }

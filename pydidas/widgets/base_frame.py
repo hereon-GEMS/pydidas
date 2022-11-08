@@ -86,8 +86,8 @@ class BaseFrame(
             _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
             self.setLayout(_layout)
         self.frame_index = -1
-        self.ref_name = kwargs.get("menu_entry", self.menu_entry)
-        self.title = kwargs.get("title", self.menu_title)
+        self.menu_entry = kwargs.get("menu_entry", self.menu_entry)
+        self.menu_title = kwargs.get("title", self.menu_title)
         self.icon = kwargs.get("icon", self.menu_icon)
         self._config = {"built": False}
 

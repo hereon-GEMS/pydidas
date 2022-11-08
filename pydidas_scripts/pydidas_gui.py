@@ -102,4 +102,4 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication.instance()
     if not isinstance(app, PydidasApp):
         app = PydidasApp(sys.argv)
-    _ = run_gui(app, restore_state="saved")
+    _ = run_gui(app, restore_state="None")

@@ -28,7 +28,7 @@ __all__ = ["SetupScanFrameBuilder"]
 from ....core import constants, utils
 from ....experiment import SetupScan
 from ....widgets import BaseFrame
-from ....widgets.utilities import get_pyqt_icon_from_str_reference
+from ....widgets.utilities import get_pyqt_icon_from_str
 
 
 SCAN_SETTINGS = SetupScan()
@@ -163,7 +163,7 @@ class SetupScanFrameBuilder(BaseFrame):
             self.create_button(
                 f"button_up_{i_dim}",
                 "",
-                icon=get_pyqt_icon_from_str_reference("qta::fa.chevron-up"),
+                icon=get_pyqt_icon_from_str("qta::fa.chevron-up"),
                 fixedWidth=20,
                 fixedHeight=20,
                 alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
@@ -173,7 +173,7 @@ class SetupScanFrameBuilder(BaseFrame):
             self.create_button(
                 f"button_down_{i_dim}",
                 "",
-                icon=get_pyqt_icon_from_str_reference("qta::fa.chevron-down"),
+                icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
                 fixedWidth=20,
                 fixedHeight=20,
                 alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,

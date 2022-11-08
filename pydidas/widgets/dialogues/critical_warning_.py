@@ -27,7 +27,7 @@ __all__ = ["critical_warning"]
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str_reference
+from ..utilities import get_pyqt_icon_from_str
 
 
 def critical_warning(title, text):
@@ -43,5 +43,5 @@ def critical_warning(title, text):
     """
 
     _box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical, title, text)
-    _box.setWindowIcon(get_pyqt_icon_from_str_reference("qt-std::11"))
+    _box.setWindowIcon(get_pyqt_icon_from_str("qt-std::11"))
     _box.exec_()

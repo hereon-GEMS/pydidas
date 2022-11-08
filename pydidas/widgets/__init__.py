@@ -52,8 +52,8 @@ __all__.extend(["CreateWidgetsMixIn"])
 # import __all__ items from modules:
 from .base_frame import *
 from .base_frame_with_app import *
-from .central_widget_stack import *
 from .info_widget import *
+from .pydidas_frame_stack import *
 from .qta_button import *
 from .read_only_text_widget import *
 from .scroll_area import *
@@ -71,15 +71,15 @@ from . import base_frame_with_app
 __all__.extend(base_frame_with_app.__all__)
 del base_frame_with_app
 
-from . import central_widget_stack
-
-__all__.extend(central_widget_stack.__all__)
-del central_widget_stack
-
 from . import info_widget
 
 __all__.extend(info_widget.__all__)
 del info_widget
+
+from . import pydidas_frame_stack
+
+__all__.extend(pydidas_frame_stack.__all__)
+del pydidas_frame_stack
 
 from . import qta_button
 

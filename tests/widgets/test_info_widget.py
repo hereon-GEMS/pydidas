@@ -30,7 +30,7 @@ from qtpy import QtWidgets, QtCore
 from pydidas.widgets.info_widget import InfoWidget
 
 
-class TestCentralWidgetStack(unittest.TestCase):
+class TestInfoWidget(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication.instance()

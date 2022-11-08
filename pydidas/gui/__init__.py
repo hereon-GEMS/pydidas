@@ -36,6 +36,7 @@ __all__.extend(["frames", "managers", "mixins", "windows"])
 # import __all__ items from modules:
 from .gui_excepthook_ import *
 from .main_window import *
+from .pydidas_app import *
 
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -49,3 +50,8 @@ from . import main_window
 
 __all__.extend(main_window.__all__)
 del main_window
+
+from . import pydidas_app
+
+__all__.extend(pydidas_app.__all__)
+del pydidas_app

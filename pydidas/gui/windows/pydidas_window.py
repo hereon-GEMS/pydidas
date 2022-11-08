@@ -118,6 +118,9 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self.open_help)
 
+        _app = QtWidgets.QApplication.instance()
+        _app.sig_close_gui.connect(self.deleteLater)
+
     @QtCore.Slot()
     def open_help(self):
         """

@@ -41,7 +41,7 @@ from ..core.utils import (
 )
 from ..experiment import SetupScan, SetupExperiment
 from ..workflow import WorkflowTree
-from ..widgets import CentralWidgetStack
+from ..widgets import PydidasFrameStack
 from ..widgets.dialogues import QuestionBox
 from ..version import VERSION
 from . import utils
@@ -81,13 +81,10 @@ class MainMenu(QtWidgets.QMainWindow):
     STATE_FILENAME = f"pydidas_gui_state_{VERSION}.yaml"
     EXIT_STATE_FILENAME = f"pydidas_gui_exit_state_{VERSION}.yaml"
 
-    sig_close_gui = QtCore.Signal()
+    sig_close_main_window = QtCore.Signal()
 
     def __init__(self, parent=None, geometry=None):
-        super().__init__(parent)
-        utils.configure_qtapp_namespace()
-        utils.update_qtapp_font_size()
-        utils.apply_tooltip_event_filter()
+        QtWidgets.QMainWindow.__init__(self, parent)
         sys.excepthook = gui_excepthook
 
         self.config_path = QtCore.QStandardPaths.standardLocations(
@@ -101,8 +98,13 @@ class MainMenu(QtWidgets.QMainWindow):
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
         self._create_menu()
+
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
         self._help_shortcut.activated.connect(self._open_help)
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        _app = QtWidgets.QApplication.instance()
+        _app.aboutToQuit.connect(self.centralWidget().reset)
+        self.sig_close_main_window.connect(_app.send_gui_close_signal)
 
     def _setup_mainwindow_widget(self, geometry):
         """
@@ -119,7 +121,7 @@ class MainMenu(QtWidgets.QMainWindow):
             self.setGeometry(*geometry)
         else:
             self.setGeometry(40, 60, 1400, 1000)
-        self.setCentralWidget(CentralWidgetStack())
+        self.setCentralWidget(PydidasFrameStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI")
         self.setWindowIcon(get_pydidas_icon_w_bg())
@@ -422,18 +424,6 @@ class MainMenu(QtWidgets.QMainWindow):
         if name in self._child_windows:
             del self._child_windows[name]
 
-    def deleteLater(self):
-        """
-        Add deleteLater entries for the associated windows.
-        """
-        for _window in self._child_windows.values():
-            try:
-                _window.deleteLater()
-            except RuntimeError:
-                pass
-        self.centralWidget().deleteLater()
-        super().deleteLater()
-
     def export_gui_state(self, filename=None):
         """
         This function
@@ -448,7 +438,7 @@ class MainMenu(QtWidgets.QMainWindow):
         if not os.path.exists(_config_dir):
             os.makedirs(_config_dir)
         _state = self.__get_window_states()
-        for _index, _widget in enumerate(self.centralWidget().widgets):
+        for _index, _widget in enumerate(self.centralWidget().frames):
             _frameindex, _widget_state = _widget.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _widget_state
@@ -574,7 +564,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
     def _restore_frame_states(self, state):
         """
-        Restore the states of all the frames in the CentralWidgetStack.
+        Restore the states of all the frames in the PydidasFrameStack.
 
         Parameters
         ----------
@@ -583,11 +573,11 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         _frame_info = [
             f"frame_{_index:02d}" in state.keys()
-            for _index, _ in enumerate(self.centralWidget().widgets)
+            for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
             raise PydidasGuiError("The state is not defined for all frames.")
-        for _index, _frame in enumerate(self.centralWidget().widgets):
+        for _index, _frame in enumerate(self.centralWidget().frames):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 
     @QtCore.Slot()
@@ -607,6 +597,17 @@ class MainMenu(QtWidgets.QMainWindow):
             _url = get_doc_home_qurl()
         _ = QtGui.QDesktopServices.openUrl(_url)
 
+    def deleteLater(self):
+        """
+        Add deleteLater entries for the associated windows.
+        """
+        for _window in self._child_windows.values():
+            try:
+                _window.deleteLater()
+            except RuntimeError:
+                pass
+        super().deleteLater()
+
     def closeEvent(self, event):
         """
         Handle the Qt closeEvent.
@@ -619,9 +620,5 @@ class MainMenu(QtWidgets.QMainWindow):
             The closing event.
         """
         self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
-        self.sig_close_gui.emit()
-        _keys = list(self._child_windows.keys())
-        for _key in _keys:
-            self._child_windows[_key].deleteLater()
-            self._child_windows[_key].close()
+        self.sig_close_main_window.emit()
         event.accept()

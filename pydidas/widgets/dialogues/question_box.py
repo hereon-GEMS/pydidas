@@ -26,7 +26,7 @@ __all__ = ["QuestionBox"]
 
 from qtpy import QtWidgets
 
-from ..utilities import get_pyqt_icon_from_str_reference
+from ..utilities import get_pyqt_icon_from_str
 
 
 class QuestionBox(QtWidgets.QMessageBox):
@@ -60,7 +60,7 @@ class QuestionBox(QtWidgets.QMessageBox):
     ):
         super().__init__(parent)
         self.setWindowTitle(title)
-        self.setWindowIcon(get_pyqt_icon_from_str_reference("qt-std::12"))
+        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::12"))
         self.setText(question)
         if len(explanation) > 0:
             self.setInformativeText(explanation)

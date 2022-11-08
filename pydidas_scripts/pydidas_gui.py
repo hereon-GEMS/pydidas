@@ -31,7 +31,7 @@ import multiprocessing as mp
 from qtpy import QtWidgets
 
 from pydidas.core import UserConfigError
-from pydidas.gui import MainWindow
+from pydidas.gui import MainWindow, PydidasApp
 from pydidas.gui.frames import (
     DataBrowsingFrame,
     WorkflowEditFrame,
@@ -72,20 +72,15 @@ def run_gui(app=None, restore_state="None"):
                 "before starting any multiprocessing."
             )
 
-    if app is None:
-        app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication.instance()
+    if not isinstance(app, PydidasApp):
+        app = PydidasApp(sys.argv)
     gui = MainWindow()
     gui.register_frame(HomeFrame)
     gui.register_frame(DataBrowsingFrame)
     gui.register_frame(PyfaiCalibFrame)
     gui.register_frame(CompositeCreatorFrame)
     gui.register_frame(DirectorySpyFrame)
-    gui.register_frame(
-        "ProcessingFrame",
-        title="Workflow processing",
-        menu_entry="Workflow processing",
-        icon="qta::mdi.cogs",
-    )
     gui.register_frame(SetupExperimentFrame)
     gui.register_frame(SetupScanFrame)
     gui.register_frame(WorkflowEditFrame)
@@ -104,5 +99,7 @@ def run_gui(app=None, restore_state="None"):
 
 
 if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    _ = run_gui(app, restore_state="exit")
+    app = QtWidgets.QApplication.instance()
+    if not isinstance(app, PydidasApp):
+        app = PydidasApp(sys.argv)
+    _ = run_gui(app, restore_state="saved")

@@ -24,7 +24,6 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
-    "get_main_menu",
     "get_standard_state_full_filename",
     "clear_local_log_files",
     "open_doc_in_browser",
@@ -32,26 +31,10 @@ __all__ = [
 
 import os
 
-from qtpy import QtWidgets, QtCore, QtGui
+from qtpy import QtCore, QtGui
 
-from ..main_menu import MainMenu
 from ...core import utils, UserConfigError
 from ...widgets.dialogues import QuestionBox
-
-
-def get_main_menu():
-    """
-    Get the pydidas MainMenu instance.
-
-    Returns
-    -------
-    pydidas.gui.MainMenu
-        The instance.
-    """
-    for _widget in QtWidgets.QApplication.instance().topLevelWidgets():
-        if isinstance(_widget, MainMenu):
-            return _widget
-    raise ValueError("Could not find MainMenu instance")
 
 
 def get_standard_state_full_filename(filename):

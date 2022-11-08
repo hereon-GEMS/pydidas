@@ -25,7 +25,7 @@ __status__ = "Development"
 __all__ = [
     "delete_all_items_in_layout",
     "create_default_grid_layout",
-    "get_pyqt_icon_from_str_reference",
+    "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
 ]
 
@@ -79,7 +79,7 @@ def create_default_grid_layout():
     return _layout
 
 
-def get_pyqt_icon_from_str_reference(ref_string):
+def get_pyqt_icon_from_str(ref_string):
     """
     Get a QIcon from the reference string.
 

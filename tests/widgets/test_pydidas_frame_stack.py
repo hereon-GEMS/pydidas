@@ -29,10 +29,11 @@ import random
 import numpy as np
 from qtpy import QtWidgets
 
-from pydidas.widgets.central_widget_stack import CentralWidgetStack
+from pydidas.widgets.pydidas_frame_stack import PydidasFrameStack
+from pydidas.widgets import BaseFrame
 
 
-class TestWidget(QtWidgets.QWidget):
+class TestWidget(BaseFrame):
     ref_name = ""
     title = ""
     menu_icon = None
@@ -42,64 +43,66 @@ class TestWidget(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.hash = hash(self)
-        self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
+        self.menu_entry = "".join(
+            random.choice(string.ascii_letters) for i in range(20)
+        )
 
     def frame_activated(self, index):
         ...
 
 
-class TestCentralWidgetStack(unittest.TestCase):
+class TestPydidasFrameStack(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication([])
-        cls.widgets = []
+        cls.frames = []
 
     @classmethod
     def tearDownClass(cls):
-        while cls.widgets:
-            w = cls.widgets.pop()
+        while cls.frames:
+            w = cls.frames.pop()
             w.deleteLater()
         cls.q_app.quit()
 
     def setUp(self):
-        self.widgets = []
+        self.frames = []
 
     def create_stack(self):
-        stack = CentralWidgetStack()
+        stack = PydidasFrameStack()
         stack.reset()
         for i in range(4):
             w = TestWidget()
-            stack.register_widget(w.name, w)
-            self.widgets.append(w)
+            stack.register_frame(w)
+            self.frames.append(w)
         return stack
 
     def test_init(self):
-        obj = CentralWidgetStack()
+        obj = PydidasFrameStack()
         self.assertIsInstance(obj, QtWidgets.QStackedWidget)
-        self.assertTrue(hasattr(obj, "widget_indices"))
-        self.assertTrue(hasattr(obj, "widgets"))
+        self.assertTrue(hasattr(obj, "frame_indices"))
+        self.assertTrue(hasattr(obj, "frames"))
 
-    def test_register_widget(self):
-        stack = CentralWidgetStack()
+    def test_register_frame(self):
+        stack = PydidasFrameStack()
         w = TestWidget()
-        stack.register_widget(w.name, w)
+        stack.register_frame(w)
 
-    def test_register_widget_duplicate(self):
-        stack = CentralWidgetStack()
+    def test_register_frame_duplicate(self):
+        stack = PydidasFrameStack()
         w = TestWidget()
-        stack.register_widget(w.name, w)
+        stack.register_frame(w)
         with self.assertRaises(KeyError):
-            stack.register_widget(w.name, w)
+            stack.register_frame(w)
 
     def test_get_name_from_index(self):
         stack = self.create_stack()
         _name = stack.get_name_from_index(0)
-        self.assertEqual(_name, self.widgets[0].name)
+        self.assertEqual(_name, self.frames[0].menu_entry)
 
     def test_get_widget_by_name__known_name(self):
         stack = self.create_stack()
-        _w = stack.get_widget_by_name(self.widgets[0].name)
-        self.assertEqual(_w, self.widgets[0])
+        _w = stack.get_widget_by_name(self.frames[0].menu_entry)
+        self.assertEqual(_w, self.frames[0])
 
     def test_get_widget_by_name__not_registered(self):
         stack = self.create_stack()
@@ -109,14 +112,14 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_get_all_widget_names(self):
         stack = self.create_stack()
         _names = stack.get_all_widget_names()
-        self.assertEqual(len(self.widgets), len(_names))
-        for w in self.widgets:
-            self.assertTrue(w.ref_name in _names)
+        self.assertEqual(len(self.frames), len(_names))
+        for w in self.frames:
+            self.assertTrue(w.menu_entry in _names)
 
     def test_activate_widget_by_name(self):
         stack = self.create_stack()
-        stack.activate_widget_by_name(self.widgets[-1].name)
-        self.assertEqual(stack.currentIndex(), len(self.widgets) - 1)
+        stack.activate_widget_by_name(self.frames[-1].menu_entry)
+        self.assertEqual(stack.currentIndex(), len(self.frames) - 1)
 
     def test_activate_widget_by_name_wrong_name(self):
         stack = self.create_stack()
@@ -125,7 +128,7 @@ class TestCentralWidgetStack(unittest.TestCase):
 
     def test_remove_widget_by_name(self):
         stack = self.create_stack()
-        stack.remove_widget_by_name(self.widgets[-1].name)
+        stack.remove_widget_by_name(self.frames[-1].menu_entry)
 
     def test_remove_widget_by_name_wrong_name(self):
         stack = self.create_stack()
@@ -140,11 +143,11 @@ class TestCentralWidgetStack(unittest.TestCase):
 
     def test_removeWidget(self):
         stack = self.create_stack()
-        w = self.widgets[1]
+        w = self.frames[1]
         stack.removeWidget(w)
-        _indices = set(stack.widget_indices.values())
-        self.assertNotIn(w.name, stack.widget_indices.keys())
-        self.assertNotIn(w, stack.widgets)
+        _indices = set(stack.frame_indices.values())
+        self.assertNotIn(w.menu_entry, stack.frame_indices.keys())
+        self.assertNotIn(w, stack.frames)
         self.assertEqual(_indices, set(np.arange(stack.count())))
 
     def test_addWidget(self):
@@ -157,12 +160,12 @@ class TestCentralWidgetStack(unittest.TestCase):
         stack = self.create_stack()
         stack.reset()
         self.assertEqual(stack.count(), 0)
-        self.assertEqual(stack.widgets, [])
-        self.assertEqual(stack.widget_indices, {})
+        self.assertEqual(stack.frames, [])
+        self.assertEqual(stack.frame_indices, {})
 
     def test_is_registered(self):
         stack = self.create_stack()
-        self.assertTrue(stack.is_registered(self.widgets[0]))
+        self.assertTrue(stack.is_registered(self.frames[0]))
 
     def test_is_registered_wrong_widget(self):
         stack = self.create_stack()
@@ -171,10 +174,10 @@ class TestCentralWidgetStack(unittest.TestCase):
     def test_change_reference_name__with_registered_widget(self):
         _new = "The new widget name"
         stack = self.create_stack()
-        w = self.widgets[0]
+        w = self.frames[0]
         stack.change_reference_name(_new, w)
-        self.assertIn(_new, stack.widget_indices)
-        self.assertEqual(w.ref_name, _new)
+        self.assertIn(_new, stack.frame_indices)
+        self.assertEqual(w.menu_entry, _new)
 
     def test_change_reference_name__with_unregistered_widget(self):
         _new = "The new widget name"

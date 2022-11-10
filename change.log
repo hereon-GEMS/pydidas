@@ -1,6 +1,11 @@
 v0.1.12
 =======
 
+
+Improvements
+------------
+- Fields for filenames now accept drops from the OS's explorer.
+
 Bugfixes
 --------
 - Fixed an issue where destroyed QObjects were still referenced in the 

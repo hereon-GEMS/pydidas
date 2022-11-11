@@ -300,6 +300,10 @@ class TestDataset(unittest.TestCase):
         _new = np.random.random((14, 16))
         obj[2, 3] = _new
 
+    def test_empty_dataset_array_finalize__slice_w_tuple(self):
+        obj = self.create_large_dataset()
+        _new = obj[:, ( 1, 2, 3)]
+
     def test_empty_dataset__with_rebin2d(self):
         obj = Dataset(np.random.random((11, 11)), axis_labels=[0, 1])
         _new = rebin2d(obj, 2)

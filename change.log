@@ -5,6 +5,8 @@ v0.1.12
 Improvements
 ------------
 - Fields for filenames now accept drops from the OS's explorer.
+- Added a CorrectSplineDistortion Plugin to apply a Fit2D / pyFAI spline on a 
+  detector image.
 
 Bugfixes
 --------

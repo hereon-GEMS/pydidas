@@ -170,7 +170,6 @@ class TweakPluginParameterWindow(PydidasWindow):
         results : pydidas.core.Dataset
             The plugin results.
         """
-        results.convert_all_none_properties()
         self._widgets["plot_stack"].setCurrentIndex(results.ndim - 1)
         if results.ndim == 1:
             self._plot1d(

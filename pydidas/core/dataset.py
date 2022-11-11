@@ -535,25 +535,6 @@ class Dataset(np.ndarray):
                 )
             raise ValueError(_error)
 
-    def convert_all_none_properties(self):
-        """
-        Convert all properties of NoneType to their default values.
-        """
-        self._meta["data_unit"] = (
-            self._meta["data_unit"] if self._meta["data_unit"] is not None else ""
-        )
-        self._meta["data_label"] = (
-            self._meta["data_label"] if self._meta["data_label"] is not None else ""
-        )
-        for _name in ["axis_units", "axis_labels"]:
-            _dict = self._meta[_name]
-            for _index, _key in _dict.items():
-                if _key is None:
-                    _dict[_index] = ""
-        for _index, _key in self._meta["axis_ranges"].items():
-            if _key is None:
-                self._meta["axis_ranges"][_index] = np.arange(self.shape[_index])
-
     # ################################################
     # Implement update methods for the axis properties
     # ################################################

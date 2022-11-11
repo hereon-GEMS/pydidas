@@ -196,7 +196,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if self.__source_hash != hash((hash(SCAN), hash(TREE))):
             self.__source_hash = hash((hash(SCAN), hash(TREE)))
-            self._tree = TREE.get_copy()
+            self.reload_workflow()
 
     @QtCore.Slot(int)
     def __updated_plugin_params(self, node_id):
@@ -265,6 +265,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         to global settings.
         """
         self._tree = TREE.get_copy()
+        self.param_widgets["selected_results"].setCurrentIndex(0)
+        self._config["plugin_res_titles"] = {}
+        self.__update_selection_choices()
 
     @staticmethod
     def _check_tree_is_populated():
@@ -320,7 +323,6 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._config["plugin_res_titles"] = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
-            _data.convert_all_none_properties()
             if 1 in set(_data.shape) and _data.shape != (1,):
                 _data = _data.squeeze()
             self._results[_node_id] = _data

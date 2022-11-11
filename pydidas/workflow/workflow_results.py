@@ -66,7 +66,6 @@ class _WorkflowResults(QtCore.QObject):
         _shapes = {_key: SCAN.shape + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
             _dset = Dataset(np.zeros(_shape, dtype=np.float32))
-            _dset.convert_all_none_properties()
             for index in range(_dim):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index)
                 _dset.update_axis_labels(index, _label)
@@ -320,7 +319,6 @@ class _WorkflowResults(QtCore.QObject):
         node_id,
         slices,
         flattened_scan_dim=False,
-        force_string_metadata=False,
         squeeze=False,
     ):
         """
@@ -337,9 +335,6 @@ class _WorkflowResults(QtCore.QObject):
             is assumed to be 1-d only and the first slice item will be used
             for the Scan whereas the remaining slice items will be used for
             the resulting data. The default is False.
-        force_string_metadata : bool, optional
-            Keyword to force all metadata to be converted to strings. This will
-            replace any None entries with empty strings. The default is False.
 
         Returns
         -------
@@ -364,13 +359,11 @@ class _WorkflowResults(QtCore.QObject):
             )
             _data = _data[slices[0]]
 
-        if force_string_metadata:
-            _data.convert_all_none_properties()
         if squeeze:
             return _data.squeeze()
         return _data
 
-    def get_result_metadata(self, node_id, convert_none=False):
+    def get_result_metadata(self, node_id):
         """
         Get the stored metadata for the results of the specified node.
 
@@ -378,9 +371,6 @@ class _WorkflowResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID identifier.
-        convert_none : bool, optional
-            Flag to toggle conversion of None types to empty strings. The default is
-            False.
 
         Returns
         -------
@@ -388,8 +378,6 @@ class _WorkflowResults(QtCore.QObject):
             A dictionary with the metadata stored using the "axis_labels",
             "axis_ranges", "axis_units" and "metadata" keys.
         """
-        if convert_none:
-            self.__composites[node_id].convert_all_none_properties()
         return {
             "axis_labels": self.__composites[node_id].axis_labels,
             "axis_units": self.__composites[node_id].axis_units,
@@ -542,7 +530,7 @@ class _WorkflowResults(QtCore.QObject):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _meta = self.get_result_metadata(node_id, convert_none=True)
+        _meta = self.get_result_metadata(node_id)
         _scandim = SCAN.get_param_value("scan_dim")
         _start_index = use_scan_timeline * _scandim
         _print_info = {

@@ -928,23 +928,6 @@ class TestDataset(unittest.TestCase):
             else:
                 self.assertEqual(_item, _target)
 
-    def test_convert_all_none_properties(self):
-        _range1 = np.linspace(2.7, 12, num=10)
-        _label1 = "Some label"
-        _unit1 = "The unit"
-        _array = np.random.random((10, 10))
-        obj = Dataset(
-            _array,
-            axis_ranges=[None, _range1],
-            axis_labels=[None, _label1],
-            axis_units=[None, _unit1],
-        )
-        obj.convert_all_none_properties()
-        self.assertTrue(np.allclose(obj.axis_ranges[0], np.arange(10)))
-        self.assertTrue(np.allclose(obj.axis_ranges[1], _range1))
-        self.assertEqual(obj.axis_labels, {0: "", 1: _label1})
-        self.assertEqual(obj.axis_units, {0: "", 1: _unit1})
-
 
 if __name__ == "__main__":
     unittest.main()

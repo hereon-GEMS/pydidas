@@ -223,7 +223,6 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             _label = _item.get("label", "")
             _title = _titles.get(_i_plot, "")
             _data = _item["data"]
-            _data.convert_all_none_properties()
             if _data.ndim == 1:
                 _ylabel = _plot_ylabels.get(_i_plot, "")
                 self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(0)

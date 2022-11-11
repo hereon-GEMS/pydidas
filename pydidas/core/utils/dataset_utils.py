@@ -25,7 +25,8 @@ __status__ = "Development"
 __all__ = [
     "update_dataset_properties_from_kwargs",
     "dataset_property_default_val",
-    "dataset_ax_default",
+    "dataset_ax_str_default",
+    "dataset_ax_default_ranges",
     "get_number_of_entries",
     "get_axis_item_representation",
     "convert_data_to_dict",
@@ -59,22 +60,20 @@ def update_dataset_properties_from_kwargs(obj, kwargs):
     obj : pydidas.core.Dataset
         The updated Dataset.
     """
-    obj._keys = {}
-    obj.axis_units = kwargs.get("axis_units", dataset_ax_default(obj.ndim, True))
-    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_default(obj.ndim, True))
-    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default(obj.ndim))
+    obj._meta = {}
+    obj.axis_units = kwargs.get("axis_units", dataset_ax_str_default(obj.ndim))
+    obj.axis_labels = kwargs.get("axis_labels", dataset_ax_str_default(obj.ndim))
+    obj.axis_ranges = kwargs.get("axis_ranges", dataset_ax_default_ranges(obj.shape))
     obj.metadata = kwargs.get("metadata", {})
     obj.data_unit = kwargs.get("data_unit", "")
     obj.data_label = kwargs.get("data_label", "")
-    obj.getitem_key = None
+    obj._getitem_key = ()
     return obj
 
 
-def dataset_property_default_val(entry, length=None):
+def dataset_property_default_val(entry):
     """
     Generate default values for the properties in a Dataset.
-
-    of None for a number of dimensions.
 
     Parameters
     ----------
@@ -93,21 +92,37 @@ def dataset_property_default_val(entry, length=None):
     if entry in ["data_unit", "data_label"]:
         return ""
     if entry == "getitem_key":
-        return None
+        return tuple()
     raise ValueError(f"No default available for '{entry}'.")
 
 
-def dataset_ax_default(ndim, get_string=False):
+def dataset_ax_str_default(ndim):
     """
-    Generate default values for the properties in a Dataset.
-
-    of None for a number of dimensions.
+    Generate default values for the string-based axis properties in a Dataset.
 
     Parameters
     ----------
 
     ndim : int
         The number of dimensions in the Dataset.
+
+    Returns
+    -------
+    dict
+        The default entries: a dictionary with None entries for each dimension.
+    """
+    return {i: "" for i in range(ndim)}
+
+
+def dataset_ax_default_ranges(shape):
+    """
+    Generate default values for the axis ranges in a Dataset.
+
+    Parameters
+    ----------
+
+    shape : tuple
+        The shape of the Dataset.
     get_string : bool
         Keyword to return an empty string instead of "None".
 
@@ -116,8 +131,7 @@ def dataset_ax_default(ndim, get_string=False):
     dict
         The default entries: a dictionary with None entries for each dimension.
     """
-    _val = "" if get_string else None
-    return {i: _val for i in range(ndim)}
+    return {index: np.arange(length) for index, length in enumerate(shape)}
 
 
 def get_number_of_entries(obj):
@@ -187,7 +201,9 @@ def get_axis_item_representation(key, item, use_key=True):
     return _lines
 
 
-def convert_data_to_dict(data, target_length, calling_method_name="undefined method"):
+def convert_data_to_dict(
+    data, target_shape, entry_type="str", calling_method_name="undefined method"
+):
     """
     Get an ordered dictionary with the axis keys for the input data.
 
@@ -199,9 +215,11 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
     ----------
     data : Union[dict, Iterable]
         The keys for the axis meta data.
-    target_length : int
-        The required number of entries. This number is needed to sanity-check that
+    target_shape: tuple
+        The shape of the target Dataset. This number is needed to sanity-check that
         the input has the correct length.
+    entry_type : str, optional
+        The type of entries. Can be either 'str' or 'array'. The default is 'str'.
     calling_method_name : str
         The name of the calling method (for exception handling)
 
@@ -219,7 +237,7 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
         values from the input _data.
     """
     if isinstance(data, dict):
-        if set(data.keys()) != set(np.arange(target_length)):
+        if set(data.keys()) != set(np.arange(len(target_shape))):
             warnings.warn(
                 "The key numbers do not match the number of array dimensions. Changing "
                 f"keys to defaults. (Error encountered in {calling_method_name})."
@@ -227,13 +245,15 @@ def convert_data_to_dict(data, target_length, calling_method_name="undefined met
             return dict(enumerate(data.values()))
         return data
     if isinstance(data, Iterable) and not isinstance(data, str):
-        if len(data) != target_length:
+        if len(data) != len(target_shape):
             warnings.warn(
                 "The number of given keys does not match the number of array "
                 "dimensions. Resettings keys to defaults. (Error encountered in "
                 f"{calling_method_name})."
             )
-            return dataset_ax_default(target_length)
+            if entry_type == "array":
+                return dataset_ax_default_ranges(target_shape)
+            return dataset_ax_str_default(len(target_shape))
         return dict(enumerate(data))
     raise PydidasConfigError(
         f"Input {data} cannot be converted to dictionary for property"

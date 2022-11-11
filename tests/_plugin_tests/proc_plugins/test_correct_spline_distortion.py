@@ -21,12 +21,11 @@ __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
-
+import warnings
 import os
 import unittest
 import tempfile
 import shutil
-import random
 
 import numpy as np
 import pyFAI
@@ -40,7 +39,6 @@ PLUGIN_COLLECTION = PluginCollection()
 
 
 class TestCorrectSplineDistortion(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls._temppath = tempfile.mkdtemp()
@@ -57,7 +55,9 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         _spline.yDispArray = _ydist
         _spline.xDispArray = _xdist
         _spline.grid = 50
-        _spline.array2spline()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            _spline.array2spline()
         _spline.xmax = cls.data_shape[1]
         _spline.ymax = cls.data_shape[0]
         _spline.write(cls._spline_file)
@@ -70,11 +70,10 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         cls._data_metadata = {
             "axis_labels": ["ax0", "ax1"],
             "axis_units": ["u0", "u1"],
-            "axis_ranges": [np.arange(512), 2* np.arange(512)],
+            "axis_ranges": [np.arange(512), 2 * np.arange(512)],
             "data_label": "test data",
-            "data_unit": "cts"
+            "data_unit": "cts",
         }
-
 
     @classmethod
     def tearDownClass(cls):
@@ -148,7 +147,6 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         self.assertTrue(np.isnan(_data_out[-3:]).all())
         self.assertTrue(np.isfinite(_data_out[0, 3:-3]).all())
         self.assertTrue(np.isnan(_data_out.array[:, (0, 1, -2, -1)]).all())
-
 
 
 if __name__ == "__main__":

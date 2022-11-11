@@ -25,6 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["CorrectSplineDistortion"]
 
+import warnings
 import os
 from pathlib import Path
 
@@ -34,9 +35,7 @@ import numpy as np
 
 from pydidas.core import ParameterCollection, Parameter, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN_IMAGE
-from pydidas.core.utils import rebin2d
 from pydidas.plugins import ProcPlugin
-from pydidas.data_io import import_data
 
 
 _SPLINE_PARAMS = ParameterCollection(
@@ -48,7 +47,7 @@ _SPLINE_PARAMS = ParameterCollection(
         tooltip=(
             "Apply a spline-file distortion correction to account for detector "
             "distortion."
-        )
+        ),
     ),
     Parameter(
         "geometry",
@@ -59,7 +58,7 @@ _SPLINE_PARAMS = ParameterCollection(
         tooltip=(
             "The geometry of the spline file. The origin in pyFAI is defined opposite "
             "to the Fit2D definition and Fit2D files must be corrected."
-        )
+        ),
     ),
     Parameter(
         "fill_nan",
@@ -71,8 +70,8 @@ _SPLINE_PARAMS = ParameterCollection(
             "Choice whether to fill invalid pixels with NaN instead of zeros. "
             "Invalid pixels appear when the correction shrinks the image and empty "
             "image regions appear."
-        )
-    )
+        ),
+    ),
 )
 
 
@@ -101,12 +100,14 @@ class CorrectSplineDistortion(ProcPlugin):
         Initialize the detector and modify the spline, if necessary.
         """
         _spline = self.get_param_value("spline_file")
-        if not os.path.isfile(_spline ):
+        if not os.path.isfile(_spline):
             raise UserConfigError(f"The given path '{_spline }' is not a valid file.")
-        self._detector = pyFAI.detector_factory("FReLoN", {"splineFile":_spline})
+        self._detector = pyFAI.detector_factory("FReLoN", {"splineFile": _spline})
         if self.get_param_value("geometry") == "Fit2D":
-            self._detector.spline = self._detector.spline.flipud()
-            self._detector.mask = np.flipud(self._detector.mask)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                self._detector.spline = self._detector.spline.flipud()
+                self._detector.mask = np.flipud(self._detector.mask)
         self._correction = Distortion(self._detector)
         if self.get_param_value("fill_nan"):
             _dummy = self._correction.correct(np.ones(self._detector.max_shape))

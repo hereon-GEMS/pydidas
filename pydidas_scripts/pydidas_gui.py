@@ -89,7 +89,7 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(ViewResultsFrame)
     gui.register_frame(UtilitiesFrame)
 
-    if restore_state not in ["None", "exit", "saved"]:
+    if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
     gui.raise_()
     gui.show()
@@ -102,4 +102,4 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication.instance()
     if not isinstance(app, PydidasApp):
         app = PydidasApp(sys.argv)
-    _ = run_gui(app, restore_state="None")
+    _ = run_gui(app, restore_state="none")

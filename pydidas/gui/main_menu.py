@@ -499,15 +499,15 @@ class MainMenu(QtWidgets.QMainWindow):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
-        if state == "saved":
+        if state.upper() == "SAVED":
             filename = utils.get_standard_state_full_filename(self.STATE_FILENAME)
-        elif state == "exit":
+        elif state.upper() == "EXIT":
             filename = utils.get_standard_state_full_filename(self.EXIT_STATE_FILENAME)
-        elif state == "manual" and filename is None:
+        elif state.upper() == "MANUAL" and filename is None:
             raise UserConfigError(
                 "A filename must be supplied for 'manual' gui state restoration."
             )
-        elif state == "manual" and os.path.isfile(filename):
+        elif state.upper() == "MANUAL" and os.path.isfile(filename):
             pass
         else:
             raise UserConfigError(f"The given state '{state}' cannot be interpreted.")

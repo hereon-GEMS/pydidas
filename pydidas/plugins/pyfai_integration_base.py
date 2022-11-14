@@ -103,6 +103,7 @@ class pyFAIintegrationBase(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._ai = None
+        self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
         self.params["det_mask"]._Parameter__meta["optional"] = True

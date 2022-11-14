@@ -79,6 +79,7 @@ core.utils.set_default_plugin_dir()
 import os as __os
 import logging as __logging
 
+
 __os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
 pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")

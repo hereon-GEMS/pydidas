@@ -48,15 +48,22 @@ class TestCorrectSplineDistortion(unittest.TestCase):
         cls._data_metadata = {
             "axis_labels": ["ax0", "ax1"],
             "axis_units": ["u0", "u1"],
-            "axis_ranges": [np.arange(cls.data_shape[0]), 2 * np.arange(cls.data_shape[1])],
+            "axis_ranges": [
+                np.arange(cls.data_shape[0]),
+                2 * np.arange(cls.data_shape[1]),
+            ],
             "data_label": "test data",
             "data_unit": "cts",
         }
         for _dir, _ext in enumerate(["shrink", "expand"]):
             _factor = 1 - 2 * _dir
-            cls._spline_files[_ext] = os.path.join(cls._temppath, f"spline_file_{_ext}.txt")
+            cls._spline_files[_ext] = os.path.join(
+                cls._temppath, f"spline_file_{_ext}.txt"
+            )
             _spline = pyFAI.spline.Spline()
-            _spline.zeros(xmax=cls.data_shape[1], ymax=cls.data_shape[0], pixSize=(1, 1))
+            _spline.zeros(
+                xmax=cls.data_shape[1], ymax=cls.data_shape[0], pixSize=(1, 1)
+            )
             _spline.yDispArray = _factor * np.outer(
                 np.arange(cls.data_shape[0]) / 128, -np.ones(cls.data_shape[1])
             )

@@ -39,8 +39,8 @@ def parametrized_sub_tests(param_dict_list):
     param_dict_list : list
         A list with dictionary entries for the keyword arguments for each case.
     """
-    def decorator(func):
 
+    def decorator(func):
         @functools.wraps(func)
         def wrapped(self):
             for _param_dict in param_dict_list:

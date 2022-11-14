@@ -111,7 +111,7 @@ class CorrectSplineDistortion(ProcPlugin):
         self._correction = Distortion(self._detector)
         if self.get_param_value("fill_nan"):
             _dummy = self._correction.correct(np.ones(self._detector.max_shape))
-            self._nan_mask = np.where(_dummy < 0.9999999, 1, 0)
+            self._nan_mask = np.where(_dummy < 0.8, 1, 0)
 
     def execute(self, data, **kwargs):
         """

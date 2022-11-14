@@ -858,3 +858,23 @@ class Dataset(np.ndarray):
         if obj.shape == ():
             return np.atleast_1d(obj)[0]
         return np.ndarray.__array_wrap__(self, obj, context)
+
+    def __hash__(self):
+        """
+        Generate a hash value for the dataset.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _datahash = hash(self.data.tobytes())
+        _metahash = hash(
+            (
+                self.axis_labels.values(),
+                self.axis_units.values(),
+                self.data_label,
+                self.data_unit,
+            )
+        )
+        return hash((_datahash, _metahash))

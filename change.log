@@ -15,6 +15,7 @@ Bugfixes
 - Fixed an issue with persistent object references in the SingletonFactory for
   destroyed C++ Qt objects.
 - Fixed an issue with the manual import of state files.
+- Fixed an issue with the Histogram in images which include NaN.
 
 
 v0.1.11

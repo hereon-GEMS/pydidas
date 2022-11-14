@@ -7,6 +7,8 @@ Improvements
 - Fields for filenames now accept drops from the OS's explorer.
 - Added a CorrectSplineDistortion Plugin to apply a Fit2D / pyFAI spline on a 
   detector image.
+- Dataset axis properties now default to empty strings and numpy.aranges in the
+  correct length instead of None.
 
 Bugfixes
 --------
@@ -16,10 +18,12 @@ Bugfixes
   destroyed C++ Qt objects.
 - Fixed an issue with the manual import of state files.
 - Fixed an issue with the Histogram in images which include NaN.
+- Fixed  an issue with 1D pyFAI integration plugins and a missing definition.
 
 
 v0.1.11
 =======
+
 Major changes:
 --------------
 - Added a Utilities frame to have easy access to various utility windows.
@@ -72,6 +76,7 @@ Bugfixes:
 
 v0.1.10
 =======
+
 Major changes:
 --------------
 - Changed the handling of storing persistent information for the user 
@@ -126,6 +131,7 @@ Bugfixes:
 
 v0.1.9
 ======
+
 Major changes:
 --------------
 - Added a new SilxPlot2D class which allows to limit the figure canvas to the 
@@ -171,6 +177,7 @@ Bugfixes:
 
 v0.1.8
 ======
+
 Major changes:
 --------------
 - Updated fitting functions and included a true Voigt profile, which (in its
@@ -204,6 +211,7 @@ Bugfixes:
 
 v0.1.7
 ======
+
 Major changes:
 --------------
 - Added feedback form to menu
@@ -212,6 +220,7 @@ Major changes:
 
 
 v0.1.6
+
 ======
 Major changes:
 --------------
@@ -222,6 +231,7 @@ Major changes:
 
 v0.1.5
 ======
+
 Major changes:
 --------------
 - Removed dependency on QtWebEngineWidgets to fix startup problems.

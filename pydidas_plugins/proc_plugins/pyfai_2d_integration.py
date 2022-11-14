@@ -46,7 +46,6 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__ai_params = {}
         self.set_param_value("rad_npoint", 1000)
         self.set_param_value("azi_npoint", 36)
 
@@ -54,11 +53,11 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
-        self.__ai_params["npt_rad"] = self.get_param_value("rad_npoint")
-        self.__ai_params["npt_azim"] = self.get_param_value("azi_npoint")
-        self.__ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
-        self.__ai_params["radial_range"] = self.get_radial_range()
-        self.__ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+        self._ai_params["npt_rad"] = self.get_param_value("rad_npoint")
+        self._ai_params["npt_azim"] = self.get_param_value("azi_npoint")
+        self._ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
+        self._ai_params["radial_range"] = self.get_radial_range()
+        self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
         pyFAIintegrationBase.pre_execute(self)
 
     def execute(self, data, **kwargs):
@@ -81,12 +80,12 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         """
         _newdata = self._ai.integrate2d(
             data,
-            self.__ai_params["npt_rad"],
-            npt_azim=self.__ai_params["npt_azim"],
+            self._ai_params["npt_rad"],
+            npt_azim=self._ai_params["npt_azim"],
             polarization_factor=1,
-            unit=self.__ai_params["unit"],
-            radial_range=self.__ai_params["radial_range"],
-            azimuth_range=self.__ai_params["azimuth_range"],
+            unit=self._ai_params["unit"],
+            radial_range=self._ai_params["radial_range"],
+            azimuth_range=self._ai_params["azimuth_range"],
             method=self._config["method"],
         )
         _range_fact = np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1

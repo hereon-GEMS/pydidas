@@ -507,6 +507,8 @@ class MainMenu(QtWidgets.QMainWindow):
             raise UserConfigError(
                 "A filename must be supplied for 'manual' gui state restoration."
             )
+        elif state == "manual" and os.path.isfile(filename):
+            pass
         else:
             raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
         with open(filename, "r") as _file:

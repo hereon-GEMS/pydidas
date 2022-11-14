@@ -14,6 +14,7 @@ Bugfixes
   SingletonFactory.
 - Fixed an issue with persistent object references in the SingletonFactory for
   destroyed C++ Qt objects.
+- Fixed an issue with the manual import of state files.
 
 
 v0.1.11

@@ -119,7 +119,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
 
         This method changes the combobox selection to the specified value.
         """
-        self._old_value = value
+        self._old_value = self.get_value()
         self.ledit.setText(f"{value}")
 
     def setText(self, text):

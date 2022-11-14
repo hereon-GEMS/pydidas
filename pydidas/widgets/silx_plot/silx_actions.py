@@ -143,7 +143,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             "user/histogram_outlier_fraction", dtype=float
         )
         _data = image.getData()
-        _counts, _edges = np.histogram(_data, bins=4096)
+        _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
         _cumcounts = np.cumsum(_counts / _data.size)
         _index_stop = max(1, np.where(_cumcounts <= _fraction)[0].size)
 

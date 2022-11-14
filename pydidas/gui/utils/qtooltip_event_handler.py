@@ -64,7 +64,10 @@ class QTooltipEventHandler(QObject):
             if not isinstance(widget, QWidget):
                 raise ValueError(f'QObject "{widget}" is not a widget.')
 
-            _tooltip = widget.toolTip()
+            try:
+                _tooltip = widget.toolTip()
+            except TypeError:
+                print(widget)
 
             if len(_tooltip) > 0 and not Qt.mightBeRichText(_tooltip):
                 _tooltip = f"<qt>{html.escape(_tooltip)}</qt>"

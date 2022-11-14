@@ -34,7 +34,6 @@ from qtpy import QtCore
 
 from ...version import VERSION
 
-
 LOGGING_LEVEL = logging.WARNING
 
 

@@ -169,7 +169,6 @@ class ViewResultsMixin:
             _node,
             self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
-            force_string_metadata=True,
             squeeze=True,
         )
         self._data_axlabels = _data.axis_labels.copy()

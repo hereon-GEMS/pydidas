@@ -79,10 +79,13 @@ core.utils.set_default_plugin_dir()
 import os as __os
 import logging as __logging
 
+
 __os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
 pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")
 pyFAI_azi_logger.setLevel(__logging.ERROR)
+pyFAI_logger = __logging.getLogger("pyFAI")
+pyFAI_logger.setLevel(__logging.ERROR)
 silx_opencl_logger = __logging.getLogger("silx.opencl.processing")
 silx_opencl_logger.setLevel(__logging.ERROR)
 

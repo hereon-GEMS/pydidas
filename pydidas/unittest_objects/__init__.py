@@ -32,6 +32,7 @@ from .dummy_loader import *
 from .dummy_plugin_collection import *
 from .dummy_proc import *
 from .mp_test_app import *
+from .parametrized_sub_tests_ import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -59,3 +60,8 @@ from . import mp_test_app
 
 __all__.extend(mp_test_app.__all__)
 del mp_test_app
+
+from . import parametrized_sub_tests_
+
+__all__.extend(parametrized_sub_tests_.__all__)
+del parametrized_sub_tests_

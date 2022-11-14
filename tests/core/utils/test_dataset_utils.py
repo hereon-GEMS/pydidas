@@ -32,7 +32,7 @@ from pydidas.core.dataset import Dataset
 from pydidas.core.utils.dataset_utils import (
     update_dataset_properties_from_kwargs,
     dataset_property_default_val,
-    dataset_ax_default,
+    dataset_ax_str_default,
     get_number_of_entries,
     convert_data_to_dict,
     item_is_iterable_but_not_array,
@@ -49,7 +49,7 @@ class Test_dataset_utils(unittest.TestCase):
     def test_update_dataset_properties_from_kwargs__no_input(self):
         obj = Dataset(np.random.random((10, 10)))
         update_dataset_properties_from_kwargs(obj, {})
-        self.assertIsNone(obj.getitem_key)
+        self.assertEqual(obj._getitem_key, ())
 
     def test_update_dataset_properties_from_kwargs__axis_units(self):
         _units = {0: "a", 1: "b"}
@@ -88,12 +88,12 @@ class Test_dataset_utils(unittest.TestCase):
         self.assertEqual(dataset_property_default_val("data_unit"), "")
 
     def test_dataset_property_default_val__getitem_key(self):
-        self.assertIsNone(dataset_property_default_val("getitem_key"))
+        self.assertEqual(dataset_property_default_val("getitem_key"), tuple())
 
-    def test_dataset_ax_default(self):
-        _range = dataset_ax_default(5)
+    def test_dataset_ax_str_default(self):
+        _range = dataset_ax_str_default(5)
         self.assertEqual(set(np.arange(5)), set(_range.keys()))
-        self.assertEqual(set([None]), set(_range.values()))
+        self.assertEqual(set([""]), set(_range.values()))
 
     def test_get_number_of_entries__ndarray(self):
         _arr = np.arange(27)
@@ -122,27 +122,27 @@ class Test_dataset_utils(unittest.TestCase):
 
     def test_convert_data_to_dict__correct_dict(self):
         _obj = {0: 5, 1: 4, 2: 42}
-        _new = convert_data_to_dict(_obj, 3)
+        _new = convert_data_to_dict(_obj, (1, 2, 3))
         self.assertEqual(_obj, _new)
 
     def test_convert_data_to_dict__incorrect_dict(self):
         _obj = {0: 5, 3: 4, 6: 42}
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, 3)
+            _new = convert_data_to_dict(_obj, (1, 2, 3))
             self.assertEqual(_new, dict(enumerate(_obj.values())))
 
     def test_convert_data_to_dict__correct_iterable(self):
         _obj = [5, 4, 3]
-        _new = convert_data_to_dict(_obj, 3)
+        _new = convert_data_to_dict(_obj, (1, 2, 3))
         self.assertEqual(_new, dict(enumerate(_obj)))
 
     def test_convert_data_to_dict__incorrect_iterable(self):
         _obj = [4, 2, 7, 4]
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            _new = convert_data_to_dict(_obj, 3)
-            self.assertEqual(_new, dataset_ax_default(3))
+            _new = convert_data_to_dict(_obj, (1, 2, 3))
+            self.assertEqual(_new, dataset_ax_str_default(3))
 
     def test_convert_data_to_dict__incorrect_type(self):
         _obj = "a string"

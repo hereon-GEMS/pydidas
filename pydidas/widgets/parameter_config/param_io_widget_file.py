@@ -32,6 +32,7 @@ from qtpy import QtWidgets, QtCore
 
 from ...core.constants import PARAM_INPUT_EDIT_WIDTH
 from ...data_io import IoMaster
+from ..dialogues import critical_warning
 from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 
@@ -60,6 +61,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             The width of the IOwidget.
         """
         super().__init__(parent, param, width)
+        self.setAcceptDrops(True)
         self._flag_is_output = param.refkey.startswith("output")
         self._flag_is_dir = "directory" in param.refkey
         self._flag_pattern = "pattern" in param.refkey
@@ -112,3 +114,26 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             format 'NAME (*.EXT1 *.EXT2 ...)'
         """
         self._file_selection = ";;".join(list_of_choices)
+
+    def dragEnterEvent(self, event):
+        """
+        Allow to drag files from, for example, the explorer.
+        """
+        if event.mimeData().hasFormat("text/uri-list"):
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        """
+        Allow to drop files from, for example, the explorer.
+        """
+        mimeData = event.mimeData()
+        if mimeData.hasUrls():
+            urls = mimeData.urls()
+            if len(urls) > 1:
+                critical_warning("Not a single file", "A single file is expected.")
+                return
+            _path = urls[0].toLocalFile()
+        else:
+            critical_warning("Not a file", "Can only accept single files.")
+            return
+        self.set_value(_path)

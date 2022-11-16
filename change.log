@@ -10,7 +10,7 @@ Improvements
 Bugfixes
 --------
 - Created a workaround for an issue with pyFAI ElidedLabel class toolTip.
-
+- Fixed an issue with deepcopies in the generic ObjectWithParameterCollection
 
 v0.1.12
 =======

@@ -4,6 +4,8 @@ v0.1.13
 Improvements
 ------------
 - Made Datasets hashable.
+- Added a copy method to Datasets to overwrite the generic numpy method and to
+  copy the metadata as well as the array.
 
 Bugfixes
 --------

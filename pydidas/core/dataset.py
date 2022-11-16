@@ -733,6 +733,24 @@ class Dataset(np.ndarray):
                 )
         return _new
 
+    def copy(self, order="C"):
+        """
+        Overload the generic nd.ndarray copy method to copy metadata as well.
+
+        Parameters
+        ----------
+        order : {‘C’, ‘F’, ‘A’, ‘K’},, optional
+            The memory layout. The default is "C".
+
+        Returns
+        -------
+        Dataset
+            The copied dataset.
+        """
+        _new = np.ndarray.copy(self, order)
+        _new._meta = self._meta.copy()
+        return _new
+
     def __repr__(self):
         """
         Reimplementation of the numpy.ndarray.__repr__ method

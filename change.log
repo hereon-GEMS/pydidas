@@ -13,7 +13,8 @@ Bugfixes
 - Fixed an issue with deepcopies in the generic ObjectWithParameterCollection
 - Fixed an issue with an inconsistent minimum size of the 
   PluginCollectionPresenter
-
+- Fixed an issue with 1D pyFAI Plugin initializations.
+  
 v0.1.12
 =======
 

@@ -51,13 +51,13 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
+        pyFAIintegrationBase.pre_execute(self)
         self._ai_params["npt_azim"] = self.get_param_value("azi_npoint")
         self._ai_params["npt_rad"] = self.get_param_value("rad_npoint")
         self._ai_params["unit"] = self.get_pyFAI_unit_from_param("azi_unit")
         self._ai_params["radial_unit"] = self.get_pyFAI_unit_from_param("rad_unit")
         self._ai_params["radial_range"] = self.get_radial_range()
         self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
-        pyFAIintegrationBase.pre_execute(self)
 
     def execute(self, data, **kwargs):
         """

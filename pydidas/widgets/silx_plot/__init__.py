@@ -32,7 +32,6 @@ from .pydidas_plot2d import *
 from .silx_actions import *
 from .silx_plot_stack_factory import *
 from .utilities import *
-from .wheel_colormap import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:

@@ -67,7 +67,6 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.setFixedWidth(400)
-        self.setMinimumHeight(400)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
 

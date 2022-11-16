@@ -11,6 +11,8 @@ Bugfixes
 --------
 - Created a workaround for an issue with pyFAI ElidedLabel class toolTip.
 - Fixed an issue with deepcopies in the generic ObjectWithParameterCollection
+- Fixed an issue with an inconsistent minimum size of the 
+  PluginCollectionPresenter
 
 v0.1.12
 =======

@@ -14,6 +14,7 @@ Bugfixes
 - Fixed an issue with an inconsistent minimum size of the 
   PluginCollectionPresenter
 - Fixed an issue with 1D pyFAI Plugin initializations.
+- Fixed an issue with nodeIDs of PLugins in imported WorkflowTrees
   
 v0.1.12
 =======

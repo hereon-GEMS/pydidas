@@ -316,6 +316,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         Store the WorkflowTree results in a local dictionary.
         """
         _meta = self._tree.get_complete_plugin_metadata()
+
         self._config["plugin_res_shapes"] = _meta["shapes"]
         self._config["plugin_labels"] = _meta["labels"]
         self._config["plugin_names"] = _meta["names"]

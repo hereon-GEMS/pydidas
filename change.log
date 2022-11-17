@@ -16,6 +16,9 @@ Bugfixes
   PluginCollectionPresenter
 - Fixed an issue with 1D pyFAI Plugin initializations.
 - Fixed an issue with nodeIDs of PLugins in imported WorkflowTrees
+- Added missing qtpy to requirements which was not missing.
+- Fixed an issue in the CompositeCreatorFrame with aborting the AppRunner
+- Corrected function call in ExportEigerPixelmask window.
   
 v0.1.12
 =======

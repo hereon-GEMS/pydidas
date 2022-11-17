@@ -221,6 +221,12 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
+        if self._app._det_mask is not None:
+            if self.get_param_value("raw_image_shape") != self._app._det_mask.shape:
+                raise UserConfigError(
+                    "The use of the global detector mask has been selected but the "
+                    "detector mask size does not match the image data size."
+                )
         self._prepare_plot_params()
         self._config["last_update"] = time.time()
         self._widgets["but_exec"].setEnabled(False)
@@ -241,7 +247,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         Clean up after AppRunner is done.
         """
         logger.debug("finishing AppRunner")
-        self._runner.exit()
+        if self._runner is not None:
+            self._runner.exit()
         self._widgets["but_exec"].setEnabled(True)
         self._widgets["but_show"].setEnabled(True)
         self._widgets["but_save"].setEnabled(True)
@@ -475,9 +482,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self._widgets["progress"].setVisible(False)
         self._widgets["plot_window"].setVisible(False)
         for _key in keys:
-            param = self.params[_key]
-            param.restore_default()
-            self.param_widgets[_key].set_value(param.default)
+            self.set_param_value_and_widget(_key, self.params[_key].default)
         if "first_file" in keys:
             self._config["input_configured"] = False
 
@@ -617,15 +622,14 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         try:
             self._filelist.update()
-        except UserConfigError as _ex:
+        except UserConfigError as _error:
             self.__clear_entries(["last_file"], hide=False)
-            QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
+            dialogues.critical_warning("Could not create filelist.", str(_error))
             return
         if not self._filelist.n_files > 0:
-            QtWidgets.QMessageBox.critical(
-                self,
+            dialogues.critical_warning(
                 "Filelist is empty.",
-                "The list of fils is empty. Please" " verify the selection.",
+                "The list of fils is empty. Please verify the selection."
             )
             return
         self.set_param_value_and_widget("n_files", self._filelist.n_files)

@@ -161,6 +161,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "data_labels": {},
                 "plot_active": False,
                 "plot_dim": 1,
+                "details_active": False,
             }
         )
 
@@ -188,6 +189,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__details_window = ShowDetailedPluginResultsWindow()
         self.__tweak_window = TweakPluginParameterWindow()
         self.__tweak_window.sig_new_params.connect(self.__updated_plugin_params)
+        self.__details_window.sig_minimized.connect(self.__details_hidden)
 
     def __check_tree_uptodate(self):
         """
@@ -197,6 +199,13 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         if self.__source_hash != hash((hash(SCAN), hash(TREE))):
             self.__source_hash = hash((hash(SCAN), hash(TREE)))
             self.reload_workflow()
+
+    @QtCore.Slot()
+    def __details_hidden(self):
+        """
+        Set the flag to hide the details window.
+        """
+        self._config["details_active"] = False
 
     @QtCore.Slot(int)
     def __updated_plugin_params(self, node_id):
@@ -364,6 +373,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if index == 0:
             self._active_node = -1
+            self._config["has_details"] = False
             self.__set_derived_widget_visibility(False)
             self._clear_plot()
             return
@@ -371,6 +381,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.param_widgets["selected_results"].currentText()[-4:-1]
         )
         self._config["plot_active"] = True
+        self._config["has_details"] = hasattr(
+            self._tree.nodes[self._active_node].plugin, "detailed_results"
+        )
         self.__set_derived_widget_visibility(True)
         self.__update_text_description_of_node_results()
         self.__plot_results()
@@ -390,12 +403,9 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._config["widget_visibility"] = visible
         self._widgets["result_info"].setVisible(visible)
         self._widgets["but_tweak_params"].setVisible(visible)
-        _has_get_details_attr = (
-            False
-            if self._active_node == -1
-            else hasattr(self._tree.nodes[self._active_node].plugin, "detailed_results")
+        self._widgets["but_show_details"].setVisible(
+            self._config["has_details"] and visible
         )
-        self._widgets["but_show_details"].setVisible(_has_get_details_attr and visible)
 
     def __update_text_description_of_node_results(self):
         """
@@ -424,6 +434,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._clear_plot()
             return
         self._widgets["plot_stack"].setCurrentIndex(_ndim - 1)
+        if self._config["details_active"] and self._config["has_details"]:
+            self.show_plugin_details(set_focus=False)
 
     def _plot1d(self):
         """
@@ -449,13 +461,19 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._widgets["plot2d"].clear_plot()
 
     @QtCore.Slot()
-    def show_plugin_details(self):
+    def show_plugin_details(self, set_focus=True):
         """
         Show details for the selected plugin.
 
         This method will get the detailed results for the active node and open a
         new window to display the detailed information.
+
+        Parameters
+        ----------
+        set_focus : bool, optional
+            Keyword to set the focus on the new window. The default is True.
         """
+        self._config["details_active"] = True
         _plugin = self._tree.nodes[self._active_node].plugin
         _details = _plugin.detailed_results
         _title = (
@@ -467,7 +485,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self.__details_window.update_results(_details, title=_title)
         self.__details_window.raise_()
         self.__details_window.show()
-        self.__details_window.activateWindow()
+        if set_focus:
+            self.__details_window.activateWindow()
 
     @QtCore.Slot()
     def show_tweak_params_window(self):

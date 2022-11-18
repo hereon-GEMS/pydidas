@@ -629,7 +629,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         if not self._filelist.n_files > 0:
             dialogues.critical_warning(
                 "Filelist is empty.",
-                "The list of fils is empty. Please verify the selection."
+                "The list of files is empty. Please verify the selection.",
             )
             return
         self.set_param_value_and_widget("n_files", self._filelist.n_files)

@@ -7,6 +7,7 @@ Improvements
 - Added a copy method to Datasets to overwrite the generic numpy method and to
   copy the metadata as well as the array.
 - Added a "circular" colormap named 'Wheel' to silx.
+- Added automatic update of details in the WorkflowTestFrame.
 
 Bugfixes
 --------

@@ -19,6 +19,7 @@ Bugfixes
 - Added missing qtpy to requirements which was not missing.
 - Fixed an issue in the CompositeCreatorFrame with aborting the AppRunner
 - Corrected function call in ExportEigerPixelmask window.
+- Fixed the docstring for the core.utils.Timer class.
   
 v0.1.12
 =======

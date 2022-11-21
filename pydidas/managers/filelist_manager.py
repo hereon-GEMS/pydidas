@@ -29,6 +29,7 @@ import os
 import re
 import copy
 from pathlib import Path
+from natsort import natsorted
 
 import numpy as np
 
@@ -254,8 +255,13 @@ class FilelistManager(ObjectWithParameterCollection):
         of filesnames to be stored.
         """
         _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
-        _path2, _fname2 = os.path.split(self.get_param_value("last_file"))
-        _list = sorted(os.listdir(_path1))
+        _, _fname2 = os.path.split(self.get_param_value("last_file"))
+        _list = natsorted(os.listdir(_path1))
+        if _fname2 not in _list:
+            raise UserConfigError(
+                f"No file with the selected name {_fname2} exists in the directory "
+                f"{_path1}."
+            )
         _i1 = _list.index(_fname1)
         _i2 = _list.index(_fname2)
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]

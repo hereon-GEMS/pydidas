@@ -24,6 +24,7 @@ Bugfixes
 - Fixed an issue with the CompositeImageManager and changed global max image
   size changes after instantiation.
 - Fixed an issue in the filelist manager with file sorting.
+- Fixed an issue with restoration of the CompositeCreatorFrame.
   
 v0.1.12
 =======

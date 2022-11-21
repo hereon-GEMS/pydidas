@@ -391,6 +391,7 @@ class CompositeCreatorApp(BaseApp):
             ["image_shape", self._image_metadata.final_shape],
             ["composite_nx", self.get_param_value("composite_nx")],
             ["composite_ny", self.get_param_value("composite_ny")],
+            ["composite_dir", self.get_param_value("composite_dir")],
             ["mosaic_border_width", _bwidth],
             ["mosaic_border_value", _bval],
         ]:
@@ -552,7 +553,7 @@ class CompositeCreatorApp(BaseApp):
         """
         Perform operations after running main parallel processing function.
         """
-        if self.get_param_value("use_thresholds"):
+        if self.get_param_value("use_thresholds") and not self.slave_mode:
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
@@ -589,7 +590,7 @@ class CompositeCreatorApp(BaseApp):
         if self.slave_mode:
             return
         if self.get_param_value("use_bg_file"):
-            image -= self._bg_image
+            image = image - self._bg_image
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 

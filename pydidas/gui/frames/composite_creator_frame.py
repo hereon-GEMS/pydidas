@@ -168,6 +168,53 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.__toggle_bg_file_selection(False)
         self.__toggle_threshold_selection(False)
 
+    def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        The BaseFrameWithApp implementation will update the associated App
+        and then call the BaseFrame's method.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params', 'app' and 'visibility' keys and the
+            respective information for all.
+        """
+        super().restore_state(state)
+        self._config["bg_configured"] = state["config"]["bg_configured"]
+        self._config["input_configured"] = state["config"]["input_configured"]
+        self._filelist.update()
+        super().frame_activated(self.frame_index)
+        self._image_metadata.filename = self.get_param_value("first_file")
+        self._image_metadata.update()
+        self.__update_widgets_after_selecting_first_file()
+        self.__toggle_threshold_selection(self.get_param_value("use_thresholds"))
+        self.__toggle_roi_selection(self.get_param_value("use_roi"))
+        self.__toggle_bg_file_selection(self.get_param_value("use_bg_file"))
+        self.__update_n_image()
+
+    def export_state(self):
+        """
+        Export the state of the Frame for saving.
+
+        This method adds an export for the frame's app.
+
+        Returns
+        -------
+        frame_index : int
+            The frame index which can be used as key for referencing the state.
+        information : dict
+            A dictionary with all the information required to export the
+            frame's state.
+        """
+        _index, _state = super().export_state()
+        _state["config"] = {
+            "bg_configured": self._config["bg_configured"],
+            "input_configured": self._config["input_configured"],
+        }
+        return _index, _state
+
     def frame_activated(self, index):
         """
         Overload the generic frame_activated method.
@@ -490,6 +537,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         Check whether the exec button should be enabled and enable/disable it.
         """
+        _enable = False
         try:
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
@@ -497,7 +545,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                 assert self._config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):
-            _enable = False
+            pass
         finally:
             _flag = _enable and self._config["input_configured"]
             self._widgets["but_exec"].setEnabled(_flag)

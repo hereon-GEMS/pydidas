@@ -35,15 +35,20 @@ from pydidas.core import UserConfigError, PydidasQsettings
 
 
 class TestCompositeImage(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
+    @classmethod
+    def setUpClass(cls):
+        cls._path = tempfile.mkdtemp()
         q_settings = PydidasQsettings()
-        self._maxsize = q_settings.value("global/max_image_size", float)
-        self._border = q_settings.value("user/mosaic_border_width", float)
+        cls._maxsize = q_settings.value("global/max_image_size", float)
+        cls._border = q_settings.value("user/mosaic_border_width", float)
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
-        del self._path
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+        q_settings = PydidasQsettings()
+        q_settings.set_value("global/max_image_size", cls._maxsize)
+        cls._maxsize = q_settings.value("global/max_image_size", float)
+        q_settings.set_value("user/mosaic_border_width", cls._border)
 
     def get_default_object(self, low_limit=None, high_limit=1):
         obj = CompositeImageManager(

@@ -21,6 +21,8 @@ Bugfixes
 - Fixed an issue in the CompositeCreatorFrame with aborting the AppRunner
 - Corrected function call in ExportEigerPixelmask window.
 - Fixed the docstring for the core.utils.Timer class.
+- Fixed an issue with the CompositeImageManager and changed global max image
+  size changes after instantiation.
   
 v0.1.12
 =======

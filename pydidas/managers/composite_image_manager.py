@@ -169,7 +169,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If the size of the image is larger than the defined global limit.
         """
         _size = 1e-6 * shape[0] * shape[1]
-        _maxsize = self.get_param_value("max_image_size")
+        _maxsize = self.q_settings_get_value("global/max_image_size", float)
         if _size > _maxsize:
             raise UserConfigError(
                 f"The requested image size ({_size} Mpx) is too large for the global "
@@ -219,10 +219,12 @@ class CompositeImageManager(ObjectWithParameterCollection):
         **kwargs : dict
             The kwargs passed on from the apply thresholds method.
         """
-        _thresh = self.get_param_value(f"threshold_{key}")
-        if key in kwargs:
-            _thresh = kwargs.get(key)
-        # check for non-finite values and convert them to None:
+        if key not in kwargs:
+            _thresh = self.get_param_value(f"threshold_{key}")
+            if _thresh is not None and not np.isfinite(_thresh):
+                self.set_param_value(f"threshold_{key}", None)
+            return
+        _thresh = kwargs.get(key)
         if _thresh is not None and not np.isfinite(_thresh):
             _thresh = None
         self.set_param_value(f"threshold_{key}", _thresh)
@@ -352,5 +354,5 @@ class CompositeImageManager(ObjectWithParameterCollection):
         obj = self.__class__()
         obj.params = self.params.get_copy()
         obj._config = copy(self._config)
-        obj.__image = self.__image
+        obj.__image = self.__image.copy()
         return obj

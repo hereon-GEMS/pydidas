@@ -25,6 +25,7 @@ Bugfixes
   size changes after instantiation.
 - Fixed an issue in the filelist manager with file sorting.
 - Fixed an issue with restoration of the CompositeCreatorFrame.
+- Fixed an issue with same hashes for identical Dataset arrays.
   
 v0.1.12
 =======

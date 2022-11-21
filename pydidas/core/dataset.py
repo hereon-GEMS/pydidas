@@ -889,6 +889,7 @@ class Dataset(np.ndarray):
         _datahash = hash(self.data.tobytes())
         _metahash = hash(
             (
+                id(self),
                 self.axis_labels.values(),
                 self.axis_units.values(),
                 self.data_label,

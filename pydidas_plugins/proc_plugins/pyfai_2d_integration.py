@@ -54,11 +54,27 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         Pre-execute the plugin and store the Parameters required for the execution.
         """
         pyFAIintegrationBase.pre_execute(self)
-        self._ai_params["npt_rad"] = self.get_param_value("rad_npoint")
-        self._ai_params["npt_azim"] = self.get_param_value("azi_npoint")
-        self._ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
-        self._ai_params["radial_range"] = self.get_radial_range()
-        self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+
+        self._ai_params = {
+            "npt_azim": self.get_param_value("azi_npoint"),
+            "polarozation_factor": 1,
+            "unit": self.get_pyFAI_unit_from_param("rad_unit"),
+            "radial_range": self.get_radial_range(),
+            "azimuth_range": self.get_azimuthal_range_in_deg(),
+            "method": self._config["method"],
+        }
+
+        self.__range_factor = (
+            np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
+        )
+        _x_label, _x_unit = self.get_param_value("rad_unit").replace(" ", "").split("/")
+        _y_label, _y_unit = self.get_param_value("azi_unit").replace(" ", "").split("/")
+        self._dataset_info = {
+            "axis_labels": [_y_label, _x_label],
+            "axis_units": [_y_unit, _x_unit],
+            "data_label": "integrated intensity",
+            "data_unit": "counts",
+        }
 
     def execute(self, data, **kwargs):
         """
@@ -79,25 +95,12 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             Any calling kwargs, appended by any changes in the function.
         """
         _newdata = self._ai.integrate2d(
-            data,
-            self._ai_params["npt_rad"],
-            npt_azim=self._ai_params["npt_azim"],
-            polarization_factor=1,
-            unit=self._ai_params["unit"],
-            radial_range=self._ai_params["radial_range"],
-            azimuth_range=self._ai_params["azimuth_range"],
-            method=self._config["method"],
+            data, self.get_param_value("rad_npoint"), **self._ai_params
         )
-        _range_fact = np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
-        _x_label, _x_unit = self.get_param_value("rad_unit").replace(" ", "").split("/")
-        _y_label, _y_unit = self.get_param_value("azi_unit").replace(" ", "").split("/")
         _dataset = Dataset(
             _newdata[0],
-            axis_labels=[_y_label, _x_label],
-            axis_units=[_y_unit, _x_unit],
-            axis_ranges=[_newdata[2] * _range_fact, _newdata[1]],
-            data_label="integrated intensity",
-            data_unit="counts",
+            axis_ranges=[_newdata[2] * self.__range_factor, _newdata[1]],
+            **self._dataset_info,
         )
         return _dataset, kwargs
 

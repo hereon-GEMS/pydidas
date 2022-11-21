@@ -58,6 +58,13 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         self._ai_params["radial_unit"] = self.get_pyFAI_unit_from_param("rad_unit")
         self._ai_params["radial_range"] = self.get_radial_range()
         self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+        _label, _unit = self.params["azi_unit"].value.split("/")
+        self._dataset_info = {
+            "axis_labels": [_label.strip()],
+            "axis_units": [_unit.strip()],
+            "data_label": "integrated intensity",
+            "data_unit": "counts",
+        }
 
     def execute(self, data, **kwargs):
         """
@@ -88,18 +95,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             azimuth_range=self._ai_params["azimuth_range"],
             method=self._config["method"],
         )
-
-        _label, _unit = self.params["azi_unit"].value.split("/")
-        _label = _label.strip()
-        _unit = _unit.strip()
-        _dataset = Dataset(
-            _newdata[1],
-            axis_labels=[_label],
-            axis_units=[_unit],
-            axis_ranges=[_newdata[0]],
-            data_label="integrated intensity",
-            data_unit="counts",
-        )
+        _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
         return _dataset, kwargs
 
     def calculate_result_shape(self):

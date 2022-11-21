@@ -8,6 +8,8 @@ Improvements
   copy the metadata as well as the array.
 - Added a "circular" colormap named 'Wheel' to silx.
 - Added automatic update of details in the WorkflowTestFrame.
+- Tweaked the processing speed of pyFAI plugins by moving the fixed kwargs setup
+  to the pre_execute method.
 
 Bugfixes
 --------

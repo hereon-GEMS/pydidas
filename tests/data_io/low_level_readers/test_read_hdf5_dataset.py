@@ -30,13 +30,13 @@ import os
 import h5py
 import numpy as np
 
-from pydidas.data_io.low_level_readers.read_hdf5_slice import (
-    read_hdf5_slice,
+from pydidas.data_io.low_level_readers.read_hdf5_dataset import (
+    read_hdf5_dataset,
     get_selection,
 )
 
 
-class TestReadHdf5Slice(unittest.TestCase):
+class TestReadHdf5Dataset(unittest.TestCase):
     def setUp(self):
         self._path = tempfile.mkdtemp()
         self._fname = os.path.join(self._path, "test.h5")
@@ -95,12 +95,12 @@ class TestReadHdf5Slice(unittest.TestCase):
             get_selection(_entry, _size)
 
     def test_read_all(self):
-        data = read_hdf5_slice(self._fname, "test/path", [])
+        data = read_hdf5_dataset(self._fname, "test/path", [])
         self.assertEqual(data.shape, self._data.shape)
         self.assertTrue((data == self._data).all())
 
     def test_read_some(self):
-        data = read_hdf5_slice(self._fname, "test/path", [None, [1, 8], 5])
+        data = read_hdf5_dataset(self._fname, "test/path", [None, [1, 8], 5])
         self.assertEqual(data.shape, (10, 7, 1, 10))
         self.assertTrue((data == self._data[:, 1:8, 5:6, :]).all())
 

@@ -34,7 +34,7 @@ import hdf5plugin
 
 from ...core.constants import HDF5_EXTENSIONS
 from ...core import Dataset
-from ..low_level_readers.read_hdf5_slice import read_hdf5_slice
+from ..low_level_readers.read_hdf5_dataset import read_hdf5_dataset
 from .io_base import IoBase
 
 
@@ -104,7 +104,7 @@ class Hdf5Io(IoBase):
                 for _i in range(amax(slicing_axes) + 1)
             ]
 
-        _data = squeeze(read_hdf5_slice(filename, dataset, _slicer))
+        _data = squeeze(read_hdf5_dataset(filename, dataset, _slicer))
         cls._data = Dataset(
             _data,
             metadata={"slicing_axes": slicing_axes, "frame": frame, "dataset": dataset},

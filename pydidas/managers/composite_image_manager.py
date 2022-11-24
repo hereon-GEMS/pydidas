@@ -262,7 +262,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         _ypos, _xpos = self._get_image_pos_in_composite(index)
         image = self.__apply_thresholds_to_data(image)
         _image_op = self.get_param_value("composite_image_op")
-        if _image_op != "None":
+        if _image_op is not None:
             _op = IMAGE_OPS[_image_op]
             image = _op(image)
         self.__image[_ypos, _xpos] = image

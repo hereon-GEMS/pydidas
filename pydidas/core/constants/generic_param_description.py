@@ -274,10 +274,10 @@ GENERIC_PARAM_DESCRIPTION = (
         },
         "composite_image_op": {
             "type": str,
-            "default": "None",
+            "default": None,
             "name": "Raw image operation",
             "choices": [
-                "None",
+                None,
                 "Flip left/right",
                 "Flip up/down",
                 "Rot 180deg",
@@ -285,7 +285,7 @@ GENERIC_PARAM_DESCRIPTION = (
                 "Rot 90deg counter-clockwise",
             ],
             "unit": "",
-            "allow_None": False,
+            "allow_None": True,
             "tooltip": (
                 "The image operation applied to each raw image prior to merging it in "
                 "the composite image. This allows to adjust the image orientation with "

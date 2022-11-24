@@ -116,7 +116,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                 "binning",
                 "output_fname",
                 "n_total",
-                "composite_dir",
+                "composite_ydir_orientation",
             ]:
                 self.create_line(
                     f"line_{_key}",

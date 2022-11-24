@@ -80,3 +80,17 @@
         y direction. A value of -1 will determine the number of images in
         y direction automatically based on the number of images in x
         direction.
+    - composite_image_op (type: str, default: None)
+        The image operation applied to each raw image prior to merging it in 
+        the composite image. This allows to adjust the image orientation with 
+        respect to the scan.
+    - composite_xdir_orientation (type: str, default: left-to-right)
+        The direction of how images are inserted into the composite in x 
+        direction. Left-to-right starts with low indices (python standard) 
+        whereas right-to-left will insert image at the max index position first.
+    - composite_ydir_orientation (type: str, default: left-to-right)
+        The direction of how images are inserted into the composite in y 
+        direction. Top-to-bottom starts with low indices (python standard)
+        whereas bottom-to-top will insert image at the max index position 
+        first. Note that the display may be flipped with the origin at the 
+        bottom.

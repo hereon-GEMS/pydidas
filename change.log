@@ -10,6 +10,8 @@ Improvements
 - Added automatic update of details in the WorkflowTestFrame.
 - Tweaked the processing speed of pyFAI plugins by moving the fixed kwargs setup
   to the pre_execute method.
+- Added features in the CompositeCreatorApp to control the direction in which
+  images are inserted and the orientation of the inserted images.
 
 Bugfixes
 --------

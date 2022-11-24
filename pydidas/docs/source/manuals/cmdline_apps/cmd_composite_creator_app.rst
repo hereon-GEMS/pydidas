@@ -277,6 +277,15 @@ fulfilled:
 One dimension can be automatically adjusted in size by using the value *-1*. The
 default values are `Nx = 1` and `Ny = -1`\ .
 
+In addition, raw images can be flipped or rotated prior to inserting them into
+the composite. The :py:data:`composite_image_op` Parameter allows to select the 
+type of operation to be performed (if any).
+
+The *order* in which the images are inserted in the composite can be controlled
+by the :py:data:`composite_xdir_orientation` and 
+:py:data:`composite_ydir_orientation` Parameters which allow to select if images
+are added from the left or right and top or bottom border, respectively.
+
 As example, we want to create a composite with a number of twenty images in y 
 and we want to adjust x automatically.
 
@@ -286,6 +295,24 @@ and we want to adjust x automatically.
     >>> app = pydidas.apps.CompositeCreatorApp()
     >>> app.set_param_value('composite_nx', -1)
     >>> app.set_param_value('composite_ny', 20) 
+
+As second example, we want to create a composite of 90 images with 10 images 
+in y and starting at the left side in x.
+
+.. code-block::
+
+    >>> import pydidas
+    >>> app = pydidas.apps.CompositeCreatorApp()
+    >>> app.set_param_value('composite_nx', 9)
+    >>> app.set_param_value('composite_ny', 10) 
+    >>> app.set_param_value('composite_xdir_orientation', 'right-to-left')
+
+.. tip::
+
+    Mathematically, it is equivalent to change the orientation of the raw 
+    images or to change the order of the images in the composite. However,
+    users might prefer to have the composite composed in the same orientation
+    as their raw data scan.
 
 
 Running the CompositeCreatorApp

@@ -27,6 +27,7 @@ __all__ = ["BaseParamIoWidget"]
 
 import numbers
 import pathlib
+import html
 
 from qtpy import QtWidgets, QtGui, QtCore
 from numpy import nan
@@ -69,7 +70,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self._ptype = param.dtype
         self._old_value = None
-        self.setToolTip(f"{param.tooltip}")
+        self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
     def set_validator(self, param):
         """

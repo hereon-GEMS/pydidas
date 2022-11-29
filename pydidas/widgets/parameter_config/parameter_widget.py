@@ -25,6 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParameterWidget"]
 
+import html
 from functools import partial
 
 from qtpy import QtWidgets, QtCore
@@ -168,7 +169,7 @@ class ParameterWidget(QtWidgets.QWidget):
             _text,
             fixedWidth=self.config["width_text"],
             fixedHeight=20,
-            toolTip=self.param.tooltip,
+            toolTip=f"<qt>{html.escape(self.param.tooltip)}</qt>",
             margin=0,
         )
 
@@ -191,7 +192,7 @@ class ParameterWidget(QtWidgets.QWidget):
             _text,
             fixedWidth=self.config["width_unit"],
             fixedHeight=20,
-            toolTip=self.param.tooltip,
+            toolTip=f"<qt>{html.escape(self.param.tooltip)}</qt>",
             margin=0,
         )
 

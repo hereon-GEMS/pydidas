@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ParameterEditFrame class which is a subclassed QFrame updated
+Module with the ParameterEditCanvas class which is a subclassed QFrame updated
 with the ParameterWidgetsMixIn.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ParameterEditFrame"]
+__all__ = ["ParameterEditCanvas"]
 
 from qtpy import QtWidgets, QtCore
 
@@ -31,9 +31,9 @@ from ...core.utils import apply_qt_properties
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 
-class ParameterEditFrame(QtWidgets.QFrame, ParameterWidgetsMixIn):
+class ParameterEditCanvas(QtWidgets.QFrame, ParameterWidgetsMixIn):
     """
-    The ParameterEditFrame widget can be used to create a composite
+    The ParameterEditCanvas widget can be used to create a composite
     widget for updating multiple Parameter values.
 
     Parameters

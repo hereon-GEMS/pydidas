@@ -26,29 +26,29 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .parameter_config_widget import *
-from .parameter_edit_frame import *
+from .parameter_widget import *
+from .parameter_edit_canvas import *
 from .parameter_widgets_mixin import *
-from .configure_plugin_widget import *
+from .edit_plugin_parameters_widget import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import parameter_config_widget
+from . import parameter_widget
 
-__all__.extend(parameter_config_widget.__all__)
-del parameter_config_widget
+__all__.extend(parameter_widget.__all__)
+del parameter_widget
 
-from . import parameter_edit_frame
+from . import parameter_edit_canvas
 
-__all__.extend(parameter_edit_frame.__all__)
-del parameter_edit_frame
+__all__.extend(parameter_edit_canvas.__all__)
+del parameter_edit_canvas
 
 from . import parameter_widgets_mixin
 
 __all__.extend(parameter_widgets_mixin.__all__)
 del parameter_widgets_mixin
 
-from . import configure_plugin_widget
+from . import edit_plugin_parameters_widget
 
-__all__.extend(configure_plugin_widget.__all__)
-del configure_plugin_widget
+__all__.extend(edit_plugin_parameters_widget.__all__)
+del edit_plugin_parameters_widget

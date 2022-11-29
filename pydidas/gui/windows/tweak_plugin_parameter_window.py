@@ -33,7 +33,7 @@ from qtpy import QtWidgets, QtCore
 from ...core.constants import FIX_EXP_POLICY
 from ...core.utils import ShowBusyMouse
 from ...widgets import ScrollArea
-from ...widgets.parameter_config import ConfigurePluginWidget, ParameterEditFrame
+from ...widgets.parameter_config import EditPluginParametersWidget, ParameterEditCanvas
 from ...widgets.silx_plot import (
     create_silx_plot_stack,
     get_2d_silx_plot_ax_settings,
@@ -77,7 +77,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
-        self._widgets["config_area"] = ParameterEditFrame(
+        self._widgets["config_area"] = ParameterEditCanvas(
             parent=None,
             init_layout=True,
             lineWidth=5,
@@ -98,7 +98,7 @@ class TweakPluginParameterWindow(PydidasWindow):
         )
         self.create_any_widget(
             "plugin_param_edit",
-            ConfigurePluginWidget,
+            EditPluginParametersWidget,
             parent_widget=self._widgets["config_area"],
         )
         self.create_line(

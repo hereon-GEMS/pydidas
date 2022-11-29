@@ -28,7 +28,7 @@ __all__ = ["WorkflowEditFrameBuilder"]
 from ....core.constants import EXP_EXP_POLICY
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea, BaseFrame
-from ....widgets.parameter_config import ConfigurePluginWidget
+from ....widgets.parameter_config import EditPluginParametersWidget
 from ....widgets.workflow_edit import WorkflowTreeCanvas, PluginCollectionBrowser
 
 
@@ -57,7 +57,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
         self.create_any_widget(
             "plugin_collection", PluginCollectionBrowser, gridPos=(1, 0, 3, 1)
         )
-        self._widgets["plugin_edit_canvas"] = ConfigurePluginWidget()
+        self._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
         self.create_any_widget(
             "plugin_edit_area",
             ScrollArea,

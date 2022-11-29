@@ -34,7 +34,7 @@ from ....core.constants import (
 )
 from ....core import constants
 from ....widgets import ScrollArea, BaseFrameWithApp, silx_plot
-from ....widgets.parameter_config import ParameterEditFrame
+from ....widgets.parameter_config import ParameterEditCanvas
 from ...mixins import SilxPlotWindowMixIn
 
 
@@ -55,7 +55,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         """
         self.layout().setContentsMargins(0, 0, 0, 0)
 
-        self._widgets["config"] = ParameterEditFrame(
+        self._widgets["config"] = ParameterEditCanvas(
             self, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
 

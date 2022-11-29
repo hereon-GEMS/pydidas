@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ConfigurePluginWidget class used to edit plugin
+Module with the EditPluginParametersWidget class used to edit plugin
 Parameters.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ConfigurePluginWidget"]
+__all__ = ["EditPluginParametersWidget"]
 
 from pathlib import Path
 
@@ -32,12 +32,12 @@ from qtpy import QtWidgets, QtCore
 from ...core import Hdf5key, constants
 from ..factory import CreateWidgetsMixIn
 from ..utilities import delete_all_items_in_layout
-from .parameter_edit_frame import ParameterEditFrame
+from .parameter_edit_canvas import ParameterEditCanvas
 
 
-class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
+class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
-    The ConfigurePluginWidget widget creates the composite widget for
+    The EditPluginParametersWidget widget creates the composite widget for
     updating and changing values of all Parameters in a Plugin.
 
     Depending on the Parameter types, automatic typechecks are implemented.
@@ -49,14 +49,14 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
         """
         Setup method.
 
-        Create an instance on the ConfigurePluginWidget class.
+        Create an instance on the EditPluginParametersWidget class.
 
         Parameters
         ----------
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterEditFrame.__init__(self, **kwargs)
+        ParameterEditCanvas.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
@@ -84,7 +84,7 @@ class ConfigurePluginWidget(ParameterEditFrame, CreateWidgetsMixIn):
     def clear_layout(self):
         """
         Delete all widgets and items which currently populate the
-        ConfigurePluginWidget.
+        EditPluginParametersWidget.
         """
         _layout = self.layout()
         for i in reversed(range(_layout.count())):

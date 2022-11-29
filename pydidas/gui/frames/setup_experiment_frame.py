@@ -100,8 +100,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the
-        ParameterConfigWidgetMixin.set_param_value_and_widget method to
+        This method overloads the generic set_param_value_and_widget method to
         process the linked energy / wavelength parameters.
 
         Parameters

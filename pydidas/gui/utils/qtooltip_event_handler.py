@@ -60,6 +60,7 @@ class QTooltipEventHandler(QObject):
         bool :
             Flag whether this event was handled.
         """
+
         if event.type() == QEvent.ToolTipChange:
             if not isinstance(widget, QWidget):
                 raise ValueError(f'QObject "{widget}" is not a widget.')

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ParameterConfigWidget class which is a generic QWidget with a
+Module with the ParameterWidget class which is a generic QWidget with a
 GridLayout to add the label, I/O and unit widgets for a Parameter.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ParameterConfigWidget"]
+__all__ = ["ParameterWidget"]
 
 from functools import partial
 
@@ -40,9 +40,9 @@ from ...core.utils import convert_special_chars_to_unicode, apply_qt_properties
 from ..factory import create_param_widget, create_label
 
 
-class ParameterConfigWidget(QtWidgets.QWidget):
+class ParameterWidget(QtWidgets.QWidget):
     """
-    The ParameterConfigWidget is a combined widget to display and modify a
+    The ParameterWidget is a combined widget to display and modify a
     Parameter with name, value and unit.
 
     This widget is a wrapper and includes labels for name and unit and the

@@ -53,7 +53,7 @@ GENERIC_PLUGIN_WIDGET_X_OFFSET = 10
 WORKFLOW_EDIT_CANVAS_X = 1000
 WORKFLOW_EDIT_CANVAS_Y = 600
 
-# Settings for generic ConfigurePluginWidget
+# Settings for generic EditPluginParametersWidget
 PLUGIN_PARAM_WIDGET_WIDTH = 385
 
 # Settings for generic Parameter widgets

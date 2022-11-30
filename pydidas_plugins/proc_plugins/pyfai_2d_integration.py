@@ -54,6 +54,26 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         Pre-execute the plugin and store the Parameters required for the execution.
         """
         pyFAIintegrationBase.pre_execute(self)
+        self._ai_params = {
+            "npt_azim": self.get_param_value("azi_npoint"),
+            "polarization_factor": 1,
+            "unit": self.get_pyFAI_unit_from_param("rad_unit"),
+            "radial_range": self.get_radial_range(),
+            "azimuth_range": self.get_azimuthal_range_in_deg(),
+            "method": self._config["method"],
+        }
+
+        self.__range_factor = (
+            np.pi / 180 if "rad" in self.get_param_value("azi_unit") else 1
+        )
+        _x_label, _x_unit = self.get_param_value("rad_unit").replace(" ", "").split("/")
+        _y_label, _y_unit = self.get_param_value("azi_unit").replace(" ", "").split("/")
+        self._dataset_info = {
+            "axis_labels": [_y_label, _x_label],
+            "axis_units": [_y_unit, _x_unit],
+            "data_label": "integrated intensity",
+            "data_unit": "counts",
+        }
 
         self._ai_params = {
             "npt_azim": self.get_param_value("azi_npoint"),

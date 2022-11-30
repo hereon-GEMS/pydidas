@@ -263,7 +263,6 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         Note: This method will overwrite all current settings.
         """
         fname = self.__import_dialog.get_user_response()
-        print("fname:", fname)
         if fname != "":
             EXP_SETUP.import_from_file(fname)
             for param in EXP_SETUP.params.values():

@@ -83,6 +83,9 @@ class SetupScanFrame(SetupScanFrameBuilder):
             self._widgets[f"button_down_{_index}"].clicked.connect(
                 partial(self.move_dim, _index, 1)
             )
+        self.param_widgets["scan_base_directory"].io_edited.connect(
+            self.set_new_base_directory
+        )
 
     def finalize_ui(self):
         """
@@ -180,3 +183,15 @@ class SetupScanFrame(SetupScanFrameBuilder):
                 f"scan_dim{dim_index}_{_key}",
                 SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )
+
+    @QtCore.Slot(str)
+    def set_new_base_directory(self, basedir):
+        """
+        Set the new base directory for the scan.
+
+        Parameters
+        ----------
+        basedir : str
+            The new base directory
+        """
+        self.param_widgets["scan_name_pattern"].io_dialog.set_curr_dir(basedir)

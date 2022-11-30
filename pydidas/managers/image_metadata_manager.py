@@ -187,7 +187,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         """
         if not os.path.isfile(filename):
             raise UserConfigError(
-                f"Cannot find the file '{filename}' specified for the "
+                f"Cannot find the file {filename} specified for the "
                 "ImageMetadataManager."
             )
         self._config["filename"] = filename

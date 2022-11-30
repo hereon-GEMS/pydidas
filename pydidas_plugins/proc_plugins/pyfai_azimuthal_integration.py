@@ -51,10 +51,13 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
         Pre-execute the plugin and store the Parameters required for the execution.
         """
         pyFAIintegrationBase.pre_execute(self)
-        self._ai_params["npt_rad"] = self.get_param_value("rad_npoint")
-        self._ai_params["unit"] = self.get_pyFAI_unit_from_param("rad_unit")
-        self._ai_params["radial_range"] = self.get_radial_range()
-        self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
+        self._ai_params = {
+            "unit": self.get_pyFAI_unit_from_param("rad_unit"),
+            "radial_range": self.get_radial_range(),
+            "azimuth_range": self.get_azimuthal_range_in_deg(),
+            "polarization_factor": 1,
+            "method": self._config["method"],
+        }
         _label, _unit = self.params["rad_unit"].value.split("/")
         self._dataset_info = {
             "axis_labels": [_label.strip()],
@@ -75,13 +78,7 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             Any keyword arguments from the ProcessingTree.
         """
         _newdata = self._ai.integrate1d(
-            data,
-            self._ai_params["npt_rad"],
-            unit=self._ai_params["unit"],
-            radial_range=self._ai_params["radial_range"],
-            azimuth_range=self._ai_params["azimuth_range"],
-            polarization_factor=1,
-            method=self._config["method"],
+            data, self.get_param_value("rad_npoint"), **self._ai_params
         )
         _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
         return _dataset, kwargs

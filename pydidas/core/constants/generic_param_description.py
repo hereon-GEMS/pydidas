@@ -711,7 +711,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The pattern used for naming scan (files9. Use hashes '#' for "
+                "The pattern used for naming scan (files). Use hashes '#' for "
                 "wildcards which will be filled in with numbers for the various files. "
                 "Note that individual plugins may use this Parameter for either "
                 "directory or file names. Please refer to the specific InputPlugin in "

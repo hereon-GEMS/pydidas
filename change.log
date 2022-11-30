@@ -37,6 +37,7 @@ Bugfixes
 - Fixed an issue with restoration of the CompositeCreatorFrame.
 - Fixed an issue with same hashes for identical Dataset arrays.
 - Fixed an issue with the tooltip event filter not exiting correctly.
+- Fixed an issue where loading a non-existing state would crash the pydidas gui.
 
   
 v0.1.12

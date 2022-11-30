@@ -511,6 +511,8 @@ class MainMenu(QtWidgets.QMainWindow):
             pass
         else:
             raise UserConfigError(f"The given state '{state}' cannot be interpreted.")
+        if not os.path.isfile(filename):
+            return
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
         self._restore_global_objects(_state)

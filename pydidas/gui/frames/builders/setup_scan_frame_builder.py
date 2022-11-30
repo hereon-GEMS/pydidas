@@ -132,6 +132,10 @@ class SetupScanFrameBuilder(BaseFrame):
                 parent_widget=self._widgets["global_param_frame"],
                 **constants.DEFAULT_TWO_LINE_PARAM_CONFIG.copy(),
             )
+
+        for _name in ["scan_base_directory", "scan_name_pattern"]:
+            self.param_widgets[_name].set_unique_ref_name(f"SetupScanFrame__{_name}")
+
         for _name in [
             "scan_start_index",
             "scan_index_stepping",

@@ -68,9 +68,17 @@ class WorkflowEditFrameBuilder(BaseFrame):
             gridPos=(0, 1, 2, 1),
         )
         self.create_button(
-            "but_load", "Import workflow from file", gridPos=(2, 1, 1, 1)
+            "but_load",
+            "Import workflow from file",
+            gridPos=(2, 1, 1, 1),
+            icon=self.style().standardIcon(42),
         )
-        self.create_button("but_save", "Export workflow to file", gridPos=(3, 1, 1, 1))
+        self.create_button(
+            "but_save",
+            "Export workflow to file",
+            gridPos=(3, 1, 1, 1),
+            icon=self.style().standardIcon(43),
+        )
 
         update_size_policy(self._widgets["workflow_area"], verticalStretch=2)
         update_size_policy(self._widgets["plugin_collection"], verticalStretch=1)

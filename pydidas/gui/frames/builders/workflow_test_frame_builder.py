@@ -124,6 +124,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(59),
         )
         self.create_line(
             "line_refresh_tree",
@@ -152,6 +153,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(61),
         )
         self.create_line(
             "line_results", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]

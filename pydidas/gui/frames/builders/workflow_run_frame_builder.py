@@ -129,6 +129,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(61),
         )
         self.create_progress_bar(
             "progress",
@@ -147,6 +148,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             visible=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(60),
         )
         self.create_line(
             "line_results",
@@ -183,6 +185,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             enabled=False,
+            icon=self.style().standardIcon(25),
             toolTip=(
                 "Export the current node's results to file. Note that "
                 "the filenames are pre-determined based on node ID "
@@ -197,6 +200,7 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             tooltip=("Export all results. Note that the directory must be empty."),
+            icon=self.style().standardIcon(43),
         )
         self.create_spacer(
             "config_terminal_spacer",

@@ -89,6 +89,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             gridPos=(-1, 0, 1, 2),
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
+            icon=self.style().standardIcon(59),
         )
         self.create_any_widget(
             "plot_window",
@@ -123,6 +124,16 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                     parent_widget=self._widgets["config"],
                     fixedWidth=CONFIG_WIDGET_WIDTH,
                 )
+
+        for _name in [
+            "first_file",
+            "last_file",
+            "bg_file",
+        ]:
+            self.param_widgets[_name].set_unique_ref_name(
+                f"CompositeCreatorFrame__{_name}"
+            )
+
         self.create_button(
             "but_exec",
             "Generate composite",
@@ -130,6 +141,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             parent_widget=self._widgets["config"],
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
+            icon=self.style().standardIcon(61),
         )
 
         self.create_progress_bar(
@@ -150,6 +162,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             enabled=True,
             visible=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
+            icon=self.style().standardIcon(60),
         )
 
         self.create_button(
@@ -159,6 +172,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             parent_widget=self._widgets["config"],
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
+            icon=self.style().standardIcon(13),
         )
 
         self.create_button(
@@ -168,6 +182,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             gridPos=(-1, 0, 1, 2),
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
+            icon=self.style().standardIcon(43),
         )
 
         self.create_spacer(

@@ -76,7 +76,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidget):
         self.ledit.editingFinished.connect(self.emit_signal)
         self.ledit.returnPressed.connect(partial(self.emit_signal, True))
         self._button.clicked.connect(self.button_function)
-        self.set_value(param.value)
+        self.ledit.setText(f"{param.value}")
 
     def button_function(self):
         """

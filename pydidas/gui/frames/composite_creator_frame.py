@@ -168,6 +168,53 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.__toggle_bg_file_selection(False)
         self.__toggle_threshold_selection(False)
 
+    def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        The BaseFrameWithApp implementation will update the associated App
+        and then call the BaseFrame's method.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params', 'app' and 'visibility' keys and the
+            respective information for all.
+        """
+        super().restore_state(state)
+        self._config["bg_configured"] = state["config"]["bg_configured"]
+        self._config["input_configured"] = state["config"]["input_configured"]
+        self._filelist.update()
+        super().frame_activated(self.frame_index)
+        self._image_metadata.filename = self.get_param_value("first_file")
+        self._image_metadata.update()
+        self.__update_widgets_after_selecting_first_file()
+        self.__toggle_threshold_selection(self.get_param_value("use_thresholds"))
+        self.__toggle_roi_selection(self.get_param_value("use_roi"))
+        self.__toggle_bg_file_selection(self.get_param_value("use_bg_file"))
+        self.__update_n_image()
+
+    def export_state(self):
+        """
+        Export the state of the Frame for saving.
+
+        This method adds an export for the frame's app.
+
+        Returns
+        -------
+        frame_index : int
+            The frame index which can be used as key for referencing the state.
+        information : dict
+            A dictionary with all the information required to export the
+            frame's state.
+        """
+        _index, _state = super().export_state()
+        _state["config"] = {
+            "bg_configured": self._config["bg_configured"],
+            "input_configured": self._config["input_configured"],
+        }
+        return _index, _state
+
     def frame_activated(self, index):
         """
         Overload the generic frame_activated method.
@@ -206,7 +253,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
 
     def _prepare_plot_params(self):
         _shape = self._app.composite.shape
-        _border = self._app._composite.get_param_value("mosaic_border_width")
+        _border = self.q_settings_get_value("user/mosaic_border_width", int)
         _nx = self.get_param_value("composite_nx")
         _ny = self.get_param_value("composite_ny")
         _rel_border_width_x = 0.5 * _border / (_shape[1] + _border)
@@ -221,6 +268,12 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
+        if self._app._det_mask is not None:
+            if self.get_param_value("raw_image_shape") != self._app._det_mask.shape:
+                raise UserConfigError(
+                    "The use of the global detector mask has been selected but the "
+                    "detector mask size does not match the image data size."
+                )
         self._prepare_plot_params()
         self._config["last_update"] = time.time()
         self._widgets["but_exec"].setEnabled(False)
@@ -241,7 +294,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         Clean up after AppRunner is done.
         """
         logger.debug("finishing AppRunner")
-        self._runner.exit()
+        if self._runner is not None:
+            self._runner.exit()
         self._widgets["but_exec"].setEnabled(True)
         self._widgets["but_show"].setEnabled(True)
         self._widgets["but_save"].setEnabled(True)
@@ -302,6 +356,9 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.__update_widgets_after_selecting_first_file()
         self.__update_file_selection()
         self._image_metadata.filename = self.get_param_value("first_file")
+        self.param_widgets["last_file"].io_dialog.set_curr_dir(
+            self.get_param_value("first_file")
+        )
         if self.__check_if_hdf5_file():
             self._config["input_configured"] = False
             self.__popup_select_hdf5_key(fname)
@@ -475,9 +532,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self._widgets["progress"].setVisible(False)
         self._widgets["plot_window"].setVisible(False)
         for _key in keys:
-            param = self.params[_key]
-            param.restore_default()
-            self.param_widgets[_key].set_value(param.default)
+            self.set_param_value_and_widget(_key, self.params[_key].default)
         if "first_file" in keys:
             self._config["input_configured"] = False
 
@@ -485,6 +540,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         Check whether the exec button should be enabled and enable/disable it.
         """
+        _enable = False
         try:
             assert self._image_metadata.final_shape is not None
             if self.get_param_value("use_bg_file"):
@@ -492,7 +548,7 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                 assert self._config["bg_configured"]
             _enable = True
         except (KeyError, AssertionError):
-            _enable = False
+            pass
         finally:
             _flag = _enable and self._config["input_configured"]
             self._widgets["but_exec"].setEnabled(_flag)
@@ -617,15 +673,14 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         try:
             self._filelist.update()
-        except UserConfigError as _ex:
+        except UserConfigError as _error:
             self.__clear_entries(["last_file"], hide=False)
-            QtWidgets.QMessageBox.critical(self, "Could not create filelist.", str(_ex))
+            dialogues.critical_warning("Could not create filelist.", str(_error))
             return
         if not self._filelist.n_files > 0:
-            QtWidgets.QMessageBox.critical(
-                self,
+            dialogues.critical_warning(
                 "Filelist is empty.",
-                "The list of fils is empty. Please" " verify the selection.",
+                "The list of files is empty. Please verify the selection.",
             )
             return
         self.set_param_value_and_widget("n_files", self._filelist.n_files)

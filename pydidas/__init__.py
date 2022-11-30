@@ -38,6 +38,7 @@ import warnings as __warnings
 
 # import sub-packages:
 from . import core
+from . import contexts
 from . import data_io
 from . import multiprocessing
 from . import managers

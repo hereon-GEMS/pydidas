@@ -32,6 +32,7 @@ from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
+from ...contexts import PydidasFileDialog
 from ...experiment import SetupExperiment, SetupExperimentIoMeta
 from ...widgets.dialogues import critical_warning
 from .builders import SetupExperimentFrameBuilder
@@ -68,14 +69,26 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
     def __init__(self, parent=None, **kwargs):
         SetupExperimentFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP_SETUP.params
+        self.__import_dialog = PydidasFileDialog(
+            self,
+            caption="Import experiment context file",
+            formats=SetupExperimentIoMeta.get_string_of_formats(),
+            dialog=QtWidgets.QFileDialog.getOpenFileName,
+            qsettings_ref="SetupExperimentFrame__import",
+        )
+        self.__export_dialog = PydidasFileDialog(
+            self,
+            caption="Export experiment context file",
+            formats=SetupExperimentIoMeta.get_string_of_formats(),
+            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="SetupExperimentFrame__export",
+        )
 
     def connect_signals(self):
         """
         Connect all signals and slots in the frame.
         """
-        self._widgets["but_load_from_file"].clicked.connect(
-            self.load_parameters_from_file
-        )
+        self._widgets["but_load_from_file"].clicked.connect(self.import_from_file)
         self._widgets["but_copy_from_pyfai"].clicked.connect(self.copy_all_from_pyfai)
         self._widgets["but_select_detector"].clicked.connect(self.select_detector)
         self._widgets["but_copy_det_from_pyfai"].clicked.connect(
@@ -87,7 +100,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         self._widgets["but_copy_energy_from_pyfai"].clicked.connect(
             partial(self.copy_energy_from_pyFAI, True)
         )
-        self._widgets["but_save_to_file"].clicked.connect(self.__save_to_file)
+        self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
             # disconnect directly setting the parameters and route
@@ -100,8 +113,7 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         """
         Update a Parameter value both in the widget and ParameterCollection.
 
-        This method overloads the
-        ParameterConfigWidgetMixin.set_param_value_and_widget method to
+        This method overloads the generic set_param_value_and_widget method to
         process the linked energy / wavelength parameters.
 
         Parameters
@@ -243,30 +255,24 @@ class SetupExperimentFrame(SetupExperimentFrameBuilder):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)
 
-    def load_parameters_from_file(self):
+    def import_from_file(self):
         """
         Open a dialog to select a filename and load SetupExperiment from
         the selected file.
 
         Note: This method will overwrite all current settings.
         """
-        _formats = SetupExperimentIoMeta.get_string_of_formats()
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Name of file", None, _formats
-        )[0]
+        fname = self.__import_dialog.get_user_response()
         if fname != "":
             EXP_SETUP.import_from_file(fname)
             for param in EXP_SETUP.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
-    def __save_to_file(self):
+    def export_to_file(self):
         """
         Open a dialog to select a filename and write all currrent settings
         for the SetupExperiment to file.
         """
-        _formats = SetupExperimentIoMeta.get_string_of_formats()
-        fname = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Name of file", None, _formats
-        )[0]
+        fname = self.__export_dialog.get_user_response()
         if fname != "":
             EXP_SETUP.export_to_file(fname, overwrite=True)

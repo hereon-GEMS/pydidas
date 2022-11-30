@@ -15,8 +15,7 @@
 
 """
 The parametrized_sub_tests_ module includes the parametrized_sub_tests decorator to
-use
-by the __reduce__ methods of the DummyPlugins to allow pickling.
+use within tests to run them with multiple configurations.
 """
 
 __author__ = "Malte Storm"

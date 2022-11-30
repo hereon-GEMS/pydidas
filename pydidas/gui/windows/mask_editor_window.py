@@ -71,7 +71,7 @@ class MaskEditorWindow(PydidasWindow):
         """
         self.create_any_widget(
             "param_frame",
-            parameter_config.ParameterEditFrame,
+            parameter_config.ParameterEditCanvas,
             gridPos=(0, 0, 1, 1),
         )
         self.create_label(

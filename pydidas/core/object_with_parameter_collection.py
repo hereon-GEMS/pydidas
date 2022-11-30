@@ -26,7 +26,7 @@ __status__ = "Development"
 __all__ = ["ObjectWithParameterCollection"]
 
 import warnings
-from copy import copy
+from copy import copy, deepcopy
 
 from qtpy import QtCore
 
@@ -58,12 +58,31 @@ class ObjectWithParameterCollection(
 
         Returns
         -------
-        fm : ObjectWithParameterCollection
+        obj : ObjectWithParameterCollection
             The copy with the same state.
         """
         obj = self.__class__()
         obj.params = self.params.get_copy()
         obj._config = copy(self._config)
+        return obj
+
+    def __deepcopy__(self, memo):
+        """
+        Create a deepcopy of the object.
+
+        Parameters
+        ----------
+        memo : dict
+            The copylib's memo dictionary of items already copied.
+
+        Returns
+        -------
+        obj : ObjectWithParameterCollection
+            The copy with the same state.
+        """
+        obj = self.__class__()
+        obj.params = self.params.get_copy()
+        obj._config = deepcopy(self._config)
         return obj
 
     def __getstate__(self):

@@ -31,6 +31,7 @@ import yaml
 import numpy as np
 
 from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
+from ...core import UserConfigError
 from .setup_experiment_io_base import SetupExperimentIoBase
 from .setup_experiment import SetupExperiment
 
@@ -83,7 +84,11 @@ class SetupExperimentIoYaml(SetupExperimentIoBase):
             except yaml.YAMLError as yerr:
                 cls.imported_params = {}
                 raise yaml.YAMLError from yerr
-        assert isinstance(cls.imported_params, dict)
+        if not isinstance(cls.imported_params, dict):
+            raise UserConfigError(
+                f"Cannot interpret the selected file {filename} as SetupExperiment "
+                "save."
+            )
         cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
             "xray_wavelength", np.nan
         )

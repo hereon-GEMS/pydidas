@@ -272,6 +272,55 @@ GENERIC_PARAM_DESCRIPTION = (
                 "filled first before going to the next row/column."
             ),
         },
+        "composite_image_op": {
+            "type": str,
+            "default": None,
+            "name": "Raw image operation",
+            "choices": [
+                None,
+                "Flip left/right",
+                "Flip up/down",
+                "Rot 180deg",
+                "Rot 90deg clockwise",
+                "Rot 90deg counter-clockwise",
+            ],
+            "unit": "",
+            "allow_None": True,
+            "tooltip": (
+                "The image operation applied to each raw image prior to merging it in "
+                "the composite image. This allows to adjust the image orientation with "
+                "respect to the scan."
+            ),
+        },
+        "composite_xdir_orientation": {
+            "type": str,
+            "default": "left-to-right",
+            "name": "X orientation direction",
+            "choices": ["left-to-right", "right-to-left"],
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The direction of how images are inserted into the composite in x "
+                "direction. Left-to-right starts with low indices (python standard) "
+                "whereas right-to-left will insert image at the max index position "
+                "first."
+            ),
+        },
+        "composite_ydir_orientation": {
+            "type": str,
+            "default": "top-to-bottom",
+            "name": "Y orientation direction",
+            "choices": ["top-to-bottom", "bottom-to-top"],
+            "unit": "",
+            "allow_None": False,
+            "tooltip": (
+                "The direction of how images are inserted into the composite in y "
+                "direction. Top-to-bottom starts with low indices (python standard) "
+                "whereas bottom-to-top will insert image at the max index position "
+                "first. Note that the display may be flipped with the origin at the "
+                "bottom."
+            ),
+        },
         "use_roi": {
             "type": int,
             "default": 0,
@@ -662,7 +711,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The pattern used for naming scan (files9. Use hashes '#' for "
+                "The pattern used for naming scan (files). Use hashes '#' for "
                 "wildcards which will be filled in with numbers for the various files. "
                 "Note that individual plugins may use this Parameter for either "
                 "directory or file names. Please refer to the specific InputPlugin in "

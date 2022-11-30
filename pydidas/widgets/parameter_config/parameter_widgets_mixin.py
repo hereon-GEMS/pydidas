@@ -25,16 +25,16 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ParameterWidgetsMixIn"]
 
-from .parameter_config_widget import ParameterConfigWidget
+from .parameter_widget import ParameterWidget
 from ...core import PydidasGuiError, utils
 from ..utilities import get_widget_layout_args
 
 
 class ParameterWidgetsMixIn:
     """
-    The ParameterWidgetsMixIn class includes methods which can be added
-    to other classes without having to inherit from ParameterConfigWidget to
-    avoid multiple inheritance from QtWidgets.QFrame.
+    The ParameterWidgetsMixIn class includes methods which can be added to other
+    classes to add functionality to create Parameter widgets and to have access to
+    convenience functions for settings Parameter values.
     """
 
     def __init__(self):
@@ -88,7 +88,7 @@ class ParameterWidgetsMixIn:
             to the calling widget, ie. "self". The default is None.
         """
         _parent = kwargs.get("parent_widget", self)
-        _widget = ParameterConfigWidget(param, **kwargs)
+        _widget = ParameterWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget
 

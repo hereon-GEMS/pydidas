@@ -71,6 +71,9 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
     "composite_nx",
     "composite_ny",
     "composite_dir",
+    "composite_image_op",
+    "composite_xdir_orientation",
+    "composite_ydir_orientation",
 )
 
 
@@ -91,98 +94,8 @@ class CompositeCreatorApp(BaseApp):
 
     Notes
     -----
-    The full list of Parameters used by the CompositeCreatorApp:
-
-    live_processing : bool, optional
-        Keyword to toggle live processing which means file existance and size
-        checks will be disabled in the setup process and the file processing
-        will wait for files to be created (indefinitely). The default is
-        False.
-    first_file : Union[str, pathlib.Path]
-        The name of the first file for a file series or of the hdf5 file in
-        case of hdf5 file input.
-    last_file : Union[str, pathlib.Path], optional
-        Used only for file series: The name of the last file to be added to
-        the composite image. The default is an empty Path.
-    file_stepping : int, optional
-        The step width (in files). A value n > 1 will only process every n-th
-        image for the composite. The default is 1.
-    hdf5_key : Hdf5key, optional
-        Used only for hdf5 files: The dataset key. The default is
-        entry/data/data.
-    hdf5_first_image_num : int, optional
-        The first image in the hdf5-dataset to be used. The default is 0.
-    hdf5_last_image_num : int, optional
-        The last image in the hdf5-dataset to be used. The value -1 will
-        default to the last image. The default is -1.
-    hdf5_stepping : int, optional
-        The step width (in images) of hdf5 datasets. A value n > 1 will only
-        add every n-th image to the composite. The default is 1.
-    use_bg_file : bool, optional
-        Keyword to toggle usage of background subtraction. The default is
-        False.
-    bg_file : Union[str, pathlib.Path], optional
-        The name of the file used for background correction. The default is
-        an empty Path.
-    bg_hdf5_key : Hdf5key, optional
-        Required for hdf5 background image files: The dataset key with the
-        image for the background file. The default is entry/data/data
-    bg_hdf5_frame : int, optional
-        Required for hdf5 background image files: The image number of the
-        background image in the dataset. The default is 0.
-    use_global_det_mask : bool, optional
-        Keyword to enable or disable using the global detector mask as
-        defined by the global mask file and mask value. The default is True.
-    use_roi : bool, optional
-        Keyword to toggle use of the ROI for cropping the original images
-        before combining them. The default is False.
-    roi_xlow : int, optional
-        The lower boundary (in pixel) for cropping images in x, if use_roi is
-        enabled. Negative values will be modulated with the image width.
-        The default is 0.
-    roi_xhigh : Union[int, None], optional
-        The upper boundary (in pixel) for cropping images in x, if use_roi is
-        enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size minus one. None corresponds
-        to the full image width (with respect to the upper boundary). The
-        default is None.
-    roi_ylow : int, optional
-        The lower boundary (in pixel) for cropping images in y, if use_roi is
-        enabled. Negative values will be modulated with the image width.
-        The default is 0.
-    roi_yhigh : Union[int, None], optional
-        The upper boundary (in pixel) for cropping images in y, if use_roi is
-        enabled. Negative values will be modulated with the image width, i.e.
-        -1 is equivalent with the full image size minus one. None corresponds
-        to the full image width (with respect to the upper boundary). The
-        default is None.
-    use_thresholds : bool, optional
-        Keyword to enable or disable the use of thresholds. If True,
-        threshold use is enabled and both threshold values will be used. The
-        default is False.
-    threshold_low : int, optional
-        The lower threshold of the composite image. If any finite value
-        (i.e. not np.nan or None) is used, the value of any pixels with a value
-        below the threshold will be replaced by the threshold value. A value
-        of np.nan or None will ignore the threshold. The default is None.
-    threshold_high : int, optional
-        The upper threshold of the composite image. If any finite value
-        (i.e. not np.nan or None) is used, the value of any pixels with a value
-        above the threshold will be replaced by the threshold value. A value
-        of np.nan or None will ignore the threshold. The default is None.
-    binning : int, optional
-        The re-binning factor for the images in the composite. The binning
-        will be applied to the cropped images. The default is 1.
-    composite_nx : int, optional
-        The number of original images combined in the composite image in
-        x direction. A value of -1 will determine the number of images in
-        x direction automatically based on the number of images in y
-        direction. The default is 1.
-    composite_ny : int, optional
-        The number of original images combined in the composite image in
-        y direction. A value of -1 will determine the number of images in
-        y direction automatically based on the number of images in x
-        direction. The default is -1.
+    Please refer to the help for the full list and explanation of Parameters used by
+    the CompositeCreatorApp.
 
     Parameters
     ----------
@@ -202,9 +115,20 @@ class CompositeCreatorApp(BaseApp):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._composite = None
         self._det_mask = None
         self._bg_image = None
+        self._composite = CompositeImageManager(
+            *self.get_params(
+                "composite_nx",
+                "composite_ny",
+                "composite_dir",
+                "composite_image_op",
+                "composite_xdir_orientation",
+                "composite_ydir_orientation",
+                "threshold_low",
+                "threshold_high",
+            )
+        )
         self._filelist = FilelistManager(
             *self.get_params(
                 "first_file", "last_file", "live_processing", "file_stepping"
@@ -274,7 +198,7 @@ class CompositeCreatorApp(BaseApp):
         if self.slave_mode:
             self._composite = None
             return
-        self.__check_and_update_composite_image()
+        self.__update_composite_image_params()
         self.__check_and_store_thresholds()
 
     def __get_detector_mask(self):
@@ -370,35 +294,13 @@ class CompositeCreatorApp(BaseApp):
             )
         self._bg_image = self.__apply_mask(_bg_image)
 
-    def __check_and_update_composite_image(self):
+    def __update_composite_image_params(self):
         """
-        Check the size of the Composite and create a new Composite if the
-        shape does not match the new input.
+        Update the derived Parameters of the composite and create a new array.
         """
-        if self._composite is None:
-            self._composite = CompositeImageManager(
-                image_shape=self._image_metadata.final_shape,
-                composite_nx=self.get_param_value("composite_nx"),
-                composite_ny=self.get_param_value("composite_ny"),
-                composite_dir=self.get_param_value("composite_dir"),
-                datatype=self._image_metadata.datatype,
-            )
-            return
-        _update_required = False
-        _bwidth = self.q_settings_get_value("user/mosaic_border_width", int)
-        _bval = self.q_settings_get_value("user/mosaic_border_value", float)
-        for _key, _value in [
-            ["image_shape", self._image_metadata.final_shape],
-            ["composite_nx", self.get_param_value("composite_nx")],
-            ["composite_ny", self.get_param_value("composite_ny")],
-            ["mosaic_border_width", _bwidth],
-            ["mosaic_border_value", _bval],
-        ]:
-            if _value != self._composite.get_param_value(_key):
-                self._composite.set_param_value(_key, _value)
-                _update_required = True
-        if _update_required:
-            self._composite.create_new_image()
+        self._composite.set_param_value("image_shape", self._image_metadata.final_shape)
+        self._composite.set_param_value("datatype", self._image_metadata.datatype)
+        self._composite.create_new_image()
 
     def __check_and_store_thresholds(self):
         """
@@ -552,7 +454,7 @@ class CompositeCreatorApp(BaseApp):
         """
         Perform operations after running main parallel processing function.
         """
-        if self.get_param_value("use_thresholds"):
+        if self.get_param_value("use_thresholds") and not self.slave_mode:
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
@@ -589,7 +491,7 @@ class CompositeCreatorApp(BaseApp):
         if self.slave_mode:
             return
         if self.get_param_value("use_bg_file"):
-            image -= self._bg_image
+            image = image - self._bg_image
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 

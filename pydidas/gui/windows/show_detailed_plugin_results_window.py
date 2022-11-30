@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...core.utils import SignalBlocker, update_size_policy
 from ...core.constants import STANDARD_FONT_SIZE
@@ -40,6 +40,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
 
     show_frame = False
     sig_new_selection = QtCore.Signal(str)
+    sig_minimized = QtCore.Signal()
 
     def __init__(self, parent=None, results=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
@@ -298,3 +299,16 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         )
         _plot.setGraphYLabel(_ax_labels[0])
         _plot.setGraphXLabel(_ax_labels[1])
+
+    def closeEvent(self, event):
+        """
+        Re-implement the closeEvent to also emit a signal that this Window has been
+        closed.
+
+        Parameters
+        ----------
+        event : QEvent
+            The closing event.
+        """
+        self.sig_minimized.emit()
+        QtWidgets.QWidget.closeEvent(self, event)

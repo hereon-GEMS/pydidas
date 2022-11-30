@@ -35,15 +35,20 @@ from pydidas.core import UserConfigError, PydidasQsettings
 
 
 class TestCompositeImage(unittest.TestCase):
-    def setUp(self):
-        self._path = tempfile.mkdtemp()
+    @classmethod
+    def setUpClass(cls):
+        cls._path = tempfile.mkdtemp()
         q_settings = PydidasQsettings()
-        self._maxsize = q_settings.value("global/max_image_size", float)
-        self._border = q_settings.value("user/mosaic_border_width", float)
+        cls._maxsize = q_settings.value("global/max_image_size", float)
+        cls._border = q_settings.value("user/mosaic_border_width", float)
 
-    def tearDown(self):
-        shutil.rmtree(self._path)
-        del self._path
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls._path)
+        q_settings = PydidasQsettings()
+        q_settings.set_value("global/max_image_size", cls._maxsize)
+        cls._maxsize = q_settings.value("global/max_image_size", float)
+        q_settings.set_value("user/mosaic_border_width", cls._border)
 
     def get_default_object(self, low_limit=None, high_limit=1):
         obj = CompositeImageManager(
@@ -113,6 +118,71 @@ class TestCompositeImage(unittest.TestCase):
         img = np.random.random((20, 20))
         obj.insert_image(img, 0)
         self.assertTrue((obj.image[:20, :20] == img).all())
+
+    def test_insert_image__right_to_left(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_xdir_orientation", "right-to-left")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue((obj.image[:20, -20:] == img).all())
+
+    def test_insert_image__bottom_to_top(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_ydir_orientation", "bottom-to-top")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue((obj.image[-20:, :20] == img).all())
+
+    def test_insert_image__bottom_to_top_and_right_to_left(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_ydir_orientation", "bottom-to-top")
+        obj.set_param_value("composite_xdir_orientation", "right-to-left")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue((obj.image[-20:, -20:] == img).all())
+
+    def test_insert_image__fliplr_op(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_image_op", "Flip left/right")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue(np.allclose(obj.image[:20, :20], np.fliplr(img)))
+
+    def test_insert_image__flipud_op(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_image_op", "Flip up/down")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue(np.allclose(obj.image[:20, :20], np.flipud(img)))
+
+    def test_insert_image__rot180(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_image_op", "Rot 180deg")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue(np.allclose(obj.image[:20, :20], np.rot90(img, 2)))
+
+    def test_insert_image__rot90cw(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_image_op", "Rot 90deg clockwise")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue(np.allclose(obj.image[:20, :20], np.rot90(img, -1)))
+
+    def test_insert_image__rot90ccw(self):
+        obj = self.get_default_object()
+        obj.set_param_value("composite_image_op", "Rot 90deg counter-clockwise")
+        obj._CompositeImageManager__image = None
+        img = np.random.random((20, 20))
+        obj.insert_image(img, 0)
+        self.assertTrue(np.allclose(obj.image[:20, :20], np.rot90(img, 1)))
 
     def test_insert_image__comp_dir_y(self):
         obj = self.get_default_object()
@@ -198,21 +268,9 @@ class TestCompositeImage(unittest.TestCase):
     def test_set_default_qsettings(self):
         obj = self.get_default_object()
         q_settings = PydidasQsettings()
-        _maxsize = q_settings.value("global/max_image_size", float)
-        self.assertEqual(obj.get_param_value("max_image_size"), _maxsize)
-
-    def test_set_default_qsettings__overwrite(self):
-        _maxsize_test = 150
-        obj = CompositeImageManager(
-            image_shape=(20, 20),
-            composite_nx=5,
-            composite_ny=5,
-            datatype=float,
-            threshold_low=np.nan,
-            threshold_high=1,
-            max_image_size=_maxsize_test,
-        )
-        self.assertEqual(obj.get_param_value("max_image_size"), _maxsize_test)
+        for _key in ["border_width", "border_value"]:
+            _val = q_settings.value(f"user/mosaic_{_key}", float)
+            self.assertEqual(obj._config[_key], _val)
 
     def test_check_max_size_okay(self):
         obj = self.get_default_object()

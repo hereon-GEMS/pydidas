@@ -33,7 +33,7 @@ from ....core.constants import (
 from ....core import constants
 from ....widgets import ScrollArea, BaseFrame
 from ....widgets.selection import ResultSelectionWidget
-from ....widgets.parameter_config import ParameterEditFrame
+from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.silx_plot import create_silx_plot_stack
 
 
@@ -86,7 +86,7 @@ class ViewResultsFrameBuilder(BaseFrame):
         )
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
-        self._widgets["config"] = ParameterEditFrame(
+        self._widgets["config"] = ParameterEditCanvas(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
         self.create_any_widget(
@@ -104,6 +104,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             "Import results from directory",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(42),
         )
         self.create_any_widget(
             "result_selector",
@@ -130,6 +131,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             enabled=False,
+            icon=self.style().standardIcon(25),
             toolTip=(
                 "Export the current node's results to file. Note that "
                 "the filenames are pre-determined based on node ID "
@@ -144,6 +146,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             tooltip=("Export all results. Note that the directory must be empty."),
+            icon=self.style().standardIcon(43),
         )
         self.create_spacer(
             "config_terminal_spacer",

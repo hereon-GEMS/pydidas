@@ -928,6 +928,12 @@ class TestDataset(unittest.TestCase):
             else:
                 self.assertEqual(_item, _target)
 
+    def test_hash(self):
+        obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
+        obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
+        self.assertIsInstance(hash(obj), int)
+        self.assertNotEqual(hash(obj), hash(obj2))
+
 
 if __name__ == "__main__":
     unittest.main()

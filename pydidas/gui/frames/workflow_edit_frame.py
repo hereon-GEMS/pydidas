@@ -28,6 +28,7 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
+from ...contexts import PydidasFileDialog
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
@@ -72,9 +73,24 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
     menu_title = "Workflow editing"
     menu_entry = "Workflow processing/Workflow editing"
     menu_icon = "qta::ph.share-network-fill"
+    sig_workflow_edit_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
         WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
+        self.__import_dialog = PydidasFileDialog(
+            self,
+            caption="Import workflow tree file",
+            formats=WorkflowTreeIoMeta.get_string_of_formats(),
+            dialog=QtWidgets.QFileDialog.getOpenFileName,
+            qsettings_ref="WorkflowEditFrame__import",
+        )
+        self.__export_dialog = PydidasFileDialog(
+            self,
+            caption="Export workflow tree file",
+            formats=WorkflowTreeIoMeta.get_string_of_formats(),
+            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="WorkflowEditFrame__export",
+        )
 
     def connect_signals(self):
         """
@@ -124,10 +140,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         Open a QFileDialog to geta save name and export the WorkflowTree to
         the selected file with the specified format.
         """
-        _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
-        fname = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Name of file", None, _file_selection
-        )[0]
+        fname = self.__export_dialog.get_user_response()
         if fname in ["", None]:
             return
         TREE.export_to_file(fname, overwrite=True)
@@ -137,9 +150,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         Open a Qdialog to select a filename, read the file and import an
         existing WorkflowTree from the retrieved information.
         """
-        _file_selection = WorkflowTreeIoMeta.get_string_of_formats()
-        _func = QtWidgets.QFileDialog.getOpenFileName
-        fname = _func(self, "Name of file", None, _file_selection)[0]
+        fname = self.__import_dialog.get_user_response()
         if fname in ["", None]:
             return
         TREE.import_from_file(fname)

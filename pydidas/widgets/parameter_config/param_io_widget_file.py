@@ -31,6 +31,7 @@ import pathlib
 from qtpy import QtWidgets, QtCore
 
 from ...core.constants import PARAM_INPUT_EDIT_WIDTH
+from ...contexts import PydidasDirDialog, PydidasFileDialog
 from ...data_io import IoMaster
 from ..dialogues import critical_warning
 from .param_io_widget_with_button import ParamIoWidgetWithButton
@@ -62,10 +63,20 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         super().__init__(parent, param, width)
         self.setAcceptDrops(True)
-        self._flag_is_output = param.refkey.startswith("output")
-        self._flag_is_dir = "directory" in param.refkey
         self._flag_pattern = "pattern" in param.refkey
-        self._file_selection = "All files (*.*);;" + IoMaster.get_string_of_formats()
+        if "directory" in param.refkey:
+            self.io_dialog = PydidasDirDialog(self, caption="Name of directory")
+        else:
+            if param.refkey.startswith("output"):
+                _dialog = QtWidgets.QFileDialog.getSaveFileName
+            else:
+                _dialog = QtWidgets.QFileDialog.getOpenFileName
+            self.io_dialog = PydidasFileDialog(
+                self,
+                caption="Name of File",
+                formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
+                dialog=_dialog,
+            )
 
     def button_function(self):
         """
@@ -74,21 +85,12 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method is called upon clicking the "open file" button
         and opens a QFileDialog widget to select a filename.
         """
-        if self._flag_is_dir:
-            _arg = QtWidgets.QFileDialog.ShowDirsOnly
-            _func = QtWidgets.QFileDialog.getExistingDirectory
-            _fname = _func(self, "Name of directory", None, _arg)
-        else:
-            _arg = self._file_selection
-            if self._flag_is_output:
-                _func = QtWidgets.QFileDialog.getSaveFileName
-            else:
-                _func = QtWidgets.QFileDialog.getOpenFileName
-            _fname = _func(self, "Name of file", None, _arg)[0]
-        if self._flag_pattern:
-            _fname = os.path.basename(_fname)
-        if _fname:
-            self.setText(_fname)
+        _result = self.io_dialog.get_user_response()
+        if _result:
+            if self._flag_pattern:
+                self.io_dialog.set_curr_dir(_result)
+                _result = os.path.basename(_result)
+            self.setText(_result)
             self.emit_signal()
 
     def get_value(self):
@@ -102,6 +104,17 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         text = self.ledit.text()
         return pathlib.Path(self.get_value_from_text(text))
+
+    def set_value(self, value):
+        """
+        Set the input field's value.
+
+        This method changes the combobox selection to the specified value.
+        """
+        self._old_value = self.get_value()
+        self.ledit.setText(f"{value}")
+        if not self._flag_pattern:
+            self.io_dialog.set_curr_dir(value)
 
     def modify_file_selection(self, list_of_choices):
         """
@@ -137,3 +150,15 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             critical_warning("Not a file", "Can only accept single files.")
             return
         self.set_value(_path)
+
+    def set_unique_ref_name(self, name):
+        """
+        Set a unique reference name to allow keeping track of the active working
+        directory.
+
+        Parameters
+        ----------
+        name : str
+            The unique identifier to reference this Parameter in the QSettings.
+        """
+        self.io_dialog.qsettings_ref = name

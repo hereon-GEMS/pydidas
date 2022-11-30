@@ -31,6 +31,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError
+from ...contexts import PydidasDirDialog
 from ...widgets.dialogues import critical_warning
 from ...workflow import WorkflowResults
 
@@ -80,6 +81,12 @@ class ViewResultsMixin:
         self._data_axunits = ["", ""]
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
+        self.__export_dialog = PydidasDirDialog(
+            self,
+            caption="Export results",
+            dialog=QtWidgets.QFileDialog.getExistingDirectory,
+            qsettings_ref="WorkflowResults__export",
+        )
 
     def connect_view_results_mixin_signals(self):
         """
@@ -287,7 +294,7 @@ class ViewResultsMixin:
         if _node == -1:
             critical_warning(
                 "No node selected",
-                ("No node has been selected. Please select a node and try again."),
+                "No node has been selected. Please select a node and try again.",
             )
             return
         self._export(_node)
@@ -321,9 +328,7 @@ class ViewResultsMixin:
             return
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
-            _dirname = QtWidgets.QFileDialog.getExistingDirectory(
-                self, "Name of directory", None
-            )
+            _dirname = self.__export_dialog.get_user_response()
             if _dirname == "" or len(os.listdir(_dirname)) == 0 or _overwrite:
                 break
             critical_warning(

@@ -367,18 +367,18 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_check_and_update_composite_image__no_composite_yet(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__check_and_update_composite_image()
-        self.assertIsInstance(app._composite, CompositeImageManager)
+        app._CompositeCreatorApp__update_composite_image_params()
+        self.assertIsInstance(app._composite.image, np.ndarray)
 
     def test_check_and_update_composite_image__redo(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__check_and_update_composite_image()
-        app._CompositeCreatorApp__check_and_update_composite_image()
+        app._CompositeCreatorApp__update_composite_image_params()
+        app._CompositeCreatorApp__update_composite_image_params()
         self.assertIsInstance(app._composite, CompositeImageManager)
 
     def test_check_and_update_composite_image__new_img_shape(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__check_and_update_composite_image()
+        app._CompositeCreatorApp__update_composite_image_params()
         _old_shape = app.composite.shape
         _img_shape2 = (self._img_shape[0] + 2, self._img_shape[1] + 2)
         _data2 = np.random.random((self._n,) + _img_shape2)
@@ -387,17 +387,17 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("first_file", self._fname(self._n))
         app.set_param_value("last_file", self._fname(2 * self._n - 1))
         app._image_metadata.update(filename=self._fname(self._n))
-        app._CompositeCreatorApp__check_and_update_composite_image()
+        app._CompositeCreatorApp__update_composite_image_params()
         _new_shape = app.composite.shape
         self.assertEqual(_old_shape[0] + 2 * self._ny, _new_shape[0])
         self.assertEqual(_old_shape[1] + 2 * self._nx, _new_shape[1])
 
     def test_check_and_update_composite_image__new_order(self):
         app = self.get_default_app()
-        app._CompositeCreatorApp__check_and_update_composite_image()
+        app._CompositeCreatorApp__update_composite_image_params()
         app.set_param_value("composite_nx", self._ny)
         app.set_param_value("composite_ny", self._nx)
-        app._CompositeCreatorApp__check_and_update_composite_image()
+        app._CompositeCreatorApp__update_composite_image_params()
         _new_shape = app.composite.shape
         _img_shape = app._image_metadata.final_shape
         _target_y = (_img_shape[0] + self._border) * self._nx - self._border

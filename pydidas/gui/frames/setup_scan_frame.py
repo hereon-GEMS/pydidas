@@ -29,11 +29,11 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
+from ...contexts import PydidasFileDialog
 from ...experiment import SetupScan, SetupScanIoMeta
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
 from .builders import SetupScanFrameBuilder
-
 
 SCAN = SetupScan()
 PLUGINS = PluginCollection()
@@ -51,6 +51,20 @@ class SetupScanFrame(SetupScanFrameBuilder):
 
     def __init__(self, parent=None, **kwargs):
         SetupScanFrameBuilder.__init__(self, parent, **kwargs)
+        self.__import_dialog = PydidasFileDialog(
+            self,
+            caption="Import scan context file",
+            formats=SetupScanIoMeta.get_string_of_formats(),
+            dialog=QtWidgets.QFileDialog.getOpenFileName,
+            qsettings_ref="SetupScanFrame__import",
+        )
+        self.__export_dialog = PydidasFileDialog(
+            self,
+            "Export scan context file",
+            SetupScanIoMeta.get_string_of_formats(),
+            QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="SetupScanFrame__export",
+        )
 
     def connect_signals(self):
         """
@@ -69,6 +83,9 @@ class SetupScanFrame(SetupScanFrameBuilder):
             self._widgets[f"button_down_{_index}"].clicked.connect(
                 partial(self.move_dim, _index, 1)
             )
+        self.param_widgets["scan_base_directory"].io_edited.connect(
+            self.set_new_base_directory
+        )
 
     def finalize_ui(self):
         """
@@ -106,10 +123,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
 
         This method will open a QFileDialog to select the file to be read.
         """
-        _formats = SetupScanIoMeta.get_string_of_formats()
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Name of file", None, _formats
-        )[0]
+        fname = self.__import_dialog.get_user_response()
         if fname != "":
             SCAN.import_from_file(fname)
             for param in SCAN.params.values():
@@ -123,10 +137,7 @@ class SetupScanFrame(SetupScanFrameBuilder):
         This method will open a QFileDialog to select a filename for the
         file in which the information shall be written.
         """
-        _formats = SetupScanIoMeta.get_string_of_formats()
-        fname = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Name of file", None, _formats
-        )[0]
+        fname = self.__export_dialog.get_user_response()
         if fname != "":
             SCAN.export_to_file(fname, overwrite=True)
 
@@ -172,3 +183,15 @@ class SetupScanFrame(SetupScanFrameBuilder):
                 f"scan_dim{dim_index}_{_key}",
                 SCAN.get_param_value(f"scan_dim{dim_index}_{_key}"),
             )
+
+    @QtCore.Slot(str)
+    def set_new_base_directory(self, basedir):
+        """
+        Set the new base directory for the scan.
+
+        Parameters
+        ----------
+        basedir : str
+            The new base directory
+        """
+        self.param_widgets["scan_name_pattern"].io_dialog.set_curr_dir(basedir)

@@ -34,7 +34,7 @@ from ....core.constants import (
     FIX_EXP_POLICY,
 )
 from ....core import constants
-from ....widgets.parameter_config import ParameterEditFrame
+from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.silx_plot import create_silx_plot_stack
 
 
@@ -102,7 +102,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(0, 0, 1, 1),
         )
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
-        self._widgets["config"] = ParameterEditFrame(
+        self._widgets["config"] = ParameterEditCanvas(
             parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
         )
         self.create_spacer(
@@ -124,6 +124,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(59),
         )
         self.create_line(
             "line_refresh_tree",
@@ -152,6 +153,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
+            icon=self.style().standardIcon(61),
         )
         self.create_line(
             "line_results", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]

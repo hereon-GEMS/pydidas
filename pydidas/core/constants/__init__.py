@@ -29,7 +29,6 @@ __all__ = []
 # import __all__ items from modules:
 from .constants import *
 from .file_extensions import *
-from .fit_funcs import *
 from .generic_param_description import *
 from .generic_param_lists import *
 from .gui_constants import *
@@ -38,6 +37,8 @@ from .q_settings import *
 from .qt_presets import *
 from .unicode_greek_letters import *
 
+from . import fit_funcs
+from . import image_ops
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -50,11 +51,6 @@ from . import file_extensions
 
 __all__.extend(file_extensions.__all__)
 del file_extensions
-
-from . import fit_funcs
-
-__all__.extend(fit_funcs.__all__)
-del fit_funcs
 
 from . import generic_param_description
 

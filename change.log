@@ -1,6 +1,48 @@
-v0.1.12
+=======
+v0.1.13
 =======
 
+Improvements
+------------
+- Made Datasets hashable.
+- Added a copy method to Datasets to overwrite the generic numpy method and to
+  copy the metadata as well as the array.
+- Added a "circular" colormap named 'Wheel' to silx.
+- Added automatic update of details in the WorkflowTestFrame.
+- Tweaked the processing speed of pyFAI plugins by moving the fixed kwargs setup
+  to the pre_execute method.
+- Added features in the CompositeCreatorApp to control the direction in which
+  images are inserted and the orientation of the inserted images.
+- Added functionality that each import / export button and each fixed Parameter
+  (i.e. not those in plugins) keeps a persistent reference to its last directory
+  to allow opening the last directory for this entry.
+- Loading a "wrong" yaml file to import ExperimentSetup settings now raises a 
+  UserConfigError instead of an Assertion error.
+
+
+Bugfixes
+--------
+- Created a workaround for an issue with pyFAI ElidedLabel class toolTip.
+- Fixed an issue with deepcopies in the generic ObjectWithParameterCollection
+- Fixed an issue with an inconsistent minimum size of the 
+  PluginCollectionPresenter
+- Fixed an issue with 1D pyFAI Plugin initializations.
+- Fixed an issue with nodeIDs of PLugins in imported WorkflowTrees
+- Added missing qtpy to requirements which was not missing.
+- Fixed an issue in the CompositeCreatorFrame with aborting the AppRunner
+- Corrected function call in ExportEigerPixelmask window.
+- Fixed the docstring for the core.utils.Timer class.
+- Fixed an issue with the CompositeImageManager and changed global max image
+  size changes after instantiation.
+- Fixed an issue in the filelist manager with file sorting.
+- Fixed an issue with restoration of the CompositeCreatorFrame.
+- Fixed an issue with same hashes for identical Dataset arrays.
+- Fixed an issue with the tooltip event filter not exiting correctly.
+- Fixed an issue where loading a non-existing state would crash the pydidas gui.
+
+  
+v0.1.12
+=======
 
 Improvements
 ------------

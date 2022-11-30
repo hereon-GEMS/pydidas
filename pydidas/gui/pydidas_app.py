@@ -29,7 +29,6 @@ from qtpy import QtWidgets, QtCore
 
 from ..core import constants
 from ..widgets import PydidasFrameStack
-from .utils.qtooltip_event_handler import QTooltipEventHandler
 
 
 class PydidasApp(QtWidgets.QApplication):
@@ -47,8 +46,6 @@ class PydidasApp(QtWidgets.QApplication):
         if _font.pointSize() != constants.STANDARD_FONT_SIZE:
             _font.setPointSize(constants.STANDARD_FONT_SIZE)
             self.setFont(_font)
-
-        self.installEventFilter(QTooltipEventHandler(self))
 
     @QtCore.Slot()
     def send_gui_close_signal(self):

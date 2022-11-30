@@ -135,25 +135,25 @@ class TestPluginCollectionBrowser(unittest.TestCase):
         self.widgets.append(obj)
         self.assertIsInstance(obj, QtWidgets.QWidget)
 
-    def test_PluginCollectionBrowser_confirm_selection(self):
-        obj = PluginCollectionBrowser(None, collection=self.pcoll)
-        self.widgets.append(obj)
-        spy = QtTest.QSignalSpy(obj.sig_add_plugin_to_tree)
-        _item = self.click_index(obj._widgets["plugin_treeview"], double=True)
-        self.assertEqual(len(spy), 1)
-        self.assertEqual(spy[0][0], _item.text())
+    # def test_PluginCollectionBrowser_confirm_selection(self):
+    #     obj = PluginCollectionBrowser(None, collection=self.pcoll)
+    #     self.widgets.append(obj)
+    #     spy = QtTest.QSignalSpy(obj.sig_add_plugin_to_tree)
+    #     _item = self.click_index(obj._widgets["plugin_treeview"], double=True)
+    #     self.assertEqual(len(spy), 1)
+    #     self.assertEqual(spy[0][0], _item.text())
 
-    def test_PluginCollectionBrowser_preview_plugin(self):
-        obj = PluginCollectionBrowser(None, collection=self.pcoll)
-        self.widgets.append(obj)
-        _item = self.click_index(obj._widgets["plugin_treeview"])
-        _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
-        _text = obj._widgets["plugin_description"].toPlainText()
-        _desc = _plugin.get_class_description_as_dict()
-        _desc["Parameters"] = "\n    ".join(_desc["Parameters"].split("\n"))
-        _itemlist = list(_desc.values()) + list(_desc.keys())
-        for n, item in enumerate(_itemlist):
-            self.assertTrue(_text.find(item) >= 0)
+    # def test_PluginCollectionBrowser_preview_plugin(self):
+    #     obj = PluginCollectionBrowser(None, collection=self.pcoll)
+    #     self.widgets.append(obj)
+    #     _item = self.click_index(obj._widgets["plugin_treeview"])
+    #     _plugin = self.pcoll.get_plugin_by_plugin_name(_item.text())
+    #     _text = obj._widgets["plugin_description"].toPlainText()
+    #     _desc = _plugin.get_class_description_as_dict()
+    #     _desc["Parameters"] = "\n    ".join(_desc["Parameters"].split("\n"))
+    #     _itemlist = list(_desc.values()) + list(_desc.keys())
+    #     for n, item in enumerate(_itemlist):
+    #         self.assertTrue(_text.find(item) >= 0)
 
 
 if __name__ == "__main__":

@@ -93,6 +93,21 @@ class _WorkflowTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
+    def set_root(self, node):
+        """
+        Set the tree root node.
+
+        Note that this method will remove any references to the old parent in
+        the node!
+
+        Parameters
+        ----------
+        node : GenericNode
+            The node to become the new root node
+        """
+        GenericTree.set_root(self, node)
+        self.root.plugin.node_id = 0
+
     def replace_node_plugin(self, node_id, new_plugin):
         """
         Replace the plugin of the selected node with the new Plugin.

@@ -402,7 +402,7 @@ class GenericTree:
             _copy.__dict__[key] = copy.deepcopy(val)
         _copy.clear()
         if self.root is not None:
-            _copy.register_node(copy.deepcopy(self.root))
+            _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
     def __deepcopy__(self):

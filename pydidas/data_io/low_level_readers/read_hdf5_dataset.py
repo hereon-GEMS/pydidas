@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the read_hdf5_slice function which is the low-level implementation
+Module with the read_hdf5 function which is the low-level implementation
 of the hdf5 file reader with support for indexing and chunking.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["read_hdf5_slice"]
+__all__ = ["read_hdf5_dataset"]
 
 import itertools
 from numbers import Integral
@@ -33,7 +33,7 @@ import hdf5plugin
 import numpy as np
 
 
-def read_hdf5_slice(filename, dataset, axes=None):
+def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):
     """
     Read a n-dimensional slice from an hdf5 file.
 
@@ -46,9 +46,9 @@ def read_hdf5_slice(filename, dataset, axes=None):
     ----------
     filename : str
         The file name of the hdf5 file.
-    dataset : str
-        The path to the dataset in the hdf5 structure
-    axes : Union[list, None]
+    dataset : str, optional
+        The path to the dataset in the hdf5 structure. The default is entry/data/data
+    axes : Union[tuple, list, None]
         The indices for the individual axes (order as in the file).
         The input needs to be in form of a list of entries for each
         axis. Any missing axes will take the full data indices. No input

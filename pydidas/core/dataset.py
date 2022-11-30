@@ -733,6 +733,24 @@ class Dataset(np.ndarray):
                 )
         return _new
 
+    def copy(self, order="C"):
+        """
+        Overload the generic nd.ndarray copy method to copy metadata as well.
+
+        Parameters
+        ----------
+        order : {‘C’, ‘F’, ‘A’, ‘K’},, optional
+            The memory layout. The default is "C".
+
+        Returns
+        -------
+        Dataset
+            The copied dataset.
+        """
+        _new = np.ndarray.copy(self, order)
+        _new._meta = self._meta.copy()
+        return _new
+
     def __repr__(self):
         """
         Reimplementation of the numpy.ndarray.__repr__ method
@@ -858,3 +876,24 @@ class Dataset(np.ndarray):
         if obj.shape == ():
             return np.atleast_1d(obj)[0]
         return np.ndarray.__array_wrap__(self, obj, context)
+
+    def __hash__(self):
+        """
+        Generate a hash value for the dataset.
+
+        Returns
+        -------
+        int
+            The hash value.
+        """
+        _datahash = hash(self.data.tobytes())
+        _metahash = hash(
+            (
+                id(self),
+                self.axis_labels.values(),
+                self.axis_units.values(),
+                self.data_label,
+                self.data_unit,
+            )
+        )
+        return hash((_datahash, _metahash))

@@ -61,14 +61,13 @@ class TimerSaveRuntime:
     The TimerSaveRuntime class can be used to time running code and save the result
     to a variable.
 
-    Is it designed to be used in a "with TimerSaveRuntime(var):" statement.
+    Is it designed to be used in a "with TimerSaveRuntime() as var:" statement.
 
     Example
     -------
-    >>> a = 0
-    >>> with TimerSaveRuntime(a):
+    >>> with TimerSaveRuntime as runtime:
     >>>     arr = numpy.random.random((1000, 1000, 100))
-    >>> print(a)
+    >>> print(runtime())
     0.597181800
     """
 

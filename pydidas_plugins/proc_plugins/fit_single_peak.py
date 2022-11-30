@@ -28,9 +28,8 @@ __all__ = ["FitSinglePeak"]
 import numpy as np
 from scipy.optimize import least_squares
 
-from pydidas.core.constants import (
-    PROC_PLUGIN,
-    PROC_PLUGIN_INTEGRATED,
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
+from pydidas.core.constants.fit_funcs import (
     gaussian,
     gaussian_delta,
     lorentzian,

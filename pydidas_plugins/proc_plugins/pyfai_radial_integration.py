@@ -51,13 +51,23 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         """
         Pre-execute the plugin and store the Parameters required for the execution.
         """
-        self._ai_params["npt_azim"] = self.get_param_value("azi_npoint")
-        self._ai_params["npt_rad"] = self.get_param_value("rad_npoint")
-        self._ai_params["unit"] = self.get_pyFAI_unit_from_param("azi_unit")
-        self._ai_params["radial_unit"] = self.get_pyFAI_unit_from_param("rad_unit")
-        self._ai_params["radial_range"] = self.get_radial_range()
-        self._ai_params["azimuth_range"] = self.get_azimuthal_range_in_deg()
         pyFAIintegrationBase.pre_execute(self)
+        self._ai_params = {
+            "npt_rad": self.get_param_value("rad_npoint"),
+            "polarization_factor": 1,
+            "unit": self.get_pyFAI_unit_from_param("azi_unit"),
+            "radial_unit": self.get_pyFAI_unit_from_param("rad_unit"),
+            "radial_range": self.get_radial_range(),
+            "azimuth_range": self.get_azimuthal_range_in_deg(),
+            "method": self._config["method"],
+        }
+        _label, _unit = self.params["azi_unit"].value.split("/")
+        self._dataset_info = {
+            "axis_labels": [_label.strip()],
+            "axis_units": [_unit.strip()],
+            "data_label": "integrated intensity",
+            "data_unit": "counts",
+        }
 
     def execute(self, data, **kwargs):
         """
@@ -78,28 +88,9 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
             Any calling kwargs, appended by any changes in the function.
         """
         _newdata = self._ai.integrate_radial(
-            data,
-            self._ai_params["npt_azim"],
-            npt_rad=self._ai_params["npt_rad"],
-            polarization_factor=1,
-            unit=self._ai_params["unit"],
-            radial_unit=self._ai_params["radial_unit"],
-            radial_range=self._ai_params["radial_range"],
-            azimuth_range=self._ai_params["azimuth_range"],
-            method=self._config["method"],
+            data, self.get_param_value("azi_npoint"), **self._ai_params
         )
-
-        _label, _unit = self.params["azi_unit"].value.split("/")
-        _label = _label.strip()
-        _unit = _unit.strip()
-        _dataset = Dataset(
-            _newdata[1],
-            axis_labels=[_label],
-            axis_units=[_unit],
-            axis_ranges=[_newdata[0]],
-            data_label="integrated intensity",
-            data_unit="counts",
-        )
+        _dataset = Dataset(_newdata[1], axis_ranges=[_newdata[0]], **self._dataset_info)
         return _dataset, kwargs
 
     def calculate_result_shape(self):

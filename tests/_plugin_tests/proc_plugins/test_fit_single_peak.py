@@ -27,7 +27,7 @@ import unittest
 import numpy as np
 
 from pydidas.core import UserConfigError, Dataset
-from pydidas.core.constants import gaussian, lorentzian, voigt
+from pydidas.core.constants.fit_funcs import gaussian, lorentzian, voigt
 from pydidas.plugins import PluginCollection, BasePlugin
 
 

@@ -73,7 +73,7 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
     def test_import_from_file__wrong_format(self):
         with open(self._tmppath + "yaml.yml", "w") as stream:
             stream.write("no_entry =True")
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(UserConfigError):
             EXP_IO_YAML.import_from_file(self._tmppath + "yaml.yml")
 
     def test_export_to_file(self):

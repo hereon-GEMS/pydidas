@@ -57,9 +57,9 @@ class Test_sphinx_html(unittest.TestCase):
     ##############
     # def test_run_sphinx_html_build(self):
     #     for _fname in ['make.bat', 'Makefile']:
-    #         shutil.copyfile(os.path.join(get_doc_make_directory(), _fname),
+    #         shutil.copyfile(os.path.join(DOC_MAKE_DIRECTORY, _fname),
     #                         os.path.join(self._tmpdir, 'docs', _fname))
-    #     shutil.copytree(os.path.join(get_doc_make_directory(), 'source'),
+    #     shutil.copytree(os.path.join(DOC_MAKE_DIRECTORY, 'source'),
     #                     os.path.join(self._tmpdir, 'docs', 'source'))
     #     with io.StringIO() as buf, redirect_stdout(buf):
     #         sphinx_html.run_sphinx_html_build(

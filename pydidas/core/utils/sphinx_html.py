@@ -30,7 +30,7 @@ import os
 import sys
 import subprocess
 
-from .get_documentation_targets import get_doc_make_directory, get_doc_home_filename
+from .get_documentation_targets import DOC_MAKE_DIRECTORY, DOC_HOME_FILENAME
 
 
 def check_sphinx_html_docs(doc_dir=None):
@@ -55,7 +55,7 @@ def check_sphinx_html_docs(doc_dir=None):
     """
     _sphinx_running = "sphinx-build" in sys.argv[0]
     if doc_dir is None:
-        _index_file = get_doc_home_filename()
+        _index_file = DOC_HOME_FILENAME
     else:
         _index_file = os.path.join(doc_dir, "index.html")
     if not os.path.exists(_index_file) and not _sphinx_running:
@@ -76,7 +76,7 @@ def run_sphinx_html_build(build_dir=None, verbose=True):
         Flag to control printing of a message. The default is True.
     """
     if build_dir is None:
-        build_dir = get_doc_make_directory()
+        build_dir = DOC_MAKE_DIRECTORY
     if verbose:
         print("=" * 60)
         print("-" * 60)

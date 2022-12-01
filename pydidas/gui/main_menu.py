@@ -34,10 +34,10 @@ from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import PydidasGuiError, UserConfigError
 from ..core.utils import (
-    get_doc_home_qurl,
+    DOC_HOME_QURL,
     get_pydidas_icon_w_bg,
-    get_doc_qurl_for_frame_manual,
-    get_doc_filename_for_frame_manual,
+    doc_qurl_for_frame_manual,
+    doc_filename_for_frame_manual,
 )
 from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree
@@ -593,12 +593,12 @@ class MainMenu(QtWidgets.QMainWindow):
         the respective helpfile if it exits or the main documentation if it does not.
         """
         _frame_class = self.centralWidget().currentWidget().__class__.__name__
-        _docfile = get_doc_filename_for_frame_manual(_frame_class)
+        _docfile = doc_filename_for_frame_manual(_frame_class)
 
         if os.path.exists(_docfile):
-            _url = get_doc_qurl_for_frame_manual(_frame_class)
+            _url = doc_qurl_for_frame_manual(_frame_class)
         else:
-            _url = get_doc_home_qurl()
+            _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)
 
     def deleteLater(self):

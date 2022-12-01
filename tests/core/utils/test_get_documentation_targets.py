@@ -29,10 +29,10 @@ import os
 from qtpy import QtCore
 
 from pydidas.core.utils import (
-    get_doc_make_directory,
-    get_doc_home_filename,
-    get_doc_home_address,
-    get_doc_home_qurl,
+    DOC_MAKE_DIRECTORY,
+    DOC_HOME_FILENAME,
+    DOC_HOME_ADDRESS,
+    DOC_HOME_QURL,
 )
 
 
@@ -43,20 +43,20 @@ class TestGetDocQUrl(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def test_get_doc_make_directory(self):
-        _dir = get_doc_make_directory()
+    def test_DOC_MAKE_DIRECTORY(self):
+        _dir = DOC_MAKE_DIRECTORY
         self.assertIn("Makefile", os.listdir(_dir))
 
-    def test_get_doc_home_filename(self):
-        _fname = get_doc_home_filename()
+    def test_DOC_HOME_FILENAME(self):
+        _fname = DOC_HOME_FILENAME
         self.assertTrue(os.path.exists(_fname))
 
-    def test_get_doc_home_address(self):
-        _address = get_doc_home_address()
+    def test_DOC_HOME_ADDRESS(self):
+        _address = DOC_HOME_ADDRESS
         self.assertTrue(_address.startswith(r"file:///"))
 
     def test_get_doc_qurl(self):
-        _url = get_doc_home_qurl()
+        _url = DOC_HOME_QURL
         self.assertIsInstance(_url, QtCore.QUrl)
 
 

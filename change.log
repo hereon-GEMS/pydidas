@@ -9,6 +9,8 @@ Major changes
 
 Improvements
 ------------
+- Improved documentation target names to unclutter namespace.
+
 
 Bugfixes
 --------

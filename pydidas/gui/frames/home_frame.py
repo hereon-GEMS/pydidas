@@ -27,7 +27,7 @@ __all__ = ["HomeFrame"]
 
 from qtpy import QtCore, QtSvg, QtWidgets
 
-from ...core.utils import get_doc_home_address, get_pydidas_icon_fname
+from ...core.utils import DOC_HOME_ADDRESS, get_pydidas_icon_fname
 from ...core import constants
 from ...widgets import BaseFrame
 
@@ -50,7 +50,7 @@ _HELP_TEXT = (
     "Documentation is available in the html format. You can open the "
     'documentation from any frame using the "Help" menu entry to either open '
     "it in the system's web browser or a window. <br>Or follow this link to "
-    f'<a href="{get_doc_home_address()}">open the documentation in a browser'
+    f'<a href="{DOC_HOME_ADDRESS}">open the documentation in a browser'
     "</a>."
 )
 
@@ -78,7 +78,7 @@ _PROC_TEXT = (
     "Results can be visualized on the fly while the processing is still running by "
     "selecting the desired node and axes.<br>"
     "For a full tutorial, please visit the corresponding help page: "
-    f'<a href="{get_doc_home_address()}">open the processing documentation'
+    f'<a href="{DOC_HOME_ADDRESS}">open the processing documentation'
     " in a browser</a>."
 )
 

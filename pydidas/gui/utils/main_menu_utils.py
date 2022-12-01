@@ -90,4 +90,4 @@ def open_doc_in_browser():
     """
     Open the link to the documentation in the system web browser.
     """
-    _ = QtGui.QDesktopServices.openUrl(utils.get_doc_home_qurl())
+    _ = QtGui.QDesktopServices.openUrl(utils.DOC_HOME_QURL)

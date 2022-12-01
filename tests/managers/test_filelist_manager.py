@@ -163,57 +163,6 @@ class TestFilelistManager(unittest.TestCase):
             fm._config["file_list"], [self._fname(i) for i in range(0, 50, _stepping)]
         )
 
-    def test_get_live_processing_naming_scheme(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:03d}.txt")
-        _fnames, _range = fm._get_live_processing_naming_scheme()
-        self.assertEqual(_range[0], _index0)
-        self.assertEqual(_range[-1], _index1)
-        self.assertEqual(
-            Path(_fnames.format(index=0)), fm.get_param_value("first_file")
-        )
-
-    def test_get_live_processing_naming_scheme_wrong_ext(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:03d}.text")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_wrong_length(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value(
-            "last_file", f"/foo/path/test_0000_file_{_index1:03d}_test.txt"
-        )
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_wrong_length_ii(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0000_file_{_index1:05d}.txt")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
-    def test_get_live_processing_naming_scheme_too_many_changes(self):
-        _index0 = 0
-        _index1 = 7
-        fm = FilelistManager()
-        fm.set_param_value("first_file", f"/foo/path/test_0000_file_{_index0:03d}.txt")
-        fm.set_param_value("last_file", f"/foo/path/test_0001_file_{_index1:03d}.txt")
-        with self.assertRaises(UserConfigError):
-            _fnames, _range = fm._get_live_processing_naming_scheme()
-
     def test_update_params(self):
         fm = FilelistManager()
         fm.update(self._fname(0), self._fname(49))

@@ -30,11 +30,13 @@ import os
 import copy
 import sys
 
+from pydidas.core import UserConfigError
 from pydidas.core.utils import (
     find_valid_python_files,
     flatten,
     get_random_string,
     get_extension,
+    get_file_naming_scheme,
 )
 
 
@@ -140,6 +142,66 @@ class Test_file_utils(unittest.TestCase):
         _input_ext = "extension"
         _ext = get_extension(f"test/to/some/dir/file.{_input_ext}")
         self.assertEqual(_ext, _input_ext)
+
+    def test_get_file_naming_scheme(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:03d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:03d}.txt"
+        _fnames, _range = get_file_naming_scheme(_file1, _file2)
+        self.assertEqual(_range[0], _index0)
+        self.assertEqual(_range[-1], _index1)
+        self.assertEqual(_fnames.format(index=0).replace("\\", "/"), _file1)
+
+    def test_get_file_naming_scheme__wrong_ext(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:03d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:03d}.text"
+        with self.assertRaises(UserConfigError):
+            _fnames, _range = get_file_naming_scheme(_file1, _file2)
+
+    def test_get_file_naming_scheme__wrong_length(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:03d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:03d}_test.txt"
+        with self.assertRaises(UserConfigError):
+            _fnames, _range = get_file_naming_scheme(_file1, _file2)
+
+    def test_get_file_naming_scheme__wrong_length_ii(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:03d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:05d}.txt"
+        with self.assertRaises(UserConfigError):
+            _fnames, _range = get_file_naming_scheme(_file1, _file2)
+
+    def test_get_file_naming_scheme__wrong_number_length_with_ignore(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:03d}.txt"
+        _fnames, _range = get_file_naming_scheme(
+            _file1, _file2, ignore_leading_zeros=True
+        )
+        self.assertEqual(_fnames.format(index=0).replace("\\", "/"), _file1)
+
+    def test_get_file_naming_scheme__wrong_number_length(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:d}.txt"
+        _file2 = f"/foo/path/test_0000_file_{_index1:03d}_test.txt"
+        with self.assertRaises(UserConfigError):
+            _fnames, _range = get_file_naming_scheme(_file1, _file2)
+
+    def test_get_file_naming_scheme__too_many_changes(self):
+        _index0 = 0
+        _index1 = 7
+        _file1 = f"/foo/path/test_0000_file_{_index0:03d}.txt"
+        _file2 = f"/foo/path/test_0001_file_{_index1:03d}.txt"
+        with self.assertRaises(UserConfigError):
+            _fnames, _range = get_file_naming_scheme(_file1, _file2)
 
 
 if __name__ == "__main__":

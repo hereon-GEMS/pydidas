@@ -20,16 +20,8 @@ There are several subfolders included in the distribution
 Installation
 ------------
 
-For now, the pydidas package is not yet available through Anaconda. To install 
-it, navigate to the directory with the source files and run the following
-command:
-
-.. code-block::
-
-    python -m pip install .
-
-Then, install the required dependencies using anaconda by running this command
-in the same directory:
+First, install the required dependencies using anaconda by running this command
+in the same directory as this README:
 
 .. code-block::
 
@@ -40,6 +32,14 @@ in the same directory:
     If you do not want to use Anaconda for dependency management, you can also
     install pydidas and all required modules using 
     `python -m pip install -r requirements.txt .`
+
+To install pydidas itself, navigate to the directory with the source files 
+and run the following command:
+
+.. code-block::
+
+    python -m pip install .
+
 
 Documentation
 -------------
@@ -52,10 +52,10 @@ Anaconda python distribution or can be installed via pip.
 
 1. Navigate to the "pydidas/docs" sub-folder
 2. Run "make html" to create the html documentation. (Note, on windows you might
-   need to call ".\make html".)
+   need to call ".\make.bat html".)
 3. Navigate to the "pydidas/docs/build/html" folder and open "index.html".
 
-Note that you will have many warning during "make" because sphinx will detect
+Note that you will have some warnings during "make" because sphinx will detect
 the overloaded methods with the same name as in parent classes.
 
 License

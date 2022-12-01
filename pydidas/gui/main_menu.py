@@ -39,7 +39,7 @@ from ..core.utils import (
     get_doc_qurl_for_frame_manual,
     get_doc_filename_for_frame_manual,
 )
-from ..experiment import SetupScan, SetupExperiment
+from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree
 from ..widgets import PydidasFrameStack
 from ..widgets.dialogues import QuestionBox
@@ -57,8 +57,8 @@ from .windows import (
 )
 
 
-SCAN = SetupScan()
-EXP = SetupExperiment()
+SCAN = ScanContext()
+EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 
@@ -442,10 +442,10 @@ class MainMenu(QtWidgets.QMainWindow):
             _frameindex, _widget_state = _widget.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _widget_state
-        _state["setup_scan"] = SCAN.get_param_values_as_dict(
+        _state["scan_context"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        _state["setup_experiment"] = EXP.get_param_values_as_dict(
+        _state["experiment_context"] = EXP.get_param_values_as_dict(
             filter_types_for_export=True
         )
         _state["workflow_tree"] = TREE.export_to_string()
@@ -522,8 +522,8 @@ class MainMenu(QtWidgets.QMainWindow):
     @staticmethod
     def _restore_global_objects(state):
         """
-        Get the states of pydidas' global objects (SetupScan,
-        SetupExperiment, WorkflowTree)
+        Get the states of pydidas' global objects (ScanContext,
+        ExperimentContext, WorkflowTree)
 
         Parameters
         ----------
@@ -532,9 +532,9 @@ class MainMenu(QtWidgets.QMainWindow):
             global objects.
         """
         TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["setup_scan"].items():
+        for _key, _val in state["scan_context"].items():
             SCAN.set_param_value(_key, _val)
-        for _key, _val in state["setup_experiment"].items():
+        for _key, _val in state["experiment_context"].items():
             EXP.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):

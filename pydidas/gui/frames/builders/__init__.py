@@ -31,8 +31,8 @@ __all__ = []
 from .composite_creator_frame_builder import *
 from .data_browsing_frame_builder import *
 from .image_math_frame_builder import *
-from .setup_experiment_frame_builder import *
-from .setup_scan_frame_builder import *
+from .define_experiment_frame_builder import *
+from .define_scan_frame_builder import *
 from .utilities_frame_builder import *
 from .workflow_edit_frame_builder import *
 from .workflow_run_frame_builder import *
@@ -55,15 +55,15 @@ from . import image_math_frame_builder
 __all__.extend(image_math_frame_builder.__all__)
 del image_math_frame_builder
 
-from . import setup_experiment_frame_builder
+from . import define_experiment_frame_builder
 
-__all__.extend(setup_experiment_frame_builder.__all__)
-del setup_experiment_frame_builder
+__all__.extend(define_experiment_frame_builder.__all__)
+del define_experiment_frame_builder
 
-from . import setup_scan_frame_builder
+from . import define_scan_frame_builder
 
-__all__.extend(setup_scan_frame_builder.__all__)
-del setup_scan_frame_builder
+__all__.extend(define_scan_frame_builder.__all__)
+del define_scan_frame_builder
 
 from . import utilities_frame_builder
 

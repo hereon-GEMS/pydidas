@@ -42,7 +42,6 @@ from . import contexts
 from . import data_io
 from . import multiprocessing
 from . import managers
-from . import experiment
 from . import plugins
 from . import workflow
 from . import apps
@@ -52,18 +51,17 @@ from . import gui
 
 __all__.extend(
     [
-        "apps",
         "core",
-        "experiment",
-        "gui",
+        "contexts",
         "data_io",
-        "managers",
         "multiprocessing",
+        "managers",
         "plugins",
-        "unittest_objects",
-        "utils",
-        "widgets",
         "workflow",
+        "apps",
+        "unittest_objects",
+        "widgets",
+        "gui",
     ]
 )
 

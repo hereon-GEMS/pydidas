@@ -101,7 +101,7 @@ class ViewResultsMixin:
     def _verify_result_shapes_uptodate(self):
         """
         Verify that the underlying information for the WorkflowResults
-        (i.e. the SetupScan and WorkflowTree) have not changed.
+        (i.e. the ScanContext and WorkflowTree) have not changed.
         """
         _hash = RESULTS.source_hash
         if _hash != self._config["source_hash"]:

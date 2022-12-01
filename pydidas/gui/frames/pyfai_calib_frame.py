@@ -66,10 +66,10 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 
 from ...core import constants
 from ...widgets import BaseFrame
-from ...experiment import SetupExperiment
+from ...contexts import ExperimentContext
 
 
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 
 def get_pyfai_calib_icon_path():
@@ -240,15 +240,15 @@ class PyfaiCalibFrame(BaseFrame):
     def _store_geometry(self):
         geo = self.model().fittedGeometry()
         det = self.model().experimentSettingsModel().detector()
-        EXP_SETUP.set_param_value("xray_wavelength", geo.wavelength().value())
-        EXP_SETUP.set_param_value("detector_dist", geo.distance().value())
-        EXP_SETUP.set_param_value("detector_poni1", geo.poni1().value())
-        EXP_SETUP.set_param_value("detector_poni2", geo.poni2().value())
-        EXP_SETUP.set_param_value("detector_rot1", geo.rotation1().value())
-        EXP_SETUP.set_param_value("detector_rot2", geo.rotation2().value())
-        EXP_SETUP.set_param_value("detector_rot3", geo.rotation3().value())
-        EXP_SETUP.set_param_value("detector_name", det.name)
-        EXP_SETUP.set_param_value("detector_npixx", det.shape[1])
-        EXP_SETUP.set_param_value("detector_npixy", det.shape[0])
-        EXP_SETUP.set_param_value("detector_pxsizex", det.pixel2)
-        EXP_SETUP.set_param_value("detector_pxsizey", det.pixel1)
+        EXP.set_param_value("xray_wavelength", geo.wavelength().value())
+        EXP.set_param_value("detector_dist", geo.distance().value())
+        EXP.set_param_value("detector_poni1", geo.poni1().value())
+        EXP.set_param_value("detector_poni2", geo.poni2().value())
+        EXP.set_param_value("detector_rot1", geo.rotation1().value())
+        EXP.set_param_value("detector_rot2", geo.rotation2().value())
+        EXP.set_param_value("detector_rot3", geo.rotation3().value())
+        EXP.set_param_value("detector_name", det.name)
+        EXP.set_param_value("detector_npixx", det.shape[1])
+        EXP.set_param_value("detector_npixy", det.shape[0])
+        EXP.set_param_value("detector_pxsizex", det.pixel2)
+        EXP.set_param_value("detector_pxsizey", det.pixel1)

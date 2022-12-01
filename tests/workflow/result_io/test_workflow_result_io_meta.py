@@ -31,7 +31,7 @@ import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.workflow import WorkflowTree, WorkflowResults
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.workflow.result_io import (
     WorkflowResultIoBase,
     WorkflowResultIoMeta,
@@ -39,7 +39,7 @@ from pydidas.workflow.result_io import (
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
+SCAN = ScanContext()
 RESULTS = WorkflowResults()
 META = WorkflowResultIoMeta
 

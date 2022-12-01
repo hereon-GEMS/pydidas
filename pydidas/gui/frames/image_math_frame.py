@@ -27,12 +27,12 @@ __all__ = ["ImageMathFrame"]
 
 
 from ...core import Parameter, ParameterCollection, get_generic_param_collection
-from ...experiment import SetupScan
+from ...contexts import ScanContext
 from ...workflow import WorkflowTree
 from .builders import ImageMathFrameBuilder
 
 
-SCAN_SETTINGS = SetupScan()
+SCAN_SETTINGS = ScanContext()
 WORKFLOW_TREE = WorkflowTree()
 
 _buffer_param = Parameter(

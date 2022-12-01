@@ -49,7 +49,7 @@ full list of Parameters, the input and output data dimensions as well as further
 programmatic information (class name and plugin type). 
 
 A double click on a Plugin's name will append a new instance of the Plugin to 
-the :py:class:`WorkflowTree <pydidas.experiment.workflow_tree._WorkflowTree>`. 
+the :py:class:`WorkflowTree <pydidas.contexts.workflow_tree._WorkflowTree>`. 
 The new instance will always be appended to the currently active Plugin (or it
 will become the new root Plugin if the Tree is empty).
 

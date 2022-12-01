@@ -30,12 +30,12 @@ import os
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class EigerScanSeriesLoader(InputPlugin):

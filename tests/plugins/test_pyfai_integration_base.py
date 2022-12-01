@@ -33,10 +33,10 @@ import numpy as np
 
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 from pydidas.core import get_generic_parameter, PydidasQsettings
-from pydidas.experiment import SetupExperiment
+from pydidas.contexts import ExperimentContext
 
 
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 logger = logging.getLogger("pydidas_logger")
 logger.setLevel(logging.ERROR)

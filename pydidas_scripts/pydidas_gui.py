@@ -37,8 +37,8 @@ from pydidas.gui.frames import (
     WorkflowEditFrame,
     PyfaiCalibFrame,
     HomeFrame,
-    SetupExperimentFrame,
-    SetupScanFrame,
+    DefineExperimentFrame,
+    DefineScanFrame,
     WorkflowRunFrame,
     CompositeCreatorFrame,
     DirectorySpyFrame,
@@ -81,8 +81,8 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(PyfaiCalibFrame)
     gui.register_frame(CompositeCreatorFrame)
     gui.register_frame(DirectorySpyFrame)
-    gui.register_frame(SetupExperimentFrame)
-    gui.register_frame(SetupScanFrame)
+    gui.register_frame(DefineExperimentFrame)
+    gui.register_frame(DefineScanFrame)
     gui.register_frame(WorkflowEditFrame)
     gui.register_frame(WorkflowTestFrame)
     gui.register_frame(WorkflowRunFrame)
@@ -102,4 +102,4 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication.instance()
     if not isinstance(app, PydidasApp):
         app = PydidasApp(sys.argv)
-    _ = run_gui(app, restore_state="none")
+    _ = run_gui(app, restore_state="exit")

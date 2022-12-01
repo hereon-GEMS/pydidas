@@ -62,7 +62,7 @@ API documentation
     api/core
     api/multiprocessing
     api/data_io
-    api/experiment
+    api/contexts
     api/managers
     api/plugins
     api/workflow

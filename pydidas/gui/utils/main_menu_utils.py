@@ -61,10 +61,7 @@ def get_standard_state_full_filename(filename):
         _fname = os.path.join(_path, filename)
         if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
             return _fname
-    raise UserConfigError(
-        "No state config file found: Cannot restore the pydidas state because the "
-        "current user has not yet stored a pydidas state for the current version."
-    )
+    return os.path.join(_paths[0], filename)
 
 
 @QtCore.Slot()

@@ -22,7 +22,7 @@ Keeping the Workflow up to date
 -------------------------------
 
 The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
-is automatically kept up to date. If any Plugin, Plugin Parameter or SetupScan
+is automatically kept up to date. If any Plugin, Plugin Parameter or ScanContext
 Parameter changes, the WorkflowTree is automatically updated.
 In these instances, it is not required to manually update the 
 :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.

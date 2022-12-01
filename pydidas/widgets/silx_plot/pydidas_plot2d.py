@@ -31,13 +31,13 @@ from silx.gui.plot import Plot2D
 from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin
-from ...experiment import SetupExperiment
+from ...contexts import ExperimentContext
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .utilities import get_2d_silx_plot_ax_settings
 
-EXP = SetupExperiment()
+EXP = ExperimentContext()
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):

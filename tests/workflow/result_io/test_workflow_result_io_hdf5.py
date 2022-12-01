@@ -32,7 +32,7 @@ import h5py
 import numpy as np
 
 from pydidas.core import Dataset
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.core.utils import (
     get_random_string,
     create_hdf5_dataset,
@@ -46,7 +46,7 @@ from pydidas.workflow.result_io.workflow_result_io_hdf5 import (
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
+SCAN = ScanContext()
 RESULTS = WorkflowResults()
 META = WorkflowResultIoMeta
 H5SAVER = WorkflowResultIoHdf5

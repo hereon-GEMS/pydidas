@@ -33,13 +33,13 @@ import h5py
 
 from pydidas.core import Dataset, get_generic_parameter, Parameter
 from pydidas.core.utils import get_random_string, create_hdf5_dataset
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.unittest_objects import DummyProc, DummyLoader
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 TREE = WorkflowTree()
 RES = WorkflowResults()
 SAVER = WorkflowResultIoMeta

@@ -84,8 +84,8 @@ Detailed descriptions of the individual frames are given here.
     frames/PyfaiCalibFrame
     frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
-    frames/SetupExperimentFrame
-    frames/SetupScanFrame
+    frames/DefineExperimentFrame
+    frames/DefineScanFrame
     frames/WorkflowEditFrame
     frames/WorkflowTestFrame
     frames/WorkflowRunFrame

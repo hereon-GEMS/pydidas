@@ -38,13 +38,13 @@ from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI, PROC_PLUGIN_IMAGE
 from ..core import get_generic_param_collection, UserConfigError
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
-from ..experiment import SetupExperiment
+from ..contexts import ExperimentContext
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
 
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",
@@ -113,16 +113,16 @@ class pyFAIintegrationBase(ProcPlugin):
         Check the use_global_mask Parameter and load the mask image.
         """
         self.load_and_set_mask()
-        if self._exp_hash != hash(EXP_SETUP):
-            _lambda_in_A = EXP_SETUP.get_param_value("xray_wavelength")
+        if self._exp_hash != hash(EXP):
+            _lambda_in_A = EXP.get_param_value("xray_wavelength")
             self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
-                dist=EXP_SETUP.get_param_value("detector_dist"),
-                poni1=EXP_SETUP.get_param_value("detector_poni1"),
-                poni2=EXP_SETUP.get_param_value("detector_poni2"),
-                rot1=EXP_SETUP.get_param_value("detector_rot1"),
-                rot2=EXP_SETUP.get_param_value("detector_rot2"),
-                rot3=EXP_SETUP.get_param_value("detector_rot3"),
-                detector=EXP_SETUP.get_detector(),
+                dist=EXP.get_param_value("detector_dist"),
+                poni1=EXP.get_param_value("detector_poni1"),
+                poni2=EXP.get_param_value("detector_poni2"),
+                rot1=EXP.get_param_value("detector_rot1"),
+                rot2=EXP.get_param_value("detector_rot2"),
+                rot3=EXP.get_param_value("detector_rot3"),
+                detector=EXP.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
         if self._mask is not None:

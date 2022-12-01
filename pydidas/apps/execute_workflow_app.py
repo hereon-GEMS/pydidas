@@ -33,15 +33,15 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
-from ..experiment import SetupScan, SetupExperiment
+from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
-EXP = SetupExperiment()
+SCAN = ScanContext()
+EXP = ExperimentContext()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 
@@ -143,7 +143,7 @@ class ExecuteWorkflowApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the SetupScan.
+            2. Get all multiprocessing tasks from the ScanContext.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.

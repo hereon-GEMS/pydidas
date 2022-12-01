@@ -36,12 +36,12 @@ from ..core import (
     get_generic_param_collection,
     UserConfigError,
 )
-from ..experiment import SetupScan
+from ..contexts import ScanContext
 from .workflow_results import WorkflowResults
 
 
 RESULTS = WorkflowResults()
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class WorkflowResultsSelector(ObjectWithParameterCollection):

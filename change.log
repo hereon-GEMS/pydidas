@@ -4,6 +4,8 @@ v0.1.14
 
 Major changes
 -------------
+- Reorganized SetupScan and SetupExperiment and renamed them to ScanContext and
+  ExperimentContext in the contenxts sub-package.
 
 Improvements
 ------------

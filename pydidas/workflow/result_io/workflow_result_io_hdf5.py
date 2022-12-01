@@ -29,7 +29,7 @@ import os
 import h5py
 import numpy as np
 
-from ...experiment import SetupExperiment, SetupScan
+from ...contexts import ExperimentContext, ScanContext
 from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from ...core.constants import HDF5_EXTENSIONS, SCAN_GENERIC_PARAM_NAMES
@@ -38,8 +38,8 @@ from .workflow_result_io_base import WorkflowResultIoBase
 
 
 TREE = WorkflowTree()
-EXP = SetupExperiment()
-SCAN = SetupScan()
+EXP = ExperimentContext()
+SCAN = ScanContext()
 
 
 class WorkflowResultIoHdf5(WorkflowResultIoBase):

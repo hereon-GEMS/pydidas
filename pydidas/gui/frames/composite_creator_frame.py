@@ -28,6 +28,7 @@ __all__ = ["CompositeCreatorFrame"]
 import os
 import time
 from functools import partial
+from pathlib import Path
 
 import numpy as np
 from qtpy import QtWidgets, QtCore
@@ -184,15 +185,16 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         super().restore_state(state)
         self._config["bg_configured"] = state["config"]["bg_configured"]
         self._config["input_configured"] = state["config"]["input_configured"]
-        self._filelist.update()
         super().frame_activated(self.frame_index)
-        self._image_metadata.filename = self.get_param_value("first_file")
-        self._image_metadata.update()
+        if self.get_param_value("first_file") != Path():
+            self._filelist.update()
+            self._image_metadata.filename = self.get_param_value("first_file")
+            self._image_metadata.update()
+            self.__update_n_image()
         self.__update_widgets_after_selecting_first_file()
         self.__toggle_threshold_selection(self.get_param_value("use_thresholds"))
         self.__toggle_roi_selection(self.get_param_value("use_roi"))
         self.__toggle_bg_file_selection(self.get_param_value("use_bg_file"))
-        self.__update_n_image()
 
     def export_state(self):
         """

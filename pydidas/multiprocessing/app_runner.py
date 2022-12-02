@@ -175,7 +175,7 @@ class AppRunner(WorkerController):
         self.finalize_tasks()
         self.sig_results.connect(self.__app.multiprocessing_store_results)
         self.sig_progress.connect(self.__check_progress)
-        self._create_and_start_workers()
+        WorkerController._cycle_pre_run(self)
 
     def _cycle_post_run(self, timeout=10):
         """

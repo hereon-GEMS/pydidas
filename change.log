@@ -10,7 +10,7 @@ Major changes
 Improvements
 ------------
 - Improved documentation target names to unclutter namespace.
-
+- Improved the multiprocessing speed by optimizing the functions.
 
 Bugfixes
 --------

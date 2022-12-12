@@ -938,7 +938,7 @@ GENERIC_PARAM_DESCRIPTION = (
         "det_mask_val": {
             "type": float,
             "default": 0,
-            "name": "Detector mask display value",
+            "name": "Mask display value",
             "choices": None,
             "unit": "",
             "allow_None": False,

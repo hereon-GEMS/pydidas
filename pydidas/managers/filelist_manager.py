@@ -26,24 +26,19 @@ __status__ = "Development"
 __all__ = ["FilelistManager"]
 
 import os
-import re
 import copy
 from pathlib import Path
 from natsort import natsorted
-
-import numpy as np
 
 from ..core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import FILENAME_DELIMITERS
 from ..core.utils import (
     check_file_exists,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
-    get_extension,
     get_file_naming_scheme,
 )
 

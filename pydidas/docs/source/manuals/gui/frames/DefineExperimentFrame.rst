@@ -13,7 +13,7 @@ which holds information about the experimental/beamline setup.
 
 The frame only holds the configuration widgets:
 
-.. image::images/define_experiment_frame_full.png
+.. image:: images/define_experiment_frame_full.png
     :width: 300px
     :align: center
 

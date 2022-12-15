@@ -49,7 +49,7 @@ Its instance can be obtained by calling the following code:
     
 
 Configuring the ScanContext
--------------------------
+---------------------------
 
 Global Parameters
 ^^^^^^^^^^^^^^^^^
@@ -60,6 +60,7 @@ has *global* Parameters for generic information, listed in detail below:
 
 .. list-table::
     :header-rows: 1
+    :class: tight-table    
 
     * - ScanContext Parameter name
       - data type

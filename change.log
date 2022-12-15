@@ -14,6 +14,7 @@ Improvements
 - Improved documentation target names to unclutter namespace.
 - Improved the multiprocessing speed by optimizing the functions.
 - Added CITATION.CFF file.
+- Added licenses for texts and images.
 
 Bugfixes
 --------

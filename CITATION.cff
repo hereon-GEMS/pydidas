@@ -1,0 +1,19 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: pydidas
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Malte
+    family-names: Storm
+    email: malte.storm@hereon.de
+    affiliation: Helmholtz-Zentrum Hereon
+    orcid: 'https://orcid.org/0000-0002-1602-781X'
+url: 'https://ms.hereon.de/pydidas/'
+keywords:
+  - X-ray diffraction
+license: Apache-2.0

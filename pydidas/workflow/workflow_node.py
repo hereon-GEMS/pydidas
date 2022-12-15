@@ -303,11 +303,10 @@ class WorkflowNode(GenericNode):
         Propagate the global binning and ROI to the children.
         """
         for _child in self._children:
-            _child_plugin = _child.plugin
-            _child_plugin.input_shape = self.plugin.result_shape
+            _child.plugin.input_shape = self.plugin.result_shape
             if not self.plugin.new_dataset:
-                _child_plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
-                _child_plugin._original_input_shape = self.plugin._original_input_shape
+                _child.plugin._legacy_image_ops = self.plugin._legacy_image_ops[:]
+                _child.plugin._original_input_shape = self.plugin._original_input_shape
             _child.propagate_shapes_and_global_config()
 
     @property

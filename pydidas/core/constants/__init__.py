@@ -37,7 +37,6 @@ from .q_settings import *
 from .qt_presets import *
 from .unicode_greek_letters import *
 
-from . import fit_funcs
 from . import image_ops
 
 # add modules' __all__ items to package's __all__ items and unclutter the

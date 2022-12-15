@@ -6,6 +6,8 @@ Major changes
 -------------
 - Reorganized SetupScan and SetupExperiment and renamed them to ScanContext and
   ExperimentContext in the contenxts sub-package.
+- Added core.fitting sub-package which allows to easily add more fitting 
+  functions.
 
 Improvements
 ------------

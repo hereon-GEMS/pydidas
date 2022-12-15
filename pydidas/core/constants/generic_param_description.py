@@ -1028,6 +1028,18 @@ GENERIC_PARAM_DESCRIPTION = (
                 "which is worse than the threshold will be rejected as failed."
             ),
         },
+        "fit_min_peak_height": {
+            "type": float,
+            "default": None,
+            "name": "Minimum peak height to fit",
+            "choices": None,
+            "allow_None": True,
+            "unit": "",
+            "tooltip": (
+                "The minimum height a peak must have to attempt a fit. A value of "
+                "'None' will not impose any limits on the peak height."
+            ),
+        },
         ############################
         # global choice settings
         ############################
@@ -1357,7 +1369,7 @@ GENERIC_PARAM_DESCRIPTION = (
             "type": str,
             "default": "Gaussian",
             "name": "Fit function",
-            "choices": ["Gaussian", "Lorentzian", "Voigt"],
+            "choices": None,
             "unit": "",
             "allow_None": False,
             "tooltip": (

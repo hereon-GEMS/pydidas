@@ -137,26 +137,25 @@ class pyFAIintegrationBase(ProcPlugin):
         Parameter will be used. If not, the global QSetting detector mask
         will be used.
         """
+        self._mask = None
         _mask_param = self.get_param_value("det_mask")
         _mask_qsetting = self.q_settings_get_value("user/det_mask")
         if _mask_param != pathlib.Path():
             if os.path.isfile(_mask_param):
                 self._mask = import_data(_mask_param)
-                return
-            logger.warning(
-                (
-                    'The locally defined detector mask file "%s" does not exist.'
-                    " Falling back to the default defined in the global "
-                    "settings."
-                ),
-                _mask_param,
-            )
-        if os.path.isfile(_mask_qsetting):
+            else:
+                logger.warning(
+                    (
+                        "The locally defined detector mask file '%s' does not exist."
+                        " Falling back to the default defined in the global settings."
+                    ),
+                    _mask_param,
+                )
+        if os.path.isfile(_mask_qsetting) and self._mask is None:
             self._mask = import_data(_mask_qsetting)
+        if self._mask is not None and len(self._legacy_image_ops) > 0:
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
-        else:
-            self._mask = None
 
     def _prepare_pyfai_method(self):
         """

@@ -18,7 +18,8 @@ Improvements
 
 Bugfixes
 --------
-
+- Fixed an issue with rois and locally (i.e. in the plugin) declared masks in
+  pyFAIintegrationBase plugin.
 
 =======
 v0.1.13

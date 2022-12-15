@@ -27,9 +27,8 @@ import unittest
 import numpy as np
 
 from pydidas.core import UserConfigError, Dataset
-from pydidas.core.constants.fit_funcs import gaussian, lorentzian, voigt
 from pydidas.plugins import PluginCollection, BasePlugin
-
+from pydidas.core.fitting import FitFuncMeta
 
 PLUGIN_COLLECTION = PluginCollection()
 
@@ -67,15 +66,17 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
         plugin.set_param_value("fit_upper_limit", _high)
+        plugin.calculate_result_shape()
         return plugin
 
     def create_gauss_plugin_with_dummy_fit(self):
         plugin = self.create_generic_plugin()
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         plugin.pre_execute()
         _startguess = plugin._calc_param_start_guess()
-        plugin._fit_params = dict(zip(plugin._fitparam_labels, _startguess))
+        plugin._fit_params = dict(zip(plugin._config["param_labels"], _startguess))
         self._dummy_metadata = {"test_meta": 123}
         plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
         return plugin
@@ -109,45 +110,49 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_func", "Gaussian")
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
-        self.assertEqual(plugin._func, gaussian)
-        self.assertEqual(plugin._fitparam_labels, ["amplitude", "sigma", "center"])
-        self.assertEqual(plugin._fitparam_startpoints, [])
-        self.assertEqual(plugin._fitparam_bounds_low, [0, 0, -np.inf])
-        self.assertEqual(plugin._fitparam_bounds_high, [np.inf, np.inf, np.inf])
+        self.assertEqual(plugin._fitter, FitFuncMeta.get_fitter("Gaussian"))
+        self.assertEqual(
+            plugin._config["param_labels"], ["amplitude", "sigma", "center"]
+        )
+        self.assertEqual(plugin._config["bounds_low"], [0, 0, -np.inf])
+        self.assertEqual(plugin._config["bounds_high"], [np.inf, np.inf, np.inf])
 
     def test_pre_execute__lorentzian(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin.set_param_value("fit_func", "Lorentzian")
         plugin.pre_execute()
-        self.assertEqual(plugin._func, lorentzian)
+        self.assertEqual(plugin._fitter, FitFuncMeta.get_fitter("Lorentzian"))
         self.assertEqual(
-            plugin._fitparam_labels, ["amplitude", "gamma", "center", "background_p0"]
+            plugin._config["param_labels"],
+            ["amplitude", "gamma", "center", "background_p0"],
         )
-        self.assertEqual(plugin._fitparam_startpoints, [])
-        self.assertEqual(plugin._fitparam_bounds_low, [0, 0, -np.inf, -np.inf])
-        self.assertEqual(plugin._fitparam_bounds_high, [np.inf, np.inf, np.inf, np.inf])
+        self.assertEqual(plugin._config["bounds_low"], [0, 0, -np.inf, -np.inf])
+        self.assertEqual(
+            plugin._config["bounds_high"], [np.inf, np.inf, np.inf, np.inf]
+        )
 
     def test_pre_execute__voigt_1st_order_bg(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin.set_param_value("fit_func", "Voigt")
         plugin.set_param_value("fit_bg_order", 1)
         plugin.pre_execute()
-        self.assertEqual(plugin._func, voigt)
+        self.assertEqual(plugin._fitter, FitFuncMeta.get_fitter("Voigt"))
         self.assertEqual(
-            plugin._fitparam_labels,
+            plugin._config["param_labels"],
             ["amplitude", "sigma", "gamma", "center", "background_p0", "background_p1"],
         )
         self.assertEqual(
-            plugin._fitparam_bounds_low, [0, 0, 0, -np.inf, -np.inf, -np.inf]
+            plugin._config["bounds_low"], [0, 0, 0, -np.inf, -np.inf, -np.inf]
         )
         self.assertEqual(
-            plugin._fitparam_bounds_high,
+            plugin._config["bounds_high"],
             [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf],
         )
 
     def test_crop_data_to_selected_range__no_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         with self.assertRaises(UserConfigError):
             plugin._crop_data_to_selected_range()
 
@@ -156,6 +161,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_lower_limit", 42)
         plugin.set_param_value("fit_upper_limit", 2)
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         with self.assertRaises(UserConfigError):
             plugin._crop_data_to_selected_range()
 
@@ -164,42 +170,49 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_lower_limit", 0)
         plugin.set_param_value("fit_upper_limit", 20)
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
-        self.assertTrue((plugin._x <= 20).all())
-        self.assertTrue((plugin._x >= 0).all())
+        self.assertTrue((plugin._data_x <= 20).all())
+        self.assertTrue((plugin._data_x >= 0).all())
 
     def test_calc_param_start_guess__no_bg(self):
         plugin = self.create_generic_plugin()
+        plugin.pre_execute()
         plugin.set_param_value("fit_bg_order", None)
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         _startguess = plugin._calc_param_start_guess()
         self.assertEqual(len(_startguess), 3)
         self.assertTrue(10 <= _startguess[0] <= 60)
-        self.assertTrue(1 <= _startguess[1] <= 5)
+        self.assertTrue(0 <= _startguess[1] <= 1)
         self.assertEqual(_startguess[2], self._peak_x)
 
     def test_calc_param_start_guess__0order_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 0)
+        plugin.pre_execute()
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         _startguess = plugin._calc_param_start_guess()
         self.assertEqual(len(_startguess), 4)
         self.assertTrue(0 <= _startguess[0] <= 50)
-        self.assertTrue(1 <= _startguess[1] <= 5)
+        self.assertTrue(0 <= _startguess[1] <= 1)
         self.assertEqual(_startguess[2], self._peak_x)
         self.assertEqual(_startguess[3], np.amin(self._data))
 
     def test_calc_param_start_guess__1order_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 1)
+        plugin.pre_execute()
         plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         _startguess = plugin._calc_param_start_guess()
         self.assertEqual(len(_startguess), 5)
         self.assertTrue(0 <= _startguess[0] <= 50)
-        self.assertTrue(1 <= _startguess[1] <= 5)
+        self.assertTrue(0 <= _startguess[1] <= 1)
         self.assertEqual(_startguess[2], self._peak_x)
         self.assertEqual(_startguess[3], np.amin(self._data))
         self.assertEqual(_startguess[4], 0)
@@ -233,7 +246,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.array, np.array(-1))
+        self.assertTrue(np.isnan(_new_data.array[0]))
 
     def test_create_result_dataset__high_std(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -245,7 +258,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.array, np.array(-1))
+        self.assertTrue(np.isnan(_new_data.array[0]))
 
     def test_create_result_dataset__peak_area_and_position(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()

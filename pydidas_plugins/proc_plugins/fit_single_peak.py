@@ -29,17 +29,9 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from pydidas.core.constants.fit_funcs import (
-    gaussian,
-    gaussian_delta,
-    lorentzian,
-    lorentzian_delta,
-    voigt,
-    voigt_delta,
-)
+
 from pydidas.core import (
     get_generic_param_collection,
-    get_generic_parameter,
     Dataset,
     UserConfigError,
     Parameter,
@@ -48,6 +40,7 @@ from pydidas.core.utils import (
     process_1d_with_multi_input_dims,
     calculate_result_shape_for_multi_input_dims,
 )
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.plugins import ProcPlugin
 
 
@@ -89,21 +82,21 @@ class FitSinglePeak(ProcPlugin):
             ),
         ),
     )
-    default_params.add_param(get_generic_parameter("fit_sigma_threshold"))
+    default_params.add_params(
+        get_generic_param_collection("fit_sigma_threshold", "fit_min_peak_height")
+    )
     input_data_dim = -1
     output_data_dim = 0
     new_dataset = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._ffunc = None
-        self._func = None
+        self.params["fit_func"].choices = list(FitFuncMeta.registry.keys())
+        self._fitter = None
         self._data = None
+        self._data_x = None
         self._details = None
-        self._fitparam_labels = []
-        self._fitparam_startpoints = []
-        self._fitparam_bounds_low = []
-        self._fitparam_bounds_high = []
+        self._fit_params = {}
         self._config = self._config | {
             "range_slice": None,
             "settings_updated_from_data": False,
@@ -125,35 +118,24 @@ class FitSinglePeak(ProcPlugin):
         """
         Set up the required functions and fit variable labels.
         """
-        self._fitparam_bounds_low = [0, 0, -np.inf]
-        self._fitparam_bounds_high = [np.inf, np.inf, np.inf]
-        if self.get_param_value("fit_func") == "Gaussian":
-            self._func = gaussian
-            self._ffunc = gaussian_delta
-            self._fitparam_labels = ["amplitude", "sigma", "center"]
-        elif self.get_param_value("fit_func") == "Lorentzian":
-            self._func = lorentzian
-            self._ffunc = lorentzian_delta
-            self._fitparam_labels = ["amplitude", "gamma", "center"]
-        elif self.get_param_value("fit_func") == "Voigt":
-            self._func = voigt
-            self._ffunc = voigt_delta
-            self._fitparam_labels = ["amplitude", "sigma", "gamma", "center"]
-            self._fitparam_bounds_low.insert(1, 0)
-            self._fitparam_bounds_high.insert(1, np.inf)
-        _bg_order = self.get_param_value("fit_bg_order")
-        if _bg_order in [0, 1]:
-            self._fitparam_labels.append("background_p0")
-            self._fitparam_bounds_low.append(-np.inf)
-            self._fitparam_bounds_high.append(np.inf)
-        if _bg_order == 1:
-            self._fitparam_labels.append("background_p1")
-            self._fitparam_bounds_low.append(-np.inf)
-            self._fitparam_bounds_high.append(np.inf)
+        self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
         self.output_data_label = self.get_param_value("output")
         self.output_data_unit = ""
         self._config["range_slice"] = None
         self._config["settings_updated_from_data"] = False
+        self._config["min_peak"] = self.get_param_value("fit_min_peak_height")
+        self._config["bounds_low"] = self._fitter.param_bounds_low.copy()
+        self._config["bounds_high"] = self._fitter.param_bounds_high.copy()
+        self._config["param_labels"] = self._fitter.param_labels.copy()
+        _bg_order = self.get_param_value("fit_bg_order")
+        if _bg_order in [0, 1]:
+            self._config["param_labels"].append("background_p0")
+            self._config["bounds_low"].append(-np.inf)
+            self._config["bounds_high"].append(np.inf)
+        if _bg_order == 1:
+            self._config["param_labels"].append("background_p1")
+            self._config["bounds_low"].append(-np.inf)
+            self._config["bounds_high"].append(np.inf)
 
     @process_1d_with_multi_input_dims
     def execute(self, data, **kwargs):
@@ -179,20 +161,26 @@ class FitSinglePeak(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
+        self._data_x = data.axis_ranges[0]
+        if self._config["min_peak"] is not None and self._config["min_peak"] < np.amax(
+            data
+        ):
+            _results = self._create_result_dataset(valid=False)
+            return _results, kwargs
         self._update_settings_from_data()
         self._crop_data_to_selected_range()
         _startguess = self._calc_param_start_guess()
         _res = least_squares(
-            self._ffunc,
+            self._fitter.delta,
             _startguess,
-            args=(self._x, self._data.array),
-            bounds=(self._fitparam_bounds_low, self._fitparam_bounds_high),
+            args=(self._data_x, self._data.array),
+            bounds=(self._config["bounds_low"], self._config["bounds_high"]),
         )
-        self._fit_params = dict(zip(self._fitparam_labels, _res.x))
+        self._fit_params = dict(zip(self._config["param_labels"], _res.x))
         _results = self._create_result_dataset()
         kwargs["fit_params"] = self._fit_params
-        kwargs["fit_func"] = self._func.__name__
-        self._details = {None: self._create_detailed_results(_results)}
+        kwargs["fit_func"] = self._fitter.function.__name__
+        self._details = {None: self._create_detailed_results(_results, _startguess)}
         return _results, kwargs
 
     def _update_settings_from_data(self):
@@ -201,12 +189,10 @@ class FitSinglePeak(ProcPlugin):
         """
         if self._config["settings_updated_from_data"]:
             return
-        if self.get_param_value("fit_func") in ["Gaussian", "Lorentzian"]:
-            _center_index = 2
-        elif self.get_param_value("fit_func") == "Voigt":
-            _center_index = 3
-        self._fitparam_bounds_low[_center_index] = np.amin(self._data.axis_ranges[0])
-        self._fitparam_bounds_high[_center_index] = np.amax(self._data.axis_ranges[0])
+        if "center" in self._config["param_labels"]:
+            _index = self._config["param_labels"].index("center")
+            self._config["bounds_low"][_index] = np.amin(self._data_x)
+            self._config["bounds_high"][_index] = np.amax(self._data_x)
         if self.get_param_value("output") == "Peak position":
             self.output_data_unit = self._data.axis_units[0]
         elif self.get_param_value("output") == "Peak area":
@@ -225,7 +211,7 @@ class FitSinglePeak(ProcPlugin):
             raise UserConfigError(
                 "The data range for the fit is too small with less than 5 data points."
             )
-        self._x = self._data.axis_ranges[0][_range]
+        self._data_x = self._data_x[_range]
         self._data = self._data[_range]
 
     def _get_cropped_range(self):
@@ -241,9 +227,7 @@ class FitSinglePeak(ProcPlugin):
             return self._config["range_slice"]
         _xlow = self.get_param_value("fit_lower_limit")
         _xhigh = self.get_param_value("fit_upper_limit")
-        _range = np.where(
-            (self._data.axis_ranges[0] >= _xlow) & (self._data.axis_ranges[0] <= _xhigh)
-        )[0]
+        _range = np.where((self._data_x >= _xlow) & (self._data_x <= _xhigh))[0]
         self._config["range_slice"] = _range
         return _range
 
@@ -257,15 +241,7 @@ class FitSinglePeak(ProcPlugin):
             The list with the starting guess for the
 
         """
-        if self.get_param_value("fit_func") == "Gaussian":
-            _startguess = self._get_gaussian_startparams()
-        elif self.get_param_value("fit_func") == "Lorentzian":
-            _startguess = self._get_lorentzian_startparams()
-        elif self.get_param_value("fit_func") == "Voigt":
-            _startguess = self._get_voigt_startparams()
-        # add the start guess for the center x0:
-        _startguess.append(self._x[self._x.size // 2])
-
+        _startguess = self._fitter.guess_fit_start_params(self._data_x, self._data)
         _bg_order = self.get_param_value("fit_bg_order")
         if _bg_order in [0, 1]:
             _startguess.append(np.amin(self._data))
@@ -273,69 +249,19 @@ class FitSinglePeak(ProcPlugin):
             _startguess.append(0)
         return _startguess
 
-    def _get_gaussian_startparams(self):
-        """
-        Get the starting parameters for the fit of a Gaussian function to the data.
-
-        Returns
-        -------
-        list
-            A list with entries for the amplitude, sigma.
-        """
-        # guess that the interval is around twice the FWHM
-        _sigma = (self._x[-1] - self._x[0]) / (2 * 2.35)
-
-        # estimate the amplitude based on the maximum data height and the
-        # height of the normalized distribution which is
-        # 1 / (sqrt(2 * PI) * sigma) = 1 / (0.40 * sigma)
-        _amp = (np.amax(self._data) - np.amin(self._data)) / (0.4 * _sigma)
-        return [_amp, _sigma]
-
-    def _get_lorentzian_startparams(self):
-        """
-        Get the starting parameters for the fit of a Lorentzian function to the data.
-
-        Returns
-        -------
-        list
-            A list with entries for the amplitude, gamma.
-        """
-        # guess that the interval is around twice the FWHM
-        _gamma = (self._x[-1] - self._x[0]) / 4
-
-        # estimate the amplitude based on the maximum data height and the
-        # height of the normalized distribution which is gamma / pi
-        _amp = (np.amax(self._data) - np.amin(self._data)) / (_gamma / np.pi)
-        return [_amp, _gamma]
-
-    def _get_voigt_startparams(self):
-        """
-        Get the starting parameters for the fit of a Voigt function to the data.
-
-        Returns
-        -------
-        list
-            A list with entries for the amplitude, sigma, gamma.
-        """
-        # guess that the interval is around twice the FWHM and that both distributions
-        # have the same wweight, i.e. the generic values are divided by 2.
-        _sigma = (self._x[-1] - self._x[0]) / (2 * 2.35) / 2
-        _gamma = (self._x[-1] - self._x[0]) / 4 / 2
-
-        # estimate the amplitude based on the maximum data height and the
-        # amplitude of a function with the average of both distributions
-        _amp_norm = ((0.4 * _sigma) + (_gamma / np.pi)) / 2
-        _amp = (np.amax(self._data) - np.amin(self._data)) / _amp_norm
-        return [_amp, _sigma, _gamma]
-
-    def _create_result_dataset(self):
+    def _create_result_dataset(self, valid=True):
         """
         Create a new Dataset from the original data and the data fit including
         all the old metadata.
 
-        Note that this method does not upate the new metadata with the fit
+        Note that this method does not update the new metadata with the fit
         parameters. The new dataset includes a second dimensions with entries
         for the raw data, the data fit and the residual.
+
+        Parameters
+        ----------
+        valid : bool, optional
+            Flat to confirm the results are valid. The default is True.
 
         Returns
         -------
@@ -343,52 +269,45 @@ class FitSinglePeak(ProcPlugin):
             The new dataset.
         """
         _output = self.get_param_value("output")
-        _datafit = self._func(list(self._fit_params.values()), self._x)
-        _residual = self._data - _datafit
-        _residual_std = abs(np.std(_residual) / np.mean(self._data))
-        if _output == "Peak area":
-            _new_data = Dataset(
-                [self._fit_params["amplitude"]], axis_labels=["Peak area"]
+        if valid:
+            _datafit = self._fitter.function(
+                list(self._fit_params.values()), self._data_x
             )
-        elif _output == "Peak position":
-            _new_data = Dataset(
-                [self._fit_params["center"]],
-                axis_labels=["Peak position"],
-                axis_units=[self._data.axis_units[0]],
-            )
-        elif _output == "Peak area and position":
-            _new_data = Dataset(
-                [self._fit_params["amplitude"], self._fit_params["center"]],
-                axis_labels=["Peak area and position"],
-            )
-        elif _output == "Fit normalized standard deviation":
-            _new_data = Dataset(
-                [_residual_std],
-                axis_labels=["Fit normalized standard deviation"],
-                axis_units=[self._data.axis_units[0]],
-            )
-        elif _output == "Peak area, position and norm. std":
-            _new_data = Dataset(
-                [
+            _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
+            if _output == "Peak area":
+                _new_data = [self._fit_params["amplitude"]]
+            elif _output == "Peak position":
+                _new_data = [self._fit_params["center"]]
+            elif _output == "Peak area and position":
+                _new_data = [self._fit_params["amplitude"], self._fit_params["center"]]
+            elif _output == "Fit normalized standard deviation":
+                _new_data = [_residual]
+            elif _output == "Peak area, position and norm. std":
+                _new_data = [
                     self._fit_params["amplitude"],
                     self._fit_params["center"],
-                    _residual_std,
-                ],
-                axis_labels=["Peak area, position and norm. std"],
-            )
-        _new_metadata = {
-            "fit_func": self._func.__name__,
-            "fit_params": self._fit_params,
-            "fit_residual_std": _residual_std,
-        }
-        _new_data.metadata = self._data.metadata | _new_metadata
-        _new_data.data_label = _output
-        _new_data.data_unit = "a.u."
-        if _residual_std >= self.get_param_value("fit_sigma_threshold") or (
-            not self._x[0] <= self._fit_params["center"] <= self._x[-1]
+                    _residual,
+                ]
+        if (
+            not valid
+            or _residual >= self.get_param_value("fit_sigma_threshold")
+            or not self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]
         ):
-            _new_data[:] = -1
-        return _new_data
+            _new_data = self._config["result_shape"][0] * [np.nan]
+        _result_dataset = Dataset(
+            _new_data,
+            data_label=_output,
+            data_unit="a.u.",
+            axis_labels=[_output],
+            axis_units=[self._data.axis_units[0]],
+        )
+        _new_metadata = {
+            "fit_func": self._fitter.func_name,
+            "fit_params": self._fit_params,
+            "fit_residual_std": _residual,
+        }
+        _result_dataset.metadata = self._data.metadata | _new_metadata
+        return _result_dataset
 
     @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):
@@ -411,7 +330,7 @@ class FitSinglePeak(ProcPlugin):
         else:
             raise ValueError("No result shape defined for the selected input")
 
-    def _create_detailed_results(self, results):
+    def _create_detailed_results(self, results, start_fit_params):
         """
         Create the detailed results for the single peak fitting.
 
@@ -428,6 +347,8 @@ class FitSinglePeak(ProcPlugin):
         ----------
         results : pydidas.core.Dataset
             The Dataset with the regular results.
+        start_fit_params : list
+            The list with the starting fit params.
 
         Returns
         -------
@@ -436,31 +357,47 @@ class FitSinglePeak(ProcPlugin):
         """
         if self._data is None:
             raise ValueError("Cannot get detailed results without input data.")
-        _xfit = np.linspace(self._x[0], self._x[-1], num=(self._x.size - 1) * 10 + 1)
+        _xfit = np.linspace(
+            self._data_x[0], self._data_x[-1], num=(self._data_x.size - 1) * 10 + 1
+        )
         _datafit = Dataset(
-            self._func(list(self._fit_params.values()), _xfit),
+            self._fitter.function(list(self._fit_params.values()), _xfit),
             axis_ranges=[_xfit],
             axis_labels=self._data.axis_labels,
             axis_units=self._data.axis_units,
             data_unit=self._data.data_unit,
         )
-        _residual = self._data - self._func(list(self._fit_params.values()), self._x)
+
+        _startfit = Dataset(
+            self._fitter.function(start_fit_params, _xfit),
+            axis_ranges=[_xfit],
+            axis_labels=self._data.axis_labels,
+            axis_units=self._data.axis_units,
+            data_unit=self._data.data_unit,
+        )
+
+        _residual = self._fitter.delta(
+            list(self._fit_params.values()), self._data_x, self._data
+        )
         _meta = "\n".join(
             f"{_key}: {results.metadata[_key]}"
             for _key in ["fit_func", "fit_params", "fit_residual_std"]
         )
         _details = {
-            "n_plots": 2,
-            "plot_titles": {0: "data and fit", 1: "residual"},
+            "n_plots": 3,
+            "plot_titles": {0: "data and fit", 1: "residual", 2: "starting guess"},
             "plot_ylabels": {
                 0: "intensity / a.u.",
                 1: "intensity / a.u.",
+                2: "intensity / a.u.",
             },
             "metadata": _meta,
             "items": [
                 {"plot": 0, "label": "input data", "data": self._data},
                 {"plot": 0, "label": "fitted_data", "data": _datafit},
                 {"plot": 1, "label": "residual", "data": _residual},
+                {"plot": 2, "label": "input data", "data": self._data},
+                {"plot": 2, "label": "starting guess", "data": _startfit},
             ],
         }
         if self.get_param_value("fit_bg_order") is not None:
@@ -468,8 +405,8 @@ class FitSinglePeak(ProcPlugin):
             if "background_p1" in self._fit_params:
                 _bg_poly.insert(0, self._fit_params["background_p1"])
             _bg = Dataset(
-                np.polyval(_bg_poly, self._x),
-                axis_ranges=[self._x],
+                np.polyval(_bg_poly, self._data_x),
+                axis_ranges=[self._data_x],
                 axis_labels=self._data.axis_labels,
                 axis_units=self._data.axis_units,
                 data_unit=self._data.data_unit,

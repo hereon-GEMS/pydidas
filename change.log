@@ -20,6 +20,8 @@ Bugfixes
 --------
 - Fixed an issue with rois and locally (i.e. in the plugin) declared masks in
   pyFAIintegrationBase plugin.
+- Fixed an issue with double initiation of the AzimuthalIntegrator in the 
+  pyFAI2dIntegration plugin.
 
 =======
 v0.1.13

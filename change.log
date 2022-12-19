@@ -15,6 +15,7 @@ Improvements
 - Improved the multiprocessing speed by optimizing the functions.
 - Added CITATION.CFF file.
 - Added licenses for texts and images.
+- Added a PyFAIazimuthalSectorIntegration plugin for arbitrary sectors.
 
 Bugfixes
 --------

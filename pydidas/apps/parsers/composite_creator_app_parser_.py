@@ -27,7 +27,7 @@ __all__ = ["composite_creator_app_parser"]
 
 import argparse
 
-from ...core.constants import GENERIC_PARAM_DESCRIPTION as PARAMS
+from ...core.constants import GENERIC_PARAMS_METADATA as PARAMS
 
 
 def composite_creator_app_parser(caller=None):

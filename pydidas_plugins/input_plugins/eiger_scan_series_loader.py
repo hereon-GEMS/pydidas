@@ -60,7 +60,7 @@ class EigerScanSeriesLoader(InputPlugin):
     eiger_dir : str, optional
         The directory name created by the Eiger detector to store its data.
         The default is "eiger9m".
-    filename_suffix : str, optional
+    eiger_filename_suffix : str, optional
         The suffix to be appended to the filename pattern (including extension)
         to make up the full filename. The default is "_data_00001.h5"
     hdf5_key : str
@@ -78,7 +78,7 @@ class EigerScanSeriesLoader(InputPlugin):
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
         "eiger_dir",
-        "filename_suffix",
+        "eiger_filename_suffix",
         "hdf5_key",
         "images_per_file",
     )
@@ -107,7 +107,7 @@ class EigerScanSeriesLoader(InputPlugin):
         _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
         _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
         _eigerkey = self.get_param_value("eiger_dir")
-        _suffix = self.get_param_value("filename_suffix", dtype=str)
+        _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
         _len_pattern = _pattern.count("#")

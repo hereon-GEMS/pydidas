@@ -29,7 +29,7 @@ __all__ = []
 # import __all__ items from modules:
 from .constants import *
 from .file_extensions import *
-from .generic_param_description import *
+from .generic_params import *
 from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
@@ -51,10 +51,10 @@ from . import file_extensions
 __all__.extend(file_extensions.__all__)
 del file_extensions
 
-from . import generic_param_description
+from . import generic_params
 
-__all__.extend(generic_param_description.__all__)
-del generic_param_description
+__all__.extend(generic_params.__all__)
+del generic_params
 
 from . import generic_param_lists
 

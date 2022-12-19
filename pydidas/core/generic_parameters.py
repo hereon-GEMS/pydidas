@@ -29,7 +29,7 @@ __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
 from pathlib import Path
 
-from .constants.generic_param_description import GENERIC_PARAM_DESCRIPTION
+from .constants.generic_params import GENERIC_PARAMS_METADATA
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
 from .hdf5_key import Hdf5key
@@ -56,7 +56,7 @@ def get_generic_parameter(refkey):
         A Parameter object.
     """
     try:
-        _config = GENERIC_PARAM_DESCRIPTION[refkey].copy()
+        _config = GENERIC_PARAMS_METADATA[refkey].copy()
     except KeyError as _ke:
         raise KeyError(
             f'No Parameter with the reference key "{refkey}" '

@@ -30,8 +30,7 @@ import pathlib
 import multiprocessing as mp
 
 import numpy as np
-import pyFAI
-import pyFAI.azimuthalIntegrator
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from silx.opencl.common import OpenCL
 
 from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI, PROC_PLUGIN_IMAGE
@@ -115,7 +114,7 @@ class pyFAIintegrationBase(ProcPlugin):
         self.load_and_set_mask()
         if self._exp_hash != hash(EXP):
             _lambda_in_A = EXP.get_param_value("xray_wavelength")
-            self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
+            self._ai = AzimuthalIntegrator(
                 dist=EXP.get_param_value("detector_dist"),
                 poni1=EXP.get_param_value("detector_poni1"),
                 poni2=EXP.get_param_value("detector_poni2"),
@@ -232,7 +231,7 @@ class pyFAIintegrationBase(ProcPlugin):
             if "deg" in self.get_param_value("azi_unit"):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
             _range = self._modulate_range(_range)
-            self._check_integration_discontinuity(*_range)
+            self._adjust_integration_discontinuity(self._ai, *_range)
         return _range
 
     def get_azimuthal_range_in_deg(self):
@@ -253,8 +252,8 @@ class pyFAIintegrationBase(ProcPlugin):
             if "rad" in self.get_param_value("azi_unit"):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
             _range = self._modulate_range(_range, np.pi / 180)
-            self._check_integration_discontinuity(
-                np.pi / 180 * _range[0], np.pi / 180 * _range[1]
+            self._adjust_integration_discontinuity(
+                self._ai, np.pi / 180 * _range[0], np.pi / 180 * _range[1]
             )
         return _range
 
@@ -280,13 +279,16 @@ class pyFAIintegrationBase(ProcPlugin):
                 return (_upper, _lower)
         return None
 
-    def _check_integration_discontinuity(self, *azi_range):
+    @staticmethod
+    def _adjust_integration_discontinuity(ai, *azi_range):
         """
         Check the position of the integration discontinuity and adjust it according
         to the integration bounds.
 
         Parameters
         ----------
+        ai : pyFAI.AzimuthalIntegrator
+            The azimuthal integrator instance.
         azi_range : tuple
             The integration range in rad.
         """
@@ -298,20 +300,20 @@ class pyFAIintegrationBase(ProcPlugin):
                 "Please adjust the boundaries and try again."
             )
         if _low >= 0:
-            if self._ai.chiDiscAtPi:
-                self._ai.reset()
-            self._ai.setChiDiscAtZero()
+            if ai.chiDiscAtPi:
+                ai.reset()
+            ai.setChiDiscAtZero()
         elif _low < 0 and _high <= np.pi:
-            if not self._ai.chiDiscAtPi:
-                self._ai.reset()
-            self._ai.setChiDiscAtPi()
+            if not ai.chiDiscAtPi:
+                ai.reset()
+            ai.setChiDiscAtPi()
         else:
             _low = np.round(_low, 5)
             _high = np.round(_high, 5)
             raise UserConfigError(
                 f"The chosen integration range ({_low}, {_high}) cannot be processed "
                 "because it cannot be represented in pyFAI. The range must be either "
-                f"in the interval [-{PI_STR}, {PI_STR}[ or [0, 2*{PI_STR}[."
+                f"in the interval [-{PI_STR}, {PI_STR}] or [0, 2*{PI_STR}]."
             )
 
     @staticmethod

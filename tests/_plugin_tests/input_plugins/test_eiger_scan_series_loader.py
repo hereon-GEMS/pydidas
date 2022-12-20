@@ -67,7 +67,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
             os.makedirs(_dir)
             _fname = os.path.join(
                 _dir,
-                f"test_{i + cls._fname_i0:05d}" + cls._params["eiger_filename_suffix"]
+                f"test_{i + cls._fname_i0:05d}" + cls._params["eiger_filename_suffix"],
             )
             cls._hdf5_fnames.append(_fname)
             _slice = slice(i * cls._n_per_file, (i + 1) * cls._n_per_file, 1)

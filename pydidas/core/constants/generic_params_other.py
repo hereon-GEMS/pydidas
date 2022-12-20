@@ -195,7 +195,6 @@ GENERIC_PARAMS_OTHER = {
             "bottom."
         ),
     },
-
     "first_index": {
         "type": int,
         "default": 0,
@@ -269,9 +268,7 @@ GENERIC_PARAMS_OTHER = {
         "choices": [None, 0, 1],
         "unit": "",
         "allow_None": True,
-        "tooltip": (
-            "The order of the background. None corresponds to no background."
-        ),
+        "tooltip": "The order of the background. None corresponds to no background.",
     },
     "fit_upper_limit": {
         "type": float,
@@ -512,4 +509,4 @@ GENERIC_PARAMS_OTHER = {
     #     'unit': '',
     #     'allow_None': False,
     #     'tooltip': },
-    }
+}

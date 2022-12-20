@@ -162,9 +162,7 @@ GENERIC_PARAMS_IMAGE_OPS = {
         "choices": None,
         "unit": "px",
         "allow_None": False,
-        "tooltip": (
-            "The image shape of the original image as loaded from the file."
-        ),
+        "tooltip": "The image shape of the original image as loaded from the file.",
     },
     "datatype": {
         "type": None,

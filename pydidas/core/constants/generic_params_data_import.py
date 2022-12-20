@@ -160,9 +160,7 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": (
-            "For hdf5 background image files: The image number in the dataset"
-        ),
+        "tooltip": "For hdf5 background image files: The image number in the dataset",
     },
     "images_per_file": {
         "type": int,

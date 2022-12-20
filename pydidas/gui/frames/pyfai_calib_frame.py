@@ -15,34 +15,9 @@
 #
 # Parts of this file are adapted based on the pyfai-calib widget which is distributed
 # under the license given below:
-#
-# /*##########################################################################
-#
-# Copyright (C) 2016-2018 European Synchrotron Radiation Facility
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# ###########################################################################*/
-
 
 """
-Module with the PyfaiCalibFrame which is a subclassed pyfai-calib2 widget
+Module with the PyfaiCalibFrame which is roughly based on the pyfai-calib2 window
 to be used within pydidas.
 """
 
@@ -58,11 +33,18 @@ import functools
 
 from qtpy import QtWidgets, QtGui, QtCore
 import pyFAI
-from pyFAI.app.calib2 import parse_options, setup_model
+from pyFAI.app import calib2
 from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.utils import projecturl
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
+from pyFAI.gui.tasks import (
+    ExperimentTask,
+    MaskTask,
+    PeakPickingTask,
+    GeometryTask,
+    IntegrationTask,
+)
 
 from ...core import constants
 from ...widgets import BaseFrame
@@ -70,6 +52,26 @@ from ...contexts import ExperimentContext
 
 
 EXP = ExperimentContext()
+
+
+def create_calib_tasks():
+    """
+    Create the tasks for the calibration.
+
+    Returns
+    -------
+    tasks : list
+        The list with the tasks.
+
+    """
+    tasks = [
+        ExperimentTask.ExperimentTask(),
+        MaskTask.MaskTask(),
+        PeakPickingTask.PeakPickingTask(),
+        GeometryTask.GeometryTask(),
+        IntegrationTask.IntegrationTask(),
+    ]
+    return tasks
 
 
 def get_pyfai_calib_icon_path():
@@ -105,23 +107,32 @@ class PyfaiCalibFrame(BaseFrame):
     def __init__(self, parent=None, **kwargs):
         BaseFrame.__init__(self, parent, **kwargs)
         self._setup_pyfai_context()
-        self._CALIB_CONTEXT.setParent(self)
+        self._tasks = create_calib_tasks()
 
+    def _setup_pyfai_context(self):
+        """
+        Setup the context for the pyfai calibration.
+        """
+        _PYFAI_SETTINGS = QtCore.QSettings(
+            QtCore.QSettings.IniFormat,
+            QtCore.QSettings.UserScope,
+            "pyfai",
+            "pyfai-calib2",
+            None,
+        )
+        CalibrationContext._releaseSingleton()
+        _calib_context = CalibrationContext(_PYFAI_SETTINGS)
+        _calib_context.restoreSettings()
+        options = calib2.parse_options()
+        calib2.setup_model(_calib_context.getCalibrationModel(), options)
+        self._calibration_context = _calib_context
+        self._calibration_context.setParent(self)
+
+    def build_frame(self):
+        """
+        Build the frame with all required widgets.
+        """
         self.setUpdatesEnabled(False)
-        self._list = QtWidgets.QListWidget(self)
-        self._list.setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
-        )
-        self._list.setFixedWidth(150)
-        self._help = QtWidgets.QPushButton(self)
-        self._help.setSizePolicy(
-            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
-        )
-        self._stack = QtWidgets.QStackedWidget(self)
-        self._stack.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
-        )
-
         self.create_label(
             "title",
             "pyFAI calibration",
@@ -129,117 +140,94 @@ class PyfaiCalibFrame(BaseFrame):
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
-        self.add_any_widget("list", self._list, gridPos=(1, 0, 1, 1))
-        self.add_any_widget("help", self._help, gridPos=(2, 0, 1, 1))
-        self.add_any_widget("help", self._stack, gridPos=(1, 1, 2, 1))
+        self.add_any_widget(
+            "task_list",
+            QtWidgets.QListWidget(),
+            fixedWidth=150,
+            sizePolicy=constants.FIX_EXP_POLICY,
+            gridPos=(1, 0, 1, 1),
+        )
+        _text = (
+            "Online help"
+            if projecturl.get_documentation_url("").startswith("http")
+            else "Help"
+        )
+        self.create_button("but_help", _text, gridPos=(2, 0, 1, 1), fixedWidth=150)
+        self.add_any_widget(
+            "task_stack",
+            QtWidgets.QStackedWidget(),
+            gridPos=(1, 1, 2, 1),
+        )
+        for task in self._tasks:
+            self._widgets["task_stack"].addWidget(task)
+        self.setUpdatesEnabled(True)
 
-        model = self._CALIB_CONTEXT.getCalibrationModel()
-
-        self.__menu_connections = {}
-        self.__tasks = self.createTasks()
-        for task in self.__tasks:
-            task.nextTaskRequested.connect(self.nextTask)
-            item = MenuItem(self._list)
-            item.setText(task.windowTitle())
-            item.setIcon(task.windowIcon())
-            self._stack.addWidget(task)
-            self.__menu_connections[item.text()] = task
+    def connect_signals(self):
+        """
+        Connect the required signals to run the pyFAI calibration.
+        """
+        self._widgets["task_list"].currentRowChanged.connect(
+            self._widgets["task_stack"].setCurrentIndex
+        )
+        self._widgets["but_help"].clicked.connect(self._display_help)
+        for task in self._tasks:
+            task.nextTaskRequested.connect(self.display_next_task)
+            _menu_item = MenuItem(self._widgets["task_list"])
+            _menu_item.setText(task.windowTitle())
+            _menu_item.setIcon(task.windowIcon())
             task.warningUpdated.connect(
-                functools.partial(self.__updateTaskState, task, item)
+                functools.partial(self._update_task_state, task, _menu_item)
             )
-
-        if len(self.__tasks) > 0:
-            self._list.setCurrentRow(0)
+        if len(self._tasks) > 0:
+            self._widgets["task_list"].setCurrentRow(0)
             # Hide the nextStep button of the last task
             task.setNextStepVisible(False)
 
-        self.setModel(model)
-        self._list.currentRowChanged.connect(self._stack.setCurrentIndex)
-
-        url = projecturl.get_documentation_url("")
-        if url.startswith("http"):
-            self._help.setText("Online help...")
-        self._helpText = self._help.text()
-        self._help.clicked.connect(self.__displayHelp)
-        self.setUpdatesEnabled(True)
-
-    def _setup_pyfai_context(self):
+    def finalize_ui(self):
         """
-        Setup the context for the pyfai calibration.
+        Run the UI finalization after creating widgets and connecting signals.
         """
-        PYFAI_SETTINGS = QtCore.QSettings(
-            QtCore.QSettings.IniFormat,
-            QtCore.QSettings.UserScope,
-            "pyfai",
-            "pyfai-calib2",
-            None,
-        )
+        self.setup_calibration_model()
 
-        CalibrationContext._releaseSingleton()
-        _calib_context = CalibrationContext(PYFAI_SETTINGS)
-        _calib_context.restoreSettings()
-        options = parse_options()
-        setup_model(_calib_context.getCalibrationModel(), options)
-        self._CALIB_CONTEXT = _calib_context
-
-    def __displayHelp(self):
-        subpath = "usage/cookbook/calib-gui/index.html"
-        url = projecturl.get_documentation_url(subpath)
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
-
-    def __updateTaskState(self, task, item):
-        warnings = task.nextStepWarning()
-        item.setWarnings(warnings)
-
-    def update_stack(self, text):
-        w = self.__menu_connections[text]
-        self._stack.setCurrentWidget(w)
-
-    def closeEvent(self, event):
-        event.accept()
-        for task in self.__tasks:
-            task.aboutToClose()
-
-    def createTasks(self):
-        # Tasks must be imported here, a global import will cause errors
-        # because they will create QtWidgets before the QtApplication
-        # is instantiated.
-        from pyFAI.gui.tasks import (
-            ExperimentTask,
-            MaskTask,
-            PeakPickingTask,
-            GeometryTask,
-            IntegrationTask,
-        )
-
-        tasks = [
-            ExperimentTask.ExperimentTask(),
-            MaskTask.MaskTask(),
-            PeakPickingTask.PeakPickingTask(),
-            GeometryTask.GeometryTask(),
-            IntegrationTask.IntegrationTask(),
-        ]
-        return tasks
-
-    def model(self):
-        return self.__model
-
-    def setModel(self, model):
-        self.__model = model
-        if len(self.__model.markerModel()) == 0:
+    def setup_calibration_model(self):
+        """
+        Setup the calibration model from the context.
+        """
+        self._model = self._calibration_context.getCalibrationModel()
+        if len(self._model.markerModel()) == 0:
             origin = MarkerModel.PixelMarker("Origin", 0, 0)
-            self.__model.markerModel().add(origin)
-        for task in self.__tasks:
-            task.setModel(self.__model)
+            self._model.markerModel().add(origin)
+        for task in self._tasks:
+            task.setModel(self._model)
 
-    def nextTask(self):
-        index = self._list.currentRow() + 1
-        if index < self._list.count():
-            self._list.setCurrentRow(index)
+    @QtCore.Slot()
+    def _display_help(self):
+        """
+        Display the help for the pyFAI calibration.
+        """
+        _url = projecturl.get_documentation_url("usage/cookbook/calib-gui/index.html")
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(_url))
 
+    @QtCore.Slot(object, object)
+    def _update_task_state(self, task, item):
+        item.setWarnings(task.nextStepWarning())
+
+    @QtCore.Slot()
+    def display_next_task(self):
+        """
+        Display the next task in the QStackedWidget.
+        """
+        _index = self._widgets["task_list"].currentRow() + 1
+        if _index < self._widgets["task_list"].count():
+            self._widgets["task_list"].setCurrentRow(_index)
+
+    @QtCore.Slot()
     def _store_geometry(self):
-        geo = self.model().fittedGeometry()
-        det = self.model().experimentSettingsModel().detector()
+        """
+        Store the fitted geometry in the ExperimentContext.
+        """
+        geo = self._model.fittedGeometry()
+        det = self._model.experimentSettingsModel().detector()
         EXP.set_param_value("xray_wavelength", geo.wavelength().value())
         EXP.set_param_value("detector_dist", geo.distance().value())
         EXP.set_param_value("detector_poni1", geo.poni1().value())

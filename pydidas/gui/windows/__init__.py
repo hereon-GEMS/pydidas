@@ -33,6 +33,7 @@ from .image_series_operations_window import *
 from .global_settings_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
+from .qt_paths_window import *
 from .show_detailed_plugin_results_window import *
 from .tweak_plugin_parameter_window import *
 from .user_config_window import *
@@ -73,6 +74,11 @@ from . import pydidas_window
 
 __all__.extend(pydidas_window.__all__)
 del pydidas_window
+
+from . import qt_paths_window
+
+__all__.extend(qt_paths_window.__all__)
+del qt_paths_window
 
 from . import show_detailed_plugin_results_window
 

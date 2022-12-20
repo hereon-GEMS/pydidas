@@ -16,6 +16,7 @@ Improvements
 - Added CITATION.CFF file.
 - Added licenses for texts and images.
 - Added a PyFAIazimuthalSectorIntegration plugin for arbitrary sectors.
+- Added a menu entry in "help" to show the paths to the log and config files.
 
 Bugfixes
 --------

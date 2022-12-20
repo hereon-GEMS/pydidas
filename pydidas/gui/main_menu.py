@@ -54,6 +54,7 @@ from .windows import (
     FeedbackWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
+    QtPathsWindow,
 )
 
 
@@ -214,6 +215,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "Open documentation in default web browser", self
         )
         self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
+        self._actions["open_paths"] = QtWidgets.QAction("Pydidas paths", self)
         self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
@@ -249,6 +251,9 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["open_about"].triggered.connect(
             partial(self.create_and_show_temp_window, AboutWindow)
+        )
+        self._actions["open_paths"].triggered.connect(
+            partial(self.create_and_show_temp_window, QtPathsWindow)
         )
         self._actions["open_feedback"].triggered.connect(
             partial(self.create_and_show_temp_window, FeedbackWindow)
@@ -289,6 +294,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions["open_documentation_browser"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_feedback"])
+        _help_menu.addAction(self._actions["open_paths"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)

@@ -91,9 +91,14 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         list
             The list with the starting fit parameters.
         """
+        if amin(y) < 0:
+            y = y - amin(y)
+        _high_x = where(y >= 0.5 * amax(y))[0]
+        if _high_x.size == 0:
+            return [0, (x[-1] - x[0]) / 3, (x[-1] - x[0]) / 3, (x[0] + x[-1]) / 2]
+
         # guess that both distributions have the same weight, i.e. the generic values
         # are divided by 2:
-        _high_x = where(y >= 0.5 * amax(y))[0]
         _sigma = 0.3 * (x[_high_x[-1]] - x[_high_x[0]])
         _gamma = 0.3 * (x[_high_x[-1]] - x[_high_x[0]])
 

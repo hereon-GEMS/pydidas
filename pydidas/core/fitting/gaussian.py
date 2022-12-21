@@ -98,8 +98,12 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
         list
             The list with the starting fit parameters.
         """
+        if amin(y) < 0:
+            y = y - amin(y)
         # get the points where the function value is larger than half the maximum
         _high_x = where(y >= 0.5 * amax(y))[0]
+        if _high_x.size == 0:
+            return [0, (x[-1] - x[0]) / 5, (x[0] + x[-1]) / 2]
         _sigma = (x[_high_x[-1]] - x[_high_x[0]]) / 2.35
 
         # estimate the amplitude based on the maximum data height and the
@@ -107,5 +111,4 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
         # 1 / (sqrt(2 * PI) * sigma) = 1 / (0.40 * sigma)
         _amp = (amax(y) - amin(y)) * 2.5 * _sigma
         _center = x[y.argmax()]
-
         return [_amp, _sigma, _center]

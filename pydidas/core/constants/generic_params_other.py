@@ -288,23 +288,6 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": False,
         "tooltip": "The lower limit (in the x-axis´ unit) to the fit region.",
     },
-    ########################
-    # global choice settings
-    ########################
-    "use_global_mask": {
-        "type": int,
-        "default": 1,
-        "name": "Use global mask",
-        "choices": [True, False],
-        "unit": "",
-        "allow_None": False,
-        "tooltip": (
-            "Select 'True' to use the global settings for the detector mask and "
-            "mask value. A 'False' settings uses the local mask settings. Note: "
-            "The mask value will not be used for integrating but only for "
-            "presentation or by using the MaskImage plugin."
-        ),
-    },
     ############################
     # Autosave results settings
     ############################

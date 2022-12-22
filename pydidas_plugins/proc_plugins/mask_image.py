@@ -44,7 +44,7 @@ class MaskImage(ProcPlugin):
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = ParameterCollection(
-        get_generic_parameter("use_global_mask"),
+        get_generic_parameter("use_global_det_mask"),
         get_generic_parameter("det_mask"),
         get_generic_parameter("det_mask_val"),
     )
@@ -60,9 +60,9 @@ class MaskImage(ProcPlugin):
 
     def pre_execute(self):
         """
-        Check the use_global_mask Parameter and load the mask image.
+        Check the use_global_det_mask Parameter and load the mask image.
         """
-        if self.get_param_value("use_global_mask"):
+        if self.get_param_value("use_global_det_mask"):
             _maskfile = self.q_settings_get_value("user/det_mask")
             self._maskval = self.q_settings_get_value("user/det_mask_val", float)
         else:

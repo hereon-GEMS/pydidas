@@ -109,7 +109,7 @@ class pyFAIintegrationBase(ProcPlugin):
 
     def pre_execute(self):
         """
-        Check the use_global_mask Parameter and load the mask image.
+        Check and load the mask and set up the AzimuthalIntegrator.
         """
         self.load_and_set_mask()
         if self._exp_hash != hash(EXP):

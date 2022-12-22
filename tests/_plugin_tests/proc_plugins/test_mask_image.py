@@ -67,7 +67,7 @@ class TestMaskImage(unittest.TestCase):
     def test_pre_execute__local_mask(self):
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
+        plugin.set_param_value("use_global_det_mask", False)
         plugin.set_param_value("det_mask", _maskfilename)
         plugin.pre_execute()
         self.assertTrue((plugin._mask == self._mask).all())
@@ -76,7 +76,7 @@ class TestMaskImage(unittest.TestCase):
         _maskfilename = self.create_mask()
         self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", True)
+        plugin.set_param_value("use_global_det_mask", True)
         plugin.pre_execute()
         self.assertTrue(np.equal(plugin._mask, self._mask).all())
 
@@ -84,7 +84,7 @@ class TestMaskImage(unittest.TestCase):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
+        plugin.set_param_value("use_global_det_mask", False)
         plugin.set_param_value("det_mask", _maskfilename)
         plugin.set_param_value("det_mask_val", _maskval)
         plugin.pre_execute()
@@ -97,7 +97,7 @@ class TestMaskImage(unittest.TestCase):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_mask", False)
+        plugin.set_param_value("use_global_det_mask", False)
         plugin.set_param_value("det_mask", _maskfilename)
         plugin.set_param_value("det_mask_val", _maskval)
         plugin._legacy_image_ops = [

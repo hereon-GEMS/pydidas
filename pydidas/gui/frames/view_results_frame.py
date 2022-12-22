@@ -28,6 +28,7 @@ __all__ = ["ViewResultsFrame"]
 from qtpy import QtCore, QtWidgets
 
 from ...core import get_generic_param_collection
+from ...contexts import PydidasDirDialog
 from ...workflow import WorkflowResults, result_io
 from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
@@ -54,6 +55,12 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     def __init__(self, parent=None, **kwargs):
         ViewResultsFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
+        self.__import_dialog = PydidasDirDialog(
+            parent=self,
+            caption="Workflow results directory",
+            dialog=QtWidgets.QFileDialog.getExistingDirectory,
+            qsettings_ref="WorkflowResults__import",
+        )
 
     def finalize_ui(self):
         """

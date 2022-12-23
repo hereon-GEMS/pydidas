@@ -8,6 +8,8 @@ Major changes
   ExperimentContext in the contenxts sub-package.
 - Added core.fitting sub-package which allows to easily add more fitting 
   functions.
+- Moved the global detector mask from the settings to the ExperimentContext
+  to allow easier switching between processing different experiments.
 
 Improvements
 ------------
@@ -26,6 +28,8 @@ Bugfixes
   pyFAIintegrationBase plugin.
 - Fixed an issue with double initiation of the AzimuthalIntegrator in the 
   pyFAI2dIntegration plugin.
+- Fixed an issue with decorator for multi-dim processing if the Plugin does not
+  have detailed results.
 
 =======
 v0.1.13

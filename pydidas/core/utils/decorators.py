@@ -118,8 +118,9 @@ def process_1d_with_multi_input_dims(method):
 
             _point = insert_item_in_tuple(_params, _dim_to_process, None)
             _detail_identifier = data.get_description_of_point(_point)
-            _details[_detail_identifier] = self._details[None].copy()
-            del self._details[None]
+            if hasattr(self, "_details"):
+                _details[_detail_identifier] = self._details[None].copy()
+                del self._details[None]
 
             _output_slices = insert_item_in_tuple(
                 _params, _dim_to_process, slice(0, _single_result.size)
@@ -143,7 +144,8 @@ def process_1d_with_multi_input_dims(method):
             _results[_output_slices] = _single_result
         if _results.shape[_dim_to_process] == 1:
             _results = _results.squeeze(_dim_to_process)
-        self._details = _details
+        if hasattr(self, "_details"):
+            self._details = _details
         return _results, _new_kws
 
     _implementation.__doc__ = method.__doc__

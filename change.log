@@ -17,7 +17,9 @@ Improvements
 - Added licenses for texts and images.
 - Added a PyFAIazimuthalSectorIntegration plugin for arbitrary sectors.
 - Added a menu entry in "help" to show the paths to the log and config files.
-
+- Added the "property_dict" property to Dataset to get all properties at once,
+  for example for copying.
+  
 Bugfixes
 --------
 - Fixed an issue with rois and locally (i.e. in the plugin) declared masks in

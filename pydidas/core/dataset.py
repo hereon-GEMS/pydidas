@@ -95,8 +95,7 @@ class Dataset(np.ndarray):
 
     def __getitem__(self, key):
         """
-        Overwrite the generic __getitem__ method to catch the slicing
-        keys.
+        Overwrite the generic __getitem__ method to catch the slicing keys.
 
         Parameters
         ----------
@@ -128,7 +127,7 @@ class Dataset(np.ndarray):
 
     def __update_keys_from_object(self, obj):
         """
-        Update the axis keys from the original object
+        Update the axis keys from the original object.
 
         Parameters
         ----------
@@ -241,29 +240,6 @@ class Dataset(np.ndarray):
         self.axis_units = _axis_units
         self.axis_ranges = _axis_ranges
 
-    def transpose(self, *axes):
-        """
-        Overload the generic transpose method to transpose the metadata as
-        well.
-
-        Parameters
-        ----------
-        *axes : tuple
-            The axes to be transposed. If not given, the generic order is used.
-
-        Returns
-        -------
-        pydidas.core.Dataset
-            The transposed Dataset.
-        """
-        if axes is tuple():
-            axes = tuple(np.arange(self.ndim)[::-1])
-        _new = np.ndarray.transpose(deepcopy(self), axes)
-        _new.axis_labels = [self.axis_labels[_index] for _index in axes]
-        _new.axis_units = [self.axis_units[_index] for _index in axes]
-        _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
-        return _new
-
     def get_rebinned_copy(self, binning):
         """
         Get a binned copy of the Dataset.
@@ -311,6 +287,18 @@ class Dataset(np.ndarray):
     # ##########
     # Properties
     # ##########
+
+    @property
+    def property_dict(self):
+        """
+        Get a copy of the properties dictionary.
+
+        Returns
+        -------
+        dict
+            A dictionary with copies of all properties.
+        """
+        return {_key: deepcopy(_val) for _key, _val in self._meta.items()}
 
     @property
     def data_unit(self):
@@ -632,6 +620,31 @@ class Dataset(np.ndarray):
     # ############################################
     # Reimplementations of generic ndarray methods
     # ############################################
+
+    def transpose(self, *axes):
+        """
+        Overload the generic transpose method to transpose the metadata as well.
+
+        Note that contrary to the generic method, transpose creates a deepcopy of the
+        data and not only a view to prevent up inconsistent metadata.
+
+        Parameters
+        ----------
+        *axes : tuple
+            The axes to be transposed. If not given, the generic order is used.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The transposed Dataset.
+        """
+        if axes is tuple():
+            axes = tuple(np.arange(self.ndim)[::-1])
+        _new = np.ndarray.transpose(deepcopy(self), axes)
+        _new.axis_labels = [self.axis_labels[_index] for _index in axes]
+        _new.axis_units = [self.axis_units[_index] for _index in axes]
+        _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
+        return _new
 
     def flatten(self, order="C"):
         """

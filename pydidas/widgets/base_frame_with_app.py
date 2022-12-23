@@ -26,8 +26,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["BaseFrameWithApp"]
 
-import pathlib
-
 from qtpy import QtCore
 
 from ..core import BaseApp
@@ -123,40 +121,8 @@ class BaseFrameWithApp(BaseFrame):
             frame's state.
         """
         _index, _state = super().export_state()
-        _app_params = self._app.get_param_values_as_dict(filter_types_for_export=True)
-        _app_state = {
-            "params": _app_params,
-            "config": self.__get_app_config_for_saving(),
-        }
-        _state["app"] = _app_state
+        _state["app"] = self._app.export_state()
         return _index, _state
-
-    def __get_app_config_for_saving(self):
-        """
-        Get the Application config for saving.
-
-        This method sanitized the config for saving and is responsible for
-        conversions to yaml-dumpable formats.
-
-        Returns
-        -------
-        dict
-            The Application config in processed form.
-        """
-        _cfg = self._app._config.copy()
-        _newcfg = {}
-        for _key, _item in _cfg.items():
-            if isinstance(_item, range):
-                _newcfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
-            if isinstance(_item, slice):
-                _newcfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
-            if isinstance(_item, pathlib.Path):
-                _newcfg[_key] = str(_item)
-
-        _cfg.update(_newcfg)
-        if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
-            _cfg["shared_memory"] = "::restore::True"
-        return _cfg
 
     def restore_state(self, state):
         """
@@ -171,47 +137,5 @@ class BaseFrameWithApp(BaseFrame):
             A dictionary with 'params', 'app' and 'visibility' keys and the
             respective information for all.
         """
-        for _key, _val in state["app"]["params"].items():
-            self._app.set_param_value(_key, _val)
-        _restored_cfg = self.__process_app_config_from_import(
-            state["app"]["config"].copy()
-        )
-        self._app._config = _restored_cfg
-        if (
-            "shared_memory" in _restored_cfg
-            and _restored_cfg["shared_memory"] == "::restore::True"
-        ):
-            self._app._config["shared_memory"] = {}
-            self._app.initialize_shared_memory()
+        self._app.import_state(state["app"])
         super().restore_state(state)
-
-    def __process_app_config_from_import(self, config):
-        """
-        Process settings which have been modified for export and restore
-        the original values.
-
-        Parameters
-        ----------
-        config : dict
-            The input config dictionary.
-
-        Returns
-        -------
-        config : dict
-            The updated config dictionary
-        """
-        _newcfg = {}
-        for _key, _item in config.items():
-            if not isinstance(_item, str):
-                continue
-            if _item.startswith("::range::") or _item.startswith("::slice::"):
-                _, _, _start, _stop, _step = _item.split("::")
-                _start = None if _start == "None" else int(_start)
-                _stop = None if _stop == "None" else int(_stop)
-                _step = None if _step == "None" else int(_step)
-            if _item.startswith("::range::"):
-                _newcfg[_key] = range(_start, _stop, _step)
-            if _item.startswith("::slice::"):
-                _newcfg[_key] = slice(_start, _stop, _step)
-        config.update(_newcfg)
-        return config

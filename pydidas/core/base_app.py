@@ -25,6 +25,7 @@ __status__ = "Development"
 __all__ = ["BaseApp"]
 
 from copy import copy
+from pathlib import Path
 
 from .parameter_collection import ParameterCollection
 from .object_with_parameter_collection import ObjectWithParameterCollection
@@ -157,6 +158,65 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return copy(self._config)
 
+    def export_state(self):
+        """
+        Get the sanitized app Parameters and configuration for export.
+
+        Returns
+        -------
+        dict
+            The state dictionary.
+        """
+        _cfg = self.get_config()
+        _newcfg = {}
+        for _key, _item in self._config.items():
+            if isinstance(_item, range):
+                _newcfg[_key] = f"::range::{_item.start}::{_item.stop}::{_item.step}"
+            if isinstance(_item, slice):
+                _newcfg[_key] = f"::slice::{_item.start}::{_item.stop}::{_item.step}"
+            if isinstance(_item, Path):
+                _newcfg[_key] = str(_item)
+            if _key in ["scan_context", "exp_context"]:
+                _newcfg[_key] = "::None::"
+        _cfg.update(_newcfg)
+        if "shared_memory" in _cfg and _cfg["shared_memory"] != {}:
+            _cfg["shared_memory"] = "::restore::True"
+        return {
+            "params": self.get_param_values_as_dict(filter_types_for_export=True),
+            "config": _cfg,
+        }
+
+    def import_state(self, state):
+        """
+        Import a stored state including Parameters and configuration.
+
+        Parameters
+        ----------
+        state : dict
+            The stored state.
+        """
+        for _key, _val in state["params"].items():
+            self.set_param_value(_key, _val)
+        _newcfg = {}
+        for _key, _item in state["config"].items():
+            if not isinstance(_item, str):
+                continue
+            if _item.startswith("::range::") or _item.startswith("::slice::"):
+                _, _, _start, _stop, _step = _item.split("::")
+                _start = None if _start == "None" else int(_start)
+                _stop = None if _stop == "None" else int(_stop)
+                _step = None if _step == "None" else int(_step)
+            if _item.startswith("::range::"):
+                _newcfg[_key] = range(_start, _stop, _step)
+            if _item.startswith("::slice::"):
+                _newcfg[_key] = slice(_start, _stop, _step)
+            if _item == "::None::":
+                _newcfg[_key] = None
+        self._config = state["config"] | _newcfg
+        if self._config.get("shared_memory", False) == "::restore::True":
+            self._config["shared_memory"] = {}
+            self.initialize_shared_memory()
+
     def get_copy(self, slave_mode=False):
         """
         Get a copy of the App.
@@ -175,6 +235,19 @@ class BaseApp(ObjectWithParameterCollection):
         return self.__copy__(slave_mode)
 
     def __copy__(self, slave_mode=False):
+        """
+        Reimplement the generic copy method.
+
+        Parameters
+        ----------
+        slave_mode : bool, optional
+            Flag to signal the copy shall be a slave. The default is False.
+
+        Returns
+        -------
+        BaseApp
+            The copy of the app.
+        """
         _do_not_copy = self.attributes_not_to_copy_to_slave_app
         _obj_copy = type(self)()
         for _key in self.__dict__:

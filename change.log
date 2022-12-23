@@ -21,6 +21,7 @@ Improvements
 - Added a menu entry in "help" to show the paths to the log and config files.
 - Added the "property_dict" property to Dataset to get all properties at once,
   for example for copying.
+- Added import_state and export_state methods to the BaseApp
   
 Bugfixes
 --------

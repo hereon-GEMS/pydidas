@@ -25,7 +25,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["CompositeCreatorFrameBuilder"]
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets
 
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
@@ -111,7 +111,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
                 "n_files",
                 "images_per_file",
                 "bg_hdf5_frame",
-                "use_global_det_mask",
+                "detector_mask_val",
                 "roi_yhigh",
                 "threshold_high",
                 "binning",
@@ -237,17 +237,11 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             "bg_file",
             "bg_hdf5_key",
             "output_fname",
+            "detector_mask_file",
         ]:
-            _config = dict(
-                linebreak=True,
-                halign_text=QtCore.Qt.AlignLeft,
-                valign_text=QtCore.Qt.AlignBottom,
-                width_total=CONFIG_WIDGET_WIDTH,
-                width_io=CONFIG_WIDGET_WIDTH - 50,
-                width_text=CONFIG_WIDGET_WIDTH - 20,
-                width_unit=0,
-                parent_widget=self._widgets["config"],
-            )
+            _config = constants.DEFAULT_TWO_LINE_PARAM_CONFIG | {
+                "parent_widget": self._widgets["config"]
+            }
         else:
             _config = dict(
                 width_io=100,

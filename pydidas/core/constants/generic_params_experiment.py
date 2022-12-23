@@ -105,6 +105,15 @@ GENERIC_PARAMS_EXPERIMENT = {
         "allow_None": False,
         "tooltip": "The sample-detector distance.",
     },
+    "detector_mask_file": {
+        "type": "Path",
+        "default": "",
+        "name": "Detector mask file",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The path to the detector mask file.",
+    },
     "detector_poni1": {
         "type": float,
         "default": 0,

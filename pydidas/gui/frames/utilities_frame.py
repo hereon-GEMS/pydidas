@@ -55,8 +55,7 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
 
     def _add_config_windows(self):
         """
-        Add the required widgets and signals for the global configuration
-        window and create it.
+        Create the required widgets and signals for the global configuration window.
         """
         _frame = GlobalSettingsWindow()
         _frame.frame_activated(_frame.frame_index)

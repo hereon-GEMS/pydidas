@@ -98,10 +98,15 @@ The detector is defined by the following Parameters:
       - float
       - um
       - The detector pixel size in Y-direction.
+    * - detector_mask_file (optional)
+      - str
+      - n/a
+      - The path and filename for the detector mask file. This file is used in 
+        pyFAI integration plugins.
 
-The :py:data:`detector_name` is only relevant for referencing any pyFAI object but 
-is included in the metainformation and should be set correctly. The Parameters
-for numbers of pixels and pixelsize exactly what the name suggests.
+The :py:data:`detector_name` is only relevant for referencing any pyFAI object 
+but is included in the metainformation and should be set correctly. The 
+Parameters for numbers of pixels and pixelsize exactly what the name suggests.
 
 Defining the detector manually
 """"""""""""""""""""""""""""""

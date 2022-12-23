@@ -44,7 +44,7 @@ class ExperimentContextIoBase(GenericIoBase, metaclass=ExperimentContextIoMeta):
     imported_params = {}
 
     @classmethod
-    def _verify_all_entries_present(cls):
+    def _verify_all_entries_present(cls, exclude_det_mask=False):
         """
         Verify that the tmp_params dictionary holds all keys from the
         ExperimentContext.
@@ -53,6 +53,8 @@ class ExperimentContextIoBase(GenericIoBase, metaclass=ExperimentContextIoMeta):
         for _key in EXP.params:
             if _key not in cls.imported_params:
                 _missing_entries.append(_key)
+        if exclude_det_mask and "detector_mask_file" in _missing_entries:
+            _missing_entries.remove("detector_mask_file")
         if len(_missing_entries) > 0:
             _text = (
                 "The following ExperimentContext Parameters are missing:\n - "

@@ -128,7 +128,10 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.param_widgets["bg_file"].io_edited.connect(self.__selected_bg_file)
         self.param_widgets["bg_hdf5_key"].io_edited.connect(self.__selected_bg_hdf5_key)
         self.param_widgets["use_thresholds"].currentTextChanged.connect(
-            self.__toggle_threshold_selection
+            self.__toggle_use_threshold
+        )
+        self.param_widgets["use_detector_mask"].currentTextChanged.connect(
+            self.__toggle_use_det_mask
         )
         # disconnect the generic param update connections and re-route to
         # composite update method
@@ -167,7 +170,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         """
         self.__toggle_roi_selection(False)
         self.__toggle_bg_file_selection(False)
-        self.__toggle_threshold_selection(False)
+        self.__toggle_use_threshold(False)
+        self.__toggle_use_det_mask(False)
 
     def restore_state(self, state):
         """
@@ -192,7 +196,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             self._image_metadata.update()
             self.__update_n_image()
         self.__update_widgets_after_selecting_first_file()
-        self.__toggle_threshold_selection(self.get_param_value("use_thresholds"))
+        self.__toggle_use_threshold(self.get_param_value("use_thresholds"))
+        self.__toggle_use_det_mask(self.get_param_value("use_detector_mask"))
         self.__toggle_roi_selection(self.get_param_value("use_roi"))
         self.__toggle_bg_file_selection(self.get_param_value("use_bg_file"))
 
@@ -271,7 +276,13 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self._prepare_app_run()
         self._app.multiprocessing_pre_run()
         if self._app._det_mask is not None:
-            if self.get_param_value("raw_image_shape") != self._app._det_mask.shape:
+            _shape = tuple(
+                [
+                    _s // self.get_param_value("binning")
+                    for _s in self.get_param_value("raw_image_shape")
+                ]
+            )
+            if _shape != self._app._det_mask.shape:
                 raise UserConfigError(
                     "The use of the global detector mask has been selected but the "
                     "detector mask size does not match the image data size."
@@ -598,19 +609,34 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         for _key in ["roi_xlow", "roi_xhigh", "roi_ylow", "roi_yhigh"]:
             self.toggle_param_widget_visibility(_key, flag)
 
-    def __toggle_threshold_selection(self, flag):
+    def __toggle_use_threshold(self, flag):
         """
-        Show or hide the threshold selection.
+        Show or hide the threshold selection based on the flag selection.
 
         Parameters
         ----------
         flag : bool
-            The flaf with visibility information for the threshold selection.
+            The flag with visibility information for the threshold selection.
         """
         if isinstance(flag, str):
             flag = flag == "True"
         self.set_param_value("use_thresholds", flag)
         for _key in ["threshold_low", "threshold_high"]:
+            self.toggle_param_widget_visibility(_key, flag)
+
+    def __toggle_use_det_mask(self, flag):
+        """
+        Show or hide the detector mask Parameters based on the flag selection.
+
+        Parameters
+        ----------
+        flag : bool
+            The flag with visibility information for the threshold selection.
+        """
+        if isinstance(flag, str):
+            flag = flag == "True"
+        self.set_param_value("use_detector_mask", flag)
+        for _key in ["detector_mask_file", "detector_mask_val"]:
             self.toggle_param_widget_visibility(_key, flag)
 
     def __clear_entries(self, keys="all", hide=True):

@@ -54,6 +54,7 @@ class _ExperimentContext(ObjectWithParameterCollection):
         "detector_npixy",
         "detector_pxsizex",
         "detector_pxsizey",
+        "detector_mask_file",
         "detector_dist",
         "detector_poni1",
         "detector_poni2",

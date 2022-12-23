@@ -25,12 +25,8 @@ Documentation on the use of these objects is given in :ref:`scan_context`,
 Globally controlled settings
 ----------------------------
 
-Some settings used by the ExecuteWorkflowApp are controlled globally by pydidas. 
-These are:
-
-- The file path for the global detector mask file (`user/det_mask`)
-
-and for parallel processing additionally:
+Some settings for parallel processing additionally used by the 
+ExecuteWorkflowApp are controlled globally by pydidas. These are:
 
 - The number of parallel worker processes (`global/mp_n_workers`)
 - The size of the data exchange buffer (in MB) (`global/shared_buffer_size`)
@@ -70,7 +66,6 @@ these values, if required:
 
     >>> import pydidas
     >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('user/det_mask', '/scratch/config/det_mask.npy')
     >>> config.set_value('global/mp_n_workers', 2)
 
 Setup of the ExecuteWorkflowApp

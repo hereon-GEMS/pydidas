@@ -444,10 +444,10 @@ class MainMenu(QtWidgets.QMainWindow):
         if not os.path.exists(_config_dir):
             os.makedirs(_config_dir)
         _state = self.__get_window_states()
-        for _index, _widget in enumerate(self.centralWidget().frames):
-            _frameindex, _widget_state = _widget.export_state()
+        for _index, _frame in enumerate(self.centralWidget().frames):
+            _frameindex, _frame_state = _frame.export_state()
             assert _index == _frameindex
-            _state[f"frame_{_index:02d}"] = _widget_state
+            _state[f"frame_{_index:02d}"] = _frame_state
         _state["scan_context"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )

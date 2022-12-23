@@ -44,9 +44,8 @@ class MaskImage(ProcPlugin):
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = ParameterCollection(
-        get_generic_parameter("use_global_det_mask"),
-        get_generic_parameter("det_mask"),
-        get_generic_parameter("det_mask_val"),
+        get_generic_parameter("detector_mask_file"),
+        get_generic_parameter("detector_mask_val"),
     )
     input_data_dim = 2
     output_data_dim = 2
@@ -62,12 +61,8 @@ class MaskImage(ProcPlugin):
         """
         Check the use_global_det_mask Parameter and load the mask image.
         """
-        if self.get_param_value("use_global_det_mask"):
-            _maskfile = self.q_settings_get_value("user/det_mask")
-            self._maskval = self.q_settings_get_value("user/det_mask_val", float)
-        else:
-            _maskfile = self.get_param_value("det_mask")
-            self._maskval = self.get_param_value("det_mask_val")
+        _maskfile = self.get_param_value("detector_mask_file")
+        self._maskval = self.get_param_value("detector_mask_val")
         self._mask = import_data(_maskfile)
 
     def execute(self, data, **kwargs):

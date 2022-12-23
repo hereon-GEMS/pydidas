@@ -30,7 +30,6 @@ import random
 
 import numpy as np
 
-from pydidas.core import PydidasQsettings
 from pydidas.core.utils import rebin2d
 from pydidas.plugins import PluginCollection, BasePlugin
 
@@ -41,9 +40,6 @@ PLUGIN_COLLECTION = PluginCollection()
 class TestMaskImage(unittest.TestCase):
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
-        self._qsettings = PydidasQsettings()
-        self._qsettings_det_mask = self._qsettings.value("user/det_mask")
-        self._qsettings.set_value("user/det_mask", "")
         self._shape = (20, 20)
         _n = self._shape[0] * self._shape[1]
         self._mask = np.asarray([random.choice([0, 1]) for _ in range(_n)]).reshape(
@@ -53,7 +49,6 @@ class TestMaskImage(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.set_value("user/det_mask", self._qsettings_det_mask)
 
     def create_mask(self):
         _maskfilename = os.path.join(self._temppath, "mask.npy")
@@ -67,26 +62,16 @@ class TestMaskImage(unittest.TestCase):
     def test_pre_execute__local_mask(self):
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_det_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
         plugin.pre_execute()
         self.assertTrue((plugin._mask == self._mask).all())
-
-    def test_pre_execute__q_settings_mask(self):
-        _maskfilename = self.create_mask()
-        self._qsettings.set_value("user/det_mask", _maskfilename)
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_det_mask", True)
-        plugin.pre_execute()
-        self.assertTrue(np.equal(plugin._mask, self._mask).all())
 
     def test_execute__simple(self):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_det_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
-        plugin.set_param_value("det_mask_val", _maskval)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
+        plugin.set_param_value("detector_mask_val", _maskval)
         plugin.pre_execute()
         kwargs = {"key": 1, "another_key": "another_val"}
         _masked, _kwargs = plugin.execute(self._data, **kwargs)
@@ -97,9 +82,8 @@ class TestMaskImage(unittest.TestCase):
         _maskval = 0.42
         _maskfilename = self.create_mask()
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("MaskImage")()
-        plugin.set_param_value("use_global_det_mask", False)
-        plugin.set_param_value("det_mask", _maskfilename)
-        plugin.set_param_value("det_mask_val", _maskval)
+        plugin.set_param_value("detector_mask_file", _maskfilename)
+        plugin.set_param_value("detector_mask_val", _maskval)
         plugin._legacy_image_ops = [
             ["roi", (1, self._shape[0], 3, self._shape[1])],
             ["binning", 2],

@@ -10,3 +10,4 @@ detector_rot1 : -0.011062669730480734
 detector_rot2 : -0.00217214989245782
 detector_rot3 : -9.630003229973175e-08
 xray_wavelength : 0.8265613228880018
+detector_mask_file : .

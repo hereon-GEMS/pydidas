@@ -93,7 +93,7 @@ class ExperimentContextIoPoni(ExperimentContextIoBase):
         cls.imported_params = {}
         cls._update_detector_from_pyFAI(geo.detector)
         cls._update_geometry_from_pyFAI(geo)
-        cls._verify_all_entries_present()
+        cls._verify_all_entries_present(exclude_det_mask=True)
         cls._write_to_exp_settings()
 
     @classmethod

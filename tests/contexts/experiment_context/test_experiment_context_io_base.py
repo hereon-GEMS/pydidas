@@ -77,6 +77,12 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         with self.assertRaises(UserConfigError):
             EXP_IO._verify_all_entries_present()
 
+    def test_verify_all_entries_present__exclude_det_mask(self):
+        for param in EXP.params:
+            EXP_IO.imported_params[param] = True
+        del EXP_IO.imported_params["detector_mask_file"]
+        EXP_IO._verify_all_entries_present(exclude_det_mask=True)
+
     def test_write_to_exp_settings(self):
         _det_name = "Test Name"
         _energy = 123.45

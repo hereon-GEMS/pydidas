@@ -86,7 +86,6 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         "azi_sector_centers",
         "azi_sector_width",
         "int_method",
-        "det_mask",
     )
 
     def __init__(self, *args, **kwargs):

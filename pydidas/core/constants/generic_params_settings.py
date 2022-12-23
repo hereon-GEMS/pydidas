@@ -77,31 +77,22 @@ GENERIC_PARAMS_SETTINGS = {
         "allow_None": False,
         "tooltip": "The maximum size (in megapixels) of images.",
     },
-    "use_global_det_mask": {
+    "use_detector_mask": {
         "type": bool,
-        "default": True,
-        "name": "Use global detector mask",
+        "default": False,
+        "name": "Use detector mask",
         "choices": [True, False],
         "unit": "",
         "allow_None": False,
         "tooltip": (
-            "Flag to use the global detector mask file and value. If False, no "
-            "detector mask will be used."
+            "Flag to use a detector mask file and value. If False, no detector mask "
+            "will be used."
         ),
     },
-    "det_mask": {
-        "type": "Path",
-        "default": "",
-        "name": "Detector mask file",
-        "choices": None,
-        "unit": "",
-        "allow_None": False,
-        "tooltip": "The path to the detector mask file.",
-    },
-    "det_mask_val": {
+    "detector_mask_val": {
         "type": float,
         "default": 0,
-        "name": "Mask display value",
+        "name": "Masked pixels display value",
         "choices": None,
         "unit": "",
         "allow_None": False,

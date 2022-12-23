@@ -82,8 +82,10 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
         with open(self._tmppath + "yaml.yml", "r") as stream:
             _data = yaml.safe_load(stream)
         for key in EXP.params:
-            if key != "xray_energy":
+            if key not in ["xray_energy", "detector_mask_file"]:
                 self.assertEqual(EXP.get_param_value(key), _data[key])
+            if key == "detector_mask_file":
+                self.assertEqual(EXP.get_param_value(key, dtype=str), _data[key])
 
 
 if __name__ == "__main__":

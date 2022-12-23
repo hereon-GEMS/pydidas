@@ -18,6 +18,9 @@ Full list of Parameters for ExperimentContext
     The detector pixel size in X-direction.
 - detector_pxsizey (float, unit: um, default: -1)
     The detector pixel size in Y-direction.
+- detector_mask_file (str, default: .)
+    The path to the detector mask file. If empty, this defaults to no detector 
+    mask. 
 - detector_dist (float, unit: m, default: 1.0)
     The sample-detector distance.
 - detector_poni1 (float, unit: m, default: 0.0)

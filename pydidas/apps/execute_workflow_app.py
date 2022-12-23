@@ -46,6 +46,11 @@ RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 
 
+from pydidas.core.utils import pydidas_logger
+
+logger = pydidas_logger()
+
+
 class ExecuteWorkflowApp(BaseApp):
     """
     Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`
@@ -155,18 +160,20 @@ class ExecuteWorkflowApp(BaseApp):
         self._mp_tasks = np.arange(SCAN.n_points)
         if self.slave_mode:
             TREE.restore_from_string(self._config["tree_str_rep"])
-            for _key, _val in self._config["scan_vals"].items():
+            for _key, _val in self._config["scan_context"].items():
                 SCAN.set_param_value(_key, _val)
-            for _key, _val in self._config["exp_vals"].items():
+            for _key, _val in self._config["exp_context"].items():
                 EXP.set_param_value(_key, _val)
         if not self.slave_mode:
             RESULTS.update_shapes_from_scan_and_workflow()
             RESULT_SAVER.set_active_savers_and_title([])
             self._config["tree_str_rep"] = TREE.export_to_string()
-            self._config["scan_vals"] = SCAN.get_param_values_as_dict(
+            self._config["scan_context"] = SCAN.get_param_values_as_dict(
                 filter_types_for_export=True
             )
-            self._config["exp_vals"] = EXP.get_param_values_as_dict()
+            self._config["exp_context"] = EXP.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_buffer()
             self.initialize_shared_memory()
@@ -363,6 +370,12 @@ class ExecuteWorkflowApp(BaseApp):
             _flag_lock.release()
             time.sleep(0.01)
         for _node_id in self._config["result_shapes"]:
+            logger.debug("write results: %s ", _node_id)
+            logger.debug(
+                "shared array shape %s",
+                self._shared_arrays[_node_id][_buffer_pos].shape,
+            )
+            logger.debug("Tree results shape %s", TREE.nodes[_node_id].results.shape)
             self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
         _flag_lock.release()
 

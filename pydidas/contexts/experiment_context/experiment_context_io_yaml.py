@@ -64,6 +64,7 @@ class ExperimentContextIoYaml(ExperimentContextIoBase):
         for _key, _val in tmp_params.items():
             if isinstance(_val, Real) and not isinstance(_val, Integral):
                 tmp_params[_key] = float(_val)
+        tmp_params["detector_mask_file"] = str(tmp_params["detector_mask_file"])
         del tmp_params["xray_energy"]
         with open(filename, "w") as stream:
             yaml.safe_dump(tmp_params, stream)

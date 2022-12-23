@@ -58,7 +58,9 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
     "bg_file",
     "bg_hdf5_key",
     "bg_hdf5_frame",
-    "use_global_det_mask",
+    "use_detector_mask",
+    "detector_mask_file",
+    "detector_mask_val",
     "use_roi",
     "roi_xlow",
     "roi_xhigh",
@@ -79,8 +81,7 @@ COMPOSITE_CREATOR_DEFAULT_PARAMS = get_generic_param_collection(
 
 class CompositeCreatorApp(BaseApp):
     """
-    The CompositeCreatorApp can compose mosaic images of a large number of
-    individual image files.
+    Compose mosaic images of a large number of individual image files.
 
     Parameters can be passed either through the argparse module during
     command line calls or through keyword arguments in scripts.
@@ -151,7 +152,6 @@ class CompositeCreatorApp(BaseApp):
         self._config = {
             "current_fname": None,
             "current_kwargs": {},
-            "det_mask_val": None,
         }
 
     def multiprocessing_pre_run(self):
@@ -162,10 +162,7 @@ class CompositeCreatorApp(BaseApp):
         self._config["mp_pre_run_called"] = True
         _ntotal = self._image_metadata.images_per_file * self._filelist.n_files
         self._config["mp_tasks"] = range(_ntotal)
-        self._config["det_mask_val"] = float(
-            self.q_settings_get_value("user/det_mask_val")
-        )
-        self._det_mask = self.__get_detector_mask()
+        self._store_detector_mask()
 
     def prepare_run(self):
         """
@@ -201,23 +198,20 @@ class CompositeCreatorApp(BaseApp):
         self.__update_composite_image_params()
         self.__check_and_store_thresholds()
 
-    def __get_detector_mask(self):
+    def _store_detector_mask(self):
         """
-        Get the detector mask from the file specified in the global QSettings.
-
-        Returns
-        -------
-        _mask : Union[None, np.ndarray]
-            If the mask could be loaded from a numpy file, return the mask.
-            Else, None is returned.
+        Get the detector mask, if used, based on the given Parameters.
         """
-        if not self.get_param_value("use_global_det_mask"):
-            return None
-        _maskfile = self.q_settings_get_value("user/det_mask")
+        if not self.get_param_value("use_detector_mask"):
+            self._det_mask = None
+            return
+        _mask_file = self.get_param_value("detector_mask_file")
         try:
-            _mask = np.load(_maskfile)
-        except (FileNotFoundError, ValueError):
-            return None
+            _mask = np.load(_mask_file)
+        except (FileNotFoundError, ValueError, PermissionError):
+            self.set_param_value("use_detector_mask", False)
+            self._det_mask = None
+            return
         if self._image_metadata.roi is not None:
             _mask = _mask[self._image_metadata.roi]
         _bin = self.get_param_value("binning")
@@ -225,7 +219,7 @@ class CompositeCreatorApp(BaseApp):
             _mask = rebin2d(_mask, _bin)
             _mask = np.where(_mask > 0, 1, 0)
             _mask = _mask.astype(np.bool_)
-        return _mask
+        self._det_mask = _mask
 
     def __verify_number_of_images_fits_composite(self):
         """
@@ -254,8 +248,8 @@ class CompositeCreatorApp(BaseApp):
             )
         if (_nx - 1) * _ny >= _ntotal or _nx * (_ny - 1) >= _ntotal:
             raise UserConfigError(
-                "The selected composite dimensions are too large for all"
-                f" images. (nx={_nx}, ny={_ny}, n={_ntotal})"
+                "The selected composite dimensions are too large for all "
+                f"images. (nx={_nx}, ny={_ny}, n={_ntotal})"
             )
 
     def _check_and_set_bg_file(self):
@@ -440,15 +434,13 @@ class CompositeCreatorApp(BaseApp):
         """
         if self._det_mask is None:
             return image
-        if self._config["det_mask_val"] is None:
+        _mask_val = self.get_param_value("detector_mask_val")
+        if _mask_val is None:
             raise UserConfigError("No numerical value has been defined for the mask!")
-        return Dataset(
-            np.where(self._det_mask, self._config["det_mask_val"], image),
-            axis_ranges=image.axis_ranges,
-            axis_labels=image.axis_labels,
-            axis_units=image.axis_units,
-            metadata=image.metadata,
-        )
+        _masked_image = np.where(self._det_mask, _mask_val, image)
+        if isinstance(image, Dataset):
+            return Dataset(_masked_image, **image.property_dict)
+        return _masked_image
 
     def multiprocessing_post_run(self):
         """

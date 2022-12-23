@@ -92,7 +92,6 @@ class pyFAIintegrationBase(ProcPlugin):
         "azi_range_lower",
         "azi_range_upper",
         "int_method",
-        "det_mask",
     )
     input_data_dim = 2
     output_data_label = "Integrated data"
@@ -105,7 +104,6 @@ class pyFAIintegrationBase(ProcPlugin):
         self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
-        self.params["det_mask"]._Parameter__meta["optional"] = True
 
     def pre_execute(self):
         """
@@ -137,21 +135,15 @@ class pyFAIintegrationBase(ProcPlugin):
         will be used.
         """
         self._mask = None
-        _mask_param = self.get_param_value("det_mask")
-        _mask_qsetting = self.q_settings_get_value("user/det_mask")
-        if _mask_param != pathlib.Path():
-            if os.path.isfile(_mask_param):
-                self._mask = import_data(_mask_param)
+        _mask_file = EXP.get_param_value("detector_mask_file")
+        if _mask_file != pathlib.Path():
+            if os.path.isfile(_mask_file):
+                self._mask = import_data(_mask_file)
             else:
-                logger.warning(
-                    (
-                        "The locally defined detector mask file '%s' does not exist."
-                        " Falling back to the default defined in the global settings."
-                    ),
-                    _mask_param,
+                raise UserConfigError(
+                    f"Cannot load detector mask: No file with the name \n{_mask_file}"
+                    "\nexists."
                 )
-        if os.path.isfile(_mask_qsetting) and self._mask is None:
-            self._mask = import_data(_mask_qsetting)
         if self._mask is not None and len(self._legacy_image_ops) > 0:
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)

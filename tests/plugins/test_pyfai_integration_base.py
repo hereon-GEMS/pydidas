@@ -27,12 +27,13 @@ import tempfile
 import shutil
 import os
 import logging
+from pathlib import Path
 
 import pyFAI
 import numpy as np
 
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
-from pydidas.core import get_generic_parameter, PydidasQsettings
+from pydidas.core import get_generic_parameter, UserConfigError
 from pydidas.contexts import ExperimentContext
 
 
@@ -45,14 +46,11 @@ logger.setLevel(logging.ERROR)
 class TestPyFaiIntegrationBase(unittest.TestCase):
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
-        self._qsettings = PydidasQsettings()
-        self._qsettings_det_mask = self._qsettings.value("user/det_mask")
-        self._qsettings.set_value("user/det_mask", "")
         self._shape = (50, 50)
 
     def tearDown(self):
         shutil.rmtree(self._temppath)
-        self._qsettings.set_value("user/det_mask", self._qsettings_det_mask)
+        EXP.set_param_value("detector_mask_file", Path())
 
     def initialize_base_plugin(self, **kwargs):
         for key, value in [
@@ -234,35 +232,22 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             plugin.calculate_result_shape()
 
-    def test_load_and_set_mask__local_mask_value(self):
+    def test_load_and_set_mask__correct(self):
         _maskfilename, _mask = self.create_mask()
         plugin = pyFAIintegrationBase()
-        plugin.set_param_value("det_mask", _maskfilename)
+        EXP.set_param_value("detector_mask_file", _maskfilename)
         plugin.load_and_set_mask()
         self.assertTrue((plugin._mask == _mask).all())
 
-    def test_load_and_set_mask__q_settings(self):
-        _maskfilename, _mask = self.create_mask()
-        self._qsettings.set_value("user/det_mask", _maskfilename)
-        plugin = pyFAIintegrationBase()
-        plugin._original_input_shape = (123, 50)
-        plugin.load_and_set_mask()
-        self.assertTrue(np.equal(plugin._mask, _mask).all())
-
     def test_load_and_set_mask__wrong_local_mask_and_q_settings(self):
         _maskfilename, _mask = self.create_mask()
-        self._qsettings.set_value("user/det_mask", _maskfilename)
         plugin = pyFAIintegrationBase()
         plugin._original_input_shape = (123, 50)
-        plugin.set_param_value("det_mask", os.path.join(self._temppath, "no_mask.npy"))
-        plugin.load_and_set_mask()
-        self.assertTrue(np.equal(plugin._mask, _mask).all())
-
-    def test_load_and_set_mask__no_mask(self):
-        plugin = pyFAIintegrationBase()
-        plugin._original_input_shape = (123, 45)
-        plugin.load_and_set_mask()
-        self.assertIsNone(plugin._mask)
+        EXP.set_param_value(
+            "detector_mask_file", os.path.join(self._temppath, "no_mask.npy")
+        )
+        with self.assertRaises(UserConfigError):
+            plugin.load_and_set_mask()
 
     def test_pre_execute(self):
         plugin = pyFAIintegrationBase()

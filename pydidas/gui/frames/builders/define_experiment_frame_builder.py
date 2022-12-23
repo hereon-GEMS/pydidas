@@ -42,6 +42,11 @@ class DefineExperimentFrameBuilder(BaseFrame):
         """
         Build the frame and create all widgets.
         """
+        _2line_options = constants.DEFAULT_TWO_LINE_PARAM_CONFIG | {
+            "width_total": 360,
+            "width_io": 340,
+        }
+        _1line_options = dict(width_text=180, width_io=150, width_total=360)
         self.create_label(
             None,
             "Experimental setup\n",
@@ -62,7 +67,6 @@ class DefineExperimentFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )
-
         for _param in self.params.values():
             if _param.refkey == "xray_wavelength":
                 self.__create_xray_header()
@@ -70,9 +74,12 @@ class DefineExperimentFrameBuilder(BaseFrame):
                 self.__create_detector_header()
             if _param.refkey == "detector_dist":
                 self.__create_geometry_header()
-            self.create_param_widget(
-                _param, width_text=180, width_io=150, width_total=360
+            _options = (
+                _2line_options
+                if _param.refkey == "detector_mask_file"
+                else _1line_options
             )
+            self.create_param_widget(_param, **_options)
 
         self.create_spacer(None, gridPos=(-1, 0, 1, 1))
         self.create_button(

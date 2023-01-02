@@ -33,6 +33,10 @@ Bugfixes
   have detailed results.
 - Fixed an issue in the Hdf5DatasetSelector which did not display the full 
   dataset name.
+- Fixed an issue with the ShowDetailedPluginResults window which did not show 
+  the selector for multi-dim processing if another result had been displayed 
+  before.
+
 
 =======
 v0.1.13

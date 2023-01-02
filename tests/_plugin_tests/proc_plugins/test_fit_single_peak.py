@@ -250,7 +250,6 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__high_std(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin._fit_acceptance_threshold = 0.1
         plugin._fit_params["amplitude"] = 1e6
         plugin.set_param_value("output", "Peak position")
         _new_data = plugin._create_result_dataset()

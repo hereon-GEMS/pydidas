@@ -36,6 +36,7 @@ from ...core import PydidasGuiError
 from ...core.utils import get_hdf5_populated_dataset_keys, apply_qt_properties
 from ...core.constants import QT_COMBO_BOX_SIZE_POLICY
 from ..factory import CreateWidgetsMixIn
+from ..utilities import get_max_pixel_width_of_entries
 
 
 DEFAULT_FILTERS = {
@@ -185,13 +186,16 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             min_dim=_dset_filter_min_dim,
             ignore_keys=self._config["activeDsetFilters"],
         )
-        self._widgets["select_dataset"].currentTextChanged.disconnect()
-        self._widgets["select_dataset"].clear()
-        self._widgets["select_dataset"].addItems(_datasets)
-        self._widgets["select_dataset"].currentTextChanged.connect(
+        _combo = self._widgets["select_dataset"]
+        _combo.currentTextChanged.disconnect()
+        _combo.clear()
+        _combo.addItems(_datasets)
+        _combo.currentTextChanged.connect(
             self.__select_dataset
         )
         if len(_datasets) > 0:
+            _items = [_combo.itemText(i) for i in range(_combo.count())]
+            _combo.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)
             self.__select_dataset()
         else:
             self._widgets["but_view"].setEnabled(False)

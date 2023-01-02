@@ -31,6 +31,8 @@ Bugfixes
   pyFAI2dIntegration plugin.
 - Fixed an issue with decorator for multi-dim processing if the Plugin does not
   have detailed results.
+- Fixed an issue in the Hdf5DatasetSelector which did not display the full 
+  dataset name.
 
 =======
 v0.1.13

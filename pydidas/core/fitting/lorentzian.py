@@ -45,21 +45,23 @@ class Lorentzian(FitFuncBase, metaclass=FitFuncMeta):
         """
         Function to generate a Lorentzian profile for a series of x-values.
 
-        The Lorentzian has the general form
+        The Lorentzian fucntion has the general form
 
-        L(x) = A / pi * (GAMMA / 2) / ((x - x0)**2 + (GAMMA / 2)**2 ),
+        L(x) = A / pi * (GAMMA / 2) / ((x - x0)**2 + (GAMMA / 2)**2 ) + bg_0 + x * bg_1,
 
-        where A is the amplitude, GAMMA is the FWHM, x0 is the center.
+        where A is the amplitude, GAMMA is the FWHM, x0 is the center. bg_0 is an
+        optional background offset and bg_1 is the (optinoal) first order term for the
+        background.
 
         Parameters
         ----------
         c : tuple
             The tuple with the fit parameters.
-            c[0] : Amplitude
-            c[1] : Gamma
-            c[2] : Center
+            c[0] : amplitude
+            c[1] : gamma
+            c[2] : center
             c[3], optional: A background offset.
-            c[4], optional: THe polynomial coefficient for a first order background.
+            c[4], optional: The polynomial coefficient for a first order background.
         x : np.ndarray
             The x data points
 

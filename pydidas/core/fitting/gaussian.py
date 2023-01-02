@@ -48,20 +48,23 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
         The Gaussian function has the general form
 
         f(x) = A * (2 * pi)**(-0.5) / sigma * exp(-(x - mu)**2 / ( 2 * sigma**2))
+               + bg_0 + x * bg_1
 
         where A is the amplitude, mu is the expectation value, and sigma is the
         variance. A polinomial background of 0th or 1st order can be added by
         using additional coefficients.
+        bg_0 is an optional background offset and bg_1 is the (optional) first order
+        term for the background.
 
         Parameters
         ----------
         c : tuple
             The tuple with the function parameters.
-            c[0] : Amplitude
+            c[0] : amplitude
             c[1] : sigma
             c[2] : expectation value
-            c[3], optional: A background offset.
-            c[4], optional: The polynomial coefficient for a first order background.
+            c[3], optional : A background offset.
+            c[4], optional : The polynomial coefficient for a first order background.
         x : np.ndarray
             The x data points.
 

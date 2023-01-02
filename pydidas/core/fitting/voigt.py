@@ -51,12 +51,12 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         ----------
         c : tuple
             The tuple with the fit parameters.
-            c[0] : Amplitude
-            c[1] : Sigma
-            c[2] : Gamma
-            c[3] : Center
-            c[4] : Background order 0 (if used)
-            c[5] : Background order 1 (if used)
+            c[0] : amplitude
+            c[1] : sigma
+            c[2] : gamma
+            c[3] : center
+            c[4], optional : background order 0, i.e. background offset.
+            c[5], optional : background order 1, i.e. the linear background term.
         x : np.ndarray
             The x data points
 

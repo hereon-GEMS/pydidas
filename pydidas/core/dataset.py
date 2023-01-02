@@ -46,7 +46,7 @@ from pydidas.core.utils.dataset_utils import (
 
 class Dataset(np.ndarray):
     """
-    Dataset class, a subclass of a numpy ndarray with metadata.
+    Dataset class, a subclass of a numpy.ndarray with metadata.
 
     Parameters
     ----------

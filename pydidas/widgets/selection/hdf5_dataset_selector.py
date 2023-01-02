@@ -190,9 +190,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         _combo.currentTextChanged.disconnect()
         _combo.clear()
         _combo.addItems(_datasets)
-        _combo.currentTextChanged.connect(
-            self.__select_dataset
-        )
+        _combo.currentTextChanged.connect(self.__select_dataset)
         if len(_datasets) > 0:
             _items = [_combo.itemText(i) for i in range(_combo.count())]
             _combo.view().setMinimumWidth(get_max_pixel_width_of_entries(_items) + 50)

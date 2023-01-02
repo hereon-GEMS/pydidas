@@ -46,11 +46,6 @@ RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 
 
-from pydidas.core.utils import pydidas_logger
-
-logger = pydidas_logger()
-
-
 class ExecuteWorkflowApp(BaseApp):
     """
     Inherits from :py:class:`pydidas.apps.BaseApp<pydidas.apps.BaseApp>`
@@ -370,12 +365,6 @@ class ExecuteWorkflowApp(BaseApp):
             _flag_lock.release()
             time.sleep(0.01)
         for _node_id in self._config["result_shapes"]:
-            logger.debug("write results: %s ", _node_id)
-            logger.debug(
-                "shared array shape %s",
-                self._shared_arrays[_node_id][_buffer_pos].shape,
-            )
-            logger.debug("Tree results shape %s", TREE.nodes[_node_id].results.shape)
             self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
         _flag_lock.release()
 

@@ -76,7 +76,7 @@ class FitFuncBase:
         Parameters
         ----------
         c : tuple
-            the tuple with the function parameters
+            The tuple with the function parameters.
         x : np.ndarray
             The x points to calculate the function values.
         data : np.ndarray
@@ -88,3 +88,22 @@ class FitFuncBase:
             The difference of function - data
         """
         return cls.function(c, x) - data
+
+    @classmethod
+    def area(cls, c):
+        """
+        Get the peak area based on the values of the parameters.
+
+        For all normalized fitting functions, the area is equal to the amplitude term.
+
+        Parameters
+        ----------
+        c : tuple
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        float
+            The function area.
+        """
+        return c[0]

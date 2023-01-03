@@ -166,15 +166,24 @@ class FitSinglePeak(ProcPlugin):
         """
         self._data = data
         self._data_x = data.axis_ranges[0]
-        _min_peak = self._config["min_peak_height"]
-        if _min_peak is not None and _min_peak < np.amax(data):
-            _results = self._create_result_dataset(valid=False)
-
-            return _results, kwargs
+        self._crop_data_to_selected_range()
         if not self._config["settings_updated_from_data"]:
             self._update_settings_from_data()
-        self._crop_data_to_selected_range()
-        _startguess = self._calc_param_start_guess()
+
+        _min_peak = self._config["min_peak_height"]
+        if _min_peak is not None:
+            _tmp_y, bg_params = self._fitter.calculate_background_params(
+                self._data_x, self._data, self.get_param_value("fit_bg_order")
+            )
+            if np.amax(_tmp_y) < _min_peak:
+                _results = self._create_result_dataset(valid=False)
+                self._details = {
+                    None: self._create_details_for_invalid_peak(_tmp_y, bg_params)
+                }
+                return _results, kwargs
+        _startguess = self._fitter.guess_fit_start_params(
+            self._data_x, self._data, self.get_param_value("fit_bg_order")
+        )
         _res = least_squares(
             self._fitter.delta,
             _startguess,
@@ -236,24 +245,6 @@ class FitSinglePeak(ProcPlugin):
         self._config["range_slice"] = _range
         return _range
 
-    def _calc_param_start_guess(self):
-        """
-        Calculate the fit starting Parameters based on the x-range and the data.
-
-        Returns
-        -------
-        startguess : list
-            The list with the starting guess for the
-
-        """
-        _startguess = self._fitter.guess_fit_start_params(self._data_x, self._data)
-        _bg_order = self.get_param_value("fit_bg_order")
-        if _bg_order in [0, 1]:
-            _startguess.append(np.amin(self._data))
-        if _bg_order == 1:
-            _startguess.append(0)
-        return _startguess
-
     def _create_result_dataset(self, valid=True):
         """
         Create a new Dataset from the original data and the data fit including
@@ -275,6 +266,10 @@ class FitSinglePeak(ProcPlugin):
         """
         _output = self.get_param_value("output")
         _residual = np.nan
+        if valid and not (
+            self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]
+        ):
+            valid = False
         if valid:
             _fit_pvals = list(self._fit_params.values())
             _datafit = self._fitter.function(_fit_pvals, self._data_x)
@@ -285,10 +280,7 @@ class FitSinglePeak(ProcPlugin):
         elif valid and _output == "Peak area":
             _new_data = [_area]
         elif valid and _output == "Peak position":
-            if self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]:
-                _new_data = [self._fit_params["center"]]
-            else:
-                _new_data = [np.nan]
+            _new_data = [self._fit_params["center"]]
         elif valid and _output == "Peak area and position":
             _new_data = [_area, self._fit_params["center"]]
         elif valid and _output == "Fit normalized standard deviation":
@@ -400,3 +392,48 @@ class FitSinglePeak(ProcPlugin):
             _bg = Dataset(np.polyval(_bg_poly, _xfit), **_dset_kws)
             _details["items"].append({"plot": 0, "label": "background", "data": _bg})
         return _details
+
+    def _create_details_for_invalid_peak(self, bg_corrected_data, bg_params):
+        """
+        Create the details for an invalid peak.
+
+        Parameters
+        ----------
+        bg_corrected_data : np.ndarray
+            The background-corrected data.
+        bg_params : list
+            The parameters to calculate the background level.
+
+        Returns
+        -------
+        dict
+            The invalid results.
+        """
+        if len(bg_params) == 0:
+            return {
+                "n_plots": 1,
+                "plot_titles": {0: "data"},
+                "plot_ylabels": {0: "intensity / a.u."},
+                "metadata": "",
+                "items": [{"plot": 0, "label": "input data", "data": self._data}],
+            }
+        _bg = Dataset(
+            np.zeros(self._data_x.size) + bg_params[0], **self._data.property_dict
+        )
+        if len(bg_params) == 2:
+            _bg += self._data_x * bg_params[1]
+        return {
+            "n_plots": 2,
+            "plot_titles": {0: "data and background", 1: "background-corrected data"},
+            "plot_ylabels": {0: "intensity / a.u.", 1: "intensity / a.u."},
+            "metadata": "",
+            "items": [
+                {"plot": 0, "label": "input data", "data": self._data},
+                {"plot": 0, "label": "background", "data": _bg},
+                {
+                    "plot": 1,
+                    "label": "background-corrected data",
+                    "data": bg_corrected_data,
+                },
+            ],
+        }

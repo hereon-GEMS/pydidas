@@ -75,7 +75,9 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         plugin.pre_execute()
-        _startguess = plugin._calc_param_start_guess()
+        _startguess = plugin._fitter.guess_fit_start_params(
+            plugin._data_x, plugin._data, plugin.get_param_value("fit_bg_order")
+        )
         plugin._fit_params = dict(zip(plugin._config["param_labels"], _startguess))
         self._dummy_metadata = {"test_meta": 123}
         plugin._data.metadata = plugin._data.metadata | self._dummy_metadata
@@ -174,48 +176,6 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin._crop_data_to_selected_range()
         self.assertTrue((plugin._data_x <= 20).all())
         self.assertTrue((plugin._data_x >= 0).all())
-
-    def test_calc_param_start_guess__no_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.pre_execute()
-        plugin.set_param_value("fit_bg_order", None)
-        plugin._data = self._data
-        plugin._data_x = self._data.axis_ranges[0]
-        plugin._crop_data_to_selected_range()
-        _startguess = plugin._calc_param_start_guess()
-        self.assertEqual(len(_startguess), 3)
-        self.assertTrue(10 <= _startguess[0] <= 60)
-        self.assertTrue(0 <= _startguess[1] <= 1)
-        self.assertEqual(_startguess[2], self._peak_x)
-
-    def test_calc_param_start_guess__0order_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 0)
-        plugin.pre_execute()
-        plugin._data = self._data
-        plugin._data_x = self._data.axis_ranges[0]
-        plugin._crop_data_to_selected_range()
-        _startguess = plugin._calc_param_start_guess()
-        self.assertEqual(len(_startguess), 4)
-        self.assertTrue(0 <= _startguess[0] <= 50)
-        self.assertTrue(0 <= _startguess[1] <= 1)
-        self.assertEqual(_startguess[2], self._peak_x)
-        self.assertEqual(_startguess[3], np.amin(self._data))
-
-    def test_calc_param_start_guess__1order_bg(self):
-        plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_bg_order", 1)
-        plugin.pre_execute()
-        plugin._data = self._data
-        plugin._data_x = self._data.axis_ranges[0]
-        plugin._crop_data_to_selected_range()
-        _startguess = plugin._calc_param_start_guess()
-        self.assertEqual(len(_startguess), 5)
-        self.assertTrue(0 <= _startguess[0] <= 50)
-        self.assertTrue(0 <= _startguess[1] <= 1)
-        self.assertEqual(_startguess[2], self._peak_x)
-        self.assertEqual(_startguess[3], np.amin(self._data))
-        self.assertEqual(_startguess[4], 0)
 
     def test_create_result_dataset__peak_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -331,6 +291,14 @@ class TestFitSinglePeak(unittest.TestCase):
             (_kwargs["fit_params"]["background_p1"] < 6.5)
             & (_kwargs["fit_params"]["background_p1"] > 5.5)
         )
+
+    def test_execute__gaussian_w_only_background_and_min_peak(self):
+        plugin = self.create_generic_plugin()
+        plugin.set_param_value("fit_bg_order", 1)
+        plugin.set_param_value("fit_min_peak_height", 10)
+        plugin.pre_execute()
+        _tmp_data = Dataset(3 * np.arange(self._data.size))
+        _data, _kwargs = plugin.execute(_tmp_data)
 
     def test_execute__lorentzian_no_bg(self):
         plugin = self.create_generic_plugin("Lorentzian")

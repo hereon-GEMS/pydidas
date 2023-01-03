@@ -38,6 +38,8 @@ Bugfixes
 - Fixed an issue with the ShowDetailedPluginResults window which did not show 
   the selector for multi-dim processing if another result had been displayed 
   before.
+- Fixed an issue in the FitSinglePeak plugin where detailed results were not 
+  available for minimum peak heights.
 
 
 =======

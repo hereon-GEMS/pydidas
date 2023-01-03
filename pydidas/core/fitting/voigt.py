@@ -75,7 +75,7 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         raise ValueError("The order of the background is not supported.")
 
     @classmethod
-    def guess_fit_start_params(cls, x, y):
+    def guess_fit_start_params(cls, x, y, bg_order=None):
         """
         Guess the start params for the fit for the given x and y values.
 
@@ -85,17 +85,26 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
             The x points of the data.
         y : np.ndarray
             The data values.
+        bg_order : Union[None, 0, 1], optional
+            The order of the background. The default is None.
 
         Returns
         -------
         list
             The list with the starting fit parameters.
         """
+        y, _bg_params = cls.calculate_background_params(x, y, bg_order)
+
         if amin(y) < 0:
             y = y - amin(y)
         _high_x = where(y >= 0.5 * amax(y))[0]
         if _high_x.size == 0:
-            return [0, (x[-1] - x[0]) / 3, (x[-1] - x[0]) / 3, (x[0] + x[-1]) / 2]
+            return [
+                0,
+                (x[-1] - x[0]) / 3,
+                (x[-1] - x[0]) / 3,
+                (x[0] + x[-1]) / 2,
+            ] + _bg_params
 
         # guess that both distributions have the same weight, i.e. the generic values
         # are divided by 2:
@@ -106,4 +115,4 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         # amplitude of a function with the average of both distributions
         _amp = (amax(y) - amin(y)) / voigt_profile(0, _sigma, _gamma)
         _center = x[y.argmax()]
-        return [_amp, _sigma, _gamma, _center]
+        return [_amp, _sigma, _gamma, _center] + _bg_params

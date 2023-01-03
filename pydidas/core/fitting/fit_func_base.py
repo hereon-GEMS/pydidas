@@ -24,6 +24,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["FitFuncBase"]
 
+import numpy as np
+
 
 class FitFuncBase:
     """
@@ -107,3 +109,37 @@ class FitFuncBase:
             The function area.
         """
         return c[0]
+
+    @classmethod
+    def calculate_background_params(cls, x, y, bg_order):
+        """
+        Calculate the parameters for the background and remove it from the values.
+
+        Parameters
+        ----------
+        x : nd.ndarray
+            The x points of the data.
+        y : np.ndarray
+            The data values.
+        bg_order : Union[None, 0, 1]
+            The order of the background.
+
+        Returns
+        -------
+        y : np.ndarray
+            The background-corrected values
+        bg_params : list
+            The parameters to describe the background.
+        """
+        if bg_order is None:
+            return y, []
+        if bg_order not in [0, 1]:
+            raise ValueError("The selected background order is not supported")
+        if bg_order == 0:
+            _bg0 = np.amin(y)
+            y = y - _bg0
+            return y, [_bg0]
+        _bg1 = (y[-1] - y[0]) / (x[-1] - x[0])
+        _bg0 = y[0] - _bg1 * x[0]
+        y = y - (_bg1 * x + _bg0)
+        return y, [_bg0, _bg1]

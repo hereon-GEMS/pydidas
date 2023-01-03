@@ -85,7 +85,7 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
         raise ValueError("The order of the background is not supported.")
 
     @classmethod
-    def guess_fit_start_params(cls, x, y):
+    def guess_fit_start_params(cls, x, y, bg_order=None):
         """
         Guess the start params for the fit for the given x and y values.
 
@@ -95,18 +95,22 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
             The x points of the data.
         y : np.ndarray
             The data values.
+        bg_order : Union[None, 0, 1], optional
+            The order of the background. The default is None.
 
         Returns
         -------
         list
             The list with the starting fit parameters.
         """
-        if amin(y) < 0:
-            y = y - amin(y)
+        y, _bg_params = cls.calculate_background_params(x, y, bg_order)
         # get the points where the function value is larger than half the maximum
+        # to do this, filter negative values first
+        if amin(y) < 0:
+            y - amin(y)
         _high_x = where(y >= 0.5 * amax(y))[0]
         if _high_x.size == 0:
-            return [0, (x[-1] - x[0]) / 5, (x[0] + x[-1]) / 2]
+            return [0, (x[-1] - x[0]) / 5, (x[0] + x[-1]) / 2] + _bg_params
         _sigma = (x[_high_x[-1]] - x[_high_x[0]]) / 2.35
 
         # estimate the amplitude based on the maximum data height and the
@@ -114,4 +118,4 @@ class Gaussian(FitFuncBase, metaclass=FitFuncMeta):
         # 1 / (sqrt(2 * PI) * sigma) = 1 / (0.40 * sigma)
         _amp = (amax(y) - amin(y)) * 2.5 * _sigma
         _center = x[y.argmax()]
-        return [_amp, _sigma, _center]
+        return [_amp, _sigma, _center] + _bg_params

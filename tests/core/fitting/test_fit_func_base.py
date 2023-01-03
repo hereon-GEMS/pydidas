@@ -56,6 +56,40 @@ class TestFitFuncBase(unittest.TestCase):
         _result = FIT_CLASS.delta([], self._x, _values)
         self.assertTrue(np.allclose(_result, self._x - _values))
 
+    def test_area(self):
+        _input = [42.1, 12, 27]
+        self.assertEqual(FIT_CLASS.area(_input), _input[0])
+
+    def test_calculate_background_params__no_bg(self):
+        _x = np.arange(20)
+        _y = np.sin(_x / 3)
+        _y_new, _bg_params = FIT_CLASS.calculate_background_params(_x, _y, None)
+        self.assertTrue(np.allclose(_y, _y_new))
+        self.assertEqual(_bg_params, [])
+
+    def test_calculate_background_params__const_bg(self):
+        _x = np.arange(20)
+        _y = np.sin(_x / 3)
+        _y_new, _bg_params = FIT_CLASS.calculate_background_params(_x, _y, 0)
+        self.assertTrue(np.alltrue(_y_new >= 0))
+        self.assertEqual(_bg_params, [np.amin(_y)])
+
+    def test_calculate_background_params__bg_order1(self):
+        _x = np.arange(20)
+        _slope = -3
+        _offset = 80
+        _y = 10 * np.exp(-0.25 * (_x - 8) ** 2) + _slope * _x + _offset
+        _y_new, _bg_params = FIT_CLASS.calculate_background_params(_x, _y, 1)
+        self.assertTrue(np.alltrue(_y_new >= -1e-6))
+        self.assertTrue(abs(_slope - _bg_params[1]) < 0.1)
+        self.assertTrue(abs(_offset - _bg_params[0]) < 0.1)
+
+    def test_calculate_background_params__wrong_bg_order(self):
+        _x = np.arange(20)
+        _y = np.sin(_x / 3)
+        with self.assertRaises(ValueError):
+            FIT_CLASS.calculate_background_params(_x, _y, 4)
+
 
 if __name__ == "__main__":
     unittest.main()

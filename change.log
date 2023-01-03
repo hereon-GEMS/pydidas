@@ -22,6 +22,8 @@ Improvements
 - Added the "property_dict" property to Dataset to get all properties at once,
   for example for copying.
 - Added import_state and export_state methods to the BaseApp
+- Changed missing results (i.e. not yet procesed) values to nan to have the 
+  full range of the colormap available for the results.
   
 Bugfixes
 --------

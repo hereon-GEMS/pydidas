@@ -65,7 +65,8 @@ class _WorkflowResults(QtCore.QObject):
         _results = TREE.get_all_result_shapes()
         _shapes = {_key: SCAN.shape + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
-            _dset = Dataset(np.zeros(_shape, dtype=np.float32))
+            _dset = Dataset(np.empty(_shape, dtype=np.float32))
+            _dset[:] = np.nan
             for index in range(_dim):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index)
                 _dset.update_axis_labels(index, _label)

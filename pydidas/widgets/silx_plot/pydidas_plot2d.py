@@ -79,15 +79,13 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
-        _pos_widget_snap_mode = self._positionWidget._snappingMode
         _pos_widget_converters = [
             (_field[1], _field[2]) for _field in self._positionWidget._fields
         ]
-
         _new_position_widget = PydidasPositionInfo(
             plot=self, converters=_pos_widget_converters
         )
-        _new_position_widget.setSnappingMode(_pos_widget_snap_mode)
+        _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
         if kwargs.get("cs_transform", True):
             self.cs_transform.sig_new_coordinate_system.connect(
                 _new_position_widget.new_coordinate_system

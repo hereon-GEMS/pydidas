@@ -92,13 +92,13 @@ class BaseApp(ObjectWithParameterCollection):
         """
         Perform operations prior to running main parallel processing function.
         """
-        raise NotImplementedError
+        return
 
     def multiprocessing_post_run(self):
         """
-        Perform operatinos after running main parallel processing function.
+        Perform operations after running main parallel processing function.
         """
-        raise NotImplementedError
+        return
 
     def multiprocessing_get_tasks(self):
         """

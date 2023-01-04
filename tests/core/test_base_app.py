@@ -52,12 +52,6 @@ class TestApp(BaseApp):
     def initialize_shared_memory(self):
         self._config["shared_memory"] = {"test": True}
 
-    def multiprocessing_pre_run(self):
-        pass
-
-    def multiprocessing_post_run(self):
-        pass
-
     def multiprocessing_get_tasks(self):
         return [1, 2, 3]
 
@@ -102,13 +96,11 @@ class TestBaseApp(unittest.TestCase):
 
     def test_multiprocessing_pre_run(self):
         app = BaseApp()
-        with self.assertRaises(NotImplementedError):
-            app.multiprocessing_pre_run()
+        self.assertIsNone(app.multiprocessing_pre_run())
 
     def test_multiprocessing_post_run(self):
         app = BaseApp()
-        with self.assertRaises(NotImplementedError):
-            app.multiprocessing_post_run()
+        self.assertIsNone(app.multiprocessing_post_run())
 
     def test_multiprocessing_store_results(self):
         app = BaseApp()

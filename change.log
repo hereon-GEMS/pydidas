@@ -24,6 +24,8 @@ Improvements
 - Added import_state and export_state methods to the BaseApp
 - Changed missing results (i.e. not yet procesed) values to nan to have the 
   full range of the colormap available for the results.
+- Changed the BaseApp.multiprocessing_pre_run and _post_run to return from
+  NotImplementedError to simplify creating simple apps.
   
 Bugfixes
 --------

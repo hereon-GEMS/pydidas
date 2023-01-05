@@ -26,6 +26,7 @@ Improvements
   full range of the colormap available for the results.
 - Changed the BaseApp.multiprocessing_pre_run and _post_run to return from
   NotImplementedError to simplify creating simple apps.
+- Added an initialize_shared_memory method to the BaseApp for consistency.
   
 Bugfixes
 --------

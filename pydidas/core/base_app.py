@@ -76,7 +76,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     def run(self):
         """
-        Run the app without multiprocessing.
+        Run the app serially without multiprocessing support.
         """
         self.multiprocessing_pre_run()
         tasks = self.multiprocessing_get_tasks()
@@ -216,6 +216,14 @@ class BaseApp(ObjectWithParameterCollection):
         if self._config.get("shared_memory", False) == "::restore::True":
             self._config["shared_memory"] = {}
             self.initialize_shared_memory()
+
+    def initialize_shared_memory(self):
+        """
+        Initialize the shared memory array for the master app.
+
+        Note: This method is not required for apps without a shared memory.
+        """
+        return
 
     def get_copy(self, slave_mode=False):
         """

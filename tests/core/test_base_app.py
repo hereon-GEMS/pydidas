@@ -47,6 +47,7 @@ class TestApp(BaseApp):
             "item2": slice(0, 5),
             "item3": "dummy",
             "shared_memory": {"test": None},
+            "carryon_counter": -1,
         }
 
     def initialize_shared_memory(self):
@@ -55,11 +56,9 @@ class TestApp(BaseApp):
     def multiprocessing_get_tasks(self):
         return [1, 2, 3]
 
-    def multiprocessing_pre_cycle(self, *args):
-        """
-        Perform operations in the pre-cycle of every task.
-        """
-        return
+    def multiprocessing_carryon(self):
+        self._config["carryon_counter"] += 1
+        return self._config["carryon_counter"] % 2 == 0
 
     def multiprocessing_func(self, *args):
         return args
@@ -122,8 +121,9 @@ class TestBaseApp(unittest.TestCase):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_carryon(self):
-        app = BaseApp()
+        app = TestApp()
         self.assertTrue(app.multiprocessing_carryon())
+        self.assertFalse(app.multiprocessing_carryon())
 
     def test_get_config(self):
         app = BaseApp()

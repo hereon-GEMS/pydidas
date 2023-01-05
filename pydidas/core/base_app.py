@@ -83,10 +83,12 @@ class BaseApp(ObjectWithParameterCollection):
         tasks = self.multiprocessing_get_tasks()
         for task in tasks:
             self.multiprocessing_pre_cycle(task)
-            _carryon = self.multiprocessing_carryon()
-            if _carryon:
-                _results = self.multiprocessing_func(task)
-                self.multiprocessing_store_results(task, _results)
+            while True:
+                _carryon = self.multiprocessing_carryon()
+                if _carryon:
+                    _results = self.multiprocessing_func(task)
+                    self.multiprocessing_store_results(task, _results)
+                    break
         self.multiprocessing_post_run()
 
     def multiprocessing_pre_run(self):

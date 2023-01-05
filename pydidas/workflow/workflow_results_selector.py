@@ -68,6 +68,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self._selection = None
         self._npoints = []
         self._config["active_node"] = -1

@@ -86,7 +86,7 @@ class EigerScanSeriesLoader(InputPlugin):
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, use_filename_pattern=True, **kwargs)
+        super().__init__(*args, **kwargs)
         self.filename_string = ""
 
     def pre_execute(self):

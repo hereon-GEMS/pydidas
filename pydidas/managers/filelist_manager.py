@@ -91,8 +91,9 @@ class FilelistManager(ObjectWithParameterCollection):
         Create a FilelistManager instance.
         """
         ObjectWithParameterCollection.__init__(self)
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self._config = {"file_list": [], "file_size": None, "n_files": 0}
 
     @property

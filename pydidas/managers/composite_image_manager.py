@@ -63,6 +63,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         self.__image = None
         self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self.__get_default_qsettings()
         for _key, _item in kwargs.items():
             if isinstance(_item, Parameter):

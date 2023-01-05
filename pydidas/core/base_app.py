@@ -57,9 +57,10 @@ class BaseApp(ObjectWithParameterCollection):
         self.slave_mode = kwargs.get("slave_mode", False)
         if "slave_mode" in kwargs:
             del kwargs["slave_mode"]
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self._config = {}
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self.parse_args_and_set_params()
 
     def parse_args_and_set_params(self):

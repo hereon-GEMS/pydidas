@@ -65,8 +65,9 @@ class _ExperimentContext(ObjectWithParameterCollection):
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
 
     def set_param_value(self, param_key, value):
         """

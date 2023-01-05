@@ -202,9 +202,9 @@ class BasePlugin(ObjectWithParameterCollection):
             OUTPUT_PLUGIN,
         ]:
             raise ValueError("Unknown value for the plugin type")
-        self.add_params(self.generic_params.get_copy())
-        self.add_params(*args)
+        self.add_params(self.generic_params.get_copy(), *args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         for _kw, _item in kwargs.items():
             if _kw in self.params.keys():
                 self.set_param_value(_kw, _item)

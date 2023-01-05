@@ -29,6 +29,8 @@ Improvements
 - Added an initialize_shared_memory method to the BaseApp for consistency.
 - Removed the (unused) option to add Parameters to objects with keyword 
   arguments.
+- Added the option to set Parameter values at object instantiation with 
+  keywords.
   
 Bugfixes
 --------

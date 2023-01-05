@@ -50,10 +50,10 @@ class ParameterCollection(dict):
         Any number of Parameters
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args):
         """Setup method."""
         super().__init__()
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
 
     def __copy__(self):
         return self.get_copy()
@@ -209,8 +209,7 @@ class ParameterCollection(dict):
 
     def __check_duplicate_keys(self, *args):
         """
-        Check for duplicate keys and raise an error if a duplicate key is
-        found.
+        Check for duplicate keys and raise an error if a duplicate key is found.
 
         This method compares the reference key of all args with the dictionary
         keys.
@@ -386,7 +385,7 @@ class ParameterCollection(dict):
         for _arg in args:
             if _arg not in self.keys():
                 raise KeyError(
-                    f'No Parameter with the key "{_arg}" has ' "been registered."
+                    f"No Parameter with the key '{_arg}' has been registered."
                 )
             _vals.add(self.get_value(_arg))
         if len(_vals) == 1:

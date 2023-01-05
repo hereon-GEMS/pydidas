@@ -16,13 +16,6 @@
         The maximum number of datasets in the buffer. A dataset consists of all 
         results for one frame. For performance reasons, the buffer should not 
         be too large as this is only a temporary buffer.
-- Detector settings
-    - Detector mask file (key: det_mask, type: Path, default: '' [empty Path])
-        The path to the detector mask file.
-    - Detector mask value (key: det_mask_val, type: float, default: 0)
-        The value to be used for the pixels masked on the detector. Note that 
-        this value will only be used for displaying the images. For pyFAI 
-        integration, the pixels will be fully masked and not be included.
 - Composite creation settings
     - Mosaic tiling border width (key: mosaic_border_width, type: int, default: 0, unit: px)
         The width of the border inserted between adjacent frames in the 
@@ -31,7 +24,11 @@
         The value to be put in the border pixels in mosaics.
     - Mosaic maximum size (key: max_image_size, type: float, default: 100, unit: Mpx)
         The maximum size (in megapixels) of mosaic images.
-
+- Detector settings
+    - Detector mask value (key: det_mask_val, type: float, default: 0)
+        The value to be used for the pixels masked on the detector. Note that 
+        this value will only be used for displaying the images. For pyFAI 
+        integration, the pixels will be fully masked and not be included.
 - Plotting settings
     - Plot update time (key: plot_update_time, type: float, default: 1.0)
         The delay before any plot updates will be processed. This will prevent 

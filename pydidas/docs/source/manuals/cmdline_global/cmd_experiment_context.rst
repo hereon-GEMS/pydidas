@@ -72,7 +72,9 @@ The detector
 The detector is defined by the following Parameters:
 
 .. list-table::
+    :widths: 20 10 10 60
     :header-rows: 1
+    :class: tight-table
 
     * - Parameter
       - type

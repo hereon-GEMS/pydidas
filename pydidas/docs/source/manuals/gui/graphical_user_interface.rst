@@ -115,4 +115,8 @@ Detailed information about the individual windows is given here.
 
 Recipes
 -------
-to be added upon request
+
+.. toctree::
+    :maxdepth: 1
+
+    recipes/pydidas_processing

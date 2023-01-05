@@ -413,3 +413,8 @@ here for demonstration purposes.
     for every individual user account, i.e. any changes you make will persist 
     if you start a new pydidas instance or process. Likewise, any changes made
     as a different user will not be applied to your settings.
+
+Description of pydidas's Qsettings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../global/pydidas_qsettings.rst

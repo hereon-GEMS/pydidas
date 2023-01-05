@@ -381,7 +381,7 @@ class ExecuteWorkflowApp(BaseApp):
         Parameters
         ----------
         index : int
-            The index in the composite image.
+            The index of the buffer position.
         data : tuple
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.

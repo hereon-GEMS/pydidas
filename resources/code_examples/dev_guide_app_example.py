@@ -27,7 +27,11 @@ class RandomImageGeneratorApp(pydidas.core.BaseApp):
         Parameter("num_images", int, 50),
         Parameter("image_shape", tuple, (100, 100)),
     )
-    attributes_not_to_copy_to_slave_app = ["shared_array", "shared_index_in_use", "_tasks"]
+    attributes_not_to_copy_to_slave_app = [
+        "shared_array",
+        "shared_index_in_use",
+        "_tasks",
+    ]
     parse_func = app_param_parser
 
     def __init__(self, *args, **kwargs):
@@ -126,6 +130,7 @@ app_slave.multiprocessing_pre_run()
 
 index = 10
 buffer_index = app_slave.multiprocessing_func(index)
+app.shared_index_in_use
 app.shared_array[buffer_index, 0, 0:5]
 app_slave.shared_array[buffer_index, 0, 0:5]
 

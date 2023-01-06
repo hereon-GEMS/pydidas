@@ -1,3 +1,5 @@
+.. _workflow_edit_frame:
+
 The Workflow edit frame
 =======================
 

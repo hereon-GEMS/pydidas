@@ -1,3 +1,5 @@
+.. _define_experimental_setup_frame:
+
 Define Experimental setup frame
 ===============================
 
@@ -23,7 +25,7 @@ Detailed description of frame items
 Load settings
 ^^^^^^^^^^^^^
 
-.. image::images/define_experiment_frame_button_import.png
+.. image:: images/define_experiment_frame_button_import.png
     :align: left
 
 Experimental settings can be import from file. Clicking the corresponding 
@@ -33,7 +35,7 @@ File extensions will be pre-selected based on the available importers.
 Copy Parameters from calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. image::images/define_experiment_frame_button_copyall.png
+.. image:: images/define_experiment_frame_button_copyall.png
     :align: left
 
 If a calibration using the :ref:`pyfai_calib_frame` has been performed during
@@ -43,7 +45,7 @@ the last successful fit in the pyFAI calibration tool.
 Beamline energy
 ^^^^^^^^^^^^^^^
 
-.. image::images/define_experiment_frame_energy.png
+.. image:: images/define_experiment_frame_energy.png
     :align: left
 
 The beamline energy can either be copied from the pyFAI calibration tool (a 
@@ -52,10 +54,10 @@ is active) or the user can update the values for either the X-ray energy
 (in keV) or the wavelength (in A). Updating either of these values will also
 modify the other value to keep them consistent.
 
-Detector model
-^^^^^^^^^^^^^^
+Detector
+^^^^^^^^
 
-.. image::images/define_experiment_frame_detector.png
+.. image:: images/define_experiment_frame_detector.png
     :align: left
 
 To select a detector and automatically update all detector Parameters, the 
@@ -63,21 +65,28 @@ To select a detector and automatically update all detector Parameters, the
 pyFAI DetectorSelectorDialog, see the screenshot below) which allows to select 
 a detector based on manufacturer and model.
 
-.. image::images/define_experiment_frame_detector_popup.png
+.. image:: images/define_experiment_frame_detector_popup.png
     :width: 361px
     :align: right
 
-Confirming the selection in the dialogue will update all detector Parameters.  
- 
+Confirming the selection in the dialogue will update the detector Parameters.  
+
+|
+
 Alternatively, if the detector has been selected in the pyFAI calibration, 
 the detector Parameters can be copied from pyFAI by clicking the button "Copy 
 X-ray detector from pyFAI calibration" or all Parameters can also be entered 
 manually in the input fields.
 
+The last field of the detector group, the *Detector pixel mask* determines if 
+a mask should be used for the pyFAI integration. This parameter is independent
+of the other detector Parameters and is not updated with the selection of the 
+detector. If empty, no detector mask will be applied to the pyFAI integration.
+
 Detector geometry
 ^^^^^^^^^^^^^^^^^
 
-.. image::images/define_experiment_frame_detector_geometry.png
+.. image:: images/define_experiment_frame_detector_geometry.png
     :align: left
     
 pydidas uses the `Default geometry in pyFAI 
@@ -95,7 +104,7 @@ values can be entered manually.
 Saving
 ^^^^^^
 
-.. image::images/define_experiment_frame_export.png
+.. image:: images/define_experiment_frame_export.png
     :align: left
     
 All settings can be exported to file using the saving button. Clicking the 

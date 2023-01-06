@@ -1,5 +1,7 @@
-Scan setup frame
-================
+.. _define_scan_frame:
+
+Define scan frame
+=================
 
 .. contents::
     :depth: 2

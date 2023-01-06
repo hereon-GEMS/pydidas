@@ -183,9 +183,10 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
         context = CalibrationContext.instance()
         model = context.getCalibrationModel()
         _det = model.experimentSettingsModel().detector()
-        self.update_detector_params(_det, show_warning)
+        _maskfile = model.experimentSettingsModel().mask().filename()
+        self.update_detector_params(_det, maskfile=_maskfile, show_warning=show_warning)
 
-    def update_detector_params(self, det, show_warning=True):
+    def update_detector_params(self, det, maskfile=None, show_warning=True):
         """
         Update the pydidas detector Parameters based on the selected pyFAI
         detector.
@@ -194,6 +195,9 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
         ----------
         det : pyFAI.detectors.Detector
             The detector instance.
+        maskfile : Union [None, str], optional
+            The path of the mask file, if it has been defined in the pyFAI calibration.
+            The default is None.
         show_warning : bool, optional
             Flag to show a warning if the detector cannot be found or simply
             to ignore. True will show the warning. The default is True.
@@ -204,6 +208,8 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
             self.set_param_value_and_widget("detector_npixy", det.shape[0])
             self.set_param_value_and_widget("detector_pxsizex", 1e6 * det.pixel2)
             self.set_param_value_and_widget("detector_pxsizey", 1e6 * det.pixel1)
+            if maskfile is not None:
+                self.set_param_value_and_widget("detector_mask_file", maskfile)
         elif show_warning:
             critical_warning(
                 "No pyFAI Detector",

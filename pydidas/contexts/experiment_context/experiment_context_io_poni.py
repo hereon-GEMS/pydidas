@@ -103,7 +103,7 @@ class ExperimentContextIoPoni(ExperimentContextIoBase):
         """
         if not isinstance(det, pyFAI.detectors.Detector):
             raise TypeError(
-                f'Object "{det} (type {type(det)} is not a '
+                f"Object '{det} (type {type(det)}' is not a "
                 "pyFAI.detectors.Detector instance."
             )
         for key, value in [
@@ -122,7 +122,7 @@ class ExperimentContextIoPoni(ExperimentContextIoBase):
         """
         if not isinstance(geo, pyFAI.geometry.Geometry):
             raise TypeError(
-                f'Object "{geo} (type {type(geo)} is not a '
+                f"Object '{geo} (type {type(geo)}' is not a "
                 "pyFAI.geometry.Geometry instance."
             )
         cls.imported_params["xray_wavelength"] = geo.wavelength * 1e10

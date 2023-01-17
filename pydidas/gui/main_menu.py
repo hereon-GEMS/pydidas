@@ -34,15 +34,15 @@ from qtpy import QtWidgets, QtGui, QtCore
 
 from ..core import PydidasGuiError, UserConfigError
 from ..core.utils import (
-    get_doc_home_qurl,
+    DOC_HOME_QURL,
     get_pydidas_icon_w_bg,
-    get_doc_qurl_for_frame_manual,
-    get_doc_filename_for_frame_manual,
+    doc_qurl_for_frame_manual,
+    doc_filename_for_frame_manual,
 )
-from ..experiment import SetupScan, SetupExperiment
+from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree
 from ..widgets import PydidasFrameStack
-from ..widgets.dialogues import QuestionBox
+from ..widgets.dialogues import QuestionBox, critical_warning
 from ..version import VERSION
 from . import utils
 from .gui_excepthook_ import gui_excepthook
@@ -54,11 +54,12 @@ from .windows import (
     FeedbackWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
+    QtPathsWindow,
 )
 
 
-SCAN = SetupScan()
-EXP = SetupExperiment()
+SCAN = ScanContext()
+EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 
@@ -214,6 +215,7 @@ class MainMenu(QtWidgets.QMainWindow):
             "Open documentation in default web browser", self
         )
         self._actions["open_about"] = QtWidgets.QAction("About pydidas", self)
+        self._actions["open_paths"] = QtWidgets.QAction("Pydidas paths", self)
         self._actions["open_feedback"] = QtWidgets.QAction("Open feedback form", self)
 
     def _connect_menu_actions(self):
@@ -249,6 +251,9 @@ class MainMenu(QtWidgets.QMainWindow):
         )
         self._actions["open_about"].triggered.connect(
             partial(self.create_and_show_temp_window, AboutWindow)
+        )
+        self._actions["open_paths"].triggered.connect(
+            partial(self.create_and_show_temp_window, QtPathsWindow)
         )
         self._actions["open_feedback"].triggered.connect(
             partial(self.create_and_show_temp_window, FeedbackWindow)
@@ -289,6 +294,7 @@ class MainMenu(QtWidgets.QMainWindow):
         _help_menu.addAction(self._actions["open_documentation_browser"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_feedback"])
+        _help_menu.addAction(self._actions["open_paths"])
         _help_menu.addSeparator()
         _help_menu.addAction(self._actions["open_about"])
         _menu.addMenu(_help_menu)
@@ -438,14 +444,14 @@ class MainMenu(QtWidgets.QMainWindow):
         if not os.path.exists(_config_dir):
             os.makedirs(_config_dir)
         _state = self.__get_window_states()
-        for _index, _widget in enumerate(self.centralWidget().frames):
-            _frameindex, _widget_state = _widget.export_state()
+        for _index, _frame in enumerate(self.centralWidget().frames):
+            _frameindex, _frame_state = _frame.export_state()
             assert _index == _frameindex
-            _state[f"frame_{_index:02d}"] = _widget_state
-        _state["setup_scan"] = SCAN.get_param_values_as_dict(
+            _state[f"frame_{_index:02d}"] = _frame_state
+        _state["scan_context"] = SCAN.get_param_values_as_dict(
             filter_types_for_export=True
         )
-        _state["setup_experiment"] = EXP.get_param_values_as_dict(
+        _state["experiment_context"] = EXP.get_param_values_as_dict(
             filter_types_for_export=True
         )
         _state["workflow_tree"] = TREE.export_to_string()
@@ -522,8 +528,8 @@ class MainMenu(QtWidgets.QMainWindow):
     @staticmethod
     def _restore_global_objects(state):
         """
-        Get the states of pydidas' global objects (SetupScan,
-        SetupExperiment, WorkflowTree)
+        Get the states of pydidas' global objects (ScanContext,
+        ExperimentContext, WorkflowTree)
 
         Parameters
         ----------
@@ -532,9 +538,9 @@ class MainMenu(QtWidgets.QMainWindow):
             global objects.
         """
         TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["setup_scan"].items():
+        for _key, _val in state["scan_context"].items():
             SCAN.set_param_value(_key, _val)
-        for _key, _val in state["setup_experiment"].items():
+        for _key, _val in state["experiment_context"].items():
             EXP.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):
@@ -580,7 +586,11 @@ class MainMenu(QtWidgets.QMainWindow):
             for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
-            raise PydidasGuiError("The state is not defined for all frames.")
+            critical_warning(
+                "Error",
+                "The state is not defined for all frames. Aborting Frame state import.",
+            )
+            return
         for _index, _frame in enumerate(self.centralWidget().frames):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 
@@ -593,12 +603,12 @@ class MainMenu(QtWidgets.QMainWindow):
         the respective helpfile if it exits or the main documentation if it does not.
         """
         _frame_class = self.centralWidget().currentWidget().__class__.__name__
-        _docfile = get_doc_filename_for_frame_manual(_frame_class)
+        _docfile = doc_filename_for_frame_manual(_frame_class)
 
         if os.path.exists(_docfile):
-            _url = get_doc_qurl_for_frame_manual(_frame_class)
+            _url = doc_qurl_for_frame_manual(_frame_class)
         else:
-            _url = get_doc_home_qurl()
+            _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)
 
     def deleteLater(self):

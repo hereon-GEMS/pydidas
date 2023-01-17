@@ -28,12 +28,12 @@ import numpy as np
 
 from ..core import get_generic_parameter, UserConfigError
 from ..core.constants import INPUT_PLUGIN
-from ..experiment import SetupScan
+from ..contexts import ScanContext
 from .base_plugin import BasePlugin
 from .base_input_plugin import InputPlugin
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class InputPlugin1d(InputPlugin):

@@ -37,14 +37,14 @@ from pydidas.core import Parameter, get_generic_parameter, Dataset
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import get_random_string
 from pydidas.data_io import import_data
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.unittest_objects import create_plugin_class
 from pydidas.plugins import InputPlugin
 
 
 _DUMMY_SHAPE = (130, 140)
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class TestInputPlugin(InputPlugin):
@@ -81,7 +81,7 @@ class TestBaseInputPlugin(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        SetupScan._reset_instance()
+        ScanContext._reset_instance()
         shutil.rmtree(cls._testpath)
 
     def setUp(self):

@@ -97,12 +97,14 @@ def app_processor_without_tasks(
             break
         except queue.Empty:
             pass
+        # run processing
         _app.multiprocessing_pre_cycle(-1)
         _app_carryon = _app.multiprocessing_carryon()
         if _app_carryon:
             logger.debug("Starting computation")
             _index, _results = _app.multiprocessing_func(-1)
             output_queue.put([_index, _results])
-        time.sleep(0.01)
+        else:
+            time.sleep(0.005)
     finished_queue.put(1)
     logger.debug("Emitted finished signal")

@@ -15,22 +15,18 @@ The :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>` is one of
 the most important objects in pydidas as it allows to process workflows. Note 
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
 but by the global objects for 
-:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
-:py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
+:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
+:py:class:`ExperimentContext <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
-Documentation on the use of these objects is given in :ref:`setup_scan`,
-:ref:`setup_experiment` and :ref:`workflow_tree`, respectively.
+Documentation on the use of these objects is given in :ref:`scan_context`,
+:ref:`experiment_context` and :ref:`workflow_tree`, respectively.
 
 Globally controlled settings
 ----------------------------
 
-Some settings used by the ExecuteWorkflowApp are controlled globally by pydidas. 
-These are:
-
-- The file path for the global detector mask file (`user/det_mask`)
-
-and for parallel processing additionally:
+Some settings for parallel processing additionally used by the 
+ExecuteWorkflowApp are controlled globally by pydidas. These are:
 
 - The number of parallel worker processes (`global/mp_n_workers`)
 - The size of the data exchange buffer (in MB) (`global/shared_buffer_size`)
@@ -70,7 +66,6 @@ these values, if required:
 
     >>> import pydidas
     >>> config = pydidas.core.PydidasQsettings()
-    >>> config.set_value('user/det_mask', '/scratch/config/det_mask.npy')
     >>> config.set_value('global/mp_n_workers', 2)
 
 Setup of the ExecuteWorkflowApp
@@ -78,9 +73,9 @@ Setup of the ExecuteWorkflowApp
 
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
 uses the aforementioned objects (
-:py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`,
-:py:class:`SetupExperiment 
-<pydidas.experiment.setup_experiment.setup_experiment._ExpSetup>`,
+:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
+:py:class:`ExperimentContext 
+<pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
 which include most of the required configuration.
 

@@ -31,12 +31,12 @@ from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from ...core import UserConfigError, utils
 from ...core.constants import GREEK_ASCII_TO_UNI
-from ...experiment import SetupExperiment
+from ...contexts import ExperimentContext
 
 
 THETA = GREEK_ASCII_TO_UNI["theta"]
 CHI = GREEK_ASCII_TO_UNI["chi"]
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 
 class CoordinateTransformButton(PlotToolButton):
@@ -151,10 +151,10 @@ class CoordinateTransformButton(PlotToolButton):
             Flag whether the detecor has been set up correctly.
         """
         if (
-            EXP_SETUP.get_param_value("detector_npixx") < 1
-            or EXP_SETUP.get_param_value("detector_npixy") < 1
-            or EXP_SETUP.get_param_value("detector_pxsizex") <= 0
-            or EXP_SETUP.get_param_value("detector_pxsizey") <= 0
+            EXP.get_param_value("detector_npixx") < 1
+            or EXP.get_param_value("detector_npixy") < 1
+            or EXP.get_param_value("detector_pxsizex") <= 0
+            or EXP.get_param_value("detector_pxsizey") <= 0
         ):
             self.set_coordinates("cartesian")
             if not silent:

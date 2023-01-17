@@ -30,7 +30,7 @@ from silx.gui.colors import Colormap
 from silx.utils.weakref import WeakMethodProxy
 
 from ...core import PydidasQsettingsMixin
-from ...experiment import SetupExperiment
+from ...contexts import ExperimentContext
 from .silx_actions import CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
@@ -44,7 +44,7 @@ SNAP_MODE = (
     | tools.PositionInfo.SNAPPING_SCATTER
 )
 
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 
 class PydidasImageView(ImageView, PydidasQsettingsMixin):
@@ -100,11 +100,11 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
     @QtCore.Slot()
     def get_detector_size(self):
         """
-        Get the detector size from the SetupExperiment and store it.
+        Get the detector size from the ExperimentContext and store it.
         """
         self._detector_size = (
-            EXP_SETUP.get_param_value("detector_npixy"),
-            EXP_SETUP.get_param_value("detector_npixx"),
+            EXP.get_param_value("detector_npixy"),
+            EXP.get_param_value("detector_npixx"),
         )
 
     def setData(self, data, **kwargs):

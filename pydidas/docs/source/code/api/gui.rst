@@ -36,8 +36,8 @@ Frames
     gui/frames/data_browsing_frame
     gui/frames/pyfai_calib_frame
     gui/frames/composite_creator_frame
-    gui/frames/setup_experiment_frame
-    gui/frames/setup_scan_frame
+    gui/frames/define_experiment_frame
+    gui/frames/define_scan_frame
     gui/frames/workflow_edit_frame
     gui/frames/workflow_test_frame
     gui/frames/workflow_run_frame

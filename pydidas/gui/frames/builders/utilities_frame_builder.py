@@ -79,8 +79,8 @@ class UtilitiesFrameBuilder(BaseFrame):
 
     Parameters
     ----------
-    self : pydidas.gui.SetupScanFrame
-        The SetupScanFrame instance.
+    self : pydidas.gui.DefineScanFrame
+        The DefineScanFrame instance.
     """
 
     GROUP_WIDTH = 320

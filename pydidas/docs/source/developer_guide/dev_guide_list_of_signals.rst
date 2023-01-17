@@ -3,4 +3,4 @@
 Developers guide to pydidas signals
 ===================================
 
-to be added
+Pydidas uses Qt's Signal and Slot system for communication between objects.

@@ -63,6 +63,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         if param_key in [
             "filename_pattern",
             "directory_path",
+            "detector_mask_file",
             "bg_file",
             "hdf5_key",
             "bg_hdf5_key",
@@ -77,13 +78,6 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH,
             )
-        if param_key in [
-            "hdf5_key",
-            "bg_file",
-            "bg_hdf5_key",
-            "bg_hdf5_frame",
-        ]:
-            _dict["visible"] = False
         return _dict
 
     def build_frame(self):
@@ -124,7 +118,9 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
             "scan_for_all",
             "filename_pattern",
             "hdf5_key",
-            "use_global_det_mask",
+            "use_detector_mask",
+            "detector_mask_file",
+            "detector_mask_val",
             "use_bg_file",
             "bg_file",
             "bg_hdf5_key",
@@ -133,6 +129,10 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
             self.create_param_widget(
                 self.get_param(_param), **self.__param_widget_config(_param)
             )
+            if _param in ["hdf5_key", "detector_mask_val"]:
+                self.create_line(
+                    f"line_{_param}", parent_widget=self._widgets["config"]
+                )
 
         self.create_line(
             "line_buttons", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]

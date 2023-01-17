@@ -27,7 +27,7 @@ __all__ = ["directory_spy_app_parser"]
 
 import argparse
 
-from ...core.constants import GENERIC_PARAM_DESCRIPTION as PARAMS
+from ...core.constants import GENERIC_PARAMS_METADATA as PARAMS
 
 
 def directory_spy_app_parser(caller=None):

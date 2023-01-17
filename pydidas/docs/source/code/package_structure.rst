@@ -81,17 +81,17 @@ Sub-package descriptions
         Low-level implementations of file readers used by *implementations*
         (e.g. reading slices out of hdf5 files).
 
-- **pydidas.experiment** 
+- **pydidas.contexts** 
     
     Singleton classes which manage global settings for the experimental setup 
     and the scan setup. This information can be used by plugins or apps to query 
     the global processing parameters.
 
-  - *pydidas.experiment.setup_experiment* 
+  - *pydidas.contexts.experiment_context* 
         
         Classes for the global experimental settings and import/export.
   
-  - *pydidas.experiment.setup_scan* 
+  - *pydidas.contexts.scan_context* 
         
         Classes for the global scan settings and import/export.
 

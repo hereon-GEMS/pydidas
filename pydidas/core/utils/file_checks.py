@@ -79,7 +79,7 @@ def check_file_exists(fname):
     """
     if not os.path.isfile(fname):
         raise UserConfigError(
-            f'The selected filename "{fname}" does not ' "point to a valid file."
+            f"The selected filename '{fname}' does not point to a valid file."
         )
 
 

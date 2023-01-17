@@ -49,8 +49,8 @@ class FeedbackWindow(PydidasWindow):
 
     Parameters
     ----------
-    self : pydidas.gui.SetupScanFrame
-        The SetupScanFrame instance.
+    self : pydidas.gui.DefineScanFrame
+        The DefineScanFrame instance.
     """
 
     show_frame = False

@@ -17,6 +17,7 @@ include MANIFEST.in
 include README.rst
 include LICENSE.md
 include requirements.txt
+include environment.yml
 include pyproject.toml
 include change.log
 include pydidas/core/icons/*.svg

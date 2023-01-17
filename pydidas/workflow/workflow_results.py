@@ -32,13 +32,13 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import utils, Dataset, SingletonFactory
-from ..experiment import SetupScan
+from ..contexts import ScanContext
 from .workflow_tree import WorkflowTree
 from .result_io import WorkflowResultIoMeta
 
 
 RESULT_SAVER = WorkflowResultIoMeta
-SCAN = SetupScan()
+SCAN = ScanContext()
 TREE = WorkflowTree()
 
 
@@ -57,7 +57,7 @@ class _WorkflowResults(QtCore.QObject):
 
     def update_shapes_from_scan_and_workflow(self):
         """
-        Update the shape of the results by querying SetupScan and
+        Update the shape of the results by querying ScanContext and
         WorkflowTree for their current dimensions and shapes.
         """
         self.clear_all_results()
@@ -65,7 +65,8 @@ class _WorkflowResults(QtCore.QObject):
         _results = TREE.get_all_result_shapes()
         _shapes = {_key: SCAN.shape + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
-            _dset = Dataset(np.zeros(_shape, dtype=np.float32))
+            _dset = Dataset(np.empty(_shape, dtype=np.float32))
+            _dset[:] = np.nan
             for index in range(_dim):
                 _label, _unit, _range = SCAN.get_metadata_for_dim(index)
                 _dset.update_axis_labels(index, _label)
@@ -229,7 +230,7 @@ class _WorkflowResults(QtCore.QObject):
     @property
     def source_hash(self):
         """
-        Get the source hash from the input WorkflowTree ans SetupScan.
+        Get the source hash from the input WorkflowTree ans ScanContext.
 
         Returns
         -------

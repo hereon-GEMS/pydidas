@@ -37,14 +37,14 @@ from pydidas import unittest_objects
 from pydidas.core import get_generic_parameter, UserConfigError, utils, PydidasQsettings
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.plugins import PluginCollection
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
+SCAN = ScanContext()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()

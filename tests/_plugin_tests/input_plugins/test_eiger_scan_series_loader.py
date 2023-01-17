@@ -32,12 +32,12 @@ import h5py
 
 from pydidas.core import UserConfigError, Parameter, Dataset
 from pydidas.core.utils import get_random_string
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.plugins import PluginCollection, BasePlugin
 
 
 COLLECTION = PluginCollection()
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class TestEigerScanSeriesLoader(unittest.TestCase):
@@ -51,7 +51,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         cls._fname_i0 = 2
         cls._params = {
             "eiger_dir": "eiger9m",
-            "filename_suffix": "_data.h5",
+            "eiger_filename_suffix": "_data.h5",
             "hdf5_key": "/entry/data/data",
             "images_per_file": -1,
         }
@@ -66,7 +66,8 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
             )
             os.makedirs(_dir)
             _fname = os.path.join(
-                _dir, f"test_{i + cls._fname_i0:05d}" + cls._params["filename_suffix"]
+                _dir,
+                f"test_{i + cls._fname_i0:05d}" + cls._params["eiger_filename_suffix"],
             )
             cls._hdf5_fnames.append(_fname)
             _slice = slice(i * cls._n_per_file, (i + 1) * cls._n_per_file, 1)

@@ -116,13 +116,6 @@ class _UserConfigWindow(PydidasWindow):
         )
 
         self.create_label(
-            "section_detector", "Detector mask settings", **_section_options
-        )
-        self.create_param_widget(self.get_param("det_mask"), **_twoline_options)
-        self.create_param_widget(self.get_param("det_mask_val"), **_options)
-        self.create_spacer("spacer_2")
-
-        self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
         )
         self.create_param_widget(self.get_param("mosaic_border_width"), **_options)

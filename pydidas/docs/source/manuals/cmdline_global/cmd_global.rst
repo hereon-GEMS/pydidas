@@ -45,7 +45,7 @@ will probably manage with a handful of methods:
 Examples
 ^^^^^^^^
 
-All examples will use the SetupExperiment object (please see below for a 
+All examples will use the ExperimentContext object (please see below for a 
 description of the object) and the examples will only cover the code bases, not 
 the use case. 
 
@@ -54,7 +54,7 @@ First, let us create the object called :py:data:`exp`
 .. code-block::
 
     >>> import pydidas
-    >>> exp = pydidas.experiment.SetupExperiment()
+    >>> exp = pydidas.contexts.ExperimentContext()
 
 The object :py:data:`exp` will be used in all examples below.
 
@@ -136,19 +136,19 @@ All apps use the same global persistent objects (implemented as singletons), if
 required. Information is separated according to the reasons to change. The three
 main objects are:
 
-    :py:class:`SetupScan <pydidas.experiment.setup_scan.setup_scan._SetupScan>`
+    :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`
         The details about the scan. This includes generic information like scan
         title, data directory and scan names and specific information like the
         number of scan dimensions and the number of points in each dimension 
         (but also metadata like dimension names, units, offsets and step width). 
         The latter information can be used to create the correct axis labels in 
         plots. For the full documentation please visit the 
-        :ref:`ScanSetup manual <setup_scan>`.
-    :py:class:`SetupExperiment <pydidas.experiment.setup_experiment.setup_experiment._SetupExperiment>`
+        :ref:`ScanSetup manual <scan_context>`.
+    :py:class:`ExperimentContext <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
         documentation please visit the 
-        :ref:`SetupExperiment manual <setup_experiment>`.
+        :ref:`ExperimentContext manual <experiment_context>`.
     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
         The WorkflowTree holds information about which plugins are used and 
         about the order of plugins to be processed. For the full documentation 
@@ -159,8 +159,8 @@ These objects can be accesses by calling their respective factories:
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.SetupScan()
-    >>> EXPERIMENT = pydidas.experiment.SetupExperiment()
+    >>> SCAN = pydidas.contexts.ScanContext()
+    >>> EXPERIMENT = pydidas.contexts.ExperimentContext()
     >>> TREE= pydidas.workflow.WorkflowTree()
 
 Note that the factories return a link to the unique instance and multiple calls 
@@ -169,12 +169,12 @@ yield the same object:
 .. code-block::
 
     >>> import pydidas
-    >>> SCAN = pydidas.experiment.SetupScan()
+    >>> SCAN = pydidas.contexts.ScanContext()
     >>> SCAN
-    <pydidas.experiment.setup_scan.setup_scan._SetupScan at 0x1d4a257b820>
-    >>> SCAN2  = pydidas.experiment.SetupScan()
+    <pydidas.contexts.scan_context.scan_context._ScanContext at 0x1d4a257b820>
+    >>> SCAN2  = pydidas.contexts.ScanContext()
     >>> SCAN2
-    <pydidas.experiment.setup_scan.setup_scan._SetupScan at 0x1d4a257b820>
+    <pydidas.contexts.scan_context.scan_context._ScanContext at 0x1d4a257b820>
     >>> SCAN == SCAN2
     True
     
@@ -413,3 +413,8 @@ here for demonstration purposes.
     for every individual user account, i.e. any changes you make will persist 
     if you start a new pydidas instance or process. Likewise, any changes made
     as a different user will not be applied to your settings.
+
+Description of pydidas's Qsettings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../global/pydidas_qsettings.rst

@@ -30,12 +30,12 @@ import numpy as np
 
 from ..core import get_generic_parameter, UserConfigError
 from ..core.constants import INPUT_PLUGIN
-from ..experiment import SetupScan
+from ..contexts import ScanContext
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class InputPlugin(BasePlugin):
@@ -162,7 +162,7 @@ class InputPlugin(BasePlugin):
         Set up the generator that can create the full file names to load images.
 
         The generic implementation only joins the base directory and filename pattern,
-        as defined in the SetupScan class.
+        as defined in the ScanContext class.
         """
         _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
         _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)

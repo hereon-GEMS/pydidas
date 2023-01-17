@@ -33,8 +33,8 @@ from .directory_spy_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .pyfai_calib_frame import *
-from .setup_experiment_frame import *
-from .setup_scan_frame import *
+from .define_experiment_frame import *
+from .define_scan_frame import *
 from .utilities_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
@@ -73,15 +73,15 @@ from . import pyfai_calib_frame
 __all__.extend(pyfai_calib_frame.__all__)
 del pyfai_calib_frame
 
-from . import setup_experiment_frame
+from . import define_experiment_frame
 
-__all__.extend(setup_experiment_frame.__all__)
-del setup_experiment_frame
+__all__.extend(define_experiment_frame.__all__)
+del define_experiment_frame
 
-from . import setup_scan_frame
+from . import define_scan_frame
 
-__all__.extend(setup_scan_frame.__all__)
-del setup_scan_frame
+__all__.extend(define_scan_frame.__all__)
+del define_scan_frame
 
 from . import utilities_frame
 

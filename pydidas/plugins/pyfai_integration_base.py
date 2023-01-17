@@ -30,21 +30,20 @@ import pathlib
 import multiprocessing as mp
 
 import numpy as np
-import pyFAI
-import pyFAI.azimuthalIntegrator
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 from silx.opencl.common import OpenCL
 
 from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI, PROC_PLUGIN_IMAGE
 from ..core import get_generic_param_collection, UserConfigError
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
-from ..experiment import SetupExperiment
+from ..contexts import ExperimentContext
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
 
-EXP_SETUP = SetupExperiment()
+EXP = ExperimentContext()
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",
@@ -93,7 +92,6 @@ class pyFAIintegrationBase(ProcPlugin):
         "azi_range_lower",
         "azi_range_upper",
         "int_method",
-        "det_mask",
     )
     input_data_dim = 2
     output_data_label = "Integrated data"
@@ -106,23 +104,22 @@ class pyFAIintegrationBase(ProcPlugin):
         self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
-        self.params["det_mask"]._Parameter__meta["optional"] = True
 
     def pre_execute(self):
         """
-        Check the use_global_mask Parameter and load the mask image.
+        Check and load the mask and set up the AzimuthalIntegrator.
         """
         self.load_and_set_mask()
-        if self._exp_hash != hash(EXP_SETUP):
-            _lambda_in_A = EXP_SETUP.get_param_value("xray_wavelength")
-            self._ai = pyFAI.azimuthalIntegrator.AzimuthalIntegrator(
-                dist=EXP_SETUP.get_param_value("detector_dist"),
-                poni1=EXP_SETUP.get_param_value("detector_poni1"),
-                poni2=EXP_SETUP.get_param_value("detector_poni2"),
-                rot1=EXP_SETUP.get_param_value("detector_rot1"),
-                rot2=EXP_SETUP.get_param_value("detector_rot2"),
-                rot3=EXP_SETUP.get_param_value("detector_rot3"),
-                detector=EXP_SETUP.get_detector(),
+        if self._exp_hash != hash(EXP):
+            _lambda_in_A = EXP.get_param_value("xray_wavelength")
+            self._ai = AzimuthalIntegrator(
+                dist=EXP.get_param_value("detector_dist"),
+                poni1=EXP.get_param_value("detector_poni1"),
+                poni2=EXP.get_param_value("detector_poni2"),
+                rot1=EXP.get_param_value("detector_rot1"),
+                rot2=EXP.get_param_value("detector_rot2"),
+                rot3=EXP.get_param_value("detector_rot3"),
+                detector=EXP.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
         if self._mask is not None:
@@ -137,26 +134,19 @@ class pyFAIintegrationBase(ProcPlugin):
         Parameter will be used. If not, the global QSetting detector mask
         will be used.
         """
-        _mask_param = self.get_param_value("det_mask")
-        _mask_qsetting = self.q_settings_get_value("user/det_mask")
-        if _mask_param != pathlib.Path():
-            if os.path.isfile(_mask_param):
-                self._mask = import_data(_mask_param)
-                return
-            logger.warning(
-                (
-                    'The locally defined detector mask file "%s" does not exist.'
-                    " Falling back to the default defined in the global "
-                    "settings."
-                ),
-                _mask_param,
-            )
-        if os.path.isfile(_mask_qsetting):
-            self._mask = import_data(_mask_qsetting)
+        self._mask = None
+        _mask_file = EXP.get_param_value("detector_mask_file")
+        if _mask_file != pathlib.Path():
+            if os.path.isfile(_mask_file):
+                self._mask = import_data(_mask_file)
+            else:
+                raise UserConfigError(
+                    f"Cannot load detector mask: No file with the name \n{_mask_file}"
+                    "\nexists."
+                )
+        if self._mask is not None and len(self._legacy_image_ops) > 0:
             _roi, _bin = self.get_single_ops_from_legacy()
             self._mask = np.where(rebin2d(self._mask[_roi], _bin) > 0, 1, 0)
-        else:
-            self._mask = None
 
     def _prepare_pyfai_method(self):
         """
@@ -233,7 +223,7 @@ class pyFAIintegrationBase(ProcPlugin):
             if "deg" in self.get_param_value("azi_unit"):
                 _range = (np.pi / 180 * _range[0], np.pi / 180 * _range[1])
             _range = self._modulate_range(_range)
-            self._check_integration_discontinuity(*_range)
+            self._adjust_integration_discontinuity(self._ai, *_range)
         return _range
 
     def get_azimuthal_range_in_deg(self):
@@ -254,8 +244,8 @@ class pyFAIintegrationBase(ProcPlugin):
             if "rad" in self.get_param_value("azi_unit"):
                 _range = (180 / np.pi * _range[0], 180 / np.pi * _range[1])
             _range = self._modulate_range(_range, np.pi / 180)
-            self._check_integration_discontinuity(
-                np.pi / 180 * _range[0], np.pi / 180 * _range[1]
+            self._adjust_integration_discontinuity(
+                self._ai, np.pi / 180 * _range[0], np.pi / 180 * _range[1]
             )
         return _range
 
@@ -281,13 +271,16 @@ class pyFAIintegrationBase(ProcPlugin):
                 return (_upper, _lower)
         return None
 
-    def _check_integration_discontinuity(self, *azi_range):
+    @staticmethod
+    def _adjust_integration_discontinuity(ai, *azi_range):
         """
         Check the position of the integration discontinuity and adjust it according
         to the integration bounds.
 
         Parameters
         ----------
+        ai : pyFAI.AzimuthalIntegrator
+            The azimuthal integrator instance.
         azi_range : tuple
             The integration range in rad.
         """
@@ -299,20 +292,20 @@ class pyFAIintegrationBase(ProcPlugin):
                 "Please adjust the boundaries and try again."
             )
         if _low >= 0:
-            if self._ai.chiDiscAtPi:
-                self._ai.reset()
-            self._ai.setChiDiscAtZero()
+            if ai.chiDiscAtPi:
+                ai.reset()
+            ai.setChiDiscAtZero()
         elif _low < 0 and _high <= np.pi:
-            if not self._ai.chiDiscAtPi:
-                self._ai.reset()
-            self._ai.setChiDiscAtPi()
+            if not ai.chiDiscAtPi:
+                ai.reset()
+            ai.setChiDiscAtPi()
         else:
             _low = np.round(_low, 5)
             _high = np.round(_high, 5)
             raise UserConfigError(
                 f"The chosen integration range ({_low}, {_high}) cannot be processed "
                 "because it cannot be represented in pyFAI. The range must be either "
-                f"in the interval [-{PI_STR}, {PI_STR}[ or [0, 2*{PI_STR}[."
+                f"in the interval [-{PI_STR}, {PI_STR}] or [0, 2*{PI_STR}]."
             )
 
     @staticmethod

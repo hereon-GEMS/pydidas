@@ -29,6 +29,7 @@ import time
 import multiprocessing as mp
 from numbers import Integral
 from queue import Empty
+from contextlib import contextmanager
 
 from qtpy import QtCore
 
@@ -53,13 +54,16 @@ class WorkerController(QtCore.QThread):
     n_workers : int, optional
         The number of spawned worker processes. The default is None which will
         use the globally defined pydidas setting for the number of workers.
+    function : Union[type, None], optional
+        The function to be called by the workers. If not specified at init, it must
+        be set later for the workers to actually perform tasks.
     """
 
     sig_progress = QtCore.Signal(float)
-    sig_results = QtCore.Signal(int, object)
+    sig_results = QtCore.Signal(object, object)
     sig_finished = QtCore.Signal()
 
-    def __init__(self, n_workers=None):
+    def __init__(self, n_workers=None, function=None):
         super().__init__()
         self._flag_running = False
         self._flag_thread_alive = True
@@ -86,6 +90,17 @@ class WorkerController(QtCore.QThread):
         self._processor = dict(func=processor, args=_worker_args, kwargs={})
         self._progress_done = 0
         self._progress_target = 0
+
+    @contextmanager
+    def write_lock(self):
+        """
+        Set up the write lock which adding tasks to the list.
+        """
+        try:
+            self._write_lock.lockForWrite()
+            yield
+        finally:
+            self._write_lock.unlock()
 
     @property
     def n_workers(self):
@@ -140,7 +155,7 @@ class WorkerController(QtCore.QThread):
         """
         Stop the thread from running and clean up.
         """
-        self.add_tasks([None] * self.n_workers, stop_tasks=True)
+        self.add_tasks([None] * self.n_workers, are_stop_tasks=True)
         self.suspend()
         self.send_stop_signal()
         self._flag_thread_alive = False
@@ -184,22 +199,22 @@ class WorkerController(QtCore.QThread):
         func : object
             The function to be called by the workers.
         *args : tuple
-            Any arguments which need to be passed to the function.
+            Any additional arguments which need to be passed to the function. The first
+            function argument will always the the task.
         **kwargs : dict
             Any keyword arguments which need to be passed to the function.
         """
         self.suspend()
-        self._reset_task_list()
+        self.reset_task_list()
         self._update_function(func, *args, **kwargs)
         self.restart()
 
-    def _reset_task_list(self):
+    def reset_task_list(self):
         """
         Reset and clear the list of tasks.
         """
-        self._write_lock.lockForWrite()
-        self._to_process = []
-        self._write_lock.unlock()
+        with self.write_lock():
+            self._to_process = []
 
     def _update_function(self, func, *args, **kwargs):
         """
@@ -234,7 +249,7 @@ class WorkerController(QtCore.QThread):
         """
         self._flag_running = True
 
-    def add_task(self, task_arg):
+    def add_task(self, task):
         """
         Add a task to the worker pool.
 
@@ -245,15 +260,13 @@ class WorkerController(QtCore.QThread):
 
         Parameters
         ----------
-        task_arg : object
+        task : object
             The first argument for the processing function.
         """
-        self._write_lock.lockForWrite()
-        self._to_process.append(task_arg)
-        self._write_lock.unlock()
-        self._progress_target += 1
+        with self.write_lock():
+            self._to_process.append(task)
 
-    def add_tasks(self, task_args, stop_tasks=False):
+    def add_tasks(self, tasks, are_stop_tasks=False):
         """
         Add tasks to the worker pool.
 
@@ -264,35 +277,18 @@ class WorkerController(QtCore.QThread):
 
         Parameters
         ----------
-        task_args : Union[list, tuple, set]
+        tasks : Union[list, tuple, set]
             An iterable of the first argument for the processing function.
-        stop_tasks : bool
-            Keyword to signal adding stop tasks. This flag will disable
-            updating the task target number.
+        are_stop_tasks : bool
+            Keyword to signal that the added tasks are stop tasks. This flag will
+            disable updating the task target number.
         """
-        self._write_lock.lockForWrite()
-        for task in task_args:
-            self._to_process.append(task)
-        self._write_lock.unlock()
-        if not stop_tasks:
-            self._progress_target = len(task_args)
-
-    def send_stop_signal(self):
-        """
-        Send stop signal to workers.
-
-        This method will send stop signals to all workers.
-        Note that the runtime of the workers will be determined by the runtime
-        of the called function. This call will be finished before the stop
-        signal will be processed.
-
-        Parameters
-        ----------
-        task_args : Union[list, tuple, set]
-            An iterable of the first argument for the processing function.
-        """
-        for _ in self._workers:
-            self._queues["stop"].put(1)
+        with self.write_lock():
+            for task in tasks:
+                self._to_process.append(task)
+            self._write_lock.unlock()
+        if not are_stop_tasks:
+            self._progress_target += len(tasks)
 
     def finalize_tasks(self):
         """
@@ -301,11 +297,22 @@ class WorkerController(QtCore.QThread):
         This will add tasks to tell the workers to shut down and set a flag
         to quit the loop once processing is done.
         """
-        self._write_lock.lockForWrite()
-        for task in [None] * self._n_workers:
-            self._to_process.append(task)
-        self._write_lock.unlock()
+        with self.write_lock():
+            for task in [None] * self._n_workers:
+                self._to_process.append(task)
         self._flag_stop_after_run = True
+
+    def send_stop_signal(self):
+        """
+        Send stop signal to workers.
+
+        This method will send stop signals to all workers.
+        Note that the runtime of the workers will be determined by the runtime
+        of the called function. the currrent call will be finished before the stop
+        signal will be processed.
+        """
+        for _ in self._workers:
+            self._queues["stop"].put(1)
 
     def run(self):
         """
@@ -321,13 +328,13 @@ class WorkerController(QtCore.QThread):
             while self._flag_running:
                 while len(self._to_process) > 0:
                     self._put_next_task_in_queue()
-                time.sleep(0.005)
+                time.sleep(0.001)
                 self._get_and_emit_all_queue_items()
                 self._check_if_workers_done()
             if self._flag_active:
                 logger.debug("Starting post run")
                 self._cycle_post_run()
-            time.sleep(0.005)
+            time.sleep(0.001)
         logger.debug("finished worker_controller loop")
         self.sig_finished.emit()
 
@@ -335,6 +342,12 @@ class WorkerController(QtCore.QThread):
         """
         Perform operations before entering the main processing loop.
         """
+        self._flag_active = True
+        self._progress_done = 0
+        _tmp_to_process = self._to_process[:]
+        while None in _tmp_to_process:
+            _tmp_to_process.remove(None)
+        self._progress_target = len(_tmp_to_process)
         self._create_and_start_workers()
 
     def _create_and_start_workers(self):
@@ -353,16 +366,13 @@ class WorkerController(QtCore.QThread):
         ]
         for _worker in self._workers:
             _worker.start()
-        self._flag_active = True
-        self._progress_done = 0
 
     def _put_next_task_in_queue(self):
         """
         Get the next task from the list and put it into the queue.
         """
-        self._write_lock.lockForWrite()
-        _arg = self._to_process.pop(0)
-        self._write_lock.unlock()
+        with self.write_lock():
+            _arg = self._to_process.pop(0)
         self._queues["send"].put(_arg)
 
     def _get_and_emit_all_queue_items(self):
@@ -384,13 +394,13 @@ class WorkerController(QtCore.QThread):
         """
         Check if workers are all done.
         """
-        for _worker in self._workers:
-            try:
+        try:
+            for _worker in self._workers:
                 self._queues["finished"].get_nowait()
                 self._workers_done += 1
                 logger.debug("Worker done")
-            except Empty:
-                pass
+        except Empty:
+            pass
         if self._workers_done >= len(self._workers):
             self._flag_running = False
             logger.debug("Stopped running")
@@ -419,13 +429,17 @@ class WorkerController(QtCore.QThread):
         Join the workers back to the thread and free their resources.
         """
         for _worker in self._workers:
-            self._queues["send"].put(None)
             self._queues["stop"].put(1)
         for _worker in self._workers:
-            _worker.join()
             _worker.terminate()
+            _worker.join()
         self._workers = []
         self._flag_active = False
+        while True:
+            try:
+                self._queues["stop"].get_nowait()
+            except Empty:
+                break
 
     def _wait_for_worker_finished_signals(self, timeout=10):
         """

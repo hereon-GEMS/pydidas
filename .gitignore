@@ -21,5 +21,5 @@ htmlcov
 
 # svg files
 *.svg
-!pydidas_images/**/*.svg
+!resources/**/*.svg
 !pydidas*.svg

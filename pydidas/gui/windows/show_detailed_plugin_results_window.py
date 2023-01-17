@@ -148,7 +148,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
 
     def __create_necessary_plots(self):
         """
-        Create all required plots
+        Create all required plots.
         """
         for _index in range(self._config["n_plots"]):
             if f"plot{_index}_stack" in self._widgets:
@@ -186,6 +186,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
                 self._widgets["selector"].clear()
                 self._widgets["selector"].addItems(list(self._results.keys()))
             self._widgets["selector"].setCurrentIndex(0)
+            self._widgets["selector"].setVisible(True)
             self.__select_point(self._config["result_keys"][0])
 
     @QtCore.Slot(str)

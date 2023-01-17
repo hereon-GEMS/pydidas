@@ -134,7 +134,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     output_data_dim = 1
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, use_filename_pattern=True, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_param_value("live_processing", False)
         self._filepath_generator = None
         self._filename_generator = None

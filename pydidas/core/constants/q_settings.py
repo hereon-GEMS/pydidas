@@ -37,8 +37,6 @@ QSETTINGS_GLOBAL_KEYS = [
 ]
 
 QSETTINGS_USER_KEYS = [
-    "det_mask",
-    "det_mask_val",
     "mosaic_border_width",
     "mosaic_border_value",
     "histogram_outlier_fraction",

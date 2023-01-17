@@ -33,15 +33,15 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
-from ..experiment import SetupScan, SetupExperiment
+from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
 
 
 TREE = WorkflowTree()
-SCAN = SetupScan()
-EXP = SetupExperiment()
+SCAN = ScanContext()
+EXP = ExperimentContext()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 
@@ -143,7 +143,7 @@ class ExecuteWorkflowApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the SetupScan.
+            2. Get all multiprocessing tasks from the ScanContext.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -155,18 +155,20 @@ class ExecuteWorkflowApp(BaseApp):
         self._mp_tasks = np.arange(SCAN.n_points)
         if self.slave_mode:
             TREE.restore_from_string(self._config["tree_str_rep"])
-            for _key, _val in self._config["scan_vals"].items():
+            for _key, _val in self._config["scan_context"].items():
                 SCAN.set_param_value(_key, _val)
-            for _key, _val in self._config["exp_vals"].items():
+            for _key, _val in self._config["exp_context"].items():
                 EXP.set_param_value(_key, _val)
         if not self.slave_mode:
             RESULTS.update_shapes_from_scan_and_workflow()
             RESULT_SAVER.set_active_savers_and_title([])
             self._config["tree_str_rep"] = TREE.export_to_string()
-            self._config["scan_vals"] = SCAN.get_param_values_as_dict(
+            self._config["scan_context"] = SCAN.get_param_values_as_dict(
                 filter_types_for_export=True
             )
-            self._config["exp_vals"] = EXP.get_param_values_as_dict()
+            self._config["exp_context"] = EXP.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
             self.__check_and_store_result_shapes()
             self.__check_size_of_results_and_buffer()
             self.initialize_shared_memory()
@@ -379,7 +381,7 @@ class ExecuteWorkflowApp(BaseApp):
         Parameters
         ----------
         index : int
-            The index in the composite image.
+            The index of the buffer position.
         data : tuple
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.

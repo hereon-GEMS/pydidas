@@ -101,7 +101,7 @@ class ViewResultsMixin:
     def _verify_result_shapes_uptodate(self):
         """
         Verify that the underlying information for the WorkflowResults
-        (i.e. the SetupScan and WorkflowTree) have not changed.
+        (i.e. the ScanContext and WorkflowTree) have not changed.
         """
         _hash = RESULTS.source_hash
         if _hash != self._config["source_hash"]:
@@ -269,8 +269,7 @@ class ViewResultsMixin:
 
     def _update_choices_of_selected_results(self):
         """
-        Update the choices of the "selected_results" Parameter based on the
-        latest WorkflowResults.
+        Update the "selected_results" Parameter choices based on the WorkflowResults.
         """
         _param = self.get_param("selected_results")
         RESULTS.update_param_choices_from_labels(_param)
@@ -278,8 +277,7 @@ class ViewResultsMixin:
 
     def _update_export_button_activation(self):
         """
-        Update the enabled state of the export buttons based on available
-        results.
+        Update the enabled state of the export buttons based on available results.
         """
         _active = RESULTS.shapes != {}
         self._widgets["but_export_current"].setEnabled(_active)
@@ -308,7 +306,9 @@ class ViewResultsMixin:
 
     def _export(self, node):
         """
-        Export data of
+        Export data of the specified node.
+
+        If no node is chosen (i.e. None), all nodes will be exported.
 
         Parameters
         ----------

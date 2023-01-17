@@ -68,7 +68,7 @@ class ParameterCollectionMixIn:
         """
         self.params.add_param(param)
 
-    def add_params(self, *params, **kwed_params):
+    def add_params(self, *params):
         """
         Add parameters to the object.
 
@@ -86,7 +86,7 @@ class ParameterCollectionMixIn:
             A dictionary with Parameters. Note that the dictionary keys will
             be ignored and only the Parameter.refkey attributes will be used.
         """
-        for _param in params + tuple(kwed_params.values()):
+        for _param in params:
             if isinstance(_param, Parameter):
                 self.add_param(_param)
             elif isinstance(_param, ParameterCollection):
@@ -108,6 +108,22 @@ class ParameterCollectionMixIn:
         for _param in self.default_params.values():
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
+
+    def update_param_values_from_kwargs(self, **kwargs):
+        """
+        Update the Parameter values corresponding to the given keys.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            The dictionary with Parameter refkeys and values.
+        """
+        for _key, _val in kwargs.items():
+            if _key not in self.params:
+                raise KeyError(
+                    f"No Parameter with the key '{_key}' has been registered."
+                )
+            self.set_param_value(_key, _val)
 
     def get_param_value(self, param_key, *default, dtype=None, for_export=False):
         """

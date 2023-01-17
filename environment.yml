@@ -1,0 +1,20 @@
+name: pydidas-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pyqt>=5.15.7
+  - pip=22.3.1
+  - pyFAI>=0.21.3
+  - scikit-image>=0.19.0
+  - qtawesome>=1.0.3
+  - sphinx>=4.4.0
+  - sphinx_rtd_theme>=1.0.0
+  - pyopencl>=2022.1
+  - qtpy>=2.1.0
+  - natsort>=8.2.0
+  - pyyaml>=6.0
+  - pip:
+    - h5py>=3.7.0
+    - hdf5plugin>=3.2.0

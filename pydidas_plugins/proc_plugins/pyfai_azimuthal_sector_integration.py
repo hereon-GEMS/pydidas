@@ -1,0 +1,198 @@
+# This file is part of pydidas.
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Module with the PyFAIazimuthalSectorIntegration Plugin which allows to integrate over
+several azimuthal sectors at once.
+"""
+
+__author__ = "Malte Storm"
+__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0"
+__maintainer__ = "Malte Storm"
+__status__ = "Development"
+__all__ = ["PyFAIazimuthalSectorIntegration"]
+
+import numpy as np
+from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
+
+from pydidas.plugins import pyFAIintegrationBase
+from pydidas.core import (
+    Dataset,
+    Parameter,
+    get_generic_param_collection,
+    UserConfigError,
+)
+from pydidas.contexts import ExperimentContext
+
+
+EXP = ExperimentContext()
+
+SECTOR_CENTER_PARAM = Parameter(
+    "azi_sector_centers",
+    str,
+    "0; 90; 180; 270",
+    name="Azimuthal sector centers",
+    unit="deg",
+    tooltip=(
+        "The centers of the azimuthal sectors to be integrated (in degree). Separate "
+        "multiple sectors by semicolons."
+    ),
+)
+SECTOR_WIDTH_PARAM = Parameter(
+    "azi_sector_width",
+    float,
+    20,
+    name="Azimuthal sector width",
+    unit="deg",
+    tooltip="The width of each azimuthal sector (in degree).",
+)
+
+
+class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
+    """
+    Integrate images radially to get multiple azimuthal profiles using pyFAI.
+
+    Note: This plugin is intended for arbitrary, asymmetric integration ranges. For
+    repetitive ranges (e.g. 0, 90, 180, 270 degree), it is faster to use the
+    pyFAI2dIntegration and the ExtractAzimuthalSectors plugin.
+
+    For a full documentation of the Plugin, please refer to the pyFAI
+    documentation.
+    """
+
+    plugin_name = "pyFAI azimuthal sector integration"
+    basic_plugin = False
+    output_data_dim = 1
+    default_params = get_generic_param_collection(
+        "rad_npoint",
+        "rad_unit",
+        "rad_use_range",
+        "rad_range_lower",
+        "rad_range_upper",
+        "azi_unit",
+        "azi_sector_centers",
+        "azi_sector_width",
+        "int_method",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._ais = []
+        self._dataset_info = {}
+        self.params["rad_unit"].choices = ["Q / nm^-1", "2theta / deg", "r / mm"]
+
+    def pre_execute(self):
+        """
+        Pre-execute the plugin and store the Parameters required for the execution.
+        """
+        self._eval_sectors()
+        if self._exp_hash != hash(EXP):
+            _lambda_in_A = EXP.get_param_value("xray_wavelength")
+            self._ais = [
+                AzimuthalIntegrator(
+                    dist=EXP.get_param_value("detector_dist"),
+                    poni1=EXP.get_param_value("detector_poni1"),
+                    poni2=EXP.get_param_value("detector_poni2"),
+                    rot1=EXP.get_param_value("detector_rot1"),
+                    rot2=EXP.get_param_value("detector_rot2"),
+                    rot3=EXP.get_param_value("detector_rot3"),
+                    detector=EXP.get_detector(),
+                    wavelength=1e-10 * _lambda_in_A,
+                )
+                for _ in range(self._config["sector_centers"].size)
+            ]
+        self.load_and_set_mask()
+        if self._mask is not None:
+            for _ai in self._ais:
+                _ai.set_mask(self._mask)
+        self._prepare_pyfai_method()
+        self._ai_params = {
+            "unit": self.get_pyFAI_unit_from_param("rad_unit"),
+            "radial_range": self.get_radial_range(),
+            "polarization_factor": 1,
+            "method": self._config["method"],
+        }
+        _label, _unit = self.params["rad_unit"].value.split("/")
+        _azi_unit = self.params["azi_unit"].value.split("/")[1]
+        self._dataset_info = {
+            "axis_labels": ["chi", _label.strip()],
+            "axis_units": [_azi_unit.strip(), _unit.strip()],
+            "data_label": "integrated intensity",
+            "data_unit": "counts",
+        }
+
+    def _eval_sectors(self):
+        """
+        Evaluate the user input for the sectors.
+
+        Raises
+        ------
+        UserConfigError
+            When the sector entries could not be converted correctly.
+        """
+        _delta = self.get_param_value("azi_sector_width") / 2
+        _sector_entries = self.get_param_value("azi_sector_centers")
+        try:
+            _sectors = [float(_entry) for _entry in _sector_entries.split(";")]
+        except ValueError:
+            raise UserConfigError(
+                "Could not convert the azimuthal sectors to numbers: \n"
+                + _sector_entries
+            )
+        self._config["sector_centers"] = np.array(_sectors)
+        self._config["sector_ranges"] = list(
+            zip(np.array(_sectors) - _delta, np.array(_sectors) + _delta)
+        )
+
+    def execute(self, data, **kwargs):
+        """
+        Run the azimuthal integration on the input data.
+
+        Parameters
+        ----------
+        data : np.ndarray
+            The input image array.
+        kwargs : dict
+            Any keyword arguments from the ProcessingTree.
+        """
+        _results = [
+            _ai.integrate1d(
+                data,
+                self.get_param_value("rad_npoint"),
+                azimuth_range=self._config["sector_ranges"][_index],
+                **self._ai_params,
+            )
+            for _index, _ai in enumerate(self._ais)
+        ]
+        _newdata = np.asarray([_res[0] for _res in _results])
+        _axranges = [self._config["sector_centers"], _results[0][0]]
+        _dataset = Dataset(_newdata, axis_ranges=_axranges, **self._dataset_info)
+        return _dataset, kwargs
+
+    def calculate_result_shape(self):
+        """
+        Get the shape of the integrated dataset to set up the CRS / LUT.
+
+        Returns
+        -------
+        tuple
+            The new shape. This is a tuple with a single integer value.
+        """
+        self._eval_sectors()
+        self._config["result_shape"] = (
+            self._config["sector_centers"].size,
+            self.get_param_value("rad_npoint"),
+        )

@@ -81,12 +81,11 @@ def processor(
             try:
                 _results = function(_arg1, *func_args, **func_kwargs)
             except Exception as ex:
-                print("Exception occured during function call to: " f"{function}: {ex}")
+                print(f"Exception occured during function call to: {function}: {ex}")
                 # Sleep time required to stop queues from becoming corrupted.
                 time.sleep(0.02)
                 break
             output_queue.put([_arg1, _results])
         except queue.Empty:
-            pass
-        time.sleep(0.01)
+            time.sleep(0.01)
     finished_queue.put(1)

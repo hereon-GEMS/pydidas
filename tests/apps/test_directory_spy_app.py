@@ -33,7 +33,7 @@ import multiprocessing as mp
 import h5py
 import numpy as np
 
-from pydidas.core import get_generic_parameter, UserConfigError, PydidasQsettings
+from pydidas.core import get_generic_parameter, UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
@@ -45,8 +45,6 @@ class TestDirectorySpyApp(unittest.TestCase):
         self._pname = "test_12345_#####_suffix.npy"
         self._ppath = os.path.join(self._path, self._pname)
         self._glob_str = self._ppath.replace("#####", "*")
-        self.q_settings = PydidasQsettings()
-        self._original_mask_file = self.q_settings.value("user/det_mask")
         self._shape = (20, 20)
         self._mask = np.asarray(
             [
@@ -57,7 +55,6 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._path)
-        self.q_settings.set_value("user/det_mask", self._original_mask_file)
         DirectorySpyApp.parse_func = directory_spy_app_parser
 
     def get_test_image(self, shape=None):
@@ -134,7 +131,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertEqual(app._index, -1)
 
     def test_apply_mask__no_mask(self):
-        _param = get_generic_parameter("use_global_det_mask")
+        _param = get_generic_parameter("use_detector_mask")
         _param.value = False
         _image = self.get_test_image()
         app = DirectorySpyApp(_param)
@@ -143,15 +140,16 @@ class TestDirectorySpyApp(unittest.TestCase):
         self.assertTrue(np.allclose(_image, _newimage))
 
     def test_apply_mask__with_mask(self):
+        _val = 42
         app = DirectorySpyApp()
         app._det_mask = self._mask
-        _val = app._config["det_mask_val"]
+        app.set_param_value("detector_mask_val", _val)
         _image = self.get_test_image()
         _newimage = app._apply_mask(_image)
         self.assertTrue(np.allclose(_newimage[self._mask], _val))
 
     def test_get_detector_mask__no_mask(self):
-        _param = get_generic_parameter("use_global_det_mask")
+        _param = get_generic_parameter("use_detector_mask")
         _param.value = False
         app = DirectorySpyApp(_param)
         _mask = app._get_detector_mask()
@@ -159,8 +157,9 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_get_detector_mask__with_mask(self):
         self.create_temp_mask_file()
-        self.q_settings.set_value("user/det_mask", self._mask_fname)
         app = DirectorySpyApp()
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._mask_fname)
         _mask = app._get_detector_mask()
         self.assertTrue((_mask == self._mask).all())
 
@@ -532,7 +531,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         _names = self.create_pattern_files(n=2)
         app = self.create_default_app()
         app.set_param_value("use_bg_file", True)
-        app.set_param_value("use_global_det_mask", False)
+        app.set_param_value("use_detector_mask", False)
         app.set_param_value("bg_file", _bg_fname)
         app._config["latest_file"] = _names[1]
         app.prepare_run()

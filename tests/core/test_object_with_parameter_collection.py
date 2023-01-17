@@ -72,18 +72,28 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         with self.assertRaises(TypeError):
             obj.add_params(["test"])
 
-    def test_add_params__with_kwargs(self):
+    def test_update_param_values_from_kwargs__empty(self):
         obj = ObjectWithParameterCollection()
-        obj.add_params(
-            param1=self._params.get("Test0"),
-            param2=self._params.get("Test1"),
-            param3=self._params.get("Test2"),
-            param4=self._params.get("Test3"),
-        )
-        for index in range(4):
-            self.assertEqual(
-                obj.params[f"Test{index}"], self._params.get(f"Test{index}")
-            )
+        obj.add_params(*self._params.values())
+        _vals = obj.get_param_values_as_dict()
+        obj.update_param_values_from_kwargs()
+        _new_vals = obj.get_param_values_as_dict()
+        for _key, _val in _vals.items():
+            self.assertEqual(_val, _new_vals[_key])
+
+    def test_update_param_values_from_kwargs__wrong_key(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(*self._params.values())
+        with self.assertRaises(KeyError):
+            obj.update_param_values_from_kwargs(Test5=42)
+
+    def test_update_param_values_from_kwargs__use_case(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(*self._params.values())
+        _new_vals = dict(Test0=42, Test1="new", Test2=17, Test3=3.15)
+        obj.update_param_values_from_kwargs(**_new_vals)
+        for _key, _val in _new_vals.items():
+            self.assertEqual(_val, obj.get_param_value(_key))
 
     def test_add_param(self):
         obj = ObjectWithParameterCollection()

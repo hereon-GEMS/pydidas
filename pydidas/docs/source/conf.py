@@ -20,12 +20,12 @@ sys.path.insert(1, os.path.abspath("./../../.."))
 # -- Project information -----------------------------------------------------
 
 project = "pydidas"
-copyright = "2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+copyright = "2021-2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
 release = "beta"
-version = "0.1.13"
+version = "23.1.17"
 
 # -- General configuration ---------------------------------------------------
 

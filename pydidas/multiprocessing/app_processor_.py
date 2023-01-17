@@ -94,19 +94,18 @@ def app_processor(
         # run processing step
         if _app_carryon:
             try:
-                _arg = input_queue.get(timeout=0.01)
-                if _arg is None:
-                    break
+                _arg = input_queue.get_nowait()
             except queue.Empty:
-                _arg = NO_ITEM
-        if _arg is not NO_ITEM:
+                time.sleep(0.005)
+                continue
+            if _arg is None:
+                break
             logger.debug('Received item "%s" from queue' % _arg)
             _app.multiprocessing_pre_cycle(_arg)
-            _app_carryon = _app.multiprocessing_carryon()
-            if _app_carryon:
-                logger.debug("Starting computation")
-                _results = _app.multiprocessing_func(_arg)
-                logger.debug("Finished computation")
-                output_queue.put([_arg, _results])
-        time.sleep(0.01)
+        _app_carryon = _app.multiprocessing_carryon()
+        if _app_carryon:
+            logger.debug("Starting computation")
+            _results = _app.multiprocessing_func(_arg)
+            logger.debug("Finished computation")
+            output_queue.put([_arg, _results])
     finished_queue.put(1)

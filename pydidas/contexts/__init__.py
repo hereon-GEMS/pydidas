@@ -24,8 +24,25 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+# import sub-packages:
+from . import experiment_context
+from . import scan_context
+
+__all__.extend(["experiment_context", "scan_context"])
+
+
 # import __all__ items from modules:
 from .file_dialogues import *
+
+
+# explicitly import the singleton factories from the subpackages
+from .experiment_context import ExperimentContext, ExperimentContextIoMeta
+from .scan_context import ScanContext, ScanContextIoMeta
+
+__all__.extend(
+    ["ExperimentContext", "ExperimentContextIoMeta", "ScanContext", "ScanContextIoMeta"]
+)
+
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:

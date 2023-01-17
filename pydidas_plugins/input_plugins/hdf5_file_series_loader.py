@@ -29,11 +29,11 @@ from pydidas.core import get_generic_param_collection, UserConfigError
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
 from pydidas.plugins import InputPlugin
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.data_io import import_data
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class Hdf5fileSeriesLoader(InputPlugin):

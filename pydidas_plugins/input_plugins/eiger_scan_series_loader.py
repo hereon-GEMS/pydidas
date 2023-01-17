@@ -30,12 +30,12 @@ import os
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
 
 
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class EigerScanSeriesLoader(InputPlugin):
@@ -60,7 +60,7 @@ class EigerScanSeriesLoader(InputPlugin):
     eiger_dir : str, optional
         The directory name created by the Eiger detector to store its data.
         The default is "eiger9m".
-    filename_suffix : str, optional
+    eiger_filename_suffix : str, optional
         The suffix to be appended to the filename pattern (including extension)
         to make up the full filename. The default is "_data_00001.h5"
     hdf5_key : str
@@ -78,7 +78,7 @@ class EigerScanSeriesLoader(InputPlugin):
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
         "eiger_dir",
-        "filename_suffix",
+        "eiger_filename_suffix",
         "hdf5_key",
         "images_per_file",
     )
@@ -86,7 +86,7 @@ class EigerScanSeriesLoader(InputPlugin):
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, use_filename_pattern=True, **kwargs)
+        super().__init__(*args, **kwargs)
         self.filename_string = ""
 
     def pre_execute(self):
@@ -107,7 +107,7 @@ class EigerScanSeriesLoader(InputPlugin):
         _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
         _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
         _eigerkey = self.get_param_value("eiger_dir")
-        _suffix = self.get_param_value("filename_suffix", dtype=str)
+        _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
         if _pattern.endswith(_suffix):
             _pattern = _pattern[: -len(_suffix)]
         _len_pattern = _pattern.count("#")

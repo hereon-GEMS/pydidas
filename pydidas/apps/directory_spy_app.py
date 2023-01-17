@@ -79,9 +79,14 @@ class DirectorySpyApp(BaseApp):
     hdf5_key : Hdf5key, optional
         Used only for hdf5 files: The dataset key. The default is
         entry/data/data.
-    use_global_det_mask : bool, optional
+    use_det_mask : bool, optional
         Keyword to enable or disable using the global detector mask as
         defined by the global mask file and mask value. The default is True.
+    detector_mask_file : Union[pathlib.Path, str], optional
+        The full path to the detector mask file.
+    det_mask_val : float, optional
+        The display value for masked pixels. The default is 0.
+
     use_bg_file : bool, optional
         Keyword to toggle usage of background subtraction. The default is
         False.
@@ -110,7 +115,9 @@ class DirectorySpyApp(BaseApp):
         "filename_pattern",
         "directory_path",
         "hdf5_key",
-        "use_global_det_mask",
+        "use_detector_mask",
+        "detector_mask_file",
+        "detector_mask_val",
         "use_bg_file",
         "bg_file",
         "bg_hdf5_key",
@@ -145,9 +152,6 @@ class DirectorySpyApp(BaseApp):
         """
         self._shared_array = None
         self._index = -1
-        self._config["det_mask_val"] = float(
-            self.q_settings_get_value("user/det_mask_val")
-        )
 
     def multiprocessing_pre_run(self):
         """
@@ -164,7 +168,7 @@ class DirectorySpyApp(BaseApp):
 
             1. Get the shape of all results from the WorkflowTree and store
                them for internal reference.
-            2. Get all multiprocessing tasks from the SetupScan.
+            2. Get all multiprocessing tasks from the ScanContext.
             3. Calculate the required buffer size and verify that the memory
                requirements are okay.
             4. Initialize the shared memory arrays.
@@ -193,14 +197,14 @@ class DirectorySpyApp(BaseApp):
             If the mask could be loaded from a numpy file, return the mask.
             Else, None is returned.
         """
-        if not self.get_param_value("use_global_det_mask"):
+        if not self.get_param_value("use_detector_mask"):
             return None
-        _maskfile = self.q_settings_get_value("user/det_mask")
+        _mask_file = self.get_param_value("detector_mask_file")
         try:
-            _mask = np.load(_maskfile)
+            _mask = np.load(_mask_file)
             return _mask
         except (FileNotFoundError, ValueError, PermissionError):
-            self.set_param_value("use_global_det_mask", False)
+            self.set_param_value("use_detector_mask", False)
             return None
         raise PydidasConfigError("Unknown error when reading detector mask file.")
 
@@ -273,7 +277,8 @@ class DirectorySpyApp(BaseApp):
         """
         if self._det_mask is None:
             return image
-        return np.where(self._det_mask, self._config["det_mask_val"], image)
+        _val = self.get_param_value("detector_mask_val")
+        return np.where(self._det_mask, _val, image)
 
     def initialize_shared_memory(self):
         """

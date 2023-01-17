@@ -33,12 +33,12 @@ import h5py
 
 from pydidas.core import UserConfigError, Parameter
 from pydidas.core.utils import get_random_string
-from pydidas.experiment import SetupScan
+from pydidas.contexts import ScanContext
 from pydidas.plugins import PluginCollection, BasePlugin
 
 
 PLUGIN_COLLECTION = PluginCollection()
-SCAN = SetupScan()
+SCAN = ScanContext()
 
 
 class TestHdf5FileSeriesLoader(unittest.TestCase):

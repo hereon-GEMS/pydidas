@@ -27,7 +27,7 @@ __all__ = ["composite_creator_app_parser"]
 
 import argparse
 
-from ...core.constants import GENERIC_PARAM_DESCRIPTION as PARAMS
+from ...core.constants import GENERIC_PARAMS_METADATA as PARAMS
 
 
 def composite_creator_app_parser(caller=None):
@@ -47,6 +47,11 @@ def composite_creator_app_parser(caller=None):
         and entered values or  - if missing - the default values.
     """
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--live_processing",
+        action="store_true",
+        help="Flag to enable live_processing without checking filenames and sizes.",
+    )
     parser.add_argument("-first_file", "-f", help=PARAMS["first_file"]["tooltip"])
     parser.add_argument("-last_file", "-l", help=PARAMS["last_file"]["tooltip"])
     parser.add_argument(
@@ -73,15 +78,15 @@ def composite_creator_app_parser(caller=None):
         "-bg_hdf5_frame", type=int, help=PARAMS["bg_hdf5_frame"]["tooltip"]
     )
     parser.add_argument(
-        "-composite_nx", type=int, help=PARAMS["composite_nx"]["tooltip"]
-    )
-    parser.add_argument(
-        "-composite_ny", type=int, help=PARAMS["composite_ny"]["tooltip"]
-    )
-    parser.add_argument(
-        "--do_not_use_detmask",
+        "--use_detector_mask",
         action="store_true",
-        help="Do not use the global detector mask.",
+        help=PARAMS["use_detector_mask"]["tooltip"],
+    )
+    parser.add_argument(
+        "-detector_mask_file", help=PARAMS["detector_mask_file"]["tooltip"]
+    )
+    parser.add_argument(
+        "-detector_mask_val", help=PARAMS["detector_mask_val"]["tooltip"]
     )
     parser.add_argument(
         "--use_roi", action="store_true", help=PARAMS["use_roi"]["tooltip"]
@@ -103,6 +108,22 @@ def composite_creator_app_parser(caller=None):
     )
     parser.add_argument("-binning", type=int, help=PARAMS["binning"]["tooltip"])
     parser.add_argument(
+        "-composite_nx", type=int, help=PARAMS["composite_nx"]["tooltip"]
+    )
+    parser.add_argument(
+        "-composite_ny", type=int, help=PARAMS["composite_ny"]["tooltip"]
+    )
+    parser.add_argument(
+        "-composite_xdir_orientation",
+        type=int,
+        help=PARAMS["composite_xdir_orientation"]["tooltip"],
+    )
+    parser.add_argument(
+        "-composite_ydir_orientation",
+        type=int,
+        help=PARAMS["composite_ydir_orientation"]["tooltip"],
+    )
+    parser.add_argument(
         "-output_fname",
         help=(
             "The name used for saving the composite image "
@@ -113,8 +134,7 @@ def composite_creator_app_parser(caller=None):
     )
     _args = dict(vars(parser.parse_args()))
     # store None for keyword arguments which were not selected:
-    for _key in ["use_roi", "use_thresholds", "use_bg_file"]:
+    for _key in ["use_roi", "use_thresholds", "use_bg_file", "use_detector_mask"]:
         _val = _args[_key]
         _args[_key] = True if _val else None
-    _args["use_global_det_mask"] = False if _args.pop("do_not_use_detmask") else None
     return _args

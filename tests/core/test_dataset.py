@@ -169,13 +169,6 @@ class TestDataset(unittest.TestCase):
         _new = obj[_mask == 0]
         self.assertTrue(np.allclose(obj.flatten(), _new))
 
-    # def test_array_finalize__get_masked_ii(self):
-    #     obj = self.create_large_dataset()
-    #     _mask = np.zeros(obj.shape)
-    #     _new = obj[_mask == 1]
-    #     print(_new)
-    #     self.assertTrue(np.allclose(obj.flatten(), _new))
-
     def test_get_rebinned_copy__bin2(self):
         obj = self.create_large_dataset()
         _new = obj.get_rebinned_copy(2)
@@ -189,6 +182,14 @@ class TestDataset(unittest.TestCase):
         self.assertIsInstance(_new, Dataset)
         self.assertNotEqual(id(obj), id(_new))
         self.assertEqual(obj.shape, _new.shape)
+
+    def test_property_dict(self):
+        obj = self.create_large_dataset()
+        _obj_props = obj.property_dict
+        _copy = obj.property_dict
+        _copy["data_unit"] = "42 space"
+        self.assertEqual(_obj_props["data_unit"], obj.data_unit)
+        self.assertNotEqual(_copy["data_unit"], obj.data_unit)
 
     def test_flatten(self):
         obj = self.create_large_dataset()

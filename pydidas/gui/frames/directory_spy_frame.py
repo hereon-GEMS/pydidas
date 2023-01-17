@@ -33,14 +33,14 @@ from ...apps import DirectorySpyApp
 from ...core import ParameterCollection
 from ...core.utils import pydidas_logger, get_extension
 from ...core.constants import HDF5_EXTENSIONS
-from ...experiment import SetupExperiment, SetupScan
+from ...contexts import ExperimentContext, ScanContext
 from ...multiprocessing import AppRunner, app_processor_without_tasks
 from ...workflow import WorkflowTree, WorkflowResults
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
 
 
-EXP = SetupExperiment()
-SCAN = SetupScan()
+EXP = ExperimentContext()
+SCAN = ScanContext()
 RESULTS = WorkflowResults()
 TREE = WorkflowTree()
 logger = pydidas_logger()
@@ -85,6 +85,9 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self.param_widgets["filename_pattern"].io_edited.connect(
             self.__update_file_widget_visibility
         )
+        self.param_widgets["use_detector_mask"].io_edited.connect(
+            self.__update_det_mask_visibility
+        )
         self.param_widgets["use_bg_file"].io_edited.connect(
             self.__update_bg_widget_visibility
         )
@@ -95,6 +98,23 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self._widgets["but_show"].clicked.connect(self.__force_show)
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_stop"].clicked.connect(self.__stop_execution)
+        self.__update_det_mask_visibility()
+        self.__update_bg_widget_visibility()
+
+    def restore_state(self, state):
+        """
+        Restore the frame's state from stored information.
+
+        Parameters
+        ----------
+        state : dict
+            A dictionary with 'params', 'app' and 'visibility' keys and the
+            respective information for all.
+        """
+        super().restore_state(state)
+        super().frame_activated(self.frame_index)
+        self.__update_det_mask_visibility()
+        self.__update_bg_widget_visibility()
 
     @QtCore.Slot()
     def __update_file_widget_visibility(self):
@@ -109,6 +129,15 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         )
         self.toggle_param_widget_visibility("filename_pattern", not _vis)
         self.toggle_param_widget_visibility("hdf5_key", _vis or _hdf5_pattern)
+
+    @QtCore.Slot()
+    def __update_det_mask_visibility(self):
+        """
+        Update the visibility of the detector mask Parameters.
+        """
+        _vis = self.get_param_value("use_detector_mask")
+        self.toggle_param_widget_visibility("detector_mask_file", _vis)
+        self.toggle_param_widget_visibility("detector_mask_val", _vis)
 
     @QtCore.Slot()
     def __update_bg_widget_visibility(self):

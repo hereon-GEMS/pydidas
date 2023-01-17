@@ -84,8 +84,8 @@ Detailed descriptions of the individual frames are given here.
     frames/PyfaiCalibFrame
     frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
-    frames/SetupExperimentFrame
-    frames/SetupScanFrame
+    frames/DefineExperimentFrame
+    frames/DefineScanFrame
     frames/WorkflowEditFrame
     frames/WorkflowTestFrame
     frames/WorkflowRunFrame
@@ -115,4 +115,8 @@ Detailed information about the individual windows is given here.
 
 Recipes
 -------
-to be added upon request
+
+.. toctree::
+    :maxdepth: 1
+
+    recipes/pydidas_processing

@@ -26,24 +26,20 @@ __status__ = "Development"
 __all__ = ["FilelistManager"]
 
 import os
-import re
 import copy
 from pathlib import Path
 from natsort import natsorted
-
-import numpy as np
 
 from ..core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
-from ..core.constants import FILENAME_DELIMITERS
 from ..core.utils import (
     check_file_exists,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
-    get_extension,
+    get_file_naming_scheme,
 )
 
 
@@ -95,8 +91,9 @@ class FilelistManager(ObjectWithParameterCollection):
         Create a FilelistManager instance.
         """
         ObjectWithParameterCollection.__init__(self)
-        self.add_params(*args, **kwargs)
+        self.add_params(*args)
         self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
         self._config = {"file_list": [], "file_size": None, "n_files": 0}
 
     @property
@@ -277,65 +274,12 @@ class FilelistManager(ObjectWithParameterCollection):
         This method will filter the compare the names of the first and last
         file and try to interprete the selected range.
         """
-        _fnames, _range = self._get_live_processing_naming_scheme()
+        _fnames, _range = get_file_naming_scheme(
+            self.get_param_value("first_file"), self.get_param_value("last_file")
+        )
         self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
         self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
         self._config["n_files"] = len(_range)
-
-    def _get_live_processing_naming_scheme(self):
-        """
-        Get the naming scheme for live processing files.
-
-        This method tries to find the single difference in the filenames and
-        builds a formattable string from it.
-
-        Returns
-        -------
-        fnames : str
-            The formattable string (keyword "index") to get the file name.
-        range : range
-            The range iteratable which points to all file names.
-        """
-
-        def raise_error():
-            raise UserConfigError(
-                "Could not interprete the filenames. The filenames do not "
-                "differ in exactly one item, as determined by the delimiters."
-                f'Delimiters considered are: {FILENAME_DELIMITERS.split("|")}'
-            )
-
-        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
-        _fname2 = os.path.split(self.get_param_value("last_file"))[1]
-        _items1 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname1)[0])
-        _items2 = re.split(FILENAME_DELIMITERS, os.path.splitext(_fname2)[0])
-        if len(_items1) != len(_items2) or get_extension(_fname1) != get_extension(
-            _fname2
-        ):
-            raise_error()
-        diff_index = []
-        for index, item in enumerate(_items1):
-            item2 = _items2[index]
-            if item != item2 and len(item) == len(item2):
-                diff_index.append(index)
-        if len(diff_index) != 1:
-            raise_error()
-        diff_index = diff_index[0]
-        _n = len(_items1[diff_index])
-        _strindex = int(
-            np.sum(np.r_[[len(_items1[index]) + 1 for index in range(diff_index)]])
-        )
-        _fnames = (
-            _path1
-            + os.sep
-            + _fname1[:_strindex]
-            + "{index:0"
-            + f"{_n}"
-            + "d}"
-            + _fname1[_strindex + _n :]
-        )
-        _index1 = int(_items1[diff_index])
-        _index2 = int(_items2[diff_index])
-        return _fnames, range(_index1, _index2 + 1)
 
     def get_filename(self, index):
         """

@@ -62,16 +62,14 @@ class TestCompositeCreatorApp(unittest.TestCase):
         self._q_settings = PydidasQsettings()
         self._border = self._q_settings.value("user/mosaic_border_width", int)
         self._bgvalue = self._q_settings.value("user/mosaic_border_value", float)
-        self._globalmask = self._q_settings.value("user/det_mask")
         _mask = np.zeros((self._img_shape), dtype=np.bool_)
         _maskfile = Path(os.path.join(self._path, "mask.npy"))
         np.save(_maskfile, _mask)
-        self._q_settings.set_value("user/det_mask", _maskfile)
         self._maskfile = _maskfile
 
     def tearDown(self):
-        self._q_settings.set_value("user/det_mask", self._globalmask)
         shutil.rmtree(self._path)
+        self._q_settings = PydidasQsettings()
 
     def get_default_app(self):
         self._ny = 5
@@ -235,17 +233,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isclose(_image, _newimage).all())
 
-    def test_apply_mask__with_mask_and_no_value(self):
-        _shape = (50, 50)
-        rng = np.random.default_rng(12345)
-        _mask = rng.integers(low=0, high=2, size=_shape)
-        app = CompositeCreatorApp()
-        app._det_mask = _mask
-        app._config["det_mask_val"] = None
-        _image = np.random.random(_shape)
-        with self.assertRaises(UserConfigError):
-            app._CompositeCreatorApp__apply_mask(_image)
-
     def test_apply_mask__with_mask_and_finite_mask_val(self):
         _shape = (50, 50)
         rng = np.random.default_rng(12345)
@@ -253,7 +240,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _val = rng.random() * 1e3
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config["det_mask_val"] = _val
+        app.set_param_value("detector_mask_val", _val)
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         _delta = _newimage - _image
@@ -267,7 +254,7 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _mask = rng.integers(low=0, high=2, size=_shape)
         app = CompositeCreatorApp()
         app._det_mask = _mask
-        app._config["det_mask_val"] = _val
+        app.set_param_value("detector_mask_val", _val)
         _image = Dataset(np.random.random(_shape))
         _newimage = app._CompositeCreatorApp__apply_mask(_image)
         self.assertTrue(np.isnan(_newimage[_mask == 1]).all())
@@ -466,20 +453,25 @@ class TestCompositeCreatorApp(unittest.TestCase):
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
         app.q_settings_set_key("user/det_mask", "no/such/file.tif")
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__wrong_file(self):
         app = CompositeCreatorApp()
         with open(self._maskfile, "w") as f:
             f.write("this is not a numpy file.")
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertIsNone(_mask)
 
     def test_get_detector_mask__with_binning(self):
         app = CompositeCreatorApp()
         app.set_param_value("binning", 2)
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
+        app._store_detector_mask()
+        _mask = app._det_mask
         _binned_shape = (self._img_shape[0] // 2, self._img_shape[1] // 2)
         self.assertEqual(_mask.shape, _binned_shape)
 
@@ -488,8 +480,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("roi_xlow", 5)
         app.set_param_value("use_roi", True)
         app.set_param_value("first_file", self._hdf5_fnames[0])
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         _target_shape = (self._img_shape[0], self._img_shape[1] - 5)
         self.assertEqual(_mask.shape, _target_shape)
 
@@ -499,8 +494,11 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.set_param_value("use_roi", True)
         app.set_param_value("binning", 2)
         app.set_param_value("first_file", self._hdf5_fnames[0])
+        app.set_param_value("use_detector_mask", True)
+        app.set_param_value("detector_mask_file", self._maskfile)
         app._image_metadata.update(filename=self._hdf5_fnames[0])
-        _mask = app._CompositeCreatorApp__get_detector_mask()
+        app._store_detector_mask()
+        _mask = app._det_mask
         self.assertEqual(_mask.shape, app._image_metadata.final_shape)
 
     def test_prepare_run__plain(self):
@@ -536,7 +534,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.multiprocessing_pre_run()
         self.assertTrue(app._config["mp_pre_run_called"])
         self.assertIsNotNone(app._config["mp_tasks"])
-        self.assertIsNotNone(app._config["det_mask_val"])
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ Improvements
   keywords.
 - The DefineExperimentFrame now also checks for a mask file, if a detector mask
   has been imported from file for the pyFAI calibration.
+- Reworked the RemoveOutlier plugin to be more robust.
   
 Bugfixes
 --------

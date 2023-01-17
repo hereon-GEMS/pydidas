@@ -27,7 +27,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+import os as __os
+import logging as __logging
+
 import qtpy.QtCore as __QtCore
+import h5py as __h5py
+
 
 # import local modules
 from . import version
@@ -75,10 +80,6 @@ if not core.utils.check_sphinx_html_docs():
 core.utils.set_default_plugin_dir()
 
 # Disable the pyFAI logging to console
-import os as __os
-import logging as __logging
-
-
 __os.environ["PYFAI_NO_LOGGING"] = "1"
 # Change the pyFAI logging level to ERROR and above
 pyFAI_azi_logger = __logging.getLogger("pyFAI.azimuthalIntegrator")

@@ -1,6 +1,4 @@
-import sys
 import argparse
-
 
 import pydidas
 from pydidas.core import Parameter, ParameterCollection

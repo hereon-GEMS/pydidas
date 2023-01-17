@@ -52,6 +52,7 @@ Bugfixes
 - Fixed the parser for the CompositeCreatorApp.
 - Fixed an issue with multiprocessing_carry in the BaseApp (relavant for 
   serial processing only).
+- Fixed an issue with importing a incomplete state file.
 
 
 =======

@@ -42,7 +42,7 @@ from ..core.utils import (
 from ..contexts import ScanContext, ExperimentContext
 from ..workflow import WorkflowTree
 from ..widgets import PydidasFrameStack
-from ..widgets.dialogues import QuestionBox
+from ..widgets.dialogues import QuestionBox, critical_warning
 from ..version import VERSION
 from . import utils
 from .gui_excepthook_ import gui_excepthook
@@ -586,7 +586,11 @@ class MainMenu(QtWidgets.QMainWindow):
             for _index, _ in enumerate(self.centralWidget().frames)
         ]
         if False in _frame_info:
-            raise PydidasGuiError("The state is not defined for all frames.")
+            critical_warning(
+                "Error",
+                "The state is not defined for all frames. Aborting Frame state import."
+            )
+            return
         for _index, _frame in enumerate(self.centralWidget().frames):
             _frame.restore_state(state[f"frame_{_index:02d}"])
 

@@ -588,7 +588,7 @@ class MainMenu(QtWidgets.QMainWindow):
         if False in _frame_info:
             critical_warning(
                 "Error",
-                "The state is not defined for all frames. Aborting Frame state import."
+                "The state is not defined for all frames. Aborting Frame state import.",
             )
             return
         for _index, _frame in enumerate(self.centralWidget().frames):

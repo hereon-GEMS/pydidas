@@ -5,7 +5,7 @@ virtualenv
 meson-python
 cython
 PyQt5>=5.15.7
-pyFAI>=2023.1
+pyFAI==0.21.3
 scikit-image>=0.18.3
 qtawesome>=1.0.3
 sphinx>=4.4.0

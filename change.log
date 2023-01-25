@@ -1,3 +1,72 @@
+========
+v23.1.25
+========
+
+Improvements
+------------
+- Added zenodo DOI to CFF
+- Updated logo
+
+
+========
+v23.1.17
+========
+
+Major changes
+-------------
+- Changed the version numbering to YY.MM.DD
+- Reorganized SetupScan and SetupExperiment and renamed them to ScanContext and
+  ExperimentContext in the contenxts sub-package.
+- Added core.fitting sub-package which allows to easily add more fitting 
+  functions.
+- Moved the global detector mask from the settings to the ExperimentContext
+  to allow easier switching between processing different experiments.
+
+Improvements
+------------
+- Improved documentation target names to unclutter namespace.
+- Improved the multiprocessing speed by optimizing the functions.
+- Added CITATION.CFF file.
+- Added licenses for texts and images.
+- Added a PyFAIazimuthalSectorIntegration plugin for arbitrary sectors.
+- Added a menu entry in "help" to show the paths to the log and config files.
+- Added the "property_dict" property to Dataset to get all properties at once,
+  for example for copying.
+- Added import_state and export_state methods to the BaseApp
+- Changed missing results (i.e. not yet procesed) values to nan to have the 
+  full range of the colormap available for the results.
+- Changed the BaseApp.multiprocessing_pre_run and _post_run to return from
+  NotImplementedError to simplify creating simple apps.
+- Added an initialize_shared_memory method to the BaseApp for consistency.
+- Removed the (unused) option to add Parameters to objects with keyword 
+  arguments.
+- Added the option to set Parameter values at object instantiation with 
+  keywords.
+- The DefineExperimentFrame now also checks for a mask file, if a detector mask
+  has been imported from file for the pyFAI calibration.
+- Reworked the RemoveOutlier plugin to be more robust.
+  
+Bugfixes
+--------
+- Fixed an issue with rois and locally (i.e. in the plugin) declared masks in
+  pyFAIintegrationBase plugin.
+- Fixed an issue with double initiation of the AzimuthalIntegrator in the 
+  pyFAI2dIntegration plugin.
+- Fixed an issue with decorator for multi-dim processing if the Plugin does not
+  have detailed results.
+- Fixed an issue in the Hdf5DatasetSelector which did not display the full 
+  dataset name.
+- Fixed an issue with the ShowDetailedPluginResults window which did not show 
+  the selector for multi-dim processing if another result had been displayed 
+  before.
+- Fixed an issue in the FitSinglePeak plugin where detailed results were not 
+  available for minimum peak heights.
+- Fixed the parser for the CompositeCreatorApp.
+- Fixed an issue with multiprocessing_carry in the BaseApp (relavant for 
+  serial processing only).
+- Fixed an issue with importing a incomplete state file.
+
+
 =======
 v0.1.14
 =======

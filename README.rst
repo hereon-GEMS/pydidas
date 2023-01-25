@@ -25,7 +25,7 @@ Using conda
 
 Use the provided environment.yml file to create the conda environment::
 
-    conda env create --name pydidas --file .\environment.yml
+    conda env create --name pydidas --file .\pydidas-env.yml
 
 Using pip
 .........
@@ -63,8 +63,17 @@ pydidas, but depending on system settings and python installation, the
 3. Navigate to the "pydidas/docs/build/html" folder and open "index.html".
 
 
+Referencing pydidas
+-------------------
+
+For the full citation  information of pydidas, please see the CITATION.cff file.
+
+Pydidas can also be cited by its DOI on zenodo: 10.5281/zenodo.7568392 |zenodo DOI|
+
+
 License
 -------
 
-pydidas is released under the GNU GENERAL PUBLIC LICENSE Version 3. A copy
-of the full license is provided with the pydidas.
+pydidas is released under the GNU General Public License Version 3. A copy
+of the full license is provided with the pydidas. For more information on the
+individual files, please refer to the LICENSE.md file.

@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
 # Parts of this file are adapted based on the pyfai-calib widget which is distributed
-# under the license given below:
+# under the MIT license.
 
 """
 Module with the PyfaiCalibFrame which is roughly based on the pyfai-calib2 window

@@ -1,6 +1,3 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 title: "pydidas - Python Diffraction Data Analysis Suite"
@@ -20,6 +17,5 @@ repository-code: "https://github.com/hereon-GEMS/pydidas"
 identifiers:
   - description: The pydidas project DOI
     type: doi
-	value: "10.5281/zenodo.7568392"
+    value: "10.5281/zenodo.7568392"
 version: 23.1.25
-doi: 10.5281/zenodo.7568392

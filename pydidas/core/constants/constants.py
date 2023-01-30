@@ -72,7 +72,7 @@ PROC_PLUGIN_INTEGRATED = 12
 PROC_PLUGIN_TYPE_NAMES = {
     PROC_PLUGIN_GENERIC: "Generic processing plugins",
     PROC_PLUGIN_IMAGE: "Processing plugins for image data",
-    PROC_PLUGIN_INTEGRATED: "Processing plugins for integrated data"
+    PROC_PLUGIN_INTEGRATED: "Processing plugins for integrated data",
 }
 
 pyFAI_UNITS = {

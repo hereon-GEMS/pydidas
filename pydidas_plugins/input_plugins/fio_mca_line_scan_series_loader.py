@@ -91,6 +91,7 @@ FIO_MCA_READER_DEFAULT_PARAMS = ParameterCollection(
     ),
 )
 
+
 class FioMcaLineScanSeriesLoader(InputPlugin1d):
     """
     Load data frames from a series of Fio files with MCA data.
@@ -181,11 +182,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         if _len_pattern < 1:
             raise UserConfigError("No filename pattern detected in the Input plugin!")
         _name = os.path.join(_basepath, _pattern, _pattern + _suffix)
-        _name = _name.replace(
-            "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
-        )
+        _name = _name.replace("#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}")
         self.filename_string = _name.replace("#", "{index2:d}")
-
 
     def __determine_header_size(self):
         """
@@ -271,9 +269,6 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("files_per_directory")
-        _tmp_index =+ SCAN.get_param_value(
-            "scan_start_index"
-        )
         _pathindex = index // _n_per_dir + SCAN.get_param_value("scan_start_index")
         _fileindex = index % _n_per_dir
         return self.filename_string.format(index=_pathindex, index2=_fileindex)

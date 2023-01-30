@@ -27,15 +27,13 @@ __all__ = ["FrameLoader"]
 
 
 from pydidas.core.constants import INPUT_PLUGIN
-from pydidas.core import get_generic_param_collection
 from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
 
 
 class FrameLoader(InputPlugin):
     """
-    Load data frames from files with a single image in each, for example tif
-    or cif files.
+    Load data frames from files with a single image in each, for example tif files.
 
     This class is designed to load data from a series of files. The file
     series is defined through the first and last file and file stepping.

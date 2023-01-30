@@ -106,8 +106,12 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the selected plugin.
         """
-        if name in ["Input plugins", "Processing plugins", "Output plugins",
-                    *list(PROC_PLUGIN_TYPE_NAMES.values())]:
+        if name in [
+            "Input plugins",
+            "Processing plugins",
+            "Output plugins",
+            *list(PROC_PLUGIN_TYPE_NAMES.values()),
+        ]:
             return
         self.sig_add_plugin_to_tree.emit(name)
 
@@ -121,8 +125,12 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the plugin.
         """
-        if name in ["Input plugins", "Processing plugins", "Output plugins",
-                    *list(PROC_PLUGIN_TYPE_NAMES.values())]:
+        if name in [
+            "Input plugins",
+            "Processing plugins",
+            "Output plugins",
+            *list(PROC_PLUGIN_TYPE_NAMES.values()),
+        ]:
             return
         _p = self.collection.get_plugin_by_plugin_name(name)
         self._widgets["plugin_description"].setTextFromDict(

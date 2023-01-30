@@ -17,5 +17,5 @@ repository-code: "https://github.com/hereon-GEMS/pydidas"
 identifiers:
   - description: The pydidas project DOI
     type: doi
-    value: "10.5072/zenodo.1151470"
+    value: "10.5281/zenodo.7568610"
 version: 23.1.25

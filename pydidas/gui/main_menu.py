@@ -32,7 +32,7 @@ from functools import partial
 import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
-from ..core import PydidasGuiError, UserConfigError
+from ..core import UserConfigError
 from ..core.utils import (
     DOC_HOME_QURL,
     get_pydidas_icon_w_bg,

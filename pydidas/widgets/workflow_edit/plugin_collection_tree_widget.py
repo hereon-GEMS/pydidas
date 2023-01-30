@@ -194,29 +194,22 @@ class PluginCollectionTreeWidget(QtWidgets.QTreeView):
         input_plugins = QtGui.QStandardItem("Input plugins")
         output_plugins = QtGui.QStandardItem("Output plugins")
 
-        proc_plugin_generic = QtGui.QStandardItem("Generic processing plugins")
-        proc_plugin_image = QtGui.QStandardItem("Processing plugins for image data")
-        proc_plugin_integrated = QtGui.QStandardItem(
-            "Processing plugins for integrated data"
-        )
+        proc_plugin_items = {
+            _key: QtGui.QStandardItem(_label)
+            for _key, _label in constants.PROC_PLUGIN_TYPE_NAMES.items()
+        }
 
         for _plugin in self.collection.get_all_plugins_of_type("input"):
             input_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type("proc"):
-            if _plugin.plugin_subtype == constants.PROC_PLUGIN_GENERIC:
-                _parent = proc_plugin_generic
-            elif _plugin.plugin_subtype == constants.PROC_PLUGIN_IMAGE:
-                _parent = proc_plugin_image
-            elif _plugin.plugin_subtype == constants.PROC_PLUGIN_INTEGRATED:
-                _parent = proc_plugin_integrated
+            _parent = proc_plugin_items[_plugin.plugin_subtype]
             _parent.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
         for _plugin in self.collection.get_all_plugins_of_type("output"):
             output_plugins.appendRow(QtGui.QStandardItem(_plugin.plugin_name))
 
         root_node.appendRow(input_plugins)
-        root_node.appendRow(proc_plugin_generic)
-        root_node.appendRow(proc_plugin_image)
-        root_node.appendRow(proc_plugin_integrated)
+        for _item in proc_plugin_items.values():
+            root_node.appendRow(_item)
         root_node.appendRow(output_plugins)
         return root_node, tree_model
 

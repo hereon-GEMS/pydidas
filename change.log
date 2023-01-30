@@ -1,12 +1,15 @@
 
 Improvements
 ------------
-
+- Generalized the plugin processing-plugin subcategories and defined them 
+  in core.constants.constants.
   
 Bugfixes
 --------
 - Fixed an issue with the font size in Unix systems.
 - Fixed outdated docstring for FrameLoader plugin class.
+- Fixed an issue with the PluginCollectionBrowser widget which did not filter
+  the sub-categories for processing plugins.
 
 ========
 v23.1.25

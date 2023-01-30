@@ -6,6 +6,7 @@ Improvements
 Bugfixes
 --------
 - Fixed an issue with the font size in Unix systems.
+- Fixed outdated docstring for FrameLoader plugin class.
 
 ========
 v23.1.25

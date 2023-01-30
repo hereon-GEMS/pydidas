@@ -224,9 +224,10 @@ class InputPlugin(BasePlugin):
         str
             The filename.
         """
-        _index = frame_index * self.get_param_value(
-            "file_stepping", 1
-        ) + SCAN.get_param_value("scan_start_index")
+        _index = (
+            frame_index * SCAN.get_param_value("scan_index_stepping")
+            + SCAN.get_param_value("scan_start_index")
+        )
         return self.filename_string.format(index=_index)
 
     def get_frame(self, frame_index, **kwargs):

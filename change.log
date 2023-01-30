@@ -10,6 +10,8 @@ Bugfixes
 - Fixed outdated docstring for FrameLoader plugin class.
 - Fixed an issue with the PluginCollectionBrowser widget which did not filter
   the sub-categories for processing plugins.
+- Fixed outdated FioMcaLineScanSeriesLoader to work with latest release.
+  
 
 ========
 v23.1.25

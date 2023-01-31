@@ -12,7 +12,7 @@ Bugfixes
 - Fixed an issue with the PluginCollectionBrowser widget which did not filter
   the sub-categories for processing plugins.
 - Fixed outdated FioMcaLineScanSeriesLoader to work with latest release.
-  
+- Fixed an issue with datatypes in the ImageSeriesOperationsWindow.
 
 ========
 v23.1.25

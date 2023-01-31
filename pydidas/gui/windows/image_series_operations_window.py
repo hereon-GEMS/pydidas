@@ -305,7 +305,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         _op = self.get_param_value("operation")
         if _op in ["sum", "mean"]:
-            self._data += frame
+            self._data = self._data + frame
         elif _op == "max":
             self._data = np.maximum(self._data, frame)
 

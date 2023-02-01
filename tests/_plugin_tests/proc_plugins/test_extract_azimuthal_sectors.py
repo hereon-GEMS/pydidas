@@ -80,7 +80,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("ExtractAzimuthalSectors")()
         plugin.set_param_value("centers", "90; 170; 240")
         plugin.pre_execute()
-        self.assertIsInstance(plugin._config["centers"], np.ndarray)
+        self.assertIsInstance(plugin._config["centers"], tuple)
         self.assertTrue(
             np.allclose(plugin._config["centers"], np.array((90, 170, 240)))
         )

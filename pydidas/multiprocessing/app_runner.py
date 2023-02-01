@@ -84,7 +84,6 @@ class AppRunner(WorkerController):
 
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(int, object)
-    sig_finished = QtCore.Signal()
     sig_final_app_state = QtCore.Signal(object)
 
     def __init__(self, app, n_workers=None, processor=app_processor):

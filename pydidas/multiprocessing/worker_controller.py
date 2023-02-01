@@ -61,7 +61,6 @@ class WorkerController(QtCore.QThread):
 
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(object, object)
-    sig_finished = QtCore.Signal()
 
     def __init__(self, n_workers=None, function=None):
         super().__init__()
@@ -336,8 +335,6 @@ class WorkerController(QtCore.QThread):
                 self._cycle_post_run()
             time.sleep(0.001)
         logger.debug("finished worker_controller loop")
-        self.sig_finished.emit()
-        time.sleep(0.001)
 
     def _cycle_pre_run(self):
         """

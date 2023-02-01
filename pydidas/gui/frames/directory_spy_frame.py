@@ -194,9 +194,9 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         )
         self._runner.sig_final_app_state.connect(self._set_app)
         self._runner.sig_progress.connect(self._apprunner_update_progress)
-        self._runner.sig_finished.connect(self._apprunner_finished)
         self._runner.sig_results.connect(self._app.multiprocessing_store_results)
         self._runner.sig_results.connect(self.__check_for_plot_update)
+        self._runner.finished.connect(self._apprunner_finished)
         logger.debug("Running AppRunner")
         self._runner.start()
 

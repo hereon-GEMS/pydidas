@@ -45,7 +45,7 @@ def run_app_runner():
 
     app_runner.sig_final_app_state.connect(tester.store_app)
     app_runner.sig_results.connect(tester.store_results)
-    app_runner.sig_finished.connect(app.exit)
+    app_runner.finished.connect(app.exit)
 
     timer = QtCore.QTimer()
     timer.singleShot(10, app_runner.start)

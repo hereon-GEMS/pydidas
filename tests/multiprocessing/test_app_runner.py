@@ -80,7 +80,7 @@ class TestAppRunner(unittest.TestCase):
     def test_run(self):
         self._runner = AppRunner(self.app)
         _spy = QtTest.QSignalSpy(self._runner.sig_final_app_state)
-        _spy2 = QtTest.QSignalSpy(self._runner.sig_finished)
+        _spy2 = QtTest.QSignalSpy(self._runner.finished)
         self._runner.start()
         time.sleep(0.1)
         self.wait_for_spy_signal(_spy)

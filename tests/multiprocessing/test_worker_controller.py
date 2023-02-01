@@ -128,7 +128,7 @@ class TestWorkerController(unittest.TestCase):
         wc.change_function(local_test_func, *(0, 0))
         wc.add_tasks(_tasks)
         wc.finalize_tasks()
-        _spy = QtTest.QSignalSpy(wc.sig_finished)
+        _spy = QtTest.QSignalSpy(wc.finished)
         wc.start()
         # wc.stop()
         self.wait_for_finish_signal(wc)

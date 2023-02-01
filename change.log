@@ -17,7 +17,8 @@ Bugfixes
 - Fixed an issue with datatypes in the ImageSeriesOperationsWindow.
 - Fixed issues with Azimuthal sector integration Parameters which were not
   hashable.
-
+- Fixed an issue with AppRunner threads sending their finished signal 
+  prematurely on slower cpus.
 
 ========
 v23.1.25

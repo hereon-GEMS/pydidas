@@ -281,9 +281,10 @@ signals:
       - (int, object)
       - The task number and results are emitted as a signal once they have been
         received from the workers.
-    * - sig_finished
+    * - finished
       - None
-      - This signal is emitted once the processing has been completed.
+      - This generic QThread signal is emitted once the processing has been 
+        completed.
     * - sig_final_app_state
       - object
       - After the AppRunner's local copy of the app has finished processing all
@@ -368,7 +369,7 @@ QCoreApplication is started and a test object is used to receive the
 
         app_runner.sig_final_app_state.connect(tester.store_app)
         app_runner.sig_results.connect(tester.store_results)
-        app_runner.sig_finished.connect(app.exit)
+        app_runner.finished.connect(app.exit)
 
         timer = QtCore.QTimer()
         timer.singleShot(10, app_runner.start)

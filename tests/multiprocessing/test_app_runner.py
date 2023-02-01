@@ -49,7 +49,7 @@ class TestAppRunner(unittest.TestCase):
 
     def tearDown(self):
         if self._runner is not None:
-            self._runner.quit()
+            self._runner.exit()
 
     def wait_for_spy_signal(self, spy, timeout=8):
         _t0 = time.time()

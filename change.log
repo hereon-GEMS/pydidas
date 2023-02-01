@@ -4,6 +4,8 @@ Improvements
 - Generalized the plugin processing-plugin subcategories and defined them 
   in core.constants.constants.
 - Removed a redundant import from main_menu file.
+- Removed quit method definition in the WorkerController and added exit method.
+  
   
 Bugfixes
 --------

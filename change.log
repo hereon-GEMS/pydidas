@@ -13,6 +13,9 @@ Bugfixes
   the sub-categories for processing plugins.
 - Fixed outdated FioMcaLineScanSeriesLoader to work with latest release.
 - Fixed an issue with datatypes in the ImageSeriesOperationsWindow.
+- Fixed issues with Azimuthal sector integration Parameters which were not
+  hashable.
+
 
 ========
 v23.1.25

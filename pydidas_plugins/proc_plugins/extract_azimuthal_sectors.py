@@ -95,7 +95,7 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         Set up the required functions and fit variable labels.
         """
-        self._config["centers"] = np.round(self._get_sector_values(), 10)
+        self._config["centers"] = tuple(np.round(self._get_sector_values(), 10))
 
     def _get_sector_values(self):
         """
@@ -155,7 +155,7 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         self._data = data
         self._update_settings_from_data()
-        _res = np.zeros((self._config["centers"].size, self._data.shape[1]))
+        _res = np.zeros((len(self._config["centers"]), self._data.shape[1]))
         for _index, _slices in self._config["slices"].items():
             _res[_index] = np.sum(data[_slices, :], axis=0)
             if self.get_param_value("mode") == "Average":

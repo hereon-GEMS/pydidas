@@ -33,13 +33,12 @@ from ...apps import DirectorySpyApp
 from ...core import ParameterCollection
 from ...core.utils import pydidas_logger, get_extension
 from ...core.constants import HDF5_EXTENSIONS
-from ...contexts import ExperimentContext, ScanContext
+from ...contexts import ScanContext
 from ...multiprocessing import AppRunner, app_processor_without_tasks
 from ...workflow import WorkflowTree, WorkflowResults
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
 
 
-EXP = ExperimentContext()
 SCAN = ScanContext()
 RESULTS = WorkflowResults()
 TREE = WorkflowTree()

@@ -1,4 +1,11 @@
 
+Major changes
+-------------
+- Added a GLOBAL_CONTEXTS dictionary in contexts to have generic access to all
+  contexts and to allow adding contexts in a convenient way.
+- Renamed ExperimentContext to DiffractionExperimentContext to have a clear
+  association and allow adding further experiments.
+
 Improvements
 ------------
 - Generalized the plugin processing-plugin subcategories and defined them 

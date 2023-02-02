@@ -27,19 +27,19 @@ import unittest
 import shutil
 import tempfile
 
-from pydidas.contexts.experiment_context import (
-    ExperimentContext,
-    ExperimentContextIoBase,
-    ExperimentContextIoMeta,
+from pydidas.contexts.diffraction_exp_context import (
+    DiffractionExperimentContext,
+    DiffractionExperimentContextIoBase,
+    DiffractionExperimentContextIoMeta,
 )
 
 
-EXP = ExperimentContext()
-EXP_IO_META = ExperimentContextIoMeta
+EXP = DiffractionExperimentContext()
+EXP_IO_META = DiffractionExperimentContextIoMeta
 EXP_IO_META.clear_registry()
 
 
-class TestIo(ExperimentContextIoBase):
+class TestIo(DiffractionExperimentContextIoBase):
     extensions = ["test"]
     format_name = "Test"
 

@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentContextIoPoni class which is used to import
-ExperimentContext metadata from a pyFAI poni file.
+Module with the DiffractionExperimentContextIoPoni class which is used to import
+DiffractionExperimentContext metadata from a pyFAI poni file.
 """
 
 __author__ = "Malte Storm"
@@ -23,19 +23,19 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentContextIoPoni"]
+__all__ = ["DiffractionExperimentContextIoPoni"]
 
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
-from .experiment_context_io_base import ExperimentContextIoBase
-from .experiment_context import ExperimentContext
+from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
+from .diffraction_exp_context import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 
-class ExperimentContextIoPoni(ExperimentContextIoBase):
+class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
     """
     Base class for WorkflowTree exporters.
     """
@@ -82,7 +82,7 @@ class ExperimentContextIoPoni(ExperimentContextIoBase):
     @classmethod
     def import_from_file(cls, filename):
         """
-        Restore the ExperimentContext from a YAML file.
+        Restore the DiffractionExperimentContext from a YAML file.
 
         Parameters
         ----------

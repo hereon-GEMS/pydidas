@@ -36,7 +36,7 @@ from ...core import (
     utils,
     UserConfigError,
 )
-from ...contexts import ScanContext, ExperimentContext
+from ...contexts import ScanContext
 from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
 from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
@@ -44,7 +44,6 @@ from .builders import WorkflowTestFrameBuilder
 
 
 SCAN = ScanContext()
-EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 

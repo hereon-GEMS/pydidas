@@ -30,20 +30,22 @@ import tempfile
 import yaml
 
 from pydidas.core import UserConfigError
-from pydidas.contexts import ExperimentContext
-from pydidas.contexts.experiment_context.experiment_context_io_yaml import (
-    ExperimentContextIoYaml,
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_yaml import (
+    DiffractionExperimentContextIoYaml,
 )
 
 
-EXP = ExperimentContext()
-EXP_IO_YAML = ExperimentContextIoYaml
+EXP = DiffractionExperimentContext()
+EXP_IO_YAML = DiffractionExperimentContextIoYaml
 
 
 class TestExperimentSettingsIoYaml(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_experiment_context_")
+        self._path = os.path.join(
+            _test_dir, "_data", "load_test_diffraction_exp_context_"
+        )
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):

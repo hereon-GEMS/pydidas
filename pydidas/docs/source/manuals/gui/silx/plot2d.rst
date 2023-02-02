@@ -99,8 +99,8 @@ menu entries description
             :align: center
       - Set coordinate system: This button will open a submenu which allows to
         select the coordinate system (cartesian or cylindrical). Note that the
-        cylindrical coordinate system use the global :py:class:`ExperimentContext
-        <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>` 
+        cylindrical coordinate system use the global :py:class:`DiffractionExperimentContext
+        <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>` 
         calibration to determine the beam center. Therefore, looking at data 
         with a different calibration will display a wrong center and therefore 
         also wrong coordinates.

@@ -34,10 +34,10 @@ import numpy as np
 
 from pydidas.plugins import BasePlugin, pyFAIintegrationBase
 from pydidas.core import get_generic_parameter, UserConfigError
-from pydidas.contexts import ExperimentContext
+from pydidas.contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 logger = logging.getLogger("pydidas_logger")
 logger.setLevel(logging.ERROR)

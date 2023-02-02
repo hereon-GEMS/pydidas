@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DefineExperimentFrameBuilder class which is used to
-populate the ExperimentSettings with widgets.
+Module with the DefineDiffractionExpFrameBuilder class which is used to
+populate the DefineDiffractionExpFrame with widgets.
 """
 
 __author__ = "Malte Storm"
@@ -23,13 +23,13 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DefineExperimentFrameBuilder"]
+__all__ = ["DefineDiffractionExpFrameBuilder"]
 
 from ....core import constants
 from ....widgets import BaseFrame
 
 
-class DefineExperimentFrameBuilder(BaseFrame):
+class DefineDiffractionExpFrameBuilder(BaseFrame):
     """
     Mix-in class which includes the build_self method to populate the
     base class's UI and initialize all widgets.
@@ -49,14 +49,14 @@ class DefineExperimentFrameBuilder(BaseFrame):
         _1line_options = dict(width_text=180, width_io=150, width_total=360)
         self.create_label(
             None,
-            "Experimental setup\n",
+            "Diffraction experimental setup\n",
             fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
         self.create_button(
             "but_load_from_file",
-            "Import experimental parameters from file",
+            "Import diffraction experimental parameters from file",
             icon=self.style().standardIcon(42),
             gridPos=(-1, 0, 1, 1),
             alignment=None,

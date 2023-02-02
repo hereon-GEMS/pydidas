@@ -39,7 +39,7 @@ from ..core.utils import (
     doc_qurl_for_frame_manual,
     doc_filename_for_frame_manual,
 )
-from ..contexts import ScanContext, ExperimentContext
+from ..contexts import GLOBAL_CONTEXTS
 from ..workflow import WorkflowTree
 from ..widgets import PydidasFrameStack
 from ..widgets.dialogues import QuestionBox, critical_warning
@@ -57,9 +57,6 @@ from .windows import (
     QtPathsWindow,
 )
 
-
-SCAN = ScanContext()
-EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 
@@ -448,12 +445,10 @@ class MainMenu(QtWidgets.QMainWindow):
             _frameindex, _frame_state = _frame.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _frame_state
-        _state["scan_context"] = SCAN.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
-        _state["experiment_context"] = EXP.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
+        for _key, _context in GLOBAL_CONTEXTS.items():
+            _state[_key] = _context.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
         _state["workflow_tree"] = TREE.export_to_string()
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
@@ -529,7 +524,7 @@ class MainMenu(QtWidgets.QMainWindow):
     def _restore_global_objects(state):
         """
         Get the states of pydidas' global objects (ScanContext,
-        ExperimentContext, WorkflowTree)
+        DiffractionExperimentContext, WorkflowTree)
 
         Parameters
         ----------
@@ -538,10 +533,9 @@ class MainMenu(QtWidgets.QMainWindow):
             global objects.
         """
         TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["scan_context"].items():
-            SCAN.set_param_value(_key, _val)
-        for _key, _val in state["experiment_context"].items():
-            EXP.set_param_value(_key, _val)
+        for _contex_key, _context in GLOBAL_CONTEXTS.items():
+            for _key, _val in state[_contex_key].items():
+                _context.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):
         """

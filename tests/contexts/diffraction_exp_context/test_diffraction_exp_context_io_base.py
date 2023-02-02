@@ -28,14 +28,14 @@ import shutil
 import tempfile
 
 from pydidas.core import UserConfigError
-from pydidas.contexts.experiment_context import ExperimentContext
-from pydidas.contexts.experiment_context.experiment_context_io_base import (
-    ExperimentContextIoBase,
+from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_base import (
+    DiffractionExperimentContextIoBase,
 )
 
 
-EXP = ExperimentContext()
-EXP_IO = ExperimentContextIoBase
+EXP = DiffractionExperimentContext()
+EXP_IO = DiffractionExperimentContextIoBase
 
 
 class TestExperimentSettingsIoBase(unittest.TestCase):

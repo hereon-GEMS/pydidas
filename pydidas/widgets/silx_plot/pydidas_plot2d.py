@@ -31,13 +31,13 @@ from silx.gui.plot import Plot2D
 from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .utilities import get_2d_silx_plot_ax_settings
 
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -142,8 +142,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.enable_cs_transform(
             data.shape
             == (
-                EXP.get_param_value("detector_npixy"),
-                EXP.get_param_value("detector_npixx"),
+                DIFFRACTION_EXP.get_param_value("detector_npixy"),
+                DIFFRACTION_EXP.get_param_value("detector_npixx"),
             )
         )
         self.update_cs_units(data.axis_units[1], data.axis_units[0])

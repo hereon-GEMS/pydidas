@@ -1,5 +1,3 @@
-.. |plugin_collection| replace:: DirectorySpyApp
-
 pydidas general command line tutorial
 =====================================
 
@@ -45,7 +43,7 @@ will probably manage with a handful of methods:
 Examples
 ^^^^^^^^
 
-All examples will use the ExperimentContext object (please see below for a 
+All examples will use the DiffractionExperimentContext object (please see below for a 
 description of the object) and the examples will only cover the code bases, not 
 the use case. 
 
@@ -54,7 +52,7 @@ First, let us create the object called :py:data:`exp`
 .. code-block::
 
     >>> import pydidas
-    >>> exp = pydidas.contexts.ExperimentContext()
+    >>> exp = pydidas.contexts.DiffractionExperimentContext()
 
 The object :py:data:`exp` will be used in all examples below.
 
@@ -144,11 +142,11 @@ main objects are:
         The latter information can be used to create the correct axis labels in 
         plots. For the full documentation please visit the 
         :ref:`ScanSetup manual <scan_context>`.
-    :py:class:`ExperimentContext <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`
+    :py:class:`DiffractionExperimentContext <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
         documentation please visit the 
-        :ref:`ExperimentContext manual <experiment_context>`.
+        :ref:`DiffractionExperimentContext manual <diffraction_exp_context>`.
     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`
         The WorkflowTree holds information about which plugins are used and 
         about the order of plugins to be processed. For the full documentation 
@@ -160,7 +158,7 @@ These objects can be accesses by calling their respective factories:
 
     >>> import pydidas
     >>> SCAN = pydidas.contexts.ScanContext()
-    >>> EXPERIMENT = pydidas.contexts.ExperimentContext()
+    >>> EXPERIMENT = pydidas.contexts.DiffractionExperimentContext()
     >>> TREE= pydidas.workflow.WorkflowTree()
 
 Note that the factories return a link to the unique instance and multiple calls 

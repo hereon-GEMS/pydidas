@@ -34,10 +34,9 @@ from qtpy import QtCore
 from ..core import utils, Dataset, SingletonFactory
 from ..contexts import ScanContext
 from .workflow_tree import WorkflowTree
-from .result_io import WorkflowResultIoMeta
+from .result_io import WorkflowResultIoMeta as RESULT_SAVER
 
 
-RESULT_SAVER = WorkflowResultIoMeta
 SCAN = ScanContext()
 TREE = WorkflowTree()
 

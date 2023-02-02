@@ -30,10 +30,10 @@ from qtpy import QtCore
 from silx.gui.plot.tools import PositionInfo
 
 from ...core.utils import pyfai_rot_matrix, get_chi_from_x_and_y
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 AX_LABELS = {
@@ -119,10 +119,12 @@ class PydidasPositionInfo(PositionInfo):
         tuple
             The beam center in a tuple (y, x)
         """
-        _theta = [EXP.get_param_value(f"detector_rot{dim}") for dim in [1, 2, 3]]
-        _y0 = EXP.get_param_value("detector_poni1")
-        _x0 = EXP.get_param_value("detector_poni2")
-        _z0 = EXP.get_param_value("detector_dist")
+        _theta = [
+            DIFFRACTION_EXP.get_param_value(f"detector_rot{dim}") for dim in [1, 2, 3]
+        ]
+        _y0 = DIFFRACTION_EXP.get_param_value("detector_poni1")
+        _x0 = DIFFRACTION_EXP.get_param_value("detector_poni2")
+        _z0 = DIFFRACTION_EXP.get_param_value("detector_dist")
         _rot = pyfai_rot_matrix(*_theta)
         # the center is found by *subtracting* the rotation of the 0-position with
         # respect to the poni (because pyFAI geometry moves the detector)
@@ -130,8 +132,8 @@ class PydidasPositionInfo(PositionInfo):
         _beam_center *= abs(_z0 / _beam_center[2])
         self._beam_center = (_beam_center[0], _beam_center[1], _z0)
         self._pixelsize = (
-            EXP.get_param_value("detector_pxsizex") * 1e-6,
-            EXP.get_param_value("detector_pxsizey") * 1e-6,
+            DIFFRACTION_EXP.get_param_value("detector_pxsizex") * 1e-6,
+            DIFFRACTION_EXP.get_param_value("detector_pxsizey") * 1e-6,
         )
 
     def _plotEvent(self, event):
@@ -227,7 +229,7 @@ class PydidasPositionInfo(PositionInfo):
         tuple
             The tuple with the polar q, chi coordinates.
         """
-        _lambda = EXP.get_param_value("xray_wavelength") * 1e-10
+        _lambda = DIFFRACTION_EXP.get_param_value("xray_wavelength") * 1e-10
         _2theta, _chi = self.pixel_to_cs_2theta_chi(x_pix, y_pix)
         _q = (4 * np.pi / _lambda) * np.sin(_2theta * np.pi / 180 / 2) * 1e-9
         return (_q, _chi)

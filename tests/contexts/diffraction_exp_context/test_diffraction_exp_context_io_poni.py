@@ -31,14 +31,14 @@ import logging
 import pyFAI
 from pyFAI.geometry import Geometry
 
-from pydidas.contexts import ExperimentContext
-from pydidas.contexts.experiment_context.experiment_context_io_poni import (
-    ExperimentContextIoPoni,
+from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_poni import (
+    DiffractionExperimentContextIoPoni,
 )
 
 
-EXP = ExperimentContext()
-EXP_IO_PONI = ExperimentContextIoPoni
+EXP = DiffractionExperimentContext()
+EXP_IO_PONI = DiffractionExperimentContextIoPoni
 
 _logger = logging.getLogger("pyFAI.geometry")
 _logger.setLevel(logging.CRITICAL)
@@ -47,7 +47,9 @@ _logger.setLevel(logging.CRITICAL)
 class TestExperimentSettingsIoPoni(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        self._path = os.path.join(_test_dir, "_data", "load_test_experiment_context_")
+        self._path = os.path.join(
+            _test_dir, "_data", "load_test_diffraction_exp_context_"
+        )
         self._tmppath = tempfile.mkdtemp()
 
     def tearDown(self):

@@ -37,13 +37,13 @@ from ..core.constants import PROC_PLUGIN, GREEK_ASCII_TO_UNI, PROC_PLUGIN_IMAGE
 from ..core import get_generic_param_collection, UserConfigError
 from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
-from ..contexts import ExperimentContext
+from ..contexts import DiffractionExperimentContext
 from .base_proc_plugin import ProcPlugin
 
 
 logger = pydidas_logger()
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",

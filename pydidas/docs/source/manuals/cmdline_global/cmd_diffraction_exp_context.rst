@@ -1,7 +1,7 @@
-.. _experiment_context:
+.. _diffraction_exp_context:
 
-The ExperimentContext class
-===========================
+The DiffractionExperimentContext class
+======================================
 
 .. contents::
     :depth: 2
@@ -11,11 +11,11 @@ The ExperimentContext class
 Introduction
 ------------
 
-The :py:class:`ExperimentContext 
-<pydidas.contexts.experiment_context.experiment_context.ExperimentContext>`
+The :py:class:`DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context.DiffractionExperimentContext>`
 is the pydidas Singleton instance of the 
-:py:class:`_ExperimentContext 
-<pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`
+:py:class:`_DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
 class. It is used for storing and accessing global information about the 
 experimental setup. Stored information include
 
@@ -25,17 +25,17 @@ experimental setup. Stored information include
 
 All objects are stored as :py:class:`Parameters <pydidas.core.Parameter>` and
 can be accesses as described in the basic tutorial. A full list of Parameters is
-given in :ref:`experiment_context_parameters`\ .
+given in :ref:`diffraction_exp_context_parameters`\ .
 
 Its instance can be obtained by running the following code:
 
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
 
-Configuring the ExperimentContext
----------------------------------
+Configuring the DiffractionExperimentContext
+--------------------------------------------
 
 X-ray energy and wavelength
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -50,7 +50,7 @@ Please see also the example below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
     >>> EXP.get_param_value('xray_wavelength')
     1
     >>> EXP.get_param_value('xray_energy')
@@ -119,7 +119,7 @@ detector which is not inclued in pyFAI, by setting all Parameters values:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
     >>> EXP.set_param_value('detector_name', 'A detector with very small asymmetric pixels')
     >>> EXP.set_param_value('detector_npixx', 1024)
     >>> EXP.set_param_value('detector_npixy', 2048)
@@ -132,13 +132,13 @@ Using a pyFAI detector
 If the detector is defined in pyFAI, this library can be used to update the 
 detector settings automatically by giving the detector name in the 
 :py:meth:`set_detector_params_from_name 
-<pydidas.contexts.experiment_context.experiment_context._ExperimentContext.set_detector_params_from_name>`
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.set_detector_params_from_name>`
 method:
 
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
     >>> EXP.set_detector_params_from_name('Eiger 9M')
     >>> EXP.get_param_value('detector_name')
     'Eiger 9M'
@@ -178,7 +178,7 @@ up; :math:`rot_2`: mathematically negative around the :math:`x_2` axis;
 used to move the detector with respect to the origin (sample) are applied to 
 the detector to transform the detector geometry into the experimental geometry.
 
-The correspondence between pyFAI geometry and pydidas ExperimentContext
+The correspondence between pyFAI geometry and pydidas DiffractionExperimentContext
 Parameter names is given below:
 
 .. list-table::
@@ -215,7 +215,7 @@ given in the table above. For an example, see below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
     >>> EXP.set_param_value('detector_poni1', 0.114731)
     >>> EXP.set_param_value('detector_poni2', 0.123635)
     >>> EXP.set_param_value('detector_dist', 0.235885)
@@ -227,23 +227,23 @@ given in the table above. For an example, see below:
 Import and Export
 -----------------
 
-The ExperimentContext settings can be imported and exported to files, based on
+The DiffractionExperimentContext settings can be imported and exported to files, based on
 the available im-/exporters. The standard distribution ships with support for
 YAML files and pyFAI .poni files. Both types are supported for import and 
 export. The format will be determined automatically based on the file extension.
 
 Imports and exports are started by calling the 
 :py:meth:`import_from_file(filename) 
-<pydidas.contexts.experiment_context.experiment_context._ExperimentContext.import_from_file>`
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.import_from_file>`
 and 
 :py:meth:`export_to_file(filename) 
-<pydidas.contexts.experiment_context.experiment_context._ExperimentContext.export_to_file>`,
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.export_to_file>`,
 respectively. The filename must include the absolute path to the file. 
 
 .. warning::
 
-    Importing the :py:class:`ExperimentContext 
-    <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`
+    Importing the :py:class:`DiffractionExperimentContext 
+    <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
     from file will overwrite all current values without asking for confirmation.
 
 An example to demonstrate these methods is given below:
@@ -251,7 +251,7 @@ An example to demonstrate these methods is given below:
 .. code-block::
 
     >>> import pydidas
-    >>> EXP = pydidas.contexts.ExperimentContext()
+    >>> EXP = pydidas.contexts.DiffractionExperimentContext()
     >>> EXP.get_param_values_as_dict()
     {'xray_wavelength': 1,
      'xray_energy': 12.398,
@@ -303,6 +303,6 @@ An example to demonstrate these methods is given below:
      'detector_rot2': 0,
      'detector_rot3': 0}
 
-.. _experiment_context_parameters:
+.. _diffraction_exp_context_parameters:
 
-.. include:: ../global/experiment_context_params.rst
+.. include:: ../global/diffraction_exp_context_params.rst

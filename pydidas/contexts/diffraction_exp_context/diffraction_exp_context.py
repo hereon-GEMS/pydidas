@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentContext singleton which is used to manage
+Module with the DiffractionExperimentContext singleton which is used to manage
 global information about the experiment independant from the individual frames.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentContext"]
+__all__ = ["DiffractionExperimentContext"]
 
 import pyFAI
 
@@ -33,17 +33,18 @@ from ...core import (
     get_generic_param_collection,
     ObjectWithParameterCollection,
 )
-from .experiment_context_io_meta import ExperimentContextIoMeta
+from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
 
 
-class _ExperimentContext(ObjectWithParameterCollection):
+class _DiffractionExperimentContext(ObjectWithParameterCollection):
     """
     Class which holds experimental settings. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
     single instance exists.
 
     The singleton factory will allow access to the single instance through
-    :py:class:`pydidas.contexts.experiment_context.ExperimentContext`.
+    :py:class:`
+    pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext`.
     """
 
     default_params = get_generic_param_collection(
@@ -105,7 +106,7 @@ class _ExperimentContext(ObjectWithParameterCollection):
 
         If a pyFAI detector can be instantiated from the "detector" Parameter
         value, this object will be used. Otherwise, a new detector is created
-        and values from the ExperimentContext are copied.
+        and values from the DiffractionExperimentContext are copied.
 
         Returns
         -------
@@ -161,19 +162,19 @@ class _ExperimentContext(ObjectWithParameterCollection):
     @staticmethod
     def import_from_file(filename):
         """
-        Import ExperimentContext from a file.
+        Import DiffractionExperimentContext from a file.
 
         Parameters
         ----------
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        ExperimentContextIoMeta.import_from_file(filename)
+        DiffractionExperimentContextIoMeta.import_from_file(filename)
 
     @staticmethod
     def export_to_file(filename, overwrite=False):
         """
-        Import ExperimentContext from a file.
+        Import DiffractionExperimentContext from a file.
 
         Parameters
         ----------
@@ -182,7 +183,7 @@ class _ExperimentContext(ObjectWithParameterCollection):
         overwrite : bool, optional
             Keyword to allow overwriting of existing files.
         """
-        ExperimentContextIoMeta.export_to_file(filename, overwrite=overwrite)
+        DiffractionExperimentContextIoMeta.export_to_file(filename, overwrite=overwrite)
 
     def __copy__(self):
         """
@@ -191,4 +192,4 @@ class _ExperimentContext(ObjectWithParameterCollection):
         return self
 
 
-ExperimentContext = SingletonFactory(_ExperimentContext)
+DiffractionExperimentContext = SingletonFactory(_DiffractionExperimentContext)

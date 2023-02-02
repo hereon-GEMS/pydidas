@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DefineExperimentFrame which is used to define or modify the
+Module with the DefineDiffractionExpFrame which is used to define or modify the
 global experimental settings like detector, geometry and energy.
 """
 
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DefineExperimentFrame"]
+__all__ = ["DefineDiffractionExpFrame"]
 
 from functools import partial
 
@@ -33,12 +33,12 @@ from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
 from ...contexts import PydidasFileDialog
-from ...contexts import ExperimentContext, ExperimentContextIoMeta
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
 from ...widgets.dialogues import critical_warning
-from .builders import DefineExperimentFrameBuilder
+from .builders import DefineDiffractionExpFrameBuilder
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 _GEO_INVALID = (
     "The pyFAI geometry is not valid and cannot be copied. "
@@ -56,10 +56,10 @@ _ENERGY_INVALID = (
 )
 
 
-class DefineExperimentFrame(DefineExperimentFrameBuilder):
+class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
     """
-    The DefineExperimentFrame is the main frame for reading, editing and
-    saving the ExperimentalSettings in the GUI.
+    The DefineDiffractionExpFrame is the main frame for reading, editing and
+    saving the DiffractionExperimentContext in the GUI.
     """
 
     menu_icon = "qta::mdi.card-bulleted-settings-outline"
@@ -67,21 +67,21 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
     menu_entry = "Workflow processing/Define experimental setup"
 
     def __init__(self, parent=None, **kwargs):
-        DefineExperimentFrameBuilder.__init__(self, parent, **kwargs)
+        DefineDiffractionExpFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP.params
         self.__import_dialog = PydidasFileDialog(
             self,
             caption="Import experiment context file",
-            formats=ExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
             dialog=QtWidgets.QFileDialog.getOpenFileName,
-            qsettings_ref="DefineExperimentFrame__import",
+            qsettings_ref="DefineDiffractionExpFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             self,
             caption="Export experiment context file",
-            formats=ExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
             dialog=QtWidgets.QFileDialog.getSaveFileName,
-            qsettings_ref="DefineExperimentFrame__export",
+            qsettings_ref="DefineDiffractionExpFrame__export",
         )
 
     def connect_signals(self):
@@ -188,8 +188,7 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
 
     def update_detector_params(self, det, maskfile=None, show_warning=True):
         """
-        Update the pydidas detector Parameters based on the selected pyFAI
-        detector.
+        Update the pydidas detector Parameters based on the selected pyFAI detector.
 
         Parameters
         ----------
@@ -243,8 +242,7 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
 
     def copy_energy_from_pyFAI(self, show_warning=True):
         """
-        Copy the energy setting from pyFAI and store it in the
-        ExperimentContext.
+        Copy the pyFAI energy and store it in the DiffractionExperimentContext.
 
         Parameters
         ----------
@@ -263,7 +261,7 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
 
     def import_from_file(self):
         """
-        Open a dialog to select a filename and load ExperimentContext from
+        Open a dialog to select a filename and load DiffractionExperimentContext from
         the selected file.
 
         Note: This method will overwrite all current settings.
@@ -277,7 +275,7 @@ class DefineExperimentFrame(DefineExperimentFrameBuilder):
     def export_to_file(self):
         """
         Open a dialog to select a filename and write all currrent settings
-        for the ExperimentContext to file.
+        for the DiffractionExperimentContext to file.
         """
         fname = self.__export_dialog.get_user_response()
         if fname != "":

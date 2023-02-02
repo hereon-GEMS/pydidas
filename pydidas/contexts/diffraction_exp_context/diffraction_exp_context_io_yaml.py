@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentContextIoYaml class which is used to import or export
-ExperimentContext metadata from a YAML file.
+Module with the DiffractionExperimentContextIoYaml class which is used to import or
+export DiffractionExperimentContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentContextIoYaml"]
+__all__ = ["DiffractionExperimentContextIoYaml"]
 
 from numbers import Real, Integral
 
@@ -32,14 +32,14 @@ import numpy as np
 
 from ...core.constants import YAML_EXTENSIONS, LAMBDA_IN_A_TO_E
 from ...core import UserConfigError
-from .experiment_context_io_base import ExperimentContextIoBase
-from .experiment_context import ExperimentContext
+from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
+from .diffraction_exp_context import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 
-class ExperimentContextIoYaml(ExperimentContextIoBase):
+class DiffractionExperimentContextIoYaml(DiffractionExperimentContextIoBase):
     """
     YAML importer/exporter for ExperimentalSetting files.
     """
@@ -72,7 +72,7 @@ class ExperimentContextIoYaml(ExperimentContextIoBase):
     @classmethod
     def import_from_file(cls, filename):
         """
-        Restore the ExperimentContext from a YAML file.
+        Restore the DiffractionExperimentContext from a YAML file.
 
         Parameters
         ----------
@@ -87,8 +87,8 @@ class ExperimentContextIoYaml(ExperimentContextIoBase):
                 raise yaml.YAMLError from yerr
         if not isinstance(cls.imported_params, dict):
             raise UserConfigError(
-                f"Cannot interpret the selected file {filename} as ExperimentContext "
-                "save."
+                f"Cannot interpret the selected file {filename} as a saved instance of "
+                "DiffractionExperimentContext."
             )
         cls.imported_params["xray_energy"] = LAMBDA_IN_A_TO_E / cls.imported_params.get(
             "xray_wavelength", np.nan

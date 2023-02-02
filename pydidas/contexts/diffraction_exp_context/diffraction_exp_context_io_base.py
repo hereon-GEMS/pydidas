@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentContextIoBase class which exporters/importers for
-ExperimentContext should inherit from.
+Module with the DiffractionExperimentContextIoBase class which exporters/importers for
+DiffractionExperimentContext should inherit from.
 """
 
 __author__ = "Malte Storm"
@@ -23,20 +23,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentContextIoBase"]
+__all__ = ["DiffractionExperimentContextIoBase"]
 
 from ...core.io_registry import GenericIoBase
 from ...core import UserConfigError
-from .experiment_context_io_meta import ExperimentContextIoMeta
-from .experiment_context import ExperimentContext
+from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
+from .diffraction_exp_context import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 
-class ExperimentContextIoBase(GenericIoBase, metaclass=ExperimentContextIoMeta):
+class DiffractionExperimentContextIoBase(
+    GenericIoBase, metaclass=DiffractionExperimentContextIoMeta
+):
     """
-    Base class for ExperimentContext importer/exporters.
+    Base class for DiffractionExperimentContext importer/exporters.
     """
 
     extensions = []
@@ -47,7 +49,7 @@ class ExperimentContextIoBase(GenericIoBase, metaclass=ExperimentContextIoMeta):
     def _verify_all_entries_present(cls, exclude_det_mask=False):
         """
         Verify that the tmp_params dictionary holds all keys from the
-        ExperimentContext.
+        DiffractionExperimentContext.
         """
         _missing_entries = []
         for _key in EXP.params:
@@ -57,15 +59,15 @@ class ExperimentContextIoBase(GenericIoBase, metaclass=ExperimentContextIoMeta):
             _missing_entries.remove("detector_mask_file")
         if len(_missing_entries) > 0:
             _text = (
-                "The following ExperimentContext Parameters are missing:\n - "
-                + "\n - ".join(_missing_entries)
+                "The following DiffractionExperimentContext Parameters are missing:\n- "
+                + "\n- ".join(_missing_entries)
             )
             raise UserConfigError(_text)
 
     @classmethod
     def _write_to_exp_settings(cls):
         """
-        Write the loaded (temporary) Parameters to the ExperimentContext.
+        Write the loaded (temporary) Parameters to the DiffractionExperimentContext.
         """
         for key in cls.imported_params:
             EXP.set_param_value(key, cls.imported_params[key])

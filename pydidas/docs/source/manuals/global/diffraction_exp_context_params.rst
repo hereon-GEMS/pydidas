@@ -1,5 +1,5 @@
-Full list of Parameters for ExperimentContext 
----------------------------------------------
+Full list of Parameters for DiffractionExperimentContext 
+--------------------------------------------------------
 
 - xray_wavelength (float, unit: Angstrom, default: 1.0)
     The X-ray wavelength. Any changes to the wavelength will also update 

@@ -11,7 +11,7 @@ Using the pydidas processing pipeline
     While setting up and using the pydidas processing pipeline is also available
     from the command line, creating and editing the 
     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`, 
-    :py:class:`ExperimentContext <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`, and
+    :py:class:`DiffractionExperimentContext <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`, and
     :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` are more easily
     done in the graphical user interface and therefore, this guide covers
     the GUI.
@@ -69,7 +69,7 @@ Note that the *detector mask file* parameter is not included in pyFAI's
 The *detector mask file* must be set independently of the pyFAI calibration
 parameter import, if it has not been set in the pyFAI calibration.
 
-For more details, please refer to the :ref:`define_experimental_setup_frame` 
+For more details, please refer to the :ref:`define_diffraction_exp_frame` 
 manual.
 
 Example
@@ -120,5 +120,6 @@ To create the workflow, select the *Workflow processing* - > *Workflow editing*
 toolbar entry (marked in orange in the image above). 
 The workflow is comprised of individual plugins which each perform a single 
 task, like frame loading, azimuthal integration, background correction, 
-peak fitting. The workflow can branch 
+peak fitting. The workflow can branch downward in an unlimited number of nodes
+(subject to processing resources).
 

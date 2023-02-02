@@ -35,10 +35,10 @@ from pydidas.core import (
     get_generic_param_collection,
     UserConfigError,
 )
-from pydidas.contexts import ExperimentContext
+from pydidas.contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 SECTOR_CENTER_PARAM = Parameter(
     "azi_sector_centers",

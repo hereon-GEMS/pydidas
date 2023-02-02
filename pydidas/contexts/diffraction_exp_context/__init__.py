@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The experiment_context package includes a singleton class with the settings
-for the experiment (detector, geometry) and importers/exporters for different
+The diffraction_exp_context package includes a singleton class with the settings
+for a diffraction experiment (detector, geometry) and importers/exporters for different
 formats as well as a registry metaclass to handle actual imports/exports.
 """
 
@@ -27,26 +27,26 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-from .experiment_context import *
-from .experiment_context_io_base import *
-from .experiment_context_io_meta import *
+from .diffraction_exp_context import *
+from .diffraction_exp_context_io_base import *
+from .diffraction_exp_context_io_meta import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import experiment_context
+from . import diffraction_exp_context
 
-__all__.extend(experiment_context.__all__)
-del experiment_context
+__all__.extend(diffraction_exp_context.__all__)
+del diffraction_exp_context
 
-from . import experiment_context_io_base
+from . import diffraction_exp_context_io_base
 
-__all__.extend(experiment_context_io_base.__all__)
-del experiment_context_io_base
+__all__.extend(diffraction_exp_context_io_base.__all__)
+del diffraction_exp_context_io_base
 
-from . import experiment_context_io_meta
+from . import diffraction_exp_context_io_meta
 
-__all__.extend(experiment_context_io_meta.__all__)
-del experiment_context_io_meta
+__all__.extend(diffraction_exp_context_io_meta.__all__)
+del diffraction_exp_context_io_meta
 
 # Automatically find and import IO classes to have them registered
 # with the Metaclass:
@@ -58,7 +58,7 @@ _io_classes = set(
     item.strip(".py")
     for item in os.listdir(_dir)
     if (
-        item.startswith("experiment_context_io")
+        item.startswith("diffraction_exp_context_io")
         and not item[-7:] in ["base.py", "meta.py"]
     )
 )

@@ -48,10 +48,10 @@ from pyFAI.gui.tasks import (
 
 from ...core import constants
 from ...widgets import BaseFrame
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 
 def create_calib_tasks():
@@ -224,7 +224,7 @@ class PyfaiCalibFrame(BaseFrame):
     @QtCore.Slot()
     def _store_geometry(self):
         """
-        Store the fitted geometry in the ExperimentContext.
+        Store the fitted geometry in the DiffractionExperimentContext.
         """
         geo = self._model.fittedGeometry()
         det = self._model.experimentSettingsModel().detector()

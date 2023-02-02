@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ExperimentContextIoMeta class which is used for creating
+Module with the DiffractionExperimentContextIoMeta class which is used for creating
 exporter/importer classes for the ExperimentalSetting singleton and
 registering them.
 """
@@ -24,18 +24,18 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ExperimentContextIoMeta"]
+__all__ = ["DiffractionExperimentContextIoMeta"]
 
 from ...core.io_registry import GenericIoMeta
 
 
-class ExperimentContextIoMeta(GenericIoMeta):
+class DiffractionExperimentContextIoMeta(GenericIoMeta):
     """
-    Metaclass for ExperimentContext exporters and importers which holds the
+    Metaclass for DiffractionExperimentContext exporters and importers which holds the
     registry with all associated file extensions for imprting/ exporting
-    ExperimentContext.
+    DiffractionExperimentContext.
     """
 
     # need to redefine the registry to have a unique registry for
-    # ExperimentContextIoMeta
+    # DiffractionExperimentContextIoMeta
     registry = {}

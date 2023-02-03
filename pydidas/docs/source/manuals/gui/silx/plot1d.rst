@@ -1,5 +1,4 @@
-
-Pydidas 1d plot
+Pydidas 1D plot
 ^^^^^^^^^^^^^^^ 
 
 The :py:class:`PydidasPlot1d <pydidas.widgets.silx_plot.PydidasPlot1d>` is a 

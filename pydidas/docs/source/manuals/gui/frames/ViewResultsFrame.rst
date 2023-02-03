@@ -40,6 +40,9 @@ pydidas-written node result files which will be imported.
 Result selection
 ----------------
 
+Node results
+^^^^^^^^^^^^
+
 .. include:: ./workflow_result_selection.rst
 
 Export of results
@@ -49,6 +52,8 @@ Export of results
 
 Data display
 ------------
+
+1D and 2D data can be displayed using the two widgets described below.
 
 .. include:: ../silx/plot1d.rst
 

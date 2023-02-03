@@ -116,6 +116,10 @@ One image was acquired at each scan point in a mesh of 25 x 25 points.
 4. Creating the workflow
 ------------------------
 
+.. image:: images/processing_04_workflow_setup.png
+    :align: center
+    :width: 400px
+    
 To create the workflow, select the *Workflow processing* - > *Workflow editing* 
 toolbar entry (marked in orange in the image above). 
 The workflow is comprised of individual plugins which each perform a single 
@@ -123,3 +127,133 @@ task, like frame loading, azimuthal integration, background correction,
 peak fitting. The workflow can branch downward in an unlimited number of nodes
 (subject to processing resources).
 
+Use the Plugin browser at the bottom of the frame to display more information 
+about and to select plugins. Double click on any plugin to add it as child to 
+the current plugin or use the right mouse button on a Plugin to open a menu with 
+additional options.
+
+Clicking on a plugin in the field at the top selects it and opens these plugin's 
+parameters on the right side for editing. Plugins can also be rearranged by 
+drag & drop.
+
+For additional information, please refer to the :ref:`workflow_edit_frame` 
+manual. 
+
+Note that pydidas by default only stores the result of leaves (i.e. plugins 
+which have no children). If you want to store additional results, please set the
+*Always store results* parameter to :py:data:`True`.
+
+Example
+^^^^^^^
+
+In the example used above, the plugins have been used with most of their default
+settings. Only the radial integration has been limited to [5, 30] degrees in the
+*pyFAI azimuthal integration* plugin (to have a region with a smooth background
+which can be well subtracted) and the *Fit single peak* has been changed to use
+a Lorentzian function and to set the limits.
+
+5. Testing the workflow
+-----------------------
+
+.. image:: images/processing_05_workflow_test.png
+    :align: center
+    :width: 400px
+    
+    
+Once the parameters for Experiment, Scan and and Workflow have been configured,
+the Workflow can be tested. Select the *Workflow processing* - > *Test Workflow* 
+toolbar entry (marked in orange in the image above). 
+
+Pick a good datapoint by using either the image number or scan indices and click
+the button *Process frame* to run the workflow locally. Note: To avoid overhead,
+the workflow is executed in the same process and is blocking. Especially using
+any pyFAI integration for the first time will require a few seconds to set up 
+the matrix tables.
+
+The *Results* dropdown selection allows to see the results for any plugin in the
+workflow. The textbox on the left gives you additional information about the 
+plugin results, the window on the right plots the 2d image or 1d curve.
+If you are not happy with the results, select the *Tweak plugin 
+parameters* button at the bottom to open a new window and edit this plugin's 
+parameters.
+
+5.1 Plugin details
+^^^^^^^^^^^^^^^^^^
+
+Some plugins allow to inspect detailed results which can be anything and which 
+are defined in each plugin. The *Show detailed results for plugin* button opens
+a new window with the details for the selected plugin.
+
+.. image:: images/processing_05a_workflow_test_details.png
+    :align: center
+    :width: 400px
+
+Depending on the plugin, several images or plots can be shown in this window.
+All plots are labelled. More information, including a legend, can be accessed
+through the *Options* at the bottom of the plot.
+    
+5.2 Tweaking Parameters
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Using the *Tweak plugin parameters* button on the *Test Workflow* frame opens 
+a new window which allows to modify Plugin parameters in place. 
+
+.. image:: images/processing_05b_workflow_test_tweak.png
+    :align: center
+    :width: 400px
+
+The *Run plugin with current parameters* will run the current plugin only and 
+display its results (and its details, if the plugin has them defined). Once
+you have configured the plugin to your wishes, use the *Confirm current 
+parameters and close window* button. This will also run any child plugins with
+the updated input data again.
+
+Example
+^^^^^^^
+
+The resulting outputs for each plugin in the workflow are shown below:
+
+.. figure:: images/processing_05c_workflow_test_loader.png
+    :width: 300px
+    :align: center
+    
+    The imported image from the loader.
+
+.. figure:: images/processing_05d_workflow_test_integration.png
+    :width: 300px
+    :align: center
+    
+    The azimuthally integrated data.
+    
+.. figure:: images/processing_05e_workflow_test_outlier_removal.png
+    :width: 300px
+    :align: center
+    
+    The data after outlier removal.
+
+.. figure:: images/processing_05f_workflow_test_bg_removal.png
+    :width: 300px
+    :align: center
+    
+    The data after polynomial background removal.
+
+
+
+6. Running the full workflow
+----------------------------
+
+.. image:: images/processing_06_workflow_run.png
+    :align: center
+    :width: 400px
+        
+Once you are confident that everything is configured correctly, select the 
+*Workflow processing* - > *Run full Workflow* toolbar entry (marked in orange 
+in the image above). This will open the *Run full workflow* frame which allows 
+to run the workflow in separate processes in the background and to visualize
+the results. 
+
+The *Start processing* button opens background processes, which perform the 
+actual processing and only communicate their results. Starting these processes
+takes some time and once results come in, you can select one of the nodes from
+the drop-down on the left to display their results. For details, please refer 
+to the :ref:`Run full workflow frame manual <workflow_run_frame>`.

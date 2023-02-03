@@ -12,7 +12,8 @@ Improvements
   in core.constants.constants.
 - Removed a redundant import from main_menu file.
 - Removed quit method definition in the WorkerController and added exit method.
-  
+- Added a typecheck for lists in ObjectWithParameterCollection hash to 
+  convert them to hashable tuples.  
   
 Bugfixes
 --------

@@ -129,6 +129,8 @@ class ObjectWithParameterCollection(
         for _key, _val in self._config.items():
             _config_keys.append(hash(_key))
             try:
+                if isinstance(_val, list):
+                    _val = tuple(_val)
                 _hash = hash(_val)
                 _config_vals.append(_hash)
             except TypeError:

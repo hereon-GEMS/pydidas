@@ -25,10 +25,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ViewResultsFrame"]
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core import get_generic_param_collection
-from ...contexts import PydidasDirDialog
+from ...widgets import PydidasFileDialog
 from ...workflow import WorkflowResults, result_io
 from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
@@ -55,10 +55,10 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     def __init__(self, parent=None, **kwargs):
         ViewResultsFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
-        self.__import_dialog = PydidasDirDialog(
+        self.__import_dialog = PydidasFileDialog(
             parent=self,
+            dialog_type="open_directory",
             caption="Workflow results directory",
-            dialog=QtWidgets.QFileDialog.getExistingDirectory,
             qsettings_ref="WorkflowResults__import",
         )
 
@@ -94,10 +94,8 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         """
         Import data to the workflow results.
         """
-        _dir = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select directory for import", None
-        )
-        if _dir != "":
+        _dir = self.__import_dialog.get_user_response()
+        if _dir is not None:
             RESULTS.import_data_from_directory(_dir)
             self._update_choices_of_selected_results()
             self._update_export_button_activation()

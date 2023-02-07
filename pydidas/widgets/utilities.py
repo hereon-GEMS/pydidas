@@ -34,7 +34,7 @@ from qtpy import QtWidgets, QtCore, QtGui
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 import qtawesome
 
-from ..core import PydidasGuiError
+from ..core import PydidasGuiError, utils
 
 
 def delete_all_items_in_layout(layout):
@@ -113,6 +113,8 @@ def get_pyqt_icon_from_str(ref_string):
         _num = int(_ref)
         app = QtWidgets.QApplication.instance()
         _menu_icon = app.style().standardIcon(_num)
+    elif _type == "pydidas":
+        _menu_icon = utils.get_pydidas_qt_icon(_ref)
     elif _type == "path":
         _menu_icon = QtGui.QIcon(_ref)
     else:

@@ -32,8 +32,6 @@ __all__.extend(["experiment_context", "scan_context"])
 
 
 # import __all__ items from modules:
-from .file_dialogues import *
-
 
 # explicitly import the singleton factories from the subpackages
 from .diffraction_exp_context import (
@@ -58,7 +56,3 @@ GLOBAL_CONTEXTS = {
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import file_dialogues
-
-__all__.extend(file_dialogues.__all__)
-del file_dialogues

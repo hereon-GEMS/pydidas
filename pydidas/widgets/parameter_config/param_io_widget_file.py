@@ -28,10 +28,10 @@ __all__ = ["ParamIoWidgetFile"]
 import os
 import pathlib
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore
 
 from ...core.constants import PARAM_INPUT_EDIT_WIDTH
-from ...contexts import PydidasDirDialog, PydidasFileDialog
+from ..file_dialog import PydidasFileDialog
 from ...data_io import IoMaster
 from ..dialogues import critical_warning
 from .param_io_widget_with_button import ParamIoWidgetWithButton
@@ -65,18 +65,17 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         self.setAcceptDrops(True)
         self._flag_pattern = "pattern" in param.refkey
         if "directory" in param.refkey:
-            self.io_dialog = PydidasDirDialog(self, caption="Name of directory")
+            _dialog_type = "open_directory"
         else:
             if param.refkey.startswith("output"):
-                _dialog = QtWidgets.QFileDialog.getSaveFileName
+                _dialog_type = "save_file"
             else:
-                _dialog = QtWidgets.QFileDialog.getOpenFileName
-            self.io_dialog = PydidasFileDialog(
-                self,
-                caption="Name of File",
-                formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
-                dialog=_dialog,
-            )
+                _dialog_type = "open_file"
+        self.io_dialog = PydidasFileDialog(
+            self,
+            dialog_type=_dialog_type,
+            formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
+        )
 
     def button_function(self):
         """
@@ -86,7 +85,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         and opens a QFileDialog widget to select a filename.
         """
         _result = self.io_dialog.get_user_response()
-        if _result:
+        if _result is not None:
             if self._flag_pattern:
                 self.io_dialog.set_curr_dir(_result)
                 _result = os.path.basename(_result)

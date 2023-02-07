@@ -28,10 +28,10 @@ __all__ = ["ViewResultsMixin"]
 import os
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core import UserConfigError
-from ...contexts import PydidasDirDialog
+from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from ...workflow import WorkflowResults
 
@@ -81,10 +81,10 @@ class ViewResultsMixin:
         self._data_axunits = ["", ""]
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
-        self.__export_dialog = PydidasDirDialog(
+        self.__export_dialog = PydidasFileDialog(
             self,
+            dialog_type="open_directory",
             caption="Export results",
-            dialog=QtWidgets.QFileDialog.getExistingDirectory,
             qsettings_ref="WorkflowResults__export",
         )
 
@@ -329,14 +329,14 @@ class ViewResultsMixin:
         _overwrite = self.get_param_value("enable_overwrite")
         while True:
             _dirname = self.__export_dialog.get_user_response()
-            if _dirname == "" or len(os.listdir(_dirname)) == 0 or _overwrite:
+            if _dirname is None or len(os.listdir(_dirname)) == 0 or _overwrite:
                 break
             critical_warning(
                 "Directory not empty",
                 "The selected directory is not empty. Please "
                 "select an empty directory or cancel.",
             )
-        if _dirname == "":
+        if _dirname is None:
             return
         RESULTS.save_results_to_disk(
             _dirname, _formats, overwrite=_overwrite, node_id=node

@@ -32,8 +32,8 @@ from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 
-from ...contexts import PydidasFileDialog
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
+from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from .builders import DefineDiffractionExpFrameBuilder
 
@@ -71,13 +71,14 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         self.params = EXP.params
         self.__import_dialog = PydidasFileDialog(
             self,
+            dialog_type="open_file",
             caption="Import experiment context file",
             formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
             qsettings_ref="DefineDiffractionExpFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             self,
+            dialog_type="save_file",
             caption="Export experiment context file",
             formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
             dialog=QtWidgets.QFileDialog.getSaveFileName,
@@ -266,9 +267,9 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
 
         Note: This method will overwrite all current settings.
         """
-        fname = self.__import_dialog.get_user_response()
-        if fname != "":
-            EXP.import_from_file(fname)
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is not None:
+            EXP.import_from_file(_fname)
             for param in EXP.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
@@ -277,6 +278,6 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         Open a dialog to select a filename and write all currrent settings
         for the DiffractionExperimentContext to file.
         """
-        fname = self.__export_dialog.get_user_response()
-        if fname != "":
-            EXP.export_to_file(fname, overwrite=True)
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is not None:
+            EXP.export_to_file(_fname, overwrite=True)

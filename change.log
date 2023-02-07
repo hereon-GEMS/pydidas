@@ -14,6 +14,8 @@ Improvements
 - Removed quit method definition in the WorkerController and added exit method.
 - Added a typecheck for lists in ObjectWithParameterCollection hash to 
   convert them to hashable tuples.  
+- Added a new PydidasFileDialog which has buttons for quick access to latest 
+  opened location and to ScanContext base directory.
   
 Bugfixes
 --------

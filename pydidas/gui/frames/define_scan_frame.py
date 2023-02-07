@@ -27,12 +27,11 @@ __all__ = ["DefineScanFrame"]
 
 from functools import partial
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore
 
-from ...core.utils import get_pydidas_qt_icon
-from ...contexts import PydidasFileDialog
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
+from ...widgets import PydidasFileDialog
 from ...workflow import WorkflowTree
 from .builders import DefineScanFrameBuilder
 
@@ -54,16 +53,16 @@ class DefineScanFrame(DefineScanFrameBuilder):
         DefineScanFrameBuilder.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             self,
+            dialog_type="open_file",
             caption="Import scan context file",
             formats=ScanContextIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
             qsettings_ref="DefineScanFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             self,
-            "Export scan context file",
-            ScanContextIoMeta.get_string_of_formats(),
-            QtWidgets.QFileDialog.getSaveFileName,
+            dialog_type="save_file",
+            caption="Export scan context file",
+            formats=ScanContextIoMeta.get_string_of_formats(),
             qsettings_ref="DefineScanFrame__export",
         )
 
@@ -124,9 +123,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
 
         This method will open a QFileDialog to select the file to be read.
         """
-        fname = self.__import_dialog.get_user_response()
-        if fname != "":
-            SCAN.import_from_file(fname)
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is not None:
+            SCAN.import_from_file(_fname)
             for param in SCAN.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
@@ -138,9 +137,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
         This method will open a QFileDialog to select a filename for the
         file in which the information shall be written.
         """
-        fname = self.__export_dialog.get_user_response()
-        if fname != "":
-            SCAN.export_to_file(fname, overwrite=True)
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is not None:
+            SCAN.export_to_file(_fname, overwrite=True)
 
     @QtCore.Slot()
     def reset_entries(self):

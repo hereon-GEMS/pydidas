@@ -189,9 +189,10 @@ class PydidasFileDialog(
         self._widgets["but_scan_home"].setEnabled(
             os.path.isdir(self._config["scan_base"])
         )
-        self._widgets["but_latest_location"].setEnabled(
-            os.path.isdir(self._config["latest"])
-        )
+        if self._config["latest"] is not None:
+            self._widgets["but_latest_location"].setEnabled(
+                os.path.isdir(self._config["latest"])
+            )
         return QtWidgets.QFileDialog.exec_(self)
 
     def get_existing_directory(self):

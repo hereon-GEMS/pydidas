@@ -29,6 +29,7 @@ from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
+from ...core.utils import get_pydidas_qt_icon
 from ...contexts import PydidasFileDialog
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
@@ -45,7 +46,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
     Frame for managing the global scan setup.
     """
 
-    menu_icon = "qta::ei.move"
+    menu_icon = "pydidas::scan_icon.png"
     menu_title = "Define Scan"
     menu_entry = "Workflow processing/Define scan"
 

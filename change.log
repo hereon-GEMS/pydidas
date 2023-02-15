@@ -16,6 +16,7 @@ Improvements
   convert them to hashable tuples.  
 - Added a new PydidasFileDialog which has buttons for quick access to latest 
   opened location and to ScanContext base directory.
+- Added the option to add 'permanent' keyword arguments to the SingletonFactory
   
 Bugfixes
 --------

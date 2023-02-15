@@ -45,12 +45,13 @@ class SingletonFactory:
         to keep the reference intact. The default is True
     """
 
-    def __init__(self, cls):
+    def __init__(self, cls, **permanent_kwargs):
         """
         Setup method.
         """
         self.__instance = None
         self.__class = cls
+        self.__permanent_kwargs = permanent_kwargs
 
     def __call__(self, *args, **kwargs):
         """
@@ -58,6 +59,9 @@ class SingletonFactory:
 
         Parameters
         ----------
+        args : tuple
+            Any args to be passed to the class. Note that this is only used
+            if no instance exists yet.
         kwargs : dict
             Any kwargs which should be passed. Note that this is only used
             if no instance exists yet.
@@ -68,22 +72,25 @@ class SingletonFactory:
             The instance of the Singleton class.
         """
         if self.__instance is None:
-            self.__instance = self.__class(*args, **kwargs)
+            self.__instance = self.__class(*args, **(kwargs | self.__permanent_kwargs))
             if isinstance(self.__instance, QtCore.QObject):
                 self.__instance.destroyed.connect(self._clear_instance)
         return self.__instance
 
-    def _reset_instance(self, **kwargs):
+    def _reset_instance(self, *args, **kwargs):
         """
         Reset the Singleton instance and create a new one.
 
          Parameters
         ----------
+        args : tuple
+            Any args to be passed to the class. Note that this is only used
+            if no instance exists yet.
         kwargs : dict
             Any kwargs which should be passed. Note that this is only used
             if no instance exists yet.
         """
-        self.__instance = self.__class(**kwargs)
+        self.__instance = self.__class(*args, **(kwargs | self.__permanent_kwargs))
 
     def _clear_instance(self):
         """

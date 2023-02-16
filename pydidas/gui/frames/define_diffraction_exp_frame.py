@@ -62,7 +62,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
     saving the DiffractionExperimentContext in the GUI.
     """
 
-    menu_icon = "pydidas::frame_icon_define_diffraction_exp.png" #"::mdi.card-bulleted-settings-outline"
+    menu_icon = "pydidas::frame_icon_define_diffraction_exp.png"
     menu_title = "Define Diffraction setup"
     menu_entry = "Workflow processing/Define diffraction setup"
 

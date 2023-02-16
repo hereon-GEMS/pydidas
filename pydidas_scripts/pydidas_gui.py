@@ -94,7 +94,10 @@ def run_gui(app=None, restore_state="None"):
     gui.raise_()
     gui.show()
     if restore_state in ["exit", "saved"]:
-        gui.restore_gui_state(state=restore_state)
+        try:
+            gui.restore_gui_state(state=restore_state)
+        except UserConfigError:
+            pass
     return app.exec_()
 
 

@@ -30,6 +30,8 @@ Bugfixes
   hashable.
 - Fixed an issue with AppRunner threads sending their finished signal 
   prematurely on slower cpus.
+- Fixed an issue in the pydidas_gui script when restoring a GUI state which 
+  was invalid.
 
 ========
 v23.1.25

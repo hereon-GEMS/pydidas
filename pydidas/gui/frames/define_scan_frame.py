@@ -52,14 +52,14 @@ class DefineScanFrame(DefineScanFrameBuilder):
     def __init__(self, parent=None, **kwargs):
         DefineScanFrameBuilder.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="open_file",
             caption="Import scan context file",
             formats=ScanContextIoMeta.get_string_of_formats(),
             qsettings_ref="DefineScanFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="save_file",
             caption="Export scan context file",
             formats=ScanContextIoMeta.get_string_of_formats(),

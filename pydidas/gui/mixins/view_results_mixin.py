@@ -82,7 +82,7 @@ class ViewResultsMixin:
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="open_directory",
             caption="Export results",
             qsettings_ref="WorkflowResults__export",

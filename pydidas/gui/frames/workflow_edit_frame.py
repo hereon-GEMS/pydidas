@@ -78,19 +78,17 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
     def __init__(self, parent=None, **kwargs):
         WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="open_file",
             caption="Import workflow tree file",
             formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
             qsettings_ref="WorkflowEditFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="save_file",
             caption="Export workflow tree file",
             formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="WorkflowEditFrame__export",
         )
 

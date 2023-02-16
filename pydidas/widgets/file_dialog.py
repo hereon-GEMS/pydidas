@@ -61,10 +61,14 @@ class PydidasFileDialog(
         The default is open_file.
     formats : Union[None, str], optional
         The list of format filters for filenames, if used. The default is None.
+    qsettings_ref : Union[str, None], optional
+        A reference string to store persistent information about the directory between
+        sessions. If None, the currently active directory will be selected. The default
+        is None.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        QtWidgets.QFileDialog.__init__(self, parent)
+    def __init__(self, **kwargs):
+        QtWidgets.QFileDialog.__init__(self, kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
         self._config = {

@@ -77,7 +77,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             else:
                 _dialog_type = "open_file"
         self.io_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type=_dialog_type,
             formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
             qsettings_ref=persistent_qsettings_ref,

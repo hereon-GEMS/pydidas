@@ -144,14 +144,14 @@ class MainMenu(QtWidgets.QMainWindow):
         Create the persistent dialogues for import/export of the GUI state.
         """
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="open_file",
             caption="Import GUI state file",
             formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
             qsettings_ref="MainWindowGuiState__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="save_file",
             caption="Export GUI state file",
             formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",

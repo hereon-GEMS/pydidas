@@ -70,14 +70,14 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         DefineDiffractionExpFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP.params
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="open_file",
             caption="Import experiment context file",
             formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
             qsettings_ref="DefineDiffractionExpFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
             dialog_type="save_file",
             caption="Export experiment context file",
             formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),

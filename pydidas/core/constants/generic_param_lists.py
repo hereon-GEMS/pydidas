@@ -14,8 +14,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The generic_param_lists module holds key lists for accessing all required Parameters
-in an object.
+The generic_param_lists module holds key lists for defining subsets of required 
+Parameters in an object.
 
 """
 

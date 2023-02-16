@@ -72,7 +72,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
 
     menu_title = "Workflow editing"
     menu_entry = "Workflow processing/Workflow editing"
-    menu_icon = "qta::ph.share-network-fill"
+    menu_icon = "pydidas::frame_icon_workflow_edit.png"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):

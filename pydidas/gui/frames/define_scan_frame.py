@@ -45,7 +45,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
     Frame for managing the global scan setup.
     """
 
-    menu_icon = "pydidas::scan_icon.png"
+    menu_icon = "pydidas::frame_icon_define_scan.png"
     menu_title = "Define Scan"
     menu_entry = "Workflow processing/Define scan"
 

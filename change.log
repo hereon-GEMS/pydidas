@@ -17,6 +17,8 @@ Improvements
 - Added a new PydidasFileDialog which has buttons for quick access to latest 
   opened location and to ScanContext base directory.
 - Added the option to add 'permanent' keyword arguments to the SingletonFactory
+- Added the option to add persistent identifiers to file/directory Parameters 
+  to configure their respective FileDialogs.  
   
 Bugfixes
 --------

@@ -96,6 +96,19 @@ class ImageSeriesOperationsWindow(PydidasWindow):
                 "output_fname",
                 "operation",
             ]
+            if param_key == "first_file":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__import_file"
+            if param_key == "last_file":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__import_file"
+            if param_key == "output_fname":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__export_file"
+
             return _config
 
         self.create_label(

@@ -193,6 +193,9 @@ class PydidasFileDialog(
             self._widgets["but_latest_location"].setEnabled(
                 os.path.isdir(self._config["latest"])
             )
+        if self._config["curr_dir"] is not None:
+            self.setDirectory(self._config["curr_dir"])
+
         return QtWidgets.QFileDialog.exec_(self)
 
     def get_existing_directory(self):
@@ -322,6 +325,6 @@ class PydidasFileDialog(
             "dialogues/" + name if name is not None else None
         )
         if name is not None:
-            self._config["curr_dir"] = self.q_settings.value(
+            self._config["curr_dir"] = self.q_settings_get_value(
                 self._config["qsettings_ref"], str
             )

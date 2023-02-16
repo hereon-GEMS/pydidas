@@ -45,7 +45,9 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
+    def __init__(
+        self, parent, param, width=PARAM_INPUT_EDIT_WIDTH, persistent_qsettings_ref=None
+    ):
         """
         Setup the widget.
 
@@ -60,6 +62,9 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             A Parameter instance.
         width : int, optional
             The width of the IOwidget.
+        persistent_qsettings_ref : Union[None, str], optional
+            The persistent reference for the directory in the QSettings. If None,
+            the widget will not keep references spanning instances. The default is None.
         """
         super().__init__(parent, param, width)
         self.setAcceptDrops(True)
@@ -75,6 +80,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             self,
             dialog_type=_dialog_type,
             formats="All files (*.*);;" + IoMaster.get_string_of_formats(),
+            qsettings_ref=persistent_qsettings_ref,
         )
 
     def button_function(self):
@@ -112,7 +118,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         self._old_value = self.get_value()
         self.ledit.setText(f"{value}")
-        if not self._flag_pattern:
+        if not self._flag_pattern and value != pathlib.Path():
             self.io_dialog.set_curr_dir(value)
 
     def modify_file_selection(self, list_of_choices):

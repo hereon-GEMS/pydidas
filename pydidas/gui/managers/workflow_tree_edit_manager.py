@@ -117,7 +117,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         name if not selected.
         New plugins will always be created as children of the active plugin
         and it is the users responsibility to select the correct parent
-        prior to calling this method.
+        prior to calling this method or to use the parent_node_id keyword.
 
         Parameters
         ----------
@@ -196,7 +196,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             partial(self.delete_branch, node_id)
         )
         _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
-        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)  #
+        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
+        _widget.sig_create_copy_request.connect(self.create_node_copy_request)
         self.sig_consistent_plugins.connect(_widget.receive_consistent_signal)
         self.sig_inconsistent_plugins.connect(_widget.receive_inconsistent_signal)
         _widget.setVisible(True)
@@ -267,7 +268,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     @QtCore.Slot(int, int)
     def new_node_parent_request(self, calling_node, new_parent_node):
         """
-        Handle the signal that a new shall have a new parent.
+        Handle the signal that a node requested to have a new parent.
 
         Parameters
         ----------
@@ -277,6 +278,27 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node ID of the requested parent.
         """
         TREE.change_node_parent(calling_node, new_parent_node)
+        TREE.order_node_ids()
+        self.update_from_tree()
+        self._check_consistency()
+
+    @QtCore.Slot(int, int)
+    def create_node_copy_request(self, calling_node, new_parent_node):
+        """
+        Handle the signal that a node requested to append a copy of itself to parent.
+
+        Parameters
+        ----------
+        calling_node : int
+            The node ID of the calling node.
+        new_parent_node : int
+            The node ID of the requested parent.
+        """
+        _plugin = TREE.nodes[calling_node].plugin
+        self.add_new_plugin_node(_plugin.plugin_name, parent_node_id=new_parent_node)
+        _dump = TREE.nodes[calling_node].dump()
+        for _key, _val in _dump["plugin_params"]:
+            TREE.active_node.plugin.set_param_value(_key, _val)
         TREE.order_node_ids()
         self.update_from_tree()
         self._check_consistency()

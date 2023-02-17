@@ -20,6 +20,8 @@ Improvements
 - Added the option to add persistent identifiers to file/directory Parameters 
   to configure their respective FileDialogs.  
 - Added FWHM determination to the core.fitting routines.
+- Added context menus to the nodes in the Workflow edit frame to allow moving
+  and creating copies.
   
 Bugfixes
 --------

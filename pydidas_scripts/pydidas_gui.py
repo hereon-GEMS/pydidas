@@ -106,3 +106,4 @@ if __name__ == "__main__":
     if not isinstance(app, PydidasApp):
         app = PydidasApp(sys.argv)
     _ = run_gui(app, restore_state="exit")
+    app.quit()

@@ -277,7 +277,7 @@ class FitSinglePeak(ProcPlugin):
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
             _area = self._fitter.area(_fit_pvals)
             if _residual > self._config["sigma_threshold"]:
-                _new_data = len(self._config["single_result_shape"]) * [np.nan]
+                _new_data = self._config["single_result_shape"][0] * [np.nan]
             else:
                 _new_data = []
                 if "position" in _output:
@@ -287,7 +287,7 @@ class FitSinglePeak(ProcPlugin):
                 if "FWHM" in _output:
                     _new_data.append(self._fitter.fwhm(_fit_pvals))
         else:
-            _new_data = len(self._config["single_result_shape"]) * [np.nan]
+            _new_data = self._config["single_result_shape"][0] * [np.nan]
         _result_dataset = Dataset(
             _new_data,
             data_label=_output,

@@ -62,6 +62,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self._flag_active = False
         self._flag_inconsistent = False
         self.widget_id = widget_id
+        self._label = kwargs.get("label", "")
 
         self.setFixedSize(self.widget_width, self.widget_height)
 
@@ -88,7 +89,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         _font.setBold(True)
         self.id_label.setFont(_font)
 
-        self.update_text(widget_id, "")
+        self.update_text(widget_id, self._label)
         self.setText(plugin_name)
 
     def __create_menu(self):
@@ -215,7 +216,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             self._flag_inconsistent = False
             self._update_stylesheets()
 
-    def update_text(self, node_id, label):
+    def update_text(self, node_id, label=""):
         """
         Update the text for node label.
 
@@ -223,11 +224,12 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         ----------
         node_id : int
             The unique node ID.
-        label : str
+        label : str, optional
             The new label for the workflow node.
         """
         _txt = f"node {node_id:d}"
         if len(label) > 0:
+            self._label = label
             _txt += f": {label}"
         self.id_label.setText(_txt)
 

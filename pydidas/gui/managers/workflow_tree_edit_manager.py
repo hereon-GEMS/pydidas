@@ -174,7 +174,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if self.root is None:
             self.root = _node
 
-    def __create_widget(self, title, node_id):
+    def __create_widget(self, title, node_id, label=""):
         """
         Create the widget associated with the Plugin to display the plugin
         position on the canvas.
@@ -185,8 +185,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The plugin title.
         node_id : int
             The node ID. Required for referencing the widgets later.
+        label : str, optional
+            The plugin label.
         """
-        _widget = PluginInWorkflowBox(title, node_id, parent=self.qt_canvas)
+        _widget = PluginInWorkflowBox(
+            title, node_id, parent=self.qt_canvas, label=label
+        )
         _widget.sig_widget_activated.connect(self.set_active_node)
         _widget.sig_widget_delete_branch_request.connect(
             partial(self.delete_branch, node_id)
@@ -344,9 +348,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         self.__delete_all_nodes_and_widgets()
         for _node_id, _node in TREE.nodes.items():
-            name = _node.plugin.plugin_name
+            _name = _node.plugin.plugin_name
+            _label = _node.plugin.get_param_value("label")
             self.__create_position_node(_node_id)
-            self.__create_widget(name, _node_id)
+            self.__create_widget(_name, _node_id, label=_label)
         self.update_node_positions()
         if reset_active_node:
             self.sig_plugin_selected.emit(-1)

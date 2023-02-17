@@ -38,6 +38,8 @@ Bugfixes
 - Fixed an issue with importing the Mask file from pyFAI CalibrationContext.
 - Fixed an issue with the FitSinglePeak plugin metadata when the first image
   was invalid.
+- Fixed an issue where the node labels would not be displayd in the Workflow 
+  tree editor.
 
 
 ========

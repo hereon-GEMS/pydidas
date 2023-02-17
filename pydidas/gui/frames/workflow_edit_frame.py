@@ -24,6 +24,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrame"]
 
+import os
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
@@ -153,6 +154,8 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         _fname = self.__import_dialog.get_user_response()
         if _fname is None:
             return
+        if os.path.splitext(_fname)[1] == "":
+            _fname = _fname + ".yaml"
         TREE.import_from_file(_fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 

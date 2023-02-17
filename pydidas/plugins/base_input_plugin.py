@@ -168,7 +168,9 @@ class InputPlugin(BasePlugin):
         _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise UserConfigError("No filename pattern detected in the Input plugin!")
+            # raise UserConfigError("No filename pattern detected in the Input plugin!")
+            self.filename_string = os.path.join(_basepath, _pattern)
+            return
         self.filename_string = os.path.join(_basepath, _pattern).replace(
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )

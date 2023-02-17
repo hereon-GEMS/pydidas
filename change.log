@@ -35,6 +35,7 @@ Bugfixes
   prematurely on slower cpus.
 - Fixed an issue in the pydidas_gui script when restoring a GUI state which 
   was invalid.
+- Fixed an issue with importing the Mask file from pyFAI CalibrationContext.
 
 ========
 v23.1.25

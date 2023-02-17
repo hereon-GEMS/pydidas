@@ -209,6 +209,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             self.set_param_value_and_widget("detector_pxsizex", 1e6 * det.pixel2)
             self.set_param_value_and_widget("detector_pxsizey", 1e6 * det.pixel1)
             if maskfile is not None:
+                if maskfile.startswith("fabio:///"):
+                    maskfile = maskfile[9:]
                 self.set_param_value_and_widget("detector_mask_file", maskfile)
         elif show_warning:
             critical_warning(

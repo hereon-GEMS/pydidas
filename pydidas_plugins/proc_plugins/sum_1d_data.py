@@ -109,8 +109,8 @@ class Sum1dData(ProcPlugin):
             axis_labels=["Data sum"],
             axis_units=[""],
             metadata=data.metadata,
-            axis_label="data sum",
-            axis_unit="a.u.",
+            data_label="data sum",
+            data_unit=data.data_unit,
         )
         return _new_data, kwargs
 

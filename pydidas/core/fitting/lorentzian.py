@@ -115,3 +115,22 @@ class Lorentzian(FitFuncBase, metaclass=FitFuncMeta):
 
         _center = x[y.argmax()]
         return [_amp, _gamma, _center] + _bg_params
+
+    @classmethod
+    def fwhm(cls, c):
+        """
+        Get the FWHM of the fit from the values of the parameters.
+
+        This method needs to be implemented by each fitting function.
+
+        Parameters
+        ----------
+        c : tuple
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        float
+            The function FWHM.
+        """
+        return c[1]

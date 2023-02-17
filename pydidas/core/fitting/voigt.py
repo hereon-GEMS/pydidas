@@ -116,3 +116,32 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         _amp = (amax(y) - amin(y)) / voigt_profile(0, _sigma, _gamma)
         _center = x[y.argmax()]
         return [_amp, _sigma, _gamma, _center] + _bg_params
+
+    @classmethod
+    def fwhm(cls, c):
+        """
+        Get the FWHM of the fit from the values of the parameters.
+
+        This method needs to be implemented by each fitting function.
+
+        The FWHM for the Voigt function is determined according to Kielkopf:
+        John F. Kielkopf: New approximation to the Voigt function with applications
+        to spectral-line profile analysis. 8. Auflage. Vol. 63. Journal of the Optical
+        Society of America, 1973.
+
+        Parameters
+        ----------
+        c : tuple
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        float
+            The function FWHM.
+        """
+        _fwhm_gauss = 2.354820 * c[1]
+        _fwhm_lorentz = c[2]
+        return (
+            0.5343 * _fwhm_lorentz
+            + (0.2169 * _fwhm_lorentz**2 + _fwhm_gauss**2) ** 0.5
+        )

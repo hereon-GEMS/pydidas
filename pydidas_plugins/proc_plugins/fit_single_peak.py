@@ -71,17 +71,18 @@ class FitSinglePeak(ProcPlugin):
             choices=[
                 "Peak position",
                 "Peak area",
-                "Fit normalized standard deviation",
-                "Peak area and position",
-                "Peak area, position and norm. std",
+                "FWHM",
+                "Peak position and area",
+                "Peak position and FWHM",
+                "Peak area and FWHM",
+                "Peak position, area and FWHM",
             ],
             name="Output",
             tooltip=(
                 "The output of the fitting plugin. The plugin can either return"
-                " the peak area or the peak position, or both. Alternatively, "
-                "The input data, the fitted data and the residual can be returned"
-                " as well. Note that the fit parameters are always stored in the "
-                "metadata."
+                " the peak area, the peak position or the FWHM. Alternatively, "
+                "any combination of these values can be retured as well. "
+                "Note that the fit parameters are always stored in the metadata."
             ),
         ),
     )
@@ -275,18 +276,16 @@ class FitSinglePeak(ProcPlugin):
             _datafit = self._fitter.function(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
             _area = self._fitter.area(_fit_pvals)
-        if valid and _residual > self._config["sigma_threshold"]:
-            _new_data = len(self._config["single_result_shape"]) * [np.nan]
-        elif valid and _output == "Peak area":
-            _new_data = [_area]
-        elif valid and _output == "Peak position":
-            _new_data = [self._fit_params["center"]]
-        elif valid and _output == "Peak area and position":
-            _new_data = [_area, self._fit_params["center"]]
-        elif valid and _output == "Fit normalized standard deviation":
-            _new_data = [_residual]
-        elif valid and _output == "Peak area, position and norm. std":
-            _new_data = [_area, self._fit_params["center"], _residual]
+            if _residual > self._config["sigma_threshold"]:
+                _new_data = len(self._config["single_result_shape"]) * [np.nan]
+            else:
+                _new_data = []
+                if "position" in _output:
+                    _new_data.append(self._fit_params["center"])
+                if "area" in _output:
+                    _new_data.append(_area)
+                if "FWHM" in _output:
+                    _new_data.append(self._fitter.fwhm(_fit_pvals))
         else:
             _new_data = len(self._config["single_result_shape"]) * [np.nan]
         _result_dataset = Dataset(
@@ -313,12 +312,16 @@ class FitSinglePeak(ProcPlugin):
         if _output in [
             "Peak area",
             "Peak position",
-            "Fit normalized standard deviation",
+            "FWHM",
         ]:
             self._config["result_shape"] = (1,)
-        elif _output == "Peak area and position":
+        elif _output in [
+            "Peak position and area",
+            "Peak position and FWHM",
+            "Peak area and FWHM",
+        ]:
             self._config["result_shape"] = (2,)
-        elif _output == "Peak area, position and norm. std":
+        elif _output == "Peak position, area and FWHM":
             self._config["result_shape"] = (3,)
         else:
             raise ValueError("No result shape defined for the selected input")

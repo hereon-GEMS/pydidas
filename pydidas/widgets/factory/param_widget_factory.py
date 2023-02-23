@@ -86,5 +86,8 @@ def create_param_widget(
             _widget = ParamIoWidgetHdf5Key(None, param, widget_width)
         else:
             _widget = ParamIoWidgetLineEdit(None, param, widget_width)
-    _widget.set_value(param.value)
+    try:
+        _widget.set_value(param.value)
+    except UserConfigError:
+        pass
     return _widget

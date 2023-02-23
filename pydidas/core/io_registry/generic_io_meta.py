@@ -115,8 +115,7 @@ class GenericIoMeta(type):
         if not cls.is_extension_registered(ext):
             _name = cls.__name__[:-6]
             raise UserConfigError(
-                f'The extension "{ext}" is not a registered extension for '
-                f'{_name}.'
+                f'The extension "{ext}" is not a registered extension for {_name}.'
             )
 
     @classmethod

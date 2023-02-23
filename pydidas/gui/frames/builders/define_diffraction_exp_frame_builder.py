@@ -50,22 +50,26 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         """
         self._scroll_width = 360
         self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY)
+            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+        )
         _2line_options = constants.DEFAULT_TWO_LINE_PARAM_CONFIG | {
             "width_total": self._scroll_width,
             "width_io": self._scroll_width - 20,
-            "parent_widget":self._widgets["config"],
+            "parent_widget": self._widgets["config"],
         }
-        _1line_options = dict(width_text=self._scroll_width - 180, width_io=150, width_total=self._scroll_width,
-                              parent_widget=self._widgets["config"],
-)
+        _1line_options = dict(
+            width_text=self._scroll_width - 180,
+            width_io=150,
+            width_total=self._scroll_width,
+            parent_widget=self._widgets["config"],
+        )
         self.create_label(
             None,
             "Diffraction experimental setup\n",
             fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),
-            fixedWidth=self._scroll_width
+            fixedWidth=self._scroll_width,
         )
         self.create_any_widget(
             "config_area",
@@ -108,7 +112,9 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             )
             self.create_param_widget(_param, **_options)
 
-        self.create_spacer(None, gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"])
+        self.create_spacer(
+            None, gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
+        )
         self.create_button(
             "but_save_to_file",
             "Export experimental parameters to file",

@@ -78,7 +78,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             widget=self._widgets["label"],
             gridPos=(1, 0, 1, 2),
         )
-        self.create_button("button_okay", "OK", gridPos=(2, 3, 1, 1))
+        self.create_button("button_okay", "Acknowledge", gridPos=(2, 3, 1, 1))
 
         _icon_fname = os.path.join(get_pydidas_icon_path(), "pydidas_error.svg")
         self.add_any_widget(

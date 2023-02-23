@@ -83,7 +83,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             QtWidgets.QCheckBox("Do not show this notice again"),
             gridPos=(2, 0, 1, 2),
         )
-        self.create_button("button_okay", "OK", gridPos=(2, 3, 1, 1))
+        self.create_button("button_okay", "Acknowledge", gridPos=(2, 3, 1, 1))
 
         self._widgets["button_okay"].clicked.connect(self.close)
         self.set_text(_text)

@@ -45,6 +45,8 @@ Bugfixes
   was invalid.
 - Fixed an issue where the node labels would not be displayd in the Workflow 
   tree editor.
+- Fixed an issue with the ParamIoWidgetFile's FileDialog if the corresponding 
+  Parameter value is not a valid path.
 
 
 ========

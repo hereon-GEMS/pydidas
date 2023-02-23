@@ -118,7 +118,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         """
         self._old_value = self.get_value()
         self.ledit.setText(f"{value}")
-        if not self._flag_pattern and value != pathlib.Path():
+        if not self._flag_pattern and value != pathlib.Path() and os.path.exists(value):
             self.io_dialog.set_curr_dir(value)
 
     def modify_file_selection(self, list_of_choices):

@@ -26,7 +26,13 @@ __status__ = "Development"
 __all__ = ["DefineDiffractionExpFrameBuilder"]
 
 from ....core import constants
-from ....widgets import BaseFrame
+from ....core.constants import (
+    CONFIG_WIDGET_WIDTH,
+    DEFAULT_TWO_LINE_PARAM_CONFIG,
+    FIX_EXP_POLICY,
+)
+from ....widgets import ScrollArea, BaseFrame
+from ....widgets.parameter_config import ParameterEditCanvas
 
 
 class DefineDiffractionExpFrameBuilder(BaseFrame):
@@ -42,17 +48,34 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         """
         Build the frame and create all widgets.
         """
+        self._scroll_width = 360
+        self._widgets["config"] = ParameterEditCanvas(
+            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY)
         _2line_options = constants.DEFAULT_TWO_LINE_PARAM_CONFIG | {
-            "width_total": 360,
-            "width_io": 340,
+            "width_total": self._scroll_width,
+            "width_io": self._scroll_width - 20,
+            "parent_widget":self._widgets["config"],
         }
-        _1line_options = dict(width_text=180, width_io=150, width_total=360)
+        _1line_options = dict(width_text=self._scroll_width - 180, width_io=150, width_total=self._scroll_width,
+                              parent_widget=self._widgets["config"],
+)
         self.create_label(
             None,
             "Diffraction experimental setup\n",
             fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 1),
+            fixedWidth=self._scroll_width
+        )
+        self.create_any_widget(
+            "config_area",
+            ScrollArea,
+            widget=self._widgets["config"],
+            fixedWidth=self._scroll_width + 50,
+            sizePolicy=FIX_EXP_POLICY,
+            gridPos=(-1, 0, 1, 1),
+            stretch=(1, 0),
+            layout_kwargs={"alignment": None},
         )
         self.create_button(
             "but_load_from_file",
@@ -60,12 +83,16 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             icon=self.style().standardIcon(42),
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         self.create_button(
             "but_copy_from_pyfai",
             "Copy all experimental parameters from calibration",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         for _param in self.params.values():
             if _param.refkey == "xray_wavelength":
@@ -81,12 +108,14 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             )
             self.create_param_widget(_param, **_options)
 
-        self.create_spacer(None, gridPos=(-1, 0, 1, 1))
+        self.create_spacer(None, gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"])
         self.create_button(
             "but_save_to_file",
             "Export experimental parameters to file",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
             icon=self.style().standardIcon(43),
         )
 
@@ -100,12 +129,16 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         self.create_button(
             "but_copy_energy_from_pyfai",
             "Copy X-ray energy from pyFAI calibration",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
 
     def __create_detector_header(self):
@@ -118,18 +151,24 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         self.create_button(
             "but_select_detector",
             "Select X-ray detector from list",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         self.create_button(
             "but_copy_det_from_pyfai",
             "Copy X-ray detector from pyFAI calibration",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
 
     def __create_geometry_header(self):
@@ -142,9 +181,13 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )
         self.create_button(
             "but_copy_geo_from_pyfai",
             "Copy X-ray detector geometry from pyFAI calibration",
             gridPos=(-1, 0, 1, 1),
+            fixedWidth=self._scroll_width,
+            parent_widget=self._widgets["config"],
         )

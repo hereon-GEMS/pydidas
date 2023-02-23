@@ -63,7 +63,7 @@ def _param_widget_config(param_key):
             linebreak=True,
             halign_text=QtCore.Qt.AlignLeft,
             valign_text=QtCore.Qt.AlignBottom,
-            width_total=CONFIG_WIDGET_WIDTH - 10,
+            width_total=CONFIG_WIDGET_WIDTH,
             width_io=CONFIG_WIDGET_WIDTH - 50,
             width_text=CONFIG_WIDGET_WIDTH - 20,
             width_unit=0,
@@ -72,7 +72,7 @@ def _param_widget_config(param_key):
         width_io=100,
         width_unit=0,
         width_text=CONFIG_WIDGET_WIDTH - 100,
-        width_total=CONFIG_WIDGET_WIDTH - 10,
+        width_total=CONFIG_WIDGET_WIDTH,
         visible=False,
     )
 
@@ -200,9 +200,7 @@ class ResultSelectionWidget(
             title="Data selection:",
             fixedWidth=CONFIG_WIDGET_WIDTH - 10,
         )
-        _w = QtWidgets.QFrame()
-        _w.setLayout(QtWidgets.QGridLayout())
-        self.add_any_widget("plot_ax_group", _w)
+        self.create_empty_widget("plot_ax_group")
         self.create_param_widget(
             self.get_param("plot_ax1"),
             parent_widget=self._widgets["plot_ax_group"],

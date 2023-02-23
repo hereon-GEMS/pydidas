@@ -75,6 +75,7 @@ class PydidasFileDialog(
             "caption": kwargs.get("caption", None),
             "type": kwargs.get("dialog_type", "open_file"),
             "formats": kwargs.get("formats", None),
+            "extensions": None,
             "curr_dir": None,
             "scan_base": None,
             "latest": None,
@@ -97,6 +98,15 @@ class PydidasFileDialog(
             self.setWindowTitle(self._config["caption"])
         if self._config["formats"] is not None:
             self.setNameFilter(self._config["formats"])
+            _exts = [
+                _entry.strip()
+                for _entry in self._config["formats"]
+                .split(";;")[0]
+                .strip(")")
+                .split("*.")[1:]
+            ]
+            if len(_exts) > 0:
+                self._config["extensions"] = _exts
         self.setViewMode(QtWidgets.QFileDialog.Detail)
         self.setOption(QtWidgets.QFileDialog.DontUseNativeDialog)
         self.setSidebarUrls(
@@ -271,6 +281,12 @@ class PydidasFileDialog(
         if res == 0:
             return None
         _selection = self.selectedFiles()[0]
+        _ext = os.path.splitext(_selection)[1]
+        if len(_ext) == 0 and self._config["extensions"] is not None:
+            if "yaml" in self._config["extensions"]:
+                _selection = _selection + ".yaml"
+            else:
+                _selection = _selection + "." + self._config["extensions"][0]
         self._config["curr_dir"] = os.path.dirname(_selection)
         self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:

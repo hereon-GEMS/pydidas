@@ -22,6 +22,9 @@ Improvements
 - Added FWHM determination to the core.fitting routines.
 - Added context menus to the nodes in the Workflow edit frame to allow moving
   and creating copies.
+- Changed the Exception in the GenericIoMeta class to UserConfigError to 
+  improve the user experience when trying to export data with an unsupported
+  file format.
   
 Bugfixes
 --------

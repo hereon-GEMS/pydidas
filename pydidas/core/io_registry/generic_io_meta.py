@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ["GenericIoMeta"]
 
 
+from ..exceptions import UserConfigError
 from ..utils.file_utils import get_extension
 
 
@@ -112,8 +113,10 @@ class GenericIoMeta(type):
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext):
-            raise KeyError(
-                f'The extension "{ext}" is not registered with ' "the MetaClass."
+            _name = cls.__name__[:-6]
+            raise UserConfigError(
+                f'The extension "{ext}" is not a registered extension for '
+                f'{_name}.'
             )
 
     @classmethod

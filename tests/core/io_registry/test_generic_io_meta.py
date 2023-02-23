@@ -24,6 +24,7 @@ __status__ = "Development"
 
 import unittest
 
+from pydidas.core import UserConfigError
 from pydidas.core.io_registry import GenericIoMeta
 
 
@@ -93,7 +94,7 @@ class TestGenericIoMeta(unittest.TestCase):
 
     def test_verify_extension_is_registered__incorrect(self):
         self.create_test_class()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             GenericIoMeta.verify_extension_is_registered("none")
 
     def test_new__method(self):

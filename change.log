@@ -50,6 +50,7 @@ Bugfixes
   tree editor.
 - Fixed an issue with the ParamIoWidgetFile's FileDialog if the corresponding 
   Parameter value is not a valid path.
+- Added a file exists check to the SubtractBgImage plugin.
 
 
 ========

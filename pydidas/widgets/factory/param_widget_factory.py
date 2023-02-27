@@ -28,7 +28,7 @@ __all__ = ["create_param_widget"]
 import pathlib
 
 from ...core.constants import PARAM_INPUT_EDIT_WIDTH
-from ...core import Hdf5key
+from ...core import Hdf5key, UserConfigError
 
 
 def create_param_widget(

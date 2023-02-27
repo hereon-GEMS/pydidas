@@ -272,21 +272,27 @@ GENERIC_PARAMS_OTHER = {
     },
     "fit_upper_limit": {
         "type": float,
-        "default": 0,
+        "default": None,
         "name": "Peak fit upper limit",
         "choices": None,
         "unit": "",
-        "allow_None": False,
-        "tooltip": "The upper limit (in the x-axis´ unit) to the fit region.",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit (in the x-axis´ unit) to the fit region. None corresponds "
+            "to using no upper limit but the data limits."
+        ),
     },
     "fit_lower_limit": {
         "type": float,
-        "default": 0,
+        "default": None,
         "name": "Peak fit lower limit",
         "choices": None,
         "unit": "",
-        "allow_None": False,
-        "tooltip": "The lower limit (in the x-axis´ unit) to the fit region.",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit (in the x-axis´ unit) to the fit region. None corresponds "
+            "to using no upper limit but the data limits."
+        ),
     },
     ############################
     # Autosave results settings

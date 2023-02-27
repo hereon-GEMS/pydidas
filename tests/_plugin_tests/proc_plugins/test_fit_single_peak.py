@@ -58,8 +58,8 @@ class TestFitSinglePeak(unittest.TestCase):
         pass
 
     def create_generic_plugin(self, func="Gaussian"):
-        _low = 15
-        _high = 27
+        _low = 10
+        _high = 37
         self._rangen = np.where((self._x >= _low) & (self._x <= _high))[0].size
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin._config["input_shape"] = (150,)
@@ -73,6 +73,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin._data = self._data
         plugin._data_x = self._data.axis_ranges[0]
+        # plugin._config[]
         plugin._crop_data_to_selected_range()
         plugin.pre_execute()
         _startguess = plugin._fitter.guess_fit_start_params(
@@ -151,13 +152,6 @@ class TestFitSinglePeak(unittest.TestCase):
             [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf],
         )
 
-    def test_crop_data_to_selected_range__no_limits(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
-        plugin._data = self._data
-        plugin._data_x = self._data.axis_ranges[0]
-        with self.assertRaises(UserConfigError):
-            plugin._crop_data_to_selected_range()
-
     def test_crop_data_to_selected_range__empty_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
         plugin.set_param_value("fit_lower_limit", 42)
@@ -169,13 +163,31 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_crop_data_to_selected_range__normal_limits(self):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
-        plugin.set_param_value("fit_lower_limit", 0)
+        plugin.set_param_value("fit_lower_limit", 5)
         plugin.set_param_value("fit_upper_limit", 20)
         plugin._data = self._data
         plugin._data_x = self._data.axis_ranges[0]
         plugin._crop_data_to_selected_range()
         self.assertTrue((plugin._data_x <= 20).all())
-        self.assertTrue((plugin._data_x >= 0).all())
+        self.assertTrue((plugin._data_x >= 5).all())
+
+    def test_crop_data_to_selected_range__low_limit_None(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin.set_param_value("fit_lower_limit", None)
+        plugin.set_param_value("fit_upper_limit", 20)
+        plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
+        plugin._crop_data_to_selected_range()
+        self.assertTrue((plugin._data_x <= 20).all())
+
+    def test_crop_data_to_selected_range__high_limit_None(self):
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin.set_param_value("fit_lower_limit", 5)
+        plugin.set_param_value("fit_upper_limit", None)
+        plugin._data = self._data
+        plugin._data_x = self._data.axis_ranges[0]
+        plugin._crop_data_to_selected_range()
+        self.assertTrue((plugin._data_x >= 5).all())
 
     def test_create_result_dataset__peak_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()

@@ -27,7 +27,8 @@ Improvements
   file format.
 - Added a standard fontsize property to the PydidasApp in preparation for a 
   scalable font size in the UI.
-
+- Changed the default ranges in the FitSinglePeak plugin to None which will
+  default to the full input data range.
   
 Bugfixes
 --------

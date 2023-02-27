@@ -104,6 +104,7 @@ class FitSinglePeak(ProcPlugin):
         self._config = self._config | {
             "range_slice": None,
             "settings_updated_from_data": False,
+            "data_x_hash": -1,
         }
 
     @property
@@ -222,10 +223,6 @@ class FitSinglePeak(ProcPlugin):
         x-range and data values.
         """
         _range = self._get_cropped_range()
-        if _range.size < 5:
-            raise UserConfigError(
-                "The data range for the fit is too small with less than 5 data points."
-            )
         self._data_x = self._data_x[_range]
         self._data = self._data[_range]
 
@@ -238,13 +235,33 @@ class FitSinglePeak(ProcPlugin):
         range : np.ndarray
             The index range corresponding to the selected data ranges.
         """
-        if self._config["range_slice"] is not None:
-            return self._config["range_slice"]
-        _xlow = self.get_param_value("fit_lower_limit")
-        _xhigh = self.get_param_value("fit_upper_limit")
-        _range = np.where((self._data_x >= _xlow) & (self._data_x <= _xhigh))[0]
-        self._config["range_slice"] = _range
-        return _range
+        if not (
+            hash(self._data_x.tobytes()) == self._config["data_x_hash"]
+            and self._config["range_slice"] is not None
+        ):
+            _xlow = self.get_param_value("fit_lower_limit")
+            _xhigh = self.get_param_value("fit_upper_limit")
+            self._config["data_x_hash"] = hash(self._data_x.tobytes())
+            _range_low = (
+                np.where((self._data_x >= _xlow))[0]
+                if _xlow is not None
+                else np.arange(self._data_x.size)
+            )
+            _range_high = (
+                np.where((self._data_x <= _xhigh))[0]
+                if _xhigh is not None
+                else np.arange(self._data_x.size)
+            )
+            _range = np.intersect1d(_range_low, _range_high)
+            if _range.size < 5:
+                raise UserConfigError(
+                    "The data range for the fit is too small with less than 5 data "
+                    "points. Please control the selected data range in the "
+                    "FitSinglePeak plugin. The input data range is "
+                    f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
+                )
+            self._config["range_slice"] = slice(_range[0], _range[-1])
+        return self._config["range_slice"]
 
     def _create_result_dataset(self, valid=True):
         """

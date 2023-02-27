@@ -30,22 +30,8 @@ import multiprocessing as mp
 
 from qtpy import QtWidgets
 
-from pydidas.core import UserConfigError
-from pydidas.gui import MainWindow, PydidasApp
-from pydidas.gui.frames import (
-    DataBrowsingFrame,
-    WorkflowEditFrame,
-    PyfaiCalibFrame,
-    HomeFrame,
-    DefineDiffractionExpFrame,
-    DefineScanFrame,
-    WorkflowRunFrame,
-    CompositeCreatorFrame,
-    DirectorySpyFrame,
-    ViewResultsFrame,
-    WorkflowTestFrame,
-    UtilitiesFrame,
-)
+from pydidas.core import UserConfigError, PydidasQApplication
+from pydidas.gui import MainWindow, frames
 
 
 def run_gui(app=None, restore_state="None"):
@@ -73,21 +59,22 @@ def run_gui(app=None, restore_state="None"):
             )
 
     app = QtWidgets.QApplication.instance()
-    if not isinstance(app, PydidasApp):
-        app = PydidasApp(sys.argv)
+    if app is not None:
+        app.quit()
+    app = PydidasQApplication(sys.argv)
     gui = MainWindow()
-    gui.register_frame(HomeFrame)
-    gui.register_frame(DataBrowsingFrame)
-    gui.register_frame(PyfaiCalibFrame)
-    gui.register_frame(CompositeCreatorFrame)
-    gui.register_frame(DirectorySpyFrame)
-    gui.register_frame(DefineDiffractionExpFrame)
-    gui.register_frame(DefineScanFrame)
-    gui.register_frame(WorkflowEditFrame)
-    gui.register_frame(WorkflowTestFrame)
-    gui.register_frame(WorkflowRunFrame)
-    gui.register_frame(ViewResultsFrame)
-    gui.register_frame(UtilitiesFrame)
+    gui.register_frame(frames.HomeFrame)
+    gui.register_frame(frames.DataBrowsingFrame)
+    gui.register_frame(frames.PyfaiCalibFrame)
+    gui.register_frame(frames.CompositeCreatorFrame)
+    gui.register_frame(frames.DirectorySpyFrame)
+    gui.register_frame(frames.DefineDiffractionExpFrame)
+    gui.register_frame(frames.DefineScanFrame)
+    gui.register_frame(frames.WorkflowEditFrame)
+    gui.register_frame(frames.WorkflowTestFrame)
+    gui.register_frame(frames.WorkflowRunFrame)
+    gui.register_frame(frames.ViewResultsFrame)
+    gui.register_frame(frames.UtilitiesFrame)
 
     if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
@@ -102,8 +89,6 @@ def run_gui(app=None, restore_state="None"):
 
 
 if __name__ == "__main__":
+    _ = run_gui(restore_state="exit")
     app = QtWidgets.QApplication.instance()
-    if not isinstance(app, PydidasApp):
-        app = PydidasApp(sys.argv)
-    _ = run_gui(app, restore_state="exit")
     app.quit()

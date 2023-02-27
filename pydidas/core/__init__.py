@@ -42,6 +42,7 @@ from .object_with_parameter_collection import *
 from .parameter import *
 from .parameter_collection import *
 from .parameter_collection_mixin import *
+from .pydidas_qapp import *
 from .pydidas_q_settings import *
 from .pydidas_q_settings_mixin import *
 from .singleton_factory import *
@@ -97,6 +98,11 @@ from . import singleton_factory
 
 __all__.extend(singleton_factory.__all__)
 del singleton_factory
+
+from . import pydidas_qapp
+
+__all__.extend(pydidas_qapp.__all__)
+del pydidas_qapp
 
 from . import pydidas_q_settings
 

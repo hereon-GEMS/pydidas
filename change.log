@@ -25,6 +25,9 @@ Improvements
 - Changed the Exception in the GenericIoMeta class to UserConfigError to 
   improve the user experience when trying to export data with an unsupported
   file format.
+- Added a standard fontsize property to the PydidasApp in preparation for a 
+  scalable font size in the UI.
+
   
 Bugfixes
 --------

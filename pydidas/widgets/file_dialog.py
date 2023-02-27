@@ -98,6 +98,7 @@ class PydidasFileDialog(
             self.setWindowTitle(self._config["caption"])
         if self._config["formats"] is not None:
             self.setNameFilter(self._config["formats"])
+            self.selectNameFilter(self._config["formats"].split(";;")[1])
             _exts = [
                 _entry.strip()
                 for _entry in self._config["formats"]
@@ -105,6 +106,8 @@ class PydidasFileDialog(
                 .strip(")")
                 .split("*.")[1:]
             ]
+            if "*" in _exts:
+                _exts.pop(_exts.index("*"))
             if len(_exts) > 0:
                 self._config["extensions"] = _exts
         self.setViewMode(QtWidgets.QFileDialog.Detail)

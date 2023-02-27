@@ -29,6 +29,8 @@ Improvements
   scalable font size in the UI.
 - Changed the default ranges in the FitSinglePeak plugin to None which will
   default to the full input data range.
+- Added a threshold for low pixel intensities in the 'Crop histogram outliers'
+  action in silx plot.
   
 Bugfixes
 --------

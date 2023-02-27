@@ -124,7 +124,12 @@ class _UserConfigWindow(PydidasWindow):
 
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
-            self.get_param("histogram_outlier_fraction"), **_options
+            self.get_param("histogram_outlier_fraction_low"),
+            **(_twoline_options | {"width_io": 80, "width_text": CONFIG_WIDGET_WIDTH}),
+        )
+        self.create_param_widget(
+            self.get_param("histogram_outlier_fraction_high"),
+            **(_twoline_options | {"width_io": 80, "width_text": CONFIG_WIDGET_WIDTH}),
         )
         self.create_empty_widget("colormap_editor", fixedWidth=CONFIG_WIDGET_WIDTH)
         self.create_label(

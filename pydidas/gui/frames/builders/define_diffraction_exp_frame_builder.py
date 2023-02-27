@@ -27,8 +27,6 @@ __all__ = ["DefineDiffractionExpFrameBuilder"]
 
 from ....core import constants
 from ....core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
 from ....widgets import ScrollArea, BaseFrame

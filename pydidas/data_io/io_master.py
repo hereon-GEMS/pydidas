@@ -26,6 +26,7 @@ __status__ = "Development"
 __all__ = ["IoMaster"]
 
 
+from ..core import UserConfigError
 from ..core.utils import get_extension
 
 
@@ -119,12 +120,12 @@ class IoMaster(type):
 
         Raises
         ------
-        TypeError
+        UserConfigError
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext, mode=mode):
-            raise KeyError(
-                f'The extension "{ext}" is not registered with ' "the MetaClass."
+            raise UserConfigError(
+                f'The extension "{ext}" is not registered for data input/output.'
             )
 
     @classmethod

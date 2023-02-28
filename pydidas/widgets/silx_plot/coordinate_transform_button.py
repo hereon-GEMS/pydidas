@@ -69,7 +69,7 @@ class CoordinateTransformButton(PlotToolButton):
             "silx_coordinates_r_chi.png"
         )
         self.STATE["r_chi", "state"] = f"Polar r / {CHI} coordinates"
-        self.STATE["r_chi", "action"] = f"Use polar r / {CHI} coordinates [px, deg]"
+        self.STATE["r_chi", "action"] = f"Use polar r / {CHI} coordinates [mm, deg]"
 
         self.STATE["2theta_chi", "icon"] = utils.get_pydidas_qt_icon(
             "silx_coordinates_2theta_chi.png"

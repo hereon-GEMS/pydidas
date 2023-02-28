@@ -23,14 +23,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ChangeCanvasToData", "ExpandCanvas", "CropHistogramOutliers"]
+__all__ = [
+    "ChangeCanvasToData",
+    "ExpandCanvas",
+    "CropHistogramOutliers",
+    "PydidasLoadImageAction",
+]
 
 
+from qtpy import QtWidgets, QtCore
 import numpy as np
 import silx.gui.plot
 from silx.gui.plot.actions import PlotAction
 
 from ...core import PydidasQsettingsMixin, UserConfigError, utils
+from ...data_io import IoMaster, import_data
+from ..file_dialog import PydidasFileDialog
 
 
 class ChangeCanvasToData(PlotAction):
@@ -186,3 +194,32 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             _cmap_limit_low = _edges2[_index_stop2]
 
         colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
+
+
+class PydidasLoadImageAction(QtWidgets.QAction):
+    """
+    Action to load an image using the pydidas file dialog.
+
+    This action is used as additional option in the pyFAI calibration widgets.
+    """
+
+    def __init__(self, parent, caption="Select image file", ref=None):
+        QtWidgets.QAction.__init__(self, parent)
+        self.triggered.connect(self.__execute)
+        self._dialog = PydidasFileDialog(
+            caption=caption,
+            dialog_type="open_file",
+            extensions=IoMaster.get_string_of_formats(),
+            qsettings_ref=ref,
+        )
+        self.setText("Use pydidas file dialog")
+
+    @QtCore.Slot()
+    def __execute(self):
+        """
+        Execute the dialog and select a filename.
+        """
+        _filename = self._dialog.get_user_response()
+        if _filename is not None:
+            _image = import_data(_filename)
+            self.parent()._setValue(filename=_filename, data=_image)

@@ -98,14 +98,14 @@ class PydidasFileDialog(
             self.setWindowTitle(self._config["caption"])
         if self._config["formats"] is not None:
             self.setNameFilter(self._config["formats"])
-            self.selectNameFilter(self._config["formats"].split(";;")[1])
+            if self._config["formats"].split(";;")[0] == "All files (*.*)":
+                self.selectNameFilter(self._config["formats"].split(";;")[1])
+
             _exts = [
-                _entry.strip()
-                for _entry in self._config["formats"]
-                .split(";;")[0]
-                .strip(")")
-                .split("*.")[1:]
-            ]
+                [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
+                for _entry in self._config["formats"].split(";;")
+                if _entry.startswith("All supported files")
+            ][0]
             if "*" in _exts:
                 _exts.pop(_exts.index("*"))
             if len(_exts) > 0:

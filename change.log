@@ -31,6 +31,9 @@ Improvements
   default to the full input data range.
 - Added a threshold for low pixel intensities in the 'Crop histogram outliers'
   action in silx plot.
+- Changed the r/theta coordinate system in the silx plots to mm/deg coordinates
+  to be consistent with pyFAI units.
+
   
 Bugfixes
 --------

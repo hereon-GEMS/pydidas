@@ -38,7 +38,7 @@ DIFFRACTION_EXP = DiffractionExperimentContext()
 
 AX_LABELS = {
     "cartesian": ("x", "px", "y", "px"),
-    "r_chi": ("r", "px", "&#x3C7;", "deg"),
+    "r_chi": ("r", "mm", "&#x3C7;", "deg"),
     "q_chi": ("q", "nm^-1", "&#x3C7;", "deg"),
     "2theta_chi": ("2&#x3B8;", "deg", "&#x3C7;", "deg"),
 }
@@ -184,9 +184,7 @@ class PydidasPositionInfo(PositionInfo):
         """
         _x_rel = x_pix * self._pixelsize[0] - self._beam_center[1]
         _y_rel = y_pix * self._pixelsize[1] - self._beam_center[0]
-        _r = (
-            (_x_rel / self._pixelsize[0]) ** 2 + (_y_rel / self._pixelsize[1]) ** 2
-        ) ** 0.5
+        _r = ((_x_rel) ** 2 + (_y_rel) ** 2) ** 0.5 * 1e3
         _chi = get_chi_from_x_and_y(_x_rel, _y_rel)
         return (_r, _chi)
 

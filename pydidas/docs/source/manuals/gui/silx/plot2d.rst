@@ -75,9 +75,9 @@ menu entries description
     * - .. image:: ../silx/images/menu_crop_histogram_outliers.png
             :align: center
       - Crop histogram outliers: Calculate the histogram of the image and set 
-        the colormap to ignore the top *x%* of the image histogram. The level of
-        *x* can be adjusted in the global pydidas user settings.
-       
+        the colormap to ignore the low *x% and the top *y%* of the image 
+        histogram. The levels of *x* and *y* can be adjusted in the pydidas 
+        user settings.      
     * -  .. image:: ../silx/images/menu_aspect.png
             :align: center
       - This action allows to control the aspect of the displayed data and 

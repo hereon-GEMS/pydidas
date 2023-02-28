@@ -148,7 +148,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         _fraction_high = 1 - self.q_settings_get_value(
             "user/histogram_outlier_fraction_high", dtype=float
         )
-        if 1 - _fraction_low - _fraction_high <= 0:
+        if _fraction_high - _fraction_low <= 0:
             raise UserConfigError(
                 "The selected outlier fractions are too large. No data left to display."
             )
@@ -178,7 +178,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             _index_stop = np.where(_fraction_low <= _cumcounts)[0].size
 
             _counts2, _edges2 = np.histogram(
-                _data, bins=4096, range=(0, _edges[_index_stop])
+                _data, bins=32768, range=(0, _edges[_index_stop])
             )
             _cumcounts2 = np.cumsum(_counts2 / _data.size)
             _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_low)[0].size)

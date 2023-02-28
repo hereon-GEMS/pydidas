@@ -155,7 +155,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             "auto_update",
             "Auto update",
             gridPos=(3 + _row_offset, 0, 1, 2),
-            checked=True
+            checked=True,
         )
         self.setVisible(False)
 

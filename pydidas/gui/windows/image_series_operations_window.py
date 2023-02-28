@@ -152,8 +152,10 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.params["output_fname"], **get_config("output_fname")
         )
         self.create_spacer(None)
+        self.create_check_box(
+            "check_keep_open", "Close window after processing", checked=True
+        )
         self.create_button("but_exec", "Process and export image")
-        self.create_button("but_close", "Close window")
 
     def connect_signals(self):
         """
@@ -161,7 +163,6 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
-        self._widgets["but_close"].clicked.connect(self.close)
 
     @QtCore.Slot(str)
     def __selected_first_file(self, fname):
@@ -273,6 +274,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             export_data(
                 self.get_param_value("output_fname"), self._data, overwrite=True
             )
+        if self._widgets["check_keep_open"].isChecked():
+            self.close()
 
     def _calculate_hdf5_frame_limits(self):
         """

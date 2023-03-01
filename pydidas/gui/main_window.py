@@ -61,7 +61,10 @@ class MainWindow(MainMenu):
 
         self._toolbars = {}
         self._toolbar_actions = {}
-        self.__configuration = {"toolbars_created": False}
+        self.__configuration = {
+            "toolbars_created": False,
+            "toolbar_visibility": {"": True},
+        }
         self.__create_logging_info_box()
 
     def __create_logging_info_box(self):
@@ -88,7 +91,6 @@ class MainWindow(MainMenu):
             self.create_toolbar_menu()
         QtWidgets.QMainWindow.show(self)
         self.centralWidget().currentChanged.emit(0)
-        self.centralWidget().sig_mouse_entered.connect(self._reset_toolbar_menu)
 
     def create_frame_instances(self):
         """
@@ -121,8 +123,8 @@ class MainWindow(MainMenu):
             if _toolbar_name != "":
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)
             self.addToolBar(QtCore.Qt.LeftToolBarArea, _toolbar)
-            # only make the root toolbar visible to start with:
-            _toolbar.setVisible(_toolbar_name == "")
+
+        self._update_toolbar_visibility()
         self.select_item(self.centralWidget().currentWidget().menu_entry)
         self.__configuration["toolbars_created"] = True
 
@@ -141,6 +143,7 @@ class MainWindow(MainMenu):
                     self._toolbar_metadata[_entry] = utils.create_generic_toolbar_entry(
                         _entry
                     )
+                    self.__configuration["toolbar_visibility"][_entry] = False
         self.__configuration["menu_entries"] = _menu_entries
 
     def _create_toolbars(self):
@@ -151,6 +154,7 @@ class MainWindow(MainMenu):
         for _tb in utils.find_toolbar_bases(self.__configuration["menu_entries"]):
             tb_title = _tb if _tb else "Main toolbar"
             self._toolbars[_tb] = QtWidgets.QToolBar(tb_title, self)
+            self._toolbars[_tb].generic_label = tb_title
             self._toolbars[_tb].setStyleSheet("QToolBar{spacing:20px;}")
             self._toolbars[_tb].setIconSize(QtCore.QSize(45, 45))
             self._toolbars[_tb].setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
@@ -171,6 +175,38 @@ class MainWindow(MainMenu):
             self._toolbar_actions[item] = _action
             itembase = os.path.dirname(item)
             self._toolbars[itembase].addAction(_action)
+
+    def _update_toolbar_visibility(self):
+        """
+        Update the toolbar visibility based on the stored information.
+        """
+        for _name, _toolbar in self._toolbars.items():
+            _visible = self.__configuration["toolbar_visibility"].get(_name, False)
+            _toolbar.setVisible(_visible)
+            if _name != "":
+                self._auto_update_toolbar_entry(_name)
+
+    def _auto_update_toolbar_entry(self, label):
+        """
+        Run an automatic update of the toolbar entry referenced by name.
+
+        This method toggles the expand/hide of the toolbar entry.
+
+        Parameters
+        ----------
+        label : str
+            The toolbar entry reference label.
+        """
+        _action = self._toolbar_actions[label]
+        _suffix = (
+            "_visible"
+            if self.__configuration["toolbar_visibility"][label]
+            else "_invisible"
+        )
+        _text = self._toolbar_metadata[label][f"label{_suffix}"]
+        _action.setText(_text)
+        _icon = self._toolbar_metadata[label][f"icon{_suffix}"]
+        _action.setIcon(_icon)
 
     def register_frame(self, frame):
         """
@@ -208,34 +244,29 @@ class MainWindow(MainMenu):
         Select an item from the left toolbar and select the corresponding
         frame in the centralWidget.
 
+        For labels that have frames attached to them, this method will show the frame.
+        For labels which are only entries in the menu tree, this method will show/hide
+        the respective toolbar.
+
         Parameters
         ----------
         label : str
             The label of the selected item.
         """
         self.setUpdatesEnabled(False)
-        for _name, _toolbar in self._toolbars.items():
-            _toolbar.setVisible(_name in self._toolbar_metadata[label]["menu_tree"])
-        for _name, _action in self._toolbar_actions.items():
-            _action.setChecked(
-                _name in self._toolbar_metadata[label]["menu_tree"] or _name == label
-            )
         if label in self.centralWidget().frame_indices:
+            for _name, _action in self._toolbar_actions.items():
+                _action.setChecked(_name == label)
             self.centralWidget().activate_widget_by_name(label)
-        self.setUpdatesEnabled(True)
+        else:
+            _toolbar = self._toolbars[label]
+            _new_visibility = not _toolbar.isVisible()
+            _toolbar.setVisible(_new_visibility)
+            self._toolbar_actions[label].setChecked(False)
+            self.__configuration["toolbar_visibility"][label] = _new_visibility
+            self._auto_update_toolbar_entry(label)
 
-    @QtCore.Slot()
-    def _reset_toolbar_menu(self):
-        """
-        Reset the toolbar menu to highlight the current Frame.
-        """
-        _label = self.centralWidget().active_widget_name
-        for _name, _toolbar in self._toolbars.items():
-            _toolbar.setVisible(_name in self._toolbar_metadata[_label]["menu_tree"])
-        for _name, _action in self._toolbar_actions.items():
-            _action.setChecked(
-                _name in self._toolbar_metadata[_label]["menu_tree"] or _name == _label
-            )
+        self.setUpdatesEnabled(True)
 
     def restore_gui_state(self, state="saved", filename=None):
         """
@@ -255,6 +286,32 @@ class MainWindow(MainMenu):
         """
         MainMenu.restore_gui_state(self, state, filename)
         self.select_item(self.centralWidget().currentWidget().menu_entry)
+
+    def export_mainwindow_state(self):
+        """
+        Export the main window's state.
+
+        Returns
+        -------
+        dict
+            The state of the main window required to restore the look.
+        """
+        return MainMenu.export_mainwindow_state(self) | {
+            "toolbar_visibility": self.__configuration["toolbar_visibility"],
+        }
+
+    def restore_mainwindow_state(self, state):
+        """
+        Restore the main window's state from saved information.
+
+        Parameters
+        ----------
+        state : dict
+            The stored state of the main window.
+        """
+        self.__configuration["toolbar_visibility"] = state["toolbar_visibility"]
+        self._update_toolbar_visibility()
+        MainMenu.restore_mainwindow_state(self, state)
 
     @QtCore.Slot(str)
     def update_status(self, text):

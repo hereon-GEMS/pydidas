@@ -9,7 +9,7 @@
    id="svg4442"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    sodipodi:docname="frame_icon_test_workflow.svg"
-   inkscape:export-filename="..\..\pydidas\core\icons\frame_icon_define_diffraction_exp.png"
+   inkscape:export-filename="..\..\pydidas\core\icons\frame_icon_test_workflow.png"
    inkscape:export-xdpi="95.249985"
    inkscape:export-ydpi="95.249985"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -28,16 +28,28 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="2.56"
-     inkscape:cx="428.51563"
-     inkscape:cy="169.14063"
-     inkscape:window-width="3440"
-     inkscape:window-height="1377"
-     inkscape:window-x="1912"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:cx="153.90625"
+     inkscape:cy="197.07031"
+     inkscape:window-width="2290"
+     inkscape:window-height="1368"
+     inkscape:window-x="3059"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
      id="defs4439">
+    <rect
+       x="139.45312"
+       y="27.734375"
+       width="225"
+       height="91.796875"
+       id="rect4145" />
+    <rect
+       x="146.875"
+       y="38.28125"
+       width="155.07812"
+       height="86.328125"
+       id="rect1892" />
     <rect
        x="-80.859375"
        y="-6.640625"
@@ -895,6 +907,17 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-25.536866)">
+    <path
+       style="fill:none;stroke:#001aff;stroke-width:3.00881;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 24.293292,95.297512 c 1.376174,-1.869743 3.452424,-3.096537 4.991286,-4.753106 1.502238,-1.61715 2.92854,-6.126422 5.303238,-6.716348 4.129637,-1.025888 10.412965,15.470538 15.285808,5.786391 0.621084,-1.234317 2.525197,-15.311095 3.43151,-15.085948 1.671649,0.415273 1.950216,13.54968 3.327523,15.602592 0.851352,1.268961 6.573901,1.35032 7.798882,0.61997 1.134022,-0.676116 1.452003,-2.065312 2.703612,-2.479881 2.625602,-0.869674 5.441813,2.479881 7.798884,2.479881"
+       id="path1836" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
+       id="rect381"
+       width="50.332844"
+       height="34.519855"
+       x="24.39127"
+       y="66.671303" />
     <text
        xml:space="preserve"
        transform="matrix(0.26458333,0,0,0.26458333,0,25.536866)"
@@ -964,8 +987,26 @@
        rx="14.384807"
        ry="14.384809" />
     <path
-       style="fill:none;stroke:#ff9600;stroke-width:7;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
-       d="M 30.435353,57.187648 50.589162,80.235337"
+       style="fill:none;stroke:#ff9600;stroke-width:6;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 29.616373,56.368668 15.900656,17.14089"
        id="path16392" />
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,0,25.536866)"
+       id="text1890"
+       style="font-style:normal;font-weight:normal;font-size:80px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect1892);display:inline;fill:#000000;fill-opacity:1;stroke:none"><tspan
+         x="146.875"
+         y="197.5958"
+         id="tspan5494"><tspan
+           dx="0 40.703125 47.65625 41.679688"
+           id="tspan5492">Test</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       transform="matrix(0.26458333,0,0,0.26458333,2.4804687,26.570395)"
+       id="text4143"
+       style="font-style:normal;font-weight:normal;font-size:80px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect4145);display:inline;fill:#000000;fill-opacity:1;stroke:none"><tspan
+         x="139.45312"
+         y="100.7208"
+         id="tspan5496">1x</tspan></text>
   </g>
 </svg>

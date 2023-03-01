@@ -485,10 +485,10 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if _key != "tmp":
                 _window_states[_key] = _window.export_window_state()
-        _window_states["main"] = self.__export_mainwindow_state()
+        _window_states["main"] = self.export_mainwindow_state()
         return _window_states
 
-    def __export_mainwindow_state(self):
+    def export_mainwindow_state(self):
         """
         Export the main window's state.
 
@@ -573,9 +573,9 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
-        self.__restore_mainwindow_state(state["main"])
+        self.restore_mainwindow_state(state["main"])
 
-    def __restore_mainwindow_state(self, state):
+    def restore_mainwindow_state(self, state):
         """
         Restore the main window's state from saved information.
 

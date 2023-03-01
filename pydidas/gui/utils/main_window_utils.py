@@ -90,8 +90,16 @@ def create_generic_toolbar_entry(entry):
     if entry in _generic_entries:
         return _generic_entries[entry]
     return {
-        "label": format_input_to_multiline_str(entry, max_line_length=12),
+        "label": format_input_to_multiline_str("Expand " + entry, max_line_length=12),
+        "label_invisible": format_input_to_multiline_str(
+            "Expand " + entry, max_line_length=12
+        ),
+        "label_visible": format_input_to_multiline_str(
+            "Hide " + entry, max_line_length=12
+        ),
         "icon": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
+        "icon_invisible": get_pyqt_icon_from_str("qta::mdi.arrow-right-circle"),
+        "icon_visible": get_pyqt_icon_from_str("qta::mdi.arrow-left-circle"),
         "menu_tree": [
             ("" if _path == Path() else _path.as_posix())
             for _path in reversed(Path(entry).parents)
@@ -114,8 +122,16 @@ def get_generic_menu_entries():
     """
     return {
         "Workflow processing": {
-            "label": "Workflow\nprocessing",
-            "icon": get_pyqt_icon_from_str("qta::mdi.cogs"),
+            "label": "Expand\nWorkflow\nprocessing",
+            "label_visible": "Hide\nWorkflow\nProcessing",
+            "label_invisible": "Expand\nWorkflow\nProcessing",
+            "icon": get_pyqt_icon_from_str("pydidas::workflow_processing_expand.png"),
+            "icon_visible": get_pyqt_icon_from_str(
+                "pydidas::workflow_processing_hide.png"
+            ),
+            "icon_invisible": get_pyqt_icon_from_str(
+                "pydidas::workflow_processing_expand.png"
+            ),
             "menu_tree": ["", "Workflow processing"],
         }
     }

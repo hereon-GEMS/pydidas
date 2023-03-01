@@ -118,7 +118,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     ``image_selection`` Parameter equals "Use scan indices").
     """
 
-    menu_icon = "qta::mdi.play-protected-content"
+    menu_icon = "pydidas::frame_icon_workflow_test.png"
     menu_title = "Test workflow"
     menu_entry = "Workflow processing/Test workflow"
 

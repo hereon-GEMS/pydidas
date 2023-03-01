@@ -34,6 +34,7 @@ Improvements
 - Changed the r/theta coordinate system in the silx plots to mm/deg coordinates
   to be consistent with pyFAI units.
 - Added CropHistogramOutlier actions to the pyFAI calibration frame.
+- Improved the handling of additional toolbars in the MainWindow.
 
   
 Bugfixes

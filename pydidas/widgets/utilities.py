@@ -83,12 +83,14 @@ def get_pyqt_icon_from_str(ref_string):
     """
     Get a QIcon from the reference string.
 
-    Three types of strings can be processsed:
+    Four types of strings can be processsed:
         1. References to a qtawesome icon. The reference must be preceeded
            by 'qta::'.
         2. A reference number of a QStandardIcon, preceeded by a 'qt-std::'.
         3. A reference to a image file in the file system. This must be
            preceeded by 'path::'.
+        4. A reference to a icon in pydidas.core.icons with the filename preceded
+           by a 'pydidas::'
 
     Parameters
     ----------

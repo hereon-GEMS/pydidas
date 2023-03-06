@@ -115,7 +115,7 @@ class TestSum1dData(unittest.TestCase):
         _data, _ = plugin.execute(data)
         self.assertEqual(_data[0], 0)
 
-    def test_execute__sinlge_item_selection(self):
+    def test_execute__single_item_selection(self):
         _low = 42
         _high = 42
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -136,6 +136,28 @@ class TestSum1dData(unittest.TestCase):
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
         self.assertTrue(_data[0], np.sum(self._data[_low : _high + 1]))
+
+    def test_execute__None_lower_bounds(self):
+        _low = None
+        _high = 47
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
+        self.assertTrue(_data[0], np.sum(self._data[: _high + 1]))
+
+    def test_execute__None_upper_bounds(self):
+        _low = 42
+        _high = None
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
+        plugin.set_param_value("lower_limit", _low)
+        plugin.set_param_value("upper_limit", _high)
+        plugin.set_param_value("type_selection", "Indices")
+        data = self.create_dataset()
+        _data, _ = plugin.execute(data)
+        self.assertTrue(_data[0], np.sum(self._data[_low:]))
 
 
 if __name__ == "__main__":

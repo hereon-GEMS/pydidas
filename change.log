@@ -35,7 +35,7 @@ Improvements
   to be consistent with pyFAI units.
 - Added CropHistogramOutlier actions to the pyFAI calibration frame.
 - Improved the handling of additional toolbars in the MainWindow.
-
+- Allowed None in the Sum1D plugin bounds to have no limits.
   
 Bugfixes
 --------

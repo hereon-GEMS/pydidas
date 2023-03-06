@@ -28,7 +28,7 @@ __all__ = ["Sum1dData"]
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import Dataset, ParameterCollection, Parameter, get_generic_parameter
+from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.utils import (
     process_1d_with_multi_input_dims,
     calculate_result_shape_for_multi_input_dims,
@@ -44,33 +44,8 @@ class Sum1dData(ProcPlugin):
     plugin_name = "Sum 1D data"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter("process_data_dim"),
-        get_generic_parameter("type_selection"),
-        Parameter(
-            "lower_limit",
-            float,
-            0,
-            name="Lower limit",
-            tooltip=(
-                "The lower limit of data selection. This point is "
-                "included in the data. Note that the selection is either"
-                " in indices or data range, depending on the value of "
-                '"type_selection".'
-            ),
-        ),
-        Parameter(
-            "upper_limit",
-            float,
-            0,
-            name="Upper limit",
-            tooltip=(
-                "The upper limit of data selection. This point is "
-                "included in the data. Note that the selection is either"
-                " in indices or data range, depending on the value of "
-                '"type_selection".'
-            ),
-        ),
+    default_params = get_generic_param_collection(
+        "process_data_dim", "type_selection", "upper_limit", "lower_limit"
     )
     input_data_dim = -1
     output_data_dim = 0
@@ -123,11 +98,29 @@ class Sum1dData(ProcPlugin):
         slice
             The slice object to select the range from the input data.
         """
-        _low = self.get_param_value("lower_limit")
-        _high = self.get_param_value("upper_limit")
         if self.get_param_value("type_selection") == "Indices":
+            _low = (
+                self.get_param_value("lower_limit")
+                if self.get_param_value("lower_limit") is not None
+                else 0
+            )
+            _high = (
+                self.get_param_value("upper_limit")
+                if self.get_param_value("upper_limit") is not None
+                else self._data.size
+            )
             return slice(int(_low), int(_high) + 1)
         _x = self._data.axis_ranges[0]
+        _low = (
+            self.get_param_value("lower_limit")
+            if self.get_param_value("lower_limit") is not None
+            else _x[0]
+        )
+        _high = (
+            self.get_param_value("upper_limit")
+            if self.get_param_value("upper_limit") is not None
+            else _x[-1]
+        )
         assert isinstance(_x, np.ndarray), (
             "The data does not have a correct range and using the data range "
             "for selection is only available using the indices."

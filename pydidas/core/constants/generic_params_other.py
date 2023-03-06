@@ -313,7 +313,59 @@ GENERIC_PARAMS_OTHER = {
     "lower_limit": {
         "type": float,
         "default": None,
-        "name": "Peak fit lower limit",
+        "name": "Lower limit",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
+    },
+    "upper_limit_ax0": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit axis 0 (y)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit_ax0": {
+        "type": float,
+        "default": None,
+        "name": "Lower limit axis 0 (y)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
+    },
+    "upper_limit_ax1": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit axis 1 (x)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit_ax1": {
+        "type": float,
+        "default": None,
+        "name": "Lower limit axis 1 (x)",
         "choices": None,
         "unit": "",
         "allow_None": True,

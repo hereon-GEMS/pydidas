@@ -111,6 +111,10 @@ class Sum1dData(ProcPlugin):
             )
             return slice(int(_low), int(_high) + 1)
         _x = self._data.axis_ranges[0]
+        assert isinstance(_x, np.ndarray), (
+            "The data does not have a correct range and using the data range "
+            "for selection is only available using the indices."
+        )
         _low = (
             self.get_param_value("lower_limit")
             if self.get_param_value("lower_limit") is not None
@@ -120,10 +124,6 @@ class Sum1dData(ProcPlugin):
             self.get_param_value("upper_limit")
             if self.get_param_value("upper_limit") is not None
             else _x[-1]
-        )
-        assert isinstance(_x, np.ndarray), (
-            "The data does not have a correct range and using the data range "
-            "for selection is only available using the indices."
         )
         _bounds = np.where((_x >= _low) & (_x <= _high))[0]
         if _bounds.size == 0:

@@ -63,10 +63,11 @@ class TestSum2dData(unittest.TestCase):
         _low = 3
         _high = 8
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low)
-        plugin.set_param_value("upper_limit_x", _high)
+        plugin.set_param_value("lower_limit_ax1", _low)
+        plugin.set_param_value("upper_limit_ax1", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range("x")
+        plugin._data = self.create_dataset()
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -74,10 +75,11 @@ class TestSum2dData(unittest.TestCase):
         _low = 5
         _high = 13
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_y", _low)
-        plugin.set_param_value("upper_limit_y", _high)
+        plugin.set_param_value("lower_limit_ax0", _low)
+        plugin.set_param_value("upper_limit_ax0", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range("y")
+        plugin._data = self.create_dataset()
+        _range = plugin._get_index_ranges()[0]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -87,10 +89,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_x", self._x[_low])
-        plugin.set_param_value("upper_limit_x", self._x[_high])
+        plugin.set_param_value("lower_limit_ax1", self._x[_low])
+        plugin.set_param_value("upper_limit_ax1", self._x[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("x")
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -100,10 +102,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_y", self._y[_low])
-        plugin.set_param_value("upper_limit_y", self._y[_high])
+        plugin.set_param_value("lower_limit_ax0", self._y[_low])
+        plugin.set_param_value("upper_limit_ax0", self._y[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("y")
+        _range = plugin._get_index_ranges()[0]
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
@@ -111,10 +113,10 @@ class TestSum2dData(unittest.TestCase):
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
         data = self.create_dataset()
         plugin._data = data
-        plugin.set_param_value("lower_limit_x", 120)
-        plugin.set_param_value("upper_limit_x", 420)
+        plugin.set_param_value("lower_limit_ax1", 120)
+        plugin.set_param_value("upper_limit_ax1", 420)
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range("x")
+        _range = plugin._get_index_ranges()[1]
         self.assertEqual(_range, slice(0, 0))
 
     def test_execute__empty_selection(self):
@@ -123,10 +125,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 8
         _high_x = 3
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
@@ -138,10 +140,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 7
         _high_x = 7
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)
@@ -153,10 +155,10 @@ class TestSum2dData(unittest.TestCase):
         _low_x = 1
         _high_x = 7
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum2dData")()
-        plugin.set_param_value("lower_limit_x", _low_x)
-        plugin.set_param_value("upper_limit_x", _high_x)
-        plugin.set_param_value("lower_limit_y", _low_y)
-        plugin.set_param_value("upper_limit_y", _high_y)
+        plugin.set_param_value("lower_limit_ax1", _low_x)
+        plugin.set_param_value("upper_limit_ax1", _high_x)
+        plugin.set_param_value("lower_limit_ax0", _low_y)
+        plugin.set_param_value("upper_limit_ax0", _high_y)
         plugin.set_param_value("type_selection", "Indices")
         data = self.create_dataset()
         _data, _ = plugin.execute(data)

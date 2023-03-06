@@ -41,17 +41,16 @@ _GENERIC_INTRO = (
 )
 
 _TOOOLBAR_USER_TEXT = (
-    "Use the menu toolbar on the left to switch between different frames. "
-    "Some menu toolbars will open an additional submenu on  the left. The "
-    "active frame is highlighted."
+    "Use the menu toolbar on the left to switch between different frames. Some menu "
+    "toolbars will open an additional submenu on  the left. The active frame is "
+    "highlighted."
 )
 
 _HELP_TEXT = (
-    "Documentation is available in the html format. You can open the "
-    'documentation from any frame using the "Help" menu entry to either open '
-    "it in the system's web browser or a window. <br>Or follow this link to "
-    f'<a href="{DOC_HOME_ADDRESS}">open the documentation in a browser'
-    "</a>."
+    "Documentation is available in the html format. You can open the documentation "
+    "from any frame using the 'Help' menu entry to either open it in the system's "
+    f'web browser. <br>Or follow this link to <a href="{DOC_HOME_ADDRESS}">open the '
+    "documentation in a browser</a>."
 )
 
 _PROC_SETUP_TEXT = (

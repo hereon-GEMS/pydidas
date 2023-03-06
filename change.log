@@ -59,6 +59,8 @@ Bugfixes
 - Fixed an issue with the ParamIoWidgetFile's FileDialog if the corresponding 
   Parameter value is not a valid path.
 - Added a file exists check to the SubtractBgImage plugin.
+- Fixed an issue with the ExtractAzimuthalSectors plugin when the azimuthal 
+  values did not cover the full 360 degree.
 
 
 ========

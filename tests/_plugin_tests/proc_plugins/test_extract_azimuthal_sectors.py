@@ -89,8 +89,8 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin = self.get_default_plugin()
         plugin.pre_execute()
         plugin._update_settings_from_data()
-        for _index, _slice in plugin._config["slices"].items():
-            self.assertEqual(len(_slice), 2)
+        for _index, _factors in plugin._factors.items():
+            self.assertEqual(np.sum(_factors), 2)
 
     def test_update_settings_from_data__rad_width_10_deg(self):
         plugin = self.get_default_plugin()
@@ -104,37 +104,26 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         )
         plugin.pre_execute()
         plugin._update_settings_from_data()
-        for _index, _slice in plugin._config["slices"].items():
-            self.assertEqual(len(_slice), 2)
+        for _index, _factors in plugin._factors.items():
+            self.assertAlmostEqual(np.sum(_factors), 2, 4)
 
     def test_update_settings_from_data__degree_width_10_inconsistency_at_180(self):
         plugin = self.get_default_plugin()
         plugin.pre_execute()
         plugin._data.update_axis_ranges(0, np.linspace(-177.5, 177.5, 72))
         plugin._update_settings_from_data()
-        for _index, _slice in plugin._config["slices"].items():
-            self.assertEqual(len(_slice), 2)
+        for _index, _factors in plugin._factors.items():
+            self.assertEqual(np.sum(_factors), 2)
 
-    def test_update_settings_from_data__degree_width_5(self):
+    def test_update_settings_from_data__degree_width_2(self):
         plugin = self.get_default_plugin()
-        plugin.set_param_value("width", 5)
+        plugin.set_param_value("width", 2)
         plugin.pre_execute()
         with self.assertRaises(UserConfigError):
             plugin._update_settings_from_data()
 
-    def test_execute__width_10_sum(self):
-        plugin = self.get_default_plugin()
-        plugin.set_param_value("mode", "Sum")
-        plugin.pre_execute()
-        _input = self.create_dataset_degree()
-        _res, _kwargs = plugin.execute(_input)
-        self.assertEqual(_res.shape, (4, self._x.size))
-        self.assertEqual(np.mean(_res), 2)
-        self.assertEqual(np.std(_res), 0)
-
     def test_execute__width_10_average(self):
         plugin = self.get_default_plugin()
-        plugin.set_param_value("mode", "Average")
         plugin.pre_execute()
         _input = self.create_dataset_degree()
         _res, _kwargs = plugin.execute(_input)

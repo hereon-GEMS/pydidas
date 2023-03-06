@@ -57,18 +57,6 @@ _EAS_PARAMS = ParameterCollection(
             "unit (i.e. it can be either degree or rad)."
         ),
     ),
-    Parameter(
-        "mode",
-        str,
-        "Average",
-        name="Operation type",
-        choices=["Sum", "Average"],
-        tooltip=(
-            "The operation to create the new datasets. If 'Sum', the contributions "
-            "from all points in the sector will be added. If 'Average', all data "
-            "points will be averaged."
-        ),
-    ),
 )
 
 
@@ -89,7 +77,11 @@ class ExtractAzimuthalSectors(ProcPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._data = None
-        self._config = self._config | {"settings_updated_from_data": False}
+        self._config = self._config | {
+            "settings_updated_from_data": False,
+            "x_pos_hash": -1,
+        }
+        self._factors = {}
 
     def pre_execute(self):
         """
@@ -156,10 +148,9 @@ class ExtractAzimuthalSectors(ProcPlugin):
         self._data = data
         self._update_settings_from_data()
         _res = np.zeros((len(self._config["centers"]), self._data.shape[1]))
-        for _index, _slices in self._config["slices"].items():
-            _res[_index] = np.sum(data[_slices, :], axis=0)
-            if self.get_param_value("mode") == "Average":
-                _res[_index] /= len(_slices)
+        for _index, _factors in self._factors.items():
+            _f = np.broadcast_to(_factors, data.shape[::-1]).T
+            _res[_index] = np.sum(data * _f, axis=0) / np.sum(_factors)
         _results = Dataset(
             _res,
             axis_labels=data.axis_labels,
@@ -175,44 +166,51 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         Output Plugin settings which depend on the input data.
         """
-        if self._config["settings_updated_from_data"]:
+        _xhash = hash(self._data.axis_ranges[0].tobytes())
+        if (
+            self._config["settings_updated_from_data"]
+            and _xhash == self._config["x_pos_hash"]
+        ):
             return
-        _sector_width = self.get_param_value("width")
-        _n_data_sectors = self._data.shape[0]
         _factor = 1 if self._data.axis_units[0] == "deg" else np.pi / 180
-        _data_centers = np.round(
-            np.concatenate(
-                (
-                    self._data.axis_ranges[0] - 360 * _factor,
-                    self._data.axis_ranges[0],
-                    self._data.axis_ranges[0] + 360 * _factor,
-                )
-            ),
-            10,
-        )
-        _data_width = _factor * 360 / _n_data_sectors
-        self._config["slices"] = {}
-        for _index, _center in enumerate(self._config["centers"]):
-            _indices = (
-                np.where(
-                    (
-                        abs(_data_centers - _data_width / 2 - _center)
-                        <= _sector_width / 2 + 1e-9
-                    )
-                    & (
-                        abs(_data_centers + _data_width / 2 - _center)
-                        <= _sector_width / 2 + 1e-9
-                    )
-                )[0]
-                - _n_data_sectors
+        self._config["x_pos_hash"] = _xhash
+        _x = self._data.axis_ranges[0]
+        if _x.size < 3:
+            raise UserConfigError(
+                "The x-range of the data is too small to extract sectors with a total "
+                "of less than 4 datapoints. Please check the input data."
             )
-            _indices = np.mod(_indices, _n_data_sectors)
+        _data_centers = np.round(
+            np.concatenate([_x + i * 360 * _factor for i in [-1, 0, 1]]),
+            decimals=8,
+        )
+        _low_bounds = _data_centers - np.insert(
+            np.diff(_data_centers) / 2,
+            0,
+            ((_data_centers[1] - _data_centers[0]) / 2),
+        )
+        _high_bounds = _data_centers + np.append(
+            np.diff(_data_centers) / 2,
+            ((_data_centers[-1] - _data_centers[-2]) / 2),
+        )
+        _delta = self.get_param_value("width") / 2
+        _data_width = np.diff(self._data.axis_ranges[0]).mean()
+        self._config["factors"] = {}
+        for _index, _center in enumerate(self._config["centers"]):
+            _indices = np.where(abs(_center - _data_centers) <= _delta)[0]
+            _factors = np.zeros(_x.size)
+            for _ii in _indices:
+                _ifactor = np.mod(_ii, _x.size)
+                _factors[_ifactor] = (
+                    min(_center + _delta, _high_bounds[_ii])
+                    - max(_center - _delta, _low_bounds[_ii])
+                ) / _data_width
             if _indices.size < 1:
                 raise UserConfigError(
                     "The width of the sectors is too small for the data: No data point "
                     "fits into the selected sector width."
                 )
-            self._config["slices"][_index] = _indices
+            self._factors[_index] = _factors
         self._config["settings_updated_from_data"] = True
 
     def calculate_result_shape(self):

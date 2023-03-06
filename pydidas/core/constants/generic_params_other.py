@@ -294,6 +294,35 @@ GENERIC_PARAMS_OTHER = {
             "to using no upper limit but the data limits."
         ),
     },
+    ################
+    # Generic limits
+    ################
+    "upper_limit": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit": {
+        "type": float,
+        "default": None,
+        "name": "Peak fit lower limit",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
+    },
     ############################
     # Autosave results settings
     ############################

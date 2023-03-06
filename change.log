@@ -37,6 +37,7 @@ Improvements
 - Improved the handling of additional toolbars in the MainWindow.
 - Allowed None in the Sum1D plugin bounds to have no limits.
 - Allowed None in the Sum2D plugin bounds to have no limits.
+- Added a description for the scan dimensions and their ordering.
   
 Bugfixes
 --------

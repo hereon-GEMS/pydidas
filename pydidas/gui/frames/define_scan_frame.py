@@ -27,17 +27,35 @@ __all__ = ["DefineScanFrame"]
 
 from functools import partial
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...workflow import WorkflowTree
+from ..windows import ScanDimensionInformationWindow
 from .builders import DefineScanFrameBuilder
 
 SCAN = ScanContext()
 PLUGINS = PluginCollection()
 WORKFLOW = WorkflowTree()
+
+
+DIM_LABELS = {
+    1: {i: "\nScan dimension 1:" for i in range(4)},
+    2: {0: "\nScan dimension 1 (slow):", 1: "\nScan dimension 2 (fast):"},
+    3: {
+        0: "\nScan dimension 1 (slowest):",
+        1: "\nScan dimension 2:",
+        2: "\nScan dimension 3 (fastest):",
+    },
+    4: {
+        0: "\nScan dimension 1 (slowest):",
+        1: "\nScan dimension 2:",
+        2: "\nScan dimension 3:",
+        3: "\nScan dimension 4 (fastest):",
+    },
+}
 
 
 class DefineScanFrame(DefineScanFrameBuilder):
@@ -65,6 +83,8 @@ class DefineScanFrame(DefineScanFrameBuilder):
             formats=ScanContextIoMeta.get_string_of_formats(),
             qsettings_ref="DefineScanFrame__export",
         )
+        self.__app = QtWidgets.QApplication.instance()
+        self.__info_window = ScanDimensionInformationWindow()
 
     def connect_signals(self):
         """
@@ -73,6 +93,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
         self._widgets["but_save"].clicked.connect(self.export_to_file)
         self._widgets["but_load"].clicked.connect(self.load_from_file)
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
+        self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
         self.param_widgets["scan_dim"].currentTextChanged.connect(
             self.update_dim_visibility
         )
@@ -86,11 +107,13 @@ class DefineScanFrame(DefineScanFrameBuilder):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
+        self.__app.sig_close_gui.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
+        self.__info_window.frame_activated(self.__info_window.frame_index)
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
@@ -115,6 +138,8 @@ class DefineScanFrame(DefineScanFrameBuilder):
             self._widgets[f"button_down_{i}"].setVisible(i < _dim - 1)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
+            if i in DIM_LABELS[_dim].keys():
+                self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
 
     @QtCore.Slot()
     def load_from_file(self):
@@ -195,3 +220,11 @@ class DefineScanFrame(DefineScanFrameBuilder):
             The new base directory
         """
         self.param_widgets["scan_name_pattern"].io_dialog.set_curr_dir(basedir)
+
+    @QtCore.Slot()
+    def _show_info_window(self):
+        """
+        Show the information window about scan dimensions.
+        """
+        self.__info_window.show()
+        self.__info_window.raise_()

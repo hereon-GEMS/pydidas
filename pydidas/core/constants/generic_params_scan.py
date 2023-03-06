@@ -159,7 +159,10 @@ GENERIC_PARAMS_SCAN = (
             "choices": None,
             "unit": "",
             "allow_None": False,
-            "tooltip": f"The number of scan points in scan direction {_index}.",
+            "tooltip": (
+                f"The total number of scan points in scan direction {_index}. The "
+                "number of points is one higher than the number of intervals."
+            ),
         }
         for _index in range(4)
     }

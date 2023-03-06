@@ -45,7 +45,10 @@ class Sum1dData(ProcPlugin):
     basic_plugin = False
     plugin_type = PROC_PLUGIN
     default_params = get_generic_param_collection(
-        "process_data_dim", "type_selection", "upper_limit", "lower_limit"
+        "process_data_dim",
+        "type_selection",
+        "lower_limit",
+        "upper_limit",
     )
     input_data_dim = -1
     output_data_dim = 0

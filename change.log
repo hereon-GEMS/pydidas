@@ -38,6 +38,8 @@ Improvements
 - Allowed None in the Sum1D plugin bounds to have no limits.
 - Allowed None in the Sum2D plugin bounds to have no limits.
 - Added a description for the scan dimensions and their ordering.
+- The PydidasFileDialog now allows to show files in a directory without having
+  them selectable.
   
 Bugfixes
 --------

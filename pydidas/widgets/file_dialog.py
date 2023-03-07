@@ -37,6 +37,19 @@ from .factory import CreateWidgetsMixIn
 
 
 SCAN = ScanContext()
+ITEM_SELECTABLE = QtCore.Qt.ItemIsSelectable
+
+
+class SelectionModel(QtCore.QIdentityProxyModel):
+    """
+    A selection proxy model which allows to show files but make them unselectable.
+    """
+
+    def flags(self, index):
+        _flags = QtCore.QIdentityProxyModel.flags(self, index)
+        if not self.sourceModel().isDir(index):
+            _flags &= ~ITEM_SELECTABLE
+        return _flags
 
 
 class PydidasFileDialog(
@@ -71,6 +84,7 @@ class PydidasFileDialog(
         QtWidgets.QFileDialog.__init__(self, kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
+        self._files_unselectable_model = SelectionModel(self)
         self._config = {
             "caption": kwargs.get("caption", None),
             "type": kwargs.get("dialog_type", "open_file"),
@@ -132,6 +146,7 @@ class PydidasFileDialog(
         self.setMinimumHeight(600)
         _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
         _sidebar.setMinimumWidth(180)
+        self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
     def _insert_buttons_in_sidebar(self):
         """
@@ -226,8 +241,10 @@ class PydidasFileDialog(
         """
         if self._config["caption"] is None:
             self.setWindowTitle("Select directory")
+        self._widgets["selection"].setText("")
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
-        self.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
+        self.setFileMode(QtWidgets.QFileDialog.Directory)
+        self.setProxyModel(self._files_unselectable_model)
         res = self.exec_()
         if res == 0:
             return None
@@ -253,6 +270,7 @@ class PydidasFileDialog(
             self.setWindowTitle("Select existing file")
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptOpen)
         self.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+        self.setProxyModel(None)
         res = self.exec_()
         if res == 0:
             return None
@@ -280,6 +298,7 @@ class PydidasFileDialog(
             self.setWindowTitle("Select filename")
         self.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
         self.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        self.setProxyModel(None)
         res = self.exec_()
         if res == 0:
             return None

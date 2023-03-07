@@ -699,10 +699,18 @@ class Dataset(np.ndarray):
             _axes = [_index for _index, _shape in enumerate(self.shape) if _shape != 1]
         else:
             _axes = [_index for _index, _ in enumerate(self.shape) if _index != axis]
-        _new = np.ndarray.squeeze(self, axis)
-        for _key in ["axis_labels", "axis_ranges", "axis_units"]:
-            _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
-            setattr(_new, _key, _entry)
+        if self.size == 1:
+            _new = Dataset(
+                np.array(self).reshape(1),
+                metadata=self.metadata,
+                data_unit=self.data_unit,
+                data_label=self.data_label,
+            )
+        else:
+            _new = np.ndarray.squeeze(self, axis)
+            for _key in ["axis_labels", "axis_ranges", "axis_units"]:
+                _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
+                setattr(_new, _key, _entry)
         return _new
 
     def take(self, indices, axis=None, out=None, mode="raise"):

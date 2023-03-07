@@ -67,6 +67,7 @@ Bugfixes
   values did not cover the full 360 degree.
 - Fixed an issue with Hdf5 file loaders when using the same workflow for 
   processing files with different number of images each in one session.
+- Fixed an issue preventing from resetting Parameter.choices to None.
 
 
 ========

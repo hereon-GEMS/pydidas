@@ -183,6 +183,13 @@ class TestParameter(unittest.TestCase):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         self.assertEqual(obj.choices, [0, 12])
 
+    def test_choices_setter__update_to_None(self):
+        obj = Parameter("Test0", int, 12, choices=[0, 12])
+        obj.choices = [0, 12, 24]
+        obj.choices = None
+        obj.value = 127
+        self.assertIsNone(obj.choices)
+
     def test_choices_setter__update(self):
         obj = Parameter("Test0", int, 12, choices=[0, 12])
         obj.choices = [0, 12, 24]

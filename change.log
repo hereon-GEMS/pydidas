@@ -41,6 +41,8 @@ Improvements
 - The PydidasFileDialog now allows to show files in a directory without having
   them selectable.
 - Added axis labels and units to the workflow ResultSelectionWidget.
+- Added the Dataset data unit and data label to metadata in Workflow processing
+  for additional informations.
   
 Bugfixes
 --------

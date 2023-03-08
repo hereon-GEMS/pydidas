@@ -338,12 +338,16 @@ class ExecuteWorkflowApp(BaseApp):
                     "axis_labels": _res.axis_labels,
                     "axis_ranges": _res.axis_ranges,
                     "axis_units": _res.axis_units,
+                    "data_unit": _res.data_unit,
+                    "data_label": _res.data_label,
                 }
             else:
                 self._result_metadata[_node_id] = {
                     "axis_labels": {i: None for i in range(_res.ndim)},
                     "axis_ranges": {i: None for i in range(_res.ndim)},
                     "axis_units": {i: None for i in range(_res.ndim)},
+                    "data_unit": "",
+                    "data_label": "",
                 }
         self._config["result_metadata_set"] = True
         if not self.slave_mode:

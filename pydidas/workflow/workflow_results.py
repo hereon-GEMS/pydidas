@@ -111,10 +111,17 @@ class _WorkflowResults(QtCore.QObject):
         """
         for node_id, _meta in metadata.items():
             _dim_offset = SCAN.get_param_value("scan_dim")
-            for _key, _items in _meta.items():
-                _update_method = getattr(self.__composites[node_id], f"update_{_key}")
-                for _dim, _val in _items.items():
-                    _update_method(_dim + _dim_offset, _val)
+            for _key, _item in _meta.items():
+                if isinstance(_item, dict):
+                    _update_method = getattr(
+                        self.__composites[node_id], f"update_{_key}"
+                    )
+                    for _dim, _val in _item.items():
+                        _update_method(_dim + _dim_offset, _val)
+                else:
+                    setattr(self.__composites[node_id], _key, _item)
+                    self._config[_key + "s"][node_id] = _item
+
         self._config["metadata_complete"] = True
 
     def store_results(self, index, results):
@@ -349,6 +356,17 @@ class _WorkflowResults(QtCore.QObject):
         for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
             if isinstance(_slice, slice):
                 _slice = np.r_[_slice]
+            if (
+                isinstance(_slice, int)
+                or (isinstance(_slice, np.ndarray) and _slice.size == 1)
+            ) and ";" in _data.axis_labels[__dim_index(_dim)]:
+                try:
+                    _label = _data.axis_labels[__dim_index(_dim)].split(";")[_slice[0]]
+                    _label = _label if ":" not in _label else _label.split(":")[1]
+                    _data.update_axis_labels(__dim_index(_dim), _label)
+                    _data.data_label = _label
+                except IndexError:
+                    pass
             _data = np.take(_data, _slice, __dim_index(_dim))
 
         if flattened_scan_dim:
@@ -554,7 +572,7 @@ class _WorkflowResults(QtCore.QObject):
             _print_info["ax_types"].insert(0, "(scan)")
         if squeeze_results:
             _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]
-            for _key in _print_info.keys():
+            for _key in _print_info:
                 _print_info[_key] = list(np.delete(_print_info[_key], _squeezed_dims))
         _data_label = self._config["data_labels"][node_id] + (
             f" / {self._config['data_units'][node_id]}"
@@ -576,6 +594,9 @@ class _WorkflowResults(QtCore.QObject):
                 for _dim, _ in enumerate(_print_info["ax_labels"])
             )
         )
+        if self.__composites[node_id].size == 1:
+            _val = np.atleast_1d(self.__composites[node_id].squeeze())[0]
+            _node_info += f"Data zero-dimensional\n  Value: {_val:.6f}"
         return _node_info
 
     def import_data_from_directory(self, directory):

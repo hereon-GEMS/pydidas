@@ -213,14 +213,17 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": False,
         "tooltip": "The last index to be used for the file series.",
     },
-    "image_num": {
+    "frame_index": {
         "type": int,
         "default": 0,
-        "name": "Image number",
+        "name": "Global frame index",
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "The image number to be processed.",
+        "tooltip": (
+            "The global index of the frame to be processed. Note: The first frame "
+            "number is always 0, irrespective of any offsets in the filenames."
+        ),
     },
     #####################
     # fitting settings

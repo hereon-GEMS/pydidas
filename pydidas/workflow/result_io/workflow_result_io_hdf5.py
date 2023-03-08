@@ -354,7 +354,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                     "unit": _unit,
                     "n_points": _data.shape[_dim],
                 }
-                if isinstance(_range, np.ndarray):
+                if isinstance(_range, np.ndarray) and _range.size > 1:
                     _scandim = _scandim | {
                         "delta": _range[1] - _range[0],
                         "offset": _range[0],

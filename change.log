@@ -75,6 +75,8 @@ Bugfixes
 - Fixed an issue in Dataset when squeezing multi-dimensional arrays with size 1.
 - Fixed an issue when copying Dataset metadata which would not create new 
   objects.
+- Fixed an issue when importing results of shape (1,) from Hdf5 files.
+
 
 ========
 v23.1.25

@@ -769,7 +769,19 @@ class Dataset(np.ndarray):
             The copied dataset.
         """
         _new = np.ndarray.copy(self, order)
-        _new._meta = self._meta.copy()
+        _new._meta = {
+            _key: self._meta[_key].copy()
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]
+        } | {
+            _key: self._meta[_key]
+            for _key in ["data_unit", "data_label", "getitem_key"]
+        }
+        _new._meta["metadata"] = {}
+        for _key, _val in self._meta["metadata"].items():
+            try:
+                _new._meta["metadata"][_key] = _val.copy()
+            except AttributeError:
+                _new._meta["metadata"][_key] = _val
         return _new
 
     def __repr__(self):

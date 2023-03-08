@@ -70,7 +70,8 @@ Bugfixes
   processing files with different number of images each in one session.
 - Fixed an issue preventing from resetting Parameter.choices to None.
 - Fixed an issue in Dataset when squeezing multi-dimensional arrays with size 1.
-
+- Fixed an issue when copying Dataset metadata which would not create new 
+  objects.
 
 ========
 v23.1.25

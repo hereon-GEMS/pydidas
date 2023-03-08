@@ -947,6 +947,13 @@ class TestDataset(unittest.TestCase):
             else:
                 self.assertEqual(_item, _target)
 
+    def test_copy_dataset__update_ax_label(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array, axis_ranges=[0, 1, 2], axis_labels=["a", "b", "c"])
+        obj2 = obj.copy()
+        obj2.update_axis_labels(2, "new")
+        self.assertEqual(obj.axis_labels[2], "c")
+
     def test_hash(self):
         obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])
         obj2 = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])

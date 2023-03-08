@@ -71,11 +71,11 @@ class FitSinglePeak(ProcPlugin):
             choices=[
                 "Peak position",
                 "Peak area",
-                "FWHM",
-                "Peak position and area",
-                "Peak position and FWHM",
-                "Peak area and FWHM",
-                "Peak position, area and FWHM",
+                "Peak FWHM",
+                "Peak position; peak area",
+                "Peak position; peak FWHM",
+                "Peak area; peak FWHM",
+                "Peak position; peak area; peak FWHM",
             ],
             name="Output",
             tooltip=(
@@ -209,12 +209,8 @@ class FitSinglePeak(ProcPlugin):
             _index = self._config["param_labels"].index("center")
             self._config["bounds_low"][_index] = np.amin(self._data_x)
             self._config["bounds_high"][_index] = np.amax(self._data_x)
-        if self.get_param_value("output") == "Peak position":
-            self.output_data_unit = self._data.axis_units[0]
-        elif self.get_param_value("output") == "Peak area":
-            _pos_unit = self._data.axis_units[0]
-            _val_unit = self._data.data_unit
-            self.output_data_unit = f"({_pos_unit} * {_val_unit})"
+        self.output_data_unit = self._data.axis_units[0]
+        self.output_data_label = self.get_param_value("output")
         self._config["settings_updated_from_data"] = True
 
     def _crop_data_to_selected_range(self):
@@ -305,12 +301,16 @@ class FitSinglePeak(ProcPlugin):
                     _new_data.append(self._fitter.fwhm(_fit_pvals))
         else:
             _new_data = self._config["single_result_shape"][0] * [np.nan]
+
+        _axis_label = "; ".join(
+            [f"{i}: {_key.strip()}" for i, _key in enumerate(_output.split(";"))]
+        )
         _result_dataset = Dataset(
             _new_data,
             data_label=_output,
-            data_unit="a.u.",
-            axis_labels=[_output],
-            axis_units=[self._data.axis_units[0]],
+            data_unit=self._data.axis_units[0],
+            axis_labels=[_axis_label],
+            axis_units=[""],
         )
         _result_dataset.metadata = self._data.metadata | {
             "fit_func": self._fitter.func_name,
@@ -329,16 +329,16 @@ class FitSinglePeak(ProcPlugin):
         if _output in [
             "Peak area",
             "Peak position",
-            "FWHM",
+            "Peak FWHM",
         ]:
             self._config["result_shape"] = (1,)
         elif _output in [
-            "Peak position and area",
-            "Peak position and FWHM",
-            "Peak area and FWHM",
+            "Peak position; peak area",
+            "Peak position; peak FWHM",
+            "Peak area; peak FWHM",
         ]:
             self._config["result_shape"] = (2,)
-        elif _output == "Peak position, area and FWHM":
+        elif _output == "Peak position; peak area; peak FWHM":
             self._config["result_shape"] = (3,)
         else:
             raise ValueError("No result shape defined for the selected input")

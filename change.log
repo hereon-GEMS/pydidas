@@ -44,6 +44,7 @@ Improvements
 - Added the Dataset data unit and data label to metadata in Workflow processing
   for additional informations.
 - Added a colorbar label to the PydidasPlot2d
+- Improved the FitSinglePeak plugin to give better information about the output.
   
 Bugfixes
 --------

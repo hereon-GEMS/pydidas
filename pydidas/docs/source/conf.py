@@ -25,7 +25,7 @@ author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
 release = "beta"
-version = "23.1.25"
+version = "23.3.9"
 
 # -- General configuration ---------------------------------------------------
 

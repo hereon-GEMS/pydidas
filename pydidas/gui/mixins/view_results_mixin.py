@@ -86,6 +86,10 @@ class ViewResultsMixin:
             dialog_type="open_directory",
             caption="Export results",
             qsettings_ref="WorkflowResults__export",
+            info_string=(
+                "<b>Please select an empty an empty directory to export all "
+                "results<br> or enable overwriting of results:</b>"
+            ),
         )
 
     def connect_view_results_mixin_signals(self):

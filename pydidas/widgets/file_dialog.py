@@ -74,6 +74,9 @@ class PydidasFileDialog(
         The default is open_file.
     formats : Union[None, str], optional
         The list of format filters for filenames, if used. The default is None.
+    info_string : Union[None, str], optional
+        An additional information string which is displayed in the FileDialog widget.
+        The default is None.
     qsettings_ref : Union[str, None], optional
         A reference string to store persistent information about the directory between
         sessions. If None, the currently active directory will be selected. The default
@@ -89,6 +92,7 @@ class PydidasFileDialog(
             "caption": kwargs.get("caption", None),
             "type": kwargs.get("dialog_type", "open_file"),
             "formats": kwargs.get("formats", None),
+            "info_string": kwargs.get("info_string", None),
             "extensions": None,
             "curr_dir": None,
             "scan_base": None,
@@ -98,9 +102,7 @@ class PydidasFileDialog(
         self.qsettings_ref = kwargs.get("qsettings_ref", None)
 
         self._set_basic_widget_configuration()
-        self._insert_buttons_in_sidebar()
-        self._set_user_response_method()
-
+        self._update_widgets()
         self._widgets["but_latest_location"].clicked.connect(self.goto_latest_location)
         self._widgets["but_scan_home"].clicked.connect(self.goto_scan_base_dir)
 
@@ -148,11 +150,12 @@ class PydidasFileDialog(
         _sidebar.setMinimumWidth(180)
         self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
-    def _insert_buttons_in_sidebar(self):
+    def _update_widgets(self):
         """
-        Insert buttons to access specific locations.
+        Insert buttons to access specific locations and optional text fields.
         """
         self.create_empty_widget("sidebar_frame", parent_widget=None)
+        self.create_empty_widget("fileview_frame", parent_widget=None)
         self.create_button(
             "but_latest_location",
             "Open latest selected location",
@@ -172,19 +175,36 @@ class PydidasFileDialog(
             "listview", _listview, parent_widget=self._widgets["sidebar_frame"]
         )
         _splitter.insertWidget(0, self._widgets["sidebar_frame"])
+        if self._config["info_string"] is not None:
+            _fileview = _splitter.widget(1)
+            _fileview.setParent(None)
+            self.create_label(
+                "info_label",
+                self._config["info_string"],
+                parent_widget=self._widgets["fileview_frame"],
+                margin=15,
+            )
+            self.add_any_widget(
+                "fileview", _fileview, parent_widget=self._widgets["fileview_frame"]
+            )
+            _splitter.insertWidget(1, self._widgets["fileview_frame"])
 
-    def _set_user_response_method(self):
+    def get_user_response(self):
         """
-        Set the get_user_response method based on the selected dialog type.
+        Get a user response and return a filename or directory.
+
+        Returns
+        -------
+        str
+            The path to the selected item.
         """
         if self._config["type"] == "open_file":
-            self.get_user_response = self.get_existing_filename
-        elif self._config["type"] == "save_file":
-            self.get_user_response = self.get_saving_filename
-        elif self._config["type"] == "open_directory":
-            self.get_user_response = self.get_existing_directory
-        else:
-            raise ValueError("The dialog type {self._config['type']} is not supported.")
+            return self.get_existing_filename()
+        if self._config["type"] == "save_file":
+            return self.get_saving_filename()
+        if self._config["type"] == "open_directory":
+            return self.get_existing_directory()
+        raise ValueError("The dialog type {self._config['type']} is not supported.")
 
     @QtCore.Slot()
     def goto_latest_location(self):
@@ -197,11 +217,6 @@ class PydidasFileDialog(
     def goto_scan_base_dir(self):
         """
         Open the ScanContext home directory, if set.
-
-        Returns
-        -------
-        None.
-
         """
         self.setDirectory(self._config["scan_base"])
 

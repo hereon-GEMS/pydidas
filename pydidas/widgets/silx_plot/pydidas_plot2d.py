@@ -165,6 +165,14 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setGraphXLabel(_ax_label[1])
         if title is not None:
             self.setGraphTitle(title)
+        _cbar = self.getColorBarWidget()
+        _legend = ""
+        if len(data.data_label) > 0:
+            _legend += data.data_label
+        if len(data.data_unit) > 0:
+            _legend += f"/ {data.data_unit}"
+        if len(_legend) > 0:
+            _cbar.setLegend(_legend)
 
     def clear_plot(self):
         """

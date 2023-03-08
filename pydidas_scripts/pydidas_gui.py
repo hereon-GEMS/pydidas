@@ -78,8 +78,8 @@ def run_gui(app=None, restore_state="None"):
 
     if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
-    gui.raise_()
     gui.show()
+    gui.raise_()
     if restore_state in ["exit", "saved"]:
         try:
             gui.restore_gui_state(state=restore_state)

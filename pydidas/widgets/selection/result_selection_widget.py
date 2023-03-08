@@ -146,7 +146,6 @@ def _update_choices(param, combobox, new_choices):
     new_choices : list
         The list of new choices.
     """
-    _curr_choices = param.choices
     if len(new_choices) == 0:
         param.choices = None
         param.value = ""

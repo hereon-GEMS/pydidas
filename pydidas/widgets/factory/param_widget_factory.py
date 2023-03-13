@@ -28,10 +28,12 @@ __all__ = ["create_param_widget"]
 import pathlib
 
 from ...core.constants import PARAM_INPUT_EDIT_WIDTH
-from ...core import Hdf5key
+from ...core import Hdf5key, UserConfigError
 
 
-def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
+def create_param_widget(
+    param, widget_width=PARAM_INPUT_EDIT_WIDTH, persistent_qsettings_ref=None
+):
     """
     Create a widget based on the type of Parameter input.
 
@@ -52,6 +54,10 @@ def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
         The Parameter requiring an I/O widget.
     widget_width : int, optional
         The width of the corresponding widget. The default is 255.
+    persistent_qsettings_ref : Union[None, str], optional
+        The persistent reference for the directory in the QSettings. This keyword is
+        only used for ParamIoWidgetFile widgets. If None, the widget will not keep
+        references spanning instances. The default is None.
 
     Returns
     -------
@@ -70,10 +76,18 @@ def create_param_widget(param, widget_width=PARAM_INPUT_EDIT_WIDTH):
         _widget = ParamIoWidgetComboBox(None, param, widget_width)
     else:
         if param.dtype == pathlib.Path:
-            _widget = ParamIoWidgetFile(None, param, widget_width)
+            _widget = ParamIoWidgetFile(
+                None,
+                param,
+                width=widget_width,
+                persistent_qsettings_ref=persistent_qsettings_ref,
+            )
         elif param.dtype == Hdf5key:
             _widget = ParamIoWidgetHdf5Key(None, param, widget_width)
         else:
             _widget = ParamIoWidgetLineEdit(None, param, widget_width)
-    _widget.set_value(param.value)
+    try:
+        _widget.set_value(param.value)
+    except UserConfigError:
+        pass
     return _widget

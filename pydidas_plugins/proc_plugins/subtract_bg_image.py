@@ -26,9 +26,11 @@ __status__ = "Development"
 __all__ = ["SubtractBackgroundImage"]
 
 
+import os
+
 import numpy as np
 
-from pydidas.core import get_generic_param_collection
+from pydidas.core import get_generic_param_collection, UserConfigError
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
@@ -61,8 +63,14 @@ class SubtractBackgroundImage(ProcPlugin):
         """
         Load the background image.
         """
+        _bg_fname = self.get_param_value("bg_file")
+        if not os.path.isfile(_bg_fname):
+            raise UserConfigError(
+                f'The filename "{_bg_fname}" does not point to a valid file. Please '
+                "verify the path."
+            )
         self._bg_image = import_data(
-            self.get_param_value("bg_file"),
+            _bg_fname,
             dataset=self.get_param_value("bg_hdf5_key"),
             frame=self.get_param_value("bg_hdf5_frame"),
         )

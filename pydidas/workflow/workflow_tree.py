@@ -241,8 +241,7 @@ class _WorkflowTree(GenericTree):
 
     def export_to_file(self, filename, **kwargs):
         """
-        Export the WorkflowTree to a file using any of the registered
-        exporters.
+        Export the WorkflowTree to a file using any of the registered exporters.
 
         Parameters
         ----------
@@ -347,12 +346,10 @@ class _WorkflowTree(GenericTree):
         }
         for _id, _shape in _shapes.items():
             if -1 in _shape:
-                _plugin_cls = self.nodes[_id].plugin.__class__
-                _error = (
+                raise UserConfigError(
                     "Cannot determine the shape of the output for node "
-                    f'"{_id}" (type {_plugin_cls}).'
+                    f"#{_id} (type {self.nodes[_id].plugin.__class__})."
                 )
-                raise UserConfigError(_error)
         return _shapes
 
     def get_all_nodes_with_results(self):

@@ -96,6 +96,19 @@ class ImageSeriesOperationsWindow(PydidasWindow):
                 "output_fname",
                 "operation",
             ]
+            if param_key == "first_file":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__import_file"
+            if param_key == "last_file":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__import_file"
+            if param_key == "output_fname":
+                _config[
+                    "persistent_qsettings_ref"
+                ] = "ImageSeriesOperationsWindow__export_file"
+
             return _config
 
         self.create_label(
@@ -139,6 +152,9 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.params["output_fname"], **get_config("output_fname")
         )
         self.create_spacer(None)
+        self.create_check_box(
+            "check_keep_open", "Close window after processing", checked=True
+        )
         self.create_button("but_exec", "Process and export image")
 
     def connect_signals(self):
@@ -258,7 +274,8 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             export_data(
                 self.get_param_value("output_fname"), self._data, overwrite=True
             )
-        self.close()
+        if self._widgets["check_keep_open"].isChecked():
+            self.close()
 
     def _calculate_hdf5_frame_limits(self):
         """
@@ -305,7 +322,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         _op = self.get_param_value("operation")
         if _op in ["sum", "mean"]:
-            self._data += frame
+            self._data = self._data + frame
         elif _op == "max":
             self._data = np.maximum(self._data, frame)
 

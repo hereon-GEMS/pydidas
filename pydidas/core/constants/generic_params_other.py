@@ -213,14 +213,17 @@ GENERIC_PARAMS_OTHER = {
         "allow_None": False,
         "tooltip": "The last index to be used for the file series.",
     },
-    "image_num": {
+    "frame_index": {
         "type": int,
         "default": 0,
-        "name": "Image number",
+        "name": "Global frame index",
         "choices": None,
         "unit": "",
         "allow_None": False,
-        "tooltip": "The image number to be processed.",
+        "tooltip": (
+            "The global index of the frame to be processed. Note: The first frame "
+            "number is always 0, irrespective of any offsets in the filenames."
+        ),
     },
     #####################
     # fitting settings
@@ -272,21 +275,108 @@ GENERIC_PARAMS_OTHER = {
     },
     "fit_upper_limit": {
         "type": float,
-        "default": 0,
+        "default": None,
         "name": "Peak fit upper limit",
         "choices": None,
         "unit": "",
-        "allow_None": False,
-        "tooltip": "The upper limit (in the x-axis´ unit) to the fit region.",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit (in the x-axis´ unit) to the fit region. None corresponds "
+            "to using no upper limit but the data limits."
+        ),
     },
     "fit_lower_limit": {
         "type": float,
-        "default": 0,
+        "default": None,
         "name": "Peak fit lower limit",
         "choices": None,
         "unit": "",
-        "allow_None": False,
-        "tooltip": "The lower limit (in the x-axis´ unit) to the fit region.",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit (in the x-axis´ unit) to the fit region. None corresponds "
+            "to using no upper limit but the data limits."
+        ),
+    },
+    ################
+    # Generic limits
+    ################
+    "upper_limit": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit": {
+        "type": float,
+        "default": None,
+        "name": "Lower limit",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
+    },
+    "upper_limit_ax0": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit axis 0 (y)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit_ax0": {
+        "type": float,
+        "default": None,
+        "name": "Lower limit axis 0 (y)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
+    },
+    "upper_limit_ax1": {
+        "type": float,
+        "default": None,
+        "name": "Upper limit axis 1 (x)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no upper limit."
+        ),
+    },
+    "lower_limit_ax1": {
+        "type": float,
+        "default": None,
+        "name": "Lower limit axis 1 (x)",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower limit of data selection. This point is included in the data. "
+            "Note that the selection is either in indices or data range, depending on "
+            "the value of 'type_selection'. A limit of 'None' will set no lower limit."
+        ),
     },
     ############################
     # Autosave results settings

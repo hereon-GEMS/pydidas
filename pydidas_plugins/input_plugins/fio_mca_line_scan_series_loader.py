@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FioMcaSeriesLoader Plugin which can be used to load
+Module with the FioMcaLineScanSeriesLoader Plugin which can be used to load
 MCA spectral data
 """
 
@@ -39,6 +39,57 @@ from pydidas.core import (
 )
 from pydidas.plugins import InputPlugin1d
 from pydidas.core.utils import copy_docstring
+from pydidas.contexts import ScanContext
+
+
+SCAN = ScanContext()
+
+
+FIO_MCA_READER_DEFAULT_PARAMS = ParameterCollection(
+    get_generic_parameter("live_processing"),
+    Parameter(
+        "files_per_directory",
+        int,
+        -1,
+        name="Files per directory",
+        tooltip=(
+            "The number of files in each directory. A value of "
+            '"-1" will take the number of present files in the '
+            "first directory."
+        ),
+    ),
+    Parameter(
+        "fio_suffix",
+        str,
+        "_mfa_s#.fio",
+        name="FIO-file suffix",
+        tooltip=("The file suffix for the individual MCA files."),
+    ),
+    Parameter(
+        "use_absolute_energy",
+        int,
+        0,
+        choices=[True, False],
+        name="Use absolute energy scale",
+        tooltip=("Use an absolute energy scale for the results."),
+    ),
+    Parameter(
+        "energy_offset",
+        float,
+        0,
+        name="Energy offset",
+        unit="eV",
+        tooltip=("The absolute offset in energy for the zeroth channel."),
+    ),
+    Parameter(
+        "energy_delta",
+        float,
+        1,
+        name="Channel energy Delta",
+        unit="eV",
+        tooltip=("The width of each energy channels in eV."),
+    ),
+)
 
 
 class FioMcaLineScanSeriesLoader(InputPlugin1d):
@@ -81,55 +132,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     plugin_name = "Fio MCA line scan series loader"
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
-    default_params = ParameterCollection(
-        get_generic_parameter("live_processing"),
-        get_generic_parameter("directory_path"),
-        get_generic_parameter("filename_pattern"),
-        Parameter(
-            "filename_suffix",
-            str,
-            ".fio",
-            name="The filename suffix",
-            tooltip=("The suffix of the filename. This is anything after the counter."),
-        ),
-        get_generic_parameter("first_index"),
-        get_generic_parameter("file_stepping"),
-        Parameter(
-            "files_per_directory",
-            int,
-            -1,
-            name="Files per directory",
-            tooltip=(
-                "The number of files in each directory. A value of "
-                '"-1" will take the number of present files in the '
-                "first directory."
-            ),
-        ),
-        Parameter(
-            "use_absolute_energy",
-            int,
-            0,
-            choices=[True, False],
-            name="Use absolute energy scale",
-            tooltip=("Use an absolute energy scale for the results."),
-        ),
-        Parameter(
-            "energy_offset",
-            float,
-            0,
-            name="Energy offset",
-            unit="eV",
-            tooltip=("The absolute offset in energy for the zeroth channel."),
-        ),
-        Parameter(
-            "energy_delta",
-            float,
-            1,
-            name="Channel energy delta",
-            unit="eV",
-            tooltip=("The width of each energy channels in eV."),
-        ),
-    )
+    default_params = FIO_MCA_READER_DEFAULT_PARAMS.get_copy()
     input_data_dim = None
     output_data_dim = 1
 
@@ -146,8 +149,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         Prepare loading images from a file series.
         """
         self.__check_files_per_directory()
-        self.__create_filepath_generator()
-        self.__create_filename_generator()
+
         self.__determine_header_size()
         self.__determine_roi()
         self._config["energy_scale"] = None
@@ -169,37 +171,19 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             _nfiles = len(_files)
             self.set_param_value("files_per_directory", _nfiles)
 
-    def __create_filepath_generator(self):
+    def update_filename_string(self):
         """
-        Set up the generator that can create the file paths to load
-        MCA spectra.
+        Set up the generator that can create the full file names to load images.
         """
-        _basepath = self.get_param_value("directory_path", dtype=str)
-        _pattern = self.get_param_value("filename_pattern", dtype=str)
-        _offset = self.get_param_value("first_index")
+        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _suffix = self.get_param_value("fio_suffix", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise UserConfigError(
-                "No filename pattern detected in the FioMcaLineScanSeriesLoader!"
-            )
-        _pattern = _pattern.replace(
-            "#" * _len_pattern, "{:0" + str(_len_pattern) + "d}"
-        )
-        self.__pattern = _pattern
-        _path = os.path.join(_basepath, _pattern)
-        self._filepath_generator = lambda index: _path.format(index + _offset)
-
-    def __create_filename_generator(self):
-        """
-        Set up the generator that can create the file names to load
-        MCA spectra.
-        """
-        _suffix = self.get_param_value("filename_suffix", dtype=str)
-        _offset = self.get_param_value("first_index")
-        _name = self.__pattern + "_mca_s" + "{:d}" + _suffix
-        self._filename_generator = lambda pathindex, fileindex: _name.format(
-            pathindex + _offset, fileindex + 1
-        )
+            raise UserConfigError("No filename pattern detected in the Input plugin!")
+        _name = os.path.join(_basepath, _pattern, _pattern + _suffix)
+        _name = _name.replace("#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}")
+        self.filename_string = _name.replace("#", "{index2:d}")
 
     def __determine_header_size(self):
         """
@@ -285,11 +269,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("files_per_directory")
-        _pathindex = index // _n_per_dir
+        _pathindex = index // _n_per_dir + SCAN.get_param_value("scan_start_index")
         _fileindex = index % _n_per_dir
-        _path = self._filepath_generator(_pathindex)
-        _name = self._filename_generator(_pathindex, _fileindex)
-        return os.path.join(_path, _name)
+        return self.filename_string.format(index=_pathindex, index2=_fileindex)
 
     def get_raw_input_size(self):
         """

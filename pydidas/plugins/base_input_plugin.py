@@ -168,7 +168,9 @@ class InputPlugin(BasePlugin):
         _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
-            raise UserConfigError("No filename pattern detected in the Input plugin!")
+            # raise UserConfigError("No filename pattern detected in the Input plugin!")
+            self.filename_string = os.path.join(_basepath, _pattern)
+            return
         self.filename_string = os.path.join(_basepath, _pattern).replace(
             "#" * _len_pattern, "{index:0" + str(_len_pattern) + "d}"
         )
@@ -224,8 +226,8 @@ class InputPlugin(BasePlugin):
         str
             The filename.
         """
-        _index = frame_index * self.get_param_value(
-            "file_stepping", 1
+        _index = frame_index * SCAN.get_param_value(
+            "scan_index_stepping"
         ) + SCAN.get_param_value("scan_start_index")
         return self.filename_string.format(index=_index)
 

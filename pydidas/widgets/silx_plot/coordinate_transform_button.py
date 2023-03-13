@@ -31,12 +31,12 @@ from silx.gui.plot.PlotToolButtons import PlotToolButton
 
 from ...core import UserConfigError, utils
 from ...core.constants import GREEK_ASCII_TO_UNI
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 
 
 THETA = GREEK_ASCII_TO_UNI["theta"]
 CHI = GREEK_ASCII_TO_UNI["chi"]
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class CoordinateTransformButton(PlotToolButton):
@@ -69,7 +69,7 @@ class CoordinateTransformButton(PlotToolButton):
             "silx_coordinates_r_chi.png"
         )
         self.STATE["r_chi", "state"] = f"Polar r / {CHI} coordinates"
-        self.STATE["r_chi", "action"] = f"Use polar r / {CHI} coordinates [px, deg]"
+        self.STATE["r_chi", "action"] = f"Use polar r / {CHI} coordinates [mm, deg]"
 
         self.STATE["2theta_chi", "icon"] = utils.get_pydidas_qt_icon(
             "silx_coordinates_2theta_chi.png"
@@ -151,10 +151,10 @@ class CoordinateTransformButton(PlotToolButton):
             Flag whether the detecor has been set up correctly.
         """
         if (
-            EXP.get_param_value("detector_npixx") < 1
-            or EXP.get_param_value("detector_npixy") < 1
-            or EXP.get_param_value("detector_pxsizex") <= 0
-            or EXP.get_param_value("detector_pxsizey") <= 0
+            DIFFRACTION_EXP.get_param_value("detector_npixx") < 1
+            or DIFFRACTION_EXP.get_param_value("detector_npixy") < 1
+            or DIFFRACTION_EXP.get_param_value("detector_pxsizex") <= 0
+            or DIFFRACTION_EXP.get_param_value("detector_pxsizey") <= 0
         ):
             self.set_coordinates("cartesian")
             if not silent:

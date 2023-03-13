@@ -34,6 +34,7 @@ from .global_settings_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
 from .qt_paths_window import *
+from .scan_dimension_information_window import *
 from .show_detailed_plugin_results_window import *
 from .tweak_plugin_parameter_window import *
 from .user_config_window import *
@@ -79,6 +80,11 @@ from . import qt_paths_window
 
 __all__.extend(qt_paths_window.__all__)
 del qt_paths_window
+
+from . import scan_dimension_information_window
+
+__all__.extend(scan_dimension_information_window.__all__)
+del scan_dimension_information_window
 
 from . import show_detailed_plugin_results_window
 

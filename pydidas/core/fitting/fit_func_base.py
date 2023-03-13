@@ -143,3 +143,24 @@ class FitFuncBase:
         _bg0 = y[0] - _bg1 * x[0]
         y = y - (_bg1 * x + _bg0)
         return y, [_bg0, _bg1]
+
+    @classmethod
+    def fwhm(cls, c):
+        """
+        Get the FWHM of the fit from the values of the parameters.
+
+        This method needs to be implemented by each fitting function.
+
+        Parameters
+        ----------
+        c : tuple
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        float
+            The function FWHM.
+        """
+        raise NotImplementedError(
+            "The FWHM method must be implemented by the specific FitFunc"
+        )

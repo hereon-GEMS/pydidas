@@ -65,7 +65,7 @@ class TimerSaveRuntime:
 
     Example
     -------
-    >>> with TimerSaveRuntime as runtime:
+    >>> with TimerSaveRuntime() as runtime:
     >>>     arr = numpy.random.random((1000, 1000, 100))
     >>> print(runtime())
     0.597181800

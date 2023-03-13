@@ -30,7 +30,7 @@ from silx.gui.colors import Colormap
 from silx.utils.weakref import WeakMethodProxy
 
 from ...core import PydidasQsettingsMixin
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 from .silx_actions import CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
@@ -44,7 +44,7 @@ SNAP_MODE = (
     | tools.PositionInfo.SNAPPING_SCATTER
 )
 
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class PydidasImageView(ImageView, PydidasQsettingsMixin):
@@ -54,7 +54,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
 
     _getImageValue = Plot2D._getImageValue
 
-    def __init__(self, parent=None, backend=None):
+    def __init__(self, parent=None, backend=None, show_cs_transform=True):
 
         ImageView.__init__(self, parent, backend)
         PydidasQsettingsMixin.__init__(self)
@@ -69,8 +69,11 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             CropHistogramOutliers(self, parent=self)
         )
 
-        self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
-        self._toolbar.addWidget(self.cs_transform)
+        if show_cs_transform:
+            self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
+            self._toolbar.addWidget(self.cs_transform)
+        else:
+            self.cs_transform = None
 
         self.cropHistOutliersAction.setVisible(True)
         self.addAction(self.cropHistOutliersAction)
@@ -82,9 +85,10 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
 
         _position_widget = PydidasPositionInfo(plot=self, converters=posInfo)
         _position_widget.setSnappingMode(SNAP_MODE)
-        self.cs_transform.sig_new_coordinate_system.connect(
-            _position_widget.new_coordinate_system
-        )
+        if show_cs_transform:
+            self.cs_transform.sig_new_coordinate_system.connect(
+                _position_widget.new_coordinate_system
+            )
         _layout = self.centralWidget().layout()
         _layout.addWidget(_position_widget, 2, 0, 1, 3)
 
@@ -100,11 +104,11 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
     @QtCore.Slot()
     def get_detector_size(self):
         """
-        Get the detector size from the ExperimentContext and store it.
+        Get the detector size from the DiffractionExperimentContext and store it.
         """
         self._detector_size = (
-            EXP.get_param_value("detector_npixy"),
-            EXP.get_param_value("detector_npixx"),
+            DIFFRACTION_EXP.get_param_value("detector_npixy"),
+            DIFFRACTION_EXP.get_param_value("detector_npixx"),
         )
 
     def setData(self, data, **kwargs):
@@ -119,7 +123,8 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         **kwargs : dict
             Optional kwargs for the ImageView.setImage method.
         """
-        self._check_data_shape(data.shape)
+        if self.cs_transform is not None:
+            self._check_data_shape(data.shape)
         ImageView.setImage(self, data, **kwargs)
 
     def _check_data_shape(self, data_shape):

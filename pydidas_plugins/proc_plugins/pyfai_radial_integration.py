@@ -45,7 +45,7 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._mask = None
         self._maskval = None
-        self.set_param_value("rad_npoint", 1000)
+        self.set_param_value("rad_npoint", 100)
 
     def pre_execute(self):
         """

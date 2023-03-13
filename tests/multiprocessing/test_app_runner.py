@@ -49,7 +49,7 @@ class TestAppRunner(unittest.TestCase):
 
     def tearDown(self):
         if self._runner is not None:
-            self._runner.quit()
+            self._runner.exit()
 
     def wait_for_spy_signal(self, spy, timeout=8):
         _t0 = time.time()
@@ -80,7 +80,7 @@ class TestAppRunner(unittest.TestCase):
     def test_run(self):
         self._runner = AppRunner(self.app)
         _spy = QtTest.QSignalSpy(self._runner.sig_final_app_state)
-        _spy2 = QtTest.QSignalSpy(self._runner.sig_finished)
+        _spy2 = QtTest.QSignalSpy(self._runner.finished)
         self._runner.start()
         time.sleep(0.1)
         self.wait_for_spy_signal(_spy)

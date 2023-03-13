@@ -356,7 +356,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj._config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
-        obj2._config["Test"] = [1, 2, 3, 4, 5, 6]
+        obj2._config["Test"] = [1, 2, 3, 4, 5]
         obj2.add_params(self._params.get_copy())
         self.assertEqual(hash(obj), hash(obj2))
 

@@ -24,12 +24,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrame"]
 
+import os
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import PydidasFileDialog
 from ...plugins import PluginCollection
+from ...widgets import PydidasFileDialog
 from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
 from ..managers import WorkflowTreeEditManager
@@ -72,23 +73,23 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
 
     menu_title = "Workflow editing"
     menu_entry = "Workflow processing/Workflow editing"
-    menu_icon = "qta::ph.share-network-fill"
+    menu_icon = "pydidas::frame_icon_workflow_edit.png"
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
         WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
+            dialog_type="open_file",
             caption="Import workflow tree file",
             formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
             qsettings_ref="WorkflowEditFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
+            parent=self,
+            dialog_type="save_file",
             caption="Export workflow tree file",
             formats=WorkflowTreeIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="WorkflowEditFrame__export",
         )
 
@@ -140,20 +141,22 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         Open a QFileDialog to geta save name and export the WorkflowTree to
         the selected file with the specified format.
         """
-        fname = self.__export_dialog.get_user_response()
-        if fname in ["", None]:
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is None:
             return
-        TREE.export_to_file(fname, overwrite=True)
+        TREE.export_to_file(_fname, overwrite=True)
 
     def load_tree_from_file(self):
         """
         Open a Qdialog to select a filename, read the file and import an
         existing WorkflowTree from the retrieved information.
         """
-        fname = self.__import_dialog.get_user_response()
-        if fname in ["", None]:
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is None:
             return
-        TREE.import_from_file(fname)
+        if os.path.splitext(_fname)[1] == "":
+            _fname = _fname + ".yaml"
+        TREE.import_from_file(_fname)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     def export_state(self):

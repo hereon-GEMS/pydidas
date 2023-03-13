@@ -31,6 +31,9 @@ from qtpy import QtWidgets, QtCore, QtGui
 
 from ...core import constants
 from ...core.utils import apply_qt_properties
+from ...workflow import WorkflowTree
+
+TREE = WorkflowTree()
 
 
 class PluginInWorkflowBox(QtWidgets.QLabel):
@@ -54,6 +57,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     sig_widget_delete_branch_request = QtCore.Signal(int)
     sig_widget_delete_request = QtCore.Signal(int)
     sig_new_node_parent_request = QtCore.Signal(int, int)
+    sig_create_copy_request = QtCore.Signal(int, int)
 
     def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
         super().__init__(parent)
@@ -62,6 +66,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self._flag_active = False
         self._flag_inconsistent = False
         self.widget_id = widget_id
+        self._label = kwargs.get("label", "")
 
         self.setFixedSize(self.widget_width, self.widget_height)
 
@@ -88,27 +93,38 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         _font.setBold(True)
         self.id_label.setFont(_font)
 
-        self.update_text(widget_id, "")
+        self.update_text(widget_id, self._label)
         self.setText(plugin_name)
 
     def __create_menu(self):
         """
         Create the custom context menu for adding an replacing nodes.
         """
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self._menu_item_context = QtWidgets.QMenu(self)
+        self.customContextMenuRequested.connect(self._open_context_menu)
+
+        self._menu_move = QtWidgets.QMenu("Move to a new parent", self)
+        self._menu_append = QtWidgets.QMenu(
+            "Append a plugin copy to specific node", self
+        )
+        self._menu_item_context.addMenu(self._menu_move)
+        self._menu_item_context.addMenu(self._menu_append)
+
         self._delete_node_context = QtWidgets.QMenu(self)
 
-        self._actions = {
+        self._del_actions = {
             "delete": QtWidgets.QAction("Delete this node", self),
             "delete_branch": QtWidgets.QAction("Delete this branch", self),
         }
-        self._actions["delete"].triggered.connect(
+        self._del_actions["delete"].triggered.connect(
             partial(self.sig_widget_delete_request.emit, self.widget_id)
         )
-        self._actions["delete_branch"].triggered.connect(
+        self._del_actions["delete_branch"].triggered.connect(
             partial(self.sig_widget_delete_branch_request.emit, self.widget_id)
         )
-        self._delete_node_context.addAction(self._actions["delete"])
-        self._delete_node_context.addAction(self._actions["delete_branch"])
+        self._delete_node_context.addAction(self._del_actions["delete"])
+        self._delete_node_context.addAction(self._del_actions["delete_branch"])
         self.del_button.setMenu(self._delete_node_context)
 
     def __get_stylesheet(self, border=True):
@@ -215,7 +231,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             self._flag_inconsistent = False
             self._update_stylesheets()
 
-    def update_text(self, node_id, label):
+    def update_text(self, node_id, label=""):
         """
         Update the text for node label.
 
@@ -223,11 +239,12 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         ----------
         node_id : int
             The unique node ID.
-        label : str
+        label : str, optional
             The new label for the workflow node.
         """
         _txt = f"node {node_id:d}"
         if len(label) > 0:
+            self._label = label
             _txt += f": {label}"
         self.id_label.setText(_txt)
 
@@ -269,3 +286,67 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         _source_widget = event.source()
         event.accept()
         self.sig_new_node_parent_request.emit(_source_widget.widget_id, self.widget_id)
+
+    @QtCore.Slot(QtCore.QPoint)
+    def _open_context_menu(self, point):
+        """
+        Open the context menu after updating the menu entries based on the
+        current WorkflowTree.
+        """
+        self.__update_menus()
+        self._menu_item_context.exec(self.mapToGlobal(point))
+
+    def __update_menus(self):
+        """
+        Update the menus to move and to append a copy based on the nodes in the Tree.
+        """
+        self._menu_move.clear()
+        self._menu_append.clear()
+        self._menu_move_actions = {}
+        self._menu_append_actions = {}
+        for _id in TREE.node_ids:
+            if _id == self.widget_id:
+                continue
+
+            _plugin = TREE.nodes[_id].plugin
+            _label = _plugin.get_param_value("label")
+            _plugin_type = _plugin.plugin_name
+            _name = (
+                f"{_id}: {_label} [{_plugin_type}]"
+                if len(_label) > 0
+                else f"{_id} [{_plugin_type}]"
+            )
+            self._menu_move_actions[_id] = QtWidgets.QAction(_name)
+            self._menu_move.addAction(self._menu_move_actions[_id])
+            self._menu_move_actions[_id].triggered.connect(
+                partial(self._emit_new_parent_signal, _id)
+            )
+            self._menu_append_actions[_id] = QtWidgets.QAction(_name)
+            self._menu_append.addAction(self._menu_append_actions[_id])
+            self._menu_append_actions[_id].triggered.connect(
+                partial(self._emit_create_copy_signal, _id)
+            )
+
+    @QtCore.Slot(int)
+    def _emit_new_parent_signal(self, new_parent_id):
+        """
+        Emit the signal to move the node to a new parent.
+
+        Parameters
+        ----------
+        new_parent_id: int
+            The id of the new parent node.
+        """
+        self.sig_new_node_parent_request.emit(self.widget_id, new_parent_id)
+
+    @QtCore.Slot(int)
+    def _emit_create_copy_signal(self, new_parent_id):
+        """
+        Emit the signal to move the node to a new parent.
+
+        Parameters
+        ----------
+        new_parent_id: int
+            The id of the new parent node.
+        """
+        self.sig_create_copy_request.emit(self.widget_id, new_parent_id)

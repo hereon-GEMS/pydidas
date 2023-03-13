@@ -452,7 +452,6 @@ class TestCompositeCreatorApp(unittest.TestCase):
 
     def test_get_detector_mask__no_file(self):
         app = CompositeCreatorApp()
-        app.q_settings_set_key("user/det_mask", "no/such/file.tif")
         app._store_detector_mask()
         _mask = app._det_mask
         self.assertIsNone(_mask)

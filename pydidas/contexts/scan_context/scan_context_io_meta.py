@@ -30,9 +30,8 @@ from ...core.io_registry import GenericIoMeta
 
 class ScanContextIoMeta(GenericIoMeta):
     """
-    Metaclass for ScanContext exporters and importers which holds the
-    registry with all associated file extensions for imprting/ exporting
-    ExperimentContext.
+    Metaclass for ScanContext exporters and importers which holds the registry with all
+    associated file extensions for importing / exporting the ScanContext.
     """
 
     # need to redefine the registry to have a unique registry for

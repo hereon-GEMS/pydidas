@@ -26,7 +26,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["PyfaiCalibFrame", "get_pyfai_calib_icon_path"]
+__all__ = ["PyfaiCalibFrame"]
 
 import os
 import functools
@@ -45,18 +45,23 @@ from pyFAI.gui.tasks import (
     GeometryTask,
     IntegrationTask,
 )
+from silx.gui.plot.tools import ImageToolBar
 
 from ...core import constants
-from ...widgets import BaseFrame
-from ...contexts import ExperimentContext
+from ...widgets import BaseFrame, silx_plot
+from ...contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 
-def create_calib_tasks():
+def _create_calib_tasks():
     """
     Create the tasks for the calibration.
+
+    This function will also overload the generic tasks and add an CropHistogramOutlier
+    action to the toolbars and change the default file dialog to use the pydidas
+    file  dialog.
 
     Returns
     -------
@@ -71,21 +76,24 @@ def create_calib_tasks():
         GeometryTask.GeometryTask(),
         IntegrationTask.IntegrationTask(),
     ]
+    for _item in ["_imageLoader", "_maskLoader"]:
+        _obj = getattr(tasks[0], _item)
+        _action = silx_plot.PydidasLoadImageAction(_obj, ref=f"PyFAI_calib{_item}")
+        _obj.addAction(_action)
+        _obj.setDefaultAction(_action)
+        _obj.setText("...")
+    for _task in tasks[0:4]:
+        _plot = getattr(_task, f"_{_task.__class__.__name__}__plot")
+        _toolbar = _plot.findChildren(ImageToolBar)[0]
+        _histo_crop_action = silx_plot.CropHistogramOutliers(_plot, parent=_plot)
+        _widget_action = [
+            _action
+            for _action in _toolbar.actions()
+            if isinstance(_action, QtWidgets.QWidgetAction)
+        ][0]
+        _toolbar.addAction(_histo_crop_action)
+        _toolbar.insertAction(_widget_action, _histo_crop_action)
     return tasks
-
-
-def get_pyfai_calib_icon_path():
-    """
-    Get the pyFAI calibration icon.
-
-    Returns
-    -------
-    str
-        The full path and filename for pyFAI calibration icon.
-    """
-    return os.sep.join(
-        [os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"]
-    )
 
 
 class PyfaiCalibFrame(BaseFrame):
@@ -100,14 +108,16 @@ class PyfaiCalibFrame(BaseFrame):
     available.
     """
 
-    menu_icon = "path::" + get_pyfai_calib_icon_path()
+    menu_icon = "path::" + os.path.join(
+        os.path.dirname(pyFAI.__file__), "resources", "gui", "images", "icon.png"
+    )
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
 
     def __init__(self, parent=None, **kwargs):
         BaseFrame.__init__(self, parent, **kwargs)
         self._setup_pyfai_context()
-        self._tasks = create_calib_tasks()
+        self._tasks = _create_calib_tasks()
 
     def _setup_pyfai_context(self):
         """
@@ -224,7 +234,7 @@ class PyfaiCalibFrame(BaseFrame):
     @QtCore.Slot()
     def _store_geometry(self):
         """
-        Store the fitted geometry in the ExperimentContext.
+        Store the fitted geometry in the DiffractionExperimentContext.
         """
         geo = self._model.fittedGeometry()
         det = self._model.experimentSettingsModel().detector()

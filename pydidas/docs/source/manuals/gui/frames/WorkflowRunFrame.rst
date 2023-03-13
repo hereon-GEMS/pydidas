@@ -1,3 +1,5 @@
+.. _workflow_run_frame:
+
 The Run full workflow frame
 ===========================
 
@@ -95,4 +97,3 @@ Data display
 .. include:: ../silx/plot1d.rst
 
 .. include:: ../silx/plot2d.rst
-

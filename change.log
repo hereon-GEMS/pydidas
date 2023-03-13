@@ -1,3 +1,87 @@
+=======
+v23.3.9
+=======
+
+Major changes
+-------------
+- Added a GLOBAL_CONTEXTS dictionary in contexts to have generic access to all
+  contexts and to allow adding contexts in a convenient way.
+- Renamed ExperimentContext to DiffractionExperimentContext to have a clear
+  association and allow adding further experiments.
+
+Improvements
+------------
+- Generalized the plugin processing-plugin subcategories and defined them 
+  in core.constants.constants.
+- Removed a redundant import from main_menu file.
+- Removed quit method definition in the WorkerController and added exit method.
+- Added a typecheck for lists in ObjectWithParameterCollection hash to 
+  convert them to hashable tuples.  
+- Added a new PydidasFileDialog which has buttons for quick access to latest 
+  opened location and to ScanContext base directory.
+- Added the option to add 'permanent' keyword arguments to the SingletonFactory
+- Added the option to add persistent identifiers to file/directory Parameters 
+  to configure their respective FileDialogs.  
+- Added FWHM determination to the core.fitting routines.
+- Added context menus to the nodes in the Workflow edit frame to allow moving
+  and creating copies.
+- Changed the Exception in the GenericIoMeta class to UserConfigError to 
+  improve the user experience when trying to export data with an unsupported
+  file format.
+- Added a standard fontsize property to the PydidasApp in preparation for a 
+  scalable font size in the UI.
+- Changed the default ranges in the FitSinglePeak plugin to None which will
+  default to the full input data range.
+- Added a threshold for low pixel intensities in the 'Crop histogram outliers'
+  action in silx plot.
+- Changed the r/theta coordinate system in the silx plots to mm/deg coordinates
+  to be consistent with pyFAI units.
+- Added CropHistogramOutlier actions to the pyFAI calibration frame.
+- Improved the handling of additional toolbars in the MainWindow.
+- Allowed None in the Sum1D plugin bounds to have no limits.
+- Allowed None in the Sum2D plugin bounds to have no limits.
+- Added a description for the scan dimensions and their ordering.
+- The PydidasFileDialog now allows to show files in a directory without having
+  them selectable.
+- Added axis labels and units to the workflow ResultSelectionWidget.
+- Added the Dataset data unit and data label to metadata in Workflow processing
+  for additional informations.
+- Added a colorbar label to the PydidasPlot2d
+- Improved the FitSinglePeak plugin to give better information about the output.
+  
+Bugfixes
+--------
+- Fixed an issue with the font size in Unix systems.
+- Fixed outdated docstring for FrameLoader plugin class.
+- Fixed an issue with the PluginCollectionBrowser widget which did not filter
+  the sub-categories for processing plugins.
+- Fixed outdated FioMcaLineScanSeriesLoader to work with latest release.
+- Fixed an issue with datatypes in the ImageSeriesOperationsWindow.
+- Fixed issues with Azimuthal sector integration Parameters which were not
+  hashable.
+- Fixed an issue with AppRunner threads sending their finished signal 
+  prematurely on slower cpus.
+- Fixed an issue in the pydidas_gui script when restoring a GUI state which 
+  was invalid.
+- Fixed an issue with importing the Mask file from pyFAI CalibrationContext.
+- Fixed an issue with the FitSinglePeak plugin metadata when the first image
+  was invalid.
+- Fixed an issue where the node labels would not be displayd in the Workflow 
+  tree editor.
+- Fixed an issue with the ParamIoWidgetFile's FileDialog if the corresponding 
+  Parameter value is not a valid path.
+- Added a file exists check to the SubtractBgImage plugin.
+- Fixed an issue with the ExtractAzimuthalSectors plugin when the azimuthal 
+  values did not cover the full 360 degree.
+- Fixed an issue with Hdf5 file loaders when using the same workflow for 
+  processing files with different number of images each in one session.
+- Fixed an issue preventing from resetting Parameter.choices to None.
+- Fixed an issue in Dataset when squeezing multi-dimensional arrays with size 1.
+- Fixed an issue when copying Dataset metadata which would not create new 
+  objects.
+- Fixed an issue when importing results of shape (1,) from Hdf5 files.
+
+
 ========
 v23.1.25
 ========

@@ -115,7 +115,7 @@ class TestEigerScanSeriesLoader(unittest.TestCase):
         plugin.set_param_value("images_per_file", -1)
         plugin.pre_execute()
         self.assertEqual(plugin._image_metadata.final_shape, self._img_shape)
-        self.assertEqual(plugin.get_param_value("images_per_file"), self._n_per_file)
+        self.assertEqual(plugin._config["images_per_file"], self._n_per_file)
 
     def test_execute__no_input(self):
         plugin = COLLECTION.get_plugin_by_name("EigerScanSeriesLoader")(

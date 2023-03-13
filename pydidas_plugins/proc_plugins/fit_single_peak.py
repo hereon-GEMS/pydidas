@@ -71,17 +71,18 @@ class FitSinglePeak(ProcPlugin):
             choices=[
                 "Peak position",
                 "Peak area",
-                "Fit normalized standard deviation",
-                "Peak area and position",
-                "Peak area, position and norm. std",
+                "Peak FWHM",
+                "Peak position; peak area",
+                "Peak position; peak FWHM",
+                "Peak area; peak FWHM",
+                "Peak position; peak area; peak FWHM",
             ],
             name="Output",
             tooltip=(
                 "The output of the fitting plugin. The plugin can either return"
-                " the peak area or the peak position, or both. Alternatively, "
-                "The input data, the fitted data and the residual can be returned"
-                " as well. Note that the fit parameters are always stored in the "
-                "metadata."
+                " the peak area, the peak position or the FWHM. Alternatively, "
+                "any combination of these values can be retured as well. "
+                "Note that the fit parameters are always stored in the metadata."
             ),
         ),
     )
@@ -103,6 +104,7 @@ class FitSinglePeak(ProcPlugin):
         self._config = self._config | {
             "range_slice": None,
             "settings_updated_from_data": False,
+            "data_x_hash": -1,
         }
 
     @property
@@ -207,12 +209,8 @@ class FitSinglePeak(ProcPlugin):
             _index = self._config["param_labels"].index("center")
             self._config["bounds_low"][_index] = np.amin(self._data_x)
             self._config["bounds_high"][_index] = np.amax(self._data_x)
-        if self.get_param_value("output") == "Peak position":
-            self.output_data_unit = self._data.axis_units[0]
-        elif self.get_param_value("output") == "Peak area":
-            _pos_unit = self._data.axis_units[0]
-            _val_unit = self._data.data_unit
-            self.output_data_unit = f"({_pos_unit} * {_val_unit})"
+        self.output_data_unit = self._data.axis_units[0]
+        self.output_data_label = self.get_param_value("output")
         self._config["settings_updated_from_data"] = True
 
     def _crop_data_to_selected_range(self):
@@ -221,10 +219,6 @@ class FitSinglePeak(ProcPlugin):
         x-range and data values.
         """
         _range = self._get_cropped_range()
-        if _range.size < 5:
-            raise UserConfigError(
-                "The data range for the fit is too small with less than 5 data points."
-            )
         self._data_x = self._data_x[_range]
         self._data = self._data[_range]
 
@@ -237,13 +231,33 @@ class FitSinglePeak(ProcPlugin):
         range : np.ndarray
             The index range corresponding to the selected data ranges.
         """
-        if self._config["range_slice"] is not None:
-            return self._config["range_slice"]
-        _xlow = self.get_param_value("fit_lower_limit")
-        _xhigh = self.get_param_value("fit_upper_limit")
-        _range = np.where((self._data_x >= _xlow) & (self._data_x <= _xhigh))[0]
-        self._config["range_slice"] = _range
-        return _range
+        if not (
+            hash(self._data_x.tobytes()) == self._config["data_x_hash"]
+            and self._config["range_slice"] is not None
+        ):
+            _xlow = self.get_param_value("fit_lower_limit")
+            _xhigh = self.get_param_value("fit_upper_limit")
+            self._config["data_x_hash"] = hash(self._data_x.tobytes())
+            _range_low = (
+                np.where((self._data_x >= _xlow))[0]
+                if _xlow is not None
+                else np.arange(self._data_x.size)
+            )
+            _range_high = (
+                np.where((self._data_x <= _xhigh))[0]
+                if _xhigh is not None
+                else np.arange(self._data_x.size)
+            )
+            _range = np.intersect1d(_range_low, _range_high)
+            if _range.size < 5:
+                raise UserConfigError(
+                    "The data range for the fit is too small with less than 5 data "
+                    "points. Please control the selected data range in the "
+                    "FitSinglePeak plugin. The input data range is "
+                    f"[{self._data_x[0]:.5f}, {self._data_x[-1]:.5f}]."
+                )
+            self._config["range_slice"] = slice(_range[0], _range[-1])
+        return self._config["range_slice"]
 
     def _create_result_dataset(self, valid=True):
         """
@@ -275,26 +289,28 @@ class FitSinglePeak(ProcPlugin):
             _datafit = self._fitter.function(_fit_pvals, self._data_x)
             _residual = abs(np.std(self._data - _datafit) / np.mean(self._data))
             _area = self._fitter.area(_fit_pvals)
-        if valid and _residual > self._config["sigma_threshold"]:
-            _new_data = len(self._config["single_result_shape"]) * [np.nan]
-        elif valid and _output == "Peak area":
-            _new_data = [_area]
-        elif valid and _output == "Peak position":
-            _new_data = [self._fit_params["center"]]
-        elif valid and _output == "Peak area and position":
-            _new_data = [_area, self._fit_params["center"]]
-        elif valid and _output == "Fit normalized standard deviation":
-            _new_data = [_residual]
-        elif valid and _output == "Peak area, position and norm. std":
-            _new_data = [_area, self._fit_params["center"], _residual]
+            if _residual > self._config["sigma_threshold"]:
+                _new_data = self._config["single_result_shape"][0] * [np.nan]
+            else:
+                _new_data = []
+                if "position" in _output:
+                    _new_data.append(self._fit_params["center"])
+                if "area" in _output:
+                    _new_data.append(_area)
+                if "FWHM" in _output:
+                    _new_data.append(self._fitter.fwhm(_fit_pvals))
         else:
-            _new_data = len(self._config["single_result_shape"]) * [np.nan]
+            _new_data = self._config["single_result_shape"][0] * [np.nan]
+
+        _axis_label = "; ".join(
+            [f"{i}: {_key.strip()}" for i, _key in enumerate(_output.split(";"))]
+        )
         _result_dataset = Dataset(
             _new_data,
             data_label=_output,
-            data_unit="a.u.",
-            axis_labels=[_output],
-            axis_units=[self._data.axis_units[0]],
+            data_unit=self._data.axis_units[0],
+            axis_labels=[_axis_label],
+            axis_units=[""],
         )
         _result_dataset.metadata = self._data.metadata | {
             "fit_func": self._fitter.func_name,
@@ -313,12 +329,16 @@ class FitSinglePeak(ProcPlugin):
         if _output in [
             "Peak area",
             "Peak position",
-            "Fit normalized standard deviation",
+            "Peak FWHM",
         ]:
             self._config["result_shape"] = (1,)
-        elif _output == "Peak area and position":
+        elif _output in [
+            "Peak position; peak area",
+            "Peak position; peak FWHM",
+            "Peak area; peak FWHM",
+        ]:
             self._config["result_shape"] = (2,)
-        elif _output == "Peak area, position and norm. std":
+        elif _output == "Peak position; peak area; peak FWHM":
             self._config["result_shape"] = (3,)
         else:
             raise ValueError("No result shape defined for the selected input")

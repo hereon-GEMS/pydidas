@@ -31,13 +31,13 @@ from silx.gui.plot import Plot2D
 from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin
-from ...contexts import ExperimentContext
+from ...contexts import DiffractionExperimentContext
 from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .utilities import get_2d_silx_plot_ax_settings
 
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -142,8 +142,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.enable_cs_transform(
             data.shape
             == (
-                EXP.get_param_value("detector_npixy"),
-                EXP.get_param_value("detector_npixx"),
+                DIFFRACTION_EXP.get_param_value("detector_npixy"),
+                DIFFRACTION_EXP.get_param_value("detector_npixx"),
             )
         )
         self.update_cs_units(data.axis_units[1], data.axis_units[0])
@@ -165,6 +165,14 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setGraphXLabel(_ax_label[1])
         if title is not None:
             self.setGraphTitle(title)
+        _cbar = self.getColorBarWidget()
+        _legend = ""
+        if len(data.data_label) > 0:
+            _legend += data.data_label
+        if len(data.data_unit) > 0:
+            _legend += f"/ {data.data_unit}"
+        if len(_legend) > 0:
+            _cbar.setLegend(_legend)
 
     def clear_plot(self):
         """

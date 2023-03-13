@@ -23,14 +23,22 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ChangeCanvasToData", "ExpandCanvas", "CropHistogramOutliers"]
+__all__ = [
+    "ChangeCanvasToData",
+    "ExpandCanvas",
+    "CropHistogramOutliers",
+    "PydidasLoadImageAction",
+]
 
 
+from qtpy import QtWidgets, QtCore
 import numpy as np
 import silx.gui.plot
 from silx.gui.plot.actions import PlotAction
 
-from ...core import PydidasQsettingsMixin, utils
+from ...core import PydidasQsettingsMixin, UserConfigError, utils
+from ...data_io import IoMaster, import_data
+from ..file_dialog import PydidasFileDialog
 
 
 class ChangeCanvasToData(PlotAction):
@@ -116,9 +124,12 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     This action will use the global 'histogram_outlier_fraction' QSettings value to
     determine where to limit the histogram and pick the respective value as new upper
     limit.
-    The resolution is 27 bit, implemented in two tiers of 12 bit and 15 bit, respective
-    to the full range of the image. For an Eiger detector, this corresponds to minimal
-    final bins of 32 counts.
+
+    The resolution for the upper limit is 27 bit, implemented in two tiers of 12 bit
+    and 15 bit, respective to the full range of the image. For an Eiger detector, this
+    corresponds to minimal final bins of 32 counts.
+
+    The lower limit is implemented in two tiers of 12 bit
     """
 
     def __init__(self, plot, parent=None):
@@ -126,8 +137,8 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             self,
             plot,
             icon=utils.get_pydidas_qt_icon("silx_crop_histogram.png"),
-            text="Crop histogram outliers",
-            tooltip="Crop the upper histogram outliers",
+            text="Crop colormap histogram outliers",
+            tooltip="Crop the colormap's histogram outliers",
             triggered=self._actionTriggered,
             checkable=False,
             parent=parent,
@@ -139,21 +150,76 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
 
-        _fraction = 1 - self.q_settings_get_value(
-            "user/histogram_outlier_fraction", dtype=float
+        _fraction_low = self.q_settings_get_value(
+            "user/histogram_outlier_fraction_low", dtype=float
         )
+        _fraction_high = 1 - self.q_settings_get_value(
+            "user/histogram_outlier_fraction_high", dtype=float
+        )
+        if _fraction_high - _fraction_low <= 0:
+            raise UserConfigError(
+                "The selected outlier fractions are too large. No data left to display."
+            )
+
         _data = image.getData()
-        _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
-        _cumcounts = np.cumsum(_counts / _data.size)
-        _index_stop = max(1, np.where(_cumcounts <= _fraction)[0].size)
-
-        _counts2, _edges2 = np.histogram(
-            _data, bins=32768, range=(0, _edges[_index_stop])
-        )
-        _cumcounts2 = np.cumsum(_counts2 / _data.size)
-        _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction)[0].size)
-
-        _cmap_limit_high = _edges2[_index_stop2]
-
         colormap = image.getColormap()
-        colormap.setVMax(_cmap_limit_high)
+
+        _cmap_limit_low = None
+        _cmap_limit_high = None
+
+        if _fraction_high < 1:
+            _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
+            _cumcounts = np.cumsum(_counts / _data.size)
+            _index_stop = max(1, np.where(_cumcounts <= _fraction_high)[0].size)
+
+            _counts2, _edges2 = np.histogram(
+                _data, bins=32768, range=(0, _edges[_index_stop])
+            )
+            _cumcounts2 = np.cumsum(_counts2 / _data.size)
+            _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_high)[0].size)
+
+            _cmap_limit_high = _edges2[_index_stop2]
+
+        if _fraction_low > 0:
+            _counts, _edges = np.histogram(_data[np.isfinite(_data)], bins=4096)
+            _cumcounts = np.cumsum(_counts / _data.size)
+            _index_stop = np.where(_fraction_low <= _cumcounts)[0].size
+
+            _counts2, _edges2 = np.histogram(
+                _data, bins=32768, range=(0, _edges[_index_stop])
+            )
+            _cumcounts2 = np.cumsum(_counts2 / _data.size)
+            _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_low)[0].size)
+
+            _cmap_limit_low = _edges2[_index_stop2]
+
+        colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
+
+
+class PydidasLoadImageAction(QtWidgets.QAction):
+    """
+    Action to load an image using the pydidas file dialog.
+
+    This action is used as additional option in the pyFAI calibration widgets.
+    """
+
+    def __init__(self, parent, caption="Select image file", ref=None):
+        QtWidgets.QAction.__init__(self, parent)
+        self.triggered.connect(self.__execute)
+        self._dialog = PydidasFileDialog(
+            caption=caption,
+            dialog_type="open_file",
+            extensions=IoMaster.get_string_of_formats(),
+            qsettings_ref=ref,
+        )
+        self.setText("Use pydidas file dialog")
+
+    @QtCore.Slot()
+    def __execute(self):
+        """
+        Execute the dialog and select a filename.
+        """
+        _filename = self._dialog.get_user_response()
+        if _filename is not None:
+            _image = import_data(_filename)
+            self.parent()._setValue(filename=_filename, data=_image)

@@ -61,7 +61,6 @@ class WorkerController(QtCore.QThread):
 
     sig_progress = QtCore.Signal(float)
     sig_results = QtCore.Signal(object, object)
-    sig_finished = QtCore.Signal()
 
     def __init__(self, n_workers=None, function=None):
         super().__init__()
@@ -336,7 +335,6 @@ class WorkerController(QtCore.QThread):
                 self._cycle_post_run()
             time.sleep(0.001)
         logger.debug("finished worker_controller loop")
-        self.sig_finished.emit()
 
     def _cycle_pre_run(self):
         """
@@ -465,13 +463,16 @@ class WorkerController(QtCore.QThread):
                 return
         raise TimeoutError("Waiting too long for workers to finish.")
 
-    def quit(self):
+    def exit(self, code=None):
         """
-        Call the quit method.
+        Call the exit method.
 
-        This quit method adds shutdown calls to the Queue threads.
+        This exit method adds shutdown calls to the Queue threads.
         """
         for _queue in self._queues.values():
             _queue.close()
             _queue.join_thread()
-        super().quit()
+        if code is not None:
+            super().exit(code)
+        else:
+            super().exit()

@@ -35,10 +35,10 @@ from pydidas.core import (
     get_generic_param_collection,
     UserConfigError,
 )
-from pydidas.contexts import ExperimentContext
+from pydidas.contexts import DiffractionExperimentContext
 
 
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 
 SECTOR_CENTER_PARAM = Parameter(
     "azi_sector_centers",
@@ -112,7 +112,7 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
                     detector=EXP.get_detector(),
                     wavelength=1e-10 * _lambda_in_A,
                 )
-                for _ in range(self._config["sector_centers"].size)
+                for _, _ in enumerate(self._config["sector_centers"])
             ]
         self.load_and_set_mask()
         if self._mask is not None:
@@ -152,8 +152,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
                 "Could not convert the azimuthal sectors to numbers: \n"
                 + _sector_entries
             )
-        self._config["sector_centers"] = np.array(_sectors)
-        self._config["sector_ranges"] = list(
+        self._config["sector_centers"] = tuple(_sectors)
+        self._config["sector_ranges"] = tuple(
             zip(np.array(_sectors) - _delta, np.array(_sectors) + _delta)
         )
 
@@ -177,7 +177,7 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
             )
             for _index, _ai in enumerate(self._ais)
         ]
-        _newdata = np.asarray([_res[0] for _res in _results])
+        _newdata = np.asarray([_res[1] for _res in _results])
         _axranges = [self._config["sector_centers"], _results[0][0]]
         _dataset = Dataset(_newdata, axis_ranges=_axranges, **self._dataset_info)
         return _dataset, kwargs
@@ -193,6 +193,6 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         """
         self._eval_sectors()
         self._config["result_shape"] = (
-            self._config["sector_centers"].size,
+            len(self._config["sector_centers"]),
             self.get_param_value("rad_npoint"),
         )

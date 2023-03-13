@@ -54,6 +54,60 @@ SCAN = ScanContext()
 RESULTS = WorkflowResults()
 
 
+def _get_axis_index_labels(node_id):
+    """
+    Get the indices and axis labels for the selected node ID.
+
+    This function will filter labels of dimensions with length 0 or 1.
+
+    Parameters
+    ----------
+    node_id : int
+        The node ID.
+
+    Returns
+    -------
+    str
+        The node's axis labels.
+    """
+    _node_metadata = RESULTS.get_result_metadata(node_id)
+    _dims = [_dim for _dim, _val in enumerate(RESULTS.shapes[node_id]) if _val > 1]
+    _new_choices = [
+        (
+            f"{_index}: {_node_metadata['axis_labels'][_dim]}"
+            if len(_node_metadata["axis_labels"][_dim]) > 0
+            else f"{_index}"
+        )
+        for _index, _dim in enumerate(_dims)
+    ]
+    return _new_choices
+
+
+def _get_axis_labels_and_units(node_id):
+    """
+    Get the axis labels and units
+
+    Parameters
+    ----------
+    node_id : int
+        The node ID
+
+    Returns
+    -------
+    list
+        A list with pair entries for label and unit.
+    """
+    if node_id == -1:
+        return [[]]
+    _node_metadata = RESULTS.get_result_metadata(node_id)
+    _dims = [_dim for _dim, _val in enumerate(RESULTS.shapes[node_id]) if _val > 1]
+    _labels_and_units = [
+        [_node_metadata["axis_labels"][_dim], _node_metadata["axis_units"][_dim]]
+        for _dim in _dims
+    ]
+    return _labels_and_units
+
+
 def _param_widget_config(param_key):
     """
     Get Formatting options for create_param_widget instances.
@@ -63,18 +117,50 @@ def _param_widget_config(param_key):
             linebreak=True,
             halign_text=QtCore.Qt.AlignLeft,
             valign_text=QtCore.Qt.AlignBottom,
-            width_total=CONFIG_WIDGET_WIDTH - 10,
+            width_total=CONFIG_WIDGET_WIDTH,
             width_io=CONFIG_WIDGET_WIDTH - 50,
             width_text=CONFIG_WIDGET_WIDTH - 20,
             width_unit=0,
         )
     return dict(
-        width_io=100,
-        width_unit=0,
-        width_text=CONFIG_WIDGET_WIDTH - 100,
-        width_total=CONFIG_WIDGET_WIDTH - 10,
+        width_io=110 if param_key in ["plot_ax1", "plot_ax2"] else 80,
+        width_unit=0 if param_key in ["plot_ax1", "plot_ax2"] else 25,
+        width_text=CONFIG_WIDGET_WIDTH - 110,
+        width_total=CONFIG_WIDGET_WIDTH,
         visible=False,
     )
+
+
+def _update_choices(param, combobox, new_choices):
+    """
+    Update the choices for the given Parameter.
+
+    This function will update the choices and also set the
+
+    Parameters
+    ----------
+    param : pydidas.core.Parameter
+        The pydidas Parameter.
+    widget : QComboBox
+        The associated combo box.
+    new_choices : list
+        The list of new choices.
+    """
+    if len(new_choices) == 0:
+        param.choices = None
+        param.value = ""
+    else:
+        param.choices = None
+        param.value = new_choices[0]
+        param.choices = new_choices
+    combobox.setEnabled(len(new_choices) != 0)
+    with SignalBlocker(combobox):
+        if len(new_choices) == 0:
+            combobox.update_choices([""])
+            combobox.setCurrentText("")
+            return
+        combobox.update_choices(new_choices)
+        combobox.setCurrentText(new_choices[0])
 
 
 class ResultSelectionWidget(
@@ -124,8 +210,8 @@ class ResultSelectionWidget(
 
     default_params = ParameterCollection(
         get_generic_parameter("selected_results"),
-        Parameter("plot_ax1", int, 0, name="Data axis no. 1 for plot", choices=[0]),
-        Parameter("plot_ax2", int, 1, name="Data axis no. 2 for plot", choices=[0, 1]),
+        Parameter("plot_ax1", str, "", name="Data axis no. 1 for plot", choices=[""]),
+        Parameter("plot_ax2", str, "", name="Data axis no. 2 for plot", choices=[""]),
         get_generic_parameter("use_scan_timeline"),
     )
 
@@ -200,9 +286,7 @@ class ResultSelectionWidget(
             title="Data selection:",
             fixedWidth=CONFIG_WIDGET_WIDTH - 10,
         )
-        _w = QtWidgets.QFrame()
-        _w.setLayout(QtWidgets.QGridLayout())
-        self.add_any_widget("plot_ax_group", _w)
+        self.create_empty_widget("plot_ax_group")
         self.create_param_widget(
             self.get_param("plot_ax1"),
             parent_widget=self._widgets["plot_ax_group"],
@@ -236,10 +320,10 @@ class ResultSelectionWidget(
         self._widgets["radio_data_selection"].new_button_label.connect(
             self.__modify_data_selection
         )
-        self.param_widgets["plot_ax1"].currentIndexChanged.connect(
+        self.param_widgets["plot_ax1"].currentTextChanged.connect(
             partial(self.__selected_new_plot_axis, 1)
         )
-        self.param_widgets["plot_ax2"].currentIndexChanged.connect(
+        self.param_widgets["plot_ax2"].currentTextChanged.connect(
             partial(self.__selected_new_plot_axis, 2)
         )
         self._widgets["but_confirm"].clicked.connect(self.__confirm_selection)
@@ -290,11 +374,11 @@ class ResultSelectionWidget(
             The index of the dimension selection.
         """
         self._config["plot_type"] = label
-        self.__change_slice_param_widget_visibility()
+        self.__update_slice_param_widgets()
 
-    def __change_slice_param_widget_visibility(self, hide_all=False):
+    def __update_slice_param_widgets(self, hide_all=False):
         """
-        Change the visibility of Parameter selection widgets for the slice
+        Change the visibility and text of Parameter selection widgets for the slice
         dimensions in the dataset.
 
         Parameters
@@ -306,18 +390,30 @@ class ResultSelectionWidget(
         self.param_composite_widgets["plot_ax1"].setVisible(_ax1_used and not hide_all)
         self.param_composite_widgets["plot_ax2"].setVisible(_ax2_used and not hide_all)
         _frozendims = []
-        if _ax1_used:
-            _frozendims.append(self.get_param_value("plot_ax1"))
-        if _ax2_used:
-            _frozendims.append(self.get_param_value("plot_ax2"))
+        _labels_and_units = _get_axis_labels_and_units(self._active_node)
+        if _ax1_used and self._config["result_ndim"] > 0:
+            _frozendims.append(int(self.get_param_value("plot_ax1").split(":")[0]))
+        if _ax2_used and self._config["result_ndim"] > 0:
+            _frozendims.append(int(self.get_param_value("plot_ax2").split(":")[0]))
         for _dim in range(self._config["n_slice_params"]):
             _refkey = f"plot_slice_{_dim}"
+            _composite_widget = self.param_composite_widgets[_refkey]
             _vis = (
                 False
                 if hide_all
                 else (_dim < self._config["result_ndim"] and _dim not in _frozendims)
             )
-            self.param_composite_widgets[_refkey].setVisible(_vis)
+            _composite_widget.setVisible(_vis)
+            if _dim < self._config["result_ndim"] and self._active_node != -1:
+                _label, _unit = _labels_and_units[_dim]
+                _label = _label[:6] + "..." if len(_label) > 6 else _label
+                _composite_widget.name_widget.setText(
+                    f"Slice of data dim #{_dim}"
+                    + (f" ({_label})" if len(_label) > 0 else "")
+                )
+                _composite_widget.unit_widget.setText(
+                    _unit if self._config["selection_by_data_values"] else ""
+                )
 
     def __are_axes_used(self):
         """
@@ -357,6 +453,7 @@ class ResultSelectionWidget(
         for _dim in range(self._config["n_slice_params"]):
             _refkey = f"plot_slice_{_dim}"
             self.param_widgets[_refkey].setValidator(self._config["validator"])
+        self.__update_slice_param_widgets()
 
     @QtCore.Slot(int)
     def __selected_new_node(self, index):
@@ -378,9 +475,9 @@ class ResultSelectionWidget(
             )
             self._selector.select_active_node(self._active_node)
             self.__calc_and_store_ndim_of_results()
+            self.__update_dim_choices_for_plot_selection()
             self.__update_text_description_of_node_results()
             self.__enable_valid_result_plot_selection()
-            self.__update_dim_choices_for_plot_selection()
             self.__check_and_create_params_for_slice_selection()
 
     def __set_derived_widget_visibility(self, visible):
@@ -405,7 +502,7 @@ class ResultSelectionWidget(
             visible and (self._config["plot_type"] == 2)
         )
         self._widgets["but_confirm"].setVisible(visible)
-        self.__change_slice_param_widget_visibility(hide_all=not visible)
+        self.__update_slice_param_widgets(hide_all=not visible)
 
     def __calc_and_store_ndim_of_results(self):
         """
@@ -439,6 +536,10 @@ class ResultSelectionWidget(
         accordingly.
         """
         _group = self._widgets["radio_plot_type"]
+        _not_zero_dim = self._config["result_ndim"] > 0
+        _group.setEnabled(_not_zero_dim)
+        self._widgets["radio_data_selection"].setEnabled(_not_zero_dim)
+        self._widgets["but_confirm"].setEnabled(_not_zero_dim)
         if self._config["result_ndim"] == 1:
             self._config["plot_type"] = "1D plot"
             _group.select_by_index(0)
@@ -466,7 +567,7 @@ class ResultSelectionWidget(
         self.__calc_and_store_ndim_of_results()
         self.__update_text_description_of_node_results()
         self.__update_dim_choices_for_plot_selection()
-        self.__change_slice_param_widget_visibility()
+        self.__update_slice_param_widgets()
 
     @QtCore.Slot(int, str)
     def __selected_new_plot_axis(self, plot_axis, new_dim):
@@ -483,7 +584,7 @@ class ResultSelectionWidget(
         """
         # get the other axis (1, 2) from the input axis:
         _other_ax = 3 - plot_axis % 3
-        new_dim = int(new_dim)
+        # new_dim = int(new_dim.split(":")[0])
         _selected_param = self.params[f"plot_ax{plot_axis}"]
         _selected_param.value = new_dim
         self.param_widgets[f"plot_ax{plot_axis}"].set_value(_selected_param.value)
@@ -495,7 +596,7 @@ class ResultSelectionWidget(
             else:
                 _other_param.value = _other_param.choices[0]
             self.param_widgets[f"plot_ax{_other_ax}"].set_value(_other_param.value)
-        self.__change_slice_param_widget_visibility()
+        self.__update_slice_param_widgets()
 
     @QtCore.Slot()
     def __confirm_selection(self):
@@ -543,14 +644,13 @@ class ResultSelectionWidget(
         list
             The active dimensions in form of integer entries.
         """
+        _active_dim1 = int(self.get_param_value("plot_ax1").split(":")[0])
         if self._config["plot_type"] in ["1D plot", "group of 1D plots"]:
-            _active_dim = self.get_param_value("plot_ax1")
-            self._selector.set_param_value(f"data_slice_{_active_dim}", ":")
-            return [_active_dim]
-        if self._config["plot_type"] == "2D full axes":
-            _active_dim1 = self.get_param_value("plot_ax1")
             self._selector.set_param_value(f"data_slice_{_active_dim1}", ":")
-            _active_dim2 = self.get_param_value("plot_ax2")
+            return [_active_dim1]
+        if self._config["plot_type"] == "2D full axes":
+            self._selector.set_param_value(f"data_slice_{_active_dim1}", ":")
+            _active_dim2 = int(self.get_param_value("plot_ax2").split(":")[0])
             self._selector.set_param_value(f"data_slice_{_active_dim2}", ":")
             return [_active_dim1, _active_dim2]
         if self._config["plot_type"] == "2D data subset":
@@ -562,18 +662,11 @@ class ResultSelectionWidget(
         Calculate and update the basic dimension choices for the plot
         slicing.
         """
-        _new_choices = list(np.arange((self._config["result_ndim"])))
+        _new_choices = _get_axis_index_labels(self._active_node)
         for _ax in [1, 2]:
             _axwidget = self.param_widgets[f"plot_ax{_ax}"]
             _axparam = self.params[f"plot_ax{_ax}"]
-            _curr_choices = _axparam.choices
-            if _axparam.value not in _new_choices:
-                _axparam.choices = _curr_choices + [_new_choices[0]]
-                _axparam.value = _new_choices[0]
-            _axparam.choices = _new_choices
-            with SignalBlocker(_axwidget):
-                _axwidget.update_choices(_new_choices)
-                _axwidget.setCurrentIndex(_axparam.value)
+            _update_choices(_axparam, _axwidget, _new_choices)
         if (
             self.params.values_equal("plot_ax1", "plot_ax2")
             and self._config["result_ndim"] > 1
@@ -614,4 +707,4 @@ class ResultSelectionWidget(
         self._config["n_slice_params"] = max(
             self._config["n_slice_params"], RESULTS.ndims[self._active_node]
         )
-        self.__change_slice_param_widget_visibility()
+        self.__update_slice_param_widgets()

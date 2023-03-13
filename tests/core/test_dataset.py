@@ -422,6 +422,24 @@ class TestDataset(unittest.TestCase):
             self.assertTrue(np.allclose(obj.axis_ranges[_i1], _new.axis_ranges[_i2]))
         self.assertTrue(np.allclose(obj[0, 0, 0, 0], _new[0, 0]))
 
+    def test_squeeze__multi_dims_of_len_1(self):
+        obj = Dataset(
+            np.random.random((1, 1, 7, 1, 1)),
+            axis_labels=[0, 1, 2, 3, 4],
+            axis_units=["a", "b", "c", "d", "e"],
+            axis_ranges=[[1], [3], np.arange(7), [2], [42]],
+        )
+        _new = np.squeeze(obj)
+        self.assertEqual(obj.axis_labels[2], _new.axis_labels[0])
+        self.assertEqual(obj.axis_units[2], _new.axis_units[0])
+        self.assertTrue(np.allclose(obj.axis_ranges[2], _new.axis_ranges[0]))
+        self.assertTrue(np.allclose(obj[0, 0, :, 0, 0], _new))
+
+    def test_squeeze__multi_dim_size_1(self):
+        obj = Dataset([[[[42]]]])
+        _new = np.squeeze(obj)
+        self.assertEqual(42, _new[0])
+
     def test_squeeze__multi_dim_with_None_range(self):
         obj = Dataset(
             np.random.random((6, 1, 7, 1, 9)),
@@ -928,6 +946,13 @@ class TestDataset(unittest.TestCase):
                     self.assertEqual(_local_item, _target[_local_key])
             else:
                 self.assertEqual(_item, _target)
+
+    def test_copy_dataset__update_ax_label(self):
+        _array = np.random.random((10, 10, 10))
+        obj = Dataset(_array, axis_ranges=[0, 1, 2], axis_labels=["a", "b", "c"])
+        obj2 = obj.copy()
+        obj2.update_axis_labels(2, "new")
+        self.assertEqual(obj.axis_labels[2], "c")
 
     def test_hash(self):
         obj = Dataset(np.zeros((10, 10, 10)), axis_ranges=[0, 1, 2])

@@ -87,7 +87,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
                 datasetKeyFilters if datasetKeyFilters is not None else DEFAULT_FILTERS
             ),
         )
-        self.flags = dict(slotActive=False, autoUpdate=0)
+        self.flags = dict(slotActive=False, autoUpdate=True)
         self._widgets["viewer"] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()
@@ -152,7 +152,10 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
             alignment=QtCore.Qt.AlignRight | QtCore.Qt.AlignTop,
         )
         self.create_check_box(
-            "auto_update", "Auto update", gridPos=(3 + _row_offset, 0, 1, 2)
+            "auto_update",
+            "Auto update",
+            gridPos=(3 + _row_offset, 0, 1, 2),
+            checked=True,
         )
         self.setVisible(False)
 
@@ -335,6 +338,7 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         """
         self._config["currentFname"] = name
         self.__populate_dataset_list()
+        self.__update(True)
 
     def _index_changed(self, index):
         """

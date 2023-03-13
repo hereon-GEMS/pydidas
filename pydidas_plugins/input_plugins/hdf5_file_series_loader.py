@@ -74,16 +74,23 @@ class Hdf5fileSeriesLoader(InputPlugin):
     input_data_dim = None
     output_data_dim = 2
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._config["images_per_file"] = -1
+
     def pre_execute(self):
         """
         Prepare loading images from a file series.
         """
         InputPlugin.pre_execute(self)
-        if self.get_param_value("images_per_file") == -1:
+        _i_per_file = self.get_param_value("images_per_file")
+        if _i_per_file == -1:
             _n_per_file = get_hdf5_metadata(
                 self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
             )[0]
-            self.set_param_value("images_per_file", _n_per_file)
+            self._config["images_per_file"] = _n_per_file
+        else:
+            self._config["images_per_file"] = _i_per_file
 
     def get_frame(self, frame_index, **kwargs):
         """
@@ -103,7 +110,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
             The image data.
         """
         _fname = self.get_filename(frame_index)
-        _hdf_index = frame_index % self.get_param_value("images_per_file")
+        _hdf_index = frame_index % self._config["images_per_file"]
         kwargs["dataset"] = self.get_param_value("hdf5_key")
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
@@ -124,7 +131,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
                 "pre_execute has not been called for Hdf5FileSeriesLoader and no "
                 "filename generator has been created."
             )
-        _images_per_file = self.get_param_value("images_per_file")
+        _images_per_file = self._config["images_per_file"]
         _i_file = (frame_index // _images_per_file) * self.get_param_value(
             "file_stepping"
         ) + SCAN.get_param_value("scan_start_index")

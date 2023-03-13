@@ -101,7 +101,9 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
             gridPos=(0, 2, 2, 1),
         )
-        self.create_button("button_okay", "OK", gridPos=(2, 2, 1, 1), fixdWidth=150)
+        self.create_button(
+            "button_okay", "Acknowledge", gridPos=(2, 2, 1, 1), fixdWidth=150
+        )
 
         self._widgets["button_okay"].clicked.connect(self.close)
         self._widgets["button_copy"].clicked.connect(

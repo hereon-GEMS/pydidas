@@ -1,6 +1,8 @@
 pydidas
 =======
 
+|zenodo_DOI|
+
 pydidas (the Python DIffraction Data Analysis Suite) is a toolkit for
 the analysis of diffraction datasets, both live at beamlines and
 offline for in-depth analysis.
@@ -68,7 +70,7 @@ Referencing pydidas
 
 For the full citation  information of pydidas, please see the CITATION.cff file.
 
-Pydidas can also be cited by its DOI on zenodo: 10.5281/zenodo.7568392 |zenodo DOI|
+Pydidas can also be cited by its DOI on zenodo: 10.5281/zenodo.7568392 |zenodo_DOI|
 
 
 License
@@ -77,3 +79,6 @@ License
 pydidas is released under the GNU General Public License Version 3. A copy
 of the full license is provided with the pydidas. For more information on the
 individual files, please refer to the LICENSE.md file.
+
+
+.. |zenodo_DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7568611.svg

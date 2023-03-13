@@ -133,7 +133,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         )
         for _param in [
             "image_selection",
-            "image_num",
+            "frame_index",
             "scan_index1",
             "scan_index2",
             "scan_index3",

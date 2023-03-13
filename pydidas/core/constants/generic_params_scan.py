@@ -128,8 +128,11 @@ GENERIC_PARAMS_SCAN = (
             "unit": "",
             "allow_None": False,
             "tooltip": (
-                "The number of images acquired at each scan point. The default of '1' "
-                "corresponds to one image per scan point."
+                "The number of images acquired at *each* scan point. The default of "
+                "'1' corresponds to one image per scan point. Please note that the "
+                "value for the multiplicity will be multiplied with the number of scan "
+                "points. If this setting is used for 'averaging' images, please reduce "
+                "the number of scan points correspondingly."
             ),
         },
     }
@@ -156,7 +159,10 @@ GENERIC_PARAMS_SCAN = (
             "choices": None,
             "unit": "",
             "allow_None": False,
-            "tooltip": f"The number of scan points in scan direction {_index}.",
+            "tooltip": (
+                f"The total number of scan points in scan direction {_index}. The "
+                "number of points is one higher than the number of intervals."
+            ),
         }
         for _index in range(4)
     }

@@ -395,6 +395,9 @@ class Parameter:
             If the current Parameter value is not included in the list of
             new choices.
         """
+        if choices is None:
+            self.__meta["choices"] = None
+            return
         if not isinstance(choices, (list, tuple, set)):
             raise TypeError("New choices must be a list, set or tuple.")
         for _c in choices:

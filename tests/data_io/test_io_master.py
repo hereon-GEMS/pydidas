@@ -26,7 +26,7 @@ import unittest
 
 import numpy as np
 
-from pydidas.core import utils
+from pydidas.core import utils, UserConfigError
 from pydidas.data_io import IoMaster
 
 
@@ -137,7 +137,7 @@ class TestIoMaster(unittest.TestCase):
     def test_verify_extension_is_registered_import_error(self):
         for _mode in ["import", "export"]:
             with self.subTest():
-                with self.assertRaises(KeyError):
+                with self.assertRaises(UserConfigError):
                     IoMaster.verify_extension_is_registered("something", mode=_mode)
 
     def test_get_string_of_formats__empty(self):

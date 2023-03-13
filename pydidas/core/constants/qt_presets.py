@@ -42,10 +42,14 @@ __all__ = [
     "EXP_FIX_POLICY",
 ]
 
+import platform
+
 from qtpy import QtGui, QtCore, QtWidgets
 
-
-STANDARD_FONT_SIZE = 10
+if platform.system() == "Windows":
+    STANDARD_FONT_SIZE = 10
+else:
+    STANDARD_FONT_SIZE = 8
 
 QT_STYLES = {
     "title": "QWidget {font: bold; font-size: " + f"{STANDARD_FONT_SIZE + 4}" + "pt}",

@@ -28,57 +28,8 @@ __all__ = ["Sum2dData"]
 import numpy as np
 
 from pydidas.core.constants import PROC_PLUGIN
-from pydidas.core import Dataset, ParameterCollection, Parameter, get_generic_parameter
+from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.plugins import ProcPlugin
-
-
-SUM2D_DEFAULT_PARAMS = ParameterCollection(
-    get_generic_parameter("type_selection"),
-    Parameter(
-        "lower_limit_y",
-        float,
-        0,
-        name="y-axis lower limit",
-        tooltip=(
-            "The lower limit of data selection in y direction. This point is included "
-            "in the data. Note that the selection is either in indices or data range, "
-            "depending on the value of 'type_selection'."
-        ),
-    ),
-    Parameter(
-        "upper_limit_y",
-        float,
-        0,
-        name="y-axis upper limit",
-        tooltip=(
-            "The upper limit of data selection in y direction. This point is included "
-            "in the data. Note that the selection is either in indices or data range, "
-            "depending on the value of 'type_selection'."
-        ),
-    ),
-    Parameter(
-        "lower_limit_x",
-        float,
-        0,
-        name="x-axis lower limit",
-        tooltip=(
-            "The lower limit of data selection in x direction. This point is included "
-            "in the data. Note that the selection is either in indices or data range, "
-            "depending on the value of 'type_selection'."
-        ),
-    ),
-    Parameter(
-        "upper_limit_x",
-        float,
-        0,
-        name="x-axis upper limit",
-        tooltip=(
-            "The upper limit of data selection in x direction. This point is included "
-            "in the data. Note that the selection is either in indices or data range, "
-            "depending on the value of 'type_selection'."
-        ),
-    ),
-)
 
 
 class Sum2dData(ProcPlugin):
@@ -89,7 +40,13 @@ class Sum2dData(ProcPlugin):
     plugin_name = "Sum 2D data"
     basic_plugin = False
     plugin_type = PROC_PLUGIN
-    default_params = SUM2D_DEFAULT_PARAMS
+    default_params = get_generic_param_collection(
+        "type_selection",
+        "lower_limit_ax0",
+        "upper_limit_ax0",
+        "lower_limit_ax1",
+        "upper_limit_ax1",
+    )
     input_data_dim = 2
     output_data_dim = 0
     output_data_label = "data sum (2d)"
@@ -119,7 +76,7 @@ class Sum2dData(ProcPlugin):
             Any calling kwargs, appended by any changes in the function.
         """
         self._data = data
-        _selection = self._data[self._get_index_range("y"), self._get_index_range("x")]
+        _selection = self._data[self._get_index_ranges()]
         _sum = np.sum(_selection)
         _new_data = Dataset(
             [_sum],
@@ -131,7 +88,7 @@ class Sum2dData(ProcPlugin):
         )
         return _new_data, kwargs
 
-    def _get_index_range(self, axis):
+    def _get_index_ranges(self):
         """
         Get the indices for the selected data range.
 
@@ -145,19 +102,54 @@ class Sum2dData(ProcPlugin):
         slice
             The slice object to select the range from the input data.
         """
-        _low = self.get_param_value(f"lower_limit_{axis}")
-        _high = self.get_param_value(f"upper_limit_{axis}")
-        if self.get_param_value("type_selection") == "Indices":
-            return slice(int(_low), int(_high) + 1)
-        _x = self._data.axis_ranges[axis == "x"]
-        assert isinstance(_x, np.ndarray), (
-            "The data does not have a correct range and using the data range "
-            "for selection is only available using the indices."
+        _slices = []
+        for _ax in [0, 1]:
+            if self.get_param_value("type_selection") == "Indices":
+                _low, _high = self._get_axis_range(_ax, 0, self._data.shape[_ax])
+                _slices.append(slice(int(_low), int(_high) + 1))
+            else:
+                _x = self._data.axis_ranges[_ax]
+                assert isinstance(_x, np.ndarray), (
+                    "The data does not have a correct range and using the data range "
+                    "for selection is only available using the indices."
+                )
+                _low, _high = self._get_axis_range(_ax, _x[0], _x[-1])
+                _bounds = np.where((_x >= _low) & (_x <= _high))[0]
+                if _bounds.size == 0:
+                    _slices.append(slice(0, 0))
+                else:
+                    _slices.append(slice(_bounds[0], _bounds[-1] + 1))
+        return tuple(_slices)
+
+    def _get_axis_range(self, axis, default_low, default_high):
+        """
+        Get the range for the selected axis.
+
+        Parameters
+        ----------
+        axis : int
+            The axis numbe.
+        default_low : float
+            The default value in case the lower limit is None.
+        default_high : float
+            The default value in case the lower limit is None.
+
+        Returns
+        -------
+        tuple
+            The axis bounds
+        """
+        _low = (
+            self.get_param_value(f"lower_limit_ax{axis}")
+            if self.get_param_value(f"lower_limit_ax{axis}") is not None
+            else default_low
         )
-        _bounds = np.where((_x >= _low) & (_x <= _high))[0]
-        if _bounds.size == 0:
-            return slice(0, 0)
-        return slice(_bounds[0], _bounds[-1] + 1)
+        _high = (
+            self.get_param_value(f"upper_limit_ax{axis}")
+            if self.get_param_value(f"upper_limit_ax{axis}") is not None
+            else default_high
+        )
+        return (_low, _high)
 
     def calculate_result_shape(self):
         """

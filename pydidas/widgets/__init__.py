@@ -52,6 +52,7 @@ __all__.extend(["CreateWidgetsMixIn"])
 # import __all__ items from modules:
 from .base_frame import *
 from .base_frame_with_app import *
+from .file_dialog import *
 from .info_widget import *
 from .pydidas_frame_stack import *
 from .qta_button import *
@@ -70,6 +71,11 @@ from . import base_frame_with_app
 
 __all__.extend(base_frame_with_app.__all__)
 del base_frame_with_app
+
+from . import file_dialog
+
+__all__.extend(file_dialog.__all__)
+del file_dialog
 
 from . import info_widget
 

@@ -29,7 +29,7 @@ import os
 import h5py
 import numpy as np
 
-from ...contexts import ExperimentContext, ScanContext
+from ...contexts import DiffractionExperimentContext, ScanContext
 from ...core import Dataset
 from ...core.utils import create_hdf5_dataset, read_and_decode_hdf5_dataset
 from ...core.constants import HDF5_EXTENSIONS, SCAN_GENERIC_PARAM_NAMES
@@ -38,7 +38,7 @@ from .workflow_result_io_base import WorkflowResultIoBase
 
 
 TREE = WorkflowTree()
-EXP = ExperimentContext()
+DIFFRACTION_EXP = DiffractionExperimentContext()
 SCAN = ScanContext()
 
 
@@ -118,17 +118,17 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             [
                 "entry/instrument/detector",
                 "x_pixel_size",
-                {"data": EXP.get_param_value("detector_pxsizex")},
+                {"data": DIFFRACTION_EXP.get_param_value("detector_pxsizex")},
             ],
             [
                 "entry/instrument/detector",
                 "y_pixel_size",
-                {"data": EXP.get_param_value("detector_pxsizey")},
+                {"data": DIFFRACTION_EXP.get_param_value("detector_pxsizey")},
             ],
             [
                 "entry/instrument/detector",
                 "distance",
-                {"data": EXP.get_param_value("detector_dist")},
+                {"data": DIFFRACTION_EXP.get_param_value("detector_dist")},
             ],
             ["entry/data", "data", {"shape": cls.get_node_attribute(node_id, "shape")}],
         ]
@@ -354,7 +354,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
                     "unit": _unit,
                     "n_points": _data.shape[_dim],
                 }
-                if isinstance(_range, np.ndarray):
+                if isinstance(_range, np.ndarray) and _range.size > 1:
                     _scandim = _scandim | {
                         "delta": _range[1] - _range[0],
                         "offset": _range[0],

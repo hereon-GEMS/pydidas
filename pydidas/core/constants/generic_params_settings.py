@@ -156,17 +156,29 @@ GENERIC_PARAMS_SETTINGS = {
             " will prevent multiple frequent update of plots."
         ),
     },
-    "histogram_outlier_fraction": {
+    "histogram_outlier_fraction_high": {
         "type": float,
         "default": 0.07,
-        "name": "Histogram outlier fraction",
+        "name": "Histogram outlier fraction (high)",
         "choices": None,
         "allow_None": False,
         "unit": "",
         "tooltip": (
-            "The fraction of pixels which will be ignored when cropping the "
-            "histogram for 2d plots. A value of 0.07 will mask all sensor gaps in "
-            "the Eiger."
+            "The fraction of pixels with high values which will be ignored when "
+            "cropping the histogram for 2d plots. A value of 0.07 will mask all sensor "
+            "gaps in the Eiger detector."
+        ),
+    },
+    "histogram_outlier_fraction_low": {
+        "type": float,
+        "default": 0.02,
+        "name": "Histogram outlier fraction (low)",
+        "choices": None,
+        "allow_None": False,
+        "unit": "",
+        "tooltip": (
+            "The fraction of pixels with low values which will be ignored when "
+            "cropping the histogram for 2d plots. "
         ),
     },
 }

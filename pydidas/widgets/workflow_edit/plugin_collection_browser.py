@@ -27,6 +27,7 @@ __all__ = ["PluginCollectionBrowser"]
 
 from qtpy import QtWidgets, QtCore
 
+from ...core.constants import PROC_PLUGIN_TYPE_NAMES
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
 from ..read_only_text_widget import ReadOnlyTextWidget
@@ -105,7 +106,12 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the selected plugin.
         """
-        if name in ["Input plugins", "Processing plugins", "Output plugins"]:
+        if name in [
+            "Input plugins",
+            "Processing plugins",
+            "Output plugins",
+            *list(PROC_PLUGIN_TYPE_NAMES.values()),
+        ]:
             return
         self.sig_add_plugin_to_tree.emit(name)
 
@@ -119,7 +125,12 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         name : str
             The name of the plugin.
         """
-        if name in ["Input plugins", "Processing plugins", "Output plugins"]:
+        if name in [
+            "Input plugins",
+            "Processing plugins",
+            "Output plugins",
+            *list(PROC_PLUGIN_TYPE_NAMES.values()),
+        ]:
             return
         _p = self.collection.get_plugin_by_plugin_name(name)
         self._widgets["plugin_description"].setTextFromDict(

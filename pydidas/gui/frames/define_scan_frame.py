@@ -27,12 +27,13 @@ __all__ = ["DefineScanFrame"]
 
 from functools import partial
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
-from ...contexts import PydidasFileDialog
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
+from ...widgets import PydidasFileDialog
 from ...workflow import WorkflowTree
+from ..windows import ScanDimensionInformationWindow
 from .builders import DefineScanFrameBuilder
 
 SCAN = ScanContext()
@@ -40,31 +41,50 @@ PLUGINS = PluginCollection()
 WORKFLOW = WorkflowTree()
 
 
+DIM_LABELS = {
+    1: {i: "\nScan dimension 1:" for i in range(4)},
+    2: {0: "\nScan dimension 1 (slow):", 1: "\nScan dimension 2 (fast):"},
+    3: {
+        0: "\nScan dimension 1 (slowest):",
+        1: "\nScan dimension 2:",
+        2: "\nScan dimension 3 (fastest):",
+    },
+    4: {
+        0: "\nScan dimension 1 (slowest):",
+        1: "\nScan dimension 2:",
+        2: "\nScan dimension 3:",
+        3: "\nScan dimension 4 (fastest):",
+    },
+}
+
+
 class DefineScanFrame(DefineScanFrameBuilder):
     """
     Frame for managing the global scan setup.
     """
 
-    menu_icon = "qta::ei.move"
-    menu_title = "Define Scan"
+    menu_icon = "pydidas::frame_icon_define_scan.png"
+    menu_title = "Define\nScan"
     menu_entry = "Workflow processing/Define scan"
 
     def __init__(self, parent=None, **kwargs):
         DefineScanFrameBuilder.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
-            self,
+            parent=self,
+            dialog_type="open_file",
             caption="Import scan context file",
             formats=ScanContextIoMeta.get_string_of_formats(),
-            dialog=QtWidgets.QFileDialog.getOpenFileName,
             qsettings_ref="DefineScanFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
-            self,
-            "Export scan context file",
-            ScanContextIoMeta.get_string_of_formats(),
-            QtWidgets.QFileDialog.getSaveFileName,
+            parent=self,
+            dialog_type="save_file",
+            caption="Export scan context file",
+            formats=ScanContextIoMeta.get_string_of_formats(),
             qsettings_ref="DefineScanFrame__export",
         )
+        self.__app = QtWidgets.QApplication.instance()
+        self.__info_window = ScanDimensionInformationWindow()
 
     def connect_signals(self):
         """
@@ -73,6 +93,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
         self._widgets["but_save"].clicked.connect(self.export_to_file)
         self._widgets["but_load"].clicked.connect(self.load_from_file)
         self._widgets["but_reset"].clicked.connect(self.reset_entries)
+        self._widgets["but_more_scan_dim_info"].clicked.connect(self._show_info_window)
         self.param_widgets["scan_dim"].currentTextChanged.connect(
             self.update_dim_visibility
         )
@@ -86,11 +107,13 @@ class DefineScanFrame(DefineScanFrameBuilder):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
+        self.__app.sig_close_gui.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """
         Finalize the UI initialization.
         """
+        self.__info_window.frame_activated(self.__info_window.frame_index)
         self.update_dim_visibility()
         for param in SCAN.params.values():
             self.param_widgets[param.refkey].set_value(param.value)
@@ -115,6 +138,8 @@ class DefineScanFrame(DefineScanFrameBuilder):
             self._widgets[f"button_down_{i}"].setVisible(i < _dim - 1)
             for _pre in _prefixes:
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
+            if i in DIM_LABELS[_dim].keys():
+                self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
 
     @QtCore.Slot()
     def load_from_file(self):
@@ -123,9 +148,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
 
         This method will open a QFileDialog to select the file to be read.
         """
-        fname = self.__import_dialog.get_user_response()
-        if fname != "":
-            SCAN.import_from_file(fname)
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is not None:
+            SCAN.import_from_file(_fname)
             for param in SCAN.params.values():
                 self.param_widgets[param.refkey].set_value(param.value)
 
@@ -137,9 +162,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
         This method will open a QFileDialog to select a filename for the
         file in which the information shall be written.
         """
-        fname = self.__export_dialog.get_user_response()
-        if fname != "":
-            SCAN.export_to_file(fname, overwrite=True)
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is not None:
+            SCAN.export_to_file(_fname, overwrite=True)
 
     @QtCore.Slot()
     def reset_entries(self):
@@ -195,3 +220,11 @@ class DefineScanFrame(DefineScanFrameBuilder):
             The new base directory
         """
         self.param_widgets["scan_name_pattern"].io_dialog.set_curr_dir(basedir)
+
+    @QtCore.Slot()
+    def _show_info_window(self):
+        """
+        Show the information window about scan dimensions.
+        """
+        self.__info_window.show()
+        self.__info_window.raise_()

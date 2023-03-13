@@ -16,11 +16,12 @@ the most important objects in pydidas as it allows to process workflows. Note
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
 but by the global objects for 
 :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
-:py:class:`ExperimentContext <pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`,
+:py:class:`DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
 Documentation on the use of these objects is given in :ref:`scan_context`,
-:ref:`experiment_context` and :ref:`workflow_tree`, respectively.
+:ref:`diffraction_exp_context` and :ref:`workflow_tree`, respectively.
 
 Globally controlled settings
 ----------------------------
@@ -74,8 +75,8 @@ Setup of the ExecuteWorkflowApp
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
 uses the aforementioned objects (
 :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
-:py:class:`ExperimentContext 
-<pydidas.contexts.experiment_context.experiment_context._ExperimentContext>`,
+:py:class:`DiffractionExperimentContext 
+<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
 which include most of the required configuration.
 

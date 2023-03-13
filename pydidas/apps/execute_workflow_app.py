@@ -33,7 +33,7 @@ import numpy as np
 from qtpy import QtCore
 
 from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
-from ..contexts import ScanContext, ExperimentContext
+from ..contexts import ScanContext, DiffractionExperimentContext
 from ..workflow import WorkflowTree, WorkflowResults
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
@@ -41,7 +41,7 @@ from .parsers import execute_workflow_app_parser
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
-EXP = ExperimentContext()
+EXP = DiffractionExperimentContext()
 RESULTS = WorkflowResults()
 RESULT_SAVER = WorkflowResultIoMeta
 
@@ -338,12 +338,16 @@ class ExecuteWorkflowApp(BaseApp):
                     "axis_labels": _res.axis_labels,
                     "axis_ranges": _res.axis_ranges,
                     "axis_units": _res.axis_units,
+                    "data_unit": _res.data_unit,
+                    "data_label": _res.data_label,
                 }
             else:
                 self._result_metadata[_node_id] = {
                     "axis_labels": {i: None for i in range(_res.ndim)},
                     "axis_ranges": {i: None for i in range(_res.ndim)},
                     "axis_units": {i: None for i in range(_res.ndim)},
+                    "data_unit": "",
+                    "data_label": "",
                 }
         self._config["result_metadata_set"] = True
         if not self.slave_mode:

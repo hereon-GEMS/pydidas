@@ -117,7 +117,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         name if not selected.
         New plugins will always be created as children of the active plugin
         and it is the users responsibility to select the correct parent
-        prior to calling this method.
+        prior to calling this method or to use the parent_node_id keyword.
 
         Parameters
         ----------
@@ -174,7 +174,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         if self.root is None:
             self.root = _node
 
-    def __create_widget(self, title, node_id):
+    def __create_widget(self, title, node_id, label=""):
         """
         Create the widget associated with the Plugin to display the plugin
         position on the canvas.
@@ -185,14 +185,19 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The plugin title.
         node_id : int
             The node ID. Required for referencing the widgets later.
+        label : str, optional
+            The plugin label.
         """
-        _widget = PluginInWorkflowBox(title, node_id, parent=self.qt_canvas)
+        _widget = PluginInWorkflowBox(
+            title, node_id, parent=self.qt_canvas, label=label
+        )
         _widget.sig_widget_activated.connect(self.set_active_node)
         _widget.sig_widget_delete_branch_request.connect(
             partial(self.delete_branch, node_id)
         )
         _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
-        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)  #
+        _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
+        _widget.sig_create_copy_request.connect(self.create_node_copy_request)
         self.sig_consistent_plugins.connect(_widget.receive_consistent_signal)
         self.sig_inconsistent_plugins.connect(_widget.receive_inconsistent_signal)
         _widget.setVisible(True)
@@ -263,7 +268,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
     @QtCore.Slot(int, int)
     def new_node_parent_request(self, calling_node, new_parent_node):
         """
-        Handle the signal that a new shall have a new parent.
+        Handle the signal that a node requested to have a new parent.
 
         Parameters
         ----------
@@ -273,6 +278,27 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node ID of the requested parent.
         """
         TREE.change_node_parent(calling_node, new_parent_node)
+        TREE.order_node_ids()
+        self.update_from_tree()
+        self._check_consistency()
+
+    @QtCore.Slot(int, int)
+    def create_node_copy_request(self, calling_node, new_parent_node):
+        """
+        Handle the signal that a node requested to append a copy of itself to parent.
+
+        Parameters
+        ----------
+        calling_node : int
+            The node ID of the calling node.
+        new_parent_node : int
+            The node ID of the requested parent.
+        """
+        _plugin = TREE.nodes[calling_node].plugin
+        self.add_new_plugin_node(_plugin.plugin_name, parent_node_id=new_parent_node)
+        _dump = TREE.nodes[calling_node].dump()
+        for _key, _val in _dump["plugin_params"]:
+            TREE.active_node.plugin.set_param_value(_key, _val)
         TREE.order_node_ids()
         self.update_from_tree()
         self._check_consistency()
@@ -344,9 +370,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         self.__delete_all_nodes_and_widgets()
         for _node_id, _node in TREE.nodes.items():
-            name = _node.plugin.plugin_name
+            _name = _node.plugin.plugin_name
+            _label = _node.plugin.get_param_value("label")
             self.__create_position_node(_node_id)
-            self.__create_widget(name, _node_id)
+            self.__create_widget(_name, _node_id, label=_label)
         self.update_node_positions()
         if reset_active_node:
             self.sig_plugin_selected.emit(-1)

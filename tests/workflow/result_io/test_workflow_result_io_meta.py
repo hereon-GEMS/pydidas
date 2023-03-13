@@ -29,7 +29,7 @@ import tempfile
 
 import numpy as np
 
-from pydidas.core import Dataset
+from pydidas.core import Dataset, UserConfigError
 from pydidas.workflow import WorkflowTree, WorkflowResults
 from pydidas.contexts import ScanContext
 from pydidas.workflow.result_io import (
@@ -179,7 +179,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
 
     def test_set_active_savers_and_title__not_registered(self):
         self.create_saver_class("SAVER", ".Test")
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             META.set_active_savers_and_title(["TEST", "TEST2"])
 
     def test_export_frame_to_file(self):
@@ -267,7 +267,7 @@ class TestWorkflowResultsSaverMeta(unittest.TestCase):
 
     def test_prepare_saver__no_such_saver(self):
         _save_dir, _node_info = self.get_save_dir_and_node_info()
-        with self.assertRaises(KeyError):
+        with self.assertRaises(UserConfigError):
             META.prepare_saver("TEST", _save_dir, _node_info)
 
     def test_import_data_from_directory(self):

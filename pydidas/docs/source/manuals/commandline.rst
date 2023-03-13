@@ -11,7 +11,7 @@ The following general manuals are available:
     :maxdepth: 1
         
     cmdline_global/cmd_global
-    cmdline_global/cmd_experiment_context
+    cmdline_global/cmd_diffraction_exp_context
     cmdline_global/cmd_scan_context
     cmdline_global/cmd_workflow_tree
     cmdline_global/cmd_workflow_results

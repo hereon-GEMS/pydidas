@@ -34,6 +34,7 @@ __all__ = [
     "PROC_PLUGIN_GENERIC",
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
+    "PROC_PLUGIN_TYPE_NAMES",
     "FLOAT_REGEX",
 ]
 
@@ -67,6 +68,12 @@ OUTPUT_PLUGIN = 2
 PROC_PLUGIN_GENERIC = 10
 PROC_PLUGIN_IMAGE = 11
 PROC_PLUGIN_INTEGRATED = 12
+
+PROC_PLUGIN_TYPE_NAMES = {
+    PROC_PLUGIN_GENERIC: "Generic processing plugins",
+    PROC_PLUGIN_IMAGE: "Processing plugins for image data",
+    PROC_PLUGIN_INTEGRATED: "Processing plugins for integrated data",
+}
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",

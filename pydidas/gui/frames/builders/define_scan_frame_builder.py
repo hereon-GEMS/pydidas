@@ -33,6 +33,13 @@ from ....widgets.utilities import get_pyqt_icon_from_str
 
 SCAN_SETTINGS = ScanContext()
 
+SCAN_DIMENSION_EXPLANATION_TEXT = (
+    "The scan dimensions must be assigned based on the data acquisition scheme to "
+    "match the incrementing image numbers.<br><b>The lowest numbered scan dimension is "
+    "the slowest scan dimension and the highest numbered scan dimension is the fastest."
+    "</b>"
+)
+
 
 class DefineScanFrameBuilder(BaseFrame):
     """
@@ -86,6 +93,29 @@ class DefineScanFrameBuilder(BaseFrame):
             icon=self.style().standardIcon(59),
             fixedWidth=constants.CONFIG_WIDGET_WIDTH,
         )
+        self.create_spacer(None)
+        self.create_label(
+            "dimension_hint_title",
+            "Scan dimension explanation",
+            gridPos=(-1, 0, 1, 2),
+            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            bold=True,
+        )
+        self.create_label(
+            "dimension_hint_text",
+            SCAN_DIMENSION_EXPLANATION_TEXT,
+            gridPos=(-1, 0, 1, 2),
+            fixedWidth=600,
+            fixedHeight=80,
+        )
+        self.create_button(
+            "but_more_scan_dim_info",
+            "More information about scan dimensions",
+            gridPos=(-1, 0, 1, 2),
+            icon=self.style().standardIcon(9),
+            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
+        )
+        self.create_spacer(None)
 
         _param_edit_row = self.next_row()
         self.create_empty_widget(

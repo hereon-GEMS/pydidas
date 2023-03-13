@@ -699,10 +699,18 @@ class Dataset(np.ndarray):
             _axes = [_index for _index, _shape in enumerate(self.shape) if _shape != 1]
         else:
             _axes = [_index for _index, _ in enumerate(self.shape) if _index != axis]
-        _new = np.ndarray.squeeze(self, axis)
-        for _key in ["axis_labels", "axis_ranges", "axis_units"]:
-            _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
-            setattr(_new, _key, _entry)
+        if self.size == 1:
+            _new = Dataset(
+                np.array(self).reshape(1),
+                metadata=self.metadata,
+                data_unit=self.data_unit,
+                data_label=self.data_label,
+            )
+        else:
+            _new = np.ndarray.squeeze(self, axis)
+            for _key in ["axis_labels", "axis_ranges", "axis_units"]:
+                _entry = [_v for _k, _v in getattr(self, _key).items() if _k in _axes]
+                setattr(_new, _key, _entry)
         return _new
 
     def take(self, indices, axis=None, out=None, mode="raise"):
@@ -761,7 +769,19 @@ class Dataset(np.ndarray):
             The copied dataset.
         """
         _new = np.ndarray.copy(self, order)
-        _new._meta = self._meta.copy()
+        _new._meta = {
+            _key: self._meta[_key].copy()
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]
+        } | {
+            _key: self._meta[_key]
+            for _key in ["data_unit", "data_label", "getitem_key"]
+        }
+        _new._meta["metadata"] = {}
+        for _key, _val in self._meta["metadata"].items():
+            try:
+                _new._meta["metadata"][_key] = _val.copy()
+            except AttributeError:
+                _new._meta["metadata"][_key] = _val
         return _new
 
     def __repr__(self):

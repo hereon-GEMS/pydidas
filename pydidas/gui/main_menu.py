@@ -32,16 +32,17 @@ from functools import partial
 import yaml
 from qtpy import QtWidgets, QtGui, QtCore
 
-from ..core import PydidasGuiError, UserConfigError
+from ..core import UserConfigError
 from ..core.utils import (
     DOC_HOME_QURL,
     get_pydidas_icon_w_bg,
     doc_qurl_for_frame_manual,
     doc_filename_for_frame_manual,
 )
-from ..contexts import ScanContext, ExperimentContext
+from ..contexts import GLOBAL_CONTEXTS
 from ..workflow import WorkflowTree
 from ..widgets import PydidasFrameStack
+from ..widgets import PydidasFileDialog
 from ..widgets.dialogues import QuestionBox, critical_warning
 from ..version import VERSION
 from . import utils
@@ -57,9 +58,6 @@ from .windows import (
     QtPathsWindow,
 )
 
-
-SCAN = ScanContext()
-EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 
@@ -98,6 +96,7 @@ class MainMenu(QtWidgets.QMainWindow):
 
         self._setup_mainwindow_widget(geometry)
         self._add_config_windows()
+        self._create_gui_state_dialogs()
         self._create_menu()
 
         self._help_shortcut = QtWidgets.QShortcut(QtCore.Qt.Key_F1, self)
@@ -139,6 +138,25 @@ class MainMenu(QtWidgets.QMainWindow):
         _frame = UserConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
+
+    def _create_gui_state_dialogs(self):
+        """
+        Create the persistent dialogues for import/export of the GUI state.
+        """
+        self.__import_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="open_file",
+            caption="Import GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            qsettings_ref="MainWindowGuiState__import",
+        )
+        self.__export_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="save_file",
+            caption="Export GUI state file",
+            formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            qsettings_ref="MainWindowGuiState__export",
+        )
 
     def _create_menu(self):
         """
@@ -323,11 +341,9 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Store the current GUI state in a user-defined file.
         """
-        fname = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Name of file for export", None, "YAML (*.yaml *.yml)"
-        )[0]
-        if fname != "":
-            self.export_gui_state(fname)
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is not None:
+            self.export_gui_state(_fname)
 
     @QtCore.Slot()
     def _action_restore_state(self):
@@ -360,11 +376,9 @@ class MainMenu(QtWidgets.QMainWindow):
         """
         Restore the GUI state from a user-defined file.
         """
-        fname = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Name of file", None, "YAML (*.yaml *.yml)"
-        )[0]
-        if fname != "":
-            self.restore_gui_state(state="manual", filename=fname)
+        _fname = self.__import_dialog.get_user_response()
+        if _fname is not None:
+            self.restore_gui_state(state="manual", filename=_fname)
 
     @QtCore.Slot(str)
     def update_status(self, text):
@@ -448,13 +462,12 @@ class MainMenu(QtWidgets.QMainWindow):
             _frameindex, _frame_state = _frame.export_state()
             assert _index == _frameindex
             _state[f"frame_{_index:02d}"] = _frame_state
-        _state["scan_context"] = SCAN.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
-        _state["experiment_context"] = EXP.get_param_values_as_dict(
-            filter_types_for_export=True
-        )
+        for _key, _context in GLOBAL_CONTEXTS.items():
+            _state[_key] = _context.get_param_values_as_dict(
+                filter_types_for_export=True
+            )
         _state["workflow_tree"] = TREE.export_to_string()
+        _state["pydidas_version"] = VERSION
         with open(filename, "w") as _file:
             yaml.dump(_state, _file, Dumper=yaml.SafeDumper)
 
@@ -472,10 +485,10 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if _key != "tmp":
                 _window_states[_key] = _window.export_window_state()
-        _window_states["main"] = self.__export_mainwindow_state()
+        _window_states["main"] = self.export_mainwindow_state()
         return _window_states
 
-    def __export_mainwindow_state(self):
+    def export_mainwindow_state(self):
         """
         Export the main window's state.
 
@@ -521,6 +534,11 @@ class MainMenu(QtWidgets.QMainWindow):
             return
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
+        if _state.get("pydidas_version", "0.0.0") != VERSION:
+            raise UserConfigError(
+                "The saved state was not created with the current pydidas version and "
+                "cannot be imported."
+            )
         self._restore_global_objects(_state)
         self._restore_frame_states(_state)
         self._restore_window_states(_state)
@@ -529,7 +547,7 @@ class MainMenu(QtWidgets.QMainWindow):
     def _restore_global_objects(state):
         """
         Get the states of pydidas' global objects (ScanContext,
-        ExperimentContext, WorkflowTree)
+        DiffractionExperimentContext, WorkflowTree)
 
         Parameters
         ----------
@@ -538,10 +556,9 @@ class MainMenu(QtWidgets.QMainWindow):
             global objects.
         """
         TREE.restore_from_string(state["workflow_tree"])
-        for _key, _val in state["scan_context"].items():
-            SCAN.set_param_value(_key, _val)
-        for _key, _val in state["experiment_context"].items():
-            EXP.set_param_value(_key, _val)
+        for _contex_key, _context in GLOBAL_CONTEXTS.items():
+            for _key, _val in state[_contex_key].items():
+                _context.set_param_value(_key, _val)
 
     def _restore_window_states(self, state):
         """
@@ -556,9 +573,9 @@ class MainMenu(QtWidgets.QMainWindow):
         for _key, _window in self._child_windows.items():
             if not _key.startswith("temp_window"):
                 _window.restore_window_state(state[_key])
-        self.__restore_mainwindow_state(state["main"])
+        self.restore_mainwindow_state(state["main"])
 
-    def __restore_mainwindow_state(self, state):
+    def restore_mainwindow_state(self, state):
         """
         Restore the main window's state from saved information.
 

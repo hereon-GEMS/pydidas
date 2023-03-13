@@ -36,6 +36,14 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
     """
     Integrate an image in 2D using pyFAI.
 
+    The default setting for the azimuthal range in (-180, 180) degree. Using
+    the azimuthal range setting, this can be changed to (0, 360) degree, if
+    required.
+
+    The output data dimensions are
+        0: azimuthal angle (chi)
+        1: radial 2theta angle / Q / r.
+
     For a full documentation of the Plugin, please refer to the pyFAI
     documentation.
     """

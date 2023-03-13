@@ -36,7 +36,7 @@ from ...core import (
     utils,
     UserConfigError,
 )
-from ...contexts import ScanContext, ExperimentContext
+from ...contexts import ScanContext
 from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
 from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
@@ -44,7 +44,6 @@ from .builders import WorkflowTestFrameBuilder
 
 
 SCAN = ScanContext()
-EXP = ExperimentContext()
 TREE = WorkflowTree()
 
 
@@ -114,12 +113,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     single datapoint.
 
     The selection of a frame can be done either using the absolute frame number
-    (if the ``image_selection`` Parameter equals "Use image number") or by
+    (if the ``image_selection`` Parameter equals "Use global index") or by
     supplying scan indices for all active scan dimensions  (if the
     ``image_selection`` Parameter equals "Use scan indices").
     """
 
-    menu_icon = "qta::mdi.play-protected-content"
+    menu_icon = "pydidas::frame_icon_workflow_test.png"
     menu_title = "Test workflow"
     menu_entry = "Workflow processing/Test workflow"
 
@@ -127,17 +126,17 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         Parameter(
             "image_selection",
             str,
-            "Use image number",
-            name="Image selection",
-            choices=["Use image number", "Use scan indices"],
+            "Use global index",
+            name="Scan point selection",
+            choices=["Use global index", "Use scan dimensional indices"],
             tooltip=(
-                "Choose between selecing images using either the "
-                "image / frame number or the multi-dimensional "
-                "position in the scan."
+                "Choose between selecing frames using either the flattened image / "
+                "frame index (the 'timeline') or the multi-dimensional position in the "
+                "scan."
             ),
         ),
         get_generic_param_collection(
-            "image_num",
+            "frame_index",
             "scan_index1",
             "scan_index2",
             "scan_index3",
@@ -241,8 +240,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         Update the visibility of the image selection widgets.
         """
-        _use_frame = self.get_param_value("image_selection") == "Use image number"
-        self.toggle_param_widget_visibility("image_num", _use_frame)
+        _use_frame = self.get_param_value("image_selection") == "Use global index"
+        self.toggle_param_widget_visibility("frame_index", _use_frame)
         for _dim in [1, 2, 3, 4]:
             self.toggle_param_widget_visibility(
                 f"scan_index{_dim}", not _use_frame and _dim <= SCAN.ndim
@@ -306,8 +305,8 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         int
             The absolute frame number.
         """
-        if self.get_param_value("image_selection") == "Use image number":
-            _index = self.get_param_value("image_num", dtype=int)
+        if self.get_param_value("image_selection") == "Use global index":
+            _index = self.get_param_value("frame_index", dtype=int)
             if not 0 <= _index < SCAN.n_points:
                 raise UserConfigError(
                     f"The selected number {_index} is outside the scope of the number "
@@ -318,6 +317,11 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]
         _index = SCAN.get_frame_number_from_scan_indices(_nums)
+        if _index >= SCAN.n_points:
+            raise UserConfigError(
+                f"The selected scan point {_nums} is outside the scope of the scan "
+                f"dimensions. (Please note that python starts counting at zero)."
+            )
         return _index
 
     def __store_tree_results(self):

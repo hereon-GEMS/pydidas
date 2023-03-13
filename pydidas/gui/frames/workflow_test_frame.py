@@ -317,6 +317,11 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]
         _index = SCAN.get_frame_number_from_scan_indices(_nums)
+        if _index >= SCAN.n_points:
+            raise UserConfigError(
+                f"The selected scan point {_nums} is outside the scope of the scan "
+                f"dimensions. (Please note that python starts counting at zero)."
+            )
         return _index
 
     def __store_tree_results(self):

@@ -124,6 +124,11 @@ class IoMaster(type):
             If the extension is not registered.
         """
         if not cls.is_extension_registered(ext, mode=mode):
+            if ext == "":
+                raise UserConfigError(
+                    "No extension has been selected for data export. Please set an "
+                    "extension to choose a fileformat."
+                )
             raise UserConfigError(
                 f'The extension "{ext}" is not registered for data input/output.'
             )

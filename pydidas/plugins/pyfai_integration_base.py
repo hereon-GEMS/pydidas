@@ -195,7 +195,7 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The radial range for the pyFAI integration.
         """
-        if self.get_param_value("rad_use_range"):
+        if self.get_param_value("rad_use_range") == "Specify radial range":
             _lower = self.get_param_value("rad_range_lower")
             _upper = self.get_param_value("rad_range_upper")
             if 0 <= _lower < _upper:
@@ -262,7 +262,7 @@ class pyFAIintegrationBase(ProcPlugin):
         Union[None, tuple]
             The azimuthal range for the pyFAI integration.
         """
-        if self.get_param_value("azi_use_range"):
+        if self.get_param_value("azi_use_range") == "Specify azimuthal range":
             _lower = self.get_param_value("azi_range_lower")
             _upper = self.get_param_value("azi_range_upper")
             if _lower < _upper:

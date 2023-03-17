@@ -2,6 +2,7 @@ Improvements
 ------------
 - Added unique configuration plugin to SubtractBackgroundImage plugin.
 - When leaving the TestWorkflowFrame, pop-up windows are now hidden.
+- Changed pyFAI plugins to use explicit parameters to select the ranges.
 
 Bugfixes
 --------

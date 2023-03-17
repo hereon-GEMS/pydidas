@@ -29,6 +29,7 @@ __all__ = []
 from . import dialogues
 from . import factory
 from . import parameter_config
+from . import plugin_config_widgets
 from . import selection
 from . import silx_plot
 from . import workflow_edit
@@ -38,6 +39,7 @@ __all__.extend(
         "dialogues",
         "factory",
         "parameter_config",
+        "plugin_config_widgets",
         "selection",
         "workflow_edit",
         "silx_plot",

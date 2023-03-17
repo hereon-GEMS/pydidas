@@ -499,6 +499,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         _plugin = self._tree.nodes[self._active_node].plugin
         _res = self._tree.nodes[self._active_node].results
+        self.__details_window.hide()
         self.__tweak_window.tweak_plugin(_plugin, _res)
         self.__tweak_window.raise_()
         self.__tweak_window.show()
@@ -521,3 +522,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         if index == self.frame_index:
             self.__update_image_selection_visibility()
             self.__check_tree_uptodate()
+        else:
+            if self._config["built"]:
+                self.__tweak_window.hide()
+                self.__details_window.hide()

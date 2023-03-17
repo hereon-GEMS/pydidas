@@ -309,3 +309,10 @@ class TweakPluginParameterWindow(PydidasWindow):
             self.discard_parameter_changes()
         self._widgets["detailed_results"].close()
         QtWidgets.QWidget.closeEvent(self, event)
+
+    def hide(self):
+        """
+        Overload the generic hide method to hide the details window as well.
+        """
+        self._widgets["detailed_results"].setVisible(False)
+        QtWidgets.QWidget.hide(self)

@@ -1,6 +1,7 @@
 Improvements
 ------------
 - Added unique configuration plugin to SubtractBackgroundImage plugin.
+- When leaving the TestWorkflowFrame, pop-up windows are now hidden.
 
 Bugfixes
 --------

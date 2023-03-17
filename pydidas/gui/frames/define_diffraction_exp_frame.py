@@ -81,6 +81,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             dialog_type="save_file",
             caption="Export experiment context file",
             formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            default_extension="yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="DefineDiffractionExpFrame__export",
         )

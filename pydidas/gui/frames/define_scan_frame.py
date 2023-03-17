@@ -81,6 +81,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
             dialog_type="save_file",
             caption="Export scan context file",
             formats=ScanContextIoMeta.get_string_of_formats(),
+            default_extension="yaml",
             qsettings_ref="DefineScanFrame__export",
         )
         self.__app = QtWidgets.QApplication.instance()

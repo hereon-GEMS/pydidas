@@ -94,6 +94,7 @@ class PydidasFileDialog(
             "formats": kwargs.get("formats", None),
             "info_string": kwargs.get("info_string", None),
             "extensions": None,
+            "default_extension": kwargs.get("default_extension", None),
             "curr_dir": None,
             "scan_base": None,
             "latest": None,
@@ -319,11 +320,11 @@ class PydidasFileDialog(
             return None
         _selection = self.selectedFiles()[0]
         _ext = os.path.splitext(_selection)[1]
-        if len(_ext) == 0 and self._config["extensions"] is not None:
-            if "yaml" in self._config["extensions"]:
-                _selection = _selection + ".yaml"
-            else:
-                _selection = _selection + "." + self._config["extensions"][0]
+        if len(_ext) == 0:
+            _selection = _selection + self._get_extension()
+        else:
+            self._check_extension(_ext)
+
         self._config["curr_dir"] = os.path.dirname(_selection)
         self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:
@@ -331,6 +332,51 @@ class PydidasFileDialog(
                 self._config["qsettings_ref"], self._config["curr_dir"]
             )
         return _selection
+
+    def _get_extension(self):
+        """
+        Get an extension for the selectd filename.
+
+        The extension will be selected from the list of selected extensions, if
+        possible.
+
+        Returns
+        -------
+        str
+            The extension for the filename.
+        """
+        if self._config["extensions"] is None:
+            return ""
+        if self.selectedNameFilter().startswith(
+            "All files"
+        ) or self.selectedNameFilter().startswith("All supported files"):
+            if self._config["default_extension"] is not None:
+                return "." + self._config["default_extension"]
+            _defaults = ["yaml", "npy", "tif", "h5"]
+            while len(_defaults) > 0:
+                _ext = _defaults.pop(0)
+                if _ext in self._config["extensions"]:
+                    return f".{_ext}"
+            return self._config["extensions"][0]
+        _formats = self.selectedNameFilter().strip(")").split("*.")[1:]
+        return "." + _formats[0]
+
+    def _check_extension(self, extension):
+        """
+        Check the given extension and confirm that it is valid.
+
+        Parameters
+        ----------
+        extension : str
+            The extension.
+        """
+        if self._config["extensions"] is None:
+            return
+        if extension.strip(".") not in self._config["extensions"]:
+            raise UserConfigError(
+                f'The given extension "{extension}" is invalid because the file type '
+                "is unknown."
+            )
 
     def set_curr_dir(self, item):
         """

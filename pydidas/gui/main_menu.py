@@ -155,6 +155,7 @@ class MainMenu(QtWidgets.QMainWindow):
             dialog_type="save_file",
             caption="Export GUI state file",
             formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            default_extension="yaml",
             qsettings_ref="MainWindowGuiState__export",
         )
 

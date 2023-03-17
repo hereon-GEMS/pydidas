@@ -90,6 +90,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             dialog_type="save_file",
             caption="Export workflow tree file",
             formats=WorkflowTreeIoMeta.get_string_of_formats(),
+            default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
 

@@ -129,12 +129,20 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             fontsize=constants.STANDARD_FONT_SIZE + 2,
             gridPos=(3, 0, 1, 1),
         )
+        self.__add_restore_default_button()
         if self.plugin.has_unique_parameter_config_widget:
-            self.layout().add(self.plugin.get_parameter_config_widget())
+            self.add_any_widget(
+                "plugin_widget",
+                self.plugin.get_parameter_config_widget(),
+                gridPos=(-1, 0, 1, 2),
+            )
         else:
-            self.__add_restore_default_button()
             for param in self.plugin.params.values():
-                _kwargs = self.__get_param_creation_kwargs(param)
+                _kwargs = (
+                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
+                    if param.dtype in [Hdf5key, Path]
+                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
+                )
                 self.create_param_widget(param, **_kwargs)
             self.param_widgets["label"].io_edited.connect(self._label_updated)
 
@@ -175,38 +183,6 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.plugin.restore_all_defaults(confirm=True)
         self.update_edits()
 
-    def __get_param_creation_kwargs(self, param):
-        """
-        Get the kwargs to create the widgets for the Parameter in different
-        styles for the different types of keys.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The Parameter for which an I/O widget shall be created.
-
-        Returns
-        -------
-        _kwargs : dict
-            The kwargs to be used for widget creation.
-        """
-        # The total width is reduced by 10 because of the margins
-        if param.dtype in [Hdf5key, Path]:
-            _kwargs = {
-                "width_text": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_unit": 0,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-                "linebreak": True,
-            }
-        else:
-            _kwargs = {
-                "width_text": 200,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 240,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-            }
-        return _kwargs
-
     def update_edits(self):
         """
         Update the input fields with the stored parameter values.
@@ -214,5 +190,8 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         This method will go through all plugin parameters and populates
         the input fields with the stores parameter values.
         """
+        if self.plugin.has_unique_parameter_config_widget:
+            self._widgets["plugin_widget"].update_edits()
+            return
         for param in self.plugin.params.values():
-            self.param_widgets[param.refkey].set_value(param.value)
+            self.update_widget_value(param.refkey, param.value)

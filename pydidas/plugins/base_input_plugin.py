@@ -157,6 +157,25 @@ class InputPlugin(BasePlugin):
         self._config["start_index"] = SCAN.get_param_value("scan_start_index")
         self._config["delta_index"] = SCAN.get_param_value("scan_index_stepping")
 
+    def get_filename(self, frame_index):
+        """
+        Get the filename of the file associated with the frame index.
+
+        Parameters
+        ----------
+        frame index : int
+            The index of the frame to be processed.
+
+        Returns
+        -------
+        str
+            The filename.
+        """
+        _index = frame_index * SCAN.get_param_value(
+            "scan_index_stepping"
+        ) + SCAN.get_param_value("scan_start_index")
+        return self.filename_string.format(index=_index)
+
     def update_filename_string(self):
         """
         Set up the generator that can create the full file names to load images.
@@ -198,9 +217,7 @@ class InputPlugin(BasePlugin):
         _data = None
         if "roi" not in kwargs and self.get_param_value("use_roi"):
             kwargs["roi"] = self._image_metadata.roi
-        _frames = self._config["n_multi"] * self._config[
-            "delta_index"
-        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
+        _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
         for _frame_index in _frames:
             if _data is None:
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)
@@ -211,25 +228,6 @@ class InputPlugin(BasePlugin):
         if _frames.size > 1:
             kwargs["frames"] = _frames
         return _data, kwargs
-
-    def get_filename(self, frame_index):
-        """
-        Get the filename of the file associated with the frame index.
-
-        Parameters
-        ----------
-        frame index : int
-            The index of the frame to be processed.
-
-        Returns
-        -------
-        str
-            The filename.
-        """
-        _index = frame_index * SCAN.get_param_value(
-            "scan_index_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
-        return self.filename_string.format(index=_index)
 
     def get_frame(self, frame_index, **kwargs):
         """

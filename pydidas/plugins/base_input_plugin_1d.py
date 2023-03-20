@@ -93,9 +93,7 @@ class InputPlugin1d(InputPlugin):
             kwargs["roi"] = slice(
                 self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
             )
-        _frames = self._config["n_multi"] * self._config[
-            "delta_index"
-        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
+        _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
         for _frame_index in _frames:
             if _data is None:
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)

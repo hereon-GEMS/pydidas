@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanContext"]
+__all__ = ["ScanContext", "Scan"]
 
 import numpy as np
 
@@ -68,7 +68,7 @@ SCAN_CONTEXT_DEFAULT_PARAMS = get_generic_param_collection(
 )
 
 
-class _ScanContext(ObjectWithParameterCollection):
+class Scan(ObjectWithParameterCollection):
     """
     Class which holds the settings for the scan. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
@@ -298,4 +298,4 @@ class _ScanContext(ObjectWithParameterCollection):
         ScanContextIoMeta.export_to_file(filename, overwrite=overwrite)
 
 
-ScanContext = SingletonFactory(_ScanContext)
+ScanContext = SingletonFactory(Scan)

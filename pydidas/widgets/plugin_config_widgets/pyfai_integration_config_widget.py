@@ -25,12 +25,8 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PyfaiIntegrationConfigWidget"]
 
-import os
-from pathlib import Path
-
 from qtpy import QtCore
 
-from pydidas.core import Hdf5key
 from pydidas.core.constants import DEFAULT_PLUGIN_PARAM_CONFIG
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn

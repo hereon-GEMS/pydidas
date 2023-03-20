@@ -33,10 +33,10 @@ from qtpy import QtCore
 from ...core import UserConfigError
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
-from ...workflow import WorkflowResults
+from ...workflow import WorkflowResultsContext
 
 
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 
 
 class ViewResultsMixin:

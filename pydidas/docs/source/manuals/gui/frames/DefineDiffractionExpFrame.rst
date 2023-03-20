@@ -10,7 +10,7 @@ The DefineDiffractionExpFrame
     
 The *Define Experimental setup* frame is a graphical interface to configure the 
 :py:class:`DiffractionExperimentContext 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>` 
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment>` 
 which holds information about the experimental/beamline setup.
 
 The frame only holds the configuration widgets:
@@ -116,7 +116,7 @@ Using the Experimental settings
 -------------------------------
 
 The :py:class:`DiffractionExperimentContext 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>` 
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment>` 
 is not used directly but the information is required in applications, e.g. to
 run processing workflows or to determine the beam center on the detector.
    

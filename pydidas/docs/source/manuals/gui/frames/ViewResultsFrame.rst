@@ -33,7 +33,7 @@ pydidas-written node result files which will be imported.
 .. warning::
 
     Because the :py:class:`WorkflowResults 
-    <pydidas.workflow.workflow_results._WorkflowResults>` are a global 
+    <pydidas.workflow.WorkflowResults>` are a global 
     singleton, importing results will overwrite all current results held in
     memory and may thus clear unsaved results. 
 

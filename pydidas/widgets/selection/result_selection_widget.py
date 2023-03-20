@@ -44,14 +44,14 @@ from ...core.constants import (
 )
 from ...core.utils import SignalBlocker, apply_qt_properties
 from ...contexts import ScanContext
-from ...workflow import WorkflowResults, WorkflowResultsSelector
+from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
 from ..read_only_text_widget import ReadOnlyTextWidget
 
 
 SCAN = ScanContext()
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 
 
 def _get_axis_index_labels(node_id):

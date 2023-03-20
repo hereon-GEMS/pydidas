@@ -38,14 +38,14 @@ from pydidas.core import get_generic_parameter, UserConfigError, utils, PydidasQ
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import ScanContext
-from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.workflow import WorkflowTree, WorkflowResultsContext
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.plugins import PluginCollection
 
 
 TREE = WorkflowTree()
 SCAN = ScanContext()
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()
 _PLUGIN_PATHS = COLL.get_all_registered_paths()

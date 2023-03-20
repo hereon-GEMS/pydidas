@@ -34,12 +34,12 @@ from ...core import get_generic_param_collection
 from ...core.utils import pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
-from ...workflow import WorkflowResults, WorkflowTree
+from ...workflow import WorkflowResultsContext, WorkflowTree
 from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 from ..mixins import ViewResultsMixin
 
 
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 TREE = WorkflowTree()
 logger = pydidas_logger()
 

@@ -1,9 +1,15 @@
+Major changes
+-------------
+  
 Improvements
 ------------
 - Added unique configuration widget to SubtractBackgroundImage plugin.
 - When leaving the TestWorkflowFrame, pop-up windows are now hidden.
 - Changed pyFAI plugins to use explicit parameters to select the ranges.
 - Added unique configuration widget to PyfaiIntegrationBase plugin.
+- Exposed Scan and DiffractionExperiment in the contexts in preparation of 
+  local usages. This also includes an update of the object names for 
+  consistency.
 
 Bugfixes
 --------

@@ -33,15 +33,15 @@ import h5py
 
 from pydidas.core import Dataset, get_generic_parameter, Parameter
 from pydidas.core.utils import get_random_string, create_hdf5_dataset
-from pydidas.contexts import ScanContext
+from pydidas.contexts.scan_context import Scan, ScanContext
 from pydidas.unittest_objects import DummyProc, DummyLoader
-from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.workflow import WorkflowTree, WorkflowResults, WorkflowResultsContext
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
-RES = WorkflowResults()
+RES = WorkflowResultsContext()
 SAVER = WorkflowResultIoMeta
 
 
@@ -629,6 +629,22 @@ class TestWorkflowResults(unittest.TestCase):
                     )
                 else:
                     self.assertEqual(_res.axis_ranges[_dim], _local["axranges"][_dim])
+
+    def test_creation_with_local_scan_context(self):
+        _title = "The local scan title."
+        _local_scan = Scan()
+        _local_scan.set_param_value("scan_title", _title)
+        _RES = WorkflowResults(scan_context=_local_scan)
+        SCAN.set_param_value("scan_title", "New title")
+        self.assertEqual(_RES._SCAN.get_param_value("scan_title"), _title)
+
+    def test_creation_with_local_workflow_tree(self):
+        _label = "A new plugin label"
+        _local_tree = TREE.get_copy()
+        _local_tree.root.plugin.set_param_value("label", _label)
+        _RES = WorkflowResults(workflow_tree=_local_tree)
+        TREE.root.plugin.set_param_value("label", "main label")
+        self.assertEqual(_RES._TREE.root.plugin.get_param_value("label"), _label)
 
 
 if __name__ == "__main__":

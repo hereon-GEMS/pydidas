@@ -9,7 +9,7 @@ Define scan frame
     :backlinks: none
 
 The *Scan setup* frame is a graphical interface to configure the 
-:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
 which holds information about the scan setup. 
 
 The frame only holds the configuration widgets for its Parameters as well as 
@@ -48,7 +48,7 @@ Export scan settings
     :align: left
 
 At the bottom of the Frame, the export button allows users to export the current
-:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
 Parameters to a file. This button will open a filename dialogue.
 
 Global Parameters
@@ -106,7 +106,7 @@ The range of each scan dimension is determined by the number of points
 Using the Scan settings
 -------------------------------
 
-The :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+The :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
 is not used directly but the information is required in applications, e.g. to
 run processing workflows.
    

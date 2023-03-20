@@ -29,7 +29,7 @@ import numpy as np
 from pydidas.core import UserConfigError
 from pydidas.core.utils import get_random_string
 from pydidas.contexts import ScanContext
-from pydidas.contexts.scan_context.scan_context import _ScanContext
+from pydidas.contexts.scan_context import Scan
 
 
 class TestScanContext(unittest.TestCase):
@@ -65,49 +65,49 @@ class TestScanContext(unittest.TestCase):
         pass
 
     def test_init(self):
-        SCAN = _ScanContext()
-        self.assertIsInstance(SCAN, _ScanContext)
+        SCAN = Scan()
+        self.assertIsInstance(SCAN, Scan)
 
     def test_init_singleton(self):
         SCAN = ScanContext()
-        self.assertIsInstance(SCAN, _ScanContext)
+        self.assertIsInstance(SCAN, Scan)
 
     def test_n_total(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.n_points, np.prod(self._scan_shape))
 
     def test_shape(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.shape, self._scan_shape)
 
     def test_ndim(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         self.assertEqual(SCAN.ndim, 4)
 
     def test_get_range_for_dim__wrong_dim(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         with self.assertRaises(UserConfigError):
             SCAN.get_range_for_dim(5)
 
     def test_get_range_for_dim__empty_dim(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         _range = SCAN.get_range_for_dim(1)
         self.assertIsInstance(_range, np.ndarray)
 
     def test_get_range_for_dim__normal(self):
         _index = 1
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         _range = SCAN.get_range_for_dim(_index)
         _target = self.get_scan_range(_index)
         self.assertTrue(np.equal(_range, _target).all())
 
     def test_get_metadata_for_dim(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         for _index in range(4):
             _unit = get_random_string(5)
@@ -120,13 +120,13 @@ class TestScanContext(unittest.TestCase):
             self.assertTrue(np.equal(self.get_scan_range(_index), _range).all())
 
     def test_get_frame_position_in_scan__zero(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_position_in_scan(0)
         self.assertEqual(_index, (0, 0, 0, 0))
 
     def test_get_frame_position_in_scan__inscan(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         _pos = tuple(i - 1 for i in self._scan_shape)
         _tmpshape = self._scan_shape + (1,)
@@ -140,19 +140,19 @@ class TestScanContext(unittest.TestCase):
         self.assertEqual(_index, _pos)
 
     def test_get_frame_position_in_scan__negative(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         with self.assertRaises(UserConfigError):
             SCAN.get_frame_position_in_scan(-1)
 
     def test_get_frame_position_in_scan__too_large(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         with self.assertRaises(UserConfigError):
             SCAN.get_frame_position_in_scan(np.prod(self._scan_shape))
 
     def test_get_frame_position_in_scan__multiplicity_gt_one(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         SCAN.set_param_value("scan_multiplicity", 3)
         _pos = tuple(i - 1 for i in self._scan_shape)
@@ -167,13 +167,13 @@ class TestScanContext(unittest.TestCase):
         self.assertEqual(_index, _pos)
 
     def test_get_frame_number_from_scan_indices__zero(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices((0, 0, 0, 0))
         self.assertEqual(_index, 0)
 
     def test_get_frame_number_from_scan_indices__negative(self):
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         with self.assertRaises(UserConfigError):
             SCAN.get_frame_number_from_scan_indices((0, -1, 0, 0))
@@ -186,7 +186,7 @@ class TestScanContext(unittest.TestCase):
             + np.prod(self._scan_shape[2:]) * _indices[1]
             + np.prod(self._scan_shape[1:]) * _indices[0]
         )
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
         self.assertEqual(_index, _frame)
@@ -199,7 +199,7 @@ class TestScanContext(unittest.TestCase):
             + np.prod(self._scan_shape[2:]) * _indices[1]
             + np.prod(self._scan_shape[1:]) * _indices[0]
         ) * 3
-        SCAN = _ScanContext()
+        SCAN = Scan()
         self.set_scan_params(SCAN)
         SCAN.set_param_value("scan_multiplicity", 3)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
@@ -207,13 +207,13 @@ class TestScanContext(unittest.TestCase):
 
     def test_update_from_dictionary__missing_dim(self):
         _scan = {"scan_title": get_random_string(8), "scan_dim": 2}
-        SCAN = _ScanContext()
+        SCAN = Scan()
         with self.assertRaises(KeyError):
             SCAN.update_from_dictionary(_scan)
 
     def test_update_from_dictionary__empty_input(self):
         _title = get_random_string(8)
-        SCAN = _ScanContext()
+        SCAN = Scan()
         SCAN.set_param_value("scan_title", _title)
         SCAN.update_from_dictionary({})
         self.assertEqual(SCAN.get_param_value("scan_title"), _title)
@@ -243,7 +243,7 @@ class TestScanContext(unittest.TestCase):
                 "n_points": 8,
             },
         }
-        SCAN = _ScanContext()
+        SCAN = Scan()
         SCAN.update_from_dictionary(_scan)
         self.assertEqual(SCAN.get_param_value("scan_title"), _scan["scan_title"])
         self.assertEqual(SCAN.get_param_value("scan_dim"), _scan["scan_dim"])

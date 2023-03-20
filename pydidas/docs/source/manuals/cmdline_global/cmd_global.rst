@@ -134,7 +134,7 @@ All apps use the same global persistent objects (implemented as singletons), if
 required. Information is separated according to the reasons to change. The three
 main objects are:
 
-    :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`
+    :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`
         The details about the scan. This includes generic information like scan
         title, data directory and scan names and specific information like the
         number of scan dimensions and the number of points in each dimension 
@@ -142,7 +142,7 @@ main objects are:
         The latter information can be used to create the correct axis labels in 
         plots. For the full documentation please visit the 
         :ref:`ScanSetup manual <scan_context>`.
-    :py:class:`DiffractionExperimentContext <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
+    :py:class:`DiffractionExperimentContext <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>`
         This object includes information about the global experimental setup 
         like X-ray energy, detector type, position and geometry. For the full 
         documentation please visit the 
@@ -169,10 +169,10 @@ yield the same object:
     >>> import pydidas
     >>> SCAN = pydidas.contexts.ScanContext()
     >>> SCAN
-    <pydidas.contexts.scan_context.scan_context._ScanContext at 0x1d4a257b820>
+    <pydidas.contexts.scan_context.Scan at 0x1d4a257b820>
     >>> SCAN2  = pydidas.contexts.ScanContext()
     >>> SCAN2
-    <pydidas.contexts.scan_context.scan_context._ScanContext at 0x1d4a257b820>
+    <pydidas.contexts.scan_context.Scan at 0x1d4a257b820>
     >>> SCAN == SCAN2
     True
     

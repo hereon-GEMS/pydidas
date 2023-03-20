@@ -37,10 +37,10 @@ from ..core import (
     UserConfigError,
 )
 from ..contexts import ScanContext
-from .workflow_results import WorkflowResults
+from .workflow_results import WorkflowResultsContext
 
 
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 SCAN = ScanContext()
 
 

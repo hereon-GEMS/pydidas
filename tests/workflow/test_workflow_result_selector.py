@@ -32,13 +32,13 @@ import numpy as np
 from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.contexts import ScanContext
 from pydidas.unittest_objects import DummyProc, DummyLoader
-from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.workflow import WorkflowTree, WorkflowResultsContext
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
-RES = WorkflowResults()
+RES = WorkflowResultsContext()
 SAVER = WorkflowResultIoMeta
 
 

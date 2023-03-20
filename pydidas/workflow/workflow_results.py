@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["WorkflowResults"]
+__all__ = ["WorkflowResults", "WorkflowResultsContext"]
 
 import os
 import re
@@ -37,21 +37,22 @@ from .workflow_tree import WorkflowTree
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
 
 
-SCAN = ScanContext()
-TREE = WorkflowTree()
-
-
-class _WorkflowResults(QtCore.QObject):
+class WorkflowResults(QtCore.QObject):
     """
     WorkflowResults is a class for handling composite data which spans
     multiple datasets with multiple dimensions each. Results are referenced
     by the node ID of the data's producer.
+
+    Warning: Users should generally only use the WorkflowResultsContext singleton,
+    and never use the WorkflowResults directly unless explicitly required.
     """
 
     new_results = QtCore.Signal()
 
-    def __init__(self):
+    def __init__(self, scan_context=None, workflow_tree=None):
         super().__init__()
+        self._SCAN = ScanContext() if scan_context is None else scan_context
+        self._TREE = WorkflowTree() if workflow_tree is None else workflow_tree
         self.clear_all_results()
 
     def update_shapes_from_scan_and_workflow(self):
@@ -60,33 +61,33 @@ class _WorkflowResults(QtCore.QObject):
         WorkflowTree for their current dimensions and shapes.
         """
         self.clear_all_results()
-        _dim = SCAN.get_param_value("scan_dim")
-        _results = TREE.get_all_result_shapes()
-        _shapes = {_key: SCAN.shape + _shape for _key, _shape in _results.items()}
+        _dim = self._SCAN.get_param_value("scan_dim")
+        _results = self._TREE.get_all_result_shapes()
+        _shapes = {_key: self._SCAN.shape + _shape for _key, _shape in _results.items()}
         for _node_id, _shape in _shapes.items():
             _dset = Dataset(np.empty(_shape, dtype=np.float32))
             _dset[:] = np.nan
             for index in range(_dim):
-                _label, _unit, _range = SCAN.get_metadata_for_dim(index)
+                _label, _unit, _range = self._SCAN.get_metadata_for_dim(index)
                 _dset.update_axis_labels(index, _label)
                 _dset.update_axis_units(index, _unit)
                 _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
             self._config["shapes"] = _shapes
-            _plugin = TREE.nodes[_node_id].plugin
+            _plugin = self._TREE.nodes[_node_id].plugin
             self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
             self._config["data_labels"][_node_id] = _plugin.output_data_label
             self._config["data_units"][_node_id] = _plugin.output_data_unit
             self._config["plugin_names"][_node_id] = _plugin.plugin_name
             self._config["result_titles"][_node_id] = _plugin.result_title
-        self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
 
     def clear_all_results(self):
         """
         Clear all interally stored results and reset the instance attributes.
         """
         self.__composites = {}
-        self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
         self._config = {
             "shapes": {},
             "node_labels": {},
@@ -110,7 +111,7 @@ class _WorkflowResults(QtCore.QObject):
             the associated data.
         """
         for node_id, _meta in metadata.items():
-            _dim_offset = SCAN.get_param_value("scan_dim")
+            _dim_offset = self._SCAN.get_param_value("scan_dim")
             for _key, _item in _meta.items():
                 if isinstance(_item, dict):
                     _update_method = getattr(
@@ -141,7 +142,7 @@ class _WorkflowResults(QtCore.QObject):
         """
         if not self._config["metadata_complete"]:
             self.__update_composite_metadata(results)
-        _scan_index = SCAN.get_frame_position_in_scan(index)
+        _scan_index = self._SCAN.get_frame_position_in_scan(index)
         for _key, _val in results.items():
             self.__composites[_key][_scan_index] = _val
         self.new_results.emit()
@@ -158,7 +159,7 @@ class _WorkflowResults(QtCore.QObject):
         for node_id, result in results.items():
             if not isinstance(result, Dataset):
                 continue
-            _dim_offset = SCAN.get_param_value("scan_dim")
+            _dim_offset = self._SCAN.get_param_value("scan_dim")
             for _dim in range(result.ndim):
                 self.__composites[node_id].update_axis_labels(
                     _dim + _dim_offset, result.axis_labels[_dim]
@@ -243,7 +244,7 @@ class _WorkflowResults(QtCore.QObject):
         int
             The hash value of the combined input data.
         """
-        self.__source_hash = hash((hash(SCAN), hash(TREE)))
+        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
         return self.__source_hash
 
     @property
@@ -313,9 +314,9 @@ class _WorkflowResults(QtCore.QObject):
         """
         _data = self.__composites[node_id].copy()
         _data.flatten_dims(
-            *range(SCAN.ndim),
+            *range(self._SCAN.ndim),
             new_dim_label="Chronological scan points",
-            new_dim_range=np.arange(SCAN.n_points),
+            new_dim_range=np.arange(self._SCAN.n_points),
         )
         if squeeze:
             return _data.squeeze()
@@ -351,7 +352,7 @@ class _WorkflowResults(QtCore.QObject):
         _data = self.__composites[node_id].copy()
 
         def __dim_index(i):
-            return len(slices) - (i + 1) + flattened_scan_dim * (SCAN.ndim - 1)
+            return len(slices) - (i + 1) + flattened_scan_dim * (self._SCAN.ndim - 1)
 
         for _dim, _slice in enumerate(slices[flattened_scan_dim:][::-1]):
             if isinstance(_slice, slice):
@@ -371,9 +372,9 @@ class _WorkflowResults(QtCore.QObject):
 
         if flattened_scan_dim:
             _data.flatten_dims(
-                *range(SCAN.ndim),
+                *range(self._SCAN.ndim),
                 new_dim_label="Chronological scan points",
-                new_dim_range=np.arange(SCAN.n_points),
+                new_dim_range=np.arange(self._SCAN.n_points),
             )
             _data = _data[slices[0]]
 
@@ -470,7 +471,7 @@ class _WorkflowResults(QtCore.QObject):
             enabled.
         """
         save_formats = [s.strip() for s in re.split("&|/|,", save_formats)]
-        _name = SCAN.get_param_value("scan_title")
+        _name = self._SCAN.get_param_value("scan_title")
         RESULT_SAVER.set_active_savers_and_title(save_formats, _name)
         if single_node is None:
             _keys = list(self.shapes.keys())
@@ -549,7 +550,7 @@ class _WorkflowResults(QtCore.QObject):
             The formatted string with a representation of all the metadata.
         """
         _meta = self.get_result_metadata(node_id)
-        _scandim = SCAN.get_param_value("scan_dim")
+        _scandim = self._SCAN.get_param_value("scan_dim")
         _start_index = use_scan_timeline * _scandim
         _print_info = {
             "ax_labels": list(_meta["axis_labels"].values())[_start_index:],
@@ -567,8 +568,8 @@ class _WorkflowResults(QtCore.QObject):
         if use_scan_timeline:
             _print_info["ax_labels"].insert(0, "Chronological scan points")
             _print_info["ax_units"].insert(0, "")
-            _print_info["ax_ranges"].insert(0, f"0 ... {SCAN.n_points - 1}")
-            _print_info["ax_points"].insert(0, SCAN.n_points)
+            _print_info["ax_ranges"].insert(0, f"0 ... {self._SCAN.n_points - 1}")
+            _print_info["ax_points"].insert(0, self._SCAN.n_points)
             _print_info["ax_types"].insert(0, "(scan)")
         if squeeze_results:
             _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]
@@ -630,7 +631,7 @@ class _WorkflowResults(QtCore.QObject):
             "metadata_complete": True,
         }
         self.__composites = _data
-        SCAN.update_from_dictionary(_scan)
+        self._SCAN.update_from_dictionary(_scan)
 
 
-WorkflowResults = SingletonFactory(_WorkflowResults)
+WorkflowResultsContext = SingletonFactory(WorkflowResults)

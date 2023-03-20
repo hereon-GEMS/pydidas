@@ -29,7 +29,7 @@ import logging
 import pyFAI
 
 from pydidas.contexts.diffraction_exp_context.diffraction_exp_context import (
-    _DiffractionExperimentContext,
+    DiffractionExperiment,
     DiffractionExperimentContext,
 )
 
@@ -47,7 +47,7 @@ class TestDiffractionExperimentContext(unittest.TestCase):
 
     def test_creation(self):
         obj = DiffractionExperimentContext()
-        self.assertIsInstance(obj, _DiffractionExperimentContext)
+        self.assertIsInstance(obj, DiffractionExperiment)
 
     def test_set_param_generic(self):
         _name = "Test"

@@ -23,7 +23,7 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DiffractionExperimentContext"]
+__all__ = ["DiffractionExperimentContext", "DiffractionExperiment"]
 
 import pyFAI
 
@@ -36,7 +36,7 @@ from ...core import (
 from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
 
 
-class _DiffractionExperimentContext(ObjectWithParameterCollection):
+class DiffractionExperiment(ObjectWithParameterCollection):
     """
     Class which holds experimental settings. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
@@ -192,4 +192,4 @@ class _DiffractionExperimentContext(ObjectWithParameterCollection):
         return self
 
 
-DiffractionExperimentContext = SingletonFactory(_DiffractionExperimentContext)
+DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)

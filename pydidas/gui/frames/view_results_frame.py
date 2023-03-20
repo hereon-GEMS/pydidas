@@ -29,11 +29,11 @@ from qtpy import QtCore
 
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
-from ...workflow import WorkflowResults, result_io
+from ...workflow import WorkflowResultsContext, result_io
 from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 SAVER = result_io.WorkflowResultIoMeta
 
 
@@ -60,6 +60,10 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
             dialog_type="open_directory",
             caption="Workflow results directory",
             qsettings_ref="WorkflowResults__import",
+            info_string=(
+                "Please note that import Workflow results will also overwrite any "
+                "current results and change the "
+            ),
         )
 
     def finalize_ui(self):

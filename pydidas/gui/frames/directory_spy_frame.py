@@ -35,12 +35,12 @@ from ...core.utils import pydidas_logger, get_extension
 from ...core.constants import HDF5_EXTENSIONS
 from ...contexts import ScanContext
 from ...multiprocessing import AppRunner, app_processor_without_tasks
-from ...workflow import WorkflowTree, WorkflowResults
+from ...workflow import WorkflowTree, WorkflowResultsContext
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
 
 
 SCAN = ScanContext()
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 TREE = WorkflowTree()
 logger = pydidas_logger()
 

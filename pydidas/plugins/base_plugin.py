@@ -98,6 +98,7 @@ class BasePlugin(ObjectWithParameterCollection):
     output_data_label = ""
     output_data_unit = ""
     new_dataset = False
+    has_unique_parameter_config_widget = False
 
     @classmethod
     def get_class_description(cls):
@@ -303,19 +304,6 @@ class BasePlugin(ObjectWithParameterCollection):
         raise NotImplementedError(
             "Generic plugins do not have a unique parameter config widget."
         )
-
-    @property
-    def has_unique_parameter_config_widget(self):
-        """
-        Get the flag whether the Plugin has a unique configuration widget.
-
-        Returns
-        -------
-        bool
-            The flag value whether the plugin has a unique configuration
-            widget associated with it.
-        """
-        return False
 
     @property
     def input_data(self):

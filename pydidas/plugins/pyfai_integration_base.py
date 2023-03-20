@@ -39,7 +39,7 @@ from ..core.utils import pydidas_logger, rebin2d
 from ..data_io import import_data
 from ..contexts import DiffractionExperimentContext
 from .base_proc_plugin import ProcPlugin
-
+from ..widgets.plugin_config_widgets import PyfaiIntegrationConfigWidget
 
 logger = pydidas_logger()
 
@@ -97,6 +97,7 @@ class pyFAIintegrationBase(ProcPlugin):
     output_data_label = "Integrated data"
     output_data_unit = "a.u."
     new_dataset = True
+    has_unique_parameter_config_widget = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -359,3 +360,14 @@ class pyFAIintegrationBase(ProcPlugin):
         To be implemented by the concrete subclass.
         """
         raise NotImplementedError
+
+    def get_parameter_config_widget(self):
+        """
+        Get the unique configuration widget associated with this Plugin.
+
+        Returns
+        -------
+        QtWidgets.QWidget
+            The unique ParameterConfig widget
+        """
+        return PyfaiIntegrationConfigWidget(self)

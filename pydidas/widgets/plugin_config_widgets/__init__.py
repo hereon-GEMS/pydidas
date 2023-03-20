@@ -26,11 +26,16 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .pyfai_integration_config_widget import *
 from .subtract_bg_image_config_widget import *
-
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import pyfai_integration_config_widget
+
+__all__.extend(pyfai_integration_config_widget.__all__)
+del pyfai_integration_config_widget
+
 from . import subtract_bg_image_config_widget
 
 __all__.extend(subtract_bg_image_config_widget.__all__)

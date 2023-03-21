@@ -18,7 +18,7 @@ Bugfixes
 --------
 - Fixed an issue in the BaseInputPlugin when using both the ScanContext 
   scan_start_index > 0 and scan_index_stepping > 1.
-
+- Fixed an issue with the DirectorySpyFrame displaying wrong status messages.
 
 =======
 v23.3.9

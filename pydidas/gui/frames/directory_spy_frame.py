@@ -206,7 +206,7 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         if self._runner is not None:
             self._runner.send_stop_signal()
-        self.set_status("Aborted processing of full workflow.")
+        self.set_status("Stopped scanning for new image files.")
         self.__set_proc_widget_enabled_for_running(False)
 
     @QtCore.Slot()

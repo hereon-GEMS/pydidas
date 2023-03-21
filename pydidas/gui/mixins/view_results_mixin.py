@@ -36,9 +36,6 @@ from ...widgets.dialogues import critical_warning
 from ...workflow import WorkflowResultsContext
 
 
-RESULTS = WorkflowResultsContext()
-
-
 class ViewResultsMixin:
     """
     The ViewResultsMixin has all the necessary functionality to show and
@@ -66,6 +63,8 @@ class ViewResultsMixin:
     """
 
     def __init__(self, **kwargs):
+        _results = kwargs.get("workflow_results", None)
+        self._RESULTS = _results if _results is not None else WorkflowResultsContext()
         self._config.update(
             {
                 "data_use_timeline": False,
@@ -74,7 +73,7 @@ class ViewResultsMixin:
                 "active_node": None,
                 "data_slices": (),
                 "frame_active": True,
-                "source_hash": RESULTS.source_hash,
+                "source_hash": self._RESULTS.source_hash,
             }
         )
         self._data_axlabels = ["", ""]
@@ -107,10 +106,10 @@ class ViewResultsMixin:
         Verify that the underlying information for the WorkflowResults
         (i.e. the ScanContext and WorkflowTree) have not changed.
         """
-        _hash = RESULTS.source_hash
+        _hash = self._RESULTS.source_hash
         if _hash != self._config["source_hash"]:
-            RESULTS.update_shapes_from_scan_and_workflow()
-            self._config["source_hash"] = RESULTS.source_hash
+            self._RESULTS.update_shapes_from_scan_and_workflow()
+            self._config["source_hash"] = self._RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()
             self._update_choices_of_selected_results()
@@ -176,7 +175,7 @@ class ViewResultsMixin:
             return
         _dim = 1 if self._config["plot_type"] in ["1D plot", "group of 1D plots"] else 2
         _node = self._config["active_node"]
-        _data = RESULTS.get_result_subset(
+        _data = self._RESULTS.get_result_subset(
             _node,
             self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
@@ -193,7 +192,7 @@ class ViewResultsMixin:
         elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
             self._widgets["plot_stack"].setCurrentIndex(1)
             self._plot_2d(_data)
-        self._widgets[f"plot{_dim}d"].setGraphTitle(RESULTS.result_titles[_node])
+        self._widgets[f"plot{_dim}d"].setGraphTitle(self._RESULTS.result_titles[_node])
 
     def _plot_group_of_curves(self, data):
         """
@@ -249,7 +248,7 @@ class ViewResultsMixin:
             data,
             replace=replace,
             legend=legend,
-            title=RESULTS.result_titles[self._config["active_node"]],
+            title=self._RESULTS.result_titles[self._config["active_node"]],
         )
 
     def _plot_2d(self, data):
@@ -268,7 +267,7 @@ class ViewResultsMixin:
         if _dim0 > _dim1:
             data = data.transpose()
         self._widgets["plot2d"].plot_pydidas_dataset(
-            data, title=RESULTS.result_titles[self._config["active_node"]]
+            data, title=self._RESULTS.result_titles[self._config["active_node"]]
         )
 
     def _update_choices_of_selected_results(self):
@@ -276,14 +275,14 @@ class ViewResultsMixin:
         Update the "selected_results" Parameter choices based on the WorkflowResults.
         """
         _param = self.get_param("selected_results")
-        RESULTS.update_param_choices_from_labels(_param)
+        self._RESULTS.update_param_choices_from_labels(_param)
         self._widgets["result_selector"].get_and_store_result_node_labels()
 
     def _update_export_button_activation(self):
         """
         Update the enabled state of the export buttons based on available results.
         """
-        _active = RESULTS.shapes != {}
+        _active = self._RESULTS.shapes != {}
         self._widgets["but_export_current"].setEnabled(_active)
         self._widgets["but_export_all"].setEnabled(_active)
 
@@ -342,6 +341,6 @@ class ViewResultsMixin:
             )
         if _dirname is None:
             return
-        RESULTS.save_results_to_disk(
+        self._RESULTS.save_results_to_disk(
             _dirname, _formats, overwrite=_overwrite, node_id=node
         )

@@ -28,12 +28,13 @@ __all__ = ["ViewResultsFrame"]
 from qtpy import QtCore
 
 from ...core import get_generic_param_collection
+from ...contexts.scan_context import Scan
 from ...widgets import PydidasFileDialog
-from ...workflow import WorkflowResultsContext, result_io
+from ...workflow import WorkflowResults, result_io
+from ...workflow.workflow_tree import _WorkflowTree
 from ..mixins import ViewResultsMixin
 from .builders.view_results_frame_builder import ViewResultsFrameBuilder
 
-RESULTS = WorkflowResultsContext()
 SAVER = result_io.WorkflowResultIoMeta
 
 
@@ -44,7 +45,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     """
 
     menu_icon = "qta::mdi.monitor-eye"
-    menu_title = "View workflow results"
+    menu_title = "Import and display workflow results"
     menu_entry = "Workflow processing/View workflow results"
 
     default_params = get_generic_param_collection(
@@ -53,6 +54,11 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
     params_not_to_restore = ["selected_results"]
 
     def __init__(self, parent=None, **kwargs):
+        self._SCAN = Scan()
+        self._TREE = _WorkflowTree()
+        self._RESULTS = WorkflowResults(
+            scan_context=self._SCAN, workflow_tree=self._TREE
+        )
         ViewResultsFrameBuilder.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog(
@@ -70,7 +76,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         """
         Connect the export functions to the results widget data.
         """
-        ViewResultsMixin.__init__(self)
+        ViewResultsMixin.__init__(self, workflow_results=self._RESULTS)
 
     def connect_signals(self):
         self._widgets["but_load"].clicked.connect(self.import_data_to_workflow_results)
@@ -89,9 +95,6 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
             The index of the newly activated frame.
         """
         super().frame_activated(index)
-        if index == self.frame_index:
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def import_data_to_workflow_results(self):
@@ -100,6 +103,6 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         """
         _dir = self.__import_dialog.get_user_response()
         if _dir is not None:
-            RESULTS.import_data_from_directory(_dir)
+            self._RESULTS.import_data_from_directory(_dir)
             self._update_choices_of_selected_results()
             self._update_export_button_activation()

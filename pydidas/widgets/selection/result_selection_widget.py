@@ -42,70 +42,12 @@ from ...core.constants import (
     QT_REG_EXP_SLICE_VALIDATOR,
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
 )
-from ...core.utils import SignalBlocker, apply_qt_properties
+from ...core.utils import SignalBlocker, apply_qt_properties, convert_unicode_to_ascii
 from ...contexts import ScanContext
 from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
 from ..read_only_text_widget import ReadOnlyTextWidget
-
-
-SCAN = ScanContext()
-RESULTS = WorkflowResultsContext()
-
-
-def _get_axis_index_labels(node_id):
-    """
-    Get the indices and axis labels for the selected node ID.
-
-    This function will filter labels of dimensions with length 0 or 1.
-
-    Parameters
-    ----------
-    node_id : int
-        The node ID.
-
-    Returns
-    -------
-    str
-        The node's axis labels.
-    """
-    _node_metadata = RESULTS.get_result_metadata(node_id)
-    _dims = [_dim for _dim, _val in enumerate(RESULTS.shapes[node_id]) if _val > 1]
-    _new_choices = [
-        (
-            f"{_index}: {_node_metadata['axis_labels'][_dim]}"
-            if len(_node_metadata["axis_labels"][_dim]) > 0
-            else f"{_index}"
-        )
-        for _index, _dim in enumerate(_dims)
-    ]
-    return _new_choices
-
-
-def _get_axis_labels_and_units(node_id):
-    """
-    Get the axis labels and units
-
-    Parameters
-    ----------
-    node_id : int
-        The node ID
-
-    Returns
-    -------
-    list
-        A list with pair entries for label and unit.
-    """
-    if node_id == -1:
-        return [[]]
-    _node_metadata = RESULTS.get_result_metadata(node_id)
-    _dims = [_dim for _dim, _val in enumerate(RESULTS.shapes[node_id]) if _val > 1]
-    _labels_and_units = [
-        [_node_metadata["axis_labels"][_dim], _node_metadata["axis_units"][_dim]]
-        for _dim in _dims
-    ]
-    return _labels_and_units
 
 
 def _param_widget_config(param_key):
@@ -229,11 +171,19 @@ class ResultSelectionWidget(
             "selection_by_data_values": True,
             "validator": QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
         }
+        _scan_context = kwargs.get("scan_context", None)
+        self._SCAN = ScanContext() if _scan_context is None else _scan_context
+        _results = kwargs.get("workflow_results", None)
+        self._RESULTS = WorkflowResultsContext() if _results is None else _results
         self._active_node = -1
         if select_results_param is not None:
             self.add_param(select_results_param)
         self.set_default_params()
-        self._selector = WorkflowResultsSelector(self.get_param("use_scan_timeline"))
+        self._selector = WorkflowResultsSelector(
+            self.get_param("use_scan_timeline"),
+            scan_context=self._SCAN,
+            workflow_results=self._RESULTS,
+        )
         self.__create_widgets()
         self.__connect_signals()
 
@@ -358,7 +308,7 @@ class ResultSelectionWidget(
         """
         _param = self.get_param("selected_results")
         # store the labels for the different nodes from the RESULTS
-        RESULTS.update_param_choices_from_labels(_param)
+        self._RESULTS.update_param_choices_from_labels(_param)
         with SignalBlocker(self.param_widgets["selected_results"]):
             self.param_widgets["selected_results"].update_choices(_param.choices)
             self.param_widgets["selected_results"].setCurrentText(_param.value)
@@ -390,7 +340,7 @@ class ResultSelectionWidget(
         self.param_composite_widgets["plot_ax1"].setVisible(_ax1_used and not hide_all)
         self.param_composite_widgets["plot_ax2"].setVisible(_ax2_used and not hide_all)
         _frozendims = []
-        _labels_and_units = _get_axis_labels_and_units(self._active_node)
+        _labels_and_units = self._get_axis_labels_and_units()
         if _ax1_used and self._config["result_ndim"] > 0:
             _frozendims.append(int(self.get_param_value("plot_ax1").split(":")[0]))
         if _ax2_used and self._config["result_ndim"] > 0:
@@ -509,11 +459,13 @@ class ResultSelectionWidget(
         Update the number of dimensions the results will have and store the
         new number.
         """
-        _ndim = RESULTS.ndims[self._active_node]
+        _ndim = self._RESULTS.ndims[self._active_node]
         _ndim_scan = np.where(
-            np.asarray(RESULTS.shapes[self._active_node][: SCAN.ndim]) > 1
+            np.asarray(self._RESULTS.shapes[self._active_node][: self._SCAN.ndim]) > 1
         )[0].size
-        _ndim = np.where(np.asarray(RESULTS.shapes[self._active_node]) > 1)[0].size
+        _ndim = np.where(np.asarray(self._RESULTS.shapes[self._active_node]) > 1)[
+            0
+        ].size
         if self.get_param_value("use_scan_timeline"):
             _ndim -= _ndim_scan - 1
         self._config["result_ndim"] = _ndim
@@ -524,7 +476,7 @@ class ResultSelectionWidget(
         selection of the "selected_results" Parameter.
         """
         self._widgets["result_info"].setText(
-            RESULTS.get_node_result_metadata_string(
+            self._RESULTS.get_node_result_metadata_string(
                 self._active_node, self.get_param_value("use_scan_timeline")
             )
         )
@@ -586,9 +538,8 @@ class ResultSelectionWidget(
         _other_ax = 3 - plot_axis % 3
         # new_dim = int(new_dim.split(":")[0])
         _selected_param = self.params[f"plot_ax{plot_axis}"]
-        _selected_param.value = new_dim
+        _selected_param.value = convert_unicode_to_ascii(new_dim)
         self.param_widgets[f"plot_ax{plot_axis}"].set_value(_selected_param.value)
-
         _other_param = self.params[f"plot_ax{_other_ax}"]
         if _other_param.value == new_dim:
             if new_dim == _other_param.choices[0]:
@@ -662,7 +613,7 @@ class ResultSelectionWidget(
         Calculate and update the basic dimension choices for the plot
         slicing.
         """
-        _new_choices = _get_axis_index_labels(self._active_node)
+        _new_choices = self._get_axis_index_labels()
         for _ax in [1, 2]:
             _axwidget = self.param_widgets[f"plot_ax{_ax}"]
             _axparam = self.params[f"plot_ax{_ax}"]
@@ -683,7 +634,7 @@ class ResultSelectionWidget(
         Check whether the required Parameters for the slice selection exist
         and create and add them if they do not.
         """
-        for _dim in range(RESULTS.ndims[self._active_node]):
+        for _dim in range(self._RESULTS.ndims[self._active_node]):
             _refkey = f"plot_slice_{_dim}"
             _param = Parameter(
                 _refkey,
@@ -705,6 +656,57 @@ class ResultSelectionWidget(
                 )
                 self.param_widgets[_refkey].setValidator(self._config["validator"])
         self._config["n_slice_params"] = max(
-            self._config["n_slice_params"], RESULTS.ndims[self._active_node]
+            self._config["n_slice_params"], self._RESULTS.ndims[self._active_node]
         )
         self.__update_slice_param_widgets()
+
+    def _get_axis_index_labels(self):
+        """
+        Get the indices and axis labels for the selected node ID.
+
+        This function will filter labels of dimensions with length 0 or 1.
+
+        Returns
+        -------
+        str
+            The node's axis labels.
+        """
+
+        _node_metadata = self._RESULTS.get_result_metadata(self._active_node)
+        _dims = [
+            _dim
+            for _dim, _val in enumerate(self._RESULTS.shapes[self._active_node])
+            if _val > 1
+        ]
+        _new_choices = [
+            (
+                f"{_index}: {_node_metadata['axis_labels'][_dim]}"
+                if len(_node_metadata["axis_labels"][_dim]) > 0
+                else f"{_index}"
+            )
+            for _index, _dim in enumerate(_dims)
+        ]
+        return _new_choices
+
+    def _get_axis_labels_and_units(self):
+        """
+        Get the axis labels and units
+
+        Returns
+        -------
+        list
+            A list with pair entries for label and unit.
+        """
+        if self._active_node == -1:
+            return [[]]
+        _node_metadata = self._RESULTS.get_result_metadata(self._active_node)
+        _dims = [
+            _dim
+            for _dim, _val in enumerate(self._RESULTS.shapes[self._active_node])
+            if _val > 1
+        ]
+        _labels_and_units = [
+            [_node_metadata["axis_labels"][_dim], _node_metadata["axis_units"][_dim]]
+            for _dim in _dims
+        ]
+        return _labels_and_units

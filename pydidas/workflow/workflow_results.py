@@ -518,7 +518,7 @@ class WorkflowResults(QtCore.QObject):
         """
         _curr_choice = param.value
         _new_choices = ["No selection"] if add_no_selection_entry else []
-        _new_choices.extend(self._config["result_titles"].values())
+        _new_choices.extend(list(self._config["result_titles"].values()))
         if _curr_choice in _new_choices:
             param.choices = _new_choices
         else:

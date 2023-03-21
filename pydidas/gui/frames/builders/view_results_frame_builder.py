@@ -112,6 +112,8 @@ class ViewResultsFrameBuilder(BaseFrame):
             parent_widget=self._widgets["config"],
             gridpos=(-1, 0, 1, 1),
             select_results_param=self.get_param("selected_results"),
+            scan_context=self._SCAN,
+            workflow_results=self._RESULTS,
         )
         self.create_line(
             "line_export", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]

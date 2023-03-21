@@ -43,10 +43,19 @@ SAVER = WorkflowResultIoMeta
 
 
 class TestWorkflowResultSelector(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        ScanContext._reset_instance()
+        WorkflowResultsContext._reset_instance()
+        global SCAN, RES
+        SCAN = ScanContext()
+        RES = WorkflowResultsContext()
+
     def setUp(self):
         self.set_up_scan()
         self.set_up_tree()
         RES.clear_all_results()
+
         self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -131,6 +140,8 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
         self.assertTrue("active_node" in obj._config)
+        self.assertEqual(obj._SCAN, ScanContext())
+        self.assertEqual(obj._RESULTS, RES)
 
     def test_init__with_param(self):
         _param = Parameter("result_n_dim", int, 124)

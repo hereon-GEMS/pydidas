@@ -28,7 +28,7 @@ __all__ = ["BaseFrame"]
 from qtpy import QtWidgets, QtCore
 
 from ..core import ParameterCollection, PydidasQsettingsMixin, ParameterCollectionMixIn
-from ..core.utils import get_pydidas_icon_w_bg
+from ..core.utils import get_pydidas_icon_w_bg, ShowBusyMouse
 from .factory import CreateWidgetsMixIn
 from .parameter_config import ParameterWidgetsMixIn
 
@@ -107,12 +107,13 @@ class BaseFrame(
             The index of the activated frame.
         """
         if index == self.frame_index and not self._config["built"]:
-            self.setUpdatesEnabled(False)
-            self.build_frame()
-            self.setUpdatesEnabled(True)
-            self.connect_signals()
-            self.finalize_ui()
-            self._config["built"] = True
+            with ShowBusyMouse():
+                self.setUpdatesEnabled(False)
+                self.build_frame()
+                self.setUpdatesEnabled(True)
+                self.connect_signals()
+                self.finalize_ui()
+                self._config["built"] = True
         if "state" in self._config:
             _state = self._config.pop("state")
             self.restore_state(_state)

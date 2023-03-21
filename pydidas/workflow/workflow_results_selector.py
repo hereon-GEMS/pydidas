@@ -40,10 +40,6 @@ from ..contexts import ScanContext
 from .workflow_results import WorkflowResultsContext
 
 
-RESULTS = WorkflowResultsContext()
-SCAN = ScanContext()
-
-
 class WorkflowResultsSelector(ObjectWithParameterCollection):
     """
     The WorkflowResultsSelector class allows to select a subset of results
@@ -68,7 +64,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
-        self.update_param_values_from_kwargs(**kwargs)
+        _scan_context = kwargs.get("scan_context", None)
+        self._SCAN = ScanContext() if _scan_context is None else _scan_context
+        _results = kwargs.get("workflow_results", None)
+        self._RESULTS = WorkflowResultsContext() if _results is None else _results
         self._selection = None
         self._npoints = []
         self._config["active_node"] = -1
@@ -96,16 +95,16 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._config["active_node"] = index
         self._calc_and_store_ndim_of_results()
         self._check_and_create_params_for_slice_selection()
-        self._config["active_ranges"] = RESULTS.get_result_ranges(index)
+        self._config["active_ranges"] = self._RESULTS.get_result_ranges(index)
 
     def _calc_and_store_ndim_of_results(self):
         """
         Update the number of dimensions the results will have and store the
         new number.
         """
-        _ndim = RESULTS.ndims[self._config["active_node"]]
+        _ndim = self._RESULTS.ndims[self._config["active_node"]]
         if self.get_param_value("use_scan_timeline"):
-            _ndim -= SCAN.ndim - 1
+            _ndim -= self._SCAN.ndim - 1
         self._config["result_ndim"] = _ndim
 
     def _check_and_create_params_for_slice_selection(self):
@@ -113,7 +112,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         Check whether the required Parameters for the slice selection exist
         for all current data dimensions and create and add them if they do not.
         """
-        for _dim in range(RESULTS.ndims[self._config["active_node"]]):
+        for _dim in range(self._RESULTS.ndims[self._config["active_node"]]):
             _refkey = f"data_slice_{_dim}"
             _param = Parameter(
                 _refkey,
@@ -185,10 +184,10 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         Parameters.
         """
         _use_timeline = self.get_param_value("use_scan_timeline")
-        self._npoints = list(RESULTS.shapes[self._config["active_node"]])
+        self._npoints = list(self._RESULTS.shapes[self._config["active_node"]])
         if _use_timeline:
-            del self._npoints[: SCAN.ndim]
-            self._npoints.insert(0, SCAN.n_points)
+            del self._npoints[: self._SCAN.ndim]
+            self._npoints.insert(0, self._SCAN.n_points)
         _selection = tuple(
             self._get_single_slice_object(_dim)
             for _dim in range(self._config["result_ndim"])

@@ -66,10 +66,6 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
             dialog_type="open_directory",
             caption="Workflow results directory",
             qsettings_ref="WorkflowResults__import",
-            info_string=(
-                "Please note that import Workflow results will also overwrite any "
-                "current results and change the "
-            ),
         )
 
     def finalize_ui(self):

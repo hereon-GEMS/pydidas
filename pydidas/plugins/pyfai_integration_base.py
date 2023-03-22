@@ -160,8 +160,8 @@ class pyFAIintegrationBase(ProcPlugin):
             return
         _name = mp.current_process().name
         _platforms = [_platform.name for _platform in OCL.platforms]
-        if "NVIDIA CUDA" in _platforms and _name.startswith("pydidas_worker-"):
-            _index = int(_name.strip("pydidas_worker-"))
+        if "NVIDIA CUDA" in _platforms and _name.startswith("pydidas_"):
+            _index = int(_name.split("-")[1])
             _platform = OCL.get_platform("NVIDIA CUDA")
             _n_device = len(_platform.devices)
             _device = _index % _n_device

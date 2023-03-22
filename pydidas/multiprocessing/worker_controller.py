@@ -352,12 +352,13 @@ class WorkerController(QtCore.QThread):
         """
         Create and start worker processes.
         """
+        _pid = mp.current_process().pid
         self._workers = [
             mp.Process(
                 target=self._processor["func"],
                 args=self._processor["args"],
                 kwargs=self._processor["kwargs"],
-                name=f"pydidas_worker-{i}",
+                name=f"pydidas_{_pid}_worker-{i}",
                 daemon=True,
             )
             for i in range(self._n_workers)

@@ -68,6 +68,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
         plugin.set_param_value("fit_upper_limit", _high)
+        plugin.set_param_value("output", "Peak position")
         plugin.calculate_result_shape()
         return plugin
 

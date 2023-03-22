@@ -67,7 +67,7 @@ class FitSinglePeak(ProcPlugin):
         Parameter(
             "output",
             str,
-            "Peak position",
+            "Peak position; peak area; peak FWHM",
             choices=[
                 "Peak position",
                 "Peak area",

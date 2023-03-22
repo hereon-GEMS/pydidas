@@ -31,6 +31,7 @@ __all__ = ["PyfaiCalibFrame"]
 import os
 import functools
 
+import numpy as np
 from qtpy import QtWidgets, QtGui, QtCore
 import pyFAI
 from pyFAI.app import calib2
@@ -48,8 +49,9 @@ from pyFAI.gui.tasks import (
 from silx.gui.plot.tools import ImageToolBar
 
 from ...core import constants
-from ...widgets import BaseFrame, silx_plot
-from ...contexts import DiffractionExperimentContext
+from ...widgets import BaseFrame, silx_plot, PydidasFileDialog
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
+from ...contexts.diffraction_exp_context import DiffractionExperiment
 
 
 EXP = DiffractionExperimentContext()
@@ -93,6 +95,12 @@ def _create_calib_tasks():
         ][0]
         _toolbar.addAction(_histo_crop_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
+    # insert button for exporting to DiffractionExperimentContext:
+    _parent = tasks[4]._savePoniButton.parent()
+    tasks[4]._update_context_button = QtWidgets.QPushButton(
+        "Update pydidas diffraction setup from calibration"
+    )
+    _parent.layout().addWidget(tasks[4]._update_context_button)
     return tasks
 
 
@@ -118,6 +126,19 @@ class PyfaiCalibFrame(BaseFrame):
         BaseFrame.__init__(self, parent, **kwargs)
         self._setup_pyfai_context()
         self._tasks = _create_calib_tasks()
+        self.__export_dialog = PydidasFileDialog(
+            parent=self,
+            dialog_type="save_file",
+            caption="Export experiment context file",
+            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            default_extension="yaml",
+            dialog=QtWidgets.QFileDialog.getSaveFileName,
+            qsettings_ref="PyfaiCalibFrame__export",
+            info_string=(
+                "<b>Note:</b> Using yaml format allows to export the mask file name as "
+                "well. pyFAI's poni format does not include the mask file."
+            ),
+        )
 
     def _setup_pyfai_context(self):
         """
@@ -192,6 +213,11 @@ class PyfaiCalibFrame(BaseFrame):
             self._widgets["task_list"].setCurrentRow(0)
             # Hide the nextStep button of the last task
             task.setNextStepVisible(False)
+        self._tasks[4]._savePoniButton.clicked.disconnect()
+        self._tasks[4]._savePoniButton.clicked.connect(self._export_poni)
+        self._tasks[4]._update_context_button.clicked.connect(
+            self._update_pydidas_diffraction_exp_context
+        )
 
     def finalize_ui(self):
         """
@@ -232,13 +258,66 @@ class PyfaiCalibFrame(BaseFrame):
             self._widgets["task_list"].setCurrentRow(_index)
 
     @QtCore.Slot()
-    def _store_geometry(self):
+    def _export_poni(self):
+        """
+        Export the poni settings to a file.
+        """
+        _fname = self.__export_dialog.get_user_response()
+        if _fname is None:
+            return
+        _CONTEXT = DiffractionExperiment()
+        _det = self._model.experimentSettingsModel().detector()
+        _geo = self._model.fittedGeometry()
+        _CONTEXT.set_param_value("detector_name", _det.name)
+        _CONTEXT.set_param_value("detector_npixx", _det.shape[1])
+        _CONTEXT.set_param_value("detector_npixy", _det.shape[0])
+        _CONTEXT.set_param_value("detector_pxsizex", 1e6 * _det.pixel2)
+        _CONTEXT.set_param_value("detector_pxsizey", 1e6 * _det.pixel1)
+        _wavelength = float(np.round(_geo.wavelength().value() * 1e10, 12))
+        _CONTEXT.set_param_value("xray_wavelength", _wavelength)
+
+        _mask = self._get_mask_filename()
+        if _mask is not None:
+            _CONTEXT.set_param_value("detector_mask_file", _mask)
+        if _geo.isValid():
+            for _key, _value in [
+                ["detector_dist", _geo.distance().value()],
+                ["detector_poni1", _geo.poni1().value()],
+                ["detector_poni2", _geo.poni2().value()],
+                ["detector_rot1", _geo.rotation1().value()],
+                ["detector_rot2", _geo.rotation2().value()],
+                ["detector_rot3", _geo.rotation3().value()],
+            ]:
+                _CONTEXT.set_param_value(_key, _value)
+        DiffractionExperimentContextIoMeta.export_to_file(
+            _fname, context=_CONTEXT, overwrite=True
+        )
+
+    def _get_mask_filename(self):
+        """
+        Get the filename of the mask file from the fitted model.
+
+        Returns
+        -------
+        Union[str, None]
+            The filename of the mask file. If no mask file has been, returns None.
+        """
+        _maskfile = self._model.experimentSettingsModel().mask().filename()
+        if _maskfile is not None:
+            if _maskfile.startswith("fabio:///"):
+                _maskfile = _maskfile[9:]
+        return _maskfile
+
+    @QtCore.Slot()
+    def _update_pydidas_diffraction_exp_context(self):
         """
         Store the fitted geometry in the DiffractionExperimentContext.
         """
         geo = self._model.fittedGeometry()
         det = self._model.experimentSettingsModel().detector()
-        EXP.set_param_value("xray_wavelength", geo.wavelength().value())
+        EXP.set_param_value(
+            "xray_wavelength", float(np.round(geo.wavelength().value() * 1e10, 12))
+        )
         EXP.set_param_value("detector_dist", geo.distance().value())
         EXP.set_param_value("detector_poni1", geo.poni1().value())
         EXP.set_param_value("detector_poni2", geo.poni2().value())
@@ -250,3 +329,6 @@ class PyfaiCalibFrame(BaseFrame):
         EXP.set_param_value("detector_npixy", det.shape[0])
         EXP.set_param_value("detector_pxsizex", det.pixel2)
         EXP.set_param_value("detector_pxsizey", det.pixel1)
+        _mask = self._get_mask_filename()
+        if _mask is not None:
+            EXP.set_param_value("detector_mask_file", _mask)

@@ -57,8 +57,9 @@ class DiffractionExperimentContextIoYaml(DiffractionExperimentContextIoBase):
         filename : str
             The filename of the file to be written.
         """
+        _EXP = kwargs.get("context", None) if "context" in kwargs else EXP
         cls.check_for_existing_file(filename, **kwargs)
-        tmp_params = EXP.get_param_values_as_dict()
+        tmp_params = _EXP.get_param_values_as_dict()
         # need to convert all float values to generic python "float" to
         # allow using the yaml.save_dump function
         for _key, _val in tmp_params.items():

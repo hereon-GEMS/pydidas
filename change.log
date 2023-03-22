@@ -13,6 +13,8 @@ Improvements
 - Exposed Scan and DiffractionExperiment in the contexts in preparation of 
   local usages. This also includes an update of the object names for 
   consistency.
+- Added support for exporting the calibration results to yaml files and to
+  the pydidas DiffractionExperimentContext directly from the PyfaiCalibFrame.
 
 Bugfixes
 --------
@@ -20,6 +22,8 @@ Bugfixes
   scan_start_index > 0 and scan_index_stepping > 1.
 - Fixed an issue with the DirectorySpyFrame displaying wrong status messages.
 - Fixed an issue with overlapping histogram limits in CropHistogramOutliers.
+- Fixed an issue with multiprocessing process names when running multiple 
+  instances.
 
 
 =======

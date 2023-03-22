@@ -53,12 +53,14 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
         filename : str
             The filename of the file to be written.
         """
+
+        _EXP = kwargs.get("context", None) if "context" in kwargs else EXP
         cls.check_for_existing_file(filename, **kwargs)
         _pdata = {}
         for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]:
-            _pdata[key] = EXP.get_param_value(f"detector_{key}")
-        _pdata["detector"] = EXP.get_param_value("detector_name")
-        _pdata["distance"] = EXP.get_param_value("detector_dist")
+            _pdata[key] = _EXP.get_param_value(f"detector_{key}")
+        _pdata["detector"] = _EXP.get_param_value("detector_name")
+        _pdata["distance"] = _EXP.get_param_value("detector_dist")
         if (
             _pdata["detector"] in pyFAI.detectors.Detector.registry
             and _pdata["detector"] != "detector"
@@ -66,14 +68,14 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
             _pdata["detector_config"] = {}
         else:
             _pdata["detector_config"] = dict(
-                pixel1=(1e-6 * EXP.get_param_value("detector_pxsizey")),
-                pixel2=(1e-6 * EXP.get_param_value("detector_pxsizex")),
+                pixel1=(1e-6 * _EXP.get_param_value("detector_pxsizey")),
+                pixel2=(1e-6 * _EXP.get_param_value("detector_pxsizex")),
                 max_shape=(
-                    EXP.get_param_value("detector_npixy"),
-                    EXP.get_param_value("detector_npixx"),
+                    _EXP.get_param_value("detector_npixy"),
+                    _EXP.get_param_value("detector_npixx"),
                 ),
             )
-        _pdata["wavelength"] = EXP.get_param_value("xray_wavelength") * 1e-10
+        _pdata["wavelength"] = _EXP.get_param_value("xray_wavelength") * 1e-10
         pfile = pyFAI.io.ponifile.PoniFile()
         pfile.read_from_dict(_pdata)
         with open(filename, "w") as stream:

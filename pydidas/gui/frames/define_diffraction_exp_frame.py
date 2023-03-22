@@ -284,3 +284,21 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         _fname = self.__export_dialog.get_user_response()
         if _fname is not None:
             EXP.export_to_file(_fname, overwrite=True)
+
+    def frame_activated(self, index):
+        """
+        Add a check whether the DiffractionExperimentContext has changed from some
+        other source (e.g. pyFAI calibration) and update widgets accordingly.
+
+        Parameters
+        ----------
+        index : int
+            The active frame index.
+        """
+        super().frame_activated(index)
+        if index == self.frame_index:
+            if hash(self.params) != self._config["exp_hash"]:
+                for _key, _param in EXP.params.items():
+                    self.update_widget_value(_key, _param.value)
+        else:
+            self._config["exp_hash"] = hash(self.params)

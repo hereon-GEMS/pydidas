@@ -24,6 +24,7 @@ Bugfixes
 - Fixed an issue with overlapping histogram limits in CropHistogramOutliers.
 - Fixed an issue with multiprocessing process names when running multiple 
   instances.
+- Fixed an issue with teh FilelistManager and compressed Hdf5 files.
 
 
 =======

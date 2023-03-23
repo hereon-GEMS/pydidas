@@ -41,6 +41,7 @@ from ..core.utils import (
     verify_files_of_range_are_same_size,
     get_file_naming_scheme,
 )
+from ..core.constants import HDF5_EXTENSIONS
 
 
 class FilelistManager(ObjectWithParameterCollection):
@@ -262,7 +263,8 @@ class FilelistManager(ObjectWithParameterCollection):
         _i1 = _list.index(_fname1)
         _i2 = _list.index(_fname2)
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
-        verify_files_of_range_are_same_size(_path1, _list)
+        if not os.path.splitext(_fname1)[1][1:] in HDF5_EXTENSIONS:
+            verify_files_of_range_are_same_size(_path1, _list)
         self._config["file_list"] = [Path(os.path.join(_path1, f)) for f in _list]
         self._config["n_files"] = len(_list)
         self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size

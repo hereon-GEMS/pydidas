@@ -27,6 +27,9 @@ Bugfixes
 - Fixed an issue with teh FilelistManager and compressed Hdf5 files.
 - Fixed an issue with selecting data subsets (in data space) in the 
   WorkflowResultsSelector.
+- Fixed an issue in the CropHistogramOutliers action with vmin > vmax and 
+  numpy datatypes.
+
 
 =======
 v23.3.9

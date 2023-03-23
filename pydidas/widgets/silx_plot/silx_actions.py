@@ -30,6 +30,7 @@ __all__ = [
     "PydidasLoadImageAction",
 ]
 
+from numbers import Real
 
 from qtpy import QtWidgets, QtCore
 import numpy as np
@@ -193,7 +194,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
 
             _cmap_limit_low = _edges2[_index_stop2]
 
-        if isinstance(_cmap_limit_low, float) and isinstance(_cmap_limit_high, float):
+        if isinstance(_cmap_limit_low, Real) and isinstance(_cmap_limit_high, Real):
             if _cmap_limit_low >= _cmap_limit_high:
                 _cmap_limit_low = 0.8 * _cmap_limit_high
         colormap.setVRange(_cmap_limit_low, _cmap_limit_high)

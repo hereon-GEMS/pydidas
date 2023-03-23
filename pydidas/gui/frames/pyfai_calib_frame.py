@@ -327,8 +327,8 @@ class PyfaiCalibFrame(BaseFrame):
         EXP.set_param_value("detector_name", det.name)
         EXP.set_param_value("detector_npixx", det.shape[1])
         EXP.set_param_value("detector_npixy", det.shape[0])
-        EXP.set_param_value("detector_pxsizex", det.pixel2)
-        EXP.set_param_value("detector_pxsizey", det.pixel1)
+        EXP.set_param_value("detector_pxsizex", 1e6 * det.pixel2)
+        EXP.set_param_value("detector_pxsizey", 1e6 * det.pixel1)
         _mask = self._get_mask_filename()
         if _mask is not None:
             EXP.set_param_value("detector_mask_file", _mask)

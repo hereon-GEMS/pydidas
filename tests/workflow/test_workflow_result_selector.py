@@ -331,7 +331,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj._npoints = list(RES.shapes[obj._config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "0:2, 4:6")
         _slice = obj._get_single_slice_object(_index)
-        self.assertEqual(_slice.size, 4)
+        self.assertEqual(_slice.size, 6)
 
     def test_get_single_slice_object__multiple_slices_and_numbers(self):
         self.populate_WorkflowResults()
@@ -419,12 +419,18 @@ class TestWorkflowResultSelector(unittest.TestCase):
         for _index in range(RES.ndims[_node] - 2):
             obj.set_param_value(f"data_slice_{_index}", "1:")
         obj._update_selection()
-        _delta = [
-            RES.shapes[_node][_i + 2] - obj._selection[_i].size
-            for _i in range(RES.ndims[_node] - 2)
-        ]
-        self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
-        self.assertEqual(obj._selection[0].size, np.prod(self._scan_n) - 1)
+        self.assertEqual(len(obj.selection), RES.ndims[_node] - 2)
+        self.assertTrue(np.allclose(obj.selection[0], np.arange(1, SCAN.n_points)))
+        self.assertTrue(
+            np.allclose(
+                obj.selection[1], np.arange(1, TREE.nodes[_node].plugin.result_shape[0])
+            )
+        )
+        self.assertTrue(
+            np.allclose(
+                obj.selection[2], np.arange(1, TREE.nodes[_node].plugin.result_shape[1])
+            )
+        )
 
     def test_get_best_index_for_value__low_val(self):
         _val = 42

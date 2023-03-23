@@ -237,6 +237,8 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             if len(_entry) == 1:
                 _slices.append(_entry[0])
             elif len(_entry) in (2, 3):
+                if self.get_param_value("use_data_range"):
+                    _entry[1] = _entry[1] + (_entry[2] if len(_entry) == 3 else 1)
                 _slices.append(slice(*_entry))
             else:
                 raise UserConfigError(

@@ -158,4 +158,4 @@ class ViewResultsFrameBuilder(BaseFrame):
         )
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
-        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1))
+        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1), use_data_info_action=True)

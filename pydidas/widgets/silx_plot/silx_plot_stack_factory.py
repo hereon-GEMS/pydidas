@@ -33,7 +33,7 @@ from .pydidas_plot1d import PydidasPlot1D
 from .pydidas_plot2d import PydidasPlot2D
 
 
-def create_silx_plot_stack(frame, gridPos=None):
+def create_silx_plot_stack(frame, gridPos=None, use_data_info_action=False):
     """
     Create a QStackedWidget with 1D and 2D plot widgets in the input frame.
 
@@ -44,6 +44,9 @@ def create_silx_plot_stack(frame, gridPos=None):
         The input frame.
     gridPos : Union[tuple, None], optional
         The gridPos for the new widget. The default is None.
+    use_data_info_action : bool, optional
+        Flag to use the PydidasGetDataInfoAction to display information about a
+        result datapoint. The default is False.
 
     Returns
     -------
@@ -51,7 +54,7 @@ def create_silx_plot_stack(frame, gridPos=None):
         The updated frame.
     """
     frame._widgets["plot1d"] = PydidasPlot1D()
-    frame._widgets["plot2d"] = PydidasPlot2D()
+    frame._widgets["plot2d"] = PydidasPlot2D(use_data_info_action=use_data_info_action)
     if hasattr(frame, "sig_this_frame_activated"):
         frame.sig_this_frame_activated.connect(
             partial(frame._widgets["plot2d"].cs_transform.check_detector_is_set, True)

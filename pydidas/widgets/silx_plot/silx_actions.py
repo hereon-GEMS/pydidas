@@ -28,6 +28,7 @@ __all__ = [
     "ExpandCanvas",
     "CropHistogramOutliers",
     "PydidasLoadImageAction",
+    "PydidasGetDataInfoAction",
 ]
 
 from numbers import Real
@@ -227,3 +228,47 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         if _filename is not None:
             _image = import_data(_filename)
             self.parent()._setValue(filename=_filename, data=_image)
+
+
+class PydidasGetDataInfoAction(PlotAction):
+    """
+    Action to select a datapoint and show more information about this datapoint.
+    """
+
+    sig_show_more_info_for_data = QtCore.Signal(float, float)
+
+    def __init__(
+        self, plot, parent=None, caption="Show information for scan point", ref=None
+    ):
+        app = QtWidgets.QApplication.instance()
+        PlotAction.__init__(
+            self,
+            plot,
+            icon=app.style().standardIcon(9),
+            text="Show information of scan point",
+            tooltip=(
+                "Show information about the scan point associated with this datapoint."
+            ),
+            triggered=self._actionTriggered,
+            checkable=False,
+            parent=parent,
+        )
+
+    @QtCore.Slot()
+    def _actionTriggered(self):
+        """
+        Execute the action and pick a mouse click.
+        """
+        self.plot.sigPlotSignal.connect(self.__process_event)
+        self.setEnabled(False)
+
+    @QtCore.Slot(dict)
+    def __process_event(self, event):
+        """
+        Process the event. If a mouse button click was detected, show popup.
+        """
+        if event["event"] == "mouseClicked":
+            print("coords", event["x"], event["y"])
+            self.plot.sigPlotSignal.disconnect(self.__process_event)
+            self.sig_show_more_info_for_data.emit(event["x"], event["y"])
+            self.setEnabled(True)

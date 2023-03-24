@@ -706,3 +706,17 @@ class ResultSelectionWidget(
             for _dim in _dims
         ]
         return _labels_and_units
+
+    @QtCore.Slot(float, float)
+    def show_info_popup(self, data_x, data_y):
+        """
+        Open a pop-up to show more information for the selected datapoint.
+
+        Parameters
+        ----------
+        data_x : float
+            The data x value.
+        data_y : float
+            the data y value.
+        """
+        print("requesting infor for ", data_x, data_y)

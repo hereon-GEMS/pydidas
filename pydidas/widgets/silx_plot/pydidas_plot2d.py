@@ -32,7 +32,12 @@ from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin
 from ...contexts import DiffractionExperimentContext
-from .silx_actions import ChangeCanvasToData, ExpandCanvas, CropHistogramOutliers
+from .silx_actions import (
+    ChangeCanvasToData,
+    ExpandCanvas,
+    CropHistogramOutliers,
+    PydidasGetDataInfoAction,
+)
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .utilities import get_2d_silx_plot_ax_settings
@@ -47,6 +52,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
 
     setData = Plot2D.addImage
+    sig_get_more_info_for_data = QtCore.Signal(float, float)
 
     def __init__(self, parent=None, backend=None, **kwargs):
         Plot2D.__init__(self, parent, backend)
@@ -90,7 +96,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.cs_transform.sig_new_coordinate_system.connect(
                 _new_position_widget.new_coordinate_system
             )
-        _layout = self.centralWidget().layout().itemAt(2).widget().layout()
+        _layout = self.findChild(self._positionWidget.__class__).parent().layout()
         _layout.replaceWidget(self._positionWidget, _new_position_widget)
         self._positionWidget = _new_position_widget
 
@@ -98,6 +104,16 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
+            )
+
+        if kwargs.get("use_data_info_action", False):
+            self.get_data_info_action = self.group.addAction(
+                PydidasGetDataInfoAction(self, parent=self)
+            )
+            self.addAction(self.get_data_info_action)
+            self._toolbar.addAction(self.get_data_info_action)
+            self.get_data_info_action.sig_show_more_info_for_data.connect(
+                self.sig_get_more_info_for_data
             )
 
     def enable_cs_transform(self, enable):

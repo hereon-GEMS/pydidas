@@ -382,7 +382,7 @@ class WorkflowResults(QtCore.QObject):
             return _data.squeeze()
         return _data
 
-    def get_result_metadata(self, node_id):
+    def get_result_metadata(self, node_id, use_scan_timeline=False):
         """
         Get the stored metadata for the results of the specified node.
 
@@ -390,6 +390,8 @@ class WorkflowResults(QtCore.QObject):
         ----------
         node_id : int
             The node ID identifier.
+        use_scan_timeline : bool, optional
+            Flag to collapse all scan dimensions into a single timeline.
 
         Returns
         -------
@@ -397,11 +399,27 @@ class WorkflowResults(QtCore.QObject):
             A dictionary with the metadata stored using the "axis_labels",
             "axis_ranges", "axis_units" and "metadata" keys.
         """
+        if not use_scan_timeline:
+            return {
+                "axis_labels": self.__composites[node_id].axis_labels,
+                "axis_units": self.__composites[node_id].axis_units,
+                "axis_ranges": self.__composites[node_id].axis_ranges,
+                "metadata": self.__composites[node_id].metadata,
+                "shape": self.__composites[node_id].shape,
+            }
+        _info = {}
+        for _key in ["axis_labels", "axis_units", "axis_ranges"]:
+            _values = list(getattr(self.__composites[node_id], _key).values())
+            _info[_key] = _values[self._SCAN.get_param_value("scan_dim"):]
+        _info["axis_labels"].insert(0, "Chronological scan points")
+        _info["axis_units"].insert(0, "")
+        _info["axis_ranges"].insert(0, np.arange(self._SCAN.n_points))
         return {
-            "axis_labels": self.__composites[node_id].axis_labels,
-            "axis_units": self.__composites[node_id].axis_units,
-            "axis_ranges": self.__composites[node_id].axis_ranges,
+            _key: dict(zip(np.arange(len(_info[_key])), _info[_key]))
+            for _key in ["axis_labels", "axis_units", "axis_ranges"]
+        } | {
             "metadata": self.__composites[node_id].metadata,
+            "shape": tuple(_arr.size for _arr in _info["axis_ranges"]),
         }
 
     def save_results_to_disk(
@@ -549,30 +567,29 @@ class WorkflowResults(QtCore.QObject):
         str :
             The formatted string with a representation of all the metadata.
         """
-        _meta = self.get_result_metadata(node_id)
         _scandim = self._SCAN.get_param_value("scan_dim")
-        _start_index = use_scan_timeline * _scandim
-        _print_info = {
-            "ax_labels": list(_meta["axis_labels"].values())[_start_index:],
-            "ax_units": list(_meta["axis_units"].values())[_start_index:],
-            "ax_ranges": list(
-                utils.get_range_as_formatted_string(_range)
-                for _range in _meta["axis_ranges"].values()
-            )[_start_index:],
-            "ax_types": list(
-                ("(scan)" if _key < _scandim else "(data)")
-                for _key in _meta["axis_labels"].keys()
-            )[_start_index:],
-            "ax_points": list(self.shapes[node_id])[_start_index:],
-        }
+        _metadata = self.get_result_metadata(node_id, use_scan_timeline)
         if use_scan_timeline:
-            _print_info["ax_labels"].insert(0, "Chronological scan points")
-            _print_info["ax_units"].insert(0, "")
-            _print_info["ax_ranges"].insert(0, f"0 ... {self._SCAN.n_points - 1}")
-            _print_info["ax_points"].insert(0, self._SCAN.n_points)
-            _print_info["ax_types"].insert(0, "(scan)")
+            _ax_points = list(self.shapes[node_id])[_scandim:]
+            _ax_points.insert(0, self._SCAN.n_points)
+            _ax_types = ["(scan)"] + ["(data)"] * (self.ndims[node_id] - _scandim)
+        else:
+            _ax_points = list(self.shapes[node_id])
+            _ax_types = ["scan"] * _scandim + ["(data)"] * (
+                self.ndims[node_id] - _scandim
+            )
+        _print_info = {
+            "axis_labels": list(_metadata["axis_labels"].values()),
+            "axis_units": list(_metadata["axis_units"].values()),
+            "axis_ranges": list(
+                utils.get_range_as_formatted_string(_range)
+                for _range in _metadata["axis_ranges"].values()
+            ),
+            "axis_types": _ax_types,
+            "axis_points": _ax_points,
+        }
         if squeeze_results:
-            _squeezed_dims = np.where(np.asarray(_print_info["ax_points"]) == 1)[0]
+            _squeezed_dims = np.where(np.asarray(_print_info["axis_points"]) == 1)[0]
             for _key in _print_info:
                 _print_info[_key] = list(np.delete(_print_info[_key], _squeezed_dims))
         _data_label = self._config["data_labels"][node_id] + (
@@ -586,13 +603,13 @@ class WorkflowResults(QtCore.QObject):
             + f"Data: {_data_label}\n\n"
             + "".join(
                 (
-                    f"Axis #{_dim:02d} {_print_info['ax_types'][_dim]}:\n"
-                    f"  Label: {_print_info['ax_labels'][_dim]}\n"
-                    f"  N points: {_print_info['ax_points'][_dim]}\n"
-                    f"  Range: {_print_info['ax_ranges'][_dim]} "
-                    f"{_print_info['ax_units'][_dim]}\n"
+                    f"Axis #{_dim:02d} {_print_info['axis_types'][_dim]}:\n"
+                    f"  Label: {_print_info['axis_labels'][_dim]}\n"
+                    f"  N points: {_print_info['axis_points'][_dim]}\n"
+                    f"  Range: {_print_info['axis_ranges'][_dim]} "
+                    f"{_print_info['axis_units'][_dim]}\n"
                 )
-                for _dim, _ in enumerate(_print_info["ax_labels"])
+                for _dim, _ in enumerate(_print_info["axis_labels"])
             )
         )
         if self.__composites[node_id].size == 1:

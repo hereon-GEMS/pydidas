@@ -672,12 +672,10 @@ class ResultSelectionWidget(
             The node's axis labels.
         """
 
-        _node_metadata = self._RESULTS.get_result_metadata(self._active_node)
-        _dims = [
-            _dim
-            for _dim, _val in enumerate(self._RESULTS.shapes[self._active_node])
-            if _val > 1
-        ]
+        _node_metadata = self._RESULTS.get_result_metadata(
+            self._active_node, self.get_param_value("use_scan_timeline")
+        )
+        _dims = [_dim for _dim, _val in enumerate(_node_metadata["shape"]) if _val > 1]
         _new_choices = [
             (
                 f"{_index}: {_node_metadata['axis_labels'][_dim]}"
@@ -699,12 +697,10 @@ class ResultSelectionWidget(
         """
         if self._active_node == -1:
             return [[]]
-        _node_metadata = self._RESULTS.get_result_metadata(self._active_node)
-        _dims = [
-            _dim
-            for _dim, _val in enumerate(self._RESULTS.shapes[self._active_node])
-            if _val > 1
-        ]
+        _node_metadata = self._RESULTS.get_result_metadata(
+            self._active_node, self.get_param_value("use_scan_timeline")
+        )
+        _dims = [_dim for _dim, _val in enumerate(_node_metadata["shape"]) if _val > 1]
         _labels_and_units = [
             [_node_metadata["axis_labels"][_dim], _node_metadata["axis_units"][_dim]]
             for _dim in _dims

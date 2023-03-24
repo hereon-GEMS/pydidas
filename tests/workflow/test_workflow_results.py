@@ -315,8 +315,26 @@ class TestWorkflowResults(unittest.TestCase):
 
     def test_get_result_metadata(self):
         _tmpres = np.random.random((50, 50))
-        RES._WorkflowResults__composites[0] = Dataset(_tmpres)
+        RES._WorkflowResults__composites[0] = Dataset(
+            _tmpres,
+            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+        )
         _res = RES.get_result_metadata(0)
+        self.assertIsInstance(_res, dict)
+        for _key in ["axis_labels", "axis_ranges", "axis_units", "metadata"]:
+            self.assertEqual(
+                _res[_key], getattr(RES._WorkflowResults__composites[0], _key)
+            )
+
+    def test_get_result_metadata__use_scan_timeline(self):
+        _tmpres = np.random.random(SCAN.shape + (50, 50))
+        RES._WorkflowResults__composites[0] = Dataset(
+            _tmpres,
+            axis_labels=[[chr(_i + 97)] for _i in range(_tmpres.ndim)],
+            axis_units=[["unit_" + chr(_i + 97)] for _i in range(_tmpres.ndim)],
+        )
+        _res = RES.get_result_metadata(0, use_scan_timeline=True)
         self.assertIsInstance(_res, dict)
         for _key in ["axis_labels", "axis_ranges", "axis_units", "metadata"]:
             self.assertTrue(_key in _res)

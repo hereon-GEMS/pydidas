@@ -29,7 +29,8 @@ Bugfixes
   WorkflowResultsSelector.
 - Fixed an issue in the CropHistogramOutliers action with vmin > vmax and 
   numpy datatypes.
-
+- Fixed an issue where the scan dimensions in the ResultSelectionWidgets would
+  not be displayed correctly when using the 'Timeline' option.
 
 =======
 v23.3.9

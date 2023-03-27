@@ -26,7 +26,6 @@ __status__ = "Development"
 __all__ = ["ParameterWidget"]
 
 import html
-from functools import partial
 
 from qtpy import QtWidgets, QtCore
 
@@ -91,9 +90,7 @@ class ParameterWidget(QtWidgets.QWidget):
             _layout.addWidget(self.unit_widget, *_unit_w_args)
 
         self.io_widget.io_edited.connect(self.__emit_io_changed)
-        self.io_widget.io_edited.connect(
-            partial(self.__set_param_value, param, self.io_widget)
-        )
+        self.io_widget.io_edited.connect(self.__set_param_value)
         self.setLayout(_layout)
         apply_qt_properties(self, **kwargs)
 
@@ -254,8 +251,8 @@ class ParameterWidget(QtWidgets.QWidget):
         """
         self.io_edited.emit(value)
 
-    @staticmethod
-    def __set_param_value(param, widget):
+    @QtCore.Slot()
+    def __set_param_value(self):
         """
         Update the Parameter value with the entry from the widget.
 
@@ -271,9 +268,9 @@ class ParameterWidget(QtWidgets.QWidget):
             The input widget used for editing the parameter value.
         """
         try:
-            param.value = widget.get_value()
+            self.param.value = self.io_widget.get_value()
         except ValueError:
-            widget.set_value(param.value)
+            self.io_widget.set_value(self.param.value)
             raise
 
     def sizeHint(self):

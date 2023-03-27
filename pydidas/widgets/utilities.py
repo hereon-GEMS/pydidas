@@ -27,6 +27,7 @@ __all__ = [
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
+    "update_param_and_widget_choices",
 ]
 
 
@@ -145,7 +146,7 @@ def get_max_pixel_width_of_entries(entries):
 
     font = QtWidgets.QApplication.instance().font()
     metrics = QtGui.QFontMetrics(font)
-    _width = max([metrics.boundingRect(_item).width() for _item in entries])
+    _width = max(metrics.boundingRect(_item).width() for _item in entries)
     return _width
 
 
@@ -232,3 +233,35 @@ def get_grid_pos(parent, **kwargs):
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row,) + _grid_pos[1:4]
     return _grid_pos
+
+
+def update_param_and_widget_choices(param_widget, new_choices):
+    """
+    Update the choices for the given Parameter and in its widget.
+
+    This function will update the choices and also set the combo box widget to an
+    allowed choice.
+
+    Parameters
+    ----------
+    param_widget : pydidas.widgets.parameter_config.ParameterWidget
+        The pydidas ParameterWidget instance.
+    new_choices : list
+        The list of new choices.
+    """
+    _param = param_widget.param
+    if len(new_choices) == 0:
+        _param.choices = None
+        _param.value = ""
+    else:
+        _param.choices = None
+        _param.value = new_choices[0]
+        _param.choices = new_choices
+    param_widget.io_widget.setEnabled(len(new_choices) != 0)
+    with utils.SignalBlocker(param_widget.io_widget):
+        if len(new_choices) == 0:
+            param_widget.io_widget.update_choices([""])
+            param_widget.io_widget.setCurrentText("")
+            return
+        param_widget.io_widget.update_choices(new_choices)
+        param_widget.io_widget.setCurrentText(new_choices[0])

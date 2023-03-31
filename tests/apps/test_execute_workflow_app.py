@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,31 +18,31 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
-import tempfile
-import shutil
-import random
+import multiprocessing as mp
 import os
+import random
+import shutil
+import tempfile
 import threading
 import time
-import multiprocessing as mp
+import unittest
 
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import get_generic_parameter, UserConfigError, utils, PydidasQsettings
 from pydidas.apps import ExecuteWorkflowApp
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.contexts import ScanContext
-from pydidas.workflow import WorkflowTree, WorkflowResultsContext
-from pydidas.workflow.result_io import WorkflowResultIoMeta
+from pydidas.core import PydidasQsettings, UserConfigError, get_generic_parameter, utils
 from pydidas.plugins import PluginCollection
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
+from pydidas.workflow.result_io import WorkflowResultIoMeta
 
 
 TREE = WorkflowTree()
@@ -228,9 +230,14 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app._ExecuteWorkflowApp__check_size_of_results_and_buffer()
         app.initialize_shared_memory()
         for key in app._config["shared_memory"]:
-            self.assertIsInstance(
-                app._config["shared_memory"][key], mp.sharedctypes.SynchronizedArray
+            if key == "lock":
+                self.assertIsInstance(
+                    app._config["shared_memory"][key], mp.synchronize.Lock
             )
+            else:
+                self.assertIsInstance(
+                    app._config["shared_memory"][key], mp.sharedctypes.SynchronizedArray
+                )
 
     def test_initialize_arrays_from_shared_memory(self):
         app = ExecuteWorkflowApp()

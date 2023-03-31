@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,14 +14,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
 Module with the WorkflowResultIoBase class which exporters/importers should
 inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResultIoBase"]
@@ -42,7 +45,7 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
     _node_information = {}
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, node_information):
+    def prepare_files_and_directories(cls, save_dir, node_information, **kwargs):
         """
         Prepare the required files and directories to write the data to disk.
 
@@ -57,6 +60,17 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
+        scan_context : Union[Scan, None], optional
+            The scan context. If None, the generic context will be used. Only specify
+            this, if you explicitly require a different context. The default is None.
+        diffraction_exp_context : Union[DiffractionExp, None], optional
+            The diffraction experiment context. If None, the generic context will be
+            used. Only specify this, if you explicitly require a different context. The
+            default is None.
+        workflow_tree : Union[WorkflowTree, None], optional
+            The WorkflowTree. If None, the generic WorkflowTree will be used. Only
+            specify this, if you explicitly require a different context. The default is
+            None.
         """
         raise NotImplementedError
 
@@ -133,9 +147,13 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         return _names
 
     @classmethod
-    def export_full_data_to_file(cls, full_data):
+    def export_full_data_to_file(
+        cls,
+        full_data,
+        scan_context=None,
+    ):
         """
-        Export the full dataset to disk,
+        Export all specified datasets to disk.
 
         Raises
         ------
@@ -146,6 +164,9 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         ----------
         full_data : dict
             The result dictionary with nodeID keys and result values.
+        scan_context : Union[Scan, None], optional
+            The scan context. If None, the generic context will be used. Only specify
+            this, if you explicitly require a different context. The default is None.
         """
         raise NotImplementedError
 
@@ -171,7 +192,7 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         raise NotImplementedError
 
     @classmethod
-    def update_frame_metadata(cls, metadata):
+    def update_frame_metadata(cls, metadata, scan=None):
         """
         Update the metadata of the individual frame.
 
@@ -184,6 +205,9 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         ----------
         metadata : dict
             The metadata dictionary with results of one frame for each node.
+        scan : Union[pydidas.contexts.scan_context.Scan, None], optional
+            The Scan instance. If None, this will default to the generic ScanContext.
+            The default is None.
         """
         raise NotImplementedError
 

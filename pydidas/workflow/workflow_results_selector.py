@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ results stored in the WorkflowResults.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResultsSelector"]
@@ -30,13 +32,13 @@ import re
 import numpy as np
 from qtpy import QtCore
 
-from ..core import (
-    Parameter,
-    ObjectWithParameterCollection,
-    get_generic_param_collection,
-    UserConfigError,
-)
 from ..contexts import ScanContext
+from ..core import (
+    ObjectWithParameterCollection,
+    Parameter,
+    UserConfigError,
+    get_generic_param_collection,
+)
 from .workflow_results import WorkflowResultsContext
 
 
@@ -297,23 +299,22 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 for _pos, _val in enumerate(_item.split(":"))
             ]
             if len(_keys) == 1:
-                _index = self._get_best_index_for_value(_keys[0], _range)
+                _index = self.get_best_index_for_value(_keys[0], _range)
                 _new_items.append([_index])
             elif len(_keys) == 2:
-                _startindex = self._get_best_index_for_value(_keys[0], _range)
-                _stopindex = self._get_best_index_for_value(_keys[1], _range)
+                _startindex = self.get_best_index_for_value(_keys[0], _range)
+                _stopindex = self.get_best_index_for_value(_keys[1], _range)
                 _new_items.append([_startindex, _stopindex])
             elif len(_keys) == 3:
                 _targets = np.arange(_keys[0], _keys[1], _keys[2])
                 for _val in _targets:
-                    _index = self._get_best_index_for_value(_val, _range)
+                    _index = self.get_best_index_for_value(_val, _range)
                     _new_items.append([_index])
         return _new_items
 
-    def _get_best_index_for_value(self, value, valrange):
+    def get_best_index_for_value(self, value, valrange):
         """
-        Get the index which is the closest match to the selected value from a
-        range.
+        Get the index which is the closest match to the selected value from a range.
 
         Parameters
         ----------

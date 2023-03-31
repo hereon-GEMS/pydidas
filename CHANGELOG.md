@@ -7,7 +7,9 @@ Major changes
 - The "Import and display workflow results" now has its own instances of 
   ScanContext and WorkflowResults and can be used in parallel to 
   the current workflow and its results.
-    
+- The structure of pydidas hdf5 result imports/exports has changed and all
+  result files now have the complete processing metadata included.
+
 Improvements
 ------------
 - Added unique configuration widget to SubtractBackgroundImage plugin.

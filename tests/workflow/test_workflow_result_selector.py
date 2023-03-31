@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,25 +18,26 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
 import shutil
 import tempfile
+import unittest
 from numbers import Integral
 
 import numpy as np
 
-from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.contexts import ScanContext
-from pydidas.unittest_objects import DummyProc, DummyLoader
-from pydidas.workflow import WorkflowTree, WorkflowResultsContext
+from pydidas.core import Dataset, Parameter, UserConfigError
+from pydidas.unittest_objects import DummyLoader, DummyProc
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
+
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
@@ -436,14 +439,14 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _val = 42
         _range = np.arange(45, 105)
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, 0)
 
     def test_get_best_index_for_value__high_val(self):
         _val = 42
         _range = np.arange(0, 37)
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _range.size - 1)
 
     def test_get_best_index_for_value__middle_val(self):
@@ -451,14 +454,14 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _range = np.arange(12, 47, 0.5)
         _target = (_val - _range[0]) / (_range[1] - _range[0])
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _target)
 
     def test_get_best_index_for_value__None_range(self):
         _val = 42
         _range = None
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _val)
         self.assertIsInstance(_match, Integral)
 
@@ -466,7 +469,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _val = 42.0
         _range = None
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _val)
         self.assertIsInstance(_match, Integral)
 

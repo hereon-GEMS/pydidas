@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,13 +16,13 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The workflow_results module includes the WorkflowResults singleton class for
-storing and accessing the composite results of the processing.
+The workflow_results module includes the WorkflowResults and WorkflowResultsContext
+singleton class for storing and accessing the composite results of the processing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResults", "WorkflowResultsContext"]
@@ -31,10 +33,10 @@ import re
 import numpy as np
 from qtpy import QtCore
 
-from ..core import utils, Dataset, SingletonFactory
-from ..contexts import ScanContext
-from .workflow_tree import WorkflowTree
+from ..contexts import DiffractionExperimentContext, ScanContext
+from ..core import Dataset, SingletonFactory, utils
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
+from .workflow_tree import WorkflowTree
 
 
 class WorkflowResults(QtCore.QObject):
@@ -45,13 +47,33 @@ class WorkflowResults(QtCore.QObject):
 
     Warning: Users should generally only use the WorkflowResultsContext singleton,
     and never use the WorkflowResults directly unless explicitly required.
+
+    Parameters
+    ----------
+    scan_context : Union[Scan, None], optional
+        The scan context. If None, the generic context will be used. Only specify this,
+        if you explicitly require a different context. The default is None.
+    diffraction_exp_context : Union[DiffractionExp, None], optional
+        The diffraction experiment context. If None, the generic context will be used.
+        Only specify this, if you explicitly require a different context. The default
+        is None.
+    workflow_tree : Union[WorkflowTree, None], optional
+        The WorkflowTree. If None, the generic WorkflowTree will be used. Only specify
+        this, if you explicitly require a different context. The default is None.
     """
 
     new_results = QtCore.Signal()
 
-    def __init__(self, scan_context=None, workflow_tree=None):
+    def __init__(
+        self, scan_context=None, diffraction_exp_context=None, workflow_tree=None
+    ):
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context
+        self._EXP = (
+            DiffractionExperimentContext()
+            if diffraction_exp_context is None
+            else diffraction_exp_context
+        )
         self._TREE = WorkflowTree() if workflow_tree is None else workflow_tree
         self.clear_all_results()
 
@@ -96,6 +118,7 @@ class WorkflowResults(QtCore.QObject):
             "metadata_complete": False,
             "plugin_names": {},
             "result_titles": {},
+            "exported": False,
         }
 
     def update_frame_metadata(self, metadata):
@@ -185,7 +208,7 @@ class WorkflowResults(QtCore.QObject):
         return self._config["shapes"].copy()
 
     @property
-    def labels(self):
+    def node_labels(self):
         """
         Return the labels of the results in form of a dictionary.
 
@@ -406,11 +429,12 @@ class WorkflowResults(QtCore.QObject):
                 "axis_ranges": self.__composites[node_id].axis_ranges,
                 "metadata": self.__composites[node_id].metadata,
                 "shape": self.__composites[node_id].shape,
+                "node_label": self._config["node_labels"].get(node_id, ""),
             }
         _info = {}
         for _key in ["axis_labels", "axis_units", "axis_ranges"]:
             _values = list(getattr(self.__composites[node_id], _key).values())
-            _info[_key] = _values[self._SCAN.get_param_value("scan_dim"):]
+            _info[_key] = _values[self._SCAN.get_param_value("scan_dim") :]
         _info["axis_labels"].insert(0, "Chronological scan points")
         _info["axis_units"].insert(0, "")
         _info["axis_ranges"].insert(0, np.arange(self._SCAN.n_points))
@@ -420,6 +444,7 @@ class WorkflowResults(QtCore.QObject):
         } | {
             "metadata": self.__composites[node_id].metadata,
             "shape": tuple(_arr.size for _arr in _info["axis_ranges"]),
+            "node_label": self._config["node_labels"].get(node_id, ""),
         }
 
     def save_results_to_disk(
@@ -457,7 +482,7 @@ class WorkflowResults(QtCore.QObject):
             _res = self.__composites
         else:
             _res = {node_id: self.__composites[node_id]}
-        RESULT_SAVER.export_full_data_to_active_savers(_res)
+        RESULT_SAVER.export_full_data_to_active_savers(_res, scan_context=self._SCAN)
 
     def prepare_files_for_saving(
         self, save_dir, save_formats, overwrite=False, single_node=None
@@ -517,7 +542,13 @@ class WorkflowResults(QtCore.QObject):
             )
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        RESULT_SAVER.prepare_active_savers(save_dir, _node_info)
+        RESULT_SAVER.prepare_active_savers(
+            save_dir,
+            _node_info,
+            scan_context=self._SCAN,
+            diffraction_exp_context=self._EXP,
+            workflow_tree=self._TREE,
+        )
 
     def update_param_choices_from_labels(self, param, add_no_selection_entry=True):
         """
@@ -627,7 +658,9 @@ class WorkflowResults(QtCore.QObject):
             The input directory with the exported pydidas results.
         """
         self.clear_all_results()
-        _data, _node_info, _scan = RESULT_SAVER.import_data_from_directory(directory)
+        _data, _node_info, _scan, _exp, _tree = RESULT_SAVER.import_data_from_directory(
+            directory
+        )
         self._config = {
             "shapes": {_key: _item.shape for _key, _item in _data.items()},
             "node_labels": {
@@ -648,7 +681,10 @@ class WorkflowResults(QtCore.QObject):
             "metadata_complete": True,
         }
         self.__composites = _data
-        self._SCAN.update_from_dictionary(_scan)
+        if _data != {}:
+            self._SCAN = _scan
+            self._EXP = _exp
+            self._TREE = _tree
 
 
 WorkflowResultsContext = SingletonFactory(WorkflowResults)

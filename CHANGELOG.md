@@ -29,6 +29,8 @@ Improvements
   main.
 - The PluginCollection now uses the pathlib library instead of strings for 
   management of files and paths.
+- Added a new feature to get the position of a datapoint in the scan by clicking
+  on the result.
 
 Bugfixes
 --------

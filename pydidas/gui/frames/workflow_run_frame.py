@@ -35,8 +35,8 @@ from ...core.utils import pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
 from ...workflow import WorkflowTree
-from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 from ..mixins import ViewResultsMixin
+from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 
 
 TREE = WorkflowTree()
@@ -84,6 +84,9 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
+        self._widgets["plot2d"].sig_get_more_info_for_data.connect(
+            self._widgets["result_selector"].show_info_popup
+        )
 
     def finalize_ui(self):
         """

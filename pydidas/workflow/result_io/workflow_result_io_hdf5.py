@@ -32,7 +32,7 @@ from functools import partial
 
 import h5py
 
-from .... import version
+from ... import version
 from ...contexts import DiffractionExperimentContext, ScanContext
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...contexts.scan_context import Scan

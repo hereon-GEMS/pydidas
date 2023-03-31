@@ -18,8 +18,8 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
@@ -41,7 +41,7 @@ from pydidas.plugins import PluginCollection
 
 
 COLL = PluginCollection()
-_PLUGIN_PATHS = COLL.registered_paths()
+_PLUGIN_PATHS = COLL.registered_paths
 
 
 class TestWorkflowTree(unittest.TestCase):

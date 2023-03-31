@@ -1,3 +1,8 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+
 .. _developer_guide_to_apps:
 
 Developers guide to pydidas applications
@@ -422,7 +427,7 @@ slave mode). This will allow the two apps to use the joint shared memory:
     
     >>> app = RandomImageGeneratorApp()
     >>> app.multiprocessing_pre_run()
-    >>> app_slave = app.get_copy(slave_mode=True)
+    >>> app_slave = app.copy(slave_mode=True)
     >>> app_slave.multiprocessing_pre_run()
     >>> index = 10
     >>> buffer_index = app_slave.multiprocessing_func(index)

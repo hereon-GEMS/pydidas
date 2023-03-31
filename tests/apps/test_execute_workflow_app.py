@@ -48,7 +48,7 @@ SCAN = ScanContext()
 RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 COLL = PluginCollection()
-_PLUGIN_PATHS = COLL.get_all_registered_paths()
+_PLUGIN_PATHS = COLL.registered_paths
 
 
 class TestLock(threading.Thread):
@@ -175,7 +175,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
         app.set_param_value("live_processing", False)
         app.prepare_run()
         SCAN.set_param_value("scan_dim3_offset", -12345)
-        app2 = app.get_copy(slave_mode=True)
+        app2 = app.copy(slave_mode=True)
         SCAN.set_param_value("scan_dim3_offset", 0)
         app2.prepare_run()
         self.assertIsInstance(app2._shared_arrays[1], np.ndarray)

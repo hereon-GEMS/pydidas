@@ -357,7 +357,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         _state = {
-            "params": obj.params.get_copy(),
+            "params": obj.params.copy(),
             "_config": {"test_key": True, "another_key": "entry"},
         }
         obj.__setstate__(_state)
@@ -391,7 +391,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj._config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
         obj2._config["Test"] = [1, 2, 3, 4, 5]
-        obj2.add_params(self._params.get_copy())
+        obj2.add_params(self._params.copy())
         self.assertEqual(hash(obj), hash(obj2))
 
     def test_hash__complex_comparison_w_difference(self):
@@ -400,7 +400,7 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj._config["Test"] = [1, 2, 3, 4, 5]
         obj2 = ObjectWithParameterCollection()
         obj2._config["Test"] = [1, 2, 3, 4, 5, 6]
-        obj2.add_params(self._params.get_copy())
+        obj2.add_params(self._params.copy())
         obj2.set_param_value("Test0", 13)
         self.assertNotEqual(hash(obj), hash(obj2))
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,6 +34,7 @@ from numpy import mod
 
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
+from .exceptions import UserConfigError
 
 
 class ParameterCollectionMixIn:
@@ -53,7 +56,7 @@ class ParameterCollectionMixIn:
         ParameterCollection
             A copy of the default ParameterCollection.
         """
-        return cls.default_params.get_copy()
+        return cls.default_params.copy()
 
     def add_param(self, param):
         """
@@ -322,7 +325,7 @@ class ParameterCollectionMixIn:
             Confirmation flag as safety feature.
         """
         if not confirm:
-            return
+            raise UserConfigError("Restoration of defaults not confirmed. Aborting.")
         for _key in self.params.keys():
             self.params[_key].restore_default()
 

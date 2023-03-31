@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,9 +40,9 @@ class OutputPlugin(BasePlugin):
 
     plugin_type = OUTPUT_PLUGIN
     plugin_name = "Base output plugin"
-    generic_params = BasePlugin.generic_params.get_copy()
+    generic_params = BasePlugin.generic_params.copy()
     generic_params.add_param(get_generic_parameter("directory_path"))
-    default_params = BasePlugin.default_params.get_copy()
+    default_params = BasePlugin.default_params.copy()
 
     def pre_execute(self):
         """

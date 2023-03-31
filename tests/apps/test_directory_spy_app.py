@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -397,7 +399,7 @@ class TestDirectorySpyApp(unittest.TestCase):
     def test_prepare_run__slave(self):
         app = self.create_default_app()
         app.prepare_run()
-        slave_app = app.get_copy(slave_mode=True)
+        slave_app = app.copy(slave_mode=True)
         slave_app.prepare_run()
         for _key in ["flag", "width", "height", "array"]:
             self.assertEqual(

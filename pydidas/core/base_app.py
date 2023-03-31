@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["BaseApp"]
 
-from copy import copy
+from copy import copy, deepcopy
 from pathlib import Path
 
 from .parameter_collection import ParameterCollection
@@ -228,7 +230,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return
 
-    def get_copy(self, slave_mode=False):
+    def copy(self, slave_mode=False):
         """
         Get a copy of the App.
 

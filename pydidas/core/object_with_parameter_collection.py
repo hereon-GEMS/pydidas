@@ -4,9 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
 The ObjectWithParameterCollection is a class which includes a
 ParameterCollection and is serializable (ie. pickleable).
@@ -65,7 +63,7 @@ class ObjectWithParameterCollection(
             The copy with the same state.
         """
         obj = self.__class__()
-        obj.params = self.params.get_copy()
+        obj.params = self.params.copy()
         obj._config = copy(self._config)
         return obj
 
@@ -84,7 +82,7 @@ class ObjectWithParameterCollection(
             The copy with the same state.
         """
         obj = self.__class__()
-        obj.params = self.params.get_copy()
+        obj.params = self.params.copy()
         obj._config = deepcopy(self._config)
         return obj
 
@@ -97,7 +95,7 @@ class ObjectWithParameterCollection(
         state : dict
             The state dictionary.
         """
-        _state = {"params": self.params.get_copy(), "_config": copy(self._config)}
+        _state = {"params": self.params.copy(), "_config": copy(self._config)}
         if "shared_memory" in _state["_config"]:
             _state["_config"]["shared_memory"] = {}
         return _state

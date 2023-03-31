@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -83,7 +85,7 @@ class TestParameterCollection(unittest.TestCase):
         with self.assertRaises(KeyError):
             obj.get_value("TEST")
 
-    def test_get_copy(self):
+    def test_copy(self):
         obj = ParameterCollection(*self._params)
         _copy = copy.copy(obj)
         self.assertNotEqual(obj, _copy)
@@ -265,12 +267,12 @@ class TestParameterCollection(unittest.TestCase):
 
     def test_hash__comparison_of_equal_collections(self):
         obj = ParameterCollection(*self._params)
-        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        obj2 = ParameterCollection(*[_p.copy() for _p in self._params])
         self.assertEqual(hash(obj), hash(obj2))
 
     def test_hash__comparison_w_different_param_value(self):
         obj = ParameterCollection(*self._params)
-        obj2 = ParameterCollection(*[_p.get_copy() for _p in self._params])
+        obj2 = ParameterCollection(*[_p.copy() for _p in self._params])
         obj.set_value("Test0", 13)
         self.assertNotEqual(hash(obj), hash(obj2))
 

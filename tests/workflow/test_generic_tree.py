@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -367,20 +369,20 @@ class TestGenericTree(unittest.TestCase):
         for key in set(tree.__dict__.keys()) - {"root", "nodes"}:
             self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
-    def test_get_copy(self):
+    def test_copy(self):
         _depth = 3
         _width = 4
         tree = GenericTree()
         _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
         tree.register_node(_nodes[0][0])
-        _copy = tree.get_copy()
+        _copy = tree.copy()
         for _node in tree.nodes.values():
             self.assertFalse(_node in _copy.nodes.values())
 
-    def test_get_copy__no_nodes(self):
+    def test_copy__no_nodes(self):
         tree = GenericTree()
         tree.dummy = 1234.522
-        _copy = tree.get_copy()
+        _copy = tree.copy()
         self.assertIsInstance(_copy, GenericTree)
         self.assertEqual(tree.dummy, _copy.dummy)
 
@@ -400,7 +402,7 @@ class TestGenericTree(unittest.TestCase):
         tree2 = GenericTree()
         _nodes, _n_nodes = self.create_node_tree(depth=_depth, width=_width)
         tree.register_node(_nodes[0][0])
-        tree2.register_node(_nodes[0][0].get_copy())
+        tree2.register_node(_nodes[0][0].copy())
         self.assertNotEqual(hash(tree), hash(tree2))
 
 

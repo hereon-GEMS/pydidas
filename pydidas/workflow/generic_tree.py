@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -234,7 +236,7 @@ class GenericTree:
         for _id in node_ids:
             if _id in self.node_ids:
                 raise ValueError(
-                    "Duplicate node ID detected. Tree node has " "not been registered!"
+                    "Duplicate node ID detected. Tree node has not been registered!"
                 )
             if _id is not None and self.node_ids and _id < max(self.node_ids):
                 raise ValueError(
@@ -371,7 +373,7 @@ class GenericTree:
                 _leaves.append(_node)
         return _leaves
 
-    def get_copy(self):
+    def copy(self):
         """
         Get a copy of the WorkflowTree.
 
@@ -385,7 +387,9 @@ class GenericTree:
         pydidas.workflow.WorkflowTree
             A new instance of the WorkflowTree
         """
-        return self.__copy__()
+        return copy.copy(self)
+
+    deepcopy = copy
 
     def __copy__(self):
         """
@@ -405,11 +409,16 @@ class GenericTree:
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         """
         Get a deep copy of the GenericTree.
 
         Note: The implementation of copy and deepcopy is the same for Trees.
+
+        Parameters
+        ----------
+        memo : dict
+            copy.deepcopy's dict of already copied values.
 
         Returns
         -------

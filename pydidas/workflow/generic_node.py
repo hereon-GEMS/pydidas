@@ -1,15 +1,17 @@
 # This file is part of pydidas.
-
+#
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# Pydidas is distributed in the hope that it oowill be useful,
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
@@ -360,7 +362,7 @@ class GenericNode:
         new_parent.add_child(self)
         self._parent = new_parent
 
-    def get_copy(self):
+    def copy(self):
         """
         Get a copy of the Node.
 
@@ -370,6 +372,8 @@ class GenericNode:
             The nodes's copy.
         """
         return self.__copy__()
+
+    deepcopy = copy
 
     def __copy__(self):
         """

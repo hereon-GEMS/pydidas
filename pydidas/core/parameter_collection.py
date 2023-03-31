@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -56,7 +58,23 @@ class ParameterCollection(dict):
         self.add_params(*args)
 
     def __copy__(self):
-        return self.get_copy()
+        """
+        Get a copy of the ParameterCollection.
+
+        This method will return a copy of the ParameterCollection with
+        a copy of each Parameter object. Note that there is no difference between
+        a ParameterCollections copy and deepcopy.
+
+        Returns
+        -------
+        _copy : ParameterCollection
+            The copy of ParameterCollection with no shared objects.
+        """
+        _copy = ParameterCollection()
+        for _param in self.values():
+            _new_param = Parameter(*_param.dump())
+            _copy.add_param(_new_param)
+        return _copy
 
     def __hash__(self):
         """
@@ -265,7 +283,7 @@ class ParameterCollection(dict):
         """
         self.__delitem__(key)
 
-    def get_copy(self):
+    def copy(self):
         """
         Get a copy of the ParameterCollection.
 
@@ -277,11 +295,21 @@ class ParameterCollection(dict):
         _copy : ParameterCollection
             The copy of ParameterCollection with no shared objects.
         """
-        _copy = ParameterCollection()
-        for _param in self.values():
-            _new_param = Parameter(*_param.dump())
-            _copy.add_param(_new_param)
-        return _copy
+        return self.__copy__()
+
+    def deepcopy(self):
+        """
+        Get a copy of the ParameterCollection.
+
+        This method will return a copy of the ParameterCollection with
+        a copy of each Parameter object.
+
+        Returns
+        -------
+        _copy : ParameterCollection
+            The copy of ParameterCollection with no shared objects.
+        """
+        return self.__copy__()
 
     def get_value(self, param_key):
         """

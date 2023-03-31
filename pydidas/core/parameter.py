@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -511,7 +513,7 @@ class Parameter:
         """
         self.value = self.__meta["default"]
 
-    def get_copy(self):
+    def copy(self):
         """
         A method to get the a copy of the Parameter object.
 
@@ -521,6 +523,8 @@ class Parameter:
             A full copy of the object.
         """
         return Parameter(*self.dump())
+
+    deepcopy = copy
 
     def dump(self):
         """
@@ -612,7 +616,7 @@ class Parameter:
         """
         Copy the Parameter object.
 
-        This method is a wrapper for the "get_copy" method to allow the generic
+        This method is a wrapper for the "copy" method to allow the generic
         Python copy module to make copies of Parameters as well.
 
         Returns
@@ -620,7 +624,7 @@ class Parameter:
         Parameter
             A copy of the Parameter.
         """
-        return self.get_copy()
+        return self.copy()
 
     def __call__(self):
         """

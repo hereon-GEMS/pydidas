@@ -23,6 +23,8 @@ Improvements
   WorkflowResults plots.
 - Added explicit .copy and .deepcopy methods to ObjectWithParameterCollection
 - Updated pyproject.toml and removed setup.cfg
+- Changed all .get_copy methods to .copy for consistency with numpy and python
+  main.
 
 Bugfixes
 --------

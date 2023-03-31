@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -267,9 +269,9 @@ class TestParameter(unittest.TestCase):
         obj.restore_default()
         self.assertEqual(obj.value, 12)
 
-    def test_get_copy(self):
+    def test_copy(self):
         obj = Parameter("Test0", int, 12)
-        copy = obj.get_copy()
+        copy = obj.copy()
         self.assertNotEqual(obj, copy)
         self.assertIsInstance(copy, Parameter)
 

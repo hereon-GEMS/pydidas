@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +22,7 @@ which are used throughout the package.
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
@@ -37,6 +39,7 @@ from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger import *
 from .math_utils import *
+from .no_print import *
 from .qt_utilities import *
 from .rebin_ import *
 from .set_default_plugin_dir_ import *
@@ -102,6 +105,11 @@ from . import math_utils
 
 __all__.extend(math_utils.__all__)
 del math_utils
+
+from . import no_print
+
+__all__.extend(no_print.__all__)
+del no_print
 
 from . import qt_utilities
 

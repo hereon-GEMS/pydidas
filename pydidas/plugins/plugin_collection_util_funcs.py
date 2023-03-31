@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,10 +26,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["get_generic_plugin_path", "plugin_type_check"]
 
-import os
+from pathlib import Path
 
 from .. import core
-from ..core.utils import pydidas_logger, LOGGING_LEVEL
+from ..core.utils import LOGGING_LEVEL, pydidas_logger
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
@@ -44,8 +46,8 @@ def get_generic_plugin_path():
     list
         A list with the path to the generic plugin folder as the only entry.
     """
-    _pydidas_module_path = os.path.dirname(os.path.abspath(core.__path__[0]))
-    return [os.path.join(os.path.dirname(_pydidas_module_path), "pydidas_plugins")]
+    _pydidas_module_path = Path(core.__path__[0]).absolute().parent.parent
+    return [_pydidas_module_path.joinpath("pydidas_plugins")]
 
 
 def plugin_type_check(cls_item):

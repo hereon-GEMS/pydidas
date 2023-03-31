@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,10 +33,11 @@ __all__ = [
 
 import os
 import re
+from pathlib import Path
 
-from .iterable_utils import flatten
-from ..exceptions import UserConfigError
 from ..constants import FILENAME_DELIMITERS
+from ..exceptions import UserConfigError
+from .iterable_utils import flatten
 
 _FILE_NAME_SCHEME_ERROR_STR = (
     "Could not interprete the filenames. The filenames do not differ in exactly one "
@@ -49,20 +52,15 @@ def trim_filename(path):
 
     Parameters
     ----------
-    path : str
+    path : pathlib.Path
         The file system path, including eventual filenames.
 
     Returns
     -------
-    path : str
+    path : pathlib.Path
         The path without the filename.
     """
-    path = os.path.dirname(path) if os.path.isfile(path) else path
-    if os.sep == "/":
-        path.replace("\\", os.sep)
-    else:
-        path.replace("/", os.sep)
-    return path
+    return path.parent if path.is_file() else path
 
 
 def get_extension(path):
@@ -96,7 +94,7 @@ def find_valid_python_files(path):
 
     Parameters
     ----------
-    path : str
+    path : Union[str, Path]
         The file system path to search.
 
     Returns
@@ -105,20 +103,29 @@ def find_valid_python_files(path):
         A list with the full filesystem path of python files in the
         directory and its subdirectories.
     """
-    if path is None or not os.path.exists(path):
+    if isinstance(path, str):
+        path = Path(path)
+    if path is None or not path.exists():
+        return []
+    if path.is_file():
+        if (
+            not (path.stem.startswith("__") or path.stem.startswith("."))
+            and path.suffix == ".py"
+        ):
+            return [path]
         return []
     path = trim_filename(path)
     _entries = [
-        os.path.join(path, item)
-        for item in os.listdir(path)
-        if not (item.startswith("__") or item.startswith("."))
+        path.joinpath(_item)
+        for _item in path.iterdir()
+        if not (_item.name.startswith("__") or _item.name.startswith("."))
     ]
-    _dirs = [item for item in _entries if os.path.isdir(item)]
-    _files = [item for item in _entries if os.path.isfile(item)]
+    _dirs = [_item for _item in _entries if _item.is_dir()]
+    _files = [_item for _item in _entries if _item.is_file()]
     _results = flatten(
-        [find_valid_python_files(os.path.join(path, entry)) for entry in _dirs]
+        [find_valid_python_files(path.joinpath(_entry)) for _entry in _dirs]
     )
-    _results += [f for f in _files if f.endswith(".py")]
+    _results += [f for f in _files if f.suffix == ".py"]
     return _results
 
 

@@ -237,11 +237,11 @@ An example of the use of stored paths is given below.
 
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins']
     >>> COLLECTION.find_and_register_plugins('/home/someuser/another/path', 
     ...                                      'home/someuser/yet/another/path')
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     
@@ -251,26 +251,26 @@ An example of the use of stored paths is given below.
     $ python
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     
     # If we use the ``clear_qsettings`` method, the paths will still exist
     # in the current instance, but will be gone once we restart the kernel:
     >>> COLLECTION.clear_qsettings()
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     >>> exit()
     $ python
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     []
     >>> COLLECTION.find_and_register_plugins('/home/someuser/path/to/plugins', 
     ...                                      '/home/someuser/another/path', 
     ...                                      '/home/someuser/yet/another/path')
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     
@@ -278,11 +278,11 @@ An example of the use of stored paths is given below.
     # will be ignored:
     >>> COLLECTION.clear_collection()
     'The confirmation flag was not given. The PluginCollection has not been reset.'
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     >>> COLLECTION.clear_collection(True)
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     []
 
     # Starting a new instance will restore the paths because the qsettings have
@@ -291,7 +291,7 @@ An example of the use of stored paths is given below.
     $ python
     >>> import pydidas
     >>> COLLECTION = pydidas.plugins.PluginCollection()
-    >>> COLLECTION.get_all_registered_paths()
+    >>> COLLECTION.registered_paths
     ['/home/someuser/path/to/plugins', '/home/someuser/another/path',
      '/home/someuser/yet/another/path']
     

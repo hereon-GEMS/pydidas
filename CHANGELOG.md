@@ -25,6 +25,8 @@ Improvements
 - Updated pyproject.toml and removed setup.cfg
 - Changed all .get_copy methods to .copy for consistency with numpy and python
   main.
+- The PluginCollection now uses the pathlib library instead of strings for 
+  management of files and paths.
 
 Bugfixes
 --------

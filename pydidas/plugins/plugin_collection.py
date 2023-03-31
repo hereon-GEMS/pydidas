@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,12 +29,12 @@ __status__ = "Development"
 __all__ = ["PluginCollection"]
 
 import importlib
-import os
 import inspect
+from pathlib import Path
 
 from qtpy import QtCore
 
-from ..core import SingletonFactory, PydidasQsettingsMixin
+from ..core import PydidasQsettingsMixin, SingletonFactory, UserConfigError
 from ..core.utils import find_valid_python_files
 from .plugin_collection_util_funcs import get_generic_plugin_path, plugin_type_check
 
@@ -63,8 +65,6 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         self.__plugin_paths = []
         PydidasQsettingsMixin.__init__(self)
         _plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
-        if _plugin_path is None:
-            _plugin_path = self.__get_generic_plugin_path()
         self._config = {"initial_plugin_path": _plugin_path, "initialized": False}
         if kwargs.get("force_initialization", False):
             self.verify_is_initialized()
@@ -86,24 +86,26 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         """
         _path = kwargs.get("plugin_path", None)
         if isinstance(_path, str):
-            _path = [item.strip() for item in _path.split(";;")]
+            _path = [Path(item.strip()) for item in _path.split(";;") if item != ""]
+        if isinstance(_path, Path):
+            _path = [_path]
         return _path
 
-    def __get_generic_plugin_path(self):
+    def __get_generic_plugin_paths(self):
         """
         Get the generic plugin path(s).
 
         Returns
         -------
-        plugin_path : list
+        plugin_paths : list
             A list of plugin paths.
         """
-        plugin_path = self.get_q_settings_plugin_path()
-        if plugin_path == [""] or plugin_path is None:
-            plugin_path = get_generic_plugin_path()
-        return plugin_path
+        plugin_paths = self.get_q_settings_plugin_paths()
+        if plugin_paths == [Path()] or plugin_paths is None:
+            plugin_paths = get_generic_plugin_path()
+        return plugin_paths
 
-    def get_q_settings_plugin_path(self):
+    def get_q_settings_plugin_paths(self):
         """
         Get the plugin path from the global QSettings
 
@@ -115,7 +117,9 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         """
         _path = self.q_settings_get_value("user/plugin_path")
         if isinstance(_path, str):
-            return _path.split(";;")
+            return [Path(_key) for _key in _path.split(";;")]
+        if isinstance(_path, Path):
+            return [_path]
         return _path
 
     def find_and_register_plugins(self, *plugin_paths, reload=True):
@@ -132,6 +136,8 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
             name is encountered. If False, these plugins will be skipped.
         """
         for _path in plugin_paths:
+            if isinstance(_path, str):
+                _path = Path(_path)
             self._find_and_register_plugins_in_path(_path, reload)
         self.sig_updated_plugins.emit()
 
@@ -141,7 +147,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        path : str
+        path : pathlib.Path
             The file system search path.
         reload : bool, optional
             Flag to handle reloading of plugins if a plugin with an identical
@@ -160,18 +166,18 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        plugin_path : str
-            The plugin path as string
+        plugin_path : pathlib.Path
+            The plugin path.
         verbose : bool, optional
             Keyword to toggle printed warnings. The default is False
         """
         if plugin_path in self.__plugin_paths:
             if verbose:
-                print("Warning. Storing same path again: ", plugin_path)
+                print("Warning. Storing same path again: {str(plugin_path)}")
             return
-        if os.path.exists(plugin_path):
+        if plugin_path.exists():
             self.__plugin_paths.append(plugin_path)
-        _paths = ";;".join(self.__plugin_paths)
+        _paths = ";;".join(str(_path) for _path in self.__plugin_paths)
         self.q_settings_set_key("user/plugin_path", _paths)
 
     @staticmethod
@@ -181,23 +187,22 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
 
         Parameters
         ----------
-        path : str
+        path : Union[str, pathlib.Path]
             The file system path.
 
         Returns
         -------
-        _modules : list
-            A list with the module names.
+        _modules : dict
+            A list with the module names and their relative paths.
         """
+        if isinstance(path, str):
+            path = Path(path)
         _files = find_valid_python_files(path)
-        _path = path.replace(os.sep, "/")
-        _path = _path + (not _path.endswith("/")) * "/"
-        _modules = {}
-        for _file in _files:
-            _file = _file.replace(os.sep, "/")
-            _tmpmod = _file.removesuffix(".py").removeprefix(_path)
-            _mod = _tmpmod.replace("/", ".")
-            _modules[_mod] = _file
+        _dirpath = path if path.is_dir() else path.parent
+        _modules = {
+            ".".join(_file.relative_to(_dirpath).parts).removesuffix(".py"): _file
+            for _file in _files
+        }
         return _modules
 
     @staticmethod
@@ -299,7 +304,12 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         """
         if self._config["initialized"]:
             return
-        self.find_and_register_plugins(*self._config["initial_plugin_path"])
+        _plugin_path = (
+            self._config["initial_plugin_path"]
+            if self._config["initial_plugin_path"] is not None
+            else self.__get_generic_plugin_paths()
+        )
+        self.find_and_register_plugins(*_plugin_path)
         self._config["initialized"] = True
 
     def get_all_plugin_names(self):
@@ -388,7 +398,8 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
                 _res.append(_plugin)
         return _res
 
-    def get_all_registered_paths(self):
+    @property
+    def registered_paths(self):
         """
         Get all the paths which have been registered in the PluginCollection.
 
@@ -399,6 +410,48 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         """
         self.verify_is_initialized()
         return self.__plugin_paths[:]
+
+    def unregister_plugin_path(self, path):
+        """
+        Unregister the given path from the PluginCollection.
+
+        Parameters
+        ----------
+        path : Union[str, pathlib.Path]
+            The path to the directory containing the plugins.
+
+        Raises
+        ------
+        UserConfigError
+            If the given path is not registered.
+        """
+        if isinstance(path, str):
+            path = Path(path)
+        if path not in self.__plugin_paths:
+            raise UserConfigError(
+                f"The given path '{str(path)}' is not registered with the "
+                "PluginCollection."
+            )
+        self.__plugin_paths.remove(path)
+        self._config["initial_plugin_path"] = list(self.__plugin_paths)
+        self.clear_collection(confirmation=True)
+        self.verify_is_initialized()
+
+    def unregister_all_paths(self, confirmation=False):
+        """
+        Unregister all paths.
+
+        Parameters
+        ----------
+        confirmation : bool, optional
+            Confirmation flag to prevent accidentially unregistering all paths. The
+            default is False.
+        """
+        if not confirmation:
+            print("Confirmation for unregistering all paths was not given. Aborting...")
+            return
+        self.q_settings_set_key("user/plugin_path", None)
+        self.clear_collection(True)
 
     def clear_collection(self, confirmation=False):
         """
@@ -415,6 +468,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
             self.__plugin_types = {}
             self.__plugin_names = {}
             self.__plugin_paths = []
+            self._config["initialized"] = False
             self.sig_updated_plugins.emit()
         else:
             print(

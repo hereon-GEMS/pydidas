@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,9 +32,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from .pydidas_window import PydidasWindow
-
-from ...core import get_generic_param_collection, SingletonFactory
+from ...core import SingletonFactory, get_generic_param_collection
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     QSETTINGS_USER_KEYS,
@@ -41,6 +41,7 @@ from ...core.constants import (
 )
 from ...plugins import PluginCollection
 from ...widgets.dialogues import AcknowledgeBox
+from .pydidas_window import PydidasWindow
 
 
 PLUGINS = PluginCollection()
@@ -53,7 +54,7 @@ def update_plugin_collection():
     plugin directories.
     """
     PLUGINS.clear_collection(True)
-    PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_path())
+    PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
 
 class _UserConfigWindow(PydidasWindow):

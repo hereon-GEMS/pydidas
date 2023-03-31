@@ -1,5 +1,8 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -22,16 +25,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
+import copy
+import io
+import multiprocessing as mp
+import pathlib
+import pickle
+import sys
 import unittest
 import warnings
-import pathlib
-import io
-import sys
-import copy
-import pickle
-import multiprocessing as mp
 
-from pydidas.core import ObjectWithParameterCollection, Parameter, ParameterCollection
+from pydidas.core import (
+    ObjectWithParameterCollection,
+    Parameter,
+    ParameterCollection,
+    UserConfigError,
+)
 
 
 class TestObjectWithParameterCollection(unittest.TestCase):
@@ -279,8 +287,8 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj = ObjectWithParameterCollection()
         obj.add_params(self._params)
         obj.set_param_value("Test2", 12)
-        obj.restore_all_defaults()
-        self.assertEqual(obj.get_param_value("Test2"), 12)
+        with self.assertRaises(UserConfigError):
+            obj.restore_all_defaults()
 
     def test_restore_all_defaults(self):
         obj = ObjectWithParameterCollection()
@@ -294,6 +302,32 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         obj.add_params(self._params)
         obj2 = copy.copy(obj)
         self.assertIsInstance(obj2, ObjectWithParameterCollection)
+
+    def test_explicity_copy(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config = {"a": "123", "b": [1, 2, 3], "c": ("A", "C")}
+        obj2 = obj.copy()
+        for _param in obj.params.values():
+            self.assertNotIn(_param, obj2.params.values())
+        for _key, _val in obj._config.items():
+            self.assertIn(_key, obj2._config)
+            obj._config[_key] = 42
+            self.assertNotEqual(id(obj._config[_key]), id(obj2._config[_key]))
+
+    def test_explicity_deepcopy(self):
+        obj = ObjectWithParameterCollection()
+        obj.add_params(self._params)
+        obj._config = {"a": 123, "b": [1, 2, 3], "c": ("A", "C")}
+        obj2 = obj.deepcopy()
+        obj2._config["a"] = 42
+        obj2._config["b"].append(42)
+        obj2._config["c"] = ("A", "a", "C")
+        for _param in obj.params.values():
+            self.assertNotIn(_param, obj2.params.values())
+        for _key, _val in obj._config.items():
+            self.assertIn(_key, obj2._config)
+            self.assertNotEqual(id(_val), id(obj2._config[_key]))
 
     def test_getstate(self):
         obj = ObjectWithParameterCollection()

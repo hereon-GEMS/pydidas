@@ -1,5 +1,8 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +34,8 @@ from copy import copy, deepcopy
 from qtpy import QtCore
 
 from .parameter_collection import ParameterCollection
-from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 from .parameter_collection_mixin import ParameterCollectionMixIn
+from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class ObjectWithParameterCollection(
@@ -136,3 +139,25 @@ class ObjectWithParameterCollection(
             except TypeError:
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
         return hash((_param_hash, tuple(_config_keys), tuple(_config_vals)))
+
+    def copy(self):
+        """
+        Get a copy of the object.
+
+        Returns
+        -------
+        ObjectWithParameterCollection :
+            The object's copy.
+        """
+        return copy(self)
+
+    def deepcopy(self):
+        """
+        Get a deepcopy of the object.
+
+        Returns
+        -------
+        ObjectWithParameterCollection :
+            The object's deepcopy.
+        """
+        return deepcopy(self)

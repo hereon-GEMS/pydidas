@@ -1,3 +1,6 @@
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
 # local files from running pydidas
 .pylint.d
 .pylint.d/*

@@ -1,3 +1,7 @@
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
+
 Major changes
 -------------
 - The "Import and display workflow results" now has its own instances of 
@@ -18,6 +22,7 @@ Improvements
 - Added an action to get information about the underlying datapoint from 
   WorkflowResults plots.
 - Added explicit .copy and .deepcopy methods to ObjectWithParameterCollection
+- Updated pyproject.toml and removed setup.cfg
 
 Bugfixes
 --------

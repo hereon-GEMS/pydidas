@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
-# Parts of this file are adapted based on the pyfai-calib widget which is distributed
-# under the MIT license.
+# Parts of this file are adapted based on the pyfai-calib widget which
+# is distributed under the MIT license.
 
 """
 Module with the PyfaiCalibFrame which is roughly based on the pyfai-calib2 window
@@ -22,36 +24,36 @@ to be used within pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PyfaiCalibFrame"]
 
-import os
 import functools
+import os
 
 import numpy as np
-from qtpy import QtWidgets, QtGui, QtCore
 import pyFAI
 from pyFAI.app import calib2
-from pyFAI.gui.model import MarkerModel
-from pyFAI.gui.utils import projecturl
-from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.CalibrationContext import CalibrationContext
+from pyFAI.gui.CalibrationWindow import MenuItem
+from pyFAI.gui.model import MarkerModel
 from pyFAI.gui.tasks import (
     ExperimentTask,
-    MaskTask,
-    PeakPickingTask,
     GeometryTask,
     IntegrationTask,
+    MaskTask,
+    PeakPickingTask,
 )
+from pyFAI.gui.utils import projecturl
+from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
 
-from ...core import constants
-from ...widgets import BaseFrame, silx_plot, PydidasFileDialog
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
 from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...core import constants
+from ...widgets import BaseFrame, PydidasFileDialog, silx_plot
 
 
 EXP = DiffractionExperimentContext()
@@ -265,20 +267,20 @@ class PyfaiCalibFrame(BaseFrame):
         _fname = self.__export_dialog.get_user_response()
         if _fname is None:
             return
-        _CONTEXT = DiffractionExperiment()
+        _experiment = DiffractionExperiment()
         _det = self._model.experimentSettingsModel().detector()
         _geo = self._model.fittedGeometry()
-        _CONTEXT.set_param_value("detector_name", _det.name)
-        _CONTEXT.set_param_value("detector_npixx", _det.shape[1])
-        _CONTEXT.set_param_value("detector_npixy", _det.shape[0])
-        _CONTEXT.set_param_value("detector_pxsizex", 1e6 * _det.pixel2)
-        _CONTEXT.set_param_value("detector_pxsizey", 1e6 * _det.pixel1)
+        _experiment.set_param_value("detector_name", _det.name)
+        _experiment.set_param_value("detector_npixx", _det.shape[1])
+        _experiment.set_param_value("detector_npixy", _det.shape[0])
+        _experiment.set_param_value("detector_pxsizex", 1e6 * _det.pixel2)
+        _experiment.set_param_value("detector_pxsizey", 1e6 * _det.pixel1)
         _wavelength = float(np.round(_geo.wavelength().value() * 1e10, 12))
-        _CONTEXT.set_param_value("xray_wavelength", _wavelength)
+        _experiment.set_param_value("xray_wavelength", _wavelength)
 
         _mask = self._get_mask_filename()
         if _mask is not None:
-            _CONTEXT.set_param_value("detector_mask_file", _mask)
+            _experiment.set_param_value("detector_mask_file", _mask)
         if _geo.isValid():
             for _key, _value in [
                 ["detector_dist", _geo.distance().value()],
@@ -288,9 +290,9 @@ class PyfaiCalibFrame(BaseFrame):
                 ["detector_rot2", _geo.rotation2().value()],
                 ["detector_rot3", _geo.rotation3().value()],
             ]:
-                _CONTEXT.set_param_value(_key, _value)
+                _experiment.set_param_value(_key, _value)
         DiffractionExperimentContextIoMeta.export_to_file(
-            _fname, context=_CONTEXT, overwrite=True
+            _fname, diffraction_exp=_experiment, overwrite=True
         )
 
     def _get_mask_filename(self):

@@ -233,7 +233,7 @@ class TestExecuteWorkflowApp(unittest.TestCase):
             if key == "lock":
                 self.assertIsInstance(
                     app._config["shared_memory"][key], mp.synchronize.Lock
-            )
+                )
             else:
                 self.assertIsInstance(
                     app._config["shared_memory"][key], mp.sharedctypes.SynchronizedArray

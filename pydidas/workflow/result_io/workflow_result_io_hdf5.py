@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -112,6 +112,14 @@ def get_pydidas_context_config_entries(scan, exp, tree):
     _dsets.append(
         ["entry/pydidas_config", "pydidas_version", {"data": version.version}]
     )
+    for _dim in range(scan.ndim):
+        _label = scan.get_param_value(f"scan_dim{_dim}_label")
+        _unit = scan.get_param_value(f"scan_dim{_dim}_unit")
+        _dsets.append(
+            [f"entry/data/axis_{_dim}", "range", {"data": scan.get_range_for_dim(_dim)}]
+        )
+        _dsets.append([f"entry/data/axis_{_dim}", "label", {"data": _label}])
+        _dsets.append([f"entry/data/axis_{_dim}", "unit", {"data": _unit}])
     return _dsets
 
 
@@ -201,10 +209,6 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         ) as _file:
             for _group, _name, kws in _dsets:
                 create_hdf5_dataset(_file, _group, _name, **kws)
-            for _dim in range(scan.get_param_value("scan_dim")):
-                _file[f"entry/data/axis_{_dim}"] = h5py.SoftLink(
-                    f"/entry/scan/dim_{_dim}"
-                )
 
     @classmethod
     def export_frame_to_file(

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ in 1d data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-m, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["FitSinglePeak"]
@@ -28,19 +30,18 @@ __all__ = ["FitSinglePeak"]
 import numpy as np
 from scipy.optimize import least_squares
 
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-
 from pydidas.core import (
-    get_generic_param_collection,
     Dataset,
-    UserConfigError,
     Parameter,
+    UserConfigError,
+    get_generic_param_collection,
 )
-from pydidas.core.utils import (
-    process_1d_with_multi_input_dims,
-    calculate_result_shape_for_multi_input_dims,
-)
+from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.fitting import FitFuncMeta
+from pydidas.core.utils import (
+    calculate_result_shape_for_multi_input_dims,
+    process_1d_with_multi_input_dims,
+)
 from pydidas.plugins import ProcPlugin
 
 
@@ -60,34 +61,11 @@ class FitSinglePeak(ProcPlugin):
         "process_data_dim",
         "fit_func",
         "fit_bg_order",
+        "fit_output",
         "fit_lower_limit",
         "fit_upper_limit",
-    )
-    default_params.add_param(
-        Parameter(
-            "output",
-            str,
-            "Peak position; peak area; peak FWHM",
-            choices=[
-                "Peak position",
-                "Peak area",
-                "Peak FWHM",
-                "Peak position; peak area",
-                "Peak position; peak FWHM",
-                "Peak area; peak FWHM",
-                "Peak position; peak area; peak FWHM",
-            ],
-            name="Output",
-            tooltip=(
-                "The output of the fitting plugin. The plugin can either return"
-                " the peak area, the peak position or the FWHM. Alternatively, "
-                "any combination of these values can be retured as well. "
-                "Note that the fit parameters are always stored in the metadata."
-            ),
-        ),
-    )
-    default_params.add_params(
-        get_generic_param_collection("fit_sigma_threshold", "fit_min_peak_height")
+        "fit_sigma_threshold",
+        "fit_min_peak_height",
     )
     input_data_dim = -1
     output_data_dim = 0
@@ -124,7 +102,7 @@ class FitSinglePeak(ProcPlugin):
         Set up the required functions and fit variable labels.
         """
         self._fitter = FitFuncMeta.get_fitter(self.get_param_value("fit_func"))
-        self.output_data_label = self.get_param_value("output")
+        self.output_data_label = self.get_param_value("fit_output")
         self.output_data_unit = ""
         self._config["range_slice"] = None
         self._config["settings_updated_from_data"] = False
@@ -210,7 +188,7 @@ class FitSinglePeak(ProcPlugin):
             self._config["bounds_low"][_index] = np.amin(self._data_x)
             self._config["bounds_high"][_index] = np.amax(self._data_x)
         self.output_data_unit = self._data.axis_units[0]
-        self.output_data_label = self.get_param_value("output")
+        self.output_data_label = self.get_param_value("fit_output")
         self._config["settings_updated_from_data"] = True
 
     def _crop_data_to_selected_range(self):
@@ -278,7 +256,7 @@ class FitSinglePeak(ProcPlugin):
         new_data : pydidas.core.Dataset
             The new dataset.
         """
-        _output = self.get_param_value("output")
+        _output = self.get_param_value("fit_output")
         _residual = np.nan
         if valid and not (
             self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]
@@ -324,7 +302,7 @@ class FitSinglePeak(ProcPlugin):
         """
         Calculate the shape of the Plugin results.
         """
-        _output = self.get_param_value("output")
+        _output = self.get_param_value("fit_output")
         self.output_data_label = _output
         if _output in [
             "Peak area",

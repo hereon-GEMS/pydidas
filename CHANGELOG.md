@@ -53,6 +53,8 @@ Bugfixes
   not be displayed correctly when using the 'Timeline' option.
 - Fixed an issue in the ResultSelectionWidget which occured when changing the
   dimension selection for axes with unicode characters.
+- Fixed a bug when importing a WorkflowTree while not all Plugins in the tree
+  were registered.
 
 
 =======

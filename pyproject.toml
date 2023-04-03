@@ -61,6 +61,8 @@ omit = ['*/tests/*']
 
 [tool.isort]
 profile = 'black'
+extend_skip = ["__init__.py"]
+lines_after_imports = 2
 
 [tool.black]
 line-length = 88

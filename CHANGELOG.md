@@ -33,6 +33,8 @@ Improvements
   on the result.
 - contexts.scan_contexts importers can now select which Scan instance to import
   to.
+- contexts.diffraction_exp_context importers can now select which 
+  DiffractionExperiment instance to import to.
 
 Bugfixes
 --------

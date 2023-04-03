@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,24 +18,25 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
 import os
-import unittest
 import shutil
 import tempfile
+import unittest
 
 import yaml
 
-from pydidas.core import UserConfigError
 from pydidas.contexts import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
 from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_yaml import (
     DiffractionExperimentContextIoYaml,
 )
+from pydidas.core import UserConfigError
 
 
 EXP = DiffractionExperimentContext()
@@ -65,6 +68,21 @@ class TestExperimentSettingsIoYaml(unittest.TestCase):
             "detector_rot3",
         ]:
             self.assertEqual(EXP.get_param_value(key), _data[key])
+
+    def test_import_from_file__w_diffraction_exp(self):
+        _exp = DiffractionExperiment()
+        EXP_IO_YAML.import_from_file(self._path + "yaml.yml", diffraction_exp=_exp)
+        with open(self._path + "yaml.yml", "r") as stream:
+            _data = yaml.safe_load(stream)
+        for key in [
+            "detector_dist",
+            "detector_poni1",
+            "detector_poni2",
+            "detector_rot1",
+            "detector_rot2",
+            "detector_rot3",
+        ]:
+            self.assertEqual(_exp.get_param_value(key), _data[key])
 
     def test_import_from_file__missing_keys(self):
         with open(self._tmppath + "yaml.yml", "w") as stream:

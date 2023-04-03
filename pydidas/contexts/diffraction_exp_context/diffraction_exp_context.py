@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,20 @@ global information about the experiment independant from the individual frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DiffractionExperimentContext", "DiffractionExperiment"]
 
 import pyFAI
 
-from ...core.constants import LAMBDA_IN_A_TO_E
 from ...core import (
+    ObjectWithParameterCollection,
     SingletonFactory,
     get_generic_param_collection,
-    ObjectWithParameterCollection,
 )
+from ...core.constants import LAMBDA_IN_A_TO_E
 from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
 
 
@@ -159,8 +161,22 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         self.set_param_value("detector_npixx", _det.max_shape[1])
         self.set_param_value("detector_name", _det.name)
 
-    @staticmethod
-    def import_from_file(filename):
+    def update_from_diffraction_exp(self, diffraction_exp):
+        """
+        Update this DiffractionExperiment object's Parameters from another instance.
+
+        The purpose of this method is to "copy" the other DiffractionExperiment's
+        Parameter values while keeping the reference to this object.
+
+        Parameters
+        ----------
+        diffraction_exp : DiffractionExperiment
+            The other DiffractionExperiment from which the Parameters should be taken.
+        """
+        for _key, _val in diffraction_exp.get_param_values_as_dict().items():
+            self.set_param_value(_key, _val)
+
+    def import_from_file(self, filename):
         """
         Import DiffractionExperimentContext from a file.
 
@@ -169,10 +185,11 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        DiffractionExperimentContextIoMeta.import_from_file(filename)
+        DiffractionExperimentContextIoMeta.import_from_file(
+            filename, diffraction_exp=self
+        )
 
-    @staticmethod
-    def export_to_file(filename, overwrite=False):
+    def export_to_file(self, filename, overwrite=False):
         """
         Import DiffractionExperimentContext from a file.
 
@@ -183,13 +200,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         overwrite : bool, optional
             Keyword to allow overwriting of existing files.
         """
-        DiffractionExperimentContextIoMeta.export_to_file(filename, overwrite=overwrite)
-
-    def __copy__(self):
-        """
-        Overload copy to return self.
-        """
-        return self
+        DiffractionExperimentContextIoMeta.export_to_file(
+            filename, diffraction_exp=self, overwrite=overwrite
+        )
 
 
 DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,22 +18,25 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
 import os
-import unittest
 import shutil
 import tempfile
+import unittest
 
-from pydidas.core import UserConfigError
-from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
+from pydidas.contexts.diffraction_exp_context import (
+    DiffractionExperiment,
+    DiffractionExperimentContext,
+)
 from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_base import (
     DiffractionExperimentContextIoBase,
 )
+from pydidas.core import UserConfigError
 
 
 EXP = DiffractionExperimentContext()
@@ -48,25 +53,6 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
     def tearDown(self):
         del self._path
         shutil.rmtree(self._tmppath)
-
-    def test_check_for_existing_file__file_present(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        with open(_fname, "w") as f:
-            f.write("test entry")
-        with self.assertRaises(FileExistsError):
-            EXP_IO.check_for_existing_file(_fname)
-
-    def test_check_for_existing_file__file_present_and_overwrite(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        with open(_fname, "w") as f:
-            f.write("test entry")
-        EXP_IO.check_for_existing_file(_fname, overwrite=True)
-        # assert does not raise FileExistsError
-
-    def test_check_for_existing_file__file_new(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        EXP_IO.check_for_existing_file(_fname)
-        # assert does not raise FileExistsError
 
     def test_verify_all_entries_present__correct(self):
         for param in EXP.params:
@@ -90,6 +76,18 @@ class TestExperimentSettingsIoBase(unittest.TestCase):
         EXP_IO._write_to_exp_settings()
         self.assertEqual(EXP.get_param_value("detector_name"), _det_name)
         self.assertEqual(EXP.get_param_value("xray_energy"), _energy)
+
+    def test_write_to_exp_settings__with_diffraction_exp(self):
+        EXP.restore_all_defaults(True)
+        _exp = DiffractionExperiment()
+        _det_name = "Test Name"
+        _energy = 123.45
+        EXP_IO.imported_params = {"detector_name": _det_name, "xray_energy": _energy}
+        EXP_IO._write_to_exp_settings(diffraction_exp=_exp)
+        self.assertEqual(_exp.get_param_value("detector_name"), _det_name)
+        self.assertEqual(_exp.get_param_value("xray_energy"), _energy)
+        self.assertNotEqual(EXP.get_param_value("detector_name"), _det_name)
+        self.assertNotEqual(EXP.get_param_value("xray_energy"), _energy)
 
 
 if __name__ == "__main__":

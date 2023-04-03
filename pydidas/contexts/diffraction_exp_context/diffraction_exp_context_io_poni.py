@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ DiffractionExperimentContext metadata from a pyFAI poni file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DiffractionExperimentContextIoPoni"]
@@ -28,8 +30,8 @@ __all__ = ["DiffractionExperimentContextIoPoni"]
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
-from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
 from .diffraction_exp_context import DiffractionExperimentContext
+from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
 
 
 EXP = DiffractionExperimentContext()
@@ -54,7 +56,7 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
             The filename of the file to be written.
         """
 
-        _EXP = kwargs.get("context", None) if "context" in kwargs else EXP
+        _EXP = kwargs.get("diffraction_exp", EXP)
         cls.check_for_existing_file(filename, **kwargs)
         _pdata = {}
         for key in ["rot1", "rot2", "rot3", "poni1", "poni2"]:
@@ -82,7 +84,7 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
             pfile.write(stream)
 
     @classmethod
-    def import_from_file(cls, filename):
+    def import_from_file(cls, filename, diffraction_exp=None):
         """
         Restore the DiffractionExperimentContext from a YAML file.
 
@@ -90,13 +92,15 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
         ----------
         filename : str
             The filename of the file to be written.
+        diffraction_exp : Union[DiffractionExperiment, None], optional
+            The DiffractionExperiment instance to be updated.
         """
         geo = pyFAI.geometry.Geometry().load(filename)
         cls.imported_params = {}
         cls._update_detector_from_pyFAI(geo.detector)
         cls._update_geometry_from_pyFAI(geo)
         cls._verify_all_entries_present(exclude_det_mask=True)
-        cls._write_to_exp_settings()
+        cls._write_to_exp_settings(diffraction_exp=diffraction_exp)
 
     @classmethod
     def _update_detector_from_pyFAI(cls, det):

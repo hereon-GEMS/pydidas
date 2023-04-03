@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,8 +21,8 @@ MCA spectral data
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["FioMcaLineScanSeriesLoader"]
@@ -31,20 +31,16 @@ import os
 
 import numpy as np
 
-from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core import (
+    Dataset,
+    Parameter,
     ParameterCollection,
     UserConfigError,
-    Parameter,
     get_generic_parameter,
-    Dataset,
 )
-from pydidas.plugins import InputPlugin1d
+from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring
-from pydidas.contexts import ScanContext
-
-
-SCAN = ScanContext()
+from pydidas.plugins import InputPlugin1d
 
 
 FIO_MCA_READER_DEFAULT_PARAMS = ParameterCollection(
@@ -177,8 +173,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
         _suffix = self.get_param_value("fio_suffix", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
@@ -271,7 +267,9 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         <InputPlugin>` class.
         """
         _n_per_dir = self.get_param_value("files_per_directory")
-        _pathindex = index // _n_per_dir + SCAN.get_param_value("scan_start_index")
+        _pathindex = index // _n_per_dir + self._SCAN.get_param_value(
+            "scan_start_index"
+        )
         _fileindex = index % _n_per_dir
         return self.filename_string.format(index=_pathindex, index2=_fileindex)
 

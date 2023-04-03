@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,21 +21,17 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Hdf5fileSeriesLoader"]
 
-from pydidas.core import get_generic_param_collection, UserConfigError
+from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
-from pydidas.plugins import InputPlugin
-from pydidas.contexts import ScanContext
 from pydidas.data_io import import_data
-
-
-SCAN = ScanContext()
+from pydidas.plugins import InputPlugin
 
 
 class Hdf5fileSeriesLoader(InputPlugin):
@@ -69,14 +67,13 @@ class Hdf5fileSeriesLoader(InputPlugin):
     basic_plugin = False
     plugin_type = INPUT_PLUGIN
     default_params = get_generic_param_collection(
-        "hdf5_key", "images_per_file", "file_stepping"
+        "hdf5_key", "images_per_file", "file_stepping", "_counted_images_per_file"
     )
     input_data_dim = None
     output_data_dim = 2
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._config["images_per_file"] = -1
 
     def pre_execute(self):
         """
@@ -88,9 +85,9 @@ class Hdf5fileSeriesLoader(InputPlugin):
             _n_per_file = get_hdf5_metadata(
                 self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
             )[0]
-            self._config["images_per_file"] = _n_per_file
+            self.set_param_value("_counted_images_per_file", _n_per_file)
         else:
-            self._config["images_per_file"] = _i_per_file
+            self.set_param_value("_counted_images_per_file", _i_per_file)
 
     def get_frame(self, frame_index, **kwargs):
         """
@@ -110,7 +107,7 @@ class Hdf5fileSeriesLoader(InputPlugin):
             The image data.
         """
         _fname = self.get_filename(frame_index)
-        _hdf_index = frame_index % self._config["images_per_file"]
+        _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
         kwargs["dataset"] = self.get_param_value("hdf5_key")
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
@@ -131,8 +128,8 @@ class Hdf5fileSeriesLoader(InputPlugin):
                 "pre_execute has not been called for Hdf5FileSeriesLoader and no "
                 "filename generator has been created."
             )
-        _images_per_file = self._config["images_per_file"]
+        _images_per_file = self.get_param_value("_counted_images_per_file")
         _i_file = (frame_index // _images_per_file) * self.get_param_value(
             "file_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
+        ) + self._SCAN.get_param_value("scan_start_index")
         return self.filename_string.format(index=_i_file)

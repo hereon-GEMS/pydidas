@@ -28,11 +28,11 @@ __all__ = ["InputPlugin1d"]
 
 import numpy as np
 
-from ..core import get_generic_parameter, UserConfigError
-from ..core.constants import INPUT_PLUGIN
 from ..contexts import ScanContext
-from .base_plugin import BasePlugin
+from ..core import UserConfigError, get_generic_parameter
+from ..core.constants import INPUT_PLUGIN
 from .base_input_plugin import InputPlugin
+from .base_plugin import BasePlugin
 
 
 SCAN = ScanContext()
@@ -60,6 +60,7 @@ class InputPlugin1d(InputPlugin):
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
+        self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
 
     def calculate_result_shape(self):
@@ -101,7 +102,7 @@ class InputPlugin1d(InputPlugin):
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)
             else:
                 _data += self.get_frame(_frame_index, **kwargs)[0]
-        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
+        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
             _data = _data / self._config["n_multi"]
         if _frames.size > 1:
             kwargs["frames"] = _frames

@@ -30,9 +30,9 @@ import os
 
 import numpy as np
 
-from ..core import get_generic_parameter, UserConfigError
-from ..core.constants import INPUT_PLUGIN
 from ..contexts import ScanContext
+from ..core import UserConfigError, get_generic_parameter
+from ..core.constants import INPUT_PLUGIN
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
 
@@ -67,6 +67,7 @@ class InputPlugin(BasePlugin):
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
+        self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
         self.__setup_image_magedata_manager()
 
@@ -155,9 +156,9 @@ class InputPlugin(BasePlugin):
         """
         self.update_filename_string()
         self._image_metadata.update(filename=self.get_filename(0))
-        self._config["n_multi"] = SCAN.get_param_value("scan_multiplicity")
-        self._config["start_index"] = SCAN.get_param_value("scan_start_index")
-        self._config["delta_index"] = SCAN.get_param_value("scan_index_stepping")
+        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
+        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
+        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
 
     def get_filename(self, frame_index):
         """
@@ -173,9 +174,9 @@ class InputPlugin(BasePlugin):
         str
             The filename.
         """
-        _index = frame_index * SCAN.get_param_value(
+        _index = frame_index * self._SCAN.get_param_value(
             "scan_index_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
+        ) + self._SCAN.get_param_value("scan_start_index")
         return self.filename_string.format(index=_index)
 
     def update_filename_string(self):
@@ -185,8 +186,8 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
             # raise UserConfigError("No filename pattern detected in the Input plugin!")
@@ -225,7 +226,7 @@ class InputPlugin(BasePlugin):
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)
             else:
                 _data += self.get_frame(_frame_index, **kwargs)[0]
-        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
+        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
             _data = _data / self._config["n_multi"]
         if _frames.size > 1:
             kwargs["frames"] = _frames

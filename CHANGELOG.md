@@ -36,6 +36,9 @@ Improvements
 - contexts.diffraction_exp_context importers can now select which 
   DiffractionExperiment instance to import to.
 - Added an update_from_tree method to the WorkflowTree.
+- Added 'counted_images_per_file' Parameter to hdf5 loaders to allow exporting
+  the number of processed images.
+
 
 Bugfixes
 --------

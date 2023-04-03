@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,7 +37,7 @@ import numpy as np
 import pydidas
 from pydidas.contexts.diffraction_exp_context import DiffractionExperimentContext
 from pydidas.contexts.scan_context import Scan, ScanContext
-from pydidas.core import Dataset, Parameter, get_generic_parameter
+from pydidas.core import Dataset, Parameter, UserConfigError, get_generic_parameter
 from pydidas.core.utils import get_random_string
 from pydidas.plugins import PluginCollection
 from pydidas.unittest_objects import DummyLoader, DummyProc, create_hdf5_io_file
@@ -223,7 +223,7 @@ class TestWorkflowResults(unittest.TestCase):
         self.create_composites()
         with open(os.path.join(self._tmpdir, "node_01.h5"), "w") as _file:
             _file.write("test")
-        with self.assertRaises(FileExistsError):
+        with self.assertRaises(UserConfigError):
             RES.prepare_files_for_saving(self._tmpdir, "HDF5")
 
     def test_prepare_files_for_saving__w_existing_file_w_overwrite(self):

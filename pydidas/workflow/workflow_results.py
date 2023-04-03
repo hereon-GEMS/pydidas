@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ import numpy as np
 from qtpy import QtCore
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..core import Dataset, SingletonFactory, utils
+from ..core import Dataset, SingletonFactory, UserConfigError, utils
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
 from .workflow_tree import WorkflowTree
 
@@ -536,8 +536,8 @@ class WorkflowResults(QtCore.QObject):
             os.path.exists(os.path.join(save_dir, _name)) for _name in _names
         ]
         if True in _existcheck and not overwrite:
-            raise FileExistsError(
-                f"The specified directory '{save_dir}' exists and is not empty. Please "
+            raise UserConfigError(
+                f'The specified directory "{save_dir}" exists and is not empty. Please '
                 "select a different directory."
             )
         if not os.path.exists(save_dir):
@@ -682,9 +682,9 @@ class WorkflowResults(QtCore.QObject):
         }
         self.__composites = _data
         if _data != {}:
-            self._SCAN = _scan
-            self._EXP = _exp
-            self._TREE = _tree
+            self._SCAN.update_from_scan(_scan)
+            self._EXP.update_from_diffraction_exp(_exp)
+            self._TREE.update_from_tree(_tree)
 
 
 WorkflowResultsContext = SingletonFactory(WorkflowResults)

@@ -138,12 +138,13 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             )
         else:
             for param in self.plugin.params.values():
-                _kwargs = (
-                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
-                    if param.dtype in [Hdf5key, Path]
-                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
-                )
-                self.create_param_widget(param, **_kwargs)
+                if not param.refkey.startswith("_"):
+                    _kwargs = (
+                        constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
+                        if param.dtype in [Hdf5key, Path]
+                        else constants.DEFAULT_PLUGIN_PARAM_CONFIG
+                    )
+                    self.create_param_widget(param, **_kwargs)
             self.param_widgets["label"].io_edited.connect(self._label_updated)
 
     @QtCore.Slot(str)

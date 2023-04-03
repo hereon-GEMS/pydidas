@@ -38,7 +38,8 @@ Improvements
 - Added an update_from_tree method to the WorkflowTree.
 - Added 'counted_images_per_file' Parameter to hdf5 loaders to allow exporting
   the number of processed images.
-
+- The EditPluginParametersWidget is now hiding all Parameters which start with 
+  an underscore to allow 'private' Parameters.
 
 Bugfixes
 --------

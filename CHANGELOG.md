@@ -35,6 +35,7 @@ Improvements
   to.
 - contexts.diffraction_exp_context importers can now select which 
   DiffractionExperiment instance to import to.
+- Added an update_from_tree method to the WorkflowTree.
 
 Bugfixes
 --------

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,7 +22,7 @@ with additional support for plugins and a plugin chain.
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTree"]
@@ -184,8 +186,9 @@ class _WorkflowTree(GenericTree):
 
     def prepare_execution(self):
         """
-        Prepare the execution of the WorkflowTree by running all the nodes'
-        prepare_execution methods.
+        Prepare the execution of the WorkflowTree.
+
+        This method calls all the nodes' prepare_execution methods.
         """
         self.root.propagate_shapes_and_global_config()
         self.root.prepare_execution()
@@ -279,6 +282,20 @@ class _WorkflowTree(GenericTree):
             _nodes = []
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
+
+    def update_from_tree(self, tree):
+        """
+        Update this tree from another WorkflowTree instance.
+
+        The main use of this method is to keep the referenced WorkflowTree object
+        alive while updating it.
+
+        Parameters
+        ----------
+        tree : WorkflowTree
+            A different WorkflowTree.
+        """
+        self.restore_from_string(tree.export_to_string())
 
     def restore_from_list_of_nodes(self, list_of_nodes):
         """

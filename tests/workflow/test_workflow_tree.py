@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,20 +24,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
-import tempfile
-import shutil
-import os
 import copy
+import os
 import pickle
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
 
 from pydidas import unittest_objects
-from pydidas.core import UserConfigError, Dataset, Parameter
-from pydidas.workflow import WorkflowNode, WorkflowTree, GenericNode
-from pydidas.workflow.workflow_tree import _WorkflowTree
+from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.plugins import PluginCollection
+from pydidas.workflow import GenericNode, WorkflowNode, WorkflowTree
+from pydidas.workflow.workflow_tree import _WorkflowTree
 
 
 COLL = PluginCollection()
@@ -323,6 +323,21 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertTrue(_id in self.tree.nodes.keys())
             self.assertIsInstance(
                 self.tree.nodes[_id].plugin, tree.nodes[_id].plugin.__class__
+            )
+
+    def test_update_from_tree(self):
+        tree = WorkflowTree()
+        _nodes, _index = self.create_node_tree()
+        tree.set_root(_nodes[0][0])
+        _new_tree = WorkflowTree()
+        _new_tree.create_and_add_node(unittest_objects.DummyLoader())
+        _new_tree.create_and_add_node(unittest_objects.DummyProc())
+        _new_tree.create_and_add_node(unittest_objects.DummyProc(), node_id=42)
+        tree.update_from_tree(_new_tree)
+        for _id, _node in tree.nodes.items():
+            self.assertEqual(set(tree.node_ids), set(_new_tree.node_ids))
+            self.assertIsInstance(
+                tree.nodes[_id].plugin, _new_tree.nodes[_id].plugin.__class__
             )
 
     def test_restore_from_string__empty(self):

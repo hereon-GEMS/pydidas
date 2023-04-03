@@ -28,10 +28,10 @@ __all__ = ["ScanContext", "Scan"]
 import numpy as np
 
 from ...core import (
-    SingletonFactory,
-    get_generic_param_collection,
     ObjectWithParameterCollection,
+    SingletonFactory,
     UserConfigError,
+    get_generic_param_collection,
 )
 from .scan_context_io_meta import ScanContextIoMeta
 
@@ -197,9 +197,24 @@ class Scan(ObjectWithParameterCollection):
         _n = self.get_param_value(f"scan_dim{index}_n_points")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
+    def update_from_scan(self, scan):
+        """
+        Update this Scan onject's Parameters from another Scan.
+
+        The purpose of this method is to "copy" the other Scan's Parameter values while
+        keeping the reference to this object.
+
+        Parameters
+        ----------
+        scan : Scan
+            The other Scan from which the Parameters should be taken.
+        """
+        for _key, _val in scan.get_param_values_as_dict().items():
+            self.set_param_value(_key, _val)
+
     def update_from_dictionary(self, scan_dict):
         """
-        Update scen ScanContext from an imported dictionary.
+        Update the Scan from an imported dictionary.
 
         Parameters
         ----------
@@ -270,8 +285,7 @@ class Scan(ObjectWithParameterCollection):
         """
         return self.get_param_value("scan_dim")
 
-    @staticmethod
-    def import_from_file(filename):
+    def import_from_file(self, filename):
         """
         Import ScanContext from a file.
 
@@ -280,10 +294,9 @@ class Scan(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        ScanContextIoMeta.import_from_file(filename)
+        ScanContextIoMeta.import_from_file(filename, scan=self)
 
-    @staticmethod
-    def export_to_file(filename, overwrite=False):
+    def export_to_file(self, filename, overwrite=False):
         """
         Export ScanContext to a file.
 
@@ -295,7 +308,7 @@ class Scan(ObjectWithParameterCollection):
             Keyword to allow overwriting of existing files. The default is
             False.
         """
-        ScanContextIoMeta.export_to_file(filename, overwrite=overwrite)
+        ScanContextIoMeta.export_to_file(filename, scan=self, overwrite=overwrite)
 
 
 ScanContext = SingletonFactory(Scan)

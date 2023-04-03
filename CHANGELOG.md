@@ -31,6 +31,8 @@ Improvements
   management of files and paths.
 - Added a new feature to get the position of a datapoint in the scan by clicking
   on the result.
+- contexts.scan_contexts importers can now select which Scan instance to import
+  to.
 
 Bugfixes
 --------

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,25 +18,26 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
 import os
-import unittest
 import shutil
 import tempfile
+import unittest
 
 from pydidas.contexts.scan_context import (
+    Scan,
     ScanContext,
     ScanContextIoBase,
     ScanContextIoMeta,
 )
 
 
-SCAN_SETTINGS = ScanContext()
+SCAN = ScanContext()
 SCAN_IO_META = ScanContextIoMeta
 SCAN_IO_META.clear_registry()
 
@@ -56,8 +59,9 @@ class TestIo(ScanContextIoBase):
         cls.export_filename = filename
 
     @classmethod
-    def import_from_file(cls, filename):
+    def import_from_file(cls, filename, scan):
         cls.imported = True
+        cls.scan = SCAN if scan is None else scan
         cls.import_filename = filename
 
 
@@ -68,7 +72,7 @@ class TestScanContextIoMeta(unittest.TestCase):
 
     def tearDown(self):
         shutil.rmtree(self._tmppath)
-        SCAN_SETTINGS.restore_all_defaults(True)
+        SCAN.restore_all_defaults(True)
 
     def test_export_to_file(self):
         _fname = os.path.join(self._tmppath, "test.test")
@@ -76,11 +80,20 @@ class TestScanContextIoMeta(unittest.TestCase):
         self.assertTrue(TestIo.exported)
         self.assertEqual(TestIo.export_filename, _fname)
 
-    def test_import_from_file(self):
+    def test_import_from_file__generic_ScanContext(self):
         _fname = os.path.join(self._tmppath, "test.test")
         SCAN_IO_META.import_from_file(_fname)
         self.assertTrue(TestIo.imported)
         self.assertEqual(TestIo.import_filename, _fname)
+        self.assertEqual(TestIo.scan, SCAN)
+
+    def test_import_from_file__given_Scan(self):
+        _fname = os.path.join(self._tmppath, "test.test")
+        _scan = Scan()
+        SCAN_IO_META.import_from_file(_fname, scan=_scan)
+        self.assertTrue(TestIo.imported)
+        self.assertEqual(TestIo.import_filename, _fname)
+        self.assertEqual(TestIo.scan, _scan)
 
 
 if __name__ == "__main__":

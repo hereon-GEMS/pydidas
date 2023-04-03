@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,8 +18,8 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
@@ -26,10 +28,10 @@ import unittest
 
 import numpy as np
 
-from pydidas.core import UserConfigError
-from pydidas.core.utils import get_random_string
 from pydidas.contexts import ScanContext
 from pydidas.contexts.scan_context import Scan
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_random_string
 
 
 class TestScanContext(unittest.TestCase):
@@ -204,6 +206,14 @@ class TestScanContext(unittest.TestCase):
         SCAN.set_param_value("scan_multiplicity", 3)
         _index = SCAN.get_frame_number_from_scan_indices(_indices)
         self.assertEqual(_index, _frame)
+
+    def test_update_from_scan(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _new_scan = Scan()
+        _new_scan.update_from_scan(SCAN)
+        for _key, _val in SCAN.get_param_values_as_dict().items():
+            self.assertEqual(_val, _new_scan.get_param_value(_key))
 
     def test_update_from_dictionary__missing_dim(self):
         _scan = {"scan_title": get_random_string(8), "scan_dim": 2}

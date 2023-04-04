@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,8 +18,8 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
@@ -323,14 +323,6 @@ class TestGenericNode(unittest.TestCase):
         GenericNode(node_id=1, parent=root)
         GenericNode(node_id=2, parent=root)
         root_copy = copy.copy(root)
-        self.assertNotEqual(root, root_copy)
-        self.assertNotEqual(root._children, root_copy._children)
-
-    def test_copy(self):
-        root = GenericNode(node_id=0)
-        GenericNode(node_id=1, parent=root)
-        GenericNode(node_id=2, parent=root)
-        root_copy = root.copy()
         self.assertNotEqual(root, root_copy)
         self.assertNotEqual(root._children, root_copy._children)
 

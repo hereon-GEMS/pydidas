@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseApp class from which all apps should inherit.
+Module with the BaseApp class from which all Pydidas apps should inherit.
 """
 
 __author__ = "Malte Storm"
@@ -26,7 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["BaseApp"]
 
-from copy import copy, deepcopy
+from copy import copy
 from pathlib import Path
 
 from .parameter_collection import ParameterCollection
@@ -35,8 +35,9 @@ from .object_with_parameter_collection import ObjectWithParameterCollection
 
 class BaseApp(ObjectWithParameterCollection):
     """
-    The BaseApp is the base class for all pydidas applications. It includes
-    core functionalities and pre-defines the template of required methods
+    The BaseApp is the base class for all pydidas applications.
+
+    It includes core functionalities and pre-defines the template of required methods
     for Apps to allow running the multiprocessing
     :py:class:`pydidas.multiprocessing.AppRunner`.
 
@@ -67,8 +68,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     def parse_args_and_set_params(self):
         """
-        Parse the command line arguments and update the corresponding
-        Parameter values.
+        Parse the command line arguments and update the corresponding Parameter values.
         """
         if self.parse_func is None:
             return

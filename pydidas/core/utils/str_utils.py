@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,8 +20,8 @@ The str_utils module includes convenience functions for string formatting.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
@@ -88,7 +90,7 @@ def get_fixed_length_str(
     """
     if len(fill_char) != 1:
         raise TypeError("fill_char must be exactly one character.")
-    if Real.__subclasscheck__(type(obj)):
+    if issubclass(type(obj), Real):
         obj = formatter.format(obj)
     if not isinstance(obj, str):
         obj = repr(obj)
@@ -299,7 +301,7 @@ def convert_unicode_to_ascii(obj):
     if isinstance(obj, str):
         _parts = obj.split()
         for _index, _part in enumerate(_parts):
-            if _part in GREEK_UNI_TO_ASCII.keys():
+            if _part in GREEK_UNI_TO_ASCII:
                 _parts[_index] = GREEK_UNI_TO_ASCII[_part]
         obj = " ".join(_parts)
         obj = obj.replace("\u212b", "A")

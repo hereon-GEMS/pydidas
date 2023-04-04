@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FitSinglePeak Plugin which can be used to fit a single peak
-in 1d data.
+Module with the FitSinglePeak Plugin which can be used to fit a single peak in 1d data.
 """
 
 __author__ = "Malte Storm"
@@ -32,7 +31,6 @@ from scipy.optimize import least_squares
 
 from pydidas.core import (
     Dataset,
-    Parameter,
     UserConfigError,
     get_generic_param_collection,
 )

@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,8 +21,8 @@ workflow on a single data frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrame"]
@@ -31,16 +31,16 @@ import copy
 
 from qtpy import QtCore
 
+from ...contexts import ScanContext
 from ...core import (
     Parameter,
     ParameterCollection,
+    UserConfigError,
     get_generic_param_collection,
     utils,
-    UserConfigError,
 )
-from ...contexts import ScanContext
-from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
+from ...workflow import WorkflowTree
 from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
 from .builders import WorkflowTestFrameBuilder
 
@@ -318,7 +318,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _nums = [
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]
-        _index = SCAN.get_frame_number_from_scan_indices(_nums)
+        _index = SCAN.get_frame_from_indices(_nums)
         if _index >= SCAN.n_points:
             raise UserConfigError(
                 f"The selected scan point {_nums} is outside the scope of the scan "

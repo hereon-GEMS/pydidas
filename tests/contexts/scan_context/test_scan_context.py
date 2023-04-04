@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -168,19 +168,19 @@ class TestScanContext(unittest.TestCase):
         _index = SCAN.get_frame_position_in_scan(_n)
         self.assertEqual(_index, _pos)
 
-    def test_get_frame_number_from_scan_indices__zero(self):
+    def test_get_frame_from_indices__zero(self):
         SCAN = Scan()
         self.set_scan_params(SCAN)
-        _index = SCAN.get_frame_number_from_scan_indices((0, 0, 0, 0))
+        _index = SCAN.get_frame_from_indices((0, 0, 0, 0))
         self.assertEqual(_index, 0)
 
-    def test_get_frame_number_from_scan_indices__negative(self):
+    def test_get_frame_from_indices__negative(self):
         SCAN = Scan()
         self.set_scan_params(SCAN)
         with self.assertRaises(UserConfigError):
-            SCAN.get_frame_number_from_scan_indices((0, -1, 0, 0))
+            SCAN.get_frame_from_indices((0, -1, 0, 0))
 
-    def test_get_frame_number_from_scan_indices__inscan(self):
+    def test_get_frame_from_indices__inscan(self):
         _indices = (2, 1, 2, 1)
         _frame = (
             _indices[3]
@@ -190,10 +190,10 @@ class TestScanContext(unittest.TestCase):
         )
         SCAN = Scan()
         self.set_scan_params(SCAN)
-        _index = SCAN.get_frame_number_from_scan_indices(_indices)
+        _index = SCAN.get_frame_from_indices(_indices)
         self.assertEqual(_index, _frame)
 
-    def test_get_frame_number_from_scan_indices__multiplicity_gt_one(self):
+    def test_get_frame_from_indices__multiplicity_gt_one(self):
         _indices = (2, 1, 2, 1)
         _frame = (
             _indices[3]
@@ -204,7 +204,7 @@ class TestScanContext(unittest.TestCase):
         SCAN = Scan()
         self.set_scan_params(SCAN)
         SCAN.set_param_value("scan_multiplicity", 3)
-        _index = SCAN.get_frame_number_from_scan_indices(_indices)
+        _index = SCAN.get_frame_from_indices(_indices)
         self.assertEqual(_index, _frame)
 
     def test_update_from_scan(self):

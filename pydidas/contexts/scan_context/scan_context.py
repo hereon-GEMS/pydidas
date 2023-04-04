@@ -112,7 +112,7 @@ class Scan(ObjectWithParameterCollection):
             frame -= _indices[_dim] * np.prod(_N[_dim + 1 :])
         return tuple(_indices)
 
-    def get_frame_number_from_scan_indices(self, indices):
+    def get_frame_from_indices(self, indices):
         """
         Get the frame number based on the scan indices.
 

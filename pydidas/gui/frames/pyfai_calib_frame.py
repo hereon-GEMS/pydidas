@@ -53,7 +53,8 @@ from silx.gui.plot.tools import ImageToolBar
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...core import constants
-from ...widgets import BaseFrame, PydidasFileDialog, silx_plot
+from ...widgets import PydidasFileDialog, silx_plot
+from ...widgets.framework import BaseFrame
 
 
 EXP = DiffractionExperimentContext()

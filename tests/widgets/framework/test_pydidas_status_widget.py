@@ -22,15 +22,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
 import sys
+import unittest
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
-from pydidas.widgets.info_widget import InfoWidget
+from pydidas.widgets.framework import PydidasStatusWidget
 
 
-class TestInfoWidget(unittest.TestCase):
+class TestPydidasStatusWidget(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.q_app = QtWidgets.QApplication.instance()
@@ -43,16 +43,16 @@ class TestInfoWidget(unittest.TestCase):
         cls.q_app.quit()
 
     def test_init(self):
-        obj = InfoWidget()
+        obj = PydidasStatusWidget()
         self.assertIsInstance(obj, QtWidgets.QPlainTextEdit)
 
     def test_sizeHint(self):
-        obj = InfoWidget()
+        obj = PydidasStatusWidget()
         self.assertEqual(obj.sizeHint(), QtCore.QSize(500, 50))
 
     def test_add_status(self):
         _test = "This is the test string"
-        obj = InfoWidget()
+        obj = PydidasStatusWidget()
         obj.add_status(_test)
         _text = obj.toPlainText()
         self.assertTrue(_text.strip().endswith(_test))

@@ -32,33 +32,34 @@ import sys
 from functools import partial
 
 import yaml
-from qtpy import QtWidgets, QtGui, QtCore
+from qtpy import QtCore, QtGui, QtWidgets
 
+from ..contexts import GLOBAL_CONTEXTS
 from ..core import UserConfigError
 from ..core.utils import (
     DOC_HOME_QURL,
-    get_pydidas_icon_w_bg,
-    doc_qurl_for_frame_manual,
     doc_filename_for_frame_manual,
+    doc_qurl_for_frame_manual,
+    get_pydidas_icon_w_bg,
 )
-from ..contexts import GLOBAL_CONTEXTS
-from ..workflow import WorkflowTree
-from ..widgets import PydidasFrameStack
+from ..version import VERSION
 from ..widgets import PydidasFileDialog
 from ..widgets.dialogues import QuestionBox, critical_warning
-from ..version import VERSION
+from ..widgets.framework import PydidasFrameStack
+from ..workflow import WorkflowTree
 from . import utils
 from .gui_excepthook_ import gui_excepthook
 from .windows import (
-    GlobalSettingsWindow,
-    UserConfigWindow,
-    ExportEigerPixelmaskWindow,
     AboutWindow,
+    ExportEigerPixelmaskWindow,
     FeedbackWindow,
+    GlobalSettingsWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
     QtPathsWindow,
+    UserConfigWindow,
 )
+
 
 TREE = WorkflowTree()
 

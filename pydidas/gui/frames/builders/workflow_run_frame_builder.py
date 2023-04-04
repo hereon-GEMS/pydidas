@@ -21,7 +21,7 @@ populate the WorkflowRunFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -33,7 +33,8 @@ from ....core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
-from ....widgets import BaseFrameWithApp, ScrollArea
+from ....widgets import ScrollArea
+from ....widgets.framework import BaseFrameWithApp
 from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.selection import ResultSelectionWidget
 from ....widgets.silx_plot import create_silx_plot_stack

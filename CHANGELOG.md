@@ -40,6 +40,8 @@ Improvements
   the number of processed images.
 - The EditPluginParametersWidget is now hiding all Parameters which start with 
   an underscore to allow 'private' Parameters.
+- Created widgets.framework subpackage and moved framework widgets (e.g. 
+  BaseFrames) into it.
 
 Bugfixes
 --------

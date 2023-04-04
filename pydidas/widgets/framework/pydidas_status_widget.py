@@ -14,7 +14,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the _InfoWidget class and the InfoWidget singleton instance
+Module with the PydidasStatusWidget singleton instance of the _PydidasStatusWidget
 which is used as a global logging and status widget.
 """
 
@@ -23,17 +23,17 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["InfoWidget"]
+__all__ = ["PydidasStatusWidget"]
 
 from qtpy import QtWidgets, QtCore, QtGui
 
-from ..core.utils import get_time_string
-from ..core import SingletonFactory
+from ...core.utils import get_time_string
+from ...core import SingletonFactory
 
 
-class _InfoWidget(QtWidgets.QPlainTextEdit):
+class _PydidasStatusWidget(QtWidgets.QPlainTextEdit):
     """
-    The InfoWidget is a subclassed QPlainTextEdit with an additional method
+    The PydidasStatusWidget is a subclassed QPlainTextEdit with an additional method
     to append text.
     """
 
@@ -56,7 +56,7 @@ class _InfoWidget(QtWidgets.QPlainTextEdit):
 
     def add_status(self, text):
         """
-        Add a status message to the InfoWidget
+        Add a status message to the PydidasStatusWidget
 
         This method will add a status message to the Info/Log widget together
         with a timestamp.
@@ -73,4 +73,4 @@ class _InfoWidget(QtWidgets.QPlainTextEdit):
         self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
 
-InfoWidget = SingletonFactory(_InfoWidget)
+PydidasStatusWidget = SingletonFactory(_PydidasStatusWidget)

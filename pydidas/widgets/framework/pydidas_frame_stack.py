@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,8 +22,8 @@ the PydidasFrameStack once they have been registered.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasFrameStack"]
@@ -30,8 +32,8 @@ from pathlib import Path
 
 from qtpy import QtWidgets, QtCore
 
-from ..core import SingletonFactory, utils
-from .utilities import get_pyqt_icon_from_str
+from ...core import SingletonFactory, utils
+from ..utilities import get_pyqt_icon_from_str
 from .base_frame import BaseFrame
 
 
@@ -73,13 +75,13 @@ class _PydidasFrameStack(QtWidgets.QStackedWidget):
 
         Parameters
         ----------
-        frame : pydidas.widgets.BaseFrame
+        frame : pydidas.widgets.framework.BaseFrame
             The BaseFrame to be registered.
 
         Raises
         ------
         TypeError
-            If a widget is not of type pydidas.widgets.BaseFrame
+            If a widget is not of type pydidas.widgets.framework.BaseFrame
         KeyEror
             When a widget with the same name has already been registered
             to prevent duplicate entries in the index reference.

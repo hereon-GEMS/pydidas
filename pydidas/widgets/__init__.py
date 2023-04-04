@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ interface.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
@@ -28,6 +30,8 @@ __all__ = []
 # import sub-packages:
 from . import dialogues
 from . import factory
+from . import framework
+from . import misc
 from . import parameter_config
 from . import plugin_config_widgets
 from . import selection
@@ -38,6 +42,8 @@ __all__.extend(
     [
         "dialogues",
         "factory",
+        "framework",
+        "misc",
         "parameter_config",
         "plugin_config_widgets",
         "selection",
@@ -52,47 +58,16 @@ from .factory import CreateWidgetsMixIn
 __all__.extend(["CreateWidgetsMixIn"])
 
 # import __all__ items from modules:
-from .base_frame import *
-from .base_frame_with_app import *
 from .file_dialog import *
-from .info_widget import *
-from .pydidas_frame_stack import *
-from .qta_button import *
 from .read_only_text_widget import *
 from .scroll_area import *
 from .utilities import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
-# namespace by deleting the module references:
-from . import base_frame
-
-__all__.extend(base_frame.__all__)
-del base_frame
-
-from . import base_frame_with_app
-
-__all__.extend(base_frame_with_app.__all__)
-del base_frame_with_app
-
 from . import file_dialog
 
 __all__.extend(file_dialog.__all__)
 del file_dialog
-
-from . import info_widget
-
-__all__.extend(info_widget.__all__)
-del info_widget
-
-from . import pydidas_frame_stack
-
-__all__.extend(pydidas_frame_stack.__all__)
-del pydidas_frame_stack
-
-from . import qta_button
-
-__all__.extend(qta_button.__all__)
-del qta_button
 
 from . import read_only_text_widget
 

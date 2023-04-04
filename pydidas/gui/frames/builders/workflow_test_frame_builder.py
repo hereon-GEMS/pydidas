@@ -35,8 +35,9 @@ from ....core.constants import (
     DEFAULT_TWO_LINE_PARAM_CONFIG,
     FIX_EXP_POLICY,
 )
-from ....widgets import ReadOnlyTextWidget, ScrollArea
+from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
+from ....widgets.misc import ReadOnlyTextWidget
 from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.silx_plot import create_silx_plot_stack
 

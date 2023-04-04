@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Package with individual QWidgets used editing pydidas Parameters.
+Package with miscellaneous individual QWidgets.
 """
 
 __author__ = "Malte Storm"
@@ -28,29 +28,17 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
-# from .parameter_widget import *
-# from .parameter_edit_canvas import *
-# from .parameter_widgets_mixin import *
-# from .edit_plugin_parameters_widget import *
+from .show_information_for_result import *
+from .read_only_text_widget import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-# from . import parameter_widget
 
-# __all__.extend(parameter_widget.__all__)
-# del parameter_widget
+from . import read_only_text_widget
 
-# from . import parameter_edit_canvas
+__all__.extend(read_only_text_widget.__all__)
+del read_only_text_widget
+from . import show_information_for_result
 
-# __all__.extend(parameter_edit_canvas.__all__)
-# del parameter_edit_canvas
-
-# from . import parameter_widgets_mixin
-
-# __all__.extend(parameter_widgets_mixin.__all__)
-# del parameter_widgets_mixin
-
-# from . import edit_plugin_parameters_widget
-
-# __all__.extend(edit_plugin_parameters_widget.__all__)
-# del edit_plugin_parameters_widget
+__all__.extend(show_information_for_result.__all__)
+del show_information_for_result

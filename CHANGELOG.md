@@ -42,7 +42,8 @@ Improvements
   an underscore to allow 'private' Parameters.
 - Created widgets.framework subpackage and moved framework widgets (e.g. 
   BaseFrames) into it.
-
+- Added a new button in the workflow result visualizations to show details about
+  the datapoint.
 Bugfixes
 --------
 - Fixed an issue in the BaseInputPlugin when using both the ScanContext 

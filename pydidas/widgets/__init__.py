@@ -59,7 +59,6 @@ __all__.extend(["CreateWidgetsMixIn"])
 
 # import __all__ items from modules:
 from .file_dialog import *
-from .read_only_text_widget import *
 from .scroll_area import *
 from .utilities import *
 
@@ -68,11 +67,6 @@ from . import file_dialog
 
 __all__.extend(file_dialog.__all__)
 del file_dialog
-
-from . import read_only_text_widget
-
-__all__.extend(read_only_text_widget.__all__)
-del read_only_text_widget
 
 from . import scroll_area
 

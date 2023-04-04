@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,8 +48,8 @@ from ...core.constants import (
 from ...core.utils import SignalBlocker, apply_qt_properties, convert_unicode_to_ascii
 from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
+from ..misc import ReadOnlyTextWidget, ShowInformationForResult
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
-from ..read_only_text_widget import ReadOnlyTextWidget
 from ..utilities import update_param_and_widget_choices
 
 
@@ -156,6 +156,7 @@ class ResultSelectionWidget(
             scan_context=self._SCAN,
             workflow_results=self._RESULTS,
         )
+        self.__result_window = None
         self.__create_widgets()
         self.__connect_signals()
 
@@ -690,35 +691,16 @@ class ResultSelectionWidget(
         data_y : float
             the data y value.
         """
-        _use_timeline = self.get_param_value("use_scan_timeline")
-        _node_metadata = self._RESULTS.get_result_metadata(
-            self._active_node, _use_timeline
+        _loader_plugin = self._RESULTS._TREE.root.plugin
+        _timeline = self.get_param_value("use_scan_timeline")
+        _node_metadata = self._RESULTS.get_result_metadata(self._active_node, _timeline)
+        _selection_config = self.get_param_values_as_dict() | {
+            "selection_by_data_values": self._config["selection_by_data_values"],
+            "active_dims": self._config["active_dims"],
+            "use_timeline": _timeline,
+        }
+        if self.__result_window is None:
+            self.__result_window = ShowInformationForResult(None)
+        self.__result_window.display_information(
+            (data_y, data_x), _selection_config, _node_metadata, _loader_plugin
         )
-        _ax0 = int(self.get_param_value("plot_ax1").split(":")[0])
-        _ax1 = int(self.get_param_value("plot_ax2").split(":")[0])
-        _func = (
-            self._selector.get_best_index_for_value
-            if self._config["selection_by_data_values"]
-            else lambda x, xarr: x
-        )
-        _dim_selections = [
-            _func(
-                self.get_param_value(f"plot_slice_{_dim}", dtype=float),
-                _node_metadata["axis_ranges"][_dim],
-            )
-            for _dim in range(len(_node_metadata["shape"]))
-        ]
-        _dim_selections[_ax0] = self._selector.get_best_index_for_value(
-            data_y, _node_metadata["axis_ranges"][_ax0]
-        )
-        _dim_selections[_ax1] = self._selector.get_best_index_for_value(
-            data_x, _node_metadata["axis_ranges"][_ax1]
-        )
-        _scan_dims = _dim_selections[: self._SCAN.ndim]
-        _frame = (
-            _dim_selections[0]
-            if _use_timeline
-            else self._SCAN.get_frame_number_from_scan_indices(_scan_dims)
-        )
-        _scan_indices = self._SCAN.get_frame_position_in_scan(_frame)
-        _ = _scan_indices + 1

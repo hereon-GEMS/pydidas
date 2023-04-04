@@ -27,8 +27,8 @@ __all__ = ["ReadOnlyTextWidget"]
 
 from qtpy import QtWidgets
 
-from ..core import constants
-from ..core.utils import apply_qt_properties
+from ...core import constants
+from ...core.utils import apply_qt_properties
 
 
 class ReadOnlyTextWidget(QtWidgets.QTextEdit):

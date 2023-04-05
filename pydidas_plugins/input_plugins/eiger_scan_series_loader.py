@@ -38,8 +38,7 @@ from pydidas.plugins import InputPlugin
 
 class EigerScanSeriesLoader(InputPlugin):
     """
-    Load data frames from an Eiger scan series with files in different
-    directories.
+    Load data frames from an Eiger scan series with files in different directories.
 
     This class is designed to load data from a series of directories with a
     single hdf5 file in each, as created by a series of scans with the Eiger
@@ -83,6 +82,7 @@ class EigerScanSeriesLoader(InputPlugin):
     )
     input_data_dim = None
     output_data_dim = 2
+    advanced_parameters = InputPlugin.advanced_parameters.copy() + ["images_per_file"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

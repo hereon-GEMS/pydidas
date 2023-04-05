@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,6 +54,7 @@ class InputPlugin1d(InputPlugin):
         get_generic_parameter("binning"),
     )
     default_params = InputPlugin.default_params.copy()
+    advanced_parameters = ["use_roi", "roi_xlow", "roi_xhigh", "binning"]
 
     def __init__(self, *args, **kwargs):
         """

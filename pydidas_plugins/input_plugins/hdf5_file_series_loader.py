@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Hdf5fileSeriesLoader"]
 
+
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
@@ -71,6 +72,10 @@ class Hdf5fileSeriesLoader(InputPlugin):
     )
     input_data_dim = None
     output_data_dim = 2
+    advanced_parameters = InputPlugin.advanced_parameters.copy() + [
+        "images_per_file",
+        "file_stepping",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

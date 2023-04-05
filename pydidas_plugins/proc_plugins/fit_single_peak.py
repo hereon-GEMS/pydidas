@@ -20,7 +20,7 @@ Module with the FitSinglePeak Plugin which can be used to fit a single peak in 1
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-m, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -68,6 +68,7 @@ class FitSinglePeak(ProcPlugin):
     input_data_dim = -1
     output_data_dim = 0
     new_dataset = True
+    advanced_parameters = ["fit_sigma_threshold", "fit_min_peak_height"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

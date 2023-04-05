@@ -109,5 +109,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
         _dir = self.__import_dialog.get_user_response()
         if _dir is not None:
             self._RESULTS.import_data_from_directory(_dir)
+            self._RESULTS._TREE.root.plugin._SCAN = self._RESULTS._SCAN
+            self._RESULTS._TREE.root.plugin.update_filename_string()
             self._update_choices_of_selected_results()
             self._update_export_button_activation()

@@ -44,6 +44,9 @@ Improvements
   BaseFrames) into it.
 - Added a new button in the workflow result visualizations to show details about
   the datapoint.
+- Added 'advanced_parameters' to Plugin Parameters to allow hiding of Parameters
+  (in the GUI) which are usually not required.
+
 Bugfixes
 --------
 - Fixed an issue in the BaseInputPlugin when using both the ScanContext 

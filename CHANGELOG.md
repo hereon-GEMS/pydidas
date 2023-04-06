@@ -46,6 +46,7 @@ Improvements
   the datapoint.
 - Added 'advanced_parameters' to Plugin Parameters to allow hiding of Parameters
   (in the GUI) which are usually not required.
+- Added an .active_plugin_header property to the WorkflowTree
 
 Bugfixes
 --------
@@ -66,7 +67,7 @@ Bugfixes
   dimension selection for axes with unicode characters.
 - Fixed a bug when importing a WorkflowTree while not all Plugins in the tree
   were registered.
-
+- Fixed an issue when importing plugins from an empty Path object.
 
 =======
 v23.3.9

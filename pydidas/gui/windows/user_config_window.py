@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,40 +21,32 @@ to view and modify user-specific settings in a seperate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["UserConfigWindow"]
 
+
 from functools import partial
+from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from ...core import SingletonFactory, get_generic_param_collection
+from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     QSETTINGS_USER_KEYS,
     QT_TOP_RIGHT_ALIGNMENT,
     STANDARD_FONT_SIZE,
 )
-from ...plugins import PluginCollection
-from ...widgets.dialogues import AcknowledgeBox
+from ...plugins import PluginCollection, get_generic_plugin_path
+from ...widgets.dialogues import AcknowledgeBox, QuestionBox
 from .pydidas_window import PydidasWindow
 
 
 PLUGINS = PluginCollection()
-
-
-@QtCore.Slot()
-def update_plugin_collection():
-    """
-    Update the plugin collection from the updated QSetting values for the
-    plugin directories.
-    """
-    PLUGINS.clear_collection(True)
-    PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
 
 class _UserConfigWindow(PydidasWindow):
@@ -152,7 +144,12 @@ class _UserConfigWindow(PydidasWindow):
 
         self.create_label("section_plugins", "Plugins", **_section_options)
         self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
-        self.create_button("but_plugins", "Update plugin collection")
+        self.create_button("but_plugins", "Update plugin collection", icon="qt-std::59")
+        self.create_button(
+            "but_reset_plugins",
+            "Restore default plugin collection paths",
+            icon="qt-std::39",
+        )
 
     def connect_signals(self):
         """
@@ -163,7 +160,8 @@ class _UserConfigWindow(PydidasWindow):
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
-        self._widgets["but_plugins"].clicked.connect(update_plugin_collection)
+        self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)
+        self._widgets["but_reset_plugins"].clicked.connect(self.reset_plugins)
         self._widgets["cmap_combobox"].currentTextChanged.connect(self.update_cmap)
 
     @QtCore.Slot(object)
@@ -181,6 +179,40 @@ class _UserConfigWindow(PydidasWindow):
         """
         self.q_settings_set_key(f"user/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
+
+    @QtCore.Slot()
+    def update_plugin_collection(self):
+        """
+        Update the plugin collection from the updated QSetting values for the
+        plugin directories.
+        """
+        _paths = PLUGINS.get_q_settings_plugin_paths()
+        if _paths == [Path()]:
+            self.set_param_value_and_widget(
+                "plugin_path", str(get_generic_plugin_path()[0])
+            )
+            raise UserConfigError(
+                "Warning! No plugin paths have been selected. Resetting paths to the "
+                "default path value."
+            )
+        PLUGINS.clear_collection(True)
+        PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
+
+    @QtCore.Slot()
+    def reset_plugins(self):
+        """
+        Reset the plugin paths to the default.
+        """
+        _reply = QuestionBox(
+            "Reset PluginCollection paths",
+            "Do you want to reset the PluginCollection paths and lose all changes?",
+        ).exec_()
+        if _reply:
+            self.set_param_value_and_widget(
+                "plugin_path", str(get_generic_plugin_path()[0])
+            )
+            PLUGINS.clear_collection(True)
+            PLUGINS.find_and_register_plugins(*PLUGINS.get_q_settings_plugin_paths())
 
     @QtCore.Slot(str)
     def update_cmap(self, cmap_name):

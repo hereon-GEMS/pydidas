@@ -56,6 +56,21 @@ class _WorkflowTree(GenericTree):
         self._preexecuted = False
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
+    @property
+    def active_plugin_header(self):
+        """
+        Get the header description of the active plugin.
+
+        Returns
+        -------
+        str
+            The description. If no active plugin has been selected, an empty string
+            will be returned.
+        """
+        if self.active_node is None:
+            return ""
+        return f"#{self.active_node_id:03d} [{self.active_node.plugin.plugin_name}]"
+
     def create_and_add_node(self, plugin, parent=None, node_id=None):
         """
         Create a new node and add it to the tree.

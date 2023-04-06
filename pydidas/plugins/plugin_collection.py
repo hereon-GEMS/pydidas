@@ -65,7 +65,11 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         self.__plugin_paths = []
         PydidasQsettingsMixin.__init__(self)
         _plugin_path = self.__get_plugin_path_from_kwargs(**kwargs)
-        self._config = {"initial_plugin_path": _plugin_path, "initialized": False}
+        self._config = {
+            "initial_plugin_path": _plugin_path,
+            "initialized": False,
+            "must_emit_signal": False
+        }
         if kwargs.get("force_initialization", False):
             self.verify_is_initialized()
 
@@ -140,7 +144,10 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
                 _path = Path(_path)
             if _path != Path():
                 self._find_and_register_plugins_in_path(_path, reload)
-        self.sig_updated_plugins.emit()
+        if self._config["initialized"]:
+            self.sig_updated_plugins.emit()
+        else:
+            self._config["must_emit_signal"] = True
 
     def _find_and_register_plugins_in_path(self, path, reload=True):
         """
@@ -312,6 +319,8 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         )
         self.find_and_register_plugins(*_plugin_path)
         self._config["initialized"] = True
+        if self._config["must_emit_signal"]:
+            self.sig_updated_plugins.emit()
 
     def get_all_plugin_names(self):
         """

@@ -101,6 +101,7 @@ class BasePlugin(ObjectWithParameterCollection):
     output_data_unit = ""
     new_dataset = False
     has_unique_parameter_config_widget = False
+    advanced_parameters = []
 
     @classmethod
     def get_class_description(cls):

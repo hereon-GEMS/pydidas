@@ -30,6 +30,7 @@ import pickle
 import shutil
 import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -54,7 +55,7 @@ class TestWorkflowTree(unittest.TestCase):
     def setUp(self):
         self.tree = WorkflowTree()
         self.tree.clear()
-        self._tmpdir = tempfile.mkdtemp()
+        self._tmpdir = Path(tempfile.mkdtemp())
 
     def tearDown(self):
         shutil.rmtree(self._tmpdir)
@@ -81,6 +82,22 @@ class TestWorkflowTree(unittest.TestCase):
                     _tiernodes.append(_node)
             _nodes.append(_tiernodes)
         return _nodes, _index
+
+    def test_active_plugin_header__no_nodes(self):
+        self.assertEqual(self.tree.active_plugin_header, "")
+
+    def test_active_plugin_header__no_active_node(self):
+        _nodes, _index = self.create_node_tree()
+        self.tree.register_node(_nodes[0][0])
+        self.tree.active_node_id = None
+        self.assertEqual(self.tree.active_plugin_header, "")
+
+    def test_active_plugin_header__w_active_node(self):
+        _nodes, _index = self.create_node_tree()
+        _root = _nodes[0][0]
+        self.tree.register_node(_root)
+        self.tree.active_node_id = 0
+        self.assertEqual(self.tree.active_plugin_header, "#000 [Dummy loader Plugin]")
 
     def test_get_all_result_shapes__no_nodes(self):
         with self.assertRaises(UserConfigError):
@@ -123,7 +140,7 @@ class TestWorkflowTree(unittest.TestCase):
         self.assertEqual(_shapes[2], _shape)
 
     def test_export_to_file(self):
-        _fname = os.path.join(self._tmpdir, "export.yaml")
+        _fname = self._tmpdir.joinpath("export.yaml")
         _nodes, _index = self.create_node_tree()
         self.tree.register_node(_nodes[0][0])
         self.tree.export_to_file(_fname)
@@ -136,7 +153,7 @@ class TestWorkflowTree(unittest.TestCase):
         tree = WorkflowTree()
         _nodes, _index = self.create_node_tree()
         tree.register_node(_nodes[0][0])
-        _fname = os.path.join(self._tmpdir, "export.yaml")
+        _fname = self._tmpdir.joinpath("export.yaml")
         tree.export_to_file(_fname)
         self.tree.import_from_file(_fname)
         for node_id in tree.nodes:

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,8 +20,8 @@ Module with the WorkflowEditFrame which is used to create the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrame"]
@@ -98,7 +100,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         Connect all signals and slots in the frame.
         """
-        _app = QtWidgets.QApplication.instance()
+        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["plugin_collection"].sig_add_plugin_to_tree.connect(
             partial(workflow_add_plugin_at_parent, -1)
         )
@@ -108,14 +110,14 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         self._widgets["plugin_collection"].sig_append_to_specific_node.connect(
             workflow_add_plugin_at_parent
         )
-        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
         WORKFLOW_EDIT_MANAGER.sig_plugin_selected.connect(self.configure_plugin)
         WORKFLOW_EDIT_MANAGER.sig_plugin_class_selected.connect(
             self._widgets["plugin_collection"].display_plugin_description
         )
-        WORKFLOW_EDIT_MANAGER.update_qt_canvas(self._widgets["workflow_canvas"])
         self._widgets["but_save"].clicked.connect(self.save_tree_to_file)
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
+        _app = QtWidgets.QApplication.instance()
+        _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id):

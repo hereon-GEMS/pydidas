@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,11 +20,12 @@ Module with various utility functions for widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
+    "BlockUpdates",
     "delete_all_items_in_layout",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
@@ -31,16 +34,16 @@ __all__ = [
 ]
 
 
-from qtpy import QtWidgets, QtCore, QtGui
-from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 import qtawesome
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from ..core import PydidasGuiError, utils
 
 
 def delete_all_items_in_layout(layout):
     """
-    Function to recursively delete items in a QLayout.
+    Recursively delete items in a QLayout.
 
     Parameters
     ----------
@@ -265,3 +268,19 @@ def update_param_and_widget_choices(param_widget, new_choices):
             return
         param_widget.io_widget.update_choices(new_choices)
         param_widget.io_widget.setCurrentText(new_choices[0])
+
+
+class BlockUpdates:
+    """
+    Class to block UI updates from a QWidget.
+    """
+
+    def __init__(self, caller):
+        self._caller = caller
+        self._update_status = caller.updatesEnabled()
+
+    def __enter__(self):
+        self._caller.setUpdatesEnabled(False)
+
+    def __exit__(self, type_, value, traceback):
+        self._caller.setUpdatesEnabled(self._update_status)

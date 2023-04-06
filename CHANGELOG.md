@@ -48,6 +48,7 @@ Improvements
   (in the GUI) which are usually not required.
 - Added an .active_plugin_header property to the WorkflowTree
 - The GenericTree.order_node_ids now also sets the active node again.
+- The WorkflowEditFrame now also allows to filter plugins for their name.
 
 Bugfixes
 --------

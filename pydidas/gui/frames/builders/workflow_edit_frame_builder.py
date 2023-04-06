@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrameBuilder"]
 
-from ....core.constants import EXP_EXP_POLICY
+from ....core.constants import EXP_EXP_POLICY, STANDARD_FONT_SIZE
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -53,33 +53,40 @@ class WorkflowEditFrameBuilder(BaseFrame):
         self.create_any_widget(
             "workflow_area",
             ScrollArea,
-            minimumHeight=500,
+            minimumHeight=450,
             widget=self._widgets["workflow_canvas"],
             gridPos=(0, 0, 1, 1),
         )
+        self.create_label(
+            "plugin_title",
+            "Available plugins:",
+            fontsize=STANDARD_FONT_SIZE + 4,
+            underline=True,
+            gridPos=(1, 0, 1, 1),
+        )
         self.create_any_widget(
-            "plugin_collection", PluginCollectionBrowser, gridPos=(1, 0, 3, 1)
+            "plugin_collection", PluginCollectionBrowser, gridPos=(2, 0, 3, 1)
         )
         self._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
         self.create_any_widget(
             "plugin_edit_area",
             ScrollArea,
-            minimumHeight=500,
+            minimumHeight=450,
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
             sizePolicy=EXP_EXP_POLICY,
-            gridPos=(0, 1, 2, 1),
+            gridPos=(0, 1, 3, 1),
         )
         self.create_button(
             "but_load",
             "Import workflow from file",
-            gridPos=(2, 1, 1, 1),
+            gridPos=(3, 1, 1, 1),
             icon=self.style().standardIcon(42),
         )
         self.create_button(
             "but_save",
             "Export workflow to file",
-            gridPos=(3, 1, 1, 1),
+            gridPos=(4, 1, 1, 1),
             icon=self.style().standardIcon(43),
         )
 

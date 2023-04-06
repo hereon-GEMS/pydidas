@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,26 @@ with the editing Canvas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTreeEditManager"]
 
+
 import time
 from functools import partial
 
-from qtpy import QtCore
 import numpy as np
+from qtpy import QtCore
 
-from ...core.constants import gui_constants
 from ...core import SingletonFactory
+from ...core.constants import gui_constants
 from ...plugins import PluginCollection
+from ...widgets import BlockUpdates
 from ...widgets.workflow_edit import PluginInWorkflowBox
-from ...workflow import WorkflowTree, PluginPositionNode
+from ...workflow import PluginPositionNode, WorkflowTree
+
 
 PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
@@ -132,14 +137,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
 
         Raises
         ------
-        AttributeError
-            AttributeError is raised if the Qt drawing Canvas for the plugins
-            has not been defined yet.
+        Warning
+            If the Qt drawing Canvas for the plugins has not been defined yet.
         """
         _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(name)()
-        # Check if no node is active but the TREE already has nodes.
-        # If True, pydidas will select the last node as active to append the new
-        # node.
         _parent = (
             TREE.active_node if parent_node_id is None else TREE.nodes[parent_node_id]
         )
@@ -150,7 +151,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.__create_widget(title if title is not None else name, _node_id)
         self.set_active_node(_node_id, force_update=True)
         if not self.qt_canvas:
-            raise Warning("No QtCanvas defined. Nodes added but cannot be displayed")
+            raise Warning("No QtCanvas defined. Nodes cannot be displayed")
         self.update_node_positions()
         self._check_consistency()
 
@@ -295,13 +296,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             The node ID of the requested parent.
         """
         _plugin = TREE.nodes[calling_node].plugin
-        self.add_new_plugin_node(_plugin.plugin_name, parent_node_id=new_parent_node)
-        _dump = TREE.nodes[calling_node].dump()
-        for _key, _val in _dump["plugin_params"]:
-            TREE.active_node.plugin.set_param_value(_key, _val)
-        TREE.order_node_ids()
-        self.update_from_tree()
-        self._check_consistency()
+        _param_vals = _plugin.get_param_values_as_dict()
+        with BlockUpdates(self.qt_canvas):
+            self.add_new_plugin_node(
+                _plugin.plugin_name, parent_node_id=new_parent_node
+            )
+            TREE.active_node.plugin.set_param_values_from_dict(_param_vals)
+            TREE.order_node_ids()
+            time.sleep(0.0005)
+            self.update_from_tree()
+            self._check_consistency()
 
     def update_node_positions(self):
         """
@@ -312,25 +316,26 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         if self.root is None:
             return
-        _pos = self.root.get_relative_positions()
-        _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
-        _offset = 0
-        _canvas_width = self.qt_canvas.parent().parent().width()
-        if _width < _canvas_width:
-            _offset = (_canvas_width - _width) // 2
-        pos_vals = np.asarray(list(_pos.values()))
-        pos_vals[:, 0] += -np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
-        pos_vals[:, 1] += -np.amin(pos_vals[:, 1]) + self.pos_y_min
-        self._node_positions = {key: pos_vals[i] for i, key in enumerate(_pos)}
-        for node_id in TREE.node_ids:
-            self._node_widgets[node_id].move(
-                self._node_positions[node_id][0], self._node_positions[node_id][1]
+        with BlockUpdates(self.qt_canvas):
+            _pos = self.root.get_relative_positions()
+            _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
+            _offset = 0
+            _canvas_width = self.qt_canvas.parent().parent().width()
+            if _width < _canvas_width:
+                _offset = (_canvas_width - _width) // 2
+            pos_vals = np.asarray(list(_pos.values()))
+            pos_vals[:, 0] += -np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
+            pos_vals[:, 1] += -np.amin(pos_vals[:, 1]) + self.pos_y_min
+            self._node_positions = {key: pos_vals[i] for i, key in enumerate(_pos)}
+            for node_id in TREE.node_ids:
+                self._node_widgets[node_id].move(
+                    self._node_positions[node_id][0], self._node_positions[node_id][1]
+                )
+            self.qt_canvas.setFixedSize(
+                self.root.width + 2 * self.pos_x_min + _offset,
+                self.root.height + 2 * self.pos_y_min,
             )
-        self.qt_canvas.setFixedSize(
-            self.root.width + 2 * self.pos_x_min + _offset,
-            self.root.height + 2 * self.pos_y_min,
-        )
-        self.__update_node_connections()
+            self.__update_node_connections()
 
     def __update_node_connections(self):
         """
@@ -368,18 +373,19 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             Flag to toggle resetting the active node. After loading a
             WorkflowTree from file, this can be used to reset the selection.
         """
-        self.__delete_all_nodes_and_widgets()
-        for _node_id, _node in TREE.nodes.items():
-            _name = _node.plugin.plugin_name
-            _label = _node.plugin.get_param_value("label")
-            self.__create_position_node(_node_id)
-            self.__create_widget(_name, _node_id, label=_label)
-        self.update_node_positions()
-        if reset_active_node:
-            self.sig_plugin_selected.emit(-1)
-            return
-        self.set_active_node(TREE.active_node_id, force_update=True)
-        self._check_consistency()
+        with BlockUpdates(self.qt_canvas):
+            self.__delete_all_nodes_and_widgets()
+            for _node_id, _node in TREE.nodes.items():
+                _name = _node.plugin.plugin_name
+                _label = _node.plugin.get_param_value("label")
+                self.__create_position_node(_node_id)
+                self.__create_widget(_name, _node_id, label=_label)
+            self.update_node_positions()
+            if reset_active_node:
+                self.sig_plugin_selected.emit(-1)
+                return
+            self.set_active_node(TREE.active_node_id, force_update=True)
+            self._check_consistency()
 
     def _check_consistency(self):
         """
@@ -457,17 +463,18 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         *ids : tuple
             The list of integer widget/node IDs.
         """
-        for _id in ids:
-            self._node_widgets[_id].deleteLater()
-        # wait to verify that widgets have had time to be removed
-        time.sleep(0.0005)
-        for _id in ids:
-            del self._nodes[_id]
-            del self._node_widgets[_id]
-            del self._node_positions[_id]
-        if len(self._nodes) == 0:
-            self.root = None
-            self.qt_canvas.update_widget_connections([])
+        with BlockUpdates(self.qt_canvas):
+            for _id in ids:
+                self._node_widgets[_id].deleteLater()
+            # wait to verify that widgets have had time to be removed
+            time.sleep(0.0005)
+            for _id in ids:
+                del self._nodes[_id]
+                del self._node_widgets[_id]
+                del self._node_positions[_id]
+            if len(self._nodes) == 0:
+                self.root = None
+                self.qt_canvas.update_widget_connections([])
 
 
 WorkflowTreeEditManager = SingletonFactory(_WorkflowTreeEditManager)

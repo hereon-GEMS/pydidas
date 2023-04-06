@@ -32,14 +32,15 @@ from qtpy import QtCore, QtWidgets
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
+from ..factory import CreateWidgetsMixIn
 from ..misc import ReadOnlyTextWidget
-from .plugin_collection_tree_widget import PluginCollectionTreeWidget
+from .select_new_plugin_widget import SelectNewPluginWidget
 
 
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(QtWidgets.QWidget):
+class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description
@@ -62,24 +63,26 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
     sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
-        super().__init__(parent)
+        QtWidgets.QWidget.__init__(self, parent)
+        CreateWidgetsMixIn.__init__(self)
+        _layout = QtWidgets.QGridLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_layout)
         apply_qt_properties(self, **kwargs)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (
             _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION
         )
-
-        self._widgets = dict(
-            plugin_treeview=PluginCollectionTreeWidget(self, self.collection),
-            plugin_description=ReadOnlyTextWidget(self),
+        self.add_any_widget(
+            "plugin_treeview",
+            # PluginCollectionTreeWidget(self, self.collection),
+            SelectNewPluginWidget(collection=self.collection),
+            gridPos=(0, 0, 1, 1),
         )
-
-        self.setMinimumHeight(300)
-        _layout = QtWidgets.QHBoxLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self._widgets["plugin_treeview"])
-        _layout.addWidget(self._widgets["plugin_description"])
-        self.setLayout(_layout)
+        self.add_any_widget(
+            "plugin_description", ReadOnlyTextWidget(self), gridPos=(0, 1, 1, 1)
+        )
+        self.setMinimumHeight(400)
 
         self._widgets["plugin_treeview"].sig_plugin_preselected.connect(
             self.display_plugin_description
@@ -93,9 +96,6 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         )
         self._widgets["plugin_treeview"].sig_append_to_specific_node.connect(
             self.sig_append_to_specific_node
-        )
-        self.collection.sig_updated_plugins.connect(
-            self._widgets["plugin_treeview"]._update_collection
         )
 
     @QtCore.Slot(str)

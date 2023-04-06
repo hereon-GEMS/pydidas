@@ -68,7 +68,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         self._config = {
             "initial_plugin_path": _plugin_path,
             "initialized": False,
-            "must_emit_signal": False
+            "must_emit_signal": False,
         }
         if kwargs.get("force_initialization", False):
             self.verify_is_initialized()

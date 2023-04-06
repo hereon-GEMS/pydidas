@@ -352,12 +352,15 @@ class GenericTree:
         Order the node ids of all of the tree's nodes.
         """
         _root = self.root
+        _active_node = self.active_node
         if _root is None:
             return
         for _node in self.nodes.values():
             _node.node_id = None
         self.clear()
         self.set_root(_root)
+        if _active_node is not None:
+            self.active_node_id = _active_node.node_id
 
     def get_all_leaves(self):
         """

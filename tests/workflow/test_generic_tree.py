@@ -333,9 +333,11 @@ class TestGenericTree(unittest.TestCase):
         _node = GenericNode()
         _node.node_id = 12
         tree.register_node(_node)
+        self.assertEqual(tree.active_node, _node)
         tree.order_node_ids()
         self.assertEqual(tree.root, _node)
         self.assertEqual(tree.root.node_id, 0)
+        self.assertEqual(tree.active_node, _node)
 
     def test_order_node_ids__full_tree(self):
         tree = GenericTree()
@@ -350,11 +352,13 @@ class TestGenericTree(unittest.TestCase):
             _new_node_ids.append(_new_id)
         tree.node_ids = _new_node_ids
         tree.nodes = _new_nodes
-        tree.active_node_id = 2 * tree.active_node_id + 67
+        tree.active_node_id = _new_node_ids[len(_new_node_ids) // 2]
+        _active_node = tree.active_node
         tree.order_node_ids()
         for _num, _ in enumerate(tree.node_ids):
             self.assertTrue(_num in tree.node_ids)
         self.assertEqual(tree.get_new_nodeid(), len(tree.node_ids))
+        self.assertEqual(tree.active_node, _active_node)
 
     def test_copy_copy(self):
         _depth = 3

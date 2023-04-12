@@ -1,25 +1,27 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# MERCHANTABILITY or _NESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The math_utils module includes functions for simplifying mathematical operations.
+The math_utils module includes functions for mathematical operations used in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
@@ -28,10 +30,17 @@ __all__ = [
     "rot_matrix_rz",
     "pyfai_rot_matrix",
     "get_chi_from_x_and_y",
+    "fit_ellipse_from_points",
+    "fit_detector_center_and_tilt_from_points",
+    "fit_circle_from_points",
 ]
 
+
 import numpy as np
-from numpy import sin, cos
+from numpy import cos, sin
+from scipy.optimize import leastsq
+
+from ..exceptions import UserConfigError
 
 
 def rot_matrix_rx(theta):
@@ -143,3 +152,132 @@ def get_chi_from_x_and_y(x, y):
     if x < 0:
         _chi += 180
     return np.mod(_chi, 360)
+
+
+def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
+    """
+    Fit the detector center, tilt and tilt plane from points.
+
+    This function allows to extract the detector geometry in Fit2d style from a number
+    of points.
+
+    The conversion to center, axes and rotation of the major axes with respect to the
+    cartesian axes are performed based on the formulas from
+    https://mathworld.wolfram.com/Ellipse.html
+    The coefficients for b, d, e from Halir & Flusser differ by a factor of 2 from the
+    coefficients used in mathworld (and mathworld does not use 'e' as parameter).
+
+    Parameters
+    ----------
+    xpoints : np.ndarray
+        The x positions of the points to fit.
+    ypoints : np.ndarray
+        The y positions of the points to fit.
+
+    Returns
+    -------
+    center_x : float
+        The x center position.
+    center_y : float
+        The y center position.
+    tilt : float
+        The tilt angle in radians.
+    tilt_plane : float
+        The tilt plane orientation
+    """
+    if xpoints.size < 5:
+        raise UserConfigError(
+            "A fit of an ellipse requires at least 5 input points to define a unique "
+            "solution."
+        )
+    a, b, c, d, f, g = fit_ellipse_from_points(xpoints, ypoints)
+    _Delta = np.linalg.det(np.array(((a, b, d), (b, c, f), (d, f, g))))
+    if _Delta == 0 or (a * c - b**2) <= 0 or _Delta / (a + c) >= 0:
+        raise UserConfigError(
+            "The calculated solution for the given points is not an ellipse! Please "
+            "check the input parameters."
+        )
+    center_x = (c * d - b * f) / (b**2 - a * c)
+    center_y = (a * f - b * d) / (b**2 - a * c)
+    _axes = (
+        2
+        * (a * f**2 + c * d**2 + g * b**2 - 2 * b * d * f - a * c * g)
+        / (b**2 - a * c)
+        / (np.array((1, -1)) * ((a - c) ** 2 + 4 * b**2) ** 0.5 - (a + c))
+    ) ** 0.5
+    if b == 0:
+        tilt_plane = np.pi / 2 if a > c else 0
+    else:
+        tilt_plane = 0.5 * np.arctan(2 * b / (a - c)) + (np.pi / 2 if a > c else 0)
+    tilt = np.arccos(np.amin(_axes) / np.amax(_axes))
+    return center_x, center_y, tilt, tilt_plane
+
+
+def fit_ellipse_from_points(xpoints, ypoints):
+    """
+    Fit an ellipse from the given points.
+
+    This is a Python implementation based on the Matlab algorithm from Halir and Flusser
+    adapted from "Numerically stable direct least squares fitting of ellipses" (1998).
+    The nomenclature and function parametrization is taken from the paper as well.
+    Note that the return parameters are adjusted to be consistent with Wolfram's
+    mathworld formula: https://mathworld.wolfram.com/Ellipse.html
+    Return parameters are also normed to a = 1 for consistency.
+
+    Parameters
+    ----------
+    xpoints : np.ndarray
+        The x positions of the points to fit.
+    ypoints : np.ndarray
+        The y positions of the points to fit.
+
+    Returns
+    -------
+    coeffs : np.ndarray
+        The coefficients for the formula
+        F(x; y) = ax**2 + 2bxy + cy**2 + 2dx + 2fy + g = 0
+    """
+    D1 = np.column_stack((xpoints**2, xpoints * ypoints, ypoints**2))
+    D2 = np.column_stack((xpoints, ypoints, np.ones(xpoints.size)))
+    S1 = np.matmul(D1.T, D1)
+    S2 = np.matmul(D1.T, D2)
+    S3 = np.matmul(D2.T, D2)
+    T = np.matmul(-np.linalg.inv(S3), S2.T)
+    M = S1 + np.matmul(S2, T)
+    inv_C1 = np.array(((0, 0, 0.5), (0, -1, 0), (0.5, 0, 0)))
+    M = np.matmul(inv_C1, M)
+    _eigenvals, _eigenvecs = np.linalg.eig(M)
+    _cond = 4 * _eigenvecs[0] * _eigenvecs[2] - _eigenvecs[1] ** 2
+    _a1 = _eigenvecs[:, _cond > 0]
+    coeffs = np.concatenate((_a1, np.matmul(T, _a1))).squeeze()
+    coeffs[1] = coeffs[1] / 2
+    coeffs[3] = coeffs[3] / 2
+    coeffs[4] = coeffs[4] / 2
+    return coeffs / coeffs[0]
+
+
+def fit_circle_from_points(xpoints, ypoints):
+    """
+    Fit a circle from a given list of points.
+
+    xpoints : np.ndarray
+        The x positions of the points to fit.
+    ypoints : np.ndarray
+        The y positions of the points to fit.
+
+    Returns
+    -------
+    center_x : float
+        The x center position.
+    center_y : float
+        The y center position.
+    radius: float
+        The circle's radius.
+    """
+
+    def circle_distance(c, x, y):
+        return (x - c[0]) ** 2 + (y - c[1]) ** 2 - c[2] ** 2
+
+    _c0 = [np.mean(xpoints), np.mean(ypoints), (np.amax(xpoints) - np.amin(xpoints))]
+    _c1, _ = leastsq(circle_distance, _c0, args=(xpoints, ypoints))
+    return _c1

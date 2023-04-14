@@ -296,9 +296,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _plugin = TREE.nodes[calling_node].plugin
         _param_vals = _plugin.get_param_values_as_dict()
-        self.add_new_plugin_node(
-            _plugin.plugin_name, parent_node_id=new_parent_node
-        )
+        self.add_new_plugin_node(_plugin.plugin_name, parent_node_id=new_parent_node)
         TREE.active_node.plugin.set_param_values_from_dict(_param_vals)
         TREE.order_node_ids()
         time.sleep(0.0005)

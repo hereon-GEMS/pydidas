@@ -117,8 +117,9 @@ class BaseFrame(
                 self.finalize_ui()
                 self._config["built"] = True
         if "state" in self._config:
-            _state = self._config.pop("state")
-            self.restore_state(_state)
+            with ShowBusyMouse():
+                _state = self._config.pop("state")
+                self.restore_state(_state)
         if index == self.frame_index:
             self.sig_this_frame_activated.emit()
 

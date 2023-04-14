@@ -27,14 +27,24 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DiffractionExperimentContext", "DiffractionExperiment"]
 
+
+from collections.abc import Iterable
+
+import numpy as np
 import pyFAI
 
 from ...core import (
     ObjectWithParameterCollection,
     SingletonFactory,
+    UserConfigError,
     get_generic_param_collection,
 )
 from ...core.constants import LAMBDA_IN_A_TO_E
+from ...core.utils import (
+    NoPrint,
+    fit_circle_from_points,
+    fit_detector_center_and_tilt_from_points,
+)
 from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
 
 
@@ -154,10 +164,12 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         try:
             _det = pyFAI.detector_factory(det_name)
         except RuntimeError:
-            raise NameError(f'The detector name "{det_name}"is unknown to ' "pyFAI.")
+            raise UserConfigError(
+                f"The detector name '{det_name}' is unknown to pyFAI."
+            )
         self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
         self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
-        self.set_param_value("detector_npixy", _det.max_shape[0]),
+        self.set_param_value("detector_npixy", _det.max_shape[0])
         self.set_param_value("detector_npixx", _det.max_shape[1])
         self.set_param_value("detector_name", _det.name)
 
@@ -203,6 +215,101 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         DiffractionExperimentContextIoMeta.export_to_file(
             filename, diffraction_exp=self, overwrite=overwrite
         )
+
+    def set_beamcenter_from_points_on_ellipse(self, xpoints, ypoints, det_dist):
+        """
+        Calculate the beamcenter from a number of given points.
+
+        Using an ellipse for fitting also allows to fit the detector tilt. However,
+        an ellipse fit requires
+
+        Parameters
+        ----------
+        xpoints : Union[collections.abc.Iterable, np.ndarray]
+            The x-coordinates of the selected points.
+        ypoints : Union[collections.abc.Iterable, np.ndarray]
+            The y-coordinates of the selected points.
+        det_dist : float
+            The specified detector distance in m.
+        """
+        if isinstance(xpoints, Iterable):
+            xpoints = np.asarray(xpoints)
+        if isinstance(ypoints, Iterable):
+            ypoints = np.asarray(ypoints)
+        _cx, _cy, _tilt, _tilt_plane = fit_detector_center_and_tilt_from_points(
+            xpoints, ypoints
+        )
+        self.set_beamcenter_from_fit2d_params(
+            _cx, _cy, det_dist, tilt=_tilt, tilt_plane=_tilt_plane, rot_unit="rad"
+        )
+
+    def set_beamcenter_from_fit2d_params(self, center_x, center_y, det_dist, **kwargs):
+        """
+        Set the beamcenter in detector pixel coordinates.
+
+        The center_x and center_y parameters define the position of the beam center on
+        the detector. The optional rot_x, rot_y and rot_beam allow to add a rotation
+        around axes parallel to the detector x and y direction and around the beam.
+        Following the pyFAI geometry, the order of rotations is :
+            R_pyfai = R_3(rot_beam) * R_2(-rot_x) * R_1(-rot_y)
+
+        Note that rot_x and rot_y directors are lefthanded (i.e. inverted.)
+
+        Parameters
+        ----------
+        center_x : float
+            The position of the x beam center in pixels.
+        center_y : float
+            The position of the y beam center in pixels.
+        det_dist : float
+            The distance between sample and detector beam center in meters.
+        tilt : float, optional
+            The tilt of the detector, given in rotation unit. The default is 0.
+        tilt_plane: float, optional
+            The rotation of the tile plane of the detector, given in rot unit. The
+            default is 0.
+        rot_unit : str, optional
+            The unit of the rotation angles. Allowed choices are 'degree' and 'rad'.
+            The default is degree.
+        """
+        _tilt = kwargs.get("tilt", 0)
+        _tilt_plane = kwargs.get("tilt_plane", 0)
+        if kwargs.get("rot_unit", "degree") == "rad":
+            _tilt = _tilt * 180 / np.pi
+            _tilt_plane = _tilt_plane * 180 / np.pi
+        with NoPrint():
+            _geo = pyFAI.geometry.fit2d.convert_from_Fit2d(
+                dict(
+                    directDist=det_dist * 1e3,
+                    centerX=center_x,
+                    centerY=center_y,
+                    tilt=_tilt,
+                    tiltPlanRotation=_tilt_plane,
+                    detector=self.get_detector(),
+                )
+            )
+        for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
+            self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
+
+    def set_beamcenter_from_points_on_circle(self, xpoints, ypoints, det_dist):
+        """
+        Calculate the beamcenter from a number of given points.
+
+        Parameters
+        ----------
+        xpoints : Union[collections.abc.Iterable, np.ndarray]
+            The x-coordinates of the selected points.
+        ypoints : Union[collections.abc.Iterable, np.ndarray]
+            The y-coordinates of the selected points.
+        det_dist : float
+            The specified detector distance in m.
+        """
+        if isinstance(xpoints, Iterable):
+            xpoints = np.asarray(xpoints)
+        if isinstance(ypoints, Iterable):
+            ypoints = np.asarray(ypoints)
+        _cx, _cy, _ = fit_circle_from_points(xpoints, ypoints)
+        self.set_beamcenter_from_fit2d_params(_cx, _cy, det_dist)
 
 
 DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)

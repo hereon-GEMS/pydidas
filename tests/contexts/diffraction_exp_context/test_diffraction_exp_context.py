@@ -28,12 +28,14 @@ import logging
 import unittest
 from numbers import Real
 
+import numpy as np
 import pyFAI
 
 from pydidas.contexts.diffraction_exp_context.diffraction_exp_context import (
     DiffractionExperiment,
     DiffractionExperimentContext,
 )
+from pydidas.core import UserConfigError
 
 
 logger = logging.getLogger("pyFAI.detectors._common")
@@ -41,11 +43,36 @@ logger.setLevel(logging.CRITICAL)
 
 
 class TestDiffractionExperimentContext(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._xpos = 1623.546
+        cls._ypos = 459.765
+        cls._det_dist = 0.12
+        cls._beamcenter = (cls._xpos, cls._ypos, cls._det_dist)
+        cls._xpos_abs = cls._xpos * 75e-6
+        cls._ypos_abs = cls._ypos * 75e-6
+
     def setUp(self):
         ...
 
     def tearDown(self):
         ...
+
+    def prepare_context_with_Eiger(self):
+        obj = DiffractionExperimentContext()
+        obj.set_detector_params_from_name("Eiger 9M")
+        return obj
+
+    def assert_beamcenter_okay(self, obj, accuracy=8):
+        _rot1 = obj.get_param_value("detector_rot1")
+        _rot2 = obj.get_param_value("detector_rot2")
+        _poni1 = obj.get_param_value("detector_poni1")
+        _poni2 = obj.get_param_value("detector_poni2")
+        _z = obj.get_param_value("detector_dist")
+        _beam_center_x = (_poni2 - _z * np.tan(_rot1)) / 75e-6
+        _beam_center_y = (_poni1 + _z * np.tan(_rot2) / np.cos(_rot1)) / 75e-6
+        self.assertAlmostEqual(_beam_center_y, self._ypos, accuracy)
+        self.assertAlmostEqual(_beam_center_x, self._xpos, accuracy)
 
     def test_creation(self):
         obj = DiffractionExperimentContext()
@@ -102,7 +129,7 @@ class TestDiffractionExperimentContext(unittest.TestCase):
 
     def test_set_detector_params_from_name__wrong_name(self):
         obj = DiffractionExperimentContext()
-        with self.assertRaises(NameError):
+        with self.assertRaises(UserConfigError):
             obj.set_detector_params_from_name("no such detector")
 
     def test_update_from_diffraction_exp(self):
@@ -125,6 +152,49 @@ class TestDiffractionExperimentContext(unittest.TestCase):
         self.assertEqual(obj.get_param_value("detector_pxsizey"), _det["pixsize"])
         self.assertEqual(obj.get_param_value("detector_npixy"), _det["npixy"])
         self.assertEqual(obj.get_param_value("detector_npixx"), _det["npixx"])
+
+    def test_set_beamcenter_from_fit2d_params__no_rot(self):
+        obj = self.prepare_context_with_Eiger()
+        obj.set_beamcenter_from_fit2d_params(*self._beamcenter)
+        self.assert_beamcenter_okay(obj)
+
+    def test_set_beamcenter_from_fit2d_params__full_rot_degree(self):
+        obj = self.prepare_context_with_Eiger()
+        obj.set_beamcenter_from_fit2d_params(
+            *self._beamcenter, tilt=5, tilt_plane=270, rot_unit="degree"
+        )
+        self.assert_beamcenter_okay(obj)
+
+    def test_set_beamcenter_from_fit2d_params_full_rot_rad(self):
+        obj = self.prepare_context_with_Eiger()
+        obj.set_beamcenter_from_fit2d_params(
+            *self._beamcenter, tilt=0.5, tilt_plane=1, rot_unit="rad"
+        )
+        self.assert_beamcenter_okay(obj)
+
+    def test_set_beamcenter_from_points_on_circle(self):
+        obj = self.prepare_context_with_Eiger()
+        r = 300
+        _dist = 0.234
+        phi = np.r_[[0, 1, 3, 5]]
+        _xpoints = self._xpos + r * np.cos(phi)
+        _ypoints = self._ypos + r * np.sin(phi)
+        obj.set_beamcenter_from_points_on_circle(_xpoints, _ypoints, _dist)
+        self.assertAlmostEqual(obj.get_param_value("detector_poni1"), self._ypos_abs, 3)
+        self.assertAlmostEqual(obj.get_param_value("detector_poni2"), self._xpos_abs, 3)
+        self.assertAlmostEqual(obj.get_param_value("detector_dist"), _dist, 6)
+
+    def test_set_beamcenter_from_points_on_ellipse(self):
+        obj = self.prepare_context_with_Eiger()
+        r = 300
+        _dist = 0.234
+        phi = np.r_[[0, 1, 3, 4, 5]]
+        _xpoints = self._xpos + r * np.cos(phi)
+        _ypoints = self._ypos + r * np.sin(phi)
+        obj.set_beamcenter_from_points_on_ellipse(_xpoints, _ypoints, _dist)
+        self.assertAlmostEqual(obj.get_param_value("detector_poni1"), self._ypos_abs, 3)
+        self.assertAlmostEqual(obj.get_param_value("detector_poni2"), self._xpos_abs, 3)
+        self.assertAlmostEqual(obj.get_param_value("detector_dist"), _dist, 6)
 
 
 if __name__ == "__main__":

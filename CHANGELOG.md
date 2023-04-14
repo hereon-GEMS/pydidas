@@ -50,6 +50,8 @@ Improvements
 - The GenericTree.order_node_ids now also sets the active node again.
 - The WorkflowEditFrame now also allows to filter plugins for their name.
 - Added functions to fit circles and ellipses.
+- Added methods to define DiffractionExperiment parameters from given points on 
+  circles and ellipses.
 
 
 Bugfixes

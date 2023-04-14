@@ -33,17 +33,17 @@ from pydidas.contexts.diffraction_exp_context import (
     DiffractionExperiment,
     DiffractionExperimentContext,
 )
-from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_base import (
-    DiffractionExperimentContextIoBase,
+from pydidas.contexts.diffraction_exp_context.diffraction_experiment_io_base import (
+    DiffractionExperimentIoBase,
 )
 from pydidas.core import UserConfigError
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO = DiffractionExperimentContextIoBase
+EXP_IO = DiffractionExperimentIoBase
 
 
-class TestExperimentSettingsIoBase(unittest.TestCase):
+class TestDiffractionExperimentIoBase(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(_test_dir, "_data", "load_test_exp_settings_")

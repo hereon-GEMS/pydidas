@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DiffractionExperimentContextIoYaml class which is used to import or
+Module with the DiffractionExperimentIoYaml class which is used to import or
 export DiffractionExperimentContext metadata from a YAML file.
 """
 
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DiffractionExperimentContextIoYaml"]
+__all__ = ["DiffractionExperimentIoYaml"]
 
 from numbers import Integral, Real
 
@@ -34,14 +34,14 @@ import yaml
 
 from ...core import UserConfigError
 from ...core.constants import LAMBDA_IN_A_TO_E, YAML_EXTENSIONS
-from .diffraction_exp_context import DiffractionExperimentContext
-from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
+from .diffraction_experiment_context import DiffractionExperimentContext
+from .diffraction_experiment_io_base import DiffractionExperimentIoBase
 
 
 EXP = DiffractionExperimentContext()
 
 
-class DiffractionExperimentContextIoYaml(DiffractionExperimentContextIoBase):
+class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
     """
     YAML importer/exporter for ExperimentalSetting files.
     """
@@ -58,6 +58,9 @@ class DiffractionExperimentContextIoYaml(DiffractionExperimentContextIoBase):
         ----------
         filename : str
             The filename of the file to be written.
+        diffraction_exp : DiffractionExperiment, optional
+            The DiffractionExperiment instance to be exported. The default is the
+            DiffractionExperimentContext.
         """
         _EXP = kwargs.get("diffraction_exp", EXP)
         cls.check_for_existing_file(filename, **kwargs)

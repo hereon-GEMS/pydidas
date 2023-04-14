@@ -50,7 +50,7 @@ from pyFAI.gui.utils import projecturl
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
 
-from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...core import constants
 from ...widgets import PydidasFileDialog, silx_plot
@@ -133,7 +133,7 @@ class PyfaiCalibFrame(BaseFrame):
             parent=self,
             dialog_type="save_file",
             caption="Export experiment context file",
-            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentIo.get_string_of_formats(),
             default_extension="yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="PyfaiCalibFrame__export",
@@ -292,7 +292,7 @@ class PyfaiCalibFrame(BaseFrame):
                 ["detector_rot3", _geo.rotation3().value()],
             ]:
                 _experiment.set_param_value(_key, _value)
-        DiffractionExperimentContextIoMeta.export_to_file(
+        DiffractionExperimentIo.export_to_file(
             _fname, diffraction_exp=_experiment, overwrite=True
         )
 

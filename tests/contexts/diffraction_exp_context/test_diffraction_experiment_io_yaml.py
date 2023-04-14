@@ -33,17 +33,17 @@ import yaml
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
-from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_yaml import (
-    DiffractionExperimentContextIoYaml,
+from pydidas.contexts.diffraction_exp_context.diffraction_experiment_io_yaml import (
+    DiffractionExperimentIoYaml,
 )
 from pydidas.core import UserConfigError
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO_YAML = DiffractionExperimentContextIoYaml
+EXP_IO_YAML = DiffractionExperimentIoYaml
 
 
-class TestExperimentSettingsIoYaml(unittest.TestCase):
+class TestDiffractionExperimentIoYaml(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(

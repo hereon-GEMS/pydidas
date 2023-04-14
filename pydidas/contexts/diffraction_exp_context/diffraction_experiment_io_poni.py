@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DiffractionExperimentContextIoPoni class which is used to import
+Module with the DiffractionExperimentIoPoni class which is used to import
 DiffractionExperimentContext metadata from a pyFAI poni file.
 """
 
@@ -25,19 +25,19 @@ __copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DiffractionExperimentContextIoPoni"]
+__all__ = ["DiffractionExperimentIoPoni"]
 
 import pyFAI
 
 from ...core.constants import LAMBDA_IN_M_TO_E
-from .diffraction_exp_context import DiffractionExperimentContext
-from .diffraction_exp_context_io_base import DiffractionExperimentContextIoBase
+from .diffraction_experiment_context import DiffractionExperimentContext
+from .diffraction_experiment_io_base import DiffractionExperimentIoBase
 
 
 EXP = DiffractionExperimentContext()
 
 
-class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
+class DiffractionExperimentIoPoni(DiffractionExperimentIoBase):
     """
     Base class for WorkflowTree exporters.
     """
@@ -54,8 +54,10 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
         ----------
         filename : str
             The filename of the file to be written.
+        diffraction_exp : DiffractionExperiment, optional
+            The DiffractionExperiment instance to be exported. The default is the
+            DiffractionExperimentContext.
         """
-
         _EXP = kwargs.get("diffraction_exp", EXP)
         cls.check_for_existing_file(filename, **kwargs)
         _pdata = {}
@@ -106,6 +108,11 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
     def _update_detector_from_pyFAI(cls, det):
         """
         Update the detector information from a pyFAI Detector instance.
+
+        Parameters
+        ----------
+        det : pyfai.detectors.Detector
+            The pyFAI Detector instance.
         """
         if not isinstance(det, pyFAI.detectors.Detector):
             raise TypeError(
@@ -125,6 +132,11 @@ class DiffractionExperimentContextIoPoni(DiffractionExperimentContextIoBase):
     def _update_geometry_from_pyFAI(cls, geo):
         """
         Update the geometry information from a pyFAI Geometry instance.
+
+        Parameters
+        ----------
+        geo : pyfai.geometry.Geometry
+            The geometry instance.
         """
         if not isinstance(geo, pyFAI.geometry.Geometry):
             raise TypeError(

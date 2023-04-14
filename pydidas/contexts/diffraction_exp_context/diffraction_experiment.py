@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DiffractionExperimentContext singleton which is used to manage
-global information about the experiment independant from the individual frames.
+Module with the DiffractionExperiment class which is used to manage global information
+about the experiment independant from the individual frames.
 """
 
 __author__ = "Malte Storm"
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DiffractionExperimentContext", "DiffractionExperiment"]
+__all__ = ["DiffractionExperiment"]
 
 
 from collections.abc import Iterable
@@ -35,7 +35,6 @@ import pyFAI
 
 from ...core import (
     ObjectWithParameterCollection,
-    SingletonFactory,
     UserConfigError,
     get_generic_param_collection,
 )
@@ -45,7 +44,7 @@ from ...core.utils import (
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
 )
-from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
+from .diffraction_experiment_io import DiffractionExperimentIo
 
 
 class DiffractionExperiment(ObjectWithParameterCollection):
@@ -197,9 +196,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        DiffractionExperimentContextIoMeta.import_from_file(
-            filename, diffraction_exp=self
-        )
+        DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
 
     def export_to_file(self, filename, overwrite=False):
         """
@@ -212,7 +209,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         overwrite : bool, optional
             Keyword to allow overwriting of existing files.
         """
-        DiffractionExperimentContextIoMeta.export_to_file(
+        DiffractionExperimentIo.export_to_file(
             filename, diffraction_exp=self, overwrite=overwrite
         )
 
@@ -310,6 +307,3 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             ypoints = np.asarray(ypoints)
         _cx, _cy, _ = fit_circle_from_points(xpoints, ypoints)
         self.set_beamcenter_from_fit2d_params(_cx, _cy, det_dist)
-
-
-DiffractionExperimentContext = SingletonFactory(DiffractionExperiment)

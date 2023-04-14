@@ -29,17 +29,17 @@ import unittest
 from pydidas.contexts.diffraction_exp_context import (
     DiffractionExperiment,
     DiffractionExperimentContext,
-    DiffractionExperimentContextIoBase,
-    DiffractionExperimentContextIoMeta,
+    DiffractionExperimentIo,
+    DiffractionExperimentIoBase,
 )
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO_META = DiffractionExperimentContextIoMeta
+EXP_IO_META = DiffractionExperimentIo
 EXP_IO_META.clear_registry()
 
 
-class TestIo(DiffractionExperimentContextIoBase):
+class TestIo(DiffractionExperimentIoBase):
     extensions = ["test"]
     format_name = "Test"
 
@@ -63,7 +63,7 @@ class TestIo(DiffractionExperimentContextIoBase):
         cls.import_filename = filename
 
 
-class TestExperimentSettingsIoMeta(unittest.TestCase):
+class TestDiffractionExperimentIo(unittest.TestCase):
     def setUp(self):
         TestIo.reset()
 

@@ -31,7 +31,7 @@ from numbers import Real
 import numpy as np
 import pyFAI
 
-from pydidas.contexts.diffraction_exp_context.diffraction_exp_context import (
+from pydidas.contexts.diffraction_exp_context import (
     DiffractionExperiment,
     DiffractionExperimentContext,
 )
@@ -42,7 +42,7 @@ logger = logging.getLogger("pyFAI.detectors._common")
 logger.setLevel(logging.CRITICAL)
 
 
-class TestDiffractionExperimentContext(unittest.TestCase):
+class TestDiffractionExperiment(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._xpos = 1623.546
@@ -59,7 +59,7 @@ class TestDiffractionExperimentContext(unittest.TestCase):
         ...
 
     def prepare_context_with_Eiger(self):
-        obj = DiffractionExperimentContext()
+        obj = DiffractionExperiment()
         obj.set_detector_params_from_name("Eiger 9M")
         return obj
 
@@ -73,16 +73,6 @@ class TestDiffractionExperimentContext(unittest.TestCase):
         _beam_center_y = (_poni1 + _z * np.tan(_rot2) / np.cos(_rot1)) / 75e-6
         self.assertAlmostEqual(_beam_center_y, self._ypos, accuracy)
         self.assertAlmostEqual(_beam_center_x, self._xpos, accuracy)
-
-    def test_creation(self):
-        obj = DiffractionExperimentContext()
-        self.assertIsInstance(obj, DiffractionExperiment)
-
-    def test_set_param_generic(self):
-        _name = "Test"
-        obj = DiffractionExperimentContext()
-        obj.set_param_value("detector_name", _name)
-        self.assertEqual(obj.get_param_value("detector_name"), _name)
 
     def test_set_param_energy(self):
         _new_E = 15.7

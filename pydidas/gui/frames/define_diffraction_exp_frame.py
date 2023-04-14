@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,21 @@ global experimental settings like detector, geometry and energy.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DefineDiffractionExpFrame"]
 
+
 from functools import partial
 
 import numpy as np
-from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
+from qtpy import QtWidgets
 
-from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from .builders import DefineDiffractionExpFrameBuilder
@@ -41,17 +44,13 @@ from .builders import DefineDiffractionExpFrameBuilder
 EXP = DiffractionExperimentContext()
 
 _GEO_INVALID = (
-    "The pyFAI geometry is not valid and cannot be copied. "
-    "This is probably due to either:\n"
-    "1. No fit has been performed.\nor\n"
-    "2. The fit did not succeed."
+    "The pyFAI geometry is not valid and cannot be copied. This is probably due to "
+    "either:\n1. No fit has been performed.\nor\n2. The fit did not succeed."
 )
 
 _ENERGY_INVALID = (
-    "The X-ray energy / wavelength cannot be set because the "
-    "pyFAI geometry is not valid. This is probably due to "
-    "either:\n"
-    "1. No fit has been performed.\nor\n"
+    "The X-ray energy / wavelength cannot be set because the pyFAI geometry is not "
+    "valid. This is probably due to either:\n1. No fit has been performed.\nor\n"
     "2. The fit did not succeed."
 )
 
@@ -73,14 +72,14 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             parent=self,
             dialog_type="open_file",
             caption="Import experiment context file",
-            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentIo.get_string_of_formats(),
             qsettings_ref="DefineDiffractionExpFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="save_file",
             caption="Export experiment context file",
-            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentIo.get_string_of_formats(),
             default_extension="yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="DefineDiffractionExpFrame__export",
@@ -300,5 +299,6 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             if hash(self.params) != self._config["exp_hash"]:
                 for _key, _param in EXP.params.items():
                     self.update_widget_value(_key, _param.value)
+                self._config["exp_hash"] = hash(self.params)
         else:
             self._config["exp_hash"] = hash(self.params)

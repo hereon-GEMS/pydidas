@@ -36,14 +36,14 @@ __all__.extend(["experiment_context", "scan_context"])
 # explicitly import the singleton factories from the subpackages
 from .diffraction_exp_context import (
     DiffractionExperimentContext,
-    DiffractionExperimentContextIoMeta,
+    DiffractionExperimentIo,
 )
 from .scan_context import ScanContext, ScanContextIoMeta
 
 __all__.extend(
     [
         "DiffractionExperimentContext",
-        "DiffractionExperimentContextIoMeta",
+        "DiffractionExperimentIo",
         "ScanContext",
         "ScanContextIoMeta",
     ]

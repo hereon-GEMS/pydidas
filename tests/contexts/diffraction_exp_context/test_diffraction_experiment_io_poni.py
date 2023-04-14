@@ -35,19 +35,19 @@ from pyFAI.geometry import Geometry
 
 from pydidas.contexts import DiffractionExperimentContext
 from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
-from pydidas.contexts.diffraction_exp_context.diffraction_exp_context_io_poni import (
-    DiffractionExperimentContextIoPoni,
+from pydidas.contexts.diffraction_exp_context.diffraction_experiment_io_poni import (
+    DiffractionExperimentIoPoni,
 )
 
 
 EXP = DiffractionExperimentContext()
-EXP_IO_PONI = DiffractionExperimentContextIoPoni
+EXP_IO_PONI = DiffractionExperimentIoPoni
 
 _logger = logging.getLogger("pyFAI.geometry")
 _logger.setLevel(logging.CRITICAL)
 
 
-class TestExperimentSettingsIoPoni(unittest.TestCase):
+class TestDiffractionExperimentIoPoni(unittest.TestCase):
     def setUp(self):
         _test_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         self._path = os.path.join(

@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the DiffractionExperimentContextIoBase class which exporters/importers for
-DiffractionExperimentContext should inherit from.
+Module with the DiffractionExperimentIoBase class which exporters / importers for
+DiffractionExperiment(Context) should inherit from.
 """
 
 __author__ = "Malte Storm"
@@ -25,21 +25,19 @@ __copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["DiffractionExperimentContextIoBase"]
+__all__ = ["DiffractionExperimentIoBase"]
 
 
 from ...core import UserConfigError
 from ...core.io_registry import GenericIoBase
-from .diffraction_exp_context import DiffractionExperimentContext
-from .diffraction_exp_context_io_meta import DiffractionExperimentContextIoMeta
+from .diffraction_experiment_context import DiffractionExperimentContext
+from .diffraction_experiment_io import DiffractionExperimentIo
 
 
 EXP = DiffractionExperimentContext()
 
 
-class DiffractionExperimentContextIoBase(
-    GenericIoBase, metaclass=DiffractionExperimentContextIoMeta
-):
+class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperimentIo):
     """
     Base class for DiffractionExperimentContext importer/exporters.
     """
@@ -51,8 +49,14 @@ class DiffractionExperimentContextIoBase(
     @classmethod
     def _verify_all_entries_present(cls, exclude_det_mask=False):
         """
-        Verify that the tmp_params dictionary holds all keys from the
-        DiffractionExperimentContext.
+        Verify that the tmp_params dictionary holds all required keys.
+
+        Parameters
+        ----------
+        exclude_det_mask : bool, optional
+            Flag to skip checking for the detector_mask_file Parameter. Used for
+            example when importing .poni files which do not support a detector mask.
+            The default is False.
         """
         _missing_entries = []
         for _key in EXP.params:
@@ -79,6 +83,6 @@ class DiffractionExperimentContextIoBase(
             DiffractionExperimentContext will be used. The default is None.
         """
         _exp = EXP if diffraction_exp is None else diffraction_exp
-        for key in cls.imported_params:
-            _exp.set_param_value(key, cls.imported_params[key])
+        for _key, _value in cls.imported_params.items():
+            _exp.set_param_value(_key, _value)
         cls.imported_params = {}

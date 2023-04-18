@@ -178,7 +178,7 @@ class PyfaiCalibFrame(BaseFrame):
             "task_list",
             QtWidgets.QListWidget(),
             fixedWidth=150,
-            sizePolicy=constants.FIX_EXP_POLICY,
+            sizePolicy=constants.POLICY_FIX_EXP,
             gridPos=(1, 0, 1, 1),
         )
         _text = (

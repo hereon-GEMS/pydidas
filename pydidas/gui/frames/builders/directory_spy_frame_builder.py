@@ -31,8 +31,8 @@ from ....core import constants
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
-    EXP_EXP_POLICY,
-    FIX_EXP_POLICY,
+    POLICY_EXP_EXP,
+    POLICY_FIX_EXP,
 )
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrameWithApp
@@ -98,7 +98,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+            parent=None, init_layout=True, lineWidth=5, sizePolicy=POLICY_FIX_EXP
         )
 
         self.create_spacer(
@@ -110,7 +110,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
             ScrollArea,
             widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy=FIX_EXP_POLICY,
+            sizePolicy=POLICY_FIX_EXP,
             gridPos=(-1, 0, 1, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
@@ -191,5 +191,5 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
             gridPos=(0, 1, 3, 1),
             visible=True,
             stretch=(1, 1),
-            sizePolicy=EXP_EXP_POLICY,
+            sizePolicy=POLICY_EXP_EXP,
         )

@@ -27,16 +27,19 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["create_silx_plot_stack"]
 
+
 from functools import partial
 
 from qtpy import QtWidgets
 
-from ...core.constants import EXP_EXP_POLICY
+from ...core.constants import POLICY_EXP_EXP
 from .pydidas_plot1d import PydidasPlot1D
 from .pydidas_plot2d import PydidasPlot2D
 
 
-def create_silx_plot_stack(frame, gridPos=None, use_data_info_action=False):
+def create_silx_plot_stack(
+        frame, gridPos=None, use_data_info_action=False, diffraction_exp=None
+    ):
     """
     Create a QStackedWidget with 1D and 2D plot widgets in the input frame.
 
@@ -50,6 +53,9 @@ def create_silx_plot_stack(frame, gridPos=None, use_data_info_action=False):
     use_data_info_action : bool, optional
         Flag to use the PydidasGetDataInfoAction to display information about a
         result datapoint. The default is False.
+    diffraction_exp : DiffractionExperiment
+        The DiffractionExperiment instance to be used in the PydidasPlot2D for
+        the coordinate system.
 
     Returns
     -------
@@ -57,7 +63,9 @@ def create_silx_plot_stack(frame, gridPos=None, use_data_info_action=False):
         The updated frame.
     """
     frame._widgets["plot1d"] = PydidasPlot1D()
-    frame._widgets["plot2d"] = PydidasPlot2D(use_data_info_action=use_data_info_action)
+    frame._widgets["plot2d"] = PydidasPlot2D(
+        use_data_info_action=use_data_info_action, diffraction_exp=diffraction_exp
+    )
     if hasattr(frame, "sig_this_frame_activated"):
         frame.sig_this_frame_activated.connect(
             partial(frame._widgets["plot2d"].cs_transform.check_detector_is_set, True)
@@ -73,7 +81,7 @@ def create_silx_plot_stack(frame, gridPos=None, use_data_info_action=False):
         gridPos=gridPos,
         visible=True,
         stretch=(1, 1),
-        sizePolicy=EXP_EXP_POLICY,
+        sizePolicy=POLICY_EXP_EXP,
     )
     frame._widgets["plot_stack"].addWidget(frame._widgets["plot1d"])
     frame._widgets["plot_stack"].addWidget(frame._widgets["plot2d"])

@@ -145,7 +145,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(3, 0, 1, 1),
                 fixedWidth=self.GROUP_WIDTH - 20,
                 parent_widget=self._widgets[f"utility_{_key}"],
-                alignment=constants.QT_BOTTOM_LEFT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_LEFT,
             )
             self.create_spacer(
                 f"spacer_{_key}_2",

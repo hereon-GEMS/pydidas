@@ -111,7 +111,7 @@ class HomeFrame(BaseFrame):
             ScrollArea,
             widget=self._widgets["canvas"],
             fixedWidth=650,
-            sizePolicy=constants.FIX_EXP_POLICY,
+            sizePolicy=constants.POLICY_FIX_EXP,
             gridPos=(0, 0, 2, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},

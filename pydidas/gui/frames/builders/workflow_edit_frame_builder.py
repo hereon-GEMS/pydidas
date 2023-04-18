@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrameBuilder"]
 
-from ....core.constants import EXP_EXP_POLICY, STANDARD_FONT_SIZE
+from ....core.constants import POLICY_EXP_EXP, STANDARD_FONT_SIZE
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -74,7 +74,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             minimumHeight=450,
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
-            sizePolicy=EXP_EXP_POLICY,
+            sizePolicy=POLICY_EXP_EXP,
             gridPos=(0, 1, 3, 1),
         )
         self.create_button(

@@ -30,7 +30,7 @@ __all__ = ["CompositeCreatorFrameBuilder"]
 from qtpy import QtWidgets
 
 from ....core import constants
-from ....core.constants import CONFIG_WIDGET_WIDTH, EXP_EXP_POLICY, FIX_EXP_POLICY
+from ....core.constants import CONFIG_WIDGET_WIDTH, POLICY_EXP_EXP, POLICY_FIX_EXP
 from ....widgets import ScrollArea, silx_plot
 from ....widgets.framework import BaseFrameWithApp
 from ....widgets.parameter_config import ParameterEditCanvas
@@ -55,7 +55,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.layout().setContentsMargins(0, 0, 0, 0)
 
         self._widgets["config"] = ParameterEditCanvas(
-            self, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+            self, lineWidth=5, sizePolicy=POLICY_FIX_EXP
         )
 
         self.create_label(
@@ -78,7 +78,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH + 40,
             stretch=(1, 0),
-            sizePolicy=FIX_EXP_POLICY,
+            sizePolicy=POLICY_FIX_EXP,
             gridPos=(-1, 0, 1, 1),
             layout_kwargs={"alignment": None},
         )
@@ -97,7 +97,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             stretch=(1, 1),
             gridPos=(0, 3, 1, 1),
             visible=False,
-            sizePolicy=EXP_EXP_POLICY,
+            sizePolicy=POLICY_EXP_EXP,
             cs_transform=False,
         )
 

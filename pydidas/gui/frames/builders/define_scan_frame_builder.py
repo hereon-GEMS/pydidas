@@ -66,7 +66,7 @@ class DefineScanFrameBuilder(BaseFrame):
         utils.apply_qt_properties(
             self.layout(),
             horizontalSpacing=25,
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
         self.create_label(
             "label_title",
@@ -127,21 +127,21 @@ class DefineScanFrameBuilder(BaseFrame):
             layout_kwargs=dict(
                 contentsMargins=(0, 0, 0, 0),
             ),
-            sizePolicy=constants.EXP_FIX_POLICY,
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            sizePolicy=constants.POLICY_EXP_FIX,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
 
         self.create_empty_widget(
             "scan_param_frame",
             gridPos=(_param_edit_row, 1, 1, 1),
             layout_kwargs=dict(horizontalSpacing=5, contentsMargins=(0, 0, 0, 0)),
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
         self.create_spacer(
             "right_spacer",
             gridPos=(_param_edit_row, 2, 1, 1),
             stretch=1,
-            sizePolicy=constants.EXP_EXP_POLICY,
+            sizePolicy=constants.POLICY_EXP_EXP,
         )
 
         # populate global_param_frame
@@ -192,7 +192,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 fontsize=constants.STANDARD_FONT_SIZE + 1,
                 bold=True,
                 fixedWidth=constants.CONFIG_WIDGET_WIDTH - 50,
-                alignment=constants.QT_BOTTOM_LEFT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_LEFT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2), 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -202,7 +202,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 icon=get_pyqt_icon_from_str("qta::fa.chevron-up"),
                 fixedWidth=20,
                 fixedHeight=20,
-                alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 1, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -212,7 +212,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
                 fixedWidth=20,
                 fixedHeight=20,
-                alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 2, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -243,5 +243,5 @@ class DefineScanFrameBuilder(BaseFrame):
             icon=self.style().standardIcon(43),
         )
         self.create_spacer(
-            "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.EXP_EXP_POLICY
+            "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.POLICY_EXP_EXP
         )

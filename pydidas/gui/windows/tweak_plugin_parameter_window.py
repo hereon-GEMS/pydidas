@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,15 +14,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
 Module with the TweakPluginParameterWindow class which is a stand-alone frame
 to store the Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["TweakPluginParameterWindow"]
@@ -28,16 +29,13 @@ __all__ = ["TweakPluginParameterWindow"]
 import copy
 
 import numpy as np
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
-from ...core.constants import FIX_EXP_POLICY
+from ...core.constants import POLICY_FIX_EXP
 from ...core.utils import ShowBusyMouse
 from ...widgets import ScrollArea
 from ...widgets.parameter_config import EditPluginParametersWidget, ParameterEditCanvas
-from ...widgets.silx_plot import (
-    create_silx_plot_stack,
-    get_2d_silx_plot_ax_settings,
-)
+from ...widgets.silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
 from .pydidas_window import PydidasWindow
 from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
@@ -81,7 +79,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             parent=None,
             init_layout=True,
             lineWidth=5,
-            sizePolicy=FIX_EXP_POLICY,
+            sizePolicy=POLICY_FIX_EXP,
             fixedWidth=385,
         )
         self.create_any_widget(

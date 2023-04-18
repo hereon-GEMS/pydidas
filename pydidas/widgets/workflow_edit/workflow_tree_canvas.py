@@ -58,7 +58,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
         self.setAutoFillBackground(True)
 
         self.setLineWidth(2)
-        self.setSizePolicy(*constants.EXP_EXP_POLICY)
+        self.setSizePolicy(*constants.POLICY_EXP_EXP)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 

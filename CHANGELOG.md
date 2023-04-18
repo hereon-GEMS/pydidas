@@ -52,7 +52,7 @@ Improvements
 - Added functions to fit circles and ellipses.
 - Added methods to define DiffractionExperiment parameters from given points on 
   circles and ellipses.
-
+- Changed names of policy and alignment constants for consistency.
 
 Bugfixes
 --------

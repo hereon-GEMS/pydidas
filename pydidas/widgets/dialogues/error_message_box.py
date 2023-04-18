@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,30 +14,30 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
 Module with ErrorMessageBox class for exception output.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ErrorMessageBox"]
 
 import os
 
-from qtpy import QtCore, QtWidgets, QtGui, QtSvg
+from qtpy import QtCore, QtGui, QtSvg, QtWidgets
 
+from ...core.constants import POLICY_EXP_EXP, PYDIDAS_FEEDBACK_URL
 from ...core.utils import (
+    apply_qt_properties,
+    copy_text_to_system_clipbord,
     get_logging_dir,
     get_pydidas_error_icon_w_bg,
     get_pydidas_icon_path,
+    update_size_policy,
 )
-from ...core.constants import EXP_EXP_POLICY, PYDIDAS_FEEDBACK_URL
-from ...core.utils import copy_text_to_system_clipbord
-from ...core.utils import apply_qt_properties, update_size_policy
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -73,7 +75,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         apply_qt_properties(
             self._widgets["label"],
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
-            sizePolicy=EXP_EXP_POLICY,
+            sizePolicy=POLICY_EXP_EXP,
             indent=8,
             # fixedWidth=715,
         )

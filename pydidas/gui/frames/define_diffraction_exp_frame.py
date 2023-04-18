@@ -92,14 +92,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         self._widgets["but_load_from_file"].clicked.connect(self.import_from_file)
         self._widgets["but_copy_from_pyfai"].clicked.connect(self.copy_all_from_pyfai)
         self._widgets["but_select_detector"].clicked.connect(self.select_detector)
-        self._widgets["but_copy_det_from_pyfai"].clicked.connect(
-            partial(self.copy_detector_from_pyFAI, True)
-        )
-        self._widgets["but_copy_geo_from_pyfai"].clicked.connect(
-            partial(self.copy_geometry_from_pyFAI, True)
-        )
-        self._widgets["but_copy_energy_from_pyfai"].clicked.connect(
-            partial(self.copy_energy_from_pyFAI, True)
+        self._widgets["but_select_beamcenter_manually"].clicked.connect(
+            self.select_beamcenter_manually
         )
         self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
         for _param_key in self.params.keys():
@@ -261,6 +255,10 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             self.set_param_value_and_widget("xray_wavelength", _wavelength)
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)
+
+    def select_beamcenter_manually(self):
+        pass
+        # TODO:  fill with life
 
     def import_from_file(self):
         """

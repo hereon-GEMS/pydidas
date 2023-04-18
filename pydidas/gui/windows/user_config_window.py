@@ -38,7 +38,7 @@ from ...core import SingletonFactory, UserConfigError, get_generic_param_collect
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     QSETTINGS_USER_KEYS,
-    QT_TOP_RIGHT_ALIGNMENT,
+    ALIGN_TOP_RIGHT,
     STANDARD_FONT_SIZE,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
@@ -138,7 +138,7 @@ class _UserConfigWindow(PydidasWindow):
             parent_widget=self._widgets["colormap_editor"],
             fixedWidth=(CONFIG_WIDGET_WIDTH - 20),
             gridPos=(1, 1, 1, 1),
-            layout_kwargs={"alignment": QT_TOP_RIGHT_ALIGNMENT},
+            layout_kwargs={"alignment": ALIGN_TOP_RIGHT},
         )
         self.create_spacer("spacer_4")
 

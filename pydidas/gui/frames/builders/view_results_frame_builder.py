@@ -31,7 +31,7 @@ from ....core import constants
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
-    FIX_EXP_POLICY,
+    POLICY_FIX_EXP,
 )
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -90,14 +90,14 @@ class ViewResultsFrameBuilder(BaseFrame):
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
 
         self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+            parent=None, init_layout=True, lineWidth=5, sizePolicy=POLICY_FIX_EXP
         )
         self.create_any_widget(
             "config_area",
             ScrollArea,
             widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy=FIX_EXP_POLICY,
+            sizePolicy=POLICY_FIX_EXP,
             gridPos=(-1, 0, 1, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},

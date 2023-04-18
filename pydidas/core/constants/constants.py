@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The constants module holds constant nmumber defitions needed in pydidas.
+The constants module holds constant number defitions needed in pydidas.
 """
 
 __author__ = "Malte Storm"

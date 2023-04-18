@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,30 +21,28 @@ additional actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasPlot2D"]
 
 
 from qtpy import QtCore
-from silx.gui.plot import Plot2D
 from silx.gui.colors import Colormap
+from silx.gui.plot import Plot2D
 
-from ...core import PydidasQsettingsMixin
 from ...contexts import DiffractionExperimentContext
-from .silx_actions import (
-    ChangeCanvasToData,
-    ExpandCanvas,
-    CropHistogramOutliers,
-    PydidasGetDataInfoAction,
-)
+from ...core import PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
+from .silx_actions import (
+    ChangeCanvasToData,
+    CropHistogramOutliers,
+    ExpandCanvas,
+    PydidasGetDataInfoAction,
+)
 from .utilities import get_2d_silx_plot_ax_settings
-
-DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
@@ -57,6 +57,16 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     def __init__(self, parent=None, backend=None, **kwargs):
         Plot2D.__init__(self, parent, backend)
         PydidasQsettingsMixin.__init__(self)
+        self._config = {
+            "cs_transform": kwargs.get("cs_transform", True),
+            "use_data_info_action": kwargs.get("use_data_info_action", False),
+            "diffraction_exp": (
+                DiffractionExperimentContext()
+                if kwargs.get("diffraction_exp", None) is None
+                else kwargs.get("diffraction_exp")
+            ),
+        }
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.changeCanvasToDataAction = self.group.addAction(
             ChangeCanvasToData(self, parent=self)
@@ -78,27 +88,23 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self._toolbar.insertAction(
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
-
-        if kwargs.get("cs_transform", True):
+        if self._config["cs_transform"]:
             self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
             self._toolbar.addWidget(self.cs_transform)
 
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        _pos_widget_converters = [
-            (_field[1], _field[2]) for _field in self._positionWidget._fields
-        ]
-        _new_position_widget = PydidasPositionInfo(
-            plot=self, converters=_pos_widget_converters
-        )
-        _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
-        if kwargs.get("cs_transform", True):
+            _pos_widget_converters = [
+                (_field[1], _field[2]) for _field in self._positionWidget._fields
+            ]
+            _new_position_widget = PydidasPositionInfo(
+                plot=self, converters=_pos_widget_converters
+            )
+            _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
+            _layout = self.findChild(self._positionWidget.__class__).parent().layout()
+            _layout.replaceWidget(self._positionWidget, _new_position_widget)
             self.cs_transform.sig_new_coordinate_system.connect(
                 _new_position_widget.new_coordinate_system
             )
-        _layout = self.findChild(self._positionWidget.__class__).parent().layout()
-        _layout.replaceWidget(self._positionWidget, _new_position_widget)
-        self._positionWidget = _new_position_widget
+            self._positionWidget = _new_position_widget
 
         _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
@@ -106,7 +112,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
 
-        if kwargs.get("use_data_info_action", False):
+        if self._config["use_data_info_action"]:
             self.get_data_info_action = self.group.addAction(
                 PydidasGetDataInfoAction(self, parent=self)
             )
@@ -125,6 +131,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         enable : bool
             Flag to enable the coordinate system transformations.
         """
+        if not self._config["cs_transform"]:
+            return
         if not enable:
             self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(enable)
@@ -142,6 +150,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         y_unit : str
             The unit for the data y-axis
         """
+        if not self._config["cs_transform"]:
+            return
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
     def plot_pydidas_dataset(self, data, title=None):
@@ -158,8 +168,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.enable_cs_transform(
             data.shape
             == (
-                DIFFRACTION_EXP.get_param_value("detector_npixy"),
-                DIFFRACTION_EXP.get_param_value("detector_npixx"),
+                self._config["diffraction_exp"].get_param_value("detector_npixy"),
+                self._config["diffraction_exp"].get_param_value("detector_npixx"),
             )
         )
         self.update_cs_units(data.axis_units[1], data.axis_units[0])

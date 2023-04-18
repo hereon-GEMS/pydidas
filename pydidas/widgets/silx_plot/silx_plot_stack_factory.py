@@ -38,8 +38,8 @@ from .pydidas_plot2d import PydidasPlot2D
 
 
 def create_silx_plot_stack(
-        frame, gridPos=None, use_data_info_action=False, diffraction_exp=None
-    ):
+    frame, gridPos=None, use_data_info_action=False, diffraction_exp=None
+):
     """
     Create a QStackedWidget with 1D and 2D plot widgets in the input frame.
 

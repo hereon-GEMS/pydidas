@@ -76,6 +76,8 @@ Bugfixes
 - Fixed an issue when importing plugins from an empty Path object.
 - Fixed an issue where the PluginCollection would emit the 'plugins updated' 
   signal prematurely which created an infinite loop.
+- Fixed an issue with PydidasPlot2D when not using the singleton 
+  DiffractionExperimentContext.
 
 
 =======

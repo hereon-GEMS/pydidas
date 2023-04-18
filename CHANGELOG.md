@@ -53,6 +53,8 @@ Improvements
 - Added methods to define DiffractionExperiment parameters from given points on 
   circles and ellipses.
 - Changed names of policy and alignment constants for consistency.
+- Added a widget to select points in an image, for example for beamcenter 
+  determination.
 
 Bugfixes
 --------

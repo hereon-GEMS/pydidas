@@ -183,7 +183,9 @@ def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
     tilt : float
         The tilt angle in radians.
     tilt_plane : float
-        The tilt plane orientation
+        The tilt plane orientation in radians.
+    coeffs : tuple
+        The ellipse coefficients
     """
     if xpoints.size < 5:
         raise UserConfigError(
@@ -210,7 +212,7 @@ def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
     else:
         tilt_plane = 0.5 * np.arctan(2 * b / (a - c)) + (np.pi / 2 if a > c else 0)
     tilt = np.arccos(np.amin(_axes) / np.amax(_axes))
-    return center_x, center_y, tilt, tilt_plane
+    return center_x, center_y, tilt, tilt_plane, (a, b, c, d, f, g)
 
 
 def fit_ellipse_from_points(xpoints, ypoints):

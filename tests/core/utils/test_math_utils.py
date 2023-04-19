@@ -133,7 +133,9 @@ class TestMathUtils(unittest.TestCase):
         _axes = self.get_ellipsis_axes_lengths(_params)
         _target_tilt = np.arccos(_axes[0] / _axes[1])
         _target_tiltplane = 0.5 * np.arctan(2 * _params[1] / (_params[0] - _params[2]))
-        cx, cy, tilt, tp = fit_detector_center_and_tilt_from_points(_xpoints, _ypoints)
+        cx, cy, tilt, tp, _ = fit_detector_center_and_tilt_from_points(
+            _xpoints, _ypoints
+        )
         self.assertAlmostEqual(cx, x0, 3)
         self.assertAlmostEqual(cy, y0, 3)
         self.assertAlmostEqual(_target_tilt, tilt, 3)
@@ -145,7 +147,7 @@ class TestMathUtils(unittest.TestCase):
         x = np.linspace(300, 600, num=2)
         _xpoints, _ypoints, _params = self.create_ellipse(x, x0, y0, 1e-3, 2e-4, 4e-3)
         with self.assertRaises(UserConfigError):
-            _, _, _, _ = fit_detector_center_and_tilt_from_points(_xpoints, _ypoints)
+            _, _, _, _, _ = fit_detector_center_and_tilt_from_points(_xpoints, _ypoints)
 
     def test_fit_detector_center_and_tilt_from_points__a_greater_c(self):
         x0 = 450
@@ -157,7 +159,9 @@ class TestMathUtils(unittest.TestCase):
         _target_tiltplane = np.pi / 2 + 0.5 * np.arctan(
             2 * _params[1] / (_params[0] - _params[2])
         )
-        cx, cy, tilt, tp = fit_detector_center_and_tilt_from_points(_xpoints, _ypoints)
+        cx, cy, tilt, tp, _ = fit_detector_center_and_tilt_from_points(
+            _xpoints, _ypoints
+        )
         self.assertAlmostEqual(cx, x0, 3)
         self.assertAlmostEqual(cy, y0, 3)
         self.assertAlmostEqual(_target_tilt, tilt, 3)

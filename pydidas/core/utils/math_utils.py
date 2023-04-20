@@ -33,6 +33,7 @@ __all__ = [
     "fit_ellipse_from_points",
     "fit_detector_center_and_tilt_from_points",
     "fit_circle_from_points",
+    "calc_points_on_ellipse",
 ]
 
 
@@ -192,27 +193,10 @@ def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
             "A fit of an ellipse requires at least 5 input points to define a unique "
             "solution."
         )
-    a, b, c, d, f, g = fit_ellipse_from_points(xpoints, ypoints)
-    _Delta = np.linalg.det(np.array(((a, b, d), (b, c, f), (d, f, g))))
-    if _Delta == 0 or (a * c - b**2) <= 0 or _Delta / (a + c) >= 0:
-        raise UserConfigError(
-            "The calculated solution for the given points is not an ellipse! Please "
-            "check the input parameters."
-        )
-    center_x = (c * d - b * f) / (b**2 - a * c)
-    center_y = (a * f - b * d) / (b**2 - a * c)
-    _axes = (
-        2
-        * (a * f**2 + c * d**2 + g * b**2 - 2 * b * d * f - a * c * g)
-        / (b**2 - a * c)
-        / (np.array((1, -1)) * ((a - c) ** 2 + 4 * b**2) ** 0.5 - (a + c))
-    ) ** 0.5
-    if b == 0:
-        tilt_plane = np.pi / 2 if a > c else 0
-    else:
-        tilt_plane = 0.5 * np.arctan(2 * b / (a - c)) + (np.pi / 2 if a > c else 0)
-    tilt = np.arccos(np.amin(_axes) / np.amax(_axes))
-    return center_x, center_y, tilt, tilt_plane, (a, b, c, d, f, g)
+    _coeffs = fit_ellipse_from_points(xpoints, ypoints)
+    _cx, _cy, _tilt, _tilt_plane, _ax = get_ellipse_params_from_coeffs(_coeffs)
+    print(_ax)
+    return _cx, _cy, _tilt, _tilt_plane, _coeffs
 
 
 def fit_ellipse_from_points(xpoints, ypoints):
@@ -258,6 +242,49 @@ def fit_ellipse_from_points(xpoints, ypoints):
     return coeffs / coeffs[0]
 
 
+def get_ellipse_params_from_coeffs(coeffs):
+    """
+    Get the ellipse parameters for center and tilt from the fit parameters.
+
+    Parameters are defined as in Wolfram's mathworld formula:
+    https://mathworld.wolfram.com/Ellipse.html
+
+    Parameters
+    ----------
+    coeffs : tuple
+        The tuple with the parameters (a, b, c, d, f, g)
+
+    Returns
+    -------
+    center_x : float
+        The x center position.
+    center_y : float
+        The y center position.
+    tilt : float
+        The tilt angle in radians.
+    tilt_plane : float
+        The tilt plane orientation in radians.
+    axes : tuple
+        The tuple with the two axes lengths.
+    """
+    a, b, c, d, f, g = coeffs
+    _center_x = (c * d - b * f) / (b**2 - a * c)
+    _center_y = (a * f - b * d) / (b**2 - a * c)
+    _axes = (
+        2
+        * (a * f**2 + c * d**2 + g * b**2 - 2 * b * d * f - a * c * g)
+        / (b**2 - a * c)
+        / (np.array((1, -1)) * ((a - c) ** 2 + 4 * b**2) ** 0.5 - (a + c))
+    ) ** 0.5
+    if b == 0:
+        _tilt_plane = np.pi / 2 if a > c else 0
+    else:
+        _tilt_plane = 0.5 * np.arctan(2 * b / (a - c)) + (np.pi / 2 if a > c else 0)
+    print("ax ratio:", np.amin(_axes) / np.amax(_axes))
+    _tilt = np.arccos(np.amin(_axes) / np.amax(_axes))
+    return _center_x, _center_y, _tilt, _tilt_plane, _axes
+
+
 def fit_circle_from_points(xpoints, ypoints):
     """
     Fit a circle from a given list of points.
@@ -283,3 +310,25 @@ def fit_circle_from_points(xpoints, ypoints):
     _c0 = [np.mean(xpoints), np.mean(ypoints), (np.amax(xpoints) - np.amin(xpoints))]
     _c1, _ = leastsq(circle_distance, _c0, args=(xpoints, ypoints))
     return _c1
+
+
+def calc_points_on_ellipse(coeffs, n_points=144, tmin=0, tmax=2 * np.pi):
+    """
+    Return npts points on the ellipse described by the params = x0, y0, ap,
+    bp, e, phi for values of the parametric variable t between tmin and tmax.
+
+    """
+    (a, b, c, d, f, g) = coeffs
+    _cx, _cy, _tilt, _tilt_angle, _axes = get_ellipse_params_from_coeffs(coeffs)
+    _theta = np.linspace(tmin, tmax, num=n_points)
+    _x = (
+        _cx
+        + _axes[0] * np.cos(_theta) * np.cos(_tilt_angle)
+        - _axes[1] * np.sin(_theta) * np.sin(_tilt_angle)
+    )
+    _y = (
+        _cy
+        + _axes[0] * np.cos(_theta) * np.sin(_tilt_angle)
+        + _axes[1] * np.sin(_theta) * np.cos(_tilt_angle)
+    )
+    return _x, _y

@@ -31,20 +31,15 @@ from pathlib import Path
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
-from silx.gui.plot.items import Marker
+from silx.gui.plot.items import Marker, Shape
 
 from ...core import Parameter
-from ...core.constants import (
-    ALIGN_CENTER,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-    PYDIDAS_COLORS,
-    STANDARD_FONT_SIZE,
-)
-from ...core.utils import SignalBlocker
+from ...core.constants import PYDIDAS_COLORS, STANDARD_FONT_SIZE
 from ...data_io import import_data
 from ...widgets.factory import CreateWidgetsMixIn
 from ...widgets.parameter_config import ParameterWidgetsMixIn
 from ...widgets.silx_plot import PydidasPlot2D
+from .table_with_xy_positions import TableWithXYPositions
 
 
 class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidgetsMixIn):
@@ -52,14 +47,14 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
     A widget which allows to select points in a given image.
     """
 
-    container_width = 200
+    container_width = 220
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
-        self._markers = {}
+        self._points = []
         self._image = None
         self.marker_color = Parameter(
             "marker_color",
@@ -77,8 +72,8 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         self.add_any_widget(
             "plot",
             PydidasPlot2D(cs_transform=False),
-            minimumWidth=600,
-            minimumHeight=600,
+            minimumWidth=700,
+            minimumHeight=700,
             gridPos=(0, 2, 1, 1),
         )
         self.create_label(
@@ -92,10 +87,13 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         self.create_line("line_top", parent_widget=self._widgets["left_container"])
         self.create_param_widget(
             self.marker_color,
-            **(
-                DEFAULT_TWO_LINE_PARAM_CONFIG
-                | dict(parent_widget=self._widgets["left_container"])
-            ),
+            halign_text=QtCore.Qt.AlignLeft,
+            valign_text=QtCore.Qt.AlignBottom,
+            width_total=self.container_width,
+            width_io=100,
+            width_text=120,
+            width_unit=0,
+            parent_widget=self._widgets["left_container"],
         )
         self.create_line("line_points", parent_widget=self._widgets["left_container"])
         self.create_label(
@@ -108,18 +106,9 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         )
         self.add_any_widget(
             "table",
-            QtWidgets.QTableWidget(),
+            TableWithXYPositions(),
             parent_widget=self._widgets["left_container"],
-            columnCount=1,
-            rowCount=0,
             fixedWidth=self.container_width,
-            horizontalHeaderLabels=[["(x, y) position"]],
-            verticalScrollBarPolicy=QtCore.Qt.ScrollBarAlwaysOn,
-            editTriggers=QtWidgets.QTableWidget.NoEditTriggers,
-        )
-        self._widgets["table"].horizontalHeader().resizeSection(0, 180)
-        self._widgets["table"].setSelectionBehavior(
-            QtWidgets.QAbstractItemView.SelectRows
         )
         self.create_button(
             "but_delete_selected_points",
@@ -129,28 +118,12 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
             parent_widget=self._widgets["left_container"],
         )
         self._widgets["but_delete_selected_points"].clicked.connect(
-            self._remove_selected_points
+            self._widgets["table"].remove_selected_points
         )
         self._widgets["plot"].sigPlotSignal.connect(self._process_plot_signal)
         self.param_widgets["marker_color"].io_edited.connect(self._update_markers)
-        self._widgets["table"].selectionModel().selectionChanged.connect(
-            self.__new_markers_selected
-        )
-
-    @property
-    def new_marker_index(self):
-        """
-        Get the index for a new marker.
-
-        Returns
-        -------
-        int
-            The index for the next marker.
-        """
-        _curr_markers = set(self._markers.values())
-        if _curr_markers == set():
-            return 0
-        return max(set(self._markers.values())) + 1
+        self._widgets["table"].sig_new_selection.connect(self.__new_points_selected)
+        self._widgets["table"].sig_remove_points.connect(self.__remove_points_from_plot)
 
     def open_image(self, filename, **kwargs):
         """
@@ -164,6 +137,20 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         self._image = import_data(filename, **kwargs)
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
+
+    @QtCore.Slot(object)
+    def __remove_points_from_plot(self, points):
+        """
+        Remove the selected points from the plot.
+
+        Parameters
+        ----------
+        points : list
+            List with tuples of the (x, y) position of the points.
+        """
+        for _point in points:
+            self._points.remove(_point)
+            self._widgets["plot"].removeMarker(f"marker_{_point[0]}_{_point[1]}")
 
     @QtCore.Slot(dict)
     def _process_plot_signal(self, event_dict):
@@ -182,31 +169,13 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
             _color = PYDIDAS_COLORS[self.marker_color.value]
             _x = np.round(event_dict["x"], decimals=3)
             _y = np.round(event_dict["y"], decimals=3)
-            if (_x, _y) in self._markers:
+            if (_x, _y) in self._points:
                 return
-            _index = self.new_marker_index
             self._widgets["plot"].addMarker(
-                _x, _y, legend=f"marker_{_index}", color=_color, symbol="x"
+                _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
             )
-            self._markers[(_x, _y)] = _index
-            self.__add_point_to_table(_x, _y)
-
-    def __add_point_to_table(self, xpos, ypos):
-        """
-        Add a newly selected point to the table.
-
-        Parameters
-        ----------
-        xpos : float
-            The x position.
-        ypos : float
-            The y position
-        """
-        _row = self._widgets["table"].rowCount()
-        self._widgets["table"].setRowCount(_row + 1)
-        _widget = QtWidgets.QTableWidgetItem(f"({xpos:.3f}, {ypos:.3f})")
-        _widget.setTextAlignment(ALIGN_CENTER)
-        self._widgets["table"].setItem(_row, 0, _widget)
+            self._points.append((_x, _y))
+            self._widgets["table"].add_point_to_table(_x, _y)
 
     @QtCore.Slot(str)
     def _update_markers(self, color):
@@ -221,78 +190,19 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         _colorcode = PYDIDAS_COLORS[color]
         _items = self._widgets["plot"].getItems()
         for _item in _items:
-            if isinstance(_item, Marker):
+            if isinstance(_item, (Marker, Shape)):
                 _item.setColor(_colorcode)
 
-    @QtCore.Slot()
-    def __new_markers_selected(self):
+    @QtCore.Slot(object)
+    def __new_points_selected(self, points):
         """
-        Process the signal that new markers have been selected.
+        Process the signal that new points have been selected.
         """
-        _selected_markers = self._get_indices_of_selected_points()
-        for _id in self._markers.values():
-            _marker = self._widgets["plot"]._getItem("marker", f"marker_{_id}")
-            _symbol = "o" if _id in _selected_markers else "x"
+        for _point in self._points:
+            _label = f"marker_{_point[0]}_{_point[1]}"
+            _marker = self._widgets["plot"]._getItem("marker", _label)
+            _symbol = "o" if _point in points else "x"
             _marker.setSymbol(_symbol)
-
-    def _get_indices_of_selected_points(self):
-        """
-        Get the indices of the selected points.
-
-        Returns
-        -------
-        list
-            The list of the indices of the selected points.
-        """
-        _points = self._get_selected_points()
-        return [self._markers[_pos] for _pos in _points]
-
-    def _get_selected_points(self):
-        """
-        Get the selected points.
-
-        Returns
-        -------
-        list
-            List of the (x, y) position tuples.
-        """
-        _indices = self._widgets["table"].selectedIndexes()
-        _selected_points = []
-        for _index_item in _indices:
-            _data = _index_item.data().strip("()").split(",")
-            _pos = (float(_data[0]), float(_data[1]))
-            _selected_points.append(_pos)
-        return _selected_points
-
-    @QtCore.Slot()
-    def _remove_selected_points(self):
-        """
-        Remove the selected points.
-        """
-        _selected_markers = self._get_indices_of_selected_points()
-        _rows_to_remove = self._get_rows_of_selected_points()
-        _new_row_count = self._widgets["table"].rowCount() - len(_selected_markers)
-        for _point in self._get_selected_points():
-            del self._markers[_point]
-        for _id in _selected_markers:
-            self._widgets["plot"].removeMarker(f"marker_{_id}")
-        with SignalBlocker(self._widgets["table"].selectionModel()):
-            for _row in _rows_to_remove:
-                self._widgets["table"].removeRow(_row)
-        self._widgets["table"].setRowCount(_new_row_count)
-
-    def _get_rows_of_selected_points(self):
-        """
-        Get the row numbers of the selected points, sorted in inverse order.
-
-        Returns
-        -------
-        list
-            The list with the row numbers of the selection.
-        """
-        _rows = [_item.row() for _item in self._widgets["table"].selectedIndexes()]
-        _rows.sort(reverse=True)
-        return _rows
 
     def get_selected_points(self):
         """
@@ -305,10 +215,49 @@ class SelectPointsInImage(QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidget
         y_positions : np.ndarray
             The y values of the selected points.
         """
-        _n = len(self._markers)
+        _n = len(self._points)
         _x = np.zeros((_n))
         _y = np.zeros((_n))
-        for _index, (_xpos, _ypos) in enumerate(self._markers):
+        for _index, (_xpos, _ypos) in enumerate(self._points):
             _x[_index] = _xpos
             _y[_index] = _ypos
         return _x, _y
+
+    def set_beamcenter_marker(self, position):
+        """
+        Mark the beamcenter with a marker.
+        """
+        if position is None:
+            self._widgets["plot"].remove(legend="beamcenter", kind="marker")
+            return
+        _color = PYDIDAS_COLORS[self.marker_color.value]
+        self._widgets["plot"].addMarker(
+            *position, legend="beamcenter", color=_color, symbol="+"
+        )
+
+    def show_outline(self, points):
+        """
+        Show an outline defined through the points.
+
+        The outline can, for example, be a fitted circle or ellipse. The points must be
+        given as a 2-tuple or None to clear the outline.
+
+        Parameters
+        ----------
+        points : Union[None, tuple]
+            The points for the outline in form of a tuple with x- and y- point
+            positions. If None, the outline is cleared from the plot.
+        """
+        if points is None:
+            self._widgets["plot"].remove(legend="outline", kind="item")
+            return
+        _color = PYDIDAS_COLORS[self.marker_color.value]
+        self._widgets["plot"].addShape(
+            points[0],
+            points[1],
+            legend="outline",
+            color=_color,
+            linestyle="--",
+            fill=False,
+            linewidth=2.0,
+        )

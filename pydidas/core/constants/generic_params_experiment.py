@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ Parameters for the experiment context.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["GENERIC_PARAMS_EXPERIMENT"]
@@ -171,5 +173,41 @@ GENERIC_PARAMS_EXPERIMENT = {
             "The detector rotation 3 (around the beam axis; right-handed when "
             "looking downstream with the beam.)"
         ),
+    },
+    "beamcenter_x": {
+        "type": float,
+        "default": 0,
+        "name": "beamcenter x",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": "The detector x-coordinate for the beamcenter.",
+    },
+    "beamcenter_y": {
+        "type": float,
+        "default": 0,
+        "name": "beamcenter y",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": "The detector y-coordinate for the beamcenter.",
+    },
+    "detector_tilt_angle": {
+        "type": float,
+        "default": 0,
+        "name": "detector tilt angle",
+        "choices": None,
+        "unit": "deg",
+        "allow_None": False,
+        "tooltip": "The detector tilt angle (relative to the beam normal).",
+    },
+    "detector_tilt_plane": {
+        "type": float,
+        "default": 0,
+        "name": "detector tilt plane",
+        "choices": None,
+        "unit": "deg",
+        "allow_None": False,
+        "tooltip": "The detector tilt plane orientation (relative to positive x-axis).",
     },
 }

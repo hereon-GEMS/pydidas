@@ -55,6 +55,7 @@ Improvements
 - Changed names of policy and alignment constants for consistency.
 - Added a widget to select points in an image, for example for beamcenter 
   determination.
+- Added a window to manually fit and set the beamcenter position.
 
 Bugfixes
 --------

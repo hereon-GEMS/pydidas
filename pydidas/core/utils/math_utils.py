@@ -195,7 +195,6 @@ def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
         )
     _coeffs = fit_ellipse_from_points(xpoints, ypoints)
     _cx, _cy, _tilt, _tilt_plane, _ax = get_ellipse_params_from_coeffs(_coeffs)
-    print(_ax)
     return _cx, _cy, _tilt, _tilt_plane, _coeffs
 
 
@@ -280,7 +279,6 @@ def get_ellipse_params_from_coeffs(coeffs):
         _tilt_plane = np.pi / 2 if a > c else 0
     else:
         _tilt_plane = 0.5 * np.arctan(2 * b / (a - c)) + (np.pi / 2 if a > c else 0)
-    print("ax ratio:", np.amin(_axes) / np.amax(_axes))
     _tilt = np.arccos(np.amin(_axes) / np.amax(_axes))
     return _center_x, _center_y, _tilt, _tilt_plane, _axes
 

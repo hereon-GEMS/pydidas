@@ -213,33 +213,6 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             filename, diffraction_exp=self, overwrite=overwrite
         )
 
-    def set_beamcenter_from_points_on_ellipse(self, xpoints, ypoints, det_dist):
-        """
-        Calculate the beamcenter from a number of given points.
-
-        Using an ellipse for fitting also allows to fit the detector tilt. However,
-        an ellipse fit requires
-
-        Parameters
-        ----------
-        xpoints : Union[collections.abc.Iterable, np.ndarray]
-            The x-coordinates of the selected points.
-        ypoints : Union[collections.abc.Iterable, np.ndarray]
-            The y-coordinates of the selected points.
-        det_dist : float
-            The specified detector distance in m.
-        """
-        if isinstance(xpoints, Iterable):
-            xpoints = np.asarray(xpoints)
-        if isinstance(ypoints, Iterable):
-            ypoints = np.asarray(ypoints)
-        _cx, _cy, _tilt, _tilt_plane = fit_detector_center_and_tilt_from_points(
-            xpoints, ypoints
-        )
-        self.set_beamcenter_from_fit2d_params(
-            _cx, _cy, det_dist, tilt=_tilt, tilt_plane=_tilt_plane, rot_unit="rad"
-        )
-
     def set_beamcenter_from_fit2d_params(self, center_x, center_y, det_dist, **kwargs):
         """
         Set the beamcenter in detector pixel coordinates.

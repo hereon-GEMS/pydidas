@@ -33,11 +33,12 @@ from functools import partial
 import numpy as np
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
+from ..windows import ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
 
@@ -256,9 +257,53 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)
 
+    @QtCore.Slot()
     def select_beamcenter_manually(self):
-        pass
-        # TODO:  fill with life
+        """
+        Select the beamcenter manually.
+        """
+        self._select_beamcenter_window = ManuallySetBeamcenterWindow()
+        self._select_beamcenter_window.sig_selected_beamcenter.connect(
+            self._beamcenter_selected
+        )
+        self._select_beamcenter_window.sig_about_to_close.connect(
+            self._beamcenter_window_closed
+        )
+        self._select_beamcenter_window.show()
+        self.setEnabled(False)
+
+    @QtCore.Slot(float, float)
+    def _beamcenter_selected(self, center_x, center_y):
+        """
+        Set the selected beamcenter in the DiffractionExperiment
+
+        Parameters
+        ----------
+        center_x : float
+            The beamcenter x value in pixels
+        center_y : float
+            The beancenter y value in pixels.
+        """
+        _px_size_x = self.get_param_value("detector_pxsizex")
+        _px_size_y = self.get_param_value("detector_pxsizey")
+
+        self.set_param_value_and_widget("detector_poni1", 1e-6 * _px_size_y * center_y)
+        self.set_param_value_and_widget("detector_poni2", 1e-6 * _px_size_x * center_x)
+        for _index in [1, 2, 3]:
+            self.set_param_value_and_widget(f"detector_rot{_index}", 0)
+
+    @QtCore.Slot()
+    def _beamcenter_window_closed(self):
+        """
+        Handle the signal that the beamcenter window is to be closed.
+        """
+        self.setEnabled(True)
+        self._select_beamcenter_window.sig_about_to_close.disconnect(
+            self._beamcenter_window_closed
+        )
+        self._select_beamcenter_window.sig_selected_beamcenter.disconnect(
+            self._beamcenter_selected
+        )
 
     def import_from_file(self):
         """

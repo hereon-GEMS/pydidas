@@ -174,18 +174,6 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertAlmostEqual(obj.get_param_value("detector_poni2"), self._xpos_abs, 3)
         self.assertAlmostEqual(obj.get_param_value("detector_dist"), _dist, 6)
 
-    def test_set_beamcenter_from_points_on_ellipse(self):
-        obj = self.prepare_context_with_Eiger()
-        r = 300
-        _dist = 0.234
-        phi = np.r_[[0, 1, 3, 4, 5]]
-        _xpoints = self._xpos + r * np.cos(phi)
-        _ypoints = self._ypos + r * np.sin(phi)
-        obj.set_beamcenter_from_points_on_ellipse(_xpoints, _ypoints, _dist)
-        self.assertAlmostEqual(obj.get_param_value("detector_poni1"), self._ypos_abs, 3)
-        self.assertAlmostEqual(obj.get_param_value("detector_poni2"), self._xpos_abs, 3)
-        self.assertAlmostEqual(obj.get_param_value("detector_dist"), _dist, 6)
-
 
 if __name__ == "__main__":
     unittest.main()

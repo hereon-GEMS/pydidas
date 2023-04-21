@@ -72,6 +72,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
     )
 
     sig_selected_beamcenter = QtCore.Signal(float, float)
+    sig_about_to_close = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(
@@ -411,11 +412,14 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.sig_selected_beamcenter.emit(_x, _y)
         self.close()
 
+    def closeEvent(self, event):
+        """
+        Handle the close event and also emit a signal.
 
-if __name__ == "__main__":
-    import pydidas
-
-    app = pydidas.core.PydidasQApplication([])
-    window = ManuallySetBeamcenterWindow()
-    window.show()
-    app.exec_()
+        Parameters
+        ----------
+        event : QEvent
+            The calling event.
+        """
+        self.sig_about_to_close.emit()
+        super().closeEvent(event)

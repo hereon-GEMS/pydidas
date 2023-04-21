@@ -56,6 +56,9 @@ Improvements
 - Added a widget to select points in an image, for example for beamcenter 
   determination.
 - Added a window to manually fit and set the beamcenter position.
+- The 'Define diffraction setup' frame now has an option to set the beamcenter
+  manually.
+
 
 Bugfixes
 --------

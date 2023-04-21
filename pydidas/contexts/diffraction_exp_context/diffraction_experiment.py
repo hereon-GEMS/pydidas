@@ -39,11 +39,7 @@ from ...core import (
     get_generic_param_collection,
 )
 from ...core.constants import LAMBDA_IN_A_TO_E
-from ...core.utils import (
-    NoPrint,
-    fit_circle_from_points,
-    fit_detector_center_and_tilt_from_points,
-)
+from ...core.utils import NoPrint, fit_circle_from_points
 from .diffraction_experiment_io import DiffractionExperimentIo
 
 

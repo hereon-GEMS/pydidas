@@ -29,6 +29,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .line_edit_with_icon import *
+from .select_image_frame_widget import *
 from .select_points_in_image import *
 from .show_information_for_result import *
 from .read_only_text_widget import *
@@ -39,6 +40,11 @@ from . import line_edit_with_icon
 
 __all__.extend(line_edit_with_icon.__all__)
 del line_edit_with_icon
+
+from . import select_image_frame_widget
+
+__all__.extend(select_image_frame_widget.__all__)
+del select_image_frame_widget
 
 from . import select_points_in_image
 

@@ -61,6 +61,7 @@ __all__.extend(["CreateWidgetsMixIn"])
 from .file_dialog import *
 from .scroll_area import *
 from .utilities import *
+from .widget_with_parameter_collection import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 from . import file_dialog
@@ -77,3 +78,8 @@ from . import utilities
 
 __all__.extend(utilities.__all__)
 del utilities
+
+from . import widget_with_parameter_collection
+
+__all__.extend(widget_with_parameter_collection.__all__)
+del widget_with_parameter_collection

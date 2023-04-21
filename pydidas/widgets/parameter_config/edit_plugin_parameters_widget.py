@@ -158,6 +158,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 "but_toggle_advanced_params",
                 "Display advanced Parameters",
                 icon=self.style().standardIcon(6),
+                width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
             )
             for _key in self.plugin.advanced_parameters:
                 _param = self.plugin.get_param(_key)

@@ -33,6 +33,7 @@ from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .image_series_operations_window import *
 from .global_settings_window import *
+from .manually_set_beamcenter_window import *
 from .mask_editor_window import *
 from .pydidas_window import *
 from .qt_paths_window import *
@@ -67,6 +68,11 @@ from . import global_settings_window
 
 __all__.extend(global_settings_window.__all__)
 del global_settings_window
+
+from . import manually_set_beamcenter_window
+
+__all__.extend(manually_set_beamcenter_window.__all__)
+del manually_set_beamcenter_window
 
 from . import mask_editor_window
 

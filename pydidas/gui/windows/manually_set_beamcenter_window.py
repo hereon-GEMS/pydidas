@@ -27,32 +27,26 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ManuallySetBeamcenterWindow"]
 
-from pathlib import Path
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from pydidas.core import (
+from ...core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from pydidas.core.constants import (
+from ...core.constants import (
     STANDARD_FONT_SIZE,
     CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
 )
-from pydidas.core.utils import (
-    is_hdf5_filename,
-    get_hdf5_populated_dataset_keys,
+from ...core.utils import (
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
     calc_points_on_ellipse,
 )
-from pydidas.data_io import IoMaster
-from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.dialogues import Hdf5DatasetSelectionPopup, QuestionBox
-from pydidas.widgets.misc import SelectPointsInImage
-from pydidas.gui.windows.pydidas_window import PydidasWindow
+from ...widgets.dialogues import QuestionBox
+from ...widgets.misc import SelectImageFrameWidget, SelectPointsInImage
+from .pydidas_window import PydidasWindow
 
 
 class ManuallySetBeamcenterWindow(PydidasWindow):
@@ -77,13 +71,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(
             self, parent, title="Define beamcenter through selected points", **kwargs
-        )
-        self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_file",
-            caption="Import image",
-            formats=IoMaster.get_string_of_formats(),
-            qsettings_ref="SelectPointsForBeamcenterWindow__import",
         )
         self._config = self._config | dict(
             select_mode_active=False,
@@ -127,52 +114,16 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             width_text=CONFIG_WIDGET_WIDTH - 130,
             width_unit=30,
         )
-
-        self.create_label(
-            "label_title",
-            "Input file",
-            fontsize=STANDARD_FONT_SIZE + 1,
+        self.add_any_widget(
+            "image_selection",
+            SelectImageFrameWidget(
+                *self.get_params("filename", "hdf5_key", "hdf5_frame"),
+                import_reference="SelectPointsForBeamcenterWindow__import",
+            ),
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            bold=True,
             parent_widget=self._widgets["left_container"],
         )
-
-        self.create_button(
-            "but_open",
-            "Select image file",
-            icon=self.style().standardIcon(42),
-            **_button_params,
-        )
-        self.create_param_widget(
-            self.get_param("filename"),
-            **(
-                DEFAULT_TWO_LINE_PARAM_CONFIG
-                | dict(
-                    parent_widget=self._widgets["left_container"],
-                    persistent_qsettings_ref="SelectPointsForBeamcenterWindow__import",
-                )
-            ),
-        )
-        self.create_param_widget(
-            self.get_param("hdf5_key"),
-            **(
-                DEFAULT_TWO_LINE_PARAM_CONFIG
-                | dict(
-                    parent_widget=self._widgets["left_container"],
-                    visible=False,
-                )
-            ),
-        )
-        self.create_param_widget(
-            self.get_param("hdf5_frame"), **(_param_config | dict(width_unit=0))
-        )
-        self.create_button(
-            "but_confirm_file",
-            "Confirm file selection",
-            **_button_params,
-            visible=False,
-        )
-        self.create_line("line_file", parent_widget=self._widgets["left_container"])
+        self.create_line(None, parent_widget=self._widgets["left_container"])
         self.create_spacer(
             None, fixedWidth=25, parent_widget=self._widgets["left_container"]
         )
@@ -213,11 +164,11 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
-        self._widgets["but_open"].clicked.connect(self.open_image_dialog)
-        self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
-        self._widgets["but_confirm_file"].clicked.connect(self._selected_new_file)
-        self.param_widgets["filename"].io_edited.connect(
-            self.process_new_filename_input
+        self._widgets["image_selection"].sig_file_valid.connect(
+            self._toggle_file_selected
+        )
+        self._widgets["image_selection"].sig_new_file_selection.connect(
+            self._selected_new_file
         )
         self._widgets["but_set_beamcenter"].clicked.connect(self._set_beamcenter)
         self._widgets["but_fit_circle"].clicked.connect(self._fit_beamcenter_circle)
@@ -228,46 +179,12 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.param_widgets["beamcenter_y"].io_edited.connect(
             self._manual_beamcenter_update
         )
+        self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
 
     def finalize_ui(self):
         """
         Finalize the user interface.
         """
-
-    @QtCore.Slot()
-    def open_image_dialog(self):
-        """
-        Open the image selected through the filename.
-        """
-        _fname = self.__import_dialog.get_user_response()
-        self.set_param_value_and_widget("filename", _fname)
-        self.process_new_filename_input(_fname)
-
-    @QtCore.Slot(str)
-    def process_new_filename_input(self, filename):
-        """
-        Process the input of a new filename in the Parameter widget.
-
-        Parameters
-        ----------
-        filename : str
-            The filename.
-        """
-        if not Path(filename).is_file():
-            self._toggle_file_selected(False)
-            raise UserConfigError(
-                "The selected filename is not a valid file. Please check the input "
-                "and correct the path."
-            )
-        self._toggle_file_selected(True)
-        if is_hdf5_filename(filename):
-            _dsets = get_hdf5_populated_dataset_keys(filename, min_dim=2)
-            if not self.get_param_value("hdf5_key", dtype=str) in _dsets:
-                _dset = Hdf5DatasetSelectionPopup(self, filename).get_dset()
-                if _dset is not None:
-                    self.set_param_value_and_widget("hdf5_key", _dset)
-        if not is_hdf5_filename(filename):
-            self._selected_new_file()
 
     def _toggle_file_selected(self, is_selected):
         """
@@ -279,22 +196,21 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             Flag to process.
         """
         self._widgets["selector"].setEnabled(is_selected)
-        _is_hdf5 = is_hdf5_filename(self.get_param_value("filename"))
-        for _name in ["but_confirm_file"]:
-            self._widgets[_name].setVisible(is_selected and _is_hdf5)
-        for _name in ["hdf5_key", "hdf5_frame"]:
-            self.param_composite_widgets[_name].setVisible(is_selected and _is_hdf5)
 
-    @QtCore.Slot()
-    def _selected_new_file(self):
+    @QtCore.Slot(str, object)
+    def _selected_new_file(self, filename, kwargs):
         """
-        Open a new file / frame based on the input Parameters.
+        Open a new file / frame based on the selected file input Parameters.
+
+        Parameters
+        ----------
+        filename : str
+            The filename of the new image file to be opened.
+        kwargs : dict
+            The dictionary with additional parameters (hdf5 frame and dataset) for
+            file opening.
         """
-        self._widgets["selector"].open_image(
-            self.get_param_value("filename"),
-            dataset=self.get_param_value("hdf5_key", dtype=str),
-            frame=self.get_param_value("hdf5_frame"),
-        )
+        self._widgets["selector"].open_image(filename, **kwargs)
 
     @QtCore.Slot()
     def _set_beamcenter(self):

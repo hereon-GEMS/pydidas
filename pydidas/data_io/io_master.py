@@ -126,7 +126,7 @@ class IoMaster(type):
         if not cls.is_extension_registered(ext, mode=mode):
             if ext == "":
                 raise UserConfigError(
-                    "No extension has been selected for data export. Please set an "
+                    f"No extension has been selected for data {mode}. Please set an "
                     "extension to choose a fileformat."
                 )
             raise UserConfigError(

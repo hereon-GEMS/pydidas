@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PydidasWindow"]
 
+
 import os
 
 from qtpy import QtCore, QtGui, QtWidgets
@@ -138,3 +139,15 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         else:
             _url = DOC_HOME_QURL
         _ = QtGui.QDesktopServices.openUrl(_url)
+
+    def show(self):
+        """
+        Overload the generic show method.
+
+        This makes sure that any show calls will have a fully built window.
+        """
+        if not self._config.get("built", False):
+            self.frame_activated(self.frame_index)
+        if self._geometry is not None:
+            self.setGeometry(self._geometry)
+        super().show()

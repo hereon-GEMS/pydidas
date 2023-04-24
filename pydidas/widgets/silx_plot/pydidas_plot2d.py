@@ -96,7 +96,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 (_field[1], _field[2]) for _field in self._positionWidget._fields
             ]
             _new_position_widget = PydidasPositionInfo(
-                plot=self, converters=_pos_widget_converters
+                plot=self,
+                converters=_pos_widget_converters,
+                diffraction_exp=self._config["diffraction_exp"],
             )
             _new_position_widget.setSnappingMode(self._positionWidget._snappingMode)
             _layout = self.findChild(self._positionWidget.__class__).parent().layout()
@@ -172,7 +174,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 self._config["diffraction_exp"].get_param_value("detector_npixx"),
             )
         )
-        self.update_cs_units(data.axis_units[1], data.axis_units[0])
+        if data.axis_units[0] != "" and data.axis_units[1] != "":
+            self.update_cs_units(data.axis_units[1], data.axis_units[0])
         _ax_label = [
             data.axis_labels[i]
             + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")

@@ -27,13 +27,11 @@ __all__ = ["PydidasPositionInfo"]
 
 import numpy as np
 from qtpy import QtCore
+import pyFAI
 from silx.gui.plot.tools import PositionInfo
 
 from ...core.utils import pyfai_rot_matrix, get_chi_from_x_and_y
 from ...contexts import DiffractionExperimentContext
-
-
-DIFFRACTION_EXP = DiffractionExperimentContext()
 
 
 AX_LABELS = {
@@ -50,8 +48,13 @@ class PydidasPositionInfo(PositionInfo):
     transformations to display polar coordinates.
     """
 
-    def __init__(self, parent=None, plot=None, converters=None):
+    def __init__(self, parent=None, plot=None, converters=None, diffraction_exp=None):
         PositionInfo.__init__(self, parent, plot, converters)
+        self._EXP = (
+            DiffractionExperimentContext()
+            if diffraction_exp is None
+            else diffraction_exp
+        )
         self._x_widget = self.layout().itemAt(0).widget()
         self._y_widget = self.layout().itemAt(2).widget()
         self._cs_name = "cartesian"
@@ -119,12 +122,12 @@ class PydidasPositionInfo(PositionInfo):
         tuple
             The beam center in a tuple (y, x)
         """
-        _theta = [
-            DIFFRACTION_EXP.get_param_value(f"detector_rot{dim}") for dim in [1, 2, 3]
-        ]
-        _y0 = DIFFRACTION_EXP.get_param_value("detector_poni1")
-        _x0 = DIFFRACTION_EXP.get_param_value("detector_poni2")
-        _z0 = DIFFRACTION_EXP.get_param_value("detector_dist")
+        poni = pyFAI.geometry.Geometry()
+
+        _theta = [self._EXP.get_param_value(f"detector_rot{dim}") for dim in [1, 2, 3]]
+        _y0 = self._EXP.get_param_value("detector_poni1")
+        _x0 = self._EXP.get_param_value("detector_poni2")
+        _z0 = self._EXP.get_param_value("detector_dist")
         _rot = pyfai_rot_matrix(*_theta)
         # the center is found by *subtracting* the rotation of the 0-position with
         # respect to the poni (because pyFAI geometry moves the detector)
@@ -132,8 +135,8 @@ class PydidasPositionInfo(PositionInfo):
         _beam_center *= abs(_z0 / _beam_center[2])
         self._beam_center = (_beam_center[0], _beam_center[1], _z0)
         self._pixelsize = (
-            DIFFRACTION_EXP.get_param_value("detector_pxsizex") * 1e-6,
-            DIFFRACTION_EXP.get_param_value("detector_pxsizey") * 1e-6,
+            self._EXP.get_param_value("detector_pxsizex") * 1e-6,
+            self._EXP.get_param_value("detector_pxsizey") * 1e-6,
         )
 
     def _plotEvent(self, event):
@@ -227,7 +230,7 @@ class PydidasPositionInfo(PositionInfo):
         tuple
             The tuple with the polar q, chi coordinates.
         """
-        _lambda = DIFFRACTION_EXP.get_param_value("xray_wavelength") * 1e-10
+        _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
         _2theta, _chi = self.pixel_to_cs_2theta_chi(x_pix, y_pix)
         _q = (4 * np.pi / _lambda) * np.sin(_2theta * np.pi / 180 / 2) * 1e-9
         return (_q, _chi)

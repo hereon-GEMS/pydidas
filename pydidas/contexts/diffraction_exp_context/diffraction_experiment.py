@@ -313,6 +313,21 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
         self.sig_params_changed.emit()
 
+    @property
+    def beamcenter(self):
+        """
+        Get the beamcenter in detector pixel coordinates.
+
+        Returns
+        -------
+        center_x : float
+            The beamcenter x coordinate (in pixels).
+        center_y : float
+            The beamcenter y coordinate (in pixels).
+        """
+        _f2d = self.as_fit2d_geometry_values()
+        return _f2d["center_x"], _f2d["center_y"]
+
     def as_fit2d_geometry_values(self):
         """
         Get the DiffractionExperiment configuration as values in Fit2D geometry.

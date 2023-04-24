@@ -63,6 +63,7 @@ Improvements
   easy conversion to and from pyFAI.
 - Added a signal to the DiffractionExperiment which is emitted when any of its
   Parameters are updated.
+- Added a beamcenter property to the DiffractionExperiment.
 
 Bugfixes
 --------

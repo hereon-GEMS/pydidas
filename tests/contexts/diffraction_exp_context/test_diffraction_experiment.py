@@ -231,6 +231,26 @@ class TestDiffractionExperiment(unittest.TestCase):
         _f2d = obj.as_fit2d_geometry_values()
         self.assertIsInstance(_f2d, dict)
 
+    def test_beamcenter__not_set(self):
+        obj = self.prepare_context_with_Eiger()
+        _cx, _cy = obj.beamcenter
+        self.assertEqual(_cx, 0)
+        self.assertEqual(_cy, 0)
+
+    def test_beamcenter__set(self):
+        obj = self.prepare_context_with_Eiger()
+        _cx = 1248
+        _cy = 1369.75
+        obj.set_param_value(
+            "detector_poni1", _cy * obj.get_param_value("detector_pxsizex") * 1e-6
+        )
+        obj.set_param_value(
+            "detector_poni2", _cx * obj.get_param_value("detector_pxsizey") * 1e-6
+        )
+        _cx_calc, _cy_calc = obj.beamcenter
+        self.assertAlmostEqual(_cx, _cx_calc, 8)
+        self.assertAlmostEqual(_cy, _cy_calc, 8)
+
 
 if __name__ == "__main__":
     unittest.main()

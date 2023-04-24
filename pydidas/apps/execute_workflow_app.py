@@ -213,10 +213,11 @@ class ExecuteWorkflowApp(BaseApp):
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker
             _error = (
-                "The defined buffer is too small. The required memory "
-                f"per diffraction image is {_req_mem_per_dataset:.3f} "
-                f"MB and {_n_worker} workers have been defined. The "
-                f"minimum buffer size must be {_min_buffer:.2f} MB."
+                "The defined buffer is too small. The required memory per diffraction "
+                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
+                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
+                "\nPlease update the buffer size or change number of workers in the "
+                "global settings."
             )
             raise UserConfigError(_error)
         self._config["buffer_n"] = min(

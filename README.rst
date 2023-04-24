@@ -81,9 +81,13 @@ Pydidas can also be cited by its DOI on zenodo: 10.5281/zenodo.7568392 |zenodo_D
 License
 -------
 
-pydidas is released under the GNU General Public License Version 3. A copy
-of the full license is provided with the pydidas. For more information on the
-individual files, please refer to the LICENSE.md file.
-
+The pydidas source code is released under the GNU General Public License 
+Version 3. 
+The documentation is licensed under the Creative Commons Attribution 4.0 
+International Public License (CC-BY-4.0). 
+Images and logos are licensed under Creative Commons Attribution-NoDerivatives 
+4.0 International Public License (CC-BY-ND-4.0).
+Insignificant files (e.g. changelog) are released under the CC0 1.0 Universal
+Public Domain Dedication (CC0-1.0).
 
 .. |zenodo_DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.7568611.svg

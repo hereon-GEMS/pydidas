@@ -30,6 +30,7 @@ __all__ = ["DiffractionExperiment"]
 
 import numpy as np
 import pyFAI
+from qtpy import QtCore
 
 from ...core import (
     ObjectWithParameterCollection,
@@ -37,7 +38,7 @@ from ...core import (
     get_generic_param_collection,
 )
 from ...core.constants import LAMBDA_IN_A_TO_E
-from ...core.utils import NoPrint
+from ...core.utils import NoPrint, SignalBlocker
 from .diffraction_experiment_io import DiffractionExperimentIo
 
 
@@ -69,6 +70,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         "detector_rot2",
         "detector_rot3",
     )
+    sig_params_changed = QtCore.Signal()
 
     def __init__(self, *args, **kwargs):
         ObjectWithParameterCollection.__init__(self)
@@ -105,6 +107,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             self.params["xray_energy"].value = LAMBDA_IN_A_TO_E / value
         else:
             self.params.set_value(param_key, value)
+        self.sig_params_changed.emit()
 
     def get_detector(self):
         """
@@ -180,11 +183,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             raise UserConfigError(
                 f"The detector name '{det_name}' is unknown to pyFAI."
             )
-        self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
-        self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
-        self.set_param_value("detector_npixy", _det.max_shape[0])
-        self.set_param_value("detector_npixx", _det.max_shape[1])
-        self.set_param_value("detector_name", _det.name)
+        with SignalBlocker(self):
+            self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
+            self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
+            self.set_param_value("detector_npixy", _det.max_shape[0])
+            self.set_param_value("detector_npixx", _det.max_shape[1])
+            self.set_param_value("detector_name", _det.name)
+        self.sig_params_changed.emit()
 
     def update_from_diffraction_exp(self, diffraction_exp):
         """
@@ -198,8 +203,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         diffraction_exp : DiffractionExperiment
             The other DiffractionExperiment from which the Parameters should be taken.
         """
-        for _key, _val in diffraction_exp.get_param_values_as_dict().items():
-            self.set_param_value(_key, _val)
+        with SignalBlocker(self):
+            for _key, _val in diffraction_exp.get_param_values_as_dict().items():
+                self.set_param_value(_key, _val)
+        self.sig_params_changed.emit()
 
     def update_from_pyfai_geometry(self, geometry):
         """
@@ -210,21 +217,23 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         geometry : pyFAI.geometry.Geometry
             The geometry to be used.
         """
-        for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
-            self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
-        if geometry.detector.name in pyFAI.detectors.Detector.registry:
-            self.set_detector_params_from_name(geometry.detector.name)
-        else:
-            _det = geometry.detector
-            if _det.pixel1 is not None:
-                self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
-            if _det.pixel2 is not None:
-                self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
-            if _det.max_shape is not None:
-                self.set_param_value("detector_npixy", _det.max_shape[0])
-                self.set_param_value("detector_npixx", _det.max_shape[1])
-            if [_det.pixel1, _det.pixel2, _det.max_shape] != [None, None, None]:
-                self.set_param_value("detector_name", _det.name)
+        with SignalBlocker(self):
+            for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
+                self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
+            if geometry.detector.name in pyFAI.detectors.Detector.registry:
+                self.set_detector_params_from_name(geometry.detector.name)
+            else:
+                _det = geometry.detector
+                if _det.pixel1 is not None:
+                    self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
+                if _det.pixel2 is not None:
+                    self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
+                if _det.max_shape is not None:
+                    self.set_param_value("detector_npixy", _det.max_shape[0])
+                    self.set_param_value("detector_npixx", _det.max_shape[1])
+                if [_det.pixel1, _det.pixel2, _det.max_shape] != [None, None, None]:
+                    self.set_param_value("detector_name", _det.name)
+        self.sig_params_changed.emit()
 
     def import_from_file(self, filename):
         """
@@ -235,7 +244,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
+        with SignalBlocker(self):
+            DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
+        self.sig_params_changed.emit()
 
     def export_to_file(self, filename, overwrite=False):
         """
@@ -297,8 +308,10 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     detector=self.get_detector(),
                 )
             )
-        for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
-            self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
+        with SignalBlocker(self):
+            for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
+                self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
+        self.sig_params_changed.emit()
 
     def as_fit2d_geometry_values(self):
         """

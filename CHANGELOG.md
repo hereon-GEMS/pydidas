@@ -61,6 +61,8 @@ Improvements
 - Added 'get_pyfai_geometry', 'update_from_pyfai_geometry' and 
   'as_fit2d_geometry_values' methods to the DiffractionExperiment class for 
   easy conversion to and from pyFAI.
+- Added a signal to the DiffractionExperiment which is emitted when any of its
+  Parameters are updated.
 
 Bugfixes
 --------

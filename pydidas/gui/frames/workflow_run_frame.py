@@ -1,9 +1,11 @@
-# This file is part of pydidas.
+# This file is part of pydidas
+#
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the WorkflowRunFrame which allows to run the full
@@ -19,8 +21,8 @@ processing workflow and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowRunFrame"]
@@ -86,9 +88,6 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
         self._widgets["plot2d"].sig_get_more_info_for_data.connect(
             self._widgets["result_selector"].show_info_popup
-        )
-        self.sig_this_frame_activated.connect(
-            self._widgets["plot2d"]._positionWidget.update_exp_setup_params
         )
 
     def finalize_ui(self):

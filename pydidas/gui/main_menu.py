@@ -659,6 +659,12 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
+        _reply = QuestionBox(
+            "Exit confirmation", "Do you want to close the pydidas window?"
+        ).exec_()
+        if not _reply:
+            event.ignore()
+            return
         self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
         self.sig_close_main_window.emit()
         event.accept()

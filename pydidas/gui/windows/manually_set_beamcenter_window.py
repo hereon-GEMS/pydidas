@@ -61,8 +61,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         "hdf5_frame",
         "beamcenter_x",
         "beamcenter_y",
-        "detector_tilt_angle",
-        "detector_tilt_plane",
     )
 
     sig_selected_beamcenter = QtCore.Signal(float, float)
@@ -114,6 +112,16 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             width_text=CONFIG_WIDGET_WIDTH - 130,
             width_unit=30,
         )
+        self.create_line(None, parent_widget=self._widgets["left_container"])
+        self.create_label(
+            "label_title",
+            "Input image:",
+            fontsize=STANDARD_FONT_SIZE + 1,
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            parent_widget=self._widgets["left_container"],
+            underline=True,
+        )
+
         self.add_any_widget(
             "image_selection",
             SelectImageFrameWidget(
@@ -165,7 +173,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         Build the frame and create all widgets.
         """
         self._widgets["image_selection"].sig_file_valid.connect(
-            self._toggle_file_selected
+            self._toggle_filename_valid
         )
         self._widgets["image_selection"].sig_new_file_selection.connect(
             self._selected_new_file
@@ -186,7 +194,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         Finalize the user interface.
         """
 
-    def _toggle_file_selected(self, is_selected):
+    @QtCore.Slot(bool)
+    def _toggle_filename_valid(self, is_selected):
         """
         Modify widgets visibility and activation based on the file selection.
 

@@ -48,7 +48,7 @@ class WidgetWithParameterCollection(
     methods.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **kwargs):
         self.params = ParameterCollection()
         self._config = {}
         QtWidgets.QWidget.__init__(self, parent)
@@ -58,3 +58,4 @@ class WidgetWithParameterCollection(
         CreateWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
+        apply_qt_properties(self, **kwargs)

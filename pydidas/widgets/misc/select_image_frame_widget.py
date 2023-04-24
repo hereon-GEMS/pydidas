@@ -36,7 +36,6 @@ from ...core import UserConfigError
 from ...core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
-    STANDARD_FONT_SIZE,
 )
 from ...core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
 from ...data_io import IoMaster
@@ -54,9 +53,9 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
     sig_file_valid = QtCore.Signal(bool)
 
     def __init__(self, *input_params, parent=None, import_reference=None, **kwargs):
-        WidgetWithParameterCollection.__init__(self, parent)
+        WidgetWithParameterCollection.__init__(self, parent, **kwargs)
         self.add_params(*input_params)
-
+        _width = kwargs.get("widget_width", CONFIG_WIDGET_WIDTH)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -64,27 +63,22 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             formats=IoMaster.get_string_of_formats(),
             qsettings_ref=import_reference,
         )
-
-        self.setFixedWidth(CONFIG_WIDGET_WIDTH)
         _button_params = dict(
-            fixedWidth=CONFIG_WIDGET_WIDTH,
+            fixedWidth=_width,
             fixedHeight=25,
         )
         _param_config = dict(
             visible=False,
-            width_total=CONFIG_WIDGET_WIDTH,
+            width_total=_width,
             width_io=100,
-            width_text=CONFIG_WIDGET_WIDTH - 130,
+            width_text=_width - 130,
             width_unit=30,
         )
-        self.create_label(
-            "label_title",
-            "Input file",
-            fontsize=STANDARD_FONT_SIZE + 1,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            bold=True,
+        _twoline_param_config = DEFAULT_TWO_LINE_PARAM_CONFIG.copy() | dict(
+            width_total=_width,
+            width_io=_width - 50,
+            width_text=_width - 20,
         )
-
         self.create_button(
             "but_open",
             "Select image file",
@@ -93,21 +87,18 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         )
         self.create_param_widget(
             self.get_param("filename"),
-            **(
-                DEFAULT_TWO_LINE_PARAM_CONFIG
-                | dict(persistent_qsettings_ref=import_reference)
-            ),
+            **(_twoline_param_config | dict(persistent_qsettings_ref=import_reference)),
         )
         self.create_param_widget(
             self.get_param("hdf5_key"),
-            **(DEFAULT_TWO_LINE_PARAM_CONFIG | dict(visible=False)),
+            **(_twoline_param_config | dict(visible=False)),
         )
         self.create_param_widget(
             self.get_param("hdf5_frame"), **(_param_config | dict(width_unit=0))
         )
         self.create_button(
             "but_confirm_file",
-            "Confirm file selection",
+            "Confirm input selection",
             **_button_params,
             visible=False,
         )
@@ -123,8 +114,9 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         Open the image selected through the filename.
         """
         _fname = self.__import_dialog.get_user_response()
-        self.set_param_value_and_widget("filename", _fname)
-        self.process_new_filename_input(_fname)
+        if _fname is not None:
+            self.set_param_value_and_widget("filename", _fname)
+            self.process_new_filename_input(_fname)
 
     @QtCore.Slot(str)
     def process_new_filename_input(self, filename):

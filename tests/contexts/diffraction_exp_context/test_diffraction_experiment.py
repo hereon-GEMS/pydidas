@@ -41,6 +41,15 @@ from pydidas.core import UserConfigError
 logger = logging.getLogger("pyFAI.detectors._common")
 logger.setLevel(logging.CRITICAL)
 
+_pyfai_geo_params = {
+    "rot1": 12e-5,
+    "rot2": 24e-4,
+    "rot3": 0.421,
+    "dist": 0.654,
+    "poni1": 0.1,
+    "poni2": 0.32,
+}
+
 
 class TestDiffractionExperiment(unittest.TestCase):
     @classmethod
@@ -117,6 +126,15 @@ class TestDiffractionExperiment(unittest.TestCase):
         self.assertEqual(_det.pixel1, 1e-6 * _pixelsize)
         self.assertEqual(_det.pixel2, 1e-6 * _pixelsize)
 
+    def test_as_pyfai_geometry(self):
+        obj = self.prepare_context_with_Eiger()
+        for _key, _val in _pyfai_geo_params.items():
+            obj.set_param_value(f"detector_{_key}", _val)
+        _geo = obj.as_pyfai_geometry()
+        self.assertIsInstance(_geo, pyFAI.geometry.Geometry)
+        for _key, _val in _pyfai_geo_params.items():
+            self.assertEqual(getattr(_geo, _key), _val)
+
     def test_set_detector_params_from_name__wrong_name(self):
         obj = DiffractionExperimentContext()
         with self.assertRaises(UserConfigError):
@@ -132,6 +150,52 @@ class TestDiffractionExperiment(unittest.TestCase):
                 self.assertAlmostEqual(_val, _exp.get_param_value(_key), delta=0.000001)
             else:
                 self.assertEqual(_val, _exp.get_param_value(_key))
+
+    def test_update_from_pyfai_geometry__no_detector(self):
+        obj = DiffractionExperimentContext()
+        obj.set_param_value("detector_name", "Eiger 9M")
+        _geo = pyFAI.geometry.Geometry()
+        for _key, _val in _pyfai_geo_params.items():
+            setattr(_geo, _key, _val)
+        obj.update_from_pyfai_geometry(_geo)
+        for _key, _val in _pyfai_geo_params.items():
+            self.assertEqual(obj.get_param_value(f"detector_{_key}"), _val)
+        self.assertEqual(obj.get_param_value("detector_name"), "Eiger 9M")
+
+    def test_update_from_pyfai_geometry__custom_detector(self):
+        obj = DiffractionExperimentContext()
+        _det = pyFAI.detectors.Detector(
+            pixel1=12e-6, pixel2=24e-6, max_shape=(1234, 567)
+        )
+        _det.aliases = ["Dummy"]
+        _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector=_det)
+        obj.update_from_pyfai_geometry(_geo)
+        for _key, _val in _pyfai_geo_params.items():
+            self.assertEqual(obj.get_param_value(f"detector_{_key}"), _val)
+        for _key, _val in [
+            ["pxsizex", _det.pixel2 * 1e6],
+            ["pxsizey", _det.pixel1 * 1e6],
+            ["npixx", _det.max_shape[1]],
+            ["npixy", _det.max_shape[0]],
+            ["name", "Dummy"],
+        ]:
+            self.assertEqual(obj.get_param_value(f"detector_{_key}"), _val)
+
+    def test_update_from_pyfai_geometry__generic_detector(self):
+        obj = DiffractionExperimentContext()
+        _geo = pyFAI.geometry.Geometry(**_pyfai_geo_params, detector="Eiger 9M")
+        _det = pyFAI.detector_factory("Eiger 9M")
+        obj.update_from_pyfai_geometry(_geo)
+        for _key, _val in _pyfai_geo_params.items():
+            self.assertEqual(obj.get_param_value(f"detector_{_key}"), _val)
+        for _key, _val in [
+            ["pxsizex", _det.pixel2 * 1e6],
+            ["pxsizey", _det.pixel1 * 1e6],
+            ["npixx", _det.max_shape[1]],
+            ["npixy", _det.max_shape[0]],
+            ["name", "Eiger 9M"],
+        ]:
+            self.assertEqual(obj.get_param_value(f"detector_{_key}"), _val)
 
     def test_set_detector_params_from_name(self):
         _det = {"name": "Pilatus 300k", "pixsize": 172, "npixx": 487, "npixy": 619}
@@ -162,17 +226,10 @@ class TestDiffractionExperiment(unittest.TestCase):
         )
         self.assert_beamcenter_okay(obj)
 
-    def test_set_beamcenter_from_points_on_circle(self):
+    def test_as_fit2d_geometry_values(self):
         obj = self.prepare_context_with_Eiger()
-        r = 300
-        _dist = 0.234
-        phi = np.r_[[0, 1, 3, 5]]
-        _xpoints = self._xpos + r * np.cos(phi)
-        _ypoints = self._ypos + r * np.sin(phi)
-        obj.set_beamcenter_from_points_on_circle(_xpoints, _ypoints, _dist)
-        self.assertAlmostEqual(obj.get_param_value("detector_poni1"), self._ypos_abs, 3)
-        self.assertAlmostEqual(obj.get_param_value("detector_poni2"), self._xpos_abs, 3)
-        self.assertAlmostEqual(obj.get_param_value("detector_dist"), _dist, 6)
+        _f2d = obj.as_fit2d_geometry_values()
+        self.assertIsInstance(_f2d, dict)
 
 
 if __name__ == "__main__":

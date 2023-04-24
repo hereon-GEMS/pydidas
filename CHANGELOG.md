@@ -58,7 +58,9 @@ Improvements
 - Added a window to manually fit and set the beamcenter position.
 - The 'Define diffraction setup' frame now has an option to set the beamcenter
   manually.
-
+- Added 'get_pyfai_geometry', 'update_from_pyfai_geometry' and 
+  'as_fit2d_geometry_values' methods to the DiffractionExperiment class for 
+  easy conversion to and from pyFAI.
 
 Bugfixes
 --------

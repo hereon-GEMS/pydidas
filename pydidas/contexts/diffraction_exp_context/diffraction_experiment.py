@@ -28,8 +28,6 @@ __status__ = "Development"
 __all__ = ["DiffractionExperiment"]
 
 
-from collections.abc import Iterable
-
 import numpy as np
 import pyFAI
 
@@ -39,15 +37,16 @@ from ...core import (
     get_generic_param_collection,
 )
 from ...core.constants import LAMBDA_IN_A_TO_E
-from ...core.utils import NoPrint, fit_circle_from_points
+from ...core.utils import NoPrint
 from .diffraction_experiment_io import DiffractionExperimentIo
 
 
 class DiffractionExperiment(ObjectWithParameterCollection):
     """
-    Class which holds experimental settings. This class must only be
-    instanciated through its factory, therefore guaranteeing that only a
-    single instance exists.
+    Class which holds experimental settings for diffraction experiments.
+
+    This class must be used with care. Usually, the unique DiffractionExperimentContext
+    should be used to access the active instance.
 
     The singleton factory will allow access to the single instance through
     :py:class:`
@@ -139,6 +138,25 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             setattr(_det, key, value)
         return _det
 
+    def as_pyfai_geometry(self):
+        """
+        Get an equivalent pyFAI Geometry object.
+
+        Returns
+        -------
+        pyFAI.geometry.Geometry :
+            The pyFAI geometry object corresponding to the DiffractionExperiment config.
+        """
+        return pyFAI.geometry.Geometry(
+            dist=self.get_param_value("detector_dist"),
+            poni1=self.get_param_value("detector_poni1"),
+            poni2=self.get_param_value("detector_poni2"),
+            rot1=self.get_param_value("detector_rot1"),
+            rot2=self.get_param_value("detector_rot2"),
+            rot3=self.get_param_value("detector_rot3"),
+            detector=self.get_detector(),
+        )
+
     def set_detector_params_from_name(self, det_name):
         """
         Set the detector parameters based on a detector name.
@@ -182,6 +200,31 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         """
         for _key, _val in diffraction_exp.get_param_values_as_dict().items():
             self.set_param_value(_key, _val)
+
+    def update_from_pyfai_geometry(self, geometry):
+        """
+        Update this DiffractionExperiment from a pyFAI geometry.
+
+        Parameters
+        ----------
+        geometry : pyFAI.geometry.Geometry
+            The geometry to be used.
+        """
+        for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
+            self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
+        if geometry.detector.name in pyFAI.detectors.Detector.registry:
+            self.set_detector_params_from_name(geometry.detector.name)
+        else:
+            _det = geometry.detector
+            if _det.pixel1 is not None:
+                self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
+            if _det.pixel2 is not None:
+                self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
+            if _det.max_shape is not None:
+                self.set_param_value("detector_npixy", _det.max_shape[0])
+                self.set_param_value("detector_npixx", _det.max_shape[1])
+            if [_det.pixel1, _det.pixel2, _det.max_shape] != [None, None, None]:
+                self.set_param_value("detector_name", _det.name)
 
     def import_from_file(self, filename):
         """
@@ -257,22 +300,22 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
             self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
 
-    def set_beamcenter_from_points_on_circle(self, xpoints, ypoints, det_dist):
+    def as_fit2d_geometry_values(self):
         """
-        Calculate the beamcenter from a number of given points.
+        Get the DiffractionExperiment configuration as values in Fit2D geometry.
 
-        Parameters
-        ----------
-        xpoints : Union[collections.abc.Iterable, np.ndarray]
-            The x-coordinates of the selected points.
-        ypoints : Union[collections.abc.Iterable, np.ndarray]
-            The y-coordinates of the selected points.
-        det_dist : float
-            The specified detector distance in m.
+        Returns
+        -------
+        dict :
+            The geometry in Fit2D nomenclature with center_x, center_y, det_dist,
+            tilt and tilt_plane keys.
         """
-        if isinstance(xpoints, Iterable):
-            xpoints = np.asarray(xpoints)
-        if isinstance(ypoints, Iterable):
-            ypoints = np.asarray(ypoints)
-        _cx, _cy, _ = fit_circle_from_points(xpoints, ypoints)
-        self.set_beamcenter_from_fit2d_params(_cx, _cy, det_dist)
+        _geo = self.as_pyfai_geometry()
+        _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
+        return {
+            "center_x": _f2d_geo.centerX,
+            "center_y": _f2d_geo.centerY,
+            "det_dist": _f2d_geo.directDist,
+            "tilt": _f2d_geo.tilt,
+            "tilt_plane": _f2d_geo.tiltPlanRotation,
+        }

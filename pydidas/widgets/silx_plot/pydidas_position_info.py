@@ -65,6 +65,7 @@ class PydidasPositionInfo(PositionInfo):
         self._beam_center = (0, 0, 0.1)
         self._pixelsize = (100e-6, 100e-6)
         self.update_coordinate_labels()
+        self.update_exp_setup_params()
 
     @QtCore.Slot(str)
     def new_coordinate_system(self, cs_name):

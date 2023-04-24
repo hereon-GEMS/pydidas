@@ -86,7 +86,9 @@ Bugfixes
   signal prematurely which created an infinite loop.
 - Fixed an issue with PydidasPlot2D when not using the singleton 
   DiffractionExperimentContext.
-
+- Fixed an issue where the PydidasPositionInfo widget in plots would always
+  reference the DiffractionExperimentContext
+  
 
 =======
 v23.3.9

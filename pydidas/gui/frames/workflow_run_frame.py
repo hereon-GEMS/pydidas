@@ -87,6 +87,9 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         self._widgets["plot2d"].sig_get_more_info_for_data.connect(
             self._widgets["result_selector"].show_info_popup
         )
+        self.sig_this_frame_activated.connect(
+            self._widgets["plot2d"]._positionWidget.update_exp_setup_params
+        )
 
     def finalize_ui(self):
         """

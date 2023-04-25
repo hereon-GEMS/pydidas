@@ -64,6 +64,8 @@ Improvements
 - Added a signal to the DiffractionExperiment which is emitted when any of its
   Parameters are updated.
 - Added a beamcenter property to the DiffractionExperiment.
+- Added methods to get the radial range in 2theta, r, and Q to the 
+  pyFAIíntegrationBase plugin.
 
 Bugfixes
 --------

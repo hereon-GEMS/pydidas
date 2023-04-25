@@ -92,7 +92,6 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         super().__init__(*args, **kwargs)
         self._ais = []
         self._dataset_info = {}
-        self.params["rad_unit"].choices = ["Q / nm^-1", "2theta / deg", "r / mm"]
 
     def pre_execute(self):
         """

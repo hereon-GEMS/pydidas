@@ -42,7 +42,7 @@ GENERIC_PARAMS_PYFAI = {
         "type": str,
         "default": "2theta / deg",
         "name": "Radial unit",
-        "choices": ["Q / nm^-1", "Q / A^-1", "2theta / deg", "2theta / rad"],
+        "choices": ["Q / nm^-1", "r / mm", "2theta / deg"],
         "unit": "",
         "allow_None": False,
         "tooltip": "The unit and type of the azimuthal profile.",

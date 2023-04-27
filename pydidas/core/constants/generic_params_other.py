@@ -28,6 +28,7 @@ __status__ = "Development"
 __all__ = ["GENERIC_PARAMS_OTHER"]
 
 
+from .colors import PYDIDAS_COLORS
 from .unicode_greek_letters import GREEK_ASCII_TO_UNI
 
 GENERIC_PARAMS_OTHER = {
@@ -580,6 +581,15 @@ GENERIC_PARAMS_OTHER = {
             "The axis which is to be used as the second axis in the "
             "plot of the results."
         ),
+    },
+    "marker_color": {
+        "type": str,
+        "default": "orange",
+        "name": "Plot marker color",
+        "choices": list(PYDIDAS_COLORS.keys()),
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "Set the display color for the markers of selected points.",
     },
     #######################
     # Plugin data selection

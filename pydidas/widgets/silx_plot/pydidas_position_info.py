@@ -181,7 +181,7 @@ class PydidasPositionInfo(PositionInfo):
         _x_rel = (x_pix - self._beam_center[1]) * self._pixelsize[0]
         _y_rel = (y_pix - self._beam_center[0]) * self._pixelsize[1]
         _r = ((_x_rel) ** 2 + (_y_rel) ** 2) ** 0.5 * 1e3
-        _chi = get_chi_from_x_and_y(_x_rel, _y_rel)
+        _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
         return (_r, _chi)
 
     def pixel_to_cs_2theta_chi(self, x_pix, y_pix):
@@ -204,7 +204,7 @@ class PydidasPositionInfo(PositionInfo):
         _y_rel = (y_pix - self._beam_center[0]) * self._pixelsize[1]
         _r = (_x_rel**2 + _y_rel**2) ** 0.5
         _2theta = np.arctan(_r / self._beam_center[2]) * 180 / np.pi
-        _chi = get_chi_from_x_and_y(_x_rel, _y_rel)
+        _chi = get_chi_from_x_and_y(_x_rel, _y_rel) * 180 / np.pi
         return (_2theta, _chi)
 
     def pixel_to_cs_q_chi(self, x_pix, y_pix):

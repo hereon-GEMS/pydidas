@@ -472,3 +472,41 @@ class pyFAIintegrationBase(ProcPlugin):
             _low = 180 / np.pi * np.arctan(_low * 1e-3 / _dist)
             _high = 180 / np.pi * np.arctan(_high * 1e-3 / _dist)
         return _low * _factor, _high * _factor
+
+    def convert_radial_range_values(self, from_unit, to_unit):
+        """
+        Convert and store the radial range values from the given unit to the given unit.
+
+        Parameters
+        ----------
+        from_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
+            The previous unit.
+        to_unit : Literal["2theta / deg", "Q / nm^-1", "r / mm"]
+            The new unit.
+        """
+        if from_unit == to_unit:
+            return
+        _low = self.get_param_value("rad_range_lower")
+        _high = self.get_param_value("rad_range_upper")
+        _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
+        _dist = self._EXP.get_param_value("detector_dist") * 1e3
+        if from_unit == "2theta / deg" and to_unit == "Q / nm^-1":
+            _low = (4 * np.pi / _lambda) * np.sin(_low * np.pi / 180 / 2) * 1e-9
+            _high = (4 * np.pi / _lambda) * np.sin(_high * np.pi / 180 / 2) * 1e-9
+        elif from_unit == "2theta / deg" and to_unit == "r / mm":
+            _low = _dist * np.tan(_low * np.pi / 180)
+            _high = _dist * np.tan(_high * np.pi / 180)
+        elif from_unit == "Q / nm^-1" and to_unit == "2theta / deg":
+            _low = 180 / np.pi * 2 * np.arcsin(1e9 * _low * _lambda / 4 / np.pi)
+            _high = 180 / np.pi * 2 * np.arcsin(1e9 * _high * _lambda / 4 / np.pi)
+        elif from_unit == "Q / nm^-1" and to_unit == "r / mm":
+            _low = _dist * np.tan(2 * np.arcsin(1e9 * _low * _lambda / 4 / np.pi))
+            _high = _dist * np.tan(2 * np.arcsin(1e9 * _high * _lambda / 4 / np.pi))
+        elif from_unit == "r / mm" and to_unit == "2theta / deg":
+            _low = 180 / np.pi * np.arctan(_low / _dist)
+            _high = 180 / np.pi * np.arctan(_high / _dist)
+        elif from_unit == "r / mm" and to_unit == "Q / nm^-1":
+            _low = (4 * np.pi / _lambda) * np.sin(np.arctan(_low / _dist) / 2) * 1e-9
+            _high = (4 * np.pi / _lambda) * np.sin(np.arctan(_high / _dist) / 2) * 1e-9
+        self.set_param_value("rad_range_lower", _low)
+        self.set_param_value("rad_range_upper", _high)

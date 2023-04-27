@@ -55,6 +55,16 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         EXP.set_param_value("detector_pxsizey", cls._det_pxsize)
         cls._lambda = 1
         EXP.set_param_value("xray_wavelength", cls._lambda)
+        cls._test_vals_low = {
+            "2theta": 12,
+            "q": 4e-9 * np.pi / (cls._lambda * 1e-10) * np.sin(12 / 2 * np.pi / 180),
+            "r": 1e3 * cls._det_dist * np.tan(12 * np.pi / 180),
+        }
+        cls._test_vals_high = {
+            "2theta": 25,
+            "q": 4e-9 * np.pi / (cls._lambda * 1e-10) * np.sin(25 / 2 * np.pi / 180),
+            "r": 1e3 * cls._det_dist * np.tan(25 * np.pi / 180),
+        }
 
     def setUp(self):
         self._temppath = tempfile.mkdtemp()
@@ -173,7 +183,6 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
             azi_range_upper=0.2 - 360,
         )
         plugin.modulate_and_store_azi_range()
-        _range = plugin.get_azimuthal_range_native()
         _low, _high = plugin.get_azimuthal_range_native()
         self.assertAlmostEqual(_low, 0.1)
         self.assertAlmostEqual(_high, 0.2)
@@ -417,6 +426,111 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         )
         self.assertAlmostEqual(_low, _target_low)
         self.assertAlmostEqual(_high, _target_high)
+
+    def test_convert_radial_range_values__same_unit(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="2theta / deg",
+            rad_range_lower=self._test_vals_low["2theta"],
+            rad_range_upper=self._test_vals_high["2theta"],
+        )
+        plugin.convert_radial_range_values("2theta / deg", "2theta / deg")
+        self.assertEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["2theta"]
+        )
+        self.assertEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["2theta"]
+        )
+
+    def test_convert_radial_range_values__2theta_to_q(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="2theta / deg",
+            rad_range_lower=self._test_vals_low["2theta"],
+            rad_range_upper=self._test_vals_high["2theta"],
+        )
+        plugin.convert_radial_range_values("2theta / deg", "Q / nm^-1")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["q"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["q"]
+        )
+
+    def test_convert_radial_range_values__2theta_to_r(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="2theta / deg",
+            rad_range_lower=self._test_vals_low["2theta"],
+            rad_range_upper=self._test_vals_high["2theta"],
+        )
+        plugin.convert_radial_range_values("2theta / deg", "r / mm")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["r"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["r"]
+        )
+
+    def test_convert_radial_range_values__q_to_2theta(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="Q / nm^-1",
+            rad_range_lower=self._test_vals_low["q"],
+            rad_range_upper=self._test_vals_high["q"],
+        )
+        plugin.convert_radial_range_values("Q / nm^-1", "2theta / deg")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["2theta"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["2theta"]
+        )
+
+    def test_convert_radial_range_values__q_to_r(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="Q / nm^-1",
+            rad_range_lower=self._test_vals_low["q"],
+            rad_range_upper=self._test_vals_high["q"],
+        )
+        plugin.convert_radial_range_values("Q / nm^-1", "r / mm")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["r"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["r"]
+        )
+
+    def test_convert_radial_range_values__r_to_2theta(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="r / mm",
+            rad_range_lower=self._test_vals_low["r"],
+            rad_range_upper=self._test_vals_high["r"],
+        )
+        plugin.convert_radial_range_values("r / mm", "2theta / deg")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["2theta"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["2theta"]
+        )
+
+    def test_convert_radial_range_values__r_to_q(self):
+        plugin = pyFAIintegrationBase(
+            rad_use_range="Specify radial range",
+            rad_unit="r / mm",
+            rad_range_lower=self._test_vals_low["r"],
+            rad_range_upper=self._test_vals_high["r"],
+        )
+        plugin.convert_radial_range_values("r / mm", "Q / nm^-1")
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_lower"), self._test_vals_low["q"]
+        )
+        self.assertAlmostEqual(
+            plugin.get_param_value("rad_range_upper"), self._test_vals_high["q"]
+        )
 
     def test_calculate_result_shape(self):
         _range = (1234, 789)

@@ -93,6 +93,8 @@ Bugfixes
   DiffractionExperimentContext.
 - Fixed an issue where the PydidasPositionInfo widget in plots would always
   reference the DiffractionExperimentContext
+- Fixed an issue in pyFAIintegrationBase plugin when the subclass does not have
+  the radial or azimuthal ranges.
   
 
 =======

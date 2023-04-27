@@ -195,6 +195,12 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
         _range = plugin.get_azimuthal_range_native()
         self.assertIsNone(_range)
 
+    def test_get_azimuthal_range_native__no_azi_use_range_param(self):
+        plugin = pyFAIintegrationBase(azi_use_range="Full detector")
+        del plugin.params["azi_use_range"]
+        _range = plugin.get_azimuthal_range_native()
+        self.assertIsNone(_range)
+
     def test_get_azimuthal_range_native__equal_boundaries(self):
         plugin = pyFAIintegrationBase(
             azi_use_range="Specify azimuthal range",
@@ -276,6 +282,12 @@ class TestPyFaiIntegrationBase(unittest.TestCase):
 
     def test_get_radial_range__no_range(self):
         plugin = pyFAIintegrationBase(rad_use_range="Full detector")
+        _range = plugin.get_radial_range()
+        self.assertIsNone(_range)
+
+    def test_get_radial_range__no_rad_use_range_param(self):
+        plugin = pyFAIintegrationBase(rad_use_range="Full detector")
+        del plugin.params["rad_use_range"]
         _range = plugin.get_radial_range()
         self.assertIsNone(_range)
 

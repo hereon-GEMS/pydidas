@@ -37,6 +37,7 @@ __all__ = [
     "line_intersection_with_detector",
 ]
 
+import warnings
 
 import numpy as np
 from numpy import cos, sin
@@ -355,47 +356,48 @@ def line_intersection_with_detector(center, point, shape):
     _px, _py = point
     _ny, _nx = shape
     _det_cp = _cx * _py - _cy * _px
-    try:
-        _intersect_bottom_x = -_det_cp * _nx / ((_cy - _py) * (_nx))
-    except ZeroDivisionError:
-        _intersect_bottom_x = 1e9
-    _intersect_bottom_y = 0
-    _is_bottom = (np.round(_intersect_bottom_x, 2), np.round(_intersect_bottom_y, 2))
 
-    _intersect_left_x = 0
-    try:
-        _intersect_left_y = _det_cp * _ny / ((_cx - _px) * _ny)
-    except ZeroDivisionError:
-        _intersect_left_y = 1e9
-    _is_left = (np.round(_intersect_left_x, 2), np.round(_intersect_left_y, 2))
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        try:
+            _intersect_bottom_x = -_det_cp * _nx / ((_cy - _py) * (_nx))
+        except ZeroDivisionError:
+            _intersect_bottom_x = 1e9
+        _intersect_bottom_y = 0
 
-    try:
-        _intersect_top_x = ((_cx - _px) * (_ny * _nx) - _det_cp * _nx) / (
-            (_cy - _py) * _nx
-        )
-    except ZeroDivisionError:
-        _intersect_top_x = 1e9
-    _intersect_top_y = _ny
-    _is_top = (np.round(_intersect_top_x, 2), np.round(_intersect_top_y, 2))
+        _intersect_left_x = 0
+        try:
+            _intersect_left_y = _det_cp * _ny / ((_cx - _px) * _ny)
+        except ZeroDivisionError:
+            _intersect_left_y = 1e9
+        _is_left = (np.round(_intersect_left_x, 2), np.round(_intersect_left_y, 2))
 
-    _intersect_right_x = _nx
-    try:
-        _intersect_right_y = (_det_cp * _ny + (_cy - _py) * _nx * _ny) / (
-            (_cx - _px) * (_ny) + (_cy - _py) * (_nx - _nx)
-        )
-    except ZeroDivisionError:
-        _intersect_right_y = 1e9
-    _is_right = (np.round(_intersect_right_x, 2), np.round(_intersect_right_y, 2))
+        try:
+            _intersect_top_x = ((_cx - _px) * (_ny * _nx) - _det_cp * _nx) / (
+                (_cy - _py) * _nx
+            )
+        except ZeroDivisionError:
+            _intersect_top_x = 1e9
+        _intersect_top_y = _ny
+
+        _intersect_right_x = _nx
+        try:
+            _intersect_right_y = (_det_cp * _ny + (_cy - _py) * _nx * _ny) / (
+                (_cx - _px) * (_ny) + (_cy - _py) * (_nx - _nx)
+            )
+        except ZeroDivisionError:
+            _intersect_right_y = 1e9
+        _is_right = (np.round(_intersect_right_x, 2), np.round(_intersect_right_y, 2))
 
     if _py >= _cy:
         if 0 <= _intersect_top_x <= _nx and 0 <= _intersect_top_y <= _ny:
-            return _is_top
+            return np.round(_intersect_top_x, 2), np.round(_intersect_top_y, 2)
         if _px >= _cx:
             return _is_right
         return _is_left
     else:
         if 0 <= _intersect_bottom_x <= _nx and 0 <= _intersect_bottom_y <= _ny:
-            return _is_bottom
+            return np.round(_intersect_bottom_x, 2), np.round(_intersect_bottom_y, 2)
         if _px >= _cx:
             return _is_right
         return _is_left

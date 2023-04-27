@@ -457,18 +457,18 @@ class pyFAIintegrationBase(ProcPlugin):
             If no range has been set, returns None. Otherwise, the range limits are
             given as tuple.
         """
-        if not self.get_param_value("rad_use_range", False) == "Specify radial range":
+        if self.get_param_value("rad_use_range", "Full detector") == "Full detector":
             return None
-        _low = np.pi / 180 * self.get_param_value("rad_range_lower")
-        _high = np.pi / 180 * self.get_param_value("rad_range_upper")
+        _low = self.get_param_value("rad_range_lower")
+        _high = self.get_param_value("rad_range_upper")
         _unit = self.get_param_value("rad_unit")
-        _factor = 1 if unit == "rad" else 180 / np.pi
-        if unit == "Q / nm^-1":
+        _factor = np.pi / 180 if unit == "rad" else 1
+        if _unit == "Q / nm^-1":
             _lambda = self._EXP.get_param_value("xray_wavelength") * 1e-10
-            _low = 2 * np.arcsin((_low * 1e9 * _lambda) / (4 * np.pi))
-            _high = 2 * np.arcsin((_high * 1e9 * _lambda) / (4 * np.pi))
+            _low = 180 / np.pi * 2 * np.arcsin((_low * 1e9 * _lambda) / (4 * np.pi))
+            _high = 180 / np.pi * 2 * np.arcsin((_high * 1e9 * _lambda) / (4 * np.pi))
         elif _unit == "r / mm":
             _dist = self._EXP.get_param_value("detector_dist")
-            _low = np.arctan(_low * 1e-3 / _dist)
-            _high = np.arctan(_high * 1e-3 / _dist)
+            _low = 180 / np.pi * np.arctan(_low * 1e-3 / _dist)
+            _high = 180 / np.pi * np.arctan(_high * 1e-3 / _dist)
         return _low * _factor, _high * _factor

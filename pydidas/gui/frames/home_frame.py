@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["HomeFrame"]
 
+
 from qtpy import QtCore, QtSvg, QtWidgets
 
 from ...core import constants

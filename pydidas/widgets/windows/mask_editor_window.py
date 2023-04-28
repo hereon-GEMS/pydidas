@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,26 +21,27 @@ mask editor in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["MaskEditorWindow"]
+
 
 import os
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import get_generic_param_collection, UserConfigError
+from ...core import UserConfigError, get_generic_param_collection
 from ...core.constants import (
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
     CONFIG_WIDGET_WIDTH,
+    DEFAULT_TWO_LINE_PARAM_CONFIG,
     HDF5_EXTENSIONS,
 )
 from ...core.utils import get_extension, update_size_policy
 from ...data_io import import_data
-from ...widgets import dialogues, silx_plot, parameter_config
-from .pydidas_window import PydidasWindow
+from .. import dialogues, parameter_config, silx_plot
+from ..framework import PydidasWindow
 
 
 PARAM_CONFIG = dict(

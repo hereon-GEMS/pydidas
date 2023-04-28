@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the UserConfigWindow class which is a QMainWindow widget
+Module with the UserConfigWindow class which is a PydidasWindow widget
 to view and modify user-specific settings in a seperate Window.
 """
 
@@ -36,14 +36,14 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
 from ...core.constants import (
+    ALIGN_TOP_RIGHT,
     CONFIG_WIDGET_WIDTH,
     QSETTINGS_USER_KEYS,
-    ALIGN_TOP_RIGHT,
     STANDARD_FONT_SIZE,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
-from ...widgets.dialogues import AcknowledgeBox, QuestionBox
-from .pydidas_window import PydidasWindow
+from ..dialogues import AcknowledgeBox, QuestionBox
+from ..framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()

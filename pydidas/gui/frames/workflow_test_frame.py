@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrame"]
 
+
 import copy
 
 from qtpy import QtCore
@@ -40,8 +41,11 @@ from ...core import (
     utils,
 )
 from ...widgets.dialogues import WarningBox
+from ...widgets.windows import (
+    ShowDetailedPluginResultsWindow,
+    TweakPluginParameterWindow,
+)
 from ...workflow import WorkflowTree
-from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
 from .builders import WorkflowTestFrameBuilder
 
 

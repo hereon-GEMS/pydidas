@@ -49,7 +49,7 @@ from ..widgets.framework import PydidasFrameStack
 from ..workflow import WorkflowTree
 from . import utils
 from .gui_excepthook_ import gui_excepthook
-from .windows import (
+from ..widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,
     FeedbackWindow,

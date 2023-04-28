@@ -29,6 +29,7 @@ from .pydidas_imageview import *
 from .pydidas_masktools_widget import *
 from .pydidas_plot1d import *
 from .pydidas_plot2d import *
+from .pydidas_plot2d_with_integration_regions import *
 from .silx_actions import *
 from .silx_plot_stack_factory import *
 from .utilities import *
@@ -54,6 +55,11 @@ from . import pydidas_plot2d
 
 __all__.extend(pydidas_plot2d.__all__)
 del pydidas_plot2d
+
+from . import pydidas_plot2d_with_integration_regions
+
+__all__.extend(pydidas_plot2d_with_integration_regions.__all__)
+del pydidas_plot2d_with_integration_regions
 
 from . import silx_actions
 

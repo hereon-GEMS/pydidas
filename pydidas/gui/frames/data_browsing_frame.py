@@ -27,14 +27,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DataBrowsingFrame"]
 
+
 import os
 from functools import partial
 
 from qtpy import QtCore
 
-from ...data_io import IoMaster, import_data
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import get_extension
+from ...data_io import IoMaster, import_data
 from .builders import DataBrowsingFrameBuilder
 
 

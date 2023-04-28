@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowEditFrame"]
 
+
 import os
 from functools import partial
 
@@ -37,6 +38,7 @@ from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
 from ..managers import WorkflowTreeEditManager
 from .builders import WorkflowEditFrameBuilder
+
 
 TREE = WorkflowTree()
 PLUGIN_COLLECTION = PluginCollection()

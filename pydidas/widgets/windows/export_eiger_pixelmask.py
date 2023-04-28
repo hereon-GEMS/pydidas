@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,11 +21,12 @@ to store the pixel mask.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ExportEigerPixelmaskWindow"]
+
 
 import os
 from pathlib import Path
@@ -31,11 +34,11 @@ from pathlib import Path
 from qtpy import QtCore
 
 from ...core import Parameter, ParameterCollection
-from ...core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
 from ...core.constants import DEFAULT_TWO_LINE_PARAM_CONFIG
-from ...widgets.dialogues import critical_warning
+from ...core.utils.dectris_utils import store_eiger_pixel_mask_from_master_file
 from ...data_io import IoMaster
-from .pydidas_window import PydidasWindow
+from ..dialogues import critical_warning
+from ..framework import PydidasWindow
 
 
 class ExportEigerPixelmaskWindow(PydidasWindow):

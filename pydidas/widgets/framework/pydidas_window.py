@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PydidasWindowMixIn and PydidasWindowMixIn classes which can be used
-to is a QMainWindow widget and is used to extend BaseFrames to stand-alone Qt windows.
+Module with the PydidasWindowMixIn and PydidasWindow classes which can be used
+to subclass BaseFrames to stand-alone Qt windows.
 """
 
 __author__ = "Malte Storm"
@@ -38,7 +38,7 @@ from ...core.utils import (
     doc_qurl_for_window_manual,
     get_pydidas_icon_w_bg,
 )
-from ...widgets.framework import BaseFrame
+from .base_frame import BaseFrame
 
 
 class PydidasWindowMixIn:
@@ -112,7 +112,8 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         BaseFrame.__init__(self, parent, **kwargs)
         PydidasWindowMixIn.__init__(self)
         self.set_default_params()
-        self.frame_activated(self.frame_index)
+        if kwargs.get("activate_frame", True):
+            self.frame_activated(self.frame_index)
         self.setWindowIcon(get_pydidas_icon_w_bg())
         if "title" in kwargs:
             self.setWindowTitle(kwargs.get("title"))

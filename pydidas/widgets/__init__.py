@@ -36,6 +36,7 @@ from . import parameter_config
 from . import plugin_config_widgets
 from . import selection
 from . import silx_plot
+from . import windows
 from . import workflow_edit
 
 __all__.extend(
@@ -47,8 +48,9 @@ __all__.extend(
         "parameter_config",
         "plugin_config_widgets",
         "selection",
-        "workflow_edit",
         "silx_plot",
+        "windows",
+        "workflow_edit",
     ]
 )
 

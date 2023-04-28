@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ViewResultsFrame"]
 
+
 from qtpy import QtCore
 
 from ...contexts.diffraction_exp_context import DiffractionExperiment

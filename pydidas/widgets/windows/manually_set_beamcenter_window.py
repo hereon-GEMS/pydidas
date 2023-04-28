@@ -21,8 +21,8 @@ in an image to define the beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ManuallySetBeamcenterWindow"]
@@ -31,22 +31,16 @@ __all__ = ["ManuallySetBeamcenterWindow"]
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import (
-    UserConfigError,
-    get_generic_param_collection,
-)
-from ...core.constants import (
-    STANDARD_FONT_SIZE,
-    CONFIG_WIDGET_WIDTH,
-)
+from ...core import UserConfigError, get_generic_param_collection
+from ...core.constants import CONFIG_WIDGET_WIDTH, STANDARD_FONT_SIZE
 from ...core.utils import (
+    calc_points_on_ellipse,
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
-    calc_points_on_ellipse,
 )
-from ...widgets.dialogues import QuestionBox
-from ...widgets.misc import SelectImageFrameWidget, SelectPointsInImage
-from .pydidas_window import PydidasWindow
+from ..dialogues import QuestionBox
+from ..framework import PydidasWindow
+from ..misc import SelectImageFrameWidget, SelectPointsInImage
 
 
 class ManuallySetBeamcenterWindow(PydidasWindow):

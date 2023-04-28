@@ -35,7 +35,6 @@ from .image_series_operations_window import *
 from .global_settings_window import *
 from .manually_set_beamcenter_window import *
 from .mask_editor_window import *
-from .pydidas_window import *
 from .qt_paths_window import *
 from .scan_dimension_information_window import *
 from .show_detailed_plugin_results_window import *
@@ -78,11 +77,6 @@ from . import mask_editor_window
 
 __all__.extend(mask_editor_window.__all__)
 del mask_editor_window
-
-from . import pydidas_window
-
-__all__.extend(pydidas_window.__all__)
-del pydidas_window
 
 from . import qt_paths_window
 

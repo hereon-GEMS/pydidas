@@ -25,13 +25,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ScanDimensionInformationWindow"]
 
-import os
+
+from pathlib import Path
 
 from qtpy import QtCore, QtGui
 
 from ...core import constants
-from ...widgets import ScrollArea
-from .pydidas_window import PydidasWindow
+from ..framework import PydidasWindow
+from ..scroll_area import ScrollArea
 
 
 INTRO_TEXT = (
@@ -80,7 +81,7 @@ EXAMPLE_2 = (
     "programmatical scan order."
 )
 
-IMAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources")
+IMAGE_PATH = Path(__file__).parent.parent.parent.joinpath("resources", "images")
 
 
 class ScanDimensionInformationWindow(PydidasWindow):
@@ -151,7 +152,9 @@ class ScanDimensionInformationWindow(PydidasWindow):
             parent_widget=self._widgets["canvas"],
         )
 
-        _image0 = QtGui.QPixmap(os.path.join(IMAGE_PATH, "scan_scheme_with_lines.png"))
+        _image0 = QtGui.QPixmap(
+            IMAGE_PATH.joinpath("scan_scheme_with_lines.png").as_posix()
+        )
         self.create_label(
             "example_image0",
             "",
@@ -166,7 +169,9 @@ class ScanDimensionInformationWindow(PydidasWindow):
             fixedWidth=600,
             parent_widget=self._widgets["canvas"],
         )
-        _image1 = QtGui.QPixmap(os.path.join(IMAGE_PATH, "scan_scheme_with_points.png"))
+        _image1 = QtGui.QPixmap(
+            IMAGE_PATH.joinpath("scan_scheme_with_points.png").as_posix()
+        )
         self.create_label(
             "example_image1",
             "",

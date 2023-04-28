@@ -38,7 +38,7 @@ from qtpy import QtCore, QtWidgets
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
-from ..windows import ManuallySetBeamcenterWindow
+from ...widgets.windows import ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
 

@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["TweakPluginParameterWindow"]
 
+
 import copy
 
 import numpy as np
@@ -33,10 +34,10 @@ from qtpy import QtCore, QtWidgets
 
 from ...core.constants import POLICY_FIX_EXP
 from ...core.utils import ShowBusyMouse
-from ...widgets import ScrollArea
-from ...widgets.parameter_config import EditPluginParametersWidget, ParameterEditCanvas
-from ...widgets.silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
-from .pydidas_window import PydidasWindow
+from ..framework import PydidasWindow
+from ..parameter_config import EditPluginParametersWidget, ParameterEditCanvas
+from ..scroll_area import ScrollArea
+from ..silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
 from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
 

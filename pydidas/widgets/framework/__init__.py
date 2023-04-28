@@ -33,6 +33,7 @@ from .base_frame import *
 from .base_frame_with_app import *
 from .pydidas_status_widget import *
 from .pydidas_frame_stack import *
+from .pydidas_window import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -55,3 +56,8 @@ from . import pydidas_frame_stack
 
 __all__.extend(pydidas_frame_stack.__all__)
 del pydidas_frame_stack
+
+from . import pydidas_window
+
+__all__.extend(pydidas_window.__all__)
+del pydidas_window

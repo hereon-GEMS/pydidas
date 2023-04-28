@@ -66,6 +66,8 @@ Improvements
 - Added a beamcenter property to the DiffractionExperiment.
 - Added methods to get the radial range in 2theta, r, and Q to the 
   pyFAIíntegrationBase plugin.
+- Moved the windows from gui to widgets subpackage for better dependency 
+  management in Plugin configuration widgets.
 
 Bugfixes
 --------

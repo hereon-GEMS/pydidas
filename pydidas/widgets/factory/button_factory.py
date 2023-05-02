@@ -54,5 +54,8 @@ def create_button(text, **kwargs):
     _button = QPushButton(text)
     if isinstance(kwargs.get("icon", None), str):
         kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
+    if "clicked" in kwargs:
+        _method = kwargs.pop("clicked")
+        _button.clicked.connect(_method)
     apply_qt_properties(_button, **kwargs)
     return _button

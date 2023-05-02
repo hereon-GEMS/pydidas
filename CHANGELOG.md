@@ -70,6 +70,7 @@ Improvements
   management in Plugin configuration widgets.
 - Added a window to select the integration region graphically through clicking
   the boundaries in an image.
+- Updated the pyFAI integration plugin custom configuration widget.
 
 Bugfixes
 --------

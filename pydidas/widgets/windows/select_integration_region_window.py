@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Literal, Tuple
 
 import numpy as np
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, UserConfigError, get_generic_param_collection
@@ -55,6 +55,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     default_params = get_generic_param_collection(
         "filename", "hdf5_key", "hdf5_frame", "marker_color"
     )
+    sig_roi_changed = QtCore.Signal()
+    sig_about_to_close = QtCore.Signal()
 
     def __init__(self, plugin, parent=None, **kwargs):
 
@@ -559,6 +561,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         Confirm all changes made to the plugin and close the window.
         """
         self._config["closing_confirmed"] = True
+        self.sig_roi_changed.emit()
         self.close()
 
     def closeEvent(self, event):
@@ -571,6 +574,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             The closing event.
         """
         if self._config["closing_confirmed"]:
+            self.sig_about_to_close.emit()
             event.accept()
             return
         _reply = QuestionBox(
@@ -583,4 +587,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             event.ignore()
             return
         self._reset_plugin()
+        self.sig_about_to_close.emit()
         event.accept()
+
+    def show(self):
+        """
+        Overload the generic show to also update the input widgets.
+        """
+        for _key in self.param_widgets:
+            self.update_widget_value(_key, self.get_param_value(_key))
+        self._update_input_widgets()
+        self._show_integration_region()
+        QtWidgets.QWidget.show(self)

@@ -36,8 +36,8 @@ from silx.gui.plot.items import Marker, Shape
 
 from ...core.constants import PYDIDAS_COLORS
 from ...core.utils import (
-    ray_from_center_intersection_with_detector,
     get_chi_from_x_and_y,
+    ray_from_center_intersection_with_detector,
 )
 from .pydidas_plot2d import PydidasPlot2D
 

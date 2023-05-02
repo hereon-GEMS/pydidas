@@ -44,7 +44,8 @@ from pydidas.widgets.windows import SelectIntegrationRegionWindow
 
 class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
-    Subtract a background image from the data.
+    The PyfaiIntegrationConfigWidget is the custom widget to modify the Parameters for
+    pyFAI integration plugins.
     """
 
     def __init__(self, plugin, *args, **kwargs):

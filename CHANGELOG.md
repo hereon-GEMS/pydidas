@@ -68,6 +68,8 @@ Improvements
   pyFAIíntegrationBase plugin.
 - Moved the windows from gui to widgets subpackage for better dependency 
   management in Plugin configuration widgets.
+- Added a window to select the integration region graphically through clicking
+  the boundaries in an image.
 
 Bugfixes
 --------

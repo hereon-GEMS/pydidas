@@ -37,6 +37,7 @@ from .manually_set_beamcenter_window import *
 from .mask_editor_window import *
 from .qt_paths_window import *
 from .scan_dimension_information_window import *
+from .select_integration_region_window import *
 from .show_detailed_plugin_results_window import *
 from .tweak_plugin_parameter_window import *
 from .user_config_window import *
@@ -87,6 +88,11 @@ from . import scan_dimension_information_window
 
 __all__.extend(scan_dimension_information_window.__all__)
 del scan_dimension_information_window
+
+from . import select_integration_region_window
+
+__all__.extend(select_integration_region_window.__all__)
+del select_integration_region_window
 
 from . import show_detailed_plugin_results_window
 

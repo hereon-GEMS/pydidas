@@ -34,10 +34,9 @@ __all__ = [
     "fit_detector_center_and_tilt_from_points",
     "fit_circle_from_points",
     "calc_points_on_ellipse",
-    "line_intersection_with_detector",
+    "ray_from_center_intersection_with_detector",
 ]
 
-import warnings
 
 import numpy as np
 from numpy import cos, sin
@@ -318,7 +317,6 @@ def calc_points_on_ellipse(coeffs, n_points=144, tmin=0, tmax=2 * np.pi):
     bp, e, phi for values of the parametric variable t between tmin and tmax.
 
     """
-    (a, b, c, d, f, g) = coeffs
     _cx, _cy, _tilt, _tilt_angle, _axes = get_ellipse_params_from_coeffs(coeffs)
     _theta = np.linspace(tmin, tmax, num=n_points)
     _x = (
@@ -334,16 +332,16 @@ def calc_points_on_ellipse(coeffs, n_points=144, tmin=0, tmax=2 * np.pi):
     return _x, _y
 
 
-def line_intersection_with_detector(center, point, shape):
+def ray_from_center_intersection_with_detector(center, chi, shape):
     """
-    Calculate the point where a line hits the detector's edge.
+    Calculate the point where a ray from the detector center hits the detector's edge.
 
     Parameters
     ----------
     center : tuple
         The center (cx, cy) coordinates.
-    point : tuple
-        The selected point's (x, y) coordinates.
+    chi : float
+        The angle from the center point in rad.
     shape : tuple
         The detector shape (in pixels).
 
@@ -353,51 +351,31 @@ def line_intersection_with_detector(center, point, shape):
         The point on the detector frame intersecting the defined line.
     """
     _cx, _cy = center
-    _px, _py = point
     _ny, _nx = shape
-    _det_cp = _cx * _py - _cy * _px
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-        try:
-            _intersect_bottom_x = -_det_cp * _nx / ((_cy - _py) * (_nx))
-        except ZeroDivisionError:
-            _intersect_bottom_x = 1e9
-        _intersect_bottom_y = 0
-
-        _intersect_left_x = 0
-        try:
-            _intersect_left_y = _det_cp * _ny / ((_cx - _px) * _ny)
-        except ZeroDivisionError:
-            _intersect_left_y = 1e9
-        _is_left = (np.round(_intersect_left_x, 2), np.round(_intersect_left_y, 2))
-
-        try:
-            _intersect_top_x = ((_cx - _px) * (_ny * _nx) - _det_cp * _nx) / (
-                (_cy - _py) * _nx
-            )
-        except ZeroDivisionError:
-            _intersect_top_x = 1e9
-        _intersect_top_y = _ny
-
-        _intersect_right_x = _nx
-        try:
-            _intersect_right_y = (_det_cp * _ny + (_cy - _py) * _nx * _ny) / (
-                (_cx - _px) * (_ny) + (_cy - _py) * (_nx - _nx)
-            )
-        except ZeroDivisionError:
-            _intersect_right_y = 1e9
-        _is_right = (np.round(_intersect_right_x, 2), np.round(_intersect_right_y, 2))
-
-    if _py >= _cy:
-        if 0 <= _intersect_top_x <= _nx and 0 <= _intersect_top_y <= _ny:
-            return np.round(_intersect_top_x, 2), np.round(_intersect_top_y, 2)
-        if _px >= _cx:
-            return _is_right
-        return _is_left
-    else:
-        if 0 <= _intersect_bottom_x <= _nx and 0 <= _intersect_bottom_y <= _ny:
-            return np.round(_intersect_bottom_x, 2), np.round(_intersect_bottom_y, 2)
-        if _px >= _cx:
-            return _is_right
-        return _is_left
+    _px = 10 * _nx * np.cos(chi) + _cx
+    _py = 10 * _ny * np.sin(chi) + _cy
+    _xintersections = []
+    _yintersections = []
+    _dist_center = []
+    for (_x3, _x4, _y3, _y4) in [
+        [_nx, _nx, 0, _ny],
+        [_nx, 0, _ny, _ny],
+        [0, 0, _ny, 0],
+        [0, _nx, 0, 0],
+    ]:
+        _denom = (_cx - _px) * (_y3 - _y4) - (_cy - _py) * (_x3 - _x4)
+        if _denom != 0:
+            _t = ((_cx - _x3) * (_y3 - _y4) - (_cy - _y3) * (_x3 - _x4)) / _denom
+            _u = ((_cx - _x3) * (_cy - _py) - (_cy - _y3) * (_cx - _px)) / _denom
+            if 0 <= _t <= 1 and 0 <= _u <= 1:
+                _xi = np.round(_cx + _t * (_px - _cx), 5)
+                if _xi not in _xintersections:
+                    _xintersections.append(_xi)
+                    _yintersections.append(np.round(_cy + _t * (_py - _cy), 5))
+                    _dist_center.append(
+                        _t * ((_px - _cx) ** 2 + (_py - _cy) ** 2) ** 0.5
+                    )
+    if len(_dist_center) == 2 and _dist_center[1] < _dist_center[0]:
+        _xintersections = _xintersections[::-1]
+        _yintersections = _yintersections[::-1]
+    return _xintersections, _yintersections

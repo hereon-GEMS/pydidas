@@ -1,4 +1,4 @@
-# This file is part of ...
+# This file is part of pydidas
 #
 # Copyright 2021-, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ... If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the TableWithXYPositions class which is a QTableWidget with one column

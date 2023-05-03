@@ -28,6 +28,8 @@ __status__ = "Development"
 __all__ = ["ManuallySetBeamcenterWindow"]
 
 
+from pathlib import Path
+
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
@@ -38,9 +40,11 @@ from ...core.utils import (
     fit_circle_from_points,
     fit_detector_center_and_tilt_from_points,
 )
+from ...data_io import import_data
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
-from ..misc import SelectImageFrameWidget, SelectPointsInImage
+from ..misc import PointPositionTableWidget, SelectImageFrameWidget
+from ..silx_plot import PydidasPlot2D
 
 
 class ManuallySetBeamcenterWindow(PydidasWindow):
@@ -55,6 +59,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         "hdf5_frame",
         "beamcenter_x",
         "beamcenter_y",
+        "marker_color",
     )
 
     sig_selected_beamcenter = QtCore.Signal(float, float)
@@ -82,15 +87,33 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             gridPos=(0, 0, 1, 3),
         )
         self.create_empty_widget(
-            "left_container", fixedWidth=CONFIG_WIDGET_WIDTH, minimumHeight=400
+            "left_container",
+            fixedWidth=CONFIG_WIDGET_WIDTH,
+            minimumHeight=400,
+            gridPos=(1, 1, 2, 1),
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
         self.create_any_widget(
-            "selector",
-            SelectPointsInImage,
-            minimumWidth=1000,
-            minimumHeight=600,
+            "plot",
+            PydidasPlot2D,
+            PydidasPlot2D(cs_transform=False),
+            minimumWidth=700,
+            minimumHeight=700,
+            gridPos=(1, 3, 2, 1),
+            enabled=False,
+        )
+        self.create_param_widget(
+            self.get_param("marker_color"),
+            width_total=PointPositionTableWidget.container_width,
+            width_io=90,
+            width_text=120,
+            width_unit=0,
             gridPos=(1, 2, 1, 1),
+        )
+        self.add_any_widget(
+            "point_table",
+            PointPositionTableWidget(self._widgets["plot"]),
+            gridPos=(2, 2, 1, 1),
             enabled=False,
         )
         _button_params = dict(
@@ -182,6 +205,9 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             self._manual_beamcenter_update
         )
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
+        self.param_widgets["marker_color"].io_edited.connect(
+            self._widgets["point_table"].set_marker_color
+        )
 
     def finalize_ui(self):
         """
@@ -198,7 +224,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         is_selected : bool
             Flag to process.
         """
-        self._widgets["selector"].setEnabled(is_selected)
+        self._widgets["point_table"].setEnabled(is_selected)
+        self._widgets["plot"].setEnabled(is_selected)
 
     @QtCore.Slot(str, object)
     def _selected_new_file(self, filename, kwargs):
@@ -213,23 +240,25 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             The dictionary with additional parameters (hdf5 frame and dataset) for
             file opening.
         """
-        self._widgets["selector"].open_image(filename, **kwargs)
+        self._image = import_data(filename, **kwargs)
+        _path = Path(filename)
+        self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
 
     @QtCore.Slot()
     def _set_beamcenter(self):
         """
         Set the beamcenter from a single point.
         """
-        _x, _y = self._widgets["selector"].get_selected_points()
+        _x, _y = self._widgets["point_table"].points
         if _x.size != 1:
             self._toggle_beamcenter_is_set(False)
-            self._widgets["selector"].set_beamcenter_marker(None)
+            self._widgets["point_table"].remove_plot_items("beamcenter")
             raise UserConfigError(
                 "Please select exactly one point in the image to set the beamcenter "
                 "directly."
             )
-        self._widgets["selector"].set_beamcenter_marker((_x[0], _y[0]))
-        self._widgets["selector"].show_outline(None)
+        self._widgets["point_table"].set_beamcenter_marker((_x[0], _y[0]))
+        self._widgets["point_table"].remove_plot_items("beamcenter_outline")
         self.set_param_value_and_widget("beamcenter_x", _x[0])
         self.set_param_value_and_widget("beamcenter_y", _y[0])
         self._toggle_beamcenter_is_set(True)
@@ -238,34 +267,34 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         Fit the beamcenter through a circle.
         """
-        _x, _y = self._widgets["selector"].get_selected_points()
+        _x, _y = self._widgets["point_table"].points
         if _x.size < 3:
             self._toggle_beamcenter_is_set(False)
-            self._widgets["selector"].set_beamcenter_marker(None)
-            self._widgets["selector"].show_outline(None)
+            self._widgets["point_table"].remove_plot_items("beamcenter")
+            self._widgets["point_table"].remove_plot_items("beamcenter_outline")
             raise UserConfigError(
                 "Please select at least three points to fit a circle for beamcenter "
                 "determination."
             )
         _cx, _cy, _r = fit_circle_from_points(_x, _y)
-        self._widgets["selector"].set_beamcenter_marker((_cx, _cy))
+        self._widgets["point_table"].set_beamcenter_marker((_cx, _cy))
         self.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
         self.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
         self._toggle_beamcenter_is_set(True)
         _theta = np.linspace(0, 2 * np.pi, num=73, endpoint=True)
         _x = np.cos(_theta) * _r + _cx
         _y = np.sin(_theta) * _r + _cy
-        self._widgets["selector"].show_outline((_x, _y))
+        self._widgets["point_table"].show_beamcenter_outline((_x, _y))
 
     def _fit_beamcenter_ellipse(self):
         """
         Fit the beamcenter through an ellipse.
         """
-        _x, _y = self._widgets["selector"].get_selected_points()
+        _x, _y = self._widgets["point_table"].points
         if _x.size < 5:
             self._toggle_beamcenter_is_set(False)
-            self._widgets["selector"].set_beamcenter_marker(None)
-            self._widgets["selector"].show_outline(None)
+            self._widgets["point_table"].remove_plot_items("beamcenter")
+            self._widgets["point_table"].remove_plot_items("beamcenter_outline")
             raise UserConfigError(
                 "Please select at least five points to fit a fully-defined ellipse "
                 "for beamcenter determination."
@@ -277,12 +306,12 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             _tilt_plane,
             _coeffs,
         ) = fit_detector_center_and_tilt_from_points(_x, _y)
-        self._widgets["selector"].set_beamcenter_marker((_cx, _cy))
+        self._widgets["point_table"].set_beamcenter_marker((_cx, _cy))
         self.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
         self.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
         self._toggle_beamcenter_is_set(True)
         _x, _y = calc_points_on_ellipse(_coeffs)
-        self._widgets["selector"].show_outline((_x, _y))
+        self._widgets["point_table"].show_beamcenter_outline((_x, _y))
 
     def _toggle_beamcenter_is_set(self, is_set):
         """
@@ -309,8 +338,8 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         _x = self.get_param_value("beamcenter_x")
         _y = self.get_param_value("beamcenter_y")
-        self._widgets["selector"].set_beamcenter_marker((_x, _y))
-        self._widgets["selector"].show_outline(None)
+        self._widgets["point_table"].set_beamcenter_marker((_x, _y))
+        self._widgets["point_table"].remove_plot_items("beamcenter_outline")
 
     @QtCore.Slot()
     def _confirm_points(self):

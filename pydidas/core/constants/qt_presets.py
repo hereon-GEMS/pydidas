@@ -44,6 +44,7 @@ __all__ = [
     "POLICY_FIX_EXP",
     "POLICY_EXP_EXP",
     "POLICY_EXP_FIX",
+    "POLICY_MIN_MIN",
 ]
 
 import platform
@@ -102,3 +103,5 @@ POLICY_FIX_EXP = (QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
 POLICY_EXP_EXP = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
 POLICY_EXP_FIX = (QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+
+POLICY_MIN_MIN = (QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)

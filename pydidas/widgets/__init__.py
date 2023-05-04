@@ -28,6 +28,7 @@ __status__ = "Development"
 __all__ = []
 
 # import sub-packages:
+from . import controllers
 from . import dialogues
 from . import factory
 from . import framework
@@ -41,6 +42,7 @@ from . import workflow_edit
 
 __all__.extend(
     [
+        "controllers",
         "dialogues",
         "factory",
         "framework",

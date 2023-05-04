@@ -30,17 +30,12 @@ __all__ = ["ManuallySetBeamcenterWindow"]
 
 from pathlib import Path
 
-import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import UserConfigError, get_generic_param_collection
+from ...core import get_generic_param_collection
 from ...core.constants import CONFIG_WIDGET_WIDTH, STANDARD_FONT_SIZE
-from ...core.utils import (
-    calc_points_on_ellipse,
-    fit_circle_from_points,
-    fit_detector_center_and_tilt_from_points,
-)
 from ...data_io import import_data
+from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
 from ..misc import PointPositionTableWidget, SelectImageFrameWidget
@@ -104,7 +99,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_param_widget(
             self.get_param("marker_color"),
-            width_total=PointPositionTableWidget.container_width,
+            width_total=PointPositionTableWidget.widget_width,
             width_io=90,
             width_text=120,
             width_unit=0,
@@ -189,24 +184,27 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
+        self._bc_controller = ManuallySetBeamcenterController(
+            self, self._widgets["plot"], self._widgets["point_table"]
+        )
         self._widgets["image_selection"].sig_file_valid.connect(
             self._toggle_filename_valid
         )
         self._widgets["image_selection"].sig_new_file_selection.connect(
             self._selected_new_file
         )
-        self._widgets["but_set_beamcenter"].clicked.connect(self._set_beamcenter)
-        self._widgets["but_fit_circle"].clicked.connect(self._fit_beamcenter_circle)
-        self._widgets["but_fit_ellipse"].clicked.connect(self._fit_beamcenter_ellipse)
-        self.param_widgets["beamcenter_x"].io_edited.connect(
-            self._manual_beamcenter_update
+        self._widgets["but_set_beamcenter"].clicked.connect(
+            self._bc_controller.set_beamcenter_from_point
         )
-        self.param_widgets["beamcenter_y"].io_edited.connect(
-            self._manual_beamcenter_update
+        self._widgets["but_fit_circle"].clicked.connect(
+            self._bc_controller.fit_beamcenter_with_circle
+        )
+        self._widgets["but_fit_ellipse"].clicked.connect(
+            self._bc_controller.fit_beamcenter_with_ellipse
         )
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
         self.param_widgets["marker_color"].io_edited.connect(
-            self._widgets["point_table"].set_marker_color
+            self._bc_controller.set_marker_color
         )
 
     def finalize_ui(self):
@@ -245,108 +243,11 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
 
     @QtCore.Slot()
-    def _set_beamcenter(self):
-        """
-        Set the beamcenter from a single point.
-        """
-        _x, _y = self._widgets["point_table"].points
-        if _x.size != 1:
-            self._toggle_beamcenter_is_set(False)
-            self._widgets["point_table"].remove_plot_items("beamcenter")
-            raise UserConfigError(
-                "Please select exactly one point in the image to set the beamcenter "
-                "directly."
-            )
-        self._widgets["point_table"].set_beamcenter_marker((_x[0], _y[0]))
-        self._widgets["point_table"].remove_plot_items("beamcenter_outline")
-        self.set_param_value_and_widget("beamcenter_x", _x[0])
-        self.set_param_value_and_widget("beamcenter_y", _y[0])
-        self._toggle_beamcenter_is_set(True)
-
-    def _fit_beamcenter_circle(self):
-        """
-        Fit the beamcenter through a circle.
-        """
-        _x, _y = self._widgets["point_table"].points
-        if _x.size < 3:
-            self._toggle_beamcenter_is_set(False)
-            self._widgets["point_table"].remove_plot_items("beamcenter")
-            self._widgets["point_table"].remove_plot_items("beamcenter_outline")
-            raise UserConfigError(
-                "Please select at least three points to fit a circle for beamcenter "
-                "determination."
-            )
-        _cx, _cy, _r = fit_circle_from_points(_x, _y)
-        self._widgets["point_table"].set_beamcenter_marker((_cx, _cy))
-        self.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
-        self.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
-        self._toggle_beamcenter_is_set(True)
-        _theta = np.linspace(0, 2 * np.pi, num=73, endpoint=True)
-        _x = np.cos(_theta) * _r + _cx
-        _y = np.sin(_theta) * _r + _cy
-        self._widgets["point_table"].show_beamcenter_outline((_x, _y))
-
-    def _fit_beamcenter_ellipse(self):
-        """
-        Fit the beamcenter through an ellipse.
-        """
-        _x, _y = self._widgets["point_table"].points
-        if _x.size < 5:
-            self._toggle_beamcenter_is_set(False)
-            self._widgets["point_table"].remove_plot_items("beamcenter")
-            self._widgets["point_table"].remove_plot_items("beamcenter_outline")
-            raise UserConfigError(
-                "Please select at least five points to fit a fully-defined ellipse "
-                "for beamcenter determination."
-            )
-        (
-            _cx,
-            _cy,
-            _tilt,
-            _tilt_plane,
-            _coeffs,
-        ) = fit_detector_center_and_tilt_from_points(_x, _y)
-        self._widgets["point_table"].set_beamcenter_marker((_cx, _cy))
-        self.set_param_value_and_widget("beamcenter_x", np.round(_cx, 4))
-        self.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
-        self._toggle_beamcenter_is_set(True)
-        _x, _y = calc_points_on_ellipse(_coeffs)
-        self._widgets["point_table"].show_beamcenter_outline((_x, _y))
-
-    def _toggle_beamcenter_is_set(self, is_set):
-        """
-        Toggle the visibility of the Parameter widgets for the results.
-
-        Parameters
-        ----------
-        is_set : bool
-            The new visibility.
-        """
-        for _name in ["beamcenter_x", "beamcenter_y"]:
-            self.param_composite_widgets[_name].setVisible(is_set)
-        self._config["beamcenter_set"] = is_set
-
-    @QtCore.Slot(str)
-    def _manual_beamcenter_update(self, pos):
-        """
-        Call the manual setting of a new beamcenter position
-
-        Parameters
-        ----------
-        pos : str
-            The new beamcenter pos value.
-        """
-        _x = self.get_param_value("beamcenter_x")
-        _y = self.get_param_value("beamcenter_y")
-        self._widgets["point_table"].set_beamcenter_marker((_x, _y))
-        self._widgets["point_table"].remove_plot_items("beamcenter_outline")
-
-    @QtCore.Slot()
     def _confirm_points(self):
         """
         Confirm the selection of the specified points.
         """
-        if not self._config["beamcenter_set"]:
+        if not self._bc_controller.beamcenter_is_set:
             _reply = QuestionBox(
                 "Beamcenter not set",
                 "No beamcenter has been set. Do you want to close the window without "

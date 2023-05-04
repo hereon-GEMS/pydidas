@@ -71,6 +71,10 @@ Improvements
 - Added a window to select the integration region graphically through clicking
   the boundaries in an image.
 - Updated the pyFAI integration plugin custom configuration widget.
+- Added ManuallySetIntegrationRegionController and 
+  ManuallySetBeamcenterController classes to pydidas.widgets.controllers to 
+  manage the corresponding widgets.
+
 
 Bugfixes
 --------

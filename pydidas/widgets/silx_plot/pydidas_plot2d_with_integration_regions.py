@@ -28,11 +28,8 @@ __status__ = "Development"
 __all__ = ["PydidasPlot2DwithIntegrationRegions"]
 
 
-from typing import Literal, Tuple
-
 import numpy as np
 from qtpy import QtCore
-from silx.gui.plot.items import Marker, Shape
 
 from ...core.constants import PYDIDAS_COLORS
 from ...core.utils import (
@@ -58,6 +55,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         self._config["marker_color"] = kwargs.get(
             "marker_color", PYDIDAS_COLORS["orange"]
         )
+        self._config["roi_active"] = False
         self._process_exp_update()
         self.sigPlotSignal.connect(self._process_plot_signal)
         self._config["diffraction_exp"].sig_params_changed.connect(
@@ -71,41 +69,16 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         """
         self._config["beamcenter"] = self._config["diffraction_exp"].beamcenter
 
-    @QtCore.Slot(str)
-    def set_new_marker_color(self, color):
+    def set_marker_color(self, color: str):
         """
-        Set the new color for the markers.
+        Set the new marker color.
 
         Parameters
         ----------
         color : str
-            The name of the new color.
+            The marker color name.
         """
-        self._config["color"] = PYDIDAS_COLORS[color]
-        _items = self.getItems()
-        for _item in _items:
-            if isinstance(_item, (Marker, Shape)):
-                _item.setColor(self._config["color"])
-
-    def remove_plot_items(
-        self, *kind: Tuple[Literal["azimuthal", "radial", "roi", "all"]]
-    ):
-        """
-        Remove the items for the given kind from the plot.
-
-        Parameters
-        ----------
-        *kind : Tuple[Literal["azimuthal", "radial", "roi", "all"]]
-            The kind or markers to be removed.
-        """
-        _entries = set(_item for _item in kind if _item != "all")
-        if "all" in kind:
-            _entries.update(("azimuthal", "radial", "roi"))
-        for _kind in _entries:
-            if _kind in ["azimuthal", "radial"]:
-                self.remove(legend=f"{_kind}_lower", kind="item")
-                self.remove(legend=f"{_kind}_upper", kind="item")
-            self.remove(legend=_kind, kind="item")
+        self._config["marker_color"] = PYDIDAS_COLORS[color]
 
     def draw_circle(self, radius, legend, center=None):
         """
@@ -261,6 +234,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             color=self._config["marker_color"],
             linewidth=2.0,
         )
+        self._config["roi_active"] = True
 
     def _get_included_corners(self, startpoint, endpoint):
         """

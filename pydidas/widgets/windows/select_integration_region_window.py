@@ -37,6 +37,7 @@ from ...core import Dataset, UserConfigError, get_generic_param_collection
 from ...core.constants import STANDARD_FONT_SIZE
 from ...core.utils import apply_qt_properties
 from ...data_io import import_data
+from ..controllers import ManuallySetIntegrationRoiController
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
 from ..misc import SelectImageFrameWidget, ShowIntegrationRegionWidget
@@ -48,7 +49,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     A pydidas window which allows to open a file
     """
 
-    container_width = ShowIntegrationRegionWidget.container_width + 20
+    container_width = ShowIntegrationRegionWidget.widget_width
     default_params = get_generic_param_collection(
         "filename", "hdf5_key", "hdf5_frame", "marker_color"
     )
@@ -135,7 +136,6 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.add_any_widget(
             "roi_selector",
             ShowIntegrationRegionWidget(
-                self._widgets["plot"],
                 plugin=self._plugin,
                 forced_edit_disable=self._config["only_show_roi"],
             ),
@@ -154,6 +154,9 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         """
         Connect all signals.
         """
+        self._roi_controller = ManuallySetIntegrationRoiController(
+            self._widgets["roi_selector"], self._widgets["plot"], plugin=self._plugin
+        )
         self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
         self._widgets["but_confirm"].clicked.connect(self._confirm_changes)
@@ -170,10 +173,10 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             )
         self._image = Dataset(np.zeros((_ny, _ny)))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
-        self._widgets["roi_selector"].show_plot_items("roi")
+        self._roi_controller.show_plot_items("roi")
         if self._config["only_show_roi"]:
             self._config["closing_confirmed"] = True
-        self._widgets["roi_selector"].update_input_widgets()
+        self._roi_controller.update_input_widgets()
 
     @QtCore.Slot(bool)
     def _toggle_fname_valid(self, is_valid):
@@ -203,9 +206,9 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
         self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
-        self._widgets["roi_selector"].reset_selection_mode()
-        self._widgets["roi_selector"].update_input_widgets()
-        self._widgets["roi_selector"].show_plot_items("roi")
+        self._roi_controller.reset_selection_mode()
+        self._roi_controller.update_input_widgets()
+        self._roi_controller.show_plot_items("roi")
 
     @QtCore.Slot()
     def _confirm_changes(self):
@@ -238,7 +241,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         if not _reply:
             event.ignore()
             return
-        self._widgets["roi_selector"].reset_plugin()
+        self._roi_controller.reset_plugin()
         self.sig_about_to_close.emit()
         event.accept()
 
@@ -248,6 +251,6 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         """
         for _key in self.param_widgets:
             self.update_widget_value(_key, self.get_param_value(_key))
-        self._widgets["roi_selector"].update_input_widgets()
-        self._widgets["roi_selector"].show_plot_items("roi")
+        self._roi_controller.update_input_widgets()
+        self._roi_controller.show_plot_items("roi")
         QtWidgets.QWidget.show(self)

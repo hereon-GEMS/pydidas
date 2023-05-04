@@ -100,6 +100,8 @@ Bugfixes
   reference the DiffractionExperimentContext
 - Fixed an issue in pyFAIintegrationBase plugin when the subclass does not have
   the radial or azimuthal ranges.
+- Fixed an issue in the PyfaiIntegrationBase plugin with the diffraction_exp
+  keyword being interpreted as a parameter value.
   
 
 =======

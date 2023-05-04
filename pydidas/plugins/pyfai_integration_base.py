@@ -103,11 +103,11 @@ class pyFAIintegrationBase(ProcPlugin):
     has_unique_parameter_config_widget = True
 
     def __init__(self, *args, **kwargs):
+        self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())
         super().__init__(*args, **kwargs)
         self._ai = None
         self._ai_params = {}
         self._exp_hash = -1
-        self._EXP = kwargs.get("diffraction_exp", DiffractionExperimentContext())
         self._mask = None
 
     def pre_execute(self):

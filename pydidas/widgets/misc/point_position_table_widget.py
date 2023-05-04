@@ -172,6 +172,7 @@ class PointPositionTableWidget(
         CreateWidgetsMixIn.__init__(self)
         ParameterWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
+        apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self._points = []
         self._plot = plot
         self._config = {

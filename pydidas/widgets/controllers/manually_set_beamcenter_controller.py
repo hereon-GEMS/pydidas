@@ -69,6 +69,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             "selection_active": kwargs.get("selection_active", True),
             "marker_color": kwargs.get("marker_color", "orange"),
             "beamcenter_set": False,
+            "beamcenter_outline_points": None,
+            "selected_points": [],
+            "beamcenter_position": None,
         }
         self._points = []
         self._master = master
@@ -116,6 +119,18 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         return self._config["beamcenter_set"]
 
+    @property
+    def selection_active(self) -> bool:
+        """
+        Get the flag whether the selection is active.
+
+        Returns
+        -------
+        bool
+            Selection active flag.
+        """
+        return self._config["selection_active"]
+
     @QtCore.Slot(str)
     def set_marker_color(self, color: str):
         """
@@ -153,6 +168,39 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         if "marker" in kind:
             for _point in self._points:
                 self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
+
+    def show_plot_items(
+        self, *kind: Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+    ):
+        """
+        Show the selected items in the plot.
+
+        Parameters
+        ----------
+        *kind : Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
+            The kind of items to be removed.
+        """
+        kind = ["marker", "beamcenter", "beamcenter_outline"] if "all" in kind else kind
+        if "beamcenter" in kind and self._config["beamcenter_position"] is not None:
+            self._plot.addMarker(
+                *self._config["beamcenter_position"],
+                legend="beamcenter",
+                color=PYDIDAS_COLORS[self._config["marker_color"]],
+                symbol="+",
+            )
+        if (
+            "beamcenter_outline" in kind
+            and self._config["beamcenter_outline_points"] is not None
+        ):
+            self._plot_beamcenter_outline(self._config["beamcenter_outline_points"])
+        if "marker" in kind:
+            _color = PYDIDAS_COLORS[self._config["marker_color"]]
+            for _point in self._points:
+                _label = f"marker_{_point[0]}_{_point[1]}"
+                _symbol = "o" if _point in self._config["selected_points"] else "x"
+                self._plot.addMarker(
+                    _point[0], _point[1], legend=_label, color=_color, symbol=_symbol
+                )
 
     @QtCore.Slot(bool)
     def toggle_selection_active(self, active: bool):
@@ -222,6 +270,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The (x, y) position of the beamcenter.
         """
         _color = PYDIDAS_COLORS[self._config["marker_color"]]
+        self._config["beamcenter_position"] = position
         self._plot.addMarker(*position, legend="beamcenter", color=_color, symbol="+")
         self._toggle_beamcenter_is_set(True)
 
@@ -299,6 +348,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         points : Iterable[str]
             An iterable (tuple, list) with the string names of the points.
         """
+        self._config["selected_points"] = points
         for _point in self._points:
             _label = f"marker_{_point[0]}_{_point[1]}"
             _marker = self._plot._getItem("marker", _label)
@@ -331,8 +381,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         _x = self._master.get_param_value("beamcenter_x")
         _y = self._master.get_param_value("beamcenter_y")
-        self._set_beamcenter_marker((_x, _y))
-        self.remove_plot_items("beamcenter_outline")
+        self._config["beamcenter_position"] = (_x, _y)
+        if self.selection_active:
+            self._set_beamcenter_marker((_x, _y))
+            self.remove_plot_items("beamcenter_outline")
 
     def _plot_beamcenter_outline(self, points: Tuple[Tuple, Tuple]):
         """
@@ -348,6 +400,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             positions.
         """
         _color = PYDIDAS_COLORS[self._config["marker_color"]]
+        self._config["beamcenter_outline_points"] = points
         self._plot.addShape(
             points[0],
             points[1],

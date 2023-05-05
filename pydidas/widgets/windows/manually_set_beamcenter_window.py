@@ -54,7 +54,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         "hdf5_frame",
         "beamcenter_x",
         "beamcenter_y",
-        "marker_color",
+        "overlay_color",
     )
 
     sig_selected_beamcenter = QtCore.Signal(float, float)
@@ -98,7 +98,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             enabled=False,
         )
         self.create_param_widget(
-            self.get_param("marker_color"),
+            self.get_param("overlay_color"),
             width_total=PointPositionTableWidget.widget_width,
             width_io=90,
             width_text=120,
@@ -203,7 +203,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             self._bc_controller.fit_beamcenter_with_ellipse
         )
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
-        self.param_widgets["marker_color"].io_edited.connect(
+        self.param_widgets["overlay_color"].io_edited.connect(
             self._bc_controller.set_marker_color
         )
 

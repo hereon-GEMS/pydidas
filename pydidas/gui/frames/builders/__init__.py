@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +35,7 @@ from .data_browsing_frame_builder import *
 from .image_math_frame_builder import *
 from .define_diffraction_exp_frame_builder import *
 from .define_scan_frame_builder import *
+from .quick_integration_frame_builder import *
 from .utilities_frame_builder import *
 from .workflow_edit_frame_builder import *
 from .workflow_run_frame_builder import *
@@ -64,6 +67,11 @@ from . import define_scan_frame_builder
 
 __all__.extend(define_scan_frame_builder.__all__)
 del define_scan_frame_builder
+
+from . import quick_integration_frame_builder
+
+__all__.extend(quick_integration_frame_builder.__all__)
+del quick_integration_frame_builder
 
 from . import utilities_frame_builder
 

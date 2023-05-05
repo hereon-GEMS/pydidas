@@ -74,7 +74,8 @@ Improvements
 - Added ManuallySetIntegrationRegionController and 
   ManuallySetBeamcenterController classes to pydidas.widgets.controllers to 
   manage the corresponding widgets.
-
+- Added a QuickIntegrationFrame to run fast integrations without needing to 
+  set up a full workflow.
 
 Bugfixes
 --------

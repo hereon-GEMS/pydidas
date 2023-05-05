@@ -176,7 +176,7 @@ class PointPositionTableWidget(
         self._points = []
         self._plot = plot
         self._config = {
-            "marker_color": kwargs.get("marker_color", "orange"),
+            "overlay_color": kwargs.get("overlay_color", "orange"),
         }
         self.add_any_widget(
             "table",

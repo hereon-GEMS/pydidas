@@ -52,8 +52,8 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
 
     def __init__(self, parent=None, backend=None, **kwargs):
         PydidasPlot2D.__init__(self, parent, backend, **kwargs)
-        self._config["marker_color"] = kwargs.get(
-            "marker_color", PYDIDAS_COLORS["orange"]
+        self._config["overlay_color"] = kwargs.get(
+            "overlay_color", PYDIDAS_COLORS["orange"]
         )
         self._config["roi_active"] = False
         self._process_exp_update()
@@ -78,7 +78,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         color : str
             The marker color name.
         """
-        self._config["marker_color"] = PYDIDAS_COLORS[color]
+        self._config["overlay_color"] = PYDIDAS_COLORS[color]
 
     def draw_circle(self, radius, legend, center=None):
         """
@@ -99,7 +99,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             radius * cos_phi + _cx,
             radius * sin_phi + _cy,
             legend=legend,
-            color=self._config["marker_color"],
+            color=self._config["overlay_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
@@ -135,7 +135,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _yarr,
             legend=legend,
             shape="polylines",
-            color=self._config["marker_color"],
+            color=self._config["overlay_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,
@@ -231,7 +231,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _xarr,
             _yarr,
             legend="roi",
-            color=self._config["marker_color"],
+            color=self._config["overlay_color"],
             linewidth=2.0,
         )
         self._config["roi_active"] = True

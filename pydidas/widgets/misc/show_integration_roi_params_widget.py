@@ -16,8 +16,8 @@
 # along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the ShowIntegrationRegionWidget class which allows to show the integration
-region of an associated Plugin in the linked plot.
+Module with the ShowIntegrationRoiParamsWidget class which allows to show the
+integration region of an associated Plugin in the linked plot.
 """
 
 __author__ = "Malte Storm"
@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2021-, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ShowIntegrationRegionWidget"]
+__all__ = ["ShowIntegrationRoiParamsWidget"]
 
 
 from typing import Literal
@@ -37,16 +37,15 @@ from ...core.constants import POLICY_FIX_EXP, POLICY_MIN_MIN, STANDARD_FONT_SIZE
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
-class ShowIntegrationRegionWidget(WidgetWithParameterCollection):
+class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
     """
-    A widget which allows to show the integration region in a linked plot.
+    A widget which allows to show the Parameters for the integration region.
 
-    This widget must be connected to a PydidasPlot2DwithIntegrationRegions widget
-    to display the integration region correctly. The associated plugin can be set
-    with the '.set_new_plugin' method.
+    The Parameter widgets are created for an associated plugin which is not owned
+    by this widget.
     """
 
-    default_params = get_generic_param_collection("marker_color")
+    default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_edits = QtCore.Signal(bool)
     widget_width = 320
@@ -58,10 +57,12 @@ class ShowIntegrationRegionWidget(WidgetWithParameterCollection):
         self.set_default_params()
         self.setFixedWidth(self.widget_width)
         self._plugin = kwargs.get("plugin", None)
-        self._config["forced_edit_disable"] = kwargs.get("forced_edit_disable", False)
-        self._config["roi_active"] = False
+        self._config = self._config | {
+            "forced_edit_disable": kwargs.get("forced_edit_disable", False),
+            "roi_active": False,
+        }
         self.create_param_widget(
-            self.get_param("marker_color"), **self._plugin_kwargs()
+            self.get_param("overlay_color"), **self._plugin_kwargs()
         )
         self.create_empty_widget(
             "plugin_container",
@@ -74,13 +75,15 @@ class ShowIntegrationRegionWidget(WidgetWithParameterCollection):
             "Reset all changes",
             fixedWidth=self.widget_width,
             fixedHeight=25,
+            visible=kwargs.get("show_reset_button", True),
         )
-        self.create_empty_widget(
-            "bottom_spacer",
-            stretch=(1, 1),
-            sizePolicy=POLICY_FIX_EXP,
-            fixedWidth=self.widget_width,
-        )
+        if kwargs.get("add_bottom_spacer", True):
+            self.create_empty_widget(
+                "bottom_spacer",
+                stretch=(1, 1),
+                sizePolicy=POLICY_FIX_EXP,
+                fixedWidth=self.widget_width,
+            )
 
     def create_widgets_for_axis(self, plugin, axis: Literal["rad", "azi"]):
         """
@@ -110,7 +113,7 @@ class ShowIntegrationRegionWidget(WidgetWithParameterCollection):
         )
         self.create_button(
             f"but_select_{_axis_long}",
-            f"Select {_axis_long} integration region",
+            f"Select {_axis_long} integration range in image",
             fixedWidth=self.widget_width,
             fixedHeight=25,
             parent_widget=self._widgets["plugin_container"],
@@ -126,6 +129,25 @@ class ShowIntegrationRegionWidget(WidgetWithParameterCollection):
             parent_widget=self._widgets["plugin_container"],
             fixedWidth=self.widget_width,
         )
+
+    def toggle_enable(self, enabled: bool):
+        """
+        Toggle the selection mode and enable/disable the Parameter widgets.
+
+        Parameters
+        ----------
+        enabled : bool
+            Editing enabled flag.
+        """
+        for _type in ["rad", "azi"]:
+            _type_long = "radial" if _type == "rad" else "azimuthal"
+            if f"but_select_{_type_long}" in self._widgets:
+                self._widgets[f"but_select_{_type_long}"].setEnabled(enabled)
+                self.param_widgets[f"{_type}_use_range"].setEnabled(enabled)
+                self.param_widgets[f"{_type}_range_lower"].setEnabled(enabled)
+                self.param_widgets[f"{_type}_range_upper"].setEnabled(enabled)
+                self.param_widgets[f"{_type}_unit"].setEnabled(enabled)
+        self._widgets["but_reset_to_start_values"].setEnabled(enabled)
 
     def clear_plugin_widgets(self):
         """

@@ -40,7 +40,7 @@ from ...data_io import import_data
 from ..controllers import ManuallySetIntegrationRoiController
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
-from ..misc import SelectImageFrameWidget, ShowIntegrationRegionWidget
+from ..misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
 from ..silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
@@ -49,9 +49,9 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     A pydidas window which allows to open a file
     """
 
-    container_width = ShowIntegrationRegionWidget.widget_width
+    container_width = ShowIntegrationRoiParamsWidget.widget_width
     default_params = get_generic_param_collection(
-        "filename", "hdf5_key", "hdf5_frame", "marker_color"
+        "filename", "hdf5_key", "hdf5_frame", "overlay_color"
     )
     sig_roi_changed = QtCore.Signal()
     sig_about_to_close = QtCore.Signal()
@@ -135,7 +135,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
 
         self.add_any_widget(
             "roi_selector",
-            ShowIntegrationRegionWidget(
+            ShowIntegrationRoiParamsWidget(
                 plugin=self._plugin,
                 forced_edit_disable=self._config["only_show_roi"],
             ),

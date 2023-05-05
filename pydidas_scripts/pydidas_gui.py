@@ -68,6 +68,7 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(frames.PyfaiCalibFrame)
     gui.register_frame(frames.CompositeCreatorFrame)
     gui.register_frame(frames.DirectorySpyFrame)
+    gui.register_frame(frames.QuickIntegrationFrame)
     gui.register_frame(frames.DefineDiffractionExpFrame)
     gui.register_frame(frames.DefineScanFrame)
     gui.register_frame(frames.WorkflowEditFrame)

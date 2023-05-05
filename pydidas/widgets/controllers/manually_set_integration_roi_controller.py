@@ -46,17 +46,18 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
 
     Parameters
     ----------
-    editor : pydidas.widgets.misc.ShowIntegrationRegionWidget
-        The ShowIntegrationRegionWidget instance to display parameter values.
+    editor : pydidas.widgets.misc.ShowIntegrationRoiParamsWidget
+        The ShowIntegrationRoiParamsWidget instance to display parameter values.
     plot : pydidas.widgets.silx_plot.PydidasPlot2DwithIntegrationRegions
         The plot to display the ROI.
     plugin : pydidas.plugins.BasePlugin
         The plugin to be edited.
     """
 
-    default_params = get_generic_param_collection("marker_color")
+    default_params = get_generic_param_collection("overlay_color")
     sig_roi_changed = QtCore.Signal()
     sig_toggle_enable = QtCore.Signal(bool)
+    sig_toggle_selection_mode = QtCore.Signal(bool)
     widget_width = 320
 
     def __init__(self, editor, plot, plugin=None, **kwargs):
@@ -67,8 +68,9 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._config = {
             "roi_plotted": False,
             "forced_edit_disable": kwargs.get("forced_edit_disable", False),
+            "enabled": True,
         }
-        self._editor.param_widgets["marker_color"].io_edited.connect(
+        self._editor.param_widgets["overlay_color"].io_edited.connect(
             self.set_new_marker_color
         )
         self._editor._widgets["but_reset_to_start_values"].clicked.connect(
@@ -76,6 +78,18 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         )
         if plugin is not None:
             self.set_new_plugin(plugin)
+
+    @property
+    def enabled(self) -> bool:
+        """
+        Get the enabled status flag.
+
+        Returns
+        -------
+        bool
+            The enabled status.
+        """
+        return self._config["enabled"]
 
     def set_new_plugin(self, plugin: BasePlugin):
         """
@@ -99,6 +113,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         if "rad_use_range" in plugin.params:
             self._editor.create_widgets_for_axis(plugin, "rad")
             self._connect_axis_widgets("rad")
+            self._config["rad_unit"] = plugin.get_param_value("rad_unit")
         if "azi_use_range" in plugin.params:
             self._editor.create_widgets_for_axis(plugin, "azi")
             self._connect_axis_widgets("azi")
@@ -176,6 +191,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self._config["azimuthal_n"] = 0
         self.toggle_enable(True)
         self.update_input_widgets()
+        self.sig_toggle_selection_mode.emit(False)
 
     def toggle_enable(self, enabled: bool):
         """
@@ -187,17 +203,22 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
             Flag whether the editing mode is active.
         """
         enabled = enabled if not self._config["forced_edit_disable"] else False
-        for _type in ["rad", "azi"]:
-            _type_long = "radial" if _type == "rad" else "azimuthal"
-            if f"but_select_{_type}" in self._editor._widgets:
-                self._editor._widgets[f"but_select_{_type_long}"].setEnabled(enabled)
-                self._editor.param_widgets[f"{_type}_use_range"].setEnabled(enabled)
-                self._editor.param_widgets[f"{_type}_range_lower"].setEnabled(enabled)
-                self._editor.param_widgets[f"{_type}_range_upper"].setEnabled(enabled)
-                self._editor.param_widgets[f"{_type}_unit"].setEnabled(enabled)
-        self._editor._widgets["but_reset_to_start_values"].setEnabled(enabled)
+        self._config["enabled"] = enabled
+        self._editor.toggle_enable(enabled)
         self.sig_toggle_enable.emit(enabled)
 
+    def toggle_marker_color_param_visibility(self, visible: bool):
+        """
+        Toggle the visibility of the marker_color Parameter widget.
+
+        Parameters
+        ----------
+        visible : bool
+            Visible status flag.
+        """
+        self._editor.toggle_param_widget_visibility("overlay_color", visible)
+
+    @QtCore.Slot()
     def show_plot_items(
         self, *kind: Tuple[Literal["azimuthal", "radial", "roi", "all"]]
     ):
@@ -276,6 +297,7 @@ class ManuallySetIntegrationRoiController(QtCore.QObject):
         self.remove_plot_items("all")
         self.show_plot_items(_other_type)
         self.toggle_enable(False)
+        self.sig_toggle_selection_mode.emit(True)
         self._plot.sig_new_point_selected.connect(getattr(self, f"_new_{type_}_point"))
 
     def _set_param_value_and_widget(self, key, value):

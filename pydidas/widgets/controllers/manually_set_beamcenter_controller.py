@@ -32,7 +32,6 @@ from typing import Iterable, Literal, Tuple
 
 import numpy as np
 from qtpy import QtCore
-from silx.gui.plot.items import Marker, Shape
 
 from ...core import UserConfigError
 from ...core.constants import PYDIDAS_COLORS
@@ -61,13 +60,13 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         The table to store the selected points.
     """
 
-    sig_selected_beamcenter = QtCore.Signal(float, float)
+    sig_selected_beamcenter = QtCore.Signal()
 
     def __init__(self, master, plot, point_table, **kwargs):
         QtCore.QObject.__init__(self)
         self._config = {
             "selection_active": kwargs.get("selection_active", True),
-            "marker_color": kwargs.get("marker_color", "orange"),
+            "overlay_color": kwargs.get("overlay_color", PYDIDAS_COLORS["orange"]),
             "beamcenter_set": False,
             "beamcenter_outline_points": None,
             "selected_points": [],
@@ -141,13 +140,16 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         color : str
             The new color name.
         """
-        _colorcode = PYDIDAS_COLORS[color]
-        _items = self._plot.getItems()
-        for _item in _items:
-            if isinstance(_item, (Marker, Shape)):
-                _name = _item.getName()
-                if _name.startswith("marker_") or _name == "beamcenter":
-                    _item.setColor(_colorcode)
+        self._config["overlay_color"] = PYDIDAS_COLORS[color]
+        _marker_keys = [f"marker_{_point[0]}_{_point[1]}" for _point in self._points]
+        _marker_keys.append("beamcenter")
+        for _key in _marker_keys:
+            _item = self._plot._getItem("marker", legend=_key)
+            if _item is not None:
+                _item.setColor(self._config["overlay_color"])
+        _item = self._plot._getItem("item", legend="beamcenter_outline")
+        if _item is not None:
+            _item.setColor(self._config["overlay_color"])
 
     def remove_plot_items(
         self, *kind: Tuple[Literal["all", "marker", "beamcenter", "beamcenter_outline"]]
@@ -185,7 +187,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self._plot.addMarker(
                 *self._config["beamcenter_position"],
                 legend="beamcenter",
-                color=PYDIDAS_COLORS[self._config["marker_color"]],
+                color=self._config["overlay_color"],
                 symbol="+",
             )
         if (
@@ -194,12 +196,14 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         ):
             self._plot_beamcenter_outline(self._config["beamcenter_outline_points"])
         if "marker" in kind:
-            _color = PYDIDAS_COLORS[self._config["marker_color"]]
             for _point in self._points:
                 _label = f"marker_{_point[0]}_{_point[1]}"
                 _symbol = "o" if _point in self._config["selected_points"] else "x"
                 self._plot.addMarker(
-                    _point[0], _point[1], legend=_label, color=_color, symbol=_symbol
+                    *_point,
+                    legend=_label,
+                    color=self._config["overlay_color"],
+                    symbol=_symbol,
                 )
 
     @QtCore.Slot(bool)
@@ -230,7 +234,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             and event_dict.get("button", "None") == "left"
             and self._config["selection_active"]
         ):
-            _color = PYDIDAS_COLORS[self._config["marker_color"]]
+            _color = self._config["overlay_color"]
             _x = np.round(event_dict["x"], decimals=3)
             _y = np.round(event_dict["y"], decimals=3)
             if (_x, _y) in self._points:
@@ -248,9 +252,6 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         _x, _y = self.points
         if _x.size != 1:
-            self._toggle_beamcenter_is_set(False)
-            self.remove_plot_items("beamcenter")
-            self.remove_plot_items("beamcenter_outline")
             raise UserConfigError(
                 "Please select exactly one point in the image to set the beamcenter "
                 "directly."
@@ -259,6 +260,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self.remove_plot_items("beamcenter_outline")
         self._master.set_param_value_and_widget("beamcenter_x", _x[0])
         self._master.set_param_value_and_widget("beamcenter_y", _y[0])
+        self.sig_selected_beamcenter.emit()
 
     def _set_beamcenter_marker(self, position: Tuple[float, float]):
         """
@@ -269,9 +271,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         position : Tuple[float, float]
             The (x, y) position of the beamcenter.
         """
-        _color = PYDIDAS_COLORS[self._config["marker_color"]]
+        _color = self._config["overlay_color"]
         self._config["beamcenter_position"] = position
-        self._plot.addMarker(*position, legend="beamcenter", color=_color, symbol="+")
+        self._plot.addMarker(*position, legend="beamcenter", color=_color, symbol="d")
         self._toggle_beamcenter_is_set(True)
 
     @QtCore.Slot()
@@ -281,9 +283,6 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         _x, _y = self.points
         if _x.size < 3:
-            self._toggle_beamcenter_is_set(False)
-            self.remove_plot_items("beamcenter")
-            self.remove_plot_items("beamcenter_outline")
             raise UserConfigError(
                 "Please select at least three points to fit a circle for beamcenter "
                 "determination."
@@ -297,6 +296,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         _x = np.cos(_theta) * _r + _cx
         _y = np.sin(_theta) * _r + _cy
         self._plot_beamcenter_outline((_x, _y))
+        self.sig_selected_beamcenter.emit()
 
     @QtCore.Slot()
     def fit_beamcenter_with_ellipse(self):
@@ -305,9 +305,6 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         _x, _y = self.points
         if _x.size < 5:
-            self._toggle_beamcenter_is_set(False)
-            self.remove_plot_items("beamcenter")
-            self.remove_plot_items("beamcenter_outline")
             raise UserConfigError(
                 "Please select at least five points to fit a fully-defined ellipse "
                 "for beamcenter determination."
@@ -324,6 +321,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._master.set_param_value_and_widget("beamcenter_y", np.round(_cy, 4))
         _x, _y = calc_points_on_ellipse(_coeffs)
         self._plot_beamcenter_outline((_x, _y))
+        self.sig_selected_beamcenter.emit()
 
     def _toggle_beamcenter_is_set(self, is_set: bool):
         """
@@ -370,14 +368,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
 
     @QtCore.Slot(str)
-    def _manual_beamcenter_update(self, pos: str):
+    def _manual_beamcenter_update(self, _):
         """
         Process a manual update of the beamcenter x/y Parameter.
-
-        Parameters
-        ----------
-        pos : str
-            The new beamcenter pos value.
         """
         _x = self._master.get_param_value("beamcenter_x")
         _y = self._master.get_param_value("beamcenter_y")
@@ -399,13 +392,12 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The points for the outline in form of a tuple with x- and y- point
             positions.
         """
-        _color = PYDIDAS_COLORS[self._config["marker_color"]]
         self._config["beamcenter_outline_points"] = points
         self._plot.addShape(
             points[0],
             points[1],
             legend="beamcenter_outline",
-            color=_color,
+            color=self._config["overlay_color"],
             linestyle="--",
             fill=False,
             linewidth=2.0,

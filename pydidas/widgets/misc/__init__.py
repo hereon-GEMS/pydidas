@@ -32,7 +32,7 @@ from .line_edit_with_icon import *
 from .point_position_table_widget import *
 from .select_image_frame_widget import *
 from .show_information_for_result import *
-from .show_integration_region_widget import *
+from .show_integration_roi_params_widget import *
 from .read_only_text_widget import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
@@ -57,10 +57,10 @@ from . import show_information_for_result
 __all__.extend(show_information_for_result.__all__)
 del show_information_for_result
 
-from . import show_integration_region_widget
+from . import show_integration_roi_params_widget
 
-__all__.extend(show_integration_region_widget.__all__)
-del show_integration_region_widget
+__all__.extend(show_integration_roi_params_widget.__all__)
+del show_integration_roi_params_widget
 
 from . import read_only_text_widget
 

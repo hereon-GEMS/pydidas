@@ -188,4 +188,17 @@ GENERIC_PARAMS_PYFAI = {
             "https://pyfai.readthedocs.io/"
         ),
     },
+    "integration_direction": {
+        "type": str,
+        "default": "Azimuthal integration",
+        "name": "Integration direction",
+        "choices": [
+            "Azimuthal integration",
+            "Radial integration",
+            "2D integration",
+        ],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The integration direction.",
+    },
 }

@@ -98,6 +98,15 @@ GENERIC_PARAMS_EXPERIMENT = {
         "allow_None": False,
         "tooltip": "The detector pixel size in Y-direction.",
     },
+    "detector_pxsize": {
+        "type": float,
+        "default": 100,
+        "name": "Detector pixel size",
+        "choices": None,
+        "unit": "um",
+        "allow_None": False,
+        "tooltip": "The detector pixel size in both X- and Y-direction.",
+    },
     "detector_dist": {
         "type": float,
         "default": 1,
@@ -177,7 +186,7 @@ GENERIC_PARAMS_EXPERIMENT = {
     "beamcenter_x": {
         "type": float,
         "default": 0,
-        "name": "beamcenter x",
+        "name": "Beamcenter x",
         "choices": None,
         "unit": "px",
         "allow_None": False,
@@ -186,7 +195,7 @@ GENERIC_PARAMS_EXPERIMENT = {
     "beamcenter_y": {
         "type": float,
         "default": 0,
-        "name": "beamcenter y",
+        "name": "Beamcenter y",
         "choices": None,
         "unit": "px",
         "allow_None": False,

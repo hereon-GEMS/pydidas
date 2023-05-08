@@ -33,7 +33,7 @@ from qtpy import QtCore, QtWidgets
 from ...core.constants import STANDARD_FONT_SIZE
 from ...core.utils import SignalBlocker, update_size_policy
 from ..framework import PydidasWindow
-from ..silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
+from ..silx_plot import PydidasPlotStack
 
 
 class ShowDetailedPluginResultsWindow(PydidasWindow):
@@ -142,40 +142,25 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         """
         self.__create_necessary_plots()
         for _index in range(4):
-            if f"plot{_index}_stack" in self._widgets:
-                self._widgets[f"plot{_index}_stack"].setVisible(
+            if f"plot_{_index}" in self._widgets:
+                self._widgets[f"plot_{_index}"].setVisible(
                     _index < self._config["n_plots"]
                 )
-                for _dim in [1, 2]:
-                    self._widgets[f"plot{_index}_{_dim}d"].clear()
+                self._widgets[f"plot_{_index}"].clear_plots()
 
     def __create_necessary_plots(self):
         """
         Create all required plots.
         """
         for _index in range(self._config["n_plots"]):
-            if f"plot{_index}_stack" in self._widgets:
+            if f"plot_{_index}" in self._widgets:
                 continue
             _y = 1 + _index // 2
             _x = 1 + _index % 2
-            create_silx_plot_stack(self, gridPos=(_y, _x, 1, 1))
-            self.__rename_plots(_index)
-            update_size_policy(
-                self._widgets[f"plot{_index}_stack"], horizontalStretch=0.5
+            self.create_any_widget(
+                f"plot_{_index}", PydidasPlotStack, gridPos=(_y, _x, 1, 1)
             )
-
-    def __rename_plots(self, target):
-        """
-        Rename the generic plot_stacks and plots to allow different plots.
-
-        Parameters
-        ----------
-        target : int
-            The subplot number.
-        """
-        self._widgets[f"plot{target}_stack"] = self._widgets["plot_stack"]
-        self._widgets[f"plot{target}_1d"] = self._widgets["plot1d"]
-        self._widgets[f"plot{target}_2d"] = self._widgets["plot2d"]
+            update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=0.5)
 
     def __update_metadata(self):
         """
@@ -225,84 +210,21 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.__clear_plots()
         for _item in _point_result.get("items", []):
             _i_plot = _item["plot"]
-            _label = _item.get("label", "")
-            _title = _titles.get(_i_plot, "")
             _data = _item["data"]
-            if _data.ndim == 1:
-                _ylabel = _plot_ylabels.get(_i_plot, "")
-                self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(0)
-                self._plot1d(_i_plot, _data, _label, _ylabel)
-                self._widgets[f"plot{_i_plot}_1d"].setGraphTitle(_title)
-            elif _data.ndim == 2:
-                self._widgets[f"plot{_i_plot}_stack"].setCurrentIndex(1)
-                self._plot2d(_i_plot, _data)
-                self._widgets[f"plot{_i_plot}_2d"].setGraphTitle(_title)
+            self._widgets[f"plot_{_i_plot}"].plot_data(
+                _data,
+                title=_titles.get(_i_plot, ""),
+                legend=_item.get("label", ""),
+                ylabel=_plot_ylabels.get(_i_plot, ""),
+                replace=False,
+            )
 
     def __clear_plots(self):
         """
-        Clear all items from the plots.
+        Clear all items from all plots.
         """
-        _n_plots = self._config["n_plots"]
-        for _index in range(_n_plots):
-            self._widgets[f"plot{_index}_1d"].clear()
-            self._widgets[f"plot{_index}_2d"].clear()
-
-    def _plot1d(self, i_plot, data, label, plot_ylabel=None):
-        """
-        Plot a 1D-dataset in the 1D plot widget.
-
-        Parameters
-        ----------
-        i_plot : int
-            The plot number.
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        label : str
-            The curve label.
-        plot_ylabel : Union[None, str], optional
-            The y axis label for the plot.
-        """
-        _plot = self._widgets[f"plot{i_plot}_1d"]
-        _axlabel = data.axis_labels[0] + (
-            " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
-        )
-        _plot.addCurve(
-            data.axis_ranges[0],
-            data.array,
-            linewidth=1.5,
-            legend=label,
-            xlabel=_axlabel,
-            ylabel=plot_ylabel,
-        )
-
-    def _plot2d(self, i_plot, data):
-        """
-        Plot a 2D-dataset in the 2D plot widget.
-
-        Parameters
-        ----------
-        i_plot : int
-            The plot number.
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        """
-        _plot = self._widgets[f"plot{i_plot}_2d"]
-        _ax_labels = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[0]) > 0 else "")
-            for i in [0, 1]
-        ]
-        _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
-        _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        _plot.addImage(
-            data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-        )
-        _plot.setGraphYLabel(_ax_labels[0])
-        _plot.setGraphXLabel(_ax_labels[1])
+        for _index in range(self._config["n_plots"]):
+            self._widgets[f"plot_{_index}"].clear_plots()
 
     def closeEvent(self, event):
         """

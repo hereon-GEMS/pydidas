@@ -191,7 +191,6 @@ class QuickIntegrationFrameBuilder:
             parent_widget=cls._frame._widgets["tab_plot"],
             gridPos=(0, 0, 1, 1),
             visible=False,
-
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("overlay_color"),

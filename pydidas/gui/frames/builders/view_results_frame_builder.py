@@ -37,7 +37,7 @@ from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.selection import ResultSelectionWidget
-from ....widgets.silx_plot import create_silx_plot_stack
+from ....widgets.silx_plot import PydidasPlotStack
 
 
 class ViewResultsFrameBuilder(BaseFrame):
@@ -160,9 +160,9 @@ class ViewResultsFrameBuilder(BaseFrame):
             parent_widget=self._widgets["config"],
         )
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
-
-        create_silx_plot_stack(
-            self,
+        self.create_any_widget(
+            "plot",
+            PydidasPlotStack,
             gridPos=(0, 1, 3, 1),
             use_data_info_action=True,
             diffraction_exp=self._EXP,

@@ -87,7 +87,7 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
-        self._widgets["plot2d"].sig_get_more_info_for_data.connect(
+        self._widgets["plot"].sig_get_more_info_for_data.connect(
             self._widgets["result_selector"].show_info_popup
         )
 

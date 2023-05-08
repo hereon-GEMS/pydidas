@@ -83,7 +83,7 @@ class ViewResultsFrame(ViewResultsFrameBuilder, ViewResultsMixin):
 
     def connect_signals(self):
         self._widgets["but_load"].clicked.connect(self.import_data_to_workflow_results)
-        self._widgets["plot2d"].sig_get_more_info_for_data.connect(
+        self._widgets["plot"].sig_get_more_info_for_data.connect(
             self._widgets["result_selector"].show_info_popup
         )
 

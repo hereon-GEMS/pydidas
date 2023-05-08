@@ -30,7 +30,7 @@ __all__ = ["PydidasPlotStack"]
 
 from typing import Union
 
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset
 from .pydidas_plot1d import PydidasPlot1D
@@ -50,8 +50,9 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
     diffraction_exp : DiffractionExperiment
         The DiffractionExperiment instance to be used in the PydidasPlot2D for
         the coordinate system.
-
     """
+
+    sig_get_more_info_for_data = QtCore.Signal(float, float)
 
     def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs):
         QtWidgets.QStackedWidget.__init__(self, parent)
@@ -83,7 +84,19 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._create_widget_if_required(_dim)
         self.setCurrentIndex(_dim - 1)
         _plot = getattr(self, f"_{_dim}dplot")
+        _title = kwargs.pop("title", None)
+        if _title is not None:
+            _plot.setGraphTitle(_title)
         _plot.plot_pydidas_dataset(data, **kwargs)
+
+    def clear_plots(self):
+        """
+        Clear all plots.
+        """
+        if self._1dplot is not None:
+            self._1dplot.clear_plot()
+        if self._2dplot is not None:
+            self._2dplot.clear_plot()
 
     def _create_widget_if_required(self, dim: int):
         """
@@ -100,3 +113,7 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
             setattr(self, f"_{dim}dplot", _plot)
             _widget = getattr(self, f"_frame{dim}d")
             _widget.layout().addWidget(_plot)
+            if dim == 2:
+                _plot.sig_get_more_info_for_data.connect(
+                    self.sig_get_more_info_for_data
+                )

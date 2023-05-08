@@ -232,7 +232,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             "store_input_data": True,
         }
         with utils.ShowBusyMouse():
-            self._tree.nodes[node_id].plugin.pre_execute()
+            self._tree.nodes[node_id].prepare_execution()
             self._tree.nodes[node_id].execute_plugin_chain(_arg, **_kwargs)
             self.__store_tree_results()
             self.__update_selection_choices()
@@ -385,7 +385,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._active_node = -1
             self._config["has_details"] = False
             self.__set_derived_widget_visibility(False)
-            self._clear_plot()
+            self._widgets["plot"].clear_plots()
             return
         self._active_node = int(
             self.param_widgets["selected_results"].currentText()[-4:-1]
@@ -435,40 +435,15 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if not self._config["plot_active"]:
             return
-        _ndim = self._results[self._active_node].ndim
-        if _ndim == 1:
-            self._plot1d()
-        elif _ndim == 2:
-            self._plot_2d()
+        _data = self._results[self._active_node]
+        if _data.ndim in [1, 2]:
+            _title = self._config["plugin_res_titles"][self._active_node]
+            self._widgets["plot"].plot_data(_data, title=_title)
         else:
-            self._clear_plot()
+            self._widgets["plot"].clear_plots()
             return
-        self._widgets["plot_stack"].setCurrentIndex(_ndim - 1)
         if self._config["details_active"] and self._config["has_details"]:
             self.show_plugin_details(set_focus=False)
-
-    def _plot1d(self):
-        """
-        Plot a 1D-dataset in the 1D plot widget.
-        """
-        _data = self._results[self._active_node]
-        _title = self._config["plugin_res_titles"][self._active_node]
-        self._widgets["plot1d"].plot_pydidas_dataset(_data, title=_title)
-
-    def _plot_2d(self):
-        """
-        Plot a 2D dataset as an image.
-        """
-        _data = self._results[self._active_node]
-        _title = self._config["plugin_res_titles"][self._active_node]
-        self._widgets["plot2d"].plot_pydidas_dataset(_data, title=_title)
-
-    def _clear_plot(self):
-        """
-        Clear the current plot and remove all items.
-        """
-        self._widgets["plot1d"].clear_plot()
-        self._widgets["plot2d"].clear_plot()
 
     @QtCore.Slot()
     def show_plugin_details(self, set_focus=True):

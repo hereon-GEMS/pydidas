@@ -37,7 +37,7 @@ from ...core.utils import ShowBusyMouse
 from ..framework import PydidasWindow
 from ..parameter_config import EditPluginParametersWidget, ParameterEditCanvas
 from ..scroll_area import ScrollArea
-from ..silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
+from ..silx_plot import PydidasPlotStack
 from .show_detailed_plugin_results_window import ShowDetailedPluginResultsWindow
 
 
@@ -127,9 +127,7 @@ class TweakPluginParameterWindow(PydidasWindow):
             "Cancel parameter editing and discard changes",
             parent_widget=self._widgets["config_area"],
         )
-
-        create_silx_plot_stack(self, gridPos=(1, 1, 1, 1))
-
+        self.create_any_widget("plot", PydidasPlotStack, gridPos=(1, 1, 1, 1))
         self._widgets["detailed_results"] = ShowDetailedPluginResultsWindow()
 
     def connect_signals(self):
@@ -157,81 +155,10 @@ class TweakPluginParameterWindow(PydidasWindow):
         self._widgets["plugin_param_edit"]._widgets["restore_defaults"].setVisible(
             False
         )
-        self.__plot_plugin_results(results)
+        self._widgets["plot"].plot_data(
+            results, title=f"{self.__plugin.plugin_name} results", replace=True
+        )
         self.__process_detailed_results()
-
-    def __plot_plugin_results(self, results):
-        """
-        Plot the plugin results in the respective plot window.
-
-        Parameters
-        ----------
-        results : pydidas.core.Dataset
-            The plugin results.
-        """
-        self._widgets["plot_stack"].setCurrentIndex(results.ndim - 1)
-        if results.ndim == 1:
-            self._plot1d(
-                results,
-                f"{self.__plugin.plugin_name} results",
-                plot_ylabel=results.data_label,
-            )
-        elif results.ndim == 2:
-            self._plot2d(results)
-
-    def _plot1d(self, data, label, plot_ylabel=None):
-        """
-        Plot a 1D-dataset in the 1D plot widget.
-
-        Parameters
-        ----------
-        plot : pydidas.widgets.silx_plot.PydidasPlot1D
-            The silx plot widget to show the data.
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        label : str
-            The curve label.
-        plot_ylabel : Union[None, str], optional
-            The y axis label for the plot.
-        """
-        _axlabel = data.axis_labels[0] + (
-            " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
-        )
-        self._widgets["plot1d"].addCurve(
-            data.axis_ranges[0],
-            data.array,
-            replace=True,
-            linewidth=1.5,
-            legend=label,
-            xlabel=_axlabel,
-            ylabel=plot_ylabel,
-        )
-
-    def _plot2d(self, data):
-        """
-        Plot a 2D-dataset in the 2D plot widget.
-
-        Parameters
-        ----------
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        """
-        _ax_labels = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[0]) > 0 else "")
-            for i in [0, 1]
-        ]
-        _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
-        _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self._widgets["plot2d"].addImage(
-            data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-        )
-        self._widgets["plot2d"].setGraphYLabel(_ax_labels[0])
-        self._widgets["plot2d"].setGraphXLabel(_ax_labels[1])
 
     def __process_detailed_results(self):
         """
@@ -267,7 +194,10 @@ class TweakPluginParameterWindow(PydidasWindow):
             _kwargs = self.__plugin._config["input_kwargs"].copy()
             self.__plugin.pre_execute()
             _res, _new_kws = self.__plugin.execute(_arg, **_kwargs)
-            self.__plot_plugin_results(_res)
+            self._widgets["plot"].plot_data(
+                _res, title=f"{self.__plugin.plugin_name} results", replace=True
+            )
+
             self.__process_detailed_results()
 
     @QtCore.Slot()

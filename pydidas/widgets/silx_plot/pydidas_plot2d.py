@@ -28,6 +28,8 @@ __status__ = "Development"
 __all__ = ["PydidasPlot2D"]
 
 
+import inspect
+
 from qtpy import QtCore
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
@@ -66,6 +68,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 else kwargs.get("diffraction_exp")
             ),
         }
+        self._allowed_kwargs = [
+            _key
+            for _key, _value in inspect.signature(self.addImage).parameters.items()
+            if _value.default is not inspect.Parameter.empty
+        ]
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.changeCanvasToDataAction = self.group.addAction(
@@ -156,7 +163,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             return
         self._positionWidget.update_coordinate_units(x_unit, y_unit)
 
-    def plot_pydidas_dataset(self, data, title=None):
+    def plot_pydidas_dataset(self, data, **kwargs):
         """
         Plot a pydidas dataset.
 
@@ -164,9 +171,8 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         ----------
         data : pydidas.core.Dataset
             The data to be plotted.
-        title : Union[None, str], optional
-            The title for the plot. If None, no title will be added to the plot.
-        """
+        **kwargs : dict
+            Additional keyword arguments to be passed to the silx plot method."""
         self.enable_cs_transform(
             data.shape
             == (
@@ -183,17 +189,20 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         ]
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self.addImage(
-            data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-        )
         self.setGraphYLabel(_ax_label[0])
         self.setGraphXLabel(_ax_label[1])
-        if title is not None:
-            self.setGraphTitle(title)
+        self.addImage(
+            data,
+            replace=kwargs.pop("replace", True),
+            copy=kwargs.pop("copy", False),
+            origin=(_originx, _originy),
+            scale=(_scalex, _scaley),
+            **{
+                _key: _val
+                for _key, _val in kwargs.items()
+                if _key in self._allowed_kwargs
+            },
+        )
         _cbar = self.getColorBarWidget()
         _legend = ""
         if len(data.data_label) > 0:
@@ -211,3 +220,4 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setGraphTitle("")
         self.setGraphYLabel("")
         self.setGraphXLabel("")
+        self.getColorBarWidget().setLegend("")

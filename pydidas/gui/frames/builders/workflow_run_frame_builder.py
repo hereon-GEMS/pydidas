@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,7 +37,7 @@ from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrameWithApp
 from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.selection import ResultSelectionWidget
-from ....widgets.silx_plot import create_silx_plot_stack
+from ....widgets.silx_plot import PydidasPlotStack
 
 
 class WorkflowRunFrameBuilder(BaseFrameWithApp):
@@ -213,4 +213,6 @@ class WorkflowRunFrameBuilder(BaseFrameWithApp):
         )
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
 
-        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1), use_data_info_action=True)
+        self.create_any_widget(
+            "plot", PydidasPlotStack, gridPos=(0, 1, 3, 1), use_data_info_action=True
+        )

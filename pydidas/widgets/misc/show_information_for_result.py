@@ -35,19 +35,17 @@ from qtpy import QtCore, QtWidgets
 from ...core import UserConfigError
 from ...core.utils import (
     ShowBusyMouse,
-    apply_qt_properties,
     get_fixed_length_str,
     get_pydidas_icon_w_bg,
 )
 from ..factory import CreateWidgetsMixIn
-from ..silx_plot import create_silx_plot_stack, get_2d_silx_plot_ax_settings
+from ..silx_plot import PydidasPlotStack
 from .read_only_text_widget import ReadOnlyTextWidget
 
 
 class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
-    Window to display detailed plugin results in combination with all Plugin
-    Parameters to allow running the Plugin with different values.
+    Window to display detailed information about a datapoint from a pydidas result.
     """
 
     show_frame = False
@@ -75,9 +73,8 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
             "info_field", ReadOnlyTextWidget, fixedWidth=600, fixedHeight=250
         )
         self.create_button("but_show_input", "Show input frame")
-        create_silx_plot_stack(self)
-        apply_qt_properties(
-            self._widgets["plot_stack"], visible=False, minimumHeight=600
+        self.create_any_widget(
+            "plot", PydidasPlotStack, visible=False, minimumHeight=600
         )
         self._widgets["but_show_input"].clicked.connect(self.show_input_image)
 
@@ -159,7 +156,7 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
             _info_str += "\n" + get_fixed_length_str("Frame in file:", 18) + str(_index)
         self._widgets["info_field"].setText(_info_str)
         self._widgets["but_show_input"].setEnabled(True)
-        self._widgets["plot_stack"].setVisible(False)
+        self._widgets["plot"].setVisible(False)
         self.show()
 
     @QtCore.Slot()
@@ -173,59 +170,8 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
                 "Cannot display the input image because the filename does not point to "
                 "a valid file on this system."
             )
-        self._widgets["plot_stack"].setVisible(True)
+        self._widgets["plot"].setVisible(True)
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
             _input, _kwargs = self._loader_plugin.execute(self._frame)
-            self._widgets["plot_stack"].setCurrentIndex(_input.ndim - 1)
-            if _input.ndim == 1:
-                self._plot1d(_input)
-            elif _input.ndim == 2:
-                self._plot2d(_input)
-
-    def _plot1d(self, data):
-        """
-        Plot a 1D-dataset in the 1D plot widget.
-
-        Parameters
-        ----------
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        """
-        _axlabel = data.axis_labels[0] + (
-            " / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else ""
-        )
-        self._widgets["plot1d"].addCurve(
-            data.axis_ranges[0],
-            data.array,
-            replace=True,
-            linewidth=1.5,
-            xlabel=_axlabel,
-            ylabel=f"{self._loader_plugin.plugin_name} results",
-        )
-
-    def _plot2d(self, data):
-        """
-        Plot a 2D-dataset in the 2D plot widget.
-
-        Parameters
-        ----------
-        data : pydidas.core.Dataset
-            The data to be plotted.
-        """
-        _ax_labels = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[0]) > 0 else "")
-            for i in [0, 1]
-        ]
-        _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
-        _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self._widgets["plot2d"].addImage(
-            data,
-            replace=True,
-            copy=False,
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-        )
-        self._widgets["plot2d"].setGraphYLabel(_ax_labels[0])
-        self._widgets["plot2d"].setGraphXLabel(_ax_labels[1])
+            self._widgets["plot"].plot_data(_input)

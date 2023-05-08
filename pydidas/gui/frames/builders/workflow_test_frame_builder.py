@@ -39,7 +39,7 @@ from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.misc import ReadOnlyTextWidget
 from ....widgets.parameter_config import ParameterEditCanvas
-from ....widgets.silx_plot import create_silx_plot_stack
+from ....widgets.silx_plot import PydidasPlotStack
 
 
 class WorkflowTestFrameBuilder(BaseFrame):
@@ -206,6 +206,5 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
+        self.create_any_widget("plot", PydidasPlotStack, gridPos=(0, 1, 3, 1))
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
-
-        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1))

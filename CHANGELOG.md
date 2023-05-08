@@ -76,6 +76,8 @@ Improvements
   manage the corresponding widgets.
 - Added a QuickIntegrationFrame to run fast integrations without needing to 
   set up a full workflow.
+- Added a PydidasPlotStack widget which automatically switches between 1D and 2D
+  plots and allows to plot data using a single interface.
 
 Bugfixes
 --------

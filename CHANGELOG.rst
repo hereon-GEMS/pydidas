@@ -1,9 +1,10 @@
-# Copyright 2021-, Helmholtz-Zentrum Hereon
-# SPDX-License-Identifier: CC0-1.0
+.. Copyright 2021-, Helmholtz-Zentrum Hereon
+.. SPDX-License-Identifier: CC0-1.0
 
 
 Major changes
 -------------
+
 - The "Import and display workflow results" now has its own instances of 
   ScanContext and WorkflowResults and can be used in parallel to 
   the current workflow and its results.
@@ -12,6 +13,7 @@ Major changes
 
 Improvements
 ------------
+
 - Added unique configuration widget to SubtractBackgroundImage plugin.
 - When leaving the TestWorkflowFrame, pop-up windows are now hidden.
 - Changed pyFAI plugins to use explicit parameters to select the ranges.
@@ -78,9 +80,11 @@ Improvements
   set up a full workflow.
 - Added a PydidasPlotStack widget which automatically switches between 1D and 2D
   plots and allows to plot data using a single interface.
+- The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
 
 Bugfixes
 --------
+
 - Fixed an issue in the BaseInputPlugin when using both the ScanContext 
   scan_start_index > 0 and scan_index_stepping > 1.
 - Fixed an issue with the DirectorySpyFrame displaying wrong status messages.
@@ -117,6 +121,7 @@ v23.3.9
 
 Major changes
 -------------
+
 - Added a GLOBAL_CONTEXTS dictionary in contexts to have generic access to all
   contexts and to allow adding contexts in a convenient way.
 - Renamed ExperimentContext to DiffractionExperimentContext to have a clear
@@ -124,6 +129,7 @@ Major changes
 
 Improvements
 ------------
+
 - Generalized the plugin processing-plugin subcategories and defined them 
   in core.constants.constants.
 - Removed a redundant import from main_menu file.
@@ -164,6 +170,7 @@ Improvements
   
 Bugfixes
 --------
+
 - Fixed an issue with the font size in Unix systems.
 - Fixed outdated docstring for FrameLoader plugin class.
 - Fixed an issue with the PluginCollectionBrowser widget which did not filter
@@ -201,6 +208,7 @@ v23.1.25
 
 Improvements
 ------------
+
 - Added zenodo DOI to CFF
 - Updated logo
 
@@ -211,6 +219,7 @@ v23.1.17
 
 Major changes
 -------------
+
 - Changed the version numbering to YY.MM.DD
 - Reorganized SetupScan and SetupExperiment and renamed them to ScanContext and
   ExperimentContext in the contenxts sub-package.
@@ -221,6 +230,7 @@ Major changes
 
 Improvements
 ------------
+
 - Improved documentation target names to unclutter namespace.
 - Improved the multiprocessing speed by optimizing the functions.
 - Added CITATION.CFF file.
@@ -245,6 +255,7 @@ Improvements
   
 Bugfixes
 --------
+
 - Fixed an issue with rois and locally (i.e. in the plugin) declared masks in
   pyFAIintegrationBase plugin.
 - Fixed an issue with double initiation of the AzimuthalIntegrator in the 
@@ -270,6 +281,7 @@ v0.1.14
 
 Major changes
 -------------
+
 - Reorganized SetupScan and SetupExperiment and renamed them to ScanContext and
   ExperimentContext in the contenxts sub-package.
 - Added core.fitting sub-package which allows to easily add more fitting 
@@ -279,6 +291,7 @@ Major changes
 
 Improvements
 ------------
+
 - Improved documentation target names to unclutter namespace.
 - Improved the multiprocessing speed by optimizing the functions.
 - Added CITATION.CFF file.
@@ -303,6 +316,7 @@ Improvements
   
 Bugfixes
 --------
+
 - Fixed an issue with rois and locally (i.e. in the plugin) declared masks in
   pyFAIintegrationBase plugin.
 - Fixed an issue with double initiation of the AzimuthalIntegrator in the 
@@ -328,6 +342,7 @@ v0.1.13
 
 Improvements
 ------------
+
 - Made Datasets hashable.
 - Added a copy method to Datasets to overwrite the generic numpy method and to
   copy the metadata as well as the array.
@@ -346,6 +361,7 @@ Improvements
 
 Bugfixes
 --------
+
 - Created a workaround for an issue with pyFAI ElidedLabel class toolTip.
 - Fixed an issue with deepcopies in the generic ObjectWithParameterCollection
 - Fixed an issue with an inconsistent minimum size of the 
@@ -370,6 +386,7 @@ v0.1.12
 
 Improvements
 ------------
+
 - Fields for filenames now accept drops from the OS's explorer.
 - Added a CorrectSplineDistortion Plugin to apply a Fit2D / pyFAI spline on a 
   detector image.
@@ -378,6 +395,7 @@ Improvements
 
 Bugfixes
 --------
+
 - Fixed an issue where destroyed QObjects were still referenced in the 
   SingletonFactory.
 - Fixed an issue with persistent object references in the SingletonFactory for
@@ -390,8 +408,9 @@ Bugfixes
 v0.1.11
 =======
 
-Major changes:
---------------
+Major changes
+-------------
+
 - Added a Utilities frame to have easy access to various utility windows.
 - Added new utility windows (Mask editing, file series operations)
 - Added a global default colormap for users to select.
@@ -400,6 +419,7 @@ Major changes:
 
 Improvements
 ------------
+
 - Removed the GlobalConfigurationFrame and moved content directly to
   GlobalConfigWindow.
 - Added fit2d mask images to the recognized file types.
@@ -430,8 +450,9 @@ Improvements
 - Details for all sub-points are now available for multi-dimensional processing
 
 
-Bugfixes:
----------
+Bugfixes
+--------
+
 - Fixed an issue with the canvas resize buttons in empty 2d plots.
 - Fixed missing kwargs in PydidasPlot2D class.
 - Fixed minor bugs in widget layout settings.
@@ -445,12 +466,12 @@ Bugfixes:
   destroyed C++ Qt objects.
 
 
-
 v0.1.10
 =======
 
-Major changes:
---------------
+Major changes
+-------------
+
 - Changed the handling of storing persistent information for the user 
   (Qt QSettings) to be version specific which allows to work with multiple
   pydidas versions in parallel.
@@ -467,6 +488,7 @@ Major changes:
 
 Improvements
 ------------
+
 - Moved all frames and framebuilders to subpackage in gui package.
 - Added the plugin names to the node result titles in case that no
   user-defined node label has been set.
@@ -480,8 +502,9 @@ Improvements
   action to restore the exit state.
 - Sanitized all module docstrings.
 
-Bugfixes:
----------
+Bugfixes
+--------
+
 - Fixed an issue with the selection of 1D data in plots.
 - Fixed an issue with non-existing config paths.
 - Fixed an issue with the Pyfai2dIntegration plugin.
@@ -504,8 +527,9 @@ Bugfixes:
 v0.1.9
 ======
 
-Major changes:
---------------
+Major changes
+-------------
+
 - Added a new SilxPlot2D class which allows to limit the figure canvas to the 
   data dimensions and back to the full window. This class also has a new feature
   to crop the top percentage of the histogram, for example to remove dead pixels.
@@ -518,6 +542,7 @@ Major changes:
   
 Improvements
 ------------
+
 - Dataset class has been reworked to function correctly with more numpy ufuncs,
   in particularly with np.take.
 - Added settings for displaying only a limited floating point precision of 
@@ -534,8 +559,9 @@ Improvements
 - Added an uninstaller script to remove registry information and local data
   (e.g. logfiles)
 
-Bugfixes:
----------
+Bugfixes
+--------
+
 - Fixed an issue with Parameter updates in the ViewResultsMixin
 - Fixed an issue with QComboBoxes being too small for the text to display the
   full text.
@@ -550,8 +576,9 @@ Bugfixes:
 v0.1.8
 ======
 
-Major changes:
---------------
+Major changes
+-------------
+
 - Updated fitting functions and included a true Voigt profile, which (in its
   scipy implementation) is faster to compute than the pseudo-Voigt.
 - Added a functionality to load and visualize results which have been exported
@@ -560,10 +587,12 @@ Major changes:
 
 Improvements
 ------------
+
 - Added a check on the length of axis ranges in Dataset.
 
-Bugfixes:
----------
+Bugfixes
+--------
+
 - Fixed compatibility with latest Qt (Qt 5.15)
 - Fixed an issue with dictionary passing between plugins which propagated metadata 
   to up the WorkflowTree.
@@ -579,35 +608,3 @@ Bugfixes:
 - Fixed an issue in  WorkflowResultsSelector with selection of data ranges when no 
   range was given.
 - Fixed an issue with the order of axis ranges in transposed Datasets.  
-
-
-v0.1.7
-======
-
-Major changes:
---------------
-- Added feedback form to menu
-- Added semi-automatic bug reporting to excepthook
-- Changed frame creation from static to on the fly to speed up GUI creation.
-
-
-v0.1.6
-
-======
-Major changes:
---------------
-- Refactored data_io and moved classes which are not truly I/O classes.
-- Changed code formatting to use black. 
-- Changed used line width to 88 characters.
-
-
-v0.1.5
-======
-
-Major changes:
---------------
-- Removed dependency on QtWebEngineWidgets to fix startup problems.
-- Documentation only available in system's web browser, not in applications
-  own window.
-- Removed image_io subpackage and replaced it with new registry-based data_io
-  package.

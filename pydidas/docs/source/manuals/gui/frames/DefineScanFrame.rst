@@ -28,7 +28,7 @@ Import scan settings
 .. image:: images/define_scan_frame_import.png
     :align: left
 
-The Scan settings can be importted from file. Clicking the corresponding 
+The Scan settings can be imported from file. Clicking the corresponding 
 button will open a selection dialogue to pick the file with the stored settings.
 File extensions will be pre-selected based on the available importers. 
 
@@ -50,6 +50,18 @@ Export scan settings
 At the bottom of the Frame, the export button allows users to export the current
 :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
 Parameters to a file. This button will open a filename dialogue.
+
+Scan dimension explanation
+--------------------------
+
+.. image:: images/define_scan_frame_more_dim_info.png
+    :align: left
+
+The scan dimension explanation section gives detailed information about the 
+ordering of scan scan dimensions. The *slowest* scan dimension is dimension no. 
+1 and the fastest is the last scan dimension. This ordering corresponds to how
+the scan must be performed algorithmically. The button opens a window with an
+in-depth explanation, including images.
 
 Global Parameters
 -----------------
@@ -103,13 +115,6 @@ The range of each scan dimension is determined by the number of points
     x_0,\ x_0 + \Delta x,\ x_0 + 2 * \Delta x,\ ...,\ x_0 + (N - 1) * \Delta x.
 
 
-Using the Scan settings
--------------------------------
-
-The :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
-is not used directly but the information is required in applications, e.g. to
-run processing workflows.
-   
 .. _scan_context_params:
 
 .. include:: ../../global/scan_context_params.rst

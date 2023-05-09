@@ -1,14 +1,19 @@
-# Configuration file for the Sphinx documentation builder.
+# This file is part of pydidas.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# pydidas is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import sys
@@ -25,7 +30,7 @@ author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
 release = "beta"
-version = "23.3.9"
+version = "23.3.22"
 
 # -- General configuration ---------------------------------------------------
 

@@ -8,7 +8,7 @@ The DefineDiffractionExpFrame
     :local:
     :backlinks: none
     
-The *Define Experimental setup* frame is a graphical interface to configure the 
+The *Define Diffrraction setup* frame is a graphical interface to configure the 
 :py:class:`DiffractionExperimentContext 
 <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>` 
 which holds information about the experimental/beamline setup.
@@ -16,14 +16,14 @@ which holds information about the experimental/beamline setup.
 The frame only holds the configuration widgets:
 
 .. image:: images/define_experiment_frame_full.png
-    :width: 300px
+    :width: 370px
     :align: center
 
 Detailed description of frame items
 -----------------------------------
 
-Load settings
-^^^^^^^^^^^^^
+Import settings
+^^^^^^^^^^^^^^^
 
 .. image:: images/define_experiment_frame_button_import.png
     :align: left
@@ -31,6 +31,8 @@ Load settings
 Experimental settings can be import from file. Clicking the corresponding 
 button will open a selection dialogue to pick the file with the stored settings.
 File extensions will be pre-selected based on the available importers. 
+
+.. _copy_from calibration:
 
 Copy Parameters from calibration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -48,11 +50,10 @@ Beamline energy
 .. image:: images/define_experiment_frame_energy.png
     :align: left
 
-The beamline energy can either be copied from the pyFAI calibration tool (a 
-warning will pop up if this option has been selected but no pyFAI calibration
-is active) or the user can update the values for either the X-ray energy 
-(in keV) or the wavelength (in A). Updating either of these values will also
-modify the other value to keep them consistent.
+The beamline energy can either be copied from the pyFAI calibration tool (see 
+:ref:`copy_from calibration`) or the user can update the values for either the 
+X-ray energy (in keV) or the wavelength (in A). Updating either of these values 
+will also modify the other value to keep them consistent.
 
 Detector
 ^^^^^^^^
@@ -73,9 +74,8 @@ Confirming the selection in the dialogue will update the detector Parameters.
 
 |
 
-Alternatively, if the detector has been selected in the pyFAI calibration, 
-the detector Parameters can be copied from pyFAI by clicking the button "Copy 
-X-ray detector from pyFAI calibration" or all Parameters can also be entered 
+Alternatively, the detector can be taken from the the pyFAI calibration, 
+(see :ref:`copy_from calibration`) or all Parameters can also be entered 
 manually in the input fields.
 
 The last field of the detector group, the *Detector pixel mask* determines if 
@@ -98,10 +98,13 @@ the origin (i.e. sample) on the detector and three rotations to modify the
 detector position.  Please refer to the pyFAI documentation for a detailed 
 description.
 
-These settings can be copied from the pyFAI calibration using the button or the
-values can be entered manually.
+In addition to taking these settings from the the pyFAI calibration
+(see :ref:`copy_from calibration`) and manual update, pydidas also offers a 
+tool for manually setting the beamcenter. The button *Manual beamcenter 
+definition* opens a new window. The window is described in detail in 
+:ref:`manually_set_beamcenter_window`.
 
-Saving
+Export
 ^^^^^^
 
 .. image:: images/define_experiment_frame_export.png
@@ -112,12 +115,13 @@ button will open a dialogue to select a filename. By default, a filename filter
 for all supported extensions is active. The file type is selected automatically 
 based on the extension.
 
-Using the Experimental settings
--------------------------------
+Using the Diffracion Experiment settings
+----------------------------------------
 
 The :py:class:`DiffractionExperimentContext 
 <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>` 
-is not used directly but the information is required in applications, e.g. to
-run processing workflows or to determine the beam center on the detector.
+is not used directly by the user but the information is required in 
+applications, e.g. to run processing workflows or to determine the beam center 
+on the detector.
    
 .. include:: ../../global/diffraction_exp_context_params.rst

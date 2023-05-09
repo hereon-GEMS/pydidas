@@ -2,9 +2,9 @@
     Copyright 2021-, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-The widgets.workflow_edit sub-package
--------------------------------------
+The widgets.controllers sub-package
+-----------------------------------
 
-.. automodule:: pydidas.widgets.workflow_edit
+.. automodule:: pydidas.widgets.controllers
     :members:
     :show-inheritance:

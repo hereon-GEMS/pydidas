@@ -30,12 +30,11 @@ Using the *Import results from directory* button in the top left of the frame
 opens a window to select a directory. The selected directory is scanned for 
 pydidas-written node result files which will be imported.
 
-.. warning::
+.. note::
 
-    Because the :py:class:`WorkflowResults 
-    <pydidas.workflow.WorkflowResults>` are a global 
-    singleton, importing results will overwrite all current results held in
-    memory and may thus clear unsaved results. 
+    Importing results will also import Scan and Diffraction Experiment 
+    defintions into separate instances in the background. Therefore, the 
+    imported data is completely independent from any current processing.
 
 Result selection
 ----------------

@@ -7,7 +7,7 @@
    id="svg8"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    sodipodi:docname="scan_setup_overview.svg"
-   inkscape:export-filename="..\..\..\..\..\..\pydidas\docs\source\manuals\gui\frames\images\scan_setup_overview.png"
+   inkscape:export-filename="H:\myPython\pydidas\pydidas\docs\source\manuals\gui\frames\images\scan_setup_overview.png"
    inkscape:export-xdpi="104"
    inkscape:export-ydpi="104"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -134,8 +134,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="-35"
-     inkscape:cy="222.85714"
+     inkscape:cx="101.42857"
+     inkscape:cy="365.71429"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -146,7 +146,7 @@
      fit-margin-bottom="0"
      inkscape:window-width="3440"
      inkscape:window-height="1377"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:showpageshadow="2"
@@ -206,23 +206,23 @@
     <text
        xml:space="preserve"
        id="text850-9-4"
-       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect852-4-1);display:inline;fill:#0000ff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect852-4-1);fill:#0000ff;fill-opacity:1;stroke:none"
        transform="translate(30.0235,147.05379)"
        inkscape:export-xdpi="104"
        inkscape:export-ydpi="104"><tspan
          x="108.7793"
          y="35.253697"
-         id="tspan2608"><tspan
+         id="tspan2538"><tspan
            style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
-           id="tspan2606">[detailed dimension
+           id="tspan2536">[detailed dimension
 </tspan></tspan><tspan
          x="108.7793"
          y="45.837033"
-         id="tspan2614"><tspan
+         id="tspan2544"><tspan
            style="font-size:5.64444px"
-           id="tspan2610">  </tspan><tspan
+           id="tspan2540">  </tspan><tspan
            style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
-           id="tspan2612">parameters]</tspan></tspan></text>
+           id="tspan2542">parameters]</tspan></tspan></text>
     <rect
        style="fill:none;fill-opacity:0.2;stroke:#ffd42a;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.643179;stroke-opacity:1;paint-order:stroke fill markers;stop-color:#000000"
        id="rect864"
@@ -253,27 +253,27 @@
     <text
        xml:space="preserve"
        id="text866"
-       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect868);display:inline;fill:#000000;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect868);fill:#000000;fill-opacity:1;stroke:none"
        transform="translate(-130.71277,-128.11694)"
        inkscape:export-xdpi="104"
        inkscape:export-ydpi="104"><tspan
          x="127.48828"
          y="245.86112"
-         id="tspan2618"><tspan
+         id="tspan2548"><tspan
            style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold';fill:#ffd42a"
-           id="tspan2616">[global scan
+           id="tspan2546">[global scan
 </tspan></tspan><tspan
          x="127.48828"
          y="256.44446"
-         id="tspan2624"><tspan
+         id="tspan2554"><tspan
            style="font-size:6.35px"
-           id="tspan2620">  </tspan><tspan
+           id="tspan2550">  </tspan><tspan
            style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold';fill:#ffd42a"
-           id="tspan2622">parameters]</tspan></tspan></text>
+           id="tspan2552">parameters]</tspan></tspan></text>
     <text
        xml:space="preserve"
        id="text943"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect945);display:inline;fill:#000000;fill-opacity:1;stroke:none" />
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect945);fill:#000000;fill-opacity:1;stroke:none" />
     <rect
        style="fill:none;fill-opacity:0.2;stroke:#f7941e;stroke-width:1;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.643179;paint-order:stroke fill markers;stop-color:#000000"
        id="rect848-9"
@@ -295,14 +295,14 @@
     <text
        xml:space="preserve"
        id="text850"
-       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect852);display:inline;fill:#00d400;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:8.46667px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect852);fill:#00d400;fill-opacity:1;stroke:none"
        transform="translate(-40.092321,59.092823)"
        inkscape:export-xdpi="104"
        inkscape:export-ydpi="104"><tspan
          x="108.7793"
          y="35.253697"
-         id="tspan2628"><tspan
+         id="tspan2558"><tspan
            style="font-weight:bold;-inkscape-font-specification:'sans-serif Bold'"
-           id="tspan2626">[Extra information]</tspan></tspan></text>
+           id="tspan2556">[Extra information]</tspan></tspan></text>
   </g>
 </svg>

@@ -104,6 +104,11 @@ menu entries description
         calibration to determine the beam center. Therefore, looking at data 
         with a different calibration will display a wrong center and therefore 
         also wrong coordinates.
+    * -  .. image:: ../silx/images/menu_get_data_info.png
+            :align: center
+      - Get information for selected datapoint: This button will allow the user
+        to click on a point in the image and show a window with additional 
+        information about this point (specifically: all indices / data values).
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png
             :align: center
       - Copy the currently visible figure to the clipboard. This will only copy

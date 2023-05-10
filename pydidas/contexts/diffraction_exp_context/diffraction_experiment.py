@@ -37,7 +37,7 @@ from ...core import (
     UserConfigError,
     get_generic_param_collection,
 )
-from ...core.constants import LAMBDA_IN_A_TO_E
+from ...core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
 from ...core.utils import NoPrint, SignalBlocker
 from .diffraction_experiment_io import DiffractionExperimentIo
 
@@ -123,9 +123,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             The detector object.
         """
         _name = self.get_param_value("detector_name")
-        try:
+        if _name in PYFAI_DETECTOR_NAMES:
             _det = pyFAI.detector_factory(_name)
-        except RuntimeError:
+        else:
             _det = pyFAI.detectors.Detector()
         for key, value in [
             ["pixel1", self.get_param_value("detector_pxsizey") * 1e-6],
@@ -177,9 +177,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         NameError
             If the specified detector name is unknown by pyFAI.
         """
-        try:
+        if det_name in PYFAI_DETECTOR_NAMES:
             _det = pyFAI.detector_factory(det_name)
-        except RuntimeError:
+        else:
             raise UserConfigError(
                 f"The detector name '{det_name}' is unknown to pyFAI."
             )

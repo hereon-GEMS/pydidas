@@ -36,6 +36,7 @@ from .generic_params import *
 from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
+from .pyfai_names import *
 from .q_settings import *
 from .qt_presets import *
 from .unicode_greek_letters import *
@@ -78,6 +79,11 @@ from . import links
 
 __all__.extend(links.__all__)
 del links
+
+from . import pyfai_names
+
+__all__.extend(pyfai_names.__all__)
+del pyfai_names
 
 from . import q_settings
 

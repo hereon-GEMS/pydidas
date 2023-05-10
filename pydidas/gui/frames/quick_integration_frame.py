@@ -33,19 +33,21 @@ from functools import partial
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from pydidas.contexts import DiffractionExperimentIo
-from pydidas.contexts.diffraction_exp_context import DiffractionExperiment
-from pydidas.widgets import PydidasFileDialog
-from pydidas.widgets.framework import BaseFrame
-from pydidas.core import get_generic_param_collection
-from pydidas.data_io import import_data
-from pydidas.widgets.controllers import (
+from ...contexts import DiffractionExperimentIo
+from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...core import get_generic_param_collection
+from ...core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
+from ...core.utils import ShowBusyMouse
+from ...data_io import import_data
+from ...plugins import PluginCollection, pyFAIintegrationBase
+from ...widgets import PydidasFileDialog
+from ...widgets.controllers import (
     ManuallySetBeamcenterController,
     ManuallySetIntegrationRoiController,
 )
-from pydidas.core.utils import ShowBusyMouse
-from pydidas.plugins import PluginCollection, pyFAIintegrationBase
-from pydidas.gui.frames.builders import QuickIntegrationFrameBuilder
+from ...widgets.framework import BaseFrame
+from .builders import QuickIntegrationFrameBuilder
+
 
 COLL = PluginCollection()
 
@@ -70,7 +72,14 @@ class QuickIntegrationFrame(BaseFrame):
         "integration_direction",
         "azi_npoint",
         "rad_npoint",
+        "detector_model",
     )
+    params_not_to_restore = [
+        "integration_direction",
+        "azi_npoint",
+        "rad_npoint",
+        "detector_model",
+    ]
 
     def __init__(self, parent=None, **kwargs):
         BaseFrame.__init__(self, parent, **kwargs)
@@ -194,13 +203,9 @@ class QuickIntegrationFrame(BaseFrame):
         self._widgets["input_plot"].plot_pydidas_dataset(self._image)
         self._widgets["input_plot"].changeCanvasToDataAction._actionTriggered()
         self._roi_controller.show_plot_items("roi")
-        for _key in [
-            "beamcenter_section",
-            "integration_header",
-            "integration_section",
-            "run_integration",
-        ]:
-            self._widgets[_key].setVisible(True)
+        self._toggle_fname_valid(True)
+        self._update_detector_model()
+        self._widgets["tabs"].setCurrentIndex(0)
 
     @QtCore.Slot(bool)
     def _toggle_fname_valid(self, is_valid):
@@ -213,14 +218,27 @@ class QuickIntegrationFrame(BaseFrame):
             Flag to process.
         """
         self._widgets["input_plot"].setEnabled(is_valid)
-        if not is_valid:
-            for _key in [
-                "beamcenter_section",
-                "integration_header",
-                "integration_section",
-                "run_integration",
-            ]:
-                self._widgets[_key].setVisible(False)
+        for _key in [
+            "beamcenter_section",
+            "integration_header",
+            "integration_section",
+            "run_integration",
+        ]:
+            self._widgets[_key].setVisible(is_valid)
+        self.toggle_param_widget_visibility("detector_model", is_valid)
+
+    def _update_detector_model(self):
+        """
+        Update the detector model selection based on the input image shape.
+        """
+        _shape = self._image.shape
+        _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(_shape, [])
+        self.params["detector_model"].update_value_and_choices(
+            _det_models[0], _det_models + ["Custom detector"]
+        )
+        self.param_widgets["detector_model"].update_choices(
+            _det_models + ["Custom detector"]
+        )
 
     def set_param_value_and_widget(self, key, value):
         """
@@ -384,34 +402,14 @@ class QuickIntegrationFrame(BaseFrame):
             _plugin.set_param_value("azi_npoint", self.get_param_value("azi_npoint"))
         if _dir != "Radial integration":
             _plugin.set_param_value("rad_npoint", self.get_param_value("rad_npoint"))
+        _det_model = self.get_param_value("detector_model")
+        if _det_model == "Custom detector":
+            self._update_detector_pxsize(self.get_param_value("detector_pxsize"))
+            self.set_param_value("detector_name", "Custom detector")
+        else:
+            self._EXP.set_detector_params_from_name(_det_model.split("]")[1].strip())
         with ShowBusyMouse():
             _plugin.pre_execute()
             _results, _ = _plugin.execute(self._image)
             self._widgets["result_plot"].plot_data(_results)
             self._widgets["tabs"].setCurrentIndex(1)
-
-    def export_to_file(self):
-        """
-        Open a dialog to select a filename and write all currrent settings
-        for the DiffractionExperimentContext to file.
-        """
-        _fname = self.__export_dialog.get_user_response()
-        if _fname is not None:
-            self._EXP.export_to_file(_fname, overwrite=True)
-
-
-if __name__ == "__main__":
-    import pydidas
-
-    app = pydidas.core.PydidasQApplication([])
-    PC = pydidas.plugins.PluginCollection()
-    EXP = pydidas.contexts.DiffractionExperimentContext()
-    EXP.import_from_file("E:/MATRAC/Analysis/experiment_context.yaml")
-    EXP.set_beamcenter_from_fit2d_params(
-        5000, -1000, EXP.get_param_value("detector_dist")
-    )
-    _plugin = PC.get_plugin_by_name("PyFAIazimuthalIntegration")()
-    window = QuickIntegrationFrame()
-    window.frame_activated(window.frame_index)
-    window.show()
-    app.exec_()

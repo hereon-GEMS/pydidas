@@ -326,6 +326,11 @@ class QuickIntegrationFrameBuilder:
             parent_widget=cls._frame._widgets["exp_section"],
             visible=True,
         )
+        cls._frame.create_param_widget(
+            cls._frame.get_param("detector_model"),
+            **(cls._2line_options() | dict(visible=False)),
+        )
+
         cls._frame.create_spacer(
             None, fixedHeight=15, parent_widget=cls._frame._widgets["exp_section"]
         )

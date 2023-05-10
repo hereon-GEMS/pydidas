@@ -201,4 +201,13 @@ GENERIC_PARAMS_PYFAI = {
         "allow_None": False,
         "tooltip": "The integration direction.",
     },
+    "detector_model": {
+        "type": str,
+        "default": "Custom detector",
+        "name": "Detector model",
+        "choices": ["Custom detector"],
+        "unit": "",
+        "allow_None": None,
+        "tooltip": "The model name of the detector.",
+    },
 }

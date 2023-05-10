@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["UtilitiesFrameBuilder"]
 
+
 from qtpy import QtWidgets
 
 from ....core import constants
@@ -71,6 +72,11 @@ UTILITIES = {
             "images and save the results to a new single image."
         ),
         "button_text": "Image series operations",
+    },
+    "composite_creation": {
+        "title": "Create composite image",
+        "text": "Compose mosaic images of a large number of individual image files.",
+        "button_text": "Create composite image",
     },
 }
 

@@ -270,8 +270,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         The center_x and center_y parameters define the position of the beam center on
         the detector. The optional rot_x, rot_y and rot_beam allow to add a rotation
         around axes parallel to the detector x and y direction and around the beam.
-        Following the pyFAI geometry, the order of rotations is :
-            R_pyfai = R_3(rot_beam) * R_2(-rot_x) * R_1(-rot_y)
+        Following the pyFAI geometry, the order of rotations is:
+
+        R_pyfai = R_3(rot_beam) * R_2(-rot_x) * R_1(-rot_y)
 
         Note that rot_x and rot_y directors are lefthanded (i.e. inverted.)
 

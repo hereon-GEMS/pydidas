@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,19 +20,20 @@ The pydidas_gui module includes a function to run the default pydidas processing
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["run_gui"]
 
+
+import multiprocessing as mp
 import sys
 import warnings
-import multiprocessing as mp
 
 from qtpy import QtWidgets
 
-from pydidas.core import UserConfigError, PydidasQApplication
+from pydidas.core import PydidasQApplication, UserConfigError
 from pydidas.gui import MainWindow, frames
 
 
@@ -66,7 +69,6 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(frames.HomeFrame)
     gui.register_frame(frames.DataBrowsingFrame)
     gui.register_frame(frames.PyfaiCalibFrame)
-    gui.register_frame(frames.CompositeCreatorFrame)
     gui.register_frame(frames.DirectorySpyFrame)
     gui.register_frame(frames.QuickIntegrationFrame)
     gui.register_frame(frames.DefineDiffractionExpFrame)

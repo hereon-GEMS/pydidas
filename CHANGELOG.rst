@@ -81,6 +81,8 @@ Improvements
 - Added a PydidasPlotStack widget which automatically switches between 1D and 2D
   plots and allows to plot data using a single interface.
 - The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
+- Moved the CompositeCreator frame from the main toolbar menu to the utilities.
+
 
 Bugfixes
 --------

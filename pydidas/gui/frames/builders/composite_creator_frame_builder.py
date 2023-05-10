@@ -96,6 +96,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             alignment=None,
             stretch=(1, 1),
             gridPos=(0, 3, 1, 1),
+            minimumWidth=900,
             visible=False,
             sizePolicy=POLICY_EXP_EXP,
             cs_transform=False,

@@ -40,6 +40,7 @@ from ...widgets.windows import (
     UserConfigWindow,
 )
 from .builders import UtilitiesFrameBuilder
+from .composite_creator_frame import CompositeCreatorFrame
 
 
 class UtilitiesFrame(UtilitiesFrameBuilder):
@@ -94,6 +95,9 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._widgets["button_user_config"].clicked.connect(
             partial(self.show_window, "user_config")
         )
+        self._widgets["button_composite_creation"].clicked.connect(
+            partial(self.create_and_show_frame, CompositeCreatorFrame)
+        )
 
     @QtCore.Slot(object)
     def create_and_show_temp_window(self, window):
@@ -113,6 +117,25 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         )
         self.__app.sig_close_gui.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()
+
+    @QtCore.Slot(object)
+    def create_and_show_frame(self, frame):
+        """
+        Show the given frame.
+
+        Parameters
+        ----------
+        frame : pydidas.widgets.framework.BaseFrame
+            The frame to be shown.
+        """
+        if frame.menu_title in self._child_windows:
+            self._child_windows[frame.menu_title].show()
+            return
+        _frame = frame()
+        _frame.setWindowTitle(frame.menu_title)
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows[frame.menu_title] = _frame
+        _frame.show()
 
     @QtCore.Slot(str)
     def show_window(self, name):

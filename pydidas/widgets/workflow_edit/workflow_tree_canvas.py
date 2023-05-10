@@ -28,10 +28,10 @@ __all__ = ["WorkflowTreeCanvas"]
 from qtpy import QtWidgets, QtGui, QtCore
 
 from ...core import constants
-from ..factory import create_label
+from ..factory import create_label, CreateWidgetsMixIn
 
 
-class WorkflowTreeCanvas(QtWidgets.QFrame):
+class WorkflowTreeCanvas(QtWidgets.QFrame, CreateWidgetsMixIn):
     """
     The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
     the individual plugin widgets. It is also responsible to draw the lines
@@ -44,16 +44,9 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
     """
 
     def __init__(self, parent=None):
-        super().__init__(parent=parent)
+        QtWidgets.QFrame.__init__(self, parent=parent)
+        CreateWidgetsMixIn.__init__(self)
         self.setAcceptDrops(True)
-        self.title = create_label(
-            "Workflow tree editor",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
-            bold=True,
-            parent=self,
-            fixedWidth=250,
-        )
-        self.title.move(0, 0)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
 

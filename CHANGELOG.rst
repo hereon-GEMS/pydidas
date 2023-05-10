@@ -83,7 +83,6 @@ Improvements
 - The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
 - Moved the CompositeCreator frame from the main toolbar menu to the utilities.
 
-
 Bugfixes
 --------
 
@@ -115,6 +114,7 @@ Bugfixes
   the radial or azimuthal ranges.
 - Fixed an issue in the PyfaiIntegrationBase plugin with the diffraction_exp
   keyword being interpreted as a parameter value.
+- Fixed an issue with centering of the WorkflowTree in the WorkflowEditFrame.
   
 
 =======

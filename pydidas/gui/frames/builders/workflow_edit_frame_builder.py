@@ -50,22 +50,30 @@ class WorkflowEditFrameBuilder(BaseFrame):
         """
         self._widgets["workflow_canvas"] = WorkflowTreeCanvas()
 
+        self.create_label(
+            "label_title",
+            "Workflow tree editor",
+            fontsize=STANDARD_FONT_SIZE + 4,
+            bold=True,
+            fixedWidth=250,
+            gridPos=(0, 0, 1, 3),
+        )
         self.create_any_widget(
             "workflow_area",
             ScrollArea,
             minimumHeight=450,
             widget=self._widgets["workflow_canvas"],
-            gridPos=(0, 0, 1, 1),
+            gridPos=(1, 0, 3, 2),
         )
         self.create_label(
             "plugin_title",
             "Available plugins:",
             fontsize=STANDARD_FONT_SIZE + 4,
             underline=True,
-            gridPos=(1, 0, 1, 1),
+            gridPos=(4, 0, 1, 2),
         )
         self.create_any_widget(
-            "plugin_collection", PluginCollectionBrowser, gridPos=(2, 0, 3, 1)
+            "plugin_collection", PluginCollectionBrowser, gridPos=(5, 0, 1, 2)
         )
         self._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
         self.create_any_widget(
@@ -75,19 +83,23 @@ class WorkflowEditFrameBuilder(BaseFrame):
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
             sizePolicy=POLICY_EXP_EXP,
-            gridPos=(0, 1, 3, 1),
+            gridPos=(1, 2, 4, 1),
         )
         self.create_button(
             "but_load",
             "Import workflow from file",
-            gridPos=(3, 1, 1, 1),
+            fixedWidth=250,
+            fixedHeight=25,
             icon=self.style().standardIcon(42),
+            gridPos=(1, 0, 1, 1),
         )
         self.create_button(
             "but_save",
             "Export workflow to file",
-            gridPos=(4, 1, 1, 1),
+            fixedWidth=250,
+            fixedHeight=25,
             icon=self.style().standardIcon(43),
+            gridPos=(2, 0, 1, 1),
         )
 
         update_size_policy(self._widgets["workflow_area"], verticalStretch=2)

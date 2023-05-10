@@ -220,4 +220,17 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
         """
         super().frame_activated(index)
         if self.frame_index == index:
-            WORKFLOW_EDIT_MANAGER.update_from_tree()
+            WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
+
+    def resizeEvent(self, event):
+        """
+        Handle the resizeEvent and also update the node positions in the WorkflowTree.
+
+        Parameters
+        ----------
+        event : QtCore.QEvent
+            The calling event.
+        """
+        QtWidgets.QWidget.resizeEvent(self, event)
+        if self._config["built"]:
+            WORKFLOW_EDIT_MANAGER.update_node_positions()

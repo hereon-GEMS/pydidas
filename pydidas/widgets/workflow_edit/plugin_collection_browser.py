@@ -75,7 +75,6 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
         )
         self.add_any_widget(
             "plugin_treeview",
-            # PluginCollectionTreeWidget(self, self.collection),
             SelectNewPluginWidget(collection=self.collection),
             gridPos=(0, 0, 1, 1),
         )
@@ -120,7 +119,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
     @QtCore.Slot(str)
     def display_plugin_description(self, name):
         """
-        display the plugin description of the selected plugin.
+        Display the plugin description of the selected plugin.
 
         Parameters
         ----------

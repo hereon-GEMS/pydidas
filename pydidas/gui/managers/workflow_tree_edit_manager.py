@@ -303,6 +303,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.update_from_tree()
         self._check_consistency()
 
+    @QtCore.Slot()
     def update_node_positions(self):
         """
         Update the node positions on the canvas after changes to the tree.
@@ -312,24 +313,24 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         if self.root is None:
             return
-        _pos = self.root.get_relative_positions()
-        _width = max(_pos.values())[0] + gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
-        _offset = 0
+        _positions = self.root.get_relative_positions()
+        _pos_vals = np.asarray(list(_positions.values()))
+        _tree_width = self.root.width
         _canvas_width = self.qt_canvas.parent().parent().width()
-        if _width < _canvas_width:
-            _offset = (_canvas_width - _width) // 2
-        pos_vals = np.asarray(list(_pos.values()))
-        pos_vals[:, 0] += -np.amin(pos_vals[:, 0]) + self.pos_x_min + _offset
-        pos_vals[:, 1] += -np.amin(pos_vals[:, 1]) + self.pos_y_min
-        self._node_positions = {key: pos_vals[i] for i, key in enumerate(_pos)}
+        _canvas_height = self.qt_canvas.parent().parent().height()
+        _offset = (
+            (_canvas_width - _tree_width) // 2 if _tree_width < _canvas_width else 0
+        )
+        _pos_vals[:, 0] += -np.amin(_pos_vals[:, 0]) + self.pos_x_min + _offset
+        _pos_vals[:, 1] += -np.amin(_pos_vals[:, 1]) + self.pos_y_min
+        self._node_positions = {key: _pos_vals[i] for i, key in enumerate(_positions)}
         for node_id in TREE.node_ids:
             self._node_widgets[node_id].move(
                 self._node_positions[node_id][0], self._node_positions[node_id][1]
             )
-        self.qt_canvas.setFixedSize(
-            self.root.width + 2 * self.pos_x_min + _offset,
-            self.root.height + 2 * self.pos_y_min,
-        )
+        _canvas_xsize = max(_tree_width + 2 * self.pos_x_min + _offset, _canvas_width)
+        _canvas_ysize = max(self.root.height + 2 * self.pos_y_min, _canvas_height)
+        self.qt_canvas.setFixedSize(_canvas_xsize, _canvas_ysize)
         self.__update_node_connections()
 
     def __update_node_connections(self):
@@ -377,6 +378,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.update_node_positions()
         if reset_active_node:
             self.sig_plugin_selected.emit(-1)
+            TREE.active_node_id = None
             return
         self.set_active_node(TREE.active_node_id, force_update=True)
         self._check_consistency()

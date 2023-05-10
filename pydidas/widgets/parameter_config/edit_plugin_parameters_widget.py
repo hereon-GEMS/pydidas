@@ -112,7 +112,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """
         self.create_label(
             "plugin_name",
-            f"\nPlugin: {self.plugin.plugin_name}",
+            f"Plugin: {self.plugin.plugin_name}",
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,

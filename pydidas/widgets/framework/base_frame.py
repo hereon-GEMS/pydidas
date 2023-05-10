@@ -110,7 +110,6 @@ class BaseFrame(
         """
         if index == self.frame_index and not self._config["built"]:
             with ShowBusyMouse():
-                self.setUpdatesEnabled(False)
                 self.build_frame()
                 self.setUpdatesEnabled(True)
                 self.connect_signals()

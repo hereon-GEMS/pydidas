@@ -267,7 +267,6 @@ class MainWindow(MainMenu):
             self._toolbar_actions[label].setChecked(False)
             self.__configuration["toolbar_visibility"][label] = _new_visibility
             self._auto_update_toolbar_entry(label)
-
         self.setUpdatesEnabled(True)
 
     def restore_gui_state(self, state="saved", filename=None):

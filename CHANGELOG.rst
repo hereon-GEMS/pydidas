@@ -82,6 +82,10 @@ Improvements
   plots and allows to plot data using a single interface.
 - The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
 - Moved the CompositeCreator frame from the main toolbar menu to the utilities.
+- Added an 'update_value_and_choices' method to the Parameter to change the 
+  value and choices simultaneously without any incorrect intermediate status.
+
+
 
 Bugfixes
 --------

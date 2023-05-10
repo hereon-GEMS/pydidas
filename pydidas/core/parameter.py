@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,8 +21,8 @@ consistent interface for various data types.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Parameter"]
@@ -506,6 +506,27 @@ class Parameter:
         if self.__type in (list, tuple, dict):
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
+
+    def update_value_and_choices(self, value, choices):
+        """
+        Update the value and choices of the Parameter to prevent illegal selections.
+
+        Parameters
+        ----------
+        value : type
+            The new Parameter values
+        choices : Iterable
+            The new choices for the Parameter.
+        """
+        if not self.__typecheck(value):
+            raise ValueError(
+                f"The new value '{value}' of type '{type(value)}' is of the wrong "
+                f"type. Expected '{self.__type}'."
+            )
+        if value not in choices:
+            raise ValueError("The new value must be included in the new choices.")
+        self.__value = value
+        self.choices = choices
 
     def restore_default(self):
         """

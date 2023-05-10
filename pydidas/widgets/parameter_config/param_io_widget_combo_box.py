@@ -150,4 +150,5 @@ class ParamIoWidgetComboBox(QtWidgets.QComboBox, BaseParamIoWidget):
                 self.addItem(_itemstr)
             self.__items = [self.itemText(i) for i in range(self.count())]
             self.set_value(new_choices[0])
+            self.emit_signal()
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)

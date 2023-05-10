@@ -121,6 +121,9 @@ Bugfixes
 - Fixed an issue with centering of the WorkflowTree in the WorkflowEditFrame.
 - Fixed an issue where updating a Path ParameterIoWidget would not emit the 
   io_edited signal when a new file would be selected through drag & drop.
+- Fixed an issue where no signal would be emitted if the choices in the 
+  ParamIoWidgetComboBox were updated and the selected value was changed 
+  for consistency.
  
 
 =======

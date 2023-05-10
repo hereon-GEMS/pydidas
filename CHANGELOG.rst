@@ -115,7 +115,9 @@ Bugfixes
 - Fixed an issue in the PyfaiIntegrationBase plugin with the diffraction_exp
   keyword being interpreted as a parameter value.
 - Fixed an issue with centering of the WorkflowTree in the WorkflowEditFrame.
-  
+- Fixed an issue where updating a Path ParameterIoWidget would not emit the 
+  io_edited signal when a new file would be selected through drag & drop.
+ 
 
 =======
 v23.3.9

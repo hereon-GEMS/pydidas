@@ -1,3 +1,7 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Graphical user interface
 ========================
 
@@ -84,6 +88,7 @@ Detailed descriptions of the individual frames are given here.
     frames/PyfaiCalibFrame
     frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
+    frames/QuickIntegrationFrame
     frames/DefineDiffractionExpFrame
     frames/DefineScanFrame
     frames/WorkflowEditFrame
@@ -110,6 +115,7 @@ Detailed information about the individual windows is given here.
     windows/_GlobalSettingsWindow
     windows/TweakPluginParameterWindow
     windows/ShowDetailedPluginResultsWindow
+    windows/ManuallySetBeamcenterWindow
 
 .. _gui_recipes:
 

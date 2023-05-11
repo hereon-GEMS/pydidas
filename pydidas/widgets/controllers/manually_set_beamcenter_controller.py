@@ -188,7 +188,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
                 *self._config["beamcenter_position"],
                 legend="beamcenter",
                 color=self._config["overlay_color"],
-                symbol="+",
+                symbol="d",
             )
         if (
             "beamcenter_outline" in kind

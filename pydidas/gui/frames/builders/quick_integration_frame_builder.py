@@ -360,7 +360,7 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_button(
             "but_set_beamcenter",
-            "Set point as beamcenter",
+            "Set selected point as beamcenter",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["beamcenter_section"],
             visible=False,

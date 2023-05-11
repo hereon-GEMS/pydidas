@@ -233,8 +233,9 @@ class QuickIntegrationFrame(BaseFrame):
         """
         _shape = self._image.shape
         _det_models = PYFAI_DETECTOR_MODELS_OF_SHAPES.get(_shape, [])
+        _model = "Custom detector" if len(_det_models) == 0 else _det_models[0]
         self.params["detector_model"].update_value_and_choices(
-            _det_models[0], _det_models + ["Custom detector"]
+            _model, _det_models + ["Custom detector"]
         )
         self.param_widgets["detector_model"].update_choices(
             _det_models + ["Custom detector"]
@@ -324,6 +325,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._widgets["but_select_beamcenter_manually"].setVisible(not _active)
         self._widgets["label_overlay_color"].setVisible(not _active)
         self._roi_controller.toggle_marker_color_param_visibility(not _active)
+        self._widgets["file_selector"].setEnabled(not _active)
         self._roi_controller.toggle_enable(not _active)
         if _active:
             self._bc_controller.show_plot_items("all")

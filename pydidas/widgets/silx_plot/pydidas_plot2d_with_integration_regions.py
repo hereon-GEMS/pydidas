@@ -120,7 +120,7 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
         _ny = self._config["diffraction_exp"].get_param_value("detector_npixy")
         _cx, _cy = self._config["beamcenter"]
         _xpoints, _ypoints = ray_from_center_intersection_with_detector(
-            (_cx, _cy), chi, (_nx, _ny)
+            (_cx, _cy), chi, (_ny, _nx)
         )
         if len(_xpoints) == 0:
             return
@@ -163,10 +163,10 @@ class PydidasPlot2DwithIntegrationRegions(PydidasPlot2D):
             _yarr = [0, _ny, _ny, 0]
         if radial is None and azimuthal is not None:
             _x0, _y0 = ray_from_center_intersection_with_detector(
-                (_cx, _cy), azimuthal[0], (_nx, _ny)
+                (_cx, _cy), azimuthal[0], (_ny, _nx)
             )
             _x1, _y1 = ray_from_center_intersection_with_detector(
-                (_cx, _cy), azimuthal[1], (_nx, _ny)
+                (_cx, _cy), azimuthal[1], (_ny, _nx)
             )
             if _center_on_det:
                 _xpoints, _ypoints = self._get_included_corners(

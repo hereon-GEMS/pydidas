@@ -127,6 +127,7 @@ class pyFAIintegrationBase(ProcPlugin):
                 detector=self._EXP.get_detector(),
                 wavelength=1e-10 * _lambda_in_A,
             )
+            self._exp_hash = hash(self._EXP)
         if self._mask is not None:
             self._ai.set_mask(self._mask)
         self._adjust_integration_discontinuity()

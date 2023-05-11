@@ -10,6 +10,8 @@ Major changes
   the current workflow and its results.
 - The structure of pydidas hdf5 result imports/exports has changed and all
   result files now have the complete processing metadata included.
+- Added a QuickIntegrationFrame to run fast integrations without needing to 
+  set up a full workflow.
 
 Improvements
 ------------
@@ -76,15 +78,12 @@ Improvements
 - Added ManuallySetIntegrationRegionController and 
   ManuallySetBeamcenterController classes to pydidas.widgets.controllers to 
   manage the corresponding widgets.
-- Added a QuickIntegrationFrame to run fast integrations without needing to 
-  set up a full workflow.
 - Added a PydidasPlotStack widget which automatically switches between 1D and 2D
   plots and allows to plot data using a single interface.
 - The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
 - Moved the CompositeCreator frame from the main toolbar menu to the utilities.
 - Added an 'update_value_and_choices' method to the Parameter to change the 
   value and choices simultaneously without any incorrect intermediate status.
-
 
 
 Bugfixes
@@ -124,6 +123,9 @@ Bugfixes
 - Fixed an issue where no signal would be emitted if the choices in the 
   ParamIoWidgetComboBox were updated and the selected value was changed 
   for consistency.
+- Fixed an issue in the pyFAIintegrationBase plugin where the check for the 
+  re-initialization of the AzimuthalIntegrator was always performed, 
+  irrespective of the implemented check.
  
 
 =======

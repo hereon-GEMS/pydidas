@@ -468,6 +468,13 @@ class QuickIntegrationFrameBuilder:
             parent_widget=cls._frame._widgets["config"],
             visible=False,
         )
+        _options = dict(
+            width_text=cls._frame._config["scroll_width"] - 100,
+            width_io=100,
+            width_unit=0,
+            width_total=cls._frame._config["scroll_width"],
+            parent_widget=cls._frame._widgets["run_integration"],
+        )
 
         cls._frame.create_line(
             None, parent_widget=cls._frame._widgets["run_integration"]
@@ -477,15 +484,15 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("integration_direction"),
-            **cls._1line_options("run_integration", width_unit=0),
+            width_text=cls._frame._config["scroll_width"] - 185,
+            width_io=180,
+            width_unit=0,
+            width_total=cls._frame._config["scroll_width"],
+            parent_widget=cls._frame._widgets["run_integration"],
         )
+        cls._frame.create_param_widget(cls._frame.get_param("azi_npoint"), **_options)
         cls._frame.create_param_widget(
-            cls._frame.get_param("azi_npoint"),
-            **cls._1line_options("run_integration", width_unit=0, visible=False),
-        )
-        cls._frame.create_param_widget(
-            cls._frame.get_param("rad_npoint"),
-            **cls._1line_options("run_integration", width_unit=0),
+            cls._frame.get_param("rad_npoint"), **(_options | dict(visible=False))
         )
         cls._frame.create_button(
             "but_run_integration",

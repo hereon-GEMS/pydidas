@@ -21,11 +21,12 @@ WorkflowEditFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowEditFrameBuilder"]
+
 
 from ....core.constants import POLICY_EXP_EXP, STANDARD_FONT_SIZE
 from ....core.utils import update_size_policy
@@ -83,7 +84,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
             sizePolicy=POLICY_EXP_EXP,
-            gridPos=(1, 2, 4, 1),
+            gridPos=(1, 2, 5, 1),
         )
         self.create_button(
             "but_load",

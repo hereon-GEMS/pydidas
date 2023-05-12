@@ -21,10 +21,10 @@ about the experiment independant from the individual frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
@@ -339,6 +339,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             The geometry in Fit2D nomenclature with center_x, center_y, det_dist,
             tilt and tilt_plane keys.
         """
+        if (
+            self.get_param_value("detector_pxsizex") == 0
+            or self.get_param_value("detector_pxsizey") == 0
+        ):
+            raise UserConfigError(
+                "The detector pixelsize of 0 is invalid for a fit2d geometry."
+            )
         _geo = self.as_pyfai_geometry()
         _f2d_geo = pyFAI.geometry.fit2d.convert_to_Fit2d(_geo)
         return {

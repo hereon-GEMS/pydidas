@@ -130,6 +130,8 @@ Bugfixes
   WorkflowTree would not be displayed as such after restoring the GUI state. 
 - Fixed an issue in the BasePlugin where the data consistency check would not
   give a human-readable error message.
+- Fixed an issue with detector pixel sizes of zero interfering with plot widget
+  position information which raised exceptions.
 
 
 

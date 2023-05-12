@@ -21,10 +21,10 @@ additional actions.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasPlot2D"]
 
 
@@ -61,6 +61,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         PydidasQsettingsMixin.__init__(self)
         self._config = {
             "cs_transform": kwargs.get("cs_transform", True),
+            "cs_transform_valid": True,
             "use_data_info_action": kwargs.get("use_data_info_action", False),
             "diffraction_exp": (
                 DiffractionExperimentContext()
@@ -96,6 +97,10 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
         if self._config["cs_transform"]:
+            self._config["diffraction_exp"].sig_params_changed.connect(
+                self.update_exp_setup_params
+            )
+            self.update_exp_setup_params()
             self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
             self._toolbar.addWidget(self.cs_transform)
 
@@ -131,6 +136,18 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 self.sig_get_more_info_for_data
             )
 
+    @QtCore.Slot()
+    def update_exp_setup_params(self):
+        """
+        Check that the detector is valid for a CS transform.
+        """
+        self._config["cs_transform_valid"] = (
+            self._config["diffraction_exp"].get_param_value("detector_pxsizex") > 0
+            and self._config["diffraction_exp"].get_param_value("detector_pxsizey") > 0
+            and self._config["diffraction_exp"].get_param_value("detector_npixx") > 0
+            and self._config["diffraction_exp"].get_param_value("detector_npixy") > 0
+        )
+
     def enable_cs_transform(self, enable):
         """
         Enable or disable the coordinate system transformations.
@@ -144,7 +161,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             return
         if not enable:
             self.cs_transform.set_coordinates("cartesian")
-        self.cs_transform.setEnabled(enable)
+        self.cs_transform.setEnabled(enable and self._config["cs_transform_valid"])
 
     def update_cs_units(self, x_unit, y_unit):
         """

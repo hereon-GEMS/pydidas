@@ -231,6 +231,12 @@ class TestDiffractionExperiment(unittest.TestCase):
         _f2d = obj.as_fit2d_geometry_values()
         self.assertIsInstance(_f2d, dict)
 
+    def test_as_fit2d_geometry_values__invalid_exp(self):
+        obj = self.prepare_context_with_Eiger()
+        obj.set_param_value("detector_pxsizex", 0)
+        with self.assertRaises(UserConfigError):
+            obj.as_fit2d_geometry_values()
+
     def test_beamcenter__not_set(self):
         obj = self.prepare_context_with_Eiger()
         _cx, _cy = obj.beamcenter

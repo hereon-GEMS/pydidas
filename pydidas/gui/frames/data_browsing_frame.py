@@ -66,7 +66,9 @@ class DataBrowsingFrame(DataBrowsingFrameBuilder):
         self._widgets["but_maximize"].clicked.connect(
             partial(self.change_splitter_pos, True)
         )
-        self.sig_this_frame_activated.connect(self._widgets["viewer"].get_detector_size)
+        self.sig_this_frame_activated.connect(
+            self._widgets["viewer"].update_from_diffraction_exp
+        )
         self.sig_this_frame_activated.connect(
             partial(self._widgets["viewer"].cs_transform.check_detector_is_set, True)
         )

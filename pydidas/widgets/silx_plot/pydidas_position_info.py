@@ -21,17 +21,19 @@ different coordinate systems.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasPositionInfo"]
+
 
 import numpy as np
 from qtpy import QtCore
 from silx.gui.plot.tools import PositionInfo
 
 from ...contexts import DiffractionExperimentContext
+from ...core import UserConfigError
 from ...core.utils import get_chi_from_x_and_y
 
 
@@ -120,7 +122,11 @@ class PydidasPositionInfo(PositionInfo):
         """
         Update beamcenter and detector distance from the DiffractionExperiment.
         """
-        _f2dgeo = self._EXP.as_fit2d_geometry_values()
+        try:
+            _f2dgeo = self._EXP.as_fit2d_geometry_values()
+        except UserConfigError:
+            self._plotRef.enable_cs_transform(False)
+            return
         self._pixelsize = (
             self._EXP.get_param_value("detector_pxsizex") * 1e-6,
             self._EXP.get_param_value("detector_pxsizey") * 1e-6,

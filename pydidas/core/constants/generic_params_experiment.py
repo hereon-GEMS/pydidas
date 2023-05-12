@@ -21,10 +21,10 @@ Parameters for the experiment context.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_EXPERIMENT"]
 
 
@@ -82,7 +82,7 @@ GENERIC_PARAMS_EXPERIMENT = {
     },
     "detector_pxsizex": {
         "type": float,
-        "default": -1,
+        "default": 100,
         "name": "Detector pixel size X",
         "choices": None,
         "unit": "um",
@@ -91,7 +91,7 @@ GENERIC_PARAMS_EXPERIMENT = {
     },
     "detector_pxsizey": {
         "type": float,
-        "default": -1,
+        "default": 100,
         "name": "Detector pixel size Y",
         "choices": None,
         "unit": "um",

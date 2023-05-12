@@ -1,3 +1,10 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+
+.. _data_browsing_frame:
+
 Data browsing frame
 ===================
 

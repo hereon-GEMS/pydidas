@@ -2,8 +2,8 @@
     Copyright 2021-, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
-The Quick Integration frame
-===========================
+Quick Integration frame
+=======================
 
 .. contents::
     :depth: 2
@@ -40,28 +40,7 @@ described in more detail below:
 Input selection
 ---------------
 
-The input file can be selected in any one of four ways:
-
-.. image:: images/quick_integration_frame_input.png
-    :align: left
-
-1. Use the "Select image file" button at the top.
-2. Enter the full file path in the input field.
-3. Use the small "open" button right of the input field.
-4. Drag and drop a file from the system's file explorer.
-
-.. image:: images/quick_integration_frame_input_hdf5.png
-    :align: right
-
-If the filename is valid, the selected file will be displayed immediately.
-
-For hdf5 files, however, you need to select data the dataset and frame number 
-first and confirm the selection with the "Confirm input selection" button before
-any frame is loaded and displayed.
-
-After loading an image, the current integration region is shown as an overlay.
-By default,the overlay is orange and will cover the full image (because the full
-detector is used by default).
+.. include:: ../beamcenter/file_input.rst
 
 Experiment description
 ----------------------
@@ -118,46 +97,9 @@ The image above shows the initial view after enabling the graphical beamcenter
 selection. The additional control buttons and center panel with the point list 
 are described in detail below.
 
-Image display
-^^^^^^^^^^^^^
+.. include:: ../beamcenter/bc_image_display.rst
 
-The image now remembers (left mouse button) clicks to store the pixel position
-and also displays all points. Points are visualized by different symbols, as
-explained below.
-
-.. list-table::
-    :widths: 5 95
-    :class: tight-table
-    :header-rows: 1
-
-    * - point symbol
-      - description
-    * -  .. image:: images/quick_integration_frame_bc_point.png
-            :align: center
-      - A generic **x** marker to signal that this point has been stored.
-    * -  .. image:: images/quick_integration_frame_bc_selected_point.png
-            :align: center
-      - Selected points are highlighted with a filled circle.
-    * -  .. image:: images/quick_integration_frame_bc_center.png
-            :align: center
-      - The beamcenter is marker with a diamond-shaped marker.
-
-Point list and controls
-^^^^^^^^^^^^^^^^^^^^^^^
-
-At the very top of the list is a configuration widget to change the color of all
-the plot overlay items like the points to increase the contrast. 
-
-The point list displays the positions of all clicked points. Left-clicking on
-a point in the list will select this point and also highlight it in the image
-by changing the marker. Multiple points can be selected by holding 
-:py:data:`Shift` when selecting the second point to select all points inbetween
-or by holding :py:data:`Ctrl` while selecting points to add only single points 
-to the selection. All selected points will be highlighted in the image. 
-
-The two buttons at the bottom of the point list allow to delete the current
-selection of points or all points. The current selection of points can also be
-deleted by pressing :py:data:`Del` while the plot list has the focus.
+.. include:: ../beamcenter/point_list.rst
 
 Control buttons
 ^^^^^^^^^^^^^^^
@@ -194,65 +136,7 @@ The integration region of interest can be selected either by entering values
 for the radial and azimuthal range or graphically after clicking the 
 "Select radial / azimuthal integration range in image" button.
 
-Selecting radial integration range in image
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If the azimuthal range is "Full detector", nothing will be displayed to start 
-with. If a range has been selected, the limits of the range will be marked by 
-two lines starting from the beamcenter. Clicking on the first point will set
-the inner radial limit, which will be displayed as a circle. Clicking a second
-time will set the upper limit and the selected integration ROI will be displayed
-as overlay.
-
-.. list-table::
-    :widths: 33 33 33
-    :class: tight-table
-    :header-rows: 1
-
-    * -  .. image:: images/quick_integration_frame_roi_azimuthal.png
-            :align: center
-            :width: 200
-      -  .. image:: images/quick_integration_frame_roi_azimuthal_inner_radial.png
-            :align: center
-            :width: 200
-      -  .. image:: images/quick_integration_frame_roi_final_roi.png
-            :align: center
-            :width: 200
-    * -  The starting azimuthal limits without any radial selection.
-      - After selecting the inner radial limit, it is shown as a circle.
-      - After selecting the outer radial limit as well, the final integration
-        ROI is displayed.
-
-Selecting azimuthal integration range in image
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If the radial range is "Full detector", nothing will be displayed to start 
-with. If a range has been selected, the limits of the range will be marked by 
-two circles around the beamcenter. Clicking on the first point will set the 
-starting radial limit and draw a line from the beamcenter. Clicking a second
-time will set the upper limit and the selected integration ROI will be displayed
-as overlay.
-
-.. list-table::
-    :widths: 33 33 33
-    :class: tight-table
-    :header-rows: 1
-
-    * -  .. image:: images/quick_integration_frame_roi_radial.png
-            :align: center
-            :width: 200
-      -  .. image:: images/quick_integration_frame_roi_radial_azi_start.png
-            :align: center
-            :width: 200
-      -  .. image:: images/quick_integration_frame_roi_final_roi.png
-            :align: center
-            :width: 200
-    * -  The starting radial limits without any azimuthal selection.
-      - After selecting the lower azimuthal limit, it is shown as a line from 
-        the beamcenter.
-      - After selecting the upper azimuthal limit as well, the final integration
-        ROI is displayed.
-
+.. include:: ../integration_roi/select_integration_roi.rst
 
 Run the integration
 -------------------

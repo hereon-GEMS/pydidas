@@ -1,3 +1,7 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _define_scan_frame:
 
 Define scan frame

@@ -1,5 +1,11 @@
-The Workflow test frame
-=======================
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.. _workflow_test_frame:
+
+Workflow test frame
+===================
 
 .. contents::
     :depth: 2

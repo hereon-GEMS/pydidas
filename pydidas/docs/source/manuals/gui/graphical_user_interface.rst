@@ -1,5 +1,5 @@
 .. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 Graphical user interface
@@ -73,6 +73,7 @@ Generic GUI information
     
     menu
     editing_parameters
+    silx/plots
 
 .. _gui_frames:
 
@@ -116,6 +117,7 @@ Detailed information about the individual windows is given here.
     windows/TweakPluginParameterWindow
     windows/ShowDetailedPluginResultsWindow
     windows/ManuallySetBeamcenterWindow
+    windows/SelectIntegrationRegionWindow
 
 .. _gui_recipes:
 

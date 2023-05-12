@@ -1,3 +1,7 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _image_series_operations_window:
 
 Image series operations window

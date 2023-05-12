@@ -1,5 +1,11 @@
-The Utilities frame
-===================
+.. 
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+..  _utilities_frame:
+
+Utilities frame
+===============
 
 .. contents::
     :depth: 2
@@ -38,4 +44,6 @@ The following windows can be opened:
     * - :ref:`Image series operations window <image_series_operations_window>`
       - Perform mathematical operations (e.g. sum, mean, max) on a series of 
         images and save the results to a new single image.
+    * - :ref:`Composite creator frame <composite_creator_frame>`
+      - Create composite images from a number of individual images.
 

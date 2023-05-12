@@ -1,5 +1,11 @@
-The View workflow results frame
-===============================
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.._view_results_frame:
+
+View workflow results frame
+===========================
 
 .. contents::
     :depth: 2

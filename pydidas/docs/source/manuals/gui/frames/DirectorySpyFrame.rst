@@ -1,3 +1,9 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.. _directory_spy_frame:
+
 Directory spy frame
 ===================
 

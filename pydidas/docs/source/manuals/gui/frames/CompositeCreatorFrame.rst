@@ -1,3 +1,9 @@
+.. 
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
+.. _composite_creator_frame:
+
 Composite image creator frame
 =============================
 

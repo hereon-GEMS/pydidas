@@ -1,7 +1,11 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _define_diffraction_exp_frame:
 
-The DefineDiffractionExpFrame
-=============================
+DefineDiffractionExpFrame
+=========================
 
 .. contents::
     :depth: 2

@@ -1,7 +1,11 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _workflow_edit_frame:
 
-The Workflow edit frame
-=======================
+Workflow edit frame
+===================
 
 .. contents::
     :depth: 2

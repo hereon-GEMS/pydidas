@@ -206,6 +206,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._toggle_fname_valid(True)
         self._update_detector_model()
         self._widgets["tabs"].setCurrentIndex(0)
+        self._bc_controller.manual_beamcenter_update(None)
 
     @QtCore.Slot(bool)
     def _toggle_fname_valid(self, is_valid):

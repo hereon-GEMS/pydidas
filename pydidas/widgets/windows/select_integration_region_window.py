@@ -86,7 +86,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.create_label(
             "label_title",
             (
-                "Display integration region" if self._config["only_show_roi"]
+                "Display integration region"
+                if self._config["only_show_roi"]
                 else "Select integration region"
             ),
             fontsize=STANDARD_FONT_SIZE + 1,
@@ -177,6 +178,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             )
         self._image = Dataset(np.zeros((_ny, _ny)))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")
+        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
         self._roi_controller.show_plot_items("roi")
         if self._config["only_show_roi"]:
             self._config["closing_confirmed"] = True

@@ -125,7 +125,7 @@ class PydidasPositionInfo(PositionInfo):
         try:
             _f2dgeo = self._EXP.as_fit2d_geometry_values()
         except UserConfigError:
-            self._plotRef.enable_cs_transform(False)
+            self._plotRef().enable_cs_transform(False)
             return
         self._pixelsize = (
             self._EXP.get_param_value("detector_pxsizex") * 1e-6,

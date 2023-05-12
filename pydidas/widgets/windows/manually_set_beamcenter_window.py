@@ -30,9 +30,11 @@ __all__ = ["ManuallySetBeamcenterWindow"]
 
 from pathlib import Path
 
+import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...core import get_generic_param_collection
+from ...contexts import DiffractionExperimentContext
+from ...core import get_generic_param_collection, Dataset
 from ...core.constants import CONFIG_WIDGET_WIDTH, STANDARD_FONT_SIZE
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
@@ -62,13 +64,22 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
 
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(
-            self, parent, title="Define beamcenter through selected points", **kwargs
+            self,
+            parent,
+            title="Define beamcenter through selected points",
+            activate_frame=False,
+            **kwargs,
         )
         self._config = self._config | dict(
             select_mode_active=False,
             beamcenter_set=False,
+            diffraction_exp=kwargs.get(
+                "diffraction_exp", DiffractionExperimentContext()
+            ),
         )
         self._markers = {}
+        self._image = Dataset(np.zeros((5, 5)))
+        self.frame_activated(self.frame_index)
 
     def build_frame(self):
         """
@@ -76,7 +87,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         self.create_label(
             "label_title",
-            "Define beamcenter through selected point",
+            "Define beamcenter through selected points",
             fontsize=STANDARD_FONT_SIZE + 4,
             bold=True,
             gridPos=(0, 0, 1, 3),
@@ -88,14 +99,14 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             gridPos=(1, 1, 2, 1),
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
-        self.create_any_widget(
+        self.add_any_widget(
             "plot",
-            PydidasPlot2D,
-            PydidasPlot2D(cs_transform=False),
+            PydidasPlot2D(
+                cs_transform=False, diffraction_exp=self._config["diffraction_exp"]
+            ),
             minimumWidth=700,
             minimumHeight=700,
             gridPos=(1, 3, 2, 1),
-            enabled=False,
         )
         self.create_param_widget(
             self.get_param("overlay_color"),
@@ -109,7 +120,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             "point_table",
             PointPositionTableWidget(self._widgets["plot"]),
             gridPos=(2, 2, 1, 1),
-            enabled=False,
         )
         _button_params = dict(
             fixedWidth=CONFIG_WIDGET_WIDTH,
@@ -118,7 +128,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         _param_config = dict(
             parent_widget=self._widgets["left_container"],
-            visible=False,
             width_total=CONFIG_WIDGET_WIDTH,
             width_io=100,
             width_text=CONFIG_WIDGET_WIDTH - 130,
@@ -149,7 +158,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_button(
             "but_set_beamcenter",
-            "Set point as beamcenter",
+            "Set point in list as beamcenter",
             **_button_params,
         )
         self.create_button(
@@ -187,9 +196,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._bc_controller = ManuallySetBeamcenterController(
             self, self._widgets["plot"], self._widgets["point_table"]
         )
-        self._widgets["image_selection"].sig_file_valid.connect(
-            self._toggle_filename_valid
-        )
         self._widgets["image_selection"].sig_new_file_selection.connect(
             self._selected_new_file
         )
@@ -211,19 +217,9 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         Finalize the user interface.
         """
-
-    @QtCore.Slot(bool)
-    def _toggle_filename_valid(self, is_selected):
-        """
-        Modify widgets visibility and activation based on the file selection.
-
-        Parameters
-        ----------
-        is_selected : bool
-            Flag to process.
-        """
-        self._widgets["point_table"].setEnabled(is_selected)
-        self._widgets["plot"].setEnabled(is_selected)
+        self._update_image_if_required()
+        self._bc_controller.manual_beamcenter_update(None)
+        self._bc_controller.show_plot_items("beamcenter")
 
     @QtCore.Slot(str, object)
     def _selected_new_file(self, filename, kwargs):
@@ -241,6 +237,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self._image = import_data(filename, **kwargs)
         _path = Path(filename)
         self._widgets["plot"].plot_pydidas_dataset(self._image, title=_path.name)
+        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
 
     @QtCore.Slot()
     def _confirm_points(self):
@@ -261,6 +258,21 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.sig_selected_beamcenter.emit(_x, _y)
         self.close()
 
+    def _update_image_if_required(self):
+        """
+        Check the dimensions of the current image with respect to the Detector size.
+        """
+        _shape = (
+            self._config["diffraction_exp"].get_param_value("detector_npixy"),
+            self._config["diffraction_exp"].get_param_value("detector_npixx"),
+        )
+        if _shape == self._image.shape:
+            return
+        self._image = Dataset(np.zeros(_shape))
+        self._widgets["image_selection"].set_param_value_and_widget("filename", ".")
+        self._widgets["plot"].plot_pydidas_dataset(self._image)
+        self._widgets["plot"].changeCanvasToDataAction._actionTriggered()
+
     def closeEvent(self, event):
         """
         Handle the close event and also emit a signal.
@@ -272,3 +284,10 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         """
         self.sig_about_to_close.emit()
         super().closeEvent(event)
+
+    def show(self):
+        """
+        Show the window and check the image shape.
+        """
+        self._update_image_if_required()
+        super().show()

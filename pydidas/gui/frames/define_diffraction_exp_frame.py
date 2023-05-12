@@ -85,6 +85,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
+        self._select_beamcenter_window = None
 
     def connect_signals(self):
         """
@@ -262,13 +263,14 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         """
         Select the beamcenter manually.
         """
-        self._select_beamcenter_window = ManuallySetBeamcenterWindow()
-        self._select_beamcenter_window.sig_selected_beamcenter.connect(
-            self._beamcenter_selected
-        )
-        self._select_beamcenter_window.sig_about_to_close.connect(
-            self._beamcenter_window_closed
-        )
+        if self._select_beamcenter_window is None:
+            self._select_beamcenter_window = ManuallySetBeamcenterWindow()
+            self._select_beamcenter_window.sig_selected_beamcenter.connect(
+                self._beamcenter_selected
+            )
+            self._select_beamcenter_window.sig_about_to_close.connect(
+                self._beamcenter_window_closed
+            )
         self._select_beamcenter_window.show()
         self.setEnabled(False)
 
@@ -298,12 +300,6 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         Handle the signal that the beamcenter window is to be closed.
         """
         self.setEnabled(True)
-        self._select_beamcenter_window.sig_about_to_close.disconnect(
-            self._beamcenter_window_closed
-        )
-        self._select_beamcenter_window.sig_selected_beamcenter.disconnect(
-            self._beamcenter_selected
-        )
 
     def import_from_file(self):
         """

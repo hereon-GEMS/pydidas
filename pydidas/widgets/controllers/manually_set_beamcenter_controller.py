@@ -21,10 +21,10 @@ beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ManuallySetBeamcenterController"]
 
 
@@ -80,10 +80,10 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._point_table.sig_new_selection.connect(self.__new_points_selected)
         self._point_table.sig_remove_points.connect(self.__remove_points_from_plot)
         self._master.param_widgets["beamcenter_x"].io_edited.connect(
-            self._manual_beamcenter_update
+            self.manual_beamcenter_update
         )
         self._master.param_widgets["beamcenter_y"].io_edited.connect(
-            self._manual_beamcenter_update
+            self.manual_beamcenter_update
         )
 
     @property
@@ -368,7 +368,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
 
     @QtCore.Slot(str)
-    def _manual_beamcenter_update(self, _):
+    def manual_beamcenter_update(self, _):
         """
         Process a manual update of the beamcenter x/y Parameter.
         """

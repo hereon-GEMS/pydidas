@@ -21,10 +21,10 @@ integration region of an associated Plugin in the linked plot.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ShowIntegrationRoiParamsWidget"]
 
 
@@ -139,6 +139,8 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
         enabled : bool
             Editing enabled flag.
         """
+        if self._config["forced_edit_disable"]:
+            enabled = False
         for _type in ["rad", "azi"]:
             _type_long = "radial" if _type == "rad" else "azimuthal"
             if f"but_select_{_type_long}" in self._widgets:

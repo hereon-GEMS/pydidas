@@ -21,10 +21,10 @@ integration region for a plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["SelectIntegrationRegionWindow"]
 
 
@@ -85,7 +85,10 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         """
         self.create_label(
             "label_title",
-            "Select integration region",
+            (
+                "Display integration region" if self._config["only_show_roi"]
+                else "Select integration region"
+            ),
             fontsize=STANDARD_FONT_SIZE + 1,
             fixedWidth=self.container_width,
             bold=True,
@@ -169,7 +172,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         _ny = self._EXP.get_param_value("detector_npixy")
         if _nx == 0 or _ny == 0:
             raise UserConfigError(
-                "No detector has been defined. Cannot display the integration region."
+                "No detector has been defined in the DiffractionExperiment setup. "
+                "Cannot display and edit the integration region."
             )
         self._image = Dataset(np.zeros((_ny, _ny)))
         self._widgets["plot"].plot_pydidas_dataset(self._image, title="")

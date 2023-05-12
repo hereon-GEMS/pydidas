@@ -22,24 +22,25 @@ and OutputPlugin base classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BasePlugin"]
+
 
 import copy
 from numbers import Integral
 
 from pydidas.core import (
-    ParameterCollection,
     ObjectWithParameterCollection,
-    get_generic_param_collection,
+    ParameterCollection,
     UserConfigError,
+    get_generic_param_collection,
 )
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
 from pydidas.core.utils import rebin2d
 from pydidas.data_io.utils import RoiSliceManager
-from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
 
 
 ptype = {
@@ -73,21 +74,36 @@ class BasePlugin(ObjectWithParameterCollection):
     plugin_type : int
         A key to discriminate between the different types of plugins
         (input, processing, output)
-    default_params : ParameterCollection
-        A ParameterCollection with the class parameters which are required
-        to perform the execute operation.
-    generic_params : ParameterCollection
-        A ParameterCollection with the generic parameters for all plugins of
-        a specific type.
-    input_data_dim : int
-        The dimensionality of the input data. Use -1 for arbitraty
-        dimensionality.
-    output_data_dim : int
-        The dimensionality of the output data. Use -1 for arbitraty
-        dimensionality.
+    plugin_name : str
+        The plugin name key in hunman-readable form for referencing the plugin.
+    default_params : ParameterCollection, optional
+        A ParameterCollection with the class parameters which are required to use the
+        plugin. The default is an empty ParameterCollection.
+    generic_params : ParameterCollection, optinoal
+        A ParameterCollection with the generic parameters for all plugins of a specific
+        type. The default are the Parameters "keep_results" and "label" for all plugins.
+    input_data_dim : int, optional
+        The dimensionality of the input data. Use -1 for arbitraty dimensionality or
+        None if the plugin does not accept any input data. The default is -1.
+    output_data_dim : int, optional
+        The dimensionality of the output data. Use -1 for arbitraty dimensionality or
+        None if the plugin does not create any output data. The default is -1.
+    output_data_label : str, optional
+        The label for the output Dataset. The default is an empty string.
+    output_data_unit : str, optional
+        The unit of the output Dataset. The default is an empty string.
     new_dataset : bool
         Keyword that the Plugin creates a new dataset. This will trigger a
         re-evaluation of the output data shape.
+    has_unique_parameter_config_widget : bool, optional
+        Flag to use a unique ParameterConfigWidget for this plugin. The widget must be
+        made accessible through the "get_parameter_config_widget" method. the default
+        is False.
+    advanced_parameters : list, optional
+        A list with the keys of "advanced parameters". These Parameters are hidden in
+        the plugin's Parameter configuration widget be default and can be accessed
+        through the associated button not to confuse users with too many options. The
+        default is an empty list [].
     """
 
     basic_plugin = True
@@ -392,7 +408,7 @@ class BasePlugin(ObjectWithParameterCollection):
     @input_shape.setter
     def input_shape(self, new_shape):
         """
-        The the shape of the Plugin's input.
+        Set the shape of the Plugin's input.
 
         Parameters
         ----------
@@ -406,10 +422,23 @@ class BasePlugin(ObjectWithParameterCollection):
             The shape of the plugin's input.
         """
         if not isinstance(new_shape, tuple):
-            raise TypeError("The new shape must be a tuple.")
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                f"\nThe new shape must be a tuple, but received {new_shape} which is "
+                f"of type {type(new_shape)}."
+            )
+        if self.input_data_dim is None:
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                "\nThe plugin is an input plugin and cannot accept any input. This is "
+                "due to an incorrect and inconsistent workflow tree. Please check the "
+                "full workflow."
+            )
         if self.input_data_dim > 0 and len(new_shape) != self.input_data_dim:
-            raise ValueError(
-                f"The new shape must be a tuple of length {self.input_data_dim}."
+            raise UserConfigError(
+                f"Error when updating the input shape of plugin\n\t{self.plugin_name}:"
+                f"\nThe new shape must be a tuple of length {self.input_data_dim} but "
+                f"received a tuple of length {len(new_shape)}."
             )
         self._config["input_shape"] = new_shape
 

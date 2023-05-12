@@ -128,6 +128,9 @@ Bugfixes
   irrespective of the implemented check.
 - Fixed an issue in the WorkflowTreeEditManager where an inconsistent 
   WorkflowTree would not be displayed as such after restoring the GUI state. 
+- Fixed an issue in the BasePlugin where the data consistency check would not
+  give a human-readable error message.
+
 
 
 =======

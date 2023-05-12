@@ -126,7 +126,9 @@ Bugfixes
 - Fixed an issue in the pyFAIintegrationBase plugin where the check for the 
   re-initialization of the AzimuthalIntegrator was always performed, 
   irrespective of the implemented check.
- 
+- Fixed an issue in the WorkflowTreeEditManager where an inconsistent 
+  WorkflowTree would not be displayed as such after restoring the GUI state. 
+
 
 =======
 v23.3.9

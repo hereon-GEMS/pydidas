@@ -378,12 +378,12 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self.__create_position_node(_node_id)
             self.__create_widget(_name, _node_id, label=_label)
         self.update_node_positions()
+        self._check_consistency()
         if reset_active_node:
             self.sig_plugin_selected.emit(-1)
             TREE.active_node_id = None
             return
         self.set_active_node(TREE.active_node_id, force_update=True)
-        self._check_consistency()
 
     def _check_consistency(self):
         """

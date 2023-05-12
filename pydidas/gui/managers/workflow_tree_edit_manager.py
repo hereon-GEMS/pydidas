@@ -328,8 +328,10 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             self._node_widgets[node_id].move(
                 self._node_positions[node_id][0], self._node_positions[node_id][1]
             )
-        _canvas_xsize = max(_tree_width + 2 * self.pos_x_min + _offset, _canvas_width)
-        _canvas_ysize = max(self.root.height + 2 * self.pos_y_min, _canvas_height)
+        _canvas_xsize = max(
+            _tree_width + 2 * self.pos_x_min + _offset, _canvas_width - 30
+        )
+        _canvas_ysize = max(self.root.height + 2 * self.pos_y_min, _canvas_height - 30)
         self.qt_canvas.setFixedSize(_canvas_xsize, _canvas_ysize)
         self.__update_node_connections()
 

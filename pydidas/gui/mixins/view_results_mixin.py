@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,11 +21,12 @@ WorkflowTree results when running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ViewResultsMixin"]
+
 
 import os
 
@@ -33,10 +36,7 @@ from qtpy import QtCore
 from ...core import UserConfigError
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
-from ...workflow import WorkflowResults
-
-
-RESULTS = WorkflowResults()
+from ...workflow import WorkflowResultsContext
 
 
 class ViewResultsMixin:
@@ -66,6 +66,8 @@ class ViewResultsMixin:
     """
 
     def __init__(self, **kwargs):
+        _results = kwargs.get("workflow_results", None)
+        self._RESULTS = _results if _results is not None else WorkflowResultsContext()
         self._config.update(
             {
                 "data_use_timeline": False,
@@ -74,11 +76,9 @@ class ViewResultsMixin:
                 "active_node": None,
                 "data_slices": (),
                 "frame_active": True,
-                "source_hash": RESULTS.source_hash,
+                "source_hash": self._RESULTS.source_hash,
             }
         )
-        self._data_axlabels = ["", ""]
-        self._data_axunits = ["", ""]
         self.connect_view_results_mixin_signals()
         self._update_choices_of_selected_results()
         self.__export_dialog = PydidasFileDialog(
@@ -107,10 +107,10 @@ class ViewResultsMixin:
         Verify that the underlying information for the WorkflowResults
         (i.e. the ScanContext and WorkflowTree) have not changed.
         """
-        _hash = RESULTS.source_hash
+        _hash = self._RESULTS.source_hash
         if _hash != self._config["source_hash"]:
-            RESULTS.update_shapes_from_scan_and_workflow()
-            self._config["source_hash"] = RESULTS.source_hash
+            self._RESULTS.update_shapes_from_scan_and_workflow()
+            self._config["source_hash"] = self._RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()
             self._update_choices_of_selected_results()
@@ -129,8 +129,7 @@ class ViewResultsMixin:
         Clear all curves / images from the plot and disable any new updates.
         """
         self._config["plot_active"] = False
-        for _plot in [self._widgets["plot1d"], self._widgets["plot2d"]]:
-            _plot.clear_plot()
+        self._widgets["plot"].clear_plots()
 
     @QtCore.Slot(bool, object, int, object, str)
     def update_result_selection(
@@ -174,26 +173,19 @@ class ViewResultsMixin:
         """
         if not self._config["plot_active"]:
             return
-        _dim = 1 if self._config["plot_type"] in ["1D plot", "group of 1D plots"] else 2
         _node = self._config["active_node"]
-        _data = RESULTS.get_result_subset(
+        _data = self._RESULTS.get_result_subset(
             _node,
             self._config["data_slices"],
             flattened_scan_dim=self._config["data_use_timeline"],
             squeeze=True,
         )
-        self._data_axlabels = _data.axis_labels.copy()
-        self._data_axunits = _data.axis_units.copy()
         if self._config["plot_type"] == "group of 1D plots":
-            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot_group_of_curves(_data)
         elif self._config["plot_type"] == "1D plot":
-            self._widgets["plot_stack"].setCurrentIndex(0)
             self._plot1d(_data, replace=True)
         elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
-            self._widgets["plot_stack"].setCurrentIndex(1)
             self._plot_2d(_data)
-        self._widgets[f"plot{_dim}d"].setGraphTitle(RESULTS.result_titles[_node])
 
     def _plot_group_of_curves(self, data):
         """
@@ -245,11 +237,11 @@ class ViewResultsMixin:
             )
         if not isinstance(data.axis_ranges[0], np.ndarray):
             data.update_axis_ranges(0, np.arange(data.size))
-        self._widgets["plot1d"].plot_pydidas_dataset(
+        self._widgets["plot"].plot_data(
             data,
             replace=replace,
             legend=legend,
-            title=RESULTS.result_titles[self._config["active_node"]],
+            title=self._RESULTS.result_titles[self._config["active_node"]],
         )
 
     def _plot_2d(self, data):
@@ -267,8 +259,8 @@ class ViewResultsMixin:
         _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()
-        self._widgets["plot2d"].plot_pydidas_dataset(
-            data, title=RESULTS.result_titles[self._config["active_node"]]
+        self._widgets["plot"].plot_data(
+            data, title=self._RESULTS.result_titles[self._config["active_node"]]
         )
 
     def _update_choices_of_selected_results(self):
@@ -276,14 +268,14 @@ class ViewResultsMixin:
         Update the "selected_results" Parameter choices based on the WorkflowResults.
         """
         _param = self.get_param("selected_results")
-        RESULTS.update_param_choices_from_labels(_param)
+        self._RESULTS.update_param_choices_from_labels(_param)
         self._widgets["result_selector"].get_and_store_result_node_labels()
 
     def _update_export_button_activation(self):
         """
         Update the enabled state of the export buttons based on available results.
         """
-        _active = RESULTS.shapes != {}
+        _active = self._RESULTS.shapes != {}
         self._widgets["but_export_current"].setEnabled(_active)
         self._widgets["but_export_all"].setEnabled(_active)
 
@@ -342,6 +334,6 @@ class ViewResultsMixin:
             )
         if _dirname is None:
             return
-        RESULTS.save_results_to_disk(
+        self._RESULTS.save_results_to_disk(
             _dirname, _formats, overwrite=_overwrite, node_id=node
         )

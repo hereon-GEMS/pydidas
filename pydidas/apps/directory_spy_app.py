@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ file or file of a specific pattern.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DirectorySpyApp"]
 
 import os
@@ -331,7 +333,7 @@ class DirectorySpyApp(BaseApp):
         """
         Process the filenames.
 
-        This method will take the filenames and file sized and check whether
+        This method will take the filenames and file sizes and check whether
         any values have changed since the last call. The result of the check
         will be returned.
 
@@ -363,6 +365,8 @@ class DirectorySpyApp(BaseApp):
         """
         while os.path.isfile(self._fname(self._index + 1)):
             self._index += 1
+        if not os.path.isfile(self._fname(self._index)):
+            self.__find_current_index()
         _file_one = self._fname(self._index) if self._index >= 0 else None
         _file_two = self._fname(self._index - 1) if self._index > 0 else None
         _new_items = self.__process_filenames(_file_one, _file_two)
@@ -372,21 +376,27 @@ class DirectorySpyApp(BaseApp):
         """
         Find the current index of files matching the pattern.
         """
-        _files = glob.glob(self._config["glob_pattern"])
+        _files = glob.glob(self._config["path"] + os.sep + self._config["glob_pattern"])
         _index = self._config["glob_pattern"].find("*")
         _prefix = self._config["glob_pattern"][:_index]
         _suffix = self._config["glob_pattern"][_index + 1 :]
         _files = [
             _f
             for _f in _files
-            if (os.path.isfile(_f) and _f.startswith(_prefix) and _f.endswith(_suffix))
+            if (
+                os.path.isfile(_f)
+                and os.path.basename(_f).startswith(_prefix)
+                and _f.endswith(_suffix)
+            )
         ]
         if len(_files) == 0:
             self._index = -1
             return
         _files.sort()
         if len(_files) > 0:
-            _index = _files[-1].removeprefix(_prefix).removesuffix(_suffix)
+            _index = (
+                os.path.basename(_files[-1]).removeprefix(_prefix).removesuffix(_suffix)
+            )
             self._index = int(_index)
 
     def multiprocessing_post_run(self):

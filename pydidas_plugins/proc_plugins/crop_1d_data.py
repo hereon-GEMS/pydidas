@@ -46,16 +46,24 @@ class Crop1dData(ProcPlugin):
         Parameter(
             "crop_low",
             float,
-            0,
+            None,
             name="Cropping lower boundary",
-            tooltip="The lower boundary for cropping.",
+            allow_None=True,
+            tooltip=(
+                "The lower boundary for cropping. If None, no lower boundary will be "
+                "applied."
+            ),
         ),
         Parameter(
             "crop_high",
             float,
-            0,
+            None,
             name="Cropping upper boundary",
-            tooltip="The upper boundary for cropping.",
+            allow_None=True,
+            tooltip=(
+                "The upper boundary for cropping. If None, no upper boundary will be "
+                "applied"
+            ),
         ),
     )
     input_data_dim = 1
@@ -105,7 +113,9 @@ class Crop1dData(ProcPlugin):
             The slice object to select the range from the input data.
         """
         _low = self.get_param_value("crop_low")
+        _low = _low if _low is not None else 0
         _high = self.get_param_value("crop_high")
+        _high = _high if _high is not None else self._data.size
         if self.get_param_value("type_selection") == "Indices":
             return slice(int(_low), int(_high) + 1)
         _x = self._data.axis_ranges[0]

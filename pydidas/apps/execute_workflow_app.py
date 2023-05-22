@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,22 +21,22 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ExecuteWorkflowApp"]
 
+import multiprocessing as mp
 import time
 import warnings
-import multiprocessing as mp
 
 import numpy as np
 from qtpy import QtCore
 
-from ..core import get_generic_param_collection, Dataset, BaseApp, UserConfigError
-from ..contexts import ScanContext, DiffractionExperimentContext
-from ..workflow import WorkflowTree, WorkflowResults
+from ..contexts import DiffractionExperimentContext, ScanContext
+from ..core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
+from ..workflow import WorkflowResultsContext, WorkflowTree
 from ..workflow.result_io import WorkflowResultIoMeta
 from .parsers import execute_workflow_app_parser
 
@@ -42,7 +44,7 @@ from .parsers import execute_workflow_app_parser
 TREE = WorkflowTree()
 SCAN = ScanContext()
 EXP = DiffractionExperimentContext()
-RESULTS = WorkflowResults()
+RESULTS = WorkflowResultsContext()
 RESULT_SAVER = WorkflowResultIoMeta
 
 
@@ -211,10 +213,11 @@ class ExecuteWorkflowApp(BaseApp):
         if _n_dataset_in_buffer < _n_worker:
             _min_buffer = _req_mem_per_dataset * _n_worker
             _error = (
-                "The defined buffer is too small. The required memory "
-                f"per diffraction image is {_req_mem_per_dataset:.3f} "
-                f"MB and {_n_worker} workers have been defined. The "
-                f"minimum buffer size must be {_min_buffer:.2f} MB."
+                "The defined buffer is too small. The required memory per diffraction "
+                f"image is {_req_mem_per_dataset:.3f} MB and {_n_worker} workers have "
+                f"been defined. The minimum buffer size must be {_min_buffer:.2f} MB. "
+                "\nPlease update the buffer size or change number of workers in the "
+                "global settings."
             )
             raise UserConfigError(_error)
         self._config["buffer_n"] = min(
@@ -228,7 +231,8 @@ class ExecuteWorkflowApp(BaseApp):
         """
         _n = self._config["buffer_n"]
         _share = self._config["shared_memory"]
-        _share["flag"] = mp.Array("I", _n, lock=mp.Lock())
+        self._config["shared_memory"]["lock"] = mp.Lock()
+        _share["flag"] = mp.Array("I", _n, lock=self._config["shared_memory"]["lock"])
         for _key in self._config["result_shapes"]:
             _num = int(_n * np.prod(self._config["result_shapes"][_key]))
             _share[_key] = mp.Array("f", _num, lock=mp.Lock())
@@ -357,20 +361,17 @@ class ExecuteWorkflowApp(BaseApp):
         """
         Write the results from the WorkflowTree execution to the shared array.
         """
-        _flag_lock = self._config["shared_memory"]["flag"]
         while True:
-            _flag_lock.acquire()
-            _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
-            if _zeros.size > 0:
-                _buffer_pos = _zeros[0]
-                self._config["buffer_pos"] = _buffer_pos
-                self._shared_arrays["flag"][_buffer_pos] = 1
-                break
-            _flag_lock.release()
+            with self._config["shared_memory"]["lock"]:
+                _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
+                if _zeros.size > 0:
+                    _buffer_pos = _zeros[0]
+                    self._config["buffer_pos"] = _buffer_pos
+                    self._shared_arrays["flag"][_buffer_pos] = 1
+                    break
             time.sleep(0.01)
         for _node_id in self._config["result_shapes"]:
             self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
-        _flag_lock.release()
 
     def multiprocessing_post_run(self):
         """
@@ -402,12 +403,10 @@ class ExecuteWorkflowApp(BaseApp):
         else:
             buffer_pos = data
         _new_results = {_key: None for _key in self._config["result_shapes"]}
-        _flag_lock = self._config["shared_memory"]["flag"]
-        _flag_lock.acquire()
-        for _key in _new_results:
-            _new_results[_key] = self._shared_arrays[_key][buffer_pos]
-        self._shared_arrays["flag"][buffer_pos] = 0
-        _flag_lock.release()
+        with self._config["shared_memory"]["lock"]:
+            for _key in _new_results:
+                _new_results[_key] = self._shared_arrays[_key][buffer_pos]
+            self._shared_arrays["flag"][buffer_pos] = 0
         RESULTS.store_results(index, _new_results)
         if self.get_param_value("autosave_results"):
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)

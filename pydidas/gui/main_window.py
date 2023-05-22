@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ to select the different frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["MainWindow"]
@@ -28,10 +30,10 @@ __all__ = ["MainWindow"]
 import os
 from functools import partial
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasGuiError
-from ..widgets import InfoWidget
+from ..widgets.framework import PydidasStatusWidget
 from . import utils
 from .main_menu import MainMenu
 
@@ -69,9 +71,9 @@ class MainWindow(MainMenu):
 
     def __create_logging_info_box(self):
         """
-        Create the InfoWidget for logging and status messages.
+        Create the PydidasStatusWidget for logging and status messages.
         """
-        self.__info_widget = InfoWidget()
+        self.__info_widget = PydidasStatusWidget()
         _dock_widget = QtWidgets.QDockWidget("Logging && information")
         _dock_widget.setWidget(self.__info_widget)
         _dock_widget.setFeatures(
@@ -213,14 +215,14 @@ class MainWindow(MainMenu):
         Register a frame class with the MainWindow and add it to the
         PydidasFrameStack.
 
-        This method takes a :py:class:`BaseFrame <pydidas.widgets.BaseFrame>`
+        This method takes a :py:class:`BaseFrame <pydidas.widgets.framework.BaseFrame>`
         and creates an instance which is registeres with the
         PydidasFrameStack. It also stores the required metadata to create
         a actionbar link to open the frame.
 
         Parameters
         ----------
-        frame : type[pydidas.widgets.BaseFrame]
+        frame : type[pydidas.widgets.framework.BaseFrame]
             The class of the Frame. This must be a subclass of BaseFrame.
             If a string is passed, an empty frame class with the metadata
             given by title, menu_entry and icon is created.
@@ -265,7 +267,6 @@ class MainWindow(MainMenu):
             self._toolbar_actions[label].setChecked(False)
             self.__configuration["toolbar_visibility"][label] = _new_visibility
             self._auto_update_toolbar_entry(label)
-
         self.setUpdatesEnabled(True)
 
     def restore_gui_state(self, state="saved", filename=None):

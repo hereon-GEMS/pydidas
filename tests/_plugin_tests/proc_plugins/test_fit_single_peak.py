@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,8 +18,8 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
@@ -26,9 +28,10 @@ import unittest
 
 import numpy as np
 
-from pydidas.core import UserConfigError, Dataset
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.core import Dataset, UserConfigError
 from pydidas.core.fitting import FitFuncMeta
+from pydidas.plugins import BasePlugin, PluginCollection
+
 
 PLUGIN_COLLECTION = PluginCollection()
 
@@ -68,6 +71,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
         plugin.set_param_value("fit_upper_limit", _high)
+        plugin.set_param_value("fit_output", "Peak position")
         plugin.calculate_result_shape()
         return plugin
 
@@ -193,7 +197,7 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__peak_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Peak area")
+        plugin.set_param_value("fit_output", "Peak area")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -203,7 +207,7 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__peak_position(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Peak position")
+        plugin.set_param_value("fit_output", "Peak position")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -214,7 +218,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_create_result_dataset__peak_outside_array(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
         plugin._fit_params["center"] = 0
-        plugin.set_param_value("output", "Peak position")
+        plugin.set_param_value("fit_output", "Peak position")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -225,7 +229,7 @@ class TestFitSinglePeak(unittest.TestCase):
     def test_create_result_dataset__high_std(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
         plugin._fit_params["amplitude"] = 1e6
-        plugin.set_param_value("output", "Peak position")
+        plugin.set_param_value("fit_output", "Peak position")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -235,7 +239,7 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__peak_pos_and_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Peak position; peak area")
+        plugin.set_param_value("fit_output", "Peak position; peak area")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -245,7 +249,7 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__fwhm(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Peak FWHM")
+        plugin.set_param_value("fit_output", "Peak FWHM")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -255,7 +259,7 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_create_result_dataset__peak_pos_and_area_and_fwhm(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
-        plugin.set_param_value("output", "Peak position; peak area; peak FWHM")
+        plugin.set_param_value("fit_output", "Peak position; peak area; peak FWHM")
         _new_data = plugin._create_result_dataset()
         self.assertTrue("fit_params" in _new_data.metadata)
         self.assertTrue("fit_func" in _new_data.metadata)
@@ -359,38 +363,40 @@ class TestFitSinglePeak(unittest.TestCase):
 
     def test_calculate_result_shape__area(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("output", "Peak area")
+        plugin.set_param_value("fit_output", "Peak area")
         plugin.calculate_result_shape()
         self.assertEqual(plugin._config["result_shape"], (1,))
 
     def test_calculate_result_shape__position(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("output", "Peak position")
+        plugin.set_param_value("fit_output", "Peak position")
         plugin.calculate_result_shape()
         self.assertEqual(plugin._config["result_shape"], (1,))
 
     def test_calculate_result_shape__fwhm(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("output", "Peak FWHM")
+        plugin.set_param_value("fit_output", "Peak FWHM")
         plugin.calculate_result_shape()
         self.assertEqual(plugin._config["result_shape"], (1,))
 
     def test_calculate_result_shape__area_and_pos(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("output", "Peak position; peak area")
+        plugin.set_param_value("fit_output", "Peak position; peak area")
         plugin.calculate_result_shape()
         self.assertEqual(plugin._config["result_shape"], (2,))
 
     def test_calculate_result_shape__area_pos_and_std(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("output", "Peak position; peak area; peak FWHM")
+        plugin.set_param_value("fit_output", "Peak position; peak area; peak FWHM")
         plugin.calculate_result_shape()
         self.assertEqual(plugin._config["result_shape"], (3,))
 
     def test_calculate_result_shape__other(self):
         plugin = self.create_generic_plugin()
-        plugin.params["output"].choices = plugin.params["output"].choices + ["dummy"]
-        plugin.set_param_value("output", "dummy")
+        plugin.params["fit_output"].choices = plugin.params["fit_output"].choices + [
+            "dummy"
+        ]
+        plugin.set_param_value("fit_output", "dummy")
         with self.assertRaises(ValueError):
             plugin.calculate_result_shape()
 

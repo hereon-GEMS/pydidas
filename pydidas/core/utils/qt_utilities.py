@@ -22,7 +22,16 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["update_size_policy", "apply_qt_properties", "apply_font_properties"]
+__all__ = [
+    "update_size_policy",
+    "apply_qt_properties",
+    "update_palette",
+    "update_qobject_font",
+    "apply_font_properties",
+]
+
+
+from qtpy import QtGui
 
 
 def _get_args_as_list(args):
@@ -90,6 +99,42 @@ def apply_qt_properties(obj, **kwargs):
         if hasattr(obj, _name):
             _func = getattr(obj, _name)
             _func(*_get_args_as_list(kwargs.get(_key)))
+
+
+def update_palette(obj, **kwargs):
+    """
+    Update the palette associated with a QWidget.
+
+    Parameters
+    ----------
+    obj : QtCore.QObject
+        The QObject to be updated.
+    **kwargs : dict
+        A dictionary with palette values. Keys must correspond to palette roles.
+    """
+    _palette = obj.palette()
+    for _key, _value in kwargs.items():
+        _role = _key[0].upper() + _key[1:]
+        if _role in QtGui.QPalette.__dict__:
+            _rolekey = getattr(QtGui.QPalette, _role)
+            _palette.setColor(_rolekey, QtGui.QColor(_value))
+    obj.setPalette(_palette)
+
+
+def update_qobject_font(obj, **kwargs):
+    """
+    Update the font associated with a QObject.
+
+    Parameters
+    ----------
+    obj : QtCore.QObject
+        The QObject to be updated.
+    **kwargs : dict
+        A dictionary with font properties.
+    """
+    _font = obj.font()
+    apply_font_properties(_font, **kwargs)
+    obj.setFont(_font)
 
 
 def apply_font_properties(fontobj, **kwargs):

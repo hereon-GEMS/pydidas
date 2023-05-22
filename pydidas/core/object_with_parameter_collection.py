@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,7 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
-
 """
 The ObjectWithParameterCollection is a class which includes a
 ParameterCollection and is serializable (ie. pickleable).
@@ -31,8 +32,8 @@ from copy import copy, deepcopy
 from qtpy import QtCore
 
 from .parameter_collection import ParameterCollection
-from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 from .parameter_collection_mixin import ParameterCollectionMixIn
+from .pydidas_q_settings_mixin import PydidasQsettingsMixin
 
 
 class ObjectWithParameterCollection(
@@ -62,7 +63,7 @@ class ObjectWithParameterCollection(
             The copy with the same state.
         """
         obj = self.__class__()
-        obj.params = self.params.get_copy()
+        obj.params = self.params.copy()
         obj._config = copy(self._config)
         return obj
 
@@ -81,7 +82,7 @@ class ObjectWithParameterCollection(
             The copy with the same state.
         """
         obj = self.__class__()
-        obj.params = self.params.get_copy()
+        obj.params = self.params.copy()
         obj._config = deepcopy(self._config)
         return obj
 
@@ -94,7 +95,7 @@ class ObjectWithParameterCollection(
         state : dict
             The state dictionary.
         """
-        _state = {"params": self.params.get_copy(), "_config": copy(self._config)}
+        _state = {"params": self.params.copy(), "_config": copy(self._config)}
         if "shared_memory" in _state["_config"]:
             _state["_config"]["shared_memory"] = {}
         return _state
@@ -136,3 +137,25 @@ class ObjectWithParameterCollection(
             except TypeError:
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
         return hash((_param_hash, tuple(_config_keys), tuple(_config_vals)))
+
+    def copy(self):
+        """
+        Get a copy of the object.
+
+        Returns
+        -------
+        ObjectWithParameterCollection :
+            The object's copy.
+        """
+        return copy(self)
+
+    def deepcopy(self):
+        """
+        Get a deepcopy of the object.
+
+        Returns
+        -------
+        ObjectWithParameterCollection :
+            The object's deepcopy.
+        """
+        return deepcopy(self)

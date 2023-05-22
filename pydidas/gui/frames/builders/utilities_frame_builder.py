@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,17 @@ the UtilitiesFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["UtilitiesFrameBuilder"]
 
+
 from qtpy import QtWidgets
 
 from ....core import constants
-from ....widgets import BaseFrame
+from ....widgets.framework import BaseFrame
 
 
 UTILITIES = {
@@ -69,6 +72,11 @@ UTILITIES = {
             "images and save the results to a new single image."
         ),
         "button_text": "Image series operations",
+    },
+    "composite_creation": {
+        "title": "Create composite image",
+        "text": "Compose mosaic images of a large number of individual image files.",
+        "button_text": "Create composite image",
     },
 }
 
@@ -143,7 +151,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(3, 0, 1, 1),
                 fixedWidth=self.GROUP_WIDTH - 20,
                 parent_widget=self._widgets[f"utility_{_key}"],
-                alignment=constants.QT_BOTTOM_LEFT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_LEFT,
             )
             self.create_spacer(
                 f"spacer_{_key}_2",

@@ -1,0 +1,32 @@
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
+[flake8]
+per-file-ignores =
+    # F401 module imported but unused
+    # F403 ‘from module import *’ used; unable to detect undefined names
+    # F405 name may be undefined, or defined from star imports: module
+    # E402 module level import not at top of file
+    # E501 line too long
+    # W605 invalid escape sequence
+    __init__.py: F401, F403, F405, E402
+    generic_base_plugins.py: F401
+    qt_presets.py: W605
+    file_extensions.py: W605
+    # For reading Eiger data, the hdf5plugin must be imported to allow 
+    # decompressing the data, but it is not actually used.
+    dectris_utils.py: F401
+    hdf5_dataset_utils.py: F401
+    read_hdf5_slice.py: F401
+    read_hdf5_dataset.py: F401
+    hdf5_dataset_selector.py: F401, E501
+    hdf5_io.py: F401
+    base_app.py: E731
+    pydidas_plot2d_with_integration_regions.py: C901
+# E203 whitespace before ':'
+ignore =  E121, E123, E126, E133, E203, W503, W504
+max-line-length = 88
+max-complexity = 10
+color = auto
+statistics = True
+exclude = .git, __pycache__, docs/source/conf.py, old, build, dist

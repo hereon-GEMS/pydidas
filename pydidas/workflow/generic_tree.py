@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ tree-like structure.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["GenericTree"]
@@ -111,11 +113,12 @@ class GenericTree:
         ValueError
             If new_id is not inluded in the tree's node ids.
         """
-        if not (new_id is None or new_id in self.node_ids):
-            raise ValueError(
-                f"The given node ID '{new_id}' is not included in the stored node ids."
-            )
-        self._config["active_node_id"] = new_id
+        if new_id is None or new_id in self.node_ids:
+            self._config["active_node_id"] = new_id
+            return
+        raise ValueError(
+            f"The given node ID '{new_id}' is not included in the stored node ids."
+        )
 
     def reset_tree_changed_flag(self):
         """
@@ -234,7 +237,7 @@ class GenericTree:
         for _id in node_ids:
             if _id in self.node_ids:
                 raise ValueError(
-                    "Duplicate node ID detected. Tree node has " "not been registered!"
+                    "Duplicate node ID detected. Tree node has not been registered!"
                 )
             if _id is not None and self.node_ids and _id < max(self.node_ids):
                 raise ValueError(
@@ -349,12 +352,15 @@ class GenericTree:
         Order the node ids of all of the tree's nodes.
         """
         _root = self.root
+        _active_node = self.active_node
         if _root is None:
             return
         for _node in self.nodes.values():
             _node.node_id = None
         self.clear()
         self.set_root(_root)
+        if _active_node is not None:
+            self.active_node_id = _active_node.node_id
 
     def get_all_leaves(self):
         """
@@ -371,7 +377,7 @@ class GenericTree:
                 _leaves.append(_node)
         return _leaves
 
-    def get_copy(self):
+    def copy(self):
         """
         Get a copy of the WorkflowTree.
 
@@ -385,7 +391,9 @@ class GenericTree:
         pydidas.workflow.WorkflowTree
             A new instance of the WorkflowTree
         """
-        return self.__copy__()
+        return copy.copy(self)
+
+    deepcopy = copy
 
     def __copy__(self):
         """
@@ -405,11 +413,16 @@ class GenericTree:
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         """
         Get a deep copy of the GenericTree.
 
         Note: The implementation of copy and deepcopy is the same for Trees.
+
+        Parameters
+        ----------
+        memo : dict
+            copy.deepcopy's dict of already copied values.
 
         Returns
         -------

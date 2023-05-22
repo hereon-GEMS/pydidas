@@ -42,22 +42,22 @@ GENERIC_PARAMS_PYFAI = {
         "type": str,
         "default": "2theta / deg",
         "name": "Radial unit",
-        "choices": ["Q / nm^-1", "Q / A^-1", "2theta / deg", "2theta / rad"],
+        "choices": ["Q / nm^-1", "r / mm", "2theta / deg"],
         "unit": "",
         "allow_None": False,
         "tooltip": "The unit and type of the azimuthal profile.",
     },
     "rad_use_range": {
-        "type": int,
-        "default": 0,
-        "name": "Use radial range",
-        "choices": [True, False],
+        "type": str,
+        "default": "Full detector",
+        "name": "Radial range",
+        "choices": ["Full detector", "Specify radial range"],
         "unit": "",
         "allow_None": False,
         "tooltip": (
             "Toggle to limit the radial integration range or use the full data "
-            "range. If True, boundaries need to be defined in the lower and upper "
-            "radial range Parameters."
+            "range. If 'Specify radial range' is used, boundaries need to be defined "
+            "in the lower and upper radial range Parameters."
         ),
     },
     "rad_range_lower": {
@@ -69,7 +69,7 @@ GENERIC_PARAMS_PYFAI = {
         "allow_None": False,
         "tooltip": (
             "The lower boundary of the radial integration range. This setting is "
-            "only used if 'Use radial range' is  True. This value needs to be "
+            "only used if the 'Specify radial range' is set. This value needs to be "
             "given in the unit selected as radial unit."
         ),
     },
@@ -82,7 +82,7 @@ GENERIC_PARAMS_PYFAI = {
         "allow_None": False,
         "tooltip": (
             "The upper boundary of the radial integration range. This setting is "
-            "only used if 'Use radial range' is  True.  This value needs to be "
+            "only used if 'Specify radial range' is set. This value needs to be "
             "given in the unit selected as radial unit."
         ),
     },
@@ -107,16 +107,16 @@ GENERIC_PARAMS_PYFAI = {
         "tooltip": "The unit and type of the azimuthal profile.",
     },
     "azi_use_range": {
-        "type": int,
-        "default": 0,
-        "name": "Use azimuthal range",
-        "choices": [True, False],
+        "type": str,
+        "default": "Full detector",
+        "name": "Azimuthal range",
+        "choices": ["Full detector", "Specify azimuthal range"],
         "unit": "",
         "allow_None": False,
         "tooltip": (
             "Toggle to limit the azimuthal integration range or use the full data "
-            "range. If True, boundaries need to be defined in the lower and upper "
-            "azimuthal range Parameters."
+            "range. If 'Specify azimuthal range' is used, boundaries need to be "
+            "defined in the lower and upper azimuthal range Parameters."
         ),
     },
     "azi_range_lower": {
@@ -128,7 +128,7 @@ GENERIC_PARAMS_PYFAI = {
         "allow_None": False,
         "tooltip": (
             "The lower boundary of the azimuthal integration range. This setting "
-            "is only used if 'Use azimuthal range' is True. This value needs to be "
+            "is only used if 'Specify azimuthal range' is set. This value needs to be "
             "given in the unit selected as azimuthal unit."
         ),
     },
@@ -141,7 +141,7 @@ GENERIC_PARAMS_PYFAI = {
         "allow_None": False,
         "tooltip": (
             "The upper boundary of the azimuthal integration range. This setting "
-            "is only used if 'Use azimuthal range' is True. This value needs to be "
+            "is only used if 'Specify azimuthal range' is set. This value needs to be "
             "given in the unit selected as azimuthal unit."
         ),
     },
@@ -187,5 +187,27 @@ GENERIC_PARAMS_PYFAI = {
             " visit the pyfai documentation available at: "
             "https://pyfai.readthedocs.io/"
         ),
+    },
+    "integration_direction": {
+        "type": str,
+        "default": "Azimuthal integration",
+        "name": "Integration direction",
+        "choices": [
+            "Azimuthal integration",
+            "Radial integration",
+            "2D integration",
+        ],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The integration direction.",
+    },
+    "detector_model": {
+        "type": str,
+        "default": "Custom detector",
+        "name": "Detector model",
+        "choices": ["Custom detector"],
+        "unit": "",
+        "allow_None": None,
+        "tooltip": "The model name of the detector.",
     },
 }

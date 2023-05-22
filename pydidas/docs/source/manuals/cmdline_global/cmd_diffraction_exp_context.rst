@@ -14,8 +14,8 @@ Introduction
 The :py:class:`DiffractionExperimentContext 
 <pydidas.contexts.diffraction_exp_context.diffraction_exp_context.DiffractionExperimentContext>`
 is the pydidas Singleton instance of the 
-:py:class:`_DiffractionExperimentContext 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
+:py:class:`DiffractionExperiment
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment>`
 class. It is used for storing and accessing global information about the 
 experimental setup. Stored information include
 
@@ -132,7 +132,7 @@ Using a pyFAI detector
 If the detector is defined in pyFAI, this library can be used to update the 
 detector settings automatically by giving the detector name in the 
 :py:meth:`set_detector_params_from_name 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.set_detector_params_from_name>`
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment.set_detector_params_from_name>`
 method:
 
 .. code-block::
@@ -234,16 +234,16 @@ export. The format will be determined automatically based on the file extension.
 
 Imports and exports are started by calling the 
 :py:meth:`import_from_file(filename) 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.import_from_file>`
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment.import_from_file>`
 and 
 :py:meth:`export_to_file(filename) 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext.export_to_file>`,
+<pydidas.contexts.diffraction_exp_context.DiffractionExperiment.export_to_file>`,
 respectively. The filename must include the absolute path to the file. 
 
 .. warning::
 
     Importing the :py:class:`DiffractionExperimentContext 
-    <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`
+    <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>`
     from file will overwrite all current values without asking for confirmation.
 
 An example to demonstrate these methods is given below:

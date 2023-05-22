@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ manages the pydidas GUI menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["MainMenu"]
@@ -30,33 +32,34 @@ import sys
 from functools import partial
 
 import yaml
-from qtpy import QtWidgets, QtGui, QtCore
+from qtpy import QtCore, QtGui, QtWidgets
 
+from ..contexts import GLOBAL_CONTEXTS
 from ..core import UserConfigError
 from ..core.utils import (
     DOC_HOME_QURL,
-    get_pydidas_icon_w_bg,
-    doc_qurl_for_frame_manual,
     doc_filename_for_frame_manual,
+    doc_qurl_for_frame_manual,
+    get_pydidas_icon_w_bg,
 )
-from ..contexts import GLOBAL_CONTEXTS
-from ..workflow import WorkflowTree
-from ..widgets import PydidasFrameStack
+from ..version import VERSION
 from ..widgets import PydidasFileDialog
 from ..widgets.dialogues import QuestionBox, critical_warning
-from ..version import VERSION
+from ..widgets.framework import PydidasFrameStack
+from ..workflow import WorkflowTree
 from . import utils
 from .gui_excepthook_ import gui_excepthook
-from .windows import (
-    GlobalSettingsWindow,
-    UserConfigWindow,
-    ExportEigerPixelmaskWindow,
+from ..widgets.windows import (
     AboutWindow,
+    ExportEigerPixelmaskWindow,
     FeedbackWindow,
+    GlobalSettingsWindow,
     ImageSeriesOperationsWindow,
     MaskEditorWindow,
     QtPathsWindow,
+    UserConfigWindow,
 )
+
 
 TREE = WorkflowTree()
 
@@ -155,6 +158,7 @@ class MainMenu(QtWidgets.QMainWindow):
             dialog_type="save_file",
             caption="Export GUI state file",
             formats="All supported files (*.yaml *.yml);;YAML (*.yaml *.yml)",
+            default_extension="yaml",
             qsettings_ref="MainWindowGuiState__export",
         )
 
@@ -534,6 +538,8 @@ class MainMenu(QtWidgets.QMainWindow):
             return
         with open(filename, "r") as _file:
             _state = yaml.load(_file, Loader=yaml.SafeLoader)
+        if _state is None:
+            return
         if _state.get("pydidas_version", "0.0.0") != VERSION:
             raise UserConfigError(
                 "The saved state was not created with the current pydidas version and "
@@ -555,7 +561,10 @@ class MainMenu(QtWidgets.QMainWindow):
             The restored global states which includes the states for the
             global objects.
         """
-        TREE.restore_from_string(state["workflow_tree"])
+        try:
+            TREE.restore_from_string(state["workflow_tree"])
+        except KeyError:
+            raise UserConfigError("Cannot import Workflow. Not all plugins found.")
         for _contex_key, _context in GLOBAL_CONTEXTS.items():
             for _key, _val in state[_contex_key].items():
                 _context.set_param_value(_key, _val)
@@ -650,6 +659,12 @@ class MainMenu(QtWidgets.QMainWindow):
         event : QtCore.QEvent
             The closing event.
         """
+        _reply = QuestionBox(
+            "Exit confirmation", "Do you want to close the pydidas window?"
+        ).exec_()
+        if not _reply:
+            event.ignore()
+            return
         self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
         self.sig_close_main_window.emit()
         event.accept()

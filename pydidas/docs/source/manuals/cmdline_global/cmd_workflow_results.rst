@@ -13,19 +13,19 @@ Introduction
 
 The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` is the 
 Singleton instance of the 
-:py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`.
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`.
 It is used for managing the processing results.
 
 This class does not need any configuration as the layout of the results are 
 determined based on 
 
   1. The information about the scan from the 
-     :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+     :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
      class.
   2. The information about the processing steps from the 
      :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
-The :py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`
+The :py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
 is only responsible for storing and presenting the results.
 
 To access the instance, execute the following code:
@@ -36,14 +36,14 @@ To access the instance, execute the following code:
     >>> RESULTS = pydidas.workflow.WorkflowResults()
 
 The public interface is detailed in the class documentation 
-(:py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`)
+(:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`)
 and this document will focus on the use case to access results.
 
 Getting information about the results
 -------------------------------------
 
 To get more information about the results, the 
-:py:class:`WorkflowResults <pydidas.workflow.workflow_results._WorkflowResults>`
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>`
 class has several properties to get general information about the stored results
 
 
@@ -98,7 +98,7 @@ Metadata
 
 The metadata of a node ID's Dataset can be accessed using the 
 :py:meth:`get_result_metadata(node_id) 
-<pydidas.workflow.workflow_results._WorkflowResults.get_result_metadata>` 
+<pydidas.workflow.WorkflowResults.get_result_metadata>` 
 method. It will return a dictionary with the metadata keys and their respective
 data:
 
@@ -123,12 +123,12 @@ creating a copy of the full data.
 Generic Data
 """"""""""""
 
-The :py:meth:`get_results(node_id) <pydidas.workflow.workflow_results._WorkflowResults.get_results>` 
+The :py:meth:`get_results(node_id) <pydidas.workflow.WorkflowResults.get_results>` 
 method is available to access the full Dataset with the results of a Plugin. 
 The calling parameter is the node ID of the particular Plugin corresponding to
 the results:
 
-.. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_results
+.. automethod:: pydidas.workflow.WorkflowResults.get_results
     :noindex:
 
 An example is given below:
@@ -185,11 +185,11 @@ Flattened scan dimensions
 For some applications, it might be interesting to ignore the detailed shape of
 the scan and flatten the scan to a *timeline*. The 
 :py:meth:`get_results_for_flattened_scan(node_id) 
-<pydidas.workflow.workflow_results._WorkflowResults.get_results_for_flattened_scan>` 
+<pydidas.workflow.WorkflowResults.get_results_for_flattened_scan>` 
 method allows to get a Dataset with all the scan dimensions flattened to a 
 single dimension renamed to *timeline*:
 
-.. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_results_for_flattened_scan
+.. automethod:: pydidas.workflow.WorkflowResults.get_results_for_flattened_scan
     :noindex:
 
 An example is given below:
@@ -243,13 +243,13 @@ Accessing a data subset
 For convenience, a method to access only a subset of the data is implemented as 
 well: 
 
-.. automethod:: pydidas.workflow.workflow_results._WorkflowResults.get_result_subset
+.. automethod:: pydidas.workflow.WorkflowResults.get_result_subset
     :noindex:
 
 This method is interesing if the user wants to access a specific subset in the 
 flattened data, for example the results for the frames 40 to 55 of the 
 experiment. This can easily be done using the :py:meth:`get_result_subset 
-<pydidas.workflow.workflow_results._WorkflowResults.get_result_subset>`
+<pydidas.workflow.WorkflowResults.get_result_subset>`
 method, as demonstrated in the example below:
 
 
@@ -299,11 +299,11 @@ Saving results
 --------------
 
 Saving the results is achieved via the :py:meth:`save_results_to_disk
-<pydidas.workflow.workflow_results._WorkflowResults.save_results_to_disk>` 
+<pydidas.workflow.WorkflowResults.save_results_to_disk>` 
 method:
 
 .. automethod:: 
-    pydidas.workflow.workflow_results._WorkflowResults.save_results_to_disk
+    pydidas.workflow.WorkflowResults.save_results_to_disk
     :noindex:
 
 For now, the only available saver is 'HDF5' and additional savers will be added

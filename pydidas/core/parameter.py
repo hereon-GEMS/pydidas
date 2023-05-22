@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ consistent interface for various data types.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["Parameter"]
@@ -505,13 +507,34 @@ class Parameter:
             return self.value
         raise TypeError(f"No export format for type {self.__type} has been defined.")
 
+    def update_value_and_choices(self, value, choices):
+        """
+        Update the value and choices of the Parameter to prevent illegal selections.
+
+        Parameters
+        ----------
+        value : type
+            The new Parameter values
+        choices : Iterable
+            The new choices for the Parameter.
+        """
+        if not self.__typecheck(value):
+            raise ValueError(
+                f"The new value '{value}' of type '{type(value)}' is of the wrong "
+                f"type. Expected '{self.__type}'."
+            )
+        if value not in choices:
+            raise ValueError("The new value must be included in the new choices.")
+        self.__value = value
+        self.choices = choices
+
     def restore_default(self):
         """
         Restore the parameter to its default value.
         """
         self.value = self.__meta["default"]
 
-    def get_copy(self):
+    def copy(self):
         """
         A method to get the a copy of the Parameter object.
 
@@ -521,6 +544,8 @@ class Parameter:
             A full copy of the object.
         """
         return Parameter(*self.dump())
+
+    deepcopy = copy
 
     def dump(self):
         """
@@ -612,7 +637,7 @@ class Parameter:
         """
         Copy the Parameter object.
 
-        This method is a wrapper for the "get_copy" method to allow the generic
+        This method is a wrapper for the "copy" method to allow the generic
         Python copy module to make copies of Parameters as well.
 
         Returns
@@ -620,7 +645,7 @@ class Parameter:
         Parameter
             A copy of the Parameter.
         """
-        return self.get_copy()
+        return self.copy()
 
     def __call__(self):
         """

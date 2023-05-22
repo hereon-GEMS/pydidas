@@ -11,8 +11,9 @@ Using the pydidas processing pipeline
     While setting up and using the pydidas processing pipeline is also available
     from the command line, creating and editing the 
     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`, 
-    :py:class:`DiffractionExperimentContext <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`, and
-    :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` are more easily
+    :py:class:`DiffractionExperimentContext 
+    <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>`, and
+    :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` are more easily
     done in the graphical user interface and therefore, this guide covers
     the GUI.
     

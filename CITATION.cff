@@ -1,3 +1,6 @@
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: CC0-1.0
+
 cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 title: "pydidas - Python Diffraction Data Analysis Suite"
@@ -18,4 +21,4 @@ identifiers:
   - description: The pydidas project DOI
     type: doi
     value: "10.5281/zenodo.7568610"
-version: 23.3.9
+version: 23.3.22

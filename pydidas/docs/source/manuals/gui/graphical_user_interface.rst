@@ -1,3 +1,7 @@
+.. 
+    Copyright 2023, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Graphical user interface
 ========================
 
@@ -69,6 +73,7 @@ Generic GUI information
     
     menu
     editing_parameters
+    silx/plots
 
 .. _gui_frames:
 
@@ -84,6 +89,7 @@ Detailed descriptions of the individual frames are given here.
     frames/PyfaiCalibFrame
     frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
+    frames/QuickIntegrationFrame
     frames/DefineDiffractionExpFrame
     frames/DefineScanFrame
     frames/WorkflowEditFrame
@@ -110,6 +116,8 @@ Detailed information about the individual windows is given here.
     windows/_GlobalSettingsWindow
     windows/TweakPluginParameterWindow
     windows/ShowDetailedPluginResultsWindow
+    windows/ManuallySetBeamcenterWindow
+    windows/SelectIntegrationRegionWindow
 
 .. _gui_recipes:
 

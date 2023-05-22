@@ -1,12 +1,12 @@
 The contexts sub-package
 ------------------------
 
-.. autoclass:: pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext
+.. autoclass:: pydidas.contexts.diffraction_exp_context.DiffractionExperiment
     :members:
     :show-inheritance:
     :inherited-members: QObject
 
-.. autoclass:: pydidas.contexts.scan_context.scan_context._ScanContext
+.. autoclass:: pydidas.contexts.scan_context.Scan
     :members:
     :show-inheritance:
     :inherited-members: QObject

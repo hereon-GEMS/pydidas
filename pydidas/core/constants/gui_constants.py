@@ -39,6 +39,8 @@ __all__ = [
     "CONFIG_WIDGET_WIDTH",
     "DEFAULT_TWO_LINE_PARAM_CONFIG",
     "FLOAT_DISPLAY_ACCURACY",
+    "DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG",
+    "DEFAULT_PLUGIN_PARAM_CONFIG",
 ]
 
 
@@ -74,6 +76,20 @@ DEFAULT_TWO_LINE_PARAM_CONFIG = dict(
     width_io=CONFIG_WIDGET_WIDTH - 50,
     width_text=CONFIG_WIDGET_WIDTH - 20,
     width_unit=0,
+)
+
+DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG = dict(
+    width_text=PLUGIN_PARAM_WIDGET_WIDTH - 50,
+    width_io=PLUGIN_PARAM_WIDGET_WIDTH - 50,
+    width_unit=0,
+    width_total=PLUGIN_PARAM_WIDGET_WIDTH - 10,
+    linebreak=True,
+)
+
+DEFAULT_PLUGIN_PARAM_CONFIG = dict(
+    width_text=200,
+    width_io=PLUGIN_PARAM_WIDGET_WIDTH - 240,
+    width_total=PLUGIN_PARAM_WIDGET_WIDTH - 10,
 )
 
 FLOAT_DISPLAY_ACCURACY = 10

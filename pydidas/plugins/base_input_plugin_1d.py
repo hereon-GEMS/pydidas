@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,11 +28,11 @@ __all__ = ["InputPlugin1d"]
 
 import numpy as np
 
-from ..core import get_generic_parameter, UserConfigError
-from ..core.constants import INPUT_PLUGIN
 from ..contexts import ScanContext
-from .base_plugin import BasePlugin
+from ..core import UserConfigError, get_generic_parameter
+from ..core.constants import INPUT_PLUGIN
 from .base_input_plugin import InputPlugin
+from .base_plugin import BasePlugin
 
 
 SCAN = ScanContext()
@@ -44,20 +46,22 @@ class InputPlugin1d(InputPlugin):
     plugin_type = INPUT_PLUGIN
     plugin_name = "Base input plugin 1d"
     input_data_dim = 1
-    generic_params = BasePlugin.generic_params.get_copy()
+    generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),
         get_generic_parameter("roi_xlow"),
         get_generic_parameter("roi_xhigh"),
         get_generic_parameter("binning"),
     )
-    default_params = InputPlugin.default_params.get_copy()
+    default_params = InputPlugin.default_params.copy()
+    advanced_parameters = ["use_roi", "roi_xlow", "roi_xhigh", "binning"]
 
     def __init__(self, *args, **kwargs):
         """
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
+        self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
 
     def calculate_result_shape(self):
@@ -93,15 +97,13 @@ class InputPlugin1d(InputPlugin):
             kwargs["roi"] = slice(
                 self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
             )
-        _frames = self._config["n_multi"] * self._config[
-            "delta_index"
-        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
+        _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
         for _frame_index in _frames:
             if _data is None:
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)
             else:
                 _data += self.get_frame(_frame_index, **kwargs)[0]
-        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
+        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
             _data = _data / self._config["n_multi"]
         if _frames.size > 1:
             kwargs["frames"] = _frames

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseApp class from which all apps should inherit.
+Module with the BaseApp class from which all Pydidas apps should inherit.
 """
 
 __author__ = "Malte Storm"
@@ -33,8 +35,9 @@ from .object_with_parameter_collection import ObjectWithParameterCollection
 
 class BaseApp(ObjectWithParameterCollection):
     """
-    The BaseApp is the base class for all pydidas applications. It includes
-    core functionalities and pre-defines the template of required methods
+    The BaseApp is the base class for all pydidas applications.
+
+    It includes core functionalities and pre-defines the template of required methods
     for Apps to allow running the multiprocessing
     :py:class:`pydidas.multiprocessing.AppRunner`.
 
@@ -65,8 +68,7 @@ class BaseApp(ObjectWithParameterCollection):
 
     def parse_args_and_set_params(self):
         """
-        Parse the command line arguments and update the corresponding
-        Parameter values.
+        Parse the command line arguments and update the corresponding Parameter values.
         """
         if self.parse_func is None:
             return
@@ -228,7 +230,7 @@ class BaseApp(ObjectWithParameterCollection):
         """
         return
 
-    def get_copy(self, slave_mode=False):
+    def copy(self, slave_mode=False):
         """
         Get a copy of the App.
 

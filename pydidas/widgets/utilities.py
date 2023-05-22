@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,28 +20,30 @@ Module with various utility functions for widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
+    "BlockUpdates",
     "delete_all_items_in_layout",
     "create_default_grid_layout",
     "get_pyqt_icon_from_str",
     "get_max_pixel_width_of_entries",
+    "update_param_and_widget_choices",
 ]
 
 
-from qtpy import QtWidgets, QtCore, QtGui
-from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 import qtawesome
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
 
 from ..core import PydidasGuiError, utils
 
 
 def delete_all_items_in_layout(layout):
     """
-    Function to recursively delete items in a QLayout.
+    Recursively delete items in a QLayout.
 
     Parameters
     ----------
@@ -145,7 +149,7 @@ def get_max_pixel_width_of_entries(entries):
 
     font = QtWidgets.QApplication.instance().font()
     metrics = QtGui.QFontMetrics(font)
-    _width = max([metrics.boundingRect(_item).width() for _item in entries])
+    _width = max(metrics.boundingRect(_item).width() for _item in entries)
     return _width
 
 
@@ -232,3 +236,51 @@ def get_grid_pos(parent, **kwargs):
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row,) + _grid_pos[1:4]
     return _grid_pos
+
+
+def update_param_and_widget_choices(param_widget, new_choices):
+    """
+    Update the choices for the given Parameter and in its widget.
+
+    This function will update the choices and also set the combo box widget to an
+    allowed choice.
+
+    Parameters
+    ----------
+    param_widget : pydidas.widgets.parameter_config.ParameterWidget
+        The pydidas ParameterWidget instance.
+    new_choices : list
+        The list of new choices.
+    """
+    _param = param_widget.param
+    if len(new_choices) == 0:
+        _param.choices = None
+        _param.value = ""
+    else:
+        _param.choices = None
+        _param.value = new_choices[0]
+        _param.choices = new_choices
+    param_widget.io_widget.setEnabled(len(new_choices) != 0)
+    with utils.SignalBlocker(param_widget.io_widget):
+        if len(new_choices) == 0:
+            param_widget.io_widget.update_choices([""])
+            param_widget.io_widget.setCurrentText("")
+            return
+        param_widget.io_widget.update_choices(new_choices)
+        param_widget.io_widget.setCurrentText(new_choices[0])
+
+
+class BlockUpdates:
+    """
+    Class to block UI updates from a QWidget.
+    """
+
+    def __init__(self, caller):
+        self._caller = caller
+        self._update_status = caller.updatesEnabled()
+
+    def __enter__(self):
+        self._caller.setUpdatesEnabled(False)
+
+    def __exit__(self, type_, value, traceback):
+        self._caller.setUpdatesEnabled(self._update_status)

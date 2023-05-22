@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -89,7 +91,7 @@ class AppRunner(WorkerController):
     def __init__(self, app, n_workers=None, processor=app_processor):
         logger.debug("Starting AppRunner")
         super().__init__(n_workers)
-        self.__app = app.get_copy(slave_mode=True)
+        self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor["func"] = processor
         logger.debug("Finished init")
@@ -151,7 +153,7 @@ class AppRunner(WorkerController):
         pydidas.core.BaseApp
             The application instance.
         """
-        return self.__app.get_copy()
+        return self.__app.copy()
 
     def _cycle_pre_run(self):
         """
@@ -184,7 +186,7 @@ class AppRunner(WorkerController):
         self._join_workers()
         self._wait_for_worker_finished_signals(timeout)
         self.__app.multiprocessing_post_run()
-        self.sig_final_app_state.emit(self.__app.get_copy())
+        self.sig_final_app_state.emit(self.__app.copy())
 
     @QtCore.Slot(float)
     def __check_progress(self, progress):
@@ -233,6 +235,6 @@ class AppRunner(WorkerController):
         """Get the App arguments to pass to the processor."""
         return (
             self.__app.__class__,
-            self.__app.params.get_copy(),
+            self.__app.params.copy(),
             self.__app.get_config(),
         )

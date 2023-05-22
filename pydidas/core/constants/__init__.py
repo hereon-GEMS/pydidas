@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,22 @@ throughout the pydidas package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
 
 # import __all__ items from modules:
+from .colors import *
 from .constants import *
 from .file_extensions import *
 from .generic_params import *
 from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
+from .pyfai_names import *
 from .q_settings import *
 from .qt_presets import *
 from .unicode_greek_letters import *
@@ -41,6 +45,11 @@ from . import image_ops
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import colors
+
+__all__.extend(colors.__all__)
+del colors
+
 from . import constants
 
 __all__.extend(constants.__all__)
@@ -70,6 +79,11 @@ from . import links
 
 __all__.extend(links.__all__)
 del links
+
+from . import pyfai_names
+
+__all__.extend(pyfai_names.__all__)
+del pyfai_names
 
 from . import q_settings
 

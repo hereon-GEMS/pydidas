@@ -23,21 +23,21 @@ given below:
 +-------------------+------------------------------------------------+
 | data_io           | core                                           |      
 +-------------------+------------------------------------------------+
-| experiment        | core                                           |
+| contexts          | core                                           |
 +-------------------+------------------------------------------------+
 | managers          | core, data_io                                  |
 +-------------------+------------------------------------------------+
 | plugins           | core, data_io, managers                        |
 +-------------------+------------------------------------------------+
-| workflow          | core, experiment, plugins                      |
+| workflow          | core, contexts, plugins                        |
 +-------------------+------------------------------------------------+
-| apps              | core, data_io, experiment, managers, workflow  |
+| apps              | core, data_io, contexts, managers, workflow    |
 +-------------------+------------------------------------------------+
-| widgets           | core, experiment, workflow, apps               |
+| widgets           | core, contexts, workflow, apps                 |
 +-------------------+------------------------------------------------+
 | unittest_objects  | core, data_io, plugins, apps                   |
 +-------------------+------------------------------------------------+
-| gui               | core, multiprocessing, data_io, experiment,    |
+| gui               | core, multiprocessing, data_io, contexts,      |
 |                   | workflow, apps, widgets                        |
 +-------------------+------------------------------------------------+
 

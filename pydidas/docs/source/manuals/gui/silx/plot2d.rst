@@ -1,3 +1,7 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 Pydidas 2D plot
 ^^^^^^^^^^^^^^^
 
@@ -100,10 +104,15 @@ menu entries description
       - Set coordinate system: This button will open a submenu which allows to
         select the coordinate system (cartesian or cylindrical). Note that the
         cylindrical coordinate system use the global :py:class:`DiffractionExperimentContext
-        <pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>` 
+        <pydidas.contexts.diffraction_exp_context.DiffractionExperiment>` 
         calibration to determine the beam center. Therefore, looking at data 
         with a different calibration will display a wrong center and therefore 
         also wrong coordinates.
+    * -  .. image:: ../silx/images/menu_get_data_info.png
+            :align: center
+      - Get information for selected datapoint: This button will allow the user
+        to click on a point in the image and show a window with additional 
+        information about this point (specifically: all indices / data values).
     * -  .. image:: ../silx/images/menu_copy_to_clipboard.png
             :align: center
       - Copy the currently visible figure to the clipboard. This will only copy

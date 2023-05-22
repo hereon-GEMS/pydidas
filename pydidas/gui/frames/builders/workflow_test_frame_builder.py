@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,25 @@ the WorkflowTestFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrameBuilder"]
 
 from qtpy import QtCore
 
-from ....widgets import BaseFrame, ReadOnlyTextWidget, ScrollArea
+from ....core import constants
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
-    FIX_EXP_POLICY,
+    POLICY_FIX_EXP,
 )
-from ....core import constants
+from ....widgets import ScrollArea
+from ....widgets.framework import BaseFrame
+from ....widgets.misc import ReadOnlyTextWidget
 from ....widgets.parameter_config import ParameterEditCanvas
-from ....widgets.silx_plot import create_silx_plot_stack
+from ....widgets.silx_plot import PydidasPlotStack
 
 
 class WorkflowTestFrameBuilder(BaseFrame):
@@ -103,7 +107,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         )
         self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
         self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=FIX_EXP_POLICY
+            parent=None, init_layout=True, lineWidth=5, sizePolicy=POLICY_FIX_EXP
         )
         self.create_spacer(
             "spacer1", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
@@ -113,7 +117,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             ScrollArea,
             widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH + 40,
-            sizePolicy=FIX_EXP_POLICY,
+            sizePolicy=POLICY_FIX_EXP,
             gridPos=(-1, 0, 1, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
@@ -202,6 +206,5 @@ class WorkflowTestFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
         )
+        self.create_any_widget("plot", PydidasPlotStack, gridPos=(0, 1, 3, 1))
         self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
-
-        create_silx_plot_stack(self, gridPos=(0, 1, 3, 1))

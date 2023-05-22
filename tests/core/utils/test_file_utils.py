@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,27 +24,29 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
-import random
-import tempfile
-import shutil
-import os
 import copy
+import os
+import random
+import shutil
 import sys
+import tempfile
+import unittest
+from collections.abc import Iterable
+from pathlib import Path
 
 from pydidas.core import UserConfigError
 from pydidas.core.utils import (
     find_valid_python_files,
     flatten,
-    get_random_string,
     get_extension,
     get_file_naming_scheme,
+    get_random_string,
 )
 
 
 class Test_file_utils(unittest.TestCase):
     def setUp(self):
-        self._path = tempfile.mkdtemp()
+        self._path = Path(tempfile.mkdtemp())
         self._good_filenames = ["test.py", "test_2.py", "test3.py"]
         self._bad_filenames = [
             ".test.py",
@@ -66,9 +70,9 @@ class Test_file_utils(unittest.TestCase):
     def create_dir_tree(self, path=None, depth=3, width=2):
         _dirs = []
         for _width in range(width):
-            _dir = os.path.join(path, get_random_string(8))
+            _dir = path.joinpath(get_random_string(8))
             os.makedirs(_dir)
-            with open(os.path.join(_dir, "__init__.py"), "w") as f:
+            with open(_dir.joinpath("__init__.py"), "w") as f:
                 f.write(" ")
             if depth > 1:
                 _dirs += self.create_dir_tree(_dir, width=width, depth=depth - 1)
@@ -78,14 +82,14 @@ class Test_file_utils(unittest.TestCase):
 
     def populate_with_python_files(self, dirs):
         self._class_names = []
-        if isinstance(dirs, str):
+        if not isinstance(dirs, Iterable):
             dirs = [dirs]
         for _dir in dirs:
             for _name in self._good_filenames:
-                with open(os.path.join(_dir, _name), "w") as f:
+                with open(_dir.joinpath(_name), "w") as f:
                     f.write(self.get_random_class_def(store_name=True))
             for _name in self._bad_filenames:
-                with open(os.path.join(_dir, _name), "w") as f:
+                with open(_dir.joinpath(_name), "w") as f:
                     f.write(self.get_random_class_def())
 
     def get_random_class_def(self, store_name=False):
@@ -105,30 +109,45 @@ class Test_file_utils(unittest.TestCase):
             self._class_names.append(_name.upper())
         return _str
 
-    def test_find_files__no_path(self):
+    def test_find_valid_python_files__no_path(self):
         _files = find_valid_python_files(self._path)
         self.assertEqual(_files, [])
 
-    def test_find_files__simple_path(self):
+    def test_find_valid_python_files__simple_path(self):
         self.populate_with_python_files(self._path)
         _files = set(find_valid_python_files(self._path))
         _target = set(
-            [os.path.join(self._path, _file) for _file in self._good_filenames]
+            [Path(os.path.join(self._path, _file)) for _file in self._good_filenames]
         )
         self.assertEqual(_files, _target)
 
-    def test_find_files__path_tree(self):
+    def test_find_valid_python_files__path_tree(self):
         _dirs = self.create_python_file_tree()
         _files = set(find_valid_python_files(self._path))
         _target = set(
             flatten(
                 [
-                    [os.path.join(_dir, _file) for _file in self._good_filenames]
+                    [Path(_dir.joinpath(_file)) for _file in self._good_filenames]
                     for _dir in _dirs
                 ]
             )
         )
         self.assertEqual(_files, _target)
+
+    def test_find_valid_python_files__single_file(self):
+        _path = self._path.joinpath(self._good_filenames[0])
+        with open(_path, "w") as _f:
+            _f.write(self.get_random_class_def())
+        _files = find_valid_python_files(_path)
+        self.assertEqual(_files, [_path])
+
+    def test_find_valid_python_files__bad_filename(self):
+        for _name in self._bad_filenames:
+            _path = self._path.joinpath(_name)
+            with open(_path, "w") as _f:
+                _f.write(self.get_random_class_def())
+            _files = find_valid_python_files(_path)
+            self.assertEqual(_files, [])
 
     def test_get_extension__empty_path(self):
         _ext = get_extension("")

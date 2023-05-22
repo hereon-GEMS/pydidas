@@ -53,7 +53,9 @@ class TestInputPlugin(InputPlugin):
         self.filename_string = filename
 
     def get_frame(self, index, **kwargs):
-        _frame = index + SCAN.get_param_value("scan_start_index")
+        _frame = index * SCAN.get_param_value(
+            "scan_index_stepping"
+        ) + SCAN.get_param_value("scan_start_index")
         kwargs["frame"] = _frame
         return import_data(self.filename_string, **kwargs), kwargs
 

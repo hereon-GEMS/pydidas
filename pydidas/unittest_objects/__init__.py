@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,8 +28,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
 
+
 # import __all__ items from modules:
 from .create_dummy_plugins import *
+from .create_hdf5_io_file_ import *
 from .dummy_loader import *
 from .dummy_plugin_collection import *
 from .dummy_proc import *
@@ -40,6 +44,11 @@ from . import create_dummy_plugins
 
 __all__.extend(create_dummy_plugins.__all__)
 del create_dummy_plugins
+
+from . import create_hdf5_io_file_
+
+__all__.extend(create_hdf5_io_file_.__all__)
+del create_hdf5_io_file_
 
 from . import dummy_loader
 

@@ -23,15 +23,15 @@ __copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
-__all__ = ["ScanContext"]
+__all__ = ["ScanContext", "Scan"]
 
 import numpy as np
 
 from ...core import (
-    SingletonFactory,
-    get_generic_param_collection,
     ObjectWithParameterCollection,
+    SingletonFactory,
     UserConfigError,
+    get_generic_param_collection,
 )
 from .scan_context_io_meta import ScanContextIoMeta
 
@@ -68,7 +68,7 @@ SCAN_CONTEXT_DEFAULT_PARAMS = get_generic_param_collection(
 )
 
 
-class _ScanContext(ObjectWithParameterCollection):
+class Scan(ObjectWithParameterCollection):
     """
     Class which holds the settings for the scan. This class must only be
     instanciated through its factory, therefore guaranteeing that only a
@@ -112,7 +112,7 @@ class _ScanContext(ObjectWithParameterCollection):
             frame -= _indices[_dim] * np.prod(_N[_dim + 1 :])
         return tuple(_indices)
 
-    def get_frame_number_from_scan_indices(self, indices):
+    def get_frame_from_indices(self, indices):
         """
         Get the frame number based on the scan indices.
 
@@ -197,9 +197,24 @@ class _ScanContext(ObjectWithParameterCollection):
         _n = self.get_param_value(f"scan_dim{index}_n_points")
         return np.linspace(_f0, _f0 + _df * _n, _n, endpoint=False)
 
+    def update_from_scan(self, scan):
+        """
+        Update this Scan onject's Parameters from another Scan.
+
+        The purpose of this method is to "copy" the other Scan's Parameter values while
+        keeping the reference to this object.
+
+        Parameters
+        ----------
+        scan : Scan
+            The other Scan from which the Parameters should be taken.
+        """
+        for _key, _val in scan.get_param_values_as_dict().items():
+            self.set_param_value(_key, _val)
+
     def update_from_dictionary(self, scan_dict):
         """
-        Update scen ScanContext from an imported dictionary.
+        Update the Scan from an imported dictionary.
 
         Parameters
         ----------
@@ -270,8 +285,7 @@ class _ScanContext(ObjectWithParameterCollection):
         """
         return self.get_param_value("scan_dim")
 
-    @staticmethod
-    def import_from_file(filename):
+    def import_from_file(self, filename):
         """
         Import ScanContext from a file.
 
@@ -280,10 +294,9 @@ class _ScanContext(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        ScanContextIoMeta.import_from_file(filename)
+        ScanContextIoMeta.import_from_file(filename, scan=self)
 
-    @staticmethod
-    def export_to_file(filename, overwrite=False):
+    def export_to_file(self, filename, overwrite=False):
         """
         Export ScanContext to a file.
 
@@ -295,7 +308,7 @@ class _ScanContext(ObjectWithParameterCollection):
             Keyword to allow overwriting of existing files. The default is
             False.
         """
-        ScanContextIoMeta.export_to_file(filename, overwrite=overwrite)
+        ScanContextIoMeta.export_to_file(filename, scan=self, overwrite=overwrite)
 
 
-ScanContext = SingletonFactory(_ScanContext)
+ScanContext = SingletonFactory(Scan)

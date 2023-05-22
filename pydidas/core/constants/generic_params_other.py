@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,14 +21,16 @@ Parameters which are are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["GENERIC_PARAMS_OTHER"]
 
 
+from .colors import PYDIDAS_COLORS
 from .unicode_greek_letters import GREEK_ASCII_TO_UNI
+
 
 GENERIC_PARAMS_OTHER = {
     ###############################
@@ -297,6 +301,28 @@ GENERIC_PARAMS_OTHER = {
             "to using no upper limit but the data limits."
         ),
     },
+    "fit_output": {
+        "type": str,
+        "default": "Peak position; peak area; peak FWHM",
+        "name": "Output",
+        "choices": [
+            "Peak position",
+            "Peak area",
+            "Peak FWHM",
+            "Peak position; peak area",
+            "Peak position; peak FWHM",
+            "Peak area; peak FWHM",
+            "Peak position; peak area; peak FWHM",
+        ],
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The output of the fitting plugin. The plugin can either return the peak "
+            "area, the peak position or the FWHM. Alternatively, any combination of "
+            "these values can be retured as well. Note that the fit parameters are "
+            "always stored in the metadata."
+        ),
+    },
     ################
     # Generic limits
     ################
@@ -555,6 +581,18 @@ GENERIC_PARAMS_OTHER = {
         "tooltip": (
             "The axis which is to be used as the second axis in the "
             "plot of the results."
+        ),
+    },
+    "overlay_color": {
+        "type": str,
+        "default": "orange",
+        "name": "Plot overlay color",
+        "choices": list(PYDIDAS_COLORS.keys()),
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "Set the display color for the overlay items (markers and shapes) in the "
+            "plot."
         ),
     },
     #######################

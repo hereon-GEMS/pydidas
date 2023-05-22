@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,17 +21,17 @@ ScanContext should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ScanContextIoBase"]
 
-from ...core.io_registry import GenericIoBase
-from ...core.constants import SCAN_GENERIC_PARAM_NAMES
 from ...core import UserConfigError
-from .scan_context_io_meta import ScanContextIoMeta
+from ...core.constants import SCAN_GENERIC_PARAM_NAMES
+from ...core.io_registry import GenericIoBase
 from .scan_context import ScanContext
+from .scan_context_io_meta import ScanContextIoMeta
 
 
 SCAN = ScanContext()
@@ -69,10 +71,17 @@ class ScanContextIoBase(GenericIoBase, metaclass=ScanContextIoMeta):
             raise UserConfigError(_text)
 
     @classmethod
-    def _write_to_scan_settings(cls):
+    def _write_to_scan_settings(cls, scan=None):
         """
         Write the loaded (temporary) Parameters to the scanSettings.
+
+        Parameters
+        ----------
+        scan : Union[None, pydidas.contexts.scan_context.Scan], optional
+            The Scan instance to be updated. If None, the ScanContext instance is used.
+            The default is None.
         """
+        _scan = SCAN if scan is None else scan
         for _key, _item in cls.imported_params.items():
-            SCAN.set_param_value(_key, _item)
+            _scan.set_param_value(_key, _item)
         cls.imported_params = {}

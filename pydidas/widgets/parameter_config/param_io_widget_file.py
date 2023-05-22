@@ -155,6 +155,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
             critical_warning("Not a file", "Can only accept single files.")
             return
         self.set_value(_path)
+        self.emit_signal()
 
     def set_unique_ref_name(self, name):
         """

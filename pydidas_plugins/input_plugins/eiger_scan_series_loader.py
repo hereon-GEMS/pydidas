@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ images from single Hdf5 files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["EigerScanSeriesLoader"]
@@ -30,18 +32,13 @@ import os
 from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring, get_hdf5_metadata
-from pydidas.contexts import ScanContext
-from pydidas.plugins import InputPlugin
 from pydidas.data_io import import_data
-
-
-SCAN = ScanContext()
+from pydidas.plugins import InputPlugin
 
 
 class EigerScanSeriesLoader(InputPlugin):
     """
-    Load data frames from an Eiger scan series with files in different
-    directories.
+    Load data frames from an Eiger scan series with files in different directories.
 
     This class is designed to load data from a series of directories with a
     single hdf5 file in each, as created by a series of scans with the Eiger
@@ -81,14 +78,15 @@ class EigerScanSeriesLoader(InputPlugin):
         "eiger_filename_suffix",
         "hdf5_key",
         "images_per_file",
+        "_counted_images_per_file",
     )
     input_data_dim = None
     output_data_dim = 2
+    advanced_parameters = InputPlugin.advanced_parameters.copy() + ["images_per_file"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.filename_string = ""
-        self._config["images_per_file"] = -1
 
     def pre_execute(self):
         """
@@ -100,16 +98,16 @@ class EigerScanSeriesLoader(InputPlugin):
             _n_per_file = get_hdf5_metadata(
                 self.get_filename(0), "shape", dset=self.get_param_value("hdf5_key")
             )[0]
-            self._config["images_per_file"] = _n_per_file
+            self.set_param_value("_counted_images_per_file", _n_per_file)
         else:
-            self._config["images_per_file"] = _i_per_file
+            self.set_param_value("_counted_images_per_file", _i_per_file)
 
     def update_filename_string(self):
         """
         Set up the generator that can create the full file names to load images.
         """
-        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
         _eigerkey = self.get_param_value("eiger_dir")
         _suffix = self.get_param_value("eiger_filename_suffix", dtype=str)
         if _pattern.endswith(_suffix):
@@ -140,7 +138,7 @@ class EigerScanSeriesLoader(InputPlugin):
             The image data.
         """
         _fname = self.get_filename(frame_index)
-        _hdf_index = frame_index % self._config["images_per_file"]
+        _hdf_index = frame_index % self.get_param_value("_counted_images_per_file")
         kwargs["dataset"] = self.get_param_value("hdf5_key")
         kwargs["frame"] = _hdf_index
         kwargs["binning"] = self.get_param_value("binning")
@@ -161,7 +159,7 @@ class EigerScanSeriesLoader(InputPlugin):
                 "pre_execute has not been called for EigerScanSeriesLoader and no "
                 "filename generator has been created."
             )
-        _i_file = frame_index // self._config["images_per_file"] + SCAN.get_param_value(
-            "scan_start_index"
-        )
+        _i_file = frame_index // self.get_param_value(
+            "_counted_images_per_file"
+        ) + self._SCAN.get_param_value("scan_start_index")
         return self.filename_string.format(index=_i_file)

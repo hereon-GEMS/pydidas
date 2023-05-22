@@ -25,7 +25,6 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["SubtractBackgroundImage"]
 
-
 import os
 
 import numpy as np
@@ -35,6 +34,7 @@ from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
 from pydidas.plugins import ProcPlugin
+from pydidas.widgets.plugin_config_widgets import SubtractBackgroundImageConfigWidget
 
 
 class SubtractBackgroundImage(ProcPlugin):
@@ -53,6 +53,7 @@ class SubtractBackgroundImage(ProcPlugin):
     output_data_dim = 2
     output_data_label = "Background corrected image"
     output_data_unit = "counts"
+    has_unique_parameter_config_widget = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,3 +104,14 @@ class SubtractBackgroundImage(ProcPlugin):
         if self._thresh is not None:
             _corrected_data[_corrected_data < self._thresh] = self._thresh
         return _corrected_data, kwargs
+
+    def get_parameter_config_widget(self):
+        """
+        Get the unique configuration widget associated with this Plugin.
+
+        Returns
+        -------
+        QtWidgets.QWidget
+            The unique ParameterConfig widget
+        """
+        return SubtractBackgroundImageConfigWidget(self)

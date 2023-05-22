@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -83,7 +85,7 @@ class CorrectSplineDistortion(ProcPlugin):
     plugin_name = "Correct spline distortion"
     basic_plugin = False
     plugin_subtype = PROC_PLUGIN_IMAGE
-    default_params = _SPLINE_PARAMS.get_copy()
+    default_params = _SPLINE_PARAMS.copy()
     input_data_dim = 2
     output_data_dim = 2
     output_data_label = "Distortion-corrected image"

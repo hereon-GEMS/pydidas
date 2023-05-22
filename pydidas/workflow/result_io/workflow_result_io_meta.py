@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,16 +24,18 @@ the specified file formats.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowResultIoMeta"]
 
 import os
 
+from ...contexts import diffraction_exp_context, scan_context
 from ...core.io_registry import GenericIoMeta
 from ...core.utils import get_extension
+from ..workflow_tree import _WorkflowTree
 
 
 class WorkflowResultIoMeta(GenericIoMeta):
@@ -102,7 +106,14 @@ class WorkflowResultIoMeta(GenericIoMeta):
         return _names
 
     @classmethod
-    def prepare_active_savers(cls, save_dir, node_information):
+    def prepare_active_savers(
+        cls,
+        save_dir,
+        node_information,
+        scan_context=None,
+        diffraction_exp_context=None,
+        workflow_tree=None,
+    ):
         """
         Prepare the active savers for storing data by creating the required
         files and directories.
@@ -118,38 +129,31 @@ class WorkflowResultIoMeta(GenericIoMeta):
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
+        scan_context : Union[Scan, None], optional
+            The scan context. If None, the generic context will be used. Only specify
+            this, if you explicitly require a different context. The default is None.
+        diffraction_exp_context : Union[DiffractionExp, None], optional
+            The diffraction experiment context. If None, the generic context will be
+            used. Only specify this, if you explicitly require a different context. The
+            default is None.
+        workflow_tree : Union[WorkflowTree, None], optional
+            The WorkflowTree. If None, the generic WorkflowTree will be used. Only
+            specify this, if you explicitly require a different context. The default is
+            None.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
             _saver.scan_title = cls.scan_title
-            _saver.prepare_files_and_directories(save_dir, node_information)
+            _saver.prepare_files_and_directories(
+                save_dir,
+                node_information,
+                scan_context=scan_context,
+                diffraction_exp_context=diffraction_exp_context,
+                workflow_tree=workflow_tree,
+            )
 
     @classmethod
-    def prepare_saver(cls, extension, save_dir, node_information):
-        """
-        Call the concrete saver associated with the extension to prepare
-        all requird files and directories.
-
-        Parameters
-        ----------
-        extension : str
-            The extension of the saved files.
-        save_dir : Union[pathlib.Path, str]
-            The full path for the data to be saved.
-        node_information : dict
-            A dictionary with nodeID keys and dictionary values. Each value dictionary
-            must have the following keys: shape, node_label, data_label, plugin_name
-            and the respecive values. The shape (tuple) detemines the shape of the
-            Dataset, the node_label is the user's name for the processing node. The
-            data_label gives the description of what the data shows (e.g. intensity)
-            and the plugin_name is simply the name of the plugin.
-        """
-        cls.verify_extension_is_registered(extension)
-        _saver = cls.registry[extension]
-        _saver.prepare_files_and_directories(save_dir, node_information)
-
-    @classmethod
-    def push_frame_metadata_to_active_savers(cls, metadata):
+    def push_frame_metadata_to_active_savers(cls, metadata, scan=None):
         """
         Push the frame metadata to all active savers.
 
@@ -162,10 +166,13 @@ class WorkflowResultIoMeta(GenericIoMeta):
         ----------
         metadata : dict
             The dictionary with the metadata.
+        scan : Union[pydidas.contexts.scan_context.Scan, None], optional
+            The Scan instance. If None, this will default to the generic ScanContext.
+            The default is None.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.update_frame_metadata(metadata)
+            _saver.update_frame_metadata(metadata, scan)
 
     @classmethod
     def export_frame_to_active_savers(cls, index, frame_result_dict, **kwargs):
@@ -186,7 +193,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
             _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod
-    def export_full_data_to_active_savers(cls, data):
+    def export_full_data_to_active_savers(cls, data, scan_context=None):
         """
         Export the full data to all active savers.
 
@@ -194,13 +201,16 @@ class WorkflowResultIoMeta(GenericIoMeta):
         ----------
         data : dict
             The result dictionary with nodeID keys and result values.
+        scan_context : Union[Scan, None], optional
+            The scan context. If None, the generic context will be used. Only specify
+            this, if you explicitly require a different context. The default is None.
         """
         for _ext in cls.active_savers:
             _saver = cls.registry[_ext]
-            _saver.export_full_data_to_file(data)
+            _saver.export_full_data_to_file(data, scan_context)
 
     @classmethod
-    def export_full_data_to_file(cls, extension, data):
+    def export_full_data_to_file(cls, extension, data, scan_context=None):
         """
         Export the full data to all active savers.
 
@@ -210,10 +220,13 @@ class WorkflowResultIoMeta(GenericIoMeta):
             The file extension for the saver.
         data : dict
             The result dictionary with nodeID keys and result values.
+        scan_context : Union[Scan, None], optional
+            The scan context. If None, the generic context will be used. Only specify
+            this, if you explicitly require a different context. The default is None.
         """
         cls.verify_extension_is_registered(extension)
         _saver = cls.registry[extension]
-        _saver.export_full_data_to_file(data)
+        _saver.export_full_data_to_file(data, scan_context)
 
     @classmethod
     def export_frame_to_file(cls, index, extension, frame_result_dict, **kwargs):
@@ -254,12 +267,18 @@ class WorkflowResultIoMeta(GenericIoMeta):
             values is the imported data.
         node_info_dict : dict
             The dictionary with information for all imported nodes.
-        scan : dict
-            The dictionary with information about the Scan.
+        scan : Scan
+            A pydidas Scan instance with the scan's context
+        exp: DiffractionExperiment
+            A pydidas DiffractionExperiment instance with the experiment's context
+        tree : WorkflowTree
+            A pydidas WorkflowTree instance with the workflow's context
         """
         _data_dict = {}
         _node_info_dict = {}
-        _scan = {}
+        _scan = scan_context.Scan()
+        _exp = diffraction_exp_context.DiffractionExperiment()
+        _tree = _WorkflowTree()
         _files = [
             _file
             for _file in os.listdir(dirname)
@@ -274,7 +293,9 @@ class WorkflowResultIoMeta(GenericIoMeta):
             _importer = cls.registry[_ext]
             _node_id = int(_file[5:7])
             _path = os.path.join(dirname, _file)
-            _data, _node_info, _scan = _importer.import_results_from_file(_path)
+            _data, _node_info, _scan, _exp, _tree = _importer.import_results_from_file(
+                _path
+            )
             _data_dict[_node_id] = _data
             _node_info_dict[_node_id] = _node_info
-        return _data_dict, _node_info_dict, _scan
+        return _data_dict, _node_info_dict, _scan, _exp, _tree

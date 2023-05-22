@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -117,7 +119,7 @@ class Test_app_processor(unittest.TestCase):
             self.stop_queue,
             self.finished_queue,
             self.app.__class__,
-            self.app.params.get_copy(),
+            self.app.params.copy(),
             self.app._config,
         )
         time.sleep(0.1)
@@ -132,7 +134,7 @@ class Test_app_processor(unittest.TestCase):
             self.stop_queue,
             self.finished_queue,
             self.app.__class__,
-            self.app.params.get_copy(),
+            self.app.params.copy(),
             self.app._config,
         )
         _thread.start()
@@ -151,7 +153,7 @@ class Test_app_processor(unittest.TestCase):
             self.stop_queue,
             self.finished_queue,
             self.app.__class__,
-            self.app.params.get_copy(),
+            self.app.params.copy(),
             self.app._config,
         )
         _thread.start()

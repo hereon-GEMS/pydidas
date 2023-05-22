@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,22 +20,23 @@ Module with PydidasImageView class which adds configurations to the base silx Im
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasImageView"]
 
+
 from qtpy import QtCore
-from silx.gui.plot import ImageView, tools, Plot2D
 from silx.gui.colors import Colormap
+from silx.gui.plot import ImageView, Plot2D, tools
 from silx.utils.weakref import WeakMethodProxy
 
-from ...core import PydidasQsettingsMixin
 from ...contexts import DiffractionExperimentContext
-from .silx_actions import CropHistogramOutliers
+from ...core import PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
+from .silx_actions import CropHistogramOutliers
 
 
 SNAP_MODE = (
@@ -93,7 +96,8 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         _layout.addWidget(_position_widget, 2, 0, 1, 3)
 
         self._positionWidget = _position_widget
-        self.get_detector_size()
+        DIFFRACTION_EXP.sig_params_changed.connect(self.update_from_diffraction_exp)
+        self.update_from_diffraction_exp()
 
         _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
@@ -102,14 +106,24 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             )
 
     @QtCore.Slot()
-    def get_detector_size(self):
+    def update_from_diffraction_exp(self):
         """
         Get the detector size from the DiffractionExperimentContext and store it.
         """
+        if self.cs_transform is None:
+            return
+        self._cs_transform_valid = (
+            DIFFRACTION_EXP.get_param_value("detector_pxsizex") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_pxsizey") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_npixx") > 0
+            and DIFFRACTION_EXP.get_param_value("detector_npixy") > 0
+        )
         self._detector_size = (
             DIFFRACTION_EXP.get_param_value("detector_npixy"),
             DIFFRACTION_EXP.get_param_value("detector_npixx"),
         )
+        self.cs_transform.set_coordinates("cartesian")
+        self.cs_transform.setEnabled(self._cs_transform_valid)
 
     def setData(self, data, **kwargs):
         """
@@ -137,10 +151,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         data_shape : tuple
             The shape of the input data.
         """
-        if data_shape != self._detector_size:
+        _valid = data_shape == self._detector_size and self._cs_transform_valid
+        if not _valid:
             self.cs_transform.set_coordinates("cartesian")
-            for _action in self.cs_transform.menu().actions()[1:]:
-                _action.setEnabled(False)
-        else:
-            for _action in self.cs_transform.menu().actions()[1:]:
-                _action.setEnabled(True)
+        self.cs_transform.setEnabled(_valid)

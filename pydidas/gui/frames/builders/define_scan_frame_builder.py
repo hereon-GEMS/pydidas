@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,15 +21,15 @@ the DefineScanFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DefineScanFrameBuilder"]
 
-from ....core import constants, utils
 from ....contexts import ScanContext
-from ....widgets import BaseFrame
+from ....core import constants, utils
+from ....widgets.framework import BaseFrame
 from ....widgets.utilities import get_pyqt_icon_from_str
 
 
@@ -64,7 +66,7 @@ class DefineScanFrameBuilder(BaseFrame):
         utils.apply_qt_properties(
             self.layout(),
             horizontalSpacing=25,
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
         self.create_label(
             "label_title",
@@ -125,21 +127,21 @@ class DefineScanFrameBuilder(BaseFrame):
             layout_kwargs=dict(
                 contentsMargins=(0, 0, 0, 0),
             ),
-            sizePolicy=constants.EXP_FIX_POLICY,
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            sizePolicy=constants.POLICY_EXP_FIX,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
 
         self.create_empty_widget(
             "scan_param_frame",
             gridPos=(_param_edit_row, 1, 1, 1),
             layout_kwargs=dict(horizontalSpacing=5, contentsMargins=(0, 0, 0, 0)),
-            alignment=constants.QT_DEFAULT_ALIGNMENT,
+            alignment=constants.ALIGN_TOP_LEFT,
         )
         self.create_spacer(
             "right_spacer",
             gridPos=(_param_edit_row, 2, 1, 1),
             stretch=1,
-            sizePolicy=constants.EXP_EXP_POLICY,
+            sizePolicy=constants.POLICY_EXP_EXP,
         )
 
         # populate global_param_frame
@@ -190,7 +192,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 fontsize=constants.STANDARD_FONT_SIZE + 1,
                 bold=True,
                 fixedWidth=constants.CONFIG_WIDGET_WIDTH - 50,
-                alignment=constants.QT_BOTTOM_LEFT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_LEFT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2), 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -200,7 +202,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 icon=get_pyqt_icon_from_str("qta::fa.chevron-up"),
                 fixedWidth=20,
                 fixedHeight=20,
-                alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 1, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -210,7 +212,7 @@ class DefineScanFrameBuilder(BaseFrame):
                 icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
                 fixedWidth=20,
                 fixedHeight=20,
-                alignment=constants.QT_BOTTOM_RIGHT_ALIGNMENT,
+                alignment=constants.ALIGN_BOTTOM_RIGHT,
                 gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 2, 1, 1),
                 parent_widget=self._widgets["scan_param_frame"],
             )
@@ -241,5 +243,5 @@ class DefineScanFrameBuilder(BaseFrame):
             icon=self.style().standardIcon(43),
         )
         self.create_spacer(
-            "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.EXP_EXP_POLICY
+            "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.POLICY_EXP_EXP
         )

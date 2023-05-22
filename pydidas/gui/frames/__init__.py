@@ -19,8 +19,8 @@ pydidas's functionality from within a graphical user interface.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = []
@@ -29,12 +29,13 @@ __all__ = []
 # import __all__ items from modules:
 from .composite_creator_frame import *
 from .data_browsing_frame import *
+from .define_diffraction_exp_frame import *
+from .define_scan_frame import *
 from .directory_spy_frame import *
 from .home_frame import *
 from .image_math_frame import *
 from .pyfai_calib_frame import *
-from .define_diffraction_exp_frame import *
-from .define_scan_frame import *
+from .quick_integration_frame import *
 from .utilities_frame import *
 from .view_results_frame import *
 from .workflow_edit_frame import *
@@ -52,6 +53,16 @@ from . import data_browsing_frame
 
 __all__.extend(data_browsing_frame.__all__)
 del data_browsing_frame
+
+from . import define_diffraction_exp_frame
+
+__all__.extend(define_diffraction_exp_frame.__all__)
+del define_diffraction_exp_frame
+
+from . import define_scan_frame
+
+__all__.extend(define_scan_frame.__all__)
+del define_scan_frame
 
 from . import directory_spy_frame
 
@@ -73,15 +84,10 @@ from . import pyfai_calib_frame
 __all__.extend(pyfai_calib_frame.__all__)
 del pyfai_calib_frame
 
-from . import define_diffraction_exp_frame
+from . import quick_integration_frame
 
-__all__.extend(define_diffraction_exp_frame.__all__)
-del define_diffraction_exp_frame
-
-from . import define_scan_frame
-
-__all__.extend(define_scan_frame.__all__)
-del define_scan_frame
+__all__.extend(quick_integration_frame.__all__)
+del quick_integration_frame
 
 from . import utilities_frame
 

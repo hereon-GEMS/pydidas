@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,9 +30,9 @@ import os
 
 import numpy as np
 
-from ..core import get_generic_parameter, UserConfigError
-from ..core.constants import INPUT_PLUGIN
 from ..contexts import ScanContext
+from ..core import UserConfigError, get_generic_parameter
+from ..core.constants import INPUT_PLUGIN
 from ..managers import ImageMetadataManager
 from .base_plugin import BasePlugin
 
@@ -48,7 +50,7 @@ class InputPlugin(BasePlugin):
     output_data_label = "Image intensity"
     output_data_unit = "counts"
     input_data_dim = 2
-    generic_params = BasePlugin.generic_params.get_copy()
+    generic_params = BasePlugin.generic_params.copy()
     generic_params.add_params(
         get_generic_parameter("use_roi"),
         get_generic_parameter("roi_xlow"),
@@ -58,13 +60,22 @@ class InputPlugin(BasePlugin):
         get_generic_parameter("binning"),
         get_generic_parameter("live_processing"),
     )
-    default_params = BasePlugin.default_params.get_copy()
+    default_params = BasePlugin.default_params.copy()
+    advanced_parameters = [
+        "use_roi",
+        "roi_xlow",
+        "roi_xhigh",
+        "roi_ylow",
+        "roi_yhigh",
+        "binning",
+    ]
 
     def __init__(self, *args, **kwargs):
         """
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
+        self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
         self.__setup_image_magedata_manager()
 
@@ -153,9 +164,28 @@ class InputPlugin(BasePlugin):
         """
         self.update_filename_string()
         self._image_metadata.update(filename=self.get_filename(0))
-        self._config["n_multi"] = SCAN.get_param_value("scan_multiplicity")
-        self._config["start_index"] = SCAN.get_param_value("scan_start_index")
-        self._config["delta_index"] = SCAN.get_param_value("scan_index_stepping")
+        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
+        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
+        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
+
+    def get_filename(self, frame_index):
+        """
+        Get the filename of the file associated with the frame index.
+
+        Parameters
+        ----------
+        frame index : int
+            The index of the frame to be processed.
+
+        Returns
+        -------
+        str
+            The filename.
+        """
+        _index = frame_index * self._SCAN.get_param_value(
+            "scan_index_stepping"
+        ) + self._SCAN.get_param_value("scan_start_index")
+        return self.filename_string.format(index=_index)
 
     def update_filename_string(self):
         """
@@ -164,8 +194,8 @@ class InputPlugin(BasePlugin):
         The generic implementation only joins the base directory and filename pattern,
         as defined in the ScanContext class.
         """
-        _basepath = SCAN.get_param_value("scan_base_directory", dtype=str)
-        _pattern = SCAN.get_param_value("scan_name_pattern", dtype=str)
+        _basepath = self._SCAN.get_param_value("scan_base_directory", dtype=str)
+        _pattern = self._SCAN.get_param_value("scan_name_pattern", dtype=str)
         _len_pattern = _pattern.count("#")
         if _len_pattern < 1:
             # raise UserConfigError("No filename pattern detected in the Input plugin!")
@@ -198,38 +228,17 @@ class InputPlugin(BasePlugin):
         _data = None
         if "roi" not in kwargs and self.get_param_value("use_roi"):
             kwargs["roi"] = self._image_metadata.roi
-        _frames = self._config["n_multi"] * self._config[
-            "delta_index"
-        ] * index + self._config["delta_index"] * np.arange(self._config["n_multi"])
+        _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
         for _frame_index in _frames:
             if _data is None:
                 _data, kwargs = self.get_frame(_frame_index, **kwargs)
             else:
                 _data += self.get_frame(_frame_index, **kwargs)[0]
-        if SCAN.get_param_value("scan_multi_image_handling") == "Average":
+        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
             _data = _data / self._config["n_multi"]
         if _frames.size > 1:
             kwargs["frames"] = _frames
         return _data, kwargs
-
-    def get_filename(self, frame_index):
-        """
-        Get the filename of the file associated with the frame index.
-
-        Parameters
-        ----------
-        frame index : int
-            The index of the frame to be processed.
-
-        Returns
-        -------
-        str
-            The filename.
-        """
-        _index = frame_index * SCAN.get_param_value(
-            "scan_index_stepping"
-        ) + SCAN.get_param_value("scan_start_index")
-        return self.filename_string.format(index=_index)
 
     def get_frame(self, frame_index, **kwargs):
         """

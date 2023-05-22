@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,20 +16,20 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the EditPluginParametersWidget class used to edit plugin
-Parameters.
+Module with the EditPluginParametersWidget widget used to display and edit the
+Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["EditPluginParametersWidget"]
 
 from pathlib import Path
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...core import Hdf5key, constants
 from ..factory import CreateWidgetsMixIn
@@ -79,6 +81,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.clear_layout()
         self.plugin = plugin
         self.node_id = node_id
+        self.__advanced_hidden = True
         self.__create_widgets_for_new_plugin()
 
     def clear_layout(self):
@@ -109,7 +112,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         """
         self.create_label(
             "plugin_name",
-            f"\nPlugin: {self.plugin.plugin_name}",
+            f"Plugin: {self.plugin.plugin_name}",
             fontsize=constants.STANDARD_FONT_SIZE + 1,
             bold=True,
             fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,
@@ -129,14 +132,45 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             fontsize=constants.STANDARD_FONT_SIZE + 2,
             gridPos=(3, 0, 1, 1),
         )
+        self.__add_restore_default_button()
         if self.plugin.has_unique_parameter_config_widget:
-            self.layout().add(self.plugin.get_parameter_config_widget())
+            self.add_any_widget(
+                "plugin_widget",
+                self.plugin.get_parameter_config_widget(),
+                gridPos=(-1, 0, 1, 2),
+            )
         else:
-            self.__add_restore_default_button()
             for param in self.plugin.params.values():
-                _kwargs = self.__get_param_creation_kwargs(param)
-                self.create_param_widget(param, **_kwargs)
+                if (
+                    param.refkey not in self.plugin.advanced_parameters
+                    and not param.refkey.startswith("_")
+                ):
+                    _kwargs = (
+                        constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
+                        if param.dtype in [Hdf5key, Path]
+                        else constants.DEFAULT_PLUGIN_PARAM_CONFIG
+                    )
+                    self.create_param_widget(param, **_kwargs)
             self.param_widgets["label"].io_edited.connect(self._label_updated)
+        if len(self.plugin.advanced_parameters) > 0:
+            self.__advanced_hidden = True
+            self.create_button(
+                "but_toggle_advanced_params",
+                "Display advanced Parameters",
+                icon=self.style().standardIcon(6),
+                width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
+            )
+            for _key in self.plugin.advanced_parameters:
+                _param = self.plugin.get_param(_key)
+                _kwargs = (
+                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
+                    if _param.dtype in [Hdf5key, Path]
+                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
+                ) | {"visible": False}
+                self.create_param_widget(_param, **_kwargs)
+            self._widgets["but_toggle_advanced_params"].clicked.connect(
+                self.__toggle_advanced_params
+            )
 
     @QtCore.Slot(str)
     def _label_updated(self, label):
@@ -175,37 +209,22 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.plugin.restore_all_defaults(confirm=True)
         self.update_edits()
 
-    def __get_param_creation_kwargs(self, param):
+    @QtCore.Slot()
+    def __toggle_advanced_params(self):
         """
-        Get the kwargs to create the widgets for the Parameter in different
-        styles for the different types of keys.
-
-        Parameters
-        ----------
-        param : pydidas.core.Parameter
-            The Parameter for which an I/O widget shall be created.
-
-        Returns
-        -------
-        _kwargs : dict
-            The kwargs to be used for widget creation.
+        Toggle the visiblity of the advanced Parameters.
         """
-        # The total width is reduced by 10 because of the margins
-        if param.dtype in [Hdf5key, Path]:
-            _kwargs = {
-                "width_text": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 50,
-                "width_unit": 0,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-                "linebreak": True,
-            }
-        else:
-            _kwargs = {
-                "width_text": 200,
-                "width_io": constants.PLUGIN_PARAM_WIDGET_WIDTH - 240,
-                "width_total": constants.PLUGIN_PARAM_WIDGET_WIDTH - 10,
-            }
-        return _kwargs
+        self.__advanced_hidden = not self.__advanced_hidden
+        for _key in self.plugin.advanced_parameters:
+            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
+        self._widgets["but_toggle_advanced_params"].setText(
+            "Display advanced Parameters"
+            if self.__advanced_hidden
+            else "Hide advanced Parameters"
+        )
+        self._widgets["but_toggle_advanced_params"].setIcon(
+            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+        )
 
     def update_edits(self):
         """
@@ -214,5 +233,8 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         This method will go through all plugin parameters and populates
         the input fields with the stores parameter values.
         """
+        if self.plugin.has_unique_parameter_config_widget:
+            self._widgets["plugin_widget"].update_edits()
+            return
         for param in self.plugin.params.values():
-            self.param_widgets[param.refkey].set_value(param.value)
+            self.update_widget_value(param.refkey, param.value)

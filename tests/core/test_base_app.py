@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -129,18 +131,18 @@ class TestBaseApp(unittest.TestCase):
         app = BaseApp()
         self.assertEqual(app.get_config(), {})
 
-    def test_get_copy(self):
+    def test_copy(self):
         app = BaseApp()
-        _copy = app.get_copy()
+        _copy = app.copy()
         self.assertNotEqual(app, _copy)
         self.assertIsInstance(_copy, BaseApp)
 
-    def test_get_copy__as_slave(self):
+    def test_copy__as_slave(self):
         app = BaseApp()
         app.attributes_not_to_copy_to_slave_app = ["slave_att"]
         app.slave_att = 12
         app.non_slave_att = 42
-        _copy = app.get_copy(slave_mode=True)
+        _copy = app.copy(slave_mode=True)
         self.assertNotEqual(app, _copy)
         self.assertTrue(hasattr(_copy, "non_slave_att"))
         self.assertFalse(hasattr(_copy, "slave_att"))

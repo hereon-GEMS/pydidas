@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,12 +16,12 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The constants module holds constant nmumber defitions needed in pydidas.
+The constants module holds constant number defitions needed in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
@@ -35,6 +37,7 @@ __all__ = [
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
     "PROC_PLUGIN_TYPE_NAMES",
+    "PLUGIN_TYPE_NAMES",
     "FLOAT_REGEX",
 ]
 
@@ -74,6 +77,12 @@ PROC_PLUGIN_TYPE_NAMES = {
     PROC_PLUGIN_IMAGE: "Processing plugins for image data",
     PROC_PLUGIN_INTEGRATED: "Processing plugins for integrated data",
 }
+
+PLUGIN_TYPE_NAMES = {
+    INPUT_PLUGIN: "Input plugins",
+    PROC_PLUGIN: "Processing plugins",
+    OUTPUT_PLUGIN: "Output plugins",
+} | PROC_PLUGIN_TYPE_NAMES
 
 pyFAI_UNITS = {
     "Q / nm^-1": "q_nm^-1",

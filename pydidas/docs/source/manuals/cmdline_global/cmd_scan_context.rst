@@ -12,7 +12,7 @@ Introduction
 ------------
 
 The :py:class:`ScanContext` is the pydidas Singleton instance of the 
-:py:class:`_ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+:py:class:`Scan <pydidas.contexts.scan_context.Scan>` 
 class. It is used for storing and accessing global information about the scan 
 layout and generic infomation like title, directory and file naming patterns.
 
@@ -54,7 +54,7 @@ Configuring the ScanContext
 Global Parameters
 ^^^^^^^^^^^^^^^^^
 
-The :py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>` 
+The :py:class:`ScanContext <pydidas.contexts.scan_context.Scan>` 
 has *global* Parameters for generic information, listed in detail below:
 
 

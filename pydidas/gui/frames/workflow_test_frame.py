@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,27 +21,31 @@ workflow on a single data frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowTestFrame"]
+
 
 import copy
 
 from qtpy import QtCore
 
+from ...contexts import ScanContext
 from ...core import (
     Parameter,
     ParameterCollection,
+    UserConfigError,
     get_generic_param_collection,
     utils,
-    UserConfigError,
 )
-from ...contexts import ScanContext
-from ...workflow import WorkflowTree
 from ...widgets.dialogues import WarningBox
-from ..windows import ShowDetailedPluginResultsWindow, TweakPluginParameterWindow
+from ...widgets.windows import (
+    ShowDetailedPluginResultsWindow,
+    TweakPluginParameterWindow,
+)
+from ...workflow import WorkflowTree
 from .builders import WorkflowTestFrameBuilder
 
 
@@ -226,7 +232,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             "store_input_data": True,
         }
         with utils.ShowBusyMouse():
-            self._tree.nodes[node_id].plugin.pre_execute()
+            self._tree.nodes[node_id].prepare_execution()
             self._tree.nodes[node_id].execute_plugin_chain(_arg, **_kwargs)
             self.__store_tree_results()
             self.__update_selection_choices()
@@ -272,7 +278,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         Reload the local WorkflowTree from the global one, e.g. to propagate changes
         to global settings.
         """
-        self._tree = TREE.get_copy()
+        self._tree = TREE.deepcopy()
         self.param_widgets["selected_results"].setCurrentIndex(0)
         self._config["plugin_res_titles"] = {}
         self.__update_selection_choices()
@@ -316,7 +322,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         _nums = [
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]
-        _index = SCAN.get_frame_number_from_scan_indices(_nums)
+        _index = SCAN.get_frame_from_indices(_nums)
         if _index >= SCAN.n_points:
             raise UserConfigError(
                 f"The selected scan point {_nums} is outside the scope of the scan "
@@ -379,7 +385,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             self._active_node = -1
             self._config["has_details"] = False
             self.__set_derived_widget_visibility(False)
-            self._clear_plot()
+            self._widgets["plot"].clear_plots()
             return
         self._active_node = int(
             self.param_widgets["selected_results"].currentText()[-4:-1]
@@ -429,40 +435,15 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if not self._config["plot_active"]:
             return
-        _ndim = self._results[self._active_node].ndim
-        if _ndim == 1:
-            self._plot1d()
-        elif _ndim == 2:
-            self._plot_2d()
+        _data = self._results[self._active_node]
+        if _data.ndim in [1, 2]:
+            _title = self._config["plugin_res_titles"][self._active_node]
+            self._widgets["plot"].plot_data(_data, title=_title)
         else:
-            self._clear_plot()
+            self._widgets["plot"].clear_plots()
             return
-        self._widgets["plot_stack"].setCurrentIndex(_ndim - 1)
         if self._config["details_active"] and self._config["has_details"]:
             self.show_plugin_details(set_focus=False)
-
-    def _plot1d(self):
-        """
-        Plot a 1D-dataset in the 1D plot widget.
-        """
-        _data = self._results[self._active_node]
-        _title = self._config["plugin_res_titles"][self._active_node]
-        self._widgets["plot1d"].plot_pydidas_dataset(_data, title=_title)
-
-    def _plot_2d(self):
-        """
-        Plot a 2D dataset as an image.
-        """
-        _data = self._results[self._active_node]
-        _title = self._config["plugin_res_titles"][self._active_node]
-        self._widgets["plot2d"].plot_pydidas_dataset(_data, title=_title)
-
-    def _clear_plot(self):
-        """
-        Clear the current plot and remove all items.
-        """
-        self._widgets["plot1d"].clear_plot()
-        self._widgets["plot2d"].clear_plot()
 
     @QtCore.Slot()
     def show_plugin_details(self, set_focus=True):
@@ -499,6 +480,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         _plugin = self._tree.nodes[self._active_node].plugin
         _res = self._tree.nodes[self._active_node].results
+        self.__details_window.hide()
         self.__tweak_window.tweak_plugin(_plugin, _res)
         self.__tweak_window.raise_()
         self.__tweak_window.show()
@@ -521,3 +503,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         if index == self.frame_index:
             self.__update_image_selection_visibility()
             self.__check_tree_uptodate()
+        else:
+            if self._config["built"]:
+                self.__tweak_window.hide()
+                self.__details_window.hide()

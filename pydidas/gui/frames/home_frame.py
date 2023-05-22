@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,17 +21,19 @@ opening pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["HomeFrame"]
 
+
 from qtpy import QtCore, QtSvg, QtWidgets
 
-from ...core.utils import DOC_HOME_ADDRESS, get_pydidas_icon_fname
 from ...core import constants
-from ...widgets import BaseFrame, ScrollArea
+from ...core.utils import DOC_HOME_ADDRESS, get_pydidas_icon_fname
+from ...widgets import ScrollArea
+from ...widgets.framework import BaseFrame
 
 
 _GENERIC_INTRO = (
@@ -108,7 +112,7 @@ class HomeFrame(BaseFrame):
             ScrollArea,
             widget=self._widgets["canvas"],
             fixedWidth=650,
-            sizePolicy=constants.FIX_EXP_POLICY,
+            sizePolicy=constants.POLICY_FIX_EXP,
             gridPos=(0, 0, 2, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},

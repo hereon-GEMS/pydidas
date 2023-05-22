@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,25 +21,26 @@ plugins to add them to the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["PluginCollectionBrowser"]
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
-from ..read_only_text_widget import ReadOnlyTextWidget
-from .plugin_collection_tree_widget import PluginCollectionTreeWidget
+from ..factory import CreateWidgetsMixIn
+from ..misc import ReadOnlyTextWidget
+from .select_new_plugin_widget import SelectNewPluginWidget
 
 
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(QtWidgets.QWidget):
+class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
     """
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description
@@ -60,24 +63,25 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
     sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
-        super().__init__(parent)
+        QtWidgets.QWidget.__init__(self, parent)
+        CreateWidgetsMixIn.__init__(self)
+        _layout = QtWidgets.QGridLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_layout)
         apply_qt_properties(self, **kwargs)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (
             _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION
         )
-
-        self._widgets = dict(
-            plugin_treeview=PluginCollectionTreeWidget(self, self.collection),
-            plugin_description=ReadOnlyTextWidget(self),
+        self.add_any_widget(
+            "plugin_treeview",
+            SelectNewPluginWidget(collection=self.collection),
+            gridPos=(0, 0, 1, 1),
         )
-
-        self.setMinimumHeight(300)
-        _layout = QtWidgets.QHBoxLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.addWidget(self._widgets["plugin_treeview"])
-        _layout.addWidget(self._widgets["plugin_description"])
-        self.setLayout(_layout)
+        self.add_any_widget(
+            "plugin_description", ReadOnlyTextWidget(self), gridPos=(0, 1, 1, 1)
+        )
+        self.setMinimumHeight(400)
 
         self._widgets["plugin_treeview"].sig_plugin_preselected.connect(
             self.display_plugin_description
@@ -91,9 +95,6 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
         )
         self._widgets["plugin_treeview"].sig_append_to_specific_node.connect(
             self.sig_append_to_specific_node
-        )
-        self.collection.sig_updated_plugins.connect(
-            self._widgets["plugin_treeview"]._update_collection
         )
 
     @QtCore.Slot(str)
@@ -118,7 +119,7 @@ class PluginCollectionBrowser(QtWidgets.QWidget):
     @QtCore.Slot(str)
     def display_plugin_description(self, name):
         """
-        display the plugin description of the selected plugin.
+        Display the plugin description of the selected plugin.
 
         Parameters
         ----------

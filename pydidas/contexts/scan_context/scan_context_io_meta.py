@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,13 +21,15 @@ exporter/importer classes for the ScanContext singleton and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["ScanContextIoMeta"]
 
+
 from ...core.io_registry import GenericIoMeta
+from ...core.utils.file_utils import get_extension
 
 
 class ScanContextIoMeta(GenericIoMeta):
@@ -37,3 +41,22 @@ class ScanContextIoMeta(GenericIoMeta):
     # need to redefine the registry to have a unique registry for
     # ScanContextIoMeta
     registry = {}
+
+    @classmethod
+    def import_from_file(cls, filename, scan=None):
+        """
+        Call the concrete import_from_file method in the subclass registered
+        to the extension of the filename.
+
+        Parameters
+        ----------
+        filename : str
+            The full filename and path.
+        scan : Union[None, pydidas.contexts.scan_context.Scan], optional
+            The Scan object to be updated. If None, the generic ScanContext is used.
+            The default is None.
+        """
+        _extension = get_extension(filename)
+        cls.verify_extension_is_registered(_extension)
+        _io_class = cls.registry[_extension]
+        _io_class.import_from_file(filename, scan=scan)

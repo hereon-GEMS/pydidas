@@ -50,4 +50,4 @@ Windows
 .. toctree::
     :maxdepth: 3
     
-    gui/windows/global_settings_window
+    widgets/windows/global_settings_window

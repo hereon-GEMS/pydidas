@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ persistent references to the selected directory.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasFileDialog"]
 
 import pathlib
@@ -30,7 +32,7 @@ import os
 
 from qtpy import QtWidgets, QtCore
 
-from ..core.utils import get_pydidas_qt_icon
+from ..core.utils import flatten, get_pydidas_qt_icon
 from ..core import PydidasQsettingsMixin, UserConfigError
 from ..contexts import ScanContext
 from .factory import CreateWidgetsMixIn
@@ -94,6 +96,7 @@ class PydidasFileDialog(
             "formats": kwargs.get("formats", None),
             "info_string": kwargs.get("info_string", None),
             "extensions": None,
+            "default_extension": kwargs.get("default_extension", None),
             "curr_dir": None,
             "scan_base": None,
             "latest": None,
@@ -116,12 +119,17 @@ class PydidasFileDialog(
             self.setNameFilter(self._config["formats"])
             if self._config["formats"].split(";;")[0] == "All files (*.*)":
                 self.selectNameFilter(self._config["formats"].split(";;")[1])
-
-            _exts = [
-                [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
-                for _entry in self._config["formats"].split(";;")
-                if _entry.startswith("All supported files")
-            ][0]
+            if "All supported files" in self._config["formats"]:
+                _exts = [
+                    [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
+                    for _entry in self._config["formats"].split(";;")
+                    if _entry.startswith("All supported files")
+                ][0]
+            else:
+                _exts = flatten(
+                    [_ext.strip() for _ext in _entry.strip(")").split("*.")[1:]]
+                    for _entry in self._config["formats"].split(";;")
+                )
             if "*" in _exts:
                 _exts.pop(_exts.index("*"))
             if len(_exts) > 0:
@@ -319,11 +327,11 @@ class PydidasFileDialog(
             return None
         _selection = self.selectedFiles()[0]
         _ext = os.path.splitext(_selection)[1]
-        if len(_ext) == 0 and self._config["extensions"] is not None:
-            if "yaml" in self._config["extensions"]:
-                _selection = _selection + ".yaml"
-            else:
-                _selection = _selection + "." + self._config["extensions"][0]
+        if len(_ext) == 0:
+            _selection = _selection + self._get_extension()
+        else:
+            self._check_extension(_ext)
+
         self._config["curr_dir"] = os.path.dirname(_selection)
         self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:
@@ -331,6 +339,51 @@ class PydidasFileDialog(
                 self._config["qsettings_ref"], self._config["curr_dir"]
             )
         return _selection
+
+    def _get_extension(self):
+        """
+        Get an extension for the selectd filename.
+
+        The extension will be selected from the list of selected extensions, if
+        possible.
+
+        Returns
+        -------
+        str
+            The extension for the filename.
+        """
+        if self._config["extensions"] is None:
+            return ""
+        if self.selectedNameFilter().startswith(
+            "All files"
+        ) or self.selectedNameFilter().startswith("All supported files"):
+            if self._config["default_extension"] is not None:
+                return "." + self._config["default_extension"]
+            _defaults = ["yaml", "npy", "tif", "h5"]
+            while len(_defaults) > 0:
+                _ext = _defaults.pop(0)
+                if _ext in self._config["extensions"]:
+                    return f".{_ext}"
+            return self._config["extensions"][0]
+        _formats = self.selectedNameFilter().strip(")").split("*.")[1:]
+        return "." + _formats[0]
+
+    def _check_extension(self, extension):
+        """
+        Check the given extension and confirm that it is valid.
+
+        Parameters
+        ----------
+        extension : str
+            The extension.
+        """
+        if self._config["extensions"] is None:
+            return
+        if extension.strip(".") not in self._config["extensions"]:
+            raise UserConfigError(
+                f'The given extension "{extension}" is invalid because the file type '
+                "is unknown."
+            )
 
     def set_curr_dir(self, item):
         """

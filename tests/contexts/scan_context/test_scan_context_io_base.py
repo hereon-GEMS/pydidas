@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,20 +18,24 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
 import os
-import unittest
 import shutil
 import tempfile
+import unittest
+from numbers import Integral, Real
 
-from pydidas.core import UserConfigError
-from pydidas.contexts.scan_context import ScanContext
+import numpy as np
+
+from pydidas.contexts.scan_context import Scan, ScanContext
 from pydidas.contexts.scan_context.scan_context_io_base import ScanContextIoBase
+from pydidas.core import UserConfigError
+from pydidas.core.utils import get_random_string
 
 
 SCAN = ScanContext()
@@ -47,25 +53,6 @@ class TestScanContextIoBase(unittest.TestCase):
         del self._path
         shutil.rmtree(self._tmppath)
 
-    def test_check_for_existing_file__file_present(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        with open(_fname, "w") as f:
-            f.write("test entry")
-        with self.assertRaises(FileExistsError):
-            SCAN_IO.check_for_existing_file(_fname)
-
-    def test_check_for_existing_file__file_present_and_overwrite(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        with open(_fname, "w") as f:
-            f.write("test entry")
-        SCAN_IO.check_for_existing_file(_fname, overwrite=True)
-        # assert does not raise FileExistsError
-
-    def test_check_for_existing_file__file_new(self):
-        _fname = os.path.join(self._tmppath, "test.txt")
-        SCAN_IO.check_for_existing_file(_fname)
-        # assert does not raise FileExistsError
-
     def test_verify_all_entries_present__correct(self):
         for param in SCAN.params:
             SCAN_IO.imported_params[param] = True
@@ -74,6 +61,37 @@ class TestScanContextIoBase(unittest.TestCase):
     def test_verify_all_entries_present__missing_keys(self):
         with self.assertRaises(UserConfigError):
             SCAN_IO._verify_all_entries_present()
+
+    def test_write_to_scan_settings__generic_ScanContext(self):
+        _scan = Scan()
+        for _param in _scan.params.values():
+            if _param.dtype == str and _param.choices is None:
+                _param.value = get_random_string(6)
+            elif _param.dtype == Real:
+                _param.value = np.random.random()
+            elif _param.dtype == Integral and _param.refkey != "scan_dim":
+                _param.value = int(100 * np.random.random())
+        SCAN_IO.imported_params = _scan.get_param_values_as_dict()
+        SCAN_IO._write_to_scan_settings()
+        for _key, _value in _scan.get_param_values_as_dict().items():
+            self.assertEqual(SCAN.get_param_value(_key), _value)
+
+    def test_write_to_scan_settings__given_scan(self):
+        _scan = Scan()
+        for _param in _scan.params.values():
+            if _param.dtype == str and _param.choices is None:
+                _param.value = get_random_string(6)
+            elif _param.dtype == Real:
+                _param.value = np.random.random()
+            elif _param.dtype == Integral and _param.refkey != "scan_dim":
+                _param.value = int(100 * np.random.random())
+        _new_scan = Scan()
+        SCAN_IO.imported_params = _scan.get_param_values_as_dict()
+        SCAN_IO._write_to_scan_settings(scan=_new_scan)
+        SCAN.restore_all_defaults(True)
+        for _key, _value in _scan.get_param_values_as_dict().items():
+            self.assertEqual(_new_scan.get_param_value(_key), _value)
+        self.assertEqual(SCAN.get_param_value("scan_dim1_label"), "")
 
 
 if __name__ == "__main__":

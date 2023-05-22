@@ -1,9 +1,11 @@
-# This file is part of pydidas.
+# This file is part of pydidas
+#
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -11,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+# along with pydidas If not, see <http://www.gnu.org/licenses/>.
 
 """
 Module with the WorkflowRunFrame which allows to run the full
@@ -19,11 +21,12 @@ processing workflow and visualize the results.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["WorkflowRunFrame"]
+
 
 import time
 
@@ -34,12 +37,11 @@ from ...core import get_generic_param_collection
 from ...core.utils import pydidas_logger
 from ...multiprocessing import AppRunner
 from ...widgets.dialogues import WarningBox
-from ...workflow import WorkflowResults, WorkflowTree
-from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
+from ...workflow import WorkflowTree
 from ..mixins import ViewResultsMixin
+from .builders.workflow_run_frame_builder import WorkflowRunFrameBuilder
 
 
-RESULTS = WorkflowResults()
 TREE = WorkflowTree()
 logger = pydidas_logger()
 
@@ -85,6 +87,9 @@ class WorkflowRunFrame(WorkflowRunFrameBuilder, ViewResultsMixin):
         )
         self._widgets["but_exec"].clicked.connect(self.__execute)
         self._widgets["but_abort"].clicked.connect(self.__abort_execution)
+        self._widgets["plot"].sig_get_more_info_for_data.connect(
+            self._widgets["result_selector"].show_info_popup
+        )
 
     def finalize_ui(self):
         """

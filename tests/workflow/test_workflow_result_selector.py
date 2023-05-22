@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,37 +18,47 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
-import unittest
 import shutil
 import tempfile
+import unittest
 from numbers import Integral
 
 import numpy as np
 
-from pydidas.core import Dataset, Parameter, UserConfigError
 from pydidas.contexts import ScanContext
-from pydidas.unittest_objects import DummyProc, DummyLoader
-from pydidas.workflow import WorkflowTree, WorkflowResults
+from pydidas.core import Dataset, Parameter, UserConfigError
+from pydidas.unittest_objects import DummyLoader, DummyProc
+from pydidas.workflow import WorkflowResultsContext, WorkflowTree
 from pydidas.workflow.result_io import WorkflowResultIoMeta
 from pydidas.workflow.workflow_results_selector import WorkflowResultsSelector
 
+
 SCAN = ScanContext()
 TREE = WorkflowTree()
-RES = WorkflowResults()
+RES = WorkflowResultsContext()
 SAVER = WorkflowResultIoMeta
 
 
 class TestWorkflowResultSelector(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        ScanContext._reset_instance()
+        WorkflowResultsContext._reset_instance()
+        global SCAN, RES
+        SCAN = ScanContext()
+        RES = WorkflowResultsContext()
+
     def setUp(self):
         self.set_up_scan()
         self.set_up_tree()
         RES.clear_all_results()
+
         self._tmpdir = tempfile.mkdtemp()
 
     def tearDown(self):
@@ -131,6 +143,8 @@ class TestWorkflowResultSelector(unittest.TestCase):
         self.assertTrue("_selection" in obj.__dict__)
         self.assertTrue("_npoints" in obj.__dict__)
         self.assertTrue("active_node" in obj._config)
+        self.assertEqual(obj._SCAN, ScanContext())
+        self.assertEqual(obj._RESULTS, RES)
 
     def test_init__with_param(self):
         _param = Parameter("result_n_dim", int, 124)
@@ -320,7 +334,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         obj._npoints = list(RES.shapes[obj._config["active_node"]])
         obj.set_param_value(f"data_slice_{_index}", "0:2, 4:6")
         _slice = obj._get_single_slice_object(_index)
-        self.assertEqual(_slice.size, 4)
+        self.assertEqual(_slice.size, 6)
 
     def test_get_single_slice_object__multiple_slices_and_numbers(self):
         self.populate_WorkflowResults()
@@ -408,25 +422,31 @@ class TestWorkflowResultSelector(unittest.TestCase):
         for _index in range(RES.ndims[_node] - 2):
             obj.set_param_value(f"data_slice_{_index}", "1:")
         obj._update_selection()
-        _delta = [
-            RES.shapes[_node][_i + 2] - obj._selection[_i].size
-            for _i in range(RES.ndims[_node] - 2)
-        ]
-        self.assertEqual(_delta[1:], [1] * (RES.ndims[_node] - 3))
-        self.assertEqual(obj._selection[0].size, np.prod(self._scan_n) - 1)
+        self.assertEqual(len(obj.selection), RES.ndims[_node] - 2)
+        self.assertTrue(np.allclose(obj.selection[0], np.arange(1, SCAN.n_points)))
+        self.assertTrue(
+            np.allclose(
+                obj.selection[1], np.arange(1, TREE.nodes[_node].plugin.result_shape[0])
+            )
+        )
+        self.assertTrue(
+            np.allclose(
+                obj.selection[2], np.arange(1, TREE.nodes[_node].plugin.result_shape[1])
+            )
+        )
 
     def test_get_best_index_for_value__low_val(self):
         _val = 42
         _range = np.arange(45, 105)
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, 0)
 
     def test_get_best_index_for_value__high_val(self):
         _val = 42
         _range = np.arange(0, 37)
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _range.size - 1)
 
     def test_get_best_index_for_value__middle_val(self):
@@ -434,14 +454,14 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _range = np.arange(12, 47, 0.5)
         _target = (_val - _range[0]) / (_range[1] - _range[0])
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _target)
 
     def test_get_best_index_for_value__None_range(self):
         _val = 42
         _range = None
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _val)
         self.assertIsInstance(_match, Integral)
 
@@ -449,7 +469,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
         _val = 42.0
         _range = None
         obj = WorkflowResultsSelector()
-        _match = obj._get_best_index_for_value(_val, _range)
+        _match = obj.get_best_index_for_value(_val, _range)
         self.assertEqual(_match, _val)
         self.assertIsInstance(_match, Integral)
 

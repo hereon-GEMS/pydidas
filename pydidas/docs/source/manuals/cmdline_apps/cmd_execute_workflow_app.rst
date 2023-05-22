@@ -15,9 +15,9 @@ The :py:class:`ExecuteWorkflowApp <pydidas.apps.ExecuteWorkflowApp>` is one of
 the most important objects in pydidas as it allows to process workflows. Note 
 that most of the configuration is not performed by the ExecuteWorkflowApp itself
 but by the global objects for 
-:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
 :py:class:`DiffractionExperimentContext 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`,
+<pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`.
 
 Documentation on the use of these objects is given in :ref:`scan_context`,
@@ -74,9 +74,9 @@ Setup of the ExecuteWorkflowApp
 
 The ExecuteWorkflowApp has only a very limited number of Parameters because it 
 uses the aforementioned objects (
-:py:class:`ScanContext <pydidas.contexts.scan_context.scan_context._ScanContext>`,
+:py:class:`ScanContext <pydidas.contexts.scan_context.Scan>`,
 :py:class:`DiffractionExperimentContext 
-<pydidas.contexts.diffraction_exp_context.diffraction_exp_context._DiffractionExperimentContext>`,
+<pydidas.contexts.diffraction_exp_context.DiffractionExperimentContext>`,
 and :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>`)
 which include most of the required configuration.
 
@@ -174,9 +174,9 @@ Accessing results within Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The results from the ExecuteWorkflowApp are written in the global 
-:py:class:`WorkflowResults <pydidas.workflow.WorkflowResults>` (the Singleton 
-instance of :py:class:`_WorkflowResults 
-<pydidas.workflow.workflow_results._WorkflowResults>`) which is described in 
+:py:class:`WorkflowResults <pydidas.workflow.WorkflowResultsContext>` (the 
+Singleton instance of :py:class:`WorkflowResults 
+<pydidas.workflow.WorkflowResults>`) which is described in 
 detail in :ref:`workflow_results`.
 
 List of all ExecuteWorkflowApp Parameters

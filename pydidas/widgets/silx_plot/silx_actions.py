@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as published by
+# the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,8 +21,8 @@ widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
@@ -28,12 +30,14 @@ __all__ = [
     "ExpandCanvas",
     "CropHistogramOutliers",
     "PydidasLoadImageAction",
+    "PydidasGetDataInfoAction",
 ]
 
+from numbers import Real
 
-from qtpy import QtWidgets, QtCore
 import numpy as np
 import silx.gui.plot
+from qtpy import QtCore, QtWidgets
 from silx.gui.plot.actions import PlotAction
 
 from ...core import PydidasQsettingsMixin, UserConfigError, utils
@@ -193,6 +197,9 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
 
             _cmap_limit_low = _edges2[_index_stop2]
 
+        if isinstance(_cmap_limit_low, Real) and isinstance(_cmap_limit_high, Real):
+            if _cmap_limit_low >= _cmap_limit_high:
+                _cmap_limit_low = 0.8 * _cmap_limit_high
         colormap.setVRange(_cmap_limit_low, _cmap_limit_high)
 
 
@@ -223,3 +230,43 @@ class PydidasLoadImageAction(QtWidgets.QAction):
         if _filename is not None:
             _image = import_data(_filename)
             self.parent()._setValue(filename=_filename, data=_image)
+
+
+class PydidasGetDataInfoAction(PlotAction):
+    """
+    Action to select a datapoint and show more information about this datapoint.
+    """
+
+    sig_show_more_info_for_data = QtCore.Signal(float, float)
+
+    def __init__(self, plot, parent=None):
+        PlotAction.__init__(
+            self,
+            plot,
+            icon=utils.get_pydidas_qt_icon("silx_get_data_info.png"),
+            text="Show information of scan point",
+            tooltip=(
+                "Show information about the scan point associated with this datapoint."
+            ),
+            triggered=self._actionTriggered,
+            checkable=False,
+            parent=parent,
+        )
+
+    @QtCore.Slot()
+    def _actionTriggered(self):
+        """
+        Execute the action and pick a mouse click.
+        """
+        self.plot.sigPlotSignal.connect(self.__process_event)
+        self.setEnabled(False)
+
+    @QtCore.Slot(dict)
+    def __process_event(self, event):
+        """
+        Process the event. If a mouse button click was detected, show popup.
+        """
+        if event["event"] == "mouseClicked":
+            self.plot.sigPlotSignal.disconnect(self.__process_event)
+            self.sig_show_more_info_for_data.emit(event["x"], event["y"])
+            self.setEnabled(True)

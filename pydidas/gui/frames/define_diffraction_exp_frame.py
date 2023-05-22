@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,39 +21,37 @@ global experimental settings like detector, geometry and energy.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DefineDiffractionExpFrame"]
 
+
 from functools import partial
 
 import numpy as np
-from qtpy import QtWidgets
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
+from qtpy import QtCore, QtWidgets
 
-from ...contexts import DiffractionExperimentContext, DiffractionExperimentContextIoMeta
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
+from ...widgets.windows import ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
 
 EXP = DiffractionExperimentContext()
 
 _GEO_INVALID = (
-    "The pyFAI geometry is not valid and cannot be copied. "
-    "This is probably due to either:\n"
-    "1. No fit has been performed.\nor\n"
-    "2. The fit did not succeed."
+    "The pyFAI geometry is not valid and cannot be copied. This is probably due to "
+    "either:\n1. No fit has been performed.\nor\n2. The fit did not succeed."
 )
 
 _ENERGY_INVALID = (
-    "The X-ray energy / wavelength cannot be set because the "
-    "pyFAI geometry is not valid. This is probably due to "
-    "either:\n"
-    "1. No fit has been performed.\nor\n"
+    "The X-ray energy / wavelength cannot be set because the pyFAI geometry is not "
+    "valid. This is probably due to either:\n1. No fit has been performed.\nor\n"
     "2. The fit did not succeed."
 )
 
@@ -73,17 +73,19 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             parent=self,
             dialog_type="open_file",
             caption="Import experiment context file",
-            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentIo.get_string_of_formats(),
             qsettings_ref="DefineDiffractionExpFrame__import",
         )
         self.__export_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="save_file",
             caption="Export experiment context file",
-            formats=DiffractionExperimentContextIoMeta.get_string_of_formats(),
+            formats=DiffractionExperimentIo.get_string_of_formats(),
+            default_extension="yaml",
             dialog=QtWidgets.QFileDialog.getSaveFileName,
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
+        self._select_beamcenter_window = None
 
     def connect_signals(self):
         """
@@ -92,14 +94,8 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         self._widgets["but_load_from_file"].clicked.connect(self.import_from_file)
         self._widgets["but_copy_from_pyfai"].clicked.connect(self.copy_all_from_pyfai)
         self._widgets["but_select_detector"].clicked.connect(self.select_detector)
-        self._widgets["but_copy_det_from_pyfai"].clicked.connect(
-            partial(self.copy_detector_from_pyFAI, True)
-        )
-        self._widgets["but_copy_geo_from_pyfai"].clicked.connect(
-            partial(self.copy_geometry_from_pyFAI, True)
-        )
-        self._widgets["but_copy_energy_from_pyfai"].clicked.connect(
-            partial(self.copy_energy_from_pyFAI, True)
+        self._widgets["but_select_beamcenter_manually"].clicked.connect(
+            self.select_beamcenter_manually
         )
         self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
         for _param_key in self.params.keys():
@@ -262,6 +258,49 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         elif show_warning:
             critical_warning("pyFAI geometry invalid", _ENERGY_INVALID)
 
+    @QtCore.Slot()
+    def select_beamcenter_manually(self):
+        """
+        Select the beamcenter manually.
+        """
+        if self._select_beamcenter_window is None:
+            self._select_beamcenter_window = ManuallySetBeamcenterWindow()
+            self._select_beamcenter_window.sig_selected_beamcenter.connect(
+                self._beamcenter_selected
+            )
+            self._select_beamcenter_window.sig_about_to_close.connect(
+                self._beamcenter_window_closed
+            )
+        self._select_beamcenter_window.show()
+        self.setEnabled(False)
+
+    @QtCore.Slot(float, float)
+    def _beamcenter_selected(self, center_x, center_y):
+        """
+        Set the selected beamcenter in the DiffractionExperiment
+
+        Parameters
+        ----------
+        center_x : float
+            The beamcenter x value in pixels
+        center_y : float
+            The beancenter y value in pixels.
+        """
+        _px_size_x = self.get_param_value("detector_pxsizex")
+        _px_size_y = self.get_param_value("detector_pxsizey")
+
+        self.set_param_value_and_widget("detector_poni1", 1e-6 * _px_size_y * center_y)
+        self.set_param_value_and_widget("detector_poni2", 1e-6 * _px_size_x * center_x)
+        for _index in [1, 2, 3]:
+            self.set_param_value_and_widget(f"detector_rot{_index}", 0)
+
+    @QtCore.Slot()
+    def _beamcenter_window_closed(self):
+        """
+        Handle the signal that the beamcenter window is to be closed.
+        """
+        self.setEnabled(True)
+
     def import_from_file(self):
         """
         Open a dialog to select a filename and load DiffractionExperimentContext from
@@ -283,3 +322,22 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         _fname = self.__export_dialog.get_user_response()
         if _fname is not None:
             EXP.export_to_file(_fname, overwrite=True)
+
+    def frame_activated(self, index):
+        """
+        Add a check whether the DiffractionExperimentContext has changed from some
+        other source (e.g. pyFAI calibration) and update widgets accordingly.
+
+        Parameters
+        ----------
+        index : int
+            The active frame index.
+        """
+        super().frame_activated(index)
+        if index == self.frame_index:
+            if hash(self.params) != self._config["exp_hash"]:
+                for _key, _param in EXP.params.items():
+                    self.update_widget_value(_key, _param.value)
+                self._config["exp_hash"] = hash(self.params)
+        else:
+            self._config["exp_hash"] = hash(self.params)

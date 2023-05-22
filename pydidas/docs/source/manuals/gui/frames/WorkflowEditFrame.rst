@@ -1,7 +1,11 @@
+.. 
+    Copyright 2021-, Helmholtz-Zentrum Hereon
+    SPDX-License-Identifier: CC-BY-4.0
+
 .. _workflow_edit_frame:
 
-The Workflow edit frame
-=======================
+Workflow edit frame
+===================
 
 .. contents::
     :depth: 2
@@ -16,18 +20,18 @@ frame is shown below.
     :width:  600px
     :align: center
 
-- PluginBrowser
-    This widget displays all available Plugins in the PluginCollection on the 
-    left as well as a description of the selected plugin on the right.
+- I/O buttons
+    Buttons for importing and exporting the workflow are situated here.
 - Workflow tree canvas
     This is the area where the visualization of the 
     :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` 
     and its :py:class:`WorkflowNodes <pydidas.workflow.WorkflowNode>`.
+- PluginBrowser
+    This widget displays all available Plugins in the PluginCollection on the 
+    left as well as a description of the selected plugin on the right.
 - Plugin parameter edit area
     Once a Plugin has been added to the WorkflowTree, its Parameters can be
     edited here after selecting the respective plugin.
-- I/O buttons
-    Buttons for importing and exporting the workflow are situated here.
 
 
 .. _workflow_plugin_presenter:
@@ -44,6 +48,9 @@ On the right, it shows detailed information about the selected plugin:
 .. image:: images/workflow_edit_plugin_browser.png
     :width:  500px
     :align: center
+
+A filter can be selected at the top of the left part to display only plugins 
+with matching names.
 
 A single click on a Plugin's name on the left will show more information about 
 the selected Plugin on the right. This information included the description, a 
@@ -147,9 +154,9 @@ Plugin Parameter editing
 .. image:: images/workflow_edit_plugin_param_edit.png
     :align: left
 
-After selecting a Plugin in the :ref:`workflow_tree_canvas`, the Plugin Parameter
-editing widget will be updated with the information from the selected Plugin. 
-The first two lines are the plugin name and the node ID.
+After selecting a Plugin in the :ref:`workflow_tree_canvas`, the Plugin 
+Parameter editing widget will be updated with the information from the selected 
+Plugin. The first two lines are the plugin name and the node ID.
 
 The "Restore default Parameters" button can be used to reset all of the active 
 plugin's Parameters to their defaults. 
@@ -163,6 +170,7 @@ i.e. if a :py:class:`WorkflowNode <pydidas.workflow.WorkflowNode>` does not
 have any children. When :py:data:`always_store_results` is set to 
 :py:data:`True`, pydidas will store this node's results irrespective of its
 position in the WorkflowTree.
+
 The :py:data:`label` allows the user to give the plugin a reference name. This 
 name will be used as identifier when displaying or exporting data.
 
@@ -176,6 +184,15 @@ name will be used as identifier when displaying or exporting data.
     therefore encouraged to select meaningful labels for their Plugins and to 
     make a note of the plugin node IDs.
 
+Some plugin have additional advanced Parameters, which can be edited after 
+clicking the "Display advanced Parameters" button at the bottom of the list.
+
+Also, some plugin have unique Parameter editing widgets which might have 
+additional functionality or logic. For example, pyFAI integration plugins have
+the option to select the integration region graphically buttons are added to 
+use this functionality.
+
+
 Import and Export
 -----------------
 
@@ -183,7 +200,7 @@ Import and Export
     :align: left
 
 Workflows can be imported and exported using the respective buttons in the 
-bottom right corner of the frame. Both buttons will open a file selection 
+top left corner of the frame. Both buttons will open a file selection 
 dialogue and have filters implemented to allow only supported file types and 
 extensions.
 
@@ -191,5 +208,5 @@ Using the WorkflowTree
 ----------------------
 
 The :py:class:`WorkflowTree <pydidas.workflow.workflow_tree._WorkflowTree>` 
-is not used directly by the users but the information is required in 
-applications, e.g. to run processing workflows.
+is used automatically by pydidas to run processing workflows. The user does not
+need to access it directly.

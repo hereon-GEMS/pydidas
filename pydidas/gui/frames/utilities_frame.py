@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,29 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Module with the UtilitiesFrame which allows to present and open various utilities.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["UtilitiesFrame"]
+
 
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from .builders import UtilitiesFrameBuilder
-from ..windows import (
+from ...widgets.windows import (
     ExportEigerPixelmaskWindow,
-    ImageSeriesOperationsWindow,
     GlobalSettingsWindow,
-    UserConfigWindow,
+    ImageSeriesOperationsWindow,
     MaskEditorWindow,
+    UserConfigWindow,
 )
+from .builders import UtilitiesFrameBuilder
+from .composite_creator_frame import CompositeCreatorFrame
 
 
 class UtilitiesFrame(UtilitiesFrameBuilder):
@@ -90,6 +95,9 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         self._widgets["button_user_config"].clicked.connect(
             partial(self.show_window, "user_config")
         )
+        self._widgets["button_composite_creation"].clicked.connect(
+            partial(self.create_and_show_frame, CompositeCreatorFrame)
+        )
 
     @QtCore.Slot(object)
     def create_and_show_temp_window(self, window):
@@ -109,6 +117,25 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         )
         self.__app.sig_close_gui.connect(self._child_windows[_name].close)
         self._child_windows[_name].show()
+
+    @QtCore.Slot(object)
+    def create_and_show_frame(self, frame):
+        """
+        Show the given frame.
+
+        Parameters
+        ----------
+        frame : pydidas.widgets.framework.BaseFrame
+            The frame to be shown.
+        """
+        if frame.menu_title in self._child_windows:
+            self._child_windows[frame.menu_title].show()
+            return
+        _frame = frame()
+        _frame.setWindowTitle(frame.menu_title)
+        _frame.frame_activated(_frame.frame_index)
+        self._child_windows[frame.menu_title] = _frame
+        _frame.show()
 
     @QtCore.Slot(str)
     def show_window(self, name):

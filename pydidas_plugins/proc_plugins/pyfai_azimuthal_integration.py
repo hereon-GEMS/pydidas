@@ -43,7 +43,6 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.params["rad_unit"].choices = ["Q / nm^-1", "2theta / deg", "r / mm"]
         del self.params["azi_npoint"]
 
     def pre_execute(self):

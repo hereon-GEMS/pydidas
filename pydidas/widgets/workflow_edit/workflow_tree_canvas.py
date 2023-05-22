@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,25 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Module with the WorkflowTreeCanvas which is used to arrange the widgets for
 editing the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTreeCanvas"]
 
-from qtpy import QtWidgets, QtGui, QtCore
+
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
-from ..factory import create_label
+from ..factory import CreateWidgetsMixIn
 
 
-class WorkflowTreeCanvas(QtWidgets.QFrame):
+class WorkflowTreeCanvas(QtWidgets.QFrame, CreateWidgetsMixIn):
     """
     The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
     the individual plugin widgets. It is also responsible to draw the lines
@@ -44,21 +48,14 @@ class WorkflowTreeCanvas(QtWidgets.QFrame):
     """
 
     def __init__(self, parent=None):
-        super().__init__(parent=parent)
+        QtWidgets.QFrame.__init__(self, parent=parent)
+        CreateWidgetsMixIn.__init__(self)
         self.setAcceptDrops(True)
-        self.title = create_label(
-            "Workflow tree editor",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
-            bold=True,
-            parent=self,
-            fixedWidth=250,
-        )
-        self.title.move(0, 0)
         self.painter = QtGui.QPainter()
         self.setAutoFillBackground(True)
 
         self.setLineWidth(2)
-        self.setSizePolicy(*constants.EXP_EXP_POLICY)
+        self.setSizePolicy(*constants.POLICY_EXP_EXP)
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,15 +20,16 @@ Module with a factory function to create an empty QWidget.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["create_empty_widget"]
 
-from qtpy.QtWidgets import QWidget, QGridLayout
 
-from ...core.constants import QT_DEFAULT_ALIGNMENT
+from qtpy.QtWidgets import QGridLayout, QWidget
+
+from ...core.constants import ALIGN_TOP_LEFT
 from ...core.utils import apply_qt_properties
 
 
@@ -56,6 +59,6 @@ def create_empty_widget(**kwargs):
         apply_qt_properties(
             _widget.layout(),
             contentsMargins=(0, 0, 0, 0),
-            alignment=QT_DEFAULT_ALIGNMENT,
+            alignment=ALIGN_TOP_LEFT,
         )
     return _widget

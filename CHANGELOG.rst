@@ -16,74 +16,87 @@ Major changes
 Improvements
 ------------
 
-- Added unique configuration widget to SubtractBackgroundImage plugin.
-- When leaving the TestWorkflowFrame, pop-up windows are now hidden.
-- Changed pyFAI plugins to use explicit parameters to select the ranges.
-- Added unique configuration widget to PyfaiIntegrationBase plugin.
-- Exposed Scan and DiffractionExperiment in the contexts in preparation of 
-  local usages. This also includes an update of the object names for 
-  consistency.
-- Added support for exporting the calibration results to yaml files and to
-  the pydidas DiffractionExperimentContext directly from the PyfaiCalibFrame.
-- Added an action to get information about the underlying datapoint from 
-  WorkflowResults plots.
-- Added explicit .copy and .deepcopy methods to ObjectWithParameterCollection
-- Updated pyproject.toml and removed setup.cfg
-- Changed all .get_copy methods to .copy for consistency with numpy and python
-  main.
-- The PluginCollection now uses the pathlib library instead of strings for 
-  management of files and paths.
-- Added a new feature to get the position of a datapoint in the scan by clicking
-  on the result.
-- contexts.scan_contexts importers can now select which Scan instance to import
-  to.
-- contexts.diffraction_exp_context importers can now select which 
-  DiffractionExperiment instance to import to.
-- Added an update_from_tree method to the WorkflowTree.
-- Added 'counted_images_per_file' Parameter to hdf5 loaders to allow exporting
-  the number of processed images.
-- The EditPluginParametersWidget is now hiding all Parameters which start with 
-  an underscore to allow 'private' Parameters.
-- Created widgets.framework subpackage and moved framework widgets (e.g. 
-  BaseFrames) into it.
-- Added a new button in the workflow result visualizations to show details about
-  the datapoint.
-- Added 'advanced_parameters' to Plugin Parameters to allow hiding of Parameters
-  (in the GUI) which are usually not required.
-- Added an .active_plugin_header property to the WorkflowTree
-- The GenericTree.order_node_ids now also sets the active node again.
-- The WorkflowEditFrame now also allows to filter plugins for their name.
-- Added functions to fit circles and ellipses.
-- Added methods to define DiffractionExperiment parameters from given points on 
-  circles and ellipses.
-- Changed names of policy and alignment constants for consistency.
-- Added a widget to select points in an image, for example for beamcenter 
-  determination.
-- Added a window to manually fit and set the beamcenter position.
-- The 'Define diffraction setup' frame now has an option to set the beamcenter
-  manually.
-- Added 'get_pyfai_geometry', 'update_from_pyfai_geometry' and 
-  'as_fit2d_geometry_values' methods to the DiffractionExperiment class for 
-  easy conversion to and from pyFAI.
-- Added a signal to the DiffractionExperiment which is emitted when any of its
-  Parameters are updated.
-- Added a beamcenter property to the DiffractionExperiment.
-- Added methods to get the radial range in 2theta, r, and Q to the 
-  pyFAIíntegrationBase plugin.
-- Moved the windows from gui to widgets subpackage for better dependency 
-  management in Plugin configuration widgets.
-- Added a window to select the integration region graphically through clicking
-  the boundaries in an image.
-- Updated the pyFAI integration plugin custom configuration widget.
-- Added ManuallySetIntegrationRegionController and 
-  ManuallySetBeamcenterController classes to pydidas.widgets.controllers to 
-  manage the corresponding widgets.
-- Added a PydidasPlotStack widget which automatically switches between 1D and 2D
-  plots and allows to plot data using a single interface.
-- The CropData1D plugin now accepts 'None' as bounds to disable specific bounds.
-- Moved the CompositeCreator frame from the main toolbar menu to the utilities.
-- Added an 'update_value_and_choices' method to the Parameter to change the 
-  value and choices simultaneously without any incorrect intermediate status.
+- New features:
+
+    - Added support for exporting the calibration results to yaml files and 
+      to the pydidas DiffractionExperimentContext directly from the 
+      PyfaiCalibFrame.
+    - Added an action to get information about the underlying datapoint from 
+      WorkflowResults plots.
+    - Added a new button in the workflow result visualizations to show details 
+      about the datapoint.
+    - The WorkflowEditFrame now also allows to filter plugins for their name.
+    - Added methods to define DiffractionExperiment parameters from given points 
+      on circles and ellipses.
+    - Added a window to manually fit and set the beamcenter position.
+    - The 'Define diffraction setup' frame now has an option to set the 
+      beamcenter manually.
+    - Added a window to select the integration region graphically through 
+      clicking the boundaries in an image.
+
+- General improvements:
+
+    - Updated pyproject.toml and removed setup.cfg
+    - When leaving the TestWorkflowFrame, pop-up windows are now hidden.
+    - Changed pyFAI plugins to use explicit parameters to select the ranges.
+    - The EditPluginParametersWidget is now hiding all Parameters which start 
+      with an underscore to allow 'private' Parameters.
+    - Added 'advanced_parameters' to Plugin Parameters to allow hiding of 
+      Parameters (in the GUI) which are usually not required.
+    - Added a widget to select points in an image, for example for beamcenter 
+      determination.
+    - Added methods to get the radial range in 2theta, r, and Q to the 
+      pyFAI integrationBase plugin.
+    - The CropData1D plugin now accepts 'None' as bounds to disable specific 
+      bounds.
+
+- Added unique plugin configuration widgets:
+    
+    - Moved the windows from gui to widgets subpackage for better dependency 
+      management in Plugin configuration widgets.
+    - Added unique configuration widget to SubtractBackgroundImage plugin.
+    - Added unique configuration widget to PyfaiIntegrationBase plugin.
+
+- Programmatic improvements:
+    
+    - Exposed Scan and DiffractionExperiment in the contexts in preparation of 
+      local usages. This also includes an update of the object names for 
+      consistency.
+    - Added explicit .copy and .deepcopy methods to 
+      ObjectWithParameterCollection
+    - Changed all .get_copy methods to .copy for consistency with numpy and 
+      python main.
+    - The PluginCollection now uses the pathlib library instead of strings for 
+      management of files and paths.
+    - contexts.scan_contexts importers can now select which Scan instance to 
+      import to.
+    - contexts.diffraction_exp_context importers can now select which 
+      DiffractionExperiment instance to import to.
+    - Added an update_from_tree method to the WorkflowTree.
+    - Added 'counted_images_per_file' Parameter to hdf5 loaders to allow 
+      exporting the number of processed images.
+    - Created widgets.framework subpackage and moved framework widgets (e.g. 
+      BaseFrames) into it.
+    - Added an .active_plugin_header property to the WorkflowTree
+    - The GenericTree.order_node_ids now also sets the active node again.
+    - Added functions to fit circles and ellipses.
+    - Changed names of policy and alignment constants for consistency.
+    - Added 'get_pyfai_geometry', 'update_from_pyfai_geometry' and 
+      'as_fit2d_geometry_values' methods to the DiffractionExperiment class for 
+      easy conversion to and from pyFAI.
+    - Added a signal to the DiffractionExperiment which is emitted when any of 
+      its Parameters are updated.
+    - Added a beamcenter property to the DiffractionExperiment.
+    - Added ManuallySetIntegrationRegionController and 
+      ManuallySetBeamcenterController classes to pydidas.widgets.controllers to 
+      manage the corresponding widgets.
+    - Added a PydidasPlotStack widget which automatically switches between 1D 
+      and 2D plots and allows to plot data using a single interface.
+    - Moved the CompositeCreator frame from the main toolbar menu to the 
+      utilities.
+    - Added an 'update_value_and_choices' method to the Parameter to change the 
+      value and choices simultaneously without any incorrect intermediate 
+      status.
 
 
 Bugfixes

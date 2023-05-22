@@ -132,6 +132,8 @@ Bugfixes
   give a human-readable error message.
 - Fixed an issue with detector pixel sizes of zero interfering with plot widget
   position information which raised exceptions.
+- Fixed an issue with the DirectorySpyApp when the first file does not start
+  with the indices zero or 1.
 
 
 

@@ -1,6 +1,8 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+v23.5.22
+========
 
 Major changes
 -------------
@@ -151,7 +153,6 @@ Bugfixes
   file format is available without the option of all supported files.
 
 
-=======
 v23.3.9
 =======
 
@@ -238,7 +239,6 @@ Bugfixes
 - Fixed an issue when importing results of shape (1,) from Hdf5 files.
 
 
-========
 v23.1.25
 ========
 
@@ -249,7 +249,6 @@ Improvements
 - Updated logo
 
 
-========
 v23.1.17
 ========
 
@@ -311,7 +310,6 @@ Bugfixes
 - Fixed an issue with importing a incomplete state file.
 
 
-=======
 v0.1.14
 =======
 
@@ -372,7 +370,6 @@ Bugfixes
 - Fixed an issue with importing a incomplete state file.
 
 
-=======
 v0.1.13
 =======
 

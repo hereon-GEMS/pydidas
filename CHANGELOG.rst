@@ -134,7 +134,8 @@ Bugfixes
   position information which raised exceptions.
 - Fixed an issue with the DirectorySpyApp when the first file does not start
   with the indices zero or 1.
-
+- Fixed an issue with the FileDialog initialization when only a specific 
+  file format is available without the option of all supported files.
 
 
 =======

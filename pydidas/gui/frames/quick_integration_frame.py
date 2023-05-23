@@ -79,6 +79,7 @@ class QuickIntegrationFrame(BaseFrame):
         "azi_npoint",
         "rad_npoint",
         "detector_model",
+        "detector_mask_file",
     ]
 
     def __init__(self, parent=None, **kwargs):
@@ -103,6 +104,8 @@ class QuickIntegrationFrame(BaseFrame):
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
         self._config["scroll_width"] = 350
+        self._config["custom_det_pxsize"] = 100
+        self._config["previous_det_pxsize"] = 100
         _generic = pyFAIintegrationBase(diffraction_exp=self._EXP)
         self._plugins = {
             "generic": _generic,
@@ -159,6 +162,9 @@ class QuickIntegrationFrame(BaseFrame):
         )
         self.param_widgets["detector_pxsize"].io_edited.connect(
             self._update_detector_pxsize
+        )
+        self.param_widgets["detector_model"].io_edited.connect(
+            self._change_detector_model
         )
         self.param_widgets["integration_direction"].io_edited.connect(
             self._changed_plugin_direction
@@ -241,6 +247,7 @@ class QuickIntegrationFrame(BaseFrame):
         self.param_widgets["detector_model"].update_choices(
             _det_models + ["Custom detector"]
         )
+        self._change_detector_model(_model)
 
     def set_param_value_and_widget(self, key, value):
         """
@@ -298,10 +305,43 @@ class QuickIntegrationFrame(BaseFrame):
         ----------
         new_pxsize : str
             The new pixelsize.
+        manual : bool, optional
+            Flag for manual
         """
         _pxsize = float(new_pxsize)
+        _current_pxsize = self._config["previous_det_pxsize"]
         self._EXP.set_param_value("detector_pxsizex", _pxsize)
         self._EXP.set_param_value("detector_pxsizey", _pxsize)
+        self.set_param_value_and_widget("detector_pxsize", _pxsize)
+        if self.get_param_value("detector_model") == "Custom detector":
+            self._config["custom_det_pxsize"] = _pxsize
+        _ratio = _pxsize / _current_pxsize
+        for _key in ["rad_range_lower", "rad_range_upper"]:
+            self._roi_controller.set_param_value_and_widget(
+                _key, self._plugins["generic"].get_param_value(_key) * _ratio
+            )
+        self._update_beamcenter(None)
+        self._config["previous_det_pxsize"] = _pxsize
+
+    @QtCore.Slot(str)
+    def _change_detector_model(self, model: str):
+        """
+        Process a manual change of the detector model.
+
+        Parameters
+        ----------
+        model : str
+            The name of the new detector model.
+        """
+        _det_model = self.get_param_value("detector_model")
+        if _det_model == "Custom detector":
+            _pxsize = self._config["custom_det_pxsize"]
+            self.set_param_value("detector_name", "Custom detector")
+        else:
+            _det_name = _det_model.split("]")[1].strip()
+            self._EXP.set_detector_params_from_name(_det_name)
+            _pxsize = self.get_param_value("detector_pxsizex")
+        self._update_detector_pxsize(_pxsize)
 
     @QtCore.Slot(str)
     def _update_beamcenter(self, _):
@@ -405,12 +445,6 @@ class QuickIntegrationFrame(BaseFrame):
             _plugin.set_param_value("azi_npoint", self.get_param_value("azi_npoint"))
         if _dir != "Radial integration":
             _plugin.set_param_value("rad_npoint", self.get_param_value("rad_npoint"))
-        _det_model = self.get_param_value("detector_model")
-        if _det_model == "Custom detector":
-            self._update_detector_pxsize(self.get_param_value("detector_pxsize"))
-            self.set_param_value("detector_name", "Custom detector")
-        else:
-            self._EXP.set_detector_params_from_name(_det_model.split("]")[1].strip())
         with ShowBusyMouse():
             _plugin.pre_execute()
             _results, _ = _plugin.execute(self._image)

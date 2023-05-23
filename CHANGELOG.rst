@@ -1,6 +1,16 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+v23.MM.DD
+=========
+
+Bugfixes
+--------
+
+- Fixed an issue with the QuickIntegrationFrame which changed the intergration 
+  region when changing the detector model.
+
+
 v23.5.22
 ========
 

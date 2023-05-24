@@ -22,6 +22,8 @@ Bugfixes
   SelectIntegrationRegionWindow.
 - Fixed an issue with the FilelistManager if files with the same prefix button
   an additional suffix were present in the directory.
+- Fixed an issue in the WorkflowTestFrame when output plugins were included in
+  the WorkflowTree.
 
 
 

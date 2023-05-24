@@ -11,6 +11,9 @@ Bugfixes
   region when changing the detector model.
 - Fixed a formatting issue when opening Hdf5 files in the 
   SelectIntegrationRegionWindow.
+- Fixed an issue with the FilelistManager if files with the same prefix button
+  an additional suffix were present in the directory.
+
 
 
 v23.5.22

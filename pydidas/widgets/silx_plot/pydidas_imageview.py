@@ -58,7 +58,6 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
     _getImageValue = Plot2D._getImageValue
 
     def __init__(self, parent=None, backend=None, show_cs_transform=True):
-
         ImageView.__init__(self, parent, backend)
         PydidasQsettingsMixin.__init__(self)
 

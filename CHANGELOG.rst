@@ -9,6 +9,8 @@ Bugfixes
 
 - Fixed an issue with the QuickIntegrationFrame which changed the intergration 
   region when changing the detector model.
+- Fixed a formatting issue when opening Hdf5 files in the 
+  SelectIntegrationRegionWindow.
 
 
 v23.5.22

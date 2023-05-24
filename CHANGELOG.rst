@@ -4,6 +4,15 @@
 v23.MM.DD
 =========
 
+Improvements
+------------
+
+- Plugins:
+
+    - Added an option to apply a multiplication factor to the background in the
+      SubtractBackgroundImage and Subtract1dBackgroundProfile plugins.
+
+
 Bugfixes
 --------
 

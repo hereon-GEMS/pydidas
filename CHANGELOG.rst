@@ -36,6 +36,8 @@ Bugfixes
   an additional suffix were present in the directory.
 - Fixed an issue in the WorkflowTestFrame when output plugins were included in
   the WorkflowTree.
+- Fixed an uncomprehensible exception message when the selected indices for
+  reading a hdf5 dataset were out of bounds.
 
 
 

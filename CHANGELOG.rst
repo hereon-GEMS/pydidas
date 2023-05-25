@@ -18,6 +18,8 @@ Improvements
       the QuickIntegrationFrame to allow using an existing calibration.
     - Manually setting the beamcenter from points now works also with a single
       selected points, even if more points are in the list.
+    - The Define diffraction setup frame now also displays the derived position
+      of the beamcenter.
 
 Bugfixes
 --------

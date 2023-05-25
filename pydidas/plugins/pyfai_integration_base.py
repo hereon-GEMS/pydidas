@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ integration plugins using pyFAI.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["pyFAIintegrationBase", "pyFAI_UNITS", "pyFAI_METHOD"]
 
 
@@ -109,6 +109,7 @@ class pyFAIintegrationBase(ProcPlugin):
         self._ai_params = {}
         self._exp_hash = -1
         self._mask = None
+        self._config["custom_mask"] = False
 
     def pre_execute(self):
         """
@@ -369,6 +370,29 @@ class pyFAIintegrationBase(ProcPlugin):
             The unit in pyFAI notation.
         """
         return pyFAI_UNITS[self.get_param_value(param_name)]
+
+    def check_and_set_custom_mask(self, **kwargs):
+        """
+        Check the kwargs for a custom mask and set it, if available.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Any keyword arguments.
+        """
+        _mask = kwargs.get("custom_mask", None)
+        if _mask is not None:
+            self._config["custom_mask"] = True
+        elif _mask is None and self._mask is not None and self._config["custom_mask"]:
+            _mask = self._mask
+            self._config["custom_mask"] = False
+        else:
+            return
+        if hasattr(self, "_ai"):
+            self._ai.set_mask(_mask)
+        if hasattr(self, "_ais"):
+            for _ai in self._ais:
+                _ai.set_mask(_mask)
 
     def execute(self, data, **kwargs):
         """

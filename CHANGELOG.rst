@@ -11,6 +11,8 @@ Improvements
 
     - Added an option to apply a multiplication factor to the background in the
       SubtractBackgroundImage and Subtract1dBackgroundProfile plugins.
+    - pyFAI integration plugins now can accept custom masks as keyword argument
+      in the execute method.
 
 - General improvements:
 

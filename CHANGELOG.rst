@@ -12,6 +12,10 @@ Improvements
     - Added an option to apply a multiplication factor to the background in the
       SubtractBackgroundImage and Subtract1dBackgroundProfile plugins.
 
+- General improvements:
+
+    - Added a 'Copy experiment description from diffraction context' button in 
+      the QuickIntegrationFrame to allow using an existing calibration.
 
 Bugfixes
 --------

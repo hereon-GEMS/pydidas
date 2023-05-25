@@ -16,6 +16,8 @@ Improvements
 
     - Added a 'Copy experiment description from diffraction context' button in 
       the QuickIntegrationFrame to allow using an existing calibration.
+    - Manually setting the beamcenter from points now works also with a single
+      selected points, even if more points are in the list.
 
 Bugfixes
 --------

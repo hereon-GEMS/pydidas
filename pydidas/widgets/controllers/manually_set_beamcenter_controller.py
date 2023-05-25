@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ManuallySetBeamcenterController"]
 
 
-from typing import Iterable, Literal, Tuple
+from typing import Iterable, List, Literal, Tuple
 
 import numpy as np
 from qtpy import QtCore
@@ -89,7 +89,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
     @property
     def points(self) -> Tuple[np.ndarray, np.ndarray]:
         """
-        The points selected in the image.
+        The points marked in the image.
 
         Returns
         -------
@@ -98,10 +98,39 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         y_positions : np.ndarray
             The y values of the selected points.
         """
-        _n = len(self._points)
-        _x = np.zeros((_n))
-        _y = np.zeros((_n))
-        for _index, (_xpos, _ypos) in enumerate(self._points):
+        return self._get_points_as_arrays(self._points)
+
+    @property
+    def selected_points(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        The currently selected points in the image.
+
+        Returns
+        -------
+        x_positions : np.ndarray
+            The x values of the selected points.
+        y_positions : np.ndarray
+            The y values of the selected points.
+        """
+        return self._get_points_as_arrays(self._config["selected_points"])
+
+    def _get_points_as_arrays(self, points: List[Tuple[float, float]]):
+        """
+        Get the given list of points as arrays.
+
+        Parameters
+        ----------
+        points : List[Tuple[float, float]]
+            The points to be processed.
+
+        Returns
+        -------
+        np.ndarray, np.ndarray :
+            The x and y positions of the selected points.
+        """
+        _x = np.zeros((len(points)))
+        _y = np.zeros((len(points)))
+        for _index, (_xpos, _ypos) in enumerate(points):
             _x[_index] = _xpos
             _y[_index] = _ypos
         return _x, _y
@@ -250,7 +279,9 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         """
         Set the beamcenter from a single point.
         """
-        _x, _y = self.points
+        _x, _y = self.selected_points
+        if _x.size != 1 and len(self._points) == 1:
+            _x, _y = self.points
         if _x.size != 1:
             raise UserConfigError(
                 "Please select exactly one point in the image to set the beamcenter "
@@ -366,9 +397,12 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         for _point in points:
             self._points.remove(_point)
             self._plot.removeMarker(f"marker_{_point[0]}_{_point[1]}")
+            if _point in self._config["selected_points"]:
+                _index = self._config["selected_points"].index(_point)
+                self._config["selected_points"].pop(_index)
 
     @QtCore.Slot(str)
-    def manual_beamcenter_update(self, _):
+    def manual_beamcenter_update(self, *arg):
         """
         Process a manual update of the beamcenter x/y Parameter.
         """

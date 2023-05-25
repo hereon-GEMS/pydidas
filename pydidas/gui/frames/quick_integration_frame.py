@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ without fully defining Scan, DiffractionExperiment and Workflow.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["QuickIntegrationFrame"]
 
 
@@ -33,7 +33,7 @@ from functools import partial
 import numpy as np
 from qtpy import QtCore, QtWidgets
 
-from ...contexts import DiffractionExperimentIo
+from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...core import get_generic_param_collection
 from ...core.constants import PYFAI_DETECTOR_MODELS_OF_SHAPES
@@ -50,6 +50,7 @@ from .builders import QuickIntegrationFrameBuilder
 
 
 COLL = PluginCollection()
+EXP = DiffractionExperimentContext()
 
 
 class QuickIntegrationFrame(BaseFrame):
@@ -148,6 +149,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
+        self._widgets["copy_exp_context"].clicked.connect(self._copy_diffraction_exp)
         self._widgets["but_import_exp"].clicked.connect(self._import_diffraction_exp)
         for _label in ["but_select_beamcenter_manually", "but_confirm_beamcenter"]:
             self._widgets[_label].clicked.connect(self._toggle_beamcenter_selection)
@@ -352,6 +354,7 @@ class QuickIntegrationFrame(BaseFrame):
         _by = self.get_param_value("beamcenter_y")
         _dist = self.get_param_value("detector_dist")
         self._EXP.set_beamcenter_from_fit2d_params(_bx, _by, _dist)
+        self._bc_controller.manual_beamcenter_update()
 
     @QtCore.Slot()
     def _toggle_beamcenter_selection(self):
@@ -368,6 +371,7 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.toggle_marker_color_param_visibility(not _active)
         self._widgets["file_selector"].setEnabled(not _active)
         self._roi_controller.toggle_enable(not _active)
+        self._bc_controller.selected_points
         if _active:
             self._bc_controller.show_plot_items("all")
             self._roi_controller.remove_plot_items("roi")
@@ -417,6 +421,22 @@ class QuickIntegrationFrame(BaseFrame):
         self.toggle_param_widget_visibility(
             "rad_npoint", direction != "Radial integration"
         )
+
+    def _copy_diffraction_exp(self):
+        """
+        Copy the DiffracctionExperiment configuration from the Workflow context.
+        """
+        for _key, _param in EXP.params.items():
+            self._EXP.set_param_value(_key, _param.value)
+            if _key in self.param_widgets:
+                self.param_widgets[_key].set_value(_param.value)
+        self.set_param_value_and_widget(
+            "detector_pxsize", self.get_param_value("detector_pxsizex")
+        )
+        _cx, _cy = self._EXP.beamcenter
+        self.set_param_value_and_widget("beamcenter_x", _cx)
+        self.set_param_value_and_widget("beamcenter_y", _cy)
+        self._bc_controller.manual_beamcenter_update()
 
     def _import_diffraction_exp(self):
         """

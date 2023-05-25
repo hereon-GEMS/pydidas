@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,29 +20,77 @@ The pydidas_gui module includes a function to run the default pydidas processing
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["run_gui"]
 
 
 import multiprocessing as mp
+import signal
 import sys
 import warnings
+from pathlib import Path
+from typing import Union
 
-from qtpy import QtWidgets
-
-from pydidas.core import PydidasQApplication, UserConfigError
-from pydidas.gui import MainWindow, frames
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QApplication, QSplashScreen
 
 
-def run_gui(app=None, restore_state="None"):
+def _get_icon_pixmap():
+    """
+    Get the path for loading the icon and set the icon.
+
+    Returns
+    -------
+    None.
+
+    """
+    for _path in sys.path:
+        _p = Path(_path).joinpath("pydidas", "resources", "images", "splash_image.png")
+        if _p.is_file():
+            _iconpath = str(_p)
+            break
+    if _iconpath is None:
+        raise ModuleNotFoundError(
+            "Cannot find the required files for the startup window"
+        )
+    return QtGui.QPixmap(_iconpath)
+
+
+class PydidasSplashScreen(QtWidgets.QSplashScreen):
+    def __init__(self, pixmap=None):
+        if pixmap is None:
+            pixmap = _get_icon_pixmap()
+        QtWidgets.QSplashScreen.__init__(self, pixmap)
+        self.show_aligned_message("Importing packages")
+        self.show()
+        QtWidgets.QApplication.instance().processEvents()
+
+    def show_aligned_message(self, message: str):
+        """
+        Show a message aligned bottom / center.
+
+        Parameters
+        ----------
+        message : str
+            The message to be displayes.
+        """
+        self.showMessage(message, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
+
+
+def run_gui(
+    splash_screen: QSplashScreen,
+    app: Union[None, QApplication] = None,
+    restore_state: str = "None",
+):
     """
     Run the GUI application with the generic pydidas layout.
 
     Parameters
     ----------
+    splash_screen :
     app : Union[QtCore.QApplication, None], optional
         The main Qt application. If None, a new QApplication will be created.
     restore_state : str, optional
@@ -50,6 +98,10 @@ def run_gui(app=None, restore_state="None"):
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
     """
+    from pydidas.core import PydidasQApplication, UserConfigError
+    from pydidas.gui import MainWindow, frames
+
+    splash_screen.show_aligned_message("Starting QApplication")
     if mp.get_start_method() != "spawn":
         try:
             mp.set_start_method("spawn", force=True)
@@ -64,6 +116,7 @@ def run_gui(app=None, restore_state="None"):
     app = QtWidgets.QApplication.instance()
     if app is not None:
         app.quit()
+    splash_screen.show_aligned_message("Creating objects")
     app = PydidasQApplication(sys.argv)
     gui = MainWindow()
     gui.register_frame(frames.HomeFrame)
@@ -79,19 +132,26 @@ def run_gui(app=None, restore_state="None"):
     gui.register_frame(frames.ViewResultsFrame)
     gui.register_frame(frames.UtilitiesFrame)
 
+    splash_screen.show_aligned_message("Creating widgets")
+    gui.show()
     if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
-    gui.show()
-    gui.raise_()
     if restore_state in ["exit", "saved"]:
+        splash_screen.show_aligned_message("Restoring interface state")
         try:
             gui.restore_gui_state(state=restore_state)
         except UserConfigError:
             pass
+    splash_screen.finish(gui)
+    gui.raise_()
     return app.exec_()
 
 
 if __name__ == "__main__":
-    _ = run_gui(restore_state="exit")
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    app = QtWidgets.QApplication([])
+    _splash = PydidasSplashScreen()
+
+    _ = run_gui(_splash, restore_state="exit")
     app = QtWidgets.QApplication.instance()
     app.quit()

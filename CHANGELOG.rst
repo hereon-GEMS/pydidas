@@ -20,6 +20,8 @@ Improvements
       selected points, even if more points are in the list.
     - The Define diffraction setup frame now also displays the derived position
       of the beamcenter.
+    - Added a splash screen at startup to display the give feedback about 
+      startup of the GUI.
 
 Bugfixes
 --------

@@ -11,19 +11,16 @@ recursive-include pydidas *.py
 recursive-include plugins/*.py
 recursive-include pydidas/docs *.png
 recursive-include pydidas/docs *.rst
+recursive-include pydidas/resources *.png
+recursive-include pydidas/resources *.svg
 
 recursive-exclude tests *
 recursive-exclude pydidas/docs/build *
 
-include setup.cfg
 include MANIFEST.in
 include README.rst
 include LICENSE.md
-include requirements.txt
-include environment.yml
 include pyproject.toml
-include change.log
-include pydidas/core/icons/*.svg
-include pydidas/core/icons/*.png
+include CHANGELOG.rst
 include pydidas/docs/make.bat
 include pydidas/docs/Makefile

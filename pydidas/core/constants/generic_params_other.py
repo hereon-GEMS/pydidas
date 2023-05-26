@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ Parameters which are are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_OTHER"]
 
 
@@ -593,6 +593,61 @@ GENERIC_PARAMS_OTHER = {
         "tooltip": (
             "Set the display color for the overlay items (markers and shapes) in the "
             "plot."
+        ),
+    },
+    ############################
+    # Dynamic mask configuration
+    ############################
+    "mask_threshold_low": {
+        "type": float,
+        "default": None,
+        "name": "Lower mask threshold",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower threshold for the mask. If any finite value (i.e. not np.nan or "
+            "None) is used, the value of any pixels with a value below the threshold "
+            "will be masked. A value of np.nan or None will ignore the threshold."
+        ),
+    },
+    "mask_threshold_high": {
+        "type": float,
+        "default": None,
+        "name": "Upper mask threshold",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper threshold for the mask. If any finite value (i.e. not np.nan or "
+            "None) is used, the value of any pixels with a value above the threshold "
+            "will be masked. A value of np.nan or None will ignore the threshold."
+        ),
+    },
+    "mask_grow": {
+        "type": int,
+        "default": 0,
+        "name": "Grow/shrink masked regions",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": (
+            "The masked region can be grown (morphological dilation) or shrunk "
+            "(morphological erosion), based on the input value. A value >0 will grow "
+            "the masked region by the specified amounts in pixels, a value less than "
+            "zero will erode the masked regions by the specified amount."
+        ),
+    },
+    "kernel_iterations": {
+        "type": int,
+        "default": 1,
+        "name": "Grow/shrink iterations",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of iterations to apply the erosion/dilation operation on the "
+            "masked region."
         ),
     },
     #######################

@@ -13,6 +13,9 @@ Improvements
       SubtractBackgroundImage and Subtract1dBackgroundProfile plugins.
     - pyFAI integration plugins now can accept custom masks as keyword argument
       in the execute method.
+    - Added a new plugin for creating dynamic detector masks based on data
+      thresholds.
+      
 
 - General improvements:
 

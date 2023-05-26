@@ -24,6 +24,8 @@ Improvements
       of the beamcenter.
     - Added a splash screen at startup to display the give feedback about 
       startup of the GUI.
+    - Updated the ParameterCollectionMixin to accept all kwargs. Kwargs matching
+      Parameters will update their values and other kwargs will be ignored.
 
 Bugfixes
 --------

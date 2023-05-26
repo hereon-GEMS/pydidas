@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,10 +22,10 @@ ParameterCollection.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParameterCollectionMixIn"]
 
 from numbers import Integral
@@ -122,11 +122,8 @@ class ParameterCollectionMixIn:
             The dictionary with Parameter refkeys and values.
         """
         for _key, _val in kwargs.items():
-            if _key not in self.params:
-                raise KeyError(
-                    f"No Parameter with the key '{_key}' has been registered."
-                )
-            self.set_param_value(_key, _val)
+            if _key in self.params:
+                self.set_param_value(_key, _val)
 
     def get_param_value(self, param_key, *default, dtype=None, for_export=False):
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -19,10 +19,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import copy
@@ -88,12 +88,6 @@ class TestObjectWithParameterCollection(unittest.TestCase):
         _new_vals = obj.get_param_values_as_dict()
         for _key, _val in _vals.items():
             self.assertEqual(_val, _new_vals[_key])
-
-    def test_update_param_values_from_kwargs__wrong_key(self):
-        obj = ObjectWithParameterCollection()
-        obj.add_params(*self._params.values())
-        with self.assertRaises(KeyError):
-            obj.update_param_values_from_kwargs(Test5=42)
 
     def test_update_param_values_from_kwargs__use_case(self):
         obj = ObjectWithParameterCollection()

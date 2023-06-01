@@ -181,7 +181,16 @@ def install_wheel(wheel_filename: str):
     wheel_filename : str
         The name of the wheel file.
     """
-    subprocess.check_call([sys.executable, "-m", "pip", "install", wheel_filename])
+    subprocess.check_call(
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            wheel_filename,
+            "--no-warn-scripts-location",
+        ]
+    )
 
 
 def get_location_of_installed_pydidas() -> Path:

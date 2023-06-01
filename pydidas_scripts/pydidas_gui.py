@@ -24,7 +24,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["run_gui"]
+__all__ = ["run_gui", "start_pydidas_gui"]
 
 
 import multiprocessing as mp
@@ -80,7 +80,7 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
         self.showMessage(message, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
 
 
-def run_gui(
+def start_pydidas_gui(
     splash_screen: QSplashScreen,
     app: Union[None, QApplication] = None,
     restore_state: str = "None",
@@ -98,6 +98,7 @@ def run_gui(
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
     """
+
     from pydidas.core import PydidasQApplication, UserConfigError
     from pydidas.gui import MainWindow, frames
 
@@ -112,10 +113,6 @@ def run_gui(
                 "To solve this issue, restart the kernel and import pydidas "
                 "before starting any multiprocessing."
             )
-
-    app = QtWidgets.QApplication.instance()
-    if app is not None:
-        app.quit()
     splash_screen.show_aligned_message("Creating objects")
     app = PydidasQApplication(sys.argv)
     gui = MainWindow()
@@ -131,7 +128,6 @@ def run_gui(
     gui.register_frame(frames.WorkflowRunFrame)
     gui.register_frame(frames.ViewResultsFrame)
     gui.register_frame(frames.UtilitiesFrame)
-
     splash_screen.show_aligned_message("Creating widgets")
     gui.show()
     if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
@@ -147,11 +143,15 @@ def run_gui(
     return app.exec_()
 
 
-if __name__ == "__main__":
+def run_gui():
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QtWidgets.QApplication([])
     _splash = PydidasSplashScreen()
 
-    _ = run_gui(_splash, restore_state="exit")
+    _ = start_pydidas_gui(_splash, restore_state="exit")
     app = QtWidgets.QApplication.instance()
     app.quit()
+
+
+if __name__ == "__main__":
+    run_gui()

@@ -25,6 +25,7 @@ dynamic = ["version"]
 dependencies = [
     "meson-python",
     "cython",
+    "build>=0.10.0",
     "PyQt5>=5.15.7",
     "pyFAI==2023.1.0",
     "scikit-image>=0.20.0",
@@ -36,6 +37,7 @@ dependencies = [
     "natsort>=8.2.0",
     "hdf5plugin>=4.0.1",
     "pyyaml>=6.0",
+    "requests>=2.31.0",
 ]
 
 [project.urls]
@@ -54,7 +56,7 @@ packages = ["pydidas", "pydidas_scripts", "pydidas_plugins"]
 pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"
 
 [project.gui-scripts]
-ydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
+pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 
 [tools.coverage.report]
 omit = ['*/tests/*']

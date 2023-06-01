@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,17 +21,19 @@ the GUI startup.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["remove_pydidas_from_system"]
 
-import sys
+
 import os
 import shutil
+import sys
 
 from qtpy import QtCore
+
 
 _path = os.path.dirname(__file__)
 sys.path.insert(0, _path)
@@ -45,11 +49,12 @@ def remove_pydidas_from_system():
         "# and will only be removed for the current user!    #\n"
         "#####################################################\n"
     )
-
-    _reply = input("Do you really want to remove all pydidas system data? (y/[n]) ")
+    _reply = input(
+        "Do you really want to remove all local pydidas settings from the system? "
+        "(y/[n]) "
+    )
     if _reply.upper() not in ["Y", "YES"]:
-        print("\nAborted by user request.")
-        input("Press <Enter> to continue.")
+        input("\nAborted by user request. \n\nPress <Enter> to continue.")
         return
 
     # Remove all system registry settings
@@ -73,7 +78,7 @@ def remove_pydidas_from_system():
             shutil.remove(_qs_dir)
     else:
         raise TypeError("The system architecture is not supported by pydidas!")
-    print("done")
+    print("done!")
 
     # Remove all local config files
     print("\nRemoving local configuration files...", end="")
@@ -87,7 +92,7 @@ def remove_pydidas_from_system():
     _top_path = os.path.dirname(_path)
     if os.path.exists(_top_path) and len(os.listdir(_top_path)) == 0:
         shutil.rmtree(_top_path)
-    print("done")
+    print("done!")
 
     # Remove all local documents and logs
     print("\nRemoving local documents and logfiles...", end="")
@@ -96,7 +101,7 @@ def remove_pydidas_from_system():
     )[0]
     _docs_path = os.path.join(_qt_docs_path, "pydidas")
     shutil.rmtree(_docs_path)
-    print("done")
+    print("done!")
 
     print(
         "\nSuccessfully removed all pydidas entries from the Windows operating "

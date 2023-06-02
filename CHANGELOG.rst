@@ -29,6 +29,9 @@ Improvements
       startup of the GUI.
     - Updated the ParameterCollectionMixin to accept all kwargs. Kwargs matching
       Parameters will update their values and other kwargs will be ignored.
+    - Reworked the fitting plugins to add double and triple-peak fitting
+      capabilities.
+
 
 Bugfixes
 --------

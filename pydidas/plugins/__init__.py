@@ -27,6 +27,7 @@ __status__ = "Development"
 __all__ = []
 
 # import __all__ items from modules:
+from .base_fit_plugin import *
 from .base_input_plugin import *
 from .base_input_plugin_1d import *
 from .base_output_plugin import *

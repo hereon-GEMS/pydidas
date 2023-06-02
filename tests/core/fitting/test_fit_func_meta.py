@@ -22,6 +22,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 
 
+import copy
 import unittest
 
 from pydidas.core.fitting import (
@@ -39,6 +40,15 @@ def create_test_class():
 
 
 class TestFitFuncMeta(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls._registry = copy.deepcopy(FitFuncMeta.registry)
+
+    @classmethod
+    def tearDownClass(cls):
+        FitFuncMeta.registry = cls._registry
+
     def tearDown(self):
         FitFuncMeta.clear_registry()
 
@@ -55,6 +65,23 @@ class TestFitFuncMeta(unittest.TestCase):
         create_test_class()
         with self.assertRaises(KeyError):
             create_test_class()
+
+    def test_get_fitter_names_with_num_peaks__n1(self):
+        create_test_class()
+        _n1 = FitFuncMeta.get_fitter_names_with_num_peaks(1)
+        _n2 = FitFuncMeta.get_fitter_names_with_num_peaks(2)
+        self.assertEqual(_n1, ("Test",))
+        self.assertEqual(_n2, ())
+
+    def test_get_fitter_names_with_num_peaks__n3(self):
+        create_test_class()
+        FitFuncMeta.registry["Test"].num_peaks = 3
+        _n1 = FitFuncMeta.get_fitter_names_with_num_peaks(1)
+        _n2 = FitFuncMeta.get_fitter_names_with_num_peaks(2)
+        _n3 = FitFuncMeta.get_fitter_names_with_num_peaks(3)
+        self.assertEqual(_n1, ())
+        self.assertEqual(_n2, ())
+        self.assertEqual(_n3, ("Test",))
 
 
 if __name__ == "__main__":

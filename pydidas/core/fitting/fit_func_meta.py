@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,11 +20,17 @@ Module with the FitFuncMeta class which is used for creating fit function classe
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FitFuncMeta"]
+
+
+from typing import Tuple, TypeVar
+
+
+FitFuncBase = TypeVar("FitFuncBase")
 
 
 class FitFuncMeta(type):
@@ -65,13 +73,13 @@ class FitFuncMeta(type):
         cls.registry = {}
 
     @classmethod
-    def register_class(cls, new_class, update_registry=False):
+    def register_class(cls, new_class: FitFuncBase, update_registry=False):
         """
         Register a fit function class.
 
         Parameters
         ----------
-        new_class : type
+        new_class : FitFuncBase
             The class to be registered.
         update_registry : bool, optional
             Keyword to allow updating / overwriting of registered extensions.
@@ -91,7 +99,7 @@ class FitFuncMeta(type):
         cls.registry[_name] = new_class
 
     @classmethod
-    def get_fitter(cls, name):
+    def get_fitter(cls, name: str) -> FitFuncBase:
         """
         Get the fit function class referenced by given name.
 
@@ -102,7 +110,29 @@ class FitFuncMeta(type):
 
         Returns
         -------
-        type
+        FitFuncBase
             The fitter class.
         """
         return cls.registry[name]
+
+    @classmethod
+    def get_fitter_names_with_num_peaks(cls, num_peaks: int) -> Tuple[str]:
+        """
+        Get the names of all FitFuncBase classes with the given number of peaks.
+
+        Parameters
+        ----------
+        num_peaks : int
+            The number of peaks.
+
+        Returns
+        -------
+        Tuple[str]
+            The tuple with the names of the FitFuncBase classes that have registered
+            with the given number of peaks.
+        """
+        return tuple(
+            _key
+            for _key, _class in cls.registry.items()
+            if _class.num_peaks == num_peaks
+        )

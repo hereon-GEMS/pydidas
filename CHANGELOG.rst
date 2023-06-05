@@ -46,7 +46,8 @@ Bugfixes
   the WorkflowTree.
 - Fixed an uncomprehensible exception message when the selected indices for
   reading a hdf5 dataset were out of bounds.
-
+- Fixed an issue with copying Parameters, when the default value was not in the 
+  currently allowed choices.
 
 
 v23.5.22

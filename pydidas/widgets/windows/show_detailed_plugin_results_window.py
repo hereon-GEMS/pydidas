@@ -160,7 +160,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             self.create_any_widget(
                 f"plot_{_index}", PydidasPlotStack, gridPos=(_y, _x, 1, 1)
             )
-            update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=0.5)
+            update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=1)
 
     def __update_metadata(self):
         """

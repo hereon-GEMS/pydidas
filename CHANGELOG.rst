@@ -48,6 +48,7 @@ Bugfixes
   reading a hdf5 dataset were out of bounds.
 - Fixed an issue with copying Parameters, when the default value was not in the 
   currently allowed choices.
+- Fixed an issue in Dataset when adding new dimensions after the last dimension.
 
 
 v23.5.22

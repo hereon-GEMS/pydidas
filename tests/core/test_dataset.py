@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import copy
@@ -142,19 +144,19 @@ class TestDataset(unittest.TestCase):
     def test_array_finalize__add_dimension(self):
         obj = self.create_large_dataset()
         _new = obj[None, :]
-        self.assertEqual(list(_new.axis_labels.values()), [None] + self._dset["labels"])
-        self.assertEqual(list(_new.axis_units.values()), [None] + self._dset["units"])
+        self.assertEqual(list(_new.axis_labels.values()), [""] + self._dset["labels"])
+        self.assertEqual(list(_new.axis_units.values()), [""] + self._dset["units"])
 
     def test_array_finalize__add_dimension_in_middle(self):
         obj = self.create_large_dataset()
         _new = obj[:, None, :]
         self.assertEqual(
             list(_new.axis_labels.values()),
-            [self._dset["labels"][0]] + [None] + self._dset["labels"][1:],
+            [self._dset["labels"][0]] + [""] + self._dset["labels"][1:],
         )
         self.assertEqual(
             list(_new.axis_units.values()),
-            [self._dset["units"][0]] + [None] + self._dset["units"][1:],
+            [self._dset["units"][0]] + [""] + self._dset["units"][1:],
         )
 
     def test_array_finalize__with_array_mask(self):

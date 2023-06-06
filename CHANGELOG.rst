@@ -31,6 +31,8 @@ Improvements
       Parameters will update their values and other kwargs will be ignored.
     - Reworked the fitting plugins to add double and triple-peak fitting
       capabilities.
+    - Added a 'param_values' property to the ObjectWithParameterCollection for 
+      quicker access.
 
 
 Bugfixes

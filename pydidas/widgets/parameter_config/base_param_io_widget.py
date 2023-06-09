@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,11 +21,12 @@ Parameters should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BaseParamIoWidget"]
+
 
 import numbers
 import pathlib
@@ -32,7 +35,7 @@ import html
 from qtpy import QtWidgets, QtGui, QtCore
 from numpy import nan
 
-from ...core import Hdf5key
+from ...core import Hdf5key, UserConfigError
 from ...core.constants import (
     PARAM_INPUT_WIDGET_HEIGHT,
     QT_REG_EXP_FLOAT_VALIDATOR,
@@ -112,20 +115,25 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         # of int but the strings 'True' and 'False' cannot be converted to int
         if text.upper() == "TRUE":
             return True
-        if text.upper() == "FALSE":
+        elif text.upper() == "FALSE":
             return False
-        if text.upper() == "NAN":
+        elif text.upper() == "NAN":
             return nan
-        if text.upper() == "NONE":
+        elif text.upper() == "NONE":
             return None
-        if self._ptype == numbers.Integral:
-            return int(text)
-        if self._ptype == numbers.Real:
-            return float(text)
-        if self._ptype == pathlib.Path:
-            return pathlib.Path(text)
-        if self._ptype == Hdf5key:
-            return Hdf5key(text)
+        try:
+            if self._ptype == numbers.Integral:
+                return int(text)
+            if self._ptype == numbers.Real:
+                return float(text)
+            if self._ptype == pathlib.Path:
+                return pathlib.Path(text)
+            if self._ptype == Hdf5key:
+                return Hdf5key(text)
+        except ValueError as _error:
+            _msg = str(_error)
+            _msg = _msg[0].upper() + _msg[1:]
+            raise UserConfigError(f'ValueError! {_msg} Input text was "{text}"')
         return text
 
     def emit_signal(self):

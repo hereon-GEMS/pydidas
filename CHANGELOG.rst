@@ -51,6 +51,7 @@ Bugfixes
 - Fixed an issue with copying Parameters, when the default value was not in the 
   currently allowed choices.
 - Fixed an issue in Dataset when adding new dimensions after the last dimension.
+- Fixed an issue in ParamIoWidget when the type conversion was not successful.
 
 
 v23.5.22

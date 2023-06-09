@@ -52,6 +52,8 @@ Bugfixes
   currently allowed choices.
 - Fixed an issue in Dataset when adding new dimensions after the last dimension.
 - Fixed an issue in ParamIoWidget when the type conversion was not successful.
+- Fixed an isssue in Dateset, where the getitem_key was not reset after 
+  returning a single item instead of a new Dataset.
 
 
 v23.5.22

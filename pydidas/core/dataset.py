@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -111,7 +111,10 @@ class Dataset(np.ndarray):
             The sliced new dataset.
         """
         self._meta["getitem_key"] = key if isinstance(key, tuple) else (key,)
-        return np.ndarray.__getitem__(self, key)
+        _item = np.ndarray.__getitem__(self, key)
+        if not isinstance(_item, np.ndarray):
+            self._meta["getitem_key"] = ()
+        return _item
 
     def __array_finalize__(self, obj):
         """

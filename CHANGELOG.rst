@@ -33,6 +33,8 @@ Improvements
       capabilities.
     - Added a 'param_values' property to the ObjectWithParameterCollection for 
       quicker access.
+    - Added functionality to the widgets factory to reference parent_widgets by
+      their string reference key.
 
 
 Bugfixes

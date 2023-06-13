@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,13 +21,18 @@ add convenience widget creation methods to other classes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CreateWidgetsMixIn"]
 
-from ...core.utils import copy_docstring, apply_qt_properties
+
+from typing import Dict, List, Tuple
+
+from qtpy.QtWidgets import QWidget
+
+from ...core.utils import apply_qt_properties, copy_docstring
 from ..utilities import get_widget_layout_args
 from .button_factory import create_button
 from .check_box_factory import create_check_box
@@ -55,7 +62,7 @@ class CreateWidgetsMixIn:
         self.__index_unreferenced = 0
 
     @copy_docstring(create_spacer)
-    def create_spacer(self, ref, **kwargs):
+    def create_spacer(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_spacer
         """
@@ -69,76 +76,76 @@ class CreateWidgetsMixIn:
         self._widgets[ref] = _spacer
 
     @copy_docstring(create_label)
-    def create_label(self, ref, text, **kwargs):
+    def create_label(self, ref: str, text: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_label
         """
         self.__create_widget(create_label, ref, text, **kwargs)
 
     @copy_docstring(create_line)
-    def create_line(self, ref, **kwargs):
+    def create_line(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_line
         """
         self.__create_widget(create_line, ref, **kwargs)
 
     @copy_docstring(create_lineedit)
-    def create_lineedit(self, ref, **kwargs):
+    def create_lineedit(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_lineedit
         """
         self.__create_widget(create_lineedit, ref, **kwargs)
 
     @copy_docstring(create_button)
-    def create_button(self, ref, text, **kwargs):
+    def create_button(self, ref: str, text: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_button
         """
         self.__create_widget(create_button, ref, text, **kwargs)
 
     @copy_docstring(create_spin_box)
-    def create_spin_box(self, ref, **kwargs):
+    def create_spin_box(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_spin_box
         """
         self.__create_widget(create_spin_box, ref, **kwargs)
 
     @copy_docstring(create_progress_bar)
-    def create_progress_bar(self, ref, **kwargs):
+    def create_progress_bar(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_progress_bar
         """
         self.__create_widget(create_progress_bar, ref, **kwargs)
 
     @copy_docstring(create_check_box)
-    def create_check_box(self, ref, text, **kwargs):
+    def create_check_box(self, ref: str, text, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_check_box
         """
         self.__create_widget(create_check_box, ref, text, **kwargs)
 
     @copy_docstring(create_combo_box)
-    def create_combo_box(self, ref, **kwargs):
+    def create_combo_box(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_check_box
         """
         self.__create_widget(create_combo_box, ref, **kwargs)
 
     @copy_docstring(create_radio_button_group)
-    def create_radio_button_group(self, ref, entries, **kwargs):
+    def create_radio_button_group(self, ref: str, entries: List, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_radio_button_group
         """
         self.__create_widget(create_radio_button_group, ref, entries, **kwargs)
 
     @copy_docstring(create_empty_widget)
-    def create_empty_widget(self, ref, **kwargs):
+    def create_empty_widget(self, ref: str, **kwargs: Dict):
         """
         Please refer to pydidas.widgets.factory.create_empty_widget
         """
         self.__create_widget(create_empty_widget, ref, **kwargs)
 
-    def __create_widget(self, object_, ref, *args, **kwargs):
+    def __create_widget(self, object_: object, ref: str, *args: Tuple, **kwargs: Dict):
         """
         Create a widget from a object (function / class).
 
@@ -154,6 +161,8 @@ class CreateWidgetsMixIn:
             Keyword arguments for the widget creation.
         """
         _parent = kwargs.get("parent_widget", self)
+        if isinstance(_parent, str):
+            _parent = self._widgets[_parent]
         _widget = object_(*args, **kwargs)
         if isinstance(kwargs.get("layout_kwargs"), dict):
             apply_qt_properties(_widget.layout(), **kwargs.get("layout_kwargs"))
@@ -166,7 +175,9 @@ class CreateWidgetsMixIn:
             self.__index_unreferenced += 1
         self._widgets[ref] = _widget
 
-    def create_any_widget(self, ref, widget_class, *args, **kwargs):
+    def create_any_widget(
+        self, ref: str, widget_class: type, *args: Tuple, **kwargs: Dict
+    ):
         """
         Create any widget with any settings and add it to the layout.
 
@@ -180,8 +191,8 @@ class CreateWidgetsMixIn:
         ----------
         ref : str
             The reference name in the _widgets dictionary.
-        widget_class : QtWidgets.QWidget
-            The class of the widget.
+        widget_class : type
+            The class type of the widget.
         *args : args
             Any arguments for the widget creation.
         **kwargs : dict
@@ -197,7 +208,7 @@ class CreateWidgetsMixIn:
         self.__create_widget(widget_class, ref, *args, **kwargs)
         apply_qt_properties(self._widgets[ref], **kwargs)
 
-    def add_any_widget(self, ref, widget, **kwargs):
+    def add_any_widget(self, ref: str, widget: QWidget, **kwargs: Dict):
         """
         Add any existing widget with any settings to the layout.
 
@@ -239,6 +250,8 @@ class CreateWidgetsMixIn:
             raise TypeError("Widget reference must be None or a string.")
         apply_qt_properties(widget, **kwargs)
         _parent = kwargs.get("parent_widget", self)
+        if isinstance(_parent, str):
+            _parent = self._widgets[_parent]
         if isinstance(kwargs.get("layout_kwargs"), dict):
             kwargs.update(kwargs.get("layout_kwargs"))
             del kwargs["layout_kwargs"]

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,14 +22,13 @@ get new instances of these plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 # import __all__ items from modules:
-from .base_fit_plugin import *
 from .base_input_plugin import *
 from .base_input_plugin_1d import *
 from .base_output_plugin import *
@@ -35,10 +36,19 @@ from .base_plugin import *
 from .base_proc_plugin import *
 from .plugin_collection import *
 from .plugin_getter_ import *
+
+# The base plugins with references to widgets must be imported last:
+from .base_fit_plugin import *
+from .base_multi_peak_fit_plugin import *
 from .pyfai_integration_base import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
+from . import base_fit_plugin
+
+__all__.extend(base_fit_plugin.__all__)
+del base_fit_plugin
+
 from . import base_input_plugin
 
 __all__.extend(base_input_plugin.__all__)
@@ -48,6 +58,11 @@ from . import base_input_plugin_1d
 
 __all__.extend(base_input_plugin_1d.__all__)
 del base_input_plugin_1d
+
+from . import base_multi_peak_fit_plugin
+
+__all__.extend(base_multi_peak_fit_plugin.__all__)
+del base_multi_peak_fit_plugin
 
 from . import base_output_plugin
 

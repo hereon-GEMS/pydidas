@@ -26,7 +26,7 @@ per-file-ignores =
 # E203 whitespace before ':'
 ignore =  E121, E123, E126, E133, E203, W503, W504
 max-line-length = 88
-max-complexity = 10
+max-complexity = 12
 color = auto
 statistics = True
 exclude = .git, __pycache__, docs/source/conf.py, old, build, dist

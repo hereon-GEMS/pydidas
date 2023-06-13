@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -40,14 +40,14 @@ class FitFuncMeta(type):
 
     registry = {}
 
-    def __new__(cls, clsname, bases, attrs):
+    def __new__(mcs, clsname, bases, attrs):
         """
         Call the class' (i.e. the WorkflowTree exporter) __new__ method
         and register the class with the registry.
 
         Parameters
         ----------
-        cls : type
+        mcs : type
             The new class.
         clsname : str
             The name of the new class
@@ -61,19 +61,19 @@ class FitFuncMeta(type):
         type
             The new class.
         """
-        _new_class = super(FitFuncMeta, cls).__new__(cls, clsname, bases, attrs)
-        cls.register_class(_new_class)
+        _new_class = super(FitFuncMeta, mcs).__new__(mcs, clsname, bases, attrs)
+        mcs.register_class(_new_class)
         return _new_class
 
     @classmethod
-    def clear_registry(cls):
+    def clear_registry(mcs):
         """
         Clear the registry and remove all items.
         """
-        cls.registry = {}
+        mcs.registry = {}
 
     @classmethod
-    def register_class(cls, new_class: FitFuncBase, update_registry=False):
+    def register_class(mcs, new_class: FitFuncBase, update_registry=False):
         """
         Register a fit function class.
 
@@ -91,15 +91,17 @@ class FitFuncMeta(type):
             If an extension associated with new_class has already been
             registered and update_registry is False.
         """
-        _name = new_class.func_name
-        if _name in cls.registry and not update_registry:
+        _name = new_class.name
+        if _name == "base fit function":
+            return
+        if _name in mcs.registry and not update_registry:
             raise KeyError(
-                "A fitting function with the name '{_name}' is already registered."
+                f"A fitting function with the name '{_name}' is already registered."
             )
-        cls.registry[_name] = new_class
+        mcs.registry[_name] = new_class
 
     @classmethod
-    def get_fitter(cls, name: str) -> FitFuncBase:
+    def get_fitter(mcs, name: str) -> FitFuncBase:
         """
         Get the fit function class referenced by given name.
 
@@ -113,10 +115,10 @@ class FitFuncMeta(type):
         FitFuncBase
             The fitter class.
         """
-        return cls.registry[name]
+        return mcs.registry[name]
 
     @classmethod
-    def get_fitter_names_with_num_peaks(cls, num_peaks: int) -> Tuple[str]:
+    def get_fitter_names_with_num_peaks(mcs, num_peaks: int) -> Tuple[str]:
         """
         Get the names of all FitFuncBase classes with the given number of peaks.
 
@@ -133,6 +135,6 @@ class FitFuncMeta(type):
         """
         return tuple(
             _key
-            for _key, _class in cls.registry.items()
+            for _key, _class in mcs.registry.items()
             if _class.num_peaks == num_peaks
         )

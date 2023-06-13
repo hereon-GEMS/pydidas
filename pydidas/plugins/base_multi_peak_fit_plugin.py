@@ -16,7 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the FitSinglePeak Plugin which can be used to fit a single peak in 1d data.
+Module with the FitMultiPeak base plugin which can be subclassed to fit a specific
+number of peaks to data.
 """
 
 __author__ = "Malte Storm"
@@ -24,50 +25,37 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["FitSinglePeak"]
+__all__ = ["FitMultiPeak"]
 
 
-from pydidas.core import get_generic_param_collection
-from pydidas.core.fitting import FitFuncMeta
-from pydidas.core.utils import calculate_result_shape_for_multi_input_dims
-from pydidas.plugins import BaseFitPlugin
+from ..core.utils import calculate_result_shape_for_multi_input_dims
+from .base_fit_plugin import BaseFitPlugin
 
 
-class FitSinglePeak(BaseFitPlugin):
+class FitMultiPeak(BaseFitPlugin):
     """
-    Fit a single peak to the input data.
+    Fit multiple peaks to the input data.
 
     This plugin allows to fit the input data with any function defined in the
     pydidas.core.fitting package.
     """
 
-    plugin_name = "Fit single peak"
-    basic_plugin = False
-    num_peaks = 1
-    default_params = BaseFitPlugin.default_params | get_generic_param_collection(
-        "fit_peak_xlow", "fit_peak_xhigh", "fit_peak_xstart", "fit_peak_width"
-    )
-    advanced_parameters = BaseFitPlugin.advanced_parameters + [
-        "fit_peak_xlow",
-        "fit_peak_xhigh",
-        "fit_peak_xstart",
-        "fit_peak_width",
-    ]
-
-    def __init__(self, *args, **kwargs):
-        BaseFitPlugin.__init__(self, *args, **kwargs)
-        self.params["fit_func"].choices = FitFuncMeta.get_fitter_names_with_num_peaks(1)
+    plugin_name = "Base fit multiple peaks"
 
     def check_center_positions(self) -> bool:
         """
-        Check the fitted center position.
+        Check the fitted center positions.
 
         Returns
         -------
         bool
             Flag whether all centers are in the input x range.
         """
-        return self._data_x[0] <= self._fit_params["center"] <= self._data_x[-1]
+        return set([True]) == set(
+            self._data_x[0] <= self._fit_params[_key] <= self._data_x[-1]
+            for _key in self._fit_params
+            if _key.startswith("center")
+        )
 
     @calculate_result_shape_for_multi_input_dims
     def calculate_result_shape(self):
@@ -76,5 +64,8 @@ class FitSinglePeak(BaseFitPlugin):
         """
         _output = self.get_param_value("fit_output")
         self.output_data_label = _output
-        self._config["result_shape"] = (len(_output.split(";")),)
+        _dim1 = len(_output.split(";"))
+        self._config["result_shape"] = (
+            (self.num_peaks, _dim1) if _dim1 > 1 else (self.num_peaks,)
+        )
         self._config["single_result_shape"] = self._config["result_shape"]

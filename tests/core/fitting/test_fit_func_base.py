@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
@@ -40,15 +42,19 @@ class TestFitFuncBase(unittest.TestCase):
 
     def test_class_params_okay(self):
         for _attribute in [
-            "func_name",
+            "name",
             "param_bounds_low",
             "param_bounds_high",
             "param_labels",
         ]:
             self.assertTrue(hasattr(FIT_CLASS, _attribute))
 
-    def test_function(self):
-        _result = FIT_CLASS.function([], self._x)
+    def test_func(self):
+        _res = FIT_CLASS.func([], self._y)
+        self.assertTrue(np.alltrue(_res == self._y))
+
+    def test_profile(self):
+        _result = FIT_CLASS.profile([], self._x)
         self.assertTrue(np.allclose(_result, self._x))
 
     def test_delta(self):
@@ -89,6 +95,45 @@ class TestFitFuncBase(unittest.TestCase):
         _y = np.sin(_x / 3)
         with self.assertRaises(ValueError):
             FIT_CLASS.calculate_background_params(_x, _y, 4)
+
+    def test_get_fwhm_indices__single_range_x_in(self):
+        _x = np.linspace(-0.5 * np.pi, 1.5 * np.pi, num=41)
+        _y = np.sin(_x)
+        _x0 = (_x[19] + _x[20]) / 2
+        _y0 = np.sin(_x0)
+        _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
+        self.assertTrue(np.alltrue(np.where(_y >= 0.5 * _y0)[0] == _range))
+
+    def test_get_fwhm_indices__empty_range(self):
+        _x = 0.4 * np.arange(30) + 2
+        _y = np.ones(_x.size)
+        _range = FIT_CLASS.get_fwhm_indices(_x[15], 3, _x, _y)
+        self.assertTrue(np.alltrue(np.array([]) == _range))
+
+    def test_get_fwhm_indices__adjacent_jumps(self):
+        _x = 0.4 * np.arange(30) + 2
+        _y = np.zeros(_x.size)
+        _y[2:5] = 1
+        _y[9] = 1
+        _y[15:18] = 1
+        _range = FIT_CLASS.get_fwhm_indices(_x[3], 1, _x, _y)
+        self.assertTrue(np.alltrue(np.arange(2, 5) == _range))
+
+    def test_get_fwhm_indices__double_range_x_in(self):
+        _x = np.linspace(-0.5 * np.pi, 3.5 * np.pi, num=61)
+        _y = np.sin(_x)
+        _x0 = (_x[15] + _x[14]) / 2
+        _y0 = np.sin(_x0)
+        _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
+        self.assertTrue(np.alltrue(np.where(_y[:31] >= 0.5 * _y0)[0] == _range))
+
+    def test_get_fwhm_indices__double_range_x_out(self):
+        _x = np.linspace(-0.5 * np.pi, 3.5 * np.pi, num=61)
+        _y = np.sin(_x)
+        _x0 = np.pi
+        _y0 = 1
+        _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
+        self.assertTrue(np.alltrue(np.array([]) == _range))
 
 
 if __name__ == "__main__":

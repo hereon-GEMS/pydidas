@@ -15,6 +15,9 @@ Improvements
       in the execute method.
     - Added a new plugin for creating dynamic detector masks based on data
       thresholds.
+    - Added new plugins for double and triple peak fitting.
+    - The output selection for fitting plugins can now be done using checkboxes
+      for the various options.
       
 
 - General improvements:

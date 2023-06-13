@@ -37,29 +37,33 @@ from pydidas.plugins import BasePlugin, PluginCollection
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class TestFitSinglePeak(unittest.TestCase):
+class TestFitDoublePeak(unittest.TestCase):
     def setUp(self):
-        self._peakpos = 42
         self._data = Dataset(
             np.ones((150)), data_unit="data unit", axis_units=["ax_unit"]
         )
         self._x = np.arange(self._data.size) * 0.5
-        self._peak_x = self._x[self._peakpos]
+        _index1 = 42
+        _index2 = 48
+        self._peak_x1 = self._x[_index1]
+        self._peak_x2 = self._x[_index2]
         self._data.axis_ranges = [self._x]
 
         self._sigma = 1.25
-        self._amp = 25
-        _peak = self._amp * Gaussian.func((1, self._sigma, 0), np.linspace(-4, 4, 15))
-        self._data[self._peakpos - 7 : self._peakpos + 8] += _peak
+        self._amp1 = 25
+        self._amp2 = 37
+        _peak = Gaussian.func((1, self._sigma, 0), np.linspace(-4, 4, 15))
+        self._data[_index1 - 7 : _index1 + 8] += self._amp1 * _peak
+        self._data[_index2 - 7 : _index2 + 8] += self._amp2 * _peak
 
     def tearDown(self):
         pass
 
-    def create_generic_plugin(self, func="Gaussian"):
+    def create_generic_plugin(self, func="Double Gaussian"):
         _low = 10
         _high = 37
         self._rangen = np.where((self._x >= _low) & (self._x <= _high))[0].size
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitDoublePeak")()
         plugin._config["input_shape"] = (150,)
         plugin.set_param_value("fit_func", func)
         plugin.set_param_value("fit_lower_limit", _low)
@@ -85,26 +89,25 @@ class TestFitSinglePeak(unittest.TestCase):
         return plugin
 
     def assert_fit_results_okay(self, fit_result_data, params, bg_order):
-        self.assertEqual(fit_result_data.shape, (1,))
+        self.assertEqual(fit_result_data.shape, (2,))
         self.assertTrue("fit_params" in fit_result_data.metadata)
         self.assertTrue("fit_func" in fit_result_data.metadata)
         self.assertTrue("fit_residual_std" in fit_result_data.metadata)
-        self.assertTrue(abs(params["amplitude"] - self._amp) <= 20)
-        if "sigma" in params and "gamma" not in params:
-            self.assertTrue(abs(params["sigma"] - self._sigma) < 0.5)
-        elif "gamma" in params and "sigma" not in params:
-            self.assertTrue(abs(params["gamma"] - self._sigma) < 2)
-        elif "sigma" in params and "gamma" in params:
-            self.assertTrue(abs(params["gamma"] - self._sigma / 2) < self._sigma)
-            self.assertTrue(abs(params["sigma"] - self._sigma) < self._sigma)
-        self.assertTrue(abs(params["center"] - self._peak_x) < 1)
+        self.assertTrue(abs(params["amplitude1"] - self._amp1) <= 20)
+        self.assertTrue(abs(params["amplitude2"] - self._amp2) <= 20)
+        if "sigma" in params:
+            self.assertTrue(abs(params["sigma1"] - self._sigma) < 0.5)
+        if "gamma" in params:
+            self.assertTrue(abs(params["gamma1"] - self._sigma) < 0.5)
+        self.assertTrue(abs(params["center1"] - self._peak_x1) < 1)
+        self.assertTrue(abs(params["center2"] - self._peak_x2) < 2)
         if bg_order in [0, 1]:
             self.assertTrue(abs(params["background_p0"] - 1) < 1)
         if bg_order == 1:
             self.assertTrue(abs(params["background_p1"]) < 1)
 
     def test_creation(self):
-        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitSinglePeak")()
+        plugin = PLUGIN_COLLECTION.get_plugin_by_name("FitDoublePeak")()
         self.assertIsInstance(plugin, BasePlugin)
 
     def test_create_result_dataset__peak_area(self):
@@ -115,7 +118,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (1,))
+        self.assertEqual(_new_data.shape, (2,))
 
     def test_create_result_dataset__peak_position(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -125,7 +128,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (1,))
+        self.assertEqual(_new_data.shape, (2,))
 
     def test_create_result_dataset__peak_outside_array(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -148,6 +151,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
         self.assertTrue(np.isnan(_new_data.array[0]))
+        self.assertEqual(_new_data.shape, (2,))
 
     def test_create_result_dataset__peak_pos_and_area(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -158,7 +162,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (2,))
+        self.assertEqual(_new_data.shape, (2, 2))
 
     def test_create_result_dataset__fwhm(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -168,7 +172,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (1,))
+        self.assertEqual(_new_data.shape, (2,))
 
     def test_create_result_dataset__peak_pos_and_area_and_fwhm(self):
         plugin = self.create_gauss_plugin_with_dummy_fit()
@@ -179,7 +183,7 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assertTrue("fit_func" in _new_data.metadata)
         self.assertTrue("fit_residual_std" in _new_data.metadata)
         self.assertTrue("test_meta" in _new_data.metadata)
-        self.assertEqual(_new_data.shape, (3,))
+        self.assertEqual(_new_data.shape, (2, 3))
 
     def test_execute__gaussian_no_bg(self):
         plugin = self.create_generic_plugin()
@@ -189,20 +193,18 @@ class TestFitSinglePeak(unittest.TestCase):
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
         self.assertEqual(_data.data_unit, self._data.axis_units[0])
 
-    def test_execute__gaussian_no_output(self):
+    def test_execute__gaussian_no_bg_all_outputs(self):
         plugin = self.create_generic_plugin()
-        plugin.set_param_value("fit_output", "no output")
-        plugin.calculate_result_shape()
+        plugin.set_param_value("fit_bg_order", None)
+        plugin.set_param_value("fit_output", "position; area; FWHM")
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
-        self.assertEqual(_data.shape, (1,))
-        self.assertTrue(np.isnan(_data[0]))
+        self.assertEqual(_data.shape, (2, 3))
 
     def test_execute__gaussian_0d_bg(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
-        plugin.prepare_input_data(self._data)
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
@@ -217,15 +219,10 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_bg_order", 1)
         plugin.pre_execute()
-        _tmp_data = Dataset(
-            self._data + 3 * np.arange(self._data.size), axis_ranges=[self._x]
-        )
+        _tmp_data = self._data + 3 * np.arange(self._data.size)
         _data, _kwargs = plugin.execute(_tmp_data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
-        self.assertTrue(
-            (_kwargs["fit_params"]["background_p1"] < 6.5)
-            & (_kwargs["fit_params"]["background_p1"] > 5.5)
-        )
+        self.assertTrue(abs(_kwargs["fit_params"]["background_p1"] - 6) < 0.5)
 
     def test_execute__gaussian_w_only_background_and_min_peak(self):
         plugin = self.create_generic_plugin()
@@ -236,42 +233,42 @@ class TestFitSinglePeak(unittest.TestCase):
         _data, _kwargs = plugin.execute(_tmp_data)
 
     def test_execute__lorentzian_no_bg(self):
-        plugin = self.create_generic_plugin("Lorentzian")
+        plugin = self.create_generic_plugin("Double Lorentzian")
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
 
     def test_execute__lorentzian_0d_bg(self):
-        plugin = self.create_generic_plugin("Lorentzian")
+        plugin = self.create_generic_plugin("Double Lorentzian")
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
     def test_execute__lorentzian_1d_bg(self):
-        plugin = self.create_generic_plugin("Lorentzian")
+        plugin = self.create_generic_plugin("Double Lorentzian")
         plugin.set_param_value("fit_bg_order", 1)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 1)
 
     def test_execute__voigt_no_bg(self):
-        plugin = self.create_generic_plugin("Voigt")
+        plugin = self.create_generic_plugin("Double Voigt")
         plugin.set_param_value("fit_bg_order", None)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
 
     def test_execute__voigt_0d_bg(self):
-        plugin = self.create_generic_plugin("Voigt")
+        plugin = self.create_generic_plugin("Double Voigt")
         plugin.set_param_value("fit_bg_order", 0)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], 0)
 
     def test_execute__voigt_1d_bg(self):
-        plugin = self.create_generic_plugin("Voigt")
+        plugin = self.create_generic_plugin("Double Voigt")
         plugin.set_param_value("fit_bg_order", 1)
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
@@ -281,31 +278,31 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "area")
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
+        self.assertEqual(plugin._config["result_shape"], (2,))
 
     def test_calculate_result_shape__position(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "position")
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
+        self.assertEqual(plugin._config["result_shape"], (2,))
 
     def test_calculate_result_shape__fwhm(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "FWHM")
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (1,))
+        self.assertEqual(plugin._config["result_shape"], (2,))
 
     def test_calculate_result_shape__area_and_pos(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "position; area")
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (2,))
+        self.assertEqual(plugin._config["result_shape"], (2, 2))
 
     def test_calculate_result_shape__area_pos_and_std(self):
         plugin = self.create_generic_plugin()
         plugin.set_param_value("fit_output", "position; area; FWHM")
         plugin.calculate_result_shape()
-        self.assertEqual(plugin._config["result_shape"], (3,))
+        self.assertEqual(plugin._config["result_shape"], (2, 3))
 
     def test_detailed_results(self):
         plugin = self.create_generic_plugin()

@@ -95,12 +95,15 @@ class pyFAIintegrationBase(ProcPlugin):
         "azi_range_lower",
         "azi_range_upper",
         "int_method",
+        "correct_solid_angle",
+        "polarization_factor",
     )
     input_data_dim = 2
     output_data_label = "Integrated data"
     output_data_unit = "a.u."
     new_dataset = True
     has_unique_parameter_config_widget = True
+    advanced_parameters = ["correct_solid_angle", "polarization_factor"]
 
     def __init__(self, *args, **kwargs):
         self._EXP = kwargs.pop("diffraction_exp", DiffractionExperimentContext())

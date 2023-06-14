@@ -57,7 +57,8 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
             "azimuth_range": self.get_azimuthal_range_in_deg(),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "method": self._config["method"],
         }
         _label, _unit = self.params["rad_unit"].value.split("/")

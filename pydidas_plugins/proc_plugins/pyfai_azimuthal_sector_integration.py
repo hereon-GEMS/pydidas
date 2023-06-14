@@ -89,6 +89,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         "azi_sector_centers",
         "azi_sector_width",
         "int_method",
+        "correct_solid_angle",
+        "polarization_factor",
     )
 
     def __init__(self, *args, **kwargs):
@@ -124,7 +126,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         self._ai_params = {
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "method": self._config["method"],
         }
         _label, _unit = self.params["rad_unit"].value.split("/")

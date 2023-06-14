@@ -18,6 +18,8 @@ Improvements
     - Added new plugins for double and triple peak fitting.
     - The output selection for fitting plugins can now be done using checkboxes
       for the various options.
+    - Added Parameters for pyFAI's 'correctSolidAngle' and 
+      'polarization_correction' to pyFAI plugins.
       
 
 - General improvements:

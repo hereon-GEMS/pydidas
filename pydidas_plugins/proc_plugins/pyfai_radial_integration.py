@@ -57,7 +57,8 @@ class PyFAIradialIntegration(pyFAIintegrationBase):
         pyFAIintegrationBase.pre_execute(self)
         self._ai_params = {
             "npt_rad": self.get_param_value("rad_npoint"),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "unit": self.get_pyFAI_unit_from_param("azi_unit"),
             "radial_unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),

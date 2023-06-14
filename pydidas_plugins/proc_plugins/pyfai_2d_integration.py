@@ -66,7 +66,8 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
         pyFAIintegrationBase.pre_execute(self)
         self._ai_params = {
             "npt_azim": self.get_param_value("azi_npoint"),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
             "azimuth_range": self.get_azimuthal_range_in_deg(),

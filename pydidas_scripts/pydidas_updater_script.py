@@ -57,7 +57,10 @@ def get_remote_version() -> str:
     for _line in _lines:
         if _line.startswith("__version__ ="):
             return _line.split('"')[1]
-    raise ValueError("Could not determine the remote version number.")
+    raise ValueError(
+        "Could not determine the remote version number. Please check your "
+        "internet connection status."
+    )
 
 
 def get_local_version() -> str:

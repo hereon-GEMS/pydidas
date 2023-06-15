@@ -1,7 +1,7 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
-v23.MM.DD
+v23.06.15
 =========
 
 Improvements
@@ -21,7 +21,6 @@ Improvements
     - Added Parameters for pyFAI's 'correctSolidAngle' and 
       'polarization_correction' to pyFAI plugins.
       
-
 - General improvements:
 
     - Added a 'Copy experiment description from diffraction context' button in 
@@ -40,7 +39,6 @@ Improvements
       quicker access.
     - Added functionality to the widgets factory to reference parent_widgets by
       their string reference key.
-
 
 Bugfixes
 --------

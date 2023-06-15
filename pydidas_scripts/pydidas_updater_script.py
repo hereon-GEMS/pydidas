@@ -191,7 +191,7 @@ def install_wheel(wheel_filename: str):
             "pip",
             "install",
             wheel_filename,
-            "--no-warn-scripts-location",
+            "--no-warn-script-location",
         ]
     )
 

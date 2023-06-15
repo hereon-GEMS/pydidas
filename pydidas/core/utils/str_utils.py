@@ -362,10 +362,12 @@ def get_simplified_array_representation(obj, max_items=6, leading_indent=4):
     """
     _repr = ""
     if obj.ndim > 1:
-        _repr += (
-            get_simplified_array_representation(obj[0])
-            + "\n...\n"
+        _repr = (
+            "["
+            + get_simplified_array_representation(obj[0]).strip()
+            + (",\n...,\n" if obj.shape[0] > 2 else ",\n")
             + get_simplified_array_representation(obj[-1])
+            + "]"
         )
     elif obj.ndim == 1:
         if obj.size <= max_items:

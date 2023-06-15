@@ -159,7 +159,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
             return y, [_bg0]
         _bg1 = (y[-1] - y[0]) / (x[-1] - x[0])
         _bg0 = y[0] - _bg1 * x[0]
-        _new_y = y - (_bg1 * x - _bg0)
+        _new_y = y - (_bg1 * x + _bg0)
         return _new_y, [_bg0, _bg1]
 
     @classmethod

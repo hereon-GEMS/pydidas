@@ -141,6 +141,35 @@ def print_status(status: str):
     print("=" * 80 + "\n")
 
 
+def check_git_installed():
+    """
+    Check if git is installed and accessible.
+
+    Raises
+    ------
+    FileNotFoundError
+        If git is not installed.
+    """
+    try:
+        subprocess.check_call(["git", "--version"])
+    except FileNotFoundError as _error:
+        _local_git_path = Path(sys.executable).parent.joinpath(".git", "cmd")
+        if _local_git_path.is_dir():
+            os.environ["PATH"] = ";".join([os.environ["PATH"], str(_local_git_path)])
+            return
+        raise FileNotFoundError(
+            "\n"
+            + "=" * 80
+            + "\n=== "
+            + "No git installation found. Git is necessary to run the pydidas update. "
+            + "\n=== "
+            + "Please install git or download an updated pydidas wheel "
+            + "\n=== "
+            + "or distribution directly.\n"
+            + "=" * 80
+        ) from _error
+
+
 def clone_git_repo(path: Path):
     """
     Clone the pydidas git repository into the given directory.
@@ -326,6 +355,7 @@ def run_update():
     _should_update = check_update_necessary_and_wanted(_local_version, _remote_version)
     if not _should_update:
         return
+    check_git_installed()
     _success = False
     try:
         _path = Path(sys.executable).parent.joinpath(".temp", "pydidas")

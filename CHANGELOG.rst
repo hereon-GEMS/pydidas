@@ -20,6 +20,8 @@ Improvements
       for the various options.
     - Added Parameters for pyFAI's 'correctSolidAngle' and 
       'polarization_correction' to pyFAI plugins.
+    - Reworked the fitting plugins to add double and triple-peak fitting
+      capabilities.
       
 - General improvements:
 
@@ -33,12 +35,12 @@ Improvements
       startup of the GUI.
     - Updated the ParameterCollectionMixin to accept all kwargs. Kwargs matching
       Parameters will update their values and other kwargs will be ignored.
-    - Reworked the fitting plugins to add double and triple-peak fitting
-      capabilities.
     - Added a 'param_values' property to the ObjectWithParameterCollection for 
       quicker access.
     - Added functionality to the widgets factory to reference parent_widgets by
       their string reference key.
+    - Added a script to update pydidas in place in the current python 
+      environment.
 
 Bugfixes
 --------

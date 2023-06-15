@@ -63,6 +63,9 @@ Bugfixes
   returning a single item instead of a new Dataset.
 - Fixed an issue with custom plugin configuration widgets with advanced 
   parameters.
+- Fixed an issue when starting up where calling the sphinx process to create 
+  the documentation would crash the GUI.
+
 
 
 v23.5.22

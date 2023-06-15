@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,24 +22,24 @@ generate the Sphinx html documentation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["check_sphinx_html_docs", "run_sphinx_html_build"]
 
-import os
-import sys
-import subprocess
 
-from .get_documentation_targets import DOC_MAKE_DIRECTORY, DOC_HOME_FILENAME
+import os
+
+from qtpy import QtWidgets
+from sphinx.cmd import build
+
+from .get_documentation_targets import DOC_HOME_FILENAME, DOC_MAKE_DIRECTORY
 
 
 def check_sphinx_html_docs(doc_dir=None):
     """
-    This functions checks whether the index.html file for the built sphinx
-    documentation exists or is in the process of being created and calls the
-    builder if neither check is true.
+    Check whether the index.html file for the built sphinx documentation exists.
 
     Parameters
     ----------
@@ -53,14 +55,11 @@ def check_sphinx_html_docs(doc_dir=None):
         it will return a False which can trigger a call to build the
         documentation.
     """
-    _sphinx_running = "sphinx-build" in sys.argv[0]
     if doc_dir is None:
         _index_file = DOC_HOME_FILENAME
     else:
         _index_file = os.path.join(doc_dir, "index.html")
-    if not os.path.exists(_index_file) and not _sphinx_running:
-        return False
-    return True
+    return os.path.exists(_index_file)
 
 
 def run_sphinx_html_build(build_dir=None, verbose=True):
@@ -76,7 +75,7 @@ def run_sphinx_html_build(build_dir=None, verbose=True):
         Flag to control printing of a message. The default is True.
     """
     if build_dir is None:
-        build_dir = DOC_MAKE_DIRECTORY
+        build_dir = os.path.join(DOC_MAKE_DIRECTORY, "build", "html")
     if verbose:
         print("=" * 60)
         print("-" * 60)
@@ -86,7 +85,13 @@ def run_sphinx_html_build(build_dir=None, verbose=True):
         print("----- the documentation has been finished.             -----")
         print("-" * 60)
         print("=" * 60)
-    if sys.platform in ["win32", "win64"]:
-        subprocess.call([os.path.join(build_dir, "make.bat"), "html"])
-    else:
-        subprocess.call(["make", "-C", build_dir, "html"])
+        app = QtWidgets.QApplication.instance()
+        for _widget in app.topLevelWidgets():
+            if isinstance(_widget, QtWidgets.QSplashScreen) and hasattr(
+                _widget, "show_aligned_message"
+            ):
+                _widget.show_aligned_message(
+                    "Building html documentation (required only once during first "
+                    "startup)"
+                )
+    build.main([os.path.join(DOC_MAKE_DIRECTORY, "source"), build_dir])

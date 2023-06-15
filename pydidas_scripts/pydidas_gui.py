@@ -60,10 +60,14 @@ def _get_icon_pixmap():
 
 
 class PydidasSplashScreen(QtWidgets.QSplashScreen):
-    def __init__(self, pixmap=None):
+    """
+    A splash screen which allows to show centered messages and with the pydidas icon.
+    """
+
+    def __init__(self, pixmap=None, f=QtCore.Qt.WindowStaysOnTopHint):
         if pixmap is None:
             pixmap = _get_icon_pixmap()
-        QtWidgets.QSplashScreen.__init__(self, pixmap)
+        QtWidgets.QSplashScreen.__init__(self, pixmap, f)
         self.show_aligned_message("Importing packages")
         self.show()
         QtWidgets.QApplication.instance().processEvents()
@@ -86,7 +90,7 @@ def start_pydidas_gui(
     restore_state: str = "None",
 ):
     """
-    Run the GUI application with the generic pydidas layout.
+    Start the GUI application with the generic pydidas layout.
 
     Parameters
     ----------
@@ -98,7 +102,6 @@ def start_pydidas_gui(
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
     """
-
     from pydidas.core import PydidasQApplication, UserConfigError
     from pydidas.gui import MainWindow, frames
 
@@ -108,10 +111,10 @@ def start_pydidas_gui(
             mp.set_start_method("spawn", force=True)
         except RuntimeError:
             warnings.warn(
-                "Could not set the multiprocessing Process startup method to "
-                "'spawn'. Multiprocessing with OpenGL will not work in Linux. "
-                "To solve this issue, restart the kernel and import pydidas "
-                "before starting any multiprocessing."
+                "Could not set the multiprocessing Process startup method to 'spawn'. "
+                "Multiprocessing with OpenGL will not work in Linux. To solve this "
+                "issue, restart the kernel and import pydidas before starting any "
+                "multiprocessing."
             )
     splash_screen.show_aligned_message("Creating objects")
     app = PydidasQApplication(sys.argv)
@@ -144,6 +147,9 @@ def start_pydidas_gui(
 
 
 def run_gui():
+    """
+    Run the pydidas graphical user interface process.
+    """
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = QtWidgets.QApplication([])
     _splash = PydidasSplashScreen()

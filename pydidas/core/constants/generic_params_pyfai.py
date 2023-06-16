@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ Parameters for pyFAI integrations.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_PYFAI"]
 
 
@@ -209,5 +211,32 @@ GENERIC_PARAMS_PYFAI = {
         "unit": "",
         "allow_None": None,
         "tooltip": "The model name of the detector.",
+    },
+    "polarization_factor": {
+        "type": float,
+        "default": 0.99,
+        "name": "Polarization factor",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The Polarization factor. Must be a number between -1 (vertical) and +1 "
+            "(horizontal). 0 corresponds to circular polarizazion, None corresponds to "
+            "no correction."
+        ),
+    },
+    "correct_solid_angle": {
+        "type": bool,
+        "default": True,
+        "name": "Correct solid angle",
+        "choices": [True, False],
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The correct solid angle Parameter in pyFAI (de)activates the correction "
+            "for the solid angle of the detector pixels. Detector pixels further away "
+            "from the beam axis see a smaller projected intensity. Using this "
+            "parameter allows to correct for this effect, if set to True."
+        ),
     },
 }

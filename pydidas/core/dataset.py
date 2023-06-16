@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,28 +21,29 @@ embedded metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Dataset"]
 
+
 import warnings
-from numbers import Integral
 from collections.abc import Iterable
 from copy import deepcopy
+from numbers import Integral
 
 import numpy as np
 
-from pydidas.core.utils.dataset_utils import (
-    get_number_of_entries,
-    get_axis_item_representation,
+from .utils.dataset_utils import (
     convert_data_to_dict,
-    update_dataset_properties_from_kwargs,
-    dataset_property_default_val,
-    dataset_ax_str_default,
     dataset_ax_default_ranges,
+    dataset_ax_str_default,
+    dataset_property_default_val,
+    get_axis_item_representation,
+    get_number_of_entries,
     item_is_iterable_but_not_array,
+    update_dataset_properties_from_kwargs,
 )
 
 
@@ -108,7 +111,10 @@ class Dataset(np.ndarray):
             The sliced new dataset.
         """
         self._meta["getitem_key"] = key if isinstance(key, tuple) else (key,)
-        return np.ndarray.__getitem__(self, key)
+        _item = np.ndarray.__getitem__(self, key)
+        if not isinstance(_item, np.ndarray):
+            self._meta["getitem_key"] = ()
+        return _item
 
     def __array_finalize__(self, obj):
         """
@@ -165,7 +171,10 @@ class Dataset(np.ndarray):
                 self.__insert_axis_keys(_dim)
         # finally, shift all keys to have a consistent numbering:
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
-            self._meta[_item] = dict(enumerate(self._meta[_item].values()))
+            self._meta[_item] = {
+                _dim: _item
+                for _dim, (_key, _item) in enumerate(sorted(self._meta[_item].items()))
+            }
 
     def __insert_axis_keys(self, dim):
         """
@@ -177,16 +186,19 @@ class Dataset(np.ndarray):
             The dimension in front of which the new key shall be inserted.
         """
         for _item in ["axis_labels", "axis_units", "axis_ranges"]:
+            _new_entry = np.arange(self.shape[dim]) if _item == "axis_ranges" else ""
             _copy = {}
             _dict = self._meta[_item]
             for _key in sorted(_dict):
                 if _key < dim:
                     _copy[_key] = _dict[_key]
                 elif _key == dim:
-                    _copy[_key] = None
+                    _copy[dim] = _new_entry
                     _copy[_key + 1] = _dict[_key]
                 else:
                     _copy[_key + 1] = _dict[_key]
+            if dim not in _copy:
+                _copy[dim] = _new_entry
             self._meta[_item] = _copy
 
     def flatten_dims(
@@ -264,7 +276,7 @@ class Dataset(np.ndarray):
         _highlim = _shape - (_shape % binning) + _lowlim
         _highlim[_highlim == _lowlim] += 1
         _slices = tuple(slice(low, high) for low, high in zip(_lowlim, _highlim))
-        _copy = self.__getitem__(_slices)
+        _copy = self[_slices]
         _newshape = tuple()
         for _s in self.shape:
             _addon = (1, 1) if _s == 1 else (_s // binning, binning)

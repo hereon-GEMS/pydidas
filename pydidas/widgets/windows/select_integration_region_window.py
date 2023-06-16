@@ -41,6 +41,7 @@ from ..controllers import ManuallySetIntegrationRoiController
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
 from ..misc import SelectImageFrameWidget, ShowIntegrationRoiParamsWidget
+from ..scroll_area import ScrollArea
 from ..silx_plot import PydidasPlot2DwithIntegrationRegions
 
 
@@ -57,7 +58,6 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     sig_about_to_close = QtCore.Signal()
 
     def __init__(self, plugin, parent=None, **kwargs):
-
         PydidasWindow.__init__(
             self, parent, title="Select integration region", activate_frame=False
         )
@@ -95,7 +95,17 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             bold=True,
         )
         self.create_empty_widget(
-            "left_container", fixedWidth=self.container_width + 20, minimumHeight=400
+            "left_container",
+            fixedWidth=self.container_width,
+            minimumHeight=400,
+            parent_widget=None,
+        )
+        self.create_any_widget(
+            "scroll_area",
+            ScrollArea,
+            widget=self._widgets["left_container"],
+            fixedWidth=self.container_width + 20,
+            gridPos=(1, 0, 1, 1),
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
         self.add_any_widget(

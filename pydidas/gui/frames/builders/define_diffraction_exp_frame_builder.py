@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ populate the DefineDiffractionExpFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DefineDiffractionExpFrameBuilder"]
+
 
 from ....core import constants
 from ....widgets import ScrollArea, get_pyqt_icon_from_str
@@ -119,6 +120,17 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
                 else _1line_options
             )
             self.create_param_widget(_param, **_options)
+
+        self.create_label(
+            "bc_label",
+            "Derived beamcenter pixel position:",
+            fixedWidth=self._scroll_width,
+            bold=True,
+            parent_widget=self._widgets["config"],
+        )
+        for _key in ["beamcenter_x", "beamcenter_y"]:
+            self.create_param_widget(self._bc_params[_key], **_1line_options)
+            self.param_widgets[_key].setEnabled(False)
 
         self.create_spacer(
             None, gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]

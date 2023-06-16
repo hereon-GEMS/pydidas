@@ -1,6 +1,74 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+v23.06.16
+=========
+
+Improvements
+------------
+
+- Plugins:
+
+    - Added an option to apply a multiplication factor to the background in the
+      SubtractBackgroundImage and Subtract1dBackgroundProfile plugins.
+    - pyFAI integration plugins now can accept custom masks as keyword argument
+      in the execute method.
+    - Added a new plugin for creating dynamic detector masks based on data
+      thresholds.
+    - Added new plugins for double and triple peak fitting.
+    - The output selection for fitting plugins can now be done using checkboxes
+      for the various options.
+    - Added Parameters for pyFAI's 'correctSolidAngle' and 
+      'polarization_correction' to pyFAI plugins.
+    - Reworked the fitting plugins to add double and triple-peak fitting
+      capabilities.
+    - Added a 'background at peak' output for peak fitting plugins.
+      
+- General improvements:
+
+    - Added a 'Copy experiment description from diffraction context' button in 
+      the QuickIntegrationFrame to allow using an existing calibration.
+    - Manually setting the beamcenter from points now works also with a single
+      selected points, even if more points are in the list.
+    - The Define diffraction setup frame now also displays the derived position
+      of the beamcenter.
+    - Added a splash screen at startup to display the give feedback about 
+      startup of the GUI.
+    - Updated the ParameterCollectionMixin to accept all kwargs. Kwargs matching
+      Parameters will update their values and other kwargs will be ignored.
+    - Added a 'param_values' property to the ObjectWithParameterCollection for 
+      quicker access.
+    - Added functionality to the widgets factory to reference parent_widgets by
+      their string reference key.
+    - Added a script to update pydidas in place in the current python 
+      environment.
+    - Added an entrypoint script to open the documentation.
+
+Bugfixes
+--------
+
+- Fixed an issue with the QuickIntegrationFrame which changed the intergration 
+  region when changing the detector model.
+- Fixed a formatting issue when opening Hdf5 files in the 
+  SelectIntegrationRegionWindow.
+- Fixed an issue with the FilelistManager if files with the same prefix button
+  an additional suffix were present in the directory.
+- Fixed an issue in the WorkflowTestFrame when output plugins were included in
+  the WorkflowTree.
+- Fixed an uncomprehensible exception message when the selected indices for
+  reading a hdf5 dataset were out of bounds.
+- Fixed an issue with copying Parameters, when the default value was not in the 
+  currently allowed choices.
+- Fixed an issue in Dataset when adding new dimensions after the last dimension.
+- Fixed an issue in ParamIoWidget when the type conversion was not successful.
+- Fixed an isssue in Dateset, where the getitem_key was not reset after 
+  returning a single item instead of a new Dataset.
+- Fixed an issue with custom plugin configuration widgets with advanced 
+  parameters.
+- Fixed an issue when starting up where calling the sphinx process to create 
+  the documentation would crash the GUI.
+
+
 v23.5.22
 ========
 

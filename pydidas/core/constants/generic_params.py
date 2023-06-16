@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ generic Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_METADATA"]
 
 
@@ -33,6 +35,7 @@ from .generic_params_other import GENERIC_PARAMS_OTHER
 from .generic_params_pyfai import GENERIC_PARAMS_PYFAI
 from .generic_params_scan import GENERIC_PARAMS_SCAN
 from .generic_params_settings import GENERIC_PARAMS_SETTINGS
+from .generic_params_fit import GENERIC_PARAMS_FIT
 
 GENERIC_PARAMS_METADATA = (
     GENERIC_PARAMS_DATA_IMPORT
@@ -42,4 +45,5 @@ GENERIC_PARAMS_METADATA = (
     | GENERIC_PARAMS_PYFAI
     | GENERIC_PARAMS_SCAN
     | GENERIC_PARAMS_SETTINGS
+    | GENERIC_PARAMS_FIT
 )

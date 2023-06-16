@@ -375,6 +375,13 @@ class TestParameter(unittest.TestCase):
         self.assertNotEqual(obj, _copy)
         self.assertIsInstance(_copy, Parameter)
 
+    def test_copy__with_choices(self):
+        obj = Parameter("Test0", int, 12, choices=[12, 15, 18])
+        obj.update_value_and_choices(16, [16, 19, 22])
+        _copy = copy.copy(obj)
+        self.assertNotEqual(obj, _copy)
+        self.assertIsInstance(_copy, Parameter)
+
     def test_repr__(self):
         obj = Parameter("Test0", int, 12, optional=True)
         _r = obj.__repr__()

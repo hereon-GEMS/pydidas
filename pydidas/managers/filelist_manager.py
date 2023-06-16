@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,27 +21,28 @@ and access files based on their index.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FilelistManager"]
 
-import os
+
 import copy
+import os
 from pathlib import Path
-from natsort import natsorted
 
 from ..core import (
     ObjectWithParameterCollection,
     UserConfigError,
     get_generic_param_collection,
 )
+from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
+    get_file_naming_scheme,
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
-    get_file_naming_scheme,
 )
 from ..core.constants import HDF5_EXTENSIONS
 
@@ -204,6 +207,15 @@ class FilelistManager(ObjectWithParameterCollection):
         verify_files_in_same_directory(
             self.get_param_value("first_file"), self.get_param_value("last_file")
         )
+        if (
+            self.get_param_value("first_file").suffix
+            != self.get_param_value("last_file").suffix
+            and self.get_param_value("last_file") != Path()
+        ):
+            raise UserConfigError(
+                "The selected files do not have the same extension. Please check the "
+                "selection."
+            )
 
     def _create_filelist(self):
         """
@@ -229,10 +241,7 @@ class FilelistManager(ObjectWithParameterCollection):
         bool
             Flag whether only the first file points to a valid path.
         """
-        _path2, _fname2 = os.path.split(self.get_param_value("last_file"))
-        if _path2 == "":
-            return True
-        return False
+        return self.get_param_value("last_file").parent == Path()
 
     def _create_one_file_list(self):
         """
@@ -252,22 +261,23 @@ class FilelistManager(ObjectWithParameterCollection):
         and the first and last files names will be used to select the part
         of filesnames to be stored.
         """
-        _path1, _fname1 = os.path.split(self.get_param_value("first_file"))
-        _, _fname2 = os.path.split(self.get_param_value("last_file"))
-        _list = natsorted(os.listdir(_path1))
-        if _fname2 not in _list:
+        _file1 = self.get_param_value("first_file")
+        _file2 = self.get_param_value("last_file")
+        _suffix = _file1.suffix
+        _list = [_item for _item in _file1.parent.rglob("*") if _item.suffix == _suffix]
+        if _file2 not in _list:
             raise UserConfigError(
-                f"No file with the selected name {_fname2} exists in the directory "
-                f"{_path1}."
+                f"No file with the selected name {_file2.name} exists in the directory "
+                f"{_file1.parent}."
             )
-        _i1 = _list.index(_fname1)
-        _i2 = _list.index(_fname2)
+        _i1 = _list.index(_file1)
+        _i2 = _list.index(_file2)
         _list = _list[_i1 : _i2 + 1 : self.get_param_value("file_stepping")]
-        if not os.path.splitext(_fname1)[1][1:] in HDF5_EXTENSIONS:
-            verify_files_of_range_are_same_size(_path1, _list)
-        self._config["file_list"] = [Path(os.path.join(_path1, f)) for f in _list]
+        if not _file1.suffix[1:] in HDF5_EXTENSIONS:
+            verify_files_of_range_are_same_size(_list)
+        self._config["file_list"] = _list
         self._config["n_files"] = len(_list)
-        self._config["file_size"] = os.stat(self.get_param_value("first_file")).st_size
+        self._config["file_size"] = os.stat(_file1).st_size
 
     def _create_filelist_live_processing(self):
         """

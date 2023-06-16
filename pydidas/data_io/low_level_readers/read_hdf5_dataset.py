@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ of the hdf5 file reader with support for indexing and chunking.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["read_hdf5_dataset"]
 
 import itertools
@@ -31,6 +33,8 @@ from numbers import Integral
 import h5py
 import hdf5plugin
 import numpy as np
+
+from ...core import UserConfigError
 
 
 def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):
@@ -71,7 +75,13 @@ def read_hdf5_dataset(filename, dataset="entry/data/data", axes=None):
 
         limits = np.r_[[(0, _shape) for _shape in _ds.shape]]
         for i, _axis in enumerate(axes):
-            limits[i] = get_selection(_axis, _ds.shape[i])
+            _lims = get_selection(_axis, _ds.shape[i])
+            if not (0 <= _lims[0] < _ds.shape[i] and 0 <= _lims[1] <= _ds.shape[i]):
+                raise UserConfigError(
+                    f"The specified limits {_lims} are out of bounds for axis {i}\n"
+                    f"of the hdf5 dataset {dataset}\nwith the shape {_ds.shape}."
+                )
+            limits[i] = _lims
 
         if _ds.chunks is None:
             roi = tuple(slice(*limits[i1]) for i1 in range(limits.shape[0]))
@@ -120,7 +130,7 @@ def get_selection(entry, size):
         entry[0] = entry[0] if entry[0] is not None else 0
         entry[1] = entry[1] if entry[1] not in [-1, None] else size
         return (entry[0], entry[1])
-    if Integral.__subclasscheck__(entry.__class__):
+    if isinstance(entry, Integral):
         return (entry, entry + 1)
     raise ValueError(f'Slicing "{entry}" not supported.')
 

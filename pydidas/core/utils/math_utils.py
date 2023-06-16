@@ -357,7 +357,7 @@ def ray_from_center_intersection_with_detector(center, chi, shape):
     _xintersections = []
     _yintersections = []
     _dist_center = []
-    for (_x3, _x4, _y3, _y4) in [
+    for _x3, _x4, _y3, _y4 in [
         [_nx, _nx, 0, _ny],
         [_nx, 0, _ny, _ny],
         [0, 0, _ny, 0],

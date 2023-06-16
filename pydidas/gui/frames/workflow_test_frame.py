@@ -21,10 +21,10 @@ workflow on a single data frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTestFrame"]
 
 
@@ -256,15 +256,17 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     @QtCore.Slot()
     def execute_workflow_test(self):
         """
-        Test the Workflow on the selected frame and store results for
-        presentation.
+        Test the Workflow on the selected frame and store results for presentation.
         """
         if not self._check_tree_is_populated():
             return
         with utils.ShowBusyMouse():
             _index = self.__get_index()
             self._tree.execute_process(
-                _index, force_store_results=True, store_input_data=True
+                _index,
+                force_store_results=True,
+                store_input_data=True,
+                test=True,
             )
             self.__store_tree_results()
             self.__update_selection_choices()
@@ -343,9 +345,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         self._config["plugin_res_titles"] = _meta["result_titles"]
         for _node_id, _node in self._tree.nodes.items():
             _data = _node.results
-            if 1 in set(_data.shape) and _data.shape != (1,):
-                _data = _data.squeeze()
-            self._results[_node_id] = _data
+            if _data is not None:
+                if 1 in set(_data.shape) and _data.shape != (1,):
+                    _data = _data.squeeze()
+                self._results[_node_id] = _data
 
     def __update_selection_choices(self):
         """

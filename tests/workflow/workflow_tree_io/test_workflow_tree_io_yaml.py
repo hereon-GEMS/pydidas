@@ -48,7 +48,6 @@ class TestWorkflowTreeIoYaml(unittest.TestCase):
         shutil.rmtree(self._path)
 
     def create_test_tree(self):
-
         _pluginclass = PLUGIN_COLL.get_plugin_by_name("PyFAIazimuthalIntegration")
         _plugin = _pluginclass()
         self.TREE.clear()

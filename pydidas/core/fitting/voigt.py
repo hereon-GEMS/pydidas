@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,115 +16,114 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the Voigt function for fitting
+Module with the Voigt class for fitting a Voigt peak to data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
-__all__ = ["FitFuncBase"]
+__status__ = "Production"
+__all__ = ["Voigt"]
 
-from numpy import where, amax, amin, inf
+
+from typing import List, Tuple, Union
+
+from numpy import amax, amin, inf, ndarray
 from scipy.special import voigt_profile
 
 from .fit_func_base import FitFuncBase
-from .fit_func_meta import FitFuncMeta
 
 
-class Voigt(FitFuncBase, metaclass=FitFuncMeta):
+class Voigt(FitFuncBase):
     """
     Class for fitting a Voigt function.
     """
 
-    func_name = "Voigt"
+    name = "Voigt"
     param_bounds_low = [0, 0, 0, -inf]
     param_bounds_high = [inf, inf, inf, inf]
     param_labels = ["amplitude", "sigma", "gamma", "center"]
+    num_peak_params = 4
+    center_param_index = 3
 
-    @classmethod
-    def function(cls, c, x):
+    @staticmethod
+    def func(c: Tuple, x: ndarray) -> ndarray:
         """
-        Function to calculate a Voigt profile (a convolution of a Gaussian and a
-        Lorentzian profile).
+        Get function values for a Voigt function.
+
+        The Voigt function is a convolution of a Gaussian and Lorentzian profile.
 
         Parameters
         ----------
-        c : tuple
-            The tuple with the fit parameters.
+        c : Tuple
+            The tuple with the function parameters.
             c[0] : amplitude
             c[1] : sigma
             c[2] : gamma
             c[3] : center
-            c[4], optional : background order 0, i.e. background offset.
-            c[5], optional : background order 1, i.e. the linear background term.
-        x : np.ndarray
-            The x data points
+        x : ndarray
+            The input x data points.
 
         Returns
         -------
-        np.ndarray
-            The residual between the fit and the data.
+        ndarray
+            The Voigt function values for the input parameters.
         """
-        _voigt = c[0] * voigt_profile(x - c[3], c[1], c[2])
-        if len(c) == 4:
-            return _voigt
-        if len(c) == 5:
-            return _voigt + c[4]
-        if len(c) == 6:
-            return _voigt + c[4] + c[5] * x
-        raise ValueError("The order of the background is not supported.")
+        return c[0] * voigt_profile(x - c[3], c[1], c[2])
 
     @classmethod
-    def guess_fit_start_params(cls, x, y, bg_order=None):
+    def guess_peak_start_params(
+        cls, x: ndarray, y: ndarray, index: Union[None, int], **kwargs: dict
+    ) -> List[float]:
         """
-        Guess the start params for the fit for the given x and y values.
+        Guess the starting parameters for a Voigt peak fit.
 
         Parameters
         ----------
-        x : nd.ndarray
-            The x points of the data.
+        x : np.ndarray
+            The x data points.
         y : np.ndarray
-            The data values.
-        bg_order : Union[None, 0, 1], optional
-            The order of the background. The default is None.
+            The function data points to be fitted.
+        index : Union[None, str]
+            The peak index. Use None for a non-indexed single peak or the integer peak
+            number (starting with 1).
+        **kwargs : dict
+            Optional keyword arguments.
 
         Returns
         -------
-        list
-            The list with the starting fit parameters.
+        List[float]
+            The list with estimated amplitude, width and center parameters.
         """
-        y, _bg_params = cls.calculate_background_params(x, y, bg_order)
-
         if amin(y) < 0:
-            y = y - amin(y)
-        _high_x = where(y >= 0.5 * amax(y))[0]
-        if _high_x.size == 0:
-            return [
-                0,
-                (x[-1] - x[0]) / 3,
-                (x[-1] - x[0]) / 3,
-                (x[0] + x[-1]) / 2,
-            ] + _bg_params
+            y = y + max(amin(y), -0.2 * amax(y))
+            y[y < 0] = 0
+        index = "" if index is None else str(index)
+        _center_start = kwargs.get(f"center{index}_start", x[y.argmax()])
+        _ycenter = cls.get_y_value(_center_start, x, y)
+        _high_x = cls.get_fwhm_indices(_center_start, _ycenter, x, y)
 
-        # guess that both distributions have the same weight, i.e. the generic values
-        # are divided by 2:
-        _sigma = 0.3 * (x[_high_x[-1]] - x[_high_x[0]])
-        _gamma = 0.3 * (x[_high_x[-1]] - x[_high_x[0]])
-
+        _gamma_start = kwargs.get(f"width{index}_start", None)
+        if _gamma_start is not None:
+            _gamma_start = _gamma_start / 2
+            _sigma_start = _gamma_start
+        else:
+            if _high_x.size > 0:
+                _gamma_start = 0.34 * (x[_high_x[-1]] - x[_high_x[0]])
+                _sigma_start = 0.34 * (x[_high_x[-1]] - x[_high_x[0]])
+            else:
+                _gamma_start = (x[-1] - x[0]) / 6
+                _sigma_start = (x[-1] - x[0]) / 6
         # estimate the amplitude based on the maximum data height and the
-        # amplitude of a function with the average of both distributions
-        _amp = (amax(y) - amin(y)) / voigt_profile(0, _sigma, _gamma)
-        _center = x[y.argmax()]
-        return [_amp, _sigma, _gamma, _center] + _bg_params
+        # height of the normalized distribution
+        _amp = (_ycenter - amin(y)) / voigt_profile(0, _sigma_start, _gamma_start)
+        return [_amp, _sigma_start, _gamma_start, _center_start]
 
     @classmethod
-    def fwhm(cls, c):
+    def fwhm(cls, c: Tuple[float]) -> float:
         """
         Get the FWHM of the fit from the values of the parameters.
-
-        This method needs to be implemented by each fitting function.
 
         The FWHM for the Voigt function is determined according to Kielkopf:
         John F. Kielkopf: New approximation to the Voigt function with applications
@@ -139,9 +140,21 @@ class Voigt(FitFuncBase, metaclass=FitFuncMeta):
         float
             The function FWHM.
         """
-        _fwhm_gauss = 2.354820 * c[1]
-        _fwhm_lorentz = c[2]
-        return (
-            0.5343 * _fwhm_lorentz
-            + (0.2169 * _fwhm_lorentz**2 + _fwhm_gauss**2) ** 0.5
-        )
+        return 0.5343 * c[2] + (0.2169 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5
+
+    @staticmethod
+    def amplitude(c: Tuple[float]) -> float:
+        """
+        Get the amplitude of the peak from the values of the fitted parameters.
+
+        Parameters
+        ----------
+        c : tuple
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        float
+            The function amplitude.
+        """
+        return c[0] * voigt_profile(0, c[1], c[2])

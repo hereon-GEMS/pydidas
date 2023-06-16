@@ -21,11 +21,12 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTree"]
+
 
 import ast
 from numbers import Integral
@@ -431,6 +432,8 @@ class _WorkflowTree(GenericTree):
             self.root.propagate_shapes_and_global_config()
             self.reset_tree_changed_flag()
         for _node_id, _node in self.nodes.items():
+            if _node.plugin.output_data_dim is None:
+                continue
             _label = _node.plugin.get_param_value("label")
             _plugin_name = _node.plugin.__class__.plugin_name
             _meta["shapes"][_node_id] = _node.result_shape

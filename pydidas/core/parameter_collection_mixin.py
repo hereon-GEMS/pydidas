@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,22 +16,24 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-This module includes the ParameterCollectionMixIn class which can be used
-to extend class functionality to make simplified use of the pydidas
-ParameterCollection.
+This module includes the ParameterCollectionMixIn class which can be used to extend
+class functionality to make simplified use of the pydidas ParameterCollection.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParameterCollectionMixIn"]
 
+
 from numbers import Integral
+from typing import Dict, List, Self, Tuple, Type, Union
 
 from numpy import mod
 
+from .exceptions import UserConfigError
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
 from .exceptions import UserConfigError
@@ -40,6 +42,7 @@ from .exceptions import UserConfigError
 class ParameterCollectionMixIn:
     """
     MixIn class with ParameterCollection convenience methods.
+
     If the mix-in is used, the subclass is responsible for creating a
     ParameterCollection instance as self.params attribute.
     """
@@ -47,7 +50,7 @@ class ParameterCollectionMixIn:
     default_params = ParameterCollection()
 
     @classmethod
-    def get_default_params_copy(cls):
+    def get_default_params_copy(cls) -> Self:
         """
         Get a copy of the default ParameterCollection.
 
@@ -58,7 +61,19 @@ class ParameterCollectionMixIn:
         """
         return cls.default_params.copy()
 
-    def add_param(self, param):
+    @property
+    def param_values(self) -> Dict:
+        """
+        Get the values of all stored Parameters along with their refkeys.
+
+        Returns
+        -------
+        Dict
+            The refkey, value pairs for all stored Parameters.
+        """
+        return self.get_param_values_as_dict()
+
+    def add_param(self, param: Parameter):
         """
         Add a parameter to the ParameterCollection.
 
@@ -71,7 +86,7 @@ class ParameterCollectionMixIn:
         """
         self.params.add_param(param)
 
-    def add_params(self, *params):
+    def add_params(self, *params: Tuple[Union[Parameter, dict, ParameterCollection]]):
         """
         Add parameters to the object.
 
@@ -83,7 +98,7 @@ class ParameterCollectionMixIn:
 
         Parameters
         ----------
-        *params : Union[Parameter, dict, ParameterCollection]
+        *params : Tuple[Union[Parameter, dict, ParameterCollection]]
             Any Parameter or ParameterCollection
         **kwed_params : dict
             A dictionary with Parameters. Note that the dictionary keys will
@@ -112,7 +127,7 @@ class ParameterCollectionMixIn:
             if _param.refkey not in self.params:
                 self.params.add_param(Parameter(*_param.dump()))
 
-    def update_param_values_from_kwargs(self, **kwargs):
+    def update_param_values_from_kwargs(self, **kwargs: Dict):
         """
         Update the Parameter values corresponding to the given keys.
 
@@ -122,13 +137,16 @@ class ParameterCollectionMixIn:
             The dictionary with Parameter refkeys and values.
         """
         for _key, _val in kwargs.items():
-            if _key not in self.params:
-                raise KeyError(
-                    f"No Parameter with the key '{_key}' has been registered."
-                )
-            self.set_param_value(_key, _val)
+            if _key in self.params:
+                self.set_param_value(_key, _val)
 
-    def get_param_value(self, param_key, *default, dtype=None, for_export=False):
+    def get_param_value(
+        self,
+        param_key: str,
+        *default: object,
+        dtype: Type = None,
+        for_export: bool = False,
+    ) -> object:
         """
         Get a Parameter value.
 
@@ -164,7 +182,7 @@ class ParameterCollectionMixIn:
             _val = dtype(_val)
         return _val
 
-    def get_param(self, param_key):
+    def get_param(self, param_key: str) -> Parameter:
         """
         Get a parameter.
 
@@ -183,13 +201,13 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         return self.params[param_key]
 
-    def get_params(self, *param_keys):
+    def get_params(self, *param_keys: Tuple[str]) -> List[Parameter]:
         """
         Get multiple parameters based on their reference keys.
 
         Parameters
         ----------
-        *param_keys : str
+        *param_keys : Tuple[str]
             Any number of reference keys.
 
         Returns
@@ -204,7 +222,7 @@ class ParameterCollectionMixIn:
             _params.append(self.params[_key])
         return _params
 
-    def set_param_value(self, param_key, value):
+    def set_param_value(self, param_key: str, value: object):
         """
         Set a parameter value.
 
@@ -219,7 +237,7 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         self.params.set_value(param_key, value)
 
-    def get_param_values_as_dict(self, filter_types_for_export=False):
+    def get_param_values_as_dict(self, filter_types_for_export: bool = False) -> Dict:
         """
         Get a dictionary with Parameter names and values only.
 
@@ -236,7 +254,7 @@ class ParameterCollectionMixIn:
         }
         return name_val_pairs
 
-    def set_param_values_from_dict(self, value_dict):
+    def set_param_values_from_dict(self, value_dict: Dict):
         """
         Set the Parameter values from a dict with name, value paris.
 
@@ -249,7 +267,7 @@ class ParameterCollectionMixIn:
             if _key in self.params:
                 self.set_param_value(_key, _value)
 
-    def get_param_keys(self):
+    def get_param_keys(self) -> List[str]:
         """
         Get the keys of all registered Parameters.
 
@@ -269,7 +287,9 @@ class ParameterCollectionMixIn:
         for _key in _config:
             print(f"{_key}: {_config[_key]}")
 
-    def _get_param_value_with_modulo(self, param_refkey, modulo, none_low=True):
+    def _get_param_value_with_modulo(
+        self, param_refkey: str, modulo: float, none_low: bool = True
+    ) -> float:
         """
         Get a Parameter value modulo another value.
 
@@ -284,7 +304,7 @@ class ParameterCollectionMixIn:
         ----------
         param_refkey : str
             The reference key for the selected Parameter.
-        modulo : int
+        modulo : float
             The mathematical modulo to be applied.
         none_low : bool, optional
             Keyword to define the behaviour of None values. If True, None
@@ -315,7 +335,7 @@ class ParameterCollectionMixIn:
         _offset = 1 if _param.value < 0 else 0
         return _val + _offset
 
-    def restore_all_defaults(self, confirm=False):
+    def restore_all_defaults(self, confirm: bool = False):
         """
         Restore the default values to all entries.
 
@@ -329,7 +349,7 @@ class ParameterCollectionMixIn:
         for _key in self.params.keys():
             self.params[_key].restore_default()
 
-    def _check_key(self, key):
+    def _check_key(self, key: str):
         """
         Check a key exists.
 

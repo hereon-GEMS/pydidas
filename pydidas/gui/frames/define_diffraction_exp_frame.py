@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ global experimental settings like detector, geometry and energy.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DefineDiffractionExpFrame"]
 
 
@@ -36,6 +36,7 @@ from pyFAI.gui.dialog.DetectorSelectorDialog import DetectorSelectorDialog
 from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
+from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from ...widgets.windows import ManuallySetBeamcenterWindow
@@ -69,6 +70,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
     def __init__(self, parent=None, **kwargs):
         DefineDiffractionExpFrameBuilder.__init__(self, parent, **kwargs)
         self.params = EXP.params
+        self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -105,6 +107,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             _w = self.param_widgets[param.refkey]
             _w.io_edited.disconnect()
             _w.io_edited.connect(partial(self.update_param, _param_key, _w))
+        EXP.sig_params_changed.connect(self._update_beamcenter)
 
     def set_param_value_and_widget(self, key, value):
         """
@@ -300,6 +303,17 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
         Handle the signal that the beamcenter window is to be closed.
         """
         self.setEnabled(True)
+
+    @QtCore.Slot()
+    def _update_beamcenter(self):
+        """
+        Update the displayed beamcenter position.
+        """
+        _bx, _by = np.round(EXP.beamcenter, 3)
+        self._bc_params.set_value("beamcenter_x", _bx)
+        self._bc_params.set_value("beamcenter_y", _by)
+        self.update_widget_value("beamcenter_x", _bx)
+        self.update_widget_value("beamcenter_y", _by)
 
     def import_from_file(self):
         """

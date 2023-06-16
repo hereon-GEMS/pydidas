@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,17 +21,17 @@ another image as background.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["SubtractBackgroundImage"]
 
 import os
 
 import numpy as np
 
-from pydidas.core import get_generic_param_collection, UserConfigError
+from pydidas.core import UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
@@ -47,7 +49,7 @@ class SubtractBackgroundImage(ProcPlugin):
     plugin_type = PROC_PLUGIN
     plugin_subtype = PROC_PLUGIN_IMAGE
     default_params = get_generic_param_collection(
-        "bg_file", "bg_hdf5_key", "bg_hdf5_frame", "threshold_low"
+        "bg_file", "bg_hdf5_key", "bg_hdf5_frame", "threshold_low", "multiplicator"
     )
     input_data_dim = 2
     output_data_dim = 2
@@ -75,6 +77,8 @@ class SubtractBackgroundImage(ProcPlugin):
             dataset=self.get_param_value("bg_hdf5_key"),
             frame=self.get_param_value("bg_hdf5_frame"),
         )
+        if self.get_param_value("multiplicator") != 1.0:
+            self._bg_image *= self.get_param_value("multiplicator")
         self._thresh = self.get_param_value("threshold_low")
         if self._thresh is not None and not np.isfinite(self._thresh):
             self._thresh = None

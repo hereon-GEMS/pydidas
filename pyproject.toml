@@ -25,17 +25,19 @@ dynamic = ["version"]
 dependencies = [
     "meson-python",
     "cython",
+    "build>=0.10.0",
     "PyQt5>=5.15.7",
     "pyFAI==2023.1.0",
-    "scikit-image>=0.18.3",
+    "scikit-image>=0.20.0",
     "qtawesome>=1.0.3",
     "sphinx>=4.4.0",
     "sphinx_rtd_theme>=1.0.0",
-    "pyopencl>=2022.1",
-    "qtpy>=2.1.0",
+    "pyopencl>=2023.1",
+    "qtpy>=2.3.0",
     "natsort>=8.2.0",
     "hdf5plugin>=4.0.1",
     "pyyaml>=6.0",
+    "requests>=2.31.0",
 ]
 
 [project.urls]
@@ -52,9 +54,12 @@ packages = ["pydidas", "pydidas_scripts", "pydidas_plugins"]
 
 [project.scripts]
 pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"
+pydidas-updater = "pydidas_scripts.pydidas_updater_script:run_update"
+pydidas-documentation = "pydidas_scripts.pydidas_documentation:open_pydidas_documentation"
+pydidas-remove-gui-state-files = "pydidas_scripts.pydidas_remove_local_files:pydidas_remove_stored_gui_states"
 
 [project.gui-scripts]
-ydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
+pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"
 
 [tools.coverage.report]
 omit = ['*/tests/*']

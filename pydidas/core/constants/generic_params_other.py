@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,15 @@ Parameters which are are not included in other specialized modules.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_OTHER"]
 
 
 from .colors import PYDIDAS_COLORS
-from .unicode_greek_letters import GREEK_ASCII_TO_UNI
+
 
 
 GENERIC_PARAMS_OTHER = {
@@ -227,100 +227,6 @@ GENERIC_PARAMS_OTHER = {
         "tooltip": (
             "The global index of the frame to be processed. Note: The first frame "
             "number is always 0, irrespective of any offsets in the filenames."
-        ),
-    },
-    #####################
-    # fitting settings
-    #####################
-    "fit_sigma_threshold": {
-        "type": float,
-        "default": 0.25,
-        "name": f"Fit {GREEK_ASCII_TO_UNI['sigma']} rejection threshold",
-        "choices": None,
-        "allow_None": False,
-        "unit": "",
-        "tooltip": (
-            "The threshold to select which fitting points to reject, based on the "
-            "normalized standard deviation. Any fit which has a normalized std "
-            "which is worse than the threshold will be rejected as failed."
-        ),
-    },
-    "fit_min_peak_height": {
-        "type": float,
-        "default": None,
-        "name": "Minimum peak height to fit",
-        "choices": None,
-        "allow_None": True,
-        "unit": "",
-        "tooltip": (
-            "The minimum height a peak must have to attempt a fit. A value of "
-            "'None' will not impose any limits on the peak height."
-        ),
-    },
-    "fit_func": {
-        "type": str,
-        "default": "Gaussian",
-        "name": "Fit function",
-        "choices": None,
-        "unit": "",
-        "allow_None": False,
-        "tooltip": (
-            "Select the type of fit function to be used in the single peak fit."
-        ),
-    },
-    "fit_bg_order": {
-        "type": int,
-        "default": 0,
-        "name": "Fit background order",
-        "choices": [None, 0, 1],
-        "unit": "",
-        "allow_None": True,
-        "tooltip": "The order of the background. None corresponds to no background.",
-    },
-    "fit_upper_limit": {
-        "type": float,
-        "default": None,
-        "name": "Peak fit upper limit",
-        "choices": None,
-        "unit": "",
-        "allow_None": True,
-        "tooltip": (
-            "The upper limit (in the x-axis´ unit) to the fit region. None corresponds "
-            "to using no upper limit but the data limits."
-        ),
-    },
-    "fit_lower_limit": {
-        "type": float,
-        "default": None,
-        "name": "Peak fit lower limit",
-        "choices": None,
-        "unit": "",
-        "allow_None": True,
-        "tooltip": (
-            "The lower limit (in the x-axis´ unit) to the fit region. None corresponds "
-            "to using no upper limit but the data limits."
-        ),
-    },
-    "fit_output": {
-        "type": str,
-        "default": "Peak position; peak area; peak FWHM",
-        "name": "Output",
-        "choices": [
-            "Peak position",
-            "Peak area",
-            "Peak FWHM",
-            "Peak position; peak area",
-            "Peak position; peak FWHM",
-            "Peak area; peak FWHM",
-            "Peak position; peak area; peak FWHM",
-        ],
-        "unit": "",
-        "allow_None": True,
-        "tooltip": (
-            "The output of the fitting plugin. The plugin can either return the peak "
-            "area, the peak position or the FWHM. Alternatively, any combination of "
-            "these values can be retured as well. Note that the fit parameters are "
-            "always stored in the metadata."
         ),
     },
     ################
@@ -595,6 +501,61 @@ GENERIC_PARAMS_OTHER = {
             "plot."
         ),
     },
+    ############################
+    # Dynamic mask configuration
+    ############################
+    "mask_threshold_low": {
+        "type": float,
+        "default": None,
+        "name": "Lower mask threshold",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The lower threshold for the mask. If any finite value (i.e. not np.nan or "
+            "None) is used, the value of any pixels with a value below the threshold "
+            "will be masked. A value of np.nan or None will ignore the threshold."
+        ),
+    },
+    "mask_threshold_high": {
+        "type": float,
+        "default": None,
+        "name": "Upper mask threshold",
+        "choices": None,
+        "unit": "",
+        "allow_None": True,
+        "tooltip": (
+            "The upper threshold for the mask. If any finite value (i.e. not np.nan or "
+            "None) is used, the value of any pixels with a value above the threshold "
+            "will be masked. A value of np.nan or None will ignore the threshold."
+        ),
+    },
+    "mask_grow": {
+        "type": int,
+        "default": 0,
+        "name": "Grow/shrink masked regions",
+        "choices": None,
+        "unit": "px",
+        "allow_None": False,
+        "tooltip": (
+            "The masked region can be grown (morphological dilation) or shrunk "
+            "(morphological erosion), based on the input value. A value >0 will grow "
+            "the masked region by the specified amounts in pixels, a value less than "
+            "zero will erode the masked regions by the specified amount."
+        ),
+    },
+    "kernel_iterations": {
+        "type": int,
+        "default": 1,
+        "name": "Grow/shrink iterations",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": (
+            "The number of iterations to apply the erosion/dilation operation on the "
+            "masked region."
+        ),
+    },
     #######################
     # Plugin data selection
     #######################
@@ -612,12 +573,4 @@ GENERIC_PARAMS_OTHER = {
             "dimension."
         ),
     },
-    # '': {
-    #     'type': int,
-    #     'default': ,
-    #     'name': '',
-    #     'choices': None,
-    #     'unit': '',
-    #     'allow_None': False,
-    #     'tooltip': },
 }

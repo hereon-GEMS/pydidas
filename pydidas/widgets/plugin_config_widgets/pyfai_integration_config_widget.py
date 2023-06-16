@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ for pyFAI integration plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PyfaiIntegrationConfigWidget"]
 
 
@@ -55,8 +55,9 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.plugin = plugin
         self._window_edit = None
         self._window_show = None
-        for param in self.plugin.params.values():
-            self.create_param_widget(param, **DEFAULT_PLUGIN_PARAM_CONFIG)
+        for _key, _param in self.plugin.params.items():
+            if _key not in self.plugin.advanced_parameters:
+                self.create_param_widget(_param, **DEFAULT_PLUGIN_PARAM_CONFIG)
         if "azi_use_range" in self.param_composite_widgets:
             self.param_composite_widgets["azi_use_range"].io_edited.connect(
                 self._toggle_azimuthal_ranges_visibility
@@ -83,6 +84,18 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=partial(self._select_integration_region, allow_edit=True),
         )
+        self.__advanced_hidden = True
+        self.create_button(
+            "but_toggle_advanced_params",
+            "Display advanced Parameters",
+            icon=self.style().standardIcon(6),
+            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
+            clicked=self.__toggle_advanced_params,
+        )
+        for _key in self.plugin.advanced_parameters:
+            _param = self.plugin.get_param(_key)
+            _kwargs = DEFAULT_PLUGIN_PARAM_CONFIG | {"visible": False}
+            self.create_param_widget(_param, **_kwargs)
 
     @QtCore.Slot(str)
     def _toggle_azimuthal_ranges_visibility(self, new_selection):
@@ -111,6 +124,23 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         _visibility = new_selection == "Specify radial range"
         self.toggle_param_widget_visibility("rad_range_lower", _visibility)
         self.toggle_param_widget_visibility("rad_range_upper", _visibility)
+
+    @QtCore.Slot()
+    def __toggle_advanced_params(self):
+        """
+        Toggle the visiblity of the advanced Parameters.
+        """
+        self.__advanced_hidden = not self.__advanced_hidden
+        for _key in self.plugin.advanced_parameters:
+            self.toggle_param_widget_visibility(_key, not self.__advanced_hidden)
+        self._widgets["but_toggle_advanced_params"].setText(
+            "Display advanced Parameters"
+            if self.__advanced_hidden
+            else "Hide advanced Parameters"
+        )
+        self._widgets["but_toggle_advanced_params"].setIcon(
+            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+        )
 
     @QtCore.Slot()
     def _select_integration_region(self, allow_edit=True):

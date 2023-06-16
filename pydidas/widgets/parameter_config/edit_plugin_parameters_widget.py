@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ Parameters of a Plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["EditPluginParametersWidget"]
 
 from pathlib import Path
@@ -152,25 +152,25 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                     )
                     self.create_param_widget(param, **_kwargs)
             self.param_widgets["label"].io_edited.connect(self._label_updated)
-        if len(self.plugin.advanced_parameters) > 0:
-            self.__advanced_hidden = True
-            self.create_button(
-                "but_toggle_advanced_params",
-                "Display advanced Parameters",
-                icon=self.style().standardIcon(6),
-                width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
-            )
-            for _key in self.plugin.advanced_parameters:
-                _param = self.plugin.get_param(_key)
-                _kwargs = (
-                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
-                    if _param.dtype in [Hdf5key, Path]
-                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
-                ) | {"visible": False}
-                self.create_param_widget(_param, **_kwargs)
-            self._widgets["but_toggle_advanced_params"].clicked.connect(
-                self.__toggle_advanced_params
-            )
+            if len(self.plugin.advanced_parameters) > 0:
+                self.__advanced_hidden = True
+                self.create_button(
+                    "but_toggle_advanced_params",
+                    "Display advanced Parameters",
+                    icon=self.style().standardIcon(6),
+                    width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
+                )
+                for _key in self.plugin.advanced_parameters:
+                    _param = self.plugin.get_param(_key)
+                    _kwargs = (
+                        constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
+                        if _param.dtype in [Hdf5key, Path]
+                        else constants.DEFAULT_PLUGIN_PARAM_CONFIG
+                    ) | {"visible": False}
+                    self.create_param_widget(_param, **_kwargs)
+                self._widgets["but_toggle_advanced_params"].clicked.connect(
+                    self.__toggle_advanced_params
+                )
 
     @QtCore.Slot(str)
     def _label_updated(self, label):
@@ -197,7 +197,8 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             icon=self.style().standardIcon(59),
             fixedHeight=25,
             fixedWidth=225,
-            layout_kwargs={"gridPos": (2, 0, 1, 2), "alignment": QtCore.Qt.AlignRight},
+            gridPos=(2, 0, 1, 2),
+            layout_kwargs={"alignment": QtCore.Qt.AlignRight},
         )
         self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
 

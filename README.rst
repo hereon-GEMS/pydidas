@@ -1,5 +1,5 @@
 .. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 
@@ -21,36 +21,48 @@ References
 * Please check the citation file CITATION.cff
 
 
+
 Installation
 ------------
 
 Preparing the environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using conda
-...........
+Using mamba/conda
+.................
 
-Use the provided environment.yml file to create the conda environment::
+Use the provided pydidas-env.yml file to create the conda environment::
 
     conda env create --name pydidas --file .\pydidas-env.yml
 
 Using pip
 .........
 
-Use the provided requirements.txt to install all necessary packages::
+When using pip, all dependencies will be installed together with the package.
+There is no need to prepare the environment further.
 
-    pip install -r requirements.txt
-    
+
 Building and installing pydidas
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the active enviroment (or distribution), navigate to the folder with the 
-pydidas repository and install pydidas using pip::
+You will require a pydidas wheel file to install it using pip. If you have not 
+downloaded a build wheel file, you need to prepare one prior to installation.
 
-    pip install .
+Download the pydidas source code or clone the git repository and navigate to the
+folder with the project metadata files (like the README.rst). Then, install 
+the package and any missing dependencies::
+
+    python -m pip install .
+
 
 Note that pip might need to build a wheel from pydidas first which will take
-some time.
+some time. If you want to build the wheel manually, for example to keep it for 
+later use, simply use the following commands (again, in the pydidas folder)::
+
+    python -m build
+    python -m pip install dist\pydidas--YY.MM.DD-py3-none-any.whl
+    
+where YY.MM.DD would be substituted with the currrent version number.
 
 
 Documentation
@@ -60,15 +72,15 @@ The documentation is included with the distribution, but it must be compiled by
 the user first. The rational behind this is to keep the distribution 
 light-weight. 
 
-To make the documentation, make sure sphinx is installed. It is shipped with 
-pydidas, but depending on system settings and python installation, the 
-*sphinx-build* command might not be in the system's path.
+The documentation will be created automatically the first time, pydidas is
+imported in python. This will take some time (about 30 seconds, depending on 
+the system) and a notification will be displayed.
 
-1. Navigate to the "pydidas/docs" sub-folder
-2. Run "make html" to create the html documentation. (Note: on windows you might
-   need to call ".\make.bat html".)
-3. Navigate to the "pydidas/docs/build/html" folder and open "index.html".
+The compiled documentation can be found in the "pydidas/docs/build/html" folder 
+and the "index.html" is the main entry point.
 
+Alternatively, a pydidas-documentation entrypoint exists to open the 
+documentation.
 
 Referencing pydidas
 -------------------

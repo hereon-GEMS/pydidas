@@ -31,7 +31,6 @@ def run_worker_controller():
 
 
 def run_worker_controller_with_restart():
-
     worker_controller = pydidas.multiprocessing.WorkerController()
     worker_controller.change_function(test_func, 2, 5)
     result_spy = QtTest.QSignalSpy(worker_controller.sig_results)

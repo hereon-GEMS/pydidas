@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,17 +21,17 @@ with the required plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["QuickIntegrationFrameBuilder"]
 
 
 from qtpy import QtWidgets
 
 from ....core import constants
-from ....widgets import ScrollArea
+from ....widgets import ScrollArea, get_pyqt_icon_from_str
 from ....widgets.misc import (
     PointPositionTableWidget,
     SelectImageFrameWidget,
@@ -271,6 +271,13 @@ class QuickIntegrationFrameBuilder:
         Create the widgets for the experimental section.
         """
         cls._frame.create_label(None, "Experiment description:", **cls._label_header())
+        cls._frame.create_button(
+            "copy_exp_context",
+            "Copy expriment description from workflow setup",
+            icon=get_pyqt_icon_from_str("qta::fa.copy"),
+            fixedWidth=cls._frame._config["scroll_width"],
+            parent_widget=cls._frame._widgets["config"],
+        )
         cls._frame.create_button(
             "but_show_exp_section",
             "Show detailed experiment section",

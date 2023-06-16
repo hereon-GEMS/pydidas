@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2021-, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,22 +18,22 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import copy
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import get_generic_parameter, UserConfigError
+from pydidas.core import UserConfigError, get_generic_parameter
 from pydidas.managers import FilelistManager
 
 
@@ -94,23 +96,30 @@ class TestFilelistManager(unittest.TestCase):
         self.assertEqual(fm.get_param_value("live_processing"), False)
         self.assertEqual(fm.get_param_value("file_stepping"), 2)
 
-    def test_check_files_wrong_name(self):
+    def test_check_files__wrong_name(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(100))
         with self.assertRaises(UserConfigError):
             fm._check_files()
 
-    def test_check_files_wrong_dir(self):
+    def test_check_files__wrong_dir(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", "/foo/bar/dummy.npy")
         with self.assertRaises(UserConfigError):
             fm._check_files()
 
-    def test_check_files_all_good(self):
+    def test_check_files__all_good(self):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", self._fname(50))
+
+    def test_check_files__different_extension(self):
+        fm = FilelistManager()
+        fm.set_param_value("first_file", self._fname(0))
+        fm.set_param_value("last_file", str(self._fname(50)) + ".test")
+        with self.assertRaises(UserConfigError):
+            fm._check_files()
 
     def test_check_only_first_file_selected_true(self):
         fm = FilelistManager()
@@ -145,6 +154,20 @@ class TestFilelistManager(unittest.TestCase):
         fm = FilelistManager()
         fm.set_param_value("first_file", self._fname(0))
         fm.set_param_value("last_file", self._fname(49))
+        fm._create_filelist_static()
+        self.assertEqual(fm._config["n_files"], 50)
+        self.assertListEqual(
+            fm._config["file_list"], [self._fname(i) for i in range(50)]
+        )
+
+    def test_create_filelist_static__metadata_files(self):
+        fm = FilelistManager()
+        fm.set_param_value("first_file", self._fname(0))
+        fm.set_param_value("last_file", self._fname(49))
+        for _index in range(50):
+            _fname = Path(self._path).joinpath(f"test_{_index:02d}.npy.metadata")
+            _len = int(np.random.random() * 1e3)
+            np.savetxt(_fname, np.arange(_len))
         fm._create_filelist_static()
         self.assertEqual(fm._config["n_files"], 50)
         self.assertListEqual(

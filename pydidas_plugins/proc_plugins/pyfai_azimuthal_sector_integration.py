@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,24 @@ several azimuthal sectors at once.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PyFAIazimuthalSectorIntegration"]
+
 
 import numpy as np
 from pyFAI.azimuthalIntegrator import AzimuthalIntegrator
 
-from pydidas.plugins import pyFAIintegrationBase
+from pydidas.contexts import DiffractionExperimentContext
 from pydidas.core import (
     Dataset,
     Parameter,
-    get_generic_param_collection,
     UserConfigError,
+    get_generic_param_collection,
 )
-from pydidas.contexts import DiffractionExperimentContext
+from pydidas.plugins import pyFAIintegrationBase
 
 
 EXP = DiffractionExperimentContext()
@@ -86,6 +89,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         "azi_sector_centers",
         "azi_sector_width",
         "int_method",
+        "correct_solid_angle",
+        "polarization_factor",
     )
 
     def __init__(self, *args, **kwargs):
@@ -121,7 +126,8 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         self._ai_params = {
             "unit": self.get_pyFAI_unit_from_param("rad_unit"),
             "radial_range": self.get_radial_range(),
-            "polarization_factor": 1,
+            "polarization_factor": self.get_param_value("polarization_factor"),
+            "correctSolidAngle": self.get_param_value("correct_solid_angle"),
             "method": self._config["method"],
         }
         _label, _unit = self.params["rad_unit"].value.split("/")
@@ -167,6 +173,7 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
         kwargs : dict
             Any keyword arguments from the ProcessingTree.
         """
+        self.check_and_set_custom_mask(**kwargs)
         _results = [
             _ai.integrate1d(
                 data,

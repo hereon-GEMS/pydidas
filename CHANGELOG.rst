@@ -1,7 +1,7 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
-v23.06.15
+v23.06.16
 =========
 
 Improvements

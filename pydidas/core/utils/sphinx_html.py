@@ -86,12 +86,13 @@ def run_sphinx_html_build(build_dir=None, verbose=True):
         print("-" * 60)
         print("=" * 60)
         app = QtWidgets.QApplication.instance()
-        for _widget in app.topLevelWidgets():
-            if isinstance(_widget, QtWidgets.QSplashScreen) and hasattr(
-                _widget, "show_aligned_message"
-            ):
-                _widget.show_aligned_message(
-                    "Building html documentation (required only once during first "
-                    "startup)"
-                )
+        if app is not None:
+            for _widget in app.topLevelWidgets():
+                if isinstance(_widget, QtWidgets.QSplashScreen) and hasattr(
+                    _widget, "show_aligned_message"
+                ):
+                    _widget.show_aligned_message(
+                        "Building html documentation (required only once during first "
+                        "startup)"
+                    )
     build.main([os.path.join(DOC_MAKE_DIRECTORY, "source"), build_dir])

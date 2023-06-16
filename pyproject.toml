@@ -55,6 +55,8 @@ packages = ["pydidas", "pydidas_scripts", "pydidas_plugins"]
 [project.scripts]
 pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"
 pydidas-updater = "pydidas_scripts.pydidas_updater_script:run_update"
+pydidas-documentation = "pydidas_scripts.pydidas_documentation:open_pydidas_documentation"
+pydidas-remove-gui-state-files = "pydidas_scripts.pydidas_remove_local_files:pydidas_remove_stored_gui_states"
 
 [project.gui-scripts]
 pydidas-gui = "pydidas_scripts.pydidas_gui:run_gui"

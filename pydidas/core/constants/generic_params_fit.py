@@ -114,7 +114,7 @@ GENERIC_PARAMS_FIT = (
             "choices": ["no output"]
             + [
                 "; ".join(subset)
-                for L in range(1, 5)
+                for L in range(1, len(FIT_OUTPUT_OPTIONS) + 1)
                 for subset in combinations(FIT_OUTPUT_OPTIONS, L)
             ],
             "unit": "",

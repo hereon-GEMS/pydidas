@@ -45,6 +45,7 @@ class Voigt(FitFuncBase):
     param_bounds_high = [inf, inf, inf, inf]
     param_labels = ["amplitude", "sigma", "gamma", "center"]
     num_peak_params = 4
+    center_param_index = 3
 
     @staticmethod
     def func(c: Tuple, x: ndarray) -> ndarray:
@@ -120,7 +121,7 @@ class Voigt(FitFuncBase):
         return [_amp, _sigma_start, _gamma_start, _center_start]
 
     @classmethod
-    def fwhm(cls, c):
+    def fwhm(cls, c: Tuple[float]) -> float:
         """
         Get the FWHM of the fit from the values of the parameters.
 
@@ -142,7 +143,7 @@ class Voigt(FitFuncBase):
         return 0.5343 * c[2] + (0.2169 * c[2] ** 2 + 5.545177 * c[1] ** 2) ** 0.5
 
     @staticmethod
-    def amplitude(c: Tuple) -> float:
+    def amplitude(c: Tuple[float]) -> float:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 

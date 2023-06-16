@@ -22,6 +22,7 @@ Improvements
       'polarization_correction' to pyFAI plugins.
     - Reworked the fitting plugins to add double and triple-peak fitting
       capabilities.
+    - Added a 'background at peak' output for peak fitting plugins.
       
 - General improvements:
 

@@ -125,7 +125,7 @@ class Gaussian(FitFuncBase):
         return [_amp, _sigma_start, _center_start]
 
     @staticmethod
-    def fwhm(c: Tuple) -> float:
+    def fwhm(c: Tuple[float]) -> float:
         """
         Get the FWHM of the fit from the values of the fitted parameters.
 
@@ -142,7 +142,7 @@ class Gaussian(FitFuncBase):
         return 2.354820 * c[1]
 
     @staticmethod
-    def amplitude(c: Tuple) -> float:
+    def amplitude(c: Tuple[float]) -> float:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 

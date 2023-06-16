@@ -50,6 +50,7 @@ class FitFuncBase(metaclass=FitFuncMeta):
     param_labels = []
     num_peaks = 1
     num_peak_params = 3
+    center_param_index = 2
 
     @staticmethod
     def func(c: Tuple[float], x: ndarray) -> ndarray:
@@ -284,9 +285,9 @@ class FitFuncBase(metaclass=FitFuncMeta):
             The background
         """
         if len(c) == 0:
-            return 0
+            return 0 * x
         if len(c) == 1:
-            return c[0]
+            return 0 * x + c[0]
         if len(c) == 2:
             return c[0] + x * c[1]
         raise ValueError("The order of the background is not supported.")
@@ -368,3 +369,29 @@ class FitFuncBase(metaclass=FitFuncMeta):
             The peak's center.
         """
         return c[cls.num_peak_params - 1]
+
+    @classmethod
+    def background_at_peak(cls, c: Tuple[float]) -> Union[float, ndarray]:
+        """
+        Get the background level at the peak position.
+
+        Parameters
+        ----------
+        c : Tuple[float]
+            The tuple with the function parameters.
+
+        Returns
+        -------
+        Union[float, ndarray]
+            The background at the peak center. For single peaks, the value is returned
+            as float. For multiple peaks, it is returned as ndarray.
+        """
+        _n_peak_params = cls.num_peaks * cls.num_peak_params
+        _i_center = cls.center_param_index
+        _centers = np.asarray(
+            c[_i_center : (_i_center + _n_peak_params) : cls.num_peak_params]
+        )
+        _bgs = cls.calculate_background(c[_n_peak_params:], _centers)
+        if _bgs.size == 1:
+            return _bgs[0]
+        return _bgs

@@ -28,6 +28,7 @@ import unittest
 
 import numpy as np
 
+from pydidas.core.fitting import FitFuncMeta
 from pydidas.core.fitting.fit_func_base import FitFuncBase
 
 
@@ -134,6 +135,112 @@ class TestFitFuncBase(unittest.TestCase):
         _y0 = 1
         _range = FIT_CLASS.get_fwhm_indices(_x0, _y0, _x, _y)
         self.assertTrue(np.alltrue(np.array([]) == _range))
+
+    def test_backgroup_at_peak__single_peak_no_bg(self):
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 1
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, 1)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertEqual(_bg, 0)
+
+    def test_backgroup_at_peak__single_peak_0th_order_bg(self):
+        _bg0 = 12
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 1
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, 1, _bg0)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertEqual(_bg, _bg0)
+
+    def test_backgroup_at_peak__single_peak_1st_order_bg(self):
+        _bg0 = 12
+        _bg1 = 25
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 1
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, 1, _bg0, _bg1)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertEqual(_bg, _bg0 + _bg1)
+
+    def test_backgroup_at_peak__double_peak_no_bg(self):
+        _x0 = 3
+        _x1 = 7
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 2
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, _x0, 1, 1, _x1)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertTrue(np.alltrue(_bg == 0 * np.asarray((_x0, _x1))))
+
+    def test_backgroup_at_peak__double_peak_0th_order_bg(self):
+        _bg0 = 12
+        _x0 = 3
+        _x1 = 7
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 2
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, _x0, 1, 1, _x1, _bg0)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertTrue(np.alltrue(_bg == _bg0 + 0 * np.asarray((_x0, _x1))))
+
+    def test_backgroup_at_peak__double_peak_1st_order_bg(self):
+        _bg0 = 12
+        _bg1 = 25
+        _x0 = 3
+        _x1 = 7
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 2
+            num_peak_params = 3
+            center_param_index = 2
+
+        c = (1, 1, _x0, 1, 1, _x1, _bg0, _bg1)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertTrue(np.alltrue(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
+
+    def test_backgroup_at_peak__double_peak_1st_order_bg_more_params(self):
+        _bg0 = 12
+        _bg1 = 25
+        _x0 = 3
+        _x1 = 7
+
+        class FitTestClass(FitFuncBase):
+            name = "Test class"
+            num_peaks = 2
+            num_peak_params = 4
+            center_param_index = 2
+
+        c = (1, 1, _x0, 1, 1, 1, _x1, 1, _bg0, _bg1)
+        _bg = FitTestClass.background_at_peak(c)
+        del FitFuncMeta.registry["Test class"]
+        self.assertTrue(np.alltrue(_bg == _bg0 + _bg1 * np.asarray((_x0, _x1))))
 
 
 if __name__ == "__main__":

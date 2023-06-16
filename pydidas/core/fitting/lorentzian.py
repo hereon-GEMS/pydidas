@@ -120,7 +120,7 @@ class Lorentzian(FitFuncBase):
         return [_amp, _gamma_start, _center_start]
 
     @classmethod
-    def fwhm(cls, c):
+    def fwhm(cls, c: Tuple[float]) -> float:
         """
         Get the FWHM of the fit from the values of the parameters.
 
@@ -139,7 +139,7 @@ class Lorentzian(FitFuncBase):
         return c[1]
 
     @staticmethod
-    def amplitude(c: Tuple) -> float:
+    def amplitude(c: Tuple[float]) -> float:
         """
         Get the amplitude of the peak from the values of the fitted parameters.
 

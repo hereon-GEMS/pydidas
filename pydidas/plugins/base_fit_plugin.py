@@ -208,6 +208,8 @@ class BaseFitPlugin(ProcPlugin):
                     _new_data.append(_area)
                 if "FWHM" in _output:
                     _new_data.append(self._fitter.fwhm(_fit_pvals))
+                if "background" in _output:
+                    _new_data.append(self._fitter.background_at_peak(_fit_pvals))
                 if "no output" in _output:
                     _new_data.append(
                         np.full(self._config["single_result_shape"], np.nan)

@@ -36,8 +36,14 @@ import sys
 import traceback
 from pathlib import Path
 
-import build
 import requests
+
+import build
+
+from .pydidas_remove_local_files import (
+    pydidas_remove_log_files,
+    pydidas_remove_stored_gui_states,
+)
 
 
 def get_remote_version() -> str:
@@ -368,6 +374,10 @@ def run_update():
         _wheel = build_wheel(_path)
         print_status("Installing wheel")
         install_wheel(_wheel)
+        pydidas_remove_log_files(_local_version, verbose=False, confirm_finish=False)
+        pydidas_remove_stored_gui_states(
+            _local_version, verbose=False, confirm_finish=False
+        )
         _success = True
     except Exception:
         restore_pre_update_files(_pydidas_location, _local_version, _remote_version)

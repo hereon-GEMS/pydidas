@@ -41,6 +41,7 @@ Improvements
       their string reference key.
     - Added a script to update pydidas in place in the current python 
       environment.
+    - Added an entrypoint script to open the documentation.
 
 Bugfixes
 --------
@@ -65,7 +66,6 @@ Bugfixes
   parameters.
 - Fixed an issue when starting up where calling the sphinx process to create 
   the documentation would crash the GUI.
-
 
 
 v23.5.22

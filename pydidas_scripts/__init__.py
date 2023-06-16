@@ -29,3 +29,4 @@ __status__ = "Development"
 from . import pydidas_gui
 from . import clear_pydidas_qsettings
 from . import remove_pydidas_from_system
+from . import pydidas_remove_local_files

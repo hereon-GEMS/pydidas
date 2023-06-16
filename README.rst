@@ -79,6 +79,8 @@ the system) and a notification will be displayed.
 The compiled documentation can be found in the "pydidas/docs/build/html" folder 
 and the "index.html" is the main entry point.
 
+Alternatively, a pydidas-documentation entrypoint exists to open the 
+documentation.
 
 Referencing pydidas
 -------------------

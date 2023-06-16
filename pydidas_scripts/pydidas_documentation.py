@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Script to reset all stored QSettings to default in case a setting breaks
-the GUI startup.
+The pydidas_documentation script allows to open the pydidas documentation in a
+webbrowser.
 """
 
 __author__ = "Malte Storm"
@@ -25,36 +25,23 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["clear_pydidas_QSettings"]
+__all__ = ["open_pydidas_documentation"]
 
 
-from qtpy.QtCore import QSettings
+from qtpy import QtGui, QtWidgets
 
 
-def clear_pydidas_QSettings(confirm_finish: bool = True, verbose: bool = True):
+def open_pydidas_documentation():
     """
-    Clear all stored pydidas QSettings registry values.
-
-    Parameters
-    ----------
-    confirm_finish : bool, optional
-        Flag to confirm the script is finished. The default is True.
-    verbose : bool, optional
-        Flag to print status messages. The default is True.
+    Open the pydidas documentation in the system's default browser.
     """
-    qs = QSettings("Hereon", "pydidas")
-    qs.remove("")
-    if verbose:
-        print(
-            "\n"
-            + "=" * 80
-            + "\n=== Successfully removed all pydidas registry settings,\n"
-            + "=" * 80
-            + "\n"
-        )
-    if confirm_finish:
-        input("Press <Enter> to finish the registry cleanup. ")
+    from pydidas.core.utils import DOC_HOME_QURL
+
+    _app = QtWidgets.QApplication.instance()
+    if _app is None:
+        _app = QtWidgets.QApplication([])
+    _ = QtGui.QDesktopServices.openUrl(DOC_HOME_QURL)
 
 
 if __name__ == "__main__":
-    clear_pydidas_QSettings()
+    open_pydidas_documentation()

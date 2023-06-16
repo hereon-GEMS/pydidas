@@ -35,10 +35,6 @@ import sys
 from qtpy import QtCore
 
 
-_path = os.path.dirname(__file__)
-sys.path.insert(0, _path)
-
-
 def remove_pydidas_from_system():
     """
     Clear all stored pydidas QSettings and all local logs and config files.

@@ -76,6 +76,7 @@ class BaseFitPlugin(ProcPlugin):
         self._data_x = None
         self._details = None
         self._fit_params = {}
+        self._fit_presets = {}
         self._config = self._config | {
             "range_slice": None,
             "settings_updated_from_data": False,
@@ -151,7 +152,7 @@ class BaseFitPlugin(ProcPlugin):
             self._data_x,
             self._data,
             bg_order=self.get_param_value("fit_bg_order"),
-            **self._config["fit_start_presets"],
+            **self._fit_presets,
         )
         _res = least_squares(
             self._fitter.delta,
@@ -189,8 +190,7 @@ class BaseFitPlugin(ProcPlugin):
             The new dataset.
         """
         _output = self.get_param_value("fit_output")
-        _residual = np.nan
-        valid and self.check_center_positions()
+        valid = valid and self.check_center_positions()
         if valid:
             _fit_pvals = list(self._fit_params.values())
             _datafit = self._fitter.profile(_fit_pvals, self._data_x)
@@ -214,6 +214,7 @@ class BaseFitPlugin(ProcPlugin):
                     )
                 _new_data = np.atleast_1d(np.asarray(_new_data).squeeze().T)
         else:
+            _residual = np.nan
             _new_data = np.full(self._config["single_result_shape"], np.nan)
 
         _axis_label = [
@@ -363,18 +364,18 @@ class BaseFitPlugin(ProcPlugin):
         """
         Create a dictionary with preset fit starting values.
         """
-        self._config["fit_start_presets"] = {}
+        self._fit_presets = {}
         for _key in self.params:
             if _key.startswith("fit_peak") and _key.endswith("_xstart"):
                 _index = _key[8:-7]
                 _val = self.get_param_value(_key)
                 if _val is not None:
-                    self._config["fit_start_presets"][f"center{_index}_start"] = _val
+                    self._fit_presets[f"center{_index}_start"] = _val
             if _key.startswith("fit_peak") and _key.endswith("_width"):
                 _index = _key[8:-6]
                 _val = self.get_param_value(_key)
                 if _val is not None:
-                    self._config["fit_start_presets"][f"width{_index}_start"] = _val
+                    self._fit_presets[f"width{_index}_start"] = _val
 
     def check_min_peak_height(self) -> bool:
         """

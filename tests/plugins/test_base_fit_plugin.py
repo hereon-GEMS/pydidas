@@ -172,7 +172,7 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin.set_param_value("fit_peak_xstart", _center)
         plugin.set_param_value("fit_peak_width", _sigma)
         plugin.pre_execute()
-        _params = plugin._config["fit_start_presets"]
+        _params = plugin._fit_presets
         self.assertEqual(_params["center_start"], _center)
         self.assertEqual(_params["width_start"], _sigma)
 

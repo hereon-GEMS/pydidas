@@ -30,7 +30,7 @@ copyright = "2023, Helmholtz-Zentrum Hereon"
 author = "Malte Storm"
 
 # The full version, including alpha/beta/rc tags
-release = "23.6.15"
+release = "23.6.16"
 version = release
 
 # -- General configuration ---------------------------------------------------

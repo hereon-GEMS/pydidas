@@ -117,7 +117,8 @@ def start_pydidas_gui(
                 "multiprocessing."
             )
     splash_screen.show_aligned_message("Creating objects")
-    app = PydidasQApplication(sys.argv)
+    if not isinstance(app, PydidasQApplication):
+        app = PydidasQApplication([])
     gui = MainWindow()
     gui.register_frame(frames.HomeFrame)
     gui.register_frame(frames.DataBrowsingFrame)
@@ -150,13 +151,15 @@ def run_gui():
     """
     Run the pydidas graphical user interface process.
     """
+    from pydidas.core.pydidas_qapp import PydidasQApplication
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    app = QtWidgets.QApplication([])
+    app = PydidasQApplication([])
     _splash = PydidasSplashScreen()
 
     _ = start_pydidas_gui(_splash, restore_state="exit")
     app = QtWidgets.QApplication.instance()
-    app.quit()
+    app.deleteLater()
 
 
 if __name__ == "__main__":

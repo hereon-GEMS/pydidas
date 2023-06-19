@@ -1,6 +1,22 @@
 .. Copyright 2021-, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
 
+
+v23.MM.DD
+=========
+
+Improvements
+------------
+
+
+
+Bugfixes
+--------
+
+- Fixed an issue in the pydidas_gui script which caused a segmentation fault on 
+  exit in Linux.
+
+
 v23.06.16
 =========
 

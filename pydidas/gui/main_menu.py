@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,18 @@ manages the pydidas GUI menu.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MainMenu"]
+
 
 import os
 import sys
 from functools import partial
+from pathlib import Path
+from typing import Union
 
 import yaml
 from qtpy import QtCore, QtGui, QtWidgets
@@ -42,13 +45,11 @@ from ..core.utils import (
     doc_qurl_for_frame_manual,
     get_pydidas_icon_w_bg,
 )
+from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
 from ..version import VERSION
 from ..widgets import PydidasFileDialog
 from ..widgets.dialogues import QuestionBox, critical_warning
 from ..widgets.framework import PydidasFrameStack
-from ..workflow import WorkflowTree
-from . import utils
-from .gui_excepthook_ import gui_excepthook
 from ..widgets.windows import (
     AboutWindow,
     ExportEigerPixelmaskWindow,
@@ -59,6 +60,9 @@ from ..widgets.windows import (
     QtPathsWindow,
     UserConfigWindow,
 )
+from ..workflow import WorkflowTree
+from . import utils
+from .gui_excepthook_ import gui_excepthook
 
 
 TREE = WorkflowTree()
@@ -89,9 +93,6 @@ class MainMenu(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent)
         sys.excepthook = gui_excepthook
 
-        self.config_path = QtCore.QStandardPaths.standardLocations(
-            QtCore.QStandardPaths.ConfigLocation
-        )[0]
         self._child_windows = {}
         self._actions = {}
         self._menus = {}
@@ -338,7 +339,9 @@ class MainMenu(QtWidgets.QMainWindow):
             "(and overwrite any previous states)?",
         ).exec_()
         if _reply:
-            self.export_gui_state(os.path.join(self.config_path, self.STATE_FILENAME))
+            self.export_gui_state(
+                PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.STATE_FILENAME)
+            )
 
     @QtCore.Slot()
     def _action_export_state(self):
@@ -448,19 +451,19 @@ class MainMenu(QtWidgets.QMainWindow):
         if name in self._child_windows:
             del self._child_windows[name]
 
-    def export_gui_state(self, filename=None):
+    def export_gui_state(self, filename: Union[Path, str]):
         """
-        This function
+        This function exports the GUI state.
 
         Parameters
         ----------
-        filename : Union[None, str]
-            The full file system path of the configuration file. If None, a
-            generic file will be created by pydidas. The default is None.
+        filename : Union[Path, str]
+            The full file system path of the configuration file.
         """
-        _config_dir = os.path.dirname(filename)
-        if not os.path.exists(_config_dir):
-            os.makedirs(_config_dir)
+        if isinstance(filename, str):
+            filename = Path(filename)
+        if not filename.parent.is_dir():
+            filename.parent.mkdir(parents=True)
         _state = self.__get_window_states()
         for _index, _frame in enumerate(self.centralWidget().frames):
             _frameindex, _frame_state = _frame.export_state()
@@ -665,6 +668,8 @@ class MainMenu(QtWidgets.QMainWindow):
         if not _reply:
             event.ignore()
             return
-        self.export_gui_state(os.path.join(self.config_path, self.EXIT_STATE_FILENAME))
+        self.export_gui_state(
+            PYDIDAS_STANDARD_CONFIG_PATH.joinpath(self.EXIT_STATE_FILENAME)
+        )
         self.sig_close_main_window.emit()
         event.accept()

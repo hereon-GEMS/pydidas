@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ MainMenu class or relating to the MainMenu class.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "get_standard_state_full_filename",
     "clear_local_log_files",
@@ -30,19 +32,21 @@ __all__ = [
 ]
 
 import os
+from pathlib import Path
 
 from qtpy import QtCore, QtGui
 
-from ...core import utils, UserConfigError
+from ...core import UserConfigError, utils
+from ...core.constants import PYDIDAS_CONFIG_PATHS, PYDIDAS_STANDARD_CONFIG_PATH
 from ...widgets.dialogues import QuestionBox
 
 
-def get_standard_state_full_filename(filename):
+def get_standard_state_full_filename(filename: str) -> Path:
     """
     Get the standard full path for the state filename.
 
-    This method will search all stored config paths and return the first
-    match.
+    This method will search all stored config paths and return the first match of
+    path/filename combinations which is an accessible file.
 
     Parameters
     ----------
@@ -51,17 +55,14 @@ def get_standard_state_full_filename(filename):
 
     Returns
     -------
-    _fname : str
+    _fname : Path
         The file name and path to the config file.
     """
-    _paths = QtCore.QStandardPaths.standardLocations(
-        QtCore.QStandardPaths.ConfigLocation
-    )
-    for _path in _paths:
-        _fname = os.path.join(_path, filename)
-        if os.path.isfile(_fname) and os.access(_fname, os.R_OK):
+    for _path in PYDIDAS_CONFIG_PATHS:
+        _fname = _path.joinpath(filename)
+        if _fname.is_file() and os.access(_fname, os.R_OK):
             return _fname
-    return os.path.join(_paths[0], filename)
+    return PYDIDAS_STANDARD_CONFIG_PATH.joinpath(filename)
 
 
 @QtCore.Slot()

@@ -36,6 +36,7 @@ from .generic_params import *
 from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
+from .paths import *
 from .pyfai_names import *
 from .q_settings import *
 from .qt_presets import *
@@ -79,6 +80,11 @@ from . import links
 
 __all__.extend(links.__all__)
 del links
+
+from . import paths
+
+__all__.extend(paths.__all__)
+del paths
 
 from . import pyfai_names
 

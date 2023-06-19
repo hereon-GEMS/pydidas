@@ -15,6 +15,8 @@ Bugfixes
 
 - Fixed an issue in the pydidas_gui script which caused a segmentation fault on 
   exit in Linux.
+- Fixed an issue with Qt's QStandardLocation folder name inconsistencies between
+  windows and Linux.
 
 
 v23.06.16

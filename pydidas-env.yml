@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
+  - python>=3.9
   - pyqt>=5.15.7
   - pip=22.3.1
   - pyFAI==2023.1.0

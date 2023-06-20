@@ -20,6 +20,7 @@ Bugfixes
   exit in Linux.
 - Fixed an issue with Qt's QStandardLocation folder name inconsistencies between
   windows and Linux.
+- Improved an exception message for Parameter's value setter.
 
 
 v23.06.16

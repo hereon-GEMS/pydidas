@@ -18,7 +18,7 @@ per-file-ignores =
     dectris_utils.py: F401
     hdf5_dataset_utils.py: F401
     read_hdf5_slice.py: F401
-    read_hdf5_dataset.py: F401
+    read_hdf5_dataset_.py: F401
     hdf5_dataset_selector.py: F401, E501
     hdf5_io.py: F401
     base_app.py: E731

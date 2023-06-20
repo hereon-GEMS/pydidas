@@ -8,7 +8,10 @@ v23.MM.DD
 Improvements
 ------------
 
+- General improvements:
 
+    - Exposed the read_hdf5_dataset function directly in 
+      pydidas.data_io.low_level_readers.
 
 Bugfixes
 --------

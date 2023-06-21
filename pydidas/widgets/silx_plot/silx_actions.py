@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,14 +21,15 @@ widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
+    "AutoscaleToMeanAndThreeSigma",
+    "CropHistogramOutliers",
     "ChangeCanvasToData",
     "ExpandCanvas",
-    "CropHistogramOutliers",
     "PydidasLoadImageAction",
     "PydidasGetDataInfoAction",
 ]
@@ -39,6 +40,7 @@ import numpy as np
 import silx.gui.plot
 from qtpy import QtCore, QtWidgets
 from silx.gui.plot.actions import PlotAction
+from silx.gui.colors import Colormap
 
 from ...core import PydidasQsettingsMixin, UserConfigError, utils
 from ...data_io import IoMaster, import_data
@@ -121,6 +123,35 @@ class ExpandCanvas(PlotAction):
         self.plot.resetZoom()
 
 
+class AutoscaleToMeanAndThreeSigma(PlotAction):
+    """
+    A new custom PlotAction to set the colormap to autoscale with mean +/- 3 sigma.
+    """
+
+    def __init__(self, plot, parent=None):
+        PlotAction.__init__(
+            self,
+            plot,
+            icon=utils.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
+            text="Autoscale colormap to mean +/- 3 std",
+            tooltip="Autoscale colormap to mean +/- 3 std",
+            triggered=self._actionTriggered,
+            checkable=False,
+            parent=parent,
+        )
+        PydidasQsettingsMixin.__init__(self)
+
+    def _actionTriggered(self, checked=False):
+        image = self.plot.getActiveImage()
+        if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
+            return
+
+        colormap = image.getColormap()
+        colormap.setAutoscaleMode(Colormap.STDDEV3)
+        colormap.setVMin(None)
+        colormap.setVMax(None)
+
+
 class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
     """
     A new custom PlotAction to crop outliers from the histogram.
@@ -190,7 +221,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
             _index_stop = np.where(_fraction_low <= _cumcounts)[0].size
 
             _counts2, _edges2 = np.histogram(
-                _data, bins=32768, range=(0, _edges[_index_stop])
+                _data, bins=32768, range=(_edges[0], _edges[_index_stop])
             )
             _cumcounts2 = np.cumsum(_counts2 / _data.size)
             _index_stop2 = max(1, np.where(_cumcounts2 <= _fraction_low)[0].size)

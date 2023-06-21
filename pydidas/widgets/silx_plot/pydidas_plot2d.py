@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -39,6 +39,7 @@ from ...core import PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
 from .silx_actions import (
+    AutoscaleToMeanAndThreeSigma,
     ChangeCanvasToData,
     CropHistogramOutliers,
     ExpandCanvas,
@@ -91,11 +92,19 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.cropHistOutliersAction = self.group.addAction(
             CropHistogramOutliers(self, parent=self)
         )
-        self.cropHistOutliersAction.setVisible(True)
         self.addAction(self.cropHistOutliersAction)
         self._toolbar.insertAction(
             self.keepDataAspectRatioAction, self.cropHistOutliersAction
         )
+
+        self.autoscaleToMeanAndThreeSigmaAction = self.group.addAction(
+            AutoscaleToMeanAndThreeSigma(self, parent=self)
+        )
+        self.addAction(self.autoscaleToMeanAndThreeSigmaAction)
+        self._toolbar.insertAction(
+            self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
+        )
+
         if self._config["cs_transform"]:
             self._config["diffraction_exp"].sig_params_changed.connect(
                 self.update_exp_setup_params
@@ -228,6 +237,12 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             _legend += f"/ {data.data_unit}"
         if len(_legend) > 0:
             _cbar.setLegend(_legend)
+
+        if data.shape == (
+            self._config["diffraction_exp"].get_param_value("detector_npixy"),
+            self._config["diffraction_exp"].get_param_value("detector_npixx"),
+        ):
+            self.changeCanvasToDataAction._actionTriggered()
 
     def clear_plot(self):
         """

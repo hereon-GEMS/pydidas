@@ -82,6 +82,10 @@ menu entries description
         the colormap to ignore the low *x% and the top *y%* of the image 
         histogram. The levels of *x* and *y* can be adjusted in the pydidas 
         user settings.      
+    * - .. image:: ../silx/images/menu_cmap_autoscale.png
+            :align: center
+      - Autoscale the colormap to the image mean value +/- 3 standard 
+        deviations.       
     * -  .. image:: ../silx/images/menu_aspect.png
             :align: center
       - This action allows to control the aspect of the displayed data and 

@@ -12,6 +12,11 @@ Improvements
 
     - Exposed the read_hdf5_dataset function directly in 
       pydidas.data_io.low_level_readers.
+    - Added a new action to quickly access silx's autoscale to mean +/- 3 std  
+      in PydidasPlot2D and PydidasImageView
+    - PydidasPlot2D will now compare the image size with the detector image size
+      and if the two images are of the same size, it will set the aspect ratio
+      to 'same'.
 
 Bugfixes
 --------

@@ -18,6 +18,10 @@ Improvements
       and if the two images are of the same size, it will set the aspect ratio
       to 'same'.
 
+- Plugins:
+
+    - Added a 'total count intensity' output to fit plugins.
+
 Bugfixes
 --------
 

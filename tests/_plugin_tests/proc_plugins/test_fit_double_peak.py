@@ -191,7 +191,7 @@ class TestFitDoublePeak(unittest.TestCase):
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
-        self.assertEqual(_data.data_unit, self._data.axis_units[0])
+        self.assertIn(self._data.axis_units[0], _data.data_label)
 
     def test_execute__gaussian_no_bg_all_outputs(self):
         plugin = self.create_generic_plugin()

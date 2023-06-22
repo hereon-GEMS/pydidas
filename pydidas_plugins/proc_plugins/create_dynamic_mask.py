@@ -34,7 +34,7 @@ import numpy as np
 import scipy.ndimage
 
 from pydidas.contexts import DiffractionExperimentContext
-from pydidas.core import UserConfigError, get_generic_param_collection
+from pydidas.core import Dataset, UserConfigError, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_IMAGE
 from pydidas.core.utils import rebin2d
 from pydidas.data_io import import_data
@@ -79,6 +79,18 @@ class CreateDynamicMask(ProcPlugin):
         self._trivial = False
         self.set_param_value("use_detector_mask", True)
 
+    @property
+    def detailed_results(self):
+        """
+        Get the detailed results for the Remove1dPolynomialBackground plugin.
+
+        Returns
+        -------
+        dict
+            The dictionary with detailed results.
+        """
+        return self._details
+
     def pre_execute(self):
         """
         Check the use_global_det_mask Parameter and load the mask image.
@@ -89,6 +101,7 @@ class CreateDynamicMask(ProcPlugin):
         ):
             self._trivial = True
             return
+        self._mask = None
         if self.get_param_value("use_detector_mask"):
             self.load_and_set_mask()
 
@@ -103,7 +116,6 @@ class CreateDynamicMask(ProcPlugin):
         """
         Load and store the generic detector mask.
         """
-        self._mask = None
         _mask_file = self._EXP.get_param_value("detector_mask_file")
         if _mask_file != pathlib.Path():
             if _mask_file.is_file():
@@ -135,7 +147,10 @@ class CreateDynamicMask(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
+        self.__data = data
         if self._trivial:
+            self.__masked_pixels = np.zeros(data.shape, dtype=bool)
+            self._create_detailed_results(self._mask)
             return data, kwargs
         _low = self.get_param_value("mask_threshold_low")
         if _low is not None:
@@ -151,7 +166,41 @@ class CreateDynamicMask(ProcPlugin):
                 structure=self._kernel,
                 iterations=self.get_param_value("kernel_iterations"),
             )
+        self.__masked_pixels = _mask
         if self._mask is not None:
             _mask = self._mask + _mask
+        self._create_detailed_results(_mask)
         kwargs["custom_mask"] = _mask
         return data, kwargs
+
+    def _create_detailed_results(self, final_mask):
+        """
+        Get the detailed results for the dynamic mask plugin.
+
+        This method will return information with the input image and the mask.
+
+        Returns
+        -------
+        dict
+            The dictionary with the detailed results in the format expected by pydidas.
+        """
+        self._details = {
+            None: {
+                "n_plots": 1 + (final_mask is not None),
+                "plot_titles": {
+                    0: "masked pixels",
+                    1: "final mask (including detector mask",
+                },
+                "items": [
+                    {
+                        "plot": 0,
+                        "label": "masked_pixels",
+                        "data": Dataset(self.__masked_pixels),
+                    },
+                ],
+            }
+        }
+        if final_mask is not None:
+            self._details[None]["items"].append(
+                {"plot": 1, "label": "final mask", "data": Dataset(final_mask)}
+            )

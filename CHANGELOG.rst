@@ -21,6 +21,8 @@ Improvements
 - Plugins:
 
     - Added a 'total count intensity' output to fit plugins.
+    - Added 'detailed_results' to CreateDynamicMask plugin to check the created
+      mask.
 
 Bugfixes
 --------

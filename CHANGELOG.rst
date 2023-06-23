@@ -17,6 +17,9 @@ Improvements
     - PydidasPlot2D will now compare the image size with the detector image size
       and if the two images are of the same size, it will set the aspect ratio
       to 'same'.
+    - Removed the '3D' visualization option from pyFAI calibration because it 
+      requires pyopengl and raises exceptions when the Detector is not yet 
+      set up and when the 3D visualization window is closed.
 
 - Plugins:
 

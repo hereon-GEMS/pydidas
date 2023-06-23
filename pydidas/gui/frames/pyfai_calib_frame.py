@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
-# Parts of this file are adapted based on the pyFAI.gui.CalibrationWindow widget which
-# is distributed under the MIT license.
+# Parts of this file are adapted based on the pyFAI.gui.CalibrationWindow
+# widget which is distributed under the MIT license.
 
 """
 Module with the PyfaiCalibFrame which is roughly based on the pyfai-calib2 window
@@ -27,7 +27,7 @@ __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PyfaiCalibFrame"]
 
 
@@ -100,6 +100,9 @@ def _create_calib_tasks():
         ][0]
         _toolbar.addAction(_histo_crop_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
+    # explicitly hide the toolbar with the 3D visualization:
+    tasks[0]._ExperimentTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
+    tasks[3]._GeometryTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
     # insert button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()
     tasks[4]._update_context_button = QtWidgets.QPushButton(

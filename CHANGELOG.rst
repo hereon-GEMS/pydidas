@@ -20,7 +20,7 @@ Improvements
     - Removed the '3D' visualization option from pyFAI calibration because it 
       requires pyopengl and raises exceptions when the Detector is not yet 
       set up and when the 3D visualization window is closed.
-
+    
 - Plugins:
 
     - Added a 'total count intensity' output to fit plugins.
@@ -35,6 +35,7 @@ Bugfixes
 - Fixed an issue with Qt's QStandardLocation folder name inconsistencies between
   windows and Linux.
 - Improved an exception message for Parameter's value setter.
+- Fixed an issue with the centering of the WorkflowTree in the WorkflowEditFrame
 
 
 v23.06.16

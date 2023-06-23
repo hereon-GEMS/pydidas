@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -105,9 +105,12 @@ class WorkflowTreeCanvas(QtWidgets.QFrame, CreateWidgetsMixIn):
         """
         Set the Qt sizeHint to be the widget's size.
 
+        Note that the sizeHint is arbitrary large because it limits the QScrollArea's
+        size.
+
         Returns
         -------
         QtCore.QSize
             The size of the widget.
         """
-        return QtCore.QSize(1000, 600)
+        return QtCore.QSize(5000, 3000)

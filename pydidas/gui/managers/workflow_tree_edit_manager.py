@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ with the editing Canvas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTreeEditManager"]
 
 
@@ -316,23 +316,16 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _positions = self.root.get_relative_positions()
         _pos_vals = np.asarray(list(_positions.values()))
         _tree_width = self.root.width
-        _canvas_width = self.qt_canvas.parent().parent().width()
-        _canvas_height = self.qt_canvas.parent().parent().height()
-        _offset = (
-            (_canvas_width - _tree_width) // 2 if _tree_width < _canvas_width else 0
-        )
-        _pos_vals[:, 0] += -np.amin(_pos_vals[:, 0]) + self.pos_x_min + _offset
+        _pos_vals[:, 0] += -np.amin(_pos_vals[:, 0]) + self.pos_x_min
         _pos_vals[:, 1] += -np.amin(_pos_vals[:, 1]) + self.pos_y_min
         self._node_positions = {key: _pos_vals[i] for i, key in enumerate(_positions)}
         for node_id in TREE.node_ids:
             self._node_widgets[node_id].move(
                 self._node_positions[node_id][0], self._node_positions[node_id][1]
             )
-        _canvas_xsize = max(
-            _tree_width + 2 * self.pos_x_min + _offset, _canvas_width - 30
+        self.qt_canvas.setFixedSize(
+            _tree_width + 2 * self.pos_x_min, self.root.height + 2 * self.pos_y_min
         )
-        _canvas_ysize = max(self.root.height + 2 * self.pos_y_min, _canvas_height - 30)
-        self.qt_canvas.setFixedSize(_canvas_xsize, _canvas_ysize)
         self.__update_node_connections()
 
     def __update_node_connections(self):

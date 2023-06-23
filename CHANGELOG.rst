@@ -26,6 +26,7 @@ Improvements
     - Added a 'total count intensity' output to fit plugins.
     - Added 'detailed_results' to CreateDynamicMask plugin to check the created
       mask.
+    - Added a 'rolling average' plugin for 1D data.
 
 Bugfixes
 --------

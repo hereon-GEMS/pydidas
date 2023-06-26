@@ -108,8 +108,10 @@ class Lorentzian(FitFuncBase):
         _high_x = cls.get_fwhm_indices(_center_start, _ycenter, x, y)
         _gamma_start = kwargs.get(f"width{index}_start", None)
         if _gamma_start is None:
-            if _high_x.size > 0:
+            if _high_x.size > 1:
                 _gamma_start = (x[_high_x[-1]] - x[_high_x[0]]) / 2
+            elif _high_x.size == 1:
+                _gamma_start = x[1] - x[0]
             else:
                 _gamma_start = (x[-1] - x[0]) / 5
 

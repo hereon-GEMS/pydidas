@@ -109,9 +109,12 @@ class Voigt(FitFuncBase):
             _gamma_start = _gamma_start / 2
             _sigma_start = _gamma_start
         else:
-            if _high_x.size > 0:
+            if _high_x.size > 1:
                 _gamma_start = 0.34 * (x[_high_x[-1]] - x[_high_x[0]])
                 _sigma_start = 0.34 * (x[_high_x[-1]] - x[_high_x[0]])
+            elif _high_x.size == 1:
+                _gamma_start = 0.34 * (x[1] - x[0])
+                _sigma_start = 0.34 * (x[1] - x[0])
             else:
                 _gamma_start = (x[-1] - x[0]) / 6
                 _sigma_start = (x[-1] - x[0]) / 6

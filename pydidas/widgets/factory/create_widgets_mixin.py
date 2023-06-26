@@ -67,6 +67,8 @@ class CreateWidgetsMixIn:
         Please refer to pydidas.widgets.factory.create_spacer
         """
         _parent = kwargs.get("parent_widget", self)
+        if isinstance(_parent, str):
+            _parent = self._widgets[_parent]
         _spacer = create_spacer(**kwargs)
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)

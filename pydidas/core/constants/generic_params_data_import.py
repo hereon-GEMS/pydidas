@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ Parameters for data import.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021- Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GENERIC_PARAMS_DATA_IMPORT"]
 
 
@@ -37,6 +37,15 @@ GENERIC_PARAMS_DATA_IMPORT = {
         "unit": "",
         "allow_None": False,
         "tooltip": "The file name of the input file.",
+    },
+    "current_filename": {
+        "type": str,
+        "default": "",
+        "name": "Current input filename",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": "The filename of the currently active file.",
     },
     "filename_pattern": {
         "type": "Path",

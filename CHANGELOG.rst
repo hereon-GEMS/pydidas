@@ -21,6 +21,7 @@ Improvements
       requires pyopengl and raises exceptions when the Detector is not yet 
       set up and when the 3D visualization window is closed.
     - Improved the widgets.factory to allow parent string references.
+    - Added a frame for image mathematics.
     
 - Plugins:
 

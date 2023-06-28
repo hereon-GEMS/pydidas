@@ -31,7 +31,7 @@ __all__ = ["QuickIntegrationFrame"]
 from functools import partial
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...contexts.diffraction_exp_context import DiffractionExperiment
@@ -94,15 +94,6 @@ class QuickIntegrationFrame(BaseFrame):
             caption="Import diffraction experiment configuration",
             formats=DiffractionExperimentIo.get_string_of_formats(),
             qsettings_ref="QuickIntegrationFrame__diffraction_exp_import",
-        )
-        self.__export_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="save_file",
-            caption="Export experiment context file",
-            formats=DiffractionExperimentIo.get_string_of_formats(),
-            default_extension="yaml",
-            dialog=QtWidgets.QFileDialog.getSaveFileName,
-            qsettings_ref="DefineDiffractionExpFrame__export",
         )
         self._config["scroll_width"] = 350
         self._config["custom_det_pxsize"] = 100

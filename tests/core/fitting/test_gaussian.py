@@ -24,14 +24,12 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import itertools
 import unittest
 
 import numpy as np
 
 from pydidas.core import Dataset
 from pydidas.core.fitting.gaussian import Gaussian
-from pydidas.plugins import BasePlugin, PluginCollection
 
 
 class TestGaussian(unittest.TestCase):

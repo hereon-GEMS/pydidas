@@ -43,6 +43,7 @@ Bugfixes
   up correctly during initial parameter estimates.
 - Fixed an issue in the DirectorySpyApp where the tifffile would return an empty
   array instead of an exception for unreadable files.
+- Fixed an issue in the DirectorySpyApp when the directory is empty.
 
 
 v23.06.16

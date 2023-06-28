@@ -441,7 +441,10 @@ class DirectorySpyApp(BaseApp):
                 _fname = self._config["2nd_latest_file"]
                 _image = self.get_image(_fname)
             except (ValueError, KeyError, FileNotFoundError, UserConfigError):
-                raise RuntimeError("Cannot read either of the last to files.")
+                raise UserConfigError(
+                    "Cannot read either of the last two files. Please check the "
+                    "directory and filenames."
+                )
         _image = self._apply_mask(_image)
         if self.get_param_value("use_bg_file"):
             _image -= self._bg_image

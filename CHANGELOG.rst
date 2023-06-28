@@ -41,6 +41,8 @@ Bugfixes
 - Fixed an issue with the centering of the WorkflowTree in the WorkflowEditFrame
 - Fixed an issue in the peak fitting plugins where narrow peaks were not picked 
   up correctly during initial parameter estimates.
+- Fixed an issue in the DirectorySpyApp where the tifffile would return an empty
+  array instead of an exception for unreadable files.
 
 
 v23.06.16

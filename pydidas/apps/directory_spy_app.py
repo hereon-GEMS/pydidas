@@ -434,6 +434,8 @@ class DirectorySpyApp(BaseApp):
         try:
             _fname = self._config["latest_file"]
             _image = self.get_image(_fname)
+            if _image.shape == 0:
+                raise ValueError("Empty image.")
         except (ValueError, KeyError, FileNotFoundError, UserConfigError):
             try:
                 _fname = self._config["2nd_latest_file"]

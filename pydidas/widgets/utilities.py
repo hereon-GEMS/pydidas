@@ -235,6 +235,8 @@ def get_grid_pos(parent, **kwargs):
         )
     if _grid_pos[0] == -1:
         _grid_pos = (_default_row,) + _grid_pos[1:4]
+    if _grid_pos[1] == -1:
+        _grid_pos = (_grid_pos[0], parent.layout().columnCount()) + _grid_pos[2:]
     return _grid_pos
 
 
@@ -271,9 +273,7 @@ def update_param_and_widget_choices(param_widget, new_choices):
 
 
 class BlockUpdates:
-    """
-    Class to block UI updates from a QWidget.
-    """
+    """Class to block UI updates from a QWidget."""
 
     def __init__(self, caller):
         self._caller = caller

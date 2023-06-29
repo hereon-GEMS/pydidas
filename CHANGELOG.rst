@@ -44,6 +44,8 @@ Bugfixes
 - Fixed an issue in the DirectorySpyApp where the tifffile would return an empty
   array instead of an exception for unreadable files.
 - Fixed an issue in the DirectorySpyApp when the directory is empty.
+- Fixed an isssue in the pyFAIintegrationBase, where setting the azimuthal ROI
+  would not work, if the boundaries where updated in a specific order.
 
 
 v23.06.16

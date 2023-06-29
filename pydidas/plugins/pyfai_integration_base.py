@@ -288,6 +288,8 @@ class pyFAIintegrationBase(ProcPlugin):
         _factor = 1 if "rad" in self.get_param_value("azi_unit") else np.pi / 180
         _lower = _factor * self.get_param_value("azi_range_lower")
         _upper = _factor * self.get_param_value("azi_range_upper")
+        if _upper - _lower > 2 * np.pi:
+            _lower += 2 * np.pi
         if _upper > 2 * np.pi:
             _lower = np.mod(_lower, 2 * np.pi)
             _upper = np.mod(_upper, 2 * np.pi)

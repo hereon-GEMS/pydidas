@@ -46,6 +46,8 @@ Bugfixes
 - Fixed an issue in the DirectorySpyApp when the directory is empty.
 - Fixed an isssue in the pyFAIintegrationBase, where setting the azimuthal ROI
   would not work, if the boundaries where updated in a specific order.
+- Fixed an issue where the GUI scripts would stop during state restoration if 
+  the state was invalid.
 
 
 v23.06.16

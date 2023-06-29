@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,13 +21,14 @@ to select the different frames.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["MainWindow"]
 
 import os
+import warnings
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
@@ -285,7 +286,14 @@ class MainWindow(MainMenu):
             The filename to be used to restore the state. This kwarg will only be used
             if the state kwarg is set to "manual".
         """
-        MainMenu.restore_gui_state(self, state, filename)
+        try:
+            MainMenu.restore_gui_state(self, state, filename)
+        except Exception as exc:
+            warnings.warn(
+                "Error during GUI state restoration:\n"
+                + str(exc)
+                + "\nSkipping restoration..."
+            )
         self.select_item(self.centralWidget().currentWidget().menu_entry)
 
     def export_mainwindow_state(self):

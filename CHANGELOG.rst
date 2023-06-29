@@ -54,6 +54,8 @@ Bugfixes
   not update the shape correctly.
 - Fixed an issue where the result selection range was not updated correctly 
   after changing the scan dimensions.
+- Fixed an issue where specifying the peak starting guess outside of the data
+  range would raise a ValueError.
 
 
 v23.06.16

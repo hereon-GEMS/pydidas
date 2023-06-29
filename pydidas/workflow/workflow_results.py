@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ singleton class for storing and accessing the composite results of the processin
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResults", "WorkflowResultsContext"]
 
 import os
@@ -109,7 +109,7 @@ class WorkflowResults(QtCore.QObject):
         Clear all interally stored results and reset the instance attributes.
         """
         self.__composites = {}
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self.__source_hash = -1
         self._config = {
             "shapes": {},
             "node_labels": {},
@@ -565,16 +565,9 @@ class WorkflowResults(QtCore.QObject):
             Flag to add an entry of no selection in addition to the entries
             from the nodes. The default is True.
         """
-        _curr_choice = param.value
         _new_choices = ["No selection"] if add_no_selection_entry else []
         _new_choices.extend(list(self._config["result_titles"].values()))
-        if _curr_choice in _new_choices:
-            param.choices = _new_choices
-        else:
-            _new_choices.append(_curr_choice)
-            param.choices = _new_choices
-            param.value = _new_choices[0]
-            param.choices = _new_choices[:-1]
+        param.update_value_and_choices(_new_choices[0], _new_choices)
 
     def get_node_result_metadata_string(
         self, node_id, use_scan_timeline=False, squeeze_results=True

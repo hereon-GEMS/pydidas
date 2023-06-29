@@ -168,7 +168,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         int
             The hash value.
         """
-        _param_vals = (
+        _hash_tuple = tuple(
             [
                 self.get_param_value(f"data_slice_{_dim}")
                 for _dim in range(self._config["result_ndim"])
@@ -177,8 +177,9 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             + [self.get_param_value("use_data_range")]
             + [self._config["result_ndim"]]
             + [self._config["active_node"]]
+            + [hash(self._SCAN)]
         )
-        return hash(tuple(_param_vals))
+        return hash(tuple(_hash_tuple))
 
     def _update_selection(self):
         """

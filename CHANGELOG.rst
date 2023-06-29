@@ -50,6 +50,8 @@ Bugfixes
   the state was invalid.
 - Fixed an issue in the BaseFitPlugin where changing the output settings would
   not update the shape correctly.
+- Fixed an issue where the result selection range was not updated correctly 
+  after changing the scan dimensions.
 
 
 v23.06.16

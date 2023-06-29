@@ -90,6 +90,7 @@ Detailed descriptions of the individual frames are given here.
     frames/CompositeCreatorFrame
     frames/DirectorySpyFrame
     frames/QuickIntegrationFrame
+    frames/ImageMathFrame
     frames/DefineDiffractionExpFrame
     frames/DefineScanFrame
     frames/WorkflowEditFrame

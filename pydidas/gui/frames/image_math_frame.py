@@ -73,7 +73,7 @@ class ImageMathFrame(BaseFrame):
     frames or to combine multiple frames.
     """
 
-    menu_icon = "qta::mdi.home"
+    menu_icon = "pydidas::frame_icon_image_math.png"
     menu_title = "Image math"
     menu_entry = "Image math"
 
@@ -164,7 +164,7 @@ class ImageMathFrame(BaseFrame):
                 f"::{self.get_param_value('hdf5_key', dtype=str)}"
                 f"::{self.get_param_value('hdf5_frame')}"
             )
-        self._input["data"] = import_data(filename, **kwargs)
+        self._input["data"] = import_data(filename, **kwargs).astype(np.float32)
         self._input["name"] = _fname
         self._input["path"] = filename
         self._plot_image(input_data=True)
@@ -363,9 +363,9 @@ class ImageMathFrame(BaseFrame):
                 raise UserConfigError(
                     f"Cannot convert the value '{_arg2}' to a number."
                 ) from _error
-            self._image_buffer[_index_out] = _func(_input, _arg2)
+            self._image_buffer[_index_out] = _func(_input, _arg2, dtype=np.float32)
         else:
-            self._image_buffer[_index_out] = _func(_input)
+            self._image_buffer[_index_out] = _func(_input, dtype=np.float32)
         self.new_buffer_selection(f"Image #{_index_out}")
 
     @QtCore.Slot()
@@ -381,6 +381,11 @@ class ImageMathFrame(BaseFrame):
         _input2 = self.get_input_image(
             self._widgets["combo_ops_image_arithmetic_input_2"].currentText()
         )
+        if _input1.shape != _input2.shape:
+            raise UserConfigError(
+                "The selected images have different shapes and cannot be processed. "
+                "Please select two images with the same shape."
+            )
         if _ops == "+":
             self._image_buffer[_index_out] = _input1 + _input2
         elif _ops == "-":

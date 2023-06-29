@@ -48,6 +48,8 @@ Bugfixes
   would not work, if the boundaries where updated in a specific order.
 - Fixed an issue where the GUI scripts would stop during state restoration if 
   the state was invalid.
+- Fixed an issue in the BaseFitPlugin where changing the output settings would
+  not update the shape correctly.
 
 
 v23.06.16

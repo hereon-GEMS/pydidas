@@ -84,6 +84,20 @@ class BaseFitPlugin(ProcPlugin):
         }
 
     @property
+    def result_shape(self) -> tuple:
+        """
+        Get the shape of the plugin result.
+
+        Returns
+        -------
+        tuple
+            The shape of the results with a value for each dimension. Unknown
+            dimensions are represented as -1 value.
+        """
+        self.calculate_result_shape()
+        return self._config["result_shape"]
+
+    @property
     def detailed_results(self):
         """
         Get the detailed results for the FitSinglePeak plugin.

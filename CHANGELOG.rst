@@ -22,6 +22,8 @@ Improvements
       set up and when the 3D visualization window is closed.
     - Improved the widgets.factory to allow parent string references.
     - Added a frame for image mathematics.
+    - Added an option in the TestWorkflowFrame to select scan points by their 
+      detector image number.
     
 - Plugins:
 

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,21 +24,21 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
+import multiprocessing as mp
+import os
+import random
+import shutil
+import tempfile
 import time
 import unittest
-import tempfile
-import shutil
-import random
-import os
-import multiprocessing as mp
 
 import h5py
 import numpy as np
 
-from pydidas.core import get_generic_parameter, UserConfigError
-from pydidas.core.utils import get_random_string
 from pydidas.apps.directory_spy_app import DirectorySpyApp
 from pydidas.apps.parsers import directory_spy_app_parser
+from pydidas.core import UserConfigError, get_generic_parameter
+from pydidas.core.utils import get_random_string
 
 
 class TestDirectorySpyApp(unittest.TestCase):
@@ -510,7 +510,7 @@ class TestDirectorySpyApp(unittest.TestCase):
 
     def test_multiprocessing_func__no_files(self):
         app = self.create_default_app()
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(UserConfigError):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_func__last_file_not_readable(self):
@@ -539,7 +539,7 @@ class TestDirectorySpyApp(unittest.TestCase):
         for _name in _names:
             with open(_name, "w") as f:
                 f.write("no image file")
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(UserConfigError):
             app.multiprocessing_func(None)
 
     def test_multiprocessing_func__both_files_readable(self):

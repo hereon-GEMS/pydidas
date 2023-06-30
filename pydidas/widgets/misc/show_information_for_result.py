@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ information about a datapoint from a pydidas result.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ShowInformationForResult"]
 
 
@@ -38,26 +38,23 @@ from ...core.utils import (
     get_fixed_length_str,
     get_pydidas_icon_w_bg,
 )
+from ...plugins import BasePlugin
 from ..factory import CreateWidgetsMixIn
+from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
 from .read_only_text_widget import ReadOnlyTextWidget
 
 
-class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
-    """
-    Window to display detailed information about a datapoint from a pydidas result.
-    """
+class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
+    """Window to display detailed information about a result datapoint."""
 
     show_frame = False
     sig_closed = QtCore.Signal()
     sig_this_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None):
-        QtWidgets.QWidget.__init__(self, parent)
+        PydidasWindow.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
-        _layout = QtWidgets.QGridLayout()
-        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.setLayout(_layout)
 
         self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setWindowTitle("Information for data point")
@@ -72,14 +69,24 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.create_any_widget(
             "info_field", ReadOnlyTextWidget, fixedWidth=600, fixedHeight=250
         )
-        self.create_button("but_show_input", "Show input frame")
+        self.create_button(
+            "but_show_input", "Show input frame", clicked=self.show_input_image
+        )
         self.create_any_widget(
             "plot", PydidasPlotStack, visible=False, minimumHeight=600
         )
-        self._widgets["but_show_input"].clicked.connect(self.show_input_image)
+        self.create_spacer(
+            "final_spacer",
+            visible=True,
+            vertical_policy=QtWidgets.QSizePolicy.Expanding,
+        )
 
     def display_information(
-        self, data, selection_config, result_metadata, loader_plugin
+        self,
+        data: tuple,
+        selection_config: dict,
+        result_metadata: dict,
+        loader_plugin: BasePlugin,
     ):
         """
         Display the information about the selected datapoint.
@@ -133,6 +140,7 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
             if selection_config["use_timeline"]
             else _scan.get_frame_from_indices(_dim_selections[: _scan.ndim])
         )
+        self._index = _scan.get_index_of_frame(self._frame)
         _scan_indices = _scan.get_frame_position_in_scan(self._frame)
 
         _info_str += (
@@ -161,9 +169,7 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
 
     @QtCore.Slot()
     def show_input_image(self):
-        """
-        Run the plugin with the current Parameters.
-        """
+        """Show the input image as loaded from the loader plugin."""
         if not Path(self._loader_plugin.get_filename(self._frame)).is_file():
             self._widgets["but_show_input"].setEnabled(False)
             raise UserConfigError(
@@ -173,5 +179,5 @@ class ShowInformationForResult(QtWidgets.QWidget, CreateWidgetsMixIn):
         self._widgets["plot"].setVisible(True)
         with ShowBusyMouse():
             self._loader_plugin.pre_execute()
-            _input, _kwargs = self._loader_plugin.execute(self._frame)
+            _input, _kwargs = self._loader_plugin.execute(self._index)
             self._widgets["plot"].plot_data(_input)

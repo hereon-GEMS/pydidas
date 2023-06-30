@@ -183,6 +183,16 @@ class TestScanContext(unittest.TestCase):
                 _index = SCAN.get_index_position_in_scan(_n)
                 self.assertEqual(_index, _pos)
 
+    def test_get_index_of_frame(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _n = 60
+        for M in range(1, 4):
+            with self.subTest(M=M):
+                SCAN.set_param_value("scan_multiplicity", M)
+                _index = SCAN.get_index_of_frame(_n)
+                self.assertEqual(_index, _n / M)
+
     def test_get_frame_from_indices__zero(self):
         SCAN = Scan()
         self.set_scan_params(SCAN)

@@ -58,6 +58,8 @@ Bugfixes
   range would raise a ValueError.
 - Fixed an issue with Scan multiplicity > 1 which would not store results 
   correctly.
+- Fixed an issue in the ShowInformationForResult window with Scan multiplicity 
+  > 1.
 
 
 v23.06.16

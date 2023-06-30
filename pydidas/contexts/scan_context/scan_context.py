@@ -189,6 +189,22 @@ class Scan(ObjectWithParameterCollection):
         _index = np.sum(_factors * indices) * self.get_param_value("scan_multiplicity")
         return _index
 
+    def get_index_of_frame(self, frame_index: int) -> int:
+        """
+        Get the scan point index of the given frame.
+
+        Parameters
+        ----------
+        frame_index : int
+            The frame index.
+
+        Returns
+        -------
+        int
+            The scan point index.
+        """
+        return frame_index // self.get_param_value("scan_multiplicity")
+
     def get_metadata_for_dim(self, index: int) -> Tuple[str, str, np.ndarray]:
         """
         Get the label, unit and range of the specified scan dimension.

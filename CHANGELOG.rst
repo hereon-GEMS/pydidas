@@ -56,6 +56,8 @@ Bugfixes
   after changing the scan dimensions.
 - Fixed an issue where specifying the peak starting guess outside of the data
   range would raise a ValueError.
+- Fixed an issue with Scan multiplicity > 1 which would not store results 
+  correctly.
 
 
 v23.06.16

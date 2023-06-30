@@ -165,7 +165,7 @@ class WorkflowResults(QtCore.QObject):
         """
         if not self._config["metadata_complete"]:
             self.__update_composite_metadata(results)
-        _scan_index = self._SCAN.get_frame_position_in_scan(index)
+        _scan_index = self._SCAN.get_index_position_in_scan(index)
         for _key, _val in results.items():
             self.__composites[_key][_scan_index] = _val
         self.new_results.emit()

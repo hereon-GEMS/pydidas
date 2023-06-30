@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Hdf5 file format.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -229,7 +229,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
             Any kwargs which should be passed to the udnerlying exporter.
         """
         _scan = ScanContext() if scan_context is None else scan_context
-        _indices = _scan.get_frame_position_in_scan(index)
+        _indices = _scan.get_index_position_in_scan(index)
         if not cls._metadata_written:
             cls.write_metadata_to_files(frame_result_dict, _scan)
         for _node_id, _data in frame_result_dict.items():
@@ -257,7 +257,7 @@ class WorkflowResultIoHdf5(WorkflowResultIoBase):
         _scan = ScanContext() if scan_context is None else scan_context
 
         if not cls._metadata_written:
-            _indices = _scan.get_frame_position_in_scan(0)
+            _indices = _scan.get_index_position_in_scan(0)
             cls.write_metadata_to_files(
                 {_id: _data[_indices] for _id, _data in full_data.items()}, _scan
             )

@@ -85,9 +85,15 @@ class WorkflowResults(QtCore.QObject):
         self.clear_all_results()
         _dim = self._SCAN.get_param_value("scan_dim")
         _results = self._TREE.get_all_result_shapes()
-        _shapes = {_key: self._SCAN.shape + _shape for _key, _shape in _results.items()}
-        for _node_id, _shape in _shapes.items():
-            _dset = Dataset(np.empty(_shape, dtype=np.float32))
+        for _node_id, _shape in _results.items():
+            _plugin = self._TREE.nodes[_node_id].plugin
+            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
+            self._config["data_labels"][_node_id] = _plugin.output_data_label
+            self._config["data_units"][_node_id] = _plugin.output_data_unit
+            self._config["plugin_names"][_node_id] = _plugin.plugin_name
+            self._config["result_titles"][_node_id] = _plugin.result_title
+            self._config["shapes"][_node_id] = self._SCAN.shape + _shape
+            _dset = Dataset(np.empty(self._SCAN.shape + _shape, dtype=np.float32))
             _dset[:] = np.nan
             for index in range(_dim):
                 _label, _unit, _range = self._SCAN.get_metadata_for_dim(index)
@@ -95,13 +101,7 @@ class WorkflowResults(QtCore.QObject):
                 _dset.update_axis_units(index, _unit)
                 _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
-            self._config["shapes"] = _shapes
-            _plugin = self._TREE.nodes[_node_id].plugin
-            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.output_data_label
-            self._config["data_units"][_node_id] = _plugin.output_data_unit
-            self._config["plugin_names"][_node_id] = _plugin.plugin_name
-            self._config["result_titles"][_node_id] = _plugin.result_title
+
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
 
     def clear_all_results(self):

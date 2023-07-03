@@ -389,7 +389,7 @@ class _WorkflowTree(GenericTree):
             if -1 in _shape:
                 raise UserConfigError(
                     "Cannot determine the shape of the output for node "
-                    f"#{_id} (type {self.nodes[_id].plugin.__class__})."
+                    f"#{_id} (type {type(self.nodes[_id].plugin).__name__})."
                 )
         return _shapes
 

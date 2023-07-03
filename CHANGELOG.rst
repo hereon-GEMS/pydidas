@@ -60,6 +60,8 @@ Bugfixes
   correctly.
 - Fixed an issue in the ShowInformationForResult window with Scan multiplicity 
   > 1.
+- Fixed an issue with the basic PydidasWindow when not running with a 
+  PydidasQApplication.
 
 
 v23.06.16

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -28,7 +28,9 @@ __status__ = "Production"
 __all__ = ["WorkflowEditFrameBuilder"]
 
 
-from ....core.constants import POLICY_EXP_EXP, STANDARD_FONT_SIZE
+from qtpy.QtWidgets import QAbstractScrollArea
+
+from ....core.constants import ALIGN_TOP_CENTER, POLICY_EXP_EXP, STANDARD_FONT_SIZE
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -64,6 +66,9 @@ class WorkflowEditFrameBuilder(BaseFrame):
             ScrollArea,
             minimumHeight=450,
             widget=self._widgets["workflow_canvas"],
+            alignment=ALIGN_TOP_CENTER,
+            sizePolicy=POLICY_EXP_EXP,
+            sizeAdjustPolicy=QAbstractScrollArea.AdjustToContents,
             gridPos=(1, 0, 3, 2),
         )
         self.create_label(

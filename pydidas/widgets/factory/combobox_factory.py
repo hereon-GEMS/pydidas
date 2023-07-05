@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,18 +20,19 @@ Module with a factory function to create a QComboBox.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["create_combo_box"]
+
 
 from qtpy.QtWidgets import QComboBox
 
 from ...core.utils import apply_qt_properties
 
 
-def create_combo_box(**kwargs):
+def create_combo_box(**kwargs: dict) -> QComboBox:
     """
     Create a QcomboBox widget.
 
@@ -51,5 +54,8 @@ def create_combo_box(**kwargs):
         The line (in the form of a QFrame widget).
     """
     _box = QComboBox()
+    _items = kwargs.pop("items", None)
+    if _items is not None:
+        _box.insertItems(0, _items)
     apply_qt_properties(_box, **kwargs)
     return _box

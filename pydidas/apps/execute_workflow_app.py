@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,17 @@ for processing diffraction data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ExecuteWorkflowApp"]
+
 
 import multiprocessing as mp
 import time
 import warnings
+from typing import Tuple, Union
 
 import numpy as np
 from qtpy import QtCore
@@ -225,10 +227,7 @@ class ExecuteWorkflowApp(BaseApp):
         )
 
     def initialize_shared_memory(self):
-        """
-        Initialize the shared memory arrays based on the buffer size and
-        the result shapes.
-        """
+        """Initialize the shared arrays from the buffer size and result shapes."""
         _n = self._config["buffer_n"]
         _share = self._config["shared_memory"]
         self._config["shared_memory"]["lock"] = mp.Lock()
@@ -238,9 +237,7 @@ class ExecuteWorkflowApp(BaseApp):
             _share[_key] = mp.Array("f", _num, lock=mp.Lock())
 
     def __initialize_arrays_from_shared_memory(self):
-        """
-        Initialize the numpy arrays from the shared memory buffers.
-        """
+        """Initialize the numpy arrays from the shared memory buffers."""
         for _key, _shape in self._config["result_shapes"].items():
             _share = self._config["shared_memory"][_key]
             _arr_shape = (self._config["buffer_n"],) + _shape
@@ -253,23 +250,21 @@ class ExecuteWorkflowApp(BaseApp):
 
     def _redefine_multiprocessing_carryon(self):
         """
-        Redefine the multiprocessing_carryon method based on the the
-        live_processing settings.
+        Redefine multiprocessing_carryon based on the the live_processing settings.
 
-        To speed up processing, this method will link the required function
-        directly to multiprocessing_carryon. If live_processing is used,
-        this will be the input_available check of the input plugin. If not,
-        the return value will always be True.
+        To speed up processing, this method will link the required function directly to
+        multiprocessing_carryon. If live_processing is used, this will be the
+        input_available check of the input plugin. If not, the return value will always
+        be True.
         """
         if self.get_param_value("live_processing"):
             self.multiprocessing_carryon = self.__live_mp_carryon
         else:
             self.multiprocessing_carryon = lambda: True
 
-    def __live_mp_carryon(self):
+    def __live_mp_carryon(self) -> bool:
         """
-        Check the state of the latest file to allow continuation of the
-        processing.
+        Check the state of the latest file to allow continuation of the processing.
 
         Returns
         -------
@@ -278,13 +273,18 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return TREE.root.plugin.input_available(self._index)
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
+
+        Returns
+        -------
+        np.ndarray
+            The specified input tasks.
         """
         return self._mp_tasks
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Store the reference to the frame index internally.
 
@@ -295,7 +295,7 @@ class ExecuteWorkflowApp(BaseApp):
         """
         self._index = index
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Get the flag value whether to carry on processing.
 
@@ -312,9 +312,14 @@ class ExecuteWorkflowApp(BaseApp):
         """
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> Union[int, Tuple[int, dict]]:
         """
         Perform key operation with parallel processing.
+
+        Parameters
+        ----------
+        index : int
+            The task index to be executed.
 
         Returns
         -------
@@ -332,8 +337,7 @@ class ExecuteWorkflowApp(BaseApp):
 
     def __store_result_metadata(self):
         """
-        Store the result metadata because it cannot be broadcast to the shared
-        array.
+        Store the result metadata because it cannot be broadcast to the shared array.
         """
         for _node_id in self._config["result_shapes"]:
             _res = TREE.nodes[_node_id].results
@@ -358,9 +362,7 @@ class ExecuteWorkflowApp(BaseApp):
             RESULT_SAVER.push_frame_metadata_to_active_savers(self._result_metadata)
 
     def __write_results_to_shared_arrays(self):
-        """
-        Write the results from the WorkflowTree execution to the shared array.
-        """
+        """Write the results from the WorkflowTree execution to the shared array."""
         while True:
             with self._config["shared_memory"]["lock"]:
                 _zeros = np.where(self._shared_arrays["flag"] == 0)[0]
@@ -374,27 +376,25 @@ class ExecuteWorkflowApp(BaseApp):
             self._shared_arrays[_node_id][_buffer_pos] = TREE.nodes[_node_id].results
 
     def multiprocessing_post_run(self):
-        """
-        Perform operations after running main parallel processing function.
-        """
+        """Perform operations after running main parallel processing function."""
 
     @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, *data):
+    def multiprocessing_store_results(self, index: int, *data: tuple):
         """
         Store the results of the multiprocessing operation.
 
         Parameters
         ----------
         index : int
-            The index of the buffer position.
+            The index of the processed task.
         data : tuple
             The results from multiprocessing_func. This can be either a tuple
             with (buffer_pos, metadata) or the integer buffer_pos.
         """
         # the ExecutiveWorkflowApp only uses the first argument of the variadict data:
-        data = data[0]
         if self.slave_mode:
             return
+        data = data[0]
         if isinstance(data, tuple):
             buffer_pos = data[0]
             if not RESULTS._config["metadata_complete"]:
@@ -412,7 +412,7 @@ class ExecuteWorkflowApp(BaseApp):
             RESULT_SAVER.export_frame_to_active_savers(index, _new_results)
         self.sig_results_updated.emit()
 
-    def _store_frame_metadata(self, metadata):
+    def _store_frame_metadata(self, metadata: dict):
         """
         Store the (separate) metadata from a frame internally.
 

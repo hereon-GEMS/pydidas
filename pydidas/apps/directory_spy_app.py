@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -434,12 +434,17 @@ class DirectorySpyApp(BaseApp):
         try:
             _fname = self._config["latest_file"]
             _image = self.get_image(_fname)
+            if _image.shape == 0:
+                raise ValueError("Empty image.")
         except (ValueError, KeyError, FileNotFoundError, UserConfigError):
             try:
                 _fname = self._config["2nd_latest_file"]
                 _image = self.get_image(_fname)
             except (ValueError, KeyError, FileNotFoundError, UserConfigError):
-                raise RuntimeError("Cannot read either of the last to files.")
+                raise UserConfigError(
+                    "Cannot read either of the last two files. Please check the "
+                    "directory and filenames."
+                )
         _image = self._apply_mask(_image)
         if self.get_param_value("use_bg_file"):
             _image -= self._bg_image

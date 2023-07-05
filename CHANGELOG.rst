@@ -1,5 +1,68 @@
-.. Copyright 2021-, Helmholtz-Zentrum Hereon
+.. Copyright 2023, Helmholtz-Zentrum Hereon
 .. SPDX-License-Identifier: CC0-1.0
+
+
+v23.07.05
+=========
+
+Improvements
+------------
+
+- General improvements:
+
+    - Exposed the read_hdf5_dataset function directly in 
+      pydidas.data_io.low_level_readers.
+    - Added a new action to quickly access silx's autoscale to mean +/- 3 std  
+      in PydidasPlot2D and PydidasImageView
+    - PydidasPlot2D will now compare the image size with the detector image size
+      and if the two images are of the same size, it will set the aspect ratio
+      to 'same'.
+    - Removed the '3D' visualization option from pyFAI calibration because it 
+      requires pyopengl and raises exceptions when the Detector is not yet 
+      set up and when the 3D visualization window is closed.
+    - Improved the widgets.factory to allow parent string references.
+    - Added a frame for image mathematics.
+    - Added an option in the TestWorkflowFrame to select scan points by their 
+      detector image number.
+    
+- Plugins:
+
+    - Added a 'total count intensity' output to fit plugins.
+    - Added 'detailed_results' to CreateDynamicMask plugin to check the created
+      mask.
+    - Added a 'rolling average' plugin for 1D data.
+
+Bugfixes
+--------
+
+- Fixed an issue in the pydidas_gui script which caused a segmentation fault on 
+  exit in Linux.
+- Fixed an issue with Qt's QStandardLocation folder name inconsistencies between
+  windows and Linux.
+- Improved an exception message for Parameter's value setter.
+- Fixed an issue with the centering of the WorkflowTree in the WorkflowEditFrame
+- Fixed an issue in the peak fitting plugins where narrow peaks were not picked 
+  up correctly during initial parameter estimates.
+- Fixed an issue in the DirectorySpyApp where the tifffile would return an empty
+  array instead of an exception for unreadable files.
+- Fixed an issue in the DirectorySpyApp when the directory is empty.
+- Fixed an isssue in the pyFAIintegrationBase, where setting the azimuthal ROI
+  would not work, if the boundaries where updated in a specific order.
+- Fixed an issue where the GUI scripts would stop during state restoration if 
+  the state was invalid.
+- Fixed an issue in the BaseFitPlugin where changing the output settings would
+  not update the shape correctly.
+- Fixed an issue where the result selection range was not updated correctly 
+  after changing the scan dimensions.
+- Fixed an issue where specifying the peak starting guess outside of the data
+  range would raise a ValueError.
+- Fixed an issue with Scan multiplicity > 1 which would not store results 
+  correctly.
+- Fixed an issue in the ShowInformationForResult window with Scan multiplicity 
+  > 1.
+- Fixed an issue with the basic PydidasWindow when not running with a 
+  PydidasQApplication.
+
 
 v23.06.16
 =========

@@ -480,10 +480,11 @@ class Parameter:
                 f"choices: {self.__meta['choices']}"
             )
         if not (self.__typecheck(val) or self.__meta["optional"] and (val is None)):
+            _name = self.__meta["name"]
             raise ValueError(
                 f"Cannot set Parameter (object ID:{id(self)}, refkey: '{self.__refkey}'"
-                ", name: '{self.__meta[\"name\"]}') because it is of the wrong data "
-                f"type. (expected: {self.__type}, input type: {type(val)}"
+                f", name: '{_name}') because it is of the wrong data type. (expected: "
+                f"{self.__type}, input type: {type(val)}"
             )
         self.__value = val
 

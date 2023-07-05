@@ -113,8 +113,10 @@ class Gaussian(FitFuncBase):
         index = "" if index is None else str(index)
         _sigma_start = kwargs.get(f"width{index}_start", None)
         if _sigma_start is None:
-            if _high_x.size > 0:
+            if _high_x.size > 1:
                 _sigma_start = (x[_high_x[-1]] - x[_high_x[0]]) / 2.35
+            elif _high_x.size == 1:
+                _sigma_start = x[1] - x[0]
             else:
                 _sigma_start = (x[-1] - x[0]) / 5
 

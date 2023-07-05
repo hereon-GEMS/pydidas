@@ -72,7 +72,6 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin = self.create_generic_plugin()
         plugin._data = self._data
         plugin._data_x = self._data.axis_ranges[0]
-        # plugin._config[]
         plugin._crop_data_to_selected_range()
         plugin.pre_execute()
         _startguess = plugin._fitter.guess_fit_start_params(
@@ -188,7 +187,7 @@ class TestFitSinglePeak(unittest.TestCase):
         plugin.pre_execute()
         _data, _kwargs = plugin.execute(self._data)
         self.assert_fit_results_okay(_data, _kwargs["fit_params"], None)
-        self.assertEqual(_data.data_unit, self._data.axis_units[0])
+        self.assertIn(self._data.axis_units[0], _data.data_label)
 
     def test_execute__gaussian_no_output(self):
         plugin = self.create_generic_plugin()

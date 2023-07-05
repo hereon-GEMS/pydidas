@@ -44,7 +44,6 @@ from ..core.utils import (
     verify_files_in_same_directory,
     verify_files_of_range_are_same_size,
 )
-from ..core.constants import HDF5_EXTENSIONS
 
 
 class FilelistManager(ObjectWithParameterCollection):

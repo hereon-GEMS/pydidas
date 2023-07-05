@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -30,9 +30,11 @@ __all__ = ["WorkflowTree"]
 
 import ast
 from numbers import Integral
+from pathlib import Path
+from typing import Self, Union
 
 from ..core import SingletonFactory, UserConfigError
-from ..plugins import PluginCollection
+from ..plugins import BasePlugin, PluginCollection
 from .generic_tree import GenericTree
 from .workflow_node import WorkflowNode
 from .workflow_tree_io import WorkflowTreeIoMeta
@@ -43,8 +45,7 @@ PLUGINS = PluginCollection()
 
 class _WorkflowTree(GenericTree):
     """
-    The _WorkflowTree is a subclassed GenericTree with support for
-    running a plugin chain.
+    _WorkflowTree is a subclassed GenericTree with support for running a plugin chain.
 
     Access within pydidas should not be direct but through the WorkflowTree
     singleton instance. Therefore, the _WorkflowTree class is not directly
@@ -58,7 +59,7 @@ class _WorkflowTree(GenericTree):
         PLUGINS.sig_updated_plugins.connect(self.clear)
 
     @property
-    def active_plugin_header(self):
+    def active_plugin_header(self) -> str:
         """
         Get the header description of the active plugin.
 
@@ -72,7 +73,12 @@ class _WorkflowTree(GenericTree):
             return ""
         return f"#{self.active_node_id:03d} [{self.active_node.plugin.plugin_name}]"
 
-    def create_and_add_node(self, plugin, parent=None, node_id=None):
+    def create_and_add_node(
+        self,
+        plugin: BasePlugin,
+        parent: Union[None, int, BasePlugin] = None,
+        node_id: Union[None, int] = None,
+    ) -> int:
         """
         Create a new node and add it to the tree.
 
@@ -111,7 +117,7 @@ class _WorkflowTree(GenericTree):
         self.register_node(_node, node_id)
         return self.node_ids[-1]
 
-    def set_root(self, node):
+    def set_root(self, node: WorkflowNode):
         """
         Set the tree root node.
 
@@ -120,13 +126,13 @@ class _WorkflowTree(GenericTree):
 
         Parameters
         ----------
-        node : GenericNode
+        node : WorkflowNode
             The node to become the new root node
         """
         GenericTree.set_root(self, node)
         self.root.plugin.node_id = 0
 
-    def replace_node_plugin(self, node_id, new_plugin):
+    def replace_node_plugin(self, node_id: int, new_plugin: BasePlugin):
         """
         Replace the plugin of the selected node with the new Plugin.
 
@@ -140,7 +146,7 @@ class _WorkflowTree(GenericTree):
         self.nodes[node_id].plugin = new_plugin
         self._config["tree_changed"] = True
 
-    def get_consistent_and_inconsistent_nodes(self):
+    def get_consistent_and_inconsistent_nodes(self) -> (list, list):
         """
         Get the consistency flags for all plugins in the WorkflowTree.
 
@@ -160,7 +166,7 @@ class _WorkflowTree(GenericTree):
                 _inconsistent.append(_id)
         return _consistent, _inconsistent
 
-    def execute_process_and_get_results(self, arg, **kwargs):
+    def execute_process_and_get_results(self, arg: object, **kwargs: dict) -> dict:
         """
         Execute the WorkflowTree process and get the results.
 
@@ -185,7 +191,7 @@ class _WorkflowTree(GenericTree):
                 _results[_node.node_id] = _node.results
         return _results
 
-    def execute_process(self, arg, **kwargs):
+    def execute_process(self, arg: object, **kwargs: dict):
         """
         Execute the process defined in the WorkflowTree for data analysis.
 
@@ -211,7 +217,9 @@ class _WorkflowTree(GenericTree):
         self._preexecuted = True
         self.reset_tree_changed_flag()
 
-    def execute_single_plugin(self, node_id, arg, **kwargs):
+    def execute_single_plugin(
+        self, node_id: int, arg: object, **kwargs: dict
+    ) -> (object, dict):
         """
         Execute a single node Plugin and get the return.
 
@@ -244,7 +252,7 @@ class _WorkflowTree(GenericTree):
         _res, _kwargs = self.nodes[node_id].execute_plugin(arg, **kwargs)
         return _res, kwargs
 
-    def import_from_file(self, filename):
+    def import_from_file(self, filename: Union[str, Path]):
         """
         Import the WorkflowTree from a configuration file.
 
@@ -258,7 +266,7 @@ class _WorkflowTree(GenericTree):
             setattr(self, _att, getattr(_new_tree, _att))
         self._config["tree_changed"] = True
 
-    def export_to_file(self, filename, **kwargs):
+    def export_to_file(self, filename: Union[str, Path], **kwargs: dict):
         """
         Export the WorkflowTree to a file using any of the registered exporters.
 
@@ -269,7 +277,7 @@ class _WorkflowTree(GenericTree):
         """
         WorkflowTreeIoMeta.export_to_file(filename, self, **kwargs)
 
-    def export_to_string(self):
+    def export_to_string(self) -> str:
         """
         Export the Tree to a simplified string representation.
 
@@ -280,7 +288,7 @@ class _WorkflowTree(GenericTree):
         """
         return str([node.dump() for node in self.nodes.values()])
 
-    def restore_from_string(self, string):
+    def restore_from_string(self, string: str):
         """
         Restore the WorkflowTree from a string representation.
 
@@ -299,7 +307,7 @@ class _WorkflowTree(GenericTree):
         self.restore_from_list_of_nodes(_nodes)
         self._config["tree_changed"] = True
 
-    def update_from_tree(self, tree):
+    def update_from_tree(self, tree: Self):
         """
         Update this tree from another WorkflowTree instance.
 
@@ -313,7 +321,7 @@ class _WorkflowTree(GenericTree):
         """
         self.restore_from_string(tree.export_to_string())
 
-    def restore_from_list_of_nodes(self, list_of_nodes):
+    def restore_from_list_of_nodes(self, list_of_nodes: Union[list, tuple]):
         """
         Restore the WorkflowTree from a list of Nodes with the required
         information.
@@ -344,7 +352,7 @@ class _WorkflowTree(GenericTree):
             self.clear()
         self._config["tree_changed"] = True
 
-    def get_all_result_shapes(self, force_update=False):
+    def get_all_result_shapes(self, force_update: bool = False) -> dict:
         """
         Get the shapes of all leaves in form of a dictionary.
 
@@ -381,11 +389,11 @@ class _WorkflowTree(GenericTree):
             if -1 in _shape:
                 raise UserConfigError(
                     "Cannot determine the shape of the output for node "
-                    f"#{_id} (type {self.nodes[_id].plugin.__class__})."
+                    f"#{_id} (type {type(self.nodes[_id].plugin).__name__})."
                 )
         return _shapes
 
-    def get_all_nodes_with_results(self):
+    def get_all_nodes_with_results(self) -> list:
         """
         Get all tree nodes which have results associated with them.
 
@@ -397,13 +405,14 @@ class _WorkflowTree(GenericTree):
         list
             A list of all leaf nodes.
         """
-        _nodes_w_results = []
-        for _node in self.nodes.values():
-            if _node.is_leaf or _node.plugin.get_param_value("keep_results"):
-                _nodes_w_results.append(_node)
+        _nodes_w_results = [
+            _node
+            for _node in self.nodes.values()
+            if (_node.is_leaf or _node.plugin.get_param_value("keep_results"))
+        ]
         return _nodes_w_results
 
-    def get_complete_plugin_metadata(self, force_update=False):
+    def get_complete_plugin_metadata(self, force_update: bool = False) -> dict:
         """
         Get the metadata (e.g. shapes, labels, names) for all of the tree's plugins.
 

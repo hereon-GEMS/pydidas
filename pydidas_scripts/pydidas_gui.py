@@ -117,12 +117,14 @@ def start_pydidas_gui(
                 "multiprocessing."
             )
     splash_screen.show_aligned_message("Creating objects")
-    app = PydidasQApplication(sys.argv)
+    if not isinstance(app, PydidasQApplication):
+        app = PydidasQApplication([])
     gui = MainWindow()
     gui.register_frame(frames.HomeFrame)
     gui.register_frame(frames.DataBrowsingFrame)
     gui.register_frame(frames.PyfaiCalibFrame)
     gui.register_frame(frames.DirectorySpyFrame)
+    gui.register_frame(frames.ImageMathFrame)
     gui.register_frame(frames.QuickIntegrationFrame)
     gui.register_frame(frames.DefineDiffractionExpFrame)
     gui.register_frame(frames.DefineScanFrame)
@@ -135,7 +137,7 @@ def start_pydidas_gui(
     gui.show()
     if restore_state.upper() not in ["NONE", "EXIT", "SAVED"]:
         raise UserConfigError("The restore_state must be 'None', 'saved' or 'exit'.")
-    if restore_state in ["exit", "saved"]:
+    if restore_state.upper() in ["EXIT", "SAVED"]:
         splash_screen.show_aligned_message("Restoring interface state")
         try:
             gui.restore_gui_state(state=restore_state)
@@ -150,13 +152,15 @@ def run_gui():
     """
     Run the pydidas graphical user interface process.
     """
+    from pydidas.core.pydidas_qapp import PydidasQApplication
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    app = QtWidgets.QApplication([])
+    app = PydidasQApplication([])
     _splash = PydidasSplashScreen()
 
     _ = start_pydidas_gui(_splash, restore_state="exit")
     app = QtWidgets.QApplication.instance()
-    app.quit()
+    app.deleteLater()
 
 
 if __name__ == "__main__":

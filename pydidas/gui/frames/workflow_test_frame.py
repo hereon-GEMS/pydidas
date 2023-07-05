@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -134,11 +134,15 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             str,
             "Use global index",
             name="Scan point selection",
-            choices=["Use global index", "Use scan dimensional indices"],
+            choices=[
+                "Use global index",
+                "Use scan dimensional indices",
+                "Use detector image number",
+            ],
             tooltip=(
-                "Choose between selecing frames using either the flattened image / "
-                "frame index (the 'timeline') or the multi-dimensional position in the "
-                "scan."
+                "Choose between selecing frames using either the global index for the "
+                "flattened image / frame index (the 'timeline'), the multi-dimensional "
+                "position in the scan or the detector image number."
             ),
         ),
         get_generic_param_collection(
@@ -147,6 +151,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             "scan_index2",
             "scan_index3",
             "scan_index4",
+            "detector_image_index",
             "selected_results",
         ),
     )
@@ -246,12 +251,18 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         Update the visibility of the image selection widgets.
         """
-        _use_frame = self.get_param_value("image_selection") == "Use global index"
-        self.toggle_param_widget_visibility("frame_index", _use_frame)
+        _selection = self.get_param_value("image_selection")
+        self.toggle_param_widget_visibility(
+            "frame_index", _selection == "Use global index"
+        )
+        _use_scan_dim = _selection == "Use scan dimensional indices"
         for _dim in [1, 2, 3, 4]:
             self.toggle_param_widget_visibility(
-                f"scan_index{_dim}", not _use_frame and _dim <= SCAN.ndim
+                f"scan_index{_dim}", _use_scan_dim and _dim <= SCAN.ndim
             )
+        self.toggle_param_widget_visibility(
+            "detector_image_index", _selection == "Use detector image number"
+        )
 
     @QtCore.Slot()
     def execute_workflow_test(self):
@@ -314,13 +325,38 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             The absolute frame number.
         """
         if self.get_param_value("image_selection") == "Use global index":
-            _index = self.get_param_value("frame_index", dtype=int)
-            if not 0 <= _index < SCAN.n_points:
-                raise UserConfigError(
-                    f"The selected number {_index} is outside the scope of the number "
-                    f"of images in the scan (0...{SCAN.n_points - 1})"
-                )
-            return _index
+            return self.__get_global_index()
+        elif self.get_param_value("image_selection") == "Use scan dimensional indices":
+            return self.__get_index_from_scan_dim_indices()
+        elif self.get_param_value("image_selection") == "Use detector image number":
+            return self.__get_index_of_image()
+
+    def __get_global_index(self) -> int:
+        """
+        Get the global index from the respective Parameter.
+
+        Returns
+        -------
+        int
+            The global image index.
+        """
+        _index = self.get_param_value("frame_index", dtype=int)
+        if not 0 <= _index < SCAN.n_points:
+            raise UserConfigError(
+                f"The selected number {_index} is outside the scope of the number "
+                f"of images in the scan (0...{SCAN.n_points - 1})"
+            )
+        return _index
+
+    def __get_index_from_scan_dim_indices(self) -> int:
+        """
+        Get the global index from the individual scan indices.
+
+        Returns
+        -------
+        int
+            The global image index.
+        """
         _nums = [
             self.get_param_value(f"scan_index{_index+1}") for _index in range(SCAN.ndim)
         ]
@@ -329,6 +365,26 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             raise UserConfigError(
                 f"The selected scan point {_nums} is outside the scope of the scan "
                 f"dimensions. (Please note that python starts counting at zero)."
+            )
+        return _index
+
+    def __get_index_of_image(self) -> int:
+        """
+        Get the global index from the detector image number.
+
+        Returns
+        -------
+        int
+            The global index.
+        """
+        _start = SCAN.get_param_value("scan_start_index")
+        _delta = SCAN.get_param_value("scan_index_stepping")
+        _num = self.get_param_value("detector_image_index")
+        _index = (_num - _start) // _delta
+        if not 0 <= _index < SCAN.n_points:
+            raise UserConfigError(
+                f"The selected number {_num} is not included in the images of the scan "
+                f"[{_start}, {_start + _delta}, ..., {(SCAN.n_points - 1)*_delta}]."
             )
         return _index
 

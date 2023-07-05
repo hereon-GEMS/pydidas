@@ -31,7 +31,6 @@ __all__ = ["GENERIC_PARAMS_OTHER"]
 from .colors import PYDIDAS_COLORS
 
 
-
 GENERIC_PARAMS_OTHER = {
     ###############################
     # Generic processing parameters
@@ -228,6 +227,15 @@ GENERIC_PARAMS_OTHER = {
             "The global index of the frame to be processed. Note: The first frame "
             "number is always 0, irrespective of any offsets in the filenames."
         ),
+    },
+    "detector_image_index": {
+        "type": int,
+        "default": 0,
+        "name": "Detector image number",
+        "choices": None,
+        "unit": "",
+        "allow_None": False,
+        "tooltip": ("The detector image number, as files are written to disk."),
     },
     ################
     # Generic limits

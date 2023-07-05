@@ -84,6 +84,20 @@ class BaseFitPlugin(ProcPlugin):
         }
 
     @property
+    def result_shape(self) -> tuple:
+        """
+        Get the shape of the plugin result.
+
+        Returns
+        -------
+        tuple
+            The shape of the results with a value for each dimension. Unknown
+            dimensions are represented as -1 value.
+        """
+        self.calculate_result_shape()
+        return self._config["result_shape"]
+
+    @property
     def detailed_results(self):
         """
         Get the detailed results for the FitSinglePeak plugin.
@@ -210,6 +224,12 @@ class BaseFitPlugin(ProcPlugin):
                     _new_data.append(self._fitter.fwhm(_fit_pvals))
                 if "background" in _output:
                     _new_data.append(self._fitter.background_at_peak(_fit_pvals))
+                if "total count intensity" in _output:
+                    _dx = self._data.axis_ranges[0][1] - self._data.axis_ranges[0][0]
+                    if isinstance(_area, (tuple, list)):
+                        _new_data.append([a / _dx for a in _area])
+                    else:
+                        _new_data.append(_area / _dx)
                 if "no output" in _output:
                     _new_data.append(
                         np.full(self._config["single_result_shape"], np.nan)
@@ -228,8 +248,8 @@ class BaseFitPlugin(ProcPlugin):
             _axis_label = ["Peak number"] + (_axis_label if _new_data.ndim > 1 else [])
         _result_dataset = Dataset(
             _new_data,
-            data_label=_output,
-            data_unit=self._data.axis_units[0],
+            data_label=self.output_data_label,
+            data_unit="",
             axis_labels=_axis_label,
             axis_units=[""] * _new_data.ndim,
         )
@@ -270,6 +290,7 @@ class BaseFitPlugin(ProcPlugin):
         self._data_x = data.axis_ranges[0]
         self._crop_data_to_selected_range()
         if not self._config["settings_updated_from_data"]:
+            self._update_node_output_labels()
             self._update_peak_bounds_from_data()
 
     def _crop_data_to_selected_range(self):
@@ -318,6 +339,20 @@ class BaseFitPlugin(ProcPlugin):
             self._config["range_slice"] = slice(_range[0], _range[-1] + 1)
         return self._config["range_slice"]
 
+    def _update_node_output_labels(self):
+        """
+        Update the node output labels based on the settings and the input data.
+        """
+        _output = self.get_param_value("fit_output")
+        self.output_data_unit = ""
+        _output = _output.replace("position", f"position / {self._data.axis_units[0]}")
+        _output = _output.replace("amplitude", "amplitude / cts")
+        _output = _output.replace("area", f"area / (cts * {self._data.axis_units[0]})")
+        _output = _output.replace("FWHM", f"FWHM / {self._data.axis_units[0]}")
+        _output = _output.replace("background at peak", "background at peak / cts")
+        _output = _output.replace("total count intensity", "total intensity / cts")
+        self.output_data_label = _output
+
     def _update_peak_bounds_from_data(self):
         """
         Update the bounds for the peaks' center from the data x ranges.
@@ -333,8 +368,6 @@ class BaseFitPlugin(ProcPlugin):
             _xhigh = np.amax(self._data_x)
             if self._config["bounds_high"][_index] > _xhigh:
                 self._config["bounds_high"][_index] = _xhigh
-        self.output_data_unit = self._data.axis_units[0]
-        self.output_data_label = self.get_param_value("fit_output")
         self._config["settings_updated_from_data"] = True
 
     def update_fit_param_bounds(self):

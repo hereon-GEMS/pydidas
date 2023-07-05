@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ the WorkflowTestFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowTestFrameBuilder"]
+
 
 from qtpy import QtCore
 
@@ -65,23 +66,9 @@ class WorkflowTestFrameBuilder(BaseFrame):
         dict :
             The dictionary with the formatting options.
         """
-        if param_key in ["image_selection"]:
-            _dict = dict(
-                parent_widget=self._widgets["config"],
-                halign_text=QtCore.Qt.AlignLeft,
-                valign_text=QtCore.Qt.AlignBottom,
-                width_total=CONFIG_WIDGET_WIDTH,
-                width_io=170,
-                width_text=CONFIG_WIDGET_WIDTH - 180,
-                width_unit=0,
-            )
-        elif param_key in ["selected_results"]:
+        if param_key in ["image_selection", "selected_results"]:
             _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
-            _dict.update(
-                {
-                    "parent_widget": self._widgets["config"],
-                }
-            )
+            _dict.update({"parent_widget": self._widgets["config"]})
         else:
             _dict = dict(
                 parent_widget=self._widgets["config"],
@@ -90,7 +77,13 @@ class WorkflowTestFrameBuilder(BaseFrame):
                 width_text=CONFIG_WIDGET_WIDTH - 100,
                 width_total=CONFIG_WIDGET_WIDTH,
             )
-        if param_key in ["scan_index1", "scan_index2", "scan_index3", "scan_index4"]:
+        if param_key in [
+            "scan_index1",
+            "scan_index2",
+            "scan_index3",
+            "scan_index4",
+            "detector_image_index",
+        ]:
             _dict["visible"] = False
         return _dict
 
@@ -142,6 +135,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
             "scan_index2",
             "scan_index3",
             "scan_index4",
+            "detector_image_index",
         ]:
             self.create_param_widget(
                 self.get_param(_param), **self.__param_widget_config(_param)

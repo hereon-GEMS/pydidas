@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ from ...contexts import DiffractionExperimentContext
 from ...core import PydidasQsettingsMixin
 from .coordinate_transform_button import CoordinateTransformButton
 from .pydidas_position_info import PydidasPositionInfo
-from .silx_actions import CropHistogramOutliers
+from .silx_actions import AutoscaleToMeanAndThreeSigma, CropHistogramOutliers
 
 
 SNAP_MODE = (
@@ -70,18 +70,26 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         self.cropHistOutliersAction = self.group.addAction(
             CropHistogramOutliers(self, parent=self)
         )
+        self.cropHistOutliersAction.setVisible(True)
+        self.addAction(self.cropHistOutliersAction)
+        self._toolbar.insertAction(
+            self.keepDataAspectRatioAction, self.cropHistOutliersAction
+        )
+
+        self.autoscaleToMeanAndThreeSigmaAction = self.group.addAction(
+            AutoscaleToMeanAndThreeSigma(self, parent=self)
+        )
+        self.autoscaleToMeanAndThreeSigmaAction.setVisible(True)
+        self.addAction(self.autoscaleToMeanAndThreeSigmaAction)
+        self._toolbar.insertAction(
+            self.keepDataAspectRatioAction, self.autoscaleToMeanAndThreeSigmaAction
+        )
 
         if show_cs_transform:
             self.cs_transform = CoordinateTransformButton(parent=self, plot=self)
             self._toolbar.addWidget(self.cs_transform)
         else:
             self.cs_transform = None
-
-        self.cropHistOutliersAction.setVisible(True)
-        self.addAction(self.cropHistOutliersAction)
-        self._toolbar.insertAction(
-            self.keepDataAspectRatioAction, self.cropHistOutliersAction
-        )
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ Parameters.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
 from .parameter_widget import ParameterWidget
@@ -83,11 +85,14 @@ class ParameterWidgetsMixIn:
         valign_text : QtCore.Qt.Alignment, optional
             The vertical alignment for the text (label) widget. The default
             is QtCore.Qt.AlignTop.
-        parent_widget : Union[QWidget, None], optional
-            The widget to which the label is added. If None, this defaults
-            to the calling widget, ie. "self". The default is None.
+        parent_widget : Union[QWidget, str, None], optional
+            The widget to which the label is added. If a string, this picks up the
+            calling class's ._widgets dictionary and selects the string key's value.
+            The default is self.
         """
         _parent = kwargs.get("parent_widget", self)
+        if isinstance(_parent, str):
+            _parent = self._widgets[_parent]
         _widget = ParameterWidget(param, **kwargs)
         self.param_composite_widgets[param.refkey] = _widget
         self.param_widgets[param.refkey] = _widget.io_widget

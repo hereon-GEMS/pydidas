@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -105,8 +105,20 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
             parent_widget=self._widgets["plugin_container"],
         )
         self.create_label(
-            f"label_{axis}", f"Radial {_Axis_long} integration region", **_label_kwargs
+            f"label_{axis}", f"{_Axis_long} integration region", **_label_kwargs
         )
+        if axis == "azi":
+            self.create_label(
+                "label_azi_note",
+                "Note: For an upward-oriented axis (i.e. the origin at the bottom of "
+                "the image), the positive angular is counter-clockwise. For a downward-"
+                "oriented-axis (i.e. the origin at the top of the image), the positive "
+                "angular direction is clockwise. \nThe zero position is at the positive"
+                " x-axis, i.e. right of the beamcenter.",
+                parent_widget=self._widgets["plugin_container"],
+                wordWrap=True,
+                sizePolicy=POLICY_FIX_EXP,
+            )
         self.create_param_widget(
             plugin.get_param(f"{axis}_use_range"),
             **self._plugin_kwargs("plugin_container"),
@@ -118,6 +130,7 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
             fixedHeight=25,
             parent_widget=self._widgets["plugin_container"],
         )
+
         for _suffix in ["unit", "range_lower", "range_upper"]:
             _pname = f"{axis}_{_suffix}"
             self.create_param_widget(

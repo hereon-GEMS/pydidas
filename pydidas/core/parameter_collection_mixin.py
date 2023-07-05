@@ -36,7 +36,6 @@ from numpy import mod
 from .exceptions import UserConfigError
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
-from .exceptions import UserConfigError
 
 
 class ParameterCollectionMixIn:

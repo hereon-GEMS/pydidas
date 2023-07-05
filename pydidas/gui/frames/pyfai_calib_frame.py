@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -15,8 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
-# Parts of this file are adapted based on the pyfai-calib widget which
-# is distributed under the MIT license.
+# Parts of this file are adapted based on the pyFAI.gui.CalibrationWindow
+# widget which is distributed under the MIT license.
 
 """
 Module with the PyfaiCalibFrame which is roughly based on the pyfai-calib2 window
@@ -24,10 +24,10 @@ to be used within pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PyfaiCalibFrame"]
 
 
@@ -40,13 +40,6 @@ from pyFAI.app import calib2
 from pyFAI.gui.CalibrationContext import CalibrationContext
 from pyFAI.gui.CalibrationWindow import MenuItem
 from pyFAI.gui.model import MarkerModel
-from pyFAI.gui.tasks import (
-    ExperimentTask,
-    GeometryTask,
-    IntegrationTask,
-    MaskTask,
-    PeakPickingTask,
-)
 from pyFAI.gui.utils import projecturl
 from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.plot.tools import ImageToolBar
@@ -75,6 +68,14 @@ def _create_calib_tasks():
         The list with the tasks.
 
     """
+    from pyFAI.gui.tasks import (
+        ExperimentTask,
+        GeometryTask,
+        IntegrationTask,
+        MaskTask,
+        PeakPickingTask,
+    )
+
     tasks = [
         ExperimentTask.ExperimentTask(),
         MaskTask.MaskTask(),
@@ -99,6 +100,9 @@ def _create_calib_tasks():
         ][0]
         _toolbar.addAction(_histo_crop_action)
         _toolbar.insertAction(_widget_action, _histo_crop_action)
+    # explicitly hide the toolbar with the 3D visualization:
+    tasks[0]._ExperimentTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
+    tasks[3]._GeometryTask__plot.findChildren(QtWidgets.QToolBar)[2].setVisible(False)
     # insert button for exporting to DiffractionExperimentContext:
     _parent = tasks[4]._savePoniButton.parent()
     tasks[4]._update_context_button = QtWidgets.QPushButton(

@@ -40,7 +40,7 @@ import requests
 
 import build
 
-from .pydidas_remove_local_files import (
+from pydidas_scripts.pydidas_remove_local_files import (
     pydidas_remove_log_files,
     pydidas_remove_stored_gui_states,
 )

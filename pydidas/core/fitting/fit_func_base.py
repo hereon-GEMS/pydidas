@@ -34,6 +34,7 @@ from numpy import ndarray, amin
 import numpy as np
 from scipy import interpolate
 
+from ..exceptions import UserConfigError
 from .fit_func_meta import FitFuncMeta
 
 
@@ -203,6 +204,11 @@ class FitFuncBase(metaclass=FitFuncMeta):
         float
             The y value at position xpos.
         """
+        if not np.amin(x) <= xpos <= np.amax(x):
+            raise UserConfigError(
+                f"The specified peak x position {xpos} is outside of the given x data"
+                f"range [{np.round(np.amin(x), 5)}, {np.round(np.amax(x), 5)}]!"
+            )
         if xpos in x:
             _index = np.where(x == xpos)[0][0]
             _y0 = y[_index]

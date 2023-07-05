@@ -40,4 +40,11 @@ SCAN_GENERIC_PARAM_NAMES = [
 ]
 
 
-FIT_OUTPUT_OPTIONS = ["position", "amplitude", "area", "FWHM", "background at peak"]
+FIT_OUTPUT_OPTIONS = [
+    "position",
+    "amplitude",
+    "area",
+    "FWHM",
+    "background at peak",
+    "total count intensity",
+]

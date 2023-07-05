@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ singleton class for storing and accessing the composite results of the processin
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResults", "WorkflowResultsContext"]
 
 import os
@@ -85,9 +85,15 @@ class WorkflowResults(QtCore.QObject):
         self.clear_all_results()
         _dim = self._SCAN.get_param_value("scan_dim")
         _results = self._TREE.get_all_result_shapes()
-        _shapes = {_key: self._SCAN.shape + _shape for _key, _shape in _results.items()}
-        for _node_id, _shape in _shapes.items():
-            _dset = Dataset(np.empty(_shape, dtype=np.float32))
+        for _node_id, _shape in _results.items():
+            _plugin = self._TREE.nodes[_node_id].plugin
+            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
+            self._config["data_labels"][_node_id] = _plugin.output_data_label
+            self._config["data_units"][_node_id] = _plugin.output_data_unit
+            self._config["plugin_names"][_node_id] = _plugin.plugin_name
+            self._config["result_titles"][_node_id] = _plugin.result_title
+            self._config["shapes"][_node_id] = self._SCAN.shape + _shape
+            _dset = Dataset(np.empty(self._SCAN.shape + _shape, dtype=np.float32))
             _dset[:] = np.nan
             for index in range(_dim):
                 _label, _unit, _range = self._SCAN.get_metadata_for_dim(index)
@@ -95,13 +101,7 @@ class WorkflowResults(QtCore.QObject):
                 _dset.update_axis_units(index, _unit)
                 _dset.update_axis_ranges(index, _range)
             self.__composites[_node_id] = _dset
-            self._config["shapes"] = _shapes
-            _plugin = self._TREE.nodes[_node_id].plugin
-            self._config["node_labels"][_node_id] = _plugin.get_param_value("label")
-            self._config["data_labels"][_node_id] = _plugin.output_data_label
-            self._config["data_units"][_node_id] = _plugin.output_data_unit
-            self._config["plugin_names"][_node_id] = _plugin.plugin_name
-            self._config["result_titles"][_node_id] = _plugin.result_title
+
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
 
     def clear_all_results(self):
@@ -109,7 +109,7 @@ class WorkflowResults(QtCore.QObject):
         Clear all interally stored results and reset the instance attributes.
         """
         self.__composites = {}
-        self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
+        self.__source_hash = -1
         self._config = {
             "shapes": {},
             "node_labels": {},
@@ -165,7 +165,7 @@ class WorkflowResults(QtCore.QObject):
         """
         if not self._config["metadata_complete"]:
             self.__update_composite_metadata(results)
-        _scan_index = self._SCAN.get_frame_position_in_scan(index)
+        _scan_index = self._SCAN.get_index_position_in_scan(index)
         for _key, _val in results.items():
             self.__composites[_key][_scan_index] = _val
         self.new_results.emit()
@@ -565,16 +565,9 @@ class WorkflowResults(QtCore.QObject):
             Flag to add an entry of no selection in addition to the entries
             from the nodes. The default is True.
         """
-        _curr_choice = param.value
         _new_choices = ["No selection"] if add_no_selection_entry else []
         _new_choices.extend(list(self._config["result_titles"].values()))
-        if _curr_choice in _new_choices:
-            param.choices = _new_choices
-        else:
-            _new_choices.append(_curr_choice)
-            param.choices = _new_choices
-            param.value = _new_choices[0]
-            param.choices = _new_choices[:-1]
+        param.update_value_and_choices(_new_choices[0], _new_choices)
 
     def get_node_result_metadata_string(
         self, node_id, use_scan_timeline=False, squeeze_results=True

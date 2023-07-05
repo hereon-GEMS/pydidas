@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,10 +18,10 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-noly"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
@@ -39,12 +39,13 @@ class TestScanContext(unittest.TestCase):
         self._scan_shape = (5, 7, 3, 2)
         self._scan_delta = (0.1, 0.5, 1, 1.5)
         self._scan_offset = (3, -1, 0, 0.5)
+        self._scan_dim = 4
 
     def tearDown(self):
         ...
 
     def set_scan_params(self, _scan):
-        _scan.set_param_value("scan_dim", 4)
+        _scan.set_param_value("scan_dim", self._scan_dim)
         for index, val in enumerate(self._scan_shape):
             _scan.set_param_value(f"scan_dim{index}_n_points", val)
         for index, val in enumerate(self._scan_delta):
@@ -167,6 +168,30 @@ class TestScanContext(unittest.TestCase):
         )
         _index = SCAN.get_frame_position_in_scan(_n)
         self.assertEqual(_index, _pos)
+
+    def test_get_index_position_in_scan(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        for M in range(1, 4):
+            with self.subTest(M=M):
+                SCAN.set_param_value("scan_multiplicity", M)
+                _pos = tuple(i - 2 for i in self._scan_shape)
+                _shape = self._scan_shape + (1,)
+                _n = np.sum(
+                    [_pos[i] * np.prod(_shape[i + 1 :]) for i in range(self._scan_dim)]
+                )
+                _index = SCAN.get_index_position_in_scan(_n)
+                self.assertEqual(_index, _pos)
+
+    def test_get_index_of_frame(self):
+        SCAN = Scan()
+        self.set_scan_params(SCAN)
+        _n = 60
+        for M in range(1, 4):
+            with self.subTest(M=M):
+                SCAN.set_param_value("scan_multiplicity", M)
+                _index = SCAN.get_index_of_frame(_n)
+                self.assertEqual(_index, _n / M)
 
     def test_get_frame_from_indices__zero(self):
         SCAN = Scan()

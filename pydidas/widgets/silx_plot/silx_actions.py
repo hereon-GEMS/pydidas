@@ -145,7 +145,6 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
         image = self.plot.getActiveImage()
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
-
         colormap = image.getColormap()
         colormap.setAutoscaleMode(Colormap.STDDEV3)
         colormap.setVMin(None)

@@ -361,7 +361,7 @@ class ImageMathFrame(BaseFrame):
                 _arg2 = float(_arg2)
             except ValueError as _error:
                 raise UserConfigError(
-                    f"Cannot convert the value '{_arg2}' to a number."
+                    f"Cannot convert the value {_arg2} to a number."
                 ) from _error
             self._image_buffer[_index_out] = _func(_input, _arg2, dtype=np.float32)
         else:

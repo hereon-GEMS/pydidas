@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,20 +21,18 @@ box to hide this dialogue in the future.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["AcknowledgeBox"]
+
 
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import POLICY_EXP_EXP
-from ...core.utils import (
-    apply_qt_properties,
-    format_input_to_multiline_str,
-    get_pydidas_icon,
-)
+from ...core.utils import apply_qt_properties, format_input_to_multiline_str
+from ...resources import icons
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -56,7 +54,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle("Notice")
-        self.setWindowIcon(get_pydidas_icon())
+        self.setWindowIcon(icons.pydidas_icon())
         _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
 

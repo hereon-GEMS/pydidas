@@ -28,10 +28,11 @@ __status__ = "Development"
 __all__ = ["HomeFrame"]
 
 
-from qtpy import QtCore, QtSvg, QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ...core import constants
-from ...core.utils import DOC_HOME_ADDRESS, get_pydidas_icon_fname
+from ...core.utils import DOC_HOME_ADDRESS
+from ...resources import logos
 from ...widgets import ScrollArea
 from ...widgets.framework import BaseFrame
 
@@ -90,9 +91,7 @@ _PROC_TEXT = (
 
 
 class HomeFrame(BaseFrame):
-    """
-    The pydidas start-up/home frame with generic information.
-    """
+    """The pydidas start-up/home frame with generic information."""
 
     menu_icon = "qta::mdi.home"
     menu_title = "Home"
@@ -102,9 +101,7 @@ class HomeFrame(BaseFrame):
         BaseFrame.__init__(self, parent)
 
     def build_frame(self):
-        """
-        Build the frame and add all widgets.
-        """
+        """Build the frame and add all widgets."""
         self.create_empty_widget("canvas", parent_widget=None)
 
         self.create_any_widget(
@@ -231,7 +228,7 @@ class HomeFrame(BaseFrame):
         )
         self.add_any_widget(
             "svg_logo",
-            QtSvg.QSvgWidget(get_pydidas_icon_fname()),
+            logos.pydidas_logo_svg(),
             gridPos=(0, 2, 1, 1),
             fixedHeight=300,
             fixedWidth=300,

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -22,11 +22,12 @@ information on how to access the new data selection.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ResultSelectionWidget"]
+
 
 from functools import partial
 
@@ -48,9 +49,10 @@ from ...core.constants import (
 from ...core.utils import SignalBlocker, apply_qt_properties, convert_unicode_to_ascii
 from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
-from ..misc import ReadOnlyTextWidget, ShowInformationForResult
+from ..misc import ReadOnlyTextWidget
 from ..parameter_config.parameter_widgets_mixin import ParameterWidgetsMixIn
 from ..utilities import update_param_and_widget_choices
+from ..windows import ShowInformationForResult
 
 
 def _param_widget_config(param_key):

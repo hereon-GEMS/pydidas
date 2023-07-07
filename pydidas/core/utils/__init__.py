@@ -35,7 +35,6 @@ from .file_utils import *
 from .iterable_utils import *
 from .format_arguments_ import *
 from .get_documentation_targets import *
-from .get_pydidas_icons import *
 from .hdf5_dataset_utils import *
 from .logger import *
 from .math_utils import *
@@ -80,11 +79,6 @@ from . import get_documentation_targets
 
 __all__.extend(get_documentation_targets.__all__)
 del get_documentation_targets
-
-from . import get_pydidas_icons
-
-__all__.extend(get_pydidas_icons.__all__)
-del get_pydidas_icons
 
 from . import hdf5_dataset_utils
 

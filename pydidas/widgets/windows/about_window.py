@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,16 @@ software.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["AboutWindow"]
 
 
-from qtpy import QtCore, QtSvg
+from qtpy import QtCore
 
-from ...core.utils import get_pydidas_icon_fname
+from ...resources import logos
 from ...version import VERSION
 from ..framework import PydidasWindow
 
@@ -84,7 +84,7 @@ class AboutWindow(PydidasWindow):
         )
         self.add_any_widget(
             "svg_logo",
-            QtSvg.QSvgWidget(get_pydidas_icon_fname()),
+            logos.pydidas_logo_svg(),
             gridPos=(0, 1, 3, 1),
             fixedHeight=150,
             fixedWidth=150,

@@ -39,13 +39,13 @@ from qtpy import QtCore, QtGui, QtWidgets
 
 from ..contexts import GLOBAL_CONTEXTS
 from ..core import UserConfigError
+from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
 from ..core.utils import (
     DOC_HOME_QURL,
     doc_filename_for_frame_manual,
     doc_qurl_for_frame_manual,
-    get_pydidas_icon_w_bg,
 )
-from ..core.constants import PYDIDAS_STANDARD_CONFIG_PATH
+from ..resources import icons
 from ..version import VERSION
 from ..widgets import PydidasFileDialog
 from ..widgets.dialogues import QuestionBox, critical_warning
@@ -128,7 +128,7 @@ class MainMenu(QtWidgets.QMainWindow):
         self.setCentralWidget(PydidasFrameStack())
         self.statusBar().showMessage("pydidas started")
         self.setWindowTitle("pydidas GUI")
-        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setFocus(QtCore.Qt.OtherFocusReason)
 
     def _add_config_windows(self):

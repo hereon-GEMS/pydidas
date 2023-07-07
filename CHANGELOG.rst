@@ -2,6 +2,19 @@
 .. SPDX-License-Identifier: CC0-1.0
 
 
+
+v23.mm.dd
+=========
+
+Improvements
+------------
+
+- General improvements:
+
+    - Moved the functions to get resource icons and images to the resources
+      subpackage.
+
+
 v23.07.05
 =========
 

@@ -31,6 +31,7 @@ import os as __os
 import logging as __logging
 
 import qtpy.QtCore as __QtCore
+# must import h5py here to have the dll libraries linked correctly
 import h5py as __h5py
 
 
@@ -43,6 +44,7 @@ import warnings as __warnings
 
 # import sub-packages:
 from . import core
+from . import resources
 from . import contexts
 from . import data_io
 from . import multiprocessing

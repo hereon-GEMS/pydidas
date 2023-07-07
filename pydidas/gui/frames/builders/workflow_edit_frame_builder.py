@@ -30,7 +30,7 @@ __all__ = ["WorkflowEditFrameBuilder"]
 
 from qtpy.QtWidgets import QAbstractScrollArea
 
-from ....core.constants import ALIGN_TOP_CENTER, POLICY_EXP_EXP, STANDARD_FONT_SIZE
+from ....core import constants
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -56,7 +56,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Workflow tree editor",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             bold=True,
             fixedWidth=250,
             gridPos=(0, 0, 1, 3),
@@ -66,15 +66,15 @@ class WorkflowEditFrameBuilder(BaseFrame):
             ScrollArea,
             minimumHeight=450,
             widget=self._widgets["workflow_canvas"],
-            alignment=ALIGN_TOP_CENTER,
-            sizePolicy=POLICY_EXP_EXP,
+            alignment=constants.ALIGN_TOP_CENTER,
+            sizePolicy=constants.POLICY_EXP_EXP,
             sizeAdjustPolicy=QAbstractScrollArea.AdjustToContents,
             gridPos=(1, 0, 3, 2),
         )
         self.create_label(
             "plugin_title",
             "Available plugins:",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize=constants.STANDARD_FONT_SIZE + 4,
             underline=True,
             gridPos=(4, 0, 1, 2),
         )
@@ -88,7 +88,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             minimumHeight=450,
             widget=self._widgets["plugin_edit_canvas"],
             fixedWidth=400,
-            sizePolicy=POLICY_EXP_EXP,
+            sizePolicy=constants.POLICY_EXP_EXP,
             gridPos=(1, 2, 5, 1),
         )
         self.create_button(

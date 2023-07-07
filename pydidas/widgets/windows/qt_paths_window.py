@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,27 +20,25 @@ Module with the QtPathsWindow class which shows the generic paths used in pydida
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["QtPathsWindow"]
 
 
 import os
 from functools import partial
 
-from qtpy import QtCore, QtGui, QtSvg
+from qtpy import QtCore, QtGui
 
-from ...core.utils import get_pydidas_icon_fname
+from ...resources import logos
 from ...version import VERSION
 from ..framework import PydidasWindow
 
 
 class QtPathsWindow(PydidasWindow):
-    """
-    Window which displays basic information about the pydidas software.
-    """
+    """Window which displays basic information about the pydidas software."""
 
     show_frame = False
 
@@ -58,10 +56,7 @@ class QtPathsWindow(PydidasWindow):
         PydidasWindow.__init__(self, parent, title="pydidas paths", **kwargs)
 
     def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
-
+        """Build the frame and create all widgets."""
         self.create_label(
             "label_title",
             "pydidas paths",
@@ -98,7 +93,7 @@ class QtPathsWindow(PydidasWindow):
         )
         self.add_any_widget(
             "svg_logo",
-            QtSvg.QSvgWidget(get_pydidas_icon_fname()),
+            logos.pydidas_logo_svg(),
             gridPos=(0, 2, 1, 1),
             fixedHeight=75,
             fixedWidth=75,
@@ -113,9 +108,7 @@ class QtPathsWindow(PydidasWindow):
         )
 
     def connect_signals(self):
-        """
-        Build the frame and create all widgets.
-        """
+        """Connect all required signals."""
         self._widgets["but_okay"].clicked.connect(self.close)
         self._widgets["but_open_logdir"].clicked.connect(
             partial(self.open_folder, self._log_path)
@@ -125,9 +118,7 @@ class QtPathsWindow(PydidasWindow):
         )
 
     def finalize_ui(self):
-        """
-        Finalize the user interface.
-        """
+        """Finalize the user interface."""
         QtCore.QTimer.singleShot(0, self._widgets["but_okay"].setFocus)
 
     @QtCore.Slot()

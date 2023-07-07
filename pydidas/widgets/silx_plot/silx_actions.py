@@ -39,11 +39,12 @@ from numbers import Real
 import numpy as np
 import silx.gui.plot
 from qtpy import QtCore, QtWidgets
-from silx.gui.plot.actions import PlotAction
 from silx.gui.colors import Colormap
+from silx.gui.plot.actions import PlotAction
 
-from ...core import PydidasQsettingsMixin, UserConfigError, utils
+from ...core import PydidasQsettingsMixin, UserConfigError
 from ...data_io import IoMaster, import_data
+from ...resources import icons
 from ..file_dialog import PydidasFileDialog
 
 
@@ -57,7 +58,7 @@ class ChangeCanvasToData(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=utils.get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
+            icon=icons.get_pydidas_qt_icon("silx_limit_plot_canvas.png"),
             text="Change Canvas to data shape",
             tooltip="Change the canvas shape to match the data aspect ratio.",
             triggered=self._actionTriggered,
@@ -101,7 +102,7 @@ class ExpandCanvas(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=utils.get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
+            icon=icons.get_pydidas_qt_icon("silx_expand_plot_canvas.png"),
             text="Maximize canvas size",
             tooltip="Maximize the canvas size.",
             triggered=self._actionTriggered,
@@ -132,7 +133,7 @@ class AutoscaleToMeanAndThreeSigma(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=utils.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
+            icon=icons.get_pydidas_qt_icon("silx_cmap_autoscale.png"),
             text="Autoscale colormap to mean +/- 3 std",
             tooltip="Autoscale colormap to mean +/- 3 std",
             triggered=self._actionTriggered,
@@ -170,7 +171,7 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         PlotAction.__init__(
             self,
             plot,
-            icon=utils.get_pydidas_qt_icon("silx_crop_histogram.png"),
+            icon=icons.get_pydidas_qt_icon("silx_crop_histogram.png"),
             text="Crop colormap histogram outliers",
             tooltip="Crop the colormap's histogram outliers",
             triggered=self._actionTriggered,
@@ -273,7 +274,7 @@ class PydidasGetDataInfoAction(PlotAction):
         PlotAction.__init__(
             self,
             plot,
-            icon=utils.get_pydidas_qt_icon("silx_get_data_info.png"),
+            icon=icons.get_pydidas_qt_icon("silx_get_data_info.png"),
             text="Show information of scan point",
             tooltip=(
                 "Show information about the scan point associated with this datapoint."

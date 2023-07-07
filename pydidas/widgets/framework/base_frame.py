@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,16 +21,17 @@ should inherit.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BaseFrame"]
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
-from ...core import ParameterCollection, PydidasQsettingsMixin, ParameterCollectionMixIn
-from ...core.utils import get_pydidas_icon_w_bg, ShowBusyMouse
+from ...core import ParameterCollection, ParameterCollectionMixIn, PydidasQsettingsMixin
+from ...core.utils import ShowBusyMouse
+from ...resources import icons
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config import ParameterWidgetsMixIn
 
@@ -43,8 +44,7 @@ class BaseFrame(
     ParameterWidgetsMixIn,
 ):
     """
-    The BaseFrame is a subclassed QWidget and should be used as the
-    base class for all Frames in pydidas.
+    The BaseFrame is a subclassed QWidget and the base class for all Frames in pydidas.
 
     By default, a QGridLayout is applied with an alignment of left/top.
 
@@ -74,7 +74,7 @@ class BaseFrame(
 
     def __init__(self, parent=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent=parent)
-        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setVisible(False)
         self.setUpdatesEnabled(False)
         CreateWidgetsMixIn.__init__(self)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -19,25 +19,25 @@ Module with ErrorMessageBox class for exception output.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ErrorMessageBox"]
+
 
 import os
 
-from qtpy import QtCore, QtGui, QtSvg, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core.constants import POLICY_EXP_EXP, PYDIDAS_FEEDBACK_URL
 from ...core.utils import (
     apply_qt_properties,
     copy_text_to_system_clipbord,
     get_logging_dir,
-    get_pydidas_error_icon_w_bg,
-    get_pydidas_icon_path,
     update_size_policy,
 )
+from ...resources import icons, logos
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
 
@@ -59,7 +59,7 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle("Unhandled exception")
-        self.setWindowIcon(get_pydidas_error_icon_w_bg())
+        self.setWindowIcon(icons.pydidas_error_icon_with_bg())
         _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
 
@@ -94,10 +94,9 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             fixedWidth=300,
         )
 
-        _icon_fname = os.path.join(get_pydidas_icon_path(), "pydidas_error.svg")
         self.add_any_widget(
             "icon",
-            QtSvg.QSvgWidget(_icon_fname),
+            logos.pydidas_error_svg(),
             fixedHeight=150,
             fixedWidth=150,
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ to subclass BaseFrames to stand-alone Qt windows.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasWindow"]
 
 
@@ -36,8 +36,8 @@ from ...core.utils import (
     DOC_HOME_QURL,
     doc_filename_for_window_manual,
     doc_qurl_for_window_manual,
-    get_pydidas_icon_w_bg,
 )
+from ...resources import icons
 from .base_frame import BaseFrame
 
 
@@ -64,9 +64,7 @@ class PydidasWindowMixIn:
         super().closeEvent(event)
 
     def show(self):
-        """
-        Overload the show method to update the geometry.
-        """
+        """Overload the show method to update the geometry."""
         if self._geometry is not None:
             self.setGeometry(self._geometry)
         super().show()
@@ -100,10 +98,7 @@ class PydidasWindowMixIn:
 
 
 class PydidasWindow(BaseFrame, PydidasWindowMixIn):
-    """
-    The PydidasWindow is a standalone BaseFrame with a persistent geometry
-    upon closing and showing.
-    """
+    """The PydidasWindow is a standalone BaseFrame with a persistent geometry."""
 
     show_frame = False
     sig_closed = QtCore.Signal()
@@ -114,7 +109,7 @@ class PydidasWindow(BaseFrame, PydidasWindowMixIn):
         self.set_default_params()
         if kwargs.get("activate_frame", True):
             self.frame_activated(self.frame_index)
-        self.setWindowIcon(get_pydidas_icon_w_bg())
+        self.setWindowIcon(icons.pydidas_icon_with_bg())
         if "title" in kwargs:
             self.setWindowTitle(kwargs.get("title"))
 

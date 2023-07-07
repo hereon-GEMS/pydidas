@@ -33,16 +33,12 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError
-from ...core.utils import (
-    ShowBusyMouse,
-    get_fixed_length_str,
-    get_pydidas_icon_w_bg,
-)
+from ...core.utils import ShowBusyMouse, get_fixed_length_str
 from ...plugins import BasePlugin
 from ..factory import CreateWidgetsMixIn
 from ..framework import PydidasWindow
+from ..misc import ReadOnlyTextWidget
 from ..silx_plot import PydidasPlotStack
-from .read_only_text_widget import ReadOnlyTextWidget
 
 
 class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
@@ -56,7 +52,6 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         PydidasWindow.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
 
-        self.setWindowIcon(get_pydidas_icon_w_bg())
         self.setWindowTitle("Information for data point")
         self._frame = None
         self._loader_plugin = None

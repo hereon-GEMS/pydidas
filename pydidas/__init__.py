@@ -31,6 +31,7 @@ import os as __os
 import logging as __logging
 
 import qtpy.QtCore as __QtCore
+
 # must import h5py here to have the dll libraries linked correctly
 import h5py as __h5py
 

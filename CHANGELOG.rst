@@ -13,6 +13,8 @@ Improvements
 
     - Moved the functions to get resource icons and images to the resources
       subpackage.
+    - Created a pydidas_qtcore package to bundle all the core Qt functionalities
+      which need to be loaded prior to starting the UI.
 
 
 v23.07.05

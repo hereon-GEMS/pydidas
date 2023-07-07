@@ -32,7 +32,7 @@ import sys
 
 from qtpy import QtCore, QtWidgets
 
-from . import constants
+from . import fontsize
 
 
 def parse_cmd_args():
@@ -45,7 +45,8 @@ def parse_cmd_args():
         The parsed command line arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-fontsize", type=int, help="The default font size in points.")
+    parser.add_argument("-fontsize", type=int, help="The default font size in points.",
+                        default=fontsize.STANDARD_FONT_SIZE)
     _kwargs = dict(vars(parser.parse_args()))
     for _name in ["fontsize"]:
         if f"-{_name}" in sys.argv:
@@ -74,23 +75,18 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.setApplicationName("pydidas")
 
         _kwargs = parse_cmd_args()
-        _point_size = (
-            _kwargs.get("fontsize")
-            if _kwargs.get("fontsize") is not None
-            else constants.STANDARD_FONT_SIZE
-        )
+        _point_size = _kwargs.get("fontsize")
+        fontsize.STANDARD_FONT_SIZE = _point_size
         if self._point_size != _point_size:
             self.standard_fontsize = _point_size
 
     @QtCore.Slot()
     def send_gui_close_signal(self):
-        """
-        Send the signal that the GUI is about to close to all Windows.
-        """
+        """Send the signal that the GUI is about to close to all Windows."""
         self.sig_close_gui.emit()
 
     @property
-    def standard_fontsize(self):
+    def standard_fontsize(self) -> int:
         """
         Return the standard fontSize set for the app.
 
@@ -102,7 +98,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         return self._point_size
 
     @standard_fontsize.setter
-    def standard_fontsize(self, value):
+    def standard_fontsize(self, value: int):
         """
         Set the standard fontsize for the PydidasApp.
 
@@ -114,7 +110,8 @@ class PydidasQApplication(QtWidgets.QApplication):
         if value == self._point_size:
             return
         self._point_size = value
+        fontsize.STANDARD_FONT_SIZE = value
         _font = self.font()
-        _font.setPointSize(self._point_size)
+        _font.setPointSizeF(self._point_size)
         self.setFont(_font)
         self.sig_fontsize_changed.emit(self._point_size)

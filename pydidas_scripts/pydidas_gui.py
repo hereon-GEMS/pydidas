@@ -29,82 +29,28 @@ __all__ = ["run_gui", "start_pydidas_gui"]
 
 import multiprocessing as mp
 import signal
-import sys
 import warnings
-from pathlib import Path
-from typing import Union
 
-from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QApplication, QSplashScreen
 
 
-def _get_icon_pixmap():
-    """
-    Get the path for loading the icon and set the icon.
-
-    Returns
-    -------
-    None.
-
-    """
-    for _path in sys.path:
-        _p = Path(_path).joinpath("pydidas", "resources", "images", "splash_image.png")
-        if _p.is_file():
-            _iconpath = str(_p)
-            break
-    if _iconpath is None:
-        raise ModuleNotFoundError(
-            "Cannot find the required files for the startup window"
-        )
-    return QtGui.QPixmap(_iconpath)
-
-
-class PydidasSplashScreen(QtWidgets.QSplashScreen):
-    """
-    A splash screen which allows to show centered messages and with the pydidas icon.
-    """
-
-    def __init__(self, pixmap=None, f=QtCore.Qt.WindowStaysOnTopHint):
-        if pixmap is None:
-            pixmap = _get_icon_pixmap()
-        QtWidgets.QSplashScreen.__init__(self, pixmap, f)
-        self.show_aligned_message("Importing packages")
-        self.show()
-        QtWidgets.QApplication.instance().processEvents()
-
-    def show_aligned_message(self, message: str):
-        """
-        Show a message aligned bottom / center.
-
-        Parameters
-        ----------
-        message : str
-            The message to be displayes.
-        """
-        self.showMessage(message, QtCore.Qt.AlignHCenter | QtCore.Qt.AlignBottom)
-
-
-def start_pydidas_gui(
-    splash_screen: QSplashScreen,
-    app: Union[None, QApplication] = None,
-    restore_state: str = "None",
-):
+def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None"):
     """
     Start the GUI application with the generic pydidas layout.
 
     Parameters
     ----------
-    splash_screen :
-    app : Union[QtCore.QApplication, None], optional
-        The main Qt application. If None, a new QApplication will be created.
+    splash_screen : QSplashScreen
+        The
     restore_state : str, optional
         Flag to restore the state of the pydidas GUI. Flags can be either "None" to
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
     """
-    from pydidas.core import PydidasQApplication, UserConfigError
+    from pydidas.core import UserConfigError
     from pydidas.gui import MainWindow, frames
 
+    _app = QApplication.instance()
     splash_screen.show_aligned_message("Starting QApplication")
     if mp.get_start_method() != "spawn":
         try:
@@ -117,8 +63,6 @@ def start_pydidas_gui(
                 "multiprocessing."
             )
     splash_screen.show_aligned_message("Creating objects")
-    if not isinstance(app, PydidasQApplication):
-        app = PydidasQApplication([])
     gui = MainWindow()
     gui.register_frame(frames.HomeFrame)
     gui.register_frame(frames.DataBrowsingFrame)
@@ -145,21 +89,18 @@ def start_pydidas_gui(
             pass
     splash_screen.finish(gui)
     gui.raise_()
-    return app.exec_()
+    return _app.exec_()
 
 
 def run_gui():
-    """
-    Run the pydidas graphical user interface process.
-    """
-    from pydidas.core.pydidas_qapp import PydidasQApplication
+    """Run the pydidas graphical user interface process."""
+    from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = PydidasQApplication([])
     _splash = PydidasSplashScreen()
 
     _ = start_pydidas_gui(_splash, restore_state="exit")
-    app = QtWidgets.QApplication.instance()
     app.deleteLater()
 
 

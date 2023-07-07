@@ -47,16 +47,10 @@ __all__ = [
     "POLICY_MIN_MIN",
 ]
 
-import platform
-
+from pydidas_qtcore import fontsize
 from qtpy import QtCore, QtGui, QtWidgets
 
-
-if platform.system() == "Windows":
-    STANDARD_FONT_SIZE = 10
-else:
-    STANDARD_FONT_SIZE = 8
-
+STANDARD_FONT_SIZE = fontsize.STANDARD_FONT_SIZE
 
 ALIGN_TOP_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 

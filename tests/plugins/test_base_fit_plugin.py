@@ -119,8 +119,8 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin = BaseFitPlugin()
         plugin._config["settings_updated_from_data"] = True
         plugin.prepare_input_data(self._data)
-        self.assertTrue(np.alltrue((self._data == plugin._data)))
-        self.assertTrue(np.alltrue((self._x == plugin._data_x)))
+        self.assertTrue(np.all((self._data == plugin._data)))
+        self.assertTrue(np.all((self._x == plugin._data_x)))
 
     def test_prepare_input_data__w_limits(self):
         plugin = BaseFitPlugin()
@@ -128,8 +128,8 @@ class TestBaseFitPlugin(unittest.TestCase):
         plugin.set_param_value("fit_lower_limit", 12)
         plugin.set_param_value("fit_upper_limit", 25)
         plugin.prepare_input_data(self._data)
-        self.assertTrue(np.alltrue((self._data[24:51] == plugin._data)))
-        self.assertTrue(np.alltrue((self._x[24:51] == plugin._data_x)))
+        self.assertTrue(np.all((self._data[24:51] == plugin._data)))
+        self.assertTrue(np.all((self._x[24:51] == plugin._data_x)))
 
     def test_update_peak_bounds_from_data(self):
         plugin = BaseFitPlugin()

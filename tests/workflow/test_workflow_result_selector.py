@@ -135,7 +135,7 @@ class TestWorkflowResultSelector(unittest.TestCase):
             self.assertEqual(
                 _res.shape, self._scan_n + getattr(self, f"_result{_index}_shape")
             )
-            self.assertTrue(np.alltrue(_res > 0))
+            self.assertTrue(np.all(_res > 0))
 
     def test_init(self):
         obj = WorkflowResultsSelector()

@@ -96,7 +96,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             "Import workflow from file",
             fixedWidth=250,
             fixedHeight=25,
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             gridPos=(1, 0, 1, 1),
         )
         self.create_button(
@@ -104,7 +104,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
             "Export workflow to file",
             fixedWidth=250,
             fixedHeight=25,
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
             gridPos=(2, 0, 1, 1),
         )
 

@@ -166,7 +166,7 @@ class PydidasFileDialog(
         self.create_button(
             "but_latest_location",
             "Open latest selected location",
-            icon="qt-std::59",
+            icon="qt-std::SP_BrowserReload",
             parent_widget=self._widgets["sidebar_frame"],
         )
         self.create_button(

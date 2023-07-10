@@ -15,7 +15,8 @@ Improvements
       subpackage.
     - Created a pydidas_qtcore package to bundle all the core Qt functionalities
       which need to be loaded prior to starting the UI.
-
+    - Changed handling of Qt icons in preparation for Qt6 support.
+    
 
 v23.07.05
 =========

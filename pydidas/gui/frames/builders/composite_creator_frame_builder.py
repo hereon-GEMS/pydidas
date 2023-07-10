@@ -88,7 +88,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             gridPos=(-1, 0, 1, 2),
             parent_widget=self._widgets["config"],
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
         )
         self.create_any_widget(
             "plot_window",
@@ -141,7 +141,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             parent_widget=self._widgets["config"],
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(61),
+            icon="qt-std::SP_MediaPlay",
         )
 
         self.create_progress_bar(
@@ -162,7 +162,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             enabled=True,
             visible=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(60),
+            icon="qt-std::SP_BrowserStop",
         )
 
         self.create_button(
@@ -172,7 +172,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             parent_widget=self._widgets["config"],
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(13),
+            icon="qt-std::SP_DesktopIcon",
         )
 
         self.create_button(
@@ -182,7 +182,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
             gridPos=(-1, 0, 1, 2),
             enabled=False,
             fixedWidth=CONFIG_WIDGET_WIDTH,
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
         )
 
         self.create_spacer(

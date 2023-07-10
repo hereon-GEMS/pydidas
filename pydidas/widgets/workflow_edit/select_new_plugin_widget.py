@@ -70,7 +70,7 @@ class SelectNewPluginWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.create_button(
             "but_reset_filter",
             "Reset filter",
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
             gridPos=(0, 1, 1, 1),
         )
         self.add_any_widget(

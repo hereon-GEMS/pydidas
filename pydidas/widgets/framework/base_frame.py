@@ -63,7 +63,7 @@ class BaseFrame(
     """
 
     show_frame = True
-    menu_icon = "qt-std::7"
+    menu_icon = "qt-std::SP_TitleBarContextHelpButton"
     menu_title = ""
     menu_entry = ""
     params_not_to_restore = []
@@ -73,7 +73,7 @@ class BaseFrame(
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent=parent)
+        QtWidgets.QWidget.__init__(self)  # , parent=parent)
         self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setVisible(False)
         self.setUpdatesEnabled(False)

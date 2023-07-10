@@ -89,7 +89,7 @@ class _GlobalSettingsWindow(PydidasWindow):
         self.create_button(
             "but_reset",
             "Restore defaults",
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )

@@ -36,7 +36,7 @@ __all__ = [
 
 import qtawesome
 from qtpy import QtCore, QtGui, QtWidgets
-from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout
+from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
 from ..core import PydidasGuiError, utils
 from ..resources import icons
@@ -117,9 +117,9 @@ def get_pyqt_icon_from_str(ref_string):
     if _type == "qta":
         _menu_icon = qtawesome.icon(_ref)
     elif _type == "qt-std":
-        _num = int(_ref)
+        _ref = getattr(QStyle, _ref)
         app = QtWidgets.QApplication.instance()
-        _menu_icon = app.style().standardIcon(_num)
+        _menu_icon = app.style().standardIcon(_ref)
     elif _type == "pydidas":
         _menu_icon = icons.get_pydidas_qt_icon(_ref)
     elif _type == "path":

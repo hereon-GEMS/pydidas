@@ -103,7 +103,7 @@ class _UserConfigWindow(PydidasWindow):
         self.create_button(
             "but_reset",
             "Restore defaults",
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )
@@ -144,11 +144,13 @@ class _UserConfigWindow(PydidasWindow):
 
         self.create_label("section_plugins", "Plugins", **_section_options)
         self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
-        self.create_button("but_plugins", "Update plugin collection", icon="qt-std::59")
+        self.create_button(
+            "but_plugins", "Update plugin collection", icon="qt-std::SP_BrowserReload"
+        )
         self.create_button(
             "but_reset_plugins",
             "Restore default plugin collection paths",
-            icon="qt-std::39",
+            icon="qt-std::SP_DialogOkButton",
         )
 
     def connect_signals(self):

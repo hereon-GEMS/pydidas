@@ -86,7 +86,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         self.create_button(
             "but_load_from_file",
             "Import diffraction experimental parameters",
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
             fixedWidth=self._scroll_width,
@@ -142,7 +142,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
             alignment=None,
             fixedWidth=self._scroll_width,
             parent_widget=self._widgets["config"],
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
         )
 
     def __create_detector_header(self):

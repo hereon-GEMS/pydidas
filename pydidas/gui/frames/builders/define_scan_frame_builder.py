@@ -78,7 +78,7 @@ class DefineScanFrameBuilder(BaseFrame):
         self.create_button(
             "but_load",
             "Import scan settings from file",
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             fixedWidth=constants.CONFIG_WIDGET_WIDTH,
         )
         # self.create_button(
@@ -86,13 +86,13 @@ class DefineScanFrameBuilder(BaseFrame):
         #     "Open scan parameter import dialogue",
         #     gridPos=(-1, 0, 1, 1),
         #     alignment=None,
-        #     icon=self.style().standardIcon(42),
+        #     icon="qt-std::SP_DialogOpenButton",
         #     fixedWidth=constants.CONFIG_WIDGET_WIDTH,
         # )
         self.create_button(
             "but_reset",
             "Reset all scan settings",
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
             fixedWidth=constants.CONFIG_WIDGET_WIDTH,
         )
         self.create_spacer(None)
@@ -114,7 +114,7 @@ class DefineScanFrameBuilder(BaseFrame):
             "but_more_scan_dim_info",
             "More information about scan dimensions",
             gridPos=(-1, 0, 1, 2),
-            icon=self.style().standardIcon(9),
+            icon="qt-std::SP_MessageBoxInformation",
             fixedWidth=constants.CONFIG_WIDGET_WIDTH,
         )
         self.create_spacer(None)
@@ -240,7 +240,7 @@ class DefineScanFrameBuilder(BaseFrame):
             gridPos=(-1, 0, 1, 1),
             fixedWidth=constants.CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["global_param_frame"],
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
         )
         self.create_spacer(
             "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.POLICY_EXP_EXP

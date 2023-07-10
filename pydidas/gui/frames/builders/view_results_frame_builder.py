@@ -107,7 +107,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             "Import results from directory",
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
         )
         self.create_any_widget(
             "result_selector",
@@ -136,7 +136,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             enabled=False,
-            icon=self.style().standardIcon(25),
+            icon="qt-std::SP_FileIcon",
             toolTip=(
                 "Export the current node's results to file. Note that "
                 "the filenames are pre-determined based on node ID "
@@ -151,7 +151,7 @@ class ViewResultsFrameBuilder(BaseFrame):
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["config"],
             tooltip=("Export all results. Note that the directory must be empty."),
-            icon=self.style().standardIcon(43),
+            icon="qt-std::SP_DialogSaveButton",
         )
         self.create_spacer(
             "config_terminal_spacer",

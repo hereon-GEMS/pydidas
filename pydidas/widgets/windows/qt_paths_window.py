@@ -73,7 +73,7 @@ class QtPathsWindow(PydidasWindow):
         self.create_button(
             "but_open_logdir",
             "Open logging directory",
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             fixedWidth=180,
             fixedHeight=25,
             gridPos=(1, 1, 1, 1),
@@ -86,7 +86,7 @@ class QtPathsWindow(PydidasWindow):
         self.create_button(
             "but_open_configdir",
             "Open config directory",
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             fixedWidth=180,
             fixedHeight=25,
             gridPos=(2, 1, 1, 1),

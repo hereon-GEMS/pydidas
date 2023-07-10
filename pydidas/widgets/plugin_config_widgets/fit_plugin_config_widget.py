@@ -31,6 +31,7 @@ __all__ = ["FitPluginConfigWidget"]
 from functools import partial
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QStyle
 
 from pydidas.core.constants import (
     DEFAULT_PLUGIN_PARAM_CONFIG,
@@ -94,7 +95,7 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
-            icon=self.style().standardIcon(6),
+            icon="qt-std::SP_TitleBarUnshadeButton",
             fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=self.__toggle_advanced_params,
         )
@@ -142,7 +143,11 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             else "Hide advanced Parameters"
         )
         self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
         )
 
     def update_edits(self):

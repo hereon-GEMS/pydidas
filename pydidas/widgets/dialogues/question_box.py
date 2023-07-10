@@ -63,7 +63,7 @@ class QuestionBox(QtWidgets.QMessageBox):
     ):
         super().__init__(parent)
         self.setWindowTitle(title)
-        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::12"))
+        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_MessageBoxQuestion"))
         self.setText(question)
         if len(explanation) > 0:
             self.setInformativeText(explanation)

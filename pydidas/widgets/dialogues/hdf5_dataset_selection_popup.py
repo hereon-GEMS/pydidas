@@ -51,7 +51,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
             self.__update_combo_box_items(dsets)
         self.setWindowTitle("Select hdf5 dataset")
-        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::36"))
+        self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_FileDialogListView"))
         self.setLabelText("Hdf5 datasets:")
 
     def set_filename(self, fname):

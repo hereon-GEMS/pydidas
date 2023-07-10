@@ -82,7 +82,7 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         self.create_button(
             "but_open",
             "Select image file",
-            icon=self.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             **_button_params,
         )
         self.create_param_widget(

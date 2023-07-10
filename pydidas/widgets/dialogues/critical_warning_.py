@@ -43,5 +43,5 @@ def critical_warning(title, text):
     """
 
     _box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical, title, text)
-    _box.setWindowIcon(get_pyqt_icon_from_str("qt-std::11"))
+    _box.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_MessageBoxCritical"))
     _box.exec_()

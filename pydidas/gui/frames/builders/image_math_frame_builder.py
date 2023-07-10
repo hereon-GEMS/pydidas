@@ -199,7 +199,7 @@ class ImageMathFrameBuilder:
             "Store loaded image as ",
             cls._input_images,
             "Store",
-            button_icon="qt-std::57",
+            button_icon="qt-std::SP_CommandLink",
         )
         cls._frame.create_line("line_input", parent_widget="left_container")
 

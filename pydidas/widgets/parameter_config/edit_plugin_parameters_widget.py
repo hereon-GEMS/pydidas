@@ -30,6 +30,7 @@ __all__ = ["EditPluginParametersWidget"]
 from pathlib import Path
 
 from qtpy import QtCore, QtWidgets
+from qtpy.QtWidgets import QStyle
 
 from ...core import Hdf5key, constants
 from ..factory import CreateWidgetsMixIn
@@ -157,7 +158,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 self.create_button(
                     "but_toggle_advanced_params",
                     "Display advanced Parameters",
-                    icon=self.style().standardIcon(6),
+                    icon="qt-std::SP_TitleBarUnshadeButton",
                     width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
                 )
                 for _key in self.plugin.advanced_parameters:
@@ -194,7 +195,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "restore_defaults",
             "Restore default parameters",
-            icon=self.style().standardIcon(59),
+            icon="qt-std::SP_BrowserReload",
             fixedHeight=25,
             fixedWidth=225,
             gridPos=(2, 0, 1, 2),
@@ -224,7 +225,11 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             else "Hide advanced Parameters"
         )
         self._widgets["but_toggle_advanced_params"].setIcon(
-            self.style().standardIcon(6 if self.__advanced_hidden else 5)
+            self.style().standardIcon(
+                QStyle.SP_TitleBarUnshadeButton
+                if self.__advanced_hidden
+                else QStyle.SP_TitleBarShadeButton
+            )
         )
 
     def update_edits(self):

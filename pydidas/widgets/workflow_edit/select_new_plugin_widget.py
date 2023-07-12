@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ registered plugins.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
@@ -43,7 +43,7 @@ PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
 
 
-class SelectNewPluginWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
+class SelectNewPluginWidget(CreateWidgetsMixIn, QtWidgets.QWidget):
     """
     The SelectNewPluginWidget includes a search filter field and a QTreeView which
     includes all the available plugins.
@@ -296,10 +296,10 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         filter_text : str
             The new search filter.
         """
-        _pattern = QtCore.QRegExp(
-            filter_text, QtCore.Qt.CaseInsensitive, QtCore.QRegExp.FixedString
+        _pattern = QtCore.QRegularExpression(
+            filter_text, QtCore.QRegularExpression.CaseInsensitiveOption
         )
-        self.__model.setFilterRegExp(_pattern)
+        self.__model.setFilterRegularExpression(_pattern)
         self.expandAll()
 
 
@@ -333,7 +333,7 @@ class _SearchFilterModel(QtCore.QSortFilterProxyModel):
         """
         if index.isValid():
             _label = index.data(QtCore.Qt.DisplayRole)
-            if self.filterRegExp().indexIn(_label) >= 0:
+            if self.filterRegularExpression().match(_label).hasMatch():
                 return True
             for _row in range(index.model().rowCount(index)):
                 if self._accept_index(index.model().index(_row, 0, index)):

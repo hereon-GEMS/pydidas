@@ -40,7 +40,7 @@ from .select_new_plugin_widget import SelectNewPluginWidget
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(QtWidgets.QWidget, CreateWidgetsMixIn):
+class PluginCollectionBrowser(CreateWidgetsMixIn, QtWidgets.QWidget):
     """
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description

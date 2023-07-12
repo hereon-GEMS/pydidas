@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,16 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
+
 """
 Module with the PluginInWorkflowBox which is a subclassed QLabel and used
 to display plugin processing steps in the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PluginInWorkflowBox"]
 
 from functools import partial
@@ -32,6 +35,8 @@ from qtpy import QtWidgets, QtCore, QtGui
 from ...core import constants
 from ...core.utils import apply_qt_properties
 from ...workflow import WorkflowTree
+from ..utilities import get_pyqt_icon_from_str
+from ..factory import create_button
 
 TREE = WorkflowTree()
 
@@ -79,10 +84,14 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.setStyleSheet(self.__get_stylesheet())
 
         if kwargs.get("deletable", True):
-            self.del_button = QtWidgets.QPushButton(self)
-            self.del_button.setIcon(self.style().standardIcon(3))
-            self.del_button.setGeometry(self.widget_width - 18, 3, 16, 16)
-            self.del_button.setStyleSheet(self.__get_stylesheet())
+            self.del_button = create_button(
+                "",
+                icon=get_pyqt_icon_from_str("qt-std::SP_TitleBarCloseButton"),
+                parent=self,
+                styleSheet=self.__get_stylesheet(),
+                geometry=(self.widget_width - 28, 3, 25, 20),
+                layoutDirection=QtCore.Qt.RightToLeft,
+            )
             self.__create_menu()
 
         self.id_label.setStyleSheet(self.__get_stylesheet(border=False))

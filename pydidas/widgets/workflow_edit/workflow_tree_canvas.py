@@ -35,7 +35,7 @@ from ...core import constants
 from ..factory import CreateWidgetsMixIn
 
 
-class WorkflowTreeCanvas(QtWidgets.QFrame, CreateWidgetsMixIn):
+class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
     """
     The WorkflowTreeCanvas is the widget to draw the workflow tree and hold
     the individual plugin widgets. It is also responsible to draw the lines
@@ -61,8 +61,7 @@ class WorkflowTreeCanvas(QtWidgets.QFrame, CreateWidgetsMixIn):
 
     def paintEvent(self, event):
         """
-        Overload the paintEvent to also draw lines connecting
-        parent and child plugins.
+        Overload the paintEvent to also draw lines connecting parent and child plugins.
 
         Parameters
         ----------

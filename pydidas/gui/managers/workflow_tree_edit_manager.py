@@ -29,7 +29,6 @@ __all__ = ["WorkflowTreeEditManager"]
 
 
 import time
-from functools import partial
 
 import numpy as np
 from qtpy import QtCore
@@ -192,10 +191,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             title, node_id, parent=self.qt_canvas, label=label
         )
         _widget.sig_widget_activated.connect(self.set_active_node)
-        _widget.sig_widget_delete_branch_request.connect(
-            partial(self.delete_branch, node_id)
-        )
-        _widget.sig_widget_delete_request.connect(partial(self.delete_node, node_id))
+        _widget.sig_widget_delete_branch_request.connect(self.delete_branch)
+        _widget.sig_widget_delete_request.connect(self.delete_node)
         _widget.sig_new_node_parent_request.connect(self.new_node_parent_request)
         _widget.sig_create_copy_request.connect(self.create_node_copy_request)
         self.sig_consistent_plugins.connect(_widget.receive_consistent_signal)

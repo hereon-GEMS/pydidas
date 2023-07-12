@@ -23,6 +23,11 @@ Improvements
       circular dependencies.
     
 
+Bugfixes
+--------
+
+- Fixed an issue with wrong signal signaturs in WorkflowTreeEditManager.
+
 v23.07.05
 =========
 

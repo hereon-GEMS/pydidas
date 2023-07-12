@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,31 +21,38 @@ GridLayout to add the label, I/O and unit widgets for a Parameter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParameterWidget"]
 
+
 import html
+from pathlib import Path
 
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
+from ...core import Hdf5key, UserConfigError
 from ...core.constants import (
-    PARAM_INPUT_WIDGET_HEIGHT,
-    PARAM_INPUT_WIDGET_WIDTH,
+    ALIGN_TOP_LEFT,
     PARAM_INPUT_EDIT_WIDTH,
     PARAM_INPUT_TEXT_WIDTH,
     PARAM_INPUT_UNIT_WIDTH,
+    PARAM_INPUT_WIDGET_HEIGHT,
+    PARAM_INPUT_WIDGET_WIDTH,
 )
-from ...core.utils import convert_special_chars_to_unicode, apply_qt_properties
-from ..factory import create_param_widget, create_label
+from ...core.utils import apply_qt_properties, convert_special_chars_to_unicode
+from ..factory import create_label
+from .param_io_widget_combo_box import ParamIoWidgetComboBox
+from .param_io_widget_file import ParamIoWidgetFile
+from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
+from .param_io_widget_lineedit import ParamIoWidgetLineEdit
 
 
 class ParameterWidget(QtWidgets.QWidget):
     """
-    The ParameterWidget is a combined widget to display and modify a
-    Parameter with name, value and unit.
+    A combined widget to display and modify a Parameter with name, value and unit.
 
     This widget is a wrapper and includes labels for name and unit and the
     respective Parameter edit widget which is selected based on the Parameter
@@ -70,28 +79,29 @@ class ParameterWidget(QtWidgets.QWidget):
         self.__store_config_from_kwargs(kwargs)
 
         self.param = param
-        _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        _layout.setSpacing(5)
-        _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        _layout.setColumnStretch(1, 1)
+        self.setLayout(QtWidgets.QGridLayout())
+        apply_qt_properties(
+            self.layout(),
+            contentsMargins=(0, 0, 0, 0),
+            spacing=5,
+            alignment=ALIGN_TOP_LEFT,
+        )
+        self.layout().setColumnStretch(1, 1)
         self.name_widget = self.__get_name_widget()
         if self.config["width_unit"] > 0:
             self.unit_widget = self.__get_unit_widget()
-        self.io_widget = create_param_widget(
-            param,
-            widget_width=self.config["width_io"],
+        self.io_widget = self.__get_param_io_widget(
+            width=self.config["width_io"],
             persistent_qsettings_ref=kwargs.get("persistent_qsettings_ref", None),
         )
         _text_w_args, _input_w_args, _unit_w_args = self.__get_layout_args_for_widgets()
-        _layout.addWidget(self.name_widget, *_text_w_args)
-        _layout.addWidget(self.io_widget, *_input_w_args)
+        self.layout().addWidget(self.name_widget, *_text_w_args)
+        self.layout().addWidget(self.io_widget, *_input_w_args)
         if self.config["width_unit"] > 0:
-            _layout.addWidget(self.unit_widget, *_unit_w_args)
+            self.layout().addWidget(self.unit_widget, *_unit_w_args)
 
         self.io_widget.io_edited.connect(self.__emit_io_changed)
         self.io_widget.io_edited.connect(self.__set_param_value)
-        self.setLayout(_layout)
         apply_qt_properties(self, **kwargs)
 
     def __set_size_from_kwargs(self, kwargs):
@@ -172,6 +182,35 @@ class ParameterWidget(QtWidgets.QWidget):
             toolTip=f"<qt>{html.escape(self.param.tooltip)}</qt>",
             margin=0,
         )
+
+    def __get_param_io_widget(self, **kwargs: dict) -> QtWidgets.QWidget:
+        """
+        Get the specific Parameter I/O widget for the Parameter configuration and type.
+
+        Parameters
+        ----------
+        kwargs: dict
+            Additional configuration dictionary.
+
+        Returns
+        -------
+        QtWidgets.QWidget
+            The parameter I/O widget.
+        """
+        if self.param.choices:
+            _widget = ParamIoWidgetComboBox(self.param, **kwargs)
+        else:
+            if self.param.dtype == Path:
+                _widget = ParamIoWidgetFile(self.param, **kwargs)
+            elif self.param.dtype == Hdf5key:
+                _widget = ParamIoWidgetHdf5Key(self.param, **kwargs)
+            else:
+                _widget = ParamIoWidgetLineEdit(self.param, **kwargs)
+        try:
+            _widget.set_value(self.param.value)
+        except UserConfigError:
+            pass
+        return _widget
 
     def __get_unit_widget(self):
         """

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -31,7 +31,8 @@ __all__ = ["ParamIoWidgetHdf5Key"]
 
 from qtpy import QtCore
 
-from ...core.constants import HDF5_EXTENSIONS, PARAM_INPUT_EDIT_WIDTH
+from ...core import Parameter
+from ...core.constants import HDF5_EXTENSIONS
 from ..dialogues import Hdf5DatasetSelectionPopup
 from ..file_dialog import PydidasFileDialog
 from .param_io_widget_with_button import ParamIoWidgetWithButton
@@ -45,31 +46,29 @@ class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(
-        self, parent, param, width=PARAM_INPUT_EDIT_WIDTH, persistent_qsettings_ref=None
-    ):
+    def __init__(self, param: Parameter, **kwargs):
         """
-        Setup the widget.
+        Initialize the widget.
 
         Init method to setup the widget and set the links to the parameter
         and Qt parent widget.
 
         Parameters
         ----------
-        parent : QWidget
-            A QWidget instance.
         param : Parameter
             A Parameter instance.
-        width : int, optional
-            The width of the IOwidget.
+        **kwargs : dict
+            Optional keyword arguments. Supported kwargs are "width" in pixel for the
+            I/O filed and "persistent_qsettings_ref" as reference name of the last
+            opened directory.
         """
-        super().__init__(parent, param, width)
+        ParamIoWidgetWithButton.__init__(self, param, **kwargs)
         self._button.setToolTip("Select a dataset from all dataset keys in a file.")
         self.io_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
             formats=("Hdf5 files (*." + " *.".join(HDF5_EXTENSIONS) + ")"),
-            qsettings_ref=persistent_qsettings_ref,
+            qsettings_ref=kwargs.get("persistent_qsettings_ref", None),
             default_extension="Hdf5",
         )
 

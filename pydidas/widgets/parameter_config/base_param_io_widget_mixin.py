@@ -16,8 +16,8 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseParamIoWidget base class which all widgets for editing
-Parameters should inherit from.
+Module with the BaseParamIoWidgetMixIn base class which all widgets for editing
+Parameters should inherit from (in addition to their respective QWidget).
 """
 
 __author__ = "Malte Storm"
@@ -25,21 +25,21 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["BaseParamIoWidget"]
+__all__ = ["BaseParamIoWidgetMixIn"]
 
 
+import html
 import numbers
 import pathlib
-import html
 
-from qtpy import QtWidgets, QtGui, QtCore
 from numpy import nan
+from qtpy import QtCore, QtGui
 
-from ...core import Hdf5key, UserConfigError
+from ...core import Hdf5key, Parameter, UserConfigError
 from ...core.constants import (
+    PARAM_INPUT_EDIT_WIDTH,
     PARAM_INPUT_WIDGET_HEIGHT,
     QT_REG_EXP_FLOAT_VALIDATOR,
-    PARAM_INPUT_EDIT_WIDTH,
     QT_REG_EXP_INT_VALIDATOR,
 )
 
@@ -52,14 +52,12 @@ FLOAT_VALIDATOR.setNotation(QtGui.QDoubleValidator.ScientificNotation)
 FLOAT_VALIDATOR.setLocale(LOCAL_SETTINGS)
 
 
-class BaseParamIoWidget(QtWidgets.QWidget):
+class BaseParamIoWidgetMixIn:
     """
-    Base class of widgets for I/O during Parameter editing.
+    Base mixin class of widgets for I/O during Parameter editing.
 
     Parameters
     ----------
-    parent : QWidget
-        A QWidget instance.
     param : Parameter
         A Parameter instance.
     width: int, optional
@@ -67,18 +65,18 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         specified in pydidas.core.constants.gui_constants.
     """
 
-    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH):
-        super().__init__(parent)
-        self.setFixedWidth(width)
+    io_edited = QtCore.Signal(str)
+
+    def __init__(self, param: Parameter, **kwargs: dict):
+        self.setFixedWidth(kwargs.get("width", PARAM_INPUT_EDIT_WIDTH))
         self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self._ptype = param.dtype
         self._old_value = None
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
-    def set_validator(self, param):
+    def set_validator(self, param: Parameter):
         """
-        Set the widget's validator based on the Parameter datatype and
-        allow_None settings.
+        Set the widget's validator based on the Parameter's configuration.
 
         Parameters
         ----------
@@ -96,7 +94,7 @@ class BaseParamIoWidget(QtWidgets.QWidget):
             else:
                 self.setValidator(FLOAT_VALIDATOR)
 
-    def get_value_from_text(self, text):
+    def get_value_from_text(self, text: str) -> object:
         """
         Get a value from the text entry to update the Parameter value.
 
@@ -115,11 +113,11 @@ class BaseParamIoWidget(QtWidgets.QWidget):
         # of int but the strings 'True' and 'False' cannot be converted to int
         if text.upper() == "TRUE":
             return True
-        elif text.upper() == "FALSE":
+        if text.upper() == "FALSE":
             return False
-        elif text.upper() == "NAN":
+        if text.upper() == "NAN":
             return nan
-        elif text.upper() == "NONE":
+        if text.upper() == "NONE":
             return None
         try:
             if self._ptype == numbers.Integral:

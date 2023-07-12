@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["EditPluginParametersWidget"]
 
+
 from pathlib import Path
 
 from qtpy import QtCore, QtWidgets

@@ -35,7 +35,6 @@ from .empty_widget_factory import *
 from .label_factory import *
 from .line_factory import *
 from .lineedit_factory import *
-from .param_widget_factory import *
 from .progress_bar_factory import *
 from .radio_button_group_factory import *
 from .spacer_factory import *
@@ -82,11 +81,6 @@ from . import lineedit_factory
 
 __all__.extend(lineedit_factory.__all__)
 del lineedit_factory
-
-from . import param_widget_factory
-
-__all__.extend(param_widget_factory.__all__)
-del param_widget_factory
 
 from . import progress_bar_factory
 

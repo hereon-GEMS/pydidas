@@ -27,9 +27,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
-from .parameter_widget import ParameterWidget
+
 from ...core import PydidasGuiError, utils
 from ..utilities import get_widget_layout_args
+from .parameter_widget import ParameterWidget
 
 
 class ParameterWidgetsMixIn:

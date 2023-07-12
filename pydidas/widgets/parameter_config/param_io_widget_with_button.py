@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,51 +21,52 @@ the addition of a programmable button.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParamIoWidgetWithButton"]
+
 
 from functools import partial
 
-from qtpy import QtWidgets, QtCore, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QStyle
 
-from .base_param_io_widget import BaseParamIoWidget
-from ...core.constants import PARAM_INPUT_WIDGET_HEIGHT, PARAM_INPUT_EDIT_WIDTH
+from ...core import Parameter
+from ...core.constants import PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_WIDGET_HEIGHT
+from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
-class ParamIoWidgetWithButton(BaseParamIoWidget):
+class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     """
-    Widgets for Parameter I/O which includes a freely programmable button
-    for a dialog or other interactions.
+    Widgets for Parameter I/O which includes a freely programmable button.
 
     Parameters
     ----------
-    parent : QWidget
-        A QWidget instance.
     param : Parameter
         A Parameter instance.
-    width: int, optional
-        The width of the IO widget. The default is the PARAM_INPUT_EDIT_WIDTH
-        specified in pydidas.core.constants.gui_constants.
-    button_icon : Union[QIcon, None], optional
-        The icon for the button. If None, the standard "file open" icon
-        will be used.
+    **kwargs : dict
+        Optional keyword arguments. Supported kwargs are "width" (in pixel) to specify
+        the size of the I/O field and "button_icon" to give an icon for the button.
     """
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, parent, param, width=PARAM_INPUT_EDIT_WIDTH, button_icon=None):
-        super().__init__(parent, param, width)
+    def __init__(self, param: Parameter, **kwargs: dict):
+        QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
+        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
+        _width = kwargs.get("width", PARAM_INPUT_EDIT_WIDTH)
         self.ledit = QtWidgets.QLineEdit()
-        self.ledit.setFixedWidth(width - PARAM_INPUT_WIDGET_HEIGHT - 2)
+        self.ledit.setFixedWidth(_width - PARAM_INPUT_WIDGET_HEIGHT - 2)
         self.ledit.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
 
-        if not isinstance(button_icon, QtGui.QIcon):
-            button_icon = self.style().standardIcon(42)
+        if not isinstance(kwargs.get("button_icon", None), QtGui.QIcon):
+            kwargs["button_icon"] = self.style().standardIcon(
+                QStyle.SP_DialogOpenButton
+            )
 
-        self._button = QtWidgets.QPushButton(button_icon, "")
+        self._button = QtWidgets.QPushButton(kwargs["button_icon"], "")
         self._button.setFixedWidth(PARAM_INPUT_WIDGET_HEIGHT)
         self._button.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         _layout = QtWidgets.QHBoxLayout()

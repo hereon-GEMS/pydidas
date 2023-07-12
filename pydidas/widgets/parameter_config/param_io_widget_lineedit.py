@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,28 +22,26 @@ accepted by the Parameter is valid.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ParamIoWidgetLineEdit"]
+
 
 from numbers import Real
 
 import numpy as np
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 
-from ...core.constants import (
-    PARAM_INPUT_WIDGET_WIDTH,
-    FLOAT_DISPLAY_ACCURACY,
-)
-from .base_param_io_widget import BaseParamIoWidget
+from ...core import Parameter
+from ...core.constants import FLOAT_DISPLAY_ACCURACY
+from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
-class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
+class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, QtWidgets.QLineEdit):
     """
     Widgets for I/O of Parameter editing without predefined choices.
-
 
     Parameters
     ----------
@@ -50,16 +50,15 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
     param : Parameter
         A Parameter instance.
     width : int, optional
-        The width of the widget. The default is given by the
-        PARAM_INPUT_WIDGET_WIDTH value in the
-        pydidas.core.constants.gui_constants module.
+        The width of the widget. The default is given by the PARAM_INPUT_WIDGET_WIDTH
+        value in the pydidas.core.constants.gui_constants module.
     """
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, parent, param, width=PARAM_INPUT_WIDGET_WIDTH):
-        QtWidgets.QLineEdit.__init__(self, parent)
-        BaseParamIoWidget.__init__(self, parent, param, width)
+    def __init__(self, param: Parameter, **kwargs: dict):
+        QtWidgets.QLineEdit.__init__(self, parent=kwargs.get("parent", None))
+        BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         self.set_validator(param)
         self.set_value(param.value)
         self.editingFinished.connect(self.emit_signal)
@@ -95,6 +94,11 @@ class ParamIoWidgetLineEdit(QtWidgets.QLineEdit, BaseParamIoWidget):
 
         This method changes the combobox selection to the specified value.
         Warning: This method will *not* update the connected parameter value.
+
+        Parameters
+        ----------
+        value : object
+            The new value to be displayed in the widget.
         """
         if self._ptype == Real and value is not None and np.isfinite(value):
             value = np.round(value, decimals=FLOAT_DISPLAY_ACCURACY)

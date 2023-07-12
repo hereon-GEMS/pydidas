@@ -31,7 +31,7 @@ __all__ = ["QuickIntegrationFrameBuilder"]
 from qtpy import QtWidgets
 
 from ....core import constants
-from ....widgets import ScrollArea, get_pyqt_icon_from_str
+from ....widgets import ScrollArea
 from ....widgets.misc import (
     PointPositionTableWidget,
     SelectImageFrameWidget,
@@ -274,14 +274,14 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "copy_exp_context",
             "Copy expriment description from workflow setup",
-            icon=get_pyqt_icon_from_str("qta::fa.copy"),
+            icon="qta::fa.copy",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["config"],
         )
         cls._frame.create_button(
             "but_show_exp_section",
             "Show detailed experiment section",
-            icon=cls._frame.style().standardIcon(6),
+            icon="qt-std::SP_TitleBarUnshadeButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["config"],
             visible=True,
@@ -292,7 +292,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_import_exp",
             "Import diffraction experimental parameters",
-            icon=cls._frame.style().standardIcon(42),
+            icon="qt-std::SP_DialogOpenButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["exp_section"],
         )
@@ -328,7 +328,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_hide_exp_section",
             "Hide detailed experiment section",
-            icon=cls._frame.style().standardIcon(5),
+            icon="qt-std::SP_TitleBarShadeButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["exp_section"],
             visible=True,
@@ -382,7 +382,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_confirm_beamcenter",
             "Confirm beamcenter",
-            icon=cls._frame.style().standardIcon(45),
+            icon="qt-std::SP_DialogApplyButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["beamcenter_section"],
             visible=False,
@@ -423,7 +423,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_show_integration_section",
             "Show integration ROI section",
-            icon=cls._frame.style().standardIcon(6),
+            icon="qt-std::SP_TitleBarUnshadeButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["config"],
             visible=False,
@@ -454,7 +454,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_button(
             "but_hide_integration_section",
             "Hide integration ROI section",
-            icon=cls._frame.style().standardIcon(5),
+            icon="qt-std::SP_TitleBarShadeButton",
             fixedWidth=cls._frame._config["scroll_width"],
             parent_widget=cls._frame._widgets["integration_section"],
             visible=True,

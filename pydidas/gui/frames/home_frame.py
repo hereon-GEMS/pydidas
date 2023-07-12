@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["HomeFrame"]
 
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
 from ...core.utils import DOC_HOME_ADDRESS
@@ -144,7 +144,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_quickstart_info",
             _GENERIC_INTRO,
-            weight=63,
+            weight=QtGui.QFont.DemiBold,
             fixedWidth=600,
             parent_widget=self._widgets["canvas"],
         )

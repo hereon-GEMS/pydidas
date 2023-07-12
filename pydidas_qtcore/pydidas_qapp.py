@@ -45,8 +45,12 @@ def parse_cmd_args():
         The parsed command line arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-fontsize", type=int, help="The default font size in points.",
-                        default=fontsize.STANDARD_FONT_SIZE)
+    parser.add_argument(
+        "-fontsize",
+        type=int,
+        help="The default font size in points.",
+        default=fontsize.STANDARD_FONT_SIZE,
+    )
     _kwargs = dict(vars(parser.parse_args()))
     for _name in ["fontsize"]:
         if f"-{_name}" in sys.argv:

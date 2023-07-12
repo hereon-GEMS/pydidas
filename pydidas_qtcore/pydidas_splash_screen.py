@@ -40,8 +40,10 @@ class PydidasSplashScreen(QtWidgets.QSplashScreen):
     def __init__(self, pixmap=None, f=QtCore.Qt.WindowStaysOnTopHint):
         if pixmap is None:
             pixmap = QtGui.QPixmap(
-                str(Path(__file__).parent.parent.joinpath(
-                    "pydidas", "resources", "images", "splash_image.png")
+                str(
+                    Path(__file__).parent.parent.joinpath(
+                        "pydidas", "resources", "images", "splash_image.png"
+                    )
                 )
             )
         QtWidgets.QSplashScreen.__init__(self, pixmap, f)

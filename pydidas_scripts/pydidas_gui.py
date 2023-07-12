@@ -30,8 +30,10 @@ __all__ = ["run_gui", "start_pydidas_gui"]
 import multiprocessing as mp
 import signal
 import warnings
+from typing import TypeVar
 
-from qtpy.QtWidgets import QApplication, QSplashScreen
+
+QSplashScreen = TypeVar("QSplashScreen")
 
 
 def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None"):
@@ -47,6 +49,8 @@ def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None")
         start fresh, "exit" to restore the exit state or "saved" to restore the last
         saved state.
     """
+    from qtpy.QtWidgets import QApplication
+
     from pydidas.core import UserConfigError
     from pydidas.gui import MainWindow, frames
 

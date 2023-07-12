@@ -35,6 +35,8 @@ import qtpy.QtCore as __QtCore
 # must import h5py here to have the dll libraries linked correctly
 import h5py as __h5py
 
+# set the default API to PySide6
+# __os.environ["QT_API"] = "pyside6"
 
 # import local modules
 from . import version

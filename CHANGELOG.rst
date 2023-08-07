@@ -27,6 +27,8 @@ Bugfixes
 --------
 
 - Fixed an issue with wrong signal signaturs in WorkflowTreeEditManager.
+- Fixed a bug in the Remove1dPolynomialBackground plugin which forced a 
+  polynomial order setting of 3.
 
 v23.07.05
 =========

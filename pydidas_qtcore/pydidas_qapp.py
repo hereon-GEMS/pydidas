@@ -51,6 +51,8 @@ def parse_cmd_args():
         help="The default font size in points.",
         default=fontsize.STANDARD_FONT_SIZE,
     )
+    parser.add_argument("--qt6", action="store_true")
+
     _kwargs = dict(vars(parser.parse_args()))
     for _name in ["fontsize"]:
         if f"-{_name}" in sys.argv:

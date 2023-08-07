@@ -31,6 +31,7 @@ __status__ = "Production"
 __all__ = ["PyfaiCalibFrame"]
 
 
+import argparse
 import functools
 import os
 
@@ -162,7 +163,9 @@ class PyfaiCalibFrame(BaseFrame):
         CalibrationContext._releaseSingleton()
         _calib_context = CalibrationContext(_PYFAI_SETTINGS)
         _calib_context.restoreSettings()
-        options = calib2.parse_options()
+        parser = argparse.ArgumentParser()
+        calib2.configure_parser_arguments(parser)
+        options, _unknown = parser.parse_known_args()
         calib2.setup_model(_calib_context.getCalibrationModel(), options)
         self._calibration_context = _calib_context
         self._calibration_context.setParent(self)

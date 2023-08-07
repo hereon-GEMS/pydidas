@@ -25,9 +25,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
-# import os as __os
-# __os.environ["QT_API"] = "pyside6"
-# __os.environ["FORCE_QT_API"] = "True"
+import os as __os
+import sys as __sys
+
+
+if "--qt6" in __sys.argv:
+    __os.environ["QT_API"] = "pyside6"
+    __os.environ["FORCE_QT_API"] = "True"
 
 import qtpy
 print("Using QT: ", qtpy.API_NAME)

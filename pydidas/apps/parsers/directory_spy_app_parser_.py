@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,10 +21,10 @@ DirectorySpyApp.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["directory_spy_app_parser"]
 
 import argparse
@@ -68,7 +70,9 @@ def directory_spy_app_parser(caller=None):
     parser.add_argument("-bg_file", help=PARAMS["bg_file"]["tooltip"])
     parser.add_argument("-bg_hdf5_key", help=PARAMS["bg_hdf5_key"]["tooltip"])
     parser.add_argument("-bg_hdf5_frame", help=PARAMS["bg_hdf5_frame"]["tooltip"])
-    _args = dict(vars(parser.parse_args()))
+
+    _options, _unknown = parser.parse_known_args()
+    _args = dict(vars(_options))
     # store False for keyword arguments which were not selected:
     for _key in ["scan_for_all", "use_bg_file"]:
         _val = _args[_key]

@@ -106,7 +106,7 @@ class IoMaster(type):
         cls.registry_export = {}
 
     @classmethod
-    def verify_extension_is_registered(cls, ext, mode="import"):
+    def verify_extension_is_registered(cls, ext, mode="import", filename=None):
         """
         Verify the extension is registered with the MetaClass.
 
@@ -114,9 +114,11 @@ class IoMaster(type):
         ----------
         ext : str
             The file extension
-        mode : str[import, export]
+        mode : str[import, export], optional
             The mode to use: Choose between import and export. The default is
             import.
+        filename : Union[None, str]
+            The filename of the file to be checked.
 
         Raises
         ------
@@ -128,6 +130,7 @@ class IoMaster(type):
                 raise UserConfigError(
                     f"No extension has been selected for data {mode}. Please set an "
                     "extension to choose a fileformat."
+                    + ("" if filename is None else f" (filename: {filename})")
                 )
             raise UserConfigError(
                 f'The extension "{ext}" is not registered for data input/output.'
@@ -278,6 +281,6 @@ class IoMaster(type):
             The new WorkflowTree instance.
         """
         _extension = get_extension(filename)
-        cls.verify_extension_is_registered(_extension, mode="import")
+        cls.verify_extension_is_registered(_extension, mode="import", filename=filename)
         _io_class = cls.registry_import[_extension]
         return _io_class.import_from_file(filename, **kwargs)

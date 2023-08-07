@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,10 +18,11 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
+
 
 import unittest
 
@@ -221,7 +224,7 @@ class TestRemoveOutliers(unittest.TestCase):
         _ref = self.get_data_without_peaks(_thresh, 1)
         self.assertTrue(np.allclose(_newdata[~self._is_noisy], _ref[~self._is_noisy]))
         _noisy_delta = _newdata[self._is_noisy] - _ref[self._is_noisy]
-        self.assertTrue(np.alltrue((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
+        self.assertTrue(np.all((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
 
     def test_execute__w_kernel_1_thresh0p55(self):
         _thresh = 0.55
@@ -244,11 +247,9 @@ class TestRemoveOutliers(unittest.TestCase):
         _newdata, _ = plugin.execute(self._data.copy())
         _ref = self.get_data_without_peaks(_thresh, 2)
         _indices = np.where(abs(_newdata - _ref) > 0.25)[0]
-        for _index in _indices:
-            print(_index, self._data[_index], self._noisefree_data[_index])
         self.assertTrue(np.allclose(_newdata[~self._is_noisy], _ref[~self._is_noisy]))
         _noisy_delta = _newdata[self._is_noisy] - _ref[self._is_noisy]
-        self.assertTrue(np.alltrue((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
+        self.assertTrue(np.all((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
 
     def test_execute__w_kernel_2_thresh_4(self):
         _thresh = 4
@@ -261,7 +262,7 @@ class TestRemoveOutliers(unittest.TestCase):
         _ref = self.get_data_without_peaks(_thresh, _kernel)
         self.assertTrue(np.allclose(_newdata[~self._is_noisy], _ref[~self._is_noisy]))
         _noisy_delta = _newdata[self._is_noisy] - _ref[self._is_noisy]
-        self.assertTrue(np.alltrue((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
+        self.assertTrue(np.all((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))
 
 
 if __name__ == "__main__":

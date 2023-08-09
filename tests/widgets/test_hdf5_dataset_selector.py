@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,23 +18,27 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import os
-import tempfile
 import shutil
+import tempfile
+import unittest
 
 import h5py
 import numpy as np
-from qtpy import QtWidgets, QtTest
+import qtpy
+from qtpy import QtTest, QtWidgets
 
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.selection import Hdf5DatasetSelector
+
+
+IS_QT6 = qtpy.QT_VERSION[0] == "6"
 
 
 class TestWidget(QtWidgets.QWidget):
@@ -196,8 +202,12 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj.enable_signal_slot(True)
         spy = QtTest.QSignalSpy(obj.new_frame_signal)
         obj._Hdf5DatasetSelector__update()
-        self.assertEqual(len(spy), 1)
-        self.assertTrue(np.allclose(spy[0], self.data2d))
+        if IS_QT6:
+            self.assertEqual(spy.count(), 1)
+            self.assertTrue(np.allclose(spy.at(0)[0], self.data2d))
+        else:
+            self.assertEqual(len(spy), 1)
+            self.assertTrue(np.allclose(spy[0], self.data2d))
 
     def test_enable_signal_slot_disable(self):
         obj = Hdf5DatasetSelector()
@@ -205,7 +215,10 @@ class TestHdf5DatasetSelector(unittest.TestCase):
         obj.enable_signal_slot(False)
         spy = QtTest.QSignalSpy(obj.new_frame_signal)
         obj._Hdf5DatasetSelector__update()
-        self.assertEqual(len(spy), 0)
+        if IS_QT6:
+            self.assertEqual(spy.count(), 0)
+        else:
+            self.assertEqual(len(spy), 0)
 
     def test_click_view_button(self):
         _widget = TestWidgetWithSetData()

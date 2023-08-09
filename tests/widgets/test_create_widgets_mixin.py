@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,21 +18,21 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
-import string
 import random
+import string
+import unittest
 
 from qtpy import QtWidgets
 
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.factory.create_widgets_mixin import CreateWidgetsMixIn
-from pydidas.widgets.utilities import get_widget_layout_args, get_grid_pos
+from pydidas.widgets.utilities import get_grid_pos, get_widget_layout_args
 
 
 class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
@@ -47,7 +49,9 @@ def get_test_widget(*args, **kwargs):
 class TestCreateWidgetsMixIn(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.q_app = QtWidgets.QApplication([])
+        cls.q_app = QtWidgets.QApplication.instance()
+        if cls.q_app is None:
+            cls.q_app = QtWidgets.QApplication([])
         cls.widgets = []
 
     @classmethod

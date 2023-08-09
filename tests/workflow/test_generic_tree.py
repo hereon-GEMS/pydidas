@@ -27,7 +27,7 @@ __status__ = "Development"
 import unittest
 from copy import copy
 
-from pydidas.workflow import GenericTree, GenericNode
+from pydidas.workflow import GenericNode, GenericTree
 
 
 class TestGenericTree(unittest.TestCase):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -18,14 +18,15 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
-import unittest
 import copy
+import unittest
+from unittest import mock
 
 import numpy as np
 
@@ -241,7 +242,7 @@ class TestGenericNode(unittest.TestCase):
 
     def test_connect_parent_to_children__no_parent_no_children(self):
         root = GenericNode(node_id=0)
-        root._parent = unittest.mock.MagicMock()
+        root._parent = mock.MagicMock()
         root.connect_parent_to_children()
         self.assertIsNone(root.parent)
 

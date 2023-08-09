@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -24,20 +24,20 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 
-import unittest
-import tempfile
-import shutil
 import copy
 import pickle
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_parameter, utils, UserConfigError
+from pydidas.core import Parameter, UserConfigError, get_generic_parameter, utils
 from pydidas.core.constants import BASE_PLUGIN
 from pydidas.core.utils import rebin2d
-from pydidas.unittest_objects import create_plugin_class
-from pydidas.plugins import BasePlugin
 from pydidas.data_io.utils import RoiSliceManager
+from pydidas.plugins import BasePlugin
+from pydidas.unittest_objects import create_plugin_class
 
 
 class TestBasePlugin(unittest.TestCase):

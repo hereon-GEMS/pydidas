@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,21 +22,24 @@ suite.
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
+
 import os as __os
 import sys as __sys
-
 
 if "--qt6" in __sys.argv:
     __os.environ["QT_API"] = "pyside6"
     __os.environ["FORCE_QT_API"] = "True"
 
+
 import qtpy
-print("Using QT: ", qtpy.API_NAME)
+
+if "--verbose" in __sys.argv:
+    print("pydidas Using QT: ", qtpy.API_NAME)
 
 
 # import __all__ items from modules:

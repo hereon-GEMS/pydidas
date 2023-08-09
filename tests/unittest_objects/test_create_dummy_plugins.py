@@ -24,8 +24,8 @@ __status__ = "Development"
 
 import unittest
 
-from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, PROC_PLUGIN, OUTPUT_PLUGIN
-from pydidas.plugins import BasePlugin, InputPlugin, ProcPlugin, OutputPlugin
+from pydidas.core.constants import BASE_PLUGIN, INPUT_PLUGIN, OUTPUT_PLUGIN, PROC_PLUGIN
+from pydidas.plugins import BasePlugin, InputPlugin, OutputPlugin, ProcPlugin
 from pydidas.unittest_objects.create_dummy_plugins import (
     create_base_class,
     create_plugin_class,

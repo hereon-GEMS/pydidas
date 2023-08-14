@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,18 +21,21 @@ worker processes and run in parallel to an event thread.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["AppRunner"]
+
+
+from typing import Union
 
 from qtpy import QtCore
 
 from ..core import BaseApp
-from ..core.utils import pydidas_logger, LOGGING_LEVEL
-from .worker_controller import WorkerController
+from ..core.utils import LOGGING_LEVEL, pydidas_logger
 from .app_processor_ import app_processor
+from .worker_controller import WorkerController
 
 
 logger = pydidas_logger()
@@ -41,8 +44,7 @@ logger.setLevel(LOGGING_LEVEL)
 
 class AppRunner(WorkerController):
     """
-    The AppRunner is a subclassed WorkerController (QThread) which can
-    spawn a number of processes to perform computations in parallel.
+    The AppRunner is a subclassed WorkerController for running pydidas applications.
 
     The App runner requires a BaseApp (or subclass) instance with a
     defined method layout as defined in the BaseApp.
@@ -52,20 +54,9 @@ class AppRunner(WorkerController):
 
     Notes
     -----
-
     The AppRunner has the following signals which can be connected to:
 
-    progress : QtCore.Signal(float)
-        This singal emits the current relative progress in the interval (0..1)
-        in the computations, based on the number of returned results relative
-        to the total tasks.
-    results : QtCore.Signal(int, object)
-        The results as returned from the multiprocessing Processes.
-    finished : QtCore.Signal()
-        This signal is emitted when the computations are finished. If the
-        AppRunner is running headless, it needs to be connected to the
-        app.exit slot to finish the event loop.
-    final_app_state : QtCore.Signal(object)
+    sig_final_app_state : QtCore.Signal(object)
         This signal emits a copy of the App after all the calculations have
         been performed if it needs to be used in another context.
 
@@ -84,19 +75,21 @@ class AppRunner(WorkerController):
         tasks on the fly. The default is app_processor.
     """
 
-    sig_progress = QtCore.Signal(float)
-    sig_results = QtCore.Signal(int, object)
     sig_final_app_state = QtCore.Signal(object)
 
-    def __init__(self, app, n_workers=None, processor=app_processor):
+    def __init__(
+        self,
+        app: BaseApp,
+        n_workers: Union[None, int] = None,
+        processor: type = app_processor,
+    ):
         logger.debug("Starting AppRunner")
-        super().__init__(n_workers)
+        WorkerController.__init__(self, n_workers=n_workers)
         self.__app = app.copy(slave_mode=True)
         self.__check_app_is_set()
         self._processor["func"] = processor
-        logger.debug("Finished init")
 
-    def call_app_method(self, method_name, *args, **kwargs):
+    def call_app_method(self, method_name: str, *args: tuple, **kwargs: dict) -> object:
         """
         Call a method of the app on the AppRunner's copy.
 
@@ -116,7 +109,7 @@ class AppRunner(WorkerController):
 
         Returns
         -------
-        result : type
+        result : object
             The return object(s) from the App method call.
         """
         self.__check_is_running()
@@ -125,7 +118,7 @@ class AppRunner(WorkerController):
         _result = method(*args, **kwargs)
         return _result
 
-    def set_app_param(self, param_name, value):
+    def set_app_param(self, param_name: str, value: object):
         """
         Set a Parameter of the Application.
 
@@ -133,13 +126,13 @@ class AppRunner(WorkerController):
         ----------
         param_name : str
             The name of the Application Parameter.
-        value : type
+        value : object
             The new value for the selected Parameter.
         """
         self.__check_app_is_set()
         self.__app.set_param_value(param_name, value)
 
-    def get_app(self):
+    def get_app(self) -> BaseApp:
         """
         Get the reference to the interally stored app.
 
@@ -155,7 +148,7 @@ class AppRunner(WorkerController):
         """
         return self.__app.copy()
 
-    def _cycle_pre_run(self):
+    def cycle_pre_run(self):
         """
         Perform pre-multiprocessing operations.
 
@@ -168,31 +161,37 @@ class AppRunner(WorkerController):
             self._queues["send"],
             self._queues["recv"],
             self._queues["stop"],
-            self._queues["finished"],
-            *self.__get_app_arguments(),
+            self._queues["aborted"],
+            self.__app.__class__,
+            self.__app.params.copy(),
+            self.__app.get_config(),
         )
-        _tasks = self.__app.multiprocessing_get_tasks()
-        self.add_tasks(_tasks)
+        self.add_tasks(self.__app.multiprocessing_get_tasks())
         self.finalize_tasks()
         self.sig_results.connect(self.__app.multiprocessing_store_results)
         self.sig_progress.connect(self.__check_progress)
-        WorkerController._cycle_pre_run(self)
+        WorkerController.cycle_pre_run(self)
 
-    def _cycle_post_run(self, timeout=10):
+    def cycle_post_run(self, timeout: float = 10):
         """
-        Perform finishing operations of the App and close the multiprocessing
-        Processes.
+        Perform the app's final operations and shut down the workers.
+
+        Parameters
+        ----------
+        timeout: float
+            The timeout while waiting for the worker processes.
         """
-        self._join_workers()
+        self.join_workers()
+        if self.flags["stop_after_run"]:
+            self.flags["thread_alive"] = False
         self._wait_for_worker_finished_signals(timeout)
         self.__app.multiprocessing_post_run()
         self.sig_final_app_state.emit(self.__app.copy())
 
     @QtCore.Slot(float)
-    def __check_progress(self, progress):
+    def __check_progress(self, progress: float):
         """
-        Check the progress and send the signal to stop the loop if all
-        results have been received.
+        Check the progress and finish processing if all results have been received.
 
         Parameters
         ----------
@@ -205,36 +204,34 @@ class AppRunner(WorkerController):
             self.stop()
 
     def __check_is_running(self):
-        """Verify that the Thread is not actively running."""
-        if self._flag_running:
+        """
+        Verify that the Thread is not actively running.
+        """
+        if self.flags["running"]:
             raise RuntimeError(
                 "Cannot call Application methods while the"
                 " Application is running. Please call .stop()"
                 " on the AppRunner first."
             )
 
-    def __check_app_method_name(self, method_name):
-        """Verify the Application has a method with the given name."""
+    def __check_app_method_name(self, method_name: str):
+        """
+        Verify the Application has a method with the given name.
+
+        Parameters
+        ----------
+        method_name : str
+            The name of the method.
+        """
         if not hasattr(self.__app, method_name):
-            raise KeyError(
-                "The App does not have a method with name " f'"{method_name}".'
-            )
+            raise KeyError(f"The App does not have a method with name '{method_name}'.")
 
     def __check_app_is_set(self):
         """
-        Verify that the App passed to the AppRunner is a
-        :py:class:`pydidas.apps.BaseApp`.
+        Verify that the stored app is a BaseApp instance.
         """
         if not isinstance(self.__app, BaseApp):
             raise TypeError(
-                "Application is not an instance of BaseApp."
-                " Please set application first."
+                "Application is not an instance of BaseApp. "
+                "Please set application first."
             )
-
-    def __get_app_arguments(self):
-        """Get the App arguments to pass to the processor."""
-        return (
-            self.__app.__class__,
-            self.__app.params.copy(),
-            self.__app.get_config(),
-        )

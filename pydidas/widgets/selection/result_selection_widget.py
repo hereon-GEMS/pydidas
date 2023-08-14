@@ -46,7 +46,7 @@ from ...core.constants import (
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
     QT_REG_EXP_SLICE_VALIDATOR,
 )
-from ...core.utils import SignalBlocker, apply_qt_properties, convert_unicode_to_ascii
+from ...core.utils import apply_qt_properties, convert_unicode_to_ascii
 from ...workflow import WorkflowResultsContext, WorkflowResultsSelector
 from ..factory import CreateWidgetsMixIn
 from ..misc import ReadOnlyTextWidget
@@ -262,14 +262,14 @@ class ResultSelectionWidget(
             {"widget_visibility": False, "result_ndim": -1, "plot_type": "1D plot"}
         )
         self._active_node = -1
-        with SignalBlocker(self.param_widgets["selected_results"]):
+        with QtCore.QSignalBlocker(self.param_widgets["selected_results"]):
             self.param_widgets["selected_results"].update_choices(["No selection"])
         self.param_widgets["selected_results"].setCurrentText("No selection")
-        with SignalBlocker(self._widgets["radio_plot_type"]):
+        with QtCore.QSignalBlocker(self._widgets["radio_plot_type"]):
             self._widgets["radio_plot_type"].select_by_index(0)
-        with SignalBlocker(self._widgets["radio_data_selection"]):
+        with QtCore.QSignalBlocker(self._widgets["radio_data_selection"]):
             self._widgets["radio_data_selection"].select_by_index(0)
-        with SignalBlocker(self._widgets["radio_arrangement"]):
+        with QtCore.QSignalBlocker(self._widgets["radio_arrangement"]):
             self._widgets["radio_arrangement"].select_by_index(0)
         self.__set_derived_widget_visibility(False)
 
@@ -284,7 +284,7 @@ class ResultSelectionWidget(
         _param = self.get_param("selected_results")
         # store the labels for the different nodes from the RESULTS
         self._RESULTS.update_param_choices_from_labels(_param)
-        with SignalBlocker(self.param_widgets["selected_results"]):
+        with QtCore.QSignalBlocker(self.param_widgets["selected_results"]):
             self.param_widgets["selected_results"].update_choices(_param.choices)
             self.param_widgets["selected_results"].setCurrentText(_param.value)
 

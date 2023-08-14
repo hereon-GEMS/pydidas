@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ points (i.e. x/y tuples) in a plot.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PointPositionTableWidget"]
 
 
@@ -33,7 +33,7 @@ from typing import List, Tuple
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import ALIGN_CENTER
-from ...core.utils import SignalBlocker, apply_qt_properties
+from ...core.utils import apply_qt_properties
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config import ParameterWidgetsMixIn
 
@@ -89,7 +89,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         _points_to_remove = self._get_selected_points()
         _rows_to_remove = self.get_rows_of_selected_points()
         _new_row_count = self.rowCount() - len(_rows_to_remove)
-        with SignalBlocker(self.selectionModel()):
+        with QtCore.QSignalBlocker(self.selectionModel()):
             for _row in _rows_to_remove:
                 self.removeRow(_row)
         self.setRowCount(_new_row_count)
@@ -101,7 +101,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         Remove all points.
         """
         _points_to_remove = self._get_all_points()
-        with SignalBlocker(self.selectionModel()):
+        with QtCore.QSignalBlocker(self.selectionModel()):
             while self.rowCount() > 0:
                 self.removeRow(0)
         self.setRowCount(0)

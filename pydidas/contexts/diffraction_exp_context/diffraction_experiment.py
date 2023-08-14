@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ from ...core import (
     get_generic_param_collection,
 )
 from ...core.constants import LAMBDA_IN_A_TO_E, PYFAI_DETECTOR_NAMES
-from ...core.utils import NoPrint, SignalBlocker
+from ...core.utils import NoPrint
 from .diffraction_experiment_io import DiffractionExperimentIo
 
 
@@ -183,7 +183,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             raise UserConfigError(
                 f"The detector name '{det_name}' is unknown to pyFAI."
             )
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             self.set_param_value("detector_pxsizey", _det.pixel1 * 1e6)
             self.set_param_value("detector_pxsizex", _det.pixel2 * 1e6)
             self.set_param_value("detector_npixy", _det.max_shape[0])
@@ -203,7 +203,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         diffraction_exp : DiffractionExperiment
             The other DiffractionExperiment from which the Parameters should be taken.
         """
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             for _key, _val in diffraction_exp.get_param_values_as_dict().items():
                 self.set_param_value(_key, _val)
         self.sig_params_changed.emit()
@@ -217,7 +217,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         geometry : pyFAI.geometry.Geometry
             The geometry to be used.
         """
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(geometry, _key))
             if geometry.detector.name in pyFAI.detectors.Detector.registry:
@@ -244,7 +244,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         filename : Union[str, pathlib.Path]
             The full filename.
         """
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
         self.sig_params_changed.emit()
 
@@ -309,7 +309,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     detector=self.get_detector(),
                 )
             )
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             for _key in ["dist", "poni1", "poni2", "rot1", "rot2", "rot3"]:
                 self.set_param_value(f"detector_{_key}", getattr(_geo, _key))
         self.sig_params_changed.emit()

@@ -425,7 +425,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
             param.choices = _new_choices[:-1]
             self._active_node = -1
             self._config["plot_active"] = False
-        with utils.SignalBlocker(self.param_widgets["selected_results"]):
+        with QtCore.QSignalBlocker(self.param_widgets["selected_results"]):
             self.param_widgets["selected_results"].update_choices(param.choices)
             self.param_widgets["selected_results"].setCurrentText(param.value)
 

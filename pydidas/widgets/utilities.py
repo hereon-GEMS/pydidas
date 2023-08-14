@@ -38,7 +38,7 @@ import qtawesome
 from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QBoxLayout, QGridLayout, QStackedLayout, QStyle
 
-from ..core import PydidasGuiError, utils
+from ..core import PydidasGuiError
 from ..resources import icons
 
 
@@ -264,7 +264,7 @@ def update_param_and_widget_choices(param_widget, new_choices):
         _param.value = new_choices[0]
         _param.choices = new_choices
     param_widget.io_widget.setEnabled(len(new_choices) != 0)
-    with utils.SignalBlocker(param_widget.io_widget):
+    with QtCore.QSignalBlocker(param_widget.io_widget):
         if len(new_choices) == 0:
             param_widget.io_widget.update_choices([""])
             param_widget.io_widget.setCurrentText("")

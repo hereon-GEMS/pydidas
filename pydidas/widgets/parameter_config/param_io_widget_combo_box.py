@@ -28,14 +28,10 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
 
 
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
 from ...core import Parameter
-from ...core.utils import (
-    SignalBlocker,
-    convert_special_chars_to_unicode,
-    convert_unicode_to_ascii,
-)
+from ...core.utils import convert_special_chars_to_unicode, convert_unicode_to_ascii
 from ..utilities import get_max_pixel_width_of_entries
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
@@ -140,7 +136,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, QtWidgets.QComboBox):
         new_choices : collections.abc.Iterable
             Any iterable with new choices.
         """
-        with SignalBlocker(self):
+        with QtCore.QSignalBlocker(self):
             self.clear()
             for choice in new_choices:
                 _itemstr = convert_special_chars_to_unicode(str(choice))

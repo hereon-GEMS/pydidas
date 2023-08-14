@@ -31,7 +31,7 @@ __all__ = ["ShowDetailedPluginResultsWindow"]
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import STANDARD_FONT_SIZE
-from ...core.utils import SignalBlocker, update_size_policy
+from ...core.utils import update_size_policy
 from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
 
@@ -170,7 +170,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             self._widgets["selector"].setVisible(False)
             self.__select_point(None)
         else:
-            with SignalBlocker(self._widgets["selector"]):
+            with QtCore.QSignalBlocker(self._widgets["selector"]):
                 self._widgets["selector"].clear()
                 self._widgets["selector"].addItems(list(self._results.keys()))
             self._widgets["selector"].setCurrentIndex(0)

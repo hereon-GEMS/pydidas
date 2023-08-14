@@ -28,7 +28,9 @@ __status__ = "Production"
 __all__ = ["ParameterWidgetsMixIn"]
 
 
-from ...core import PydidasGuiError, utils
+from qtpy import QtCore
+
+from ...core import PydidasGuiError
 from ..utilities import get_widget_layout_args
 from .parameter_widget import ParameterWidget
 
@@ -126,7 +128,7 @@ class ParameterWidgetsMixIn:
         """
         if key not in self.params or key not in self.param_widgets:
             raise KeyError(f'No parameter with key "{key}" found.')
-        with utils.SignalBlocker(self.param_widgets[key]):
+        with QtCore.QSignalBlocker(self.param_widgets[key]):
             self.set_param_value(key, value)
             self.param_widgets[key].set_value(value)
 

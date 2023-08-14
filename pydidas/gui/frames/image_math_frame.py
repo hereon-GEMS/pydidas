@@ -40,7 +40,6 @@ from ...core import (
     constants,
     get_generic_param_collection,
 )
-from ...core.utils import SignalBlocker
 from ...data_io import IoMaster, export_data, import_data
 from ...gui.frames.builders import ImageMathFrameBuilder
 from ...widgets import PydidasFileDialog
@@ -193,7 +192,7 @@ class ImageMathFrame(BaseFrame):
         """
         _text = self._widgets["combo_display_image"].currentText()
         if _text != new_value:
-            with SignalBlocker(self._widgets["combo_display_image"]):
+            with QtCore.QSignalBlocker(self._widgets["combo_display_image"]):
                 self._widgets["combo_display_image"].setCurrentText(new_value)
         if new_value == "Opened file":
             self._plot_image(input_data=True)

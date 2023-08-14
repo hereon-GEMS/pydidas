@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ with additional support for plugins and a plugin chain.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowNode"]
 
 
@@ -217,12 +217,10 @@ class WorkflowNode(GenericNode):
         **kwargs : dict
             Any keyword arguments which need to be passed to the plugin.
         """
-        logger.debug(f"Starting plugin node #{self.node_id}")
         with TimerSaveRuntime() as _runtime:
             if kwargs.get("store_input_data", False):
                 self.plugin.store_input_data_copy(arg, **kwargs)
             res, reskws = self.plugin.execute(deepcopy(arg), **kwargs)
-        logger.debug(f"Saving data node #{self.node_id}")
         if (
             self.is_leaf
             or self.plugin.get_param_value("keep_results")
@@ -232,7 +230,6 @@ class WorkflowNode(GenericNode):
             self.result_kws = reskws
         self.runtime = _runtime()
         for _child in self._children:
-            logger.debug("Passing result to child")
             _child.execute_plugin_chain(res, **self._get_deep_copy_of_kwargs(reskws))
 
     @staticmethod

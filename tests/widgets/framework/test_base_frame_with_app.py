@@ -33,6 +33,11 @@ from pydidas.core import BaseApp, get_generic_parameter
 from pydidas.widgets.framework import BaseFrameWithApp
 
 
+class DummyRunner:
+    def exit(self):
+        pass
+
+
 class TestClass(QtCore.QObject):
     signal = QtCore.Signal(float)
     simple_signal = QtCore.Signal()
@@ -62,6 +67,9 @@ class TestBaseFrameWithApp(unittest.TestCase):
         #     w = cls.widgets.pop()
         #     w.deleteLater()
         cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         self.tester = TestClass()
@@ -123,7 +131,7 @@ class TestBaseFrameWithApp(unittest.TestCase):
 
     def test_apprunner_finished(self):
         obj = self.get_base_frame_with_app()
-        obj._runner = True
+        obj._runner = DummyRunner()
         self.tester.simple_signal.connect(obj._apprunner_finished)
         self.tester.simple_signal.emit()
         self.assertIsNone(obj._runner)

@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3
-# as published by the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -389,7 +389,7 @@ class GenericNode:
             _key: copy.copy(_value)
             for _key, _value in self.__dict__.items()
             if not (
-                isinstance(_value, QtCore.SignalInstance)
+                isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
                 or _key in ["_children", "_parent"]
             )
         }

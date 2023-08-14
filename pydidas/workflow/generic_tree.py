@@ -403,7 +403,7 @@ class GenericTree:
         _copy.__dict__ = {
             _key: copy.deepcopy(_value)
             for _key, _value in self.__dict__.items()
-            if not isinstance(_value, QtCore.SignalInstance)
+            if not isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
         }
         _copy.clear()
         if self.root is not None:

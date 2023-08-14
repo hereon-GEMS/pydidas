@@ -246,7 +246,6 @@ class TestRemoveOutliers(unittest.TestCase):
         plugin.pre_execute()
         _newdata, _ = plugin.execute(self._data.copy())
         _ref = self.get_data_without_peaks(_thresh, 2)
-        _indices = np.where(abs(_newdata - _ref) > 0.25)[0]
         self.assertTrue(np.allclose(_newdata[~self._is_noisy], _ref[~self._is_noisy]))
         _noisy_delta = _newdata[self._is_noisy] - _ref[self._is_noisy]
         self.assertTrue(np.all((-0.25 <= _noisy_delta) & (_noisy_delta <= 0.25)))

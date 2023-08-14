@@ -60,6 +60,9 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
             w = cls.widgets.pop()
             w.deleteLater()
         cls.q_app.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         ...
@@ -67,9 +70,11 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
     def tearDown(self):
         ...
 
-    def get_widget(self):
+    def get_widget(self, layout=QtWidgets.QGridLayout):
         _w = TestWidget()
-        _w.setLayout(QtWidgets.QGridLayout())
+        if layout is not None:
+            _w.setLayout(layout())
+        self.widgets.append(_w)
         return _w
 
     def testget_grid_pos_default(self):

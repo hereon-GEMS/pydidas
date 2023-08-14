@@ -31,14 +31,11 @@ import unittest
 
 import h5py
 import numpy as np
-import qtpy
 from qtpy import QtTest, QtWidgets
 
+from pydidas import IS_QT6
 from pydidas.core import PydidasGuiError
 from pydidas.widgets.selection import Hdf5DatasetSelector
-
-
-IS_QT6 = qtpy.QT_VERSION[0] == "6"
 
 
 class TestWidget(QtWidgets.QWidget):
@@ -83,6 +80,9 @@ class TestHdf5DatasetSelector(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.q_app.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
         shutil.rmtree(cls._path)
 
     def test_init(self):

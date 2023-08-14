@@ -66,6 +66,9 @@ class TestPydidasFrameStack(unittest.TestCase):
             w = cls.frames.pop()
             w.deleteLater()
         cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def setUp(self):
         self.frames = []

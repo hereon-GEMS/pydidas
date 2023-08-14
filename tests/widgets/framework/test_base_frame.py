@@ -63,6 +63,9 @@ class TestBaseFrame(unittest.TestCase):
         #     w = cls.widgets.pop()
         #     w.deleteLater()
         cls._qtapp.quit()
+        app = QtWidgets.QApplication.instance()
+        if app is None:
+            app.deleteLater()
 
     def get_base_frame(self, **kwargs):
         _frame = BaseFrame(**kwargs)

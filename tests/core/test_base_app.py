@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import yaml
+from qtpy import QtWidgets
 
 from pydidas.core import (
     BaseApp,
@@ -37,6 +38,7 @@ from pydidas.core import (
     get_generic_param_collection,
     get_generic_parameter,
 )
+from pydidas_qtcore import PydidasQApplication
 
 
 class TestApp(BaseApp):
@@ -74,6 +76,9 @@ class TestBaseApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._tempdir = tempfile.mkdtemp()
+        _app = QtWidgets.QApplication.instance()
+        if _app is None:
+            _app = PydidasQApplication([])
 
     @classmethod
     def tearDownClass(cls):

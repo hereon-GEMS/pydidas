@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -84,6 +84,21 @@ class ParameterCollectionMixIn:
             An instance of a Parameter object.
         """
         self.params.add_param(param)
+
+    def update_params_from_init(self, *args: Tuple, **kwargs: Dict):
+        """
+        Update the Parameters from the given init args and kwargs.
+
+        Parameters
+        ----------
+        *args : Tuple
+            The input arguments.
+        **kwargs : Dict
+            The input keyword arguments.
+        """
+        self.add_params(*args)
+        self.set_default_params()
+        self.update_param_values_from_kwargs(**kwargs)
 
     def add_params(self, *params: Tuple[Union[Parameter, dict, ParameterCollection]]):
         """

@@ -31,12 +31,8 @@ from numbers import Integral, Real
 
 from qtpy import QtCore
 
-from pydidas.core import (
-    CopyableQSettings,
-    Parameter,
-    ParameterCollection,
-    PydidasQsettingsMixin,
-)
+from pydidas.core import Parameter, ParameterCollection, PydidasQsettingsMixin
+from pydidas.core.pydidas_q_settings_mixin import _CopyablePydidasQSettings
 from pydidas.version import VERSION
 
 
@@ -62,7 +58,7 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         obj = PydidasQsettingsMixin()
         self.assertIsInstance(obj, PydidasQsettingsMixin)
         self.assertTrue(hasattr(obj, "q_settings"))
-        self.assertIsInstance(obj.q_settings, CopyableQSettings)
+        self.assertIsInstance(obj.q_settings, _CopyablePydidasQSettings)
 
     def test_q_settings_get_value__plain(self):
         obj = PydidasQsettingsMixin()
@@ -102,29 +98,29 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         new_obj = pickle.loads(pickle.dumps(obj))
         self.assertIsInstance(new_obj, PydidasQsettingsMixin)
 
-    def test_CopyableQSettings_copy(self):
-        _qsettings = CopyableQSettings("Hereon", "pydidas")
+    def test__CopyablePydidasQSettings_copy(self):
+        _qsettings = _CopyablePydidasQSettings()
         _copy = copy.copy(_qsettings)
-        self.assertIsInstance(_copy, CopyableQSettings)
+        self.assertIsInstance(_copy, _CopyablePydidasQSettings)
         self.assertNotEqual(_qsettings, _copy)
 
-    def test_CopyableQSettings_getstate(self):
-        _qsettings = CopyableQSettings("some", "thing")
+    def test__CopyablePydidasQSettings_getstate(self):
+        _qsettings = _CopyablePydidasQSettings()
         _state = _qsettings.__getstate__()
         self.assertEqual(_state["org_name"], "Hereon")
         self.assertEqual(_state["app_name"], "pydidas")
 
-    def test_CopyableQSettings_setstate(self):
-        _qsettings = CopyableQSettings("some", "thing")
+    def test__CopyablePydidasQSettings_setstate(self):
+        _qsettings = _CopyablePydidasQSettings()
         _state = {"org_name": "Hereon", "app_name": "pydidas"}
         _qsettings.__setstate__(_state)
         self.assertEqual(_qsettings.organizationName(), _state["org_name"])
         self.assertEqual(_qsettings.applicationName(), _state["app_name"])
 
-    def test_CopyableQSettings_pickle(self):
-        _qsettings = CopyableQSettings("Hereon", "pydidas")
+    def test__CopyablePydidasQSettings_pickle(self):
+        _qsettings = _CopyablePydidasQSettings()
         _new = pickle.loads(pickle.dumps(_qsettings))
-        self.assertIsInstance(_new, CopyableQSettings)
+        self.assertIsInstance(_new, _CopyablePydidasQSettings)
         self.assertEqual(_qsettings.organizationName(), "Hereon")
         self.assertEqual(_qsettings.applicationName(), "pydidas")
 

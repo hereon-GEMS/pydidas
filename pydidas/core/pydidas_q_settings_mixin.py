@@ -25,7 +25,7 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasQsettingsMixin", "CopyableQSettings"]
+__all__ = ["PydidasQsettingsMixin"]
 
 
 from numbers import Integral, Real
@@ -36,7 +36,7 @@ from qtpy import QtCore
 from ..version import VERSION
 
 
-class CopyableQSettings(QtCore.QSettings):
+class _CopyablePydidasQSettings(QtCore.QSettings):
     """
     A pydidas-specific QSettings instance which allows pickling.
 
@@ -45,14 +45,14 @@ class CopyableQSettings(QtCore.QSettings):
     are hard-coded to "Hereon" and "pydidas", respectively.
     """
 
-    def __init__(self, *args: tuple):
+    def __init__(self):
         QtCore.QSettings.__init__(self, "Hereon", "pydidas")
 
     def __copy__(self) -> Self:
-        return CopyableQSettings(self.organizationName(), self.applicationName())
+        return _CopyablePydidasQSettings()
 
     def __getstate__(self) -> dict:
-        return {"org_name": self.organizationName(), "app_name": self.applicationName()}
+        return {"org_name": "Hereon", "app_name": "pydidas"}
 
     def __setstate__(self, state: dict):
         return
@@ -67,7 +67,7 @@ class PydidasQsettingsMixin:
     """
 
     def __init__(self):
-        self.q_settings = CopyableQSettings("Hereon", "pydidas")
+        self.q_settings = _CopyablePydidasQSettings()
 
     def q_settings_get_value(
         self,

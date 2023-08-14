@@ -32,12 +32,8 @@ from contextlib import redirect_stdout
 
 from qtpy import QtCore
 
-from pydidas.core import (
-    CopyableQSettings,
-    Parameter,
-    ParameterCollection,
-    PydidasQsettings,
-)
+from pydidas.core import Parameter, ParameterCollection, PydidasQsettings
+from pydidas.core.pydidas_q_settings_mixin import _CopyablePydidasQSettings
 from pydidas.version import VERSION
 
 
@@ -64,7 +60,7 @@ class TestPydidasQSettings(unittest.TestCase):
         obj = PydidasQsettings()
         self.assertIsInstance(obj, PydidasQsettings)
         self.assertTrue(hasattr(obj, "q_settings"))
-        self.assertIsInstance(obj.q_settings, CopyableQSettings)
+        self.assertIsInstance(obj.q_settings, _CopyablePydidasQSettings)
 
     def test_show_all_stored_q_settings(self):
         obj = PydidasQsettings()

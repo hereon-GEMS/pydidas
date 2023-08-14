@@ -59,14 +59,9 @@ class BaseApp(ObjectWithParameterCollection):
     attributes_not_to_copy_to_slave_app = []
 
     def __init__(self, *args: tuple, **kwargs: dict):
-        super().__init__()
-        self.slave_mode = kwargs.get("slave_mode", False)
-        if "slave_mode" in kwargs:
-            del kwargs["slave_mode"]
-        self.add_params(*args)
-        self._config = {}
-        self.set_default_params()
-        self.update_param_values_from_kwargs(**kwargs)
+        self.slave_mode = kwargs.pop("slave_mode", False)
+        ObjectWithParameterCollection.__init__(self)
+        self.update_params_from_init(*args, **kwargs)
         self.parse_args_and_set_params()
 
     def parse_args_and_set_params(self):
@@ -76,9 +71,9 @@ class BaseApp(ObjectWithParameterCollection):
         if self.parse_func is None:
             return
         _cmdline_args = self.parse_func()
-        for _key in self.params:
-            if _key in _cmdline_args and _cmdline_args[_key] is not None:
-                self.params.set_value(_key, _cmdline_args[_key])
+        for _key, _value in _cmdline_args.items():
+            if _key in self.params and _value is not None:
+                self.params.set_value(_key, _value)
 
     def run(self):
         """
@@ -265,14 +260,17 @@ class BaseApp(ObjectWithParameterCollection):
             The copy of the app.
         """
         _obj_copy = type(self)()
-        _obj_copy.__dict__ = {
-            _key: copy(_value)
-            for _key, _value in self.__dict__.items()
-            if not (
-                isinstance(_value, QtCore.SignalInstance)
-                or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
-            )
-        }
+        _obj_copy.__dict__.update(
+            {
+                _key: copy(_value)
+                for _key, _value in self.__dict__.items()
+                if not (
+                    isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+                    or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
+                    or _key in ["__METAOBJECT__"]
+                )
+            }
+        )
         if slave_mode:
             _obj_copy.slave_mode = True
         return _obj_copy

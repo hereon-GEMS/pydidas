@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3
+# as published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,8 @@ def app_param_parser(caller=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("-num_images", "-n", help="The number of images")
     parser.add_argument("-image_shape", "-i", help="The image size")
-    _args = dict(vars(parser.parse_args()))
+    _input, _unknown = parser.parse_known_args()
+    _args = dict(vars(_input))
     if _args["num_images"] is not None:
         _args["num_images"] = int(_args["num_images"])
     if _args["image_shape"] is not None:

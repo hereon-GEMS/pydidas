@@ -252,7 +252,7 @@ class BasePlugin(ObjectWithParameterCollection):
         _obj_copy.__dict__ = {
             _key: _value
             for _key, _value in self.__dict__.items()
-            if not isinstance(_value, QtCore.SignalInstance)
+            if not isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
         }
         return _obj_copy
 
@@ -268,7 +268,7 @@ class BasePlugin(ObjectWithParameterCollection):
         _state = {
             _key: _value
             for _key, _value in self.__dict__.items()
-            if not isinstance(_value, QtCore.SignalInstance)
+            if not isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
         }
         return _state
 

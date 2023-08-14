@@ -32,6 +32,7 @@ import os
 import time
 from functools import partial
 from pathlib import Path
+from typing import Literal, Union
 
 import numpy as np
 from qtpy import QtCore, QtWidgets
@@ -680,7 +681,9 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         self.set_param_value_and_widget("images_per_file", _n_per_file)
         self.__update_n_total()
 
-    def __update_composite_dim(self, dim):
+    def __update_composite_dim(
+        self, dim: Literal["x", "y"], value: Union[None, str] = None
+    ):
         """
         Update the composite dimension counters upon a change in one of them.
 
@@ -688,6 +691,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
         ----------
         dim : Union['x', 'y']
             The dimension which has changed.
+        value : Union[None, str]
+            The new widget value.
         """
         _n_total = self.get_param_value("n_total")
         num1 = self.param_widgets[f"composite_n{dim}"].get_value()

@@ -106,6 +106,7 @@ class BaseFrameWithApp(BaseFrame):
         Clean up after AppRunner is done.
         """
         if self._runner is not None:
+            self._runner.exit()
             self._runner = None
 
     def export_state(self):

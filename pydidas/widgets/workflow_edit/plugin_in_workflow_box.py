@@ -68,8 +68,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         super().__init__(parent)
         self.setAcceptDrops(True)
         apply_qt_properties(self, **kwargs)
-        self._flag_active = False
-        self._flag_inconsistent = False
+        self.flags = {"active": False, "inconsistent": False}
+        self.flags["inconsistent"] = False
         self.widget_id = widget_id
         self._label = kwargs.get("label", "")
 
@@ -150,10 +150,10 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         QtWidgets.QStylesheet
             The stylesheet for this box.
         """
-        _border = (3 if self._flag_active else 1) if border else 0
-        if self._flag_inconsistent:
+        _border = (3 if self.flags["active"] else 1) if border else 0
+        if self.flags["inconsistent"]:
             _bg_color = "rgb(255, 225, 225)"
-        elif self._flag_active:
+        elif self.flags["active"]:
             _bg_color = "rgb(225, 225, 255)"
         else:
             _bg_color = "rgb(225, 225, 225)"
@@ -180,7 +180,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             The original event.
         """
         event.accept()
-        if not self._flag_active:
+        if not self.flags["active"]:
             self.sig_widget_activated.emit(self.widget_id)
 
     def delete(self):
@@ -201,7 +201,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
             Flag whether the widget has been selected (True) or deselected
             (False).
         """
-        self._flag_active = self.widget_id == selection
+        self.flags["active"] = self.widget_id == selection
         self._update_stylesheets()
 
     def _update_stylesheets(self):
@@ -222,8 +222,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         *widget_ids : int
             The widget node ID.
         """
-        if self.widget_id in widget_ids and not self._flag_inconsistent:
-            self._flag_inconsistent = True
+        if self.widget_id in widget_ids and not self.flags["inconsistent"]:
+            self.flags["inconsistent"] = True
             self._update_stylesheets()
 
     @QtCore.Slot(list)
@@ -236,8 +236,8 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         widget_id : int
             The widget node ID.
         """
-        if self.widget_id in widget_ids and self._flag_inconsistent:
-            self._flag_inconsistent = False
+        if self.widget_id in widget_ids and self.flags["inconsistent"]:
+            self.flags["inconsistent"] = False
             self._update_stylesheets()
 
     def update_text(self, node_id, label=""):

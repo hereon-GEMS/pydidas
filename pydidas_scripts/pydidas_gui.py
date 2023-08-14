@@ -32,7 +32,6 @@ import signal
 import warnings
 from typing import TypeVar
 
-
 QSplashScreen = TypeVar("QSplashScreen")
 
 
@@ -98,10 +97,14 @@ def start_pydidas_gui(splash_screen: QSplashScreen, restore_state: str = "None")
 
 def run_gui():
     """Run the pydidas graphical user interface process."""
+    from qtpy.QtWidgets import QApplication
+
     from pydidas_qtcore import PydidasQApplication, PydidasSplashScreen
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)
-    app = PydidasQApplication([])
+    app = QApplication.instance()
+    if not isinstance(app, PydidasQApplication):
+        app = PydidasQApplication([])
     _splash = PydidasSplashScreen()
 
     _ = start_pydidas_gui(_splash, restore_state="exit")

@@ -23,8 +23,8 @@ __status__ = "Development"
 
 
 import copy
-import unittest
 import sys
+import unittest
 
 from pydidas.apps.parsers import execute_workflow_app_parser
 from pydidas.core.utils import get_random_string

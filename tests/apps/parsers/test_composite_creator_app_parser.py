@@ -23,8 +23,8 @@ __status__ = "Development"
 
 
 import copy
-import unittest
 import sys
+import unittest
 
 from pydidas.apps.parsers import composite_creator_app_parser
 

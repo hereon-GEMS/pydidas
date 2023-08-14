@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,34 +16,35 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the CompositeCreatorApp class which allows to combine
-images to mosaics.
+Module with the CompositeCreatorApp class which allows to combine images to mosaics.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CompositeCreatorApp"]
+
 
 import os
 import time
+from typing import Union
 
 import numpy as np
 from qtpy import QtCore
 
-from ..core import Dataset, UserConfigError, get_generic_param_collection, BaseApp
+from ..core import BaseApp, Dataset, UserConfigError, get_generic_param_collection
 from ..core.constants import HDF5_EXTENSIONS
 from ..core.utils import (
     check_file_exists,
     check_hdf5_key_exists_in_file,
     copy_docstring,
-    rebin2d,
     get_extension,
+    rebin2d,
 )
 from ..data_io import import_data
-from ..managers import FilelistManager, ImageMetadataManager, CompositeImageManager
+from ..managers import CompositeImageManager, FilelistManager, ImageMetadataManager
 from .parsers import composite_creator_app_parser
 
 
@@ -308,7 +311,7 @@ class CompositeCreatorApp(BaseApp):
                 "threshold_high", self.get_param_value("threshold_high")
             )
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> np.ndarray:
         """
         Return all tasks required in multiprocessing.
         """
@@ -332,8 +335,7 @@ class CompositeCreatorApp(BaseApp):
 
     def _store_args_for_read_image(self, index):
         """
-        Create the required kwargs to pass to the read_image function and store
-        them internally.
+        Create the required kwargs to pass to the read_image function.
 
         Parameters
         ----------
@@ -357,7 +359,7 @@ class CompositeCreatorApp(BaseApp):
         self._config["current_fname"] = _fname
         self._config["current_kwargs"] = _params
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Get the flag value whether to carry on processing.
 
@@ -374,7 +376,7 @@ class CompositeCreatorApp(BaseApp):
             return self._image_exists_check(self._config["current_fname"], timeout=0.02)
         return True
 
-    def _image_exists_check(self, fname, timeout=-1):
+    def _image_exists_check(self, fname: str, timeout: float = -1) -> True:
         """
         Wait for the file to exist in the file system.
 
@@ -403,9 +405,14 @@ class CompositeCreatorApp(BaseApp):
                 return False
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> Dataset:
         """
         Perform key operation with parallel processing.
+
+        Parameters
+        ----------
+        index : int
+            The image frame index.
 
         Returns
         -------
@@ -418,7 +425,7 @@ class CompositeCreatorApp(BaseApp):
         _image = self.__apply_mask(_image)
         return _image
 
-    def __apply_mask(self, image):
+    def __apply_mask(self, image: Union[np.ndarray, Dataset]) -> np.ndarray:
         """
         Apply the detector mask to the image.
 
@@ -450,9 +457,9 @@ class CompositeCreatorApp(BaseApp):
             self.apply_thresholds()
 
     @copy_docstring(CompositeImageManager)
-    def apply_thresholds(self, **kwargs):
+    def apply_thresholds(self, **kwargs: dict):
         """
-        Please refer to pydidas.managers.CompositeImageManager docstring.
+        Refer to the pydidas.managers.CompositeImageManager docstring.
         """
         if (
             self.get_param_value("use_thresholds")
@@ -468,8 +475,8 @@ class CompositeCreatorApp(BaseApp):
                 high=self.get_param_value("threshold_high"),
             )
 
-    @QtCore.Slot(int, object)
-    def multiprocessing_store_results(self, index, image, *args):
+    @QtCore.Slot(object, object)
+    def multiprocessing_store_results(self, index: int, image: np.ndarray):
         """
         Store the results of the multiprocessing operation.
 
@@ -487,7 +494,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.insert_image(image, index)
         self.updated_composite.emit()
 
-    def export_image(self, output_fname, **kwargs):
+    def export_image(self, output_fname: str, **kwargs: dict):
         """
         Export the composite image to a file.
 
@@ -505,7 +512,7 @@ class CompositeCreatorApp(BaseApp):
         self._composite.export(output_fname, **kwargs)
 
     @property
-    def composite(self):
+    def composite(self) -> Union[None, np.ndarray]:
         """
         Get the composite image.
 

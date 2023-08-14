@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,29 +18,30 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
 import time
+import unittest
 from pathlib import Path
 
-import numpy as np
 import h5py
+import numpy as np
 from qtpy import QtTest
 
+from pydidas import IS_QT6
 from pydidas.apps import CompositeCreatorApp
 from pydidas.core import (
-    ParameterCollection,
     Dataset,
+    ParameterCollection,
+    PydidasQsettings,
     UserConfigError,
     get_generic_parameter,
-    PydidasQsettings,
 )
 from pydidas.managers import CompositeImageManager
 
@@ -171,7 +174,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
         self.assertTrue(np.isclose(app.composite, _image).all())
-        self.assertEqual(len(_spy), 1)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 1)
 
     def test_multiprocessing_store_results__with_bg(self):
         _image = np.random.random(self._img_shape)
@@ -185,7 +189,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         app.multiprocessing_store_results(0, _image)
         time.sleep(0.02)
         self.assertTrue((app.composite == 0).all())
-        self.assertEqual(len(_spy), 1)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 1)
 
     def test_multiprocessing_store_results__as_slave(self):
         app = self.get_default_app()
@@ -193,7 +198,8 @@ class TestCompositeCreatorApp(unittest.TestCase):
         _spy = QtTest.QSignalSpy(app.updated_composite)
         app.multiprocessing_store_results(0, 0)
         time.sleep(0.02)
-        self.assertEqual(len(_spy), 0)
+        _spy_result = _spy.count() if IS_QT6 else len(_spy)
+        self.assertEqual(_spy_result, 0)
 
     def test_apply_thresholds__plain(self):
         app = self.get_default_app()

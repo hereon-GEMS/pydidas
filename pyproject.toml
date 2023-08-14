@@ -50,7 +50,7 @@ changelog = "https://github.com/hereon-GEMS/pydidas/blob/master/CHANGELOG.md"
 version = {attr = "pydidas.version.VERSION"}
 
 [tool.setuptools]
-packages = ["pydidas", "pydidas_scripts", "pydidas_plugins"]
+packages = ["pydidas", "pydidas_scripts", "pydidas_plugins", "pydidas_qtcore"]
 
 [project.scripts]
 pydidas-clear-qsettings = "pydidas_scripts.clear_pydidas_qsettings:clear_pydidas_QSettings"

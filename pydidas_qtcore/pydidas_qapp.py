@@ -53,7 +53,8 @@ def parse_cmd_args():
     )
     parser.add_argument("--qt6", action="store_true")
 
-    _kwargs = dict(vars(parser.parse_args()))
+    _args, _unknown = parser.parse_known_args()
+    _kwargs = dict(vars(_args))
     for _name in ["fontsize"]:
         if f"-{_name}" in sys.argv:
             _pos = sys.argv.index(f"-{_name}")

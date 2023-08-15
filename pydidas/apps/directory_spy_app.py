@@ -496,7 +496,7 @@ class DirectorySpyApp(BaseApp):
         _shape = get_hdf5_metadata(fname, meta="shape", dset=_dataset)
         self.__read_image_meta = {"frame": _shape[0] - 1, "dataset": _dataset}
 
-    def __store_image_in_shared_memory(self, image: np.ndarrray):
+    def __store_image_in_shared_memory(self, image: np.ndarray):
         """
         Store the image data in the shared memory.
 

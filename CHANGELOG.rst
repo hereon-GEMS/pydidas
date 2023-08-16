@@ -15,6 +15,7 @@ Improvements
       subpackage.
     - Created a pydidas_qtcore package to bundle all the core Qt functionalities
       which need to be loaded prior to starting the UI.
+    - Added support for changing the default font and fontsize.
     
 - Programmatic updates:
 

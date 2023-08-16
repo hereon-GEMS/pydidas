@@ -33,14 +33,12 @@ from typing import Dict, List, Tuple
 from qtpy.QtWidgets import QWidget
 
 from ...core.utils import apply_qt_properties, copy_docstring
+from ..pydidas_basic_widgets import PydidasLabel, PydidasLineEdit, PydidasCheckBox
 from ..utilities import get_widget_layout_args
 from .button_factory import create_button
-from .check_box_factory import create_check_box
 from .combobox_factory import create_combo_box
 from .empty_widget_factory import create_empty_widget
-from .label_factory import create_label
 from .line_factory import create_line
-from .lineedit_factory import create_lineedit
 from .progress_bar_factory import create_progress_bar
 from .radio_button_group_factory import create_radio_button_group
 from .spacer_factory import create_spacer
@@ -77,12 +75,22 @@ class CreateWidgetsMixIn:
             self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
-    @copy_docstring(create_label)
-    def create_label(self, ref: str, text: str, **kwargs: Dict):
+    def create_label(self, ref: str, text: str, **kwargs: dict):
         """
-        Please refer to pydidas.widgets.factory.create_label
+        Create a PydidasLabel and store the widget.
+
+        Parameters
+        ----------
+        ref : str
+            The reference string for storing the widget.
+        text : str
+            The label's displayed text.
+        **kwargs : dict
+            Any kwargs for creating the label. This can be the custom kwargs
+            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
+            properties or generic Qt properties.
         """
-        self.__create_widget(create_label, ref, text, **kwargs)
+        self.__create_widget(PydidasLabel, ref, text, **kwargs)
 
     @copy_docstring(create_line)
     def create_line(self, ref: str, **kwargs: Dict):
@@ -91,12 +99,21 @@ class CreateWidgetsMixIn:
         """
         self.__create_widget(create_line, ref, **kwargs)
 
-    @copy_docstring(create_lineedit)
     def create_lineedit(self, ref: str, **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_lineedit
+        Create a PydidasLineEdit and store the widget.
+
+        Parameters
+        ----------
+        ref : str
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any kwargs for creating the label. This can be the custom kwargs
+            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
+            properties or generic Qt properties. Initial text can be defined with the
+            'text' kwarg.
         """
-        self.__create_widget(create_lineedit, ref, **kwargs)
+        self.__create_widget(PydidasLineEdit, ref, **kwargs)
 
     @copy_docstring(create_button)
     def create_button(self, ref: str, text: str, **kwargs: Dict):
@@ -119,12 +136,23 @@ class CreateWidgetsMixIn:
         """
         self.__create_widget(create_progress_bar, ref, **kwargs)
 
-    @copy_docstring(create_check_box)
     def create_check_box(self, ref: str, text, **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_check_box
+        Create a PydidasCheckBox and store the widget.
+
+        Parameters
+        ----------
+        ref : str
+            The reference string for storing the widget.
+        text : str
+            The CheckBox's descriptive text.
+        **kwargs : dict
+            Any kwargs for creating the label. This can be the custom kwargs
+            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
+            properties or generic Qt properties. Initial text can be defined with the
+            'text' kwarg.
         """
-        self.__create_widget(create_check_box, ref, text, **kwargs)
+        self.__create_widget(PydidasCheckBox, ref, text, **kwargs)
 
     @copy_docstring(create_combo_box)
     def create_combo_box(self, ref: str, **kwargs: Dict):

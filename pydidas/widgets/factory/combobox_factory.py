@@ -27,12 +27,11 @@ __status__ = "Production"
 __all__ = ["create_combo_box"]
 
 
-from qtpy.QtWidgets import QComboBox
-
 from ...core.utils import apply_qt_properties
+from ..pydidas_basic_widgets import PydidasComboBox
 
 
-def create_combo_box(**kwargs: dict) -> QComboBox:
+def create_combo_box(**kwargs: dict) -> PydidasComboBox:
     """
     Create a QcomboBox widget.
 
@@ -53,7 +52,7 @@ def create_combo_box(**kwargs: dict) -> QComboBox:
     box : QComboBox
         The line (in the form of a QFrame widget).
     """
-    _box = QComboBox()
+    _box = PydidasComboBox()
     _items = kwargs.pop("items", None)
     if _items is not None:
         _box.insertItems(0, _items)

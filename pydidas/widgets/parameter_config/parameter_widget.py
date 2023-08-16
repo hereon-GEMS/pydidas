@@ -43,7 +43,7 @@ from ...core.constants import (
     PARAM_INPUT_WIDGET_WIDTH,
 )
 from ...core.utils import apply_qt_properties, convert_special_chars_to_unicode
-from ..factory import create_label
+from ..pydidas_basic_widgets import PydidasLabel
 from .param_io_widget_combo_box import ParamIoWidgetComboBox
 from .param_io_widget_file import ParamIoWidgetFile
 from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
@@ -175,7 +175,7 @@ class ParameterWidget(QtWidgets.QWidget):
             The label with the Parameter's name.
         """
         _text = convert_special_chars_to_unicode(self.param.name) + ":"
-        return create_label(
+        return PydidasLabel(
             _text,
             fixedWidth=self.config["width_text"],
             fixedHeight=20,
@@ -227,7 +227,7 @@ class ParameterWidget(QtWidgets.QWidget):
             The label with the Parameter's unit text.
         """
         _text = convert_special_chars_to_unicode(self.param.unit)
-        return create_label(
+        return PydidasLabel(
             _text,
             fixedWidth=self.config["width_unit"],
             fixedHeight=20,

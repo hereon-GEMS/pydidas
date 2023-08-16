@@ -30,9 +30,16 @@ __all__ = ["PydidasQApplication"]
 import argparse
 import sys
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtWidgets, QtGui
 
 from . import fontsize
+
+
+_LOCALE = QtCore.QLocale(QtCore.QLocale.English)
+_LOCALE.setNumberOptions(
+    QtCore.QLocale.OmitGroupSeparator | QtCore.QLocale.RejectGroupSeparator
+)
+QtCore.QLocale.setDefault(_LOCALE)
 
 
 def parse_cmd_args():
@@ -48,8 +55,7 @@ def parse_cmd_args():
     parser.add_argument(
         "-fontsize",
         type=int,
-        help="The default font size in points.",
-        default=fontsize.STANDARD_FONT_SIZE,
+        help="The standard font size in points.",
     )
     parser.add_argument("--qt6", action="store_true")
 
@@ -70,21 +76,29 @@ class PydidasQApplication(QtWidgets.QApplication):
     """
 
     sig_close_gui = QtCore.Signal()
-    sig_fontsize_changed = QtCore.Signal(int)
+    sig_fontsize_changed = QtCore.Signal(float)
+    sig_font_family_changed = QtCore.Signal(str)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
 
-        self._point_size = self.font().pointSize()
-
         self.setOrganizationName("Hereon")
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
+        self.__settings = QtCore.QSettings()
+        self.__font_config = {
+            "size": float(
+                self.__settings.value("font/point_size", fontsize.STANDARD_FONT_SIZE)
+            ),
+            "type": self.__settings.value("font/type", self.font().family()),
+            "available_families": QtGui.QFontDatabase.families(
+                QtGui.QFontDatabase.Latin
+            ),
+        }
 
         _kwargs = parse_cmd_args()
         _point_size = _kwargs.get("fontsize")
-        fontsize.STANDARD_FONT_SIZE = _point_size
-        if self._point_size != _point_size:
+        if _point_size is not None:
             self.standard_fontsize = _point_size
 
     @QtCore.Slot()
@@ -93,32 +107,75 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.sig_close_gui.emit()
 
     @property
-    def standard_fontsize(self) -> int:
+    def standard_fontsize(self) -> float:
         """
         Return the standard fontSize set for the app.
 
         Returns
         -------
-        int
+        float
             The font size.
         """
-        return self._point_size
+        return self.__font_config["size"]
 
     @standard_fontsize.setter
-    def standard_fontsize(self, value: int):
+    def standard_fontsize(self, value: float):
         """
         Set the standard fontsize for the PydidasApp.
 
         Parameters
         ----------
-        value : int
+        value : float
             The new standard fontsize.
         """
-        if value == self._point_size:
+        if value == self.font().pointSizeF():
             return
-        self._point_size = value
-        fontsize.STANDARD_FONT_SIZE = value
+        self.__font_config["size"] = value
+        self.__settings.setValue("font/point_size", value)
         _font = self.font()
-        _font.setPointSizeF(self._point_size)
+        _font.setPointSizeF(value)
         self.setFont(_font)
-        self.sig_fontsize_changed.emit(self._point_size)
+        self.sig_fontsize_changed.emit(self.__font_config["size"])
+
+    @property
+    def standard_font_family(self) -> str:
+        """
+        Get the standard font type.
+
+        Returns
+        -------
+        str
+            The font type.
+        """
+        return self.__font_config["type"]
+
+    @standard_font_family.setter
+    def standard_font_family(self, font_family: str):
+        """
+        Set the standard font type.
+
+        Parameters
+        ----------
+        type : str
+            The font type name.
+        """
+        if font_family == self.font().family():
+            return
+        self.__font_config["type"] = font_family
+        self.__settings.setValue("font/type", font_family)
+        _font = self.font()
+        _font.setFamily(font_family)
+        self.setFont(_font)
+        self.sig_font_family_changed.emit(font_family)
+
+    @property
+    def font_families(self) -> list:
+        """
+        Get a lift of available font families.
+
+        Returns
+        -------
+        list
+            The list of available families.
+        """
+        return self.__font_config["available_families"]

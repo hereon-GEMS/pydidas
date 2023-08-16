@@ -45,7 +45,6 @@ def create_button(text, **kwargs):
         attribute name with a lowercase first character. Examples are
         ``icon``, ``fixedWidth``, ``visible``, ``enabled``.
 
-
     Returns
     -------
     button : QtWidgets.QPushButton

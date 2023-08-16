@@ -30,23 +30,35 @@ __all__ = ["UserConfigWindow"]
 
 from functools import partial
 from pathlib import Path
+from typing import Literal
 
-from qtpy import QtCore, QtWidgets
+from numpy import ceil, floor
+from qtpy import QtCore, QtWidgets, QtGui
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
-from ...core.constants import (
+from pydidas.core import SingletonFactory, UserConfigError, get_generic_param_collection
+from pydidas.core.constants import (
     ALIGN_TOP_RIGHT,
     CONFIG_WIDGET_WIDTH,
     QSETTINGS_USER_KEYS,
-    STANDARD_FONT_SIZE,
+    ALIGN_CENTER_LEFT,
+    POLICY_EXP_FIX,
+    POLICY_MIN_MIN,
 )
-from ...plugins import PluginCollection, get_generic_plugin_path
-from ..dialogues import AcknowledgeBox, QuestionBox
-from ..framework import PydidasWindow
+from pydidas.core.utils import update_size_policy
+from pydidas.plugins import PluginCollection, get_generic_plugin_path
+from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox
+from pydidas.widgets.framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()
+
+
+_BUTTON_POLICY = QtWidgets.QSizePolicy(*POLICY_MIN_MIN)
+_BUTTON_POLICY.setHeightForWidth(True)
+
+_FONT_SIZE_VALIDATOR = QtGui.QDoubleValidator(5, 20, 1)
+_FONT_SIZE_VALIDATOR.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
 
 class _UserConfigWindow(PydidasWindow):
@@ -65,10 +77,11 @@ class _UserConfigWindow(PydidasWindow):
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
     def __init__(self, parent=None, **kwargs):
+        self.__qtapp = QtWidgets.QApplication.instance()
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas user configuration")
-        self.setFixedWidth(330)
+        # self.setFixedWidth(330)
 
     def build_frame(self):
         """
@@ -89,14 +102,11 @@ class _UserConfigWindow(PydidasWindow):
             width_unit=40,
             width_total=CONFIG_WIDGET_WIDTH,
         )
-        _section_options = dict(
-            fontsize=STANDARD_FONT_SIZE + 3, bold=True, gridPos=(-1, 0, 1, 1)
-        )
-
+        _section_options = dict(fontsize_offset=3, bold=True, gridPos=(-1, 0, 1, 1))
         self.create_label(
             "title",
             "User configuration\n",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
@@ -107,6 +117,65 @@ class _UserConfigWindow(PydidasWindow):
             gridPos=(-1, 0, 1, 1),
             alignment=None,
         )
+        self.create_spacer(None)
+
+        self.create_label("section_font", "Font settings", **_section_options)
+        self.create_empty_widget("fontsize_container")
+        self.create_empty_widget(
+            "fontsize_label_wrapper",
+            parent_widget="fontsize_container",
+            gridPos=(0, -1, 1, 1),
+            sicePolicy=POLICY_EXP_FIX,
+            alignment=ALIGN_CENTER_LEFT,
+        )
+        update_size_policy(self._widgets["fontsize_label_wrapper"], horizontalStretch=6)
+        self.create_label(
+            "label_font_size",
+            "Standard font size:",
+            parent_widget="fontsize_label_wrapper",
+            wordWrap=False,
+        )
+        self.create_button(
+            "but_fontsize_reduce",
+            "",
+            icon="qta::mdi.arrow-bottom-left-thick",
+            sizePolicy=_BUTTON_POLICY,
+            gridPos=(0, -1, 1, 1),
+            parent_widget="fontsize_container",
+        )
+        self.create_lineedit(
+            "edit_fontsize",
+            text=str(QtWidgets.QApplication.instance().standard_fontsize),
+            horizontalStretch=3,
+            parent_widget="fontsize_container",
+            gridPos=(0, -1, 1, 1),
+            validator=_FONT_SIZE_VALIDATOR,
+        )
+        update_size_policy(self._widgets["edit_fontsize"], horizontalStretch=2)
+        self.create_button(
+            "but_fontsize_increase",
+            "",
+            icon="qta::mdi.arrow-top-right-thick",
+            sizePolicy=_BUTTON_POLICY,
+            gridPos=(0, -1, 1, 1),
+            parent_widget="fontsize_container",
+        )
+
+        self.create_label("label_font_family", "Standard font family:", wordWrap=False)
+        self.create_empty_widget("font_family_container", sizePolicy=POLICY_EXP_FIX)
+        self.add_any_widget(
+            "font_family_box",
+            QtWidgets.QFontComboBox(),
+            alignment=ALIGN_TOP_RIGHT,
+            sizePolicy=POLICY_EXP_FIX,
+            editable=False,
+            fontFilter=(
+                QtWidgets.QFontComboBox.ScalableFonts
+                | QtWidgets.QFontComboBox.MonospacedFonts
+            ),
+            writingSystem=QtGui.QFontDatabase.Latin,
+        )
+        self.create_spacer(None)
 
         self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
@@ -152,6 +221,7 @@ class _UserConfigWindow(PydidasWindow):
             "Restore default plugin collection paths",
             icon="qt-std::SP_DialogOkButton",
         )
+        self.layout().setColumnStretch(1, 1)
 
     def connect_signals(self):
         """
@@ -165,6 +235,18 @@ class _UserConfigWindow(PydidasWindow):
         self._widgets["but_plugins"].clicked.connect(self.update_plugin_collection)
         self._widgets["but_reset_plugins"].clicked.connect(self.reset_plugins)
         self._widgets["cmap_combobox"].currentTextChanged.connect(self.update_cmap)
+        self._widgets["edit_fontsize"].editingFinished.connect(
+            self.process_new_fontsize_setting
+        )
+        self._widgets["but_fontsize_reduce"].clicked.connect(
+            partial(self.change_fontsize, "decrease")
+        )
+        self._widgets["but_fontsize_increase"].clicked.connect(
+            partial(self.change_fontsize, "increase")
+        )
+        self._widgets["font_family_box"].currentFontChanged.connect(
+            self.new_font_family_selected
+        )
 
     @QtCore.Slot(object)
     def update_qsetting(self, param_key, value):
@@ -238,6 +320,45 @@ class _UserConfigWindow(PydidasWindow):
                 self.q_settings_set_key("user/cmap_acknowledge", True)
         self.q_settings_set_key("user/cmap_name", cmap_name)
 
+    @QtCore.Slot()
+    def change_fontsize(self, change: Literal["increase", "decrease"]):
+        """
+        Process the button clicks to change the fontsize.
+
+        Parameters
+        ----------
+        change : Literal["increase", "decrease"]
+            The change direction.
+        """
+        if change == "increase":
+            self.__qtapp.standard_fontsize = min(
+                ceil(self.__qtapp.standard_fontsize) + 1, 20
+            )
+        elif change == "decrease":
+            self.__qtapp.standard_fontsize = max(
+                floor(self.__qtapp.standard_fontsize) - 1, 5
+            )
+        self._widgets["edit_fontsize"].setText(str(self.__qtapp.standard_fontsize))
+
+    @QtCore.Slot()
+    def process_new_fontsize_setting(self):
+        """
+        Process the user input of the new font size.
+        """
+        self.__qtapp.standard_fontsize = float(self._widgets["edit_fontsize"].text())
+
+    @QtCore.Slot(QtGui.QFont)
+    def new_font_family_selected(self, font: QtGui.QFont):
+        """
+        Handle the selection of the new font and notify the PydidasQApplication.
+
+        Parameters
+        ----------
+        font : QtGui.QFont
+            The new font.
+        """
+        self.__qtapp.standard_font_family = font.family()
+
     @QtCore.Slot(int)
     def frame_activated(self, index):
         """
@@ -291,3 +412,26 @@ class _UserConfigWindow(PydidasWindow):
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)
+
+
+if __name__ == "__main__":
+    import sys
+
+    w = UserConfigWindow()
+    w.show()
+    for name in [
+        "fontsize_container",
+        "fontsize_label_wrapper",
+        "label_font_size",
+        "but_fontsize_reduce",
+        "edit_fontsize",
+        "but_fontsize_increase",
+    ]:
+        print(
+            name,
+            w._widgets[name].sizeHint(),
+            w._widgets[name].width(),
+            w._widgets[name].height(),
+        )
+    QtWidgets.QApplication.instance().exec()
+    sys.exit()

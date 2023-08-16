@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,11 +20,12 @@ Module with a factory function to create formatted QSpinBoxes.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["create_spin_box"]
+
 
 from qtpy.QtWidgets import QSpinBox
 
@@ -51,7 +54,7 @@ def create_spin_box(**kwargs):
         The instantiated spin box widget.
     """
     kwargs["range"] = kwargs.get("valueRange", (0, 1))
-    kwargs["fixedWidth"] = kwargs.get("fixedWidth", 50)
+    # kwargs["fixedWidth"] = kwargs.get("fixedWidth", 50)
     _box = QSpinBox()
     apply_qt_properties(_box, **kwargs)
     return _box

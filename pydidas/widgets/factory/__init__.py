@@ -28,13 +28,10 @@ __all__ = []
 
 # import __all__ items from modules:
 from .button_factory import *
-from .check_box_factory import *
 from .combobox_factory import *
 from .create_widgets_mixin import *
 from .empty_widget_factory import *
-from .label_factory import *
 from .line_factory import *
-from .lineedit_factory import *
 from .progress_bar_factory import *
 from .radio_button_group_factory import *
 from .spacer_factory import *
@@ -46,11 +43,6 @@ from . import button_factory
 
 __all__.extend(button_factory.__all__)
 del button_factory
-
-from . import check_box_factory
-
-__all__.extend(check_box_factory.__all__)
-del check_box_factory
 
 from . import combobox_factory
 
@@ -67,20 +59,10 @@ from . import empty_widget_factory
 __all__.extend(empty_widget_factory.__all__)
 del empty_widget_factory
 
-from . import label_factory
-
-__all__.extend(label_factory.__all__)
-del label_factory
-
 from . import line_factory
 
 __all__.extend(line_factory.__all__)
 del line_factory
-
-from . import lineedit_factory
-
-__all__.extend(lineedit_factory.__all__)
-del lineedit_factory
 
 from . import progress_bar_factory
 

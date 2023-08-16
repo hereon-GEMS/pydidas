@@ -30,22 +30,27 @@ __status__ = "Production"
 __all__ = []
 
 import os as __os
+import sys as __sys
 import logging as __logging
 
 import qtpy.QtCore as __QtCore
+import qtpy.QtWidgets as __QtWidgets
 import qtpy as __qtpy
 
 # must import h5py here to have the dll libraries linked correctly
 import h5py as __h5py
 
-# set the default API to PySide6
-# __os.environ["QT_API"] = "pyside6"
+
+if __QtWidgets.QApplication.instance() is None:
+    import pydidas_qtcore
+
+    __app = pydidas_qtcore.PydidasQApplication(__sys.argv)
+
 
 # import local modules
 from . import version
 
 # Change the multiprocessing Process spawn method to handle silx/pyFAI in linux
-import multiprocessing as __mp
 import warnings as __warnings
 
 # import sub-packages:

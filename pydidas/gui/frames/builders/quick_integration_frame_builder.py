@@ -127,7 +127,7 @@ class QuickIntegrationFrameBuilder:
         """
         _label_header = (
             dict(
-                fontsize=constants.STANDARD_FONT_SIZE + size_offset,
+                fontsize_offset=size_offset,
                 bold=True,
                 fixedWidth=cls._frame._config["scroll_width"],
                 parent_widget=cls._frame._widgets[parent_key],
@@ -230,7 +230,7 @@ class QuickIntegrationFrameBuilder:
         cls._frame.create_label(
             "label_title",
             "Quick integration\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
             fixedWidth=cls._frame._config["scroll_width"],

@@ -61,7 +61,7 @@ class CompositeCreatorFrameBuilder(BaseFrameWithApp, SilxPlotWindowMixIn):
         self.create_label(
             "title",
             "Composite image creator",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 2),
             parent_widget=self._widgets["config"],

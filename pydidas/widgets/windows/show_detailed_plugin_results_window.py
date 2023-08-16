@@ -30,7 +30,6 @@ __all__ = ["ShowDetailedPluginResultsWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import STANDARD_FONT_SIZE
 from ...core.utils import update_size_policy
 from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
@@ -59,7 +58,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Detailed plugin results",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 2),
         )
@@ -76,7 +75,7 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             parent_widget=self._widgets["metadata"],
             gridPos=(-1, 0, 1, 1),
             fixedWidth=250,
-            fontsize=STANDARD_FONT_SIZE + 2,
+            fontsize_offset=2,
         )
         self.create_label(
             "metadata_label",

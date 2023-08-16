@@ -118,7 +118,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_welcome",
             "Welcome to pydidas",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             fixedWidth=400,
             parent_widget=self._widgets["canvas"],
@@ -126,7 +126,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_full_name",
             "- the python Diffraction Data Analysis Suite.",
-            fontsize=constants.STANDARD_FONT_SIZE + 3,
+            fontsize_offset=3,
             bold=True,
             fixedWidth=400,
             parent_widget=self._widgets["canvas"],
@@ -135,7 +135,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_quickstart",
             "Quickstart hints:",
-            fontsize=constants.STANDARD_FONT_SIZE + 2,
+            fontsize_offset=2,
             bold=True,
             underline=True,
             fixedWidth=400,
@@ -152,7 +152,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_toolbar",
             "Menu toolbar:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -169,7 +169,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_help_header",
             "Online help:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -188,7 +188,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_proc_setup",
             "Workflow processing setup:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
             bold=True,
             fixedWidth=400,
@@ -204,7 +204,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_proc",
             "Running processing:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
             bold=True,
             fixedWidth=400,

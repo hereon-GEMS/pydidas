@@ -71,7 +71,7 @@ class DefineScanFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Scan settings\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
@@ -100,7 +100,7 @@ class DefineScanFrameBuilder(BaseFrame):
             "dimension_hint_title",
             "Scan dimension explanation",
             gridPos=(-1, 0, 1, 2),
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
         )
         self.create_label(
@@ -148,7 +148,7 @@ class DefineScanFrameBuilder(BaseFrame):
         self.create_label(
             "scan_global",
             "\nGlobal scan parameters:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             parent_widget=self._widgets["global_param_frame"],
         )
@@ -189,7 +189,7 @@ class DefineScanFrameBuilder(BaseFrame):
             self.create_label(
                 f"title_{i_dim}",
                 f"\nScan dimension {i_dim}:",
-                fontsize=constants.STANDARD_FONT_SIZE + 1,
+                fontsize_offset=1,
                 bold=True,
                 fixedWidth=constants.CONFIG_WIDGET_WIDTH - 50,
                 alignment=constants.ALIGN_BOTTOM_LEFT,

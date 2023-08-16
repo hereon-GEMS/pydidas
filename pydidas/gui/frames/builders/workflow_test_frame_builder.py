@@ -30,7 +30,6 @@ __all__ = ["WorkflowTestFrameBuilder"]
 
 from qtpy import QtCore
 
-from ....core import constants
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
@@ -94,7 +93,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         self.create_label(
             "title",
             "Test workflow",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
@@ -159,7 +158,7 @@ class WorkflowTestFrameBuilder(BaseFrame):
         self.create_label(
             "label_results",
             "Results:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
             gridPos=(-1, 0, 1, 1),
             parent_widget=self._widgets["config"],

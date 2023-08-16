@@ -132,7 +132,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "title",
             "Image mathematics",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 5),
         )
@@ -180,7 +180,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_open",
             "Open new image:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             parent_widget="left_container",
         )
@@ -250,7 +250,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_ops",
             "Image operations:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             parent_widget="left_container",
         )
@@ -263,7 +263,6 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_ops",
             "Apply operator to image:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
@@ -290,7 +289,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_operator",
             gridPos=(0, 1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
         )
         cls._frame.create_combo_box(
             "ops_operator_func",
@@ -306,7 +305,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_operator",
             gridPos=(0, -1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
         )
         cls._frame.create_combo_box(
             "combo_ops_operator_input",
@@ -321,7 +320,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_operator",
             gridPos=(0, -1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             alignment=constants.ALIGN_CENTER_LEFT,
             visible=False,
         )
@@ -339,7 +338,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_operator",
             gridPos=(0, -1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
         )
         cls._frame.create_spacer(
             "spacer_operator_end",
@@ -365,7 +364,6 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_arithmetic",
             "Elementary arithmetic operations:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
@@ -387,7 +385,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_arithmetic",
             gridPos=(0, 1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
         )
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_input",
@@ -434,7 +432,6 @@ class ImageMathFrameBuilder:
         cls._frame.create_label(
             "label_image_arithmetic",
             "Arithmetic image operations:",
-            fontsize=constants.STANDARD_FONT_SIZE,
             bold=True,
             parent_widget="left_container",
         )
@@ -456,7 +453,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_image_arithmetic",
             gridPos=(0, 1, 1, 1),
             bold=True,
-            fontSize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_1",

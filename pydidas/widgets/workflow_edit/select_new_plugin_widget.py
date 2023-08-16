@@ -29,7 +29,7 @@ __all__ = ["_PluginCollectionTreeWidget", "SelectNewPluginWidget"]
 
 from functools import partial
 
-from qtpy import QtWidgets, QtGui, QtCore
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
 from ...core.utils import apply_qt_properties
@@ -370,6 +370,20 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         The root node of the QStandardItemModel.
     """
 
+    def __init__(self, parent):
+        QtWidgets.QStyledItemDelegate.__init__(self, parent)
+        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__height = 2 * self.__qtapp.standard_fontsize + 2
+        self.__qtapp.sig_fontsize_changed.connect(self.changed_font)
+
+    @QtCore.Slot()
+    def changed_font(self):
+        """
+        Handle the QApplication's fontsize changed signal.
+        """
+        self.__height = 2 * self.__qtapp.standard_fontsize + 2
+        self.sizeHintChanged.emit(self.parent().currentIndex())
+
     def sizeHint(self, options, index):
         """
         Overload the size hint method to achieve a uniform row height.
@@ -387,7 +401,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
             The updated sizeHint from the QStyledItemDelegate.
         """
         size = QtWidgets.QStyledItemDelegate.sizeHint(self, options, index)
-        size.setHeight(2 * constants.STANDARD_FONT_SIZE + 2)
+        size.setHeight(self.__height)
         return size
 
     def paint(self, painter, option, index):
@@ -405,5 +419,5 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
             The index of the item to be painted.
         """
         if index.data(QtCore.Qt.DisplayRole) in constants.PLUGIN_TYPE_NAMES.values():
-            option.font.setPointSize(constants.STANDARD_FONT_SIZE + 2)
+            option.font.setPointSize(self.__qtapp.standard_fontsize + 2)
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

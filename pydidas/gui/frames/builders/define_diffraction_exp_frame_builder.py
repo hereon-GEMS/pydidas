@@ -68,7 +68,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         self.create_label(
             None,
             "Diffraction experimental setup\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
             fixedWidth=self._scroll_width,
@@ -105,7 +105,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
                 self.create_label(
                     None,
                     "\nBeamline X-ray energy:",
-                    fontsize=constants.STANDARD_FONT_SIZE + 1,
+                    fontsize_offset=1,
                     bold=True,
                     fixedWidth=self._scroll_width,
                     parent_widget=self._widgets["config"],
@@ -152,7 +152,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         self.create_label(
             None,
             "\nX-ray detector:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
             fixedWidth=self._scroll_width,
@@ -174,7 +174,7 @@ class DefineDiffractionExpFrameBuilder(BaseFrame):
         self.create_label(
             None,
             "\nDetector geometry:",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             gridPos=(-1, 0, 1, 1),
             fixedWidth=self._scroll_width,

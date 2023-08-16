@@ -30,18 +30,19 @@ __all__ = ["PluginInWorkflowBox"]
 
 from functools import partial
 
-from qtpy import QtWidgets, QtCore, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
-from ...core.utils import apply_qt_properties
 from ...workflow import WorkflowTree
-from ..utilities import get_pyqt_icon_from_str
 from ..factory import create_button
+from ..pydidas_basic_widgets import PydidasLabel
+from ..utilities import get_pyqt_icon_from_str
+
 
 TREE = WorkflowTree()
 
 
-class PluginInWorkflowBox(QtWidgets.QLabel):
+class PluginInWorkflowBox(PydidasLabel):
     """
     Widget with title and delete button for every selected plugin
     in the processing chain.
@@ -65,11 +66,11 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
     sig_create_copy_request = QtCore.Signal(int, int)
 
     def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
-        super().__init__(parent)
+        PydidasLabel.__init__(self, "", parent, **(kwargs | {"fontsize_offset": 2}))
         self.setAcceptDrops(True)
-        apply_qt_properties(self, **kwargs)
+        self.__qtapp = QtWidgets.QApplication.instance()
+
         self.flags = {"active": False, "inconsistent": False}
-        self.flags["inconsistent"] = False
         self.widget_id = widget_id
         self._label = kwargs.get("label", "")
 
@@ -97,13 +98,14 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
 
         _font = self.font()
-        _font.setPointSize(constants.STANDARD_FONT_SIZE + 2)
+        _font.setPointSize(self.__qtapp.standard_fontsize + 2)
         self.setFont(_font)
         _font.setBold(True)
         self.id_label.setFont(_font)
 
         self.update_text(widget_id, self._label)
         self.setText(plugin_name)
+        self.__qtapp.sig_new_fontsize.connect(self.process_new_fontsize)
 
     def __create_menu(self):
         """
@@ -160,7 +162,7 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         _style = (
             "QPushButton{ border: 0px; }"
             "QPushButton::menu-indicator { image: none; }"
-            "QLabel{font-size: " + f"{constants.STANDARD_FONT_SIZE + 2}px; "
+            "QLabel{font-size: " + f"{self.__qtapp.standard_fontsize + 2}px; "
             f"border: {_border}px solid;"
             "border-color: rgb(60, 60, 60);"
             "border-radius: 3px;"
@@ -170,7 +172,23 @@ class PluginInWorkflowBox(QtWidgets.QLabel):
         )
         return _style
 
-    def mousePressEvent(self, event):
+    @QtCore.Slot(float)
+    def process_new_fontsize(self, new_fontsize: float):
+        """
+        Process the application's new fontsize.
+
+        Parameters
+        ----------
+        new_fontsize : float
+            The new font size in points.
+        """
+        print("new:", new_fontsize, self.font().pointSizeF())
+        print(self.width())
+        _metrics = QtGui.QFontMetrics(self.font())
+        _width = _metrics.boundingRect("pyFAI azimuthal integration Test").width()
+        self.setFixedWidth(_width)
+
+    def mousePressEvent(self, event: QtCore.QEvent):
         """
         Extend the generic mousePressEvent by an activation signal.
 

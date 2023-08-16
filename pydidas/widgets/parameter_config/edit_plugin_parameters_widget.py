@@ -115,7 +115,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_label(
             "plugin_name",
             f"Plugin: {self.plugin.plugin_name}",
-            fontsize=constants.STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             bold=True,
             fixedWidth=constants.PLUGIN_PARAM_WIDGET_WIDTH,
             gridPos=(0, 0, 1, 2),
@@ -124,14 +124,14 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             self.create_label(
                 "node_id",
                 f"Node ID: {self.node_id}",
-                fontsize=constants.STANDARD_FONT_SIZE + 2,
+                fontsize_offset=2,
                 gridPos=(1, 0, 1, 2),
             )
         self.create_spacer("spacer", gridPos=(2, 0, 1, 2))
         self.create_label(
             "params",
             "Parameters:",
-            fontsize=constants.STANDARD_FONT_SIZE + 2,
+            fontsize_offset=2,
             gridPos=(3, 0, 1, 1),
         )
         self.__add_restore_default_button()

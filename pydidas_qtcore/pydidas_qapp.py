@@ -76,8 +76,10 @@ class PydidasQApplication(QtWidgets.QApplication):
     """
 
     sig_close_gui = QtCore.Signal()
-    sig_fontsize_changed = QtCore.Signal(float)
-    sig_font_family_changed = QtCore.Signal(str)
+    sig_new_fontsize = QtCore.Signal(float)
+    sig_fontsize_changed = QtCore.Signal()
+    sig_new_font_family = QtCore.Signal(str)
+    sig_font_family_changed = QtCore.Signal()
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
@@ -97,9 +99,10 @@ class PydidasQApplication(QtWidgets.QApplication):
         }
 
         _kwargs = parse_cmd_args()
-        _point_size = _kwargs.get("fontsize")
-        if _point_size is not None:
-            self.standard_fontsize = _point_size
+        _point_size = _kwargs.get("fontsize", None)
+        self.standard_fontsize = (
+            _point_size if _point_size is not None else self.__font_config["size"]
+        )
 
     @QtCore.Slot()
     def send_gui_close_signal(self):
@@ -131,11 +134,12 @@ class PydidasQApplication(QtWidgets.QApplication):
         if value == self.font().pointSizeF():
             return
         self.__font_config["size"] = value
-        self.__settings.setValue("font/point_size", value)
+        self.__settings.setValue("font/point_size", float(value))
         _font = self.font()
         _font.setPointSizeF(value)
         self.setFont(_font)
-        self.sig_fontsize_changed.emit(self.__font_config["size"])
+        self.sig_new_fontsize.emit(self.__font_config["size"])
+        self.sig_fontsize_changed.emit()
 
     @property
     def standard_font_family(self) -> str:
@@ -166,7 +170,8 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font = self.font()
         _font.setFamily(font_family)
         self.setFont(_font)
-        self.sig_font_family_changed.emit(font_family)
+        self.sig_new_font_family.emit(font_family)
+        self.sig_fontsize_changed.emit()
 
     @property
     def font_families(self) -> list:

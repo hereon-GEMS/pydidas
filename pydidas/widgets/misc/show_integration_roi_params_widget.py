@@ -33,7 +33,7 @@ from typing import Literal
 from qtpy import QtCore
 
 from ...core import get_generic_param_collection
-from ...core.constants import POLICY_FIX_EXP, POLICY_MIN_MIN, STANDARD_FONT_SIZE
+from ...core.constants import POLICY_FIX_EXP, POLICY_MIN_MIN
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
@@ -99,7 +99,6 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
         _axis_long = "radial" if axis == "rad" else "azimuthal"
         _Axis_long = "Radial" if axis == "rad" else "Azimuthal"
         _label_kwargs = dict(
-            fontsize=STANDARD_FONT_SIZE,
             fixedWidth=self.widget_width,
             bold=True,
             parent_widget=self._widgets["plugin_container"],

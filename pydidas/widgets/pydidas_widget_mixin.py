@@ -54,8 +54,8 @@ class PydidasWidgetMixin:
         self.__qtapp = QApplication.instance()
         self.update_fontsize(self.__qtapp.standard_fontsize)
         self.update_font_family(self.__qtapp.standard_font_family)
-        self.__qtapp.sig_fontsize_changed.connect(self.update_fontsize)
-        self.__qtapp.sig_font_family_changed.connect(self.update_font_family)
+        self.__qtapp.sig_new_fontsize.connect(self.update_fontsize)
+        self.__qtapp.sig_new_font_family.connect(self.update_font_family)
         if True in self.__font_config.values():
             update_qobject_font(self, **self.__font_config)
 

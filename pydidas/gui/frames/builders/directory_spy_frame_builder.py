@@ -27,7 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = ["DirectorySpyFrameBuilder"]
 
-from ....core import constants
+
 from ....core.constants import (
     CONFIG_WIDGET_WIDTH,
     DEFAULT_TWO_LINE_PARAM_CONFIG,
@@ -90,7 +90,7 @@ class DirectorySpyFrameBuilder(BaseFrameWithApp):
         self.create_label(
             "title",
             "Directory spy",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 5),
         )

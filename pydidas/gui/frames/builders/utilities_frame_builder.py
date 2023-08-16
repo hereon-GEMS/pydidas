@@ -105,7 +105,7 @@ class UtilitiesFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Utilities\n",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
             fixedWidth=self.GROUP_WIDTH,
@@ -125,7 +125,7 @@ class UtilitiesFrameBuilder(BaseFrame):
                 _entries["title"],
                 gridPos=(0, 0, 1, 1),
                 parent_widget=self._widgets[f"utility_{_key}"],
-                fontSize=constants.STANDARD_FONT_SIZE + 2,
+                fontsize_offset=2,
                 fixedWidth=self.GROUP_WIDTH - 20,
                 bold=True,
             )
@@ -135,7 +135,6 @@ class UtilitiesFrameBuilder(BaseFrame):
                 gridPos=(1, 0, 1, 1),
                 parent_widget=self._widgets[f"utility_{_key}"],
                 fixedWidth=self.GROUP_WIDTH - 20,
-                fontSize=constants.STANDARD_FONT_SIZE,
             )
             self.create_spacer(
                 f"spacer_{_key}",

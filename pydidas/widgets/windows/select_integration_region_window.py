@@ -34,7 +34,6 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset, UserConfigError, get_generic_param_collection
-from ...core.constants import STANDARD_FONT_SIZE
 from ...core.utils import apply_qt_properties
 from ...data_io import import_data
 from ..controllers import ManuallySetIntegrationRoiController
@@ -90,7 +89,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 if self._config["only_show_roi"]
                 else "Select integration region"
             ),
-            fontsize=STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             fixedWidth=self.container_width,
             bold=True,
         )
@@ -123,7 +122,6 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 "detectors with square pixels."
             ),
             parent_widget=self._widgets["left_container"],
-            fontsize=STANDARD_FONT_SIZE,
             bold=True,
         )
         self.create_line(None, parent_widget=self._widgets["left_container"])
@@ -131,7 +129,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             "label_file",
             "Select input file:",
             parent_widget=self._widgets["left_container"],
-            fontsize=STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             underline=True,
         )
         self.add_any_widget(

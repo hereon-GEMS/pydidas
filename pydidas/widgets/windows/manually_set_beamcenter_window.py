@@ -34,8 +34,8 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
-from ...core import get_generic_param_collection, Dataset
-from ...core.constants import CONFIG_WIDGET_WIDTH, STANDARD_FONT_SIZE
+from ...core import Dataset, get_generic_param_collection
+from ...core.constants import CONFIG_WIDGET_WIDTH
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
@@ -88,7 +88,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Define beamcenter through selected points",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 3),
         )
@@ -137,7 +137,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Input image:",
-            fontsize=STANDARD_FONT_SIZE + 1,
+            fontsize_offset=1,
             fixedWidth=CONFIG_WIDGET_WIDTH,
             parent_widget=self._widgets["left_container"],
             underline=True,

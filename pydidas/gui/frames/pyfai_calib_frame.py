@@ -178,7 +178,7 @@ class PyfaiCalibFrame(BaseFrame):
         self.create_label(
             "title",
             "pyFAI calibration",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )

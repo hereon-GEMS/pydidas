@@ -26,7 +26,6 @@ __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Development"
 __all__ = [
-    "STANDARD_FONT_SIZE",
     "ALIGN_TOP_LEFT",
     "ALIGN_TOP_CENTER",
     "ALIGN_TOP_RIGHT",
@@ -47,10 +46,7 @@ __all__ = [
     "POLICY_MIN_MIN",
 ]
 
-from pydidas_qtcore import fontsize
 from qtpy import QtCore, QtGui, QtWidgets
-
-STANDARD_FONT_SIZE = fontsize.STANDARD_FONT_SIZE
 
 ALIGN_TOP_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 

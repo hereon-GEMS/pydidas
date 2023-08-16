@@ -32,11 +32,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ...core import SingletonFactory, get_generic_param_collection
-from ...core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    QSETTINGS_GLOBAL_KEYS,
-    STANDARD_FONT_SIZE,
-)
+from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
 from ...plugins import PluginCollection
 from ..framework import PydidasWindow
 
@@ -75,14 +71,12 @@ class _GlobalSettingsWindow(PydidasWindow):
             width_unit=40,
             width_total=CONFIG_WIDGET_WIDTH,
         )
-        _section_options = dict(
-            fontsize=STANDARD_FONT_SIZE + 2, bold=True, gridPos=(-1, 0, 1, 1)
-        )
+        _section_options = dict(fontsize_offset=2, bold=True, gridPos=(-1, 0, 1, 1))
 
         self.create_label(
             "title",
             "Global settings\n",
-            fontsize=STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             gridPos=(0, 0, 1, 1),
         )

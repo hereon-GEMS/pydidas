@@ -56,7 +56,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
         self.create_label(
             "label_title",
             "Workflow tree editor",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=4,
             bold=True,
             fixedWidth=250,
             gridPos=(0, 0, 1, 3),
@@ -74,7 +74,7 @@ class WorkflowEditFrameBuilder(BaseFrame):
         self.create_label(
             "plugin_title",
             "Available plugins:",
-            fontsize=constants.STANDARD_FONT_SIZE + 4,
+            fontsize_offset=3,
             underline=True,
             gridPos=(4, 0, 1, 2),
         )

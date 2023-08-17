@@ -17,7 +17,7 @@
 
 
 """
-Module with the PluginInWorkflowBox which is a subclassed QLabel and used
+Module with the PluginInWorkflowBox which is a subclassed QFrame and used
 to display plugin processing steps in the WorkflowTree.
 """
 
@@ -28,24 +28,29 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginInWorkflowBox"]
 
+
 from functools import partial
+from typing import Union
 
 from qtpy import QtCore, QtGui, QtWidgets
+from qtpy.QtWidgets import QFrame
 
-from ...core import constants
+from ...core.constants import ALIGN_CENTER_LEFT, ALIGN_TOP_RIGHT
+from ...core.utils import apply_qt_properties
 from ...workflow import WorkflowTree
-from ..factory import create_button
-from ..pydidas_basic_widgets import PydidasLabel
+from ..factory import CreateWidgetsMixIn
 from ..utilities import get_pyqt_icon_from_str
 
 
 TREE = WorkflowTree()
 
 
-class PluginInWorkflowBox(PydidasLabel):
+class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
     """
-    Widget with title and delete button for every selected plugin
-    in the processing chain.
+    Widget to represent a Plugin in the WorkflowTree.
+
+    The widget displays plugin name, title and includes a delete button to remove the
+    Plugin or the full branch from the workflow.
 
     Parameters
     ----------
@@ -57,59 +62,91 @@ class PluginInWorkflowBox(PydidasLabel):
         The widget's parent. The default is None.
     """
 
-    widget_width = constants.GENERIC_PLUGIN_WIDGET_WIDTH
-    widget_height = constants.GENERIC_PLUGIN_WIDGET_HEIGHT
     sig_widget_activated = QtCore.Signal(int)
     sig_widget_delete_branch_request = QtCore.Signal(int)
     sig_widget_delete_request = QtCore.Signal(int)
     sig_new_node_parent_request = QtCore.Signal(int, int)
     sig_create_copy_request = QtCore.Signal(int, int)
 
-    def __init__(self, plugin_name, widget_id, parent=None, **kwargs):
-        PydidasLabel.__init__(self, "", parent, **(kwargs | {"fontsize_offset": 2}))
+    def __init__(
+        self,
+        plugin_name,
+        widget_id,
+        parent: Union[None, QtWidgets.QWidget] = None,
+        label: str = "",
+        standardSize=(220, 50),
+    ):
+        QtWidgets.QFrame.__init__(self, parent)
+        CreateWidgetsMixIn.__init__(self)
+        self.setLayout(QtWidgets.QGridLayout())
+        apply_qt_properties(
+            self.layout(),
+            contentsMargins=(5, 2, 5, 2),
+            alignment=ALIGN_CENTER_LEFT,
+        )
         self.setAcceptDrops(True)
-        self.__qtapp = QtWidgets.QApplication.instance()
-
+        self.setObjectName("PluginInWorkflowBox")
+        self.setFixedSize(QtCore.QSize(*standardSize))
         self.flags = {"active": False, "inconsistent": False}
         self.widget_id = widget_id
-        self._label = kwargs.get("label", "")
-
-        self.setFixedSize(self.widget_width, self.widget_height)
-
         self.setAutoFillBackground(True)
-        self.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignBottom)
 
-        self.id_label = QtWidgets.QLabel(self)
-        self.id_label.setGeometry(3, 3, self.widget_width - 25, 20)
+        self.create_label(
+            "node_label",
+            "",
+            fontsize_offset=1,
+            bold=True,
+            gridPos=(0, 0, 1, 2),
+            styleSheet="QLabel{ background-color: rgba(255, 255, 255, 0);}",
+            wordWrap=False,
+        )
+        self.create_label(
+            "plugin_name",
+            plugin_name,
+            fontsize_offset=1,
+            gridPos=(2, 0, 1, 3),
+            wordWrap=False,
+        )
+        self.create_label(
+            "del_button",
+            "",
+            pixmap=get_pyqt_icon_from_str("qt-std::SP_TitleBarCloseButton").pixmap(
+                QtCore.QSize(16, 16)
+            ),
+            gridPos=(0, 2, 1, 1),
+            fixedWidth=16,
+            fixedHeight=16,
+            alignment=ALIGN_TOP_RIGHT,
+            contextMenuPolicy=QtCore.Qt.CustomContextMenu,
+        )
+        self._widgets["del_button"].mousePressEvent = self.__show_deletion_context_menu
 
-        self.setStyleSheet(self.__get_stylesheet())
+        self.layout().setRowStretch(1, 1)
+        self.layout().setColumnStretch(1, 1)
+        self.update_text(widget_id, label)
+        self.__create_menus()
+        self.__update_style()
 
-        if kwargs.get("deletable", True):
-            self.del_button = create_button(
-                "",
-                icon=get_pyqt_icon_from_str("qt-std::SP_TitleBarCloseButton"),
-                parent=self,
-                styleSheet=self.__get_stylesheet(),
-                geometry=(self.widget_width - 28, 3, 25, 20),
-                layoutDirection=QtCore.Qt.RightToLeft,
-            )
-            self.__create_menu()
-
-        self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
-
-        _font = self.font()
-        _font.setPointSize(self.__qtapp.standard_fontsize + 2)
-        self.setFont(_font)
-        _font.setBold(True)
-        self.id_label.setFont(_font)
-
-        self.update_text(widget_id, self._label)
-        self.setText(plugin_name)
-        self.__qtapp.sig_new_fontsize.connect(self.process_new_fontsize)
-
-    def __create_menu(self):
+    def update_text(self, node_id: int, label: str = ""):
         """
-        Create the custom context menu for adding an replacing nodes.
+        Update the text for node label.
+
+        Parameters
+        ----------
+        node_id : int
+            The unique node ID.
+        label : str, optional
+            The new label for the workflow node.
+        """
+        _txt = f"node {node_id:d}" + (f": {label}" if len(label) > 0 else "")
+        self._widgets["node_label"].setText(_txt)
+
+    def __create_menus(self):
+        """
+        Create custom context menus.
+
+        This method creates two separate context menus for a) moving the node and
+        creating node copies and b) for deleting the current node from the tree.
         """
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self._menu_item_context = QtWidgets.QMenu(self)
@@ -136,59 +173,39 @@ class PluginInWorkflowBox(PydidasLabel):
         )
         self._delete_node_context.addAction(self._del_actions["delete"])
         self._delete_node_context.addAction(self._del_actions["delete_branch"])
-        self.del_button.setMenu(self._delete_node_context)
 
-    def __get_stylesheet(self, border=True):
+    def __show_deletion_context_menu(self, event: QtGui.QMouseEvent):
         """
-        Get the stylesheet based on the active and consistent flags.
+        Show the node deletion context menu.
 
         Parameters
         ----------
-        border : bool, optional
-            Flag to set the border. The default is True.
-
-        Returns
-        -------
-        QtWidgets.QStylesheet
-            The stylesheet for this box.
+        event : QtGui.QMouseEvent
+            The mouse press event.
         """
-        _border = (3 if self.flags["active"] else 1) if border else 0
+        self._delete_node_context.exec(event.globalPosition().toPoint())
+
+    def __update_style(self):
+        """
+        Update the widget's style based on the stored flags.
+        """
+        _border = 3 if self.flags["active"] else 1
         if self.flags["inconsistent"]:
             _bg_color = "rgb(255, 225, 225)"
         elif self.flags["active"]:
             _bg_color = "rgb(225, 225, 255)"
         else:
-            _bg_color = "rgb(225, 225, 225)"
-        _style = (
-            "QPushButton{ border: 0px; }"
-            "QPushButton::menu-indicator { image: none; }"
-            "QLabel{font-size: " + f"{self.__qtapp.standard_fontsize + 2}px; "
-            f"border: {_border}px solid;"
+            _bg_color = "rgb(200, 200, 200)"
+        self.setStyleSheet(
+            "QFrame#PluginInWorkflowBox{ border-radius: 4px; "
+            "border-style: solid;"
             "border-color: rgb(60, 60, 60);"
-            "border-radius: 3px;"
+            f"border-width: {_border}px;"
             f"background: {_bg_color};"
-            "margin-left: 2px;"
-            "margin-bottom: 2px;}"
+            "}"
         )
-        return _style
 
-    @QtCore.Slot(float)
-    def process_new_fontsize(self, new_fontsize: float):
-        """
-        Process the application's new fontsize.
-
-        Parameters
-        ----------
-        new_fontsize : float
-            The new font size in points.
-        """
-        print("new:", new_fontsize, self.font().pointSizeF())
-        print(self.width())
-        _metrics = QtGui.QFontMetrics(self.font())
-        _width = _metrics.boundingRect("pyFAI azimuthal integration Test").width()
-        self.setFixedWidth(_width)
-
-    def mousePressEvent(self, event: QtCore.QEvent):
+    def mousePressEvent(self, event: QtGui.QMouseEvent):
         """
         Extend the generic mousePressEvent by an activation signal.
 
@@ -203,8 +220,7 @@ class PluginInWorkflowBox(PydidasLabel):
 
     def delete(self):
         """
-        Reimplement the generic delete method and send it to the
-        WorkflowTreeEditManager.
+        Send the delete request to the WorkflowTreeEditManager.
         """
         self.sig_widget_delete_request.emit(self.widget_id)
 
@@ -220,20 +236,12 @@ class PluginInWorkflowBox(PydidasLabel):
             (False).
         """
         self.flags["active"] = self.widget_id == selection
-        self._update_stylesheets()
-
-    def _update_stylesheets(self):
-        """
-        Update the stylesheets based on the active and consistent flags.
-        """
-        self.setStyleSheet(self.__get_stylesheet())
-        self.id_label.setStyleSheet(self.__get_stylesheet(border=False))
+        self.__update_style()
 
     @QtCore.Slot(list)
     def receive_inconsistent_signal(self, widget_ids):
         """
-        Receive the signal that the given node ID is inconsistent and set the
-        stylesheets.
+        Handle the node inconsistent signal set the stylesheets.
 
         Parameters
         ----------
@@ -242,12 +250,12 @@ class PluginInWorkflowBox(PydidasLabel):
         """
         if self.widget_id in widget_ids and not self.flags["inconsistent"]:
             self.flags["inconsistent"] = True
-            self._update_stylesheets()
+            self.__update_style()
 
     @QtCore.Slot(list)
     def receive_consistent_signal(self, widget_ids):
         """
-        Receive the signal that the given node ID is not inconsistent any more
+        Handle the node consistent signal set the stylesheets.
 
         Parameters
         ----------
@@ -256,24 +264,7 @@ class PluginInWorkflowBox(PydidasLabel):
         """
         if self.widget_id in widget_ids and self.flags["inconsistent"]:
             self.flags["inconsistent"] = False
-            self._update_stylesheets()
-
-    def update_text(self, node_id, label=""):
-        """
-        Update the text for node label.
-
-        Parameters
-        ----------
-        node_id : int
-            The unique node ID.
-        label : str, optional
-            The new label for the workflow node.
-        """
-        _txt = f"node {node_id:d}"
-        if len(label) > 0:
-            self._label = label
-            _txt += f": {label}"
-        self.id_label.setText(_txt)
+            self.__update_style()
 
     def mouseMoveEvent(self, event):
         """

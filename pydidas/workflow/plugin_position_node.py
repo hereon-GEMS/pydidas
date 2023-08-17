@@ -43,7 +43,7 @@ class PluginPositionNode(GenericNode):
     This class only manages the position data without any reference to actual widgets.
     """
 
-    PLUGIN_HEIGHT_OFFSET = 0.7
+    PLUGIN_HEIGHT_OFFSET = 0.6
     PLUGIN_WIDTH_OFFSET = 0.1
 
     @property

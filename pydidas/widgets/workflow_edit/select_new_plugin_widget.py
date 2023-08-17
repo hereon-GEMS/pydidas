@@ -254,7 +254,7 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         self.sig_append_to_specific_node.emit(node_id, _name)
 
     @QtCore.Slot()
-    def __action_selected_item_in_menu(self, signal, checked):
+    def __action_selected_item_in_menu(self, signal, checked=True):
         """
         Emit the signal to notify watchers that an action in the menu was selected.
 

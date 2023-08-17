@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ to view and modify user-specific settings in a seperate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["UserConfigWindow"]
 
 
@@ -33,22 +33,22 @@ from pathlib import Path
 from typing import Literal
 
 from numpy import ceil, floor
-from qtpy import QtCore, QtWidgets, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
 from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
-from pydidas.core import SingletonFactory, UserConfigError, get_generic_param_collection
-from pydidas.core.constants import (
+from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
+from ...core.constants import (
+    ALIGN_CENTER_LEFT,
     ALIGN_TOP_RIGHT,
     CONFIG_WIDGET_WIDTH,
-    QSETTINGS_USER_KEYS,
-    ALIGN_CENTER_LEFT,
     POLICY_EXP_FIX,
     POLICY_MIN_MIN,
+    QSETTINGS_USER_KEYS,
 )
-from pydidas.core.utils import update_size_policy
-from pydidas.plugins import PluginCollection, get_generic_plugin_path
-from pydidas.widgets.dialogues import AcknowledgeBox, QuestionBox
-from pydidas.widgets.framework import PydidasWindow
+from ...core.utils import update_size_policy
+from ...plugins import PluginCollection, get_generic_plugin_path
+from ...widgets.dialogues import AcknowledgeBox, QuestionBox
+from ...widgets.framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()
@@ -81,7 +81,6 @@ class _UserConfigWindow(PydidasWindow):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas user configuration")
-        # self.setFixedWidth(330)
 
     def build_frame(self):
         """
@@ -412,26 +411,3 @@ class _UserConfigWindow(PydidasWindow):
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)
-
-
-if __name__ == "__main__":
-    import sys
-
-    w = UserConfigWindow()
-    w.show()
-    for name in [
-        "fontsize_container",
-        "fontsize_label_wrapper",
-        "label_font_size",
-        "but_fontsize_reduce",
-        "edit_fontsize",
-        "but_fontsize_increase",
-    ]:
-        print(
-            name,
-            w._widgets[name].sizeHint(),
-            w._widgets[name].width(),
-            w._widgets[name].height(),
-        )
-    QtWidgets.QApplication.instance().exec()
-    sys.exit()

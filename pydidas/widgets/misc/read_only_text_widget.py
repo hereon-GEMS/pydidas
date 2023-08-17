@@ -30,7 +30,7 @@ __all__ = ["ReadOnlyTextWidget"]
 
 from typing import Union
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core.utils import apply_qt_properties
 
@@ -78,9 +78,14 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             The title. If None, no title will be printed. The default is None.
         """
         QtWidgets.QTextEdit.setText(self, "")
-        self.__text = text
         self.__add_title(title)
-        self.append(text)
+        self.__text = text
+        if isinstance(text, list):
+            for _weight, _txt in text:
+                self.setFontWeight(_weight)
+                self.append(_txt)
+        else:
+            self.append(text)
         self.verticalScrollBar().triggerAction(QtWidgets.QScrollBar.SliderToMinimum)
 
     def __add_title(self, title: Union[str, None]):
@@ -96,9 +101,10 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         if title is None:
             return
         self.setFontPointSize(self.__qtapp.standard_fontsize + 3)
-        self.setFontWeight(75)
+        self.setFontWeight(QtGui.QFont.Bold)
         self.append(f"{title}")
         self.setFontPointSize(self.__qtapp.standard_fontsize + 1)
+        self.setFontWeight(QtGui.QFont.Normal)
 
     def setTextFromDict(
         self,
@@ -128,18 +134,16 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         indent : int, optional
             The indent depth for list entries. The default is 4.
         """
-        self.__text = ""
+        self.__text = []
         for _key, _value in text_dict.items():
             if one_line_entries:
-                self.__text += f"{_key}: {_value}\n"
+                self.__text.append([QtGui.QFont.Normal, f"{_key}: {_value}"])
             else:
                 _items = _value.split("\n")
-                self.setFontWeight(75)
-                self.__text += f"\n{_key}:\n"
-                self.setFontWeight(50)
+                self.__text.append([QtGui.QFont.Bold, f"\n{_key}:"])
                 for item in _items:
                     _indent = " " * indent if item[:indent] != " " * indent else ""
-                    self.__text += _indent + item + "\n"
+                    self.__text.append([QtGui.QFont.Normal, _indent + item])
         self.setText(self.__text, title=title)
 
     @QtCore.Slot()

@@ -36,6 +36,8 @@ Bugfixes
   polynomial order setting of 3.
 - Fixed an issue with pyFAI's calib2 app and additional argparse arguments.
 - Fixed an issue when deleting the root node in a GenericTree.
+- Fixed an issue where plugin labels were not updated in the WorkflowEditFrame
+  when the plugins had a custom widget.
 
 
 v23.07.05

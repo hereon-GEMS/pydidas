@@ -141,6 +141,9 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 self.plugin.get_parameter_config_widget(),
                 gridPos=(-1, 0, 1, 2),
             )
+            self._widgets["plugin_widget"].param_widgets["label"].io_edited.connect(
+                self._label_updated
+            )
         else:
             for param in self.plugin.params.values():
                 if (
@@ -153,7 +156,6 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                         else constants.DEFAULT_PLUGIN_PARAM_CONFIG
                     )
                     self.create_param_widget(param, **_kwargs)
-            self.param_widgets["label"].io_edited.connect(self._label_updated)
             if len(self.plugin.advanced_parameters) > 0:
                 self.__advanced_hidden = True
                 self.create_button(
@@ -173,6 +175,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 self._widgets["but_toggle_advanced_params"].clicked.connect(
                     self.__toggle_advanced_params
                 )
+            self.param_widgets["label"].io_edited.connect(self._label_updated)
 
     @QtCore.Slot(str)
     def _label_updated(self, label):

@@ -248,7 +248,15 @@ class TestGenericNode(unittest.TestCase):
 
     def test_connect_parent_to_children__no_parent(self):
         root = GenericNode(node_id=0)
+        _child = GenericNode(node_id=1, parent=root)
+        root.connect_parent_to_children()
+        self.assertIsNone(_child.parent)
+        self.assertEqual(root.get_children(), [])
+
+    def test_connect_parent_to_children__no_parent_multie_children(self):
+        root = GenericNode(node_id=0)
         _ = GenericNode(node_id=1, parent=root)
+        _ = GenericNode(node_id=2, parent=root)
         with self.assertRaises(UserConfigError):
             root.connect_parent_to_children()
 

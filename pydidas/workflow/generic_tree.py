@@ -35,6 +35,7 @@ from typing import Self, Union
 
 from qtpy import QtCore
 
+from ..core import UserConfigError
 from ..core.utils import get_random_string
 from .generic_node import GenericNode
 
@@ -301,8 +302,24 @@ class GenericTree:
         """
         if recursive and keep_children:
             raise ValueError(
-                "Conflicting selection of 'recursive' and 'keep_children' arguments."
+                "Conflicting selection of *recursive* and *keep_children* arguments."
             )
+        if not recursive and not keep_children and self.nodes[node_id].n_children > 0:
+            raise UserConfigError(
+                "Cannot delete a node with children without either the *recursive* or "
+                "the *keep_children* flag set."
+            )
+        if self.nodes[node_id] == self.root:
+            if self.root.n_children == 0 or recursive:
+                self.root = None
+            elif self.root.n_children == 1 and keep_children:
+                self.root = self.root.get_children()[0]
+            else:
+                raise UserConfigError(
+                    "Cannot delete the root node of the tree because it has multiple "
+                    "children which would become separate roots. Please make sure that "
+                    "the root node only has one child before deleting it."
+                )
         _subtree_ids = self.nodes[node_id].get_recursive_ids()
         if self.active_node_id in _subtree_ids:
             _parent_id = (

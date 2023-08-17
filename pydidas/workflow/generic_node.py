@@ -305,13 +305,18 @@ class GenericNode:
         UserConfigError
             If the node does not have a parent.
         """
-        if self.parent is None and len(self._children) > 0:
+        if self.parent is None and len(self._children) > 1:
             raise UserConfigError(
                 "Cannot delete the node and connect its parent and children because "
-                "the node does not have a parent."
+                "the node does not have a parent and the new tree would have multiple "
+                "roots."
             )
-        for _child in self._children:
-            self.parent.add_child(_child)
+        if self.parent is None:
+            for _child in self._children:
+                _child.parent = None
+        else:
+            for _child in self._children:
+                self.parent.add_child(_child)
         self._children = []
         self.parent = None
 

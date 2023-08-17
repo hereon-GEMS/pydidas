@@ -60,7 +60,7 @@ def parse_cmd_args():
     parser.add_argument("--qt6", action="store_true")
 
     _args, _unknown = parser.parse_known_args()
-    _kwargs = dict(vars(_args))
+    _kwargs = {_key: _val for _key, _val in vars(_args).items() if _val is not None}
     for _name in ["fontsize"]:
         if f"-{_name}" in sys.argv:
             _pos = sys.argv.index(f"-{_name}")
@@ -96,13 +96,18 @@ class PydidasQApplication(QtWidgets.QApplication):
             "available_families": QtGui.QFontDatabase.families(
                 QtGui.QFontDatabase.Latin
             ),
+            "height": 20,
         }
-
         _kwargs = parse_cmd_args()
-        _point_size = _kwargs.get("fontsize", None)
-        self.standard_fontsize = (
-            _point_size if _point_size is not None else self.__font_config["size"]
-        )
+        self.standard_fontsize = _kwargs.get("fontsize", self.__font_config["size"])
+        self._update_font_height()
+
+    def _update_font_height(self):
+        """
+        Update the stored font height metrics.
+        """
+        _font_height = QtGui.QFontMetrics(self.font()).boundingRect("Height").height()
+        self.__font_config["height"] = _font_height
 
     @QtCore.Slot()
     def send_gui_close_signal(self):
@@ -138,6 +143,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font = self.font()
         _font.setPointSizeF(value)
         self.setFont(_font)
+        self._update_font_height()
         self.sig_new_fontsize.emit(self.__font_config["size"])
         self.sig_fontsize_changed.emit()
 
@@ -152,6 +158,18 @@ class PydidasQApplication(QtWidgets.QApplication):
             The font type.
         """
         return self.__font_config["type"]
+
+    @property
+    def standard_font_height(self) -> int:
+        """
+        Get the standard font height in pixels.
+
+        Returns
+        -------
+        int
+            The height of the font.
+        """
+        return self.__font_config["height"]
 
     @standard_font_family.setter
     def standard_font_family(self, font_family: str):
@@ -170,6 +188,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font = self.font()
         _font.setFamily(font_family)
         self.setFont(_font)
+        self._update_font_height()
         self.sig_new_font_family.emit(font_family)
         self.sig_fontsize_changed.emit()
 

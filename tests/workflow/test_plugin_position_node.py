@@ -130,7 +130,9 @@ class TestPluginPositionNode(unittest.TestCase):
         root = _nodes[0][0]
         _pos = root.get_relative_positions()
         for _node_id in range(_childdepth + 1):
-            _ypos = _node_id * (1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET)
+            _ypos = np.round(
+                _node_id * (1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET), 3
+            )
             self.assertEqual(_pos[_node_id], [0, _ypos])
 
     def test_get_relative_positions__with_tree_children(self):

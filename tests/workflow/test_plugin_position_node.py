@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,24 +18,17 @@
 """Unit tests for pydidas modules."""
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
 
 import numpy as np
 
-from pydidas.core.constants import gui_constants
 from pydidas.workflow import PluginPositionNode, GenericNode
-
-
-generic_width = gui_constants.GENERIC_PLUGIN_WIDGET_WIDTH
-generic_height = gui_constants.GENERIC_PLUGIN_WIDGET_HEIGHT
-child_spacing_y = gui_constants.GENERIC_PLUGIN_WIDGET_Y_OFFSET
-child_spacing_x = gui_constants.GENERIC_PLUGIN_WIDGET_X_OFFSET
 
 
 class TestPluginPositionNode(unittest.TestCase):
@@ -86,40 +81,42 @@ class TestPluginPositionNode(unittest.TestCase):
 
     def test_width__no_children(self):
         root = PluginPositionNode()
-        self.assertEqual(root.width, generic_width)
+        self.assertEqual(root.width, 1)
 
     def test_width__children_no_tree(self):
         root = PluginPositionNode()
         PluginPositionNode(parent=root)
         PluginPositionNode(parent=root)
-        self.assertEqual(root.width, 2 * generic_width + child_spacing_x)
+        self.assertEqual(root.width, 2 * 1 + PluginPositionNode.PLUGIN_WIDTH_OFFSET)
 
     def test_width__children_tree(self):
         _depth = 3
         _width = 3
         _nodes, _n_nodes = self.create_node_tree(_depth, _width)
         _root = _nodes[0][0]
-        _target = _width**_depth * generic_width + child_spacing_x * (
+        _target = _width**_depth * 1 + PluginPositionNode.PLUGIN_WIDTH_OFFSET * (
             _width**_depth - 1
         )
         self.assertEqual(_root.width, _target)
 
     def test_height__no_children(self):
         root = PluginPositionNode()
-        self.assertEqual(root.height, generic_height)
+        self.assertEqual(root.height, 1)
 
     def test_height__children_no_tree(self):
         root = PluginPositionNode()
         PluginPositionNode(parent=root)
         PluginPositionNode(parent=root)
-        self.assertEqual(root.height, 2 * generic_height + child_spacing_y)
+        self.assertEqual(root.height, 2 * 1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET)
 
     def test_height__children_tree(self):
         _childdepth = 3
         _nodes, _n_nodes = self.create_node_tree(_childdepth)
         _root = _nodes[0][0]
-        _target = (_childdepth + 1) * generic_height + child_spacing_y * _childdepth
-        self.assertEqual(_root.height, _target)
+        _target = (
+            _childdepth + 1
+        ) * 1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET * _childdepth
+        self.assertAlmostEqual(_root.height, _target, 4)
 
     def test_get_relative_positions__no_children(self):
         root = PluginPositionNode(node_id=0)
@@ -133,12 +130,12 @@ class TestPluginPositionNode(unittest.TestCase):
         root = _nodes[0][0]
         _pos = root.get_relative_positions()
         for _node_id in range(_childdepth + 1):
-            _ypos = _node_id * (generic_height + child_spacing_y)
+            _ypos = _node_id * (1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET)
             self.assertEqual(_pos[_node_id], [0, _ypos])
 
     def test_get_relative_positions__with_tree_children(self):
         def row_width(n):
-            return n * generic_width + (n - 1) * child_spacing_x
+            return n * 1 + (n - 1) * PluginPositionNode.PLUGIN_WIDTH_OFFSET
 
         _childdepth = 3
         _width = 2
@@ -150,41 +147,13 @@ class TestPluginPositionNode(unittest.TestCase):
         _ntotal = _row_limits[-1]
         for _node_id in range(_ntotal):
             iy, ix = self.get_pos_in_tree(_node_id, _width, _childdepth)
-            _ypos = iy * (generic_height + child_spacing_y)
-            _deltax = (
-                row_width(_width**_childdepth) - row_width(_width ** (iy))
-            ) // 2
-            _xpos = _deltax + ix * (generic_width + child_spacing_x)
+            _ypos = np.round(iy * (1 + PluginPositionNode.PLUGIN_HEIGHT_OFFSET), 3)
+            _deltax = (row_width(_width**_childdepth) - row_width(_width ** (iy))) / 2
+            _xpos = np.round(
+                _deltax + ix * (1 + PluginPositionNode.PLUGIN_WIDTH_OFFSET), 3
+            )
             if iy in [0, _childdepth]:
                 self.assertEqual(_pos[_node_id], [_xpos, _ypos])
-
-    def test_make_grid_positions_positive__all_positive_pos(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = _pos.copy()
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
-
-    def test_make_grid_positions_positive__with_negative_pos(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = {}
-        for key, val in _pos.items():
-            _newpos[key] = (val[0] - 123, val[1] - 5678)
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
-
-    def test_make_grid_positions_positive__with_positive_offset(self):
-        _nodes, _n_nodes = self.create_node_tree(3, 3)
-        root = _nodes[0][0]
-        _pos = root.get_relative_positions()
-        _newpos = {}
-        for key, val in _pos.items():
-            _newpos[key] = (val[0] - 123, val[1] + 5678)
-        root.make_grid_positions_positive(_newpos)
-        self.assertEqual(_pos, _newpos)
 
 
 if __name__ == "__main__":

@@ -18,6 +18,8 @@ Improvements
     - Added support for changing the default font and fontsize.
     - Removed STANDARD_FONT_SIZE constant and added dynamic standard_font_size 
       to PydidasQApplication.
+    - Changed the PluginPositionNode positions from absolute to relative to 
+      allow scaling.
     
 - Programmatic updates:
 
@@ -33,6 +35,8 @@ Bugfixes
 - Fixed a bug in the Remove1dPolynomialBackground plugin which forced a 
   polynomial order setting of 3.
 - Fixed an issue with pyFAI's calib2 app and additional argparse arguments.
+- Fixed an issue when deleting the root node in a GenericTree.
+
 
 v23.07.05
 =========

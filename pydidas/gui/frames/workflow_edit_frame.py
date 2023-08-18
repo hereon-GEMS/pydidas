@@ -34,6 +34,7 @@ from qtpy import QtCore, QtWidgets
 
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...workflow import WorkflowTree
 from ...workflow.workflow_tree_io import WorkflowTreeIoMeta
 from ..managers import WorkflowTreeEditManager
@@ -65,7 +66,7 @@ def workflow_add_plugin_at_parent(parent_id, name):
     WORKFLOW_EDIT_MANAGER.add_new_plugin_node(name, parent_node_id=parent_id)
 
 
-class WorkflowEditFrame(WorkflowEditFrameBuilder):
+class WorkflowEditFrame(BaseFrame):
     """
     The WorkflowEditFrame includes three major objects:
         a. The editing canvas which shows the WorkflowTree structure.
@@ -81,7 +82,7 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
     sig_workflow_edit_frame_activated = QtCore.Signal()
 
     def __init__(self, parent=None, **kwargs):
-        WorkflowEditFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrame.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -97,6 +98,12 @@ class WorkflowEditFrame(WorkflowEditFrameBuilder):
             default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
+
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        WorkflowEditFrameBuilder.populate_frame(self)
 
     def connect_signals(self):
         """

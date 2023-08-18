@@ -38,22 +38,24 @@ from ....widgets.parameter_config import EditPluginParametersWidget
 from ....widgets.workflow_edit import PluginCollectionBrowser, WorkflowTreeCanvas
 
 
-class WorkflowEditFrameBuilder(BaseFrame):
+class WorkflowEditFrameBuilder:
     """
-    Mix-in class which includes the build_self method to populate the
-    base class's UI and initialize all widgets.
+    Builder for the WorkflowEditFrame.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-
-    def build_frame(self):
+    @classmethod
+    def populate_frame(cls, frame: BaseFrame):
         """
-        Create all widgets and initialize their state.
-        """
-        self._widgets["workflow_canvas"] = WorkflowTreeCanvas()
+        Build the frame by creating all required widgets and placing them in the layout.
 
-        self.create_label(
+        Parameters
+        ----------
+        frame : BaseFrame
+            The frame instance.
+        """
+        frame._widgets["workflow_canvas"] = WorkflowTreeCanvas()
+
+        frame.create_label(
             "label_title",
             "Workflow tree editor",
             fontsize_offset=4,
@@ -61,52 +63,51 @@ class WorkflowEditFrameBuilder(BaseFrame):
             fixedWidth=250,
             gridPos=(0, 0, 1, 3),
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "workflow_area",
             ScrollArea,
             minimumHeight=450,
-            widget=self._widgets["workflow_canvas"],
+            widget=frame._widgets["workflow_canvas"],
             alignment=constants.ALIGN_TOP_CENTER,
             sizePolicy=constants.POLICY_EXP_EXP,
             sizeAdjustPolicy=QAbstractScrollArea.AdjustToContents,
             gridPos=(1, 0, 3, 2),
         )
-        self.create_label(
+        frame.create_label(
             "plugin_title",
             "Available plugins:",
             fontsize_offset=3,
             underline=True,
             gridPos=(4, 0, 1, 2),
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "plugin_collection", PluginCollectionBrowser, gridPos=(5, 0, 1, 2)
         )
-        self._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
-        self.create_any_widget(
+        frame._widgets["plugin_edit_canvas"] = EditPluginParametersWidget()
+        frame.create_any_widget(
             "plugin_edit_area",
             ScrollArea,
             minimumHeight=450,
-            widget=self._widgets["plugin_edit_canvas"],
+            widget=frame._widgets["plugin_edit_canvas"],
             fixedWidth=400,
             sizePolicy=constants.POLICY_EXP_EXP,
             gridPos=(1, 2, 5, 1),
         )
-        self.create_button(
+        frame.create_button(
             "but_load",
             "Import workflow from file",
-            fixedWidth=250,
-            fixedHeight=25,
             icon="qt-std::SP_DialogOpenButton",
             gridPos=(1, 0, 1, 1),
         )
-        self.create_button(
+        frame.create_button(
             "but_save",
             "Export workflow to file",
-            fixedWidth=250,
-            fixedHeight=25,
             icon="qt-std::SP_DialogSaveButton",
             gridPos=(2, 0, 1, 1),
         )
 
-        update_size_policy(self._widgets["workflow_area"], verticalStretch=2)
-        update_size_policy(self._widgets["plugin_collection"], verticalStretch=1)
+        update_size_policy(frame._widgets["workflow_area"], verticalStretch=2)
+        update_size_policy(frame._widgets["plugin_collection"], verticalStretch=1)
+        frame.layout().setRowStretch(3, 10)
+        frame.layout().setRowStretch(5, 5)
+        frame.layout().setColumnStretch(1, 10)

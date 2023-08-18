@@ -126,6 +126,11 @@ class ImageMathFrameBuilder:
     def populate_frame(cls, frame: BaseFrame):
         """
         Build the frame by creating all required widgets and placing them in the layout.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The frame instance.
         """
         cls._frame = frame
 

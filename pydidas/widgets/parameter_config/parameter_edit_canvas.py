@@ -50,7 +50,7 @@ class ParameterEditCanvas(ParameterWidgetsMixIn, PydidasWidgetWithGridLayout):
         Additional keyword arguments
     """
 
-    def __init__(self, parent: Union[QtWidgets.QtWidget, None] = None, **kwargs: dict):
+    def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict):
         PydidasWidgetWithGridLayout.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
         apply_qt_properties(self, **kwargs)

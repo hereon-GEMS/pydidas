@@ -35,9 +35,16 @@ from ..core.utils import apply_qt_properties, update_qobject_font
 
 
 class PydidasWidgetMixin:
+    """
+    Mixin class to handle automatic font updated from the QApplication.
+
+    This class allows to use custom font settings (different sizes, bold etc) and
+    still update them automatically.
+    """
+
     def __init__(self, **kwargs: dict):
         """
-        Setup the class instance of the subclassed QWidget.
+        Set up the class instance of the subclassed QWidget.
 
         Parameters
         ----------
@@ -51,11 +58,11 @@ class PydidasWidgetMixin:
             "italic": kwargs.get("italic", False),
             "underline": kwargs.get("underline", False),
         }
-        self.__qtapp = QApplication.instance()
-        self.update_fontsize(self.__qtapp.standard_fontsize)
-        self.update_font_family(self.__qtapp.standard_font_family)
-        self.__qtapp.sig_new_fontsize.connect(self.update_fontsize)
-        self.__qtapp.sig_new_font_family.connect(self.update_font_family)
+        self._qtapp = QApplication.instance()
+        self.update_fontsize(self._qtapp.standard_fontsize)
+        self.update_font_family(self._qtapp.standard_font_family)
+        self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
+        self._qtapp.sig_new_font_family.connect(self.update_font_family)
         if True in self.__font_config.values():
             update_qobject_font(self, **self.__font_config)
 
@@ -69,9 +76,9 @@ class PydidasWidgetMixin:
         new_fontsize : float
             The new font size.
         """
-        update_qobject_font(
-            self, pointSizeF=(new_fontsize + self.__font_config["size_offset"])
-        )
+        _font = self.font()
+        _font.setPointSizeF(new_fontsize + self.__font_config["size_offset"])
+        self.setFont(_font)
 
     @QtCore.Slot(str)
     def update_font_family(self, new_family: str):
@@ -83,4 +90,6 @@ class PydidasWidgetMixin:
         new_family : str
             The name of the new font family.
         """
-        update_qobject_font(self, family=new_family)
+        _font = self.font()
+        _font.setFamily(new_family)
+        self.setFont(_font)

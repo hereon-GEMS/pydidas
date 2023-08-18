@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 
-from qtpy import QtWidgets
+from qtpy import QtWidgets, QtCore
 
 from ..core.utils import apply_qt_properties
 from .pydidas_widget_mixin import PydidasWidgetMixin
@@ -47,7 +47,6 @@ class PydidasLabel(PydidasWidgetMixin, QtWidgets.QLabel):
 
     def __init__(self, *args: tuple, **kwargs: dict):
         QtWidgets.QLabel.__init__(self, *args)
-        kwargs["wordWrap"] = kwargs.get("wordWrap", True)
         PydidasWidgetMixin.__init__(self, **kwargs)
 
 
@@ -92,3 +91,14 @@ class PydidasWidgetWithGridLayout(QtWidgets.QWidget):
         _layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(_layout)
         apply_qt_properties(self, **kwargs)
+
+    def sizeHint(self):
+        """
+        Set a reasonable small sizeHint which can be expanded.
+
+        Returns
+        -------
+        QtCore.QSize
+            The widget sizeHint
+        """
+        return QtCore.QSize(200, 25)

@@ -61,7 +61,6 @@ def delete_all_items_in_layout(layout):
                 layout.remove(item)
             widget = item.widget()
             if widget is not None:
-                widget.setParent(None)
                 widget.deleteLater()
 
 

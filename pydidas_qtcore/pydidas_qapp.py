@@ -93,9 +93,6 @@ class PydidasQApplication(QtWidgets.QApplication):
                 self.__settings.value("font/point_size", fontsize.STANDARD_FONT_SIZE)
             ),
             "type": self.__settings.value("font/type", self.font().family()),
-            "available_families": QtGui.QFontDatabase.families(
-                QtGui.QFontDatabase.Latin
-            ),
             "height": 20,
         }
         _kwargs = parse_cmd_args()
@@ -191,15 +188,3 @@ class PydidasQApplication(QtWidgets.QApplication):
         self._update_font_height()
         self.sig_new_font_family.emit(font_family)
         self.sig_fontsize_changed.emit()
-
-    @property
-    def font_families(self) -> list:
-        """
-        Get a lift of available font families.
-
-        Returns
-        -------
-        list
-            The list of available families.
-        """
-        return self.__font_config["available_families"]

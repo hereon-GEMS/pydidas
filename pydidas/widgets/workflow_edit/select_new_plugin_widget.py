@@ -37,13 +37,14 @@ from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
 from ..factory import CreateWidgetsMixIn
 from ..misc import LineEditWithIcon
+from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
 
 
 PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
 
 
-class SelectNewPluginWidget(CreateWidgetsMixIn, QtWidgets.QWidget):
+class SelectNewPluginWidget(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
     """
     The SelectNewPluginWidget includes a search filter field and a QTreeView which
     includes all the available plugins.
@@ -55,11 +56,8 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, QtWidgets.QWidget):
     sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, collection=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent)
+        PydidasWidgetWithGridLayout.__init__(self, parent, minimumWidth=400)
         CreateWidgetsMixIn.__init__(self)
-        _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_layout)
         self.add_any_widget(
             "filter_edit",
             LineEditWithIcon(
@@ -121,7 +119,7 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         apply_qt_properties(self, **kwargs)
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.setMinimumWidth(400)
+        self.setMinimumWidth(300)
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setHeaderHidden(True)

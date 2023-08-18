@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,26 +21,26 @@ plugins to add them to the WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PluginCollectionBrowser"]
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
-from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
 from ..factory import CreateWidgetsMixIn
 from ..misc import ReadOnlyTextWidget
+from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
 from .select_new_plugin_widget import SelectNewPluginWidget
 
 
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(CreateWidgetsMixIn, QtWidgets.QWidget):
+class PluginCollectionBrowser(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
     """
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description
@@ -63,12 +63,8 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, QtWidgets.QWidget):
     sig_replace_plugin = QtCore.Signal(str)
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent)
+        PydidasWidgetWithGridLayout.__init__(self, parent)
         CreateWidgetsMixIn.__init__(self)
-        _layout = QtWidgets.QGridLayout()
-        _layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(_layout)
-        apply_qt_properties(self, **kwargs)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (
             _local_plugin_coll if _local_plugin_coll is not None else PLUGIN_COLLECTION
@@ -96,9 +92,11 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, QtWidgets.QWidget):
         self._widgets["plugin_treeview"].sig_append_to_specific_node.connect(
             self.sig_append_to_specific_node
         )
+        self.layout().setColumnStretch(0, 2)
+        self.layout().setColumnStretch(1, 4)
 
     @QtCore.Slot(str)
-    def __confirm_selection(self, name):
+    def __confirm_selection(self, name: str):
         """
         Confirm the selection of the plugin to add it to the workflow tree.
 
@@ -117,7 +115,7 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, QtWidgets.QWidget):
         self.sig_add_plugin_to_tree.emit(name)
 
     @QtCore.Slot(str)
-    def display_plugin_description(self, name):
+    def display_plugin_description(self, name: str):
         """
         Display the plugin description of the selected plugin.
 

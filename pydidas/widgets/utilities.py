@@ -54,12 +54,15 @@ def delete_all_items_in_layout(layout):
     if layout is not None:
         while layout.count():
             item = layout.takeAt(0)
+            if item.spacerItem() is not None:
+                layout.removeItem(item)
+            if item.layout() is not None:
+                delete_all_items_in_layout(item.layout())
+                layout.remove(item)
             widget = item.widget()
             if widget is not None:
                 widget.setParent(None)
                 widget.deleteLater()
-            else:
-                delete_all_items_in_layout(item.layout())
 
 
 def create_default_grid_layout():

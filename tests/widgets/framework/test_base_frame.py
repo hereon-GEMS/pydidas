@@ -97,21 +97,6 @@ class TestBaseFrame(unittest.TestCase):
         obj.set_status(_test)
         self.assertEqual(self.tester.reveived_signals.pop(), _test)
 
-    def test_next_row_empty(self):
-        obj = BaseFrame()
-        # self.widgets.append(obj)
-        _row = obj.next_row()
-        self.assertEqual(_row, 0)
-
-    def test_next_row(self):
-        obj = self.get_base_frame()
-        w = QtWidgets.QLabel("test")
-        w2 = QtWidgets.QLabel("test2")
-        obj.layout().addWidget(w, 0, 0, 1, 1)
-        obj.layout().addWidget(w2, 1, 0, 1, 1)
-        _row = obj.next_row()
-        self.assertEqual(_row, 2)
-
     def test_export_state(self):
         _n = 10
         obj = self.get_base_frame()

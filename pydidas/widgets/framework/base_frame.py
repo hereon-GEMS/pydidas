@@ -73,7 +73,7 @@ class BaseFrame(
     default_params = ParameterCollection()
 
     def __init__(self, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self)  # , parent=parent)
+        QtWidgets.QWidget.__init__(self)
         self.setWindowIcon(icons.pydidas_icon_with_bg())
         self.setVisible(False)
         self.setUpdatesEnabled(False)
@@ -147,19 +147,6 @@ class BaseFrame(
             The status message to be emitted.
         """
         self.status_msg.emit(text)
-
-    def next_row(self):
-        """
-        Get the next empty row in the grid layout.
-
-        Returns
-        -------
-        int
-            The next empty row.
-        """
-        if self.layout().count() == 0:
-            return 0
-        return self.layout().rowCount()
 
     def export_state(self):
         """

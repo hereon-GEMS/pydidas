@@ -28,49 +28,31 @@ __status__ = "Production"
 __all__ = ["ParameterEditCanvas"]
 
 
-from qtpy import QtCore, QtWidgets
+from typing import Union
 
+from qtpy import QtWidgets
+
+from ...core.constants import POLICY_MIN_MIN
 from ...core.utils import apply_qt_properties
+from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 
-class ParameterEditCanvas(QtWidgets.QFrame, ParameterWidgetsMixIn):
+class ParameterEditCanvas(ParameterWidgetsMixIn, PydidasWidgetWithGridLayout):
     """
-    The ParameterEditCanvas widget can be used to create a composite
-    widget for updating multiple Parameter values.
+    The ParameterEditCanvas is widget for handling Parameter edit widgets.
 
     Parameters
     ----------
-    parent : QtWidget, optional
+    parent : Union[QtWidgets.QtWidget, None], optional
         The parent widget. The default is None.
-    init_layout : bool, optional
-        Flag to toggle layout creation (with a VBoxLayout). The default
-        is True.
     **kwargs : dict
         Additional keyword arguments
     """
 
-    def __init__(self, parent=None, **kwargs):
-        QtWidgets.QFrame.__init__(self, parent)
+    def __init__(self, parent: Union[QtWidgets.QtWidget, None] = None, **kwargs: dict):
+        PydidasWidgetWithGridLayout.__init__(self, parent)
         ParameterWidgetsMixIn.__init__(self)
-        init_layout = kwargs.get("init_layout", True)
-        kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
-        kwargs["frameStyle"] = kwargs.get("frameStyle", QtWidgets.QFrame.Raised)
-        kwargs["autoFillBackground"] = kwargs.get("autoFillBackground", True)
         apply_qt_properties(self, **kwargs)
-        if init_layout:
-            _layout = QtWidgets.QGridLayout()
-            _layout.setContentsMargins(5, 5, 5, 5)
-            _layout.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-            self.setLayout(_layout)
-
-    def next_row(self):
-        """
-        Get the next empty row in the layout.
-
-        Returns
-        -------
-        int
-            The next empty row.
-        """
-        return self.layout().rowCount() + 1
+        self.layout().setContentsMargins(5, 5, 5, 5)
+        self.setSizePolicy(*POLICY_MIN_MIN)

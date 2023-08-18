@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,11 +21,12 @@ the DefineScanFrame with widgets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DefineScanFrameBuilder"]
+
 
 from ....contexts import ScanContext
 from ....core import constants, utils
@@ -119,7 +120,7 @@ class DefineScanFrameBuilder(BaseFrame):
         )
         self.create_spacer(None)
 
-        _param_edit_row = self.next_row()
+        _param_edit_row = self.layout().rowCount()
         self.create_empty_widget(
             "global_param_frame",
             gridPos=(_param_edit_row, 0, 1, 1),

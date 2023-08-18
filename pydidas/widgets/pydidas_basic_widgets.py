@@ -25,11 +25,18 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasLabel", "PydidasCheckBox", "PydidasComboBox", "PydidasLineEdit"]
+__all__ = [
+    "PydidasLabel",
+    "PydidasCheckBox",
+    "PydidasComboBox",
+    "PydidasLineEdit",
+    "PydidasWidgetWithGridLayout",
+]
 
 
 from qtpy import QtWidgets
 
+from ..core.utils import apply_qt_properties
 from .pydidas_widget_mixin import PydidasWidgetMixin
 
 
@@ -72,3 +79,16 @@ class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):
     def __init__(self, *args: tuple, **kwargs: dict):
         QtWidgets.QLineEdit.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
+
+
+class PydidasWidgetWithGridLayout(QtWidgets.QWidget):
+    """
+    An empty widget with a grid layout and tight contents margins.
+    """
+
+    def __init__(self, parent=None, **kwargs):
+        QtWidgets.QWidget.__init__(self, parent)
+        _layout = QtWidgets.QGridLayout()
+        _layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(_layout)
+        apply_qt_properties(self, **kwargs)

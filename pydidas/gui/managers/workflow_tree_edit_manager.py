@@ -318,14 +318,15 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         _pos_vals = np.asarray(list(_positions.values()))
         _pos_vals[:, 0] *= self.PLUGIN_WIDGET_WIDTH
         _pos_vals[:, 1] *= self.PLUGIN_WIDGET_HEIGHT
+        _pos_vals = np.round(_pos_vals).astype(int)
         self._node_positions = {key: _pos_vals[i] for i, key in enumerate(_positions)}
         for node_id in TREE.node_ids:
             self._node_widgets[node_id].move(
                 self._node_positions[node_id][0], self._node_positions[node_id][1]
             )
         self.qt_canvas.setFixedSize(
-            self.root.width * self.PLUGIN_WIDGET_WIDTH + 10,
-            self.root.height * self.PLUGIN_WIDGET_HEIGHT + 10,
+            int(np.round(self.root.width * self.PLUGIN_WIDGET_WIDTH + 10)),
+            int(np.round(self.root.height * self.PLUGIN_WIDGET_HEIGHT + 10)),
         )
         self.__update_node_connections()
 

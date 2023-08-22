@@ -20,6 +20,7 @@ Improvements
       to PydidasQApplication.
     - Changed the PluginPositionNode positions from absolute to relative to 
       allow scaling.
+    - The WorkflowEditFrame now fully scales with font metrics.
     
 - Programmatic updates:
 

@@ -34,6 +34,8 @@ from qtpy import QtCore, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from ...core import Hdf5key, constants
+from ...core.constants import POLICY_FIX_EXP, PLUGIN_PARAM_EDIT_ASPECT_RATIO
+from ..utilities import delete_all_items_in_layout
 from ..factory import CreateWidgetsMixIn
 from .parameter_edit_canvas import ParameterEditCanvas
 
@@ -63,6 +65,15 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
+        self.setFixedWidth(
+            int(
+                QtWidgets.QApplication.instance().standard_font_height
+                * PLUGIN_PARAM_EDIT_ASPECT_RATIO
+                + 25
+            )
+        )
+        self.__qtapp = QtWidgets.QApplication.instance()
+        self.__qtapp.sig_new_font_height.connect(self.__update_width)
 
     def configure_plugin(self, node_id, plugin):
         """
@@ -82,26 +93,24 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.plugin = plugin
         self.node_id = node_id
         self.__advanced_hidden = True
-
-        # create the required widgets:
         self.__add_header()
         if self.plugin.has_unique_parameter_config_widget:
             self.__add_unique_config_widget()
         else:
             self.__add_generic_param_widgets()
-        self.layout().setRowStretch(self.layout().rowCount(), 100)
+        self.create_empty_widget("final_spacer", sizePolicy=POLICY_FIX_EXP)
 
     def clear_layout(self):
         """
         Clear all items from the layout and generate a new layout.
         """
-        _widget = QtWidgets.QWidget()
-        _widget.setLayout(self.layout())
-        _widget.deleteLater()
-        self.setLayout(QtWidgets.QGridLayout())
-        self.layout().setContentsMargins(5, 5, 5, 5)
         self.param_widgets = {}
         self.param_composite_widgets = {}
+        self._widgets = {}
+        delete_all_items_in_layout(self.layout())
+        QtWidgets.QApplication.instance().sendPostedEvents(
+            None, QtCore.QEvent.DeferredDelete
+        )
 
     def __add_header(self):
         """
@@ -233,3 +242,15 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 else QStyle.SP_TitleBarShadeButton
             )
         )
+
+    @QtCore.Slot(float)
+    def __update_width(self, font_height: float):
+        """
+        Update the width based on the font height to achieve a constant aspect ratio.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        self.setFixedWidth(int(PLUGIN_PARAM_EDIT_ASPECT_RATIO * font_height))

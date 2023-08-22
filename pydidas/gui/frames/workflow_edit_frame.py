@@ -32,6 +32,7 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
+from ...core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
@@ -127,6 +128,7 @@ class WorkflowEditFrame(BaseFrame):
         self._widgets["but_load"].clicked.connect(self.load_tree_from_file)
         _app = QtWidgets.QApplication.instance()
         _app.sig_close_gui.connect(WORKFLOW_EDIT_MANAGER.reset)
+        _app.sig_new_font_height.connect(self.__update_plugin_param_scroll_width)
 
     @QtCore.Slot(int)
     def configure_plugin(self, node_id):
@@ -241,3 +243,17 @@ class WorkflowEditFrame(BaseFrame):
         QtWidgets.QWidget.resizeEvent(self, event)
         if self._config["built"]:
             WORKFLOW_EDIT_MANAGER.update_node_positions()
+
+    @QtCore.Slot(float)
+    def __update_plugin_param_scroll_width(self, font_height: float):
+        """
+        Update with width of the Plugin Parameter edit widget based on font metrics.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height.
+        """
+        self._widgets["plugin_edit_area"].setFixedWidth(
+            int(PLUGIN_PARAM_EDIT_ASPECT_RATIO * font_height) + 25
+        )

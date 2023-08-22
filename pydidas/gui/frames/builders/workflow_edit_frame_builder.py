@@ -28,10 +28,11 @@ __status__ = "Production"
 __all__ = ["WorkflowEditFrameBuilder"]
 
 
-from qtpy.QtWidgets import QAbstractScrollArea
+from qtpy.QtWidgets import QAbstractScrollArea, QApplication
 
 from ....core import constants
 from ....core.utils import update_size_policy
+from ....core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.parameter_config import EditPluginParametersWidget
@@ -88,8 +89,12 @@ class WorkflowEditFrameBuilder:
             "plugin_edit_area",
             ScrollArea,
             minimumHeight=450,
+            fixedWidth=int(
+                QApplication.instance().standard_font_height
+                * PLUGIN_PARAM_EDIT_ASPECT_RATIO
+                + 25
+            ),
             widget=frame._widgets["plugin_edit_canvas"],
-            fixedWidth=400,
             sizePolicy=constants.POLICY_EXP_EXP,
             gridPos=(1, 2, 5, 1),
         )

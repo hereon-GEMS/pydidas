@@ -80,6 +80,7 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_fontsize_changed = QtCore.Signal()
     sig_new_font_family = QtCore.Signal(str)
     sig_font_family_changed = QtCore.Signal()
+    sig_new_font_height = QtCore.Signal(float)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
@@ -105,6 +106,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         """
         _font_height = QtGui.QFontMetrics(self.font()).boundingRect("Height").height()
         self.__font_config["height"] = _font_height
+        self.sig_new_font_height.emit(_font_height)
 
     @QtCore.Slot()
     def send_gui_close_signal(self):

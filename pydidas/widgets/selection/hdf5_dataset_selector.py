@@ -128,11 +128,11 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.create_spin_box(
             "min_datasize",
             value=50,
-            valueRange=(0, int(1e9)),
+            range=(0, int(1e9)),
             gridPos=(_row_offset, 1, 1, 1),
         )
         self.create_spin_box(
-            "min_datadim", value=2, valueRange=(0, 3), gridPos=(_row_offset, 4, 1, 1)
+            "min_datadim", value=2, range=(0, 3), gridPos=(_row_offset, 4, 1, 1)
         )
         self.create_combo_box(
             "select_dataset",

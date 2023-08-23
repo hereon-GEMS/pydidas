@@ -27,13 +27,13 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["PluginCollectionBrowser"]
 
+
 from qtpy import QtCore
 
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
 from ...plugins import PluginCollection
-from ..factory import CreateWidgetsMixIn
+from ..factory import CreateWidgetsMixIn, PydidasWidgetWithGridLayout
 from ..misc import ReadOnlyTextWidget
-from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
 from .select_new_plugin_widget import SelectNewPluginWidget
 
 

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,66 +22,62 @@ to simplified widget creation.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
+
 # import __all__ items from modules:
-from .button_factory import *
-from .combobox_factory import *
 from .create_widgets_mixin import *
-from .empty_widget_factory import *
-from .line_factory import *
-from .progress_bar_factory import *
-from .radio_button_group_factory import *
-from .spacer_factory import *
-from .spin_box_factory import *
+from .empty_widget import *
+from .pydidas_checkbox import *
+from .pydidas_combobox import *
+from .pydidas_label import *
+from .pydidas_lineedit import *
+from .pydidas_square_button import *
+from .pydidas_widget_with_gridlayout import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
-from . import button_factory
-
-__all__.extend(button_factory.__all__)
-del button_factory
-
-from . import combobox_factory
-
-__all__.extend(combobox_factory.__all__)
-del combobox_factory
 
 from . import create_widgets_mixin
 
 __all__.extend(create_widgets_mixin.__all__)
 del create_widgets_mixin
 
-from . import empty_widget_factory
+from . import empty_widget
 
-__all__.extend(empty_widget_factory.__all__)
-del empty_widget_factory
+__all__.extend(empty_widget.__all__)
+del empty_widget
 
-from . import line_factory
+from . import pydidas_checkbox
 
-__all__.extend(line_factory.__all__)
-del line_factory
+__all__.extend(pydidas_checkbox.__all__)
+del pydidas_checkbox
 
-from . import progress_bar_factory
+from . import pydidas_combobox
 
-__all__.extend(progress_bar_factory.__all__)
-del progress_bar_factory
+__all__.extend(pydidas_combobox.__all__)
+del pydidas_combobox
 
-from . import radio_button_group_factory
+from . import pydidas_label
 
-__all__.extend(radio_button_group_factory.__all__)
-del radio_button_group_factory
+__all__.extend(pydidas_label.__all__)
+del pydidas_label
 
-from . import spacer_factory
+from . import pydidas_lineedit
 
-__all__.extend(spacer_factory.__all__)
-del spacer_factory
+__all__.extend(pydidas_lineedit.__all__)
+del pydidas_lineedit
 
-from . import spin_box_factory
+from . import pydidas_square_button
 
-__all__.extend(spin_box_factory.__all__)
-del spin_box_factory
+__all__.extend(pydidas_square_button.__all__)
+del pydidas_square_button
+
+from . import pydidas_widget_with_gridlayout
+
+__all__.extend(pydidas_widget_with_gridlayout.__all__)
+del pydidas_widget_with_gridlayout

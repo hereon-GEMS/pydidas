@@ -36,9 +36,8 @@ from ...core import constants
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
-from ..factory import CreateWidgetsMixIn
+from ..factory import CreateWidgetsMixIn, PydidasWidgetWithGridLayout
 from ..misc import LineEditWithIcon
-from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
 
 
 PLUGIN_COLLECTION = PluginCollection()

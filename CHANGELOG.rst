@@ -27,6 +27,8 @@ Improvements
     - Changed handling of Qt icons in preparation for Qt6 support.
     - Changed the factory creation of ParameterWidgets to remove patched 
       circular dependencies.
+    - Changed the widgets.factory to remove unnecessary intermediate functions
+      for widget creation and added more custom pydidas widgets.
     
 
 Bugfixes

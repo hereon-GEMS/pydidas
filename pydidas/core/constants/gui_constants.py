@@ -47,11 +47,15 @@ __all__ = [
     "PARAM_WIDGET_TEXT_WIDTH",
     "PARAM_WIDGET_UNIT_WIDTH",
     "PLUGIN_PARAM_EDIT_ASPECT_RATIO",
+    "GENERIC_IO_WIDGET_WIDTH",
 ]
 
 
 from qtpy import QtCore
 
+
+# Generic width of pydidas I/O widgets
+GENERIC_IO_WIDGET_WIDTH = 350
 
 # Settings for arranging plugin box-widgets on the WorkflowEditCcanvas
 GENERIC_PLUGIN_WIDGET_WIDTH = 220
@@ -67,8 +71,8 @@ PLUGIN_PARAM_WIDGET_WIDTH = 385
 PLUGIN_PARAM_EDIT_ASPECT_RATIO = 22
 
 # Settings for generic Parameter widgets
-PARAM_WIDGET_EDIT_WIDTH = 0.63
-PARAM_WIDGET_TEXT_WIDTH = 0.3
+PARAM_WIDGET_TEXT_WIDTH = 0.50
+PARAM_WIDGET_EDIT_WIDTH = 0.43
 PARAM_WIDGET_UNIT_WIDTH = 0.07
 
 PARAM_INPUT_WIDGET_HEIGHT = 22

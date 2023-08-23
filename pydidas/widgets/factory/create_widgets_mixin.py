@@ -28,21 +28,18 @@ __status__ = "Production"
 __all__ = ["CreateWidgetsMixIn"]
 
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
+from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
 
-from ...core.utils import apply_qt_properties, copy_docstring
-from ..pydidas_basic_widgets import PydidasLabel, PydidasLineEdit, PydidasCheckBox
-from ..utilities import get_widget_layout_args
-from .button_factory import create_button
-from .combobox_factory import create_combo_box
-from .empty_widget_factory import create_empty_widget
-from .line_factory import create_line
-from .progress_bar_factory import create_progress_bar
-from .radio_button_group_factory import create_radio_button_group
-from .spacer_factory import create_spacer
-from .spin_box_factory import create_spin_box
+from ...core.utils import apply_qt_properties
+from ..utilities import get_pyqt_icon_from_str, get_widget_layout_args
+from .empty_widget import EmptyWidget
+from .pydidas_checkbox import PydidasCheckBox
+from .pydidas_combobox import PydidasComboBox
+from .pydidas_label import PydidasLabel
+from .pydidas_lineedit import PydidasLineEdit
 
 
 class CreateWidgetsMixIn:
@@ -59,15 +56,32 @@ class CreateWidgetsMixIn:
         self._widgets = {}
         self.__index_unreferenced = 0
 
-    @copy_docstring(create_spacer)
-    def create_spacer(self, ref: str, **kwargs: Dict):
+    def create_spacer(self, ref: Union[str, None], **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_spacer
+        Create a QSpacerItem and set its properties.
+
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The widget reference string. If None, an internal reference will be
+            used.
+        **kwargs: dict
+            Any attributes supported by QSpacerItem with a setAttribute method
+            are valid kwargs. In addition, the gridPos key allows to specify
+            the spacer's position in its parent's layout.
         """
         _parent = kwargs.get("parent_widget", self)
         if isinstance(_parent, str):
             _parent = self._widgets[_parent]
-        _spacer = create_spacer(**kwargs)
+
+        _policy = kwargs.get("policy", QtWidgets.QSizePolicy.Minimum)
+        _spacer = QtWidgets.QSpacerItem(
+            kwargs.get("fixedWidth", 20),
+            kwargs.get("fixedHeight", 20),
+            _policy,
+            kwargs.get("vertical_policy", _policy),
+        )
+        apply_qt_properties(self, **kwargs)
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addItem(_spacer, *_layout_args)
         if ref is None:
@@ -75,138 +89,204 @@ class CreateWidgetsMixIn:
             self.__index_unreferenced += 1
         self._widgets[ref] = _spacer
 
-    def create_label(self, ref: str, text: str, **kwargs: dict):
+    def create_label(self, ref: Union[str, None], text: str, **kwargs: dict):
         """
         Create a PydidasLabel and store the widget.
 
         Parameters
         ----------
-        ref : str
+        ref : Union[str, None]
             The reference string for storing the widget.
         text : str
             The label's displayed text.
         **kwargs : dict
-            Any kwargs for creating the label. This can be the custom kwargs
-            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
-            properties or generic Qt properties.
+            Any attributes supported by QLabel with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the label's position in its parent's layout.
+            The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
+            be used to control the font properties.
         """
-        self.__create_widget(PydidasLabel, ref, text, **kwargs)
+        _widget = PydidasLabel(text, **kwargs)
+        self.add_any_widget(ref, _widget, **kwargs)
 
-    @copy_docstring(create_line)
-    def create_line(self, ref: str, **kwargs: Dict):
+    def create_line(self, ref: Union[str, None], **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_line
-        """
-        self.__create_widget(create_line, ref, **kwargs)
+        Create a line widget.
 
-    def create_lineedit(self, ref: str, **kwargs: Dict):
+        This method creates a line widget (implemented as flat QFrame) as separator
+        and adds it to the parent widget.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Any additional keyword arguments. All QFrame attributes with setAttribute
+            implementation are valid kwargs.
+        """
+        kwargs["frameShape"] = kwargs.get("frameShape", QtWidgets.QFrame.HLine)
+        kwargs["frameShadow"] = kwargs.get("frameShadow", QtWidgets.QFrame.Sunken)
+        kwargs["lineWidth"] = kwargs.get("lineWidth", 2)
+        kwargs["fixedHeight"] = kwargs.get("fixedHeight", 3)
+        self.create_any_widget(ref, QtWidgets.QFrame, **kwargs)
+
+    def create_lineedit(self, ref: Union[str, None], **kwargs: Dict):
         """
         Create a PydidasLineEdit and store the widget.
 
         Parameters
         ----------
-        ref : str
+        ref : Union[str, None]
             The reference string for storing the widget.
         **kwargs : dict
-            Any kwargs for creating the label. This can be the custom kwargs
-            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
-            properties or generic Qt properties. Initial text can be defined with the
-            'text' kwarg.
+            Any attributes supported by QLineEdit with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the LineEdit's position in its parent's layout.
+            The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
+            be used to control the font properties.
         """
-        self.__create_widget(PydidasLineEdit, ref, **kwargs)
+        _widget = PydidasLineEdit(**kwargs)
+        self.add_any_widget(ref, _widget, **kwargs)
 
-    @copy_docstring(create_button)
-    def create_button(self, ref: str, text: str, **kwargs: Dict):
+    def create_button(self, ref: Union[str, None], text: str, **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_button
-        """
-        self.__create_widget(create_button, ref, text, **kwargs)
+        Create a QPushButton and store the widget.
 
-    @copy_docstring(create_spin_box)
-    def create_spin_box(self, ref: str, **kwargs: Dict):
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any attributes supported by QPushButton with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the button's position in its parent's layout.
+            The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
+            be used to control the font properties.
+            The button's clicked method can be connected directly, by specifing
+            the slot through the 'clicked' kwarg.
         """
-        Please refer to pydidas.widgets.factory.create_spin_box
-        """
-        self.__create_widget(create_spin_box, ref, **kwargs)
+        if isinstance(kwargs.get("icon", None), str):
+            kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
+        self.create_any_widget(ref, QtWidgets.QPushButton, text, **kwargs)
+        if "clicked" in kwargs and ref is not None:
+            self._widgets[ref].clicked.connect(kwargs.get("clicked"))
 
-    @copy_docstring(create_progress_bar)
-    def create_progress_bar(self, ref: str, **kwargs: Dict):
+    def create_spin_box(self, ref: Union[str, None], **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_progress_bar
-        """
-        self.__create_widget(create_progress_bar, ref, **kwargs)
+        Create a QSpinBox and store the widget.
 
-    def create_check_box(self, ref: str, text, **kwargs: Dict):
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any attributes supported by QSpinBox with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the SpinBox's position in its parent's layout. The
+            default range is set to (0, 1), if it is not overridden with the
+            'range' keyword.
+        """
+        kwargs["range"] = kwargs.get("range", (0, 1))
+        self.create_any_widget(ref, QtWidgets.QSpinBox, **kwargs)
+
+    def create_progress_bar(self, ref: Union[str, None], **kwargs: Dict):
+        """
+        Create a QProgressBar and store the widget.
+
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any attributes supported by QProgressBar with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the QProgressBar's position in its parent's layout.
+        """
+        self.create_any_widget(ref, QtWidgets.QProgressBar, **kwargs)
+
+    def create_check_box(self, ref: Union[str, None], text, **kwargs: Dict):
         """
         Create a PydidasCheckBox and store the widget.
 
         Parameters
         ----------
-        ref : str
+        ref : Union[str, None]
             The reference string for storing the widget.
         text : str
             The CheckBox's descriptive text.
         **kwargs : dict
-            Any kwargs for creating the label. This can be the custom kwargs
-            'fontsize_offset', 'bold', 'italic', 'underline' to control the font
-            properties or generic Qt properties. Initial text can be defined with the
-            'text' kwarg.
+            Any attributes supported by QCheckBox with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the QProgressBar's position in its parent's layout.
+            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            to control the font properties or generic Qt properties.
         """
-        self.__create_widget(PydidasCheckBox, ref, text, **kwargs)
+        _widget = PydidasCheckBox(text, **kwargs)
+        self.add_any_widget(ref, _widget, **kwargs)
 
-    @copy_docstring(create_combo_box)
-    def create_combo_box(self, ref: str, **kwargs: Dict):
+    def create_combo_box(self, ref: Union[str, None], **kwargs: Dict):
         """
-        Please refer to pydidas.widgets.factory.create_check_box
-        """
-        self.__create_widget(create_combo_box, ref, **kwargs)
-
-    @copy_docstring(create_radio_button_group)
-    def create_radio_button_group(self, ref: str, entries: List, **kwargs: Dict):
-        """
-        Please refer to pydidas.widgets.factory.create_radio_button_group
-        """
-        self.__create_widget(create_radio_button_group, ref, entries, **kwargs)
-
-    @copy_docstring(create_empty_widget)
-    def create_empty_widget(self, ref: str, **kwargs: Dict):
-        """
-        Please refer to pydidas.widgets.factory.create_empty_widget
-        """
-        self.__create_widget(create_empty_widget, ref, **kwargs)
-
-    def __create_widget(self, object_: object, ref: str, *args: Tuple, **kwargs: Dict):
-        """
-        Create a widget from a object (function / class).
+        Create a PydidasComboBox and store the widget.
 
         Parameters
         ----------
-        object : object
-            The object to be called.
-        ref : str
-            The reference name in the _widgets dictionary.
-        *args : args
-            Any arguments to the object call.
+        ref : Union[str, None]
+            The reference string for storing the widget.
         **kwargs : dict
-            Keyword arguments for the widget creation.
+            Any attributes supported by QComboBox with a setAttribute method
+            are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the QComboBox's position in its parent's layout.
+            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            to control the font properties or generic Qt properties.
         """
-        _parent = kwargs.get("parent_widget", self)
-        if isinstance(_parent, str):
-            _parent = self._widgets[_parent]
-        _widget = object_(*args, **kwargs)
-        if isinstance(kwargs.get("layout_kwargs"), dict):
-            apply_qt_properties(_widget.layout(), **kwargs.get("layout_kwargs"))
-            del kwargs["layout_kwargs"]
-        if _parent is not None:
-            _layout_args = get_widget_layout_args(_parent, **kwargs)
-            _parent.layout().addWidget(_widget, *_layout_args)
-        if ref is None:
-            ref = f"unreferenced_{self.__index_unreferenced:03d}"
-            self.__index_unreferenced += 1
-        self._widgets[ref] = _widget
+        _widget = PydidasComboBox(**kwargs)
+        self.add_any_widget(ref, _widget, **kwargs)
+
+    def create_radio_button_group(
+        self, ref: Union[str, None], entries: List, **kwargs: Dict
+    ):
+        """
+        Create a RadioButtonGroup widget and set its properties.
+
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        text : str
+            The CheckBox's descriptive text.
+        **kwargs : dict
+            Any attributes supported by the generic QWidget with a setAttribute
+            method are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the RadioButtonGroup's position in its parent's layout.
+            The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
+            to control the font properties or generic Qt properties.
+            The 'entries' keyword takes a list of entries for the buttons and the
+            number of rows and columns can be specified with the 'rows' and
+            'columns' keywords, respectively.
+        """
+        # need to place the import here to prevent circular import. The circular
+        # import cannot be prevented while maintaining the desired module
+        # structure.
+        from ..selection import RadioButtonGroup
+
+        _widget = RadioButtonGroup(None, entries, title=kwargs.pop("title", None))
+        self.add_any_widget(ref, _widget, **kwargs)
+
+    def create_empty_widget(self, ref: Union[str, None], **kwargs: Dict):
+        """
+        Create an ampty QWidget with a agrid layout.
+
+        Parameters
+        ----------
+        ref : Union[str, None]
+            The reference string for storing the widget.
+        **kwargs : dict
+            Any attributes supported by the generic QWidget with a setAttribute
+            method are valid kwargs. In addition, the 'gridPos' keyword can be used
+            to specify the QWidget's position in its parent's layout.
+        """
+        self.create_any_widget(ref, EmptyWidget, **kwargs)
 
     def create_any_widget(
-        self, ref: str, widget_class: type, *args: Tuple, **kwargs: Dict
+        self, ref: Union[str, None], widget_class: type, *args: Tuple, **kwargs: Dict
     ):
         """
         Create any widget with any settings and add it to the layout.
@@ -219,7 +299,7 @@ class CreateWidgetsMixIn:
 
         Parameters
         ----------
-        ref : str
+        ref : Union[str, None]
             The reference name in the _widgets dictionary.
         widget_class : type
             The class type of the widget.
@@ -233,61 +313,45 @@ class CreateWidgetsMixIn:
         TypeError
             If the reference "ref" is not of type string.
         """
-        if not isinstance(ref, str):
-            raise TypeError("Widget reference must be of type string.")
-        self.__create_widget(widget_class, ref, *args, **kwargs)
-        apply_qt_properties(self._widgets[ref], **kwargs)
+        _widget = widget_class(*args)
+        # try:
+        self.add_any_widget(ref, _widget, **kwargs)
+        # except:
+        #     print("ref", ref)
+        #     print("widget", _widget)
+        #     print(kwargs)
 
-    def add_any_widget(self, ref: str, widget: QWidget, **kwargs: Dict):
+    def add_any_widget(
+        self, ref: Union[str, None], widget_instance: QWidget, **kwargs: dict
+    ):
         """
-        Add any existing widget with any settings to the layout.
-
-        Note
-        ----
-        This method can also be used to add a new widget to the layout
-        be simply creating an instance of the widget in the call
-        (see examples).
+        Add any existing widget to the layout and apply settings to it.
 
         Parameters
         ----------
         ref : Union[str, None]
-            The reference name in the _widgets dictionary.
-        widget : QtWidgets.QWidget
+            The widget reference key.
+        widget_instance : QWidget
             The widget instance.
         **kwargs : dict
-            Keyword arguments for the widget settings and layout.
-        **layout_kwargs : dict
-            Any keyword arguments which should be passed to the layout
-            arguments but not to the widget creation. This is important
-            for an "alignment=None" flag which cannot be passed to the
-            widget creation.
-
-        Example
-        -------
-        To add a new widget, in this example a QLabel without any alignment
-        and with a width of 600 pixel, create a new instance on the fly and
-        add it to the object:
-
-        >>> object.add_any_widget('new_label', QLabel(), width=600,
-                                  layout_kwargs={'alignment': None})
-
-        Raises
-        ------
-        TypeError
-            If the reference "ref" is not of type string.
+            Any attributes supported by the specific QWidget with a setAttribute
+            method are valid kwargs. In addition, 'layout_kwargs' is a valid key
+            to pass a dictionary with attributes for the widget's layout.
         """
         if not (isinstance(ref, str) or ref is None):
             raise TypeError("Widget reference must be None or a string.")
-        apply_qt_properties(widget, **kwargs)
-        _parent = kwargs.get("parent_widget", self)
+        _parent = kwargs.pop("parent_widget", self)
+        _layout_kwargs = kwargs.pop("layout_kwargs", None)
         if isinstance(_parent, str):
             _parent = self._widgets[_parent]
-        if isinstance(kwargs.get("layout_kwargs"), dict):
-            kwargs.update(kwargs.get("layout_kwargs"))
-            del kwargs["layout_kwargs"]
-        _layout_args = get_widget_layout_args(_parent, **kwargs)
-        _parent.layout().addWidget(widget, *_layout_args)
+
+        apply_qt_properties(widget_instance, **kwargs)
+        if _layout_kwargs is not None:
+            apply_qt_properties(widget_instance.layout(), **_layout_kwargs)
+        if _parent is not None:
+            _layout_args = get_widget_layout_args(_parent, **kwargs)
+            _parent.layout().addWidget(widget_instance, *_layout_args)
         if ref is None:
             ref = f"unreferenced_{self.__index_unreferenced:03d}"
             self.__index_unreferenced += 1
-        self._widgets[ref] = widget
+        self._widgets[ref] = widget_instance

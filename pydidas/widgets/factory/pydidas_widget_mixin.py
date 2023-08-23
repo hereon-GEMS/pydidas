@@ -31,7 +31,7 @@ __all__ = ["PydidasWidgetMixin"]
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
 
-from ..core.utils import apply_qt_properties, update_qobject_font
+from ...core.utils import apply_qt_properties, update_qobject_font
 
 
 class PydidasWidgetMixin:

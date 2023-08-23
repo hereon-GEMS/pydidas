@@ -29,6 +29,8 @@ Improvements
       circular dependencies.
     - Changed the widgets.factory to remove unnecessary intermediate functions
       for widget creation and added more custom pydidas widgets.
+    - ParameterWidgets use the new Pydidas widgets and scale automatically with
+      the font size.
     
 
 Bugfixes

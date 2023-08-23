@@ -28,15 +28,16 @@ __status__ = "Production"
 __all__ = ["ParamIoWidgetComboBox"]
 
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core import Parameter
 from ...core.utils import convert_special_chars_to_unicode, convert_unicode_to_ascii
+from ..factory import PydidasComboBox
 from ..utilities import get_max_pixel_width_of_entries
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
-class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, QtWidgets.QComboBox):
+class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
     """Widgets for I/O during plugin parameter editing with predefined choices."""
 
     def __init__(self, param: Parameter, **kwargs: dict):
@@ -53,7 +54,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, QtWidgets.QComboBox):
         width : int, optional
             The width of the IOwidget.
         """
-        QtWidgets.QComboBox.__init__(self)
+        PydidasComboBox.__init__(self)
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         for choice in param.choices:
             self.addItem(f"{convert_special_chars_to_unicode(str(choice))}")

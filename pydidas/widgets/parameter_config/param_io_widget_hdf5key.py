@@ -40,8 +40,10 @@ from .param_io_widget_with_button import ParamIoWidgetWithButton
 
 class ParamIoWidgetHdf5Key(ParamIoWidgetWithButton):
     """
-    Widgets for I/O during plugin parameter for filepaths.
-    (Includes a small button to select a filepath from a dialogue.)
+    Widget for entering and editing a Hdf5Key Parameter.
+
+    This widget includes a small button to select a filepath and Hdf5 key from a
+    dialogue.
     """
 
     io_edited = QtCore.Signal(str)

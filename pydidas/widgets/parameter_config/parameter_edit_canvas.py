@@ -34,7 +34,7 @@ from qtpy import QtWidgets
 
 from ...core.constants import POLICY_MIN_MIN
 from ...core.utils import apply_qt_properties
-from ..pydidas_basic_widgets import PydidasWidgetWithGridLayout
+from ..factory import PydidasWidgetWithGridLayout
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 

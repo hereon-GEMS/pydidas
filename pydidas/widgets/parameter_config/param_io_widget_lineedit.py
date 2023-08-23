@@ -22,7 +22,7 @@ accepted by the Parameter is valid.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -32,14 +32,15 @@ __all__ = ["ParamIoWidgetLineEdit"]
 from numbers import Real
 
 import numpy as np
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core import Parameter
-from ...core.constants import FLOAT_DISPLAY_ACCURACY
+from ...core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_FIX_EXP
+from ..factory import PydidasLineEdit
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
-class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, QtWidgets.QLineEdit):
+class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
     """
     Widgets for I/O of Parameter editing without predefined choices.
 
@@ -57,11 +58,12 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, QtWidgets.QLineEdit):
     io_edited = QtCore.Signal(str)
 
     def __init__(self, param: Parameter, **kwargs: dict):
-        QtWidgets.QLineEdit.__init__(self, parent=kwargs.get("parent", None))
+        PydidasLineEdit.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
         self.set_validator(param)
         self.set_value(param.value)
         self.editingFinished.connect(self.emit_signal)
+        self.setSizePolicy(*POLICY_FIX_EXP)
 
     def emit_signal(self):
         """

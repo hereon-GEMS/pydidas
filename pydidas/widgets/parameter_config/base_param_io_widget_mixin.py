@@ -28,7 +28,6 @@ __status__ = "Production"
 __all__ = ["BaseParamIoWidgetMixIn"]
 
 
-import html
 import numbers
 import pathlib
 
@@ -36,12 +35,7 @@ from numpy import nan
 from qtpy import QtCore, QtGui
 
 from ...core import Hdf5key, Parameter, UserConfigError
-from ...core.constants import (
-    PARAM_INPUT_EDIT_WIDTH,
-    PARAM_INPUT_WIDGET_HEIGHT,
-    QT_REG_EXP_FLOAT_VALIDATOR,
-    QT_REG_EXP_INT_VALIDATOR,
-)
+from ...core.constants import QT_REG_EXP_FLOAT_VALIDATOR, QT_REG_EXP_INT_VALIDATOR
 
 
 LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
@@ -68,11 +62,8 @@ class BaseParamIoWidgetMixIn:
     io_edited = QtCore.Signal(str)
 
     def __init__(self, param: Parameter, **kwargs: dict):
-        self.setFixedWidth(kwargs.get("width", PARAM_INPUT_EDIT_WIDTH))
-        self.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
         self._ptype = param.dtype
         self._old_value = None
-        self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
     def set_validator(self, param: Parameter):
         """

@@ -107,7 +107,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         Path
             The text converted to a Path to update the Parameter value.
         """
-        text = self.ledit.text()
+        text = self._io_lineedit.text()
         return Path(self.get_value_from_text(text))
 
     def set_value(self, value: Union[str, Path]):
@@ -117,7 +117,7 @@ class ParamIoWidgetFile(ParamIoWidgetWithButton):
         This method changes the combobox selection to the specified value.
         """
         self._old_value = self.get_value()
-        self.ledit.setText(f"{value}")
+        self._io_lineedit.setText(f"{value}")
         if not self._flag_pattern and value != Path() and os.path.exists(value):
             self.io_dialog.set_curr_dir(value)
 

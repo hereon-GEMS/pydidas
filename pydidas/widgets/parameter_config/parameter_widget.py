@@ -30,27 +30,26 @@ __all__ = ["ParameterWidget"]
 
 import html
 from pathlib import Path
+from typing import Union
 
 from qtpy import QtCore, QtWidgets
 
-from ...core import Hdf5key, UserConfigError
+from ...core import Hdf5key, Parameter, UserConfigError
 from ...core.constants import (
-    ALIGN_TOP_LEFT,
-    PARAM_INPUT_EDIT_WIDTH,
-    PARAM_INPUT_TEXT_WIDTH,
-    PARAM_INPUT_UNIT_WIDTH,
-    PARAM_INPUT_WIDGET_HEIGHT,
-    PARAM_INPUT_WIDGET_WIDTH,
+    PARAM_WIDGET_EDIT_WIDTH,
+    PARAM_WIDGET_TEXT_WIDTH,
+    PARAM_WIDGET_UNIT_WIDTH,
+    POLICY_EXP_FIX,
 )
 from ...core.utils import apply_qt_properties, convert_special_chars_to_unicode
-from ..pydidas_basic_widgets import PydidasLabel
+from ..factory import EmptyWidget, PydidasLabel, PydidasWidgetWithGridLayout
 from .param_io_widget_combo_box import ParamIoWidgetComboBox
 from .param_io_widget_file import ParamIoWidgetFile
 from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
 from .param_io_widget_lineedit import ParamIoWidgetLineEdit
 
 
-class ParameterWidget(QtWidgets.QWidget):
+class ParameterWidget(PydidasWidgetWithGridLayout):
     """
     A combined widget to display and modify a Parameter with name, value and unit.
 
@@ -73,210 +72,149 @@ class ParameterWidget(QtWidgets.QWidget):
 
     io_edited = QtCore.Signal(str)
 
-    def __init__(self, param, parent=None, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent)
-        self.__set_size_from_kwargs(kwargs)
-        self.__store_config_from_kwargs(kwargs)
+    def __init__(
+        self,
+        param: Parameter,
+        parent: Union[QtWidgets.QWidget, None] = None,
+        **kwargs: dict,
+    ):
+        PydidasWidgetWithGridLayout.__init__(self, parent, **kwargs)
+        self.setSizePolicy(*POLICY_EXP_FIX)
+        self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
         self.param = param
-        self.setLayout(QtWidgets.QGridLayout())
-        apply_qt_properties(
-            self.layout(),
-            contentsMargins=(0, 0, 0, 0),
-            spacing=5,
-            alignment=ALIGN_TOP_LEFT,
-        )
-        self.layout().setColumnStretch(1, 1)
-        self.name_widget = self.__get_name_widget()
-        if self.config["width_unit"] > 0:
-            self.unit_widget = self.__get_unit_widget()
-        self.io_widget = self.__get_param_io_widget(
-            width=self.config["width_io"],
-            persistent_qsettings_ref=kwargs.get("persistent_qsettings_ref", None),
-        )
-        _text_w_args, _input_w_args, _unit_w_args = self.__get_layout_args_for_widgets()
-        self.layout().addWidget(self.name_widget, *_text_w_args)
-        self.layout().addWidget(self.io_widget, *_input_w_args)
-        if self.config["width_unit"] > 0:
-            self.layout().addWidget(self.unit_widget, *_unit_w_args)
+        self._widgets = {}
+        self.__store_config_from_kwargs(kwargs)
+        self.__store_layout_args_for_widgets()
 
-        self.io_widget.io_edited.connect(self.__emit_io_changed)
-        self.io_widget.io_edited.connect(self.__set_param_value)
+        self.__create_name_widget()
+        self.__create_param_io_widget()
+        if self._config["width_unit"] > 0:
+            self.__create_unit_widget()
+        self.io_widget = self._widgets["io"]
+
+        self._widgets["io"].io_edited.connect(self.__emit_io_changed)
+        self._widgets["io"].io_edited.connect(self.__set_param_value)
         apply_qt_properties(self, **kwargs)
 
-    def __set_size_from_kwargs(self, kwargs):
-        """
-        Set the size of the widget based on the input keyword arguments.
-
-        Parameters
-        ----------
-        kwargs : dict
-            The keyword arguments.
-        """
-        _linebreak = kwargs.get("linebreak", False)
-        _width = kwargs.get("width_total", PARAM_INPUT_WIDGET_WIDTH)
-        _height = PARAM_INPUT_WIDGET_HEIGHT + _linebreak * (
-            PARAM_INPUT_WIDGET_HEIGHT + 4
-        )
-        self.setFixedWidth(_width)
-        self.setFixedHeight(_height)
-
-    def __store_config_from_kwargs(self, kwargs):
+    def __store_config_from_kwargs(self, kwargs: dict):
         """
         Get the config from the kwargs formatting options.
 
         Parameters
         ----------
-        parent : QtWidgets.QWidget
-            The parent widget.
-        **kwargs : dict
-            All possible formatting options.
-
-        Returns
-        -------
-        config : dict
-            The full formatting options, updated with the default values.
+        kwargs : dict
+            The calling kwargs.
         """
-        _width = kwargs.get("width_total", PARAM_INPUT_WIDGET_WIDTH)
-        _width_unit = kwargs.get("width_unit", PARAM_INPUT_UNIT_WIDTH)
+        _width_unit = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
         config = {
             "linebreak": kwargs.get("linebreak", False),
-            "valign_io": kwargs.get("valign_io", QtCore.Qt.AlignVCenter),
-            "valign_text": kwargs.get("valign_text", QtCore.Qt.AlignVCenter),
+            "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
         }
         if config["linebreak"]:
-            config["width_text"] = kwargs.get("width_text", _width - 10)
-            config["width_io"] = kwargs.get("width_io", _width - _width_unit - 20)
-            config["halign_text"] = kwargs.get("halign_text", QtCore.Qt.AlignLeft)
-            config["halign_io"] = kwargs.get("halign_io", QtCore.Qt.AlignRight)
+            config["width_text"] = 1.0
+            config["width_io"] = kwargs.get("width_io", 0.8 - _width_unit)
         else:
-            config["width_text"] = kwargs.get("width_text", PARAM_INPUT_TEXT_WIDTH)
-            config["width_io"] = kwargs.get("width_io", PARAM_INPUT_EDIT_WIDTH)
-            config["halign_text"] = kwargs.get("halign_text", QtCore.Qt.AlignLeft)
-            config["halign_io"] = kwargs.get("halign_io", QtCore.Qt.AlignRight)
-        config["width_unit"] = _width_unit
-        config["width_total"] = _width
-        config["halign_unit"] = kwargs.get("halign_unit", QtCore.Qt.AlignLeft)
-        config["valign_unit"] = kwargs.get("valign_unit", QtCore.Qt.AlignVCenter)
-        self.config = config
+            config["width_text"] = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
+            config["width_io"] = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH)
+        config["width_unit"] = _width_unit if len(self.param.unit) > 0 else 0
+        config["align_text"] = QtCore.Qt.AlignVCenter | kwargs.get(
+            "halign_text", QtCore.Qt.AlignLeft
+        )
+        config["align_io"] = QtCore.Qt.AlignVCenter | kwargs.get(
+            "halign_io", QtCore.Qt.AlignLeft
+        )
+        config["align_unit"] = QtCore.Qt.AlignVCenter | kwargs.get(
+            "halign_unit", QtCore.Qt.AlignLeft
+        )
+        self._config = config
 
-    def __get_name_widget(self):
+    def __store_layout_args_for_widgets(self):
         """
-        Get a widget with the Parameter's name.
+        Store the layout insertion arguments based on the config.
+        """
+        _linebreak = int(self._config["linebreak"])
+        _show_unit = int(self._config["width_unit"] > 0)
+        self._config["layout_text"] = (
+            0,
+            0,
+            1,
+            1 + 2 * _linebreak,
+            self._config["align_text"],
+        )
+        self._config["layout_io"] = (
+            _linebreak,
+            1,
+            1,
+            2 - _show_unit,
+            self._config["align_io"],
+        )
+        self._config["layout_unit"] = (_linebreak, 2, 1, 1, self._config["align_text"])
 
-        Parameters
-        ----------
-        config : dict
-            The configuration dictionary.
-
-        Returns
-        -------
-        QtWidgets.QLabel
-            The label with the Parameter's name.
+    def __create_name_widget(self):
+        """
+        Create a widget with the Parameter's name.
         """
         _text = convert_special_chars_to_unicode(self.param.name) + ":"
-        return PydidasLabel(
-            _text,
-            fixedWidth=self.config["width_text"],
-            fixedHeight=20,
-            toolTip=f"<qt>{html.escape(self.param.tooltip)}</qt>",
-            margin=0,
+        self._widgets["name_label"] = PydidasLabel(_text, margin=0)
+        self._widgets["name_container"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
+        self.layout().addWidget(
+            self._widgets["name_container"], *self._config["layout_text"]
         )
+        self._widgets["name_container"].layout().addWidget(self._widgets["name_label"])
+        if not self._config["linebreak"]:
+            self.layout().setColumnStretch(0, int(self._config["width_text"] * 100))
 
-    def __get_param_io_widget(self, **kwargs: dict) -> QtWidgets.QWidget:
+    def __create_unit_widget(self):
         """
-        Get the specific Parameter I/O widget for the Parameter configuration and type.
-
-        Parameters
-        ----------
-        kwargs: dict
-            Additional configuration dictionary.
-
-        Returns
-        -------
-        QtWidgets.QWidget
-            The parameter I/O widget.
+        Create a widget with the Parameter's unit text.
         """
+        _text = convert_special_chars_to_unicode(self.param.unit)
+        self._widgets["unit_label"] = PydidasLabel(_text, margin=0)
+        self._widgets["unit_container"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
+        self.layout().addWidget(
+            self._widgets["unit_container"], *self._config["layout_unit"]
+        )
+        self._widgets["unit_container"].layout().addWidget(self._widgets["unit_label"])
+        self.layout().setColumnStretch(2, int(self._config["width_unit"] * 100))
+
+    def __create_param_io_widget(self):
+        """
+        Create an I/O widget for the Parameter based on its configuration and type.
+        """
+        kwargs = {"persistent_qsettings_ref": self._config["persistent_qsettings_ref"]}
         if self.param.choices:
             _widget = ParamIoWidgetComboBox(self.param, **kwargs)
         else:
             if self.param.dtype == Path:
                 _widget = ParamIoWidgetFile(self.param, **kwargs)
+                self._config["width_unit"] = 0
             elif self.param.dtype == Hdf5key:
                 _widget = ParamIoWidgetHdf5Key(self.param, **kwargs)
+                self._config["width_unit"] = 0
             else:
                 _widget = ParamIoWidgetLineEdit(self.param, **kwargs)
         try:
             _widget.set_value(self.param.value)
         except UserConfigError:
             pass
-        return _widget
-
-    def __get_unit_widget(self):
-        """
-        Get a widget with the Parameter's unit text.
-
-        Parameters
-        ----------
-        config : dict
-            The configuration dictionary.
-
-        Returns
-        -------
-        QtWidgets.QLabel
-            The label with the Parameter's unit text.
-        """
-        _text = convert_special_chars_to_unicode(self.param.unit)
-        return PydidasLabel(
-            _text,
-            fixedWidth=self.config["width_unit"],
-            fixedHeight=20,
-            toolTip=f"<qt>{html.escape(self.param.tooltip)}</qt>",
-            margin=0,
-        )
-
-    def __get_layout_args_for_widgets(self):
-        """
-        Get the layout insertion arguments based on config.
-
-        Parameters
-        ----------
-        config : dict
-            The dictionary with the layout formatting arguments.
-
-        Returns
-        -------
-        txt_args : tuple
-            The tuple with the layout formatting args for the name widget.
-        io_args : tuple
-            The tuple with the layout formatting args for the io widget.
-        unit_args : tuple
-            The tuple with the layout formatting args for the unit widget.
-        """
-        _iline = int(self.config["linebreak"])
-        _iunit = int(self.config["width_unit"] > 0)
-        _txtargs = (
-            0,
-            0,
-            1,
-            1 + 2 * _iline,
-            self.config["valign_text"] | self.config["halign_text"],
-        )
-        _ioargs = (
-            _iline,
-            1,
-            1,
-            2 - _iunit,
-            self.config["valign_io"] | self.config["halign_io"],
-        )
-        _unitargs = (
-            _iline,
-            2,
-            1,
-            1,
-            self.config["valign_text"] | self.config["halign_text"],
-        )
-        return _txtargs, _ioargs, _unitargs
+        self._widgets["io"] = _widget
+        self._widgets["io"].setSizePolicy(*POLICY_EXP_FIX)
+        self.layout().addWidget(self._widgets["io"], *self._config["layout_io"])
+        if self._config["linebreak"]:
+            self._widgets["io_spacer"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
+            self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)
+            self.layout().setColumnStretch(0, 10)
+            self.layout().setColumnStretch(
+                1, int(100 * (1 - self._config["width_unit"]))
+            )
+        else:
+            self.layout().setColumnStretch(
+                1,
+                int(
+                    100 * (1 - self._config["width_unit"] - self._config["width_text"])
+                ),
+            )
 
     @QtCore.Slot(str)
     def __emit_io_changed(self, value):
@@ -306,19 +244,12 @@ class ParameterWidget(QtWidgets.QWidget):
         widget : QWidget
             The input widget used for editing the parameter value.
         """
+        print(self.param.refkey)
+        print("own geometry:", self._widgets["io"].geometry())
+        print(self._widgets["io"].sizeHint())
+        print("parent geometry:", self._widgets["io"].parent().geometry())
         try:
-            self.param.value = self.io_widget.get_value()
+            self.param.value = self._widgets["io"].get_value()
         except ValueError:
-            self.io_widget.set_value(self.param.value)
+            self._widgets["io"].set_value(self.param.value)
             raise
-
-    def sizeHint(self):
-        """
-        Set the Qt sizeHint to be the widget's size.
-
-        Returns
-        -------
-        QtCore.QSize
-            The size of the widget.
-        """
-        return QtCore.QSize(self.width(), self.height())

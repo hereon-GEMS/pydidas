@@ -34,9 +34,9 @@ from qtpy import QtCore, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from ...core import Hdf5key, constants
-from ...core.constants import POLICY_FIX_EXP, PLUGIN_PARAM_EDIT_ASPECT_RATIO
-from ..utilities import delete_all_items_in_layout
+from ...core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP
 from ..factory import CreateWidgetsMixIn
+from ..utilities import delete_all_items_in_layout
 from .parameter_edit_canvas import ParameterEditCanvas
 
 
@@ -142,7 +142,6 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             "Restore default parameters",
             icon="qt-std::SP_BrowserReload",
             gridPos=(2, 0, 1, 2),
-            layout_kwargs={"alignment": QtCore.Qt.AlignRight},
         )
         self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
 
@@ -168,11 +167,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 param.refkey not in self.plugin.advanced_parameters
                 and not param.refkey.startswith("_")
             ):
-                _kwargs = (
-                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
-                    if param.dtype in [Hdf5key, Path]
-                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
-                )
+                _kwargs = {"linebreak": param.dtype in [Hdf5key, Path]}
                 self.create_param_widget(param, **_kwargs)
         if len(self.plugin.advanced_parameters) > 0:
             self.__advanced_hidden = True
@@ -184,11 +179,10 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             )
             for _key in self.plugin.advanced_parameters:
                 _param = self.plugin.get_param(_key)
-                _kwargs = (
-                    constants.DEFAULT_TWO_LINE_PLUGIN_PARAM_CONFIG
-                    if _param.dtype in [Hdf5key, Path]
-                    else constants.DEFAULT_PLUGIN_PARAM_CONFIG
-                ) | {"visible": False}
+                _kwargs = {
+                    "linebreak": param.dtype in [Hdf5key, Path],
+                    "visible": False,
+                }
                 self.create_param_widget(_param, **_kwargs)
             self._widgets["but_toggle_advanced_params"].clicked.connect(
                 self.__toggle_advanced_params

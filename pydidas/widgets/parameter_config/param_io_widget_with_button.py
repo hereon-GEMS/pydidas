@@ -34,7 +34,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from ...core import Parameter
-from ...core.constants import PARAM_INPUT_EDIT_WIDTH, PARAM_INPUT_WIDGET_HEIGHT
+from ..factory import PydidasLineEdit, PydidasSquareButton
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
@@ -56,30 +56,23 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     def __init__(self, param: Parameter, **kwargs: dict):
         QtWidgets.QWidget.__init__(self, parent=kwargs.get("parent", None))
         BaseParamIoWidgetMixIn.__init__(self, param, **kwargs)
-        _width = kwargs.get("width", PARAM_INPUT_EDIT_WIDTH)
-        self.ledit = QtWidgets.QLineEdit()
-        self.ledit.setFixedWidth(_width - PARAM_INPUT_WIDGET_HEIGHT - 2)
-        self.ledit.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
-
+        self._io_lineedit = PydidasLineEdit()
         if not isinstance(kwargs.get("button_icon", None), QtGui.QIcon):
             kwargs["button_icon"] = self.style().standardIcon(
                 QStyle.SP_DialogOpenButton
             )
-
-        self._button = QtWidgets.QPushButton(kwargs["button_icon"], "")
-        self._button.setFixedWidth(PARAM_INPUT_WIDGET_HEIGHT)
-        self._button.setFixedHeight(PARAM_INPUT_WIDGET_HEIGHT)
+        self._button = PydidasSquareButton(kwargs["button_icon"], "")
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setSpacing(2)
-        _layout.addWidget(self.ledit)
+        _layout.addWidget(self._io_lineedit)
         _layout.addWidget(self._button)
         self.setLayout(_layout)
 
-        self.ledit.editingFinished.connect(self.emit_signal)
-        self.ledit.returnPressed.connect(partial(self.emit_signal, True))
         self._button.clicked.connect(self.button_function)
-        self.ledit.setText(f"{param.value}")
+        self._io_lineedit.editingFinished.connect(self.emit_signal)
+        self._io_lineedit.returnPressed.connect(partial(self.emit_signal, True))
+        self._io_lineedit.setText(f"{param.value}")
 
     def button_function(self):
         """
@@ -99,7 +92,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         force_update : bool
             Force an update even if the value has not changed.
         """
-        _curr_value = self.ledit.text()
+        _curr_value = self._io_lineedit.text()
         if _curr_value != self._old_value or force_update:
             self._old_value = _curr_value
             self.io_edited.emit(_curr_value)
@@ -113,7 +106,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         str
             The input text.
         """
-        text = self.ledit.text()
+        text = self._io_lineedit.text()
         return self.get_value_from_text(text)
 
     def set_value(self, value):
@@ -123,7 +116,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         This method changes the combobox selection to the specified value.
         """
         self._old_value = self.get_value()
-        self.ledit.setText(f"{value}")
+        self._io_lineedit.setText(f"{value}")
 
     def setText(self, text):
         """
@@ -137,4 +130,4 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         text : object
             Any object, the object's str representation will be used.
         """
-        self.ledit.setText(str(text))
+        self._io_lineedit.setText(str(text))

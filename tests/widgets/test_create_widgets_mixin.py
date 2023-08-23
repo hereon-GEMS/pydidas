@@ -42,10 +42,6 @@ class TestWidget(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.name = "".join(random.choice(string.ascii_letters) for i in range(20))
 
 
-def get_test_widget(*args, **kwargs):
-    return TestWidget()
-
-
 class TestCreateWidgetsMixIn(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -216,7 +212,7 @@ class TestCreateWidgetsMixIn(unittest.TestCase):
 
     def test_create_widget__with_layout_args(self):
         obj = self.get_widget()
-        obj._CreateWidgetsMixIn__create_widget(get_test_widget, "ref", layout_kwargs={})
+        obj.create_any_widget("ref", TestWidget, layout_kwargs={})
         self.assertTrue("ref" in obj._widgets)
 
     def test_create_any_widget__plain(self):

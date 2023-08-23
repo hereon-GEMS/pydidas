@@ -314,12 +314,7 @@ class CreateWidgetsMixIn:
             If the reference "ref" is not of type string.
         """
         _widget = widget_class(*args)
-        # try:
         self.add_any_widget(ref, _widget, **kwargs)
-        # except:
-        #     print("ref", ref)
-        #     print("widget", _widget)
-        #     print(kwargs)
 
     def add_any_widget(
         self, ref: Union[str, None], widget_instance: QWidget, **kwargs: dict

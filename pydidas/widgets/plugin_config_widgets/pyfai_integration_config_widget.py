@@ -33,10 +33,6 @@ from functools import partial
 from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
-from pydidas.core.constants import (
-    DEFAULT_PLUGIN_PARAM_CONFIG,
-    PLUGIN_PARAM_WIDGET_WIDTH,
-)
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
@@ -58,7 +54,7 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self._window_show = None
         for _key, _param in self.plugin.params.items():
             if _key not in self.plugin.advanced_parameters:
-                self.create_param_widget(_param, **DEFAULT_PLUGIN_PARAM_CONFIG)
+                self.create_param_widget(_param)
         if "azi_use_range" in self.param_composite_widgets:
             self.param_composite_widgets["azi_use_range"].io_edited.connect(
                 self._toggle_azimuthal_ranges_visibility
@@ -76,13 +72,11 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "but_show_integration_region",
             "Show selected integration region",
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=partial(self._select_integration_region, allow_edit=False),
         )
         self.create_button(
             "but_select_integration_region",
             "Select integration region in image",
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=partial(self._select_integration_region, allow_edit=True),
         )
         self.__advanced_hidden = True
@@ -90,13 +84,11 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             "but_toggle_advanced_params",
             "Display advanced Parameters",
             icon="qt-std::SP_TitleBarUnshadeButton",
-            fixedWidth=PLUGIN_PARAM_WIDGET_WIDTH - 40,
             clicked=self.__toggle_advanced_params,
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)
-            _kwargs = DEFAULT_PLUGIN_PARAM_CONFIG | {"visible": False}
-            self.create_param_widget(_param, **_kwargs)
+            self.create_param_widget(_param, visible=False)
 
     @QtCore.Slot(str)
     def _toggle_azimuthal_ranges_visibility(self, new_selection):

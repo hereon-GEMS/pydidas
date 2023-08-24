@@ -27,8 +27,9 @@ __status__ = "Production"
 __all__ = ["PydidasLabel"]
 
 
-from qtpy import QtWidgets
+from qtpy import QtCore, QtWidgets
 
+from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH, POLICY_EXP_FIX
 from .pydidas_widget_mixin import PydidasWidgetMixin
 
 
@@ -40,3 +41,35 @@ class PydidasLabel(PydidasWidgetMixin, QtWidgets.QLabel):
     def __init__(self, *args: tuple, **kwargs: dict):
         QtWidgets.QLabel.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
+        if "sizePolicy" not in kwargs:
+            self.setSizePolicy(*POLICY_EXP_FIX)
+        if "font_metric_width_factor" in kwargs:
+            self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
+            self.__qtapp = QtWidgets.QApplication.instance()
+            self.set_dynamic_width_from_font(self.__qtapp.standard_font_height)
+            self.__qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
+
+    def sizeHint(self):
+        """
+        Set a reasonable wide sizeHint so the label takes the available space.
+
+        Returns
+        -------
+        QtCore.QSize
+            The widget sizeHint
+        """
+        return QtCore.QSize(GENERIC_STANDARD_WIDGET_WIDTH, 5)
+
+    @QtCore.Slot(float)
+    def set_dynamic_width_from_font(self, font_height: float):
+        """
+        Set the fixed width of the widget dynamically from the font height metric.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        self.setFixedWidth(
+            int(self.__font_metric_width_factor * self.__qtapp.standard_font_height)
+        )

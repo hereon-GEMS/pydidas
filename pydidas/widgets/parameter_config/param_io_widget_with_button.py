@@ -34,6 +34,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from ...core import Parameter
+from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH
 from ..factory import PydidasLineEdit, PydidasSquareButton
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
@@ -131,3 +132,9 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
             Any object, the object's str representation will be used.
         """
         self._io_lineedit.setText(str(text))
+
+    def sizeHint(self):
+        """
+        Set a large horizontal size hint to have the widget expand with big font sizes.
+        """
+        return QtCore.QSize(2 * GENERIC_STANDARD_WIDGET_WIDTH, 5)

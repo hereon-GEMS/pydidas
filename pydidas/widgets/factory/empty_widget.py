@@ -28,8 +28,9 @@ __all__ = ["EmptyWidget"]
 
 
 from qtpy.QtWidgets import QGridLayout, QWidget
+from qtpy import QtCore
 
-from ...core.constants import ALIGN_TOP_LEFT
+from ...core.constants import ALIGN_TOP_LEFT, GENERIC_STANDARD_WIDGET_WIDTH
 from ...core.utils import apply_qt_properties
 
 
@@ -52,3 +53,14 @@ class EmptyWidget(QWidget):
                 contentsMargins=(0, 0, 0, 0),
                 alignment=ALIGN_TOP_LEFT,
             )
+
+    def sizeHint(self):
+        """
+        Set a reasonable wide sizeHint so the widget takes the available space.
+
+        Returns
+        -------
+        QtCore.QSize
+            The widget sizeHint
+        """
+        return QtCore.QSize(GENERIC_STANDARD_WIDGET_WIDTH, 5)

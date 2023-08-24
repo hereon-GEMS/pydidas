@@ -244,10 +244,6 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         widget : QWidget
             The input widget used for editing the parameter value.
         """
-        print(self.param.refkey)
-        print("own geometry:", self._widgets["io"].geometry())
-        print(self._widgets["io"].sizeHint())
-        print("parent geometry:", self._widgets["io"].parent().geometry())
         try:
             self.param.value = self._widgets["io"].get_value()
         except ValueError:

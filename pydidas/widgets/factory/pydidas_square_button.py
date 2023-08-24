@@ -42,6 +42,7 @@ class PydidasSquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.__qtapp = QtWidgets.QApplication.instance()
         self.__qtapp.sig_new_font_height.connect(self.__update_min_sizes)
+        self.__update_min_sizes(self.__qtapp.standard_font_height)
 
     def heightForWidth(self, width: int) -> int:
         """

@@ -34,7 +34,7 @@ from qtpy import QtCore, QtWidgets
 from qtpy.QtWidgets import QStyle
 
 from ...core import Hdf5key, constants
-from ...core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP
+from ...core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP
 from ..factory import CreateWidgetsMixIn
 from ..utilities import delete_all_items_in_layout
 from .parameter_edit_canvas import ParameterEditCanvas
@@ -68,7 +68,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.setFixedWidth(
             int(
                 QtWidgets.QApplication.instance().standard_font_height
-                * PLUGIN_PARAM_EDIT_ASPECT_RATIO
+                * PARAM_EDIT_ASPECT_RATIO
                 + 25
             )
         )
@@ -247,4 +247,4 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         font_height : float
             The font height in pixels.
         """
-        self.setFixedWidth(int(PLUGIN_PARAM_EDIT_ASPECT_RATIO * font_height))
+        self.setFixedWidth(int(PARAM_EDIT_ASPECT_RATIO * font_height))

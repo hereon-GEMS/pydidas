@@ -32,7 +32,7 @@ from qtpy.QtWidgets import QAbstractScrollArea, QApplication
 
 from ....core import constants
 from ....core.utils import update_size_policy
-from ....core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO
+from ....core.constants import PARAM_EDIT_ASPECT_RATIO
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.parameter_config import EditPluginParametersWidget
@@ -90,8 +90,7 @@ class WorkflowEditFrameBuilder:
             ScrollArea,
             minimumHeight=450,
             fixedWidth=int(
-                QApplication.instance().standard_font_height
-                * PLUGIN_PARAM_EDIT_ASPECT_RATIO
+                QApplication.instance().standard_font_height * PARAM_EDIT_ASPECT_RATIO
                 + 25
             ),
             widget=frame._widgets["plugin_edit_canvas"],

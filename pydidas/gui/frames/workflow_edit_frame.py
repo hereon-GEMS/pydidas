@@ -32,7 +32,7 @@ from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import PLUGIN_PARAM_EDIT_ASPECT_RATIO
+from ...core.constants import PARAM_EDIT_ASPECT_RATIO
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
 from ...widgets.framework import BaseFrame
@@ -99,6 +99,7 @@ class WorkflowEditFrame(BaseFrame):
             default_extension="yaml",
             qsettings_ref="WorkflowEditFrame__export",
         )
+        self.__qtapp = QtWidgets.QApplication.instance()
 
     def build_frame(self):
         """
@@ -210,8 +211,6 @@ class WorkflowEditFrame(BaseFrame):
             self._config["state"] = state
             return
         super().restore_state(state)
-        for _key, _coords in state["widgets"].items():
-            self._widgets[_key].setGeometry(*_coords)
         WORKFLOW_EDIT_MANAGER.update_from_tree(reset_active_node=True)
 
     @QtCore.Slot(int)
@@ -255,5 +254,7 @@ class WorkflowEditFrame(BaseFrame):
             The font height.
         """
         self._widgets["plugin_edit_area"].setFixedWidth(
-            int(PLUGIN_PARAM_EDIT_ASPECT_RATIO * font_height) + 25
+            int(PARAM_EDIT_ASPECT_RATIO * font_height)
+            + self.__qtapp.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+            + 2
         )

@@ -83,6 +83,9 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self.__qtapp.sig_fontsize_changed.connect(self.__app_font_changed)
         self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
         self.__app_font_changed()
+        PLUGIN_COLLECTION.sig_updated_plugins.connect(
+            self.__delete_all_nodes_and_widgets
+        )
 
     def update_qt_canvas(self, qt_canvas):
         """
@@ -461,7 +464,8 @@ class _WorkflowTreeEditManager(QtCore.QObject):
             del self._node_positions[_id]
         if len(self._nodes) == 0:
             self.root = None
-            self.qt_canvas.update_widget_connections([])
+            if self.qt_canvas is not None:
+                self.qt_canvas.update_widget_connections([])
 
     @QtCore.Slot()
     def __app_font_changed(self):
@@ -469,7 +473,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         Handle the QApplication's font changed signal and update the widgets.
         """
         _font = self.__qtapp.font()
-        _font.setPointSizeF(self.__qtapp.standard_fontsize + 1)
+        _font.setPointSizeF(self.__qtapp.standard_font_size + 1)
         _metrics = QtGui.QFontMetrics(_font)
         _rect = _metrics.boundingRect("pyFAI azimuthal integration Test")
         self.PLUGIN_WIDGET_WIDTH = _width = _rect.width() + 10

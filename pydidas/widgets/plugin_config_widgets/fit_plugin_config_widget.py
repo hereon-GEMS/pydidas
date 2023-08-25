@@ -35,7 +35,7 @@ from qtpy.QtWidgets import QStyle
 
 from pydidas.core.constants import (
     FIT_OUTPUT_OPTIONS,
-    PLUGIN_PARAM_EDIT_ASPECT_RATIO,
+    PARAM_EDIT_ASPECT_RATIO,
     POLICY_EXP_FIX,
 )
 from pydidas.core.utils import apply_qt_properties
@@ -70,7 +70,7 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
             "label_fit_output",
             "Fit output values:",
             parent_widget="checkbox_widget",
-            font_metric_width_factor=0.5 * PLUGIN_PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.5 * PARAM_EDIT_ASPECT_RATIO,
         )
         for _index, _key in enumerate(FIT_OUTPUT_OPTIONS):
             self.create_check_box(

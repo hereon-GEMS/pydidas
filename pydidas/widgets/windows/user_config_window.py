@@ -38,17 +38,17 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 
 from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
 from ...core.constants import (
-    ALIGN_CENTER_LEFT,
     ALIGN_TOP_RIGHT,
-    CONFIG_WIDGET_WIDTH,
     POLICY_EXP_FIX,
     POLICY_MIN_MIN,
     QSETTINGS_USER_KEYS,
+    PARAM_EDIT_ASPECT_RATIO,
 )
-from ...core.utils import update_size_policy
 from ...plugins import PluginCollection, get_generic_plugin_path
-from ...widgets.dialogues import AcknowledgeBox, QuestionBox
-from ...widgets.framework import PydidasWindow
+from ..dialogues import AcknowledgeBox, QuestionBox
+from ..framework import PydidasWindow
+from ..factory import EmptyWidget, PydidasSquareButton
+from ..scroll_area import ScrollArea
 
 
 PLUGINS = PluginCollection()
@@ -63,8 +63,7 @@ _FONT_SIZE_VALIDATOR.setNotation(QtGui.QDoubleValidator.StandardNotation)
 
 class _UserConfigWindow(PydidasWindow):
     """
-    The UserConfigWindow is a standalone QMainWindow with the
-    GlobalConfigurationFrame as sole content.
+    The UserConfigWindow allows to set the user configuration for pydidas.
     """
 
     menu_icon = "qta::mdi.application-cog"
@@ -86,22 +85,6 @@ class _UserConfigWindow(PydidasWindow):
         """
         Populate the GlobalConfigurationFrame with widgets.
         """
-        _twoline_options = dict(
-            width_text=self.TEXT_WIDTH,
-            linebreak=True,
-            width_io=CONFIG_WIDGET_WIDTH - 20,
-            width_total=CONFIG_WIDGET_WIDTH,
-            halign_text=QtCore.Qt.AlignLeft,
-            valign_text=QtCore.Qt.AlignBottom,
-            width_unit=0,
-        )
-        _options = dict(
-            width_text=self.TEXT_WIDTH,
-            width_io=80,
-            width_unit=40,
-            width_total=CONFIG_WIDGET_WIDTH,
-        )
-        _section_options = dict(fontsize_offset=3, bold=True, gridPos=(-1, 0, 1, 1))
         self.create_label(
             "title",
             "User configuration\n",
@@ -109,59 +92,74 @@ class _UserConfigWindow(PydidasWindow):
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
+        self._widgets["config_canvas"] = EmptyWidget(
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO
+        )
+        self.layout().setColumnStretch(1, 1)
+        self.create_any_widget(
+            "config_scroll_area",
+            ScrollArea,
+            widget=self._widgets["config_canvas"],
+            # columnStretch=1,
+        )
+        _section_options = dict(
+            fontsize_offset=3,
+            bold=True,
+            gridPos=(-1, 0, 1, 1),
+            parent_widget="config_canvas",
+        )
+
         self.create_button(
             "but_reset",
             "Restore defaults",
             icon="qt-std::SP_BrowserReload",
             gridPos=(-1, 0, 1, 1),
             alignment=None,
+            parent_widget="config_canvas",
         )
-        self.create_spacer(None)
+        self.create_spacer(None, parent_widget="config_canvas")
 
         self.create_label("section_font", "Font settings", **_section_options)
-        self.create_empty_widget("fontsize_container")
         self.create_empty_widget(
-            "fontsize_label_wrapper",
-            parent_widget="fontsize_container",
-            gridPos=(0, -1, 1, 1),
-            sicePolicy=POLICY_EXP_FIX,
-            alignment=ALIGN_CENTER_LEFT,
+            "fontsize_container",
+            parent_widget="config_canvas",
+            toolTip=(
+                "Pydidas supports font sizes from 5 pt up to 20 pt. Any entries "
+                "outside of this range will be ignored."
+            ),
         )
-        update_size_policy(self._widgets["fontsize_label_wrapper"], horizontalStretch=6)
         self.create_label(
             "label_font_size",
             "Standard font size:",
-            parent_widget="fontsize_label_wrapper",
+            parent_widget="fontsize_container",
+            font_metric_width_factor=0.5 * PARAM_EDIT_ASPECT_RATIO,
             wordWrap=False,
         )
-        self.create_button(
+        self.add_any_widget(
             "but_fontsize_reduce",
-            "",
-            icon="qta::mdi.arrow-bottom-left-thick",
-            sizePolicy=_BUTTON_POLICY,
+            PydidasSquareButton(icon="qta::mdi.arrow-bottom-left-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )
         self.create_lineedit(
             "edit_fontsize",
-            text=str(QtWidgets.QApplication.instance().standard_fontsize),
-            horizontalStretch=3,
+            text=str(QtWidgets.QApplication.instance().standard_font_size),
             parent_widget="fontsize_container",
             gridPos=(0, -1, 1, 1),
             validator=_FONT_SIZE_VALIDATOR,
         )
-        update_size_policy(self._widgets["edit_fontsize"], horizontalStretch=2)
-        self.create_button(
+        self.add_any_widget(
             "but_fontsize_increase",
-            "",
-            icon="qta::mdi.arrow-top-right-thick",
-            sizePolicy=_BUTTON_POLICY,
+            PydidasSquareButton(icon="qta::mdi.arrow-top-right-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )
-
-        self.create_label("label_font_family", "Standard font family:", wordWrap=False)
-        self.create_empty_widget("font_family_container", sizePolicy=POLICY_EXP_FIX)
+        self.create_label(
+            "label_font_family",
+            "Standard font family:",
+            wordWrap=False,
+            parent_widget="config_canvas",
+        )
         self.add_any_widget(
             "font_family_box",
             QtWidgets.QFontComboBox(),
@@ -173,54 +171,73 @@ class _UserConfigWindow(PydidasWindow):
                 | QtWidgets.QFontComboBox.MonospacedFonts
             ),
             writingSystem=QtGui.QFontDatabase.Latin,
+            currentText=self.__qtapp.standard_font_family,
+            parent_widget="config_canvas",
         )
-        self.create_spacer(None)
+        self.create_spacer(None, parent_widget="config_canvas")
 
         self.create_label(
             "section_mosaic", "Composite creator settings", **_section_options
         )
-        self.create_param_widget(self.get_param("mosaic_border_width"), **_options)
-        self.create_param_widget(self.get_param("mosaic_border_value"), **_options)
-        self.create_spacer("spacer_3")
+        self.create_param_widget(
+            self.get_param("mosaic_border_width"),
+            parent_widget="config_canvas",
+            width_text=0.7,
+        )
+        self.create_param_widget(
+            self.get_param("mosaic_border_value"),
+            parent_widget="config_canvas",
+            width_text=0.7,
+        )
+        self.create_spacer("spacer_3", parent_widget="config_canvas")
 
         self.create_label("section_plotting", "Plot settings", **_section_options)
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction_low"),
-            **(_twoline_options | {"width_io": 80, "width_text": CONFIG_WIDGET_WIDTH}),
+            width_text=0.7,
+            parent_widget="config_canvas",
         )
         self.create_param_widget(
             self.get_param("histogram_outlier_fraction_high"),
-            **(_twoline_options | {"width_io": 80, "width_text": CONFIG_WIDGET_WIDTH}),
+            width_text=0.7,
+            parent_widget="config_canvas",
         )
-        self.create_empty_widget("colormap_editor", fixedWidth=CONFIG_WIDGET_WIDTH)
+        self.create_empty_widget(
+            "colormap_editor",
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            parent_widget="config_canvas",
+            layout_column_stretches={0: 10, 1: 90},
+        )
         self.create_label(
             "label_colormap",
             "Default colormap:",
             gridPos=(0, 0, 1, 2),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["colormap_editor"],
+            parent_widget="colormap_editor",
         )
         self.add_any_widget(
             "cmap_combobox",
             ColormapNameComboBox(),
-            parent_widget=self._widgets["colormap_editor"],
-            fixedWidth=(CONFIG_WIDGET_WIDTH - 20),
+            parent_widget="colormap_editor",
             gridPos=(1, 1, 1, 1),
-            layout_kwargs={"alignment": ALIGN_TOP_RIGHT},
         )
-        self.create_spacer("spacer_4")
+        self.create_spacer("spacer_4", parent_widget="config_canvas")
 
         self.create_label("section_plugins", "Plugins", **_section_options)
-        self.create_param_widget(self.get_param("plugin_path"), **_twoline_options)
+        self.create_param_widget(
+            self.get_param("plugin_path"), linebreak=True, parent_widget="config_canvas"
+        )
         self.create_button(
-            "but_plugins", "Update plugin collection", icon="qt-std::SP_BrowserReload"
+            "but_plugins",
+            "Update plugin collection",
+            icon="qt-std::SP_BrowserReload",
+            parent_widget="config_canvas",
         )
         self.create_button(
             "but_reset_plugins",
             "Restore default plugin collection paths",
             icon="qt-std::SP_DialogOkButton",
+            parent_widget="config_canvas",
         )
-        self.layout().setColumnStretch(1, 1)
 
     def connect_signals(self):
         """
@@ -245,6 +262,15 @@ class _UserConfigWindow(PydidasWindow):
         )
         self._widgets["font_family_box"].currentFontChanged.connect(
             self.new_font_family_selected
+        )
+
+    def finalize_ui(self):
+        """
+        finalize the UI initialization.
+        """
+        self.setFixedWidth(self._widgets["config_scroll_area"].sizeHint().width() + 25)
+        self._widgets["font_family_box"].setFixedWidth(
+            0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height
         )
 
     @QtCore.Slot(object)
@@ -330,21 +356,22 @@ class _UserConfigWindow(PydidasWindow):
             The change direction.
         """
         if change == "increase":
-            self.__qtapp.standard_fontsize = min(
-                ceil(self.__qtapp.standard_fontsize) + 1, 20
-            )
+            _new_fontsize = min(ceil(self.__qtapp.standard_font_size) + 1, 20)
         elif change == "decrease":
-            self.__qtapp.standard_fontsize = max(
-                floor(self.__qtapp.standard_fontsize) - 1, 5
-            )
-        self._widgets["edit_fontsize"].setText(str(self.__qtapp.standard_fontsize))
+            _new_fontsize = max(floor(self.__qtapp.standard_font_size) - 1, 5)
+        self._widgets["edit_fontsize"].setText(str(_new_fontsize))
+        self.process_new_fontsize_setting()
 
     @QtCore.Slot()
     def process_new_fontsize_setting(self):
         """
         Process the user input of the new font size.
         """
-        self.__qtapp.standard_fontsize = float(self._widgets["edit_fontsize"].text())
+        self.__qtapp.standard_font_size = float(self._widgets["edit_fontsize"].text())
+        self.setFixedWidth(self._widgets["config_scroll_area"].sizeHint().width() + 25)
+        self._widgets["font_family_box"].setFixedWidth(
+            0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height
+        )
 
     @QtCore.Slot(QtGui.QFont)
     def new_font_family_selected(self, font: QtGui.QFont):
@@ -357,6 +384,7 @@ class _UserConfigWindow(PydidasWindow):
             The new font.
         """
         self.__qtapp.standard_font_family = font.family()
+        self.process_new_fontsize_setting()
 
     @QtCore.Slot(int)
     def frame_activated(self, index):
@@ -389,6 +417,15 @@ class _UserConfigWindow(PydidasWindow):
         )
         if answer == _qm.Yes:
             self.restore_all_defaults(True)
+            self.__qtapp.reset_font_to_standard()
+            with QtCore.QSignalBlocker(self._widgets["edit_fontsize"]):
+                self._widgets["edit_fontsize"].setText(
+                    str(self.__qtapp.standard_font_size)
+                )
+            with QtCore.QSignalBlocker(self._widgets["font_family_box"]):
+                self._widgets["font_family_box"].setCurrentText(
+                    self.__qtapp.standard_font_family
+                )
             for _param_key in self.params:
                 _value = self.get_param_value(_param_key)
                 self.update_widget_value(_param_key, _value)

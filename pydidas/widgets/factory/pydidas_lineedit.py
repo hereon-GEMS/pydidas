@@ -42,8 +42,9 @@ class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):
     def __init__(self, *args: tuple, **kwargs: dict):
         QtWidgets.QLineEdit.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
+        self.__sizeHint = QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)
 
-    def sizeHint(self):
+    def sizeHint(self) -> QtCore.QSize:
         """
         Set a reasonable large sizeHint so the LineEdit takes the available space.
 
@@ -52,4 +53,16 @@ class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):
         QtCore.QSize
             The widget sizeHint
         """
-        return QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)
+        return self.__sizeHint
+
+    def update_size_hint(self, new_size_hint: QtCore.QSize):
+        """
+        Update the sizeHint value of this widget.
+
+        Parameters
+        ----------
+        new_size_hint : QtCore.QSize
+            The new size hint.
+        """
+        self.__sizeHint = new_size_hint
+        self.updateGeometry()

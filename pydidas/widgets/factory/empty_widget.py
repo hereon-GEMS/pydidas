@@ -47,6 +47,7 @@ class EmptyWidget(QWidget):
     def __init__(self, **kwargs: dict):
         self.__size_hint_width = GENERIC_STANDARD_WIDGET_WIDTH
         QWidget.__init__(self)
+        self.__scale_with_font = False
         apply_qt_properties(self, **kwargs)
         if kwargs.get("init_layout", True):
             self.setLayout(QGridLayout())
@@ -56,6 +57,7 @@ class EmptyWidget(QWidget):
                 alignment=ALIGN_TOP_LEFT,
             )
         if "font_metric_width_factor" in kwargs:
+            self.__scale_with_font = True
             self._qtapp = QApplication.instance()
             self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
             self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
@@ -85,7 +87,12 @@ class EmptyWidget(QWidget):
         font_height : float
             The font height in pixels.
         """
-        self.__size_hint_width = int(
-            self.__font_metric_width_factor * self._qtapp.standard_font_height
-        )
+        self.__size_hint_width = int(self.__font_metric_width_factor * font_height)
         self.setFixedWidth(self.__size_hint_width)
+
+    def update_dynamic_width(self):
+        """
+        Update the dynamic width.
+        """
+        if self.__scale_with_font:
+            self.set_dynamic_width_from_font(self._qtapp.standard_font_height)

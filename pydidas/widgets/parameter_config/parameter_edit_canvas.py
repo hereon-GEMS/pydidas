@@ -34,11 +34,11 @@ from qtpy import QtWidgets
 
 from ...core.constants import POLICY_MIN_MIN
 from ...core.utils import apply_qt_properties
-from ..factory import PydidasWidgetWithGridLayout
+from ..factory import EmptyWidget
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 
-class ParameterEditCanvas(ParameterWidgetsMixIn, PydidasWidgetWithGridLayout):
+class ParameterEditCanvas(ParameterWidgetsMixIn, EmptyWidget):
     """
     The ParameterEditCanvas is widget for handling Parameter edit widgets.
 
@@ -51,8 +51,7 @@ class ParameterEditCanvas(ParameterWidgetsMixIn, PydidasWidgetWithGridLayout):
     """
 
     def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict):
-        PydidasWidgetWithGridLayout.__init__(self, parent)
+        EmptyWidget.__init__(self, parent=parent, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
-        apply_qt_properties(self, **kwargs)
-        self.layout().setContentsMargins(5, 5, 5, 5)
+        self.layout().setContentsMargins(0, 0, 0, 0)
         self.setSizePolicy(*POLICY_MIN_MIN)

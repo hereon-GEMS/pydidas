@@ -56,23 +56,20 @@ class ParameterWidgetsMixIn:
         param : Parameter
             A Parameter class instance.
         **kwargs : dict
-            Optional keyword arguments
+            Optional keyword arguments.
 
         Keyword arguments
         -----------------
         gridPos : tuple, optional
             The grid position in the layout. The default is (-1, 0, 1, 1)
-        width_total : int, optional
-            The total width of the widget. The width of the IO widget is
-            calculated from width_total, width_text, width_unit and linebreak.
-        width_text : int, optional
-            The width of the text field for the Parameter name. The default
-            is 120.
-        width_unit : int, optional
-            The width of the text field for the Parameter unit. The default
-            is 30.
+        width_text : float, optional
+            The relative width of the text field for the Parameter name. The default
+            is 0.5.
+        width_unit : float, optional
+            The relative width of the text field for the Parameter unit. The default
+            is 0.07.
         width_io : int, optional
-            The width of the input widget. The default is 255 pixel.
+            The relative width of the input widget. The default is 0.43.
         linebreak : bool, optional
             Keyword to toggle a line break between the text label and the
             input widget. The default is False.
@@ -82,12 +79,6 @@ class ParameterWidgetsMixIn:
         halign_text : QtCore.Qt.Alignment, optional
             The horizontal alignment for the text (label) widget. The default
             is QtCore.Qt.AlignRight.
-        valign_io : QtCore.Qt.Alignment, optional
-            The vertical alignment for the input widget. The default is
-            QtCore.Qt.AlignTop.
-        valign_text : QtCore.Qt.Alignment, optional
-            The vertical alignment for the text (label) widget. The default
-            is QtCore.Qt.AlignTop.
         parent_widget : Union[QWidget, str, None], optional
             The widget to which the label is added. If a string, this picks up the
             calling class's ._widgets dictionary and selects the string key's value.

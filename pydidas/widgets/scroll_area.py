@@ -29,7 +29,7 @@ __all__ = ["ScrollArea"]
 
 
 from qtpy.QtWidgets import QScrollArea, QFrame, QStyle, QApplication
-from qtpy.QtCore import QSize
+from qtpy.QtCore import QSize, Slot
 
 from ..core.constants import POLICY_EXP_EXP
 from ..core.utils import apply_qt_properties
@@ -48,6 +48,8 @@ class ScrollArea(QScrollArea):
         method are valid keywords.
     """
 
+    init_kwargs = ["resize_to_widget_width"]
+
     def __init__(self, parent=None, **kwargs):
         QScrollArea.__init__(self, parent)
         kwargs["widgetResizable"] = True
@@ -58,6 +60,10 @@ class ScrollArea(QScrollArea):
         self.__scrollbar_width = (
             QApplication.instance().style().pixelMetric(QStyle.PM_ScrollBarExtent)
         )
+        if kwargs.get("resize_to_widget_width"):
+            QApplication.instance().sig_font_height_changed.connect(
+                self.force_width_from_size_hint
+            )
 
     def sizeHint(self):
         """
@@ -76,3 +82,10 @@ class ScrollArea(QScrollArea):
             _hint = self.widget().sizeHint()
             return QSize(_hint.width() + self.__scrollbar_width + 2, _hint.width())
         return super().sizeHint()
+
+    @Slot()
+    def force_width_from_size_hint(self):
+        """
+        Enforce a fixed width based on the own sizeHint.
+        """
+        self.setFixedWidth(self.sizeHint().width())

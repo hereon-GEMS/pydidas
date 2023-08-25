@@ -80,7 +80,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         self._node_widgets = {}
         self._nodes = {}
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_fontsize_changed.connect(self.__app_font_changed)
+        self.__qtapp.sig_font_size_changed.connect(self.__app_font_changed)
         self.__qtapp.sig_font_family_changed.connect(self.__app_font_changed)
         self.__app_font_changed()
         PLUGIN_COLLECTION.sig_updated_plugins.connect(

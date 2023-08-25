@@ -372,7 +372,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
         self.__qtapp = QtWidgets.QApplication.instance()
         self.__height = int(np.ceil(2 * self.__qtapp.standard_font_size + 2))
-        self.__qtapp.sig_fontsize_changed.connect(self.changed_font)
+        self.__qtapp.sig_font_size_changed.connect(self.changed_font)
 
     @QtCore.Slot()
     def changed_font(self):

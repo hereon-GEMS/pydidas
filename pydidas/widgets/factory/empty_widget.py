@@ -89,6 +89,7 @@ class EmptyWidget(QWidget):
         """
         self.__size_hint_width = int(self.__font_metric_width_factor * font_height)
         self.setFixedWidth(self.__size_hint_width)
+        self.updateGeometry()
 
     def update_dynamic_width(self):
         """

@@ -43,14 +43,12 @@ from ...core.constants import (
     POLICY_MIN_MIN,
     QSETTINGS_USER_KEYS,
     PARAM_EDIT_ASPECT_RATIO,
-    POLICY_EXP_EXP,
     GENERIC_STANDARD_WIDGET_WIDTH,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
 from ..dialogues import AcknowledgeBox, QuestionBox
 from ..framework import PydidasWindow
-from ..factory import EmptyWidget, PydidasSquareButton
-from ..scroll_area import ScrollArea
+from ..factory import  PydidasSquareButton
 
 
 PLUGINS = PluginCollection()
@@ -82,7 +80,7 @@ class _UserConfigWindow(PydidasWindow):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas user configuration")
-        self.setSizePolicy(*POLICY_EXP_EXP)
+        self.setSizePolicy(*POLICY_MIN_MIN)
 
     def build_frame(self):
         """
@@ -95,15 +93,10 @@ class _UserConfigWindow(PydidasWindow):
             bold=True,
             gridPos=(0, 0, 1, 1),
         )
-        self._widgets["config_canvas"] = EmptyWidget(
+        self.create_empty_widget(
+            "config_canvas",
             font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
             verticalSizePolicy=QtWidgets,
-        )
-        self.layout().setColumnStretch(1, 1)
-        self.create_any_widget(
-            "config_scroll_area",
-            ScrollArea,
-            widget=self._widgets["config_canvas"],
         )
         _section_options = dict(
             fontsize_offset=3,
@@ -275,7 +268,7 @@ class _UserConfigWindow(PydidasWindow):
         """
         finalize the UI initialization.
         """
-        self.setFixedWidth(self._widgets["config_scroll_area"].sizeHint().width() + 25)
+        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self._widgets["font_family_box"].setFixedWidth(
             0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height
         )
@@ -375,10 +368,11 @@ class _UserConfigWindow(PydidasWindow):
         Process the user input of the new font size.
         """
         self.__qtapp.standard_font_size = float(self._widgets["edit_fontsize"].text())
-        self.setFixedWidth(self._widgets["config_scroll_area"].sizeHint().width() + 25)
+        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
         self._widgets["font_family_box"].setFixedWidth(
             0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height
         )
+        self.adjustSize()
 
     @QtCore.Slot(QtGui.QFont)
     def new_font_family_selected(self, font: QtGui.QFont):

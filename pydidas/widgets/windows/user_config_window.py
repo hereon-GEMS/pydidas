@@ -48,7 +48,7 @@ from ...core.constants import (
 from ...plugins import PluginCollection, get_generic_plugin_path
 from ..dialogues import AcknowledgeBox, QuestionBox
 from ..framework import PydidasWindow
-from ..factory import  PydidasSquareButton
+from ..factory import PydidasSquareButton
 
 
 PLUGINS = PluginCollection()

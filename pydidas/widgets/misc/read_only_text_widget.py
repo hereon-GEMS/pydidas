@@ -62,7 +62,7 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
             del params["minimumHeight"]
         apply_qt_properties(self, **params)
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_fontsize_changed.connect(self.reprint)
+        self.__qtapp.sig_font_size_changed.connect(self.reprint)
         self.__text = ""
         self.__title = None
 

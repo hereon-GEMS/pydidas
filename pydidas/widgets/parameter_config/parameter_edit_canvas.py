@@ -33,7 +33,6 @@ from typing import Union
 from qtpy import QtWidgets
 
 from ...core.constants import POLICY_MIN_MIN
-from ...core.utils import apply_qt_properties
 from ..factory import EmptyWidget
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
 

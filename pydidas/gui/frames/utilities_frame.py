@@ -29,9 +29,11 @@ __all__ = ["UtilitiesFrame"]
 
 
 from functools import partial
+from typing import Union
 
 from qtpy import QtCore, QtWidgets
 
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import (
     ExportEigerPixelmaskWindow,
     GlobalSettingsWindow,
@@ -43,7 +45,7 @@ from .builders import UtilitiesFrameBuilder
 from .composite_creator_frame import CompositeCreatorFrame
 
 
-class UtilitiesFrame(UtilitiesFrameBuilder):
+class UtilitiesFrame(BaseFrame):
     """
     The UtilitiesFrame allows to open various independent utilities.
     """
@@ -52,8 +54,8 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
     menu_title = "Utilities"
     menu_entry = "Utilities"
 
-    def __init__(self, parent=None, **kwargs):
-        UtilitiesFrameBuilder.__init__(self, parent=parent, **kwargs)
+    def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
+        BaseFrame.__init__(self, parent=parent, **kwargs)
         self._child_windows = {}
         self.__window_counter = 0
         self._add_config_windows()
@@ -68,6 +70,12 @@ class UtilitiesFrame(UtilitiesFrameBuilder):
         _frame = UserConfigWindow()
         _frame.frame_activated(_frame.frame_index)
         self._child_windows["user_config"] = _frame
+
+    def build_frame(self):
+        """
+        Build the frame and populate it with widgets.
+        """
+        UtilitiesFrameBuilder.build_frame(self)
 
     def finalize_ui(self):
         """

@@ -39,16 +39,16 @@ from silx.gui.widgets.ColormapNameComboBox import ColormapNameComboBox
 from ...core import SingletonFactory, UserConfigError, get_generic_param_collection
 from ...core.constants import (
     ALIGN_TOP_RIGHT,
+    GENERIC_STANDARD_WIDGET_WIDTH,
+    PARAM_EDIT_ASPECT_RATIO,
     POLICY_EXP_FIX,
     POLICY_MIN_MIN,
     QSETTINGS_USER_KEYS,
-    PARAM_EDIT_ASPECT_RATIO,
-    GENERIC_STANDARD_WIDGET_WIDTH,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
 from ..dialogues import AcknowledgeBox, QuestionBox
-from ..framework import PydidasWindow
 from ..factory import PydidasSquareButton
+from ..framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()
@@ -96,7 +96,6 @@ class _UserConfigWindow(PydidasWindow):
         self.create_empty_widget(
             "config_canvas",
             font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
-            verticalSizePolicy=QtWidgets,
         )
         _section_options = dict(
             fontsize_offset=3,

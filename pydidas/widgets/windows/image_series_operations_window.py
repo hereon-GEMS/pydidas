@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ operations on a number of images.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ImageSeriesOperationsWindow"]
 
 
@@ -35,11 +35,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import Parameter, UserConfigError, get_generic_param_collection
-from ...core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-    HDF5_EXTENSIONS,
-)
+from ...core.constants import HDF5_EXTENSIONS, PARAM_EDIT_ASPECT_RATIO
 from ...core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
 from ...data_io import export_data, import_data
 from ...managers import FilelistManager
@@ -86,20 +82,17 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
 
         def get_config(param_key):
-            if param_key in ["first_file", "last_file", "hdf5_key", "output_fname"]:
-                _config = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
-            else:
-                _config = dict(
-                    width_io=100,
-                    width_unit=0,
-                    width_text=CONFIG_WIDGET_WIDTH - 100,
-                    width_total=CONFIG_WIDGET_WIDTH,
-                )
-            _config["visible"] = param_key in [
-                "first_file",
-                "output_fname",
-                "operation",
-            ]
+            _config = {
+                "linebreak": param_key
+                in ["first_file", "last_file", "hdf5_key", "output_fname"],
+                "visible": param_key
+                in [
+                    "first_file",
+                    "output_fname",
+                    "operation",
+                ],
+                "parent_widget": "config_canvas",
+            }
             if param_key == "first_file":
                 _config[
                     "persistent_qsettings_ref"
@@ -115,19 +108,27 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
             return _config
 
+        _sub_section_config = {
+            "fontsize_offset": 1,
+            "font_metric_width_factor": PARAM_EDIT_ASPECT_RATIO,
+            "bold": True,
+            "parent_widget": "config_canvas",
+        }
+        self.create_empty_widget(
+            "config_canvas",
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+        )
+
         self.create_label(
             "label_title",
             "Image series operations",
-            fontsize=14,
+            fontsize_offset=4,
             bold=True,
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            parent_widget="config_canvas",
         )
-        self.create_spacer(None)
-        self.create_label(
-            "label_input",
-            "Input selection",
-            fontsize=11,
-            bold=True,
-        )
+        self.create_spacer(None, parent_widget="config_canvas")
+        self.create_label("label_input", "Input selection", **_sub_section_config)
         for _key in [
             "first_file",
             "last_file",
@@ -138,20 +139,10 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             self.create_param_widget(self.params[_key], **get_config(_key))
 
         self.create_spacer(None)
-        self.create_label(
-            "label_operation",
-            "Operation",
-            fontsize=11,
-            bold=True,
-        )
+        self.create_label("label_operation", "Operation", **_sub_section_config)
         self.create_param_widget(self.params["operation"], **get_config("operation"))
         self.create_spacer(None)
-        self.create_label(
-            "label_output",
-            "Output",
-            fontsize=11,
-            bold=True,
-        )
+        self.create_label("label_output", "Output", **_sub_section_config)
         self.create_param_widget(
             self.params["output_fname"], **get_config("output_fname")
         )
@@ -160,6 +151,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             "check_keep_open", "Close window after processing", checked=True
         )
         self.create_button("but_exec", "Process and export image")
+        self.process_new_font_metrics()
 
     def connect_signals(self):
         """
@@ -167,6 +159,17 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
+        QtWidgets.QApplication.instance().sig_new_font_height.connect(
+            self.process_new_font_metrics
+        )
+
+    @QtCore.Slot()
+    def process_new_font_metrics(self):
+        """
+        Process the user input of the new font size.
+        """
+        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        self.adjustSize()
 
     @QtCore.Slot(str)
     def __selected_first_file(self, fname):
@@ -343,7 +346,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         Reduce the datatype of integer values to use as little disk space as possible.
         """
-        if not numbers.Integral.__subclasscheck__(self._data.dtype.type):
+        if not issubclass(self._data.dtype.type, numbers.Integral):
             return
         _min = np.amin(self._data)
         _max = np.amax(self._data)

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,18 +21,19 @@ to view and modify the global settings in a seperate Window.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["GlobalSettingsWindow"]
+
 
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
 
 from ...core import SingletonFactory, get_generic_param_collection
-from ...core.constants import CONFIG_WIDGET_WIDTH, QSETTINGS_GLOBAL_KEYS
+from ...core.constants import PARAM_EDIT_ASPECT_RATIO, QSETTINGS_GLOBAL_KEYS
 from ...plugins import PluginCollection
 from ..framework import PydidasWindow
 
@@ -42,8 +43,7 @@ PLUGINS = PluginCollection()
 
 class _GlobalSettingsWindow(PydidasWindow):
     """
-    The GlobalSettingsWindow is a standalone QMainWindow with the
-    GlobalConfigurationFrame as sole content.
+    A window to modify global pydidas settings.
     """
 
     menu_icon = "qta::mdi.application-cog"
@@ -52,55 +52,61 @@ class _GlobalSettingsWindow(PydidasWindow):
 
     value_changed_signal = QtCore.Signal(str, object)
 
-    TEXT_WIDTH = 180
     default_params = get_generic_param_collection(*QSETTINGS_GLOBAL_KEYS)
 
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas system settings")
-        self.setFixedWidth(330)
 
     def build_frame(self):
         """
         Populate the GlobalConfigurationFrame with widgets.
         """
-        _options = dict(
-            width_text=self.TEXT_WIDTH,
-            width_io=80,
-            width_unit=40,
-            width_total=CONFIG_WIDGET_WIDTH,
-        )
-        _section_options = dict(fontsize_offset=2, bold=True, gridPos=(-1, 0, 1, 1))
-
+        _section_options = {
+            "fontsize_offset": 2,
+            "bold": True,
+            "gridPos": (-1, 0, 1, 1),
+            "parent_widget": "config_canvas",
+        }
+        _param_options = {
+            "width_text": 0.6,
+            "width_unit": 0.1,
+            "parent_widget": "config_canvas",
+        }
         self.create_label(
             "title",
             "Global settings\n",
             fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 1),
         )
         self.create_button(
             "but_reset",
             "Restore defaults",
             icon="qt-std::SP_BrowserReload",
             gridPos=(-1, 0, 1, 1),
-            alignment=None,
+        )
+        self.create_empty_widget(
+            "config_canvas",
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
         )
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options
         )
-        self.create_param_widget(self.get_param("mp_n_workers"), **_options)
-        self.create_param_widget(self.get_param("shared_buffer_max_n"), **_options)
+        self.create_param_widget(self.get_param("mp_n_workers"), **_param_options)
+        self.create_param_widget(
+            self.get_param("shared_buffer_max_n"), **_param_options
+        )
         self.create_spacer("spacer_1")
 
         self.create_label("section_memory", "Memory settings", **_section_options)
-        self.create_param_widget(self.get_param("shared_buffer_size"), **_options)
-        self.create_param_widget(self.get_param("max_image_size"), **_options)
+        self.create_param_widget(self.get_param("shared_buffer_size"), **_param_options)
+        self.create_param_widget(self.get_param("max_image_size"), **_param_options)
         self.create_spacer("spacer_3")
 
         self.create_label("section_gui", "GUI behaviour", **_section_options)
-        self.create_param_widget(self.get_param("plot_update_time"), **_options)
+        self.create_param_widget(self.get_param("plot_update_time"), **_param_options)
+        self.process_new_font_metrics()
 
     def connect_signals(self):
         """
@@ -111,6 +117,9 @@ class _GlobalSettingsWindow(PydidasWindow):
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
+        QtWidgets.QApplication.instance().sig_new_font_height.connect(
+            self.process_new_font_metrics
+        )
 
     @QtCore.Slot(object)
     def update_qsetting(self, param_key, value):
@@ -178,6 +187,14 @@ class _GlobalSettingsWindow(PydidasWindow):
         """
         value = self._qsettings_convert_value_type(param_key, value)
         self.set_param_value_and_widget(param_key, value)
+
+    @QtCore.Slot()
+    def process_new_font_metrics(self):
+        """
+        Process the user input of the new font size.
+        """
+        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        self.adjustSize()
 
 
 GlobalSettingsWindow = SingletonFactory(_GlobalSettingsWindow)

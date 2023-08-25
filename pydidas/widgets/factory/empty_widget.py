@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["EmptyWidget"]
 
 
-from qtpy.QtWidgets import QGridLayout, QWidget
+from qtpy.QtWidgets import QGridLayout, QWidget, QApplication
 from qtpy import QtCore
 
 from ...core.constants import ALIGN_TOP_LEFT, GENERIC_STANDARD_WIDGET_WIDTH
@@ -42,17 +42,27 @@ class EmptyWidget(QWidget):
     a matching setter was found.
     """
 
+    init_kwargs = ["init_layout", "font_metric_width_factor", "layout_column_stretches"]
+
     def __init__(self, **kwargs: dict):
+        self.__size_hint_width = GENERIC_STANDARD_WIDGET_WIDTH
         QWidget.__init__(self)
-        init_layout = kwargs.get("init_layout", True)
         apply_qt_properties(self, **kwargs)
-        if init_layout:
+        if kwargs.get("init_layout", True):
             self.setLayout(QGridLayout())
             apply_qt_properties(
                 self.layout(),
                 contentsMargins=(0, 0, 0, 0),
                 alignment=ALIGN_TOP_LEFT,
             )
+        if "font_metric_width_factor" in kwargs:
+            self._qtapp = QApplication.instance()
+            self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
+            self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
+            self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
+        if "layout_column_stretches" in kwargs:
+            for _key, _val in kwargs.get("layout_column_stretches").items():
+                self.layout().setColumnStretch(_key, _val)
 
     def sizeHint(self):
         """
@@ -63,4 +73,19 @@ class EmptyWidget(QWidget):
         QtCore.QSize
             The widget sizeHint
         """
-        return QtCore.QSize(GENERIC_STANDARD_WIDGET_WIDTH, 5)
+        return QtCore.QSize(self.__size_hint_width, 25)
+
+    @QtCore.Slot(float)
+    def set_dynamic_width_from_font(self, font_height: float):
+        """
+        Set the fixed width of the widget dynamically from the font height metric.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        self.__size_hint_width = int(
+            self.__font_metric_width_factor * self._qtapp.standard_font_height
+        )
+        self.setFixedWidth(self.__size_hint_width)

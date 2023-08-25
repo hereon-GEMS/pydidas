@@ -219,8 +219,7 @@ class CreateWidgetsMixIn:
             The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
         """
-        _widget = PydidasCheckBox(text, **kwargs)
-        self.add_any_widget(ref, _widget, **kwargs)
+        self.create_any_widget(ref, PydidasCheckBox, text, **kwargs)
 
     def create_combo_box(self, ref: Union[str, None], **kwargs: Dict):
         """
@@ -237,8 +236,7 @@ class CreateWidgetsMixIn:
             The  'fontsize_offset', 'bold', 'italic', 'underline' can be used
             to control the font properties or generic Qt properties.
         """
-        _widget = PydidasComboBox(**kwargs)
-        self.add_any_widget(ref, _widget, **kwargs)
+        self.create_any_widget(ref, PydidasComboBox, **kwargs)
 
     def create_radio_button_group(
         self, ref: Union[str, None], entries: List, **kwargs: Dict
@@ -313,7 +311,15 @@ class CreateWidgetsMixIn:
         TypeError
             If the reference "ref" is not of type string.
         """
-        _widget = widget_class(*args)
+        if hasattr(widget_class, "init_kwargs"):
+            _init_kwargs = {
+                _key: _val
+                for _key, _val in kwargs.items()
+                if _key in widget_class.init_kwargs
+            }
+            _widget = widget_class(*args, **_init_kwargs)
+        else:
+            _widget = widget_class(*args)
         self.add_any_widget(ref, _widget, **kwargs)
 
     def add_any_widget(

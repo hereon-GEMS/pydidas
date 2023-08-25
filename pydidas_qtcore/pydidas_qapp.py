@@ -89,15 +89,17 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
         self.__settings = QtCore.QSettings()
+        self.__standard_font = self.font()
         self.__font_config = {
             "size": float(
                 self.__settings.value("font/point_size", fontsize.STANDARD_FONT_SIZE)
             ),
-            "type": self.__settings.value("font/type", self.font().family()),
+            "family": self.__settings.value("font/family", self.font().family()),
             "height": 20,
         }
         _kwargs = parse_cmd_args()
-        self.standard_fontsize = _kwargs.get("fontsize", self.__font_config["size"])
+        self.standard_font_size = _kwargs.get("fontsize", self.__font_config["size"])
+        self.standard_font_family = self.__font_config["family"]
         self._update_font_height()
 
     def _update_font_height(self):
@@ -105,8 +107,9 @@ class PydidasQApplication(QtWidgets.QApplication):
         Update the stored font height metrics.
         """
         _font_height = QtGui.QFontMetrics(self.font()).boundingRect("Height").height()
-        self.__font_config["height"] = _font_height
-        self.sig_new_font_height.emit(_font_height)
+        if _font_height != self.__font_config["height"]:
+            self.__font_config["height"] = _font_height
+            self.sig_new_font_height.emit(_font_height)
 
     @QtCore.Slot()
     def send_gui_close_signal(self):
@@ -114,7 +117,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.sig_close_gui.emit()
 
     @property
-    def standard_fontsize(self) -> float:
+    def standard_font_size(self) -> float:
         """
         Return the standard fontSize set for the app.
 
@@ -125,8 +128,8 @@ class PydidasQApplication(QtWidgets.QApplication):
         """
         return self.__font_config["size"]
 
-    @standard_fontsize.setter
-    def standard_fontsize(self, value: float):
+    @standard_font_size.setter
+    def standard_font_size(self, value: float):
         """
         Set the standard fontsize for the PydidasApp.
 
@@ -149,14 +152,14 @@ class PydidasQApplication(QtWidgets.QApplication):
     @property
     def standard_font_family(self) -> str:
         """
-        Get the standard font type.
+        Get the standard font family.
 
         Returns
         -------
         str
-            The font type.
+            The font family.
         """
-        return self.__font_config["type"]
+        return self.__font_config["family"]
 
     @property
     def standard_font_height(self) -> int:
@@ -173,20 +176,39 @@ class PydidasQApplication(QtWidgets.QApplication):
     @standard_font_family.setter
     def standard_font_family(self, font_family: str):
         """
-        Set the standard font type.
+        Set the standard font family.
 
         Parameters
         ----------
-        type : str
-            The font type name.
+        family : str
+            The font family name.
         """
         if font_family == self.font().family():
             return
-        self.__font_config["type"] = font_family
-        self.__settings.setValue("font/type", font_family)
+        self.__font_config["family"] = font_family
+        self.__settings.setValue("font/family", font_family)
         _font = self.font()
         _font.setFamily(font_family)
         self.setFont(_font)
         self._update_font_height()
         self.sig_new_font_family.emit(font_family)
         self.sig_fontsize_changed.emit()
+
+    def reset_font_to_standard(self):
+        """
+        Reset all font settings to the standard values.
+        """
+        _current_family = self.font().family()
+        _current_size = self.font().pointSizeF()
+        self.setFont(self.__standard_font)
+        self.__font_config["size"] = self.font().pointSizeF()
+        self.__font_config["family"] = self.font().family()
+        if self.__font_config["family"] != _current_family:
+            self.__settings.setValue("font/family", self.__font_config["family"])
+            self.sig_new_font_family.emit(self.__font_config["family"])
+        if self.__font_config["size"] != _current_size:
+            self.__settings.setValue(
+                "font/point_size", float(self.__font_config["size"])
+            )
+            self.sig_new_fontsize.emit(self.__font_config["size"])
+        self._update_font_height()

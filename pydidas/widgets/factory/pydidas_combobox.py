@@ -44,6 +44,8 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
     (up to the generic IO widget width) to fill the layout.
     """
 
+    init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["items"]
+
     def __init__(self, *args: tuple, **kwargs: dict) -> Self:
         self.__sizeHint = QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)
         QComboBox.__init__(self, *args)

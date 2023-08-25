@@ -80,6 +80,7 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
     ):
         PydidasWidgetWithGridLayout.__init__(self, parent, **kwargs)
         self.setSizePolicy(*POLICY_EXP_FIX)
+        self.layout().setHorizontalSpacing(0)
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
         self.param = param
@@ -170,7 +171,7 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         Create a widget with the Parameter's unit text.
         """
         _text = convert_special_chars_to_unicode(self.param.unit)
-        self._widgets["unit_label"] = PydidasLabel(_text, margin=0)
+        self._widgets["unit_label"] = PydidasLabel(_text, margin=3)
         self._widgets["unit_container"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
         self.layout().addWidget(
             self._widgets["unit_container"], *self._config["layout_unit"]

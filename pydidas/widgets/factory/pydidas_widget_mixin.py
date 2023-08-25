@@ -42,6 +42,14 @@ class PydidasWidgetMixin:
     still update them automatically.
     """
 
+    init_kwargs = [
+        "size_offset",
+        "bold",
+        "italic",
+        "underline",
+        "font_metric_width_factor",
+    ]
+
     def __init__(self, **kwargs: dict):
         """
         Set up the class instance of the subclassed QWidget.
@@ -59,12 +67,16 @@ class PydidasWidgetMixin:
             "underline": kwargs.get("underline", False),
         }
         self._qtapp = QApplication.instance()
-        self.update_fontsize(self._qtapp.standard_fontsize)
+        self.update_fontsize(self._qtapp.standard_font_size)
         self.update_font_family(self._qtapp.standard_font_family)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
         self._qtapp.sig_new_font_family.connect(self.update_font_family)
         if True in self.__font_config.values():
             update_qobject_font(self, **self.__font_config)
+        if "font_metric_width_factor" in kwargs:
+            self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
+            self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
+            self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
 
     @QtCore.Slot(float)
     def update_fontsize(self, new_fontsize: float):
@@ -93,3 +105,15 @@ class PydidasWidgetMixin:
         _font = self.font()
         _font.setFamily(new_family)
         self.setFont(_font)
+
+    @QtCore.Slot(float)
+    def set_dynamic_width_from_font(self, font_height: float):
+        """
+        Set the fixed width of the widget dynamically from the font height metric.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        self.setFixedWidth(int(self.__font_metric_width_factor * font_height))

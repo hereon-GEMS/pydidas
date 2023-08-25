@@ -30,6 +30,7 @@ __all__ = ["PydidasSquareButton"]
 from qtpy import QtCore, QtWidgets
 
 from .pydidas_widget_mixin import PydidasWidgetMixin
+from ..utilities import get_pyqt_icon_from_str
 
 
 class PydidasSquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
@@ -37,7 +38,11 @@ class PydidasSquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
     A PushButton which tries to stay square in size.
     """
 
+    init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["icon"]
+
     def __init__(self, *args: tuple, **kwargs: dict):
+        if isinstance(kwargs.get("icon"), str):
+            kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
         QtWidgets.QPushButton.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.__qtapp = QtWidgets.QApplication.instance()

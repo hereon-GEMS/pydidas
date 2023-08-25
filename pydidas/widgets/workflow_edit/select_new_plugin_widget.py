@@ -371,7 +371,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent):
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__height = int(np.ceil(2 * self.__qtapp.standard_fontsize + 2))
+        self.__height = int(np.ceil(2 * self.__qtapp.standard_font_size + 2))
         self.__qtapp.sig_fontsize_changed.connect(self.changed_font)
 
     @QtCore.Slot()
@@ -379,7 +379,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         """
         Handle the QApplication's fontsize changed signal.
         """
-        self.__height = int(np.ceil(2 * self.__qtapp.standard_fontsize + 2))
+        self.__height = int(np.ceil(2 * self.__qtapp.standard_font_size + 2))
         self.sizeHintChanged.emit(self.parent().currentIndex())
 
     def sizeHint(self, options, index):
@@ -417,5 +417,5 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
             The index of the item to be painted.
         """
         if index.data(QtCore.Qt.DisplayRole) in constants.PLUGIN_TYPE_NAMES.values():
-            option.font.setPointSizeF(self.__qtapp.standard_fontsize + 2)
+            option.font.setPointSizeF(self.__qtapp.standard_font_size + 2)
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

@@ -100,10 +100,10 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         self.__title = title
         if title is None:
             return
-        self.setFontPointSize(self.__qtapp.standard_fontsize + 3)
+        self.setFontPointSize(self.__qtapp.standard_font_size + 3)
         self.setFontWeight(QtGui.QFont.Bold)
         self.append(f"{title}")
-        self.setFontPointSize(self.__qtapp.standard_fontsize + 1)
+        self.setFontPointSize(self.__qtapp.standard_font_size + 1)
         self.setFontWeight(QtGui.QFont.Normal)
 
     def setTextFromDict(
@@ -151,5 +151,5 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         """
         Reprint the latest text with the updated font settings.
         """
-        self.setFontPointSize(self.__qtapp.standard_fontsize + 1)
+        self.setFontPointSize(self.__qtapp.standard_font_size + 1)
         self.setText(self.__text, title=self.__title)

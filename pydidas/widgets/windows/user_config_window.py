@@ -43,6 +43,8 @@ from ...core.constants import (
     POLICY_MIN_MIN,
     QSETTINGS_USER_KEYS,
     PARAM_EDIT_ASPECT_RATIO,
+    POLICY_EXP_EXP,
+    GENERIC_STANDARD_WIDGET_WIDTH,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
 from ..dialogues import AcknowledgeBox, QuestionBox
@@ -80,6 +82,7 @@ class _UserConfigWindow(PydidasWindow):
         PydidasWindow.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.setWindowTitle("pydidas user configuration")
+        self.setSizePolicy(*POLICY_EXP_EXP)
 
     def build_frame(self):
         """
@@ -93,14 +96,14 @@ class _UserConfigWindow(PydidasWindow):
             gridPos=(0, 0, 1, 1),
         )
         self._widgets["config_canvas"] = EmptyWidget(
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            verticalSizePolicy=QtWidgets,
         )
         self.layout().setColumnStretch(1, 1)
         self.create_any_widget(
             "config_scroll_area",
             ScrollArea,
             widget=self._widgets["config_canvas"],
-            # columnStretch=1,
         )
         _section_options = dict(
             fontsize_offset=3,
@@ -226,6 +229,10 @@ class _UserConfigWindow(PydidasWindow):
         self.create_param_widget(
             self.get_param("plugin_path"), linebreak=True, parent_widget="config_canvas"
         )
+        self.param_widgets["plugin_path"].update_size_hint(
+            QtCore.QSize(2 * GENERIC_STANDARD_WIDGET_WIDTH, 5)
+        )
+
         self.create_button(
             "but_plugins",
             "Update plugin collection",

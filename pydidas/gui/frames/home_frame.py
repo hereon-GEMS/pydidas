@@ -102,69 +102,67 @@ class HomeFrame(BaseFrame):
 
     def build_frame(self):
         """Build the frame and add all widgets."""
-        self.create_empty_widget("canvas", parent_widget=None)
+        self.create_empty_widget(
+            "canvas", parent_widget=None, font_metric_width_factor=30
+        )
 
+        _label_options = {"font_metric_width_factor": 30, "parent_widget": "canvas"}
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
             widget=self._widgets["canvas"],
-            fixedWidth=650,
             sizePolicy=constants.POLICY_FIX_EXP,
-            gridPos=(0, 0, 2, 1),
             stretch=(1, 0),
             layout_kwargs={"alignment": None},
         )
-
         self.create_label(
             "label_welcome",
             "Welcome to pydidas",
             fontsize_offset=4,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_full_name",
             "- the python Diffraction Data Analysis Suite.",
             fontsize_offset=3,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_quickstart",
             "Quickstart hints:",
             fontsize_offset=2,
             bold=True,
             underline=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_quickstart_info",
             _GENERIC_INTRO,
+            number_of_lines=5,
             weight=QtGui.QFont.DemiBold,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            wordWrap=True,
+            **_label_options,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_toolbar",
             "Menu toolbar:",
             fontsize_offset=1,
             underline=True,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_toolbar_use",
             _TOOOLBAR_USER_TEXT,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            wordWrap=True,
+            number_of_lines=3,
+            **_label_options,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
 
         self.create_label(
             "label_help_header",
@@ -172,54 +170,53 @@ class HomeFrame(BaseFrame):
             fontsize_offset=1,
             underline=True,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_help",
             _HELP_TEXT,
-            fixedWidth=600,
+            wordWrap=True,
             openExternalLinks=True,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
             textFormat=QtCore.Qt.RichText,
-            parent_widget=self._widgets["canvas"],
+            number_of_lines=4,
+            **_label_options,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_proc_setup",
             "Workflow processing setup:",
             fontsize_offset=1,
             underline=True,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_processing_setup",
             _PROC_SETUP_TEXT,
-            fixedWidth=600,
-            parent_widget=self._widgets["canvas"],
+            number_of_lines=11,
+            wordWrap=True,
+            **_label_options,
         )
-        self.create_spacer(None, parent_widget=self._widgets["canvas"])
+        self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_proc",
             "Running processing:",
             fontsize_offset=1,
             underline=True,
             bold=True,
-            fixedWidth=400,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
         self.create_label(
             "label_processing",
             _PROC_TEXT,
-            fixedWidth=600,
+            number_of_lines=9,
+            wordWrap=True,
             openExternalLinks=True,
             textFormat=QtCore.Qt.RichText,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
-            parent_widget=self._widgets["canvas"],
+            **_label_options,
         )
-
         self.create_spacer(
             None,
             gridPos=(0, 1, 1, 1),
@@ -232,5 +229,6 @@ class HomeFrame(BaseFrame):
             gridPos=(0, 2, 1, 1),
             fixedHeight=300,
             fixedWidth=300,
+            alignment=constants.ALIGN_TOP_RIGHT,
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )

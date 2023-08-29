@@ -49,13 +49,15 @@ from ...core.utils import (
 from ...data_io import IoMaster
 from ...multiprocessing import AppRunner
 from ...widgets import dialogues
+from ...widgets.framework import BaseFrameWithApp
+from ..mixins import SilxPlotWindowMixIn
 from .builders import CompositeCreatorFrameBuilder
 
 
 logger = pydidas_logger(LOGGING_LEVEL)
 
 
-class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
+class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
     """
     Frame with Parameter setup for the CompositeCreatorApp and result
     visualization.
@@ -66,7 +68,8 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
     menu_entry = "Composite image creator"
 
     def __init__(self, parent=None, **kwargs):
-        CompositeCreatorFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
+        SilxPlotWindowMixIn.__init__(self)
 
         self._app = CompositeCreatorApp()
         self._filelist = self._app._filelist
@@ -103,6 +106,12 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
                         tooltip=("The total number of images."),
                     )
                 )
+
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        CompositeCreatorFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -148,6 +157,10 @@ class CompositeCreatorFrame(CompositeCreatorFrameBuilder):
             partial(self.__update_composite_dim, "y")
         )
         self._app.updated_composite.connect(self.__received_composite_update)
+        _app = QtWidgets.QApplication.instance()
+        if hasattr(_app, "sig_close_gui"):
+            _app.sig_close_gui.connect(self.deleteLater)
+
         self.setup_initial_state()
 
     @QtCore.Slot()

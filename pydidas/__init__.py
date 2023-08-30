@@ -39,6 +39,7 @@ import qtpy as __qtpy
 
 # must import h5py here to have the dll libraries linked correctly
 import h5py as __h5py
+import hdf5plugin as __hdf5plugin
 
 
 if __QtWidgets.QApplication.instance() is None:

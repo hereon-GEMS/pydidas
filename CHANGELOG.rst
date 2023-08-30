@@ -43,6 +43,8 @@ Bugfixes
 - Fixed an issue when deleting the root node in a GenericTree.
 - Fixed an issue where plugin labels were not updated in the WorkflowEditFrame
   when the plugins had a custom widget.
+- Fixed an issue when displaying Hdf5 files in the DirectoryExplorer which did
+  not have any valid datasets.
 
 
 v23.07.05

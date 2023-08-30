@@ -267,9 +267,9 @@ class _UserConfigWindow(PydidasWindow):
         """
         finalize the UI initialization.
         """
-        self.setFixedWidth(self._widgets["config_canvas"].sizeHint().width() + 20)
+        self.setFixedWidth(int(self._widgets["config_canvas"].sizeHint().width() + 20))
         self._widgets["font_family_box"].setFixedWidth(
-            0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height
+            int(0.9 * PARAM_EDIT_ASPECT_RATIO * self.__qtapp.standard_font_height)
         )
 
     @QtCore.Slot(object)

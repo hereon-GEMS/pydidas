@@ -42,12 +42,18 @@ class EmptyWidget(QWidget):
     a matching setter was found.
     """
 
-    init_kwargs = ["init_layout", "font_metric_width_factor", "layout_column_stretches"]
+    init_kwargs = [
+        "init_layout",
+        "font_metric_width_factor",
+        "layout_column_stretches",
+        "fix_width",
+    ]
 
     def __init__(self, **kwargs: dict):
         self.__size_hint_width = GENERIC_STANDARD_WIDGET_WIDTH
         QWidget.__init__(self)
         self.__scale_with_font = False
+        self.__fix_width = kwargs.get("fix_width", True)
         apply_qt_properties(self, **kwargs)
         if kwargs.get("init_layout", True):
             self.setLayout(QGridLayout())
@@ -88,7 +94,8 @@ class EmptyWidget(QWidget):
             The font height in pixels.
         """
         self.__size_hint_width = int(self.__font_metric_width_factor * font_height)
-        self.setFixedWidth(self.__size_hint_width)
+        if self.__fix_width:
+            self.setFixedWidth(self.__size_hint_width)
         self.updateGeometry()
 
     def update_dynamic_width(self):

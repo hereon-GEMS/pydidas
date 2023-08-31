@@ -29,8 +29,10 @@ __all__ = ["DirectorySpyFrame"]
 
 
 import time
+from typing import Self, Union
 
 from qtpy import QtCore
+from qtpy.QtWidgets import QApplication, QWidget
 
 from ...apps import DirectorySpyApp
 from ...contexts import ScanContext
@@ -38,6 +40,7 @@ from ...core import ParameterCollection
 from ...core.constants import HDF5_EXTENSIONS
 from ...core.utils import get_extension, pydidas_logger
 from ...multiprocessing import AppRunner, app_processor_without_tasks
+from ...widgets.framework import BaseFrameWithApp
 from ...workflow import WorkflowResultsContext, WorkflowTree
 from .builders.directory_spy_frame_builder import DirectorySpyFrameBuilder
 
@@ -48,7 +51,7 @@ TREE = WorkflowTree()
 logger = pydidas_logger()
 
 
-class DirectorySpyFrame(DirectorySpyFrameBuilder):
+class DirectorySpyFrame(BaseFrameWithApp):
     """
     The DirectorySpyFrame is used to get automatic updates from a directory
     and display the latest data.
@@ -59,8 +62,8 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
     menu_entry = "Directory spy"
     default_params = ParameterCollection()
 
-    def __init__(self, parent=None, **kwargs):
-        DirectorySpyFrameBuilder.__init__(self, parent, **kwargs)
+    def __init__(self, parent: Union[QWidget, None] = None, **kwargs: dict) -> Self:
+        BaseFrameWithApp.__init__(self, parent, **kwargs)
         _global_plot_update_time = self.q_settings_get_value(
             "global/plot_update_time", dtype=float
         )
@@ -103,6 +106,12 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         self.__update_det_mask_visibility()
         self.__update_bg_widget_visibility()
 
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        DirectorySpyFrameBuilder.build_frame(self)
+
     def restore_state(self, state):
         """
         Restore the frame's state from stored information.
@@ -113,8 +122,8 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
             A dictionary with 'params', 'app' and 'visibility' keys and the
             respective information for all.
         """
-        super().restore_state(state)
-        super().frame_activated(self.frame_index)
+        BaseFrameWithApp.restore_state(self, state)
+        BaseFrameWithApp.frame_activated(self, self.frame_index)
         self.__update_det_mask_visibility()
         self.__update_bg_widget_visibility()
 
@@ -219,7 +228,8 @@ class DirectorySpyFrame(DirectorySpyFrameBuilder):
         """
         logger.debug("Telling AppRunner to exit.")
         self._runner.exit()
-        self._runner = None
+        self._runner.deleteLater()
+        QApplication.instance().sendPostedEvents(None, QtCore.QEvent.DeferredDelete)
         logger.debug("AppRunner successfully shut down.")
         self.set_status("Stopped scanning for new images.")
         self.__set_proc_widget_enabled_for_running(False)

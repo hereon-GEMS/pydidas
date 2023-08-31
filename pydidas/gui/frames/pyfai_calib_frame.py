@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 #
-# Parts of this file are adapted based on the pyFAI.gui.CalibrationWindow
+# Parts of this file are adapted from the pyFAI.gui.CalibrationWindow
 # widget which is distributed under the MIT license.
 
 """
@@ -34,6 +34,7 @@ __all__ = ["PyfaiCalibFrame"]
 import argparse
 import functools
 import os
+from typing import Self, Union
 
 import numpy as np
 import pyFAI
@@ -49,10 +50,21 @@ from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...contexts.diffraction_exp_context import DiffractionExperiment
 from ...core import constants
 from ...widgets import PydidasFileDialog, silx_plot
+from ...widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from ...widgets.framework import BaseFrame
 
 
 EXP = DiffractionExperimentContext()
+
+
+class _List(PydidasWidgetMixin, QtWidgets.QListWidget):
+    """
+    A list with automatic width scaling.
+    """
+
+    def __init__(self, **kwargs: dict):
+        QtWidgets.QListWidget.__init__(self, parent=kwargs.get("parent", None))
+        PydidasWidgetMixin.__init__(self, **kwargs)
 
 
 def _create_calib_tasks():
@@ -131,7 +143,9 @@ class PyfaiCalibFrame(BaseFrame):
     menu_title = "pyFAI calibration"
     menu_entry = "pyFAI calibration"
 
-    def __init__(self, parent=None, **kwargs):
+    def __init__(
+        self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict
+    ) -> Self:
         BaseFrame.__init__(self, parent, **kwargs)
         self._setup_pyfai_context()
         self._tasks = _create_calib_tasks()
@@ -153,7 +167,7 @@ class PyfaiCalibFrame(BaseFrame):
         """
         Setup the context for the pyfai calibration.
         """
-        _PYFAI_SETTINGS = QtCore.QSettings(
+        _settings = QtCore.QSettings(
             QtCore.QSettings.IniFormat,
             QtCore.QSettings.UserScope,
             "pyfai",
@@ -161,7 +175,7 @@ class PyfaiCalibFrame(BaseFrame):
             None,
         )
         CalibrationContext._releaseSingleton()
-        _calib_context = CalibrationContext(_PYFAI_SETTINGS)
+        _calib_context = CalibrationContext(_settings)
         _calib_context.restoreSettings()
         parser = argparse.ArgumentParser()
         calib2.configure_parser_arguments(parser)
@@ -180,12 +194,12 @@ class PyfaiCalibFrame(BaseFrame):
             "pyFAI calibration",
             fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            gridPos=(0, 0, 1, 2),
         )
-        self.add_any_widget(
+        self.create_any_widget(
             "task_list",
-            QtWidgets.QListWidget(),
-            fixedWidth=150,
+            _List,
+            font_metric_width_factor=10,
             sizePolicy=constants.POLICY_FIX_EXP,
             gridPos=(1, 0, 1, 1),
         )
@@ -194,7 +208,7 @@ class PyfaiCalibFrame(BaseFrame):
             if projecturl.get_documentation_url("").startswith("http")
             else "Help"
         )
-        self.create_button("but_help", _text, gridPos=(2, 0, 1, 1), fixedWidth=150)
+        self.create_button("but_help", _text, gridPos=(2, 0, 1, 1))
         self.add_any_widget(
             "task_stack",
             QtWidgets.QStackedWidget(),
@@ -256,7 +270,19 @@ class PyfaiCalibFrame(BaseFrame):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(_url))
 
     @QtCore.Slot(object, object)
-    def _update_task_state(self, task, item):
+    def _update_task_state(self, task: QtWidgets.QWidget, item: MenuItem):
+        """
+        Update the task state.
+
+        This method re-implements the generic pyFAI method.
+
+        Parameters
+        ----------
+        task : QtWidgets.QWidget
+            The associated task widget.
+        item : MenuItem
+            The associated menu item.
+        """
         item.setWarnings(task.nextStepWarning())
 
     @QtCore.Slot()
@@ -304,7 +330,7 @@ class PyfaiCalibFrame(BaseFrame):
             _fname, diffraction_exp=_experiment, overwrite=True
         )
 
-    def _get_mask_filename(self):
+    def _get_mask_filename(self) -> Union[str, None]:
         """
         Get the filename of the mask file from the fitted model.
 

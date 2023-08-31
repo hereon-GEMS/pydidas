@@ -32,7 +32,7 @@ import qtawesome as qta
 from qtpy import QtWidgets
 
 from ....core.constants import POLICY_EXP_EXP
-from ....widgets.factory import PydidasSquareButton
+from ....widgets.factory import SquareButton
 from ....widgets.framework import BaseFrame
 from ....widgets.selection import DirectoryExplorer, Hdf5DatasetSelector
 from ....widgets.silx_plot import PydidasImageView
@@ -69,14 +69,14 @@ class DataBrowsingFrameBuilder:
         )
         frame.create_any_widget(
             "but_minimize",
-            PydidasSquareButton,
+            SquareButton,
             icon=qta.icon("fa.chevron-left"),
             parent_widget="browser",
             gridPos=(0, 1, 1, 1),
         )
         frame.create_any_widget(
             "but_maximize",
-            PydidasSquareButton,
+            SquareButton,
             parent_widget="browser",
             icon=qta.icon("fa.chevron-right"),
             gridPos=(2, 1, 1, 1),

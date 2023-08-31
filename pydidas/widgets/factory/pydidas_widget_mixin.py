@@ -31,6 +31,7 @@ __all__ = ["PydidasWidgetMixin"]
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
 
+from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH
 from ...core.utils import apply_qt_properties, update_qobject_font
 
 
@@ -43,11 +44,12 @@ class PydidasWidgetMixin:
     """
 
     init_kwargs = [
-        "size_offset",
+        "fontsize_offset",
         "bold",
         "italic",
         "underline",
         "font_metric_width_factor",
+        "font_metric_height_factor",
     ]
 
     def __init__(self, **kwargs: dict):
@@ -77,6 +79,22 @@ class PydidasWidgetMixin:
             self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
             self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
             self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
+
+        if "font_metric_height_factor" in kwargs:
+            self.__font_metric_height_factor = kwargs.get("font_metric_height_factor")
+            self.set_dynamic_height_from_font(self._qtapp.standard_font_height)
+            self._qtapp.sig_new_font_height.connect(self.set_dynamic_height_from_font)
+
+    def sizeHint(self):
+        """
+        Set a reasonable wide sizeHint so the label takes the available space.
+
+        Returns
+        -------
+        QtCore.QSize
+            The widget sizeHint
+        """
+        return QtCore.QSize(GENERIC_STANDARD_WIDGET_WIDTH, 25)
 
     @QtCore.Slot(float)
     def update_fontsize(self, new_fontsize: float):
@@ -117,3 +135,22 @@ class PydidasWidgetMixin:
             The font height in pixels.
         """
         self.setFixedWidth(int(self.__font_metric_width_factor * font_height))
+
+    @QtCore.Slot(float)
+    def set_dynamic_height_from_font(self, font_height: float):
+        """
+        Set the fixed height of the widget dynamically from the font height metric.
+
+        In addition to the dynamic height,
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        _margins = self.contentsMargins()
+        self.setFixedHeight(
+            int(self.__font_metric_height_factor * font_height)
+            + _margins.top()
+            + _margins.bottom()
+        )

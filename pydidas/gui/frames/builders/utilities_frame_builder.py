@@ -141,7 +141,7 @@ class UtilitiesFrameBuilder:
                 wordWrap=True,
                 alignment=constants.ALIGN_TOP_LEFT,
                 sizePolicy=constants.POLICY_FIX_EXP,
-                number_of_lines=3,
+                font_metric_height_factor=3,
             )
             frame.create_button(
                 f"button_{_key}",

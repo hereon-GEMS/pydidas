@@ -28,8 +28,8 @@ __status__ = "Production"
 __all__ = ["ScrollArea"]
 
 
-from qtpy.QtWidgets import QScrollArea, QFrame, QStyle, QApplication
 from qtpy.QtCore import QSize, Slot
+from qtpy.QtWidgets import QApplication, QFrame, QScrollArea, QStyle
 
 from ..core.constants import POLICY_EXP_EXP
 from ..core.utils import apply_qt_properties
@@ -80,7 +80,7 @@ class ScrollArea(QScrollArea):
         """
         if self.widget() is not None:
             _hint = self.widget().sizeHint()
-            return QSize(_hint.width() + self.__scrollbar_width + 2, _hint.width())
+            return QSize(_hint.width() + self.__scrollbar_width + 2, _hint.height())
         return super().sizeHint()
 
     @Slot()

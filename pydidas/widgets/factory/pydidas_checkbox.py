@@ -68,4 +68,8 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
         new_font_height : float
             The font metric height in pixel.
         """
-        self.__sizeHint = QtCore.QSize(400, new_font_height + 6)
+        _margins = self.contentsMargins()
+        self.__sizeHint = QtCore.QSize(
+            GENERIC_IO_WIDGET_WIDTH,
+            new_font_height + 2 * _margins.top() + _margins.bottom(),
+        )

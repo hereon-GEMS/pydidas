@@ -141,7 +141,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_quickstart_info",
             _GENERIC_INTRO,
-            number_of_lines=5,
+            font_metric_height_factor=5,
             weight=QtGui.QFont.DemiBold,
             wordWrap=True,
             **_label_options,
@@ -159,7 +159,7 @@ class HomeFrame(BaseFrame):
             "label_toolbar_use",
             _TOOOLBAR_USER_TEXT,
             wordWrap=True,
-            number_of_lines=3,
+            font_metric_height_factor=3,
             **_label_options,
         )
         self.create_spacer(None, parent_widget="canvas")
@@ -179,7 +179,7 @@ class HomeFrame(BaseFrame):
             openExternalLinks=True,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
             textFormat=QtCore.Qt.RichText,
-            number_of_lines=4,
+            font_metric_height_factor=4,
             **_label_options,
         )
         self.create_spacer(None, parent_widget="canvas")
@@ -194,7 +194,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_processing_setup",
             _PROC_SETUP_TEXT,
-            number_of_lines=11,
+            font_metric_height_factor=11,
             wordWrap=True,
             **_label_options,
         )
@@ -210,7 +210,7 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_processing",
             _PROC_TEXT,
-            number_of_lines=9,
+            font_metric_height_factor=9,
             wordWrap=True,
             openExternalLinks=True,
             textFormat=QtCore.Qt.RichText,

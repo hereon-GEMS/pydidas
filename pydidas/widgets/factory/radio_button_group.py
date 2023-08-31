@@ -26,6 +26,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["RadioButtonGroup"]
 
+
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import CONFIG_WIDGET_WIDTH
@@ -39,28 +40,18 @@ class RadioButtonGroup(QtWidgets.QWidget):
 
     new_button_index = QtCore.Signal(int)
     new_button_label = QtCore.Signal(str)
+    init_kwargs = ["entries", "title", "rows", "columns"]
 
-    def __init__(self, parent=None, entries=None, **kwargs):
+    def __init__(self, entries, **kwargs):
         """
         Create a new RadioButtonGroup.
 
         Parameters
         ----------
-        parent : Union[QtWidgets.QWidget, None]
-            The widget's parent. The default is None.
-        entries : list
-            The list of entries for the QRadioButtons. The default is [].
-        rows : int, optional
-            The number of button rows (i.e. vertical alignment) of the
-            QRadioButtons. -1 will toggle automatic determination of the number
-            of rows. The default is 1.
-        columns: int, optional
-            The number of button columns (i.e. horizontal alignment) of the
-            QRadioButtons. -1 will toggle automatic determination of the number
-            of columns. The default is -1.
-        title : Union[str, None]
-            The title of the group. If None, no label will be added. The
-            default is None.
+        **kwargs : dict
+            Keyword arguments. Supported kwargs are "entries" with a list of
+            labels for the butttons; "rows" and "columns" to control the layout of
+            the buttons and "title" to add a header label.
         """
         super().__init__(parent)
         self._title = kwargs.get("title", None)

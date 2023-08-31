@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas_label includes a subclassed QLabel with automatic font formatting.
+The pydidas_pushbutton includes a subclassed QPushButton with automatic font formatting.
 """
 
 __author__ = "Malte Storm"
@@ -24,22 +24,33 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasLabel"]
+__all__ = ["PydidasPushButton"]
 
 
 from qtpy import QtWidgets
 
 from ...core.constants import POLICY_EXP_FIX
+from ..utilities import get_pyqt_icon_from_str
 from .pydidas_widget_mixin import PydidasWidgetMixin
 
 
-class PydidasLabel(PydidasWidgetMixin, QtWidgets.QLabel):
+class PydidasPushButton(PydidasWidgetMixin, QtWidgets.QPushButton):
     """
-    Create a QLabel with automatic font formatting.
+    Create a QPushButton with automatic font and size formatting.
     """
 
+    init_kwargs = PydidasWidgetMixin.init_kwargs[:] + ["icon"]
+
     def __init__(self, *args: tuple, **kwargs: dict):
-        QtWidgets.QLabel.__init__(self, *args)
+        QtWidgets.QPushButton.__init__(self, *args)
+        if isinstance(kwargs.get("icon", None), str):
+            kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
         PydidasWidgetMixin.__init__(self, **kwargs)
         if "sizePolicy" not in kwargs:
             self.setSizePolicy(*POLICY_EXP_FIX)
+
+    def sizeHint(self):
+        """
+        Use the generic QPushButton sizeHint.
+        """
+        return QtWidgets.QPushButton.sizeHint(self)

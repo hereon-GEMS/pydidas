@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ hdf5) files dataset and frame.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["SelectImageFrameWidget"]
 
 
@@ -33,10 +33,7 @@ from pathlib import Path
 from qtpy import QtCore
 
 from ...core import UserConfigError
-from ...core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-)
+from ...core.constants import POLICY_EXP_FIX
 from ...core.utils import get_hdf5_populated_dataset_keys, is_hdf5_filename
 from ...data_io import IoMaster
 from ...widgets.dialogues import Hdf5DatasetSelectionPopup
@@ -55,7 +52,6 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
     def __init__(self, *input_params, parent=None, import_reference=None, **kwargs):
         WidgetWithParameterCollection.__init__(self, parent, **kwargs)
         self.add_params(*input_params)
-        _width = kwargs.get("widget_width", CONFIG_WIDGET_WIDTH)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -63,43 +59,27 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
             formats=IoMaster.get_string_of_formats(),
             qsettings_ref=import_reference,
         )
-        _button_params = dict(
-            fixedWidth=_width,
-            fixedHeight=25,
-        )
-        _param_config = dict(
-            visible=False,
-            width_total=_width,
-            width_io=100,
-            width_text=_width - 130,
-            width_unit=30,
-        )
-        _twoline_param_config = DEFAULT_TWO_LINE_PARAM_CONFIG.copy() | dict(
-            width_total=_width,
-            width_io=_width - 50,
-            width_text=_width - 20,
-        )
         self.create_button(
             "but_open",
             "Select image file",
             icon="qt-std::SP_DialogOpenButton",
-            **_button_params,
+            sizePolicy=POLICY_EXP_FIX,
         )
         self.create_param_widget(
             self.get_param("filename"),
-            **(_twoline_param_config | dict(persistent_qsettings_ref=import_reference)),
+            linebreak=True,
+            persistent_qsettings_ref=import_reference,
         )
         self.create_param_widget(
             self.get_param("hdf5_key"),
-            **(_twoline_param_config | dict(visible=False)),
+            linebreak=True,
+            visible=False,
         )
-        self.create_param_widget(
-            self.get_param("hdf5_frame"), **(_param_config | dict(width_unit=0))
-        )
+        self.create_param_widget(self.get_param("hdf5_frame"), visible=False)
         self.create_button(
             "but_confirm_file",
             "Confirm input selection",
-            **_button_params,
+            sizePolicy=POLICY_EXP_FIX,
             visible=False,
         )
         self._widgets["but_open"].clicked.connect(self.open_image_dialog)
@@ -166,8 +146,8 @@ class SelectImageFrameWidget(WidgetWithParameterCollection):
         Open a new file / frame based on the input Parameters.
         """
         _fname = self.get_param_value("filename", dtype=str)
-        _options = dict(
-            dataset=self.get_param_value("hdf5_key", dtype=str),
-            frame=self.get_param_value("hdf5_frame"),
-        )
+        _options = {
+            "dataset": self.get_param_value("hdf5_key", dtype=str),
+            "frame": self.get_param_value("hdf5_frame"),
+        }
         self.sig_new_file_selection.emit(_fname, _options)

@@ -47,12 +47,11 @@ from ...core.constants import (
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
 from ..dialogues import AcknowledgeBox, QuestionBox
-from ..factory import PydidasSquareButton
+from ..factory import SquareButton
 from ..framework import PydidasWindow
 
 
 PLUGINS = PluginCollection()
-
 
 _BUTTON_POLICY = QtWidgets.QSizePolicy(*POLICY_MIN_MIN)
 _BUTTON_POLICY.setHeightForWidth(True)
@@ -72,7 +71,6 @@ class _UserConfigWindow(PydidasWindow):
 
     value_changed_signal = QtCore.Signal(str, object)
 
-    TEXT_WIDTH = 180
     default_params = get_generic_param_collection(*QSETTINGS_USER_KEYS)
 
     def __init__(self, parent=None, **kwargs):
@@ -132,7 +130,7 @@ class _UserConfigWindow(PydidasWindow):
         )
         self.add_any_widget(
             "but_fontsize_reduce",
-            PydidasSquareButton(icon="qta::mdi.arrow-bottom-left-thick"),
+            SquareButton(icon="qta::mdi.arrow-bottom-left-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )
@@ -145,7 +143,7 @@ class _UserConfigWindow(PydidasWindow):
         )
         self.add_any_widget(
             "but_fontsize_increase",
-            PydidasSquareButton(icon="qta::mdi.arrow-top-right-thick"),
+            SquareButton(icon="qta::mdi.arrow-top-right-thick"),
             gridPos=(0, -1, 1, 1),
             parent_widget="fontsize_container",
         )

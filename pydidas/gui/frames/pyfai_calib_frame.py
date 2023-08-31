@@ -208,7 +208,12 @@ class PyfaiCalibFrame(BaseFrame):
             if projecturl.get_documentation_url("").startswith("http")
             else "Help"
         )
-        self.create_button("but_help", _text, gridPos=(2, 0, 1, 1))
+        self.create_button(
+            "but_help",
+            _text,
+            gridPos=(2, 0, 1, 1),
+            font_metric_width_factor=10,
+        )
         self.add_any_widget(
             "task_stack",
             QtWidgets.QStackedWidget(),

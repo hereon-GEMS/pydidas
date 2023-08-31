@@ -27,8 +27,8 @@ __status__ = "Production"
 __all__ = ["EmptyWidget"]
 
 
-from qtpy.QtWidgets import QGridLayout, QWidget, QApplication
 from qtpy import QtCore
+from qtpy.QtWidgets import QApplication, QGridLayout, QWidget
 
 from ...core.constants import ALIGN_TOP_LEFT, GENERIC_STANDARD_WIDGET_WIDTH
 from ...core.utils import apply_qt_properties

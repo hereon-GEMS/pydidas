@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas_square_button module defines the PydidasSquareButton class.
+The pydidas_square_button module defines the SquareButton class.
 """
 
 __author__ = "Malte Storm"
@@ -24,16 +24,16 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PydidasSquareButton"]
+__all__ = ["SquareButton"]
 
 
 from qtpy import QtCore, QtWidgets
 
-from .pydidas_widget_mixin import PydidasWidgetMixin
 from ..utilities import get_pyqt_icon_from_str
+from .pydidas_widget_mixin import PydidasWidgetMixin
 
 
-class PydidasSquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
+class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
     """
     A PushButton which tries to stay square in size.
     """
@@ -75,5 +75,12 @@ class PydidasSquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         font_height : float
             The font height metrics.
         """
-        self.setMinimumWidth(font_height + 6)
-        self.setMinimumHeight(font_height + 6)
+        self.__size = font_height + 6
+        self.setMinimumWidth(self.__size)
+        self.setMinimumHeight(self.__size)
+
+    def sizeHint(self):
+        """
+        Set the sizeHint based on the font size.
+        """
+        return QtCore.QSize(self.__size, self.__size)

@@ -36,8 +36,10 @@ from .pydidas_checkbox import *
 from .pydidas_combobox import *
 from .pydidas_label import *
 from .pydidas_lineedit import *
-from .pydidas_square_button import *
+from .pydidas_pushbutton import *
 from .pydidas_widget_with_gridlayout import *
+from .square_button import *
+from .radio_button_group import *
 
 # add modules' __all__ items to package's __all__ items and unclutter the
 # namespace by deleting the module references:
@@ -72,12 +74,22 @@ from . import pydidas_lineedit
 __all__.extend(pydidas_lineedit.__all__)
 del pydidas_lineedit
 
-from . import pydidas_square_button
+from . import pydidas_pushbutton
 
-__all__.extend(pydidas_square_button.__all__)
-del pydidas_square_button
+__all__.extend(pydidas_pushbutton.__all__)
+del pydidas_pushbutton
 
 from . import pydidas_widget_with_gridlayout
 
 __all__.extend(pydidas_widget_with_gridlayout.__all__)
 del pydidas_widget_with_gridlayout
+
+from . import square_button
+
+__all__.extend(square_button.__all__)
+del square_button
+
+from . import radio_button_group
+
+__all__.extend(radio_button_group.__all__)
+del radio_button_group

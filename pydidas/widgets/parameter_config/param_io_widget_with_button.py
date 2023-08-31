@@ -35,7 +35,7 @@ from qtpy.QtWidgets import QStyle
 
 from ...core import Parameter
 from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH
-from ..factory import PydidasLineEdit, PydidasSquareButton
+from ..factory import PydidasLineEdit, SquareButton
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
 
@@ -62,7 +62,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
             kwargs["button_icon"] = self.style().standardIcon(
                 QStyle.SP_DialogOpenButton
             )
-        self._button = PydidasSquareButton(kwargs["button_icon"], "")
+        self._button = SquareButton(kwargs["button_icon"], "")
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setSpacing(2)

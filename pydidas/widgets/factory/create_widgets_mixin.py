@@ -34,12 +34,14 @@ from qtpy import QtWidgets
 from qtpy.QtWidgets import QWidget
 
 from ...core.utils import apply_qt_properties
-from ..utilities import get_pyqt_icon_from_str, get_widget_layout_args
+from ..utilities import get_widget_layout_args
 from .empty_widget import EmptyWidget
 from .pydidas_checkbox import PydidasCheckBox
 from .pydidas_combobox import PydidasComboBox
 from .pydidas_label import PydidasLabel
 from .pydidas_lineedit import PydidasLineEdit
+from .pydidas_pushbutton import PydidasPushButton
+from .radio_button_group import RadioButtonGroup
 
 
 class CreateWidgetsMixIn:
@@ -76,10 +78,10 @@ class CreateWidgetsMixIn:
 
         _policy = kwargs.get("policy", QtWidgets.QSizePolicy.Minimum)
         _spacer = QtWidgets.QSpacerItem(
-            kwargs.get("fixedWidth", 20),
-            kwargs.get("fixedHeight", 20),
+            kwargs.pop("fixedWidth", 20),
+            kwargs.pop("fixedHeight", 20),
             _policy,
-            kwargs.get("vertical_policy", _policy),
+            kwargs.pop("vertical_policy", _policy),
         )
         apply_qt_properties(self, **kwargs)
         _layout_args = get_widget_layout_args(_parent, **kwargs)
@@ -106,8 +108,7 @@ class CreateWidgetsMixIn:
             The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
             be used to control the font properties.
         """
-        _widget = PydidasLabel(text, **kwargs)
-        self.add_any_widget(ref, _widget, **kwargs)
+        self.create_any_widget(ref, PydidasLabel, text, **kwargs)
 
     def create_line(self, ref: Union[str, None], **kwargs: Dict):
         """
@@ -143,8 +144,7 @@ class CreateWidgetsMixIn:
             The 'fontsize_offset', 'bold', 'italic', 'underline' keywords can
             be used to control the font properties.
         """
-        _widget = PydidasLineEdit(**kwargs)
-        self.add_any_widget(ref, _widget, **kwargs)
+        self.create_any_widget(ref, PydidasLineEdit, **kwargs)
 
     def create_button(self, ref: Union[str, None], text: str, **kwargs: Dict):
         """
@@ -163,9 +163,7 @@ class CreateWidgetsMixIn:
             The button's clicked method can be connected directly, by specifing
             the slot through the 'clicked' kwarg.
         """
-        if isinstance(kwargs.get("icon", None), str):
-            kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
-        self.create_any_widget(ref, QtWidgets.QPushButton, text, **kwargs)
+        self.create_any_widget(ref, PydidasPushButton, text, **kwargs)
         if "clicked" in kwargs and ref is not None:
             self._widgets[ref].clicked.connect(kwargs.get("clicked"))
 
@@ -260,13 +258,7 @@ class CreateWidgetsMixIn:
             number of rows and columns can be specified with the 'rows' and
             'columns' keywords, respectively.
         """
-        # need to place the import here to prevent circular import. The circular
-        # import cannot be prevented while maintaining the desired module
-        # structure.
-        from ..selection import RadioButtonGroup
-
-        _widget = RadioButtonGroup(None, entries, title=kwargs.pop("title", None))
-        self.add_any_widget(ref, _widget, **kwargs)
+        self.create_any_widget(ref, RadioButtonGroup, entries, **kwargs)
 
     def create_empty_widget(self, ref: Union[str, None], **kwargs: Dict):
         """
@@ -312,11 +304,10 @@ class CreateWidgetsMixIn:
             If the reference "ref" is not of type string.
         """
         if hasattr(widget_class, "init_kwargs"):
-            _init_kwargs = {
-                _key: _val
-                for _key, _val in kwargs.items()
-                if _key in widget_class.init_kwargs
-            }
+            _init_kwargs = {}
+            for _key in widget_class.init_kwargs:
+                if _key in kwargs:
+                    _init_kwargs[_key] = kwargs.pop(_key)
             _widget = widget_class(*args, **_init_kwargs)
         else:
             _widget = widget_class(*args)

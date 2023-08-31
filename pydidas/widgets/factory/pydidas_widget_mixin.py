@@ -50,6 +50,7 @@ class PydidasWidgetMixin:
         "underline",
         "font_metric_width_factor",
         "font_metric_height_factor",
+        "minimum_width",
     ]
 
     def __init__(self, **kwargs: dict):
@@ -73,6 +74,7 @@ class PydidasWidgetMixin:
         self.update_font_family(self._qtapp.standard_font_family)
         self._qtapp.sig_new_fontsize.connect(self.update_fontsize)
         self._qtapp.sig_new_font_family.connect(self.update_font_family)
+        self._minimum_width = kwargs.get("minimum_width", MINIMUN_WIDGET_DIMENSIONS)
         if True in self.__font_config.values():
             update_qobject_font(self, **self.__font_config)
         if "font_metric_width_factor" in kwargs:
@@ -136,7 +138,7 @@ class PydidasWidgetMixin:
         """
         self.setFixedWidth(
             max(
-                MINIMUN_WIDGET_DIMENSIONS,
+                self._minimum_width,
                 int(self.__font_metric_width_factor * font_height),
             )
         )

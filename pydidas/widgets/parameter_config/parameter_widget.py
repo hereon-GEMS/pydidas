@@ -183,7 +183,10 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         """
         Create an I/O widget for the Parameter based on its configuration and type.
         """
-        kwargs = {"persistent_qsettings_ref": self._config["persistent_qsettings_ref"]}
+        kwargs = {
+            "persistent_qsettings_ref": self._config["persistent_qsettings_ref"],
+            "linebreak": self._config["linebreak"],
+        }
         if self.param.choices:
             _widget = ParamIoWidgetComboBox(self.param, **kwargs)
         else:

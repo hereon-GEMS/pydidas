@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore
 
 from ...core import Parameter
-from ...core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_FIX_EXP
+from ...core.constants import FLOAT_DISPLAY_ACCURACY, POLICY_EXP_FIX
 from ..factory import PydidasLineEdit
 from .base_param_io_widget_mixin import BaseParamIoWidgetMixIn
 
@@ -63,7 +63,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         self.set_validator(param)
         self.set_value(param.value)
         self.editingFinished.connect(self.emit_signal)
-        self.setSizePolicy(*POLICY_FIX_EXP)
+        self.setSizePolicy(*POLICY_EXP_FIX)
 
     def emit_signal(self):
         """

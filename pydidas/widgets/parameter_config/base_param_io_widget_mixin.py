@@ -35,7 +35,11 @@ from numpy import nan
 from qtpy import QtCore, QtGui
 
 from ...core import Hdf5key, Parameter, UserConfigError
-from ...core.constants import QT_REG_EXP_FLOAT_VALIDATOR, QT_REG_EXP_INT_VALIDATOR
+from ...core.constants import (
+    GENERIC_STANDARD_WIDGET_WIDTH,
+    QT_REG_EXP_FLOAT_VALIDATOR,
+    QT_REG_EXP_INT_VALIDATOR,
+)
 
 
 LOCAL_SETTINGS = QtCore.QLocale(QtCore.QLocale.C)
@@ -64,6 +68,18 @@ class BaseParamIoWidgetMixIn:
     def __init__(self, param: Parameter, **kwargs: dict):
         self._ptype = param.dtype
         self._old_value = None
+        self.__hint_factor = 1 + int(kwargs.get("linebreak", False))
+
+    def sizeHint(self) -> QtCore.QSize:
+        """
+        Set a large horizontal size hint to have the widget expand with big font sizes.
+
+        Returns
+        -------
+        QtCore.QSize
+            The sizeHint, depending on the "linebreak" setting.
+        """
+        return QtCore.QSize(self.__hint_factor * GENERIC_STANDARD_WIDGET_WIDTH, 25)
 
     def set_validator(self, param: Parameter):
         """

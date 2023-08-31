@@ -53,7 +53,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
             labels for the butttons; "rows" and "columns" to control the layout of
             the buttons and "title" to add a header label.
         """
-        super().__init__(parent)
+        QtWidgets.QWidget.__init__(self, kwargs.get("parent", None))
         self._title = kwargs.get("title", None)
         for _key, _default in [["rows", 1], ["columns", -1]]:
             _val = kwargs.get(_key, _default)

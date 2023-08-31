@@ -29,6 +29,7 @@ __all__ = ["SquareButton"]
 
 from qtpy import QtCore, QtWidgets
 
+from ...core.constants import MINIMUN_WIDGET_DIMENSIONS
 from ..utilities import get_pyqt_icon_from_str
 from .pydidas_widget_mixin import PydidasWidgetMixin
 
@@ -75,7 +76,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         font_height : float
             The font height metrics.
         """
-        self.__size = font_height + 6
+        self.__size = max(font_height + 6, MINIMUN_WIDGET_DIMENSIONS)
         self.setMinimumWidth(self.__size)
         self.setMinimumHeight(self.__size)
 

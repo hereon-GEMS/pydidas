@@ -62,7 +62,9 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
             kwargs["button_icon"] = self.style().standardIcon(
                 QStyle.SP_DialogOpenButton
             )
-        self._button = SquareButton(kwargs["button_icon"], "")
+        self._button = SquareButton(
+            kwargs["button_icon"], "", font_metric_height_factor=1
+        )
         _layout = QtWidgets.QHBoxLayout()
         _layout.setContentsMargins(0, 0, 0, 0)
         _layout.setSpacing(2)

@@ -40,6 +40,8 @@ class PydidasLineEdit(PydidasWidgetMixin, QtWidgets.QLineEdit):
     """
 
     def __init__(self, *args: tuple, **kwargs: dict):
+        if "font_metric_height_factor" not in kwargs:
+            kwargs["font_metric_height_factor"] = 1
         QtWidgets.QLineEdit.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.__sizeHint = QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)

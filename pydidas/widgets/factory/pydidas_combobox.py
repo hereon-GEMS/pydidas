@@ -52,6 +52,8 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
         _items = kwargs.pop("items", None)
         if _items is not None:
             self.insertItems(0, _items)
+        if "font_metric_height_factor" not in kwargs:
+            kwargs["font_metric_height_factor"] = 1
         PydidasWidgetMixin.__init__(self, **kwargs)
         self.__qtapp = QtWidgets.QApplication.instance()
         self.__qtapp.sig_new_font_height.connect(self.__update_size_hint)

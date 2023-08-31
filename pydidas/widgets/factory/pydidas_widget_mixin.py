@@ -31,7 +31,7 @@ __all__ = ["PydidasWidgetMixin"]
 from qtpy import QtCore
 from qtpy.QtWidgets import QApplication
 
-from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH
+from ...core.constants import GENERIC_STANDARD_WIDGET_WIDTH, MINIMUN_WIDGET_DIMENSIONS
 from ...core.utils import apply_qt_properties, update_qobject_font
 
 
@@ -134,7 +134,12 @@ class PydidasWidgetMixin:
         font_height : float
             The font height in pixels.
         """
-        self.setFixedWidth(int(self.__font_metric_width_factor * font_height))
+        self.setFixedWidth(
+            max(
+                MINIMUN_WIDGET_DIMENSIONS,
+                int(self.__font_metric_width_factor * font_height),
+            )
+        )
 
     @QtCore.Slot(float)
     def set_dynamic_height_from_font(self, font_height: float):
@@ -150,7 +155,11 @@ class PydidasWidgetMixin:
         """
         _margins = self.contentsMargins()
         self.setFixedHeight(
-            int(self.__font_metric_height_factor * font_height)
-            + _margins.top()
-            + _margins.bottom()
+            max(
+                MINIMUN_WIDGET_DIMENSIONS,
+                int(self.__font_metric_height_factor * font_height)
+                + _margins.top()
+                + _margins.bottom()
+                + 6,
+            )
         )

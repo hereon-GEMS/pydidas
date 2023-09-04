@@ -63,14 +63,20 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         }
         for _key in ["keep_results", "label", "process_data_dim", "fit_func"]:
             _param = self.plugin.get_param(_key)
-            self.create_param_widget(_param)
+            self.create_param_widget(_param, linebreak=_key == "label")
             self._params_already_added.append(_key)
         self.create_empty_widget("checkbox_widget", sizePolicy=POLICY_EXP_FIX)
         self.create_label(
             "label_fit_output",
             "Fit output values:",
             parent_widget="checkbox_widget",
-            font_metric_width_factor=0.5 * PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            gridPos=(0, 0, 1, 2),
+        )
+        self.create_empty_widget(
+            "spacer_fit_output",
+            parent_widget="checkbox_widget",
+            font_metric_width_factor=0.1 * PARAM_EDIT_ASPECT_RATIO,
         )
         for _index, _key in enumerate(FIT_OUTPUT_OPTIONS):
             self.create_check_box(
@@ -78,7 +84,8 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 _key,
                 parent_widget="checkbox_widget",
                 checked=_key in _plugin_output,
-                gridPos=(_index, 1, 1, 1),
+                font_metric_width_factor=0.9 * PARAM_EDIT_ASPECT_RATIO,
+                gridPos=(_index + 1, 1, 1, 1),
             )
             self._widgets[f"checkbox_{_key}"].stateChanged.connect(
                 partial(self._box_checked, _key)

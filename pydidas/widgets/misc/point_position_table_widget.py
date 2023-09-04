@@ -56,7 +56,6 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
             verticalScrollBarPolicy=QtCore.Qt.ScrollBarAlwaysOn,
             editTriggers=QtWidgets.QTableWidget.NoEditTriggers,
         )
-        self.horizontalHeader().resizeSection(0, 200)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.selectionModel().selectionChanged.connect(self.emit_new_selection)
 
@@ -162,7 +161,7 @@ class PointPositionTableWidget(
     A widget to display a list of points in an associated plot.
     """
 
-    widget_width = 220
+    widget_width_factor = 12
 
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
@@ -173,7 +172,8 @@ class PointPositionTableWidget(
         ParameterWidgetsMixIn.__init__(self)
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
-        self.setFixedWidth(self.widget_width)
+        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp.sig_new_font_height.connect(self._adjust_width)
         self._points = []
         self._plot = plot
         self._config = {
@@ -182,21 +182,17 @@ class PointPositionTableWidget(
         self.add_any_widget(
             "table",
             _TableWithXYPositions(),
-            fixedWidth=self.widget_width,
         )
         self.create_button(
             "but_delete_selected_points",
             "Delete selected points",
-            fixedWidth=self.widget_width,
-            fixedHeight=25,
         )
         self.create_button(
             "but_delete_all_points",
             "Delete all points",
-            fixedWidth=self.widget_width,
-            fixedHeight=25,
         )
 
+        self._adjust_width(self._qtapp.standard_font_height)
         self._widgets["but_delete_selected_points"].clicked.connect(
             self._widgets["table"].remove_selected_points
         )
@@ -223,3 +219,20 @@ class PointPositionTableWidget(
         _widget = QtWidgets.QTableWidgetItem(f"({xpos:.3f}, {ypos:.3f})")
         _widget.setTextAlignment(ALIGN_CENTER)
         _table.setItem(_row, 0, _widget)
+
+    @QtCore.Slot(float)
+    def _adjust_width(self, font_height: float):
+        """
+        Adjust the widget's width based on the font metrics.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        _new_width = int(self.widget_width_factor * font_height)
+        self.setFixedWidth(_new_width)
+        self._widgets["table"].setFixedWidth(_new_width)
+        self._widgets["table"].horizontalHeader().resizeSection(
+            0, int(0.93 * (_new_width - self._qtapp.scrollbar_width))
+        )

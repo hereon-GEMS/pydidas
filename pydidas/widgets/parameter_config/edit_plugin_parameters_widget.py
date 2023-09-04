@@ -167,7 +167,10 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 param.refkey not in self.plugin.advanced_parameters
                 and not param.refkey.startswith("_")
             ):
-                _kwargs = {"linebreak": param.dtype in [Hdf5key, Path]}
+                _kwargs = {
+                    "linebreak": param.dtype in [Hdf5key, Path]
+                    or param.refkey == "label"
+                }
                 self.create_param_widget(param, **_kwargs)
         if len(self.plugin.advanced_parameters) > 0:
             self.__advanced_hidden = True

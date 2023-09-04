@@ -49,7 +49,10 @@ class SubtractBackgroundImageConfigWidget(ParameterEditCanvas, CreateWidgetsMixI
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self.plugin = plugin
         for param in self.plugin.params.values():
-            self.create_param_widget(param, linebreak=param.dtype in [Hdf5key, Path])
+            self.create_param_widget(
+                param,
+                linebreak=param.dtype in [Hdf5key, Path] or param.refkey == "label",
+            )
         self.param_composite_widgets["bg_file"].io_edited.connect(
             self._toggle_hdf5_plugin_visibility
         )

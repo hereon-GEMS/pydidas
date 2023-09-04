@@ -107,18 +107,22 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         kwargs : dict
             The calling kwargs.
         """
-        _width_unit = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
         config = {
             "linebreak": kwargs.get("linebreak", False),
             "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
         }
+        config["width_unit"] = (
+            kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
+            if len(self.param.unit) > 0
+            else 0
+        )
+
         if config["linebreak"]:
             config["width_text"] = 1.0
-            config["width_io"] = kwargs.get("width_io", 0.8 - _width_unit)
+            config["width_io"] = kwargs.get("width_io", 0.8 - config["width_unit"])
         else:
             config["width_text"] = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
             config["width_io"] = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH)
-        config["width_unit"] = _width_unit if len(self.param.unit) > 0 else 0
         config["align_text"] = QtCore.Qt.AlignVCenter | kwargs.get(
             "halign_text", QtCore.Qt.AlignLeft
         )

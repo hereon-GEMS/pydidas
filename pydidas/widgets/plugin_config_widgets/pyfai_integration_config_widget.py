@@ -54,7 +54,7 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self._window_show = None
         for _key, _param in self.plugin.params.items():
             if _key not in self.plugin.advanced_parameters:
-                self.create_param_widget(_param)
+                self.create_param_widget(_param, linebreak=_key == "label")
         if "azi_use_range" in self.param_composite_widgets:
             self.param_composite_widgets["azi_use_range"].io_edited.connect(
                 self._toggle_azimuthal_ranges_visibility

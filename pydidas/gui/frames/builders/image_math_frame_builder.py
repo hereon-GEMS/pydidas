@@ -57,6 +57,7 @@ _kwargs_for_single_char_label = {
     "minimum_width": 12,
 }
 
+
 class ImageMathFrameBuilder:
     """
     Create all widgets and initialize their state.
@@ -291,24 +292,18 @@ class ImageMathFrameBuilder:
             parent_widget="ops_operator",
         )
         cls._frame.create_label(
-            None,
-            "=",
-            parent_widget="ops_operator",
-            **_kwargs_for_single_char_label
+            None, "=", parent_widget="ops_operator", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "ops_operator_func",
             currentIndex=4,
-            font_metric_width_factor=cls.relative_width_of_controls /5,
+            font_metric_width_factor=cls.relative_width_of_controls / 5,
             gridPos=(0, -1, 1, 1),
             items=UFUNCS,
             parent_widget="ops_operator",
         )
         cls._frame.create_label(
-            None,
-            " ( ",
-            parent_widget="ops_operator",
-            **_kwargs_for_single_char_label
+            None, " ( ", parent_widget="ops_operator", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "combo_ops_operator_input",
@@ -323,7 +318,7 @@ class ImageMathFrameBuilder:
             ", ",
             parent_widget="ops_operator",
             visible=False,
-            **_kwargs_for_single_char_label
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_lineedit(
             "io_ops_operator_input",
@@ -337,7 +332,7 @@ class ImageMathFrameBuilder:
             "label_ops_operator_closing_bracket",
             ")",
             parent_widget="ops_operator",
-            **_kwargs_for_single_char_label
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_spacer(
             "spacer_operator_end",
@@ -379,10 +374,7 @@ class ImageMathFrameBuilder:
             parent_widget="ops_arithmetic",
         )
         cls._frame.create_label(
-            None,
-            "=",
-            parent_widget="ops_arithmetic",
-            **_kwargs_for_single_char_label
+            None, "=", parent_widget="ops_arithmetic", **_kwargs_for_single_char_label
         )
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_input",
@@ -449,7 +441,7 @@ class ImageMathFrameBuilder:
             None,
             "=",
             parent_widget="ops_image_arithmetic",
-            **_kwargs_for_single_char_label
+            **_kwargs_for_single_char_label,
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_1",

@@ -49,7 +49,6 @@ class SelectIntegrationRegionWindow(PydidasWindow):
     A pydidas window which allows to open a file
     """
 
-    container_width = ShowIntegrationRoiParamsWidget.widget_width
     default_params = get_generic_param_collection(
         "filename", "hdf5_key", "hdf5_frame", "overlay_color"
     )
@@ -89,30 +88,27 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 if self._config["only_show_roi"]
                 else "Select integration region"
             ),
-            fontsize_offset=1,
-            fixedWidth=self.container_width,
             bold=True,
+            fontsize_offset=1,
         )
         self.create_empty_widget(
             "left_container",
-            fixedWidth=self.container_width,
             minimumHeight=400,
             parent_widget=None,
         )
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            widget=self._widgets["left_container"],
-            fixedWidth=self.container_width + 20,
             gridPos=(1, 0, 1, 1),
+            widget=self._widgets["left_container"],
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
         self.add_any_widget(
             "plot",
             PydidasPlot2DwithIntegrationRegions(cs_transform=True),
+            gridPos=(1, 2, 1, 1),
             minimumWidth=700,
             minimumHeight=700,
-            gridPos=(1, 2, 1, 1),
         )
         self.create_spacer(None, parent_widget=self._widgets["left_container"])
         self.create_label(
@@ -121,15 +117,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 "Note: The math for calculating the angles is only defined for "
                 "detectors with square pixels."
             ),
-            parent_widget=self._widgets["left_container"],
             bold=True,
+            parent_widget=self._widgets["left_container"],
         )
         self.create_line(None, parent_widget=self._widgets["left_container"])
         self.create_label(
             "label_file",
             "Select input file:",
-            parent_widget=self._widgets["left_container"],
             fontsize_offset=1,
+            parent_widget=self._widgets["left_container"],
             underline=True,
         )
         self.add_any_widget(
@@ -137,10 +133,8 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             SelectImageFrameWidget(
                 *self.params.values(),
                 import_reference="SelectIntegrationRegion__import",
-                widget_width=self.container_width,
             ),
             parent_widget=self._widgets["left_container"],
-            fixedWidth=self.container_width,
         )
 
         self.create_line(None, parent_widget=self._widgets["left_container"])
@@ -148,16 +142,14 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(
-                plugin=self._plugin,
                 forced_edit_disable=self._config["only_show_roi"],
+                plugin=self._plugin,
             ),
             parent_widget=self._widgets["left_container"],
         )
         self.create_button(
             "but_confirm",
             "Confirm integration region",
-            fixedWidth=self.container_width,
-            fixedHeight=25,
             parent_widget=self._widgets["left_container"],
         )
         self.create_spacer(None, parent_widget=self._widgets["left_container"])

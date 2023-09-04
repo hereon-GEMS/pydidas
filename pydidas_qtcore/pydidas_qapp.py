@@ -214,3 +214,15 @@ class PydidasQApplication(QtWidgets.QApplication):
             )
             self.sig_new_fontsize.emit(self.__font_config["size"])
         self._update_font_height()
+
+    @property
+    def scrollbar_width(self) -> int:
+        """
+        Get the width of scrollbars.
+
+        Returns
+        -------
+        int
+            The width in pixels.
+        """
+        return self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)

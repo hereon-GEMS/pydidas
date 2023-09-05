@@ -39,6 +39,7 @@ from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
@@ -57,7 +58,7 @@ _ENERGY_INVALID = (
 )
 
 
-class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
+class DefineDiffractionExpFrame(BaseFrame):
     """
     The DefineDiffractionExpFrame is the main frame for reading, editing and
     saving the DiffractionExperimentContext in the GUI.
@@ -68,7 +69,7 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
     menu_entry = "Workflow processing/Define diffraction setup"
 
     def __init__(self, parent=None, **kwargs):
-        DefineDiffractionExpFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrame.__init__(self, parent, **kwargs)
         self.params = EXP.params
         self._bc_params = get_generic_param_collection("beamcenter_x", "beamcenter_y")
         self.__import_dialog = PydidasFileDialog(
@@ -88,6 +89,12 @@ class DefineDiffractionExpFrame(DefineDiffractionExpFrameBuilder):
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
         self._select_beamcenter_window = None
+
+    def build_frame(self):
+        """
+        Build the frame and create all widgets.
+        """
+        DefineDiffractionExpFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """

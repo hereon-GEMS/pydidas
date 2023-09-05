@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ in an image to define the beamcenter.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ManuallySetBeamcenterWindow"]
 
 
@@ -35,7 +35,7 @@ from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, get_generic_param_collection
-from ...core.constants import CONFIG_WIDGET_WIDTH
+from ...core.constants import PARAM_EDIT_ASPECT_RATIO
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
@@ -66,16 +66,16 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         PydidasWindow.__init__(
             self,
             parent,
-            title="Define beamcenter through selected points",
             activate_frame=False,
+            title="Define beamcenter through selected points",
             **kwargs,
         )
         self._config = self._config | dict(
-            select_mode_active=False,
             beamcenter_set=False,
             diffraction_exp=kwargs.get(
                 "diffraction_exp", DiffractionExperimentContext()
             ),
+            select_mode_active=False,
         )
         self._markers = {}
         self._image = Dataset(np.zeros((5, 5)))
@@ -88,15 +88,15 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Define beamcenter through selected points",
-            fontsize_offset=4,
             bold=True,
+            fontsize_offset=4,
             gridPos=(0, 0, 1, 3),
         )
         self.create_empty_widget(
             "left_container",
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            minimumHeight=400,
+            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
             gridPos=(1, 1, 2, 1),
+            minimumHeight=400,
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
         self.add_any_widget(
@@ -104,42 +104,27 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             PydidasPlot2D(
                 cs_transform=False, diffraction_exp=self._config["diffraction_exp"]
             ),
-            minimumWidth=700,
-            minimumHeight=700,
             gridPos=(1, 3, 2, 1),
+            minimumHeight=700,
+            minimumWidth=700,
         )
         self.create_param_widget(
             self.get_param("overlay_color"),
-            width_total=PointPositionTableWidget.widget_width,
-            width_io=90,
-            width_text=120,
-            width_unit=0,
+            font_metric_width_factor=PointPositionTableWidget.widget_width_factor,
             gridPos=(1, 2, 1, 1),
+            linebreak=True,
         )
         self.add_any_widget(
             "point_table",
             PointPositionTableWidget(self._widgets["plot"]),
             gridPos=(2, 2, 1, 1),
         )
-        _button_params = dict(
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            fixedHeight=25,
-            parent_widget=self._widgets["left_container"],
-        )
-        _param_config = dict(
-            parent_widget=self._widgets["left_container"],
-            width_total=CONFIG_WIDGET_WIDTH,
-            width_io=100,
-            width_text=CONFIG_WIDGET_WIDTH - 130,
-            width_unit=30,
-        )
-        self.create_line(None, parent_widget=self._widgets["left_container"])
+        self.create_line(None, parent_widget="left_container")
         self.create_label(
             "label_title",
             "Input image:",
             fontsize_offset=1,
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["left_container"],
+            parent_widget="left_container",
             underline=True,
         )
 
@@ -149,44 +134,45 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
                 *self.get_params("filename", "hdf5_key", "hdf5_frame"),
                 import_reference="SelectPointsForBeamcenterWindow__import",
             ),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["left_container"],
+            parent_widget="left_container",
         )
-        self.create_line(None, parent_widget=self._widgets["left_container"])
-        self.create_spacer(
-            None, fixedWidth=25, parent_widget=self._widgets["left_container"]
-        )
+        self.create_line(None, parent_widget="left_container")
+        self.create_spacer(None, fixedWidth=25, parent_widget="left_container")
         self.create_button(
             "but_set_beamcenter",
             "Set point in list as beamcenter",
-            **_button_params,
+            parent_widget="left_container",
         )
         self.create_button(
             "but_fit_circle",
             "Fit beamcenter with circle",
-            **_button_params,
+            parent_widget="left_container",
         )
         self.create_button(
             "but_fit_ellipse",
             "Fit beamcenter with ellipse",
-            **_button_params,
+            parent_widget="left_container",
         )
-        self.create_line(None, parent_widget=self._widgets["left_container"])
-        self.create_param_widget(self.get_param("beamcenter_x"), **_param_config)
-        self.create_param_widget(self.get_param("beamcenter_y"), **_param_config)
+        self.create_line(None, parent_widget="left_container")
+        self.create_param_widget(
+            self.get_param("beamcenter_x"), parent_widget="left_container"
+        )
+        self.create_param_widget(
+            self.get_param("beamcenter_y"), parent_widget="left_container"
+        )
         self.create_line(
             "line_final",
-            parent_widget=self._widgets["left_container"],
+            parent_widget="left_container",
         )
         self.create_button(
             "but_confirm_selection",
             "Confirm selected beamcenter",
-            **_button_params,
+            parent_widget="left_container",
         )
         self.create_spacer(
             "final_spacer",
             vertical_policy=QtWidgets.QSizePolicy.Expanding,
-            parent_widget=self._widgets["left_container"],
+            parent_widget="left_container",
         )
 
     def connect_signals(self):

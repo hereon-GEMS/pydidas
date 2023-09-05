@@ -97,6 +97,11 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         self._widgets["io"].io_edited.connect(self.__emit_io_changed)
         self._widgets["io"].io_edited.connect(self.__set_param_value)
         apply_qt_properties(self, **kwargs)
+        if "font_metric_width_factor" in kwargs:
+            self._qtapp = QtWidgets.QApplication.instance()
+            self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
+            self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
+            self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
 
     def __store_config_from_kwargs(self, kwargs: dict):
         """
@@ -257,3 +262,15 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         except ValueError:
             self._widgets["io"].set_value(self.param.value)
             raise
+
+    @QtCore.Slot(float)
+    def set_dynamic_width_from_font(self, font_height: float):
+        """
+        Set the fixed width of the widget dynamically from the font height metric.
+
+        Parameters
+        ----------
+        font_height : float
+            The font height in pixels.
+        """
+        self.setFixedWidth(int(self.__font_metric_width_factor * font_height))

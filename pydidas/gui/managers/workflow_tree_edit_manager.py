@@ -251,7 +251,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         """
         _plugin = PLUGIN_COLLECTION.get_plugin_by_plugin_name(plugin_name)()
         TREE.replace_node_plugin(TREE.active_node_id, _plugin)
-        self._node_widgets[TREE.active_node_id].setText(plugin_name)
+        self._node_widgets[TREE.active_node_id].update_plugin(plugin_name)
         self.sig_plugin_selected.emit(TREE.active_node_id)
         self._check_consistency()
 

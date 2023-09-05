@@ -141,6 +141,18 @@ class PluginInWorkflowBox(CreateWidgetsMixIn, QFrame):
         _txt = f"node {node_id:d}" + (f": {label}" if len(label) > 0 else "")
         self._widgets["node_label"].setText(_txt)
 
+    def update_plugin(self, plugin_name: str):
+        """
+        Update the plugin.
+
+        Parameters
+        ----------
+        plugin_name : str
+            The type of the new plugin.
+        """
+        self._widgets["plugin_name"].setText(plugin_name)
+        self.update_text(self.widget_id)
+
     def __create_menus(self):
         """
         Create custom context menus.

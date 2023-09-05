@@ -104,3 +104,28 @@ class EmptyWidget(QWidget):
         """
         if self.__scale_with_font:
             self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
+
+    @property
+    def font_metric_width_factor(self) -> float:
+        """
+        Get the font metric width factor.
+
+        Returns
+        -------
+        float
+            The font metric width factor.
+        """
+        return self.__font_metric_width_factor
+
+    @font_metric_width_factor.setter
+    def font_metric_width_factor(self, factor: float):
+        """
+        Set the font metric width factor.
+
+        Parameters
+        ----------
+        factor : float
+            The new width factor.
+        """
+        self.__font_metric_width_factor = factor
+        self.set_dynamic_width_from_font(self._qtapp.standard_font_height)

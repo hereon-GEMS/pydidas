@@ -30,6 +30,8 @@ __all__ = ["DefineScanFrameBuilder"]
 
 from ....contexts import ScanContext
 from ....core import constants, utils
+from ....widgets import ScrollArea
+from ....widgets.factory import SquareButton
 from ....widgets.framework import BaseFrame
 from ....widgets.utilities import get_pyqt_icon_from_str
 
@@ -44,130 +46,140 @@ SCAN_DIMENSION_EXPLANATION_TEXT = (
 )
 
 
-class DefineScanFrameBuilder(BaseFrame):
+class DefineScanFrameBuilder:
     """
     Create all widgets and initialize their state.
-
-    Parameters
-    ----------
-    self : pydidas.gui.DefineScanFrame
-        The DefineScanFrame instance.
     """
 
-    TEXT_WIDTH = 200
-    PARAM_INPUT_WIDTH = 90
-
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-
-    def build_frame(self):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
         Create all widgets for the frame and place them in the layout.
+
+        Parameters
+        ----------
+        frame : BaseFrame
+            The DefineScanFrame instance.
         """
         utils.apply_qt_properties(
-            self.layout(),
+            frame.layout(),
             horizontalSpacing=25,
             alignment=constants.ALIGN_TOP_LEFT,
         )
-        self.create_label(
+        frame.create_empty_widget(
+            "master",
+            font_metric_width_factor=69,
+            layout_kwargs={"horizontalSpacing": 0},
+        )
+        frame.create_any_widget(
+            "config_area",
+            ScrollArea,
+            layout_kwargs={"alignment": None},
+            widget=frame._widgets["master"],
+        )
+        frame.create_label(
             "label_title",
             "Scan settings\n",
             fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            parent_widget="master",
         )
-        self.create_button(
+        frame.create_empty_widget(
+            "config_header", font_metric_width_factor=25, parent_widget="master"
+        )
+        frame.create_button(
             "but_load",
             "Import scan settings from file",
             icon="qt-std::SP_DialogOpenButton",
-            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
+            parent_widget="config_header",
         )
-        # self.create_button(
-        #     "but_import",
-        #     "Open scan parameter import dialogue",
-        #     gridPos=(-1, 0, 1, 1),
-        #     alignment=None,
-        #     icon="qt-std::SP_DialogOpenButton",
-        #     fixedWidth=constants.CONFIG_WIDGET_WIDTH,
-        # )
-        self.create_button(
+        frame.create_button(
             "but_reset",
             "Reset all scan settings",
             icon="qt-std::SP_BrowserReload",
-            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
+            parent_widget="config_header",
         )
-        self.create_spacer(None)
-        self.create_label(
+        frame.create_spacer(
+            None,
+            fixedHeight=15,
+            parent_widget="config_header",
+        )
+        frame.create_label(
             "dimension_hint_title",
             "Scan dimension explanation",
-            gridPos=(-1, 0, 1, 2),
-            fontsize_offset=1,
             bold=True,
+            fontsize_offset=1,
+            parent_widget="config_header",
         )
-        self.create_label(
+        frame.create_label(
             "dimension_hint_text",
             SCAN_DIMENSION_EXPLANATION_TEXT,
-            gridPos=(-1, 0, 1, 2),
-            fixedWidth=600,
-            fixedHeight=80,
+            font_metric_height_factor=4,
+            font_metric_width_factor=25,
+            parent_widget="config_header",
+            wordWrap=True,
         )
-        self.create_button(
+        frame.create_button(
             "but_more_scan_dim_info",
             "More information about scan dimensions",
-            gridPos=(-1, 0, 1, 2),
             icon="qt-std::SP_MessageBoxInformation",
-            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
+            parent_widget="config_header",
         )
-        self.create_spacer(None)
+        frame.create_spacer(None, parent_widget="master")
 
-        _param_edit_row = self.layout().rowCount()
-        self.create_empty_widget(
-            "global_param_frame",
-            gridPos=(_param_edit_row, 0, 1, 1),
-            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
-            layout_kwargs=dict(
-                contentsMargins=(0, 0, 0, 0),
-            ),
-            sizePolicy=constants.POLICY_EXP_FIX,
-            alignment=constants.ALIGN_TOP_LEFT,
+        _row = frame._widgets["master"].layout().rowCount()
+        frame.create_empty_widget(
+            "config_global",
+            font_metric_width_factor=25,
+            gridPos=(_row, 0, 1, 1),
+            parent_widget="master",
+        )
+        frame.create_empty_widget(
+            "horizontal_spacer_A",
+            font_metric_width_factor=2,
+            gridPos=(_row, -1, 1, 1),
+            parent_widget="master",
+        )
+        frame.create_empty_widget(
+            "config_A",
+            font_metric_width_factor=20,
+            gridPos=(_row, -1, 1, 1),
+            parent_widget="master",
+        )
+        frame.create_empty_widget(
+            "horizontal_spacer_B",
+            font_metric_width_factor=2,
+            gridPos=(_row, -1, 1, 1),
+            parent_widget="master",
+        )
+        frame.create_empty_widget(
+            "config_B",
+            font_metric_width_factor=20,
+            gridPos=(_row, -1, 1, 1),
+            parent_widget="master",
         )
 
-        self.create_empty_widget(
-            "scan_param_frame",
-            gridPos=(_param_edit_row, 1, 1, 1),
-            layout_kwargs=dict(horizontalSpacing=5, contentsMargins=(0, 0, 0, 0)),
-            alignment=constants.ALIGN_TOP_LEFT,
-        )
-        self.create_spacer(
-            "right_spacer",
-            gridPos=(_param_edit_row, 2, 1, 1),
-            stretch=1,
-            sizePolicy=constants.POLICY_EXP_EXP,
-        )
-
-        # populate global_param_frame
-        self.create_label(
+        frame.create_label(
             "scan_global",
             "\nGlobal scan parameters:",
-            fontsize_offset=1,
             bold=True,
-            parent_widget=self._widgets["global_param_frame"],
+            fontsize_offset=1,
+            parent_widget="config_global",
         )
-
-        self.create_param_widget(
+        frame.create_param_widget(
             SCAN_SETTINGS.get_param("scan_dim"),
-            parent_widget=self._widgets["global_param_frame"],
-            **constants.DEFAULT_TWO_LINE_PARAM_CONFIG.copy(),
+            linebreak=True,
+            parent_widget="config_global",
         )
         for _name in ["scan_title", "scan_base_directory", "scan_name_pattern"]:
-            self.create_param_widget(
+            frame.create_param_widget(
                 SCAN_SETTINGS.get_param(_name),
-                parent_widget=self._widgets["global_param_frame"],
-                **constants.DEFAULT_TWO_LINE_PARAM_CONFIG.copy(),
+                linebreak=True,
+                parent_widget="config_global",
             )
 
         for _name in ["scan_base_directory", "scan_name_pattern"]:
-            self.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
+            frame.param_widgets[_name].set_unique_ref_name(f"DefineScanFrame__{_name}")
 
         for _name in [
             "scan_start_index",
@@ -175,74 +187,62 @@ class DefineScanFrameBuilder(BaseFrame):
             "scan_multiplicity",
             "scan_multi_image_handling",
         ]:
-            self.create_param_widget(
+            frame.create_param_widget(
                 SCAN_SETTINGS.get_param(_name),
-                width_total=constants.CONFIG_WIDGET_WIDTH,
-                width_text=self.TEXT_WIDTH,
-                width_io=self.PARAM_INPUT_WIDTH,
-                width_unit=0,
-                parent_widget=self._widgets["global_param_frame"],
+                parent_widget="config_global",
             )
 
         # populate scan_param_frame widget
         _param_names = ["label", "n_points", "delta", "unit", "offset"]
         for i_dim in range(4):
-            self.create_label(
+            _parent = "config_A" if i_dim in [0, 1] else "config_B"
+            _row = frame._widgets[_parent].layout().rowCount()
+            frame.create_label(
                 f"title_{i_dim}",
                 f"\nScan dimension {i_dim}:",
-                fontsize_offset=1,
-                bold=True,
-                fixedWidth=constants.CONFIG_WIDGET_WIDTH - 50,
                 alignment=constants.ALIGN_BOTTOM_LEFT,
-                gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2), 1, 1),
-                parent_widget=self._widgets["scan_param_frame"],
+                bold=True,
+                fontsize_offset=1,
+                font_metric_width_factor=15,
+                gridPos=(_row, 0, 1, 1),
+                parent_widget=_parent,
             )
-            self.create_button(
+            frame.create_any_widget(
                 f"button_up_{i_dim}",
-                "",
+                SquareButton,
+                alignment=constants.ALIGN_BOTTOM_RIGHT,
+                gridPos=(_row, 2, 1, 1),
                 icon=get_pyqt_icon_from_str("qta::fa.chevron-up"),
-                fixedWidth=20,
-                fixedHeight=20,
-                alignment=constants.ALIGN_BOTTOM_RIGHT,
-                gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 1, 1, 1),
-                parent_widget=self._widgets["scan_param_frame"],
+                parent_widget=_parent,
             )
-            self.create_button(
+            frame.create_any_widget(
                 f"button_down_{i_dim}",
-                "",
-                icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
-                fixedWidth=20,
-                fixedHeight=20,
+                SquareButton,
                 alignment=constants.ALIGN_BOTTOM_RIGHT,
-                gridPos=(6 * (i_dim % 2), 4 * (i_dim // 2) + 2, 1, 1),
-                parent_widget=self._widgets["scan_param_frame"],
+                gridPos=(_row, 3, 1, 1),
+                icon=get_pyqt_icon_from_str("qta::fa.chevron-down"),
+                parent_widget=_parent,
             )
-            for i_item, basename in enumerate(_param_names):
+            for basename in _param_names:
                 param = SCAN_SETTINGS.get_param(f"scan_dim{i_dim}_{basename}")
-                self.create_param_widget(
+                frame.create_param_widget(
                     param,
-                    gridPos=(1 + i_item + 6 * (i_dim % 2), 4 * (i_dim // 2), 1, 3),
-                    width_text=self.TEXT_WIDTH + 5,
-                    width_unit=0,
-                    width_io=self.PARAM_INPUT_WIDTH,
-                    width_total=constants.CONFIG_WIDGET_WIDTH,
-                    parent_widget=self._widgets["scan_param_frame"],
+                    font_metric_width_factor=20,
+                    gridPos=(-1, 0, 1, 4),
+                    parent_widget=_parent,
+                    width_text=0.6,
+                    width_io=0.3,
                 )
-            self.create_spacer(
-                "scan_dim_spacer",
-                gridPos=(0, 3, 12, 1),
-                fixedWidth=20,
-                parent_widget=self._widgets["scan_param_frame"],
-            )
+            frame.create_spacer("scan_dim_spacer", parent_widget=_parent)
 
-        self.create_button(
+        frame.create_button(
             "but_save",
             "Export scan settings",
+            font_metric_width_factor=25,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=constants.CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["global_param_frame"],
             icon="qt-std::SP_DialogSaveButton",
+            parent_widget="master",
         )
-        self.create_spacer(
+        frame.create_spacer(
             "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.POLICY_EXP_EXP
         )

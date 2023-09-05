@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DefineScanFrame"]
 
+
 from functools import partial
 
 from qtpy import QtCore, QtWidgets
@@ -34,6 +35,7 @@ from qtpy import QtCore, QtWidgets
 from ...contexts import ScanContext, ScanContextIoMeta
 from ...plugins import PluginCollection
 from ...widgets import PydidasFileDialog
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import ScanDimensionInformationWindow
 from ...workflow import WorkflowTree
 from .builders import DefineScanFrameBuilder
@@ -61,7 +63,7 @@ DIM_LABELS = {
 }
 
 
-class DefineScanFrame(DefineScanFrameBuilder):
+class DefineScanFrame(BaseFrame):
     """
     Frame for managing the global scan setup.
     """
@@ -71,7 +73,7 @@ class DefineScanFrame(DefineScanFrameBuilder):
     menu_entry = "Workflow processing/Define scan"
 
     def __init__(self, parent=None, **kwargs):
-        DefineScanFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrame.__init__(self, parent, **kwargs)
         self.__import_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_file",
@@ -89,6 +91,12 @@ class DefineScanFrame(DefineScanFrameBuilder):
         )
         self.__app = QtWidgets.QApplication.instance()
         self.__info_window = ScanDimensionInformationWindow()
+
+    def build_frame(self):
+        """
+        Populate the frame with widgets.
+        """
+        DefineScanFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -144,6 +152,9 @@ class DefineScanFrame(DefineScanFrameBuilder):
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
             if i in DIM_LABELS[_dim].keys():
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
+        _two_rows = _dim in [3, 4]
+        self._widgets["master"].font_metric_width_factor = 49 + _two_rows * 20
+        self._widgets["config_B"].font_metric_width_factor = _two_rows * 20
 
     @QtCore.Slot()
     def load_from_file(self):

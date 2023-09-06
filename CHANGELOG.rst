@@ -18,9 +18,8 @@ Improvements
     - Added support for changing the default font and fontsize.
     - Removed STANDARD_FONT_SIZE constant and added dynamic standard_font_size 
       to PydidasQApplication.
-    - Changed the PluginPositionNode positions from absolute to relative to 
-      allow scaling.
-    - The WorkflowEditFrame now fully scales with font metrics.
+    - Improved the detailed output from fitting plugins.
+    
     
 - Programmatic updates:
 

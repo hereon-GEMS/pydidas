@@ -482,9 +482,17 @@ class BaseFitPlugin(ProcPlugin):
                 1: "intensity / a.u.",
                 2: "intensity / a.u.",
             },
-            "metadata": "\n".join(
-                f"{_key}: {results.metadata[_key]}"
-                for _key in ["fit_func", "fit_params", "fit_residual_std"]
+            "metadata": (
+                (
+                    f"fit_func: {results.metadata['fit_func']}\n"
+                    f"fit_residual_std: {results.metadata['fit_residual_std']:.6f}\n"
+                    "fit params: {\n    "
+                )
+                + "\n    ".join(
+                    f"{_key}: {_value:.6f},"
+                    for _key, _value in results.metadata["fit_params"].items()
+                )
+                + "\n}"
             ),
             "items": [
                 {"plot": 0, "label": "input data", "data": self._data},

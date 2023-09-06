@@ -41,6 +41,7 @@ from ...core import (
     utils,
 )
 from ...widgets.dialogues import WarningBox
+from ...widgets.framework import BaseFrame
 from ...widgets.windows import (
     ShowDetailedPluginResultsWindow,
     TweakPluginParameterWindow,
@@ -51,6 +52,24 @@ from .builders import WorkflowTestFrameBuilder
 
 SCAN = ScanContext()
 TREE = WorkflowTree()
+
+
+IMAGE_SELECTION_PARAM = Parameter(
+    "image_selection",
+    str,
+    "Use global index",
+    name="Scan point selection",
+    choices=[
+        "Use global index",
+        "Use scan dimensional indices",
+        "Use detector image number",
+    ],
+    tooltip=(
+        "Choose between selecing frames using either the global index for the "
+        "flattened image / frame index (the 'timeline'), the multi-dimensional "
+        "position in the scan or the detector image number."
+    ),
+)
 
 
 def _create_str_description_of_node_result(node, plugin_results):
@@ -113,7 +132,7 @@ def _create_str_description_of_node_result(node, plugin_results):
     return _str
 
 
-class WorkflowTestFrame(WorkflowTestFrameBuilder):
+class WorkflowTestFrame(BaseFrame):
     """
     The ProcessingSinglePluginFrame allows to run / test single plugins on a
     single datapoint.
@@ -129,22 +148,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     menu_entry = "Workflow processing/Test workflow"
 
     default_params = ParameterCollection(
-        Parameter(
-            "image_selection",
-            str,
-            "Use global index",
-            name="Scan point selection",
-            choices=[
-                "Use global index",
-                "Use scan dimensional indices",
-                "Use detector image number",
-            ],
-            tooltip=(
-                "Choose between selecing frames using either the global index for the "
-                "flattened image / frame index (the 'timeline'), the multi-dimensional "
-                "position in the scan or the detector image number."
-            ),
-        ),
+        IMAGE_SELECTION_PARAM.copy(),
         get_generic_param_collection(
             "frame_index",
             "scan_index1",
@@ -158,7 +162,7 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
     params_not_to_restore = ["selected_results"]
 
     def __init__(self, parent=None, **kwargs):
-        WorkflowTestFrameBuilder.__init__(self, parent, **kwargs)
+        BaseFrame.__init__(self, parent, **kwargs)
         self.set_default_params()
         self.__source_hash = -1
         self._tree = None
@@ -174,6 +178,12 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
                 "details_active": False,
             }
         )
+
+    def build_frame(self):
+        """
+        Build the frame and create all necessary widgets.
+        """
+        WorkflowTestFrameBuilder.build_frame(self)
 
     def connect_signals(self):
         """
@@ -316,8 +326,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
 
     def __get_index(self):
         """
-        Get the frame index based on the user selection for indexing using
-        the absolute number or scan position numbers.
+        Get the frame index.
+
+        The frame in dex is based on the user selection for indexing using
+        the absolute number, scan position numbers or the detector image number.
 
         Returns
         -------
@@ -326,10 +338,10 @@ class WorkflowTestFrame(WorkflowTestFrameBuilder):
         """
         if self.get_param_value("image_selection") == "Use global index":
             return self.__get_global_index()
-        elif self.get_param_value("image_selection") == "Use scan dimensional indices":
+        if self.get_param_value("image_selection") == "Use scan dimensional indices":
             return self.__get_index_from_scan_dim_indices()
-        elif self.get_param_value("image_selection") == "Use detector image number":
-            return self.__get_index_of_image()
+        # last choice is using the detector image number
+        return self.__get_index_of_image()
 
     def __get_global_index(self) -> int:
         """

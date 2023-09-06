@@ -32,10 +32,10 @@ from typing import Union
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.utils import apply_qt_properties
+from ..factory.pydidas_widget_mixin import PydidasWidgetMixin
 
 
-class ReadOnlyTextWidget(QtWidgets.QTextEdit):
+class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
     """
     A QTextEdit widget with some layout settings in setup and a more advanced setText.
 
@@ -48,21 +48,19 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         at creation.
     """
 
-    def __init__(self, parent=None, **params):
+    def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
         QtWidgets.QTextEdit.__init__(self, parent)
-        params["minimumWidth"] = params.get("minimumWidth", 300)
-        params["readOnly"] = params.get("readOnly", True)
-        params["acceptRichText"] = params.get("acceptRichText", True)
-
+        kwargs["minimumWidth"] = kwargs.get("minimumWidth", 300)
+        kwargs["readOnly"] = kwargs.get("readOnly", True)
+        kwargs["acceptRichText"] = kwargs.get("acceptRichText", True)
         # if fixed settings are given, overwrite the minimum size settings
         # because the minimumSize take precedence in Qt:
-        if "fixedWidth" in params and "minimumWidth" in params:
-            del params["minimumWidth"]
-        if "fixedHeight" in params and "minimumHeight" in params:
-            del params["minimumHeight"]
-        apply_qt_properties(self, **params)
-        self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_font_size_changed.connect(self.reprint)
+        if "fixedWidth" in kwargs and "minimumWidth" in kwargs:
+            del kwargs["minimumWidth"]
+        if "fixedHeight" in kwargs and "minimumHeight" in kwargs:
+            del kwargs["minimumHeight"]
+        PydidasWidgetMixin.__init__(self, **kwargs)
+        self._qtapp.sig_font_size_changed.connect(self.reprint)
         self.__text = ""
         self.__title = None
 
@@ -100,13 +98,13 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         self.__title = title
         if title is None:
             return
-        self.setFontPointSize(self.__qtapp.standard_font_size + 3)
+        self.setFontPointSize(self._qtapp.standard_font_size + 3)
         self.setFontWeight(QtGui.QFont.Bold)
         self.append(f"{title}")
-        self.setFontPointSize(self.__qtapp.standard_font_size + 1)
+        self.setFontPointSize(self._qtapp.standard_font_size + 1)
         self.setFontWeight(QtGui.QFont.Normal)
 
-    def setTextFromDict(
+    def set_text_from_dict(
         self,
         text_dict: dict,
         title: Union[str, None] = None,
@@ -151,5 +149,5 @@ class ReadOnlyTextWidget(QtWidgets.QTextEdit):
         """
         Reprint the latest text with the updated font settings.
         """
-        self.setFontPointSize(self.__qtapp.standard_font_size + 1)
+        self.setFontPointSize(self._qtapp.standard_font_size + 1)
         self.setText(self.__text, title=self.__title)

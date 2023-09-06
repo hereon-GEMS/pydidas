@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,16 @@ additional data for the selected plugin.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ShowDetailedPluginResultsWindow"]
 
 
 from qtpy import QtCore, QtWidgets
 
+from ...core.constants import ALIGN_TOP_LEFT
 from ...core.utils import update_size_policy
 from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
@@ -43,6 +44,8 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     show_frame = False
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
+
+    width_factor = 15
 
     def __init__(self, parent=None, results=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
@@ -58,31 +61,36 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.create_label(
             "label_title",
             "Detailed plugin results",
-            fontsize_offset=4,
             bold=True,
+            fontsize_offset=4,
             gridPos=(0, 0, 1, 2),
         )
-        self.create_empty_widget("metadata", gridPos=(1, 0, 2, 1))
+        self.create_empty_widget(
+            "metadata", gridPos=(1, 0, 2, 1), font_metric_width_factor=self.width_factor
+        )
         self.create_combo_box(
             "selector",
-            parent_widget=self._widgets["metadata"],
+            parent_widget="metadata",
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
+            font_metric_width_factor=self.width_factor,
         )
         self.create_label(
             "metadata_title",
             "Metadata:",
-            parent_widget=self._widgets["metadata"],
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
+            font_metric_width_factor=self.width_factor,
             fontsize_offset=2,
+            gridPos=(-1, 0, 1, 1),
+            parent_widget="metadata",
         )
         self.create_label(
             "metadata_label",
             "",
-            parent_widget=self._widgets["metadata"],
+            font_metric_width_factor=self.width_factor,
+            font_metric_height_factor=20,
+            wordWrap=True,
             gridPos=(-1, 0, 1, 1),
-            fixedWidth=250,
+            alignment=ALIGN_TOP_LEFT,
+            parent_widget="metadata",
         )
 
     def connect_signals(self):

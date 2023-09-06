@@ -31,8 +31,8 @@ __all__ = ["WorkflowEditFrameBuilder"]
 from qtpy.QtWidgets import QAbstractScrollArea, QApplication
 
 from ....core import constants
-from ....core.utils import update_size_policy
 from ....core.constants import PARAM_EDIT_ASPECT_RATIO
+from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.parameter_config import EditPluginParametersWidget

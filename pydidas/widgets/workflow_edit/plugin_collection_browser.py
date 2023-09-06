@@ -42,6 +42,8 @@ PLUGIN_COLLECTION = PluginCollection()
 
 class PluginCollectionBrowser(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
     """
+    A widget allows to browse through the list of available plugins.
+
     The PluginCollectionBrowser includes both a QTreeView to browse through
     the list of available plugins as well as a QTextEdit to show a description
     of the plugin.
@@ -132,6 +134,6 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
         ]:
             return
         _p = self.collection.get_plugin_by_plugin_name(name)
-        self._widgets["plugin_description"].setTextFromDict(
+        self._widgets["plugin_description"].set_text_from_dict(
             _p.get_class_description_as_dict(), _p.plugin_name
         )

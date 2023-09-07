@@ -51,6 +51,10 @@ class DefineScanFrameBuilder:
     Create all widgets and initialize their state.
     """
 
+    width_factor_left = 20
+    width_factor_dims = 20
+    width_factor_spacer = 2
+
     @classmethod
     def build_frame(cls, frame: BaseFrame):
         """
@@ -85,7 +89,9 @@ class DefineScanFrameBuilder:
             parent_widget="master",
         )
         frame.create_empty_widget(
-            "config_header", font_metric_width_factor=25, parent_widget="master"
+            "config_header",
+            font_metric_width_factor=cls.width_factor_left,
+            parent_widget="master",
         )
         frame.create_button(
             "but_load",
@@ -114,8 +120,8 @@ class DefineScanFrameBuilder:
         frame.create_label(
             "dimension_hint_text",
             SCAN_DIMENSION_EXPLANATION_TEXT,
-            font_metric_height_factor=4,
-            font_metric_width_factor=25,
+            font_metric_height_factor=6,
+            font_metric_width_factor=cls.width_factor_left,
             parent_widget="config_header",
             wordWrap=True,
         )
@@ -130,31 +136,31 @@ class DefineScanFrameBuilder:
         _row = frame._widgets["master"].layout().rowCount()
         frame.create_empty_widget(
             "config_global",
-            font_metric_width_factor=25,
+            font_metric_width_factor=cls.width_factor_left,
             gridPos=(_row, 0, 1, 1),
             parent_widget="master",
         )
         frame.create_empty_widget(
             "horizontal_spacer_A",
-            font_metric_width_factor=2,
+            font_metric_width_factor=cls.width_factor_spacer,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
         frame.create_empty_widget(
             "config_A",
-            font_metric_width_factor=20,
+            font_metric_width_factor=cls.width_factor_dims,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
         frame.create_empty_widget(
             "horizontal_spacer_B",
-            font_metric_width_factor=2,
+            font_metric_width_factor=cls.width_factor_spacer,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
         frame.create_empty_widget(
             "config_B",
-            font_metric_width_factor=20,
+            font_metric_width_factor=cls.width_factor_dims,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
@@ -168,7 +174,6 @@ class DefineScanFrameBuilder:
         )
         frame.create_param_widget(
             SCAN_SETTINGS.get_param("scan_dim"),
-            linebreak=True,
             parent_widget="config_global",
         )
         for _name in ["scan_title", "scan_base_directory", "scan_name_pattern"]:
@@ -227,7 +232,7 @@ class DefineScanFrameBuilder:
                 param = SCAN_SETTINGS.get_param(f"scan_dim{i_dim}_{basename}")
                 frame.create_param_widget(
                     param,
-                    font_metric_width_factor=20,
+                    font_metric_width_factor=cls.width_factor_dims,
                     gridPos=(-1, 0, 1, 4),
                     parent_widget=_parent,
                     width_text=0.6,
@@ -238,11 +243,33 @@ class DefineScanFrameBuilder:
         frame.create_button(
             "but_save",
             "Export scan settings",
-            font_metric_width_factor=25,
+            font_metric_width_factor=cls.width_factor_left,
             gridPos=(-1, 0, 1, 1),
             icon="qt-std::SP_DialogSaveButton",
             parent_widget="master",
         )
         frame.create_spacer(
             "final_spacer", gridPos=(-1, 0, 1, 1), sizePolicy=constants.POLICY_EXP_EXP
+        )
+
+    @classmethod
+    def width_factor(cls, two_columns: bool) -> int:
+        """
+        Get the width factor based on the number of visible columns.
+
+        Parameters
+        ----------
+        dim_columns : int
+            The number of columns
+
+        Returns
+        -------
+        float
+            The resulting total width factor for font metrics.
+        """
+        _n_columns = 1 + two_columns
+        return (
+            cls.width_factor_left
+            + 2 * cls.width_factor_spacer
+            + _n_columns * cls.width_factor_dims
         )

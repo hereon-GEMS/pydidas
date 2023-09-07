@@ -152,9 +152,11 @@ class DefineScanFrame(BaseFrame):
                 self.toggle_param_widget_visibility(_pre.format(n=i), _toggle)
             if i in DIM_LABELS[_dim].keys():
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
-        _two_rows = _dim in [3, 4]
-        self._widgets["master"].font_metric_width_factor = 49 + _two_rows * 20
-        self._widgets["config_B"].font_metric_width_factor = _two_rows * 20
+        _total_width = DefineScanFrameBuilder.width_factor(_dim in [3, 4])
+        self._widgets["master"].font_metric_width_factor = _total_width
+        self._widgets["config_B"].font_metric_width_factor = (
+            int(_dim in [3, 4]) * DefineScanFrameBuilder.width_factor_dims
+        )
 
     @QtCore.Slot()
     def load_from_file(self):

@@ -19,6 +19,8 @@ Improvements
     - Removed STANDARD_FONT_SIZE constant and added dynamic standard_font_size 
       to PydidasQApplication.
     - Improved the detailed output from fitting plugins.
+    - During active processing, editing diffraction setup, scan and workflow 
+      are disabled.
     
     
 - Programmatic updates:

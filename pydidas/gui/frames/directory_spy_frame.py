@@ -112,21 +112,6 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         DirectorySpyFrameBuilder.build_frame(self)
 
-    def restore_state(self, state):
-        """
-        Restore the frame's state from stored information.
-
-        Parameters
-        ----------
-        state : dict
-            A dictionary with 'params', 'app' and 'visibility' keys and the
-            respective information for all.
-        """
-        BaseFrameWithApp.restore_state(self, state)
-        BaseFrameWithApp.frame_activated(self, self.frame_index)
-        self.__update_det_mask_visibility()
-        self.__update_bg_widget_visibility()
-
     @QtCore.Slot()
     def __update_file_widget_visibility(self):
         """
@@ -262,7 +247,7 @@ class DirectorySpyFrame(BaseFrameWithApp):
         self._widgets["plot"].setGraphXLabel("pixel")
 
     @QtCore.Slot(int)
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Received a signal that a new frame has been selected.
 
@@ -276,10 +261,12 @@ class DirectorySpyFrame(BaseFrameWithApp):
         """
         super().frame_activated(index)
         if index == self.frame_index:
+            self.__update_det_mask_visibility()
+            self.__update_bg_widget_visibility()
             self.__check_for_plot_update()
         self._config["frame_active"] = index == self.frame_index
 
-    def __set_proc_widget_enabled_for_running(self, running):
+    def __set_proc_widget_enabled_for_running(self, running: bool):
         """
         Set the visibility of all widgets which need to be updated for/after
         procesing

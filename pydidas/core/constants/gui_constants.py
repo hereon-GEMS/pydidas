@@ -50,6 +50,7 @@ __all__ = [
     "GENERIC_IO_WIDGET_WIDTH",
     "GENERIC_STANDARD_WIDGET_WIDTH",
     "MINIMUN_WIDGET_DIMENSIONS",
+    "CONFIG_ASPECT_RATIO",
 ]
 
 
@@ -74,6 +75,7 @@ WORKFLOW_EDIT_CANVAS_Y = 600
 # Settings for generic EditPluginParametersWidget
 PLUGIN_PARAM_WIDGET_WIDTH = 385
 PARAM_EDIT_ASPECT_RATIO = 22
+CONFIG_ASPECT_RATIO = 20
 
 # Settings for generic Parameter widgets
 PARAM_WIDGET_TEXT_WIDTH = 0.55

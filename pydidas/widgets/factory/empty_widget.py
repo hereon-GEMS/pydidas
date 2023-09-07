@@ -50,9 +50,11 @@ class EmptyWidget(QWidget):
     ]
 
     def __init__(self, **kwargs: dict):
-        self.__size_hint_width = GENERIC_STANDARD_WIDGET_WIDTH
+        self.__size_hint_width = kwargs.get(
+            "size_hint_width", GENERIC_STANDARD_WIDGET_WIDTH
+        )
         QWidget.__init__(self)
-        self.__scale_with_font = False
+        self.__scale_with_font = "font_metric_width_factor" in kwargs
         self.__fix_width = kwargs.get("fix_width", True)
         apply_qt_properties(self, **kwargs)
         if kwargs.get("init_layout", True):
@@ -62,8 +64,7 @@ class EmptyWidget(QWidget):
                 contentsMargins=(0, 0, 0, 0),
                 alignment=ALIGN_TOP_LEFT,
             )
-        if "font_metric_width_factor" in kwargs:
-            self.__scale_with_font = True
+        if self.__scale_with_font:
             self._qtapp = QApplication.instance()
             self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
             self.set_dynamic_width_from_font(self._qtapp.standard_font_height)

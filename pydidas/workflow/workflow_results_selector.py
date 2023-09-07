@@ -53,7 +53,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         The parent widget.
     select_results_param : pydidas.core.Parameter
         The select_results Parameter instance. This instance should be
-        shared between the ResultSelectionWidget and the parent.
+        shared between the WorkflowResultsSelector and the parent.
     """
 
     new_selection = QtCore.Signal(bool, int, int, object)

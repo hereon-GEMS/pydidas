@@ -80,7 +80,7 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
     ):
         PydidasWidgetWithGridLayout.__init__(self, parent, **kwargs)
         self.setSizePolicy(*POLICY_EXP_FIX)
-        self.layout().setHorizontalSpacing(0)
+        self.layout().setSpacing(0)
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
 
         self.param = param
@@ -116,18 +116,23 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
             "linebreak": kwargs.get("linebreak", False),
             "persistent_qsettings_ref": kwargs.get("persistent_qsettings_ref", None),
         }
+        config["width_unit_setting"] = kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
         config["width_unit"] = (
-            kwargs.get("width_unit", PARAM_WIDGET_UNIT_WIDTH)
-            if len(self.param.unit) > 0
-            else 0
+            config["width_unit_setting"] if len(self.param.unit) > 0 else 0
         )
 
         if config["linebreak"]:
             config["width_text"] = 1.0
-            config["width_io"] = kwargs.get("width_io", 0.8 - config["width_unit"])
+            config["width_io"] = kwargs.get("width_io", 0.9 - config["width_unit"])
         else:
             config["width_text"] = kwargs.get("width_text", PARAM_WIDGET_TEXT_WIDTH)
-            config["width_io"] = kwargs.get("width_io", PARAM_WIDGET_EDIT_WIDTH)
+            config["width_io"] = kwargs.get(
+                "width_io",
+                PARAM_WIDGET_EDIT_WIDTH
+                + config["width_unit_setting"]
+                - config["width_unit"],
+            )
+
         config["align_text"] = QtCore.Qt.AlignVCenter | kwargs.get(
             "halign_text", QtCore.Qt.AlignLeft
         )
@@ -217,17 +222,14 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         if self._config["linebreak"]:
             self._widgets["io_spacer"] = EmptyWidget(sizePolicy=POLICY_EXP_FIX)
             self.layout().addWidget(self._widgets["io_spacer"], 1, 0, 1, 1)
-            self.layout().setColumnStretch(0, 10)
             self.layout().setColumnStretch(
-                1, int(100 * (1 - self._config["width_unit"]))
+                0,
+                int(100 * (1 - self._config["width_unit"] - self._config["width_io"])),
             )
+            self.layout().setColumnStretch(1, int(100 * self._config["width_io"]))
+            self.layout().setColumnStretch(2, int(100 * self._config["width_unit"]))
         else:
-            self.layout().setColumnStretch(
-                1,
-                int(
-                    100 * (1 - self._config["width_unit"] - self._config["width_text"])
-                ),
-            )
+            self.layout().setColumnStretch(1, int(100 * self._config["width_io"]))
 
     @QtCore.Slot(str)
     def __emit_io_changed(self, value):

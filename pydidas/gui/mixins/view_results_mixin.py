@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,19 +21,20 @@ WorkflowTree results when running the pydidas WorkflowTree.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ViewResultsMixin"]
 
 
 import os
+from typing import Self, Union
 
 import numpy as np
 from qtpy import QtCore
 
-from ...core import UserConfigError
+from ...core import Dataset, UserConfigError
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from ...workflow import WorkflowResultsContext
@@ -41,8 +42,7 @@ from ...workflow import WorkflowResultsContext
 
 class ViewResultsMixin:
     """
-    The ViewResultsMixin has all the necessary functionality to show and
-    export results.
+    The ViewResultsMixin adds functionality to show and export results.
 
     It requires the following widgets which need to be created by the
     parent frame:
@@ -65,7 +65,7 @@ class ViewResultsMixin:
       - enable_overwrite
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict) -> Self:
         _results = kwargs.get("workflow_results", None)
         self._RESULTS = _results if _results is not None else WorkflowResultsContext()
         self._config.update(
@@ -98,14 +98,17 @@ class ViewResultsMixin:
         """
         self._widgets["but_export_current"].clicked.connect(self._export_current)
         self._widgets["but_export_all"].clicked.connect(self._export_all)
-        self._widgets["result_selector"].new_selection.connect(
+        self._widgets["result_selector"].sig_new_selection.connect(
             self.update_result_selection
         )
 
     def _verify_result_shapes_uptodate(self):
         """
-        Verify that the underlying information for the WorkflowResults
-        (i.e. the ScanContext and WorkflowTree) have not changed.
+        Verify the consistency of the underlying information.
+
+        The information for the WorkflowResults is defined by the Singletons
+        (i.e. the ScanContext and WorkflowTree) and must be checked to detect
+        any changes.
         """
         _hash = self._RESULTS.source_hash
         if _hash != self._config["source_hash"]:
@@ -117,8 +120,9 @@ class ViewResultsMixin:
 
     def _clear_selected_results_entries(self):
         """
-        Clear the selection of the results and reset the view. This method
-        will hide the data selection widgets.
+        Clear the selection of the results and reset the view.
+
+        This method will hide the data selection widgets.
         """
         self.set_param_value("selected_results", "No selection")
         self.params["selected_results"].choices = ["No selection"]
@@ -133,7 +137,12 @@ class ViewResultsMixin:
 
     @QtCore.Slot(bool, object, int, object, str)
     def update_result_selection(
-        self, use_timeline, active_plot_dims, node_id, slices, plot_type
+        self,
+        use_timeline: bool,
+        active_plot_dims: list,
+        node_id: int,
+        slices: tuple,
+        plot_type: str,
     ):
         """
         Update the selection of results to show in the plot.
@@ -187,7 +196,7 @@ class ViewResultsMixin:
         elif self._config["plot_type"] in ["2D full axes", "2D data subset"]:
             self._plot_2d(_data)
 
-    def _plot_group_of_curves(self, data):
+    def _plot_group_of_curves(self, data: Dataset):
         """
         Plot a group of 1D curves.
 
@@ -200,8 +209,7 @@ class ViewResultsMixin:
         def _legend(i):
             return (
                 data.axis_labels[0]
-                + "="
-                + f"{data.axis_ranges[0][i]:.4f}"
+                + f"= {data.axis_ranges[0][i]:.4f}"
                 + data.axis_units[0]
             )
 
@@ -213,7 +221,9 @@ class ViewResultsMixin:
         for _index in range(1, data.shape[0]):
             self._plot1d(data[_index], replace=False, legend=_legend(_index))
 
-    def _plot1d(self, data, replace=True, legend=None):
+    def _plot1d(
+        self, data: Dataset, replace: bool = True, legend: Union[None, str] = None
+    ):
         """
         Plot a 1D-dataset in the 1D plot widget.
 
@@ -227,9 +237,6 @@ class ViewResultsMixin:
         legend : Union[None, str], optional
             If desired, a legend entry for this curve. If None, no legend
             entry will be added. The default is None.
-        label_dim : int, optional
-            The dimension of the X-axis label. For 1D-Datasets, this is 0.
-            The default is 0.
         """
         if data.ndim != 1:
             raise UserConfigError(
@@ -244,7 +251,7 @@ class ViewResultsMixin:
             title=self._RESULTS.result_titles[self._config["active_node"]],
         )
 
-    def _plot_2d(self, data):
+    def _plot_2d(self, data: Dataset):
         """
         Plot a 2D dataset as an image.
 
@@ -300,7 +307,7 @@ class ViewResultsMixin:
         """
         self._export(None)
 
-    def _export(self, node):
+    def _export(self, node: Union[None, int]):
         """
         Export data of the specified node.
 

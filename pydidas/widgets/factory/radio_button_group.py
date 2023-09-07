@@ -29,13 +29,12 @@ __all__ = ["RadioButtonGroup"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import CONFIG_WIDGET_WIDTH
-
 
 class RadioButtonGroup(QtWidgets.QWidget):
     """
-    The RadioButtonGroup is a Widget which can hold a number of QRadioButtons
-    in a QButtonGroup. Creation is automated based on the entries.
+    The RadioButtonGroup holds a number of QRadioButtons in a QButtonGroup.
+
+    Creation is automated based on the entries.
     """
 
     new_button_index = QtCore.Signal(int)
@@ -59,19 +58,21 @@ class RadioButtonGroup(QtWidgets.QWidget):
             _val = kwargs.get(_key, _default)
             _val = _val if _val != -1 else len(entries)
             setattr(self, f"_{_key}", _val)
-        self._size = (0, 0)
         self._active_index = 0
         self._emit_signal = True
         self._buttons = {}
         self._button_indices = {}
         self._button_label = {}
         if entries is not None:
-            self.__initUI(entries)
+            self.__create_widgets(entries)
             self._active_label = self._buttons[0].text()
         else:
             self._active_label = ""
+        self._qtapp = QtWidgets.QApplication.instance()
+        self._qtapp.sig_new_font_height.connect(self.set_dynamic_height_from_font)
+        self.set_dynamic_height_from_font(self._qtapp.standard_font_height)
 
-    def __initUI(self, entries):
+    def __create_widgets(self, entries):
         """
         Initialize the user interface with Widgets and Layout.
 
@@ -80,9 +81,7 @@ class RadioButtonGroup(QtWidgets.QWidget):
         entries : list
             The list of entries as passed from __init__.
         """
-        _yoffset = 0
-        _rowheight = 20
-        _height = _rowheight * self._rows + (self._rows - 1) * 5
+        _yoffset = self._title is not None
 
         self.q_button_group = QtWidgets.QButtonGroup(self)
         _layout = QtWidgets.QGridLayout()
@@ -90,17 +89,13 @@ class RadioButtonGroup(QtWidgets.QWidget):
         _layout.setSpacing(0)
         if self._title is not None:
             _label = QtWidgets.QLabel(self._title)
-            _label.setFixedHeight(18)
             _layout.addWidget(_label, 0, 0, 1, self._columns, QtCore.Qt.AlignBottom)
-            _yoffset = 1
-            _height += 20
 
         for _index, _entry in enumerate(entries):
             _currx = _index % self._columns
             _curry = _index // self._columns
             _button = QtWidgets.QRadioButton(_entry, self)
             _button.toggled.connect(self.__toggled)
-            _button.setFixedHeight(20)
             self._button_indices[id(_button)] = _index
             self._button_label[_entry] = _index
             self._buttons[_index] = _button
@@ -108,10 +103,8 @@ class RadioButtonGroup(QtWidgets.QWidget):
             _layout.addWidget(
                 _button, _yoffset + _curry, _currx, 1, 1, QtCore.Qt.AlignTop
             )
-        self._size = (CONFIG_WIDGET_WIDTH, _height)
         self._buttons[0].setChecked(True)
         self.setLayout(_layout)
-        self.setFixedHeight(_height)
 
     @property
     def emit_signal(self):
@@ -221,3 +214,15 @@ class RadioButtonGroup(QtWidgets.QWidget):
             button.setChecked(True)
         finally:
             self._emit_signal = _emit_enabled
+
+    @QtCore.Slot(float)
+    def set_dynamic_height_from_font(self, new_height: float):
+        """
+        Adjust the widget height based on the font metrics.
+
+        Parameters
+        ----------
+        new_height : float
+            The new font height metrics in pixels.
+        """
+        self.setFixedHeight((self._rows + (self._title is not None)) * (new_height + 6))

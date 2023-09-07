@@ -28,142 +28,101 @@ __status__ = "Production"
 __all__ = ["ViewResultsFrameBuilder"]
 
 
-from ....core.constants import (
-    CONFIG_WIDGET_WIDTH,
-    DEFAULT_TWO_LINE_PARAM_CONFIG,
-    POLICY_FIX_EXP,
-)
+from ....core.constants import CONFIG_ASPECT_RATIO, POLICY_FIX_EXP
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
-from ....widgets.parameter_config import ParameterEditCanvas
 from ....widgets.selection import ResultSelectionWidget
 from ....widgets.silx_plot import PydidasPlotStack
 
 
-class ViewResultsFrameBuilder(BaseFrame):
+class ViewResultsFrameBuilder:
     """
-    Mix-in class which includes the build_frame method to populate the
-    base class's UI and initialize all widgets.
+    The ViewResultsFrameBuilder allows to populate a ViewResultsFrame with widgets.
     """
 
-    def __init__(self, parent=None, **kwargs):
-        BaseFrame.__init__(self, parent, **kwargs)
-
-    def __param_widget_config(self, param_key):
+    @classmethod
+    def build_frame(cls, frame: BaseFrame):
         """
-        Get Formatting options for create_param_widget calls.
+        Build the frame and create all widgets.
 
         Parameters
         ----------
-        param_key : str
-            The Parameter reference key.
-
-        Returns
-        -------
-        dict :
-            The dictionary with the formatting options.
+        frame : BaseFrame
+            The ViewResultsFrame instance.
         """
-        if param_key in ["selected_results"]:
-            _dict = DEFAULT_TWO_LINE_PARAM_CONFIG.copy()
-            _dict.update({"parent_widget": self._widgets["config"]})
-        else:
-            _dict = dict(
-                parent_widget=self._widgets["config"],
-                width_io=100,
-                width_unit=0,
-                width_text=CONFIG_WIDGET_WIDTH - 100,
-                width_total=CONFIG_WIDGET_WIDTH,
-            )
-        return _dict
-
-    def build_frame(self):
-        """
-        Build the frame and create all widgets.
-        """
-        self.create_label(
+        frame.create_label(
             "title",
             "View results",
-            fontsize_offset=4,
             bold=True,
-            gridPos=(0, 0, 1, 5),
+            fontsize_offset=4,
+            gridPos=(0, 0, 1, 2),
         )
-        self.create_spacer("title_spacer", height=20, gridPos=(1, 0, 1, 1))
-
-        self._widgets["config"] = ParameterEditCanvas(
-            parent=None, init_layout=True, lineWidth=5, sizePolicy=POLICY_FIX_EXP
+        frame.create_spacer("title_spacer", fixedHeight=15)
+        frame.create_empty_widget(
+            "config",
+            font_metric_width_factor=CONFIG_ASPECT_RATIO,
+            parent_widget=None,
+            sizePolicy=POLICY_FIX_EXP,
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=self._widgets["config"],
-            fixedWidth=CONFIG_WIDGET_WIDTH + 40,
             sizePolicy=POLICY_FIX_EXP,
-            gridPos=(-1, 0, 1, 1),
-            stretch=(1, 0),
-            layout_kwargs={"alignment": None},
+            widget=frame._widgets["config"],
         )
-        self.create_button(
+        frame.create_button(
             "but_load",
             "Import results from directory",
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
             icon="qt-std::SP_DialogOpenButton",
+            parent_widget="config",
         )
-        self.create_any_widget(
+        frame.create_any_widget(
             "result_selector",
             ResultSelectionWidget,
-            parent_widget=self._widgets["config"],
-            gridpos=(-1, 0, 1, 1),
-            select_results_param=self.get_param("selected_results"),
-            scan_context=self._SCAN,
-            workflow_results=self._RESULTS,
+            parent_widget="config",
+            scan_context=frame._SCAN,
+            select_results_param=frame.get_param("selected_results"),
+            workflow_results=frame._RESULTS,
         )
-        self.create_line(
-            "line_export", gridPos=(-1, 0, 1, 1), parent_widget=self._widgets["config"]
+        frame.create_line("line_export", parent_widget="config")
+        frame.create_param_widget(
+            frame.get_param("saving_format"),
+            parent_widget="config",
         )
-        self.create_param_widget(
-            self.get_param("saving_format"),
-            **self.__param_widget_config("saving_format"),
+        frame.create_param_widget(
+            frame.get_param("enable_overwrite"),
+            parent_widget="config",
         )
-        self.create_param_widget(
-            self.get_param("enable_overwrite"),
-            **self.__param_widget_config("enable_overwrite"),
-        )
-        self.create_button(
+        frame.create_button(
             "but_export_current",
             "Export current node results",
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
             enabled=False,
             icon="qt-std::SP_FileIcon",
+            parent_widget="config",
             toolTip=(
                 "Export the current node's results to file. Note that "
                 "the filenames are pre-determined based on node ID "
                 "and node label."
             ),
         )
-        self.create_button(
+        frame.create_button(
             "but_export_all",
             "Export all results",
             enabled=False,
-            gridPos=(-1, 0, 1, 1),
-            fixedWidth=CONFIG_WIDGET_WIDTH,
-            parent_widget=self._widgets["config"],
-            tooltip=("Export all results. Note that the directory must be empty."),
             icon="qt-std::SP_DialogSaveButton",
+            parent_widget="config",
+            tooltip=("Export all results. Note that the directory must be empty."),
         )
-        self.create_spacer(
+        frame.create_spacer(
             "config_terminal_spacer",
-            height=20,
-            gridPos=(-1, 0, 1, 1),
-            parent_widget=self._widgets["config"],
+            fixedHeight=20,
+            parent_widget="config",
         )
-        self.create_spacer("menu_bottom_spacer", height=20, gridPos=(-1, 0, 1, 1))
-        self.create_any_widget(
+        frame.create_spacer("menu_bottom_spacer")
+        frame.create_any_widget(
             "plot",
             PydidasPlotStack,
+            diffraction_exp=frame._EXP,
             gridPos=(0, 1, 3, 1),
             use_data_info_action=True,
-            diffraction_exp=self._EXP,
         )

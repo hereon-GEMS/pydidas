@@ -120,8 +120,8 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         super().frame_activated(index)
         if index == self.frame_index:
-            self._update_choices_of_selected_results()
-            self._update_export_button_activation()
+            self.update_choices_of_selected_results()
+            self.update_export_button_activation()
         self._config["frame_active"] = index == self.frame_index
 
     def __abort_execution(self):
@@ -232,7 +232,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
         """
         self.__set_proc_widget_visibility_for_running(False)
         self.sig_processing_running.emit(False)
-        self._update_choices_of_selected_results()
+        self.update_choices_of_selected_results()
 
     def __set_proc_widget_visibility_for_running(self, running: bool):
         """

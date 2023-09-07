@@ -27,26 +27,32 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["WorkflowResults", "WorkflowResultsContext"]
 
+
 import os
 import re
+from pathlib import Path
+from typing import Self, Union
 
 import numpy as np
 from qtpy import QtCore
 
 from ..contexts import DiffractionExperimentContext, ScanContext
-from ..core import Dataset, SingletonFactory, UserConfigError, utils
+from ..contexts.diffraction_exp_context import DiffractionExperiment
+from ..contexts.scan_context import Scan
+from ..core import Dataset, Parameter, SingletonFactory, UserConfigError, utils
 from .result_io import WorkflowResultIoMeta as RESULT_SAVER
-from .workflow_tree import WorkflowTree
+from .workflow_tree import WorkflowTree, _WorkflowTree
 
 
 class WorkflowResults(QtCore.QObject):
     """
-    WorkflowResults is a class for handling composite data which spans
-    multiple datasets with multiple dimensions each. Results are referenced
-    by the node ID of the data's producer.
+    A class for handling composite data from multiple plugins.
 
-    Warning: Users should generally only use the WorkflowResultsContext singleton,
-    and never use the WorkflowResults directly unless explicitly required.
+    This class handles Datasets from each plugin in the WorkflowTree. Results
+    are referenced by the node ID of the data's producer.
+
+    Warning: Users should generally only use the WorkflowResults singleton,
+    and never use the _WorkflowResults directly unless explicitly required.
 
     Parameters
     ----------
@@ -65,8 +71,11 @@ class WorkflowResults(QtCore.QObject):
     new_results = QtCore.Signal()
 
     def __init__(
-        self, scan_context=None, diffraction_exp_context=None, workflow_tree=None
-    ):
+        self,
+        diffraction_exp_context: Union[None, DiffractionExperiment] = None,
+        scan_context: Union[None, Scan] = None,
+        workflow_tree: Union[None, _WorkflowTree] = None,
+    ) -> Self:
         super().__init__()
         self._SCAN = ScanContext() if scan_context is None else scan_context
         self._EXP = (
@@ -79,8 +88,7 @@ class WorkflowResults(QtCore.QObject):
 
     def update_shapes_from_scan_and_workflow(self):
         """
-        Update the shape of the results by querying ScanContext and
-        WorkflowTree for their current dimensions and shapes.
+        Update the shape of the results from the classes singletons' metadata.
         """
         self.clear_all_results()
         _dim = self._SCAN.get_param_value("scan_dim")
@@ -121,7 +129,7 @@ class WorkflowResults(QtCore.QObject):
             "exported": False,
         }
 
-    def update_frame_metadata(self, metadata):
+    def update_frame_metadata(self, metadata: dict):
         """
         Manually supply metadata for the non-scan dimensions of the results
         and update the stored metadata.
@@ -148,7 +156,7 @@ class WorkflowResults(QtCore.QObject):
 
         self._config["metadata_complete"] = True
 
-    def store_results(self, index, results):
+    def store_results(self, index: int, results: dict):
         """
         Store results from one scan point in the WorkflowResults.
 
@@ -170,7 +178,7 @@ class WorkflowResults(QtCore.QObject):
             self.__composites[_key][_scan_index] = _val
         self.new_results.emit()
 
-    def __update_composite_metadata(self, results):
+    def __update_composite_metadata(self, results: dict):
         """
         Update the metadata of the composites with the
 
@@ -196,7 +204,7 @@ class WorkflowResults(QtCore.QObject):
         self._config["metadata_complete"] = True
 
     @property
-    def shapes(self):
+    def shapes(self) -> dict:
         """
         Return the shapes of the results in form of a dictionary.
 
@@ -208,7 +216,7 @@ class WorkflowResults(QtCore.QObject):
         return self._config["shapes"].copy()
 
     @property
-    def node_labels(self):
+    def node_labels(self) -> dict:
         """
         Return the labels of the results in form of a dictionary.
 
@@ -220,7 +228,7 @@ class WorkflowResults(QtCore.QObject):
         return self._config["node_labels"].copy()
 
     @property
-    def data_labels(self):
+    def data_labels(self) -> dict:
         """
         Return the data labels of the different Plugins to in form of a
         dictionary.
@@ -233,7 +241,7 @@ class WorkflowResults(QtCore.QObject):
         return self._config["data_labels"].copy()
 
     @property
-    def data_units(self):
+    def data_units(self) -> dict:
         """
         Return the data units of the different Plugins to in form of a
         dictionary.
@@ -246,7 +254,7 @@ class WorkflowResults(QtCore.QObject):
         return self._config["data_units"].copy()
 
     @property
-    def ndims(self):
+    def ndims(self) -> dict:
         """
         Return the number of dimensions of the results in form of a dictionary.
 
@@ -258,7 +266,7 @@ class WorkflowResults(QtCore.QObject):
         return {_key: _item.ndim for _key, _item in self.__composites.items()}
 
     @property
-    def source_hash(self):
+    def source_hash(self) -> int:
         """
         Get the source hash from the input WorkflowTree ans ScanContext.
 
@@ -271,7 +279,7 @@ class WorkflowResults(QtCore.QObject):
         return self.__source_hash
 
     @property
-    def result_titles(self):
+    def result_titles(self) -> dict:
         """
         Return the result titles for all node IDs in form of a dictionary.
 
@@ -283,7 +291,7 @@ class WorkflowResults(QtCore.QObject):
         """
         return self._config["result_titles"].copy()
 
-    def get_result_ranges(self, node_id):
+    def get_result_ranges(self, node_id: int) -> dict:
         """
         Get the data ranges for the requested node id.
 
@@ -300,7 +308,7 @@ class WorkflowResults(QtCore.QObject):
         """
         return self.__composites[node_id].axis_ranges.copy()
 
-    def get_results(self, node_id):
+    def get_results(self, node_id: int) -> Dataset:
         """
         Get the combined results for the requested node_id.
 
@@ -316,7 +324,9 @@ class WorkflowResults(QtCore.QObject):
         """
         return self.__composites[node_id]
 
-    def get_results_for_flattened_scan(self, node_id, squeeze=False):
+    def get_results_for_flattened_scan(
+        self, node_id: int, squeeze: bool = False
+    ) -> Dataset:
         """
         Get the combined results for the requested node_id with all scan
         dimensions flatted into a timeline
@@ -347,11 +357,11 @@ class WorkflowResults(QtCore.QObject):
 
     def get_result_subset(
         self,
-        node_id,
-        slices,
-        flattened_scan_dim=False,
-        squeeze=False,
-    ):
+        node_id: int,
+        slices: tuple,
+        flattened_scan_dim: bool = False,
+        squeeze: bool = False,
+    ) -> Dataset:
         """
         Get a slices subset of a node_id result.
 
@@ -366,6 +376,8 @@ class WorkflowResults(QtCore.QObject):
             is assumed to be 1-d only and the first slice item will be used
             for the Scan whereas the remaining slice items will be used for
             the resulting data. The default is False.
+        squeeze : bool
+            Keyword to squeeze dimensions of length 0 or 1. The default is False.
 
         Returns
         -------
@@ -405,7 +417,9 @@ class WorkflowResults(QtCore.QObject):
             return _data.squeeze()
         return _data
 
-    def get_result_metadata(self, node_id, use_scan_timeline=False):
+    def get_result_metadata(
+        self, node_id: int, use_scan_timeline: bool = False
+    ) -> dict:
         """
         Get the stored metadata for the results of the specified node.
 
@@ -448,7 +462,11 @@ class WorkflowResults(QtCore.QObject):
         }
 
     def save_results_to_disk(
-        self, save_dir, *save_formats, overwrite=False, node_id=None
+        self,
+        save_dir: Union[str, Path],
+        *save_formats: tuple,
+        overwrite: bool = False,
+        node_id: Union[None, int] = None,
     ):
         """
         Save results to disk.
@@ -485,7 +503,11 @@ class WorkflowResults(QtCore.QObject):
         RESULT_SAVER.export_full_data_to_active_savers(_res, scan_context=self._SCAN)
 
     def prepare_files_for_saving(
-        self, save_dir, save_formats, overwrite=False, single_node=None
+        self,
+        save_dir: Union[str, Path],
+        save_formats: str,
+        overwrite: bool = False,
+        single_node: Union[None, int] = None,
     ):
         """
         Prepare the required files and directories for saving.
@@ -503,7 +525,7 @@ class WorkflowResults(QtCore.QObject):
             characters.
         overwrite : bool, optional
             Flag to enable overwriting of existing files. The default is False.
-        single_node: Union[None, int]
+        single_node: Union[None, int], optional
             Keyword to select a single node. If None, all nodes will be
             selected. The default is None.
 
@@ -550,7 +572,9 @@ class WorkflowResults(QtCore.QObject):
             workflow_tree=self._TREE,
         )
 
-    def update_param_choices_from_labels(self, param, add_no_selection_entry=True):
+    def update_param_choices_from_labels(
+        self, param: Parameter, add_no_selection_entry: bool = True
+    ):
         """
         Store the current WorkflowResults node labels in the specified
         Parameter's choices.
@@ -570,8 +594,11 @@ class WorkflowResults(QtCore.QObject):
         param.update_value_and_choices(_new_choices[0], _new_choices)
 
     def get_node_result_metadata_string(
-        self, node_id, use_scan_timeline=False, squeeze_results=True
-    ):
+        self,
+        node_id: int,
+        use_scan_timeline: bool = False,
+        squeeze_results: bool = True,
+    ) -> str:
         """
         Get the edited metadata from WorkflowResults as a formatted string.
 
@@ -641,7 +668,7 @@ class WorkflowResults(QtCore.QObject):
             _node_info += f"Data zero-dimensional\n  Value: {_val:.6f}"
         return _node_info
 
-    def import_data_from_directory(self, directory):
+    def import_data_from_directory(self, directory: Union[str, Path]):
         """
         Import data from a directory.
 

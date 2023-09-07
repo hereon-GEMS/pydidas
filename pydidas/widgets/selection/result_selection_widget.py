@@ -103,6 +103,11 @@ class ResultSelectionWidget(
     """
 
     sig_new_selection = QtCore.Signal(bool, object, int, object, str)
+    init_kwargs = EmptyWidget.init_kwargs + [
+        "select_results_param",
+        "scan_context",
+        "workflow_results",
+    ]
 
     default_params = ParameterCollection(
         get_generic_parameter("selected_results"),

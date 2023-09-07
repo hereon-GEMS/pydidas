@@ -80,7 +80,7 @@ class ViewResultsMixin:
             }
         )
         self.connect_view_results_mixin_signals()
-        self._update_choices_of_selected_results()
+        self.update_choices_of_selected_results()
         self.__export_dialog = PydidasFileDialog(
             parent=self,
             dialog_type="open_directory",
@@ -116,7 +116,7 @@ class ViewResultsMixin:
             self._config["source_hash"] = self._RESULTS.source_hash
             self._clear_selected_results_entries()
             self._clear_plot()
-            self._update_choices_of_selected_results()
+            self.update_choices_of_selected_results()
 
     def _clear_selected_results_entries(self):
         """
@@ -270,15 +270,14 @@ class ViewResultsMixin:
             data, title=self._RESULTS.result_titles[self._config["active_node"]]
         )
 
-    def _update_choices_of_selected_results(self):
+    def update_choices_of_selected_results(self):
         """
         Update the "selected_results" Parameter choices based on the WorkflowResults.
         """
-        _param = self.get_param("selected_results")
-        self._RESULTS.update_param_choices_from_labels(_param)
+        self._widgets["result_selector"].reset()
         self._widgets["result_selector"].get_and_store_result_node_labels()
 
-    def _update_export_button_activation(self):
+    def update_export_button_activation(self):
         """
         Update the enabled state of the export buttons based on available results.
         """

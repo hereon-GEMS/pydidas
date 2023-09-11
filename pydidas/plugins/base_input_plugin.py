@@ -238,6 +238,8 @@ class InputPlugin(BasePlugin):
             _data = _data / self._config["n_multi"]
         if _frames.size > 1:
             kwargs["frames"] = _frames
+        _data.data_label = self.output_data_label
+        _data.data_unit = self.output_data_unit
         return _data, kwargs
 
     def get_frame(self, frame_index, **kwargs):

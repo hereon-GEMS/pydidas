@@ -27,7 +27,7 @@ __status__ = "Production"
 __all__ = ["PydidasImageView"]
 
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import ImageView, Plot2D, tools
 from silx.utils.weakref import WeakMethodProxy
@@ -111,6 +111,9 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)
             )
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
 
     @QtCore.Slot()
     def update_from_diffraction_exp(self):
@@ -146,11 +149,14 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         """
         if self.cs_transform is not None:
             self._check_data_shape(data.shape)
+        self._plot_kwargs = kwargs
         ImageView.setImage(self, data, **kwargs)
 
     def _check_data_shape(self, data_shape):
         """
-        Check the data shape and reset the coordinate system to cartesian if it differs
+        Check the data shape coordinate system.
+
+        This method will reset the coordinate system to cartesian if it differs
         from the defined detector geometry.
 
         Parameters
@@ -162,3 +168,18 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         if not _valid:
             self.cs_transform.set_coordinates("cartesian")
         self.cs_transform.setEnabled(_valid)
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _image = self.getImage()
+        if _image is None:
+            return
+        self.getBackend().fig.gca().cla()
+        ImageView.setImage(self, _image.getData(), **self._plot_kwargs)
+        for _histo in [self._histoHPlot, self._histoVPlot]:
+            _profile = _histo.getProfile()
+            _histo.getBackend().fig.gca().cla()
+            _histo.setProfile(_profile)

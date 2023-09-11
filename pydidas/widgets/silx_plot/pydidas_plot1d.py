@@ -27,7 +27,7 @@ __all__ = ["PydidasPlot1D"]
 
 import inspect
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.plot import Plot1D
 
 
@@ -47,6 +47,10 @@ class PydidasPlot1D(Plot1D):
         self.getRoiAction().setVisible(False)
         self.getFitAction().setVisible(False)
 
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
     def plot_pydidas_dataset(self, data, **kwargs):
@@ -63,23 +67,30 @@ class PydidasPlot1D(Plot1D):
         if kwargs.get("replace", True):
             self.clear_plot()
 
-        self.setGraphXLabel(
-            data.axis_labels[0]
-            + (" / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else "")
-        )
-        self.setGraphYLabel(
-            data.data_label
-            + (" / " + data.data_unit if len(data.data_unit) > 0 else "")
-        )
-        self.addCurve(
-            data.axis_ranges[0],
-            data.array,
-            linewidth=1.5,
-            **{
+        self._plot_config = {
+            "ax_label_x": (
+                data.axis_labels[0]
+                + (" / " + data.axis_units[0] if len(data.axis_units[0]) > 0 else "")
+            ),
+            "ax_label_y": (
+                data.data_label
+                + (" / " + data.data_unit if len(data.data_unit) > 0 else "")
+            ),
+            "kwargs": {
+                "linewidth": 1.5,
+            }
+            | {
                 _key: _val
                 for _key, _val in kwargs.items()
                 if _key in self._allowed_kwargs
             },
+        }
+        self.setGraphXLabel(self._plot_config["ax_label_x"])
+        self.setGraphYLabel(self._plot_config["ax_label_y"])
+        self.addCurve(
+            data.axis_ranges[0],
+            data.array,
+            **self._plot_config["kwargs"],
         )
 
     def clear_plot(self):
@@ -90,3 +101,19 @@ class PydidasPlot1D(Plot1D):
         self.setGraphTitle("")
         self.setGraphYLabel("")
         self.setGraphXLabel("")
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _curve = self.getCurve()
+        if _curve is None:
+            return
+        _xarr, _yarr, _, _ = _curve.getData()
+        _title = self.getGraphTitle()
+        self.getBackend().fig.gca().cla()
+        self.addCurve(_xarr, _yarr, **self._plot_config["kwargs"])
+        self.setGraphTitle(_title)
+        self.setGraphXLabel(self._plot_config["ax_label_x"])
+        self.setGraphYLabel(self._plot_config["ax_label_y"])

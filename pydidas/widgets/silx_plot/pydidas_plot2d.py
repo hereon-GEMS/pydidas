@@ -29,8 +29,9 @@ __all__ = ["PydidasPlot2D"]
 
 
 import inspect
+from functools import partial
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.colors import Colormap
 from silx.gui.plot import Plot2D
 
@@ -45,6 +46,7 @@ from .silx_actions import (
     ExpandCanvas,
     PydidasGetDataInfoAction,
 )
+from .silx_tickbar import tickbar_paintEvent, tickbar_paintTick
 from .utilities import get_2d_silx_plot_ax_settings
 
 
@@ -70,6 +72,11 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
                 else kwargs.get("diffraction_exp")
             ),
         }
+        self._plot_config = {"kwargs": {}}
+        self._qtapp = QtWidgets.QApplication.instance()
+        if hasattr(self._qtapp, "sig_mpl_font_change"):
+            self._qtapp.sig_mpl_font_change.connect(self.update_mpl_fonts)
+
         self._allowed_kwargs = [
             _key
             for _key, _value in inspect.signature(self.addImage).parameters.items()
@@ -144,6 +151,9 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             self.get_data_info_action.sig_show_more_info_for_data.connect(
                 self.sig_get_more_info_for_data
             )
+        _tb = self.getColorBarWidget().getColorScaleBar().getTickBar()
+        _tb.paintEvent = partial(tickbar_paintEvent, _tb)
+        _tb._paintTick = partial(tickbar_paintTick, _tb)
 
     @QtCore.Slot()
     def update_exp_setup_params(self):
@@ -208,35 +218,37 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         )
         if data.axis_units[0] != "" and data.axis_units[1] != "":
             self.update_cs_units(data.axis_units[1], data.axis_units[0])
-        _ax_label = [
-            data.axis_labels[i]
-            + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
-            for i in [0, 1]
-        ]
         _originx, _scalex = get_2d_silx_plot_ax_settings(data.axis_ranges[1])
         _originy, _scaley = get_2d_silx_plot_ax_settings(data.axis_ranges[0])
-        self.setGraphYLabel(_ax_label[0])
-        self.setGraphXLabel(_ax_label[1])
-        self.addImage(
-            data,
-            replace=kwargs.pop("replace", True),
-            copy=kwargs.pop("copy", False),
-            origin=(_originx, _originy),
-            scale=(_scalex, _scaley),
-            **{
+        self._plot_config = {
+            "ax_labels": [
+                data.axis_labels[i]
+                + (" / " + data.axis_units[i] if len(data.axis_units[i]) > 0 else "")
+                for i in [0, 1]
+            ],
+            "kwargs": {
+                "replace": kwargs.pop("replace", True),
+                "copy": kwargs.pop("copy", False),
+                "origin": (_originx, _originy),
+                "scale": (_scalex, _scaley),
+            }
+            | {
                 _key: _val
                 for _key, _val in kwargs.items()
                 if _key in self._allowed_kwargs
             },
-        )
-        _cbar = self.getColorBarWidget()
-        _legend = ""
+        }
+
+        self.setGraphYLabel(self._plot_config["ax_labels"][0])
+        self.setGraphXLabel(self._plot_config["ax_labels"][1])
+        self.addImage(data, **self._plot_config["kwargs"])
+        self._plot_config["cbar_legend"] = ""
         if len(data.data_label) > 0:
-            _legend += data.data_label
+            self._plot_config["cbar_legend"] += data.data_label
         if len(data.data_unit) > 0:
-            _legend += f"/ {data.data_unit}"
-        if len(_legend) > 0:
-            _cbar.setLegend(_legend)
+            self._plot_config["cbar_legend"] += f" / {data.data_unit}"
+        if len(self._plot_config["cbar_legend"]) > 0:
+            self.getColorBarWidget().setLegend(self._plot_config["cbar_legend"])
 
         if data.shape == (
             self._config["diffraction_exp"].get_param_value("detector_npixy"),
@@ -253,3 +265,22 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.setGraphYLabel("")
         self.setGraphXLabel("")
         self.getColorBarWidget().setLegend("")
+
+    @QtCore.Slot()
+    def update_mpl_fonts(self):
+        """
+        Update the plot's fonts.
+        """
+        _image = self.getImage()
+        if _image is None:
+            return
+        _title = self.getGraphTitle()
+        self.getBackend().fig.gca().cla()
+        _cb = self.getColorBarWidget()
+        _cb.setLegend(self._plot_config.get("cbar_legend", ""))
+        _cb.getColorScaleBar().setFixedWidth(
+            int(1.6 * self._qtapp.standard_font_height)
+        )
+        _cb.update()
+        self.addImage(_image.getData(), **self._plot_config["kwargs"])
+        self.setGraphTitle(_title)

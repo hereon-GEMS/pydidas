@@ -31,6 +31,10 @@ import argparse
 import sys
 
 from qtpy import QtCore, QtWidgets, QtGui
+import matplotlib as mpl
+import matplotlib.font_manager as mpl_font_manager
+import matplotlib.ft2font as mpl_ft2font
+import numpy as np
 
 from . import fontsize
 
@@ -71,8 +75,10 @@ def parse_cmd_args():
 
 class PydidasQApplication(QtWidgets.QApplication):
     """
-    PydidasQApplication is the subclassed QApplication used in pydidas for controlling
-    the UI and event loops.
+    A subclassed QApplication used in pydidas for controlling the UI and event loops.
+
+    The PydidasQApplication also handles font changes and scaling of the GUI based on
+    font metrics.
     """
 
     sig_close_gui = QtCore.Signal()
@@ -82,15 +88,17 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_font_family_changed = QtCore.Signal()
     sig_new_font_height = QtCore.Signal(float)
     sig_font_height_changed = QtCore.Signal()
+    sig_mpl_font_change = QtCore.Signal()
+    sig_mpl_font_setting_error = QtCore.Signal(str)
 
     def __init__(self, args):
         QtWidgets.QApplication.__init__(self, args)
-
         self.setOrganizationName("Hereon")
         self.setOrganizationDomain("Hereon/WPI")
         self.setApplicationName("pydidas")
         self.__settings = QtCore.QSettings()
         self.__standard_font = self.font()
+        self.__available_mpl_fonts = mpl_font_manager.get_font_names()
         self.__font_config = {
             "size": float(
                 self.__settings.value("font/point_size", fontsize.STANDARD_FONT_SIZE)
@@ -102,6 +110,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.standard_font_size = _kwargs.get("fontsize", self.__font_config["size"])
         self.standard_font_family = self.__font_config["family"]
         self._update_font_height()
+        # self.__initialization = False
 
     def _update_font_height(self):
         """
@@ -112,6 +121,29 @@ class PydidasQApplication(QtWidgets.QApplication):
             self.__font_config["height"] = _font_height
             self.sig_new_font_height.emit(_font_height)
             self.sig_font_height_changed.emit()
+
+    def _update_matplotlib_font_family(self):
+        """
+        Update the matplotlib font from the app's font config.
+        """
+        _family = self.__font_config["family"]
+        if mpl.rcParams["font.family"] != _family:
+            if _family not in self.__available_mpl_fonts:
+                self.sig_mpl_font_setting_error.emit(
+                    f"The chosen font *{_family}* is not supported by matplotlib. "
+                    "Defaulting to DejaVu Sans."
+                )
+                return
+            _font = mpl_ft2font.FT2Font(mpl_font_manager.findfont(_family))
+            _char_keys = set(_font.get_charmap().keys())
+            if not set(np.arange(33, 125)).issubset(_char_keys):
+                self.sig_mpl_font_setting_error.emit(
+                    f"The chosen font *{_family}* is not supported by matplotlib. "
+                    "The font for plots has not been updated."
+                )
+                return
+        mpl.rc("font", family=self.__font_config["family"])
+        self.sig_mpl_font_change.emit()
 
     @QtCore.Slot()
     def send_gui_close_signal(self):
@@ -148,20 +180,10 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font.setPointSizeF(value)
         self.setFont(_font)
         self._update_font_height()
+        mpl.rc("font", size=self.__font_config["size"])
         self.sig_new_fontsize.emit(self.__font_config["size"])
         self.sig_font_size_changed.emit()
-
-    @property
-    def standard_font_family(self) -> str:
-        """
-        Get the standard font family.
-
-        Returns
-        -------
-        str
-            The font family.
-        """
-        return self.__font_config["family"]
+        self.sig_mpl_font_change.emit()
 
     @property
     def standard_font_height(self) -> int:
@@ -174,6 +196,18 @@ class PydidasQApplication(QtWidgets.QApplication):
             The height of the font.
         """
         return self.__font_config["height"]
+
+    @property
+    def standard_font_family(self) -> str:
+        """
+        Get the standard font family.
+
+        Returns
+        -------
+        str
+            The font family.
+        """
+        return self.__font_config["family"]
 
     @standard_font_family.setter
     def standard_font_family(self, font_family: str):
@@ -192,6 +226,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font = self.font()
         _font.setFamily(font_family)
         self.setFont(_font)
+        self._update_matplotlib_font_family()
         self._update_font_height()
         self.sig_new_font_family.emit(font_family)
         self.sig_font_size_changed.emit()
@@ -214,6 +249,7 @@ class PydidasQApplication(QtWidgets.QApplication):
             )
             self.sig_new_fontsize.emit(self.__font_config["size"])
         self._update_font_height()
+        self._update_matplotlib_font_family()
 
     @property
     def scrollbar_width(self) -> int:

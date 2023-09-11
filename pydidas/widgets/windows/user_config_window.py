@@ -46,7 +46,7 @@ from ...core.constants import (
     QSETTINGS_USER_KEYS,
 )
 from ...plugins import PluginCollection, get_generic_plugin_path
-from ..dialogues import AcknowledgeBox, QuestionBox
+from ..dialogues import AcknowledgeBox, QuestionBox, UserConfigErrorMessageBox
 from ..factory import SquareButton
 from ..framework import PydidasWindow
 
@@ -260,6 +260,7 @@ class _UserConfigWindow(PydidasWindow):
         self._widgets["font_family_box"].currentFontChanged.connect(
             self.new_font_family_selected
         )
+        self.__qtapp.sig_mpl_font_setting_error.connect(self.mpl_font_not_supported)
 
     def finalize_ui(self):
         """
@@ -443,6 +444,19 @@ class _UserConfigWindow(PydidasWindow):
         """
         value = self._qsettings_convert_value_type(param_key, value)
         self.set_param_value_and_widget(param_key, value)
+
+    @QtCore.Slot(str)
+    def mpl_font_not_supported(self, error: str):
+        """
+        Handle the signal that matplotlib does not support the chosen font.
+
+
+        Parameters
+        ----------
+        error : str
+            The error description.
+        """
+        _ = UserConfigErrorMessageBox(text=error).exec_()
 
 
 UserConfigWindow = SingletonFactory(_UserConfigWindow)

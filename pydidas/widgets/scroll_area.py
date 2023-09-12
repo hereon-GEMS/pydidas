@@ -29,7 +29,7 @@ __all__ = ["ScrollArea"]
 
 
 from qtpy.QtCore import QSize, Slot
-from qtpy.QtWidgets import QApplication, QFrame, QScrollArea, QStyle
+from qtpy.QtWidgets import QApplication, QFrame, QScrollArea
 
 from ..core.constants import POLICY_EXP_EXP
 from ..core.utils import apply_qt_properties
@@ -57,10 +57,8 @@ class ScrollArea(QScrollArea):
         kwargs["sizePolicy"] = POLICY_EXP_EXP
         kwargs["frameShape"] = QFrame.NoFrame
         apply_qt_properties(self, **kwargs)
-        self.__scrollbar_width = (
-            QApplication.instance().style().pixelMetric(QStyle.PM_ScrollBarExtent)
-        )
-        if kwargs.get("resize_to_widget_width"):
+        self.__scrollbar_width = QApplication.instance().scrollbar_width
+        if kwargs.get("resize_to_widget_width", False):
             QApplication.instance().sig_font_height_changed.connect(
                 self.force_width_from_size_hint
             )

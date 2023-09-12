@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,23 +21,26 @@ from the available datasets in a hdf5 file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Hdf5DatasetSelectionPopup"]
+
+
+from pathlib import Path
+from typing import Union
 
 from qtpy import QtWidgets
 
 from ...core import Hdf5key
 from ...core.utils import get_hdf5_populated_dataset_keys
-from ..utilities import get_pyqt_icon_from_str, get_max_pixel_width_of_entries
+from ..utilities import get_max_pixel_width_of_entries, get_pyqt_icon_from_str
 
 
 class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
     """
-    QInputDialog subclass for showing a pop-up dialogue to select a dataset
-    from an hdf5 file.
+    A dialogue for showing a pop-up dialogue to select a dataset from an hdf5 file.
 
     Parameters
     ----------
@@ -45,8 +50,12 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         The file path to the hdf5 file.
     """
 
-    def __init__(self, parent=None, fname=None):
-        super().__init__(parent)
+    def __init__(
+        self,
+        parent: Union[None, QtWidgets.QWidget] = None,
+        fname: Union[None, Path] = None,
+    ):
+        QtWidgets.QInputDialog.__init__(self, parent)
         if fname is not None:
             dsets = get_hdf5_populated_dataset_keys(fname, min_dim=2)
             self.__update_combo_box_items(dsets)
@@ -76,14 +85,20 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             The items which are to be displayed. This must be an iterable
             of string items.
         """
-        _width = get_max_pixel_width_of_entries(items)
-        self.resize(_width + 60, min(300, max(200, 50 + len(items) * 10)))
+        _font_height = QtWidgets.QApplication.instance().standard_font_height
+        self.resize(
+            get_max_pixel_width_of_entries(items) + 60,
+            min(
+                15 * _font_height,
+                max(10 * _font_height, 50 + len(items) * _font_height),
+            ),
+        )
         self.setOption(QtWidgets.QInputDialog.UseListViewForComboBoxItems, True)
         self.setComboBoxItems(items)
 
     def get_dset(self):
         """
-        Show the QInputDialog
+        Show the QInputDialog.
 
         Returns
         -------
@@ -93,4 +108,3 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
         """
         if self.exec_() == QtWidgets.QDialog.Accepted:
             return Hdf5key(self.textValue())
-        return None

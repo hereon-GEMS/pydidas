@@ -121,8 +121,6 @@ class UtilitiesFrameBuilder:
                 gridPos=(_ypos, _xpos, 1, 1),
                 font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
                 layout_kwargs={"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
-                # fixedWidth=frame.GROUP_WIDTH,
-                # fixedHeight=170,
             )
             frame.create_label(
                 f"title_{_key}",

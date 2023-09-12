@@ -31,7 +31,7 @@ __all__ = ["UserConfigErrorMessageBox"]
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import POLICY_EXP_EXP
-from ...core.utils import apply_qt_properties, format_input_to_multiline_str
+from ...core.utils import format_input_to_multiline_str
 from ...resources import icons, logos
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
@@ -51,6 +51,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
 
     def __init__(self, *args, **kwargs):
         _text = kwargs.pop("text", "")
+        _font_height = QtWidgets.QApplication.instance().standard_font_height
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle("Configuration error")
@@ -60,38 +61,40 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_label(
             "title",
             "Configuration error:",
-            fontsize=12,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            fontsize_offset=2,
         )
-        self._widgets["label"] = QtWidgets.QLabel()
-        apply_qt_properties(
-            self._widgets["label"],
-            textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
-            sizePolicy=POLICY_EXP_EXP,
+        self.create_label(
+            "label",
+            "",
+            font_metric_width_factor=30,
             indent=8,
-            fixedWidth=500,
+            sizePolicy=POLICY_EXP_EXP,
+            textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
         )
-
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            widget=self._widgets["label"],
             gridPos=(1, 0, 1, 2),
+            widget=self._widgets["label"],
         )
-        self.create_button("button_okay", "Acknowledge", gridPos=(2, 3, 1, 1))
+        self.create_button(
+            "button_okay",
+            "Acknowledge",
+            gridPos=(2, 3, 1, 1),
+            font_metric_width_factor=6,
+        )
 
         self.add_any_widget(
             "icon",
             logos.pydidas_error_svg(),
-            fixedHeight=100,
-            fixedWidth=100,
+            fixedHeight=_font_height * 6,
+            fixedWidth=_font_height * 6,
             autoDefault=True,
             default=True,
-            layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
             gridPos=(0, 2, 2, 2),
+            layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )
-
         self._widgets["button_okay"].clicked.connect(self.close)
         self.set_text(_text)
 
@@ -105,4 +108,5 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             The text to be displayed.
         """
         _new_text = format_input_to_multiline_str(text, max_line_length=60)
+        self._widgets["label"].font_metric_height_factor = _new_text.count("\n") + 1
         self._widgets["label"].setText(_new_text)

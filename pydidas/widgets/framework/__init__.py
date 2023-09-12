@@ -31,6 +31,7 @@ __all__ = []
 # import __all__ items from modules:
 from .base_frame import *
 from .base_frame_with_app import *
+from .font_scaling_toolbar import *
 from .pydidas_status_widget import *
 from .pydidas_frame_stack import *
 from .pydidas_window import *
@@ -46,6 +47,11 @@ from . import base_frame_with_app
 
 __all__.extend(base_frame_with_app.__all__)
 del base_frame_with_app
+
+from . import font_scaling_toolbar
+
+__all__.extend(font_scaling_toolbar.__all__)
+del font_scaling_toolbar
 
 from . import pydidas_status_widget
 

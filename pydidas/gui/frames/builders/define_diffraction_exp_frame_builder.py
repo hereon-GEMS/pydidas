@@ -184,8 +184,8 @@ class DefineDiffractionExpFrameBuilder:
             "Manual beamcenter definition",
             parent_widget="config_right",
         )
-        cls.frame.create_button(
-            "but_import_fit2d",
-            "Import Fit2D geometry",
-            parent_widget="config_right",
-        )
+        # cls.frame.create_button(
+        #     "but_import_fit2d",
+        #     "Import Fit2D geometry",
+        #     parent_widget="config_right",
+        # )

@@ -229,6 +229,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self._update_matplotlib_font_family()
         self._update_font_height()
         self.sig_new_font_family.emit(font_family)
+        self.sig_font_family_changed.emit()
         self.sig_font_size_changed.emit()
 
     def reset_font_to_standard(self):

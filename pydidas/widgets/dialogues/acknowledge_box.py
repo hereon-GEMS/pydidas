@@ -31,7 +31,7 @@ __all__ = ["AcknowledgeBox"]
 from qtpy import QtCore, QtWidgets
 
 from ...core.constants import POLICY_EXP_EXP
-from ...core.utils import apply_qt_properties, format_input_to_multiline_str
+from ...core.utils import format_input_to_multiline_str
 from ...resources import icons
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
@@ -51,6 +51,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
 
     def __init__(self, *args, **kwargs):
         _text = kwargs.pop("text", "")
+        _qtapp = QtWidgets.QApplication.instance()
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle("Notice")
@@ -61,34 +62,43 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_label(
             "title",
             "Notice:",
-            fontsize=12,
             bold=True,
+            fontsize_offset=2,
             gridPos=(0, 0, 1, 1),
         )
-        self._widgets["label"] = QtWidgets.QLabel()
-        apply_qt_properties(
-            self._widgets["label"],
-            textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
-            sizePolicy=POLICY_EXP_EXP,
+        self.create_label(
+            "label",
+            "",
+            font_metric_width_factor=25,
+            font_metric_height_factor=3,
             indent=8,
-            fixedWidth=500,
+            parent_widget=None,
+            sizePolicy=POLICY_EXP_EXP,
+            textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
         )
 
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            widget=self._widgets["label"],
+            fixedWidth=_qtapp.standard_font_height * 25 + _qtapp.scrollbar_width,
             gridPos=(1, 0, 1, 2),
+            widget=self._widgets["label"],
         )
         self.add_any_widget(
             "acknowledge",
             QtWidgets.QCheckBox("Do not show this notice again"),
             gridPos=(2, 0, 1, 2),
         )
-        self.create_button("button_okay", "Acknowledge", gridPos=(2, 3, 1, 1))
+        self.create_button(
+            "button_okay",
+            "Acknowledge",
+            gridPos=(2, 3, 1, 1),
+            font_metric_width_factor=10,
+        )
 
         self._widgets["button_okay"].clicked.connect(self.close)
         self.set_text(_text)
+        self.resize(_qtapp.standard_font_height * 35, _qtapp.standard_font_height * 10)
 
     def set_text(self, text):
         """

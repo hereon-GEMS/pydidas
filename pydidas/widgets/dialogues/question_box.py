@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,12 +20,14 @@ Module with QuestionBox class which shows a dialog with a yes/no reply.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["QuestionBox"]
 
+
+from typing import Union
 
 from qtpy import QtWidgets
 
@@ -54,14 +56,14 @@ class QuestionBox(QtWidgets.QMessageBox):
 
     def __init__(
         self,
-        title,
-        question,
-        explanation="",
-        parent=None,
-        default=QtWidgets.QMessageBox.No,
-        tooltip="",
+        title: str,
+        question: str,
+        explanation: str = "",
+        parent: Union[None, QtWidgets.QWidget] = None,
+        default: QtWidgets.QMessageBox.StandardButton = QtWidgets.QMessageBox.No,
+        tooltip: str = "",
     ):
-        super().__init__(parent)
+        QtWidgets.QMessageBox.__init__(self, parent)
         self.setWindowTitle(title)
         self.setWindowIcon(get_pyqt_icon_from_str("qt-std::SP_MessageBoxQuestion"))
         self.setText(question)
@@ -78,7 +80,4 @@ class QuestionBox(QtWidgets.QMessageBox):
 
         This method will show the QuestionBox
         """
-        _res = super().exec_()
-        if _res == QtWidgets.QMessageBox.Yes:
-            return True
-        return False
+        return QtWidgets.QMessageBox.exec_(self) == QtWidgets.QMessageBox.Yes

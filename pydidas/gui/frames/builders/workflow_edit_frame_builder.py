@@ -61,7 +61,7 @@ class WorkflowEditFrameBuilder:
             "Workflow tree editor",
             fontsize_offset=4,
             bold=True,
-            fixedWidth=250,
+            font_metric_width_factor=12,
             gridPos=(0, 0, 1, 3),
         )
         frame.create_any_widget(

@@ -35,8 +35,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ..core import PydidasGuiError
-from ..core.utils import apply_qt_properties
-from ..widgets.framework import PydidasStatusWidget
+from ..widgets.framework import FontScalingToolbar, PydidasStatusWidget
 from . import utils
 from .frames import DefineDiffractionExpFrame, DefineScanFrame, WorkflowEditFrame
 from .main_menu import MainMenu
@@ -152,16 +151,7 @@ class MainWindow(MainMenu):
         """
         for _tb in utils.find_toolbar_bases(self.__configuration["menu_entries"]):
             tb_title = _tb if _tb else "Main toolbar"
-            self._toolbars[_tb] = QtWidgets.QToolBar(tb_title, self)
-            apply_qt_properties(
-                self._toolbars[_tb],
-                styleSheet="QToolBar{spacing:20px;}",
-                iconSize=QtCore.QSize(45, 45),
-                toolButtonStyle=QtCore.Qt.ToolButtonTextUnderIcon,
-                fixedWidth=90,
-                movable=False,
-            )
-            self._toolbars[_tb].toggleViewAction().setEnabled(False)
+            self._toolbars[_tb] = FontScalingToolbar(tb_title, self)
         for _toolbar_name, _toolbar in self._toolbars.items():
             if _toolbar_name != "":
                 self.addToolBarBreak(QtCore.Qt.LeftToolBarArea)

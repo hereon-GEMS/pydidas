@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,17 +21,19 @@ ScanContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ScanContextIoYaml"]
 
+
+from typing import Union
 
 import yaml
 
 from ...core.constants import YAML_EXTENSIONS
-from .scan_context import ScanContext
+from .scan_context import Scan, ScanContext
 from .scan_context_io_base import ScanContextIoBase
 
 
@@ -47,7 +49,7 @@ class ScanContextIoYaml(ScanContextIoBase):
     format_name = "YAML"
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename: str, **kwargs: dict):
         """
         Write the ScanTree to a file.
 
@@ -63,7 +65,7 @@ class ScanContextIoYaml(ScanContextIoBase):
             yaml.safe_dump(tmp_params, stream)
 
     @classmethod
-    def import_from_file(cls, filename, scan=None):
+    def import_from_file(cls, filename: str, scan: Union[Scan, None] = None):
         """
         Restore the ScanContext from a YAML file.
 

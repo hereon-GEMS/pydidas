@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,15 +21,18 @@ DiffractionExperiment(Context) should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DiffractionExperimentIoBase"]
 
 
+from typing import Union
+
 from ...core import UserConfigError
 from ...core.io_registry import GenericIoBase
+from .diffraction_experiment import DiffractionExperiment
 from .diffraction_experiment_context import DiffractionExperimentContext
 from .diffraction_experiment_io import DiffractionExperimentIo
 
@@ -47,7 +50,7 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
     imported_params = {}
 
     @classmethod
-    def _verify_all_entries_present(cls, exclude_det_mask=False):
+    def _verify_all_entries_present(cls, exclude_det_mask: bool = False):
         """
         Verify that the tmp_params dictionary holds all required keys.
 
@@ -72,7 +75,9 @@ class DiffractionExperimentIoBase(GenericIoBase, metaclass=DiffractionExperiment
             raise UserConfigError(_text)
 
     @classmethod
-    def _write_to_exp_settings(cls, diffraction_exp=None):
+    def _write_to_exp_settings(
+        cls, diffraction_exp: Union[DiffractionExperiment, None] = None
+    ):
         """
         Write the loaded (temporary) Parameters to a Diffraction.
 

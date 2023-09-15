@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,12 +21,14 @@ exporter/importer classes for the ScanContext singleton and registering them.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ScanContextIoMeta"]
 
+
+from typing import Union
 
 from ...core.io_registry import GenericIoMeta
 from ...core.utils.file_utils import get_extension
@@ -43,7 +45,7 @@ class ScanContextIoMeta(GenericIoMeta):
     registry = {}
 
     @classmethod
-    def import_from_file(cls, filename, scan=None):
+    def import_from_file(cls, filename: str, scan: Union[object, None] = None):
         """
         Call the concrete import_from_file method in the subclass registered
         to the extension of the filename.

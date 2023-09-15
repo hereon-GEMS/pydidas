@@ -28,8 +28,12 @@ __status__ = "Production"
 __all__ = ["DiffractionExperiment"]
 
 
+import pathlib
+from typing import Self, Tuple, Union
+
 import numpy as np
 import pyFAI
+from pyFAI.geometry import Geometry
 from qtpy import QtCore
 
 from ...core import (
@@ -72,13 +76,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
     )
     sig_params_changed = QtCore.Signal()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
 
-    def set_param_value(self, param_key, value):
+    def set_param_value(self, param_key: str, value: object):
         """
         Set a Parameter value.
 
@@ -87,7 +91,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
 
         Parameters
         ----------
-        key : str
+        param_key : str
             The Parameter identifier key.
         value : object
             The new value for the parameter. Depending upon the parameter,
@@ -109,7 +113,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             self.params.set_value(param_key, value)
         self.sig_params_changed.emit()
 
-    def get_detector(self):
+    def get_detector(self) -> pyFAI.detectors.Detector:
         """
         Get the pyFAI detector object.
 
@@ -141,16 +145,16 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             setattr(_det, key, value)
         return _det
 
-    def as_pyfai_geometry(self):
+    def as_pyfai_geometry(self) -> Geometry:
         """
         Get an equivalent pyFAI Geometry object.
 
         Returns
         -------
-        pyFAI.geometry.Geometry :
+        Geometry :
             The pyFAI geometry object corresponding to the DiffractionExperiment config.
         """
-        return pyFAI.geometry.Geometry(
+        return Geometry(
             dist=self.get_param_value("detector_dist"),
             poni1=self.get_param_value("detector_poni1"),
             poni2=self.get_param_value("detector_poni2"),
@@ -160,7 +164,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             detector=self.get_detector(),
         )
 
-    def set_detector_params_from_name(self, det_name):
+    def set_detector_params_from_name(self, det_name: str):
         """
         Set the detector parameters based on a detector name.
 
@@ -191,7 +195,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             self.set_param_value("detector_name", _det.name)
         self.sig_params_changed.emit()
 
-    def update_from_diffraction_exp(self, diffraction_exp):
+    def update_from_diffraction_exp(self, diffraction_exp: Self):
         """
         Update this DiffractionExperiment object's Parameters from another instance.
 
@@ -208,13 +212,13 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                 self.set_param_value(_key, _val)
         self.sig_params_changed.emit()
 
-    def update_from_pyfai_geometry(self, geometry):
+    def update_from_pyfai_geometry(self, geometry: Geometry):
         """
         Update this DiffractionExperiment from a pyFAI geometry.
 
         Parameters
         ----------
-        geometry : pyFAI.geometry.Geometry
+        geometry : Geometry
             The geometry to be used.
         """
         with QtCore.QSignalBlocker(self):
@@ -235,7 +239,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
                     self.set_param_value("detector_name", _det.name)
         self.sig_params_changed.emit()
 
-    def import_from_file(self, filename):
+    def import_from_file(self, filename: Union[str, pathlib.Path]):
         """
         Import DiffractionExperimentContext from a file.
 
@@ -248,7 +252,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             DiffractionExperimentIo.import_from_file(filename, diffraction_exp=self)
         self.sig_params_changed.emit()
 
-    def export_to_file(self, filename, overwrite=False):
+    def export_to_file(
+        self, filename: Union[str, pathlib.Path], overwrite: bool = False
+    ):
         """
         Import DiffractionExperimentContext from a file.
 
@@ -263,7 +269,9 @@ class DiffractionExperiment(ObjectWithParameterCollection):
             filename, diffraction_exp=self, overwrite=overwrite
         )
 
-    def set_beamcenter_from_fit2d_params(self, center_x, center_y, det_dist, **kwargs):
+    def set_beamcenter_from_fit2d_params(
+        self, center_x: float, center_y: float, det_dist: float, **kwargs: dict
+    ):
         """
         Set the beamcenter in detector pixel coordinates.
 
@@ -315,7 +323,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         self.sig_params_changed.emit()
 
     @property
-    def beamcenter(self):
+    def beamcenter(self) -> Tuple[float]:
         """
         Get the beamcenter in detector pixel coordinates.
 
@@ -329,7 +337,7 @@ class DiffractionExperiment(ObjectWithParameterCollection):
         _f2d = self.as_fit2d_geometry_values()
         return _f2d["center_x"], _f2d["center_y"]
 
-    def as_fit2d_geometry_values(self):
+    def as_fit2d_geometry_values(self) -> dict:
         """
         Get the DiffractionExperiment configuration as values in Fit2D geometry.
 

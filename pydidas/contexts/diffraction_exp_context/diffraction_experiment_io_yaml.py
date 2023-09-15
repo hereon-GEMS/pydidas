@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,19 +21,22 @@ export DiffractionExperimentContext metadata from a YAML file.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["DiffractionExperimentIoYaml"]
 
+
 from numbers import Integral, Real
+from typing import Union
 
 import numpy as np
 import yaml
 
 from ...core import UserConfigError
 from ...core.constants import LAMBDA_IN_A_TO_E, YAML_EXTENSIONS
+from .diffraction_experiment import DiffractionExperiment
 from .diffraction_experiment_context import DiffractionExperimentContext
 from .diffraction_experiment_io_base import DiffractionExperimentIoBase
 
@@ -50,7 +53,7 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
     format_name = "YAML"
 
     @classmethod
-    def export_to_file(cls, filename, **kwargs):
+    def export_to_file(cls, filename: str, **kwargs: dict):
         """
         Write the ExperimentalTree to a file.
 
@@ -76,7 +79,9 @@ class DiffractionExperimentIoYaml(DiffractionExperimentIoBase):
             yaml.safe_dump(tmp_params, stream)
 
     @classmethod
-    def import_from_file(cls, filename, diffraction_exp=None):
+    def import_from_file(
+        cls, filename: str, diffraction_exp: Union[DiffractionExperiment, None] = None
+    ):
         """
         Restore the DiffractionExperimentContext from a YAML file.
 

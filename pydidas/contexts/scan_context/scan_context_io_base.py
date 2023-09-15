@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,16 +21,19 @@ ScanContext should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ScanContextIoBase"]
+
+
+from typing import Union
 
 from ...core import UserConfigError
 from ...core.constants import SCAN_GENERIC_PARAM_NAMES
 from ...core.io_registry import GenericIoBase
-from .scan_context import ScanContext
+from .scan_context import Scan, ScanContext
 from .scan_context_io_meta import ScanContextIoMeta
 
 
@@ -71,7 +74,7 @@ class ScanContextIoBase(GenericIoBase, metaclass=ScanContextIoMeta):
             raise UserConfigError(_text)
 
     @classmethod
-    def _write_to_scan_settings(cls, scan=None):
+    def _write_to_scan_settings(cls, scan: Union[Scan, None] = None):
         """
         Write the loaded (temporary) Parameters to the scanSettings.
 

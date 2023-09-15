@@ -32,7 +32,7 @@ from typing import List, Tuple
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import ALIGN_CENTER
+from ...core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
 from ...core.utils import apply_qt_properties
 from ..factory import CreateWidgetsMixIn
 from ..parameter_config import ParameterWidgetsMixIn
@@ -161,8 +161,6 @@ class PointPositionTableWidget(
     A widget to display a list of points in an associated plot.
     """
 
-    widget_width_factor = 12
-
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
 
@@ -173,7 +171,7 @@ class PointPositionTableWidget(
         self.setLayout(QtWidgets.QGridLayout())
         apply_qt_properties(self.layout(), contentsMargins=(0, 0, 0, 0))
         self._qtapp = QtWidgets.QApplication.instance()
-        self._qtapp.sig_new_font_height.connect(self._adjust_width)
+        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self._points = []
         self._plot = plot
         self._config = {
@@ -192,7 +190,7 @@ class PointPositionTableWidget(
             "Delete all points",
         )
 
-        self._adjust_width(self._qtapp.standard_font_height)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
         self._widgets["but_delete_selected_points"].clicked.connect(
             self._widgets["table"].remove_selected_points
         )
@@ -220,19 +218,21 @@ class PointPositionTableWidget(
         _widget.setTextAlignment(ALIGN_CENTER)
         _table.setItem(_row, 0, _widget)
 
-    @QtCore.Slot(float)
-    def _adjust_width(self, font_height: float):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
         """
         Adjust the widget's width based on the font metrics.
 
         Parameters
         ----------
-        font_height : float
+        char_width : float
+            The font width in pixels.
+        char_height : float
             The font height in pixels.
         """
-        _new_width = int(self.widget_width_factor * font_height)
+        _new_width = int(FONT_METRIC_WIDE_BUTTON_WIDTH * char_width)
         self.setFixedWidth(_new_width)
         self._widgets["table"].setFixedWidth(_new_width)
         self._widgets["table"].horizontalHeader().resizeSection(
-            0, int(0.93 * (_new_width - self._qtapp.scrollbar_width))
+            0, int(0.91 * (_new_width - self._qtapp.scrollbar_width))
         )

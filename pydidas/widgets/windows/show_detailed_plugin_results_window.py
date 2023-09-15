@@ -30,7 +30,7 @@ __all__ = ["ShowDetailedPluginResultsWindow"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import ALIGN_TOP_LEFT
+from ...core.constants import ALIGN_TOP_LEFT, FONT_METRIC_HALF_CONSOLE_WIDTH
 from ...core.utils import update_size_policy
 from ..framework import PydidasWindow
 from ..silx_plot import PydidasPlotStack
@@ -44,8 +44,6 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
     show_frame = False
     sig_new_selection = QtCore.Signal(str)
     sig_minimized = QtCore.Signal()
-
-    width_factor = 15
 
     def __init__(self, parent=None, results=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Detailed plugin results", **kwargs)
@@ -66,18 +64,20 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             gridPos=(0, 0, 1, 2),
         )
         self.create_empty_widget(
-            "metadata", gridPos=(1, 0, 2, 1), font_metric_width_factor=self.width_factor
+            "metadata",
+            gridPos=(1, 0, 2, 1),
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
         )
         self.create_combo_box(
             "selector",
-            parent_widget="metadata",
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             gridPos=(-1, 0, 1, 1),
-            font_metric_width_factor=self.width_factor,
+            parent_widget="metadata",
         )
         self.create_label(
             "metadata_title",
             "Metadata:",
-            font_metric_width_factor=self.width_factor,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             fontsize_offset=2,
             gridPos=(-1, 0, 1, 1),
             parent_widget="metadata",
@@ -85,12 +85,12 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         self.create_label(
             "metadata_label",
             "",
-            font_metric_width_factor=self.width_factor,
-            font_metric_height_factor=20,
-            wordWrap=True,
-            gridPos=(-1, 0, 1, 1),
             alignment=ALIGN_TOP_LEFT,
+            font_metric_height_factor=20,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(-1, 0, 1, 1),
             parent_widget="metadata",
+            wordWrap=True,
         )
 
     def connect_signals(self):
@@ -108,7 +108,8 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
         QtCore.QSize
             The desired size.
         """
-        return QtCore.QSize(1200, 600)
+        _font_height = QtWidgets.QApplication.instance().font_height
+        return QtCore.QSize(70 * _font_height, 40 * _font_height)
 
     def update_results(self, results, title=None):
         """
@@ -165,7 +166,10 @@ class ShowDetailedPluginResultsWindow(PydidasWindow):
             _y = 1 + _index // 2
             _x = 1 + _index % 2
             self.create_any_widget(
-                f"plot_{_index}", PydidasPlotStack, gridPos=(_y, _x, 1, 1)
+                f"plot_{_index}",
+                PydidasPlotStack,
+                gridPos=(_y, _x, 1, 1),
+                minimumWidth=500,
             )
             update_size_policy(self._widgets[f"plot_{_index}"], horizontalStretch=1)
 

@@ -46,9 +46,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
             kwargs["icon"] = get_pyqt_icon_from_str(kwargs.get("icon"))
         QtWidgets.QPushButton.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
-        self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_new_font_height.connect(self.__update_min_sizes)
-        self.__update_min_sizes(self.__qtapp.standard_font_height)
+        self.__update_min_sizes(self._qtapp.font_height)
 
     def heightForWidth(self, width: int) -> int:
         """
@@ -66,7 +64,21 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         """
         return width
 
-    @QtCore.Slot(float)
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, font_width: float, font_height: float):
+        """
+        Set the fixed width of the widget dynamically from the font metrics.
+
+        Parameters
+        ----------
+        font_width: float
+            The font width in pixels.
+        font_height : float
+            The font height in pixels.
+        """
+        self.__update_min_sizes(font_height)
+        PydidasWidgetMixin.process_new_font_metrics(self, font_width, font_height)
+
     def __update_min_sizes(self, font_height: float):
         """
         Update the widgets minimum sizes based on the font height.
@@ -76,7 +88,7 @@ class SquareButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         font_height : float
             The font height metrics.
         """
-        self.__size = max(font_height + 6, MINIMUN_WIDGET_DIMENSIONS)
+        self.__size = int(max(font_height + 6, MINIMUN_WIDGET_DIMENSIONS))
         self.setMinimumWidth(self.__size)
         self.setMinimumHeight(self.__size)
 

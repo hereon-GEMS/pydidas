@@ -65,16 +65,16 @@ class ViewResultsFrame(BaseFrame, ViewResultsMixin):
         self._TREE = _WorkflowTree()
         self._EXP = DiffractionExperiment()
         self._RESULTS = WorkflowResults(
-            scan_context=self._SCAN,
             diffraction_exp_context=self._EXP,
+            scan_context=self._SCAN,
             workflow_tree=self._TREE,
         )
         BaseFrame.__init__(self, **kwargs)
         self.set_default_params()
         self.__import_dialog = PydidasFileDialog(
-            parent=self,
-            dialog_type="open_directory",
             caption="Workflow results directory",
+            dialog_type="open_directory",
+            parent=self,
             qsettings_ref="WorkflowResults__import",
         )
 

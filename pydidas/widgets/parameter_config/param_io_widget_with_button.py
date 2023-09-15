@@ -47,8 +47,9 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
     param : Parameter
         A Parameter instance.
     **kwargs : dict
-        Optional keyword arguments. Supported kwargs are "width" (in pixel) to specify
-        the size of the I/O field and "button_icon" to give an icon for the button.
+        Optional keyword arguments. Supported kwargs are "width" (in pixel)
+        to specify the size of the I/O field and "button_icon" to give an
+        icon for the button.
     """
 
     io_edited = QtCore.Signal(str)
@@ -82,7 +83,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         """
         raise NotImplementedError
 
-    def emit_signal(self, force_update=False):
+    def emit_signal(self, force_update: bool = False):
         """
         Emit a signal that the value has been edited.
 
@@ -99,7 +100,7 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
             self._old_value = _curr_value
             self.io_edited.emit(_curr_value)
 
-    def get_value(self):
+    def get_value(self) -> object:
         """
         Get the current value from the QLineEdit to update the Parameter value.
 
@@ -111,16 +112,21 @@ class ParamIoWidgetWithButton(BaseParamIoWidgetMixIn, QtWidgets.QWidget):
         text = self._io_lineedit.text()
         return self.get_value_from_text(text)
 
-    def set_value(self, value):
+    def set_value(self, value: object):
         """
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
+
+        Parameters
+        ----------
+        value : object
+            The value to be displayed for the Parameter.
         """
         self._old_value = self.get_value()
         self._io_lineedit.setText(f"{value}")
 
-    def setText(self, text):
+    def setText(self, text: object):
         """
         Set the line edit text to the input.
 

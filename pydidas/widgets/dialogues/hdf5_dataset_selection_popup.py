@@ -85,7 +85,7 @@ class Hdf5DatasetSelectionPopup(QtWidgets.QInputDialog):
             The items which are to be displayed. This must be an iterable
             of string items.
         """
-        _font_height = QtWidgets.QApplication.instance().standard_font_height
+        _font_height = QtWidgets.QApplication.instance().font_height
         self.resize(
             get_max_pixel_width_of_entries(items) + 60,
             min(

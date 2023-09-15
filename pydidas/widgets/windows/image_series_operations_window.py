@@ -35,7 +35,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import Parameter, UserConfigError, get_generic_param_collection
-from ...core.constants import HDF5_EXTENSIONS, PARAM_EDIT_ASPECT_RATIO
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
 from ...core.utils import ShowBusyMouse, get_extension, get_hdf5_metadata
 from ...data_io import export_data, import_data
 from ...managers import FilelistManager
@@ -110,13 +110,13 @@ class ImageSeriesOperationsWindow(PydidasWindow):
 
         _sub_section_config = {
             "fontsize_offset": 1,
-            "font_metric_width_factor": PARAM_EDIT_ASPECT_RATIO,
+            "font_metric_width_factor": FONT_METRIC_PARAM_EDIT_WIDTH,
             "bold": True,
             "parent_widget": "config_canvas",
         }
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
 
         self.create_label(
@@ -124,7 +124,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
             "Image series operations",
             fontsize_offset=4,
             bold=True,
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget="config_canvas",
         )
         self.create_spacer(None, parent_widget="config_canvas")
@@ -159,7 +159,7 @@ class ImageSeriesOperationsWindow(PydidasWindow):
         """
         self._widgets["but_exec"].clicked.connect(self.process_file_series)
         self.param_widgets["first_file"].io_edited.connect(self.__selected_first_file)
-        QtWidgets.QApplication.instance().sig_new_font_height.connect(
+        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )
 

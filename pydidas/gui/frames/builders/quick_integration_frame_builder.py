@@ -70,8 +70,8 @@ class QuickIntegrationFrameBuilder:
             The options dictionary.
         """
         return {
-            "fontsize_offset": size_offset,
             "bold": True,
+            "fontsize_offset": size_offset,
             "parent_widget": parent_key,
             **kwargs,
         }
@@ -123,27 +123,27 @@ class QuickIntegrationFrameBuilder:
             gridPos=(0, 1, 1, 1),
             minimumHeight=500,
             minimumWidth=500,
-            parent_widget=cls._frame._widgets["tab_plot"],
+            parent_widget="tab_plot",
             sizePolicy=constants.POLICY_EXP_EXP,
         )
         cls._frame.create_empty_widget(
             "input_plot_bc_selection",
             gridPos=(0, 0, 1, 1),
-            font_metric_width_factor=PointPositionTableWidget.widget_width_factor,
-            parent_widget=cls._frame._widgets["tab_plot"],
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_BUTTON_WIDTH,
+            parent_widget="tab_plot",
             visible=False,
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("overlay_color"),
             gridPos=(0, 0, 1, 1),
             linebreak=True,
-            parent_widget=cls._frame._widgets["input_plot_bc_selection"],
+            parent_widget="input_plot_bc_selection",
         )
         cls._frame.add_any_widget(
             "input_beamcenter_points",
             PointPositionTableWidget(cls._frame._widgets["input_plot"]),
             gridPos=(1, 0, 1, 1),
-            parent_widget=cls._frame._widgets["input_plot_bc_selection"],
+            parent_widget="input_plot_bc_selection",
         )
         cls._frame.create_any_widget(
             "result_plot",
@@ -163,19 +163,20 @@ class QuickIntegrationFrameBuilder:
         """
         Create the config widgets and headers.
         """
+        cls._frame.create_empty_widget(
+            "config",
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            init_layout=True,
+            parent_widget=None,
+            sizePolicy=constants.POLICY_FIX_EXP,
+        )
         cls._frame.create_label(
             "label_title",
             "Quick integration\n",
             bold=True,
             fontsize_offset=4,
-            font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
-        )
-        cls._frame.create_empty_widget(
-            "config",
-            font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
-            init_layout=True,
-            parent_widget=None,
-            sizePolicy=constants.POLICY_FIX_EXP,
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
+            parent_widget="config",
         )
         cls._frame.create_any_widget(
             "config_area",
@@ -260,8 +261,8 @@ class QuickIntegrationFrameBuilder:
         )
         cls._frame.create_param_widget(
             cls._frame.get_param("detector_model"),
-            parent_widget="config",
             linebreak=True,
+            parent_widget="config",
             visible=False,
         )
         cls._frame.create_spacer(None, fixedHeight=15, parent_widget="exp_section")

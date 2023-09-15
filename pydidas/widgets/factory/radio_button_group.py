@@ -69,8 +69,8 @@ class RadioButtonGroup(QtWidgets.QWidget):
         else:
             self._active_label = ""
         self._qtapp = QtWidgets.QApplication.instance()
-        self._qtapp.sig_new_font_height.connect(self.set_dynamic_height_from_font)
-        self.set_dynamic_height_from_font(self._qtapp.standard_font_height)
+        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
 
     def __create_widgets(self, entries):
         """
@@ -215,14 +215,18 @@ class RadioButtonGroup(QtWidgets.QWidget):
         finally:
             self._emit_signal = _emit_enabled
 
-    @QtCore.Slot(float)
-    def set_dynamic_height_from_font(self, new_height: float):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, font_width: float, font_height: float):
         """
         Adjust the widget height based on the font metrics.
 
         Parameters
         ----------
-        new_height : float
-            The new font height metrics in pixels.
+        font_width: float
+            The font width in pixels.
+        font_height : float
+            The font height in pixels.
         """
-        self.setFixedHeight((self._rows + (self._title is not None)) * (new_height + 6))
+        self.setFixedHeight(
+            int((self._rows + (self._title is not None)) * (font_height + 6))
+        )

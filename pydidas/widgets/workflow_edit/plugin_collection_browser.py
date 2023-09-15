@@ -32,7 +32,7 @@ from qtpy import QtCore
 
 from ...core.constants import PROC_PLUGIN_TYPE_NAMES
 from ...plugins import PluginCollection
-from ..factory import CreateWidgetsMixIn, PydidasWidgetWithGridLayout
+from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..misc import ReadOnlyTextWidget
 from .select_new_plugin_widget import SelectNewPluginWidget
 
@@ -40,7 +40,7 @@ from .select_new_plugin_widget import SelectNewPluginWidget
 PLUGIN_COLLECTION = PluginCollection()
 
 
-class PluginCollectionBrowser(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
+class PluginCollectionBrowser(CreateWidgetsMixIn, EmptyWidget):
     """
     A widget allows to browse through the list of available plugins.
 
@@ -53,19 +53,19 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
     parent : QWidget, optional
         The parent widget. The default is None.
     **kwargs : dict
-        Any keyword arguments. Supported keywords are listed below.
-    **collection : Union[pydidas.PluginCollection, None]
-        The plugin collection. Normally, this entry should not be changed by
-        the user. If None, this defaults to the generic plugin collection.
-        The default is None.
+        Any keyword arguments. Supported keywords are generic keywords and
+        "collection" to set the linked plugin collection. By default, this should
+        not be changed and will default to the PluginCollection singleton.
     """
+
+    init_kwargs = ["collection"]
 
     sig_add_plugin_to_tree = QtCore.Signal(str)
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, parent=None, **kwargs):
-        PydidasWidgetWithGridLayout.__init__(self, parent)
+    def __init__(self, **kwargs):
+        EmptyWidget.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         _local_plugin_coll = kwargs.get("collection", None)
         self.collection = (

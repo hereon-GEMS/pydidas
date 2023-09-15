@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,17 +16,22 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the BaseFrameWithApp, a subclass of the BaseFrame from which all
-main pydidas frames which use apps should inherit. This subclass includes some methods
-for using a pydidas App in multiprocessing.
+The BaseFrameWithApp extends the BaseFrame with a pydidas Application.
+
+All frames with an associated app should interit BaseFrameWithApp instead of
+the BaseFrame. This subclass includes methods for using a pydidas App in
+parallel processing.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["BaseFrameWithApp"]
+
+
+from typing import Tuple
 
 from qtpy import QtCore
 
@@ -36,9 +41,10 @@ from .base_frame import BaseFrame
 
 class BaseFrameWithApp(BaseFrame):
     """
-    The BaseFrameWithApp is a subclassed BaseFrame and should be used as the
-    base class for all Frames with an associated Application in the pydidas
-    suite.
+    The BaseFrameWithApp is a subclassed BaseFrame with an associated pydidas App.
+
+    It should be used as the base class for all Frames with an associated
+    Application in the pydidas suite.
 
     It adds (internal) methods required for running a pydidas app to the
     BaseFrame.
@@ -64,7 +70,7 @@ class BaseFrameWithApp(BaseFrame):
         self._app_attributes_to_update = []
 
     @QtCore.Slot(object)
-    def _set_app(self, app):
+    def _set_app(self, app: BaseApp):
         """
         Update the local copy of the App after the AppRunner computations.
 
@@ -87,7 +93,7 @@ class BaseFrameWithApp(BaseFrame):
             setattr(self._app, att, _att_val)
 
     @QtCore.Slot(float)
-    def _apprunner_update_progress(self, progress):
+    def _apprunner_update_progress(self, progress: float):
         """
         Update the progress of the AppRunner.
 
@@ -109,7 +115,7 @@ class BaseFrameWithApp(BaseFrame):
             self._runner.exit()
             self._runner = None
 
-    def export_state(self):
+    def export_state(self) -> Tuple[int, dict]:
         """
         Export the state of the Frame for saving.
 
@@ -127,7 +133,7 @@ class BaseFrameWithApp(BaseFrame):
         _state["app"] = self._app.export_state()
         return _index, _state
 
-    def restore_state(self, state):
+    def restore_state(self, state: dict):
         """
         Restore the frame's state from stored information.
 

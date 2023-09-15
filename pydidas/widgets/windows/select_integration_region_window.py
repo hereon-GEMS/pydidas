@@ -1,6 +1,6 @@
 # This file is part of pydidas
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -34,6 +34,7 @@ import numpy as np
 from qtpy import QtCore, QtWidgets
 
 from ...core import Dataset, UserConfigError, get_generic_param_collection
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ...core.utils import apply_qt_properties
 from ...data_io import import_data
 from ..controllers import ManuallySetIntegrationRoiController
@@ -65,15 +66,15 @@ class SelectIntegrationRegionWindow(PydidasWindow):
         self._EXP = plugin._EXP
         self._original_plugin_param_values = plugin.get_param_values_as_dict()
         self.add_params(plugin.params)
-        self._config = self._config | dict(
-            radial_active=False,
-            azimuthal_active=False,
-            beamcenter=self._EXP.beamcenter,
-            det_dist=self._EXP.get_param_value("detector_dist"),
-            rad_unit=self._plugin.get_param_value("rad_unit"),
-            closing_confirmed=False,
-            only_show_roi=kwargs.get("only_show_roi", False),
-        )
+        self._config = self._config | {
+            "azimuthal_active": False,
+            "beamcenter": self._EXP.beamcenter,
+            "closing_confirmed": False,
+            "det_dist": self._EXP.get_param_value("detector_dist"),
+            "only_show_roi": kwargs.get("only_show_roi", False),
+            "radial_active": False,
+            "rad_unit": self._plugin.get_param_value("rad_unit"),
+        }
         self._image = None
         self.frame_activated(self.frame_index)
 
@@ -90,9 +91,11 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             ),
             bold=True,
             fontsize_offset=1,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.create_empty_widget(
             "left_container",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             minimumHeight=400,
             parent_widget=None,
         )
@@ -100,6 +103,7 @@ class SelectIntegrationRegionWindow(PydidasWindow):
             "scroll_area",
             ScrollArea,
             gridPos=(1, 0, 1, 1),
+            resize_to_widget_width=True,
             widget=self._widgets["left_container"],
         )
         self.create_spacer(None, fixedWidth=25, gridPos=(1, 1, 1, 1))
@@ -118,13 +122,17 @@ class SelectIntegrationRegionWindow(PydidasWindow):
                 "detectors with square pixels."
             ),
             bold=True,
+            font_metric_height_factor=2,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["left_container"],
+            wordWrap=True,
         )
         self.create_line(None, parent_widget=self._widgets["left_container"])
         self.create_label(
             "label_file",
             "Select input file:",
             fontsize_offset=1,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["left_container"],
             underline=True,
         )

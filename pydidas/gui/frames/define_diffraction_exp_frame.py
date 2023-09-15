@@ -140,7 +140,8 @@ class DefineDiffractionExpFrame(BaseFrame):
         else:
             self.param_widgets[key].set_value(value)
 
-    def update_param(self, param_key, widget):
+    @QtCore.Slot(str)
+    def update_param(self, param_key: str, widget: QtWidgets.QWidget, value_str: str):
         """
         Update a value in both the Parameter and the corresponding widget.
 
@@ -150,6 +151,8 @@ class DefineDiffractionExpFrame(BaseFrame):
             The reference key.
         widget : pydidas.widgets.parameter_config.BaseParamIoWidget
             The Parameter editing widget.
+        value_str : str
+            The string representation of the value.
         """
         EXP.set_param_value(param_key, widget.get_value())
         # explicitly call update fo wavelength and energy

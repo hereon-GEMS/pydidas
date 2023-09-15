@@ -98,10 +98,10 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         self.__title = title
         if title is None:
             return
-        self.setFontPointSize(self._qtapp.standard_font_size + 3)
+        self.setFontPointSize(self._qtapp.font_size + 3)
         self.setFontWeight(QtGui.QFont.Bold)
         self.append(f"{title}")
-        self.setFontPointSize(self._qtapp.standard_font_size + 1)
+        self.setFontPointSize(self._qtapp.font_size + 1)
         self.setFontWeight(QtGui.QFont.Normal)
 
     def set_text_from_dict(
@@ -149,5 +149,5 @@ class ReadOnlyTextWidget(PydidasWidgetMixin, QtWidgets.QTextEdit):
         """
         Reprint the latest text with the updated font settings.
         """
-        self.setFontPointSize(self._qtapp.standard_font_size + 1)
+        self.setFontPointSize(self._qtapp.font_size + 1)
         self.setText(self.__text, title=self.__title)

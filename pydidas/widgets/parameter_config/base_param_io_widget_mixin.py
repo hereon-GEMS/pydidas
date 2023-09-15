@@ -58,9 +58,8 @@ class BaseParamIoWidgetMixIn:
     ----------
     param : Parameter
         A Parameter instance.
-    width: int, optional
-        The width of the IO widget. The default is the PARAM_INPUT_EDIT_WIDTH
-        specified in pydidas.core.constants.gui_constants.
+    **kwargs : dict
+        Any additional kwargs.
     """
 
     io_edited = QtCore.Signal(str)

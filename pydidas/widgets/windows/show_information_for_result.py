@@ -33,6 +33,7 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError
+from ...core.constants import FONT_METRIC_CONSOLE_WIDTH
 from ...core.utils import ShowBusyMouse, get_fixed_length_str
 from ...plugins import BasePlugin
 from ..factory import CreateWidgetsMixIn
@@ -58,22 +59,26 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
         self.create_label(
             "label_title",
             "Information for selected data point:",
-            fontsize=14,
             bold=True,
+            fontsize_offset=4,
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
         )
         self.create_any_widget(
-            "info_field", ReadOnlyTextWidget, fixedWidth=600, fixedHeight=250
+            "info_field",
+            ReadOnlyTextWidget,
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            font_metric_height_factor=15,
         )
         self.create_button(
-            "but_show_input", "Show input frame", clicked=self.show_input_image
+            "but_show_input",
+            "Show input frame",
+            clicked=self.show_input_image,
         )
         self.create_any_widget(
             "plot", PydidasPlotStack, visible=False, minimumHeight=600
         )
-        self.create_spacer(
-            "final_spacer",
-            visible=True,
-            vertical_policy=QtWidgets.QSizePolicy.Expanding,
+        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
+            self.process_new_font_metrics
         )
 
     def display_information(
@@ -176,3 +181,10 @@ class ShowInformationForResult(PydidasWindow, CreateWidgetsMixIn):
             self._loader_plugin.pre_execute()
             _input, _kwargs = self._loader_plugin.execute(self._index)
             self._widgets["plot"].plot_data(_input)
+
+    @QtCore.Slot()
+    def process_new_font_metrics(self):
+        """
+        Process the user input of the new font size.
+        """
+        self.adjustSize()

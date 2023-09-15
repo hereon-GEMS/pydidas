@@ -30,11 +30,20 @@ __all__ = ["QtPathsWindow"]
 import os
 from functools import partial
 
-from qtpy import QtCore, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
 
+from ...core.constants import (
+    ALIGN_TOP_RIGHT,
+    FONT_METRIC_CONSOLE_WIDTH,
+    FONT_METRIC_HALF_CONFIG_WIDTH,
+    FONT_METRIC_SMALL_BUTTON_WIDTH,
+)
 from ...resources import logos
 from ...version import VERSION
 from ..framework import PydidasWindow
+
+
+_FULL_WIDTH = FONT_METRIC_CONSOLE_WIDTH + FONT_METRIC_HALF_CONFIG_WIDTH
 
 
 class QtPathsWindow(PydidasWindow):
@@ -57,54 +66,64 @@ class QtPathsWindow(PydidasWindow):
 
     def build_frame(self):
         """Build the frame and create all widgets."""
+        _font_width, _font_height = QtWidgets.QApplication.instance().font_metrics
+
+        self.create_empty_widget(
+            "left_container",
+            font_metric_width_factor=_FULL_WIDTH,
+        )
         self.create_label(
             "label_title",
             "pydidas paths",
-            fontsize=14,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            fontsize_offset=4,
+            parent_widget="left_container",
         )
-        self.create_spacer(None)
+        self.create_spacer(None, parent_widget="left_container")
         self.create_label(
             "label_document_path",
             f"Logging directory: {self._log_path}",
-            gridPos=(1, 0, 1, 1),
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            gridPos=(2, 0, 1, 1),
+            parent_widget="left_container",
         )
         self.create_button(
             "but_open_logdir",
             "Open logging directory",
             icon="qt-std::SP_DialogOpenButton",
-            fixedWidth=180,
-            fixedHeight=25,
-            gridPos=(1, 1, 1, 1),
+            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
+            gridPos=(2, 1, 1, 1),
+            parent_widget="left_container",
         )
         self.create_label(
             "label_config_path",
             f"Config directory: {self._config_path}",
-            gridPos=(2, 0, 1, 1),
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
+            gridPos=(3, 0, 1, 1),
+            parent_widget="left_container",
         )
         self.create_button(
             "but_open_configdir",
             "Open config directory",
+            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
+            gridPos=(3, 1, 1, 1),
             icon="qt-std::SP_DialogOpenButton",
-            fixedWidth=180,
-            fixedHeight=25,
-            gridPos=(2, 1, 1, 1),
+            parent_widget="left_container",
         )
         self.add_any_widget(
             "svg_logo",
             logos.pydidas_logo_svg(),
-            gridPos=(0, 2, 1, 1),
-            fixedHeight=75,
-            fixedWidth=75,
-            layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
+            alignment=ALIGN_TOP_RIGHT,
+            fixedHeight=_font_height * 5,
+            fixedWidth=_font_height * 5,
+            gridPos=(0, 1, 1, 1),
         )
-        self.create_spacer(None)
         self.create_button(
             "but_okay",
             "&Close",
-            gridPos=(-1, 2, 1, 1),
             focusPolicy=QtCore.Qt.StrongFocus,
+            font_metric_width_factor=FONT_METRIC_SMALL_BUTTON_WIDTH,
+            gridPos=(1, 1, 1, 1),
         )
 
     def connect_signals(self):
@@ -115,6 +134,9 @@ class QtPathsWindow(PydidasWindow):
         )
         self._widgets["but_open_configdir"].clicked.connect(
             partial(self.open_folder, self._config_path)
+        )
+        QtWidgets.QApplication.instance().sig_new_font_metrics.connect(
+            self.process_new_font_metrics
         )
 
     def finalize_ui(self):
@@ -132,3 +154,25 @@ class QtPathsWindow(PydidasWindow):
             The folder name.
         """
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(folder))
+
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
+        """
+        Process the user input of the new font size.
+
+        Parameters
+        ----------
+        char_width: float
+            The font width in pixels.
+        char_height : float
+            The font height in pixels.
+        """
+        self._widgets["svg_logo"].setFixedSize(
+            QtCore.QSize(char_height * 5, char_height * 5)
+        )
+        self.resize(
+            QtCore.QSize(
+                _FULL_WIDTH * char_width + 5 * char_height + 20, char_height * 10
+            )
+        )
+        self.adjustSize()

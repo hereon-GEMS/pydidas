@@ -30,7 +30,11 @@ __all__ = ["UserConfigErrorMessageBox"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import POLICY_EXP_EXP
+from ...core.constants import (
+    FONT_METRIC_SMALL_BUTTON_WIDTH,
+    FONT_METRIC_WIDE_CONFIG_WIDTH,
+    POLICY_EXP_EXP,
+)
 from ...core.utils import format_input_to_multiline_str
 from ...resources import icons, logos
 from ..factory import CreateWidgetsMixIn
@@ -51,7 +55,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
 
     def __init__(self, *args, **kwargs):
         _text = kwargs.pop("text", "")
-        _font_height = QtWidgets.QApplication.instance().standard_font_height
+        _font_height = QtWidgets.QApplication.instance().font_height
         QtWidgets.QDialog.__init__(self, *args, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         self.setWindowTitle("Configuration error")
@@ -67,7 +71,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_label(
             "label",
             "",
-            font_metric_width_factor=30,
+            font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
             indent=8,
             sizePolicy=POLICY_EXP_EXP,
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
@@ -82,7 +86,7 @@ class UserConfigErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             "button_okay",
             "Acknowledge",
             gridPos=(2, 3, 1, 1),
-            font_metric_width_factor=6,
+            font_metric_width_factor=FONT_METRIC_SMALL_BUTTON_WIDTH,
         )
 
         self.add_any_widget(

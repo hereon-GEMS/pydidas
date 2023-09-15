@@ -29,7 +29,7 @@ __all__ = ["WorkflowTestFrameBuilder"]
 
 from qtpy import QtCore
 
-from ....core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP
+from ....core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
 from ....core.utils import apply_qt_properties
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -87,7 +87,7 @@ class WorkflowTestFrameBuilder:
 
         frame.create_empty_widget(
             "config",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=None,
             sizePolicy=POLICY_FIX_EXP,
         )
@@ -95,6 +95,7 @@ class WorkflowTestFrameBuilder:
         frame.create_any_widget(
             "config_area",
             ScrollArea,
+            resize_to_widget_width=True,
             widget=frame._widgets["config"],
         )
         frame.create_button(
@@ -128,7 +129,7 @@ class WorkflowTestFrameBuilder:
             "label_results",
             "Results:",
             fontsize_offset=1,
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget="config",
             underline=True,
         )
@@ -140,7 +141,7 @@ class WorkflowTestFrameBuilder:
             "result_info",
             ReadOnlyTextWidget,
             alignment=QtCore.Qt.AlignTop,
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             font_metric_height_factor=24,
             parent_widget="config",
             visible=False,

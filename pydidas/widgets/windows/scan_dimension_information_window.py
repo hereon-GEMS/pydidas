@@ -91,14 +91,14 @@ class ScanDimensionInformationWindow(PydidasWindow):
     """
 
     show_frame = False
-    width_factor = 35
+    width_factor = 88
 
     def __init__(self, parent=None, **kwargs):
         PydidasWindow.__init__(self, parent, title="Scan dimension help", **kwargs)
         self.setMinimumHeight(600)
         self._qtapp = QtWidgets.QApplication.instance()
-        self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
-        self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
+        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
     def build_frame(self):
         """
@@ -203,7 +203,7 @@ class ScanDimensionInformationWindow(PydidasWindow):
             "Close",
             gridPos=(-1, 1, 1, 1),
             autoDefault=True,
-            font_metric_width_factor=5,
+            font_metric_width_factor=12,
         )
 
     def connect_signals(self):
@@ -212,14 +212,16 @@ class ScanDimensionInformationWindow(PydidasWindow):
         """
         self._widgets["but_close"].clicked.connect(self.close)
 
-    @QtCore.Slot(float)
-    def set_dynamic_width_from_font(self, font_height: float):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
         """
         Set the fixed width of the widget dynamically from the font height metric.
 
         Parameters
         ----------
-        font_height : float
+        char_width: float
+            The font width in pixels.
+        char_height : float
             The font height in pixels.
         """
-        self.setFixedWidth(int(40 * font_height) + self._qtapp.scrollbar_width + 30)
+        self.setFixedWidth(int(100 * char_width) + self._qtapp.scrollbar_width + 30)

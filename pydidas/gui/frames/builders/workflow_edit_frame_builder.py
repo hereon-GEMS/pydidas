@@ -28,10 +28,10 @@ __status__ = "Production"
 __all__ = ["WorkflowEditFrameBuilder"]
 
 
-from qtpy.QtWidgets import QAbstractScrollArea, QApplication
+from qtpy.QtWidgets import QAbstractScrollArea
 
 from ....core import constants
-from ....core.constants import PARAM_EDIT_ASPECT_RATIO
+from ....core.constants import FONT_METRIC_HALF_CONSOLE_WIDTH
 from ....core.utils import update_size_policy
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
@@ -61,25 +61,26 @@ class WorkflowEditFrameBuilder:
             "Workflow tree editor",
             fontsize_offset=4,
             bold=True,
-            font_metric_width_factor=12,
-            gridPos=(0, 0, 1, 3),
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
+            gridPos=(0, 0, 1, 2),
         )
         frame.create_any_widget(
             "workflow_area",
             ScrollArea,
-            minimumHeight=450,
-            widget=frame._widgets["workflow_canvas"],
             alignment=constants.ALIGN_TOP_CENTER,
+            gridPos=(1, 0, 3, 2),
+            minimumHeight=450,
             sizePolicy=constants.POLICY_EXP_EXP,
             sizeAdjustPolicy=QAbstractScrollArea.AdjustToContents,
-            gridPos=(1, 0, 3, 2),
+            widget=frame._widgets["workflow_canvas"],
         )
         frame.create_label(
             "plugin_title",
             "Available plugins:",
             fontsize_offset=3,
-            underline=True,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             gridPos=(4, 0, 1, 2),
+            underline=True,
         )
         frame.create_any_widget(
             "plugin_collection", PluginCollectionBrowser, gridPos=(5, 0, 1, 2)
@@ -88,26 +89,23 @@ class WorkflowEditFrameBuilder:
         frame.create_any_widget(
             "plugin_edit_area",
             ScrollArea,
-            minimumHeight=450,
-            fixedWidth=int(
-                QApplication.instance().standard_font_height * PARAM_EDIT_ASPECT_RATIO
-                + 25
-            ),
-            widget=frame._widgets["plugin_edit_canvas"],
-            sizePolicy=constants.POLICY_EXP_EXP,
             gridPos=(1, 2, 5, 1),
+            minimumHeight=450,
+            resize_to_widget_width=True,
+            sizePolicy=constants.POLICY_EXP_EXP,
+            widget=frame._widgets["plugin_edit_canvas"],
         )
         frame.create_button(
             "but_load",
             "Import workflow from file",
-            icon="qt-std::SP_DialogOpenButton",
             gridPos=(1, 0, 1, 1),
+            icon="qt-std::SP_DialogOpenButton",
         )
         frame.create_button(
             "but_save",
             "Export workflow to file",
-            icon="qt-std::SP_DialogSaveButton",
             gridPos=(2, 0, 1, 1),
+            icon="qt-std::SP_DialogSaveButton",
         )
 
         update_size_policy(frame._widgets["workflow_area"], verticalStretch=2)

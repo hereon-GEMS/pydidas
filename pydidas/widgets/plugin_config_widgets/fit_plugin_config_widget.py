@@ -35,7 +35,7 @@ from qtpy.QtWidgets import QStyle
 
 from pydidas.core.constants import (
     FIT_OUTPUT_OPTIONS,
-    PARAM_EDIT_ASPECT_RATIO,
+    FONT_METRIC_PARAM_EDIT_WIDTH,
     POLICY_EXP_FIX,
 )
 from pydidas.core.utils import apply_qt_properties
@@ -69,23 +69,23 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_label(
             "label_fit_output",
             "Fit output values:",
-            parent_widget="checkbox_widget",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(0, 0, 1, 2),
+            parent_widget="checkbox_widget",
         )
         self.create_empty_widget(
             "spacer_fit_output",
             parent_widget="checkbox_widget",
-            font_metric_width_factor=0.1 * PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.1 * FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         for _index, _key in enumerate(FIT_OUTPUT_OPTIONS):
             self.create_check_box(
                 f"checkbox_{_key}",
                 _key,
-                parent_widget="checkbox_widget",
                 checked=_key in _plugin_output,
-                font_metric_width_factor=0.9 * PARAM_EDIT_ASPECT_RATIO,
+                font_metric_width_factor=0.9 * FONT_METRIC_PARAM_EDIT_WIDTH,
                 gridPos=(_index + 1, 1, 1, 1),
+                parent_widget="checkbox_widget",
             )
             self._widgets[f"checkbox_{_key}"].stateChanged.connect(
                 partial(self._box_checked, _key)
@@ -102,8 +102,8 @@ class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
-            icon="qt-std::SP_TitleBarUnshadeButton",
             clicked=self.__toggle_advanced_params,
+            icon="qt-std::SP_TitleBarUnshadeButton",
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)

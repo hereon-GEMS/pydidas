@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with a factory function to create a QComboBox.
+The PydidasComboBox is a QComboBox with automatic font and width formatting.
 """
 
 __author__ = "Malte Storm"
@@ -29,7 +29,7 @@ __all__ = ["PydidasComboBox"]
 
 from typing import Self
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 from qtpy.QtWidgets import QComboBox
 
 from ...core.constants import GENERIC_IO_WIDGET_WIDTH
@@ -55,29 +55,3 @@ class PydidasComboBox(PydidasWidgetMixin, QComboBox):
         if "font_metric_height_factor" not in kwargs:
             kwargs["font_metric_height_factor"] = 1
         PydidasWidgetMixin.__init__(self, **kwargs)
-        self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_new_font_height.connect(self.__update_size_hint)
-        self.__update_size_hint(self.__qtapp.standard_font_height)
-
-    def sizeHint(self):
-        """
-        Set a reasonable large sizeHint so the LineEdit takes the available space.
-
-        Returns
-        -------
-        QtCore.QSize
-            The widget sizeHint
-        """
-        return self.__sizeHint
-
-    @QtCore.Slot(float)
-    def __update_size_hint(self, new_font_height: float):
-        """
-        Update the sizeHint based on the font's height.
-
-        Parameters
-        ----------
-        new_font_height : float
-            The font metric height in pixel.
-        """
-        self.__sizeHint = QtCore.QSize(400, new_font_height + 6)

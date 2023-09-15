@@ -36,6 +36,7 @@ from qtpy import QtCore, QtWidgets
 
 from ..contexts import ScanContext
 from ..core import PydidasQsettingsMixin, UserConfigError
+from ..core.constants import FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH
 from ..core.utils import flatten
 from ..resources import icons
 from .factory import CreateWidgetsMixIn
@@ -88,7 +89,7 @@ class PydidasFileDialog(
         is None.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         QtWidgets.QFileDialog.__init__(self, kwargs.get("parent", None))
         CreateWidgetsMixIn.__init__(self)
         PydidasQsettingsMixin.__init__(self)
@@ -111,6 +112,11 @@ class PydidasFileDialog(
         self._update_widgets()
         self._widgets["but_latest_location"].clicked.connect(self.goto_latest_location)
         self._widgets["but_scan_home"].clicked.connect(self.goto_scan_base_dir)
+        _char_width, _char_height = QtWidgets.QApplication.instance().font_metrics
+        _geometry = self.geometry()
+        _geometry.setWidth(int(_char_width * 160))
+        _geometry.setHeight(int(_char_height * 32))
+        self.setGeometry(_geometry)
 
     def _set_basic_widget_configuration(self):
         """Set the basic configuration for the widget."""
@@ -153,15 +159,17 @@ class PydidasFileDialog(
                 ),
             ]
         )
-        self.setMinimumWidth(900)
-        self.setMinimumHeight(600)
         _sidebar = self.findChild(QtWidgets.QListView, "sidebar")
         _sidebar.setMinimumWidth(180)
         self._widgets["selection"] = self.findChild(QtWidgets.QLineEdit)
 
     def _update_widgets(self):
         """Insert buttons to access specific locations and optional text fields."""
-        self.create_empty_widget("sidebar_frame", parent_widget=None)
+        self.create_empty_widget(
+            "sidebar_frame",
+            font_metric_width_factor=FONT_METRIC_EXTRAWIDE_BUTTON_WIDTH,
+            parent_widget=None,
+        )
         self.create_empty_widget("fileview_frame", parent_widget=None)
         self.create_button(
             "but_latest_location",
@@ -196,7 +204,7 @@ class PydidasFileDialog(
             )
             _splitter.insertWidget(1, self._widgets["fileview_frame"])
 
-    def get_user_response(self):
+    def get_user_response(self) -> str:
         """
         Get a user response and return a filename or directory.
 
@@ -246,6 +254,8 @@ class PydidasFileDialog(
         if self._config["curr_dir"] is not None:
             self.setDirectory(self._config["curr_dir"])
 
+        _splitter = self.layout().itemAt(2).widget()
+        _splitter.moveSplitter(self._widgets["sidebar_frame"].width(), 1)
         return QtWidgets.QFileDialog.exec_(self)
 
     def get_existing_directory(self):

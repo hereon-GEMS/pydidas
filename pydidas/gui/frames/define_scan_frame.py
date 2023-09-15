@@ -89,7 +89,7 @@ class DefineScanFrame(BaseFrame):
             default_extension="yaml",
             qsettings_ref="DefineScanFrame__export",
         )
-        self.__app = QtWidgets.QApplication.instance()
+        self._qtapp = QtWidgets.QApplication.instance()
         self.__info_window = ScanDimensionInformationWindow()
 
     def build_frame(self):
@@ -119,7 +119,7 @@ class DefineScanFrame(BaseFrame):
         self.param_widgets["scan_base_directory"].io_edited.connect(
             self.set_new_base_directory
         )
-        self.__app.sig_close_gui.connect(self.__info_window.close)
+        self._qtapp.sig_close_gui.connect(self.__info_window.close)
 
     def finalize_ui(self):
         """
@@ -154,9 +154,8 @@ class DefineScanFrame(BaseFrame):
                 self._widgets[f"title_{i}"].setText(DIM_LABELS[_dim][i])
         _total_width = DefineScanFrameBuilder.width_factor(_dim in [3, 4])
         self._widgets["master"].font_metric_width_factor = _total_width
-        self._widgets["config_B"].font_metric_width_factor = (
-            int(_dim in [3, 4]) * DefineScanFrameBuilder.width_factor_dims
-        )
+        self._widgets["config_B"].setVisible(_dim in [3, 4])
+        self._widgets["config_area"].force_width_from_size_hint()
 
     @QtCore.Slot()
     def load_from_file(self):

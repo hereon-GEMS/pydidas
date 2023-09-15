@@ -50,36 +50,32 @@ class DataBrowsingFrameBuilder:
         """
         frame.create_label(None, "Data browser", fontsize_offset=4, bold=True)
 
-        frame.create_empty_widget(
-            "browser",
-            fix_width=False,
-            sizePolicy=POLICY_EXP_EXP,
-        )
+        frame.create_empty_widget("browser", sizePolicy=POLICY_EXP_EXP)
         frame.create_any_widget(
             "explorer",
             DirectoryExplorer,
-            parent_widget="browser",
             gridPos=(0, 0, 3, 1),
+            parent_widget="browser",
         )
         frame.create_any_widget(
             "hdf_dset",
             Hdf5DatasetSelector,
-            parent_widget="browser",
             gridPos=(3, 0, 1, 1),
+            parent_widget="browser",
         )
         frame.create_any_widget(
             "but_minimize",
             SquareButton,
+            gridPos=(0, 1, 1, 1),
             icon=qta.icon("fa.chevron-left"),
             parent_widget="browser",
-            gridPos=(0, 1, 1, 1),
         )
         frame.create_any_widget(
             "but_maximize",
             SquareButton,
-            parent_widget="browser",
-            icon=qta.icon("fa.chevron-right"),
             gridPos=(2, 1, 1, 1),
+            icon=qta.icon("fa.chevron-right"),
+            parent_widget="browser",
         )
 
         frame._widgets["viewer"] = PydidasImageView()

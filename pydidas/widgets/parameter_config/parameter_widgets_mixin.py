@@ -30,7 +30,7 @@ __all__ = ["ParameterWidgetsMixIn"]
 
 from qtpy import QtCore
 
-from ...core import PydidasGuiError
+from ...core import Parameter, PydidasGuiError
 from ..utilities import get_widget_layout_args
 from .parameter_widget import ParameterWidget
 
@@ -46,7 +46,7 @@ class ParameterWidgetsMixIn:
         self.param_widgets = {}
         self.param_composite_widgets = {}
 
-    def create_param_widget(self, param, **kwargs):
+    def create_param_widget(self, param: Parameter, **kwargs: dict):
         """
         Add a name label and input widget for a specific parameter to the
         widget.
@@ -96,7 +96,7 @@ class ParameterWidgetsMixIn:
         _layout_args = get_widget_layout_args(_parent, **kwargs)
         _parent.layout().addWidget(_widget, *_layout_args)
 
-    def set_param_value_and_widget(self, key, value):
+    def set_param_value_and_widget(self, key: str, value: object):
         """
         Update a parameter value both in the Parameter and the widget.
 
@@ -123,7 +123,7 @@ class ParameterWidgetsMixIn:
             self.set_param_value(key, value)
             self.param_widgets[key].set_value(value)
 
-    def toggle_param_widget_visibility(self, key, visible):
+    def toggle_param_widget_visibility(self, key: str, visible: bool):
         """
         Toggle the visibility of widgets referenced with key.
 
@@ -146,7 +146,7 @@ class ParameterWidgetsMixIn:
             raise KeyError(f'No parameter with key "{key}" found.')
         self.param_composite_widgets[key].setVisible(visible)
 
-    def update_widget_value(self, param_key, value):
+    def update_widget_value(self, param_key: str, value: object):
         """
         Update the value stored in a widget without changing the Parameter.
 

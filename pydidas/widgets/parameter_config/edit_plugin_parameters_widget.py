@@ -33,14 +33,17 @@ from pathlib import Path
 from qtpy import QtCore, QtWidgets
 from qtpy.QtWidgets import QStyle
 
-from ...core import Hdf5key, constants
-from ...core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP
-from ..factory import CreateWidgetsMixIn
+from ...core import Hdf5key
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_FIX_EXP
+from ...plugins import BasePlugin
+from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..utilities import delete_all_items_in_layout
-from .parameter_edit_canvas import ParameterEditCanvas
+from .parameter_widgets_mixin import ParameterWidgetsMixIn
 
 
-class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
+class EditPluginParametersWidget(
+    EmptyWidget, ParameterWidgetsMixIn, CreateWidgetsMixIn
+):
     """
     The EditPluginParametersWidget widget creates the composite widget for
     updating and changing values of all Parameters in a Plugin.
@@ -50,7 +53,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
 
     sig_new_label = QtCore.Signal(int, str)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         """
         Setup method.
 
@@ -61,21 +64,23 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         parent : QtWidget, optional
             The parent widget. The default is None.
         """
-        ParameterEditCanvas.__init__(self, **kwargs)
+        if "font_metric_width_factor" not in kwargs:
+            kwargs["font_metric_width_factor"] = FONT_METRIC_PARAM_EDIT_WIDTH
+        EmptyWidget.__init__(self, **kwargs)
+        ParameterWidgetsMixIn.__init__(self)
         CreateWidgetsMixIn.__init__(self)
         self.plugin = None
         self.node_id = None
         self.setFixedWidth(
             int(
-                QtWidgets.QApplication.instance().standard_font_height
-                * PARAM_EDIT_ASPECT_RATIO
-                + 25
+                QtWidgets.QApplication.instance().font_char_width
+                * FONT_METRIC_PARAM_EDIT_WIDTH
             )
         )
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_new_font_height.connect(self.__update_width)
+        self.__qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
-    def configure_plugin(self, node_id, plugin):
+    def configure_plugin(self, node_id: int, plugin: BasePlugin):
         """
         Update the panel to show the Parameters of a different Plugin.
 
@@ -86,7 +91,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         ----------
         node_id : int
             The node_id in the workflow edit tree.
-        plugin : object
+        plugin : BasePlugin
             The instance of the Plugin to be edited.
         """
         self.clear_layout()
@@ -119,8 +124,8 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_label(
             "plugin_name",
             f"Plugin: {self.plugin.plugin_name}",
-            fontsize_offset=1,
             bold=True,
+            fontsize_offset=1,
             gridPos=(0, 0, 1, 2),
         )
         if self.node_id is not None:
@@ -140,8 +145,8 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "restore_defaults",
             "Restore default parameters",
-            icon="qt-std::SP_BrowserReload",
             gridPos=(2, 0, 1, 2),
+            icon="qt-std::SP_BrowserReload",
         )
         self._widgets["restore_defaults"].clicked.connect(self.__restore_defaults)
 
@@ -178,7 +183,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 "but_toggle_advanced_params",
                 "Display advanced Parameters",
                 icon="qt-std::SP_TitleBarUnshadeButton",
-                width=constants.PLUGIN_PARAM_WIDGET_WIDTH,
+                font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             )
             for _key in self.plugin.advanced_parameters:
                 _param = self.plugin.get_param(_key)
@@ -193,7 +198,7 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.param_widgets["label"].io_edited.connect(self._label_updated)
 
     @QtCore.Slot(str)
-    def _label_updated(self, label):
+    def _label_updated(self, label: str):
         """
         Process the updated label and emit a signal.
 
@@ -239,15 +244,3 @@ class EditPluginParametersWidget(ParameterEditCanvas, CreateWidgetsMixIn):
                 else QStyle.SP_TitleBarShadeButton
             )
         )
-
-    @QtCore.Slot(float)
-    def __update_width(self, font_height: float):
-        """
-        Update the width based on the font height to achieve a constant aspect ratio.
-
-        Parameters
-        ----------
-        font_height : float
-            The font height in pixels.
-        """
-        self.setFixedWidth(int(PARAM_EDIT_ASPECT_RATIO * font_height))

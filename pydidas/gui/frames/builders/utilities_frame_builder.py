@@ -119,27 +119,27 @@ class UtilitiesFrameBuilder:
             frame.create_empty_widget(
                 f"utility_{_key}",
                 gridPos=(_ypos, _xpos, 1, 1),
-                font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
+                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
                 layout_kwargs={"sizeConstraint": QtWidgets.QLayout.SetMinimumSize},
             )
             frame.create_label(
                 f"title_{_key}",
                 _entries["title"],
+                bold=True,
+                fontsize_offset=2,
                 gridPos=(0, 0, 1, 1),
                 parent_widget=frame._widgets[f"utility_{_key}"],
-                fontsize_offset=2,
-                bold=True,
             )
             frame.create_label(
                 f"text_{_key}",
                 _entries["text"],
+                alignment=constants.ALIGN_TOP_LEFT,
+                font_metric_height_factor=4,
+                font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
                 gridPos=(1, 0, 1, 1),
                 parent_widget=frame._widgets[f"utility_{_key}"],
-                font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
-                wordWrap=True,
-                alignment=constants.ALIGN_TOP_LEFT,
                 sizePolicy=constants.POLICY_FIX_EXP,
-                font_metric_height_factor=3,
+                wordWrap=True,
             )
             frame.create_button(
                 f"button_{_key}",

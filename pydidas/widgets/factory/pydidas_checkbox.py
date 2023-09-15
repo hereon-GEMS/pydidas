@@ -16,8 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The pydidas_check_box module defines a custom QCheckBox with font formatting and
-sizeHint adjustment.
+The PydidasCheckBox is a QCheckBox with font formatting and sizeHint adjustment.
 """
 
 __author__ = "Malte Storm"
@@ -28,9 +27,8 @@ __status__ = "Production"
 __all__ = ["PydidasCheckBox"]
 
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtWidgets
 
-from ...core.constants import GENERIC_IO_WIDGET_WIDTH
 from .pydidas_widget_mixin import PydidasWidgetMixin
 
 
@@ -40,36 +38,6 @@ class PydidasCheckBox(PydidasWidgetMixin, QtWidgets.QCheckBox):
     """
 
     def __init__(self, *args: tuple, **kwargs: dict):
-        self.__sizeHint = QtCore.QSize(GENERIC_IO_WIDGET_WIDTH, 5)
+        kwargs["font_metric_height_factor"] = 1
         QtWidgets.QCheckBox.__init__(self, *args)
         PydidasWidgetMixin.__init__(self, **kwargs)
-        self.__qtapp = QtWidgets.QApplication.instance()
-        self.__qtapp.sig_new_font_height.connect(self.__update_size_hint)
-        self.__update_size_hint(self.__qtapp.standard_font_height)
-
-    def sizeHint(self):
-        """
-        Set a reasonable large sizeHint so the LineEdit takes the available space.
-
-        Returns
-        -------
-        QtCore.QSize
-            The widget sizeHint
-        """
-        return self.__sizeHint
-
-    @QtCore.Slot(float)
-    def __update_size_hint(self, new_font_height: float):
-        """
-        Update the sizeHint based on the font's height.
-
-        Parameters
-        ----------
-        new_font_height : float
-            The font metric height in pixel.
-        """
-        _margins = self.contentsMargins()
-        self.__sizeHint = QtCore.QSize(
-            GENERIC_IO_WIDGET_WIDTH,
-            new_font_height + 2 * _margins.top() + _margins.bottom(),
-        )

@@ -59,7 +59,7 @@ class ScrollArea(QScrollArea):
         apply_qt_properties(self, **kwargs)
         self.__scrollbar_width = QApplication.instance().scrollbar_width
         if kwargs.get("resize_to_widget_width", False):
-            QApplication.instance().sig_font_height_changed.connect(
+            QApplication.instance().sig_font_metrics_changed.connect(
                 self.force_width_from_size_hint
             )
 

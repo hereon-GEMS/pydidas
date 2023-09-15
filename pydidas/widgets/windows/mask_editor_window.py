@@ -33,7 +33,7 @@ import os
 from qtpy import QtCore, QtWidgets
 
 from ...core import UserConfigError, get_generic_param_collection
-from ...core.constants import HDF5_EXTENSIONS, PARAM_EDIT_ASPECT_RATIO
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, HDF5_EXTENSIONS
 from ...core.utils import get_extension, update_size_policy
 from ...data_io import import_data
 from .. import dialogues, parameter_config, silx_plot
@@ -63,14 +63,14 @@ class MaskEditorWindow(PydidasWindow):
         self.create_any_widget(
             "param_frame",
             parameter_config.ParameterEditCanvas,
-            font_metric_width_factor=0.8 * PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(0, 0, 1, 1),
         )
         self.create_label(
             "title",
             "Input reference data file (not the mask)",
             fontsize_offset=1,
-            font_metric_width_factor=0.8 * PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.8 * FONT_METRIC_PARAM_EDIT_WIDTH,
             bold=True,
             parent_widget=self._widgets["param_frame"],
         )
@@ -102,7 +102,7 @@ class MaskEditorWindow(PydidasWindow):
             "Mask parameters",
             fontsize_offset=1,
             bold=True,
-            font_metric_width_factor=0.5 * PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.5 * FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=self._widgets["param_frame"],
         )
 

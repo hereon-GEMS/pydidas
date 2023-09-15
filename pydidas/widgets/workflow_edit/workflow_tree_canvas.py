@@ -59,7 +59,7 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         self.setFrameStyle(QtWidgets.QFrame.Raised)
         self.widget_connections = []
 
-    def paintEvent(self, event):
+    def paintEvent(self, event: QtCore.QEvent):
         """
         Overload the paintEvent to also draw lines connecting parent and child plugins.
 
@@ -85,7 +85,7 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         for _x0, _y0, _x1, _y1 in self.widget_connections:
             self.painter.drawLine(_x0, _y0, _x1, _y1)
 
-    def update_widget_connections(self, widget_conns):
+    def update_widget_connections(self, widget_conns: list):
         """
         Store updated widget connections.
 
@@ -100,7 +100,7 @@ class WorkflowTreeCanvas(CreateWidgetsMixIn, QtWidgets.QFrame):
         self.widget_connections = widget_conns
         self.update()
 
-    def sizeHint(self):
+    def sizeHint(self) -> QtCore.QSize:
         """
         Set the Qt sizeHint to be the widget's size.
 

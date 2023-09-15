@@ -28,7 +28,11 @@ __status__ = "Production"
 __all__ = ["DirectorySpyFrameBuilder"]
 
 
-from ....core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_EXP_EXP, POLICY_FIX_EXP
+from ....core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_EXP_EXP,
+    POLICY_FIX_EXP,
+)
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrameWithApp
 from ....widgets.silx_plot import PydidasPlot2D
@@ -82,22 +86,22 @@ class DirectorySpyFrameBuilder:
             "Directory spy",
             fontsize_offset=4,
             bold=True,
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
 
         frame.create_empty_widget(
             "config",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             parent_widget=None,
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
         )
         frame.create_spacer("spacer1", parent_widget=frame._widgets["config"])
         frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=frame._widgets["config"],
+            layout_kwargs={"alignment": None},
             sizePolicy=POLICY_FIX_EXP,
             stretch=(1, 0),
-            layout_kwargs={"alignment": None},
+            widget=frame._widgets["config"],
         )
 
         for _param_key in [

@@ -95,13 +95,9 @@ class DataBrowsingFrame(BaseFrame):
             is enlarged instead of the directory viewer. The default is True.
         """
         if enlarge_dir:
-            self._widgets["splitter"].moveSplitter(
-                self.__qtapp.standard_font_height * 50, 1
-            )
+            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 50, 1)
         else:
-            self._widgets["splitter"].moveSplitter(
-                self.__qtapp.standard_font_height * 20, 1
-            )
+            self._widgets["splitter"].moveSplitter(self.__qtapp.font_height * 20, 1)
 
     @QtCore.Slot(str)
     def __file_selected(self, filename: str):

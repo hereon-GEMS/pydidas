@@ -35,7 +35,10 @@ from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, get_generic_param_collection
-from ...core.constants import PARAM_EDIT_ASPECT_RATIO
+from ...core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    FONT_METRIC_WIDE_BUTTON_WIDTH,
+)
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
@@ -94,7 +97,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_empty_widget(
             "left_container",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(1, 1, 2, 1),
             minimumHeight=400,
         )
@@ -110,7 +113,7 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
         )
         self.create_param_widget(
             self.get_param("overlay_color"),
-            font_metric_width_factor=PointPositionTableWidget.widget_width_factor,
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
             gridPos=(1, 2, 1, 1),
             linebreak=True,
         )

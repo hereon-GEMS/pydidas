@@ -33,7 +33,11 @@ from typing import Literal
 from qtpy import QtCore
 
 from ...core import get_generic_param_collection
-from ...core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_FIX_EXP, POLICY_MIN_MIN
+from ...core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_FIX_EXP,
+    POLICY_MIN_MIN,
+)
 from ..widget_with_parameter_collection import WidgetWithParameterCollection
 
 
@@ -103,8 +107,8 @@ class ShowIntegrationRoiParamsWidget(WidgetWithParameterCollection):
                 "oriented-axis (i.e. the origin at the top of the image), the positive "
                 "angular direction is clockwise. \nThe zero position is at the positive"
                 " x-axis, i.e. right of the beamcenter.",
-                font_metric_height_factor=6,
-                font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+                font_metric_height_factor=7,
+                font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
                 parent_widget=self._widgets["plugin_container"],
                 sizePolicy=POLICY_FIX_EXP,
                 wordWrap=True,

@@ -42,8 +42,8 @@ class FontScalingToolbar(QtWidgets.QToolBar):
         self.toggleViewAction().setEnabled(False)
 
         self._qtapp = QtWidgets.QApplication.instance()
-        self.process_new_font_height(self._qtapp.standard_font_height)
-        self._qtapp.sig_new_font_height.connect(self.process_new_font_height)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
+        self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self._qtapp.sig_font_family_changed.connect(self.process_new_font_family)
 
     @QtCore.Slot()
@@ -51,19 +51,21 @@ class FontScalingToolbar(QtWidgets.QToolBar):
         """
         Redraw the toolbar with the new font family.
         """
-        self.process_new_font_height(self._qtapp.standard_font_height)
+        self.process_new_font_metrics(*self._qtapp.font_metrics)
 
-    @QtCore.Slot(float)
-    def process_new_font_height(self, font_height: float):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, font_width: float, font_height: float):
         """
         Process the new font height and adjust the ToolBar accordingly.
 
         Parameters
         ----------
+        font_width: float
+            The font width in pixels.
         font_height : float
-            the new font height metrics.
+            The font height in pixels.
         """
         self.setStyleSheet("QToolBar{spacing:" + f"{font_height}" + "px;}")
 
         self.setIconSize(QtCore.QSize(int(3 * font_height), int(3 * font_height)))
-        self.setFixedWidth(int(5.3 * font_height))
+        self.setFixedWidth(int(14 * font_width))

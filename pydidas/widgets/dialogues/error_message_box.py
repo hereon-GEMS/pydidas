@@ -31,12 +31,15 @@ import os
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core.constants import ALIGN_TOP_RIGHT, POLICY_EXP_EXP, PYDIDAS_FEEDBACK_URL
-from ...core.utils import (
-    copy_text_to_system_clipbord,
-    get_logging_dir,
-    update_size_policy,
+from ...core.constants import (
+    ALIGN_TOP_RIGHT,
+    FONT_METRIC_CONSOLE_WIDTH,
+    FONT_METRIC_HALF_CONSOLE_WIDTH,
+    FONT_METRIC_MEDIUM_BUTTON_WIDTH,
+    POLICY_EXP_EXP,
+    PYDIDAS_FEEDBACK_URL,
 )
+from ...core.utils import copy_text_to_system_clipbord, get_logging_dir
 from ...resources import icons, logos
 from ..factory import CreateWidgetsMixIn
 from ..scroll_area import ScrollArea
@@ -62,19 +65,20 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.setWindowIcon(icons.pydidas_error_icon_with_bg())
         _layout = QtWidgets.QGridLayout()
         self.setLayout(_layout)
-        _font_height_metric = QtWidgets.QApplication.instance().standard_font_height
+        _char_width, _char_height = QtWidgets.QApplication.instance().font_metrics
 
         self.create_label(
             "title",
             "An unhandled exception has occurred",
             bold=True,
             fontsize_offset=2,
-            font_metric_width_factor=40,
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
             gridPos=(0, 0, 1, 2),
         )
         self.create_label(
             "label",
             "",
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
             parent_widget=None,
             sizePolicy=POLICY_EXP_EXP,
             textInteractionFlags=QtCore.Qt.TextSelectableByMouse,
@@ -84,28 +88,28 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
             "scroll_area",
             ScrollArea,
             gridPos=(1, 0, 2, 2),
+            resize_to_widget_width=True,
             widget=self._widgets["label"],
         )
-        update_size_policy(self._widgets["scroll_area"], horizontalStretch=1)
         self.create_button(
             "button_copy",
             "Copy to clipboard and open webpage",
-            font_metric_width_factor=18,
+            font_metric_width_factor=FONT_METRIC_HALF_CONSOLE_WIDTH,
             gridPos=(3, 0, 1, 1),
         )
 
         self.add_any_widget(
             "icon",
             logos.pydidas_error_svg(),
-            fixedHeight=_font_height_metric * 9,
-            fixedWidth=_font_height_metric * 9,
+            fixedHeight=_char_height * 9,
+            fixedWidth=_char_height * 9,
             gridPos=(0, 2, 2, 1),
             layout_kwargs={"alignment": ALIGN_TOP_RIGHT},
         )
         self.create_button(
             "button_okay",
             "Acknowledge",
-            font_metric_width_factor=9,
+            font_metric_width_factor=FONT_METRIC_MEDIUM_BUTTON_WIDTH,
             gridPos=(3, 2, 1, 1),
         )
 
@@ -113,8 +117,15 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self._widgets["button_copy"].clicked.connect(
             self.copy_to_clipboard_and_open_webpage
         )
-        self.resize(_font_height_metric * 50, _font_height_metric * 30)
         self.set_text(self._text)
+        self.resize(
+            int(
+                _char_width * self._widgets["label"].font_metric_width_factor
+                + 10 * _char_height
+                + 20
+            ),
+            int(_char_height * 30 + 20),
+        )
         for _name in ["icon", "label", "scroll_area", "title"]:
             self._widgets[_name].setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         for _name in ["button_okay", "button_copy"]:
@@ -132,11 +143,11 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         """
         _logfile = os.path.join(get_logging_dir(), "pydidas_exception.log")
         _note = (
-            "Please report the bug online using the following form:\n"
-            "\thttps://ms.hereon.de/pydidas\n\n"
-            "You can simply use the button on the bottom left to open the\n"
-            "Webpage in your default browser. The exception trace has been \n"
-            "copied to your clipboard."
+            "Please report the bug online using the form available on:\n"
+            "\thttps://pydidas.hereon.de/\n\n"
+            "You can simply use the button on the bottom left to coyy the\n"
+            "exception trace to your clipboard and open the webpage in your"
+            " default browser."
             f"\n\nA log has been written to:\n\t{_logfile}\n\n"
             + "-" * 20
             + "\n"
@@ -145,6 +156,10 @@ class ErrorMessageBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self._text = text
         copy_text_to_system_clipbord(self._text)
         self._widgets["label"].setText(_note + text)
+        _lines = (_note + text).split("\n")
+        _max_len = max(len(_line) for _line in _lines)
+        self._widgets["label"].font_metric_height_factor = len(_lines)
+        self._widgets["label"].font_metric_width_factor = _max_len + 5
 
     def copy_to_clipboard_and_open_webpage(self):
         """

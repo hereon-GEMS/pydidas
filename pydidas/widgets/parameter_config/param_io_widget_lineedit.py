@@ -46,13 +46,10 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
 
     Parameters
     ----------
-    parent : QWidget
-        A QWidget instance.
     param : Parameter
         A Parameter instance.
-    width : int, optional
-        The width of the widget. The default is given by the PARAM_INPUT_WIDGET_WIDTH
-        value in the pydidas.core.constants.gui_constants module.
+    **kwargs : dict
+        Any additional kwargs.
     """
 
     io_edited = QtCore.Signal(str)
@@ -77,7 +74,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
             self._old_value = _cur_value
             self.io_edited.emit(_cur_value)
 
-    def get_value(self):
+    def get_value(self) -> object:
         """
         Get the current value from the combobox to update the Parameter value.
 
@@ -90,7 +87,7 @@ class ParamIoWidgetLineEdit(BaseParamIoWidgetMixIn, PydidasLineEdit):
         text = self.text()
         return self.get_value_from_text(text)
 
-    def set_value(self, value):
+    def set_value(self, value: object):
         """
         Set the input field's value.
 

@@ -55,7 +55,7 @@ class DefineDiffractionExpFrameBuilder:
             "config",
             parent_widget=None,
             sizePolicy=constants.POLICY_FIX_EXP,
-            font_metric_width_factor=2.1 * constants.PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=2.1 * constants.FONT_METRIC_PARAM_EDIT_WIDTH,
             layout_kwargs={"horizontalSpacing": 0},
         )
         frame.create_label(
@@ -91,19 +91,19 @@ class DefineDiffractionExpFrameBuilder:
         frame.create_empty_widget(
             "config_left",
             parent_widget="config",
-            font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(_row, 0, 1, 1),
         )
         frame.create_empty_widget(
             "config_spacer",
             parent_widget="config",
-            font_metric_width_factor=0.1 * constants.PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=0.1 * constants.FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(_row, 1, 1, 1),
         )
         frame.create_empty_widget(
             "config_right",
             parent_widget="config",
-            font_metric_width_factor=constants.PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=constants.FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(_row, 2, 1, 1),
         )
 

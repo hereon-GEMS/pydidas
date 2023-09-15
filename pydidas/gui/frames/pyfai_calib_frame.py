@@ -48,7 +48,7 @@ from silx.gui.plot.tools import ImageToolBar
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
 from ...contexts.diffraction_exp_context import DiffractionExperiment
-from ...core import constants
+from ...core.constants import FONT_METRIC_HALF_CONFIG_WIDTH, POLICY_FIX_EXP
 from ...widgets import PydidasFileDialog, silx_plot
 from ...widgets.factory.pydidas_widget_mixin import PydidasWidgetMixin
 from ...widgets.framework import BaseFrame
@@ -199,8 +199,8 @@ class PyfaiCalibFrame(BaseFrame):
         self.create_any_widget(
             "task_list",
             _List,
-            font_metric_width_factor=10,
-            sizePolicy=constants.POLICY_FIX_EXP,
+            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
+            sizePolicy=POLICY_FIX_EXP,
             gridPos=(1, 0, 1, 1),
         )
         _text = (
@@ -212,7 +212,7 @@ class PyfaiCalibFrame(BaseFrame):
             "but_help",
             _text,
             gridPos=(2, 0, 1, 1),
-            font_metric_width_factor=10,
+            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
         )
         self.add_any_widget(
             "task_stack",

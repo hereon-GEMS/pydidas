@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["PydidasPushButton"]
 
 
+from functools import partial
+
 from qtpy import QtWidgets
 
 from ...core.constants import POLICY_EXP_FIX
@@ -48,9 +50,4 @@ class PydidasPushButton(PydidasWidgetMixin, QtWidgets.QPushButton):
         PydidasWidgetMixin.__init__(self, **kwargs)
         if "sizePolicy" not in kwargs:
             self.setSizePolicy(*POLICY_EXP_FIX)
-
-    def sizeHint(self):
-        """
-        Use the generic QPushButton sizeHint.
-        """
-        return QtWidgets.QPushButton.sizeHint(self)
+        self.sizeHint = partial(QtWidgets.QPushButton.sizeHint, self)

@@ -64,7 +64,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
         self.set_value(param.value)
         self.view().setMinimumWidth(get_max_pixel_width_of_entries(self.__items) + 50)
 
-    def __convert_bool(self, value):
+    def __convert_bool(self, value: object):
         """
         Convert boolean integers to string.
 
@@ -73,7 +73,7 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
 
         Parameters
         ----------
-        value : any
+        value : object
             The input value from the field. This could be any object.
 
         Returns
@@ -100,24 +100,29 @@ class ParamIoWidgetComboBox(BaseParamIoWidgetMixIn, PydidasComboBox):
             self._old_value = _cur_value
             self.io_edited.emit(_cur_value)
 
-    def get_value(self):
+    def get_value(self) -> object:
         """
         Get the current value from the combobox to update the Parameter value.
 
         Returns
         -------
-        type
+        object
             The text converted to the required datatype (int, float, path)
             to update the Parameter value.
         """
         text = convert_unicode_to_ascii(self.currentText())
         return self.get_value_from_text(text)
 
-    def set_value(self, value):
+    def set_value(self, value: object):
         """
         Set the input field's value.
 
         This method changes the combobox selection to the specified value.
+
+        Parameters
+        ----------
+        value : object
+            The value to be set.
         """
         value = self.__convert_bool(value)
         self._old_value = value

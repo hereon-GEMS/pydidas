@@ -44,7 +44,7 @@ from ...core import (
     utils,
 )
 from ...core.constants import (
-    CONFIG_ASPECT_RATIO,
+    FONT_METRIC_CONFIG_WIDTH,
     QT_REG_EXP_FLOAT_SLICE_VALIDATOR,
     QT_REG_EXP_SLICE_VALIDATOR,
 )
@@ -120,7 +120,7 @@ class ResultSelectionWidget(
         self, select_results_param: Union[None, Parameter] = None, **kwargs: dict
     ) -> Self:
         self.__width_factor = kwargs.get(
-            "font_metric_width_factor", CONFIG_ASPECT_RATIO
+            "font_metric_width_factor", FONT_METRIC_CONFIG_WIDTH
         )
         EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)

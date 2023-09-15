@@ -21,6 +21,8 @@ Improvements
     - Improved the detailed output from fitting plugins.
     - During active processing, editing diffraction setup, scan and workflow 
       are disabled.
+    - All widgets now scale dynamically with font height and width to allow
+      using pydidas with any system font.
     
     
 - Programmatic updates:

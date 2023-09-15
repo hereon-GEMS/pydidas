@@ -52,12 +52,15 @@ from .utilities import get_2d_silx_plot_ax_settings
 
 class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
     """
-    A customized silx.gui.plot.Plot2D with an additional features to limit the figure
-    canvas to the data limits.
+    A customized silx.gui.plot.Plot2D with an additional features.
+
+    Additional features are implemented through additional SilxActions which
+    are added to the toolbar.
     """
 
     setData = Plot2D.addImage
     sig_get_more_info_for_data = QtCore.Signal(float, float)
+    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
 
     def __init__(self, parent=None, backend=None, **kwargs):
         Plot2D.__init__(self, parent, backend)
@@ -278,9 +281,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
         self.getBackend().fig.gca().cla()
         _cb = self.getColorBarWidget()
         _cb.setLegend(self._plot_config.get("cbar_legend", ""))
-        _cb.getColorScaleBar().setFixedWidth(
-            int(1.6 * self._qtapp.standard_font_height)
-        )
+        _cb.getColorScaleBar().setFixedWidth(int(1.6 * self._qtapp.font_height))
         _cb.update()
         self.addImage(_image.getData(), **self._plot_config["kwargs"])
         self.setGraphTitle(_title)

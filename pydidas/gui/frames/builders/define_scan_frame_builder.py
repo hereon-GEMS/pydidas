@@ -51,9 +51,7 @@ class DefineScanFrameBuilder:
     Create all widgets and initialize their state.
     """
 
-    width_factor_left = 20
-    width_factor_dims = 20
-    width_factor_spacer = 2
+    width_factor_spacer = 5
 
     @classmethod
     def build_frame(cls, frame: BaseFrame):
@@ -72,13 +70,18 @@ class DefineScanFrameBuilder:
         )
         frame.create_empty_widget(
             "master",
-            font_metric_width_factor=69,
+            font_metric_width_factor=(
+                constants.FONT_METRIC_WIDE_CONFIG_WIDTH
+                + 2 * cls.width_factor_spacer
+                + 2 * constants.FONT_METRIC_CONFIG_WIDTH
+            ),
             layout_kwargs={"horizontalSpacing": 0},
         )
         frame.create_any_widget(
             "config_area",
             ScrollArea,
             layout_kwargs={"alignment": None},
+            resize_to_widget_width=True,
             widget=frame._widgets["master"],
         )
         frame.create_label(
@@ -90,7 +93,7 @@ class DefineScanFrameBuilder:
         )
         frame.create_empty_widget(
             "config_header",
-            font_metric_width_factor=cls.width_factor_left,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             parent_widget="master",
         )
         frame.create_button(
@@ -121,7 +124,7 @@ class DefineScanFrameBuilder:
             "dimension_hint_text",
             SCAN_DIMENSION_EXPLANATION_TEXT,
             font_metric_height_factor=6,
-            font_metric_width_factor=cls.width_factor_left,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             parent_widget="config_header",
             wordWrap=True,
         )
@@ -136,7 +139,7 @@ class DefineScanFrameBuilder:
         _row = frame._widgets["master"].layout().rowCount()
         frame.create_empty_widget(
             "config_global",
-            font_metric_width_factor=cls.width_factor_left,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             gridPos=(_row, 0, 1, 1),
             parent_widget="master",
         )
@@ -148,7 +151,7 @@ class DefineScanFrameBuilder:
         )
         frame.create_empty_widget(
             "config_A",
-            font_metric_width_factor=cls.width_factor_dims,
+            font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
@@ -160,7 +163,7 @@ class DefineScanFrameBuilder:
         )
         frame.create_empty_widget(
             "config_B",
-            font_metric_width_factor=cls.width_factor_dims,
+            font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
             gridPos=(_row, -1, 1, 1),
             parent_widget="master",
         )
@@ -208,7 +211,7 @@ class DefineScanFrameBuilder:
                 alignment=constants.ALIGN_BOTTOM_LEFT,
                 bold=True,
                 fontsize_offset=1,
-                font_metric_width_factor=15,
+                font_metric_width_factor=35,
                 gridPos=(_row, 0, 1, 1),
                 parent_widget=_parent,
             )
@@ -232,7 +235,7 @@ class DefineScanFrameBuilder:
                 param = SCAN_SETTINGS.get_param(f"scan_dim{i_dim}_{basename}")
                 frame.create_param_widget(
                     param,
-                    font_metric_width_factor=cls.width_factor_dims,
+                    font_metric_width_factor=constants.FONT_METRIC_CONFIG_WIDTH,
                     gridPos=(-1, 0, 1, 4),
                     parent_widget=_parent,
                     width_text=0.6,
@@ -243,7 +246,7 @@ class DefineScanFrameBuilder:
         frame.create_button(
             "but_save",
             "Export scan settings",
-            font_metric_width_factor=cls.width_factor_left,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             gridPos=(-1, 0, 1, 1),
             icon="qt-std::SP_DialogSaveButton",
             parent_widget="master",
@@ -269,7 +272,7 @@ class DefineScanFrameBuilder:
         """
         _n_columns = 1 + two_columns
         return (
-            cls.width_factor_left
+            constants.FONT_METRIC_WIDE_CONFIG_WIDTH
             + 2 * cls.width_factor_spacer
-            + _n_columns * cls.width_factor_dims
+            + _n_columns * constants.FONT_METRIC_CONFIG_WIDTH
         )

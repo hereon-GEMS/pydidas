@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["WorkflowRunFrameBuilder"]
 
 
-from ....core.constants import CONFIG_ASPECT_RATIO, POLICY_FIX_EXP
+from ....core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrameWithApp
 from ....widgets.selection import ResultSelectionWidget
@@ -83,15 +83,15 @@ class WorkflowRunFrameBuilder:
 
         frame.create_empty_widget(
             "config",
-            font_metric_width_factor=CONFIG_ASPECT_RATIO,
-            sizePolicy=POLICY_FIX_EXP,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=None,
+            sizePolicy=POLICY_FIX_EXP,
         )
         frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=frame._widgets["config"],
             sizePolicy=POLICY_FIX_EXP,
+            widget=frame._widgets["config"],
         )
         frame.create_spacer("spacer1", parent_widget="config")
         for _param in ["autosave_results", "autosave_directory", "autosave_format"]:

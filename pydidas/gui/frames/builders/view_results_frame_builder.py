@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["ViewResultsFrameBuilder"]
 
 
-from ....core.constants import CONFIG_ASPECT_RATIO, POLICY_FIX_EXP
+from ....core.constants import FONT_METRIC_CONFIG_WIDTH, POLICY_FIX_EXP
 from ....widgets import ScrollArea
 from ....widgets.framework import BaseFrame
 from ....widgets.selection import ResultSelectionWidget
@@ -60,7 +60,7 @@ class ViewResultsFrameBuilder:
         frame.create_spacer("title_spacer", fixedHeight=15)
         frame.create_empty_widget(
             "config",
-            font_metric_width_factor=CONFIG_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_CONFIG_WIDTH,
             parent_widget=None,
             sizePolicy=POLICY_FIX_EXP,
         )
@@ -84,14 +84,16 @@ class ViewResultsFrameBuilder:
             select_results_param=frame.get_param("selected_results"),
             workflow_results=frame._RESULTS,
         )
-        frame.create_line("line_export", parent_widget="config")
+        # frame.create_line("line_export", parent_widget="config")
         frame.create_param_widget(
             frame.get_param("saving_format"),
             parent_widget="config",
+            visible=False,
         )
         frame.create_param_widget(
             frame.get_param("enable_overwrite"),
             parent_widget="config",
+            visible=False,
         )
         frame.create_button(
             "but_export_current",
@@ -104,6 +106,7 @@ class ViewResultsFrameBuilder:
                 "the filenames are pre-determined based on node ID "
                 "and node label."
             ),
+            visible=False,
         )
         frame.create_button(
             "but_export_all",
@@ -111,7 +114,8 @@ class ViewResultsFrameBuilder:
             enabled=False,
             icon="qt-std::SP_DialogSaveButton",
             parent_widget="config",
-            tooltip=("Export all results. Note that the directory must be empty."),
+            tooltip="Export all results. Note that the directory must be empty.",
+            visible=False,
         )
         frame.create_spacer(
             "config_terminal_spacer",

@@ -30,7 +30,7 @@ __all__ = ["HomeFrame"]
 
 from qtpy import QtCore, QtGui, QtWidgets
 
-from ...core import constants
+from ...core.constants import ALIGN_TOP_RIGHT, FONT_METRIC_CONSOLE_WIDTH, POLICY_FIX_EXP
 from ...core.utils import DOC_HOME_ADDRESS
 from ...resources import logos
 from ...widgets import ScrollArea
@@ -79,9 +79,7 @@ _PROC_TEXT = (
     "frame (in the 'Workflow Processing' submenu). The test also allows to view all "
     "intermediate results.<br>"
     "The full automatic processing can be started using the 'Run Full Processing' "
-    "frame.<br>"
-    "The full processing will run in separate processes and the GUI will stay "
-    "responsive. <br>"
+    "frame. It will run in separate processes and the GUI will stay responsive. <br>"
     "Results can be visualized on the fly while the processing is still running by "
     "selecting the desired node and axes.<br>"
     "For a full tutorial, please visit the corresponding help page: "
@@ -103,38 +101,44 @@ class HomeFrame(BaseFrame):
     def build_frame(self):
         """Build the frame and add all widgets."""
         self.create_empty_widget(
-            "canvas", parent_widget=None, font_metric_width_factor=30
+            "canvas",
+            parent_widget=None,
+            font_metric_width_factor=FONT_METRIC_CONSOLE_WIDTH,
         )
 
-        _label_options = {"font_metric_width_factor": 30, "parent_widget": "canvas"}
+        _label_options = {
+            "font_metric_width_factor": FONT_METRIC_CONSOLE_WIDTH,
+            "parent_widget": "canvas",
+        }
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            widget=self._widgets["canvas"],
-            sizePolicy=constants.POLICY_FIX_EXP,
-            stretch=(1, 0),
             layout_kwargs={"alignment": None},
+            resize_to_widget_width=True,
+            sizePolicy=POLICY_FIX_EXP,
+            stretch=(1, 0),
+            widget=self._widgets["canvas"],
         )
         self.create_label(
             "label_welcome",
             "Welcome to pydidas",
-            fontsize_offset=4,
             bold=True,
+            fontsize_offset=4,
             **_label_options,
         )
         self.create_label(
             "label_full_name",
             "- the python Diffraction Data Analysis Suite.",
-            fontsize_offset=3,
             bold=True,
+            fontsize_offset=3,
             **_label_options,
         )
         self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_quickstart",
             "Quickstart hints:",
-            fontsize_offset=2,
             bold=True,
+            fontsize_offset=2,
             underline=True,
             **_label_options,
         )
@@ -150,16 +154,16 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_toolbar",
             "Menu toolbar:",
+            bold=True,
             fontsize_offset=1,
             underline=True,
-            bold=True,
             **_label_options,
         )
         self.create_label(
             "label_toolbar_use",
             _TOOOLBAR_USER_TEXT,
-            wordWrap=True,
             font_metric_height_factor=3,
+            wordWrap=True,
             **_label_options,
         )
         self.create_spacer(None, parent_widget="canvas")
@@ -167,34 +171,34 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_help_header",
             "Online help:",
+            bold=True,
             fontsize_offset=1,
             underline=True,
-            bold=True,
             **_label_options,
         )
         self.create_label(
             "label_help",
             _HELP_TEXT,
-            wordWrap=True,
-            openExternalLinks=True,
-            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
-            textFormat=QtCore.Qt.RichText,
             font_metric_height_factor=4,
+            openExternalLinks=True,
+            textFormat=QtCore.Qt.RichText,
+            textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
+            wordWrap=True,
             **_label_options,
         )
         self.create_spacer(None, parent_widget="canvas")
         self.create_label(
             "label_proc_setup",
             "Workflow processing setup:",
+            bold=True,
             fontsize_offset=1,
             underline=True,
-            bold=True,
             **_label_options,
         )
         self.create_label(
             "label_processing_setup",
             _PROC_SETUP_TEXT,
-            font_metric_height_factor=11,
+            font_metric_height_factor=12,
             wordWrap=True,
             **_label_options,
         )
@@ -202,33 +206,33 @@ class HomeFrame(BaseFrame):
         self.create_label(
             "label_proc",
             "Running processing:",
+            bold=True,
             fontsize_offset=1,
             underline=True,
-            bold=True,
             **_label_options,
         )
         self.create_label(
             "label_processing",
             _PROC_TEXT,
             font_metric_height_factor=9,
-            wordWrap=True,
             openExternalLinks=True,
             textFormat=QtCore.Qt.RichText,
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
+            wordWrap=True,
             **_label_options,
         )
         self.create_spacer(
             None,
             gridPos=(0, 1, 1, 1),
-            stretch=(1, 1),
             policy=QtWidgets.QSizePolicy.Expanding,
+            stretch=(1, 1),
         )
         self.add_any_widget(
             "svg_logo",
             logos.pydidas_logo_svg(),
-            gridPos=(0, 2, 1, 1),
+            alignment=ALIGN_TOP_RIGHT,
             fixedHeight=300,
             fixedWidth=300,
-            alignment=constants.ALIGN_TOP_RIGHT,
+            gridPos=(0, 2, 1, 1),
             layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
         )

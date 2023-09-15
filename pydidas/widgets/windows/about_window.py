@@ -28,8 +28,14 @@ __status__ = "Production"
 __all__ = ["AboutWindow"]
 
 
-from qtpy import QtCore
+from qtpy import QtCore, QtWidgets
 
+from ...core.constants import (
+    ALIGN_BOTTOM_RIGHT,
+    ALIGN_TOP_RIGHT,
+    FONT_METRIC_SMALL_BUTTON_WIDTH,
+    FONT_METRIC_WIDE_CONFIG_WIDTH,
+)
 from ...resources import logos
 from ...version import VERSION
 from ..framework import PydidasWindow
@@ -41,14 +47,14 @@ PYDIDAS_INFO = (
     "and is made available under the "
     "<a href='http://www.gnu.org/licenses/gpl-3.0.txt'>GNU General Public License 3.0"
     "</a>.<br>"
-    "A small section of code is made available through other, "
+    "A small section of code is adapted from code which is distributed with other, "
     "more permissive licenses and copyrighted by their respective "
     "owners (particularly the ESRF for pyFAI and silx)."
-    "<br><br>Copyright for pydidas 2021- Helmholtz-Zentrum Hereon"
+    "<br><br>pydidas copyright 2023, Helmholtz-Zentrum Hereon"
     "<br><br>pydidas Homepage: "
-    "<a href='http://ms.hereon.de/pydidas'>pydidas</a>"
+    "<a href='https://pydidas.hereon.de/index.php.en'>pydidas.hereon.de</a>"
     "<br><br>pydidas github: "
-    "<a href='https://github.com/hereon-GEMS'>GEMS@github</a>"
+    "<a href='https://github.com/hereon-GEMS/pydidas'>pydidas@github</a>"
 )
 
 
@@ -66,36 +72,67 @@ class AboutWindow(PydidasWindow):
         """
         Build the frame and create all widgets.
         """
+        _font_height = QtWidgets.QApplication.instance().font_height
         self.create_label(
             "label_title",
             "About",
-            fontsize=14,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            font_metric_height_factor=1,
+            font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
+            fontsize_offset=4,
         )
-        self.create_spacer(None)
         self.create_label(
             "label_input",
             PYDIDAS_INFO,
-            openExternalLinks=True,
+            font_metric_height_factor=14,
+            font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
+            gridPos=(1, 0, 2, 1),
             textInteractionFlags=QtCore.Qt.LinksAccessibleByMouse,
             textFormat=QtCore.Qt.RichText,
-            gridPos=(-1, 0, 1, 1),
+            openExternalLinks=True,
+            wordWrap=True,
         )
         self.add_any_widget(
             "svg_logo",
             logos.pydidas_logo_svg(),
-            gridPos=(0, 1, 3, 1),
-            fixedHeight=150,
-            fixedWidth=150,
-            layout_kwargs={"alignment": (QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)},
+            fixedHeight=_font_height * 9,
+            fixedWidth=_font_height * 9,
+            gridPos=(0, 1, 2, 2),
+            layout_kwargs={"alignment": ALIGN_TOP_RIGHT},
         )
         self.create_button(
-            "but_okay", "&OK", gridPos=(-1, 1, 1, 1), focusPolicy=QtCore.Qt.StrongFocus
+            "but_okay",
+            "&OK",
+            focusPolicy=QtCore.Qt.StrongFocus,
+            font_metric_width_factor=FONT_METRIC_SMALL_BUTTON_WIDTH,
+            gridPos=(-1, 2, 1, 1),
+            layout_kwargs={"alignment": ALIGN_BOTTOM_RIGHT},
         )
+        self.resize(QtCore.QSize(_font_height * 35, _font_height * 18))
 
     def connect_signals(self):
         """
         Build the frame and create all widgets.
         """
         self._widgets["but_okay"].clicked.connect(self.close)
+        QtWidgets.QApplication.instance().sig_new_font_metrics.connect(
+            self.process_new_font_metrics
+        )
+
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
+        """
+        Adjust the window based on the new font metrics.
+
+        Parameters
+        ----------
+        char_width: float
+            The font width in pixels.
+        char_height : float
+            The font height in pixels.
+        """
+        self._widgets["svg_logo"].setFixedSize(
+            QtCore.QSize(char_height * 9, char_height * 9)
+        )
+        self.resize(QtCore.QSize(char_width * 70, char_height * 18))
+        self.adjustSize()

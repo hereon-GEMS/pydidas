@@ -83,8 +83,8 @@ class PyfaiIntegrationConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
         self.create_button(
             "but_toggle_advanced_params",
             "Display advanced Parameters",
-            icon="qt-std::SP_TitleBarUnshadeButton",
             clicked=self.__toggle_advanced_params,
+            icon="qt-std::SP_TitleBarUnshadeButton",
         )
         for _key in self.plugin.advanced_parameters:
             _param = self.plugin.get_param(_key)

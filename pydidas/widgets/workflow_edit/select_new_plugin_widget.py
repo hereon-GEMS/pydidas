@@ -16,27 +16,26 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module with the PluginCollectionTreeWidget class used to browse through all
-registered plugins.
+The SelectNewPluginWidget class allows to browse through all registered plugins.
 """
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["_PluginCollectionTreeWidget", "SelectNewPluginWidget"]
 
 from functools import partial
 
-from qtpy import QtCore, QtGui, QtWidgets
 import numpy as np
+from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import constants
 from ...core.utils import apply_qt_properties
 from ...plugins import PluginCollection
 from ...workflow import WorkflowTree
-from ..factory import CreateWidgetsMixIn, PydidasWidgetWithGridLayout
+from ..factory import CreateWidgetsMixIn, EmptyWidget
 from ..misc import LineEditWithIcon
 
 
@@ -44,20 +43,24 @@ PLUGIN_COLLECTION = PluginCollection()
 TREE = WorkflowTree()
 
 
-class SelectNewPluginWidget(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
+class SelectNewPluginWidget(CreateWidgetsMixIn, EmptyWidget):
     """
-    The SelectNewPluginWidget includes a search filter field and a QTreeView which
-    includes all the available plugins.
+    A widget for displaying all available Plugins and to allow the user to select one.
+
+    SelectNewPluginWidget includes a search filter field and a QTreeView which
+    displays all the available plugins.
     """
+
+    init_kwargs = ["collection"]
 
     sig_plugin_preselected = QtCore.Signal(str)
     sig_add_plugin_to_tree = QtCore.Signal(str)
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, parent=None, collection=None, **kwargs):
-        PydidasWidgetWithGridLayout.__init__(self, parent, minimumWidth=400)
+    def __init__(self, collection=None, **kwargs):
         CreateWidgetsMixIn.__init__(self)
+        EmptyWidget.__init__(self, **kwargs)
         self.add_any_widget(
             "filter_edit",
             LineEditWithIcon(
@@ -93,6 +96,24 @@ class SelectNewPluginWidget(CreateWidgetsMixIn, PydidasWidgetWithGridLayout):
             self._widgets["treeview"].update_filter
         )
 
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
+        """
+        Adjust the window based on the new font metrics.
+
+        Parameters
+        ----------
+        char_width: float
+            The font width in pixels.
+        char_height : float
+            The font height in pixels.
+        """
+        EmptyWidget.process_new_font_metrics(self, char_width, char_height)
+        if "treeview" in self._widgets:
+            self._widgets["treeview"].setMinimumWidth(
+                int(char_width * constants.FONT_METRIC_CONFIG_WIDTH)
+            )
+
 
 class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
     """
@@ -119,7 +140,12 @@ class _PluginCollectionTreeWidget(QtWidgets.QTreeView):
         apply_qt_properties(self, **kwargs)
 
         self.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.setMinimumWidth(300)
+        self.setMinimumWidth(
+            int(
+                QtWidgets.QApplication.instance().font_char_width
+                * constants.FONT_METRIC_CONFIG_WIDTH
+            )
+        )
         self.setUniformRowHeights(True)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setHeaderHidden(True)
@@ -371,15 +397,22 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent):
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
         self.__qtapp = QtWidgets.QApplication.instance()
-        self.__height = int(np.ceil(2 * self.__qtapp.standard_font_size + 2))
-        self.__qtapp.sig_font_size_changed.connect(self.changed_font)
+        self.__height = int(np.ceil(2 * self.__qtapp.font_size + 2))
+        self.__qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
 
-    @QtCore.Slot()
-    def changed_font(self):
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
         """
-        Handle the QApplication's fontsize changed signal.
+        Handle the QApplication's updated font.
+
+        Parameters
+        ----------
+        char_width: float
+            The font width in pixels.
+        char_height : float
+            The font height in pixels.
         """
-        self.__height = int(np.ceil(2 * self.__qtapp.standard_font_size + 2))
+        self.__height = int(char_height + 10)
         self.sizeHintChanged.emit(self.parent().currentIndex())
 
     def sizeHint(self, options, index):
@@ -416,6 +449,7 @@ class _TreeviewItemDelegate(QtWidgets.QStyledItemDelegate):
         index : QModelIndex
             The index of the item to be painted.
         """
+        option.font.setFamily(self.__qtapp.font_family)
         if index.data(QtCore.Qt.DisplayRole) in constants.PLUGIN_TYPE_NAMES.values():
-            option.font.setPointSizeF(self.__qtapp.standard_font_size + 2)
+            option.font.setPointSizeF(self.__qtapp.font_size + 2)
         QtWidgets.QStyledItemDelegate.paint(self, painter, option, index)

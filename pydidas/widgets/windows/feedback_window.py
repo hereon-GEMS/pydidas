@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,18 +21,18 @@ form which they can copy and paste to submit feedback.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FeedbackWindow"]
 
 
 from qtpy import QtCore, QtGui, QtWidgets
 
 from ...core import Parameter, ParameterCollection
-from ...core.constants import PYDIDAS_FEEDBACK_URL
-from ...core.utils import copy_text_to_system_clipbord
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, PYDIDAS_FEEDBACK_URL
+from ...core.utils import apply_qt_properties, copy_text_to_system_clipbord
 from ..framework import PydidasWindow
 
 
@@ -68,61 +68,117 @@ class FeedbackWindow(PydidasWindow):
         """
         Create all widgets for the frame and place them in the layout.
         """
-        self.setFixedWidth(400)
+        _font_width, _font_height = QtWidgets.QApplication.instance().font_metrics
 
         self.create_label(
             "label_title",
             "pydidas Feedback",
-            fontsize=12,
             bold=True,
-            gridPos=(0, 0, 1, 1),
+            fontsize_offset=2,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.create_label(
             "label_title",
             INFO_TEXT,
+            font_metric_height_factor=8,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
             gridPos=(-1, 0, 1, 1),
+            wordWrap=True,
         )
 
         self.create_line(None)
         self.create_label(
             "label_title",
             "type of feedback",
-            fontsize=10,
             bold=True,
-            gridPos=(-1, 0, 1, 1),
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.create_radio_button_group(
             "type",
             ["Bug report", "Improvement suggestion", "Usage question"],
+            columns=1,
             gridPos=(-1, 0, 1, 1),
+            rows=-1,
         )
         self.create_line(None)
-        self.create_spacer(None)
         self.create_label(
             "label_title",
             "feedback information",
-            fontsize=10,
             bold=True,
-            gridPos=(-1, 0, 1, 1),
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
-        self.create_param_widget(self.get_param("email"), width_text=170, width_io=200)
+        self.create_param_widget(
+            self.get_param("email"),
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
+            width_io=0.5,
+            width_text=0.5,
+        )
+        self.create_line(None)
         self.create_label(
             "label_details",
-            "details:",
-            gridPos=(-1, 0, 1, 1),
+            "Detailed feedback:",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.add_any_widget(
-            "details", QtWidgets.QPlainTextEdit(), fixedWidth=380, fixedHeight=500
+            "details",
+            QtWidgets.QPlainTextEdit(),
+            fixedWidth=_font_width * FONT_METRIC_PARAM_EDIT_WIDTH,
+            fixedHeight=_font_height * 15,
         )
         self.create_button(
-            "button_copy", "Copy to clipboard and open feedback webpage."
+            "button_copy",
+            "Copy to clipboard and open feedback webpage.",
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
+        _default_font = self._widgets["details"].document().defaultFont()
+        _default_font.setFamily(QtWidgets.QApplication.instance().font_family)
+        self._widgets["details"].document().setDefaultFont(_default_font)
 
     def connect_signals(self):
         """
         Connect the signals.
         """
         self._widgets["button_copy"].clicked.connect(self._submit_feedback)
+        QtWidgets.QApplication.instance().sig_new_font_metrics.connect(
+            self.process_new_font_metrics
+        )
+        QtWidgets.QApplication.instance().sig_new_font_family.connect(
+            self.process_new_font_family
+        )
+
+    @QtCore.Slot(float, float)
+    def process_new_font_metrics(self, char_width: float, char_height: float):
+        """
+        Process the user input of the new font size.
+
+        Parameters
+        ----------
+        char_width : float
+            The average metrics width of a char.
+        char_height : float
+            The average metrics height of a char.
+        """
+        self.setFixedWidth(char_width * FONT_METRIC_PARAM_EDIT_WIDTH + 20)
+        apply_qt_properties(
+            self._widgets["details"],
+            fixedWidth=char_width * FONT_METRIC_PARAM_EDIT_WIDTH,
+            fixedHeight=char_height * 15,
+        )
+        self.adjustSize()
+
+    @QtCore.Slot(str)
+    def process_new_font_family(self, family: str):
+        """
+        Update the TextEdit font family.
+
+        Parameters
+        ----------
+        family : str
+            The new font family.
+        """
+        _default_font = self._widgets["details"].document().defaultFont()
+        _default_font.setFamily(QtWidgets.QApplication.instance().font_family)
+        self._widgets["details"].document().setDefaultFont(_default_font)
 
     @QtCore.Slot()
     def _submit_feedback(self):

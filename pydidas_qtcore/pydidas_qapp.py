@@ -27,6 +27,8 @@ __status__ = "Production"
 __all__ = ["PydidasQApplication"]
 
 
+from typing import Tuple
+
 import argparse
 import sys
 
@@ -44,6 +46,11 @@ _LOCALE.setNumberOptions(
     QtCore.QLocale.OmitGroupSeparator | QtCore.QLocale.RejectGroupSeparator
 )
 QtCore.QLocale.setDefault(_LOCALE)
+
+
+_TEST_TEXT = (
+    "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " "abcdefghijklmnopqrstuvwxyz"
+)
 
 
 def parse_cmd_args():
@@ -86,8 +93,8 @@ class PydidasQApplication(QtWidgets.QApplication):
     sig_font_size_changed = QtCore.Signal()
     sig_new_font_family = QtCore.Signal(str)
     sig_font_family_changed = QtCore.Signal()
-    sig_new_font_height = QtCore.Signal(float)
-    sig_font_height_changed = QtCore.Signal()
+    sig_new_font_metrics = QtCore.Signal(float, float)
+    sig_font_metrics_changed = QtCore.Signal()
     sig_mpl_font_change = QtCore.Signal()
     sig_mpl_font_setting_error = QtCore.Signal(str)
 
@@ -105,42 +112,47 @@ class PydidasQApplication(QtWidgets.QApplication):
             ),
             "family": self.__settings.value("font/family", self.font().family()),
             "height": 20,
+            "font_metric_height": 0,
+            "font_metric_width": 0,
         }
         _kwargs = parse_cmd_args()
-        self.standard_font_size = _kwargs.get("fontsize", self.__font_config["size"])
-        self.standard_font_family = self.__font_config["family"]
-        self._update_font_height()
-        # self.__initialization = False
+        self.font_size = _kwargs.get("fontsize", self.__font_config["size"])
+        self.font_family = self.__font_config["family"]
+        self._update_font_metrics()
 
-    def _update_font_height(self):
+    def _update_font_metrics(self):
         """
-        Update the stored font height metrics.
+        Update the font metrics for the width and height.
         """
-        _font_height = QtGui.QFontMetrics(self.font()).boundingRect("Height").height()
-        if _font_height != self.__font_config["height"]:
-            self.__font_config["height"] = _font_height
-            self.sig_new_font_height.emit(_font_height)
-            self.sig_font_height_changed.emit()
+        _metrics = QtGui.QFontMetrics(self.font())
+        _char_height = _metrics.boundingRect(_TEST_TEXT).height()
+        _char_width = _metrics.horizontalAdvance(_TEST_TEXT) / 78
+        if (
+            _char_height != self.__font_config["font_metric_height"]
+            or _char_width != self.__font_config["font_metric_width"]
+        ):
+            self.__font_config["font_metric_height"] = _char_height
+            self.__font_config["font_metric_width"] = _char_width
+            self.sig_new_font_metrics.emit(_char_width, _char_height)
+            self.sig_font_metrics_changed.emit()
 
     def _update_matplotlib_font_family(self):
         """
         Update the matplotlib font from the app's font config.
         """
         _family = self.__font_config["family"]
+        _error = (
+            f"The chosen font *{_family}* is not supported by matplotlib. "
+            "The font for plots has not been updated."
+        )
         if mpl.rcParams["font.family"] != _family:
             if _family not in self.__available_mpl_fonts:
-                self.sig_mpl_font_setting_error.emit(
-                    f"The chosen font *{_family}* is not supported by matplotlib. "
-                    "Defaulting to DejaVu Sans."
-                )
+                self.sig_mpl_font_setting_error.emit(_error)
                 return
             _font = mpl_ft2font.FT2Font(mpl_font_manager.findfont(_family))
             _char_keys = set(_font.get_charmap().keys())
             if not set(np.arange(33, 125)).issubset(_char_keys):
-                self.sig_mpl_font_setting_error.emit(
-                    f"The chosen font *{_family}* is not supported by matplotlib. "
-                    "The font for plots has not been updated."
-                )
+                self.sig_mpl_font_setting_error.emit(_error)
                 return
         mpl.rc("font", family=self.__font_config["family"])
         self.sig_mpl_font_change.emit()
@@ -151,7 +163,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         self.sig_close_gui.emit()
 
     @property
-    def standard_font_size(self) -> float:
+    def font_size(self) -> float:
         """
         Return the standard fontSize set for the app.
 
@@ -162,8 +174,8 @@ class PydidasQApplication(QtWidgets.QApplication):
         """
         return self.__font_config["size"]
 
-    @standard_font_size.setter
-    def standard_font_size(self, value: float):
+    @font_size.setter
+    def font_size(self, value: float):
         """
         Set the standard fontsize for the PydidasApp.
 
@@ -179,14 +191,14 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font = self.font()
         _font.setPointSizeF(value)
         self.setFont(_font)
-        self._update_font_height()
+        self._update_font_metrics()
         mpl.rc("font", size=self.__font_config["size"])
         self.sig_new_fontsize.emit(self.__font_config["size"])
         self.sig_font_size_changed.emit()
         self.sig_mpl_font_change.emit()
 
     @property
-    def standard_font_height(self) -> int:
+    def font_height(self) -> int:
         """
         Get the standard font height in pixels.
 
@@ -195,10 +207,10 @@ class PydidasQApplication(QtWidgets.QApplication):
         int
             The height of the font.
         """
-        return self.__font_config["height"]
+        return self.__font_config["font_metric_height"]
 
     @property
-    def standard_font_family(self) -> str:
+    def font_family(self) -> str:
         """
         Get the standard font family.
 
@@ -209,8 +221,8 @@ class PydidasQApplication(QtWidgets.QApplication):
         """
         return self.__font_config["family"]
 
-    @standard_font_family.setter
-    def standard_font_family(self, font_family: str):
+    @font_family.setter
+    def font_family(self, font_family: str):
         """
         Set the standard font family.
 
@@ -227,7 +239,7 @@ class PydidasQApplication(QtWidgets.QApplication):
         _font.setFamily(font_family)
         self.setFont(_font)
         self._update_matplotlib_font_family()
-        self._update_font_height()
+        self._update_font_metrics()
         self.sig_new_font_family.emit(font_family)
         self.sig_font_family_changed.emit()
         self.sig_font_size_changed.emit()
@@ -249,7 +261,7 @@ class PydidasQApplication(QtWidgets.QApplication):
                 "font/point_size", float(self.__font_config["size"])
             )
             self.sig_new_fontsize.emit(self.__font_config["size"])
-        self._update_font_height()
+        self._update_font_metrics()
         self._update_matplotlib_font_family()
 
     @property
@@ -263,3 +275,32 @@ class PydidasQApplication(QtWidgets.QApplication):
             The width in pixels.
         """
         return self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+
+    @property
+    def font_char_width(self) -> float:
+        """
+        Get the width of an average character.
+
+        This method returns the average floating point width of a character.
+
+        Returns
+        -------
+        float
+            The average width for each character.
+        """
+        return self.__font_config["font_metric_width"]
+
+    @property
+    def font_metrics(self) -> Tuple[float]:
+        """
+        Get the font metrics for width and height.
+
+        Returns
+        -------
+        Tuple[float]
+            The width and height of the font in pixels.
+        """
+        return (
+            self.__font_config["font_metric_width"],
+            self.__font_config["font_metric_height"],
+        )

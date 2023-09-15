@@ -46,6 +46,8 @@ from .radio_button_group import RadioButtonGroup
 
 class CreateWidgetsMixIn:
     """
+    A mixin class to allow easy widget creation in their host classes.
+
     The CreateWidgetsMixIn class includes methods for easy adding of widgets
     to the layout. The create_something methods from the factories are called
     and in addition, the layout and positions can be set.

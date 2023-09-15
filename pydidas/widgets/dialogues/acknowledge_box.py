@@ -30,7 +30,12 @@ __all__ = ["AcknowledgeBox"]
 
 from qtpy import QtCore, QtWidgets
 
-from ...core.constants import POLICY_EXP_EXP
+from ...core.constants import (
+    FONT_METRIC_CONSOLE_WIDTH,
+    FONT_METRIC_MEDIUM_BUTTON_WIDTH,
+    FONT_METRIC_WIDE_CONFIG_WIDTH,
+    POLICY_EXP_EXP,
+)
 from ...core.utils import format_input_to_multiline_str
 from ...resources import icons
 from ..factory import CreateWidgetsMixIn
@@ -69,7 +74,7 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_label(
             "label",
             "",
-            font_metric_width_factor=25,
+            font_metric_width_factor=FONT_METRIC_WIDE_CONFIG_WIDTH,
             font_metric_height_factor=3,
             indent=8,
             parent_widget=None,
@@ -80,7 +85,8 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_any_widget(
             "scroll_area",
             ScrollArea,
-            fixedWidth=_qtapp.standard_font_height * 25 + _qtapp.scrollbar_width,
+            fixedWidth=_qtapp.font_char_width * FONT_METRIC_WIDE_CONFIG_WIDTH
+            + _qtapp.scrollbar_width,
             gridPos=(1, 0, 1, 2),
             widget=self._widgets["label"],
         )
@@ -92,13 +98,15 @@ class AcknowledgeBox(QtWidgets.QDialog, CreateWidgetsMixIn):
         self.create_button(
             "button_okay",
             "Acknowledge",
+            clicked=self.close,
+            font_metric_width_factor=FONT_METRIC_MEDIUM_BUTTON_WIDTH,
             gridPos=(2, 3, 1, 1),
-            font_metric_width_factor=10,
         )
-
-        self._widgets["button_okay"].clicked.connect(self.close)
         self.set_text(_text)
-        self.resize(_qtapp.standard_font_height * 35, _qtapp.standard_font_height * 10)
+        self.resize(
+            _qtapp.font_char_width * (FONT_METRIC_CONSOLE_WIDTH + 10),
+            _qtapp.font_height * 10,
+        )
 
     def set_text(self, text):
         """

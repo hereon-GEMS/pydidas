@@ -473,7 +473,7 @@ class _WorkflowTreeEditManager(QtCore.QObject):
         Handle the QApplication's font changed signal and update the widgets.
         """
         _font = self.__qtapp.font()
-        _font.setPointSizeF(self.__qtapp.standard_font_size + 1)
+        _font.setPointSizeF(self.__qtapp.font_size + 1)
         _metrics = QtGui.QFontMetrics(_font)
         _rect = _metrics.boundingRect("pyFAI azimuthal integration Test")
         self.PLUGIN_WIDGET_WIDTH = _width = _rect.width() + 10

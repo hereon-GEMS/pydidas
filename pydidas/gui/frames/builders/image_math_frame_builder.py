@@ -69,7 +69,6 @@ class ImageMathFrameBuilder:
     """
 
     _frame = None
-    relative_width_of_controls = 25
 
     @classmethod
     def create_combo_button_row(
@@ -98,20 +97,20 @@ class ImageMathFrameBuilder:
         """
         cls._frame.create_empty_widget(
             reference,
-            font_metric_width_factor=cls.relative_width_of_controls,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             parent_widget="left_container",
         )
         cls._frame.create_label(
             f"label_{reference}",
             label_text,
-            font_metric_width_factor=cls.relative_width_of_controls / 2,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2,
             parent_widget=reference,
             sizePolicy=constants.POLICY_MIN_MIN,
             wordWrap=False,
         )
         cls._frame.create_combo_box(
             f"combo_{reference}",
-            font_metric_width_factor=cls.relative_width_of_controls / 3,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
             gridPos=(0, 1, 1, 1),
             items=combo_choices,
             parent_widget=reference,
@@ -168,7 +167,7 @@ class ImageMathFrameBuilder:
         """Create the left config section."""
         cls._frame.create_empty_widget(
             "left_container",
-            font_metric_width_factor=cls.relative_width_of_controls,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH,
             minimumHeight=600,
             parent_widget=None,
         )
@@ -227,7 +226,7 @@ class ImageMathFrameBuilder:
             "label_display_from_buffer",
             "Display image:",
             bold=True,
-            font_metric_width_factor=cls.relative_width_of_controls / 3,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3,
             parent_widget="display_from_buffer",
             sizePolicy=constants.POLICY_MIN_MIN,
             wordWrap=False,
@@ -243,7 +242,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_display_image",
             alignment=constants.ALIGN_TOP_RIGHT,
-            font_metric_width_factor=cls.relative_width_of_controls / 2,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2,
             font_metric_height_factor=1,
             gridPos=(0, 2, 1, 1),
             items=cls._all_images,
@@ -286,7 +285,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_operator_target",
-            font_metric_width_factor=cls.relative_width_of_controls / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
             parent_widget="ops_operator",
@@ -297,7 +296,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "ops_operator_func",
             currentIndex=4,
-            font_metric_width_factor=cls.relative_width_of_controls / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, -1, 1, 1),
             items=UFUNCS,
             parent_widget="ops_operator",
@@ -308,7 +307,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_ops_operator_input",
             alignment=constants.ALIGN_CENTER_LEFT,
-            font_metric_width_factor=cls.relative_width_of_controls / 3.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
             items=cls._current_images,
             parent_widget="ops_operator",
@@ -322,7 +321,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_lineedit(
             "io_ops_operator_input",
-            font_metric_width_factor=cls.relative_width_of_controls / 9,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 9,
             gridPos=(0, -1, 1, 1),
             parent_widget="ops_operator",
             validator=FLOAT_VALIDATOR,
@@ -345,7 +344,7 @@ class ImageMathFrameBuilder:
             "but_ops_operator_execute",
             "Apply operator",
             alignment=constants.ALIGN_TOP_RIGHT,
-            font_metric_width_factor=cls.relative_width_of_controls / 2.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
             parent_widget="left_container",
         )
 
@@ -368,7 +367,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_arithmetic_target",
-            font_metric_width_factor=cls.relative_width_of_controls / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             gridPos=(0, 0, 1, 1),
             items=cls._images,
             parent_widget="ops_arithmetic",
@@ -379,14 +378,14 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_input",
             alignment=constants.ALIGN_CENTER_LEFT,
-            font_metric_width_factor=cls.relative_width_of_controls / 3.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
             items=cls._current_images,
             parent_widget="ops_arithmetic",
         )
         cls._frame.create_combo_box(
             "combo_ops_arithmetic_operation",
-            font_metric_width_factor=cls.relative_width_of_controls / 10,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 10,
             gridPos=(0, -1, 1, 1),
             items=["+", "-", "/", "x"],
             minimum_width=35,
@@ -394,7 +393,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_lineedit(
             "io_ops_arithmetic_input",
-            font_metric_width_factor=cls.relative_width_of_controls / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             font_metric_height_factor=1,
             gridPos=(0, -1, 1, 1),
             parent_widget="ops_arithmetic",
@@ -411,7 +410,7 @@ class ImageMathFrameBuilder:
             "but_ops_arithmetic_execute",
             "Apply arithmetic operation",
             alignment=constants.ALIGN_TOP_RIGHT,
-            font_metric_width_factor=cls.relative_width_of_controls / 2.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
             parent_widget="left_container",
         )
 
@@ -433,7 +432,7 @@ class ImageMathFrameBuilder:
         )
         cls._frame.create_combo_box(
             "ops_image_arithmetic_target",
-            font_metric_width_factor=cls.relative_width_of_controls / 5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 5,
             items=cls._images,
             parent_widget="ops_image_arithmetic",
         )
@@ -446,14 +445,14 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_1",
             alignment=constants.ALIGN_CENTER_LEFT,
-            font_metric_width_factor=cls.relative_width_of_controls / 3.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
             items=cls._current_images,
             parent_widget="ops_image_arithmetic",
         )
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_operation",
-            font_metric_width_factor=cls.relative_width_of_controls / 10,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 10,
             minimum_width=35,
             gridPos=(0, -1, 1, 1),
             items=["+", "-", "/", "x"],
@@ -462,7 +461,7 @@ class ImageMathFrameBuilder:
         cls._frame.create_combo_box(
             "combo_ops_image_arithmetic_input_2",
             alignment=constants.ALIGN_CENTER_LEFT,
-            font_metric_width_factor=cls.relative_width_of_controls / 3.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 3.5,
             gridPos=(0, -1, 1, 1),
             items=cls._current_images,
             parent_widget="ops_image_arithmetic",
@@ -479,7 +478,7 @@ class ImageMathFrameBuilder:
             "but_ops_image_arithmetic_execute",
             "Apply image arithmetic",
             alignment=constants.ALIGN_TOP_RIGHT,
-            font_metric_width_factor=cls.relative_width_of_controls / 2.5,
+            font_metric_width_factor=constants.FONT_METRIC_WIDE_CONFIG_WIDTH / 2.25,
             parent_widget="left_container",
         )
 

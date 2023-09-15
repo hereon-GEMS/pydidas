@@ -28,10 +28,6 @@ __status__ = "Production"
 __all__ = ["ParameterEditCanvas"]
 
 
-from typing import Union
-
-from qtpy import QtWidgets
-
 from ...core.constants import POLICY_MIN_MIN
 from ..factory import EmptyWidget
 from .parameter_widgets_mixin import ParameterWidgetsMixIn
@@ -43,14 +39,12 @@ class ParameterEditCanvas(ParameterWidgetsMixIn, EmptyWidget):
 
     Parameters
     ----------
-    parent : Union[QtWidgets.QtWidget, None], optional
-        The parent widget. The default is None.
     **kwargs : dict
         Additional keyword arguments
     """
 
-    def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict):
-        EmptyWidget.__init__(self, parent=parent, **kwargs)
+    def __init__(self, **kwargs: dict):
+        EmptyWidget.__init__(self, **kwargs)
         ParameterWidgetsMixIn.__init__(self)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setSizePolicy(*POLICY_MIN_MIN)

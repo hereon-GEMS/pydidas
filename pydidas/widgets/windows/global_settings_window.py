@@ -33,7 +33,7 @@ from functools import partial
 from qtpy import QtCore, QtWidgets
 
 from ...core import SingletonFactory, get_generic_param_collection
-from ...core.constants import PARAM_EDIT_ASPECT_RATIO, QSETTINGS_GLOBAL_KEYS
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, QSETTINGS_GLOBAL_KEYS
 from ...plugins import PluginCollection
 from ..framework import PydidasWindow
 
@@ -77,18 +77,18 @@ class _GlobalSettingsWindow(PydidasWindow):
         self.create_label(
             "title",
             "Global settings\n",
-            fontsize_offset=4,
             bold=True,
+            fontsize_offset=4,
         )
         self.create_button(
             "but_reset",
             "Restore defaults",
-            icon="qt-std::SP_BrowserReload",
             gridPos=(-1, 0, 1, 1),
+            icon="qt-std::SP_BrowserReload",
         )
         self.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         self.create_label(
             "section_multiprocessing", "Multiprocessing settings", **_section_options
@@ -117,7 +117,7 @@ class _GlobalSettingsWindow(PydidasWindow):
                 partial(self.update_qsetting, _param_key)
             )
         self._widgets["but_reset"].clicked.connect(self.__reset)
-        QtWidgets.QApplication.instance().sig_new_font_height.connect(
+        QtWidgets.QApplication.instance().sig_font_metrics_changed.connect(
             self.process_new_font_metrics
         )
 

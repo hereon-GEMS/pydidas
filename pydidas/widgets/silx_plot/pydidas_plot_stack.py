@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ datasets.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["PydidasPlotStack"]
 
 
@@ -52,9 +52,10 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         the coordinate system.
     """
 
+    init_kwargs = ["cs_transform", "use_data_info_action", "diffraction_exp"]
     sig_get_more_info_for_data = QtCore.Signal(float, float)
 
-    def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs):
+    def __init__(self, parent: Union[QtWidgets.QWidget, None] = None, **kwargs: dict):
         QtWidgets.QStackedWidget.__init__(self, parent)
         self._frame1d = QtWidgets.QWidget()
         self._frame1d.setLayout(QtWidgets.QGridLayout())
@@ -64,12 +65,13 @@ class PydidasPlotStack(QtWidgets.QStackedWidget):
         self._2dplot = None
         self._config = {
             "use_data_info_action": kwargs.get("use_data_info_action", False),
+            "cs_transform": kwargs.get("cs_transform", True),
             "diffraction_exp": kwargs.get("diffraction_exp", None),
         }
         self.addWidget(self._frame1d)
         self.addWidget(self._frame2d)
 
-    def plot_data(self, data: Dataset, **kwargs):
+    def plot_data(self, data: Dataset, **kwargs: dict):
         """
         Plot the given data.
 

@@ -30,7 +30,11 @@ __all__ = ["CompositeCreatorFrameBuilder"]
 
 from qtpy import QtWidgets
 
-from ....core.constants import PARAM_EDIT_ASPECT_RATIO, POLICY_EXP_EXP, POLICY_FIX_EXP
+from ....core.constants import (
+    FONT_METRIC_PARAM_EDIT_WIDTH,
+    POLICY_EXP_EXP,
+    POLICY_FIX_EXP,
+)
 from ....widgets import ScrollArea, silx_plot
 from ....widgets.framework import BaseFrame
 
@@ -65,24 +69,24 @@ class CompositeCreatorFrameBuilder:
             The BaseFrame instance in which the widgets shall be added.
         """
         frame.layout().setContentsMargins(10, 0, 0, 0)
-
+        frame.setMinimumHeight(800)
         frame.create_empty_widget(
             "config_canvas",
-            font_metric_width_factor=PARAM_EDIT_ASPECT_RATIO,
+            font_metric_width_factor=FONT_METRIC_PARAM_EDIT_WIDTH,
         )
         frame.create_any_widget(
             "config_area",
             ScrollArea,
-            widget=frame._widgets["config_canvas"],
+            layout_kwargs={"alignment": None},
             stretch=(1, 0),
             sizePolicy=POLICY_FIX_EXP,
-            layout_kwargs={"alignment": None},
+            widget=frame._widgets["config_canvas"],
         )
         frame.create_label(
             "title",
             "Composite image creator",
-            fontsize_offset=4,
             bold=True,
+            fontsize_offset=4,
             parent_widget="config_canvas",
         )
         frame.create_spacer(
@@ -92,19 +96,19 @@ class CompositeCreatorFrameBuilder:
         frame.create_button(
             "but_clear",
             "Clear all entries",
-            parent_widget="config_canvas",
             icon="qt-std::SP_BrowserReload",
+            parent_widget="config_canvas",
         )
         frame.create_any_widget(
             "plot_window",
             silx_plot.PydidasPlot2D,
             alignment=None,
-            stretch=(1, 1),
+            cs_transform=False,
             gridPos=(0, 1, 1, 1),
             minimumWidth=900,
             visible=False,
+            stretch=(1, 1),
             sizePolicy=POLICY_EXP_EXP,
-            cs_transform=False,
         )
 
         for _key in frame.params:
@@ -121,44 +125,44 @@ class CompositeCreatorFrameBuilder:
         frame.create_button(
             "but_exec",
             "Generate composite",
-            parent_widget="config_canvas",
             enabled=False,
             icon="qt-std::SP_MediaPlay",
+            parent_widget="config_canvas",
         )
         frame.create_progress_bar(
             "progress",
+            maximum=100,
+            minimum=0,
             parent_widget="config_canvas",
             visible=False,
-            minimum=0,
-            maximum=100,
         )
         frame.create_button(
             "but_abort",
             "Abort composite creation",
-            parent_widget="config_canvas",
             enabled=True,
-            visible=False,
             icon="qt-std::SP_BrowserStop",
+            parent_widget="config_canvas",
+            visible=False,
         )
         frame.create_button(
             "but_show",
             "Show composite",
-            parent_widget="config_canvas",
             enabled=False,
             icon="qt-std::SP_DesktopIcon",
+            parent_widget="config_canvas",
         )
         frame.create_button(
             "but_save",
             "Export composite image to file",
-            parent_widget="config_canvas",
             enabled=False,
             icon="qt-std::SP_DialogSaveButton",
+            parent_widget="config_canvas",
         )
         frame.create_spacer(
             "spacer_bottom",
+            height=300,
             parent_widget="config_canvas",
             policy=QtWidgets.QSizePolicy.Expanding,
-            height=300,
         )
         for _key in [
             "n_total",

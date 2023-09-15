@@ -37,7 +37,6 @@ from .pydidas_combobox import *
 from .pydidas_label import *
 from .pydidas_lineedit import *
 from .pydidas_pushbutton import *
-from .pydidas_widget_with_gridlayout import *
 from .square_button import *
 from .radio_button_group import *
 
@@ -78,11 +77,6 @@ from . import pydidas_pushbutton
 
 __all__.extend(pydidas_pushbutton.__all__)
 del pydidas_pushbutton
-
-from . import pydidas_widget_with_gridlayout
-
-__all__.extend(pydidas_widget_with_gridlayout.__all__)
-del pydidas_widget_with_gridlayout
 
 from . import square_button
 

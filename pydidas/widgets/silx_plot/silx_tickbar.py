@@ -52,7 +52,7 @@ def tickbar_paintEvent(instance, event: QtCore.QEvent):
     """
     _qtapp = QtWidgets.QApplication.instance()
     painter = QtGui.QPainter(instance)
-    update_qobject_font(painter, pointSizeF=_qtapp.standard_font_size - 2)
+    update_qobject_font(painter, pointSizeF=_qtapp.font_size - 2)
     _font_metric = QtGui.QFontMetrics(painter.font())
     instance._WIDTH_DISP_VAL = int(
         5.5 * (_font_metric.averageCharWidth()) + instance._LINE_WIDTH

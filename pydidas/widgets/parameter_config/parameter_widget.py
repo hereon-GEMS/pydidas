@@ -30,9 +30,8 @@ __all__ = ["ParameterWidget"]
 
 import html
 from pathlib import Path
-from typing import Union
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QtCore
 
 from ...core import Hdf5key, Parameter, UserConfigError
 from ...core.constants import (
@@ -41,15 +40,15 @@ from ...core.constants import (
     PARAM_WIDGET_UNIT_WIDTH,
     POLICY_EXP_FIX,
 )
-from ...core.utils import apply_qt_properties, convert_special_chars_to_unicode
-from ..factory import EmptyWidget, PydidasLabel, PydidasWidgetWithGridLayout
+from ...core.utils import convert_special_chars_to_unicode
+from ..factory import EmptyWidget, PydidasLabel
 from .param_io_widget_combo_box import ParamIoWidgetComboBox
 from .param_io_widget_file import ParamIoWidgetFile
 from .param_io_widget_hdf5key import ParamIoWidgetHdf5Key
 from .param_io_widget_lineedit import ParamIoWidgetLineEdit
 
 
-class ParameterWidget(PydidasWidgetWithGridLayout):
+class ParameterWidget(EmptyWidget):
     """
     A combined widget to display and modify a Parameter with name, value and unit.
 
@@ -64,8 +63,6 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
     ----------
     param : pydidas.core.Parameter
         The associated Parameter.
-    parent : QtWidget, optional
-        The parent widget. The default is None.
     **kwargs : dict
         Additional keyword arguments
     """
@@ -75,10 +72,9 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
     def __init__(
         self,
         param: Parameter,
-        parent: Union[QtWidgets.QWidget, None] = None,
         **kwargs: dict,
     ):
-        PydidasWidgetWithGridLayout.__init__(self, parent, **kwargs)
+        EmptyWidget.__init__(self, **kwargs)
         self.setSizePolicy(*POLICY_EXP_FIX)
         self.layout().setSpacing(0)
         self.setToolTip(f"<qt>{html.escape(param.tooltip)}</qt>")
@@ -96,12 +92,6 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
 
         self._widgets["io"].io_edited.connect(self.__emit_io_changed)
         self._widgets["io"].io_edited.connect(self.__set_param_value)
-        apply_qt_properties(self, **kwargs)
-        if "font_metric_width_factor" in kwargs:
-            self._qtapp = QtWidgets.QApplication.instance()
-            self.__font_metric_width_factor = kwargs.get("font_metric_width_factor")
-            self.set_dynamic_width_from_font(self._qtapp.standard_font_height)
-            self._qtapp.sig_new_font_height.connect(self.set_dynamic_width_from_font)
 
     def __store_config_from_kwargs(self, kwargs: dict):
         """
@@ -264,15 +254,3 @@ class ParameterWidget(PydidasWidgetWithGridLayout):
         except ValueError:
             self._widgets["io"].set_value(self.param.value)
             raise
-
-    @QtCore.Slot(float)
-    def set_dynamic_width_from_font(self, font_height: float):
-        """
-        Set the fixed width of the widget dynamically from the font height metric.
-
-        Parameters
-        ----------
-        font_height : float
-            The font height in pixels.
-        """
-        self.setFixedWidth(int(self.__font_metric_width_factor * font_height))

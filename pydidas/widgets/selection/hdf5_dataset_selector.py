@@ -22,7 +22,7 @@ from an Hdf5 file and to browse through its data.
 
 __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["Hdf5DatasetSelector"]
@@ -31,12 +31,12 @@ __all__ = ["Hdf5DatasetSelector"]
 from functools import partial
 
 import h5py
-from qtpy import QtWidgets, QtCore
+from qtpy import QtCore, QtWidgets
 from silx.gui.widgets.FrameBrowser import HorizontalSliderWithBrowser
 
 from ...core import PydidasGuiError
-from ...core.utils import get_hdf5_populated_dataset_keys, apply_qt_properties
-from ...core.constants import QT_COMBO_BOX_SIZE_POLICY
+from ...core.constants import ALIGN_TOP_RIGHT, QT_COMBO_BOX_SIZE_POLICY
+from ...core.utils import apply_qt_properties, get_hdf5_populated_dataset_keys
 from ..factory import CreateWidgetsMixIn
 from ..utilities import get_max_pixel_width_of_entries
 
@@ -80,16 +80,16 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         CreateWidgetsMixIn.__init__(self)
         apply_qt_properties(self, **kwargs)
 
-        self._config = dict(
-            activeDsetFilters=[],
-            urrentDset=None,
-            currentFname=None,
-            currentIndex=None,
-            dsetFilters=(
+        self._config = {
+            "activeDsetFilters": [],
+            "currentDset": None,
+            "currentFname": None,
+            "currentIndex": None,
+            "dsetFilters": (
                 datasetKeyFilters if datasetKeyFilters is not None else DEFAULT_FILTERS
             ),
-        )
-        self.flags = dict(slotActive=False, autoUpdate=True)
+        }
+        self.flags = {"slotActive": False, "autoUpdate": True}
         self._widgets["viewer"] = viewWidget
         self._frame = None
         self.__create_widgets_and_layout()
@@ -129,18 +129,21 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         )
         self.create_spin_box(
             "min_datasize",
-            value=50,
-            range=(0, int(1e9)),
             gridPos=(_row_offset, 1, 1, 1),
+            range=(0, int(1e9)),
+            value=50,
         )
         self.create_spin_box(
-            "min_datadim", value=2, range=(0, 3), gridPos=(_row_offset, 4, 1, 1)
+            "min_datadim",
+            gridPos=(_row_offset, 4, 1, 1),
+            range=(0, 3),
+            value=2,
         )
         self.create_combo_box(
             "select_dataset",
+            gridPos=(1 + _row_offset, 1, 1, 4),
             minimumContentsLength=25,
             sizeAdjustPolicy=QT_COMBO_BOX_SIZE_POLICY,
-            gridPos=(1 + _row_offset, 1, 1, 4),
         )
         self.add_any_widget(
             "frame_browser",
@@ -150,14 +153,14 @@ class Hdf5DatasetSelector(QtWidgets.QWidget, CreateWidgetsMixIn):
         self.create_button(
             "but_view",
             "Show full frame",
+            alignment=ALIGN_TOP_RIGHT,
             gridPos=(3 + _row_offset, 3, 1, 2),
-            alignment=QtCore.Qt.AlignRight | QtCore.Qt.AlignTop,
         )
         self.create_check_box(
             "auto_update",
             "Auto update",
-            gridPos=(3 + _row_offset, 0, 1, 2),
             checked=True,
+            gridPos=(3 + _row_offset, 0, 1, 2),
         )
         self.setVisible(False)
 

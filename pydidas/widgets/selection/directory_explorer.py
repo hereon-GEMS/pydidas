@@ -30,6 +30,7 @@ __all__ = ["DirectoryExplorer"]
 
 
 import os
+import qtpy
 import platform
 from typing import Self, Union
 
@@ -114,7 +115,7 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         """
         return QtCore.QSize(400, 4000)
 
-    @QtCore.Slot(bool)
+    @QtCore.Slot(int)
     def __update_filesystem_network_drive_usage(self, state: QtCore.Qt.CheckState):
         """
         Update the filesystem model network drive usage.
@@ -124,7 +125,10 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         state : QtCore.Qt.CheckState
             The checkbox's state.
         """
-        _usage = state == QtCore.Qt.Checked.value
+        if qtpy.QT_VERSION.startswith("6"):
+            _usage = state == QtCore.Qt.Checked.value
+        else:
+            _usage = state == QtCore.Qt.Checked
         self.q_settings_set_key("directory_explorer/show_network_drives", _usage)
         self._filter_model.toggle_network_location_acceptance(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
@@ -249,7 +253,9 @@ class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
         self.__network_drives = [
             _vol.rootPath()
             for _vol in __storage.mountedVolumes()
-            if not _vol.device().toStdString().startswith(__prefix)
+            # if not _vol.device().toStdString().startswith(__prefix)
+            # because toStdString does not work with Qt 5.15.2, fall back :
+            if not bytes(_vol.device()).decode().startswith(__prefix)
         ]
 
     @QtCore.Slot(bool)

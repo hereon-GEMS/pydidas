@@ -37,6 +37,8 @@ Improvements
     - Added type hints to contexts, gui, widget subpackages.
     - Updated the nomenclature of PydidasQSettings method names for 
       consistency.
+    - Updated the names of Dataset "update_axis" methods for 
+      consistency.
     
 
 Bugfixes

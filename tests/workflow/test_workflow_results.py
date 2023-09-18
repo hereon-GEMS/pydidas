@@ -123,7 +123,7 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[12 + np.arange(_shape2[0]), None, None],
         )
@@ -185,7 +185,7 @@ class TestWorkflowResults(unittest.TestCase):
         _shape2 = self._result2_shape
         _res2 = Dataset(
             np.random.random(_shape2),
-            axis_units=["m", "Test", None],
+            axis_units=["m", "Test", ""],
             axis_labels=["dim1", "2nd dim", "dim #3"],
             axis_ranges=[
                 12 + np.arange(_shape2[0]),

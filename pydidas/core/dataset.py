@@ -204,8 +204,11 @@ class Dataset(np.ndarray):
             self._meta[_item] = _copy
 
     def flatten_dims(
-        self, *args: tuple, new_dim_label: str="Flattened", new_dim_unit: str="",
-        new_dim_range: Union[None, np.ndarray, Iterable]=None
+        self,
+        *args: tuple,
+        new_dim_label: str = "Flattened",
+        new_dim_unit: str = "",
+        new_dim_range: Union[None, np.ndarray, Iterable] = None,
     ):
         """
         Flatten the specified dimensions in place in the Dataset.
@@ -586,7 +589,7 @@ class Dataset(np.ndarray):
         if not 0 <= index < self.ndim:
             raise ValueError(f"The index *{index}* is out of bounds (0..{self.ndim}).")
         if not isinstance(item, str):
-            raise ValueError (
+            raise ValueError(
                 f"The item *{item}* is not a string. Cannot update the axis label."
             )
         self._meta["axis_labels"][index] = item
@@ -611,7 +614,7 @@ class Dataset(np.ndarray):
         if not 0 <= index < self.ndim:
             raise ValueError(f"The index '{index}' is out of bounds (0..{self.ndim}).")
         if not isinstance(item, str):
-            raise ValueError (
+            raise ValueError(
                 f"The item *{item}* is not a string. Cannot update the axis label."
             )
         self._meta["axis_units"][index] = item
@@ -674,7 +677,7 @@ class Dataset(np.ndarray):
         _new.axis_ranges = [self.axis_ranges[_index] for _index in axes]
         return _new
 
-    def flatten(self, order: Literal["C", "F", "A", "K"]="C") -> Self:
+    def flatten(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Clear the metadata when flattening the array.
 
@@ -710,7 +713,7 @@ class Dataset(np.ndarray):
             self._meta["axis_ranges"] = {0: np.arange(self.size)}
             self._meta["axis_units"] = {0: ""}
 
-    def squeeze(self, axis: Union[None, int]=None) -> Self:
+    def squeeze(self, axis: Union[None, int] = None) -> Self:
         """
         Squeeze the array and remove dimensions of length one.
 
@@ -743,7 +746,13 @@ class Dataset(np.ndarray):
                 setattr(_new, _key, _entry)
         return _new
 
-    def take(self, indices: Union[int, ArrayLike], axis: Union[int, None]=None, out: Union[None, np.ndarray]=None, mode: Literal["raise", "wrap", "clip"]="raise") -> Self:
+    def take(
+        self,
+        indices: Union[int, ArrayLike],
+        axis: Union[int, None] = None,
+        out: Union[None, np.ndarray] = None,
+        mode: Literal["raise", "wrap", "clip"] = "raise",
+    ) -> Self:
         """
         Take elements from an array along an axis.
 
@@ -784,7 +793,7 @@ class Dataset(np.ndarray):
                 )
         return _new
 
-    def copy(self, order: Literal["C", "F", "A", "K"]="C") -> Self:
+    def copy(self, order: Literal["C", "F", "A", "K"] = "C") -> Self:
         """
         Overload the generic nd.ndarray copy method to copy metadata as well.
 
@@ -848,8 +857,8 @@ class Dataset(np.ndarray):
         return _repr
 
     def __get_axis_item_repr(
-            self, obj_name: Literal["axis_labels", "axis_ranges", "axis_units"]
-        ) -> str:
+        self, obj_name: Literal["axis_labels", "axis_ranges", "axis_units"]
+    ) -> str:
         """
         Get a string representation for a metadata entry.
 
@@ -921,7 +930,9 @@ class Dataset(np.ndarray):
         self.__dict__ = state[-1]
         np.ndarray.__setstate__(self, state[0:-1])
 
-    def __array_wrap__(self, obj: np.ndarray, context: Union[None, object]=None) -> Self:
+    def __array_wrap__(
+        self, obj: np.ndarray, context: Union[None, object] = None
+    ) -> Self:
         """
         Return 0-d results from ufuncs as single values.
 

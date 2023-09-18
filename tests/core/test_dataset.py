@@ -771,49 +771,49 @@ class TestDataset(unittest.TestCase):
         obj = self.create_simple_dataset()
         self.assertIsInstance(obj.array, np.ndarray)
 
-    def test_update_axis_ranges__wrong_index(self):
+    def test_update_axis_range__wrong_index(self):
         obj = self.create_large_dataset()
         with self.assertRaises(ValueError):
-            obj.update_axis_ranges(-4, 12)
+            obj.update_axis_range(-4, 12)
 
-    def test_update_axis_ranges__single_val(self):
+    def test_update_axis_range__single_val(self):
         _val = 12
         obj = self.create_large_dataset()
-        obj.update_axis_ranges(1, _val)
+        obj.update_axis_range(1, _val)
         self.assertEqual(obj.axis_ranges[1], _val)
 
-    def test_update_axis_ranges__correct_ndarray(self):
+    def test_update_axis_range__correct_ndarray(self):
         obj = self.create_large_dataset()
         _val = np.arange(obj.shape[1])
-        obj.update_axis_ranges(1, _val)
+        obj.update_axis_range(1, _val)
         self.assertTrue(np.allclose(obj.axis_ranges[1], _val))
 
-    def test_update_axis_ranges__incorrect_ndarray(self):
+    def test_update_axis_range__incorrect_ndarray(self):
         obj = self.create_large_dataset()
         _val = np.arange(obj.shape[1] + 5)
         with self.assertRaises(ValueError):
-            obj.update_axis_ranges(1, _val)
+            obj.update_axis_range(1, _val)
 
-    def test_update_axis_labels__wrong_index(self):
+    def test_update_axis_label__wrong_index(self):
         obj = self.create_large_dataset()
         with self.assertRaises(ValueError):
-            obj.update_axis_labels(-4, 12)
+            obj.update_axis_label(-4, 12)
 
-    def test_update_axis_labels__single_val(self):
+    def test_update_axis_label__single_val(self):
         _val = "a new label"
         obj = self.create_large_dataset()
-        obj.update_axis_labels(1, _val)
+        obj.update_axis_label(1, _val)
         self.assertEqual(obj.axis_labels[1], _val)
 
-    def test_update_axis_units__wrong_index(self):
+    def test_update_axis_unit__wrong_index(self):
         obj = self.create_large_dataset()
         with self.assertRaises(ValueError):
-            obj.update_axis_units(-4, 12)
+            obj.update_axis_unit(-4, 12)
 
-    def test_update_axis_units__single_val(self):
+    def test_update_axis_unit__single_val(self):
         _val = "a new unit"
         obj = self.create_large_dataset()
-        obj.update_axis_units(1, _val)
+        obj.update_axis_unit(1, _val)
         self.assertEqual(obj.axis_units[1], _val)
 
     def test_get_description_of_point__wrong_arg_len(self):
@@ -959,7 +959,7 @@ class TestDataset(unittest.TestCase):
         _array = np.random.random((10, 10, 10))
         obj = Dataset(_array, axis_ranges=[0, 1, 2], axis_labels=["a", "b", "c"])
         obj2 = obj.copy()
-        obj2.update_axis_labels(2, "new")
+        obj2.update_axis_label(2, "new")
         self.assertEqual(obj.axis_labels[2], "c")
 
     def test_hash(self):

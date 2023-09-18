@@ -105,9 +105,9 @@ class WorkflowResults(QtCore.QObject):
             _dset[:] = np.nan
             for index in range(_dim):
                 _label, _unit, _range = self._SCAN.get_metadata_for_dim(index)
-                _dset.update_axis_labels(index, _label)
-                _dset.update_axis_units(index, _unit)
-                _dset.update_axis_ranges(index, _range)
+                _dset.update_axis_label(index, _label)
+                _dset.update_axis_unit(index, _unit)
+                _dset.update_axis_range(index, _range)
             self.__composites[_node_id] = _dset
 
         self.__source_hash = hash((hash(self._SCAN), hash(self._TREE)))
@@ -192,13 +192,13 @@ class WorkflowResults(QtCore.QObject):
                 continue
             _dim_offset = self._SCAN.get_param_value("scan_dim")
             for _dim in range(result.ndim):
-                self.__composites[node_id].update_axis_labels(
+                self.__composites[node_id].update_axis_label(
                     _dim + _dim_offset, result.axis_labels[_dim]
                 )
-                self.__composites[node_id].update_axis_units(
+                self.__composites[node_id].update_axis_unit(
                     _dim + _dim_offset, result.axis_units[_dim]
                 )
-                self.__composites[node_id].update_axis_ranges(
+                self.__composites[node_id].update_axis_range(
                     _dim + _dim_offset, result.axis_ranges[_dim]
                 )
         self._config["metadata_complete"] = True
@@ -399,7 +399,7 @@ class WorkflowResults(QtCore.QObject):
                 try:
                     _label = _data.axis_labels[__dim_index(_dim)].split(";")[_slice[0]]
                     _label = _label if ":" not in _label else _label.split(":")[1]
-                    _data.update_axis_labels(__dim_index(_dim), _label)
+                    _data.update_axis_label(__dim_index(_dim), _label)
                     _data.data_label = _label
                 except IndexError:
                     pass

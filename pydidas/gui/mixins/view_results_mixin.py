@@ -243,7 +243,7 @@ class ViewResultsMixin:
                 "The selected data is not one-dimensional. Cannot create a line plot."
             )
         if not isinstance(data.axis_ranges[0], np.ndarray):
-            data.update_axis_ranges(0, np.arange(data.size))
+            data.update_axis_range(0, np.arange(data.size))
         self._widgets["plot"].plot_data(
             data,
             replace=replace,
@@ -262,7 +262,7 @@ class ViewResultsMixin:
         """
         for _dim in [0, 1]:
             if not isinstance(data.axis_ranges[_dim], np.ndarray):
-                data.update_axis_ranges(_dim, np.arange(data.shape[_dim]))
+                data.update_axis_range(_dim, np.arange(data.shape[_dim]))
         _dim0, _dim1 = self._config["active_dims"]
         if _dim0 > _dim1:
             data = data.transpose()

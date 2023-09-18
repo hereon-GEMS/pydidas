@@ -89,7 +89,7 @@ class AsciiSaver(OutputPlugin):
         if not isinstance(data, Dataset):
             data = Dataset(data)
         if data.axis_ranges[0] is None:
-            data.update_axis_ranges(0, np.arange(data.size))
+            data.update_axis_range(0, np.arange(data.size))
         with open(_fname, "w") as _file:
             _file.write("# Metadata:\n")
             for _key, _val in data.metadata:

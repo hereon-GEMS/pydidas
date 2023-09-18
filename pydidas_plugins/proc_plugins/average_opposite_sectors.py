@@ -110,7 +110,7 @@ class AverageOppositeSectors(ProcPlugin):
             self._check_input_symmetry(data)
         _i = data.shape[0] // 2
         _new_data = (data[:_i] + data[_i:]) / 2.0
-        _new_data.update_axis_ranges(
+        _new_data.update_axis_range(
             0,
             np.mod(
                 _new_data.axis_ranges[0], 180 if "deg" in data.axis_units[0] else np.pi

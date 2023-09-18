@@ -158,9 +158,9 @@ class TestWorkflowResultIoHdf5(unittest.TestCase):
             for _key, _len in enumerate(dataset.shape)
         }
         for _axis in _labels:
-            dataset.update_axis_labels(_axis, _labels[_axis])
-            dataset.update_axis_units(_axis, _units[_axis])
-            dataset.update_axis_ranges(_axis, _ranges[_axis])
+            dataset.update_axis_label(_axis, _labels[_axis])
+            dataset.update_axis_unit(_axis, _units[_axis])
+            dataset.update_axis_range(_axis, _ranges[_axis])
         return dataset, _labels, _units, _ranges
 
     def assert_written_files_are_okay(self, data, metadata):

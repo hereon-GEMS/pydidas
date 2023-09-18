@@ -98,8 +98,8 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
         plugin.set_param_value(
             "centers", ";".join(f"{i*np.pi/2:.10f}" for i in range(4))
         )
-        plugin._data.update_axis_units(0, "rad")
-        plugin._data.update_axis_ranges(
+        plugin._data.update_axis_unit(0, "rad")
+        plugin._data.update_axis_range(
             0, np.linspace(np.pi / 72, 143 / 72 * np.pi, 72)
         )
         plugin.pre_execute()
@@ -110,7 +110,7 @@ class TestExtractAzimuthalSectors(unittest.TestCase):
     def test_update_settings_from_data__degree_width_10_inconsistency_at_180(self):
         plugin = self.get_default_plugin()
         plugin.pre_execute()
-        plugin._data.update_axis_ranges(0, np.linspace(-177.5, 177.5, 72))
+        plugin._data.update_axis_range(0, np.linspace(-177.5, 177.5, 72))
         plugin._update_settings_from_data()
         for _index, _factors in plugin._factors.items():
             self.assertEqual(np.sum(_factors), 2)

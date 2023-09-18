@@ -24,15 +24,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 
 import os
-import unittest
-import tempfile
 import shutil
+import tempfile
+import unittest
 
 import h5py
 import numpy as np
 
 from pydidas.core.utils import get_random_string, rebin2d
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin, PluginCollection
 
 
 PLUGIN_COLLECTION = PluginCollection()

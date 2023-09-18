@@ -21,7 +21,7 @@ __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 
 
 import unittest
@@ -29,7 +29,7 @@ import unittest
 import numpy as np
 
 from pydidas.core import Dataset, UserConfigError
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin, PluginCollection
 
 
 PLUGIN_COLLECTION = PluginCollection()

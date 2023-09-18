@@ -25,15 +25,15 @@ __status__ = "Production"
 
 
 import os
-import unittest
-import tempfile
-import shutil
 import random
+import shutil
+import tempfile
+import unittest
 
 import numpy as np
 
 from pydidas.core.utils import rebin2d
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin, PluginCollection
 
 
 PLUGIN_COLLECTION = PluginCollection()

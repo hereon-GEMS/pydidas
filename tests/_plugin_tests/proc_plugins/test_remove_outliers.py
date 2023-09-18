@@ -28,7 +28,7 @@ import unittest
 
 import numpy as np
 
-from pydidas.plugins import PluginCollection, BasePlugin
+from pydidas.plugins import BasePlugin, PluginCollection
 
 
 PLUGIN_COLLECTION = PluginCollection()

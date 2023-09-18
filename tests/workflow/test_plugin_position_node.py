@@ -28,7 +28,7 @@ import unittest
 
 import numpy as np
 
-from pydidas.workflow import PluginPositionNode, GenericNode
+from pydidas.workflow import GenericNode, PluginPositionNode
 
 
 class TestPluginPositionNode(unittest.TestCase):

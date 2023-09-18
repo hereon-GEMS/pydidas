@@ -30,7 +30,7 @@ import numpy as np
 
 from pydidas.core import Dataset, get_generic_param_collection
 from pydidas.core.fitting.gaussian import Gaussian
-from pydidas.plugins import BasePlugin, BaseFitPlugin
+from pydidas.plugins import BaseFitPlugin, BasePlugin
 
 
 class TestBaseFitPlugin(unittest.TestCase):

@@ -289,7 +289,7 @@ class _UserConfigWindow(PydidasWindow):
         value : object
             The new value.
         """
-        self.q_settings_set_key(f"user/{param_key}", value)
+        self.q_settings_set(f"user/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot()
@@ -336,7 +336,7 @@ class _UserConfigWindow(PydidasWindow):
         cmap_name : str
             The name of the new colormap.
         """
-        _ack = self.q_settings_get_value("user/cmap_acknowledge")
+        _ack = self.q_settings_get("user/cmap_acknowledge")
         if _ack is None:
             _set_ack = AcknowledgeBox(
                 text=(
@@ -345,8 +345,8 @@ class _UserConfigWindow(PydidasWindow):
                 )
             ).exec_()
             if _set_ack:
-                self.q_settings_set_key("user/cmap_acknowledge", True)
-        self.q_settings_set_key("user/cmap_name", cmap_name)
+                self.q_settings_set("user/cmap_acknowledge", True)
+        self.q_settings_set("user/cmap_name", cmap_name)
 
     @QtCore.Slot()
     def change_fontsize(self, change: Literal["increase", "decrease"]):
@@ -408,7 +408,7 @@ class _UserConfigWindow(PydidasWindow):
         if index != self.frame_index:
             return
         for _param_key, _param in self.params.items():
-            _value = self.q_settings_get_value(f"user/{_param_key}", _param.dtype)
+            _value = self.q_settings_get(f"user/{_param_key}", _param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):

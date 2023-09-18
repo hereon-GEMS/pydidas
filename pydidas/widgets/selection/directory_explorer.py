@@ -78,7 +78,7 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         self.create_check_box(
             "map_network_drives",
             "Show network drives",
-            checked=self.q_settings_get_value(
+            checked=self.q_settings_get(
                 "directory_explorer/show_network_drives", dtype=bool, default=True
             ),
         )
@@ -95,7 +95,7 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         """
         _path = kwargs.get("current_path", None)
         if _path is None:
-            _path = self.q_settings_get_value("directory_explorer/path", default="")
+            _path = self.q_settings_get("directory_explorer/path", default="")
         self._file_model = QtWidgets.QFileSystemModel()
         self._file_model.setRootPath(_path)
         self._file_model.setReadOnly(True)
@@ -129,7 +129,7 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
             _usage = state == QtCore.Qt.Checked.value
         else:
             _usage = state == QtCore.Qt.Checked
-        self.q_settings_set_key("directory_explorer/show_network_drives", _usage)
+        self.q_settings_set("directory_explorer/show_network_drives", _usage)
         self._filter_model.toggle_network_location_acceptance(_usage)
         self._filter_model.sort(0, self._filter_model.sortOrder())
 
@@ -143,7 +143,7 @@ class DirectoryExplorer(EmptyWidget, CreateWidgetsMixIn, PydidasQsettingsMixin):
         _name = self._file_model.filePath(_index)
         if os.path.isfile(_name):
             _name = os.path.dirname(_name)
-        self.q_settings_set_key("directory_explorer/path", _name)
+        self.q_settings_set("directory_explorer/path", _name)
 
     @QtCore.Slot()
     def __file_selected(self):
@@ -240,7 +240,7 @@ class _NetworkLocationFilterModel(QtCore.QSortFilterProxyModel):
     def __init__(self, parent=None):
         QtCore.QSortFilterProxyModel.__init__(self, parent)
         self.setRecursiveFilteringEnabled(True)
-        self.__accept_network_locations = PydidasQsettings().q_settings_get_value(
+        self.__accept_network_locations = PydidasQsettings().q_settings_get(
             "directory_explorer/show_network_drives", dtype=bool, default=True
         )
         __storage = QtCore.QStorageInfo()

@@ -119,7 +119,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
             None if not QSettings has been defined, else a list of path
             entries.
         """
-        _path = self.q_settings_get_value("user/plugin_path")
+        _path = self.q_settings_get("user/plugin_path")
         if isinstance(_path, str):
             return [Path(_key) for _key in _path.split(";;")]
         if isinstance(_path, Path):
@@ -186,7 +186,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         if plugin_path.exists():
             self.__plugin_paths.append(plugin_path)
         _paths = ";;".join(str(_path) for _path in self.__plugin_paths)
-        self.q_settings_set_key("user/plugin_path", _paths)
+        self.q_settings_set("user/plugin_path", _paths)
 
     @staticmethod
     def _get_valid_modules_and_filenames(path):
@@ -460,7 +460,7 @@ class _PluginCollection(QtCore.QObject, PydidasQsettingsMixin):
         if not confirmation:
             print("Confirmation for unregistering all paths was not given. Aborting...")
             return
-        self.q_settings_set_key("user/plugin_path", None)
+        self.q_settings_set("user/plugin_path", None)
         self.clear_collection(True)
 
     def clear_collection(self, confirmation=False):

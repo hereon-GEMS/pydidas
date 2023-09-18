@@ -243,7 +243,7 @@ class PydidasFileDialog(
         self._config["scan_base"] = SCAN.get_param_value(
             "scan_base_directory", dtype=str
         )
-        self._config["latest"] = self.q_settings_get_value("dialogues/current")
+        self._config["latest"] = self.q_settings_get("dialogues/current")
         self._widgets["but_scan_home"].setEnabled(
             os.path.isdir(self._config["scan_base"])
         )
@@ -278,11 +278,9 @@ class PydidasFileDialog(
             return None
         _selection = self.selectedFiles()[0]
         self._config["curr_dir"] = _selection
-        self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
+        self.q_settings_set("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:
-            self.q_settings_set_key(
-                self._config["qsettings_ref"], self._config["curr_dir"]
-            )
+            self.q_settings_set(self._config["qsettings_ref"], self._config["curr_dir"])
         return _selection
 
     def get_existing_filename(self) -> Union[None, str]:
@@ -304,11 +302,9 @@ class PydidasFileDialog(
             return None
         _selection = self.selectedFiles()[0]
         self._config["curr_dir"] = os.path.dirname(_selection)
-        self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
+        self.q_settings_set("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:
-            self.q_settings_set_key(
-                self._config["qsettings_ref"], self._config["curr_dir"]
-            )
+            self.q_settings_set(self._config["qsettings_ref"], self._config["curr_dir"])
         return _selection
 
     def get_saving_filename(self) -> Union[None, str]:
@@ -338,11 +334,9 @@ class PydidasFileDialog(
             self._check_extension(_ext)
 
         self._config["curr_dir"] = os.path.dirname(_selection)
-        self.q_settings_set_key("dialogues/current", self._config["curr_dir"])
+        self.q_settings_set("dialogues/current", self._config["curr_dir"])
         if self._config["qsettings_ref"] is not None:
-            self.q_settings_set_key(
-                self._config["qsettings_ref"], self._config["curr_dir"]
-            )
+            self.q_settings_set(self._config["qsettings_ref"], self._config["curr_dir"])
         return _selection
 
     def _get_extension(self) -> str:
@@ -440,6 +434,6 @@ class PydidasFileDialog(
             "dialogues/" + name if name is not None else None
         )
         if name is not None:
-            self._config["curr_dir"] = self.q_settings_get_value(
+            self._config["curr_dir"] = self.q_settings_get(
                 self._config["qsettings_ref"], str
             )

@@ -209,9 +209,9 @@ class ExecuteWorkflowApp(BaseApp):
         UserConfigError
             If the buffer is too small to store a one dataset per MP worker.
         """
-        _buffer = self.q_settings_get_value("global/shared_buffer_size", float)
-        _n_worker = self.q_settings_get_value("global/mp_n_workers", int)
-        _n_data = self.q_settings_get_value("global/shared_buffer_max_n", int)
+        _buffer = self.q_settings_get("global/shared_buffer_size", float)
+        _n_worker = self.q_settings_get("global/mp_n_workers", int)
+        _n_data = self.q_settings_get("global/shared_buffer_max_n", int)
         _req_points_per_dataset = sum(
             np.prod(s) for s in self._config["result_shapes"].values()
         )

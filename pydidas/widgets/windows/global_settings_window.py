@@ -134,7 +134,7 @@ class _GlobalSettingsWindow(PydidasWindow):
         value : object
             The new value.
         """
-        self.q_settings_set_key(f"global/{param_key}", value)
+        self.q_settings_set(f"global/{param_key}", value)
         self.value_changed_signal.emit(param_key, value)
 
     @QtCore.Slot(int)
@@ -155,7 +155,7 @@ class _GlobalSettingsWindow(PydidasWindow):
         if index != self.frame_index:
             return
         for _param_key, _param in self.params.items():
-            _value = self.q_settings_get_value(f"global/{_param_key}", _param.dtype)
+            _value = self.q_settings_get(f"global/{_param_key}", _param.dtype)
             self.set_param_value_and_widget(_param_key, _value)
 
     def __reset(self):

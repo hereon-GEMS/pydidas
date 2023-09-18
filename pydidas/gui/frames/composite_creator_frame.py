@@ -277,7 +277,7 @@ class CompositeCreatorFrame(BaseFrameWithApp, SilxPlotWindowMixIn):
 
     def _prepare_plot_params(self):
         _shape = self._app.composite.shape
-        _border = self.q_settings_get_value("user/mosaic_border_width", int)
+        _border = self.q_settings_get("user/mosaic_border_width", int)
         _nx = self.get_param_value("composite_nx")
         _ny = self.get_param_value("composite_ny")
         _rel_border_width_x = 0.5 * _border / (_shape[1] + _border)

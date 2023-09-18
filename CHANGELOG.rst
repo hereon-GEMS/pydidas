@@ -35,6 +35,8 @@ Improvements
     - ParameterWidgets use the new Pydidas widgets and scale automatically with
       the font size.
     - Added type hints to contexts, gui, widget subpackages.
+    - Updated the nomenclature of PydidasQSettings method names for 
+      consistency.
     
 
 Bugfixes

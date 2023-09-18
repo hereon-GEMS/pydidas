@@ -139,7 +139,7 @@ class PydidasPlot2D(Plot2D, PydidasQsettingsMixin):
             )
             self._positionWidget = _new_position_widget
 
-        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
+        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)

@@ -106,7 +106,7 @@ class PydidasImageView(ImageView, PydidasQsettingsMixin):
         DIFFRACTION_EXP.sig_params_changed.connect(self.update_from_diffraction_exp)
         self.update_from_diffraction_exp()
 
-        _cmap_name = self.q_settings_get_value("user/cmap_name", default="Gray").lower()
+        _cmap_name = self.q_settings_get("user/cmap_name", default="Gray").lower()
         if _cmap_name is not None:
             self.setDefaultColormap(
                 Colormap(name=_cmap_name, normalization="linear", vmin=None, vmax=None)

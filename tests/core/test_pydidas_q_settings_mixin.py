@@ -64,31 +64,31 @@ class TestPydidasQSettingsMixin(unittest.TestCase):
         obj = PydidasQsettingsMixin()
         obj.params = self._params
         obj.get_param = obj.params.get
-        _val = obj.q_settings_get_value("param_float")
+        _val = obj.q_settings_get("param_float")
         self.assertEqual(float(_val), self._params.get_value("param_float"))
 
     def test_q_settings_get_value__with_dtype(self):
         obj = PydidasQsettingsMixin()
-        _val = obj.q_settings_get_value("param_float", dtype=float)
+        _val = obj.q_settings_get("param_float", dtype=float)
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
 
     def test_q_settings_get_value__with_Integral(self):
         obj = PydidasQsettingsMixin()
-        _val = obj.q_settings_get_value("param_int", dtype=Integral)
+        _val = obj.q_settings_get("param_int", dtype=Integral)
         self.assertTrue(isinstance(_val, int))
         self.assertEqual(_val, self._params.get_value("param_int"))
 
     def test_q_settings_get_value__with_Real(self):
         obj = PydidasQsettingsMixin()
-        _val = obj.q_settings_get_value("param_float", dtype=Real)
+        _val = obj.q_settings_get("param_float", dtype=Real)
         self.assertTrue(isinstance(_val, float))
         self.assertEqual(_val, self._params.get_value("param_float"))
 
-    def test_q_settings_set_key(self):
+    def test_q_settings_set(self):
         _val = 42.1235
         obj = PydidasQsettingsMixin()
-        obj.q_settings_set_key("param_float", _val)
+        obj.q_settings_set("param_float", _val)
         _new_val = float(obj.q_settings.value(f"{VERSION}/param_float"))
         self.assertEqual(_val, _new_val)
 

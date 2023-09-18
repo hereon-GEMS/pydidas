@@ -79,13 +79,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         Update local Parameters with the global QSetting values.
         """
-        self._config["border_width"] = self.q_settings_get_value(
+        self._config["border_width"] = self.q_settings_get(
             "user/mosaic_border_width", int
         )
-        self._config["border_value"] = self.q_settings_get_value(
+        self._config["border_value"] = self.q_settings_get(
             "user/mosaic_border_value", float
         )
-        self._config["max_image_size"] = self.q_settings_get_value(
+        self._config["max_image_size"] = self.q_settings_get(
             "user/max_image_size", float
         )
 
@@ -176,7 +176,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If the size of the image is larger than the defined global limit.
         """
         _size = 1e-6 * shape[0] * shape[1]
-        _maxsize = self.q_settings_get_value("global/max_image_size", float)
+        _maxsize = self.q_settings_get("global/max_image_size", float)
         if _size > _maxsize:
             raise UserConfigError(
                 f"The requested image size ({_size} Mpx) is too large for the global "

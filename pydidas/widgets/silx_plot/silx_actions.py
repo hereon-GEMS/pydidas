@@ -185,10 +185,10 @@ class CropHistogramOutliers(PlotAction, PydidasQsettingsMixin):
         if not isinstance(image, silx.gui.plot.items.ColormapMixIn):
             return
 
-        _fraction_low = self.q_settings_get_value(
+        _fraction_low = self.q_settings_get(
             "user/histogram_outlier_fraction_low", dtype=float
         )
-        _fraction_high = 1 - self.q_settings_get_value(
+        _fraction_high = 1 - self.q_settings_get(
             "user/histogram_outlier_fraction_high", dtype=float
         )
         if _fraction_high - _fraction_low <= 0:

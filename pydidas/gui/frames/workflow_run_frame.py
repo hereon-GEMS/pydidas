@@ -65,7 +65,7 @@ class WorkflowRunFrame(BaseFrameWithApp, ViewResultsMixin):
 
     def __init__(self, parent: Union[None, QtWidgets.QWidget] = None, **kwargs: dict):
         BaseFrameWithApp.__init__(self, parent, **kwargs)
-        _global_plot_update_time = self.q_settings_get_value(
+        _global_plot_update_time = self.q_settings_get(
             "global/plot_update_time", dtype=float
         )
         self._config.update(

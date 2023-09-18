@@ -1,5 +1,5 @@
 .. 
-    Copyright 2021-, Helmholtz-Zentrum Hereon
+    Copyright 2023, Helmholtz-Zentrum Hereon
     SPDX-License-Identifier: CC-BY-4.0
 
 .. _select_integration_region_window:

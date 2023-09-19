@@ -30,7 +30,7 @@ __all__ = ["execute_workflow_app_parser"]
 
 import argparse
 
-from ...core.constants import GENERIC_PARAMS_METADATA as PARAMS
+from ...core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
 
 
 def execute_workflow_app_parser(caller=None):

@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -16,15 +16,15 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The core.constantas package defines generic constants which are used
+The core.constants package defines generic constants which are used
 throughout the pydidas package.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = []
 
 
@@ -32,8 +32,6 @@ __all__ = []
 from .colors import *
 from .constants import *
 from .file_extensions import *
-from .generic_params import *
-from .generic_param_lists import *
 from .gui_constants import *
 from .links import *
 from .paths import *
@@ -60,16 +58,6 @@ from . import file_extensions
 
 __all__.extend(file_extensions.__all__)
 del file_extensions
-
-from . import generic_params
-
-__all__.extend(generic_params.__all__)
-del generic_params
-
-from . import generic_param_lists
-
-__all__.extend(generic_param_lists.__all__)
-del generic_param_lists
 
 from . import gui_constants
 

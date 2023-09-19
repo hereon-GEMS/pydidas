@@ -39,6 +39,7 @@ Improvements
       consistency.
     - Updated the names of Dataset "update_axis" methods for 
       consistency.
+    - Moved the generic parameter definitions to core.generic_params subpackage.
     
 
 Bugfixes

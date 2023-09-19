@@ -16,7 +16,7 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The colors module holds color names and RGB codes.
+The core.generic_param package defines the attributes for generic Parameters.
 """
 
 __author__ = "Malte Storm"
@@ -24,46 +24,22 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = [
-    "COLOR_ORANGE",
-    "COLOR_BLUE",
-    "COLOR_RED",
-    "COLOR_GREEN",
-    "COLOR_PURPLE",
-    "COLOR_CYAN",
-    "COLOR_GRAY",
-    "PYDIDAS_COLORS",
-]
+__all__ = []
 
 
-COLOR_ORANGE = "#FFA500"
+# import __all__ items from modules:
+from .generic_params import *
+from .param_lists import *
 
-# Blue orchid:
-COLOR_BLUE = "#1F45FC"
+# add modules' __all__ items to package's __all__ items and unclutter the
+# namespace by deleting the module references:
 
-# Chilli pepper
-COLOR_RED = "#C11B17"
+from . import generic_params
 
-# Green apple
-COLOR_GREEN = "#4CC417"
+__all__.extend(generic_params.__all__)
+del generic_params
 
-# Indigo
-COLOR_PURPLE = "#4B0082"
+from . import param_lists
 
-# Turqoise
-COLOR_CYAN = "#40E0D0"
-
-# Vampire Gray
-COLOR_GRAY = "#565051"
-
-PYDIDAS_COLORS = {
-    "orange": COLOR_ORANGE,
-    "blue": COLOR_BLUE,
-    "red": COLOR_RED,
-    "green": COLOR_GREEN,
-    "purple": COLOR_PURPLE,
-    "cyan": COLOR_CYAN,
-    "gray": COLOR_GRAY,
-    "black": "#000000",
-    "white": "#FFFFFF",
-}
+__all__.extend(param_lists.__all__)
+del param_lists

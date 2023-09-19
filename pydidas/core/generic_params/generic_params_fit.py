@@ -30,8 +30,8 @@ __all__ = ["GENERIC_PARAMS_FIT"]
 
 from itertools import combinations
 
-from .unicode_greek_letters import GREEK_ASCII_TO_UNI
-from .generic_param_lists import FIT_OUTPUT_OPTIONS
+from ..constants import GREEK_ASCII_TO_UNI
+from .param_lists import FIT_OUTPUT_OPTIONS
 
 
 GENERIC_PARAMS_FIT = (

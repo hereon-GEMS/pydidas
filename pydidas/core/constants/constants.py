@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,10 +20,10 @@ The constants module holds constant number defitions needed in pydidas.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "LAMBDA_IN_A_TO_E",
     "LAMBDA_IN_M_TO_E",
@@ -31,8 +31,6 @@ __all__ = [
     "INPUT_PLUGIN",
     "PROC_PLUGIN",
     "OUTPUT_PLUGIN",
-    "pyFAI_UNITS",
-    "pyFAI_METHOD",
     "PROC_PLUGIN_GENERIC",
     "PROC_PLUGIN_IMAGE",
     "PROC_PLUGIN_INTEGRATED",
@@ -84,22 +82,6 @@ PLUGIN_TYPE_NAMES = {
     OUTPUT_PLUGIN: "Output plugins",
 } | PROC_PLUGIN_TYPE_NAMES
 
-pyFAI_UNITS = {
-    "Q / nm^-1": "q_nm^-1",
-    "Q / A^-1": "q_A^-1",
-    "2theta / deg": "2th_deg",
-    "2theta / rad": "2th_rad",
-    "r / mm": "r_mm",
-    "chi / deg": "chi_deg",
-    "chi / rad": "chi_rad",
-}
-
-pyFAI_METHOD = {
-    "CSR": "csr",
-    "CSR OpenCL": "csr ocl",
-    "LUT": "lut",
-    "LUT OpenCL": "lut ocl",
-}
 
 FLOAT_REGEX = re.compile(
     r"\s*[+-]?[0-9]*\.?[0-9]+(?:[e][+-]?[0-9]+)?\s*"

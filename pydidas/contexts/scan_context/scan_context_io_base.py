@@ -31,7 +31,7 @@ __all__ = ["ScanContextIoBase"]
 from typing import Union
 
 from ...core import UserConfigError
-from ...core.constants import SCAN_GENERIC_PARAM_NAMES
+from ...core.generic_params import SCAN_GENERIC_PARAM_NAMES
 from ...core.io_registry import GenericIoBase
 from .scan_context import Scan, ScanContext
 from .scan_context_io_meta import ScanContextIoMeta

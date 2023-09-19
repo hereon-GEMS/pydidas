@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["GENERIC_PARAMS_OTHER"]
 
 
-from .colors import PYDIDAS_COLORS
+from ..constants.colors import PYDIDAS_COLORS
 
 
 GENERIC_PARAMS_OTHER = {

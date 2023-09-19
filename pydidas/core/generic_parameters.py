@@ -1,44 +1,47 @@
 # This file is part of pydidas.
-
+#
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# Foobar is distributed in the hope that it will be useful,
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
-# along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+# along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-This module includes functions to create generic Parameters and
-ParameterCollections from reference keys defined in the core.constants
-subpackage.
+This module includes functions to create generic Parameters and ParameterCollections.
+
+Reference keys are defined in the core.generic_params subpackage.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __version__ = "0.0.0"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
+
+from typing import Iterable
 from pathlib import Path
 
-from .constants.generic_params import GENERIC_PARAMS_METADATA
+from .generic_params import GENERIC_PARAMS_METADATA
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
 from .hdf5_key import Hdf5key
 
 
-def get_generic_parameter(refkey):
+def get_generic_parameter(refkey: str) -> Parameter:
     """
-    Create a Parameter based on pre-defined information about the Parameter
-    description.
+    Create a Parameter from a refkey based on pre-defined information.
 
     Parameters
     ----------
@@ -73,7 +76,7 @@ def get_generic_parameter(refkey):
     return Parameter(refkey, _type, _default, **_config)
 
 
-def get_generic_param_collection(*param_keys):
+def get_generic_param_collection(*param_keys: Iterable) -> ParameterCollection:
     """
     Get a initialized ParameterCollection from a number of generic Parameter
     keys.

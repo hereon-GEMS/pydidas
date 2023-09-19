@@ -28,22 +28,25 @@ __status__ = "Production"
 __all__ = ["GENERIC_PARAMS_METADATA"]
 
 
-from .generic_params_data_import import GENERIC_PARAMS_DATA_IMPORT
-from .generic_params_experiment import GENERIC_PARAMS_EXPERIMENT
-from .generic_params_image_ops import GENERIC_PARAMS_IMAGE_OPS
-from .generic_params_other import GENERIC_PARAMS_OTHER
-from .generic_params_pyfai import GENERIC_PARAMS_PYFAI
-from .generic_params_scan import GENERIC_PARAMS_SCAN
-from .generic_params_settings import GENERIC_PARAMS_SETTINGS
-from .generic_params_fit import GENERIC_PARAMS_FIT
+from pathlib import Path
 
-GENERIC_PARAMS_METADATA = (
-    GENERIC_PARAMS_DATA_IMPORT
-    | GENERIC_PARAMS_EXPERIMENT
-    | GENERIC_PARAMS_IMAGE_OPS
-    | GENERIC_PARAMS_OTHER
-    | GENERIC_PARAMS_PYFAI
-    | GENERIC_PARAMS_SCAN
-    | GENERIC_PARAMS_SETTINGS
-    | GENERIC_PARAMS_FIT
+import importlib
+from collections import ChainMap
+
+_prefix = "pydidas.core.generic_params."
+
+GENERIC_PARAMS_METADATA = dict(
+    ChainMap(
+        *[
+            getattr(
+                importlib.import_module(_prefix + _module_name, __package__),
+                _module_name.upper(),
+            )
+            for _module_name in [
+                _object.stem
+                for _object in Path(__file__).parent.iterdir()
+                if _object.name.startswith("generic_params_")
+            ]
+        ]
+    )
 )

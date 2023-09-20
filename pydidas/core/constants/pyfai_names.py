@@ -37,6 +37,7 @@ __all__ = [
 
 import pyFAI.detectors as __det
 
+
 __class_names = __det._detector_class_names
 
 

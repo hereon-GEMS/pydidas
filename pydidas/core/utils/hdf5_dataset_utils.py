@@ -38,7 +38,7 @@ __all__ = [
 
 import os
 import pathlib
-from typing import Iterable, Tuple, Union
+from typing import Iterable, List, Tuple, Union
 
 import h5py
 import numpy as np
@@ -49,13 +49,13 @@ from .file_utils import get_extension
 
 
 def get_hdf5_populated_dataset_keys(
-    item,
+    item: Union[str, h5py.File, h5py.Group, h5py.Dataset],
     min_size: int = 50,
     min_dim: int = 3,
     max_dim: Union[int, None] = None,
     file_ref: Union[h5py.File, None] = None,
     ignore_keys: Union[list, None] = None,
-):
+) -> List[str]:
     """
     Get the dataset keys of all datasets that match the conditions.
 
@@ -98,7 +98,7 @@ def get_hdf5_populated_dataset_keys(
 
     Returns
     -------
-    list
+    List[str]
         A list with all dataset keys which correspond to the filter criteria.
     """
     _close_on_exit = isinstance(item, (str, pathlib.Path))

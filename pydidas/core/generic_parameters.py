@@ -30,13 +30,13 @@ __status__ = "Production"
 __all__ = ["get_generic_parameter", "get_generic_param_collection"]
 
 
-from typing import Iterable
 from pathlib import Path
+from typing import Iterable
 
 from .generic_params import GENERIC_PARAMS_METADATA
+from .hdf5_key import Hdf5key
 from .parameter import Parameter
 from .parameter_collection import ParameterCollection
-from .hdf5_key import Hdf5key
 
 
 def get_generic_parameter(refkey: str) -> Parameter:

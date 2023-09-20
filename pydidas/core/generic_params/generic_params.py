@@ -28,10 +28,10 @@ __status__ = "Production"
 __all__ = ["GENERIC_PARAMS_METADATA"]
 
 
-from pathlib import Path
-
 import importlib
 from collections import ChainMap
+from pathlib import Path
+
 
 _prefix = "pydidas.core.generic_params."
 

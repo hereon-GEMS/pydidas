@@ -28,6 +28,7 @@ __all__ = ["PYDIDAS_CONFIG_PATHS", "PYDIDAS_STANDARD_CONFIG_PATH"]
 
 
 from pathlib import Path
+
 from qtpy import QtCore
 
 

@@ -69,7 +69,7 @@ class PydidasQsettingsMixin:
     def __init__(self):
         self.q_settings = _CopyablePydidasQSettings()
 
-    def q_settings_get_value(
+    def q_settings_get(
         self,
         key: str,
         dtype: Union[type, None] = None,
@@ -109,7 +109,7 @@ class PydidasQsettingsMixin:
             return dtype(_value)
         return _value
 
-    def q_settings_set_key(self, key: str, value: object):
+    def q_settings_set(self, key: str, value: object):
         """
         Set the value of a QSettings key.
 

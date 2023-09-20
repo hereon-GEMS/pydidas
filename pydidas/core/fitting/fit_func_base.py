@@ -29,9 +29,8 @@ __all__ = ["FitFuncBase"]
 
 from typing import Dict, List, Tuple, Union
 
-
-from numpy import ndarray, amin
 import numpy as np
+from numpy import amin, ndarray
 from scipy import interpolate
 
 from ..exceptions import UserConfigError

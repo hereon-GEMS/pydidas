@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,22 +16,23 @@
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
 
 """
-The flatten_iterable module includes functions to flatten nested iterables of various
-depths.
+Functions to flatten nested iterables of various depths.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["flatten", "flatten_all", "insert_item_in_tuple", "replace_item_in_iterable"]
 
+
 import itertools
-from collections.abc import Iterable
+from collections import abc
+from typing import Iterable
 
 
-def flatten(nested_iterable, astype=list):
+def flatten(nested_iterable: Iterable, astype: type = list) -> object:
     """
     Flatten a nested iterable.
 
@@ -42,7 +45,7 @@ def flatten(nested_iterable, astype=list):
 
     Parameters
     ----------
-    nested_iterable : list
+    nested_iterable : Iterable
         An iterable with nesting.
     astype : type, optional
         The return type of the flattened data, i.e. list, tuple or set. The default is
@@ -56,7 +59,7 @@ def flatten(nested_iterable, astype=list):
     return astype(itertools.chain.from_iterable(nested_iterable))
 
 
-def flatten_all(nested_iterable, astype=list):
+def flatten_all(nested_iterable: Iterable[Iterable], astype: type = list) -> object:
     """
     Flatten a nested iterable.
 
@@ -80,7 +83,7 @@ def flatten_all(nested_iterable, astype=list):
     """
     _new = []
     for _item in nested_iterable:
-        if isinstance(_item, Iterable):
+        if isinstance(_item, abc.Iterable):
             _items = flatten_all(_item, astype=list)
             _new.extend(_items)
         else:
@@ -88,9 +91,9 @@ def flatten_all(nested_iterable, astype=list):
     return astype(_new)
 
 
-def insert_item_in_tuple(obj, index, item):
+def insert_item_in_tuple(obj: tuple, index: int, item: object) -> tuple:
     """
-    Function to insert an item into a tuple
+    Insert an item into a tuple.
 
     Parameters
     ----------
@@ -111,9 +114,9 @@ def insert_item_in_tuple(obj, index, item):
     return tuple(_new)
 
 
-def replace_item_in_iterable(obj, index, item):
+def replace_item_in_iterable(obj: Iterable, index: int, item: object) -> Iterable:
     """
-    Function to replace an item in an existing tuple
+    Replace an item in an existing tuple.
 
     Parameters
     ----------
@@ -136,9 +139,9 @@ def replace_item_in_iterable(obj, index, item):
     return _type(_new)
 
 
-def remove_item_at_index_from_iterable(obj, index):
+def remove_item_at_index_from_iterable(obj: Iterable, index: int) -> Iterable:
     """
-    Function to remove an item
+    Remove an item from an iterable.
 
     Parameters
     ----------

@@ -30,6 +30,8 @@ __all__ = ["check_sphinx_html_docs", "run_sphinx_html_build"]
 
 
 import os
+from pathlib import Path
+from typing import Union
 
 from qtpy import QtWidgets
 from sphinx.cmd import build
@@ -37,13 +39,13 @@ from sphinx.cmd import build
 from .get_documentation_targets import DOC_HOME_FILENAME, DOC_MAKE_DIRECTORY
 
 
-def check_sphinx_html_docs(doc_dir=None):
+def check_sphinx_html_docs(doc_dir: Union[Path, str, None] = None) -> bool:
     """
     Check whether the index.html file for the built sphinx documentation exists.
 
     Parameters
     ----------
-    build_dir : Union[pathlib.Path, str, None], optional
+    doc_dir : Union[pathlib.Path, str, None], optional
         An optional build directory. If None, this defaults to the generic
         pydidas documentation directory. The default is None.
 
@@ -62,7 +64,9 @@ def check_sphinx_html_docs(doc_dir=None):
     return os.path.exists(_index_file)
 
 
-def run_sphinx_html_build(build_dir=None, verbose=True):
+def run_sphinx_html_build(
+    build_dir: Union[Path, str, None] = None, verbose: bool = True
+):
     """
     Run the sphinx process to generate the html documentation.
 

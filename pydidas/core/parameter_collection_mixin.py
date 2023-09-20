@@ -295,7 +295,6 @@ class ParameterCollectionMixIn:
     def print_param_values(self):
         """
         Print the name and value of all Parameters.
-        None.
         """
         _config = self.get_param_values_as_dict()
         for _key in _config:
@@ -338,7 +337,7 @@ class ParameterCollectionMixIn:
         _param = self.get_param(param_refkey)
         if _param.dtype is not Integral:
             raise ValueError(
-                f'The datatype of Parameter "{_param.refkey}"' " is not integer."
+                f"The datatype of Parameter *{_param.refkey}* is not integer."
             )
         if _param.value == modulo:
             return _param.value
@@ -379,5 +378,5 @@ class ParameterCollectionMixIn:
         """
         if key not in self.params:
             raise KeyError(
-                f"The key {key} is not registered with " f"{self.__class__.__name__}!"
+                f"The key {key} is not registered with {self.__class__.__name__}!"
             )

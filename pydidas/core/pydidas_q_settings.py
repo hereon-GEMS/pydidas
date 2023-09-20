@@ -96,4 +96,4 @@ class PydidasQsettings(PydidasQsettingsMixin):
             The value, converted to the type associated with the Parameter
             referenced by param_key or dtype, if given.
         """
-        return self.q_settings_get_value(key, dtype)
+        return self.q_settings_get(key, dtype)

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,10 +20,10 @@ Module with utility functions for Qt objects.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "update_size_policy",
     "apply_qt_properties",
@@ -31,16 +33,24 @@ __all__ = [
 ]
 
 
+from typing import Iterable
+
 from qtpy import QtGui
+from qtpy.QtCore import QObject
+from qtpy.QtGui import QFont
+from qtpy.QtWidgets import QWidget
 
 
-def _get_args_as_list(args):
+def _get_args_as_list(args: Iterable):
     """
     Format the input arguments to an interable list to be passed as *args.
 
+    This is used to convert strings (which are Iterable) to a list entry to
+    prevent iterating over each string character.
+
     Parameters
     ----------
-    args : object
+    args : Iterable
         Any input
 
     Returns
@@ -53,7 +63,7 @@ def _get_args_as_list(args):
     return args
 
 
-def update_size_policy(obj, **kwargs):
+def update_size_policy(obj: QWidget, **kwargs: dict):
     """
     Update the sizePolicy of an object with various keywords.
 
@@ -63,6 +73,8 @@ def update_size_policy(obj, **kwargs):
     method and will then call "obj.setProperty(12)". The verificiation that
     the methods exist allows this function to take the full kwargs of any
     object without the need to filter out non-related keys.
+
+    Note that the object is modified in place and no explicit return is given.
 
     Parameters
     ----------
@@ -76,7 +88,7 @@ def update_size_policy(obj, **kwargs):
     obj.setSizePolicy(_policy)
 
 
-def apply_qt_properties(obj, **kwargs):
+def apply_qt_properties(obj: QObject, **kwargs: dict):
     """
     Set Qt widget properties from a supplied dict.
 
@@ -86,6 +98,8 @@ def apply_qt_properties(obj, **kwargs):
     method and will then call "obj.setProperty(12)". The verificiation that
     the methods exist allows this function to take the full kwargs of any
     object without the need to filter out non-related keys.
+
+    Note that the object is modified in place and no explicit return is given.
 
     Parameters
     ----------
@@ -101,9 +115,11 @@ def apply_qt_properties(obj, **kwargs):
             _func(*_get_args_as_list(kwargs.get(_key)))
 
 
-def update_palette(obj, **kwargs):
+def update_palette(obj: QObject, **kwargs: dict):
     """
     Update the palette associated with a QWidget.
+
+    Note that the object is modified in place and no explicit return is given.
 
     Parameters
     ----------
@@ -121,9 +137,11 @@ def update_palette(obj, **kwargs):
     obj.setPalette(_palette)
 
 
-def update_qobject_font(obj, **kwargs):
+def update_qobject_font(obj: QObject, **kwargs: dict):
     """
     Update the font associated with a QObject.
+
+    Note that the object is modified in place and no explicit return is given.
 
     Parameters
     ----------
@@ -137,7 +155,7 @@ def update_qobject_font(obj, **kwargs):
     obj.setFont(_font)
 
 
-def apply_font_properties(fontobj, **kwargs):
+def apply_font_properties(fontobj: QFont, **kwargs: dict):
     """
     Set font properties from a supplied dict.
 
@@ -148,10 +166,12 @@ def apply_font_properties(fontobj, **kwargs):
     verificiation that methods exist allows this function to take the full
     kwargs of any object without the need to filter out non-related keys.
 
+    Note that the object is modified in place and no explicit return is given.
+
     Parameters
     ----------
-    fontobj : QObject
-        Any QFont
+    fontobj : QFont
+        The QFont instance.
     **kwargs : dict
         A dictionary with properties to be set.
     """

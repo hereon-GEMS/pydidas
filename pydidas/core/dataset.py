@@ -28,11 +28,11 @@ __status__ = "Production"
 __all__ = ["Dataset"]
 
 
-from typing import Self, Union, Literal, Iterable
 import warnings
 from collections import abc
 from copy import deepcopy
 from numbers import Integral
+from typing import Iterable, Literal, Self, Union
 
 import numpy as np
 from numpy.typing import ArrayLike

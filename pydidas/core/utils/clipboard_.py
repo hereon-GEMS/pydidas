@@ -30,7 +30,7 @@ __all__ = ["copy_text_to_system_clipbord"]
 from qtpy import QtWidgets
 
 
-def copy_text_to_system_clipbord(text):
+def copy_text_to_system_clipbord(text: str):
     """
     Copy the given text to the system clipboard.
 

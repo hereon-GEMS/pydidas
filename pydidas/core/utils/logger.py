@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,18 @@ pydidas which will write a logfile.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["pydidas_logger", "get_logging_dir", "clear_logging_dir", "LOGGING_LEVEL"]
 
-import os
+
 import logging
-import time
 import multiprocessing as mp
+import os
+import time
+from typing import List
 
 from qtpy import QtCore
 
@@ -43,7 +47,7 @@ _LOG_FORMATTER = logging.Formatter(
 )
 
 
-def pydidas_logger(level=LOGGING_LEVEL):
+def pydidas_logger(level: int = LOGGING_LEVEL) -> logging.Logger:
     """
     Get the pydidas logger.
 
@@ -72,7 +76,7 @@ def pydidas_logger(level=LOGGING_LEVEL):
     return _logger
 
 
-def get_logging_dir():
+def get_logging_dir() -> str:
     """
     Return the pydidas logging directory.
 
@@ -92,7 +96,7 @@ def get_logging_dir():
     return _log_path
 
 
-def _get_todays_log_name():
+def _get_todays_log_name() -> str:
     """
     Get the name of today's logfile.
 
@@ -106,7 +110,7 @@ def _get_todays_log_name():
     return os.path.join(get_logging_dir(), "logs", f"pydidas_log_{_timestr}.log")
 
 
-def clear_logging_dir():
+def clear_logging_dir() -> List[str]:
     """
     Clear all files in the logging dir, if possible.
 

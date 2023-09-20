@@ -48,6 +48,7 @@ __all__ = [
 
 from qtpy import QtCore, QtGui, QtWidgets
 
+
 ALIGN_TOP_LEFT = QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop
 
 ALIGN_TOP_CENTER = QtCore.Qt.AlignHCenter | QtCore.Qt.AlignTop

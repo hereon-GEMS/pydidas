@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,10 +20,10 @@ The math_utils module includes functions for mathematical operations used in pyd
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = [
     "rot_matrix_rx",
     "rot_matrix_ry",
@@ -38,6 +38,8 @@ __all__ = [
 ]
 
 
+from typing import List, Tuple
+
 import numpy as np
 from numpy import cos, sin
 from scipy.optimize import leastsq
@@ -45,7 +47,7 @@ from scipy.optimize import leastsq
 from ..exceptions import UserConfigError
 
 
-def rot_matrix_rx(theta):
+def rot_matrix_rx(theta: float) -> np.ndarray:
     """
     Create the rotation matrix for a rotation around the x-axis of a value of theta.
 
@@ -64,7 +66,7 @@ def rot_matrix_rx(theta):
     )
 
 
-def rot_matrix_ry(theta):
+def rot_matrix_ry(theta: float) -> np.ndarray:
     """
     Create the rotation matrix for a rotation around the y-axis of a value of theta.
 
@@ -83,7 +85,7 @@ def rot_matrix_ry(theta):
     )
 
 
-def rot_matrix_rz(theta):
+def rot_matrix_rz(theta: float) -> np.ndarray:
     """
     Create the rotation matrix for a rotation around the z-axis of a value of theta.
 
@@ -102,7 +104,7 @@ def rot_matrix_rz(theta):
     )
 
 
-def pyfai_rot_matrix(theta1, theta2, theta3):
+def pyfai_rot_matrix(theta1: float, theta2: float, theta3: float) -> np.ndarray:
     """
     Get the combined rotation matrix for pyFAI theta values.
 
@@ -129,9 +131,9 @@ def pyfai_rot_matrix(theta1, theta2, theta3):
     )
 
 
-def get_chi_from_x_and_y(x, y):
+def get_chi_from_x_and_y(x: float, y: float) -> float:
     """
-    Get the chi position in degree.
+    Get the chi position in radians from the x and y coordinates.
 
     Parameters
     ----------
@@ -156,7 +158,9 @@ def get_chi_from_x_and_y(x, y):
     return np.mod(_chi, 2 * np.pi)
 
 
-def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
+def fit_detector_center_and_tilt_from_points(
+    xpoints: np.ndarray, ypoints: np.ndarray
+) -> tuple:
     """
     Fit the detector center, tilt and tilt plane from points.
 
@@ -199,7 +203,7 @@ def fit_detector_center_and_tilt_from_points(xpoints, ypoints):
     return _cx, _cy, _tilt, _tilt_plane, _coeffs
 
 
-def fit_ellipse_from_points(xpoints, ypoints):
+def fit_ellipse_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> np.ndarray:
     """
     Fit an ellipse from the given points.
 
@@ -242,7 +246,7 @@ def fit_ellipse_from_points(xpoints, ypoints):
     return coeffs / coeffs[0]
 
 
-def get_ellipse_params_from_coeffs(coeffs):
+def get_ellipse_params_from_coeffs(coeffs: tuple) -> tuple:
     """
     Get the ellipse parameters for center and tilt from the fit parameters.
 
@@ -284,7 +288,7 @@ def get_ellipse_params_from_coeffs(coeffs):
     return _center_x, _center_y, _tilt, _tilt_plane, _axes
 
 
-def fit_circle_from_points(xpoints, ypoints):
+def fit_circle_from_points(xpoints: np.ndarray, ypoints: np.ndarray) -> tuple:
     """
     Fit a circle from a given list of points.
 
@@ -311,14 +315,39 @@ def fit_circle_from_points(xpoints, ypoints):
     return _c1
 
 
-def calc_points_on_ellipse(coeffs, n_points=144, tmin=0, tmax=2 * np.pi):
+def calc_points_on_ellipse(
+    coeffs: tuple,
+    n_points: int = 144,
+    theta_min: float = 0,
+    theta_max: float = 2 * np.pi,
+) -> Tuple[np.ndarray]:
     """
-    Return npts points on the ellipse described by the params = x0, y0, ap,
-    bp, e, phi for values of the parametric variable t between tmin and tmax.
+    Return points on the ellipse described by the given coefficients.
+
+    Parameters for the ellipse must be given in form of (x0, y0, ap, bp, e, phi)
+    for values of the parametric variable t between tmin and tmax.
+
+    Parameters
+    ----------
+    coeffs : tuple
+        The ellipse coefficients (x0, y0, ap, bp, e, phi).
+    n_points : int, optional
+        The number of points on the ellipse. The default is 144.
+    theta_min : float, optional
+        The smallest angle for a point on the ellipse. The default is 0.
+    theta_max : float, optional
+        The largest angle for a point on the ellipse. The default is 2 * np.pi.
+
+    Returns
+    -------
+    x : np.ndarray
+        The array with the x-positions of the points on the ellipse circumference.
+    y : np.ndarray
+        The array with the y-positions of the points on the ellipse circumference.
 
     """
     _cx, _cy, _tilt, _tilt_angle, _axes = get_ellipse_params_from_coeffs(coeffs)
-    _theta = np.linspace(tmin, tmax, num=n_points)
+    _theta = np.linspace(theta_min, theta_max, num=n_points)
     _x = (
         _cx
         + _axes[0] * np.cos(_theta) * np.cos(_tilt_angle)
@@ -332,7 +361,9 @@ def calc_points_on_ellipse(coeffs, n_points=144, tmin=0, tmax=2 * np.pi):
     return _x, _y
 
 
-def ray_from_center_intersection_with_detector(center, chi, shape):
+def ray_from_center_intersection_with_detector(
+    center: Tuple[float], chi: float, shape: Tuple[int]
+) -> Tuple[List[float]]:
     """
     Calculate the point where a ray from the detector center hits the detector's edge.
 
@@ -347,8 +378,10 @@ def ray_from_center_intersection_with_detector(center, chi, shape):
 
     Returns
     -------
-    tuple
-        The point on the detector frame intersecting the defined line.
+    x_intersections : List[float]
+        The x-positions of the intersections between ray and detector boundaries.
+    y_intersections : List[float]
+    The y-positions of the intersections between ray and detector boundaries.
     """
     _cx, _cy = center
     _ny, _nx = shape

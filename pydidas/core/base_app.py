@@ -94,30 +94,53 @@ class BaseApp(ObjectWithParameterCollection):
     def multiprocessing_pre_run(self):
         """
         Perform operations prior to running main parallel processing function.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
         """
         return
 
     def multiprocessing_post_run(self):
         """
         Perform operations after running main parallel processing function.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
         """
         return
 
     def multiprocessing_get_tasks(self):
         """
         Return all tasks required in multiprocessing.
+
+        This method must be implemented by the BaseApp subclasses.
         """
         raise NotImplementedError
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Perform operations in the pre-cycle of every task.
+
+        The generic method simple performs no operation and subclasses only
+        need to re-implement it when they explicitly need it.
+
+        Parameters
+        ----------
+        index : int
+            The index to be processed.
         """
         return
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int):
         """
         Perform key operation with parallel processing.
+
+        This method must be implemented by the BaseApp subclasses.
+
+        Parameters
+        ----------
+        index : int
+            The index to be processed.
         """
         raise NotImplementedError
 
@@ -141,11 +164,14 @@ class BaseApp(ObjectWithParameterCollection):
         """
         Store the multiprocessing results for other pydidas apps and processes.
 
+        This method must be implemented by the BaseApp subclasses.
+
+
         Parameters
         ----------
         index : int
             The frame index
-        args : object
+        args : tuple
             The results. The specific type depends on the app.
         """
         raise NotImplementedError

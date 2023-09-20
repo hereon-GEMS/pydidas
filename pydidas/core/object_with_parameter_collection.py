@@ -14,9 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Pydidas. If not, see <http://www.gnu.org/licenses/>.
+
 """
-The ObjectWithParameterCollection is a class which includes a
-ParameterCollection and is serializable (ie. pickleable).
+The ObjectWithParameterCollection is a serializable (ie. pickleable) class.
+
+It includes a ParameterCollection object.
 """
 
 __author__ = "Malte Storm"
@@ -26,8 +28,10 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ObjectWithParameterCollection"]
 
+
 import warnings
 from copy import copy, deepcopy
+from typing import Self
 
 from qtpy import QtCore
 
@@ -53,7 +57,7 @@ class ObjectWithParameterCollection(
         self.params = ParameterCollection()
         self._config = {}
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         """
         Create a copy of the object.
 
@@ -67,7 +71,7 @@ class ObjectWithParameterCollection(
         obj._config = copy(self._config)
         return obj
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: dict) -> Self:
         """
         Create a deepcopy of the object.
 
@@ -86,7 +90,7 @@ class ObjectWithParameterCollection(
         obj._config = deepcopy(self._config)
         return obj
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict:
         """
         Get the ObjectWithParameterCollection state for pickling.
 
@@ -100,7 +104,7 @@ class ObjectWithParameterCollection(
             _state["_config"]["shared_memory"] = {}
         return _state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict):
         """
         Set the ObjectWithParameterCollection state from a pickled state.
 
@@ -112,7 +116,7 @@ class ObjectWithParameterCollection(
         for _key, _value in state.items():
             setattr(self, _key, _value)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Get a hash value.
 
@@ -138,7 +142,7 @@ class ObjectWithParameterCollection(
                 warnings.warn(f'Could not hash the dictionary value "{_val}".')
         return hash((_param_hash, tuple(_config_keys), tuple(_config_vals)))
 
-    def copy(self):
+    def copy(self) -> Self:
         """
         Get a copy of the object.
 
@@ -149,7 +153,7 @@ class ObjectWithParameterCollection(
         """
         return copy(self)
 
-    def deepcopy(self):
+    def deepcopy(self) -> Self:
         """
         Get a deepcopy of the object.
 

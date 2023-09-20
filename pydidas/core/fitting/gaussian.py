@@ -31,7 +31,6 @@ from typing import Dict, List, Tuple, Union
 
 from numpy import amax, amin, exp, inf, ndarray, pi
 
-
 from .fit_func_base import FitFuncBase
 
 

@@ -29,11 +29,12 @@ __all__ = ["execute_workflow_app_parser"]
 
 
 import argparse
+from typing import Union
 
 from ...core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
 
 
-def execute_workflow_app_parser(caller=None):
+def execute_workflow_app_parser(caller: Union[object, None] = None) -> dict:
     """
     Parse the command line arguments for the ExecuteWorkflowApp.
 

@@ -61,14 +61,14 @@ logger = pydidas_logger()
 
 class DirectorySpyApp(BaseApp):
     """
-    The DirectorySpy is an App to scan a folder and load the latest image
-    and keep it in shared memory. To run the app in the background, please
-    refer to the :py:class:`pydidas.multiprocessing.AppRunner`.
+    An App to scan a folder and load the latest image and keep it in shared memory.
+
+    To run the app in the background, please refer to the
+    :py:class:`pydidas.multiprocessing.AppRunner` documentation.
 
     Notes
     -----
-
-    The full list of Parameters used by the DirectorySpyApp:
+    The full list of keyword arguments used by the DirectorySpyApp:
 
     scan_for_all : bool, optional
         Flag to toggle scanning for all new files or only for files matching
@@ -415,9 +415,14 @@ class DirectorySpyApp(BaseApp):
         """
         return []
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Perform operations in the pre-cycle of every task.
+
+        Parameters
+        ----------
+        index : int
+            The image iamge.
         """
         return
 

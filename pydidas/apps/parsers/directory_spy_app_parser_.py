@@ -27,12 +27,14 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["directory_spy_app_parser"]
 
+
 import argparse
+from typing import Union
 
 from ...core.generic_params import GENERIC_PARAMS_METADATA as PARAMS
 
 
-def directory_spy_app_parser(caller=None):
+def directory_spy_app_parser(caller: Union[object, None] = None) -> dict:
     """
     Parse the command line arguments for the DirectorySpyApp.
 

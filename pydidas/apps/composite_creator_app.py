@@ -322,7 +322,7 @@ class CompositeCreatorApp(BaseApp):
             )
         return self._config["mp_tasks"]
 
-    def multiprocessing_pre_cycle(self, index):
+    def multiprocessing_pre_cycle(self, index: int):
         """
         Run preparatory functions in the cycle prior to the main function.
 
@@ -333,7 +333,7 @@ class CompositeCreatorApp(BaseApp):
         """
         self._store_args_for_read_image(index)
 
-    def _store_args_for_read_image(self, index):
+    def _store_args_for_read_image(self, index: int):
         """
         Create the required kwargs to pass to the read_image function.
 

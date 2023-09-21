@@ -37,7 +37,7 @@ __all__ = [
 
 
 import os
-import pathlib
+from pathlib import Path
 from typing import Iterable, List, Tuple, Union
 
 import h5py
@@ -49,7 +49,7 @@ from .file_utils import get_extension
 
 
 def get_hdf5_populated_dataset_keys(
-    item: Union[str, h5py.File, h5py.Group, h5py.Dataset],
+    item: Union[str, Path, h5py.File, h5py.Group, h5py.Dataset],
     min_size: int = 50,
     min_dim: int = 3,
     max_dim: Union[int, None] = None,
@@ -68,7 +68,7 @@ def get_hdf5_populated_dataset_keys(
 
     Parameters
     ----------
-    item : Union[str, h5py.File, h5py.Group, h5py.Dataset]
+    item : Union[str, Path, h5py.File, h5py.Group, h5py.Dataset]
         The item to be checked recursively. A str will be interpreted as
         filepath to the Hdf5 file.
     min_size : int, optional
@@ -101,7 +101,7 @@ def get_hdf5_populated_dataset_keys(
     List[str]
         A list with all dataset keys which correspond to the filter criteria.
     """
-    _close_on_exit = isinstance(item, (str, pathlib.Path))
+    _close_on_exit = isinstance(item, (str, Path))
     _ignore = ignore_keys if ignore_keys is not None else []
 
     if isinstance(item, h5py.Dataset):
@@ -109,7 +109,7 @@ def get_hdf5_populated_dataset_keys(
             return [item.name]
         return []
 
-    if isinstance(item, (str, pathlib.Path)):
+    if isinstance(item, (str, Path)):
         _hdf5_filename_check(item)
         item = h5py.File(item, "r")
     if not isinstance(item, (h5py.File, h5py.Group)):
@@ -138,13 +138,13 @@ def get_hdf5_populated_dataset_keys(
     return _datasets
 
 
-def is_hdf5_filename(filename: Union[pathlib.Path, str]) -> bool:
+def is_hdf5_filename(filename: Union[Path, str]) -> bool:
     """
     Check whether the given filename has an hdf5 extension.
 
     Parameters
     ----------
-    filename : Union[pathlib.Path, str]
+    filename : Union[Path, str]
         The filename to check.
 
     Returns
@@ -155,13 +155,13 @@ def is_hdf5_filename(filename: Union[pathlib.Path, str]) -> bool:
     return get_extension(filename) in HDF5_EXTENSIONS
 
 
-def _hdf5_filename_check(item: Union[pathlib.Path, str]):
+def _hdf5_filename_check(item: Union[Path, str]):
     """
     Check that a specified filename is okay and points to an existing file.
 
     Parameters
     ----------
-    item : Union[str, pathlib.Path]
+    item : Union[str, Path]
         The filename.
 
     Raises
@@ -227,7 +227,7 @@ def hdf5_dataset_check(
 
 
 def _get_hdf5_file_and_dataset_names(
-    fname: Union[pathlib.Path, str], dset: Union[str, None] = None
+    fname: Union[Path, str], dset: Union[str, None] = None
 ) -> Tuple[str]:
     """
     Get the name of the file and an hdf5 dataset.
@@ -238,7 +238,7 @@ def _get_hdf5_file_and_dataset_names(
 
     Parameters
     ----------
-    fname : Union[str, pathlib.Path]
+    fname : Union[str, Path]
         The filepath or path to filename and dataset.
     dset : Union[str, None], optional
         The optional dataset key, if not specified in the fname.
@@ -249,7 +249,7 @@ def _get_hdf5_file_and_dataset_names(
     KeyError
         If the dataset has not been specified.
     TypeError
-        If fname is not of type str or pathlib.Path.
+        If fname is not of type str or Path.
 
     Returns
     -------
@@ -258,9 +258,9 @@ def _get_hdf5_file_and_dataset_names(
     dset : str
         The internal path to the dataset.
     """
-    fname = str(fname) if isinstance(fname, pathlib.Path) else fname
+    fname = str(fname) if isinstance(fname, Path) else fname
     if not isinstance(fname, str):
-        raise TypeError("The path must be specified as string or pathlib.Path")
+        raise TypeError("The path must be specified as string or Path")
     if fname.find("://") > 0:
         fname, dset = fname.split("://")
     if dset is None:
@@ -269,7 +269,7 @@ def _get_hdf5_file_and_dataset_names(
 
 
 def get_hdf5_metadata(
-    fname: Union[str, pathlib.Path],
+    fname: Union[str, Path],
     meta: Union[str, Iterable],
     dset: Union[str, None] = None,
 ) -> Union[dict, object]:
@@ -284,7 +284,7 @@ def get_hdf5_metadata(
 
     Parameters
     ----------
-    fname : Union[str, pathlib.Path]
+    fname : Union[str, Path]
         The filepath or path to filename and dataset.
     meta : Union[str, Iterable]
         The metadata item(s). Accepted values are either an iterable (list or

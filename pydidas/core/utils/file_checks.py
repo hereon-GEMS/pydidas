@@ -44,13 +44,13 @@ from ..exceptions import UserConfigError
 from .hdf5_dataset_utils import get_hdf5_populated_dataset_keys
 
 
-def check_hdf5_key_exists_in_file(fname: str, key: str):
+def check_hdf5_key_exists_in_file(fname: Union[Path, str], key: str):
     """
     Veriy that the selected file has a dataset with key.
 
     Parameters
     ----------
-    fname : str
+    fname : Union[Path, str]
         The filename and path.
     key : str
         The dataset key.

@@ -69,7 +69,7 @@ class TestInputPlugin(InputPlugin):
 
 
 def dummy_update_filename_string(plugin):
-    plugin.filename_string = plugin._image_metadata.filename
+    plugin.filename_string = str(plugin._image_metadata.filename)
 
 
 class TestBaseInputPlugin(unittest.TestCase):

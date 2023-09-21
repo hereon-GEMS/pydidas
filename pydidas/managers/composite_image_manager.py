@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,22 +20,25 @@ Module with the CompositeImageManager class used for creating mosaic images.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["CompositeImageManager"]
 
+
 from copy import copy
+from pathlib import Path
+from typing import Literal, Self, Union
 
 import numpy as np
 
 from ..core import (
-    UserConfigError,
+    ObjectWithParameterCollection,
     Parameter,
     ParameterCollection,
+    UserConfigError,
     get_generic_parameter,
-    ObjectWithParameterCollection,
 )
 from ..core.constants.image_ops import IMAGE_OPS
 from ..data_io import export_data
@@ -43,6 +46,8 @@ from ..data_io import export_data
 
 class CompositeImageManager(ObjectWithParameterCollection):
     """
+    A manager to arrrange images in a composite.
+
     The CompositeImage class holds a numpy array to combine individual images
     to a composite and to provide basic insertion and manipulation routines.
     """
@@ -66,7 +71,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         self.add_params(*args)
         self.set_default_params()
         self.update_param_values_from_kwargs(**kwargs)
-        self.__get_default_qsettings()
+        self.__read_default_qsettings()
         for _key, _item in kwargs.items():
             if isinstance(_item, Parameter):
                 self.params[_key] = _item
@@ -75,9 +80,9 @@ class CompositeImageManager(ObjectWithParameterCollection):
         if self.__check_config():
             self.__create_image_array()
 
-    def __get_default_qsettings(self):
+    def __read_default_qsettings(self):
         """
-        Update local Parameters with the global QSetting values.
+        Update local Parameters from the global QSetting values.
         """
         self._config["border_width"] = self.q_settings_get(
             "user/mosaic_border_width", int
@@ -89,25 +94,21 @@ class CompositeImageManager(ObjectWithParameterCollection):
             "user/max_image_size", float
         )
 
-    def __check_config(self):
+    def __check_config(self) -> bool:
         """
         Check whether the config is consistent.
 
         Returns
         -------
-        _okay : bool
+        bool
             The method returns True if all Parameters have been set correctly.
         """
-        _okay = True
-        if not self.get_param_value("image_shape")[0] > 0:
-            _okay = False
-        if not self.get_param_value("image_shape")[1] > 0:
-            _okay = False
-        if not self.get_param_value("composite_nx") > 0:
-            _okay = False
-        if not self.get_param_value("composite_ny") > 0:
-            _okay = False
-        return _okay
+        return (
+            self.get_param_value("image_shape")[0] > 0
+            and self.get_param_value("image_shape")[1] > 0
+            and self.get_param_value("composite_nx") > 0
+            and self.get_param_value("composite_ny") > 0
+        )
 
     def __verify_config(self):
         """
@@ -119,7 +120,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             If one or more of the required config fields have not been set.
         """
         if not self.__check_config():
-            raise ValueError(
+            raise UserConfigError(
                 "Not all required values for the creation of a "
                 "CompositeImage have been set."
             )
@@ -139,13 +140,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
             + self._config["border_value"]
         )
 
-    def __get_composite_shape(self):
+    def __get_composite_shape(self) -> tuple[int, int]:
         """
         Get the shape of the new array.
 
         Returns
         -------
-        tuple
+        tuple[int, int]
             The new shape.
         """
         _shape = self.get_param_value("image_shape")
@@ -160,14 +161,14 @@ class CompositeImageManager(ObjectWithParameterCollection):
         )
         return (_ny, _nx)
 
-    def __check_max_size(self, shape):
+    def __check_max_size(self, shape: tuple[int, int]):
         """
         Check that the size of the new image is not larger than the global
         size limit.
 
         Parameters
         ----------
-        shape : tuple
+        shape : tuple[int, int]
             The size of the image in pixels.
 
         Raises
@@ -183,7 +184,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
                 f"size limit of {_maxsize} Mpx."
             )
 
-    def apply_thresholds(self, **kwargs):
+    def apply_thresholds(self, **kwargs: dict):
         """
         Apply thresholds to the composite image.
 
@@ -214,14 +215,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
         if _thresh_high is not None:
             self.__image[self.__image > _thresh_high] = _thresh_high
 
-    def __update_threshold(self, key, **kwargs):
+    def __update_threshold(self, key: Literal["low", "high"], **kwargs: dict):
         """
-        Update the threshold from the kwargs, if the key in included and
-        change non-finite numbers to None.
+        Update the threshold from the kwargs.
 
         Parameters
         ----------
-        key : str
+        key : Literal["low", "high"]
             The threshold key. Must be either "low" or "high"
         **kwargs : dict
             The kwargs passed on from the apply thresholds method.
@@ -242,10 +242,10 @@ class CompositeImageManager(ObjectWithParameterCollection):
 
         The new image array is accessible through the .image property.
         """
-        self.__get_default_qsettings()
+        self.__read_default_qsettings()
         self.__create_image_array()
 
-    def insert_image(self, image, index):
+    def insert_image(self, image: np.ndarray, index: int):
         """
         Put the image in the composite image.
 
@@ -270,10 +270,9 @@ class CompositeImageManager(ObjectWithParameterCollection):
             image = _op(image)
         self.__image[_ypos, _xpos] = image
 
-    def _get_image_pos_in_composite(self, index):
+    def _get_image_pos_in_composite(self, index: int) -> tuple[slice, slice]:
         """
-        Get the image position for the image to be inserted into the composite in
-        coordinates of the composite image.
+        Get the image position for the image in coordinates of the composite image.
 
         Parameters
         ----------
@@ -282,7 +281,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
 
         Returns
         -------
-        tuple
+        tuple[slice, slice]
             The tuple with slice objects for the y and x position in the composite
             image.
         """
@@ -303,7 +302,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         _xslice = slice(_start_x, _start_x + _image_size[1])
         return _yslice, _xslice
 
-    def __apply_thresholds_to_data(self, image):
+    def __apply_thresholds_to_data(self, image: np.ndarray) -> np.ndarray:
         """
         Apply thresholds to the data.
 
@@ -325,7 +324,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
             image = np.where(image > _high, _high, image)
         return image
 
-    def save(self, output_fname):
+    def save(self, output_fname: str):
         """
         Save the image in binary npy format.
 
@@ -336,13 +335,13 @@ class CompositeImageManager(ObjectWithParameterCollection):
         """
         np.save(output_fname, self.__image)
 
-    def export(self, output_fname, **kwargs):
+    def export(self, output_fname: Union[Path, str], **kwargs: dict):
         """
         Export the image to a file.
 
         Parameters
         ----------
-        output_fname : str
+        output_fname : Union[Path, str]
             The full file system path and filename for the output image file.
         **kwargs : dict
             Optional keyword arguments to be passed to the exporters.
@@ -350,7 +349,7 @@ class CompositeImageManager(ObjectWithParameterCollection):
         export_data(output_fname, self.__image, **kwargs)
 
     @property
-    def image(self):
+    def image(self) -> np.ndarray:
         """
         Get the composite image.
 
@@ -362,20 +361,20 @@ class CompositeImageManager(ObjectWithParameterCollection):
         return self.__image
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, int]:
         """
         Get the shape of the composite image.
 
         Returns
         -------
-        tuple
+        tuple[int, int]
             The shape of the composite image.
         """
         if self.__image is None:
             return (0, 0)
         return self.__image.shape
 
-    def __copy__(self):
+    def __copy__(self) -> Self:
         """
         Create a copy of the object.
 

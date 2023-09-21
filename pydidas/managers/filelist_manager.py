@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ __all__ = ["FilelistManager"]
 import copy
 import os
 from pathlib import Path
+from typing import Union
 
 from ..core import (
     ObjectWithParameterCollection,
@@ -48,9 +49,6 @@ from ..core.utils import (
 
 class FilelistManager(ObjectWithParameterCollection):
     """
-    Inherits from :py:class:`pydidas.core.ObjectWithParameterCollection
-    <pydidas.core.ObjectWithParameterCollection>`
-
     The FilelistManager creates and manages a file list from which to select
     items for processing.
 
@@ -89,7 +87,7 @@ class FilelistManager(ObjectWithParameterCollection):
         "live_processing", "first_file", "last_file", "file_stepping"
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         """
         Create a FilelistManager instance.
         """
@@ -100,7 +98,7 @@ class FilelistManager(ObjectWithParameterCollection):
         self._config = {"file_list": [], "file_size": None, "n_files": 0}
 
     @property
-    def n_files(self):
+    def n_files(self) -> int:
         """
         Get the number of files.
 
@@ -112,7 +110,7 @@ class FilelistManager(ObjectWithParameterCollection):
         return self._config["n_files"]
 
     @property
-    def filesize(self):
+    def filesize(self) -> float:
         """
         Get the file size of the processed files.
 
@@ -123,7 +121,7 @@ class FilelistManager(ObjectWithParameterCollection):
         """
         return self._config["file_size"]
 
-    def get_config(self):
+    def get_config(self) -> dict:
         """
         Get the full _config dictionary.
 
@@ -136,53 +134,42 @@ class FilelistManager(ObjectWithParameterCollection):
         return copy.copy(self._config)
 
     def update(
-        self, first_file=None, last_file=None, live_processing=None, file_stepping=None
+        self,
+        first_file: Union[None, str, Path] = None,
+        last_file: Union[None, str, Path] = None,
+        live_processing: Union[None, bool] = None,
+        file_stepping: Union[None, int] = None,
     ):
         """
         Create a filelist with updated parameters.
 
         Parameters
         ----------
-        first_file : Union[str, Path], optional
+        first_file : Union[None, str, Path], optional
             The path to the first file. If None, the stored Parameter for
             'first_file' will be used. The default is None.
-        last_file : Union[str, Path], optional
+        last_file : Union[None, str, Path], optional
             The path to the last file. If None, the stored Parameter for
             'last_file' will be used. The default is None.
-        live_processing : bool, optional
+        live_processing : Union[None. bool], optional
             Flag for live processing (i.e. disable file system checks.)
             If None, the stored Parameter 'live_processing' will be used.
             The default is None.
-        file_stepping : int, optional
+        file_stepping : Union[None, int], optional
             The file stepping number. If None, the stored Parameter
-            'file_stepping' will be used.  The default is None.
+            'file_stepping' will be used. The default is None.
         """
         self._update_params(first_file, last_file, live_processing, file_stepping)
         self._check_files()
         self._create_filelist()
 
-    def _update_params(self, first_file, last_file, live_processing, file_stepping):
-        """
-        Update the internally stored Parameters if new values have been
-        provided.
-
-        Parameters
-        ----------
-        first_file : Union[str, None]
-            The name of the first file. If None, the Parameter value will not
-            be updated.
-        last_file : Union[str, None]
-            The name of the last file. If None, the Parameter value will not
-            be updated.
-        live_processing : Union[bool, None]
-            Flag to enable or disable live processing. If live processing is
-            True, checks for file existance and size will be performed.
-            If None, the Parameter value will not be updated.
-        file_stepping : Union[int, None]
-            The file stepping determined which files will be processed. A value
-            of n means that only every n-th file will be read. If None, the
-            Parameter value will not be updated.
-        """
+    def _update_params(
+        self,
+        first_file: Union[None, str, Path] = None,
+        last_file: Union[None, str, Path] = None,
+        live_processing: Union[None, bool] = None,
+        file_stepping: Union[None, int] = None,
+    ):
         if first_file is not None:
             self.set_param_value("first_file", first_file)
         if last_file is not None:
@@ -194,8 +181,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _check_files(self):
         """
-        Check the file names, paths and (for hdf5 images), the size of the
-        dataset with respect to the selected image numbers.
+        Check the file names and paths.
 
         Raises
         ------
@@ -218,9 +204,10 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _create_filelist(self):
         """
-        Create a list of files to be processed. This method will select the
-        required method based on the live_processing settings and the number
-        of selected files.
+        Create a list of files to be processed.
+
+        This method will select the required method based on the live_processing
+        settings and the number of selected files.
         """
         if self._check_only_first_file_selected():
             self._create_one_file_list()
@@ -232,8 +219,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _check_only_first_file_selected(self):
         """
-        Check whether a second file has been selected or the selection is
-        empty.
+        Check whether a second file has been selected or the selection is empty.
 
         Returns
         -------
@@ -253,7 +239,7 @@ class FilelistManager(ObjectWithParameterCollection):
 
     def _create_filelist_static(self):
         """
-        Create the list of files for static processing,
+        Create the list of files for static processing.
 
         The list of files to be processed is created based on the filenames
         of the first and last files. The directory content will be sorted
@@ -292,7 +278,7 @@ class FilelistManager(ObjectWithParameterCollection):
         self._config["file_list"] = [Path(_fnames.format(index=i)) for i in _range]
         self._config["n_files"] = len(_range)
 
-    def get_filename(self, index):
+    def get_filename(self, index: int) -> Path:
         """
         Get the filename of the image file numbered with index.
 

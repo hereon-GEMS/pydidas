@@ -92,7 +92,7 @@ class TestCompositeImage(unittest.TestCase):
             threshold_low=np.nan,
             threshold_high=1,
         )
-        with self.assertRaises(ValueError):
+        with self.assertRaises(UserConfigError):
             obj._CompositeImageManager__verify_config()
 
     def test_create_new_image(self):

@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,20 @@ metaclass-based registry should inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["IoBase"]
 
+
 import os
+from pathlib import Path
+from typing import Union
 
-from numpy import amin, amax
+from numpy import amax, amin, ndarray
 
+from ...core import Dataset
 from ...core.utils import rebin
 from ..io_master import IoMaster
 from ..utils import RoiSliceManager
@@ -48,7 +54,7 @@ class IoBase(metaclass=IoMaster):
     _data = None
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
         """
         Write the content to a file.
 
@@ -65,7 +71,7 @@ class IoBase(metaclass=IoMaster):
         raise NotImplementedError
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
         """
         Restore the content from a file
 
@@ -73,25 +79,24 @@ class IoBase(metaclass=IoMaster):
 
         Parameters
         ----------
-        filename : str
+        filename: Union[Path, str]
             The filename of the data file to be imported.
         """
         raise NotImplementedError
 
     @classmethod
-    def check_for_existing_file(cls, filename, **kwargs):
+    def check_for_existing_file(cls, filename: Union[Path, str], **kwargs: dict):
         """
         Check if the file exists and if yes if the overwrite flag has been
         set.
 
         Parameters
         ----------
-        filename : str
+        filename: Union[Path, str]
             The full filename and path.
         **kwargs : dict
-            Any keyword arguments. Supported are:
-        **overwrite : bool, optional
-            Flag to allow overwriting of existing files.
+            Any keyword arguments. Supported is 'overwrite' [bool], a flag to allow
+            overwriting of existing files.
 
         Raises
         ------
@@ -106,7 +111,7 @@ class IoBase(metaclass=IoMaster):
             )
 
     @classmethod
-    def get_data_range(cls, data, **kwargs):
+    def get_data_range(cls, data: Dataset, **kwargs: dict):
         """
         Get the data range from the keyword arguments or the data values.
 
@@ -132,7 +137,7 @@ class IoBase(metaclass=IoMaster):
         return _range
 
     @classmethod
-    def return_data(cls, **kwargs):
+    def return_data(cls, **kwargs: dict) -> Dataset:
         """
         Return the stored data.
 
@@ -140,19 +145,10 @@ class IoBase(metaclass=IoMaster):
         ----------
         **kwargs : dict
             A dictionary of keyword arguments. Supported keyword arguments
-            are:
-        **datatype : Union[datatype, 'auto'], optional
-            If 'auto', the image will be returned in its native data type.
-            If a specific datatype has been selected, the image is converted
-            to this type. The default is 'auto'.
-        **binning : int, optional
-            The reb-inning factor to be applied to the image. The default
-            is 1.
-        **roi : Union[tuple, None], optional
-            A region of interest for cropping. Acceptable are both 4-tuples
-            of integers in the format (y_low, y_high, x_low, x_high) as well
-            as 2-tuples of integers or slice  objects. If None, the full image
-            will be returned. The default is None.
+            are: "datatype", "binning", "roi".
+            "datatype" can be either "auto" for the native datatype or the
+            specified type. "Binning" can be any integer number and "roi" can
+            be either None or a 4-tuple of float.
 
         Raises
         ------

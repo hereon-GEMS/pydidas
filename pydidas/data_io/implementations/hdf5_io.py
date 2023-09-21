@@ -26,13 +26,15 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = []
 
+
 import os
 from copy import copy
 from numbers import Integral
+from pathlib import Path
+from typing import Union
 
 import h5py
-import hdf5plugin
-from numpy import amax, squeeze
+from numpy import amax, ndarray, squeeze
 
 from ...core import Dataset
 from ...core.constants import HDF5_EXTENSIONS
@@ -49,7 +51,7 @@ class Hdf5Io(IoBase):
     dimensions = [1, 2, 3, 4, 5, 6]
 
     @classmethod
-    def import_from_file(cls, filename, **kwargs):
+    def import_from_file(cls, filename: Union[Path, str], **kwargs: dict) -> Dataset:
         """
         Read data from a Hdf5 file.
 
@@ -114,7 +116,7 @@ class Hdf5Io(IoBase):
         return cls.return_data(**kwargs)
 
     @classmethod
-    def export_to_file(cls, filename, data, **kwargs):
+    def export_to_file(cls, filename: Union[Path, str], data: ndarray, **kwargs: dict):
         """
         Export data to an Hdf5 file.
 

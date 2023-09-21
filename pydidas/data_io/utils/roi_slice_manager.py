@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,20 +21,22 @@ objects for ROI cropping.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["RoiSliceManager"]
 
+
 import copy
+from typing import Union
 
 from numpy import mod
 
 from ...core.utils import flatten_all
 
 
-def error_msg(roi, exception=""):
+def error_msg(roi: object, exception: Exception = "") -> str:
     """
     Get a formatted error message.
 
@@ -80,8 +84,7 @@ class RoiSliceManager:
         initialization, this value can be supplied through the .roi property.
     """
 
-    def __init__(self, **kwargs):
-        """Initialization"""
+    def __init__(self, **kwargs: dict):
         self._roi = None
         self._original_roi = None
         self._input_shape = kwargs.get("input_shape", None)
@@ -91,25 +94,25 @@ class RoiSliceManager:
         self.create_roi_slices()
 
     @property
-    def input_shape(self):
+    def input_shape(self) -> Union[None, tuple[float, float]]:
         """
         Get the shape of the input image, if given.
 
         Returns
         -------
-        Union[None, tuple]
+        Union[None, tuple[float, float]]
             The shape of the input image.
         """
         return self._input_shape
 
     @input_shape.setter
-    def input_shape(self, shape):
+    def input_shape(self, shape: Union[None, tuple[float, float]]):
         """
         Set the input shape of the image.
 
         Parameters
         ----------
-        shape : tuple
+        shape : Union[None, tuple[float, float]]
             The shape of the input image.
         """
         if not isinstance(shape, tuple):

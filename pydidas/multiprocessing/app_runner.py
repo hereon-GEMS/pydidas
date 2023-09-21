@@ -153,7 +153,7 @@ class AppRunner(WorkerController):
         Perform pre-multiprocessing operations.
 
         This time slot is used to prepare the App by running the
-        :my:meth:`app.multiprocessing_pre_run`, settings the tasks and
+        :py:meth:`app.multiprocessing_pre_run`, settings the tasks and
         starting the workers.
         """
         self.__app.multiprocessing_pre_run()

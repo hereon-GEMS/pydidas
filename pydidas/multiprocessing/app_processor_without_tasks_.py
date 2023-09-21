@@ -86,16 +86,14 @@ def app_processor_without_tasks(
     _app_carryon = True
     logger.debug("Started process")
     _app = app(app_params, slave_mode=True)
-    logger.debug("Started app")
     _app._config = app_config
     _app.multiprocessing_pre_run()
-    logger.debug("Starting processing")
     while True:
         # check for stop signal
         try:
             stop_queue.get_nowait()
-            aborted_queue.put(1)
             logger.debug("Received stop queue signal")
+            aborted_queue.put(1)
             break
         except queue.Empty:
             pass
@@ -107,7 +105,6 @@ def app_processor_without_tasks(
             output_queue.put([_index, _results])
         else:
             time.sleep(0.005)
-    logger.debug("App processor finished.")
     logger.debug("Worker finished with all tasks. Waiting for output queue to empty.")
     while _wait_for_output and not output_queue.empty():
         time.sleep(0.05)

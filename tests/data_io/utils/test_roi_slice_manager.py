@@ -538,6 +538,21 @@ class TestRoiSliceManager(unittest.TestCase):
         with self.assertRaises(ValueError):
             obj._convert_roi_key_to_slice_objects()
 
+    def test_ndim_setter_simple(self):
+        _roi = [slice(0, 5)]
+        obj = RoiSliceManager(roi=_roi, dim=1)
+        obj.ndim = 2
+        self.assertEqual(obj.ndim, 2)
+        obj.roi
+
+    def test_ndim_setter_previous_roi(self):
+        _roi = (slice(0, 5), slice(10, 20))
+        obj = RoiSliceManager(roi=_roi, dim=2)
+        self.assertEqual(obj.roi, _roi)
+        obj.ndim = 1
+        obj.roi = [4, 12]
+        self.assertEqual(obj.roi, (slice(4, 12),))
+
     def test_full_init_1d(self):
         _roi = [slice(0, 5)]
         obj = RoiSliceManager(roi=_roi, dim=1)

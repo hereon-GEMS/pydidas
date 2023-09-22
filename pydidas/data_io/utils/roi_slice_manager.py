@@ -89,7 +89,7 @@ class RoiSliceManager:
         self._roi = None
         self._original_roi = None
         self._input_shape = kwargs.get("input_shape", None)
-        self._dim = kwargs.get("dim", 2)
+        self._ndim = kwargs.get("dim", 2)
         self._original_input_shape = None
         self._roi_key = kwargs.get("roi", None)
         self.create_roi_slices()
@@ -164,6 +164,34 @@ class RoiSliceManager:
         )
         return _coords
 
+    @property
+    def ndim(self) -> int:
+        """
+        Get the number of dimensions.
+
+        Returns
+        -------
+        int
+            The number of dimensions.
+        """
+        return self._ndim
+
+    @ndim.setter
+    def ndim(self, ndim: int):
+        """
+        Set the number of dimensions.
+
+        Parameters
+        ----------
+        ndim : int
+            The new number of dimensions.
+        """
+        if ndim == self._ndim:
+            return
+        self._ndim = ndim
+        self._roi = None
+        self._roi_key = None
+
     def apply_second_roi(self, roi2):
         """
         Apply a second ROI to the ROI.
@@ -206,7 +234,7 @@ class RoiSliceManager:
         # https://stackoverflow.com/questions/19257498/
         # combining-two-slicing-operations
         _roi = []
-        for _axis in range(self._dim):
+        for _axis in range(self._ndim):
             _slice1 = self._original_roi[_axis]
             _slice2 = self._roi[_axis]
             _step1 = _slice1.step if _slice1.step is not None else 1
@@ -365,7 +393,7 @@ class RoiSliceManager:
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
-        if _n != 2 * self._dim:
+        if _n != 2 * self._ndim:
             _msg = error_msg(
                 self._roi_key, "The input does not have the correct length."
             )
@@ -382,7 +410,7 @@ class RoiSliceManager:
         """
         _roi = copy.copy(self._roi_key)
         _out = []
-        for _dim in range(1, self._dim + 1):
+        for _dim in range(1, self._ndim + 1):
             try:
                 if isinstance(_roi[0], (Integral, type(None))) and isinstance(
                     _roi[1], (Integral, type(None))
@@ -419,7 +447,7 @@ class RoiSliceManager:
             return value
 
         _new_roi = []
-        for _axis in range(self._dim):
+        for _axis in range(self._ndim):
             _mod = self.input_shape[_axis]
             _start = apply_neg_mod(self._roi[_axis].start, _mod, True)
             _step = self._roi[_axis].step

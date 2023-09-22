@@ -512,7 +512,7 @@ class BasePlugin(ObjectWithParameterCollection):
         else:
             self._config["result_shape"] = _shape
 
-    def apply_legacy_image_ops_to_data(self, data: np.ndarray):
+    def apply_legacy_image_ops_to_data(self, data: np.ndarray) -> np.ndarray:
         """
         Apply the legacy image operations to a new data frame.
 
@@ -549,7 +549,7 @@ class BasePlugin(ObjectWithParameterCollection):
             self._legacy_image_ops_meta["num"] += 1
         self._legacy_image_ops_meta["included"] = True
 
-    def _get_own_roi(self) -> tuple:
+    def _get_own_roi(self) -> Union[tuple[slice, slice], None]:
         """
         Get the ROI defined within the plugin.
 
@@ -559,7 +559,7 @@ class BasePlugin(ObjectWithParameterCollection):
 
         Returns
         -------
-        tuple
+        Union[tuple[slice. slice], None]
             The tuple with two slice objects which define the image ROI.
         """
         if self.input_data_dim == 1:
@@ -584,14 +584,16 @@ class BasePlugin(ObjectWithParameterCollection):
         _roi = RoiSliceManager(roi=_roi_bounds, input_shape=self.input_shape, dim=_dim)
         return _roi.roi
 
-    def get_single_ops_from_legacy(self) -> tuple:
+    def get_single_ops_from_legacy(self) -> tuple[tuple[slice, ...], int]:
         """
-        Get the parameters for a single ROI and binning operation from
-        combining all legacy operations on the data.
+        Get the parameters for a single ROI and binning operation.
+
+        This method combines all legacy operations on the data into one set of
+        operations to be applied..
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, ...]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.
@@ -601,14 +603,13 @@ class BasePlugin(ObjectWithParameterCollection):
         else:
             return self.__get_legacy_op_for_2d_input()
 
-    def __get_legacy_op_for_1d_input(self) -> tuple:
+    def __get_legacy_op_for_1d_input(self) -> tuple[slice, int]:
         """
-        Get the single legacy operation that transforms the raw input to the input
-        of this plugin.
+        Get a single operation that converts the raw input to the input shape.
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, slice]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.
@@ -635,14 +636,13 @@ class BasePlugin(ObjectWithParameterCollection):
                 _roi.apply_second_roi(_roi_unbinned)
         return _roi.roi, _binning
 
-    def __get_legacy_op_for_2d_input(self) -> tuple:
+    def __get_legacy_op_for_2d_input(self) -> tuple[tuple[slice, ...], int]:
         """
-        Get the single legacy operation that transforms the raw input to the input
-        of this plugin.
+        Get a single operation that converts the raw input to the input shape.
 
         Returns
         -------
-        roi : tuple
+        roi : tuple[slice, ...]
             The ROI which needs to be applied to the original image.
         binning : int
             The binning factor which needs to be applied to the original image.

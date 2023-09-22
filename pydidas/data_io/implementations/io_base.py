@@ -167,6 +167,7 @@ class IoBase(metaclass=IoMaster):
             raise ValueError("No image has been read.")
         _data = cls._data
         if _local_roi is not None:
+            cls._roi_controller.ndim = kwargs.get("ndim", 2)
             cls._roi_controller.roi = _local_roi
             _data = _data[cls._roi_controller.roi]
         if _binning != 1:

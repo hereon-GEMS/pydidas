@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@ Module with the InputPlugin base class for 1 dim-data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["InputPlugin1d"]
 
 import numpy as np
 
 from ..contexts import ScanContext
-from ..core import UserConfigError, get_generic_parameter
+from ..core import Dataset, UserConfigError, get_generic_parameter
 from ..core.constants import INPUT_PLUGIN
 from .base_input_plugin import InputPlugin
 from .base_plugin import BasePlugin
@@ -56,13 +56,14 @@ class InputPlugin1d(InputPlugin):
     default_params = InputPlugin.default_params.copy()
     advanced_parameters = ["use_roi", "roi_xlow", "roi_xhigh", "binning"]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         """
         Create BasicPlugin instance.
         """
         BasePlugin.__init__(self, *args, **kwargs)
         self._SCAN = kwargs.get("scan", SCAN)
         self.filename_string = ""
+        self._original_input_shape = None
 
     def calculate_result_shape(self):
         """
@@ -72,7 +73,18 @@ class InputPlugin1d(InputPlugin):
         self._config["result_shape"] = (_n,)
         self._original_input_shape = (_n,)
 
-    def execute(self, index, **kwargs):
+    def pre_execute(self):
+        """
+        Run generic pre-execution routines.
+        """
+        self.update_filename_string()
+        if self._original_input_shape is None:
+            self.calculate_result_shape()
+        self._config["n_multi"] = self._SCAN.get_param_value("scan_multiplicity")
+        self._config["start_index"] = self._SCAN.get_param_value("scan_start_index")
+        self._config["delta_index"] = self._SCAN.get_param_value("scan_index_stepping")
+
+    def execute(self, index: int, **kwargs: dict):
         """
         Import the data and pass it on after (optionally) handling image multiplicity.
 
@@ -93,25 +105,58 @@ class InputPlugin1d(InputPlugin):
                 "Calling plugin execution without prior pre-execution is not allowed."
             )
         _data = None
+        kwargs
         if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["roi"] = slice(
-                self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
-            )
+            kwargs["roi"] = [
+                slice(
+                    self.get_param_value("roi_xlow"), self.get_param_value("roi_xhigh")
+                )
+            ]
+            kwargs["ndim"] = 1
+        if self._config["n_multi"] == 1:
+            _data, kwargs = self.get_frame(index, **kwargs)
+            _data.data_label = self.output_data_label
+            _data.data_unit = self.output_data_unit
+            return _data, kwargs
+        return self._handle_multi_image(index, **kwargs)
+
+    def _handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+        """
+        Handle frames with an image multiplicity.
+
+        Parameters
+        ----------
+        index : int
+            The scan index.
+        **kwargs : dict
+            Keyword arguments for the get_frame method.
+
+        Returns
+        -------
+        pydidas.core.Dataset
+            The image data frame.
+        kwargs : dict
+            The updated kwargs.
+        """
         _frames = self._config["n_multi"] * index + np.arange(self._config["n_multi"])
+        _handling = self._SCAN.get_param_value("scan_multi_image_handling")
+        _factor = self._config["n_multi"] if _handling == "Average" else 1
+        _data = Dataset(np.zeros(self._original_input_shape, dtype=np.float32))
         for _frame_index in _frames:
-            if _data is None:
-                _data, kwargs = self.get_frame(_frame_index, **kwargs)
+            _tmp_data, kwargs = self.get_frame(_frame_index, **kwargs)
+            if _handling == "Maximum":
+                np.maximum(_data, _tmp_data, out=_data)
             else:
-                _data += self.get_frame(_frame_index, **kwargs)[0]
-        if self._SCAN.get_param_value("scan_multi_image_handling") == "Average":
-            _data = _data / self._config["n_multi"]
+                _data += _tmp_data / _factor
         if _frames.size > 1:
             kwargs["frames"] = _frames
+        _data.data_label = self.output_data_label
+        _data.data_unit = self.output_data_unit
         return _data, kwargs
 
     def get_raw_input_size(self):
         """
-        Get the raw input size.
+        Get the number of data points in the raw input.
 
         Raises
         ------
@@ -121,6 +166,6 @@ class InputPlugin1d(InputPlugin):
         Returns
         -------
         int
-            The raw input size in bins.
+            The raw input size in data points.
         """
         raise NotImplementedError

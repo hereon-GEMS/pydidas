@@ -30,6 +30,7 @@ __all__ = ["BaseFitPlugin"]
 from typing import List
 
 import numpy as np
+from qtpy import QtWidgets
 from scipy.optimize import least_squares
 
 from ..core import Dataset, UserConfigError, get_generic_param_collection
@@ -84,13 +85,13 @@ class BaseFitPlugin(ProcPlugin):
         }
 
     @property
-    def result_shape(self) -> tuple:
+    def result_shape(self) -> tuple[int, ...]:
         """
         Get the shape of the plugin result.
 
         Returns
         -------
-        tuple
+        tuple[int, ...]
             The shape of the results with a value for each dimension. Unknown
             dimensions are represented as -1 value.
         """
@@ -136,7 +137,7 @@ class BaseFitPlugin(ProcPlugin):
         self.create_fit_start_param_dict()
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Fit a peak to the data.
 
@@ -184,7 +185,7 @@ class BaseFitPlugin(ProcPlugin):
         self._details = {None: self.create_detailed_results(_results, _startguess)}
         return _results, kwargs
 
-    def create_result_dataset(self, valid=True):
+    def create_result_dataset(self, valid: bool = True):
         """
         Create a new Dataset from the original data and the data fit including
         all the old metadata.
@@ -555,7 +556,7 @@ class BaseFitPlugin(ProcPlugin):
             ],
         }
 
-    def get_parameter_config_widget(self):
+    def get_parameter_config_widget(self) -> QtWidgets.QWidget:
         """
         Get the unique configuration widget associated with this Plugin.
 

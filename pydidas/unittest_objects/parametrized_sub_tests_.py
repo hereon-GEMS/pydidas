@@ -31,7 +31,7 @@ __all__ = ["parametrized_sub_tests"]
 import functools
 
 
-def parametrized_sub_tests(param_dict_list):
+def parametrized_sub_tests(param_dict_list: list) -> type:
     """
     Decorates a test case to run it as a set of subtests.
 

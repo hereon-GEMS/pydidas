@@ -28,7 +28,7 @@ __status__ = "Production"
 __all__ = ["dummy_getter"]
 
 
-def dummy_getter(plugin_name):
+def dummy_getter(plugin_name: str) -> object:
     """
     Get a new Plugin instance from a Plugin name.
 

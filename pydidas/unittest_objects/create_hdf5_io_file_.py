@@ -28,13 +28,25 @@ __status__ = "Production"
 __all__ = ["create_hdf5_io_file"]
 
 
+from pathlib import Path
+from typing import NewType, Union
+
 import h5py
 
+from pydidas.core import Dataset
 from pydidas.core.utils import create_hdf5_dataset
 
 
+WorkflowTree = NewType("WorkflowTree", type)
+
+
 def create_hdf5_io_file(
-    filename, data, scan_params, diffraction_exp_params, workflow, **kwargs
+    filename: Union[Path, str],
+    data: Dataset,
+    scan_params: dict,
+    diffraction_exp_params: dict,
+    workflow: WorkflowTree,
+    **kwargs: dict,
 ):
     """
     Create a Hdf5 file from a dataset which can be read by the Hdf5 importer.
@@ -54,7 +66,6 @@ def create_hdf5_io_file(
     **kwargs : dict
         Any optional kwargs passed to the function.
     """
-
     with h5py.File(filename, "w") as _file:
         _file.create_group("entry")
         _file.create_group("entry/data")

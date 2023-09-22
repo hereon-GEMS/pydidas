@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DummyLoader"]
 
+
 import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
@@ -65,7 +66,7 @@ class DummyLoader(InputPlugin):
         get_generic_parameter("filename"),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         InputPlugin.__init__(self, *args, **kwargs)
         self._preexecuted = False
         self._config["input_available"] = 12
@@ -87,7 +88,7 @@ class DummyLoader(InputPlugin):
 
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
-    def get_first_file_size(self):
+    def get_first_file_size(self) -> int:
         """
         Reimplement the "get_first_file_size" and return a dummy value.
 
@@ -98,7 +99,7 @@ class DummyLoader(InputPlugin):
         """
         return 1
 
-    def get_filename(self, index):
+    def get_filename(self, index: int) -> int:
         """
         Get the filename associated with the input index.
 
@@ -116,7 +117,7 @@ class DummyLoader(InputPlugin):
         """
         return index
 
-    def input_available(self, index):
+    def input_available(self, index: int) -> bool:
         """
         Check if input is available for the given index.
 
@@ -144,7 +145,7 @@ class DummyLoader(InputPlugin):
         """
         self._preexecuted = True
 
-    def execute(self, index, **kwargs):
+    def execute(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Execute the actual computations.
 

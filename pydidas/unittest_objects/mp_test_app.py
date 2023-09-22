@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["MpTestApp"]
 
+
 import time
 
 import numpy as np
@@ -36,7 +37,7 @@ from pydidas.core import BaseApp, get_generic_param_collection
 from pydidas.managers import CompositeImageManager
 
 
-def get_test_image(index, **kwargs):
+def get_test_image(index: int, **kwargs: dict) -> np.ndarray:
     """
     Get a random test image.
 
@@ -45,7 +46,7 @@ def get_test_image(index, **kwargs):
 
     Parameters
     ----------
-    index : object
+    index : int
         The index. Not used within the function but the pydidas architecture
         expects it.
     **kwargs : dict
@@ -100,7 +101,7 @@ class MpTestApp(BaseApp):
             datatype=np.float64,
         )
 
-    def multiprocessing_get_tasks(self):
+    def multiprocessing_get_tasks(self) -> list[int, ...]:
         """
         Get the tasks of the Application.
 
@@ -114,7 +115,7 @@ class MpTestApp(BaseApp):
         """
         return self._config["mp_tasks"]
 
-    def multiprocessing_carryon(self):
+    def multiprocessing_carryon(self) -> bool:
         """
         Check for carryon calls.
 
@@ -132,7 +133,7 @@ class MpTestApp(BaseApp):
             return False
         return True
 
-    def multiprocessing_func(self, index):
+    def multiprocessing_func(self, index: int) -> np.ndarray:
         """
         Perform the multiprocessing computation.
 
@@ -153,7 +154,7 @@ class MpTestApp(BaseApp):
         return _image
 
     @QtCore.Slot(object, object)
-    def multiprocessing_store_results(self, index, image):
+    def multiprocessing_store_results(self, index: int, image: np.ndarray):
         """
         Store the result of the multiprocessing function call.
 

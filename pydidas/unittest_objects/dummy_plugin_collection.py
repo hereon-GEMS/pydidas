@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DummyPluginCollection"]
 
+
 # because these Plugins will be loaded directly by importlib, absolute imports
 # are required:
 from pydidas.plugins.plugin_collection import _PluginCollection
@@ -39,7 +40,7 @@ class DummyPluginCollection(_PluginCollection):
     of random plugins.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         kwargs["plugin_path"] = kwargs.get("plugin_path", [])
         super().__init__(**kwargs)
         _nplugins = kwargs.get("n_plugins", 21)

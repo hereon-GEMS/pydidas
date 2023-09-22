@@ -27,6 +27,7 @@ __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["DummyProc"]
 
+
 import numpy as np
 
 # because these Plugins will be loaded directly by importlib, absolute imports
@@ -70,7 +71,7 @@ class DummyProc(ProcPlugin):
 
         return (dummy_getter, (self.__class__.__name__,), self.__getstate__())
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: np.ndarray, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Execute the actual computations.
 

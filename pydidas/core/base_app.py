@@ -291,12 +291,21 @@ class BaseApp(ObjectWithParameterCollection):
                 _key: copy(_value)
                 for _key, _value in self.__dict__.items()
                 if not (
-                    isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+                    isinstance(
+                        _value,
+                        (
+                            QtCore.SignalInstance,
+                            QtCore.QMetaObject,
+                            ParameterCollection,
+                        ),
+                    )
                     or (slave_mode and _key in self.attributes_not_to_copy_to_slave_app)
                     or _key in ["__METAOBJECT__"]
                 )
             }
         )
+        for _key, _param in self.params.items():
+            _obj_copy.set_param_value(_key, _param.value)
         if slave_mode:
             _obj_copy.slave_mode = True
         return _obj_copy

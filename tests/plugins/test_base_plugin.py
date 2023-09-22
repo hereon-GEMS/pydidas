@@ -40,6 +40,14 @@ from pydidas.plugins import BasePlugin
 from pydidas.unittest_objects import create_plugin_class
 
 
+class TestLinkedObject:
+    def __init__(self, params):
+        self.params = params
+
+    def get_param_value(self, key):
+        return self.params.get_value(key)
+
+
 class TestBasePlugin(unittest.TestCase):
     def setUp(self):
         self._pluginpath = tempfile.mkdtemp()
@@ -445,6 +453,20 @@ class TestBasePlugin(unittest.TestCase):
         cp = copy.copy(obj)
         self.assertEqual(obj.__class__, cp.__class__)
         self.assertEqual(obj.get_param_value("label"), cp.get_param_value("label"))
+        self.assertNotEqual(id(obj.params), id(cp.params))
+
+    def test_copy__with_linked_object(self):
+        plugin = create_plugin_class(BASE_PLUGIN)
+        obj = plugin()
+        obj.dummy = TestLinkedObject(obj.params)
+        obj.set_param_value("label", "Test 12423536")
+        self.assertEqual(
+            obj.dummy.get_param_value("label"), obj.get_param_value("label")
+        )
+        cp = copy.copy(obj)
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
+        cp.set_param_value("label", "Test 12423536")
+        self.assertEqual(cp.dummy.get_param_value("label"), cp.get_param_value("label"))
 
     def test_init__plain(self):
         plugin = create_plugin_class(BASE_PLUGIN)()

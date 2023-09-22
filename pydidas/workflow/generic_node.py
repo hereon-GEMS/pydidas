@@ -405,6 +405,12 @@ class GenericNode:
             _copy.add_child(_child_copy)
         return _copy
 
+    def __deepcopy__(self, memo: dict) -> Self:
+        """
+        Overwrite generic deepcopy with copy.
+        """
+        return self.__copy__()
+
     def __hash__(self) -> int:
         """
         Get a hash value for the GenericNode.

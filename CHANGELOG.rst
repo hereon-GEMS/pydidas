@@ -54,6 +54,8 @@ Bugfixes
   when the plugins had a custom widget.
 - Fixed an issue when displaying Hdf5 files in the DirectoryExplorer which did
   not have any valid datasets.
+- Fixed a bug when copying objects (Apps, Plugins) with objects with linked
+  Parameters where the linking got lost.
 
 
 v23.07.05

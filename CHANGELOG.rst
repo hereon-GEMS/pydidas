@@ -56,6 +56,7 @@ Bugfixes
   not have any valid datasets.
 - Fixed a bug when copying objects (Apps, Plugins) with objects with linked
   Parameters where the linking got lost.
+- Fixed an issue with the RoiSliceManager and numpy integer datatypes.
 
 
 v23.07.05

@@ -29,6 +29,7 @@ __all__ = ["RoiSliceManager"]
 
 
 import copy
+from numbers import Integral
 from typing import Union
 
 from numpy import mod
@@ -120,7 +121,7 @@ class RoiSliceManager:
         self._input_shape = shape
 
     @property
-    def roi(self):
+    def roi(self) -> tuple[slice, ...]:
         """
         Get the ROI slice objects
 
@@ -251,11 +252,10 @@ class RoiSliceManager:
             return
         if isinstance(self._roi_key, str):
             self._convert_str_roi_key()
-        if isinstance(self._roi_key, tuple):
+        elif isinstance(self._roi_key, (list, tuple)):
             self._roi_key = list(self._roi_key)
-        if not isinstance(self._roi_key, list):
-            _msg = error_msg(self._roi_key, "Not of type (list, tuple).")
-            raise ValueError(_msg)
+        else:
+            raise ValueError(error_msg(self._roi_key, "Not of type (list, tuple)."))
 
     def _convert_str_roi_key(self):
         """
@@ -297,8 +297,11 @@ class RoiSliceManager:
         ValueError
             If datatypes apart from integer and slice are encountered.
         """
-        roi_dtypes = {type(e) for e in self._roi_key}
-        roi_dtypes.discard(int)
+        roi_dtypes = {
+            (Integral if issubclass(type(e), Integral) else type(e))
+            for e in self._roi_key
+        }
+        roi_dtypes.discard(Integral)
         roi_dtypes.discard(slice)
         roi_dtypes.discard(str)
         roi_dtypes.discard(type(None))
@@ -326,7 +329,7 @@ class RoiSliceManager:
         try:
             while len(_tmpkeys) > 0:
                 key = _tmpkeys.pop(0)
-                if isinstance(key, (int, slice, type(None))):
+                if isinstance(key, (Integral, slice, type(None))):
                     _newkeys.append(key)
                     continue
                 if key.startswith("slice("):
@@ -358,13 +361,13 @@ class RoiSliceManager:
         """
         _n = 0
         for key in self._roi_key:
-            if isinstance(key, (int, type(None))):
+            if isinstance(key, (Integral, type(None))):
                 _n += 1
             elif isinstance(key, slice):
                 _n += 2
         if _n != 2 * self._dim:
             _msg = error_msg(
-                self._roi_key, "The input does not have the correct length"
+                self._roi_key, "The input does not have the correct length."
             )
             raise ValueError(_msg)
 
@@ -381,8 +384,8 @@ class RoiSliceManager:
         _out = []
         for _dim in range(1, self._dim + 1):
             try:
-                if isinstance(_roi[0], (int, type(None))) and isinstance(
-                    _roi[1], (int, type(None))
+                if isinstance(_roi[0], (Integral, type(None))) and isinstance(
+                    _roi[1], (Integral, type(None))
                 ):
                     _index0 = _roi.pop(0)
                     _index0 = _index0 if _index0 is not None else 0
@@ -393,7 +396,7 @@ class RoiSliceManager:
                 else:
                     _msg = error_msg(
                         self._roi_key,
-                        "Cannot create the slice " f"object for dimension {_dim}.",
+                        f"Cannot create the slice object for dimension {_dim}.",
                     )
                     raise ValueError(_msg)
             except ValueError as _ve:

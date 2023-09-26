@@ -146,7 +146,7 @@ class WorkflowResults(QtCore.QObject):
             for _key, _item in _meta.items():
                 if isinstance(_item, dict):
                     _update_method = getattr(
-                        self.__composites[node_id], f"update_{_key}"
+                        self.__composites[node_id], f"update_{_key[:-1]}"
                     )
                     for _dim, _val in _item.items():
                         _update_method(_dim + _dim_offset, _val)
@@ -568,7 +568,7 @@ class WorkflowResults(QtCore.QObject):
             save_dir,
             _node_info,
             scan_context=self._SCAN,
-            diffraction_exp_context=self._EXP,
+            diffraction_exp=self._EXP,
             workflow_tree=self._TREE,
         )
 

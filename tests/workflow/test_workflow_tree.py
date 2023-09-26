@@ -294,7 +294,7 @@ class TestWorkflowTree(unittest.TestCase):
             self.assertIsInstance(_node, WorkflowNode)
         for _node in tree2.root._children:
             self.assertTrue(_node in tree2.nodes.values())
-        for key in set(self.tree.__dict__.keys()) - {"root", "nodes"}:
+        for key in set(self.tree.__dict__.keys()) - {"root", "nodes", "_starthash"}:
             self.assertEqual(getattr(self.tree, key), getattr(tree2, key))
 
     def test_tree_pickling(self):

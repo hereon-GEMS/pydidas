@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,8 +24,9 @@ __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResultsSelector"]
+
 
 import re
 
@@ -62,7 +63,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         "use_scan_timeline", "result_n_dim", "use_data_range"
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         ObjectWithParameterCollection.__init__(self)
         self.add_params(*args)
         self.set_default_params()
@@ -85,7 +86,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._config["active_node"] = -1
         self._selection = None
 
-    def select_active_node(self, index):
+    def select_active_node(self, index: int):
         """
         Select the active node.
 
@@ -130,7 +131,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 self.add_param(_param)
 
     @property
-    def selection(self):
+    def selection(self) -> tuple[slice, ...]:
         """
         Get the current selection object.
 
@@ -144,7 +145,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         return self._selection
 
     @property
-    def active_dims(self):
+    def active_dims(self) -> list[int, ...]:
         """
         Get the active dimensions (i.e. dimensions with more than one entry)
 
@@ -159,7 +160,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             _index for _index, _items in enumerate(self._selection) if _items.size > 1
         ]
 
-    def _get_param_hash(self):
+    def _get_param_hash(self) -> int:
         """
         Get the hash value for all Parameter values.
 
@@ -199,7 +200,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         self._selection = _selection
         self._config["param_hash"] = self._get_param_hash()
 
-    def _get_single_slice_object(self, index):
+    def _get_single_slice_object(self, index: int) -> np.ndarray:
         """
         Get the array which slices the selected dimension
 
@@ -249,18 +250,19 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                 )
         return np.unique(np.r_[tuple(_slices)])
 
-    def _parse_string_indices(self, substrings):
+    def _parse_string_indices(self, substrings: list[str]) -> list[int]:
         """
         Parse the string with indices to integer values.
 
         Parameters
         ----------
-        substrings : list
+        substrings : list[str]
             The list with individual entries (which were separated by "," in
             the original string).
+
         Returns
         -------
-        list
+        list[int]
             The list with index values for the various selections.
         """
         _new_items = []
@@ -275,20 +277,20 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
             _new_items.append(_entries)
         return _new_items
 
-    def _convert_values_to_indices(self, substrings):
+    def _convert_values_to_indices(self, substrings: list[str]) -> list[int]:
         """
         Convert data value strings to indexes for selecting the required
         datapoints.
 
         Parameters
         ----------
-        substrings : list
+        substrings : list[str]
             The list with individual entries (which were separated by "," in
             the original string).
 
         Returns
         -------
-        list
+        list[int]
             The list with index values for the various selections.
         """
         _new_items = []
@@ -313,7 +315,7 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
                     _new_items.append([_index])
         return _new_items
 
-    def get_best_index_for_value(self, value, valrange):
+    def get_best_index_for_value(self, value: float, valrange: np.ndarray) -> int:
         """
         Get the index which is the closest match to the selected value from a range.
 
@@ -335,14 +337,14 @@ class WorkflowResultsSelector(ObjectWithParameterCollection):
         _index = _delta.argmin()
         return _index
 
-    def _check_for_selection_dim(self, selection):
+    def _check_for_selection_dim(self, selection: tuple[slice]):
         """
         Check that the selection has the same dimensionality as the requested
         dimensionality and raise an Exception if not.
 
         Parameters
         ----------
-        selection : tuple
+        selection : tuple[slice]
             The slice objects for all dimensions.
 
         Raises

@@ -162,6 +162,8 @@ class GenericTree:
         self.nodes = {}
         self.node_ids = []
         self._config["active_node_id"] = None
+        self._config["tree_changed"] = True
+        self._starthash = hash((get_random_string(12), time.time()))
         self.root = None
 
     def register_node(
@@ -417,17 +419,23 @@ class GenericTree:
         """
         cls = self.__class__
         _copy = cls.__new__(cls)
-        _copy.__dict__ = {
-            _key: copy.deepcopy(_value)
-            for _key, _value in self.__dict__.items()
-            if not isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
-        }
-        _copy.clear()
+        _copy.__dict__.update(
+            {
+                _key: copy.deepcopy(_value)
+                for _key, _value in self.__dict__.items()
+                if not (
+                    isinstance(_value, (QtCore.SignalInstance, QtCore.QMetaObject))
+                    or _key in ["nodes", "root"]
+                )
+            }
+        )
         if self.root is not None:
+            # print("root:", self.root)
+            # print("root copy", _root_copy.__dict__)
             _copy.set_root(copy.deepcopy(self.root))
         return _copy
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: dict) -> Self:
         """
         Get a deep copy of the GenericTree.
 
@@ -445,7 +453,7 @@ class GenericTree:
         """
         return self.__copy__()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Get the hash value for the GenericTree.
 

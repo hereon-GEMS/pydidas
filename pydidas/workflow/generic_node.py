@@ -75,7 +75,7 @@ class GenericNode:
 
         Parameters
         ----------
-        **kwargs : type
+        **kwargs : dict
             Any keywords required for this node.
         """
         self._parent = None
@@ -96,11 +96,9 @@ class GenericNode:
             The child object to be registered.
         """
         self._verify_type(child)
-        # need to use the child's private _parent variable to prevent
-        # recursive calls between child and parent:
-        child._parent = self
         if child not in self._children:
             self._children.append(child)
+        child.parent = self
 
     @property
     def node_id(self) -> Union[None, int]:
@@ -206,12 +204,14 @@ class GenericNode:
         parent : pydidas.workflow.GenericNode
             The parent object
         """
+        if parent == self._parent:
+            return
         self._verify_type(parent, allowNone=True)
-        if self._parent is not None:
-            self._parent.remove_child_reference(self)
+        if self.parent is not None:
+            self.parent.remove_child_reference(self)
+        self._parent = parent
         if parent is not None:
             parent.add_child(self)
-        self._parent = parent
 
     def get_children(self) -> list:
         """
@@ -266,8 +266,7 @@ class GenericNode:
 
     def delete_node_references(self, recursive: bool = True):
         """
-        Delete all references to the node from its parent and children and
-        unreference all children.
+        Delete all references to the node from its parent and children.
 
         If the node has a parent, the reference to itself is removed from the
         parent. If the node has children, references to these children are
@@ -298,12 +297,12 @@ class GenericNode:
 
     def connect_parent_to_children(self):
         """
-        Connect the own parent to the children.
+        Connect the node's parent to the node's children.
 
         Raises
         ------
         UserConfigError
-            If the node does not have a parent.
+            If the node does not have a parent and multiple children.
         """
         if self.parent is None and len(self._children) > 1:
             raise UserConfigError(
@@ -315,7 +314,7 @@ class GenericNode:
             for _child in self._children:
                 _child.parent = None
         else:
-            for _child in self._children:
+            for _child in self._children[:]:
                 self.parent.add_child(_child)
         self._children = []
         self.parent = None
@@ -363,8 +362,8 @@ class GenericNode:
             )
         if self._parent is not None:
             self._parent.remove_child_reference(self)
-        new_parent.add_child(self)
         self._parent = new_parent
+        new_parent.add_child(self)
 
     def copy(self) -> Self:
         """
@@ -399,7 +398,9 @@ class GenericNode:
             )
         }
         _copy._children = []
-        _copy._parent = self.parent
+        _copy._parent = None
+        if self.parent is not None:
+            self.parent.add_child(_copy)
         for _child in self._children:
             _child_copy = copy.copy(_child)
             _copy.add_child(_child_copy)

@@ -420,7 +420,7 @@ class TestGenericTree(unittest.TestCase):
         self.assertEqual(tree.get_new_nodeid(), len(tree.node_ids))
         self.assertEqual(tree.active_node, _active_node)
 
-    def test_copy_copy(self):
+    def test_copy__copy_full_tree(self):
         _depth = 3
         _width = 4
         tree = GenericTree()
@@ -431,7 +431,7 @@ class TestGenericTree(unittest.TestCase):
             self.assertFalse(_node in _copy.nodes.values())
         for _node in _copy.root._children:
             self.assertTrue(_node in _copy.nodes.values())
-        for key in set(tree.__dict__.keys()) - {"root", "nodes"}:
+        for key in set(tree.__dict__.keys()) - {"root", "nodes", "_starthash"}:
             self.assertEqual(getattr(tree, key), getattr(_copy, key))
 
     def test_copy(self):

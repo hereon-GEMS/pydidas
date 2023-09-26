@@ -151,6 +151,24 @@ class TestGenericNode(unittest.TestCase):
         obj._children = [1, 2, 3]
         self.assertFalse(obj.is_leaf)
 
+    def test_add_child__with_previous_parent(self):
+        obj = GenericNode()
+        old_parent = GenericNode()
+        new_parent = GenericNode()
+        old_parent.add_child(obj)
+        new_parent.add_child(obj)
+        self.assertEqual(old_parent.get_children(), [])
+        self.assertEqual(obj.parent, new_parent)
+        self.assertIn(obj, new_parent.get_children())
+
+    def test_add_child__same_parent(self):
+        obj = GenericNode()
+        _parent = GenericNode()
+        _parent.add_child(obj)
+        _parent.add_child(obj)
+        self.assertEqual(obj.parent, _parent)
+        self.assertIn(obj, _parent.get_children())
+
     def test_n_children__empty(self):
         obj = GenericNode()
         self.assertEqual(obj.n_children, 0)
@@ -344,6 +362,28 @@ class TestGenericNode(unittest.TestCase):
         self.assertNotEqual(node, node_copy)
         self.assertEqual(node._parent, node_copy._parent)
         self.assertFalse(node3 in node_copy._children)
+
+    def test_copy__with_children(self):
+        root = GenericNode(node_id=0)
+        _node1 = GenericNode(node_id=1, parent=root)
+        _node2 = GenericNode(node_id=2, parent=root)
+        node_copy = copy.copy(root)
+        self.assertNotEqual(root, node_copy)
+        self.assertEqual(len(node_copy.get_children()), 2)
+        self.assertEqual(len(root.get_children()), 2)
+        for _node in [_node1, _node2]:
+            self.assertFalse(_node in node_copy._children)
+
+    def test_copy__with_recursive_children(self):
+        root = GenericNode(node_id=0)
+        _node1 = GenericNode(node_id=1, parent=root)
+        _node2 = GenericNode(node_id=2, parent=root)
+        _ = GenericNode(node_id=3, parent=_node1)
+        _ = GenericNode(node_id=4, parent=_node2)
+        node_copy = copy.copy(root)
+        self.assertNotEqual(root, node_copy)
+        self.assertEqual(len(node_copy.get_children()), 2)
+        self.assertEqual(len(root.get_children()), 2)
 
     def test_hash__simple_node(self):
         node = GenericNode(node_id=0)

@@ -57,6 +57,8 @@ Bugfixes
 - Fixed a bug when copying objects (Apps, Plugins) with objects with linked
   Parameters where the linking got lost.
 - Fixed an issue with the RoiSliceManager and numpy integer datatypes.
+- Fixed a bug in the GenericNode where copying the node would keep references
+  to the original parent.
 
 
 v23.07.05

@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,14 +21,19 @@ inherit from.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResultIoBase"]
 
-import re
 
+import re
+from pathlib import Path
+from typing import Union
+
+from ...contexts.scan_context import Scan
+from ...core import Dataset
 from ...core.io_registry import GenericIoBase
 from .workflow_result_io_meta import WorkflowResultIoMeta
 
@@ -45,13 +50,15 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
     _node_information = {}
 
     @classmethod
-    def prepare_files_and_directories(cls, save_dir, node_information, **kwargs):
+    def prepare_files_and_directories(
+        cls, save_dir: Union[Path, str], node_information: dict, **kwargs
+    ):
         """
         Prepare the required files and directories to write the data to disk.
 
         Parameters
         ----------
-        save_dir : Union[pathlib.Path, str]
+        save_dir : Union[Path, str]
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -60,22 +67,26 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
             Dataset, the node_label is the user's name for the processing node. The
             data_label gives the description of what the data shows (e.g. intensity)
             and the plugin_name is simply the name of the plugin.
-        scan_context : Union[Scan, None], optional
-            The scan context. If None, the generic context will be used. Only specify
-            this, if you explicitly require a different context. The default is None.
-        diffraction_exp_context : Union[DiffractionExp, None], optional
-            The diffraction experiment context. If None, the generic context will be
-            used. Only specify this, if you explicitly require a different context. The
-            default is None.
-        workflow_tree : Union[WorkflowTree, None], optional
-            The WorkflowTree. If None, the generic WorkflowTree will be used. Only
-            specify this, if you explicitly require a different context. The default is
-            None.
+        **kwargs:
+            Supported kwargs are:
+
+            scan_context : Union[Scan, None], optional
+                The scan context. If None, the generic context will be used.
+                Only specify this, if you explicitly require a different context.
+                The default is None.
+            diffraction_exp_context : Union[DiffractionExp, None], optional
+                The diffraction experiment context. If None, the generic context
+                will be used. Only specify this, if you explicitly require a
+                different context. The default is None.
+            workflow_tree : Union[WorkflowTree, None], optional
+                The WorkflowTree. If None, the generic WorkflowTree will be used.
+                Only specify this, if you explicitly require a different context.
+                The default is None.
         """
         raise NotImplementedError
 
     @classmethod
-    def get_attribute_dict(cls, name):
+    def get_attribute_dict(cls, name: str) -> dict:
         """
         Get a dictionary for a single attribute from the combined node informatinon.
 
@@ -83,8 +94,6 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         ----------
         name : str
             The name of the attribute to extract.
-        node_information : dict
-            The dictionary with the full meta-information about the node.
 
         Returns
         -------
@@ -94,7 +103,7 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         return {_id: _item[name] for _id, _item in cls._node_information.items()}
 
     @classmethod
-    def get_node_attribute(cls, node_id, name):
+    def get_node_attribute(cls, node_id: int, name: str) -> object:
         """
         Get a single node attribute from the stored node information.
 
@@ -113,7 +122,7 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         return cls._node_information[node_id][name]
 
     @classmethod
-    def get_filenames_from_labels(cls, labels=None):
+    def get_filenames_from_labels(cls, labels: Union[dict, None] = None):
         """
         Get the directory names from labels.
 
@@ -149,8 +158,8 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
     @classmethod
     def export_full_data_to_file(
         cls,
-        full_data,
-        scan_context=None,
+        full_data: dict[int, Dataset],
+        scan_context: Union[Scan, None] = None,
     ):
         """
         Export all specified datasets to disk.
@@ -171,7 +180,9 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         raise NotImplementedError
 
     @classmethod
-    def export_frame_to_file(cls, index, frame_result_dict, **kwargs):
+    def export_frame_to_file(
+        cls, index: int, frame_result_dict: dict[int, Dataset], **kwargs: dict
+    ):
         """
         Export the results of one frame and store them on disk.
 
@@ -186,13 +197,13 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
             The frame index.
         frame_result_dict : dict
             The result dictionary with nodeID keys and result values.
-        kwargs : dict
+        **kwargs : dict
             Any kwargs which should be passed to the udnerlying exporter.
         """
         raise NotImplementedError
 
     @classmethod
-    def update_frame_metadata(cls, metadata, scan=None):
+    def update_frame_metadata(cls, metadata: dict, scan: Union[Scan, None] = None):
         """
         Update the metadata of the individual frame.
 
@@ -212,13 +223,13 @@ class WorkflowResultIoBase(GenericIoBase, metaclass=WorkflowResultIoMeta):
         raise NotImplementedError
 
     @classmethod
-    def import_results_from_file(cls, filename):
+    def import_results_from_file(cls, filename: Union[Path, str]):
         """
         Import results from a file and store them as a Dataset.
 
         Parameters
         ----------
-        filename : Union[pathlib.Path, str]
+        filename : Union[Path, str]
             The full filename of the file to be imported.
 
         Raises

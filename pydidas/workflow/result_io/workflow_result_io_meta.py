@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,15 +24,20 @@ the specified file formats.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["WorkflowResultIoMeta"]
 
-import os
 
-from ...contexts import diffraction_exp_context, scan_context
+import os
+from pathlib import Path
+from typing import Union
+
+from ...contexts.diffraction_exp_context import DiffractionExperiment
+from ...contexts.scan_context import Scan
+from ...core import Dataset
 from ...core.io_registry import GenericIoMeta
 from ...core.utils import get_extension
 from ..workflow_tree import _WorkflowTree
@@ -59,7 +64,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         cls.active_savers = []
 
     @classmethod
-    def set_active_savers_and_title(cls, savers, title="unknown"):
+    def set_active_savers_and_title(cls, savers: list[str], title: str = "unknown"):
         """
         Set the active savers so they do not need to be specified individually
         later on.
@@ -82,7 +87,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
                     cls.active_savers.append(_saver)
 
     @classmethod
-    def get_filenames_from_active_savers(cls, labels):
+    def get_filenames_from_active_savers(cls, labels: dict) -> list[dict]:
         """
         Get the filenames from all active savers based on the supplied labels.
 
@@ -108,19 +113,20 @@ class WorkflowResultIoMeta(GenericIoMeta):
     @classmethod
     def prepare_active_savers(
         cls,
-        save_dir,
-        node_information,
-        scan_context=None,
-        diffraction_exp_context=None,
-        workflow_tree=None,
+        save_dir: Union[Path, str],
+        node_information: dict,
+        scan_context: Union[Scan, None] = None,
+        diffraction_exp: Union[DiffractionExperiment, None] = None,
+        workflow_tree: Union[_WorkflowTree, None] = None,
     ):
         """
-        Prepare the active savers for storing data by creating the required
-        files and directories.
+        Prepare the active savers for storing data.
+
+        This method creates the required files and directories.
 
         Parameters
         ----------
-        save_dir : Union[pathlib.Path, str]
+        save_dir : Union[Path, str]
             The full path for the data to be saved.
         node_information : dict
             A dictionary with nodeID keys and dictionary values. Each value dictionary
@@ -132,7 +138,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         scan_context : Union[Scan, None], optional
             The scan context. If None, the generic context will be used. Only specify
             this, if you explicitly require a different context. The default is None.
-        diffraction_exp_context : Union[DiffractionExp, None], optional
+        diffraction_exp : Union[DiffractionExp, None], optional
             The diffraction experiment context. If None, the generic context will be
             used. Only specify this, if you explicitly require a different context. The
             default is None.
@@ -148,12 +154,14 @@ class WorkflowResultIoMeta(GenericIoMeta):
                 save_dir,
                 node_information,
                 scan_context=scan_context,
-                diffraction_exp_context=diffraction_exp_context,
+                diffraction_exp_context=diffraction_exp,
                 workflow_tree=workflow_tree,
             )
 
     @classmethod
-    def push_frame_metadata_to_active_savers(cls, metadata, scan=None):
+    def push_frame_metadata_to_active_savers(
+        cls, metadata: dict, scan: Union[Scan, None] = None
+    ):
         """
         Push the frame metadata to all active savers.
 
@@ -166,7 +174,7 @@ class WorkflowResultIoMeta(GenericIoMeta):
         ----------
         metadata : dict
             The dictionary with the metadata.
-        scan : Union[pydidas.contexts.scan_context.Scan, None], optional
+        scan : Union[Scan, None], optional
             The Scan instance. If None, this will default to the generic ScanContext.
             The default is None.
         """
@@ -175,7 +183,9 @@ class WorkflowResultIoMeta(GenericIoMeta):
             _saver.update_frame_metadata(metadata, scan)
 
     @classmethod
-    def export_frame_to_active_savers(cls, index, frame_result_dict, **kwargs):
+    def export_frame_to_active_savers(
+        cls, index: int, frame_result_dict: dict, **kwargs: dict
+    ):
         """
         Export the results of a frame to all active savers.
 
@@ -193,7 +203,9 @@ class WorkflowResultIoMeta(GenericIoMeta):
             _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod
-    def export_full_data_to_active_savers(cls, data, scan_context=None):
+    def export_full_data_to_active_savers(
+        cls, data: dict[int, Dataset], scan_context: Union[Scan, None] = None
+    ):
         """
         Export the full data to all active savers.
 
@@ -210,7 +222,12 @@ class WorkflowResultIoMeta(GenericIoMeta):
             _saver.export_full_data_to_file(data, scan_context)
 
     @classmethod
-    def export_full_data_to_file(cls, extension, data, scan_context=None):
+    def export_full_data_to_file(
+        cls,
+        extension: str,
+        data: dict[int, Dataset],
+        scan_context: Union[Scan, None] = None,
+    ):
         """
         Export the full data to all active savers.
 
@@ -229,7 +246,13 @@ class WorkflowResultIoMeta(GenericIoMeta):
         _saver.export_full_data_to_file(data, scan_context)
 
     @classmethod
-    def export_frame_to_file(cls, index, extension, frame_result_dict, **kwargs):
+    def export_frame_to_file(
+        cls,
+        index: int,
+        extension: str,
+        frame_result_dict: dict[int, Dataset],
+        **kwargs: dict,
+    ):
         """
         Call the concrete export_to_file method in the subclass registered
         to the extension of the filename.
@@ -250,14 +273,18 @@ class WorkflowResultIoMeta(GenericIoMeta):
         _saver.export_frame_to_file(index, frame_result_dict, **kwargs)
 
     @classmethod
-    def import_data_from_directory(cls, dirname):
+    def import_data_from_directory(
+        cls, dirname: Union[Path, str]
+    ) -> tuple[dict[int, Dataset], dict, Scan, DiffractionExperiment, _WorkflowTree]:
         """
-        Import data from files in a directory and pass it in a format for the
-        WorkflowResults to update itself.
+        Import data from files in a directory.
+
+        This method imports data, reads the metadata and passes it in a format for
+        the WorkflowResults to update itself.
 
         Parameters
         ----------
-        dirname : Union[pathlib.Path, str]
+        dirname : Union[Path, str]
             The name of the directory from which data shall be imported.
 
         Returns
@@ -276,8 +303,8 @@ class WorkflowResultIoMeta(GenericIoMeta):
         """
         _data_dict = {}
         _node_info_dict = {}
-        _scan = scan_context.Scan()
-        _exp = diffraction_exp_context.DiffractionExperiment()
+        _scan = Scan()
+        _exp = DiffractionExperiment()
         _tree = _WorkflowTree()
         _files = [
             _file

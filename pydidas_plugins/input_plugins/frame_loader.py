@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,13 +21,14 @@ single images in each, e.g. tiff files or numpy files.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FrameLoader"]
 
 
+from pydidas.core import Dataset
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.data_io import import_data
 from pydidas.plugins import InputPlugin
@@ -52,7 +53,7 @@ class FrameLoader(InputPlugin):
     input_data_dim = None
     output_data_dim = 2
 
-    def get_frame(self, frame_index, **kwargs):
+    def get_frame(self, frame_index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Load a frame and pass it on.
 
@@ -68,6 +69,8 @@ class FrameLoader(InputPlugin):
         -------
         data : pydidas.core.Dataset
             The image data.
+        kwargs : dict
+            The updated calling keyword arguments.
         """
         _fname = self.get_filename(frame_index)
         _data = import_data(_fname, **kwargs)

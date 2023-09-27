@@ -69,14 +69,14 @@ class PyFAIazimuthalIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Run the azimuthal integration on the input data.
 
         Parameters
         ----------
-        data : np.ndarray
-            The input image array.
+        data : Dataset
+            The radial integration results.
         kwargs : dict
             Any keyword arguments from the ProcessingTree.
         """

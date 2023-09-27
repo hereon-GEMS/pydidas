@@ -162,16 +162,16 @@ class PyFAIazimuthalSectorIntegration(pyFAIintegrationBase):
             zip(np.array(_sectors) - _delta, np.array(_sectors) + _delta)
         )
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Run the azimuthal integration on the input data.
 
         Parameters
         ----------
-        data : np.ndarray
-            The input image array.
+        data : Dataset
+            The radial integration data for the given sectors.
         kwargs : dict
-            Any keyword arguments from the ProcessingTree.
+            The input kwargs used for processing.
         """
         self.check_and_set_custom_mask(**kwargs)
         _results = [

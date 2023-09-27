@@ -1,11 +1,11 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License version 3 as published by
-# the Free Software Foundation.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,17 +21,17 @@ from full azimuthal integration data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["ExtractAzimuthalSectors"]
 
 
 import numpy as np
 
-from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED, FLOAT_REGEX
 from pydidas.core import Dataset, Parameter, ParameterCollection, UserConfigError
+from pydidas.core.constants import FLOAT_REGEX, PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.plugins import ProcPlugin
 
 
@@ -92,9 +92,9 @@ class ExtractAzimuthalSectors(ProcPlugin):
         """
         self._config["centers"] = tuple(np.round(self._get_sector_values(), 10))
 
-    def _get_sector_values(self):
+    def _get_sector_values(self) -> list[float, ...]:
         """
-        Test
+        Get the sector center positions.
 
         Raises
         ------
@@ -126,13 +126,9 @@ class ExtractAzimuthalSectors(ProcPlugin):
             )
         return [float(_s) for _s in _sectors_str_list]
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Fit a peak to the data.
-
-        Note that the results includes the original data, the fitted data and
-        the residual and that the fit Parameters are included in the kwarg
-        metadata.
+        Extract the specified azimuthal sectors from a polar dataset.
 
         Parameters
         ----------

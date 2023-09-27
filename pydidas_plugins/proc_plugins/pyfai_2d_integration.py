@@ -86,9 +86,9 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
             "data_unit": "counts",
         }
 
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Apply a mask to an image (2d data-array).
+        Perform a 2D integration of the input dataset.
 
         Parameters
         ----------
@@ -99,8 +99,8 @@ class PyFAI2dIntegration(pyFAIintegrationBase):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The image data.
+        data : pydidas.core.Dataset
+            The integrated intensity data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """

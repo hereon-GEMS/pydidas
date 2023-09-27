@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -21,10 +21,10 @@ MCA spectral data
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["FioMcaLineScanSeriesLoader"]
 
 import os
@@ -40,7 +40,7 @@ from pydidas.core import (
 )
 from pydidas.core.constants import INPUT_PLUGIN
 from pydidas.core.utils import copy_docstring
-from pydidas.plugins import InputPlugin1d
+from pydidas.plugins import InputPlugin, InputPlugin1d
 
 
 FIO_MCA_READER_DEFAULT_PARAMS = ParameterCollection(
@@ -134,7 +134,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
     input_data_dim = None
     output_data_dim = 1
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         super().__init__(*args, **kwargs)
         self.set_param_value("live_processing", False)
         self._filepath_generator = None
@@ -208,24 +208,23 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         else:
             self._config["roi"] = None
 
-    def execute(self, index, **kwargs):
+    def get_frame(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Load a frame from a file.
+        Get the frame for the given index.
 
         Parameters
         ----------
         index : int
-            The frame index.
+            The index of the scan point.
         **kwargs : dict
-            Any calling keyword arguments. Can be used to apply a ROI or
-            binning to the raw image.
+            Keyword arguments for loading frames.
 
         Returns
         -------
-        _data : pydidas.core.Dataset
-            The dataset data.
-        kwargs : dict
-            Any calling kwargs, appended by any changes in the function.
+        Dataset :
+            The loaded dataset.
+        dict :
+            The updated kwargs.
         """
         _fname = self.get_filename(index)
         _data = np.loadtxt(_fname, skiprows=self._config["header_lines"])
@@ -241,7 +240,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             _dataset = _dataset[self._config["roi"]]
         return _dataset, kwargs
 
-    def __create_energy_scale(self, num_bins):
+    def __create_energy_scale(self, num_bins: int):
         """
         Create the energy scale to be applied to the return Dataset.
 
@@ -259,8 +258,8 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
             "energy_delta"
         ) + self.get_param_value("energy_offset")
 
-    @copy_docstring(InputPlugin1d)
-    def get_filename(self, index):
+    @copy_docstring(InputPlugin)
+    def get_filename(self, index: int) -> str:
         """
         For the full docstring, please refer to the
         :py:class:`pydidas.plugins.base_input_plugin.InputPlugin
@@ -273,7 +272,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         _fileindex = index % _n_per_dir
         return self.filename_string.format(index=_pathindex, index2=_fileindex)
 
-    def get_raw_input_size(self):
+    def get_raw_input_size(self) -> int:
         """
         Get the raw input size.
 
@@ -286,7 +285,7 @@ class FioMcaLineScanSeriesLoader(InputPlugin1d):
         _data, _ = self.execute(0)
         return _data.size
 
-    def get_first_file_size(self):
+    def get_first_file_size(self) -> int:
         """
         Get the size of the first file to be processed.
 

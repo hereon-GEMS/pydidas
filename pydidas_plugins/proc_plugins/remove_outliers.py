@@ -1,9 +1,11 @@
 # This file is part of pydidas.
 #
+# Copyright 2023, Helmholtz-Zentrum Hereon
+# SPDX-License-Identifier: GPL-3.0-only
+#
 # pydidas is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
 #
 # Pydidas is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,16 +21,17 @@ a defined width.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2021-2022, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["RemoveOutliers"]
+
 
 import numpy as np
 
+from pydidas.core import Dataset, Parameter, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
-from pydidas.core import get_generic_param_collection, Parameter
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.plugins import ProcPlugin
 
@@ -81,7 +84,7 @@ class RemoveOutliers(ProcPlugin):
         self._details = None
 
     @property
-    def detailed_results(self):
+    def detailed_results(self) -> dict:
         """
         Get the detailed results for the RemoveOutliers plugin.
 
@@ -101,9 +104,9 @@ class RemoveOutliers(ProcPlugin):
         self._config["width"] = self.get_param_value("kernel_width")
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
-        Crop 1D data.
+        Remove outliers from a 1d Dataset.
 
         Parameters
         ----------
@@ -119,7 +122,7 @@ class RemoveOutliers(ProcPlugin):
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.
         """
-        self._input_data = data.copy()
+        self._input_data = data
         self._create_derived_data()
         self._outliers = np.array(())
         self._find_and_store_high_outliers()
@@ -189,7 +192,9 @@ class RemoveOutliers(ProcPlugin):
         _outliers = self._filter_for_outliers_on_flank(_outliers, high_peak=False)
         self._outliers = np.unique(np.concatenate((self._outliers, _outliers)))
 
-    def _filter_for_outliers_on_flank(self, outliers, high_peak=True):
+    def _filter_for_outliers_on_flank(
+        self, outliers: np.ndarray, high_peak: bool = True
+    ) -> np.ndarray:
         """
         Filter for outlier points which are not true outliers but sit on the flank.
 
@@ -232,7 +237,7 @@ class RemoveOutliers(ProcPlugin):
         outliers = outliers[np.where(_neighbors <= self._config["width"])[0]]
         return outliers
 
-    def _create_detailed_results(self):
+    def _create_detailed_results(self) -> dict:
         """
         Get the detailed results for the outlier removal.
 

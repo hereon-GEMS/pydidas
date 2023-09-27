@@ -54,7 +54,7 @@ class FitSinglePeak(BaseFitPlugin):
         "fit_peak_width",
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: tuple, **kwargs: dict):
         BaseFitPlugin.__init__(self, *args, **kwargs)
         self.params["fit_func"].choices = FitFuncMeta.get_fitter_names_with_num_peaks(1)
 

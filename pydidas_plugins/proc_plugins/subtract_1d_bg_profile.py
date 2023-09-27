@@ -1,6 +1,6 @@
 # This file is part of pydidas.
 #
-# Copyright 2021-, Helmholtz-Zentrum Hereon
+# Copyright 2023, Helmholtz-Zentrum Hereon
 # SPDX-License-Identifier: GPL-3.0-only
 #
 # pydidas is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ __author__ = "Malte Storm"
 __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
-__status__ = "Development"
+__status__ = "Production"
 __all__ = ["Subtract1dBackgroundProfile"]
 
 
@@ -33,7 +33,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pydidas.core import Parameter, get_generic_param_collection
+from pydidas.core import Dataset, Parameter, get_generic_param_collection
 from pydidas.core.constants import PROC_PLUGIN, PROC_PLUGIN_INTEGRATED
 from pydidas.core.utils import process_1d_with_multi_input_dims
 from pydidas.data_io import import_data
@@ -88,7 +88,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
             self._profile *= self.get_param_value("multiplicator")
 
     @process_1d_with_multi_input_dims
-    def execute(self, data, **kwargs):
+    def execute(self, data: Dataset, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Subtract a one-dimensional background profile.
 
@@ -101,7 +101,7 @@ class Subtract1dBackgroundProfile(ProcPlugin):
 
         Returns
         -------
-        _data : pydidas.core.Dataset
+        data : pydidas.core.Dataset
             The image data.
         kwargs : dict
             Any calling kwargs, appended by any changes in the function.

@@ -36,9 +36,8 @@ import sys
 import traceback
 from pathlib import Path
 
-import requests
-
 import build
+import requests
 
 from pydidas_scripts.pydidas_remove_local_files import (
     pydidas_remove_log_files,

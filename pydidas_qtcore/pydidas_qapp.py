@@ -27,16 +27,15 @@ __status__ = "Production"
 __all__ = ["PydidasQApplication"]
 
 
-from typing import Tuple
-
 import argparse
 import sys
+from typing import Tuple
 
-from qtpy import QtCore, QtWidgets, QtGui
 import matplotlib as mpl
 import matplotlib.font_manager as mpl_font_manager
 import matplotlib.ft2font as mpl_ft2font
 import numpy as np
+from qtpy import QtCore, QtGui, QtWidgets
 
 from . import fontsize
 

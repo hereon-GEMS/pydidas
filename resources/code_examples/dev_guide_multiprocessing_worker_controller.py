@@ -23,10 +23,11 @@ __status__ = "Production"
 
 
 import time
-import pydidas
-import numpy as np
 
+import numpy as np
 from qtpy import QtTest
+
+import pydidas
 
 
 def test_func(task, slope, offset):

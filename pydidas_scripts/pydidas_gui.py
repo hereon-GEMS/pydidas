@@ -32,6 +32,7 @@ import signal
 import warnings
 from typing import TypeVar
 
+
 QSplashScreen = TypeVar("QSplashScreen")
 
 

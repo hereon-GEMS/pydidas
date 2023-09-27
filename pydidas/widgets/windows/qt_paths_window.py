@@ -35,8 +35,8 @@ from qtpy import QtCore, QtGui, QtWidgets
 from ...core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONSOLE_WIDTH,
-    FONT_METRIC_WIDE_BUTTON_WIDTH,
     FONT_METRIC_SMALL_BUTTON_WIDTH,
+    FONT_METRIC_WIDE_BUTTON_WIDTH,
 )
 from ...resources import logos
 from ...version import VERSION

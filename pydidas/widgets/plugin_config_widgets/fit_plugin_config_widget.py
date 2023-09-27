@@ -33,10 +33,7 @@ from functools import partial
 from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
-from pydidas.core.constants import (
-    FONT_METRIC_PARAM_EDIT_WIDTH,
-    POLICY_EXP_FIX,
-)
+from pydidas.core.constants import FONT_METRIC_PARAM_EDIT_WIDTH, POLICY_EXP_FIX
 from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn

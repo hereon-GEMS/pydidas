@@ -33,6 +33,7 @@ import os
 
 import qtpy
 
+
 if qtpy.QT5:
     from qtpy.QtSvg import QSvgWidget
 elif qtpy.QT6:

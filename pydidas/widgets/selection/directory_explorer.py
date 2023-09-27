@@ -30,10 +30,10 @@ __all__ = ["DirectoryExplorer"]
 
 
 import os
-import qtpy
 import platform
 from typing import Self, Union
 
+import qtpy
 from qtpy import QtCore, QtWidgets
 
 from ...core import PydidasQsettings, PydidasQsettingsMixin

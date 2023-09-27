@@ -59,6 +59,9 @@ Bugfixes
 - Fixed an issue with the RoiSliceManager and numpy integer datatypes.
 - Fixed a bug in the GenericNode where copying the node would keep references
   to the original parent.
+- Fixed an issue in the DirectorySpyApp with changes in the exceptions raised
+  from tifffile if a tiff file could not be read.
+
 
 
 v23.07.05

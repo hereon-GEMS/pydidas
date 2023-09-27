@@ -14,7 +14,7 @@ requires-python = ">=3.9"
 license = {text = "GNU General Public License v3"}
 keywords = ["X-ray diffraction", "XRD", "WAXS", "SAXS"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering",
@@ -26,8 +26,7 @@ dependencies = [
     "meson-python",
     "cython",
     "build>=0.10.0",
-    "PySide6",
-    "pyFAI==2023.1.0",
+    "pyFAI>=2023.1.0",
     "scikit-image>=0.20.0",
     "qtawesome>=1.0.3",
     "sphinx>=4.4.0",

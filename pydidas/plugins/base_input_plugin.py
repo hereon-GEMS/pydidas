@@ -222,17 +222,15 @@ class InputPlugin(BasePlugin):
             raise UserConfigError(
                 "Calling plugin execution without prior pre-execution is not allowed."
             )
-        _data = None
-        if "roi" not in kwargs and self.get_param_value("use_roi"):
-            kwargs["roi"] = self._image_metadata.roi
+        self.update_required_kwargs(kwargs)
         if self._config["n_multi"] == 1:
             _data, kwargs = self.get_frame(index, **kwargs)
             _data.data_label = self.output_data_label
             _data.data_unit = self.output_data_unit
             return _data, kwargs
-        return self._handle_multi_image(index, **kwargs)
+        return self.handle_multi_image(index, **kwargs)
 
-    def _handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
+    def handle_multi_image(self, index: int, **kwargs: dict) -> tuple[Dataset, dict]:
         """
         Handle frames with an image multiplicity.
 
@@ -284,3 +282,10 @@ class InputPlugin(BasePlugin):
             The image data frame.
         """
         raise NotImplementedError
+
+    def update_required_kwargs(self, kwargs: dict):
+        """
+        Update the kwargs dict in place.
+        """
+        if "roi" not in kwargs and self.get_param_value("use_roi"):
+            kwargs["roi"] = self._image_metadata.roi

@@ -20,7 +20,7 @@ Module with the NumpyIo class for importing and exporting numpy data.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"

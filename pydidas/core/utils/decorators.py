@@ -71,9 +71,7 @@ def copy_docstring(origin: type) -> type:
         if not isinstance(dest, type) and isinstance(origin, type):
             origin = getattr(origin, dest.__name__, None)
             if origin is None:
-                raise ValueError(
-                    "Origin class has no method called " f"{dest.__name__}"
-                )
+                raise ValueError("Origin class has no method called {dest.__name__}")
 
         dest.__doc__ = origin.__doc__
         return dest

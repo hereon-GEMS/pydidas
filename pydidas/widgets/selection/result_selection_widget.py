@@ -22,7 +22,7 @@ information on how to access the new data selection.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
@@ -78,16 +78,18 @@ class ResultSelectionWidget(
 
     Notes
     -----
-    The ResultSelectionWidget offers the following signal which can be
-    used:
+    The ResultSelectionWidget offers the following signal which can be used:
 
         sig_new_selection : QtCore.Signal(
-                            use_timeline : int,
-                            active_dims : list,
-                            active_node : int,
-                            selection : tuple,
-                            plot_type : str
-                        )
+
+            use_timeline : int,
+            active_dims : list,
+            active_node : int,
+            selection : tuple,
+            plot_type : str
+
+        )
+
             The signal signature is: flag to use timeline or scan shape,
             active scan dimensions, node ID of the active node,
             the selection in form of a tuple with entries for every dimension

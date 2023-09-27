@@ -215,13 +215,13 @@ class ParameterCollectionMixIn:
         self._check_key(param_key)
         return self.params[param_key]
 
-    def get_params(self, *param_keys: Tuple[str]) -> List[Parameter]:
+    def get_params(self, *param_keys: Tuple[str, ...]) -> List[Parameter]:
         """
         Get multiple parameters based on their reference keys.
 
         Parameters
         ----------
-        *param_keys : Tuple[str]
+        *param_keys : Tuple[str, ...]
             Any number of reference keys.
 
         Returns

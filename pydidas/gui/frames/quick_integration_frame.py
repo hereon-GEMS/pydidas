@@ -31,6 +31,7 @@ __all__ = ["QuickIntegrationFrame"]
 from functools import partial
 
 import numpy as np
+import qtpy
 from qtpy import QtCore
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
@@ -137,6 +138,9 @@ class QuickIntegrationFrame(BaseFrame):
             self._roi_selection_toggled
         )
 
+        self._widgets["two_click_selection"].stateChanged.connect(
+            self._toggle_2click_selection
+        )
         self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
@@ -226,6 +230,22 @@ class QuickIntegrationFrame(BaseFrame):
         ]:
             self._widgets[_key].setVisible(is_valid)
         self.toggle_param_widget_visibility("detector_model", is_valid)
+
+    @QtCore.Slot(int)
+    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState):
+        """
+        Toggle the two-click selection option.
+
+        Parameters
+        ----------
+        state : QtCore.Qt.CheckState
+            The checkbox's state.
+        """
+        if qtpy.QT_VERSION.startswith("6"):
+            _usage = state == QtCore.Qt.Checked.value
+        else:
+            _usage = state == QtCore.Qt.Checked
+        self._bc_controller.toggle_2click_selection(_usage)
 
     def _update_detector_model(self):
         """

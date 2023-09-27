@@ -66,6 +66,8 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         QtCore.QObject.__init__(self)
         self._config = {
             "selection_active": kwargs.get("selection_active", True),
+            "2click_selection": True,
+            "wait_for_2nd_click": False,
             "overlay_color": kwargs.get("overlay_color", PYDIDAS_COLORS["orange"]),
             "beamcenter_set": False,
             "beamcenter_outline_points": None,
@@ -248,6 +250,24 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._config["selection_active"] = active
         self._point_table.setVisible(active)
 
+    @QtCore.Slot(bool)
+    def toggle_2click_selection(self, use_2_clicks: bool):
+        """
+        Toggle the 2-click selection for points.
+
+        Parameters
+        ----------
+        use_2_clicks : bool
+            Flag to activate/deactivate 2-point selection.
+        """
+        self._config["2click_selection"] = use_2_clicks
+        if self._config["wait_for_2nd_click"]:
+            self._plot.resetZoom()
+            self._plot.getImage().getColormap().setVRange(
+                *self._config["2click_cmap_limits"]
+            )
+        self._config["wait_for_2nd_click"] = False
+
     @QtCore.Slot(dict)
     def _process_plot_signal(self, event_dict):
         """
@@ -258,21 +278,47 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         event_dict : dict
             The silx event dictionary.
         """
-        if (
+        if not (
             event_dict["event"] == "mouseClicked"
             and event_dict.get("button", "None") == "left"
             and self._config["selection_active"]
         ):
-            _color = self._config["overlay_color"]
-            _x = np.round(event_dict["x"], decimals=3)
-            _y = np.round(event_dict["y"], decimals=3)
-            if (_x, _y) in self._points:
-                return
-            self._plot.addMarker(
-                _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
+            return
+        _x = np.round(event_dict["x"], decimals=3)
+        _y = np.round(event_dict["y"], decimals=3)
+        if self._config["2click_selection"] and not self._config["wait_for_2nd_click"]:
+            _cmap = self._plot.getImage().getColormap()
+            self._config["2click_xlimits"] = self._plot.getGraphXLimits()
+            self._config["2click_ylimits"] = self._plot.getGraphYLimits()
+            self._config["2click_cmap_limits"] = _cmap.getVRange()
+
+            _data = self._plot.getImage().getData(copy=False)
+            _x0 = int(np.round(max(0, _x - 25)))
+            _x1 = int(np.round(min(_data.shape[1], _x + 25)))
+            _y0 = int(np.round(max(0, _y - 25)))
+            _y1 = int(np.round(min(_data.shape[0], _y + 25)))
+            self._plot.setLimits(_x0, _x1, _y0, _y1)
+            _cmap.setVRange(
+                np.amin(_data[_y0:_y1, _x0:_x1]), np.amax(_data[_y0:_y1, _x0:_x1])
             )
-            self._points.append((_x, _y))
-            self._point_table.add_point_to_table(_x, _y)
+            self._config["wait_for_2nd_click"] = True
+            return
+        elif self._config["2click_selection"] and self._config["wait_for_2nd_click"]:
+            self._plot.setLimits(
+                *self._config["2click_xlimits"], *self._config["2click_ylimits"]
+            )
+            self._config["wait_for_2nd_click"] = False
+            self._plot.getImage().getColormap().setVRange(
+                *self._config["2click_cmap_limits"]
+            )
+        _color = self._config["overlay_color"]
+        if (_x, _y) in self._points:
+            return
+        self._plot.addMarker(
+            _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
+        )
+        self._points.append((_x, _y))
+        self._point_table.add_point_to_table(_x, _y)
 
     @QtCore.Slot()
     def set_beamcenter_from_point(self):

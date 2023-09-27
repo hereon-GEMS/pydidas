@@ -23,6 +23,8 @@ Improvements
       are disabled.
     - All widgets now scale dynamically with font height and width to allow
       using pydidas with any system font.
+    - Added an option to select points for the beamcenter with a 2-click
+      method to select the peak centers more easily.
     
     
 - Programmatic updates:

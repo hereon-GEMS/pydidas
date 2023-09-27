@@ -232,7 +232,7 @@ class TestImageMetadataManager(unittest.TestCase):
 
     def test_store_image_data(self):
         imm = ImageMetadataManager()
-        imm._store_image_data(self._img_shape, self._data.dtype, self._dsize)
+        imm.store_image_data(self._img_shape, self._data.dtype, self._dsize)
         self.assertEqual(imm._config["datatype"], self._data.dtype)
         self.assertEqual(imm._config["raw_img_shape_x"], self._img_shape[1])
         self.assertEqual(imm._config["raw_img_shape_y"], self._img_shape[0])

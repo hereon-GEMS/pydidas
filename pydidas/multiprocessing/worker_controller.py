@@ -315,6 +315,7 @@ class WorkerController(QtCore.QThread):
         of the called function. The currrent call will be finished before the stop
         signal will be processed.
         """
+        logger.debug("Sending stop queue signals")
         for _ in self._workers:
             self._queues["stop"].put(1)
 

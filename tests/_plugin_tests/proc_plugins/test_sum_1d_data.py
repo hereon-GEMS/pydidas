@@ -57,18 +57,18 @@ class TestSum1dData(unittest.TestCase):
         plugin.pre_execute()
         # assert does not raise an Error
 
-    def test_get_index_range__w_indices(self):
+    def test_get_slice__w_indices(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
         plugin.set_param_value("lower_limit", _low)
         plugin.set_param_value("upper_limit", _high)
         plugin.set_param_value("type_selection", "Indices")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
-    def test_get_index_range__w_data(self):
+    def test_get_slice__w_data(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -77,11 +77,11 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_low])
         plugin.set_param_value("upper_limit", self._x[_high])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _high + 1)
 
-    def test_get_index_range__w_empty_range(self):
+    def test_get_slice__w_empty_range(self):
         _low = 42
         _high = 87
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -90,10 +90,10 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range, slice(0, 0))
 
-    def test_get_index_range__w_sinple_point_range(self):
+    def test_get_slice__w_sinple_point_range(self):
         _low = 42
         _high = 42
         plugin = PLUGIN_COLLECTION.get_plugin_by_name("Sum1dData")()
@@ -102,7 +102,7 @@ class TestSum1dData(unittest.TestCase):
         plugin.set_param_value("lower_limit", self._x[_high])
         plugin.set_param_value("upper_limit", self._x[_low])
         plugin.set_param_value("type_selection", "Data values")
-        _range = plugin._get_index_range()
+        _range = plugin._get_slice()
         self.assertEqual(_range.start, _low)
         self.assertEqual(_range.stop, _low + 1)
 

@@ -21,8 +21,8 @@ image metadata.
 """
 
 __author__ = "Malte Storm"
-__copyright__ = "Copyright 2023, Malte Storm, Helmholtz-Zentrum Hereon"
-__license__ = "GPL-3.0"
+__copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
+__license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
 __all__ = ["ImageMetadataManager"]
@@ -292,7 +292,7 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _n_per_file = (_n1 - _n0 - 1) // _step + 1
         self._config["numbers"] = range(_n0, _n1, _step)
         self._config["hdf5_dset_shape"] = _meta["shape"]
-        self._store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
+        self.store_image_data(_meta["shape"][1:3], _meta["dtype"], _n_per_file)
 
     def __verify_selection_range(self, dset_length: int):
         """
@@ -323,9 +323,9 @@ class ImageMetadataManager(ObjectWithParameterCollection):
         _test_image = import_data(self._config["filename"])
         self._config["numbers"] = [0]
         self._config["hdf5_dset_shape"] = (0, 0, 0)
-        self._store_image_data(_test_image.shape, _test_image.dtype, 1)
+        self.store_image_data(_test_image.shape, _test_image.dtype, 1)
 
-    def _store_image_data(
+    def store_image_data(
         self, img_shape: tuple[int, int], img_dtype: type, n_image: int
     ):
         """

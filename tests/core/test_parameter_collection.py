@@ -60,6 +60,8 @@ class TestParameterCollection(unittest.TestCase):
         obj = ParameterCollection(*self._params)
         _ps = obj.get_params("Test0", "Test1")
         self.assertEqual(_ps, self._params[0:2])
+        self.assertEqual(id(_ps[0]), id(self._params[0]))
+        self.assertEqual(id(_ps[1]), id(self._params[1]))
 
     def test_get_params__wrong_key(self):
         obj = ParameterCollection(*self._params)

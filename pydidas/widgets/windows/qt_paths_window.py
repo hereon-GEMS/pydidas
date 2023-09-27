@@ -35,7 +35,7 @@ from qtpy import QtCore, QtGui, QtWidgets
 from ...core.constants import (
     ALIGN_TOP_RIGHT,
     FONT_METRIC_CONSOLE_WIDTH,
-    FONT_METRIC_HALF_CONFIG_WIDTH,
+    FONT_METRIC_WIDE_BUTTON_WIDTH,
     FONT_METRIC_SMALL_BUTTON_WIDTH,
 )
 from ...resources import logos
@@ -43,7 +43,7 @@ from ...version import VERSION
 from ..framework import PydidasWindow
 
 
-_FULL_WIDTH = FONT_METRIC_CONSOLE_WIDTH + FONT_METRIC_HALF_CONFIG_WIDTH
+_FULL_WIDTH = FONT_METRIC_CONSOLE_WIDTH + FONT_METRIC_WIDE_BUTTON_WIDTH
 
 
 class QtPathsWindow(PydidasWindow):
@@ -91,7 +91,7 @@ class QtPathsWindow(PydidasWindow):
             "but_open_logdir",
             "Open logging directory",
             icon="qt-std::SP_DialogOpenButton",
-            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
             gridPos=(2, 1, 1, 1),
             parent_widget="left_container",
         )
@@ -105,7 +105,7 @@ class QtPathsWindow(PydidasWindow):
         self.create_button(
             "but_open_configdir",
             "Open config directory",
-            font_metric_width_factor=FONT_METRIC_HALF_CONFIG_WIDTH,
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
             gridPos=(3, 1, 1, 1),
             icon="qt-std::SP_DialogOpenButton",
             parent_widget="left_container",

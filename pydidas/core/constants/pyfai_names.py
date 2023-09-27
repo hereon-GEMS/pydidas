@@ -52,10 +52,14 @@ pyFAI_UNITS = {
 }
 
 pyFAI_METHOD = {
-    "CSR": "csr",
-    "CSR OpenCL": "csr ocl",
-    "LUT": "lut",
-    "LUT OpenCL": "lut ocl",
+    "CSR": ("bbox", "csr", "cython"),
+    "CSR OpenCL": ("bbox", "csr", "opencl"),
+    "CSR full": ("full", "csr", "cython"),
+    "CSR full OpenCL": ("full", "csr", "opencl"),
+    "CSC": ("bbox", "csc", "cython"),
+    "CSC OpenCL": ("bbox", "csc", "opencl"),
+    "CSC full": ("full", "csc", "cython"),
+    "CSC full OpenCL": ("full", "csc", "opencl"),
 }
 
 

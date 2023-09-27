@@ -112,7 +112,7 @@ GENERIC_PARAMS_SCAN = (
             "type": str,
             "default": "Average",
             "name": "Multi-image handling",
-            "choices": ["Average", "Sum"],
+            "choices": ["Average", "Sum", "Maximum"],
             "unit": "",
             "allow_None": False,
             "tooltip": (

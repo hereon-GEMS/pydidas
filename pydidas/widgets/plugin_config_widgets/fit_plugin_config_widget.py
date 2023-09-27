@@ -34,10 +34,10 @@ from qtpy import QtCore
 from qtpy.QtWidgets import QStyle
 
 from pydidas.core.constants import (
-    FIT_OUTPUT_OPTIONS,
     FONT_METRIC_PARAM_EDIT_WIDTH,
     POLICY_EXP_FIX,
 )
+from pydidas.core.generic_params import FIT_OUTPUT_OPTIONS
 from pydidas.core.utils import apply_qt_properties
 from pydidas.widgets.factory import CreateWidgetsMixIn
 from pydidas.widgets.parameter_config import ParameterEditCanvas
@@ -45,8 +45,9 @@ from pydidas.widgets.parameter_config import ParameterEditCanvas
 
 class FitPluginConfigWidget(ParameterEditCanvas, CreateWidgetsMixIn):
     """
-    The FitPluginConfigWidget is the custom widget to modify the Parameters for
-    peak fitting plugins.
+    A custom widget to modify the Parameters for peak fitting plugins.
+
+    The widget adds a list of tickboxes to select the fit output.
     """
 
     def __init__(self, plugin, *args, **kwargs):

@@ -31,7 +31,6 @@ __all__ = ["QuickIntegrationFrame"]
 from functools import partial
 
 import numpy as np
-import qtpy
 from qtpy import QtCore
 
 from ...contexts import DiffractionExperimentContext, DiffractionExperimentIo
@@ -137,10 +136,6 @@ class QuickIntegrationFrame(BaseFrame):
         self._roi_controller.sig_toggle_selection_mode.connect(
             self._roi_selection_toggled
         )
-
-        self._widgets["two_click_selection"].stateChanged.connect(
-            self._toggle_2click_selection
-        )
         self._widgets["file_selector"].sig_new_file_selection.connect(self.open_image)
         self._widgets["file_selector"].sig_file_valid.connect(self._toggle_fname_valid)
 
@@ -153,9 +148,6 @@ class QuickIntegrationFrame(BaseFrame):
         )
         self._widgets["but_fit_center_circle"].clicked.connect(
             self._bc_controller.fit_beamcenter_with_circle
-        )
-        self.param_widgets["overlay_color"].io_edited.connect(
-            self._bc_controller.set_marker_color
         )
         self.param_widgets["detector_pxsize"].io_edited.connect(
             self._update_detector_pxsize
@@ -230,22 +222,6 @@ class QuickIntegrationFrame(BaseFrame):
         ]:
             self._widgets[_key].setVisible(is_valid)
         self.toggle_param_widget_visibility("detector_model", is_valid)
-
-    @QtCore.Slot(int)
-    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState):
-        """
-        Toggle the two-click selection option.
-
-        Parameters
-        ----------
-        state : QtCore.Qt.CheckState
-            The checkbox's state.
-        """
-        if qtpy.QT_VERSION.startswith("6"):
-            _usage = state == QtCore.Qt.Checked.value
-        else:
-            _usage = state == QtCore.Qt.Checked
-        self._bc_controller.toggle_2click_selection(_usage)
 
     def _update_detector_model(self):
         """
@@ -374,7 +350,7 @@ class QuickIntegrationFrame(BaseFrame):
         """
         _active = not self._bc_controller.selection_active
         self._bc_controller.toggle_selection_active(_active)
-        self._widgets["input_plot_bc_selection"].setVisible(_active)
+        self._widgets["input_beamcenter_points"].setVisible(_active)
         for _txt in ["confirm_beamcenter", "set_beamcenter", "fit_center_circle"]:
             self._widgets[f"but_{_txt}"].setVisible(_active)
         self._widgets["but_select_beamcenter_manually"].setVisible(not _active)

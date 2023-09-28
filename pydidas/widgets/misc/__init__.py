@@ -29,7 +29,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .line_edit_with_icon import *
-from .point_position_table_widget import *
+from .points_for_beamcenter_widget import *
 from .select_image_frame_widget import *
 from .show_integration_roi_params_widget import *
 from .read_only_text_widget import *
@@ -41,10 +41,10 @@ from . import line_edit_with_icon
 __all__.extend(line_edit_with_icon.__all__)
 del line_edit_with_icon
 
-from . import point_position_table_widget
+from . import points_for_beamcenter_widget
 
-__all__.extend(point_position_table_widget.__all__)
-del point_position_table_widget
+__all__.extend(points_for_beamcenter_widget.__all__)
+del points_for_beamcenter_widget
 
 from . import select_image_frame_widget
 

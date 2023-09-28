@@ -25,13 +25,14 @@ __copyright__ = "Copyright 2023, Helmholtz-Zentrum Hereon"
 __license__ = "GPL-3.0-only"
 __maintainer__ = "Malte Storm"
 __status__ = "Production"
-__all__ = ["PointPositionTableWidget"]
+__all__ = ["PointsForBeamcenterWidget"]
 
 
 from typing import List, Tuple
 
-from qtpy import QtCore, QtWidgets
+from qtpy import QT_VERSION, QtCore, QtWidgets
 
+from ...core import get_generic_parameter
 from ...core.constants import ALIGN_CENTER, FONT_METRIC_WIDE_BUTTON_WIDTH
 from ...core.utils import apply_qt_properties
 from ..factory import CreateWidgetsMixIn
@@ -154,7 +155,7 @@ class _TableWithXYPositions(QtWidgets.QTableWidget):
         return _rows
 
 
-class PointPositionTableWidget(
+class PointsForBeamcenterWidget(
     QtWidgets.QWidget, CreateWidgetsMixIn, ParameterWidgetsMixIn
 ):
     """
@@ -163,6 +164,7 @@ class PointPositionTableWidget(
 
     sig_new_selection = QtCore.Signal(object)
     sig_remove_points = QtCore.Signal(object)
+    sig_2click_usage = QtCore.Signal(bool)
 
     def __init__(self, plot, parent=None, **kwargs):
         QtWidgets.QWidget.__init__(self, parent)
@@ -174,9 +176,23 @@ class PointPositionTableWidget(
         self._qtapp.sig_new_font_metrics.connect(self.process_new_font_metrics)
         self._points = []
         self._plot = plot
-        self._config = {
-            "overlay_color": kwargs.get("overlay_color", "orange"),
-        }
+        self._color_param = get_generic_parameter("overlay_color")
+        self.create_check_box(
+            "two_click_selection",
+            "Use 2-click point selection",
+            checked=True,
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
+            toolTip=(
+                "The 2-click point selection requires two clicks in the image to "
+                "select a new point: The first click zooms in on the selected point "
+                "while the second click confirms the (finer) selection."
+            ),
+        )
+        self.create_param_widget(
+            self._color_param,
+            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
+            linebreak=True,
+        )
         self.add_any_widget(
             "table",
             _TableWithXYPositions(),
@@ -199,6 +215,9 @@ class PointPositionTableWidget(
         )
         self._widgets["table"].sig_new_selection.connect(self.sig_new_selection)
         self._widgets["table"].sig_remove_points.connect(self.sig_remove_points)
+        self._widgets["two_click_selection"].stateChanged.connect(
+            self._toggle_2click_selection
+        )
 
     def add_point_to_table(self, xpos: float, ypos: float):
         """
@@ -236,3 +255,19 @@ class PointPositionTableWidget(
         self._widgets["table"].horizontalHeader().resizeSection(
             0, int(0.91 * (_new_width - self._qtapp.scrollbar_width))
         )
+
+    @QtCore.Slot(int)
+    def _toggle_2click_selection(self, state: QtCore.Qt.CheckState):
+        """
+        Toggle the two-click selection option.
+
+        Parameters
+        ----------
+        state : QtCore.Qt.CheckState
+            The checkbox's state.
+        """
+        if QT_VERSION.startswith("6"):
+            _usage = state == QtCore.Qt.Checked.value
+        else:
+            _usage = state == QtCore.Qt.Checked
+        self.sig_2click_usage.emit(_usage)

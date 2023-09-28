@@ -77,10 +77,15 @@ class ManuallySetBeamcenterController(QtCore.QObject):
         self._points = []
         self._master = master
         self._plot = plot
-        self._point_table = point_table
+        self._points_for_bc = point_table
         self._plot.sigPlotSignal.connect(self._process_plot_signal)
-        self._point_table.sig_new_selection.connect(self.__new_points_selected)
-        self._point_table.sig_remove_points.connect(self.__remove_points_from_plot)
+        self._points_for_bc.sig_new_selection.connect(self.__new_points_selected)
+        self._points_for_bc.sig_remove_points.connect(self.__remove_points_from_plot)
+        self._points_for_bc.param_widgets["overlay_color"].io_edited.connect(
+            self.set_marker_color
+        )
+        self._points_for_bc.sig_2click_usage.connect(self.toggle_2click_selection)
+
         self._master.param_widgets["beamcenter_x"].io_edited.connect(
             self.manual_beamcenter_update
         )
@@ -248,7 +253,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             The new activation state.
         """
         self._config["selection_active"] = active
-        self._point_table.setVisible(active)
+        self._points_for_bc.setVisible(active)
 
     @QtCore.Slot(bool)
     def toggle_2click_selection(self, use_2_clicks: bool):
@@ -318,7 +323,7 @@ class ManuallySetBeamcenterController(QtCore.QObject):
             _x, _y, legend=f"marker_{_x}_{_y}", color=_color, symbol="x"
         )
         self._points.append((_x, _y))
-        self._point_table.add_point_to_table(_x, _y)
+        self._points_for_bc.add_point_to_table(_x, _y)
 
     @QtCore.Slot()
     def set_beamcenter_from_point(self):

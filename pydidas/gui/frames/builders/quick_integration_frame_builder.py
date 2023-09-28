@@ -33,7 +33,7 @@ from qtpy import QtWidgets
 from ....core import constants
 from ....widgets import ScrollArea
 from ....widgets.misc import (
-    PointPositionTableWidget,
+    PointsForBeamcenterWidget,
     SelectImageFrameWidget,
     ShowIntegrationRoiParamsWidget,
 )
@@ -126,36 +126,12 @@ class QuickIntegrationFrameBuilder:
             parent_widget="tab_plot",
             sizePolicy=constants.POLICY_EXP_EXP,
         )
-        cls._frame.create_empty_widget(
-            "input_plot_bc_selection",
-            gridPos=(0, 0, 1, 1),
-            font_metric_width_factor=constants.FONT_METRIC_WIDE_BUTTON_WIDTH,
-            parent_widget="tab_plot",
-            visible=False,
-        )
-        cls._frame.create_check_box(
-            "two_click_selection",
-            "Use 2-click point selection",
-            checked=True,
-            gridPos=(0, 0, 1, 1),
-            parent_widget="input_plot_bc_selection",
-            toolTip=(
-                "The 2-click point selection requires two clicks in the image to "
-                "select a new point: The first click zooms in on the selected point "
-                "while the second click confirms the (finer) selection."
-            ),
-        )
-        cls._frame.create_param_widget(
-            cls._frame.get_param("overlay_color"),
-            gridPos=(-1, 0, 1, 1),
-            linebreak=True,
-            parent_widget="input_plot_bc_selection",
-        )
         cls._frame.add_any_widget(
             "input_beamcenter_points",
-            PointPositionTableWidget(cls._frame._widgets["input_plot"]),
-            gridPos=(-1, 0, 1, 1),
-            parent_widget="input_plot_bc_selection",
+            PointsForBeamcenterWidget(cls._frame._widgets["input_plot"]),
+            gridPos=(0, 0, 1, 1),
+            parent_widget="tab_plot",
+            visible=False,
         )
         cls._frame.create_any_widget(
             "result_plot",
@@ -364,7 +340,6 @@ class QuickIntegrationFrameBuilder:
             "Integration ROI display color",
             **cls._label_header("integration_section", 0),
         )
-
         cls._frame.add_any_widget(
             "roi_selector",
             ShowIntegrationRoiParamsWidget(

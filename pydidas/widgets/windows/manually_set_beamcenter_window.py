@@ -35,15 +35,12 @@ from qtpy import QtCore, QtWidgets
 
 from ...contexts import DiffractionExperimentContext
 from ...core import Dataset, get_generic_param_collection
-from ...core.constants import (
-    FONT_METRIC_PARAM_EDIT_WIDTH,
-    FONT_METRIC_WIDE_BUTTON_WIDTH,
-)
+from ...core.constants import FONT_METRIC_PARAM_EDIT_WIDTH
 from ...data_io import import_data
 from ..controllers import ManuallySetBeamcenterController
 from ..dialogues import QuestionBox
 from ..framework import PydidasWindow
-from ..misc import PointPositionTableWidget, SelectImageFrameWidget
+from ..misc import PointsForBeamcenterWidget, SelectImageFrameWidget
 from ..silx_plot import PydidasPlot2D
 
 
@@ -111,16 +108,10 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             minimumHeight=700,
             minimumWidth=700,
         )
-        self.create_param_widget(
-            self.get_param("overlay_color"),
-            font_metric_width_factor=FONT_METRIC_WIDE_BUTTON_WIDTH,
-            gridPos=(1, 2, 1, 1),
-            linebreak=True,
-        )
         self.add_any_widget(
             "point_table",
-            PointPositionTableWidget(self._widgets["plot"]),
-            gridPos=(2, 2, 1, 1),
+            PointsForBeamcenterWidget(self._widgets["plot"]),
+            gridPos=(1, 2, 2, 1),
         )
         self.create_line(None, parent_widget="left_container")
         self.create_label(
@@ -198,9 +189,6 @@ class ManuallySetBeamcenterWindow(PydidasWindow):
             self._bc_controller.fit_beamcenter_with_ellipse
         )
         self._widgets["but_confirm_selection"].clicked.connect(self._confirm_points)
-        self.param_widgets["overlay_color"].io_edited.connect(
-            self._bc_controller.set_marker_color
-        )
 
     def finalize_ui(self):
         """

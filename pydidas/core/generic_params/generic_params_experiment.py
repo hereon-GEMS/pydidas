@@ -219,4 +219,13 @@ GENERIC_PARAMS_EXPERIMENT = {
         "allow_None": False,
         "tooltip": "The detector tilt plane orientation (relative to positive x-axis).",
     },
+    "detector_dist_fit2d": {
+        "type": float,
+        "default": 1,
+        "name": "Sample-detector distance",
+        "choices": None,
+        "unit": "mm",
+        "allow_None": False,
+        "tooltip": "The sample-detector distance.",
+    },
 }

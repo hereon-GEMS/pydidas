@@ -40,7 +40,7 @@ from ...core import get_generic_param_collection
 from ...widgets import PydidasFileDialog
 from ...widgets.dialogues import critical_warning
 from ...widgets.framework import BaseFrame
-from ...widgets.windows import ManuallySetBeamcenterWindow
+from ...widgets.windows import ConvertFit2dGeometryWindow, ManuallySetBeamcenterWindow
 from .builders import DefineDiffractionExpFrameBuilder
 
 
@@ -89,6 +89,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             qsettings_ref="DefineDiffractionExpFrame__export",
         )
         self._select_beamcenter_window = None
+        self._fit2d_window = None
 
     def build_frame(self):
         """
@@ -106,6 +107,8 @@ class DefineDiffractionExpFrame(BaseFrame):
         self._widgets["but_select_beamcenter_manually"].clicked.connect(
             self.select_beamcenter_manually
         )
+        self._widgets["but_convert_fit2d"].clicked.connect(self.convert_from_fit2d)
+
         self._widgets["but_save_to_file"].clicked.connect(self.export_to_file)
         for _param_key in self.params.keys():
             param = self.get_param(_param_key)
@@ -282,7 +285,7 @@ class DefineDiffractionExpFrame(BaseFrame):
                 self._beamcenter_selected
             )
             self._select_beamcenter_window.sig_about_to_close.connect(
-                self._beamcenter_window_closed
+                self._child_window_closed
             )
         self._select_beamcenter_window.show()
         self.setEnabled(False)
@@ -308,7 +311,7 @@ class DefineDiffractionExpFrame(BaseFrame):
             self.set_param_value_and_widget(f"detector_rot{_index}", 0)
 
     @QtCore.Slot()
-    def _beamcenter_window_closed(self):
+    def _child_window_closed(self):
         """
         Handle the signal that the beamcenter window is to be closed.
         """
@@ -347,7 +350,7 @@ class DefineDiffractionExpFrame(BaseFrame):
         if _fname is not None:
             EXP.export_to_file(_fname, overwrite=True)
 
-    def frame_activated(self, index):
+    def frame_activated(self, index: int):
         """
         Add a check whether the DiffractionExperimentContext has changed from some
         other source (e.g. pyFAI calibration) and update widgets accordingly.
@@ -365,3 +368,52 @@ class DefineDiffractionExpFrame(BaseFrame):
                 self._config["exp_hash"] = hash(self.params)
         else:
             self._config["exp_hash"] = hash(self.params)
+
+    @QtCore.Slot()
+    def convert_from_fit2d(self):
+        """
+        Convert a Fit2d geometry to pyFAI's PONI geometry.
+        """
+        if self._fit2d_window is None:
+            self._fit2d_window = ConvertFit2dGeometryWindow()
+            self._fit2d_window.sig_about_to_close.connect(self._child_window_closed)
+            self._fit2d_window.sig_new_geometry.connect(
+                self._process_new_geometry_from_fit2
+            )
+        self._fit2d_window.show()
+        self.setEnabled(False)
+
+    @QtCore.Slot(float, float, float, float, float, float)
+    def _process_new_geometry_from_fit2(
+        self,
+        det_dist: float,
+        poni1: float,
+        poni2: float,
+        rot1: float,
+        rot2: float,
+        rot3: float,
+    ):
+        """
+        Process the new parameters in the pyFAI geometry from the Fit2d geometry.
+
+        Parameters
+        ----------
+        det_dist : float
+            The new detector distance.
+        poni1 : float
+            The new PONI1 value.
+        poni2 : float
+            The new PONI2 value.
+        rot1 : float
+            The new detector rotation #1.
+        rot2 : float
+            The new detector rotation #2.
+        rot3 : float
+            The new detector rotation #3.
+        """
+        self.set_param_value_and_widget("detector_dist", det_dist)
+        self.set_param_value_and_widget("detector_poni1", poni1)
+        self.set_param_value_and_widget("detector_poni2", poni2)
+        self.set_param_value_and_widget("detector_rot1", rot1)
+        self.set_param_value_and_widget("detector_rot2", rot2)
+        self.set_param_value_and_widget("detector_rot3", rot3)

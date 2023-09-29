@@ -25,6 +25,7 @@ Improvements
       using pydidas with any system font.
     - Added an option to select points for the beamcenter with a 2-click
       method to select the peak centers more easily.
+    - Added option to import Fit2d geometry for the DiffractionExperiment
     
     
 - Programmatic updates:

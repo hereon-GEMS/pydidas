@@ -29,6 +29,7 @@ __all__ = []
 
 # import __all__ items from modules:
 from .about_window import *
+from .convert_fit2d_geometry import *
 from .export_eiger_pixelmask import *
 from .feedback_window import *
 from .image_series_operations_window import *
@@ -49,6 +50,11 @@ from . import about_window
 
 __all__.extend(about_window.__all__)
 del about_window
+
+from . import convert_fit2d_geometry
+
+__all__.extend(convert_fit2d_geometry.__all__)
+del convert_fit2d_geometry
 
 from . import export_eiger_pixelmask
 

@@ -140,7 +140,7 @@ class Gaussian(FitFuncBase):
         float
             The function FWHM.
         """
-        return 2.354820 * c[1]
+        return 2.3548200450 * c[1]
 
     @staticmethod
     def amplitude(c: Tuple[float]) -> float:

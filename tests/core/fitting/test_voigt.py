@@ -27,28 +27,29 @@ __status__ = "Production"
 import unittest
 
 import numpy as np
+from scipy.special import voigt_profile
 
 from pydidas.core import Dataset
-from pydidas.core.fitting.gaussian import Gaussian
+from pydidas.core.fitting.voigt import Voigt
 
 
-class TestGaussian(unittest.TestCase):
+class TestVoigt(unittest.TestCase):
     def setUp(self):
         self._x = np.linspace(0, 10, num=2000)
-        self._sigma = 1.42
+        self._gamma = 0.85
+        self._sigma = 0.35
         self._x0 = self._x[987]
         self._amplitude = 7.3
         self._data = Dataset(
             (
                 self._amplitude
-                / (self._sigma * np.sqrt(2 * np.pi))
-                * np.exp(-((self._x - self._x0) ** 2) / (2 * self._sigma**2))
+                * voigt_profile(self._x - self._x0, self._sigma, self._gamma)
             ),
             data_unit="data unit",
             axis_units=["ax_unit"],
             axis_ranges=[self._x],
         )
-        self._params = [self._amplitude, self._sigma, self._x0]
+        self._params = [self._amplitude, self._sigma, self._gamma, self._x0]
 
     def tearDown(self):
         pass
@@ -57,30 +58,30 @@ class TestGaussian(unittest.TestCase):
         _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, _data)
+        _params = Voigt.guess_fit_start_params(self._x, _data)
         self.assertTrue(_params[1] > 0)
 
     def test_guess_peak_start_params__normal_peak(self):
         _data = Dataset(np.ones((150)), data_unit="data unit", axis_units=["ax_unit"])
         _data[39:42] = 2
         _data[40] = 5
-        _params = Gaussian.guess_fit_start_params(self._x, self._data)
+        _params = Voigt.guess_fit_start_params(self._x, self._data)
         self.assertTrue(_params[1] > 0)
 
     def test_func__values(self):
-        _func_values = Gaussian.func(self._params, self._x)
+        _func_values = Voigt.func(self._params, self._x)
         self.assertTrue(np.allclose(self._data, _func_values))
 
     def test_amplitude(self):
-        _amp = Gaussian.amplitude(self._params)
-        self.assertAlmostEqual(np.amax(self._data), _amp)
+        _amp = Voigt.amplitude(self._params)
+        self.assertAlmostEqual(np.amax(self._data), _amp, places=4)
 
     def test_fwhm(self):
         _y_max = np.amax(self._data)
         _indices = np.where(self._data >= 0.5 * _y_max)[0]
         _fwhm = self._x[_indices[-1]] - self._x[_indices[0]]
         self.assertTrue(
-            abs(_fwhm - Gaussian.fwhm(self._params)) <= 2 * (self._x[1] - self._x[0])
+            abs(_fwhm - Voigt.fwhm(self._params)) <= 2 * (self._x[1] - self._x[0])
         )
 
 

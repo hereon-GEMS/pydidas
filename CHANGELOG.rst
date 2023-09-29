@@ -63,7 +63,7 @@ Bugfixes
   to the original parent.
 - Fixed an issue in the DirectorySpyApp with changes in the exceptions raised
   from tifffile if a tiff file could not be read.
-
+- Fixed a bug in the FWHM calculation of the scipy Voigt profile.
 
 
 v23.07.05

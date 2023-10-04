@@ -64,7 +64,7 @@ class PluginCollectionBrowser(CreateWidgetsMixIn, EmptyWidget):
     sig_append_to_specific_node = QtCore.Signal(int, str)
     sig_replace_plugin = QtCore.Signal(str)
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         EmptyWidget.__init__(self, **kwargs)
         CreateWidgetsMixIn.__init__(self)
         _local_plugin_coll = kwargs.get("collection", None)

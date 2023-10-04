@@ -53,7 +53,7 @@ class _WorkflowTree(GenericTree):
     accessed.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict):
         super().__init__(**kwargs)
         self._preexecuted = False
         PLUGINS.sig_updated_plugins.connect(self.clear)

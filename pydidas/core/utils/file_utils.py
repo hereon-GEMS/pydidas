@@ -66,7 +66,7 @@ def trim_filename(path: Path) -> Path:
     return path.parent if path.is_file() else path
 
 
-def get_extension(path: Path) -> str:
+def get_extension(path: Union[Path, str]) -> str:
     """
     Get the extension to a file in the given path.
 
@@ -80,8 +80,10 @@ def get_extension(path: Path) -> str:
     str
         The extracted file extension.
     """
-    _ext = os.path.splitext(path)[1]
-    if _ext != "":
+    if isinstance(path, str):
+        path = Path(path)
+    _ext = path.suffix
+    if _ext.startswith("."):
         _ext = _ext[1:]
     return _ext
 

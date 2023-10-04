@@ -78,7 +78,7 @@ class ScrollArea(QScrollArea):
         """
         if self.widget() is not None:
             _hint = self.widget().sizeHint()
-            return QSize(_hint.width() + self.__scrollbar_width + 2, _hint.height())
+            return QSize(_hint.width() + self.__scrollbar_width + 5, _hint.height())
         return super().sizeHint()
 
     @Slot()
